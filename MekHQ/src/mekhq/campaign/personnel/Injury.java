@@ -98,6 +98,10 @@ public class Injury {
 		return id;
 	}
 	
+	public void setUUID(UUID uuid) {
+		id = uuid;
+	}
+	
 	public String getUUIDAsString() {
 		return id.toString();
 	}

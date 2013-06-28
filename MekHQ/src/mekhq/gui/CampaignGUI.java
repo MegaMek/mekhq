@@ -182,6 +182,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.BaArmor;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekGyro;
@@ -189,6 +190,7 @@ import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.ProtomekArmor;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -4404,7 +4406,7 @@ public class CampaignGUI extends JPanel {
                 if(nGroup == SG_ALL) {
                     return true;
                 } else if(nGroup == SG_ARMOR) {
-                    return part instanceof Armor;
+                    return (part instanceof Armor || part instanceof ProtomekArmor || part instanceof BaArmor);
                 } else if(nGroup == SG_SYSTEM) {
                     return part instanceof MekGyro
                         || part instanceof EnginePart

@@ -27,6 +27,7 @@ import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.util.ResourceBundle;
+import java.util.UUID;
 
 import javax.swing.BorderFactory;
 
@@ -293,6 +294,7 @@ public class EditInjuryEntryDialog extends javax.swing.JDialog {
     	} else {
     		injury.setExtended(false);
     	}
+    	injury.setUUID(UUID.randomUUID());
     	this.setVisible(false);
     }
 

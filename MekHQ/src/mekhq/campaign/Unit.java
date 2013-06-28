@@ -528,6 +528,13 @@ public class Unit implements MekHqXmlSerializable {
                     armorFound = true;
                 }
             }
+			if(!armorFound && part instanceof BaArmor) {
+			    BaArmor a = (BaArmor)part;
+                if(a.needsFixing() && !a.isEnoughSpareArmorAvailable()) {
+                    missingParts.add(a);
+                    armorFound = true;
+                }
+            }
 			if(part instanceof AmmoBin && !((AmmoBin)part).isEnoughSpareAmmoAvailable()) {
 				missingParts.add((AmmoBin)part);
 			}
@@ -546,6 +553,12 @@ public class Unit implements MekHqXmlSerializable {
 			}
 			else if(part instanceof Armor) {
 				value += ((Armor)part).getValueNeeded();
+			}
+			else if(part instanceof ProtomekArmor) {
+				value += ((ProtomekArmor)part).getValueNeeded();
+			}
+			else if(part instanceof BaArmor) {
+				value += ((BaArmor)part).getValueNeeded();
 			}
 			else if(part instanceof AmmoBin) {
 				value += ((AmmoBin)part).getValueNeeded();

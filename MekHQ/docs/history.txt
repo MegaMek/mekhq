@@ -45,6 +45,7 @@ Also allow folders that just end in Male or Female (ie ralgith_Female)
 + Bug: All personnel were showing 'Returned from combat with the following injuries', even when uninjured.
 + Bug: Concurrent Modification Error with injuries on advance day
 + Bug: Windows version won't work when using "Start Game" from inside MekHQ
++ Bug: ProtoMech and Battle Armor "Armor" fixes for missing "instance of ..." in a lot of places.
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement

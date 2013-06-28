@@ -78,12 +78,12 @@ public class BaArmor extends Part implements IAcquisitionWork {
             if(isClan) {
                 return 35;
             }
-            return 60;  
+            return 60;
         case T_STEALTH_BASIC:
             if(isClan) {
                 return 30;
             }
-            return 55;  
+            return 55;
         case T_STEALTH_IMP:
             if(isClan) {
                 return 35;
@@ -265,7 +265,7 @@ public class BaArmor extends Part implements IAcquisitionWork {
             int amountAvailable = getAmountAvailable();
             if(!isSalvaging()) {
                 String[] inventories = campaign.getPartInventory(getNewPart());
-                if(amountAvailable == 0) {              
+                if(amountAvailable == 0) {
                     availability = "<br><font color='red'>No armor ("+ inventories[1] + " in transit, " + inventories[2] + " on order)</font>";
                 } else if(amountAvailable < amountNeeded) {
                     availability = "<br><font color='red'>Only " + amountAvailable + " available ("+ inventories[1] + " in transit, " + inventories[2] + " on order)</font>";
