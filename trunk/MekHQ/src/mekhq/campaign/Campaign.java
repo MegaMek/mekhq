@@ -3287,7 +3287,9 @@ public class Campaign implements Serializable {
 		birthdate.set(Calendar.DAY_OF_YEAR, randomDay);
 		person.setBirthday(birthdate);
 		person.setPrimaryRole(type);
-		person.setXp(Utilities.generateRandomExp());
+		if (getCampaignOptions().useDylansRandomXp()) {
+			person.setXp(Utilities.generateRandomExp());
+		}
 		int bonus = 0;
 		//set default skills
 		switch(type) {

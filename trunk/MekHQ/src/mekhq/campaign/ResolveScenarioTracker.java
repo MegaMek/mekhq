@@ -257,7 +257,7 @@ public class ResolveScenarioTracker {
         			potentialSalvage.add(e);
         		}
         	}
-        }       
+        }
         checkStatusOfPersonnel();
 	}
 

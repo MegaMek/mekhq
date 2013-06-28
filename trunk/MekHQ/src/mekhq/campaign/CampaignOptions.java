@@ -74,7 +74,8 @@ public class CampaignOptions implements Serializable {
     private boolean useAbilities;
     private boolean useEdge;
     private boolean useImplants;
-    private boolean useAdvancedMedical;
+    private boolean useAdvancedMedical; // Unofficial
+    private boolean useDylansRandomXp; // Unofficial
     
     //unit related
     private boolean useQuirks;
@@ -153,6 +154,7 @@ public class CampaignOptions implements Serializable {
         useEdge = false;
         useImplants = false;
         useAdvancedMedical = false;
+        useDylansRandomXp = false;
         useQuirks = false;
         payForParts = false;
         payForUnits = false;
@@ -376,6 +378,16 @@ public class CampaignOptions implements Serializable {
     public void setAdvancedMedical(boolean b) {
     	this.useAdvancedMedical = b;
     }
+    
+    public boolean useDylansRandomXp() {
+    	return useDylansRandomXp;
+    }
+   
+    public void setDylansRandomXp(boolean b) {
+    	this.useDylansRandomXp = b;
+    }
+    
+    
     
     public boolean payForParts() {
     	return payForParts;
@@ -745,6 +757,7 @@ public class CampaignOptions implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useEdge", useEdge);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useImplants", useImplants);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useAdvancedMedical", useAdvancedMedical);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useDylansRandomXp", useDylansRandomXp);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useQuirks", useQuirks);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForParts", payForParts);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForUnits", payForUnits);
@@ -871,6 +884,11 @@ public class CampaignOptions implements Serializable {
 					retVal.useAdvancedMedical = true;
 				else
 					retVal.useAdvancedMedical = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("useDylansRandomXp")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.useDylansRandomXp = true;
+				else
+					retVal.useDylansRandomXp = false;
 			} else if (wn2.getNodeName().equalsIgnoreCase("useQuirks")) {
 				if (wn2.getTextContent().equalsIgnoreCase("true"))
 					retVal.useQuirks = true;
