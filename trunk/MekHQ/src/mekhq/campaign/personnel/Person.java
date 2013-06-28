@@ -2083,7 +2083,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		if (getStatus() == S_KIA || getStatus() == S_MIA) {
 			return;
 		}
-		System.out.println("\n\nDEBUG: Diagnosis for: "+getFullTitle());
 		resolveSpecialDamage(hits, c);
 		Entity en = null;
 		Unit u = c.getUnit(getUnitId());
