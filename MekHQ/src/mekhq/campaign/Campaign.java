@@ -1071,14 +1071,12 @@ public class Campaign implements Serializable {
 					u.resetPilotAndEntity();
 				}
 			}
-			if (injury.getTime() > 0) {
-				medWork.AMheal();
-			}
 		}
 		if(xpGained > 0) {
 			doctor.setXp(doctor.getXp() + xpGained);
 			report += " (" + xpGained + "XP gained) ";
 		}
+		medWork.AMheal();
 		return report;
 	}
 	
