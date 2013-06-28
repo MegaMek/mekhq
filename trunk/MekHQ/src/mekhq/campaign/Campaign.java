@@ -707,7 +707,7 @@ public class Campaign implements Serializable {
 		parts.add(p);
 		partIds.put(new Integer(id), p);
 		lastPartId = id;
-		if(p instanceof Armor) {
+		if(p instanceof Armor || p instanceof ProtomekArmor || p instanceof BaArmor) {
 			updateAllArmorForNewSpares();
 		}
 	}
@@ -739,14 +739,20 @@ public class Campaign implements Serializable {
     	    }
     	    if(p instanceof ProtomekArmor) {
                 if(spare instanceof ProtomekArmor) {
-                    ((ProtomekArmor)spare).setAmount(((ProtomekArmor)spare).getAmount() + ((ProtomekArmor)p).getAmount());
+                	while(quantity > 0) {
+        	            ((ProtomekArmor)spare).setAmount(((ProtomekArmor)spare).getAmount() + ((ProtomekArmor)p).getAmount());
+	    	            quantity--;
+	    	        }
                     updateAllArmorForNewSpares();
                     return;
                 }
             }
     	    if(p instanceof BaArmor) {
                 if(spare instanceof BaArmor) {
-                    ((BaArmor)spare).setAmount(((BaArmor)spare).getAmount() + ((BaArmor)p).getAmount());
+                	while(quantity > 0) {
+        	            ((BaArmor)spare).setAmount(((BaArmor)spare).getAmount() + ((BaArmor)p).getAmount());
+	    	            quantity--;
+	    	        }
                     updateAllArmorForNewSpares();
                     return;
                 }
@@ -768,7 +774,7 @@ public class Campaign implements Serializable {
     	        removePart(p);
     	    }
         }
-        else if(p instanceof Armor) {
+        else if(p instanceof Armor || p instanceof ProtomekArmor || p instanceof BaArmor) {
             updateAllArmorForNewSpares();
         }
 	}
@@ -1239,6 +1245,20 @@ public class Campaign implements Serializable {
         if ((partWork instanceof Armor) && !partWork.isSalvaging()) {
             if (!((Armor)partWork).isInSupply()) {
                 report += "<b>Not enough armor remaining.  Task suspended.</b>";
+                addReport(report);
+                return;
+            }
+        }
+        if ((partWork instanceof ProtomekArmor) && !partWork.isSalvaging()) {
+            if (!((ProtomekArmor)partWork).isInSupply()) {
+                report += "<b>Not enough Protomech armor remaining.  Task suspended.</b>";
+                addReport(report);
+                return;
+            }
+        }
+        if ((partWork instanceof BaArmor) && !partWork.isSalvaging()) {
+            if (!((BaArmor)partWork).isInSupply()) {
+                report += "<b>Not enough BA armor remaining.  Task suspended.</b>";
                 addReport(report);
                 return;
             }
@@ -4687,6 +4707,10 @@ public class Campaign implements Serializable {
                 if(p.isPresent()) {
                     if(p instanceof Armor) {
                         nSupply += ((Armor)p).getAmount();
+                    } else if(p instanceof ProtomekArmor) {
+                    	nSupply += ((ProtomekArmor)p).getAmount();
+                    } else if(p instanceof BaArmor) {
+                    	nSupply += ((BaArmor)p).getAmount();
                     } else if(p instanceof AmmoStorage) {
                         nSupply += ((AmmoStorage)p).getShots();
                     } else {
@@ -4695,6 +4719,10 @@ public class Campaign implements Serializable {
                 } else {
                     if(p instanceof Armor) {
                         nTransit += ((Armor)p).getAmount();
+                    } else if(p instanceof ProtomekArmor) {
+                    	nTransit += ((ProtomekArmor)p).getAmount();
+                    } else if(p instanceof BaArmor) {
+                    	nTransit += ((BaArmor)p).getAmount();
                     } else if(p instanceof AmmoStorage) {
                         nTransit += ((AmmoStorage)p).getShots();
                     } else {
@@ -4709,6 +4737,10 @@ public class Campaign implements Serializable {
         if(null != onOrder) {
             if(onOrder instanceof Armor) {
                 nOrdered += ((Armor)onOrder).getAmount();
+            } else if(onOrder instanceof ProtomekArmor) {
+            	nOrdered += ((ProtomekArmor)onOrder).getAmount();
+            } else if(onOrder instanceof BaArmor) {
+            	nOrdered += ((BaArmor)onOrder).getAmount();
             } else if(onOrder instanceof AmmoStorage) {
                 nOrdered += ((AmmoStorage)onOrder).getShots();
             } else {
@@ -4720,7 +4752,7 @@ public class Campaign implements Serializable {
         String strTransit = Integer.toString(nTransit);
         String strOrdered = Integer.toString(nOrdered);
 
-        if(part instanceof Armor) {
+        if(part instanceof Armor || part instanceof ProtomekArmor || part instanceof BaArmor) {
             strSupply += " points";
             strTransit += " points";
             strOrdered += " points";

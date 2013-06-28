@@ -184,7 +184,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		Hashtable<String,Integer> tally = new Hashtable<String,Integer>();
 	    Hashtable<String,String> desc = new Hashtable<String,String>();
 		for(Part p : shoppingList) {
-		    if(p instanceof Armor) {
+		    if(p instanceof Armor || p instanceof ProtomekArmor || p instanceof BaArmor) {
 		        continue;
 		    }
 			if(null != tally.get(p.getName())) {
@@ -267,6 +267,16 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 									|| ((Armor)oPart).getTotalAmount() != ((Armor)part).getTotalAmount())) {
 						continue;
 					}				
+					if(oPart instanceof ProtomekArmor 
+							&& (((ProtomekArmor)oPart).getLocation() != ((ProtomekArmor)part).getLocation()
+									|| ((ProtomekArmor)oPart).getTotalAmount() != ((ProtomekArmor)part).getTotalAmount())) {
+						continue;
+					}				
+					if(oPart instanceof BaArmor 
+							&& (((BaArmor)oPart).getLocation() != ((BaArmor)part).getLocation()
+									|| ((BaArmor)oPart).getTotalAmount() != ((BaArmor)part).getTotalAmount())) {
+						continue;
+					}				
 					if(part instanceof EquipmentPart) {
 						//check the location to see if this moved. If so, then don't break, but 
 						//save this in case we fail to find equipment in the same location.
@@ -307,7 +317,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				//its a new part
 				//dont actually add the part iself but rather its missing equivalent
 				//except in the case of armor
-				if(part instanceof Armor || part instanceof AmmoBin) {
+				if(part instanceof Armor || part instanceof ProtomekArmor || part instanceof BaArmor || part instanceof AmmoBin) {
 					newPartList.add(part);
 				} else {
 					Part mPart = part.getMissingPart();
@@ -366,6 +376,24 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				//armor always gets added to the shopping list - it will be checked for differently
 				shoppingList.add(nPart);
 			}
+			else if(nPart instanceof ProtomekArmor) {
+				int totalAmount = ((ProtomekArmor)nPart).getTotalAmount();
+				time += totalAmount * ((ProtomekArmor)nPart).getBaseTimeFor(newEntity);
+				armorNeeded += totalAmount;
+				atype = 0; //((ProtomekArmor)nPart).getType();
+				aclan = ((ProtomekArmor)nPart).isClanTechBase();
+				//armor always gets added to the shopping list - it will be checked for differently
+				shoppingList.add(nPart);
+			}
+			else if(nPart instanceof BaArmor) {
+				int totalAmount = ((BaArmor)nPart).getTotalAmount();
+				time += totalAmount * ((BaArmor)nPart).getBaseTimeFor(newEntity);
+				armorNeeded += totalAmount;
+				atype = ((BaArmor)nPart).getType();
+				aclan = ((BaArmor)nPart).isClanTechBase();
+				//armor always gets added to the shopping list - it will be checked for differently
+				shoppingList.add(nPart);
+			}
 			else if(nPart instanceof AmmoBin) {
 				EquipmentType type = ((AmmoBin)nPart).getType();
 				if(null == ammoNeeded.get(type)) {
@@ -396,7 +424,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				} else {
 					updateRefitClass(CLASS_F);
 				}
-			} else if(nPart instanceof Armor) {
+			} else if(nPart instanceof Armor || nPart instanceof ProtomekArmor || nPart instanceof BaArmor) {
 				updateRefitClass(CLASS_C);
 				locationHasNewStuff[((Armor)nPart).getLocation()] = true;
 			} else if(nPart instanceof MissingMekCockpit) {
@@ -501,6 +529,14 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			}
 			if(oPart instanceof Armor && sameArmorType) {
 				recycledArmorPoints += ((Armor)oPart).getAmount();
+				continue;
+			}
+			if(oPart instanceof ProtomekArmor && sameArmorType) {
+				recycledArmorPoints += ((ProtomekArmor)oPart).getAmount();
+				continue;
+			}
+			if(oPart instanceof BaArmor && sameArmorType) {
+				recycledArmorPoints += ((BaArmor)oPart).getAmount();
 				continue;
 			}
 			boolean isSalvaging = oPart.isSalvaging();
@@ -616,7 +652,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		    //add the stuff on the shopping list to the master shopping list
 		    ArrayList<Part> newShoppingList = new ArrayList<Part>();
     		for(Part part : shoppingList) {
-    		    if(part instanceof Armor) {
+    			if(part instanceof Armor || part instanceof ProtomekArmor || part instanceof BaArmor) {
                     //automatically add armor by location, we will check for the lump sum of
                     //armor using newArmorSupplies
                     oldUnit.campaign.addPart(part, 0);
@@ -796,7 +832,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		for(int pid : newUnitParts) {
 			Part part = oldUnit.campaign.getPart(pid);
 			part.setRefitId(null);
-			if(part instanceof Armor) {
+			if(part instanceof Armor || part instanceof ProtomekArmor || part instanceof BaArmor) {
 				oldUnit.campaign.removePart(part);
 			}
 			else if(part instanceof AmmoBin) {
@@ -847,6 +883,26 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			}
 			else if(part instanceof Armor) {
 				Armor a = (Armor)part;
+				if(!sameArmorType) {
+					a.changeAmountAvailable(a.getAmount());
+				} else {
+					atype = a.getType();
+					aclan = a.isClanTechBase();
+				}
+				oldUnit.campaign.removePart(part);
+			}
+			else if(part instanceof ProtomekArmor) {
+				ProtomekArmor a = (ProtomekArmor)part;
+				if(!sameArmorType) {
+					a.changeAmountAvailable(a.getAmount());
+				} else {
+					atype = 0; //a.getType();
+					aclan = a.isClanTechBase();
+				}
+				oldUnit.campaign.removePart(part);
+			}
+			else if(part instanceof BaArmor) {
+				BaArmor a = (BaArmor)part;
 				if(!sameArmorType) {
 					a.changeAmountAvailable(a.getAmount());
 				} else {
@@ -1430,7 +1486,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	    //TODO: check somewhere before this if they can afford it
         ArrayList<Part> newShoppingList = new ArrayList<Part>();
 		for(Part part : shoppingList) {
-			if(part instanceof Armor) {
+			if(part instanceof Armor || part instanceof ProtomekArmor || part instanceof BaArmor) {
 				oldUnit.campaign.addPart(part, transitDays);
 				part.setUnit(oldUnit);
 				part.setRefitId(oldUnit.getId());
