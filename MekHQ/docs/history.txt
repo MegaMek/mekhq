@@ -42,6 +42,7 @@ Also allow folders that just end in Male or Female (ie ralgith_Female)
 + Update the MegaMek.app plist to grab the new libs for MegaMek's XML saves
 + Add MekHQ icon in png format to data/images/misc folder for usage by UNIX/Linux dist.
 + Dylan's Random Xp now uses unofficial campaign option.
++ Bug: All personnel were showing 'Returned from combat with the following injuries', even when uninjured.
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement

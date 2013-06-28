@@ -2128,7 +2128,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		for(Injury ni : new_injuries) {
 			ni_report += "\n\t\t"+ni.getFluff();
 		}
-		addLogEntry(c.getDate(), "Returned from combat with the following new injuries:"+ni_report);
+		if (new_injuries.size() > 0) {
+			addLogEntry(c.getDate(), "Returned from combat with the following new injuries:"+ni_report);
+		}
 		injuries.addAll(new_injuries);
 		//removeDuplicateInjuries();
 		setHits(0);
@@ -2452,7 +2454,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	}
 	
 	public boolean hasInjury(int loc, int type) {
-		System.out.println("hasInjury called with type: "+type+" and location: "+loc);
 		if (getInjuryByLocationAndType(loc, type) != null)
 			return true;
 		else
