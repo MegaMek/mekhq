@@ -146,6 +146,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private javax.swing.JCheckBox useEdgeBox;
     private javax.swing.JCheckBox useImplantsBox;
     private javax.swing.JCheckBox useAdvancedMedicalBox;
+    private javax.swing.JCheckBox useDylansRandomXpBox;
     private javax.swing.JCheckBox payForPartsBox;
     private javax.swing.JCheckBox payForUnitsBox;
     private javax.swing.JCheckBox payForSalariesBox;
@@ -284,6 +285,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useEdgeBox.setSelected(options.useEdge());
         useImplantsBox.setSelected(options.useImplants());
         useAdvancedMedicalBox.setSelected(options.useAdvancedMedical());
+        useDylansRandomXpBox.setSelected(options.useDylansRandomXp());
         payForPartsBox.setSelected(options.payForParts());
         payForUnitsBox.setSelected(options.payForUnits());
         payForSalariesBox.setSelected(options.payForSalaries());
@@ -363,6 +365,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useEdgeBox = new javax.swing.JCheckBox();
         useImplantsBox = new javax.swing.JCheckBox();
         useAdvancedMedicalBox = new javax.swing.JCheckBox();
+        useDylansRandomXpBox = new javax.swing.JCheckBox();
         payForPartsBox = new javax.swing.JCheckBox();
         payForUnitsBox = new javax.swing.JCheckBox();
         payForSalariesBox = new javax.swing.JCheckBox();
@@ -899,8 +902,19 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panPersonnel.add(useAdvancedMedicalBox, gridBagConstraints);
         
+        useDylansRandomXpBox.setText(resourceMap.getString("useDylansRandomXpBox.text")); // NOI18N
+        useDylansRandomXpBox.setToolTipText(resourceMap.getString("useDylansRandomXpBox.toolTipText")); // NOI18N
+        useDylansRandomXpBox.setName("useDylansRandomXpBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panPersonnel.add(useDylansRandomXpBox, gridBagConstraints);
+        
         tabOptions.addTab(resourceMap.getString("panPersonnel.TabConstraints.tabTitle"), panPersonnel); // NOI18N
-
+        
         panFinances.setName("panFinances"); // NOI18N
         panFinances.setLayout(new java.awt.GridBagLayout());
         
@@ -2222,6 +2236,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    	campaign.getGameOptions().getOption("manei_domini").setValue(false);
 	    }
 	    options.setAdvancedMedical(useAdvancedMedicalBox.isSelected());
+	    options.setDylansRandomXp(useDylansRandomXpBox.isSelected());
 	    options.setPayForParts(payForPartsBox.isSelected());
 	    options.setPayForUnits(payForUnitsBox.isSelected());
 	    options.setPayForSalaries(payForSalariesBox.isSelected());

@@ -221,7 +221,7 @@ public class Utilities {
 			return SkillType.EXP_ELITE;
 		}
 	}
-	
+
 	public static int generateRandomExp() {
 		int roll = Compute.randomInt(100);
 		if (roll < 20) { // 20% chance of a randomized xp
