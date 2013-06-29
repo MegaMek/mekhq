@@ -3595,7 +3595,10 @@ public class CampaignGUI extends JPanel {
 
         refreshPersonnelList();
         refreshPatientList();
+        refreshTechsList();
+        refreshDoctorsList();
         refreshReport();
+        refreshFinancialTransactions();
     }
 
     private void savePersonFile() throws IOException {

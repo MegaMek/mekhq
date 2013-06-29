@@ -597,7 +597,8 @@ public class Campaign implements Serializable {
 		while(null != personnelIds.get(p.getId())) {
 			p.setId(UUID.randomUUID());
 		}
-		personnel.add(p);
+		p.setRankSystem(ranks);
+		addPersonWithoutId(p);
 		if (log) {
 			addReport(p.getName() + " has been added to the personnel roster.");
 		}
@@ -614,7 +615,6 @@ public class Campaign implements Serializable {
 			rankEntry = " as a " + getRanks().getRank(p.getRank());
 		}
 		p.addLogEntry(getDate(), "Joined " + getName() + rankEntry);
-		addPersonWithoutId(p);
 	}
 	
 	public Date getDate() {
