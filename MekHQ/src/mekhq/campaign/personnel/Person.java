@@ -2626,6 +2626,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 			}
 		}
 		injuries.removeAll(removals);
+		if(!needsAMFixing()) {
+			doctorId = null;
+		}
 	}
 
 	public boolean needsAMFixing() {
