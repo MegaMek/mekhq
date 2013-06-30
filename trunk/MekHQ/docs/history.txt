@@ -48,6 +48,8 @@ Also allow folders that just end in Male or Female (ie ralgith_Female)
 + Bug: ProtoMech and Battle Armor "Armor" fixes for missing "instance of ..." in a lot of places.
 + Bug: Import Personnel adds twice & NPE when importing Personnel
 + Bug: Ghost Patients (doctor ID not correctly set to NULL when healed using injury system)
++ Bug: Edit Injury dialog not sized correctly for the column widths
++ Bug: Random Xp Option not visible
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
