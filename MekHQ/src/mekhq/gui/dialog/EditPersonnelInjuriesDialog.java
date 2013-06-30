@@ -119,11 +119,14 @@ public class EditPersonnelInjuriesDialog extends javax.swing.JDialog {
         injuriesTable = new JTable(injuryModel);
         injuriesTable.setName("injuriesTable"); // NOI18N
 		TableColumn column = null;
+		int width = 0;
         for (int i = 0; i < InjuryTableModel.N_COL; i++) {
             column = injuriesTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(injuryModel.getColumnWidth(i));
             column.setCellRenderer(injuryModel.getRenderer());
+            width += injuryModel.getColumnWidth(i);
         }
+        setMinimumSize(new Dimension(width, 500));
         injuriesTable.setIntercellSpacing(new Dimension(0, 0));
 		injuriesTable.setShowGrid(false);
 		injuriesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -304,65 +307,72 @@ public class EditPersonnelInjuriesDialog extends javax.swing.JDialog {
 		}
 		
 		 public int getColumnWidth(int c) {
-	            switch(c) {
-	            case COL_FLUFF:
-	            case COL_TYPE:
-	            case COL_LOCATION:
-	        		return 200;     
-	            default:
-	                return 10;
-	            }
-	        }
-	        
-	        public int getAlignment(int col) {
-	        	switch(col) {
-	        	case COL_DAYS:
-	        	case COL_HITS:
-	        	case COL_PERMANENT:
-	        	case COL_WORKEDON:
-	        	case COL_EXTENDED:
-	        		return SwingConstants.CENTER;
-	        	default:
-		        	return SwingConstants.LEFT;
-	        	}
-	        }
+            switch(c) {
+            case COL_DAYS:
+            case COL_HITS:
+            case COL_PERMANENT:
+            case COL_WORKEDON:
+            case COL_EXTENDED:
+            	return 110;
+            case COL_TYPE:
+            	return 150;
+            case COL_FLUFF:
+            case COL_LOCATION:
+        		return 200;     
+            default:
+                return 50;
+            }
+        }
+        
+        public int getAlignment(int col) {
+        	switch(col) {
+        	case COL_DAYS:
+        	case COL_HITS:
+        	case COL_PERMANENT:
+        	case COL_WORKEDON:
+        	case COL_EXTENDED:
+        		return SwingConstants.CENTER;
+        	default:
+	        	return SwingConstants.LEFT;
+        	}
+        }
 
-	        public String getTooltip(int row, int col) {
-	        	switch(col) {
-	            default:
-	            	return null;
-	            }
-	        }
-	        
-	        //fill table with values
-	        public void setData(ArrayList<Injury> entries) {
-	            data = entries;
-	            fireTableDataChanged();
-	        }
-	        
-	        public InjuryTableModel.Renderer getRenderer() {
-				return new InjuryTableModel.Renderer();
+        public String getTooltip(int row, int col) {
+        	switch(col) {
+            default:
+            	return null;
+            }
+        }
+        
+        //fill table with values
+        public void setData(ArrayList<Injury> entries) {
+            data = entries;
+            fireTableDataChanged();
+        }
+        
+        public InjuryTableModel.Renderer getRenderer() {
+			return new InjuryTableModel.Renderer();
+		}
+
+		public class Renderer extends DefaultTableCellRenderer {
+
+			private static final long serialVersionUID = 9054581142945717303L;
+
+			public Component getTableCellRendererComponent(JTable table,
+					Object value, boolean isSelected, boolean hasFocus,
+					int row, int column) {
+				super.getTableCellRendererComponent(table, value, isSelected,
+						hasFocus, row, column);
+				setOpaque(true);
+				int actualCol = table.convertColumnIndexToModel(column);
+				int actualRow = table.convertRowIndexToModel(row);
+				setHorizontalAlignment(getAlignment(actualCol));
+				setToolTipText(getTooltip(actualRow, actualCol));
+				
+				return this;
 			}
 
-			public class Renderer extends DefaultTableCellRenderer {
-
-				private static final long serialVersionUID = 9054581142945717303L;
-
-				public Component getTableCellRendererComponent(JTable table,
-						Object value, boolean isSelected, boolean hasFocus,
-						int row, int column) {
-					super.getTableCellRendererComponent(table, value, isSelected,
-							hasFocus, row, column);
-					setOpaque(true);
-					int actualCol = table.convertColumnIndexToModel(column);
-					int actualRow = table.convertRowIndexToModel(row);
-					setHorizontalAlignment(getAlignment(actualCol));
-					setToolTipText(getTooltip(actualRow, actualCol));
-					
-					return this;
-				}
-
-			}
+		}
 	}
 
 }
