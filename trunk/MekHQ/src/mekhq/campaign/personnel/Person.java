@@ -2538,7 +2538,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		}
 		if (location == BODY_HEAD) {
 			Injury inj = getInjuryByLocation(BODY_HEAD);
-			if (inj != null) {
+			if (inj != null && new_injuries != null && new_injuries.size() > 0) {
 				if (inj.getType() > new_injuries.get(0).getType()) {
 					inj.setTime(generateHealingTime(c, inj.getHits(), inj.getType()));
 					new_injuries.clear();
