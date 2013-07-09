@@ -51,6 +51,8 @@ Also allow folders that just end in Male or Female (ie ralgith_Female)
 + Bug: Edit Injury dialog not sized correctly for the column widths
 + Bug: Random Xp Option not visible
 + Bug: Resolution IndexOutOfBoundsException error
++ Bug: Critical Healing success for Advanced Injuries incorrect
++ Bug: Missing healing messages
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
