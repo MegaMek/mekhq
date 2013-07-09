@@ -117,6 +117,11 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public static final int S_KIA = 2;
     public static final int S_MIA = 3;
     public static final int S_NUM = 4;
+    
+    public static final int PRONOUN_HESHE = 0;
+    public static final int PRONOUN_HIMHER = 1;
+    public static final int PRONOUN_HISHER = 2;
+    public static final int PRONOUN_HISHERS = 3;
 	
     protected UUID id;
     protected int oldId;
@@ -2195,12 +2200,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		}
 		Unit u = c.getUnit(getUnitId());
 		if(status == Person.S_KIA) {
-			addLogEntry(c.getDate(), "Died from "+getGenderPronoun(3)+" wounds");
+			addLogEntry(c.getDate(), "Died from "+getGenderPronoun(PRONOUN_HISHER)+" wounds");
 			//set the deathday
 			setDeathday((GregorianCalendar)c.calendar.clone());
 		}
 		if(status == Person.S_RETIRED) {
-			addLogEntry(c.getDate(), "Retired from active duty due to "+getGenderPronoun(3)+" wounds");
+			addLogEntry(c.getDate(), "Retired from active duty due to "+getGenderPronoun(PRONOUN_HISHER)+" wounds");
 		}
 		setStatus(status);
 		if(status != Person.S_ACTIVE) {
@@ -2351,11 +2356,11 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		
 		switch (type) {
 		case Injury.INJ_CUT:
-			return "Some cuts on "+getGenderPronoun(3)+" "+name;
+			return "Some cuts on "+getGenderPronoun(PRONOUN_HISHER)+" "+name;
 		case Injury.INJ_BRUISE:
-			return "A bruise on "+getGenderPronoun(3)+" "+name;
+			return "A bruise on "+getGenderPronoun(PRONOUN_HISHER)+" "+name;
 		case Injury.INJ_LACERATION:
-			return "A laceration on "+getGenderPronoun(3)+" "+name;
+			return "A laceration on "+getGenderPronoun(PRONOUN_HISHER)+" "+name;
 		case Injury.INJ_SPRAIN:
 			return "A sprained "+name;
 		case Injury.INJ_CONCUSSION:
@@ -2371,7 +2376,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		case Injury.INJ_INTERNAL_BLEEDING:
 			return "Internal bleeding";
 		case Injury.INJ_LOST_LIMB:
-			return "Lost "+getGenderPronoun(3)+" "+name;
+			return "Lost "+getGenderPronoun(PRONOUN_HISHER)+" "+name;
 		case Injury.INJ_CEREBRAL_CONTUSION:
 			return "A cerebral contusion";
 		case Injury.INJ_PUNCTURED_LUNG:

@@ -995,6 +995,7 @@ public class Campaign implements Serializable {
 		int critSuccess;
 		int xpGained = 0;
 		String report = "";
+		String eol = System.getProperty("line.separator");
 		
 		switch (level) {
 		case 0:
@@ -1051,7 +1052,7 @@ public class Campaign implements Serializable {
 			if (!injury.getWorkedOn()) {
 				if (roll < fumble) {
 					injury.setTime((int) Math.max(Math.ceil(injury.getTime()*1.2),injury.getTime()+5));
-					report = report+doctor.getName()+" made a mistake in treatment and caused the injury to worsen.";
+					report = report+doctor.getName()+" made a mistake in the treatment of "+medWork.getName()+" and caused "+medWork.getGenderPronoun(Person.PRONOUN_HISHER)+" "+injury.getName()+" to worsen.";
 					if (Compute.randomInt(100) < (fumble/4)) {
 						// TODO: Add in special handling of the critical injuries like broken back (make perm),
 						// broken ribs (punctured lung/death chance) internal bleeding (death chance)
@@ -1060,7 +1061,8 @@ public class Campaign implements Serializable {
 						xpGained += getCampaignOptions().getMistakeXP();
 					}
 				} else if (roll > critSuccess) {
-					injury.setTime((int) Math.floor(injury.getTime()/10));
+					injury.setTime((int) Math.floor(injury.getTime()*90/100));
+					report = report+doctor.getName()+" performed some amazing work in treating "+medWork.getName()+"'s "+injury.getName()+" (10% less time to heal)";
 					if (roll > Math.min(98, 99-Math.round(99-critSuccess)/10)) {
 						xpGained += getCampaignOptions().getSuccessXP();
 					}
@@ -1070,17 +1072,21 @@ public class Campaign implements Serializable {
 						doctor.setNTasks(0);
 					}
 					doctor.setNTasks(doctor.getNTasks() + 1);
+					report = report+doctor.getName()+" successfully treated "+medWork.getName();
 				}
 				injury.setWorkedOn(true);
 				Unit u = getUnit(medWork.getUnitId());
 				if(null != u) {
 					u.resetPilotAndEntity();
 				}
+			} else {
+				report = report+medWork.getName()+" spent time resting to heal "+medWork.getGenderPronoun(Person.PRONOUN_HISHER)+" "+injury.getName()+"!";
 			}
-		}
-		if(xpGained > 0) {
-			doctor.setXp(doctor.getXp() + xpGained);
-			report += " (" + xpGained + "XP gained) ";
+			if(xpGained > 0) {
+				doctor.setXp(doctor.getXp() + xpGained);
+				report += " (" + xpGained + "XP gained)";
+			}
+			report+=eol;
 		}
 		medWork.AMheal();
 		return report;
@@ -1388,9 +1394,9 @@ public class Campaign implements Serializable {
 								
 							}*/
 						}
+						addReport(p.getName() + " spent time resting to heal "+p.getGenderPronoun(Person.PRONOUN_HISHER)+" "+injury.getName()+"!");
 					}
 					p.AMheal();
-					addReport(p.getFullTitle() + " spent time resting to heal his injuries!");
 					Unit u = getUnit(p.getUnitId());
 					if(null != u) {
 						u.resetPilotAndEntity();
