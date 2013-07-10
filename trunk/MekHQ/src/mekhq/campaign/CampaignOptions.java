@@ -74,6 +74,8 @@ public class CampaignOptions implements Serializable {
     private boolean useAbilities;
     private boolean useEdge;
     private boolean useImplants;
+    private int healWaitingPeriod;
+    private int naturalHealingWaitingPeriod;
     private boolean useAdvancedMedical; // Unofficial
     private boolean useDylansRandomXp; // Unofficial
     
@@ -206,6 +208,8 @@ public class CampaignOptions implements Serializable {
         blcSaleValue = false;
         clanAcquisitionPenalty = 0;
         isAcquisitionPenalty = 0;
+        healWaitingPeriod = 1;
+        naturalHealingWaitingPeriod = 15;
         
     }
 
@@ -740,6 +744,21 @@ public class CampaignOptions implements Serializable {
         isAcquisitionPenalty = b;
     }
     
+    public int getHealingWaitingPeriod() {
+        return healWaitingPeriod;
+    }
+    
+    public void setHealingWaitingPeriod(int d) {
+        healWaitingPeriod = d;
+    }
+    
+    public int getNaturalHealingWaitingPeriod() {
+        return naturalHealingWaitingPeriod;
+    }
+    
+    public void setNaturalHealingWaitingPeriod(int d) {
+        naturalHealingWaitingPeriod = d;
+    }
     
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
@@ -803,6 +822,9 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "isAcquisitionPenalty", isAcquisitionPenalty);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useLoanLimits", useLoanLimits);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForRecruitment", payForRecruitment);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "healWaitingPeriod", healWaitingPeriod);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "naturalHealingWaitingPeriod", naturalHealingWaitingPeriod);
+        
 
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<usePortraitForType>"
@@ -972,6 +994,10 @@ public class CampaignOptions implements Serializable {
 				retVal.monthsIdleXP = Integer.parseInt(wn2.getTextContent().trim());
 			} else if (wn2.getNodeName().equalsIgnoreCase("waitingPeriod")) {
                 retVal.waitingPeriod = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("healWaitingPeriod")) {
+                retVal.healWaitingPeriod = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("naturalHealingWaitingPeriod")) {
+                retVal.naturalHealingWaitingPeriod = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionSkill")) {
                 retVal.acquisitionSkill = wn2.getTextContent().trim();
             } else if (wn2.getNodeName().equalsIgnoreCase("nDiceTransitTime")) {

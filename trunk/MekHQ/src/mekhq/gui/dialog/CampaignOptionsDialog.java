@@ -158,6 +158,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private javax.swing.JCheckBox sellUnitsBox;
     private javax.swing.JCheckBox sellPartsBox;
     
+    private JSpinner spnHealWaitingPeriod;
+    private JSpinner spnNaturalHealWaitingPeriod;
+
+    
     private JRadioButton btnContractEquipment;
     private JRadioButton btnContractPersonnel;
     private JSpinner spnEquipPercent;
@@ -912,6 +916,32 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panPersonnel.add(useDylansRandomXpBox, gridBagConstraints);
+        
+        spnHealWaitingPeriod = new JSpinner(new SpinnerNumberModel(options.getHealingWaitingPeriod(), 1, 30, 1));
+        ((JSpinner.DefaultEditor)spnHealWaitingPeriod.getEditor()).getTextField().setEditable(false);      
+        JPanel pnlHealWaitingPeriod = new JPanel();
+        pnlHealWaitingPeriod.add(spnHealWaitingPeriod);
+        pnlHealWaitingPeriod.add(new JLabel("Days to wait between healing checks by doctors"));      
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridwidth = 2;
+        //gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panPersonnel.add(pnlHealWaitingPeriod, gridBagConstraints);
+        
+        spnNaturalHealWaitingPeriod = new JSpinner(new SpinnerNumberModel(options.getNaturalHealingWaitingPeriod(), 1, 365, 1));
+        ((JSpinner.DefaultEditor)spnNaturalHealWaitingPeriod.getEditor()).getTextField().setEditable(false);    
+        JPanel pnlNaturalHealWaitingPeriod = new JPanel();
+        pnlNaturalHealWaitingPeriod.add(spnNaturalHealWaitingPeriod);
+        pnlNaturalHealWaitingPeriod.add(new JLabel("Days to wait for natural healing"));      
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridwidth = 2;
+        //gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panPersonnel.add(pnlNaturalHealWaitingPeriod, gridBagConstraints);
         
         tabOptions.addTab(resourceMap.getString("panPersonnel.TabConstraints.tabTitle"), panPersonnel); // NOI18N
         
@@ -2301,6 +2331,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    	campaign.getGameOptions().getOption("allow_advanced_units").setValue(true);
 	    	campaign.getGameOptions().getOption("allow_advanced_ammo").setValue(true);
 	    } 
+	    
+	    //we need to reset healing time options through the campaign because we may need to 
+	    //loop through personnel to make adjustments
+	    campaign.setHealingTimeOptions((Integer)spnHealWaitingPeriod.getModel().getValue(), (Integer)spnNaturalHealWaitingPeriod.getModel().getValue());
 	    
 	    rskillPrefs.setOverallRecruitBonus((Integer)spnOverallRecruitBonus.getModel().getValue());	 
 	    for(int i = 0; i < Person.T_NUM; i++) {

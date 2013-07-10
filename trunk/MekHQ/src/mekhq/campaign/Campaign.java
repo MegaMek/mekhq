@@ -984,6 +984,7 @@ public class Campaign implements Serializable {
 			doctor.setXp(doctor.getXp() + xpGained);
 			report += " (" + xpGained + "XP gained) ";
 		}
+		medWork.setDaysToWaitForHealing(getCampaignOptions().getHealingWaitingPeriod());
 		return report;
 	}
 	
@@ -1370,10 +1371,13 @@ public class Campaign implements Serializable {
 			}
 			p.resetMinutesLeft();
 			if(p.needsFixing() || (getCampaignOptions().useAdvancedMedical() && p.needsAMFixing())) {
-				Person doctor = getPerson(p.getDoctorId());
+				p.decrementDaysToWaitForHealing();
+			    Person doctor = getPerson(p.getDoctorId());
 				if(null != doctor && doctor.isDoctor()) {
-					addReport(healPerson(p, doctor));
-				} else if(p.checkNaturalHealing()) {
+				    if(p.getDaysToWaitForHealing() <= 0) {
+				        addReport(healPerson(p, doctor));
+				    } 
+				} else if(p.checkNaturalHealing(15)) {
 					addReport(p.getDesc() + " heals naturally!");
 					Unit u = getUnit(p.getUnitId());
 					if(null != u) {
@@ -1629,7 +1633,7 @@ public class Campaign implements Serializable {
 	public void removeAllPatientsFor(Person doctor) {
 		for(Person p : personnel) {
 			if(null != p.getAssignedTeamId() && p.getAssignedTeamId().equals(doctor.getId())) {
-				p.setDoctorId(null);
+				p.setDoctorId(null, getCampaignOptions().getNaturalHealingWaitingPeriod());
 			}
 		}
 	}
@@ -3314,6 +3318,7 @@ public class Campaign implements Serializable {
 		if (getCampaignOptions().useDylansRandomXp()) {
 			person.setXp(Utilities.generateRandomExp());
 		}
+		person.setDaysToWaitForHealing(getCampaignOptions().getNaturalHealingWaitingPeriod());
 		int bonus = 0;
 		//set default skills
 		switch(type) {
@@ -4111,7 +4116,7 @@ public class Campaign implements Serializable {
 		}
 		person.setStatus(status);
 		if(status != Person.S_ACTIVE) {
-    		person.setDoctorId(null);
+    		person.setDoctorId(null, getCampaignOptions().getNaturalHealingWaitingPeriod());
     		if(null != u) {
     			u.remove(person, true);
     		}
@@ -4944,5 +4949,29 @@ public class Campaign implements Serializable {
 
         
         return new String(sb);
+    }
+    
+    public void setHealingTimeOptions(int newHeal, int newNaturalHeal) {
+        //we need to check the current values and then if necessary change the times for all 
+        //personnel, giving them credit for their current waiting time
+        int currentHeal = getCampaignOptions().getHealingWaitingPeriod();
+        int currentNaturalHeal = getCampaignOptions().getNaturalHealingWaitingPeriod();
+        
+        getCampaignOptions().setHealingWaitingPeriod(newHeal);
+        getCampaignOptions().setNaturalHealingWaitingPeriod(newNaturalHeal);
+        
+        int healDiff = newHeal - currentHeal;
+        int naturalDiff = newNaturalHeal - currentNaturalHeal;
+        
+        if(healDiff != 0 || naturalDiff != 0) {
+            for(Person p : getPersonnel()) {
+                if(p.getDoctorId() != null) {
+                    p.setDaysToWaitForHealing(Math.max(p.getDaysToWaitForHealing() + healDiff, 1));
+                } else {
+                    p.setDaysToWaitForHealing(Math.max(p.getDaysToWaitForHealing() + naturalDiff, 1));
+                }
+            }          
+        }
+        
     }
 }

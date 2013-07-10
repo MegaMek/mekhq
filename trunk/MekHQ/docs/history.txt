@@ -56,6 +56,8 @@ Also allow folders that just end in Male or Female (ie ralgith_Female)
 + Verify entity externalId matches UUID when loading campaign
 + Bug 374: Duplicate ExternalIDs
 + Bug 372: Refits start before parts/refit kit arrives in trunk.
++ removed Java 7 code. Do not use Java 7 please!
++ allow user customizable waiting time in days between healing checks
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
