@@ -79,13 +79,13 @@ public class EditInjuryEntryDialog extends javax.swing.JDialog {
     	}
     	String[] tf = { "True", "False" };
     	txtDays = new javax.swing.JTextArea();
-    	ddLocation = new javax.swing.JComboBox<String>(locNames);
-    	ddType = new javax.swing.JComboBox<String>(typeNames);
+    	ddLocation = new javax.swing.JComboBox(locNames);
+    	ddType = new javax.swing.JComboBox(typeNames);
     	txtFluff = new javax.swing.JTextArea();
     	txtHits = new javax.swing.JTextArea();
-    	ddPermanent = new javax.swing.JComboBox<String>(tf);
-    	ddWorkedOn = new javax.swing.JComboBox<String>(tf);
-    	ddExtended = new javax.swing.JComboBox<String>(tf);
+    	ddPermanent = new javax.swing.JComboBox(tf);
+    	ddWorkedOn = new javax.swing.JComboBox(tf);
+    	ddExtended = new javax.swing.JComboBox(tf);
         btnOK = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
         panBtn = new javax.swing.JPanel();

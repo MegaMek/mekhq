@@ -159,8 +159,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     private int oldDoctorId;
     
     //days of rest
-    protected int daysRest;
-    protected int idleMonths;
+    protected int idleMonths;    
+    protected int daysToWaitForHealing;
     
     //portrait
     protected String portraitCategory;
@@ -197,7 +197,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public Person(String name, Ranks r) {
     	this.name = name;
     	callsign = "";
-        daysRest = 0;
         portraitCategory = Crew.ROOT_PORTRAIT;
         portraitFile = Crew.PORTRAIT_NONE;
         xp = 0;
@@ -218,6 +217,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         nTasks = 0;
         personnelLog = new ArrayList<LogEntry>();
         idleMonths = -1;
+        daysToWaitForHealing = 15;
         resetMinutesLeft();
     }
     
@@ -373,6 +373,14 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     
     public void setIdleMonths(int m) {
     	this.idleMonths = m;
+    }
+    
+    public int getDaysToWaitForHealing() {
+        return daysToWaitForHealing;
+    }
+    
+    public void setDaysToWaitForHealing(int d) {
+        this.daysToWaitForHealing = d;
     }
 
 
@@ -571,22 +579,26 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         return doctorId;
     }
     
-    public void setDoctorId(UUID t) {
+    public void setDoctorId(UUID t, int daysToWait) {
     	this.doctorId = t;
+    	this.daysToWaitForHealing = daysToWait;
     }
   
-    public boolean checkNaturalHealing() {
-        if(needsFixing() && doctorId == null) {
-            daysRest++;
-            if(daysRest >= 15) {
-                heal();
-                daysRest = 0;
-                return true;
-            }
-        }
+    public boolean checkNaturalHealing(int daysToWait) {
+        if(needsFixing() && daysToWaitForHealing <= 0 && doctorId == null) {
+            heal();
+            daysToWaitForHealing = daysToWait;
+            return true;
+        } 
         return false;
     }
     
+    public void decrementDaysToWaitForHealing() {
+        if(daysToWaitForHealing > 0) {
+            daysToWaitForHealing--;
+        }
+    }
+        
     public boolean isDeployed(Campaign c) {
     	Unit u = c.getUnit(unitId);
     	if(null != u) {
@@ -635,10 +647,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				+MekHqXmlUtil.escape(biography)
 				+"</biography>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<daysRest>"
-				+daysRest
-				+"</daysRest>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<idleMonths>"
 				+idleMonths
 				+"</idleMonths>");
@@ -658,6 +666,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				+"<xp>"
 				+xp
 				+"</xp>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<daysToWaitForHealing>"
+                +daysToWaitForHealing
+                +"</daysToWaitForHealing>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<gender>"
 				+gender
@@ -791,8 +803,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 					retVal.primaryRole = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("secondaryRole")) {
 					retVal.secondaryRole = Integer.parseInt(wn2.getTextContent());
-				} else if (wn2.getNodeName().equalsIgnoreCase("daysRest")) {
-					retVal.daysRest = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("daysToWaitForHealing")) {
+					retVal.daysToWaitForHealing = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("idleMonths")) {
 					retVal.idleMonths = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("id")) {
@@ -1354,7 +1366,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	
 	public String getPatientDesc() {
         String toReturn = "<html><font size='2'><b>" + getFullTitle() + "</b><br/>";
-        toReturn += getHits() + " hit(s)";
+        toReturn += getHits() + " hit(s)<br>[next check in " + getDaysToWaitForHealing() + " days]";
         toReturn += "</font></html>";
         return toReturn;
     }
@@ -2209,7 +2221,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		}
 		setStatus(status);
 		if(status != Person.S_ACTIVE) {
-    		setDoctorId(null);
+    		setDoctorId(null, c.getCampaignOptions().getNaturalHealingWaitingPeriod());
     		if(null != u) {
     			u.remove(this, true);
     		}

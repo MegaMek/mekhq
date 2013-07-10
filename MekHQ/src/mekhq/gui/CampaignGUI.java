@@ -32,6 +32,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
@@ -53,6 +54,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -2443,6 +2445,10 @@ public class CampaignGUI extends JPanel {
         frame.getContentPane().add(this, BorderLayout.CENTER);
         frame.validate();
 
+        if (isMacOSX()) {
+            enableFullScreenMode(frame);
+        }
+        
         frame.setVisible(true);
         frame.addWindowListener(new WindowAdapter() {
             @Override
@@ -2452,6 +2458,25 @@ public class CampaignGUI extends JPanel {
         });
     }
 
+    private static void enableFullScreenMode(Window window) {
+        String className = "com.apple.eawt.FullScreenUtilities";
+        String methodName = "setWindowCanFullScreen";
+ 
+        try {
+            Class<?> clazz = Class.forName(className);
+            Method method = clazz.getMethod(methodName, new Class<?>[] {
+                    Window.class, boolean.class });
+            method.invoke(null, window, true);
+        } catch (Throwable t) {
+            System.err.println("Full screen mode is not supported");
+            t.printStackTrace();
+        }
+    }
+ 
+    private static boolean isMacOSX() {
+        return System.getProperty("os.name").indexOf("Mac OS X") >= 0;
+    }
+    
     private void miChatActionPerformed(ActionEvent evt) {
         JDialog chatDialog = new JDialog(getFrame(), "MekHQ Chat", false); //$NON-NLS-1$
 
@@ -2894,7 +2919,7 @@ public class CampaignGUI extends JPanel {
             if (null != p && null != doctor && (p.needsFixing() || (getCampaign().getCampaignOptions().useAdvancedMedical() && p.needsAMFixing()))
                     && getCampaign().getPatientsFor(doctor)<25
                     && getCampaign().getTargetFor(p, doctor).getValue() != TargetRoll.IMPOSSIBLE) {
-                p.setDoctorId(doctor.getId());
+                p.setDoctorId(doctor.getId(), getCampaign().getCampaignOptions().getHealingWaitingPeriod());
             }
         }
 
@@ -2906,7 +2931,7 @@ public class CampaignGUI extends JPanel {
     private void btnUnassignDocActionPerformed(java.awt.event.ActionEvent evt) {
         for(Person p : getSelectedAssignedPatients()) {
             if ((null != p)) {
-                p.setDoctorId(null);
+                p.setDoctorId(null, getCampaign().getCampaignOptions().getNaturalHealingWaitingPeriod());
             }
         }
 
@@ -7062,7 +7087,7 @@ public class CampaignGUI extends JPanel {
             } else if (command.equalsIgnoreCase("HEAL")) {
                 for(Person person : people) {
                     person.setHits(0);
-                    person.setDoctorId(null);
+                    person.setDoctorId(null, getCampaign().getCampaignOptions().getNaturalHealingWaitingPeriod());
                 }
                 getCampaign().personUpdated(selectedPerson);
                 refreshPatientList();
