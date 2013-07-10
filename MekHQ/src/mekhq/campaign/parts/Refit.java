@@ -727,6 +727,18 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		newUnitParts = newNewUnitParts;	
 	}
 	
+	public boolean partsInTransit() {
+		boolean retVal = false;
+		for (int pid : newUnitParts) {
+			Part part = oldUnit.campaign.getPart(pid);
+			if (!part.isPresent()) {
+				retVal = true;
+				break;
+			}
+		}
+		return retVal;
+	}
+	
 	public boolean acquireParts() {
 	    if(!customJob && !kitFound) {
 	        return false;
@@ -752,7 +764,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			    }
 			}
 		}
-		//cycle through newUnitParts, find any ammo bins and if they need loading, try to load them
+		// Cycle through newUnitParts, find any ammo bins and if they need loading, try to load them
 		boolean missingAmmo = false;
 		for(int pid : newUnitParts) {
 			Part part = oldUnit.campaign.getPart(pid);
@@ -766,8 +778,15 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 bin.setUnit(null);
 			}
 		}
+		
 		checkForArmorSupplies();
 		shoppingList = newShoppingList;
+
+		// Also, check to make sure that they're not still in transit! - ralgith 2013/07/09
+		if (partsInTransit()) {
+			return false;
+		}
+		
 		return shoppingList.size() == 0 && !missingAmmo && (null == newArmorSupplies || (armorNeeded - newArmorSupplies.getAmount()) <= 0);
 	}
 	

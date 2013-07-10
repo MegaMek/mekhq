@@ -55,6 +55,7 @@ Also allow folders that just end in Male or Female (ie ralgith_Female)
 + Bug: Missing healing messages
 + Verify entity externalId matches UUID when loading campaign
 + Bug 374: Duplicate ExternalIDs
++ Bug 372: Refits start before parts/refit kit arrives in trunk.
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
