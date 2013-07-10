@@ -390,7 +390,7 @@ public class UnitSelectorDialog extends JDialog {
 	        hqView.refreshFinancialTransactions();
 	        hqView.refreshReport();
 	    }
-	    // Necessary if the used wants to buy the same unit twice without reselecting it
+	    // Necessary if the user wants to buy the same unit twice without reselecting it
 	    UnitChanged(null);
 	}//GEN-LAST:event_btnBuyActionPerformed
 	
@@ -401,6 +401,8 @@ public class UnitSelectorDialog extends JDialog {
             hqView.refreshServicedUnitList();
             hqView.refreshReport();
 	    }
+	    // Necessary if the GM wants to add the same unit twice without reselecting it
+	    UnitChanged(null);
 	}
 	
 	private void btnBuySelectActionPerformed(java.awt.event.ActionEvent evt) {                                       
