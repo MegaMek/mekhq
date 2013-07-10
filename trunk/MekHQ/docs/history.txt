@@ -53,6 +53,8 @@ Also allow folders that just end in Male or Female (ie ralgith_Female)
 + Bug: Resolution IndexOutOfBoundsException error
 + Bug: Critical Healing success for Advanced Injuries incorrect
 + Bug: Missing healing messages
++ Verify entity externalId matches UUID when loading campaign
++ Bug 374: Duplicate ExternalIDs
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement

@@ -1235,7 +1235,9 @@ public class Unit implements MekHqXmlSerializable {
 		}
 		
         // Protection for old broken campaign files
-        if (retVal.entity.getExternalIdAsString().equals("-1")) {
+		// Also for entities that do not have an external ID to match the UUID
+        if (retVal.entity.getExternalIdAsString().equals("-1")
+        		|| !(retVal.entity.getExternalIdAsString().equals(retVal.id.toString()))) {
             retVal.entity.setExternalIdAsString(retVal.id.toString());
         }
 		
@@ -2067,6 +2069,7 @@ public class Unit implements MekHqXmlSerializable {
     	int nDrivers = 0;
     	int sumGunnery = 0;
     	int nGunners = 0;
+    	
     	for(UUID pid : drivers) {
     		Person p = campaign.getPerson(pid);
     		if(p.getHits() > 0 && !(entity instanceof Mech || entity instanceof Aero || entity instanceof Protomech)) {
@@ -2215,7 +2218,7 @@ public class Unit implements MekHqXmlSerializable {
     	if(commander.hasSkill(SkillType.S_TACTICS)) {
     		pilot.setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getFinalSkillValue());
     	}
-    	entity.setCrew(pilot);  		
+    	entity.setCrew(pilot);
     }   
     
 
