@@ -249,16 +249,30 @@ public class Force implements Serializable {
 	}
 	
 	public void clearScenarioIds(Campaign c) {
-		setScenarioId(-1);
-		for(UUID uid : getUnits()) {
-			Unit u = c.getUnit(uid);
-			if(null != u) {
-				u.undeploy();
+		clearScenarioIds(c, true);
+	}
+	
+	public void clearScenarioIds(Campaign c, boolean killSub) {
+		if (killSub) {
+			for(UUID uid : getUnits()) {
+				Unit u = c.getUnit(uid);
+				if(null != u) {
+					u.undeploy();
+				}
+			}
+			// We only need to clear the subForces if we're killing everything.
+			for(Force sub : getSubForces()) {
+				sub.clearScenarioIds(c);
+			}
+		} else {
+			// If we're not killing the units from the scenario, then we need to assign them with the
+			// scenario ID and add them to the scenario.
+			for(UUID uid : getUnits()) {
+				c.getUnit(uid).setScenarioId(getScenarioId());
+				c.getScenario(getScenarioId()).addUnit(uid);
 			}
 		}
-		for(Force sub : getSubForces()) {
-			sub.clearScenarioIds(c);
-		}
+		setScenarioId(-1);
 	}
 	
 	public String toString() {
