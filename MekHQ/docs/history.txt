@@ -58,6 +58,9 @@ Also allow folders that just end in Male or Female (ie ralgith_Female)
 + Bug 372: Refits start before parts/refit kit arrives in trunk.
 + removed Java 7 code. Do not use Java 7 please!
 + allow user customizable waiting time in days between healing checks
++ Bug: Dropships, Jumpships, and Warships with consolidated ammo (ie. LongTom Ammo:125) not detecting max ammo correctly
++ Bug: Views (Most especially Repair Bay) not refreshing after undeploying units from a scenario.
++ Bug: Hangar Right Click->GM Mode->Undeploy not working
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement

@@ -3747,8 +3747,17 @@ public class CampaignGUI extends JPanel {
             scenario.clearAllForcesAndPersonnel(getCampaign());
             refreshScenarioList();
             refreshPersonnelList();
+            refreshServicedUnitList();
             refreshUnitList();
             refreshOrganization();
+            refreshTaskList();
+            refreshUnitView();
+            refreshPartsList();
+            refreshAcquireList();
+            refreshReport();
+            refreshPatientList();
+            refreshPersonnelList();
+            refreshScenarioList();
         }
     }
 
@@ -5648,10 +5657,23 @@ public class CampaignGUI extends JPanel {
                             unit.getPilot().undeploy(getCampaign());
                         }
                         */
+                    	Force f = getCampaign().getForce(unit.getForceId());
+                    	f.clearScenarioIds(getCampaign(), false);
+                    	getCampaign().getScenario(unit.getScenarioId()).removeForce(f.getId());
+                    	getCampaign().getScenario(unit.getScenarioId()).removeUnit(unit.getId());
+                    	unit.undeploy();
                     }
                 }
+                refreshScenarioList();
+                refreshPersonnelList();
                 refreshServicedUnitList();
                 refreshUnitList();
+                refreshOrganization();
+                refreshTaskList();
+                refreshUnitView();
+                refreshPartsList();
+                refreshAcquireList();
+                refreshReport();
                 refreshPatientList();
                 refreshPersonnelList();
                 refreshScenarioList();
@@ -10636,10 +10658,24 @@ public class CampaignGUI extends JPanel {
                         //if (null != unit.getPilot()) {
                             //unit.getPilot().undeploy(getCampaign());
                         //}
+                    	Force f = getCampaign().getForce(unit.getForceId());
+                    	f.clearScenarioIds(getCampaign(), false);
+                    	getCampaign().getScenario(unit.getScenarioId()).removeForce(f.getId());
+                    	getCampaign().getScenario(unit.getScenarioId()).removeUnit(unit.getId());
+                    	unit.undeploy();
+                    	
                     }
                 }
+                refreshScenarioList();
+                refreshPersonnelList();
                 refreshServicedUnitList();
                 refreshUnitList();
+                refreshOrganization();
+                refreshTaskList();
+                refreshUnitView();
+                refreshPartsList();
+                refreshAcquireList();
+                refreshReport();
                 refreshPatientList();
                 refreshPersonnelList();
                 refreshScenarioList();

@@ -25,14 +25,17 @@ import java.io.PrintWriter;
 
 import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
+import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.Jumpship;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.TargetRoll;
+import megamek.common.Warship;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -119,6 +122,24 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	        if(((AmmoType)type).getMunitionType() != AmmoType.M_STANDARD) {
 	            fullShots = fullShots / 2;
 	        }
+		}
+		// Another hack because Dropships, Warships, Jumpships, etc... have their ammo done quite weirdly.
+		if (unit != null && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship || unit.getEntity() instanceof Warship)) {
+			String lookupName = unit.getEntity().getChassis() + " " + unit.getEntity().getModel();
+		    lookupName = lookupName.trim();
+	        MechSummary summary = MechSummaryCache.getInstance().getMech(lookupName);
+	        if(null == summary) {
+	            return fullShots;
+	        }
+	        try {
+                Entity newShip = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+                Mounted m = newShip.getEquipment(equipmentNum);
+                if(null != m) {
+                	fullShots = m.getOriginalShots();
+                }
+	        } catch (EntityLoadingException e) {
+                return fullShots;
+            }
 		}
 		return fullShots;
     }
@@ -380,7 +401,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 					return;
 				}
 				if(type.equals(mounted.getType())) {
-					shotsNeeded = getFullShots() - mounted.getBaseShotsLeft();	
+					shotsNeeded = getFullShots() - mounted.getBaseShotsLeft();
 					time = 15;
 					difficulty = 0;
 				} else {
