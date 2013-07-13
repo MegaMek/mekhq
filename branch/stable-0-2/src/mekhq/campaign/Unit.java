@@ -742,7 +742,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		return getDamageState() != Unit.STATE_UNDAMAGED;
 	}
 
-	public String getHeatSinkTypeString() {
+	public String getHeatSinkTypeString(int year) {
 		BigInteger heatSinkType = MiscType.F_HEAT_SINK;
 		boolean heatSinkIsClanTechBase = false;
 
@@ -765,10 +765,10 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 			}
 
 			if (isHeatSink) {
-				if (TechConstants.getTechName(etype.getTechLevel()).equals(
+				if (TechConstants.getTechName(etype.getTechLevel(year)).equals(
 						"Inner Sphere"))
 					heatSinkIsClanTechBase = false;
-				else if (TechConstants.getTechName(etype.getTechLevel())
+				else if (TechConstants.getTechName(etype.getTechLevel(year))
 						.equals("Clan"))
 					heatSinkIsClanTechBase = true;
 				break;

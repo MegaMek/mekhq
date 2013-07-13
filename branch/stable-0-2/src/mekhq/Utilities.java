@@ -89,14 +89,14 @@ public class Utilities {
                 continue;
             }
             
-            int lvl = atype.getTechLevel();
+            int lvl = atype.getTechLevel(entity.getTechLevelYear());
             if(lvl < 0) {
             	lvl = 0;
             }
             if(techLvl < Utilities.getSimpleTechLevel(lvl)) {
             	continue;
             }
-            if(TechConstants.isClan(cur_atype.getTechLevel()) != TechConstants.isClan(lvl)) {
+            if(TechConstants.isClan(cur_atype.getTechLevel(entity.getTechLevelYear())) != TechConstants.isClan(lvl)) {
             	continue;
             }
 
@@ -273,7 +273,7 @@ public class Utilities {
 		return name;
 	}
 	
-	public static String chooseWeaponSpecialization(int type, boolean isClan, int techLvl) {
+	public static String chooseWeaponSpecialization(int type, boolean isClan, int techLvl, int year) {
 		ArrayList<String> candidates = new ArrayList<String>();
 		for (Enumeration<EquipmentType> e = EquipmentType.getAllTypes(); e.hasMoreElements();) {
             EquipmentType et = e.nextElement();
@@ -308,10 +308,10 @@ public class Utilities {
             		wt.getAtClass() >= WeaponType.CLASS_CAPITAL_LASER) {
             	continue;
             }
-            if(TechConstants.isClan(wt.getTechLevel()) != isClan) {
+            if(TechConstants.isClan(wt.getTechLevel(year)) != isClan) {
             	continue;
             }
-            int lvl = wt.getTechLevel();
+            int lvl = wt.getTechLevel(year);
             if(lvl < 0) {
             	continue;
             }

@@ -12,6 +12,10 @@ v0.2.1 (SVN)
 + Bug: Conventional fighter pilot addition code not correctly reassigning Vessel Pilots.
 + Bug: canPerformRole() missing check for conventional fighter pilots.
 + Bug 363: All "new" units end up with no camo and the blue default non-camo colorization when a campaign camo is set.
++ New MegaMekLab.jar (Copied from trunk)
++ Bug 366: Broken MekLabPanel compile with latest MML trunk compiled into jar
++ Updated MegaMek.jar with revision 9541 (Copied from trunk)
++ Updated getTechLevel() calls to include a year for compatibility with MegaMek.
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method
