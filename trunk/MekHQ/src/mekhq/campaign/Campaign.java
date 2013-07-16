@@ -1364,6 +1364,13 @@ public class Campaign implements Serializable {
 		addReport("<p/><b>" + getDateAsString() + "</b>");
 
 		location.newDay(this);
+		
+		// Moved for bug #373: Warship (dropships? jumpships?) can have scheduled tasks worked on twice per day
+		for(Unit u : getUnits()) { 
+			if(null != u.getEngineer()) {
+				u.getEngineer().resetMinutesLeft();
+			}
+		}
 	
 		for (Person p : getPersonnel()) {
 			if(!p.isActive()) {
@@ -1469,9 +1476,6 @@ public class Campaign implements Serializable {
 		for(Unit u : getUnits()) {
 			if(u.isRefitting()) {
 				refit(u.getRefit());
-			}
-			if(null != u.getEngineer()) {
-				u.getEngineer().resetMinutesLeft();
 			}
 			if(!u.isPresent()) {
 			    u.checkArrival();
