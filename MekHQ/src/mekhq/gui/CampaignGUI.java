@@ -2901,16 +2901,16 @@ public class CampaignGUI extends JPanel {
         refreshTaskList();
         refreshAcquireList();
         refreshTechsList();
-        refreshPatientList();
         refreshPartsList();
+        refreshPatientList();
         refreshDoctorsList();
         refreshCalendar();
-        refreshReport();
-        refreshFunds();
         refreshLocation();
         refreshOrganization();
-        panMap.repaint();
+        refreshReport();
+        refreshFunds();
         refreshFinancialTransactions();
+        panMap.repaint();
     }// GEN-LAST:event_btnAdvanceDayActionPerformed
 
     private void btnAssignDocActionPerformed(java.awt.event.ActionEvent evt) {
