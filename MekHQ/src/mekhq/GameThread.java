@@ -123,6 +123,7 @@ class GameThread extends Thread implements CloseClientListener {
      */
     public void clientClosed() {
     	requestStop();
+    	app.stopHost();
     }
     
     public void requestStop() {

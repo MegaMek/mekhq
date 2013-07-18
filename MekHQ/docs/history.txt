@@ -62,6 +62,7 @@ Also allow folders that just end in Male or Female (ie ralgith_Female)
 + Bug: Views (Most especially Repair Bay) not refreshing after undeploying units from a scenario.
 + Bug: Hangar Right Click->GM Mode->Undeploy not working
 + Bug 373: Warship (dropships? jumpships?) can have scheduled tasks worked on twice per day [#373]
++ Bug [#343]: MegaMek server cannot be restarted if it terminates prematurely (doesn't reach the victory phase)
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
