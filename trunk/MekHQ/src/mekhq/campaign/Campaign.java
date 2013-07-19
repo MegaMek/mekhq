@@ -4831,8 +4831,8 @@ public class Campaign implements Serializable {
     
     public void addLoan(Loan loan) {
         addReport("You have taken out loan " + loan.getDescription() + ". Your account has been credited " + DecimalFormat.getInstance().format(loan.getPrincipal()) + " for the principal amount.");
-        finances.credit(loan.getPrincipal(), Transaction.C_LOAN_PRINCIPAL, "loan principal for " + loan.getDescription(), calendar.getTime());
         finances.addLoan(loan);
+        finances.credit(loan.getPrincipal(), Transaction.C_LOAN_PRINCIPAL, "loan principal for " + loan.getDescription(), calendar.getTime());
     }
     
     public void payOffLoan(Loan loan) {

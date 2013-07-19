@@ -88,7 +88,14 @@ public class Finances implements Serializable {
 	    if(null == wentIntoDebt) {
 	        return 0;
 	    }
-	    return Utilities.getDiffYears(wentIntoDebt, cal);
+	    return Utilities.getDiffFullYears(wentIntoDebt, cal);
+	}
+	
+	public int getPartialYearsInDebt(GregorianCalendar cal) {
+		if (wentIntoDebt == null) {
+			return 0;
+		}
+		return Utilities.getDiffPartialYears(wentIntoDebt, cal);
 	}
 	
 	public boolean debit(long amount, int category, String reason, Date date) {
@@ -96,17 +103,17 @@ public class Finances implements Serializable {
 	        return false;
 	    }
 		transactions.add(new Transaction(-1 * amount, category, reason, date));
-		if(null == wentIntoDebt && isInDebt()) {
-		    wentIntoDebt = date;
-		}
+		if(null != wentIntoDebt && !isInDebt()) {
+            wentIntoDebt = null;
+        }
 		return true;
 	}
 	
 	public void credit(long amount, int category, String reason, Date date) {
 		transactions.add(new Transaction(amount, category, reason, date));
-		if(null != wentIntoDebt && !isInDebt()) {
-            wentIntoDebt = null;
-        }
+		if(null == wentIntoDebt && isInDebt()) {
+		    wentIntoDebt = date;
+		}
 	}
 	
 	/**
