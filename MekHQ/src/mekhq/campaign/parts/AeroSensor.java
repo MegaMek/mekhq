@@ -44,20 +44,20 @@ public class AeroSensor extends Part {
 	 */
 	private static final long serialVersionUID = -717866644605314883L;
 
-	private boolean dropship;
+	private boolean largeCraft;
 	
 	public AeroSensor() {
     	this(0, false, null);
     }
     
-    public AeroSensor(int tonnage, boolean drop, Campaign c) {
+    public AeroSensor(int tonnage, boolean lc, Campaign c) {
         super(tonnage, c);
         this.name = "Aerospace Sensors";
-        this.dropship = drop;
+        this.largeCraft = lc;
     }
     
     public AeroSensor clone() {
-    	AeroSensor clone = new AeroSensor(getUnitTonnage(), dropship, campaign);
+    	AeroSensor clone = new AeroSensor(getUnitTonnage(), largeCraft, campaign);
         clone.copyBaseData(this);
     	return clone;
     }
@@ -119,7 +119,7 @@ public class AeroSensor extends Part {
 
 	@Override
 	public MissingPart getMissingPart() {
-		return new MissingAeroSensor(getUnitTonnage(), dropship, campaign);
+		return new MissingAeroSensor(getUnitTonnage(), largeCraft, campaign);
 	}
 
 	@Override
@@ -134,7 +134,7 @@ public class AeroSensor extends Part {
 
 	@Override
 	public long getStickerPrice() {
-		if(dropship) {
+		if(largeCraft) {
 			return 80000;
 		}
 		return 2000 * getUnitTonnage();
@@ -169,12 +169,12 @@ public class AeroSensor extends Part {
 
 	@Override
 	public boolean isSamePartType(Part part) {
-		return part instanceof AeroSensor && dropship == ((AeroSensor)part).isForDropShip()
-				&& (dropship || getUnitTonnage() == part.getUnitTonnage());
+		return part instanceof AeroSensor && largeCraft == ((AeroSensor)part).isForDropShip()
+				&& (largeCraft || getUnitTonnage() == part.getUnitTonnage());
 	}
 
 	public boolean isForDropShip() {
-		return dropship;
+		return largeCraft;
 	}
 	
 	@Override
@@ -182,7 +182,7 @@ public class AeroSensor extends Part {
 		writeToXmlBegin(pw1, indent);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<dropship>"
-				+dropship
+				+largeCraft
 				+"</dropship>");
 		writeToXmlEnd(pw1, indent);
 	}
@@ -195,9 +195,9 @@ public class AeroSensor extends Part {
 			Node wn2 = nl.item(x);		
 			if (wn2.getNodeName().equalsIgnoreCase("dropship")) {
 				if(wn2.getTextContent().trim().equalsIgnoreCase("true")) {
-					dropship = true;
+					largeCraft = true;
 				} else {
-					dropship = false;
+					largeCraft = false;
 				}
 			}
 		}
@@ -206,7 +206,7 @@ public class AeroSensor extends Part {
 	@Override
     public String getDetails() {
 		String dropper = "";
-		if(dropship) {
+		if(largeCraft) {
 			dropper = " (dropship)";
 		}
 		return super.getDetails() + ", " + getUnitTonnage() + " tons" + dropper;

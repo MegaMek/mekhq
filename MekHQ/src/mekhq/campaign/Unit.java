@@ -29,9 +29,11 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.UUID;
 
+import megamek.common.ASFBay;
 import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
+import megamek.common.Bay;
 import megamek.common.ConvFighter;
 import megamek.common.Crew;
 import megamek.common.CriticalSlot;
@@ -40,17 +42,21 @@ import megamek.common.Engine;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.EquipmentType;
+import megamek.common.HeavyVehicleBay;
 import megamek.common.IArmorState;
 import megamek.common.ILocationExposureStatus;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
+import megamek.common.LightVehicleBay;
 import megamek.common.Mech;
+import megamek.common.MechBay;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.Player;
 import megamek.common.Protomech;
 import megamek.common.QuadMech;
 import megamek.common.SmallCraft;
+import megamek.common.SmallCraftBay;
 import megamek.common.SpaceStation;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
@@ -850,8 +856,9 @@ public class Unit implements MekHqXmlSerializable {
 		long partsValue = 0;
 		for(Part part : parts) {
 			partsValue += part.getActualValue() * part.getQuantity();
+			long pv = part.getActualValue() * part.getQuantity();
 		}
-		//TODO: we need to adjust this for equipment that doesnt show up as parts
+		//TODO: we need to adjust this for equipment that doesn't show up as parts
 		//Spacecraft need: drive unit, computer, and bridge
 		if(entity instanceof SmallCraft || entity instanceof Jumpship) {
 			//bridge
@@ -860,8 +867,83 @@ public class Unit implements MekHqXmlSerializable {
 			partsValue += 200000;
 			//drive unit
 			partsValue += 500 * entity.getOriginalWalkMP() * entity.getWeight()/100;
+			// KF Drive, Docking Collars, etc...
+			if (entity instanceof Jumpship && !(entity instanceof SpaceStation)) {
+				Jumpship js = (Jumpship) entity;
+				double driveCost = 0;
+		        // coil
+		        driveCost += 60000000 + (75000000 * js.getDocks());
+		        // initiator
+		        driveCost += 25000000 + (5000000 * js.getDocks());
+		        // controller
+		        driveCost += 50000000;
+		        // tankage
+		        driveCost += 50000 * js.getKFIntegrity();
+		        // sail
+		        driveCost += 50000 * (30 + (js.getWeight() / 7500));
+		        // charging system
+		        driveCost += 500000 + (200000 * js.getDocks());
+		        // compact core
+		        if (js instanceof Warship) {
+		        	driveCost *= 5;
+		        }
+		        // lithium fusion?
+		        if (js.hasLF()) {
+		            driveCost *= 3;
+		        }
+		        // Drive Support Systems
+		        if (js instanceof Warship) {
+		        	driveCost += 20000000 * (50 + js.getWeight() / 10000);
+		        } else {
+		        	driveCost += 10000000 * (js.getWeight() / 10000);
+		        }
+		        partsValue += driveCost;
+		        
+		        // Attitude Thrusters
+		        partsValue += 10000;
+		        // Docking Collars
+		        partsValue += 100000 * js.getDocks();
+		        // HPG
+		        if (js.hasHPG()) {
+		            partsValue += 1000000000;
+		        }
+
+		        // fuel tanks
+		        partsValue += 200 * js.getFuel() / js.getFuelPerTon();
+
+		        // armor
+		        partsValue += js.getArmorWeight(js.locations()) * EquipmentType.getArmorCost(js.getArmorType(0));
+
+		        // heat sinks
+		        int sinkCost = 2000 + 4000 * js.getHeatType();// == HEAT_DOUBLE ? 6000:
+		                                                   // 2000;
+		        partsValue += sinkCost * js.getHeatSinks();
+		        
+		        // grav deck
+		        partsValue += 5000000 * js.getGravDeck();
+		        partsValue += 10000000 * js.getGravDeckLarge();
+		        partsValue += 40000000 * js.getGravDeckHuge();
+		        
+		        // get bays
+		        int baydoors = 0;
+		        int bayCost = 0;
+		        for (Bay next : js.getTransportBays()) {
+		            baydoors += next.getDoors();
+		            if ((next instanceof MechBay) || (next instanceof ASFBay) || (next instanceof SmallCraftBay)) {
+		                bayCost += 20000 * next.getCapacity();
+		            }
+		            if ((next instanceof LightVehicleBay) || (next instanceof HeavyVehicleBay)) {
+		                bayCost += 20000 * next.getCapacity();
+		            }
+		        }
+
+		        partsValue += bayCost + baydoors * 1000;
+
+		        // life boats and escape pods
+		        partsValue += 5000 * (js.getLifeBoats() + js.getEscapePods());
+			}
 		}
-		//protomeks: heat sinks ar unhittable
+		//protomeks: heat sinks are unhittable
 		if(entity instanceof Protomech) {
 		    int sinks = 0;
 	        for (Mounted mount : entity.getWeaponList()) {
@@ -907,22 +989,22 @@ public class Unit implements MekHqXmlSerializable {
 		}		
 		else if(entity instanceof Dropship) {
 			if(((Aero)entity).isSpheroid()) {
-				multiplier = 28;
+				multiplier = 28f;
 			} else {
-				multiplier = 36;
+				multiplier = 36f;
 			}
 		}
 		else if(entity instanceof SmallCraft) {
 			tonnage = 50f;
 		}
 		else if(entity instanceof SpaceStation) {
-			multiplier = 5;
+			multiplier = 5f;
 		}
 		else if(entity instanceof Warship) {
-			multiplier = 2;
+			multiplier = 2f;
 		}
 		else if(entity instanceof Jumpship) {
-			multiplier = 1.25;
+			multiplier = 1.25f;
 		}
 		else if(entity instanceof Aero) {
 			tonnage = 200f;
@@ -1834,7 +1916,7 @@ public class Unit implements MekHqXmlSerializable {
     			((FireControlSystem)fcs).calculateCost();
     		}
     		if(null == sensor) {
-    			sensor = new AeroSensor((int) entity.getWeight(), entity instanceof Dropship, campaign);
+    			sensor = new AeroSensor((int) entity.getWeight(), entity instanceof Dropship || entity instanceof Jumpship, campaign);
     			addPart(sensor);
     			partsToAdd.add(sensor);
     		}

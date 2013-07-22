@@ -136,6 +136,7 @@ public class FireControlSystem extends Part {
 
 	@Override
 	public long getStickerPrice() {
+		calculateCost();
 		return cost;
 	}
 

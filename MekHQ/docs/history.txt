@@ -66,7 +66,8 @@ Also allow folders that just end in Male or Female (ie ralgith_Female)
 + Bug [#360]: Dragoon's Rating (both methods) doesn't take loans into account
 + Bug: Incorrect pronoun usage in injuries and reports
 + Bug [#120]: Load forces from MUL file doesn't load the pilots
-+ Added a "random" crew generator that will create a crew with a specific skill target (For Bugs [#120] and [#233] - I'll fix 233 at a later time) 
++ Added a "random" crew generator that will create a crew with a specific skill target (For Bugs [#120] and [#233] - I'll fix 233 at a later time)
++ WIP [#193]: Financial issue - incorrect value on Jumpship sale 
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
