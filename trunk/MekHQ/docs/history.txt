@@ -64,6 +64,9 @@ Also allow folders that just end in Male or Female (ie ralgith_Female)
 + Bug 373: Warship (dropships? jumpships?) can have scheduled tasks worked on twice per day [#373]
 + Bug [#343]: MegaMek server cannot be restarted if it terminates prematurely (doesn't reach the victory phase)
 + Bug [#360]: Dragoon's Rating (both methods) doesn't take loans into account
++ Bug: Incorrect pronoun usage in injuries and reports
++ Bug [#120]: Load forces from MUL file doesn't load the pilots
++ Added a "random" crew generator that will create a crew with a specific skill target (For Bugs [#120] and [#233] - I'll fix 233 at a later time) 
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement

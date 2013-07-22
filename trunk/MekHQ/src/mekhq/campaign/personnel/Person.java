@@ -241,7 +241,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
     
     public static String getGenderPronoun(int gender, int variant) {
-    	if (variant == 1) {
+    	if (variant == PRONOUN_HESHE) {
 	    	switch(gender) {
 	    	case G_MALE:
 	    		return "he";
@@ -250,7 +250,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	    	default:
 	    		return "?";
 	    	}
-    	} else if (variant == 2) {
+    	} else if (variant == PRONOUN_HIMHER) {
 	    	switch(gender) {
 	    	case G_MALE:
 	    		return "him";
@@ -259,7 +259,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	    	default:
 	    		return "?";
 	    	}
-    	} else if (variant == 3) {
+    	} else if (variant == PRONOUN_HISHER) {
 	    	switch(gender) {
 	    	case G_MALE:
 	    		return "his";
@@ -268,7 +268,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	    	default:
 	    		return "?";
 	    	}
-    	} else {
+    	} else if (variant == PRONOUN_HISHERS) {
 	    	switch(gender) {
 	    	case G_MALE:
 	    		return "his";
@@ -277,6 +277,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	    	default:
 	    		return "?";
 	    	}
+    	} else {
+    		return "UNKNOWN ERROR IN GENDER PRONOUN";
     	}
     }
     

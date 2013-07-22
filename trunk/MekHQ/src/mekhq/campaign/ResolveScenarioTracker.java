@@ -201,7 +201,7 @@ public class ResolveScenarioTracker {
 							pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
 						}
 					}
-				}			
+				}
 			} else if(e.getOwner().isEnemyOf(client.getLocalPlayer())) {
 				if(!e.canEscape() && controlsField) {
 					killCredits.put(e.getDisplayName(), "None");

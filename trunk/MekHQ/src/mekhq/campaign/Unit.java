@@ -2222,7 +2222,7 @@ public class Unit implements MekHqXmlSerializable {
     }   
     
 
-    private int getAeroCrewNeeds() {
+    public int getAeroCrewNeeds() {
     	if(entity instanceof Dropship) {
     		if(((Dropship)entity).isMilitary()) {
     			return 4 + (int)Math.ceil(entity.getWeight()/5000.0);
@@ -2257,7 +2257,7 @@ public class Unit implements MekHqXmlSerializable {
 		}
 	}
 	
-	private int getTotalDriverNeeds() {
+	public int getTotalDriverNeeds() {
 		if(entity instanceof SpaceStation) {
     		return 0;
     	}
