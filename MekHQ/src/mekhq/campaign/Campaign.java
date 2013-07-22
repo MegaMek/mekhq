@@ -522,11 +522,15 @@ public class Campaign implements Serializable {
 			
 		unit.initializeParts(true);
 		unit.runDiagnostic();
-		unit.resetPilotAndEntity();
 		if(!unit.isRepairable()) {
 			unit.setSalvage(true);
 		}
 		unit.setDaysToArrival(days);
+		
+		if (allowNewPilots) {
+			Utilities.generateRandomCrewWithCombinedSkill(unit, this);
+		}
+		unit.resetPilotAndEntity();
 		
 		// Assign an entity ID to our new unit
 		if (Entity.NONE == en.getId()) {
@@ -4319,7 +4323,7 @@ public class Campaign implements Serializable {
     		unit.setNavigator(p);
     	}
     	unit.resetPilotAndEntity();
-    	unit.runDiagnostic();   	
+    	unit.runDiagnostic();
     }
 
     public String getDragoonRating() {
