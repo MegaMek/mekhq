@@ -1573,7 +1573,7 @@ public class Campaign implements Serializable {
 	public long getPayRoll() {
 		long salaries = 0;
 		for(Person p : personnel) {
-			if(p.isActive()) {
+			if(p.isActive() && !(p.isPrisoner() || p.isBondsman())) {
 				salaries += p.getSalary();
 			}
 		}
