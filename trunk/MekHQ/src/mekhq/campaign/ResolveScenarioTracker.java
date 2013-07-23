@@ -50,6 +50,7 @@ import megamek.common.Mounted;
 import megamek.common.Tank;
 import megamek.common.XMLStreamParser;
 import mekhq.MekHQ;
+import mekhq.Utilities;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -67,6 +68,8 @@ public class ResolveScenarioTracker {
 	
 	Hashtable<UUID, Entity> entities;
 	Hashtable<UUID, Crew> pilots;
+	Hashtable<UUID, Crew> mia;
+	Hashtable<UUID, Person> newPilots;
 	ArrayList<Entity> potentialSalvage;
 	ArrayList<Unit> actualSalvage;
 	ArrayList<Unit> leftoverSalvage;
@@ -87,6 +90,8 @@ public class ResolveScenarioTracker {
 		actualSalvage = new ArrayList<Unit>();
 		leftoverSalvage = new ArrayList<Unit>();
 		pilots = new Hashtable<UUID, Crew>();
+		mia = new Hashtable<UUID, Crew>();
+		newPilots = new Hashtable<UUID, Person>();
 		units = new ArrayList<Unit>();
 		peopleStatus = new Hashtable<UUID, PersonStatus>();
 		killCredits = new Hashtable<String, String>();
@@ -199,6 +204,12 @@ public class ResolveScenarioTracker {
 					if(null != e.getCrew()) {
 						if(!e.getCrew().getExternalIdAsString().equals("-1")) {
 							pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
+						} else {
+							for (Person p : Utilities.generateRandomCrewWithCombinedSkill(e, campaign)) {
+								campaign.makePrisoner(p);
+								MekHQ.logMessage("DEBUG: Adding "+p.getName()+" to the newPilots hash");
+								newPilots.put(p.getId(), p);
+							}
 						}
 					}
 				}
@@ -222,6 +233,12 @@ public class ResolveScenarioTracker {
 				if(null != e.getCrew()) {
 					if(!e.getCrew().getExternalIdAsString().equals("-1")) {
 						pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
+					} else {
+						for (Person p : Utilities.generateRandomCrewWithCombinedSkill(e, campaign)) {
+							campaign.makePrisoner(p);
+							MekHQ.logMessage("DEBUG: Adding "+p.getName()+" to the newPilots hash");
+							newPilots.put(p.getId(), p);
+						}
 					}
 				}
             }
@@ -240,6 +257,12 @@ public class ResolveScenarioTracker {
 					if(!e.getCrew().getExternalIdAsString().equals("-1")
 					        && (controlsField || e.getCrew().isDead())) {
 						pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
+					} else {
+						for (Person p : Utilities.generateRandomCrewWithCombinedSkill(e, campaign)) {
+							campaign.makePrisoner(p);
+							MekHQ.logMessage("DEBUG: Adding "+p.getName()+" to the newPilots hash");
+							newPilots.put(p.getId(), p);
+						}
 					}
 				}
         	} else if(e.getOwner().isEnemyOf(client.getLocalPlayer())) {
@@ -413,6 +436,10 @@ public class ResolveScenarioTracker {
 				if(u.usesSoloPilot()) {
 					Crew pilot = pilots.get(p.getId());
 					if(null == pilot) {
+						Crew missingPilot = mia.get(p.getId());
+						if (missingPilot != null) {
+							status.setHits(missingPilot.getHits());
+						}
 						status.setMissing(true);
 					} else {
 						status.setHits(pilot.getHits());
@@ -421,48 +448,47 @@ public class ResolveScenarioTracker {
 					//we have a multi-crewed vee
 					if(null == en) {
 						status.setMissing(true);
-					} else {
-						if(en instanceof Tank) {
-							boolean destroyed = false;
-							for(int loc = 0; loc < en.locations(); loc++) {
-								if(loc == Tank.LOC_TURRET || loc == Tank.LOC_TURRET_2 || loc == Tank.LOC_BODY) {
-									continue;
-								}
-								if(en.getInternal(loc) <= 0) {
-									destroyed = true;
-									break;
-								} 
+					}
+					if(en instanceof Tank) {
+						boolean destroyed = false;
+						for(int loc = 0; loc < en.locations(); loc++) {
+							if(loc == Tank.LOC_TURRET || loc == Tank.LOC_TURRET_2 || loc == Tank.LOC_BODY) {
+								continue;
 							}
-							if(destroyed || null == en.getCrew() || en.getCrew().isDead()) {
-								if(Compute.d6(2) >= 7) {
-									status.setHits(1);
-								} else {
-									status.setHits(6);
-								}
-							}
-							else if(((Tank)en).isDriverHit() && u.isDriver(p)) {
-								if(Compute.d6(2) >= 7) {
-									status.setHits(1);
-								} else {
-									status.setHits(6);
-								}
-							}
-							else if(((Tank)en).isCommanderHit() && u.isCommander(p)) {
-								if(Compute.d6(2) >= 7) {
-									status.setHits(1);
-								} else {
-									status.setHits(6);
-								}
+							if(en.getInternal(loc) <= 0) {
+								destroyed = true;
+								break;
+							} 
+						}
+						if(destroyed || null == en.getCrew() || en.getCrew().isDead()) {
+							if(Compute.d6(2) >= 7) {
+								status.setHits(1);
+							} else {
+								status.setHits(6);
 							}
 						}
-						else if(en instanceof Infantry) {
-							if(casualtiesAssigned < casualties) {
-								casualtiesAssigned++;
-								if(Compute.d6(2) >= 7) {
-									status.setHits(1);
-								} else {
-									status.setHits(6);
-								}
+						else if(((Tank)en).isDriverHit() && u.isDriver(p)) {
+							if(Compute.d6(2) >= 7) {
+								status.setHits(1);
+							} else {
+								status.setHits(6);
+							}
+						}
+						else if(((Tank)en).isCommanderHit() && u.isCommander(p)) {
+							if(Compute.d6(2) >= 7) {
+								status.setHits(1);
+							} else {
+								status.setHits(6);
+							}
+						}
+					}
+					else if(en instanceof Infantry) {
+						if(casualtiesAssigned < casualties) {
+							casualtiesAssigned++;
+							if(Compute.d6(2) >= 7) {
+								status.setHits(1);
+							} else {
+								status.setHits(6);
 							}
 						}
 					}
@@ -475,6 +501,16 @@ public class ResolveScenarioTracker {
 				status.setXP(campaign.getCampaignOptions().getScenarioXP());
 				peopleStatus.put(p.getId(), status);
 			}
+		}
+		
+		// And now we have prisoners...
+		for (UUID pid : newPilots.keySet()) {
+			Person p = newPilots.get(pid);
+			status = new PersonStatus(p.getName(), "None", p.getHits());
+			status.setHits(p.getHits());
+			status.setCaptured(true);
+			MekHQ.logMessage("DEBUG: Adding prisoner "+p.getName()+", with ID: "+p.getId().toString()+" to the peopleStatus hash");
+			peopleStatus.put(p.getId(), status);
 		}
 	}
 	
@@ -514,6 +550,19 @@ public class ResolveScenarioTracker {
 			for (Crew pilot : parser.getPilots()) {
 				if(!pilot.getExternalIdAsString().equals("-1")) {
 					pilots.put(UUID.fromString(pilot.getExternalIdAsString()), pilot);
+				} else { // We can currently only add crews if we have an entity associated with them.
+					for (Entity e : parser.getEntities()) {
+						if (!e.getCrew().equals(pilot)) {
+							MekHQ.logMessage("DEBUG: Pilots do no match");
+							continue;
+						}
+						for (Person p : Utilities.generateRandomCrewWithCombinedSkill(e, campaign)) {
+							campaign.makePrisoner(p);
+							MekHQ.logMessage("DEBUG: Adding "+p.getName()+" to the newPilots hash");
+							newPilots.put(p.getId(), p);
+						}
+						break;
+					}
 				}
 			}
 		}
@@ -579,11 +628,12 @@ public class ResolveScenarioTracker {
 			//TODO: we need another way of handling this for multi-crewed units
 			for(Crew crew : parser.getPilots()) {
 			    if(!controlsField && crew.getHits() < 6) {
-			        //These should be MIA
+			        // These should be MIA... MIA now sets hits!
+			    	mia.put(UUID.fromString(crew.getExternalIdAsString()), crew);
 			        continue;
 			    }
 			    if(crew.getExternalIdAsString().equals("-1")) {
-			        continue;
+			        continue; // TODO: use the generate random crew function here
 			    }
 			    Crew existingPilot = pilots.get(UUID.fromString(crew.getExternalIdAsString()));
 			    if(null != existingPilot && existingPilot.getHits() > crew.getHits()) {
@@ -671,6 +721,18 @@ public class ResolveScenarioTracker {
 			}
 			if (campaign.getCampaignOptions().useAdvancedMedical()) {
 				person.diagnose(status.getHits(), campaign);
+			}
+			if (status.isBondsman()) {
+				person.setBondsman();
+			}
+			if (status.isPrisoner()) {
+				person.setPrisoner();
+			}
+			if (!status.isBondsman() && !status.isPrisoner() && status.isCaptured()) {
+				person.setFreeMan();
+			}
+			if (status.toRemove()) {
+				campaign.removePerson(pid);
 			}
 		}
 		
@@ -835,6 +897,10 @@ public class ResolveScenarioTracker {
 		private boolean missing;
 		private int xp;
 		private ArrayList<Kill> kills;
+		private boolean captured;
+		private boolean prisoner;
+		private boolean bondsman;
+		private boolean remove;
 		
 		public PersonStatus(String n, String u, int h) {
 			name = n;
@@ -843,6 +909,42 @@ public class ResolveScenarioTracker {
 			missing = false;
 			xp = 0;
 			kills = new ArrayList<Kill>();
+			captured = false;
+			prisoner = false;
+			bondsman = false;
+			remove = false;
+		}
+		
+		public boolean toRemove() {
+			return remove;
+		}
+		
+		public void setRemove(boolean set) {
+			remove = set;
+		}
+		
+		public boolean isCaptured() {
+			return captured;
+		}
+		
+		public void setCaptured(boolean set) {
+			captured = set;
+		}
+		
+		public boolean isPrisoner() {
+			return prisoner;
+		}
+		
+		public void setPrisoner(boolean set) {
+			prisoner = set;
+		}
+		
+		public boolean isBondsman() {
+			return bondsman;
+		}
+		
+		public void setBondsman(boolean set) {
+			bondsman = set;
 		}
 		
 		public String getName() {

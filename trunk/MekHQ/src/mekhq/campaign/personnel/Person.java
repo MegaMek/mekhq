@@ -122,6 +122,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public static final int PRONOUN_HIMHER = 1;
     public static final int PRONOUN_HISHER = 2;
     public static final int PRONOUN_HISHERS = 3;
+    
+    // Prisoners, Bondsmen, and Normal Personnel
+    public static final int PRISONER_NOT = 0;
+    public static final int PRISONER_YES = 1;
+    public static final int PRISONER_BONDSMAN = 2;
+    public static final int PRISONER_NUM = 3;
 	
     protected UUID id;
     protected int oldId;
@@ -147,6 +153,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     protected int xp;
     protected int salary;
     private int hits;
+    private int prisonerStatus;
         
     //assignments
     private UUID unitId;
@@ -219,6 +226,45 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         idleMonths = -1;
         daysToWaitForHealing = 15;
         resetMinutesLeft();
+        prisonerStatus = PRISONER_NOT;
+    }
+    
+    public boolean isPrisoner() {
+    	if (prisonerStatus == PRISONER_YES) {
+    		return true;
+    	}
+    	return false;
+    }
+    
+    public void setPrisoner() {
+    	prisonerStatus = PRISONER_YES;
+    }
+    
+    public boolean isBondsman() {
+    	if (prisonerStatus == PRISONER_BONDSMAN) {
+    		return true;
+    	}
+    	return false;
+    }
+    
+    public void setBondsman() {
+    	prisonerStatus = PRISONER_BONDSMAN;
+    }
+    
+    public boolean isFree() {
+    	return (isPrisoner() || isBondsman());
+    }
+    
+    public void setFreeMan() {
+    	prisonerStatus = PRISONER_NOT;
+    }
+    
+    public void setPrisonerStatus(int status) {
+    	prisonerStatus = status;
+    }
+    
+    public int getPrisonerStatus() {
+    	return prisonerStatus;
     }
     
     public String getGenderName() {
@@ -299,6 +345,23 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     
     public String getStatusName() {
     	return getStatusName(status);
+    }
+    
+    public static String getPrisonerStatusName(int status) {
+    	switch (status) {
+    	case PRISONER_NOT:
+    		return "Free";
+    	case PRISONER_YES:
+    		return "Prisoner";
+    	case PRISONER_BONDSMAN:
+    		return "Bondsman";
+    	default:
+    		return "?";
+    	}
+    }
+    
+    public String getPrisonerStatusName() {
+    	return getPrisonerStatusName(prisonerStatus);
     }
 
     public String getName() {
@@ -705,6 +768,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				+status
 				+"</status>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<prisonerstatus>"
+				+prisonerStatus
+				+"</prisonerstatus>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<hits>"
 				+hits
 				+"</hits>");
@@ -849,6 +916,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("status")) {
 					retVal.status = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("prisonerstatus")) {
+					retVal.prisonerStatus = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("salary")) {
 					retVal.salary = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("minutesLeft")) {
@@ -1191,6 +1260,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	}
 	
 	public int getRank() {
+		if (isPrisoner()) {
+			return Ranks.RANK_PRISONER;
+		}
+		if (isBondsman()) {
+			return Ranks.RANK_BONDSMAN;
+		}
 		return rank;
 	}
 	
@@ -1376,6 +1451,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	public String getFullTitle() {
 		String rank = ranks.getRank(getRank());
 		if(rank.equalsIgnoreCase("None")) {
+			if (isPrisoner()) {
+				return "Prisoner "+getName();
+			}
+			if (isBondsman()) {
+				return "Bondsman "+getName();
+			}
 			return getName();
 		}
 		return rank + " " + getName();
