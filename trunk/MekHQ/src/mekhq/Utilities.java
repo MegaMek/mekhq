@@ -424,7 +424,6 @@ public class Utilities {
 						totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
 					}
 					averageGunnery = (int)Math.round(((double)totalGunnery)/gunners.size());
-					MekHQ.logMessage("Trying crew average gunnery of: "+averageGunnery+" for "+unit.getName()+" based on a total gunnery of: "+totalGunnery);
 				}
     		} else if (unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
 				while (averageGunnery != oldCrew.getGunnery()) {
