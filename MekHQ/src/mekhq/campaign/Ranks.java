@@ -55,6 +55,8 @@ public class Ranks implements Serializable {
 		{"None","Point","Point Commander","Star Commander","Star Captain","Star Colonel","Galaxy Commander","Khan","ilKhan"}
 	};
 	private static final int[] officerCut = {7,8,11,9,5,9,3};
+	public static final int RANK_BONDSMAN = -1;
+	public static final int RANK_PRISONER = -2;
 	
 	private int rankSystem;
 	private ArrayList<String> ranks;
@@ -124,6 +126,12 @@ public class Ranks implements Serializable {
 	public String getRank(int r) {
 		if(r >= ranks.size()) {
 			return "Unknown";
+		}
+		if (r == RANK_BONDSMAN) { // Bondsman
+			return "Bondsman";
+		}
+		if (r == RANK_PRISONER) { // Prisoners
+			return "Prisoner";
 		}
 		return ranks.get(r);
 	}

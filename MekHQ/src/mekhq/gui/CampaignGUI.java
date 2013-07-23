@@ -7069,6 +7069,20 @@ public class CampaignGUI extends JPanel {
                 refreshDoctorsList();
                 refreshReport();
                 refreshOrganization();
+            } else if (command.equalsIgnoreCase("PRISONER_STATUS")) {
+                int selected = Integer.parseInt(st.nextToken());
+                for(Person person : people) {
+                    getCampaign().changePrisonerStatus(person, selected);
+                }
+                refreshServicedUnitList();
+                refreshUnitList();
+                refreshPatientList();
+                refreshPersonnelList();
+                filterPersonnel();
+                refreshTechsList();
+                refreshDoctorsList();
+                refreshReport();
+                refreshOrganization();
             } else if (command.equalsIgnoreCase("EDGE")) {
                 String trigger = st.nextToken();
                 selectedPerson.changeEdgeTrigger(trigger);
@@ -7319,6 +7333,15 @@ public class CampaignGUI extends JPanel {
             }
             return true;
         }
+        
+        private boolean areAllEligible(Person[] people) {
+            for (Person person : people) {
+                if (person.isPrisoner() || person.isBondsman()) {
+                    return false;
+                }
+            }
+            return true;
+        }
 
         private Person[] getSelectedPeople() {
             Person[] selected = new Person[personnelTable.getSelectedRowCount()];
@@ -7343,24 +7366,27 @@ public class CampaignGUI extends JPanel {
                 JMenuItem menuItem = null;
                 JMenu menu = null;
                 JCheckBoxMenuItem cbMenuItem = null;
+                Person[] selected = getSelectedPeople();
                 // **lets fill the pop up menu**//
-                menu = new JMenu("Change Rank");
-                int rankOrder = 0;
-                for(String rank : getCampaign().getRanks().getAllRanks()) {
-                    cbMenuItem = new JCheckBoxMenuItem(rank);
-                    cbMenuItem.setActionCommand("RANK|" + rankOrder);
-                    if(person.getRank() == rankOrder) {
-                        cbMenuItem.setSelected(true);
-                    }
-                    cbMenuItem.addActionListener(this);
-                    cbMenuItem.setEnabled(true);
-                    menu.add(cbMenuItem);
-                    rankOrder++;
+                if (areAllEligible(selected)) {
+	                menu = new JMenu("Change Rank");
+	                int rankOrder = 0;
+	                for(String rank : getCampaign().getRanks().getAllRanks()) {
+	                    cbMenuItem = new JCheckBoxMenuItem(rank);
+	                    cbMenuItem.setActionCommand("RANK|" + rankOrder);
+	                    if(person.getRank() == rankOrder) {
+	                        cbMenuItem.setSelected(true);
+	                    }
+	                    cbMenuItem.addActionListener(this);
+	                    cbMenuItem.setEnabled(true);
+	                    menu.add(cbMenuItem);
+	                    rankOrder++;
+	                }
+	                if(menu.getItemCount() > 20) {
+	                    MenuScroller.setScrollerFor(menu, 20);
+	                }
+	                popup.add(menu);
                 }
-                if(menu.getItemCount() > 20) {
-                    MenuScroller.setScrollerFor(menu, 20);
-                }
-                popup.add(menu);
                 menu = new JMenu("Change Status");
                 for(int s = 0; s < Person.S_NUM; s++) {
                     cbMenuItem = new JCheckBoxMenuItem(Person.getStatusName(s));
@@ -7368,6 +7394,18 @@ public class CampaignGUI extends JPanel {
                         cbMenuItem.setSelected(true);
                     }
                     cbMenuItem.setActionCommand("STATUS|" + s);
+                    cbMenuItem.addActionListener(this);
+                    cbMenuItem.setEnabled(true);
+                    menu.add(cbMenuItem);
+                }
+                popup.add(menu);
+                menu = new JMenu("Change Prisoner Status");
+                for(int s = 0; s < Person.PRISONER_NUM; s++) {
+                    cbMenuItem = new JCheckBoxMenuItem(Person.getPrisonerStatusName(s));
+                    if(person.getPrisonerStatus() == s) {
+                        cbMenuItem.setSelected(true);
+                    }
+                    cbMenuItem.setActionCommand("PRISONER_STATUS|" + s);
                     cbMenuItem.addActionListener(this);
                     cbMenuItem.setEnabled(true);
                     menu.add(cbMenuItem);
@@ -7415,8 +7453,7 @@ public class CampaignGUI extends JPanel {
                 }
                 popup.add(menu);
                 // switch pilot
-                Person[] selected = getSelectedPeople();
-                if(oneSelected && person.isActive()) {
+                if(oneSelected && person.isActive() && !(person.isPrisoner() || person.isBondsman())) {
                         menu = new JMenu("Assign to Unit");
                         JMenu pilotMenu = new JMenu("As Pilot");
                         JMenu crewMenu = new JMenu("As Crewmember");
@@ -7525,7 +7562,7 @@ public class CampaignGUI extends JPanel {
                         }
                         menu.setEnabled(!person.isDeployed(getCampaign()));
                         popup.add(menu);
-                } else if (areAllActive(selected)) {
+                } else if (areAllActive(selected)  && areAllEligible(selected)) {
                     JMenu pilotMenu = new JMenu("As Pilot");
                     JMenu crewMenu = new JMenu("As Crewmember");
                     JMenu driverMenu = new JMenu("As Driver");

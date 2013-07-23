@@ -560,9 +560,26 @@ public class Campaign implements Serializable {
 		}
 		return unitIds.get(id);
 	}
+	
+	public boolean makePrisoner(Person p) {
+		return recruitPerson(p, true, false);
+	}
+	
+	public boolean makeBondsman(Person p) {
+		return recruitPerson(p, false, true);
+	}
 
 	public boolean recruitPerson(Person p) {
-	    if(getCampaignOptions().payForRecruitment()) {
+		return recruitPerson(p, false, false);
+	}
+	
+	public boolean recruitPerson(Person p, boolean prisoner, boolean bondsman) {
+		if (prisoner && bondsman) {
+			addReport("<font color='red'><b>Cannot have someone who is both a prisoner and a bondsman, there is an error in the code.</b></font>");
+			return false;
+		}
+		// Only pay if option set and this isn't a prisoner or bondsman
+	    if(getCampaignOptions().payForRecruitment() && !(prisoner || bondsman)) {
 	        if(!getFinances().debit(2 * p.getSalary(), Transaction.C_SALARY, "recruitment of " + p.getName(), getCalendar().getTime())) {
 	            addReport("<font color='red'><b>Insufficient funds to recruit " + p.getName() + "</b></font>");
 	            return false;
@@ -588,7 +605,16 @@ public class Campaign implements Serializable {
 		if(p.getRank() > 0) {
 			rankEntry = " as a " + getRanks().getRank(p.getRank());
 		}
-		p.addLogEntry(getDate(), "Joined " + getName() + rankEntry);
+		if (prisoner) {
+			p.setPrisoner();
+			p.addLogEntry(getDate(), "Made Prisoner " + getName() + rankEntry);
+		} else if (bondsman) {
+			p.setBondsman();
+			p.addLogEntry(getDate(), "Made Bondsman " + getName() + rankEntry);
+		} else {
+			p.setFreeMan();
+			p.addLogEntry(getDate(), "Joined " + getName() + rankEntry);
+		}
 		return true;
 	}
 	
@@ -4102,6 +4128,37 @@ public class Campaign implements Serializable {
 	public void decreaseMedicPool(int i) {
 		medicPool = Math.max(0, medicPool - i);
 	}
+    
+    public void changePrisonerStatus(Person p, int status) {
+    	switch (status) {
+    	case Person.PRISONER_NOT:
+    		p.setFreeMan();
+    		p.addLogEntry(getDate(), "Freed");
+    		break;
+    	case Person.PRISONER_YES:
+    		if (p.getRank() > 0) {
+    			changeRank(p, 0, true); // They don't get to have a rank. Their rank is Prisoner or Bondsman.
+    		}
+    		p.setPrisoner();
+    		p.addLogEntry(getDate(), "Made Prisoner");
+    		break;
+    	case Person.PRISONER_BONDSMAN:
+    		if (p.getRank() > 0) {
+    			changeRank(p, 0, true); // They don't get to have a rank. Their rank is Prisoner or Bondsman.
+    		}
+    		p.setBondsman();
+    		p.addLogEntry(getDate(), "Made Bondsman");
+    		break;
+    	default:
+    		break;
+    	}
+    	if (p.isBondsman() || p.isPrisoner()) {
+    		Unit u = getUnit(p.getUnitId());
+    		if (u != null) {
+    			u.remove(p, true);
+    		}
+    	}
+    }
 	
 	public void changeStatus(Person person, int status) {
 		Unit u = getUnit(person.getUnitId());
