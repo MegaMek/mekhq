@@ -27,7 +27,6 @@ import java.io.Serializable;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

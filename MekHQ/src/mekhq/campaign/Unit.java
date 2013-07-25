@@ -34,6 +34,7 @@ import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
 import megamek.common.Bay;
+import megamek.common.CargoBay;
 import megamek.common.ConvFighter;
 import megamek.common.Crew;
 import megamek.common.CriticalSlot;
@@ -943,6 +944,7 @@ public class Unit implements MekHqXmlSerializable {
 		        partsValue += 5000 * (js.getLifeBoats() + js.getEscapePods());
 			}
 		}
+		
 		//protomeks: heat sinks are unhittable
 		if(entity instanceof Protomech) {
 		    int sinks = 0;
@@ -956,6 +958,16 @@ public class Unit implements MekHqXmlSerializable {
 		}
 		
 		return (long)(partsValue * getUnitCostMultiplier());
+	}
+	
+	public double getCargoCapacity() {
+		double capacity = 0;
+		for (Bay bay : entity.getTransportBays()) {
+			if (bay instanceof CargoBay) {
+				capacity += bay.getCapacity();
+			}
+		}
+		return capacity;
 	}
 	
 	public double getUnitCostMultiplier() {

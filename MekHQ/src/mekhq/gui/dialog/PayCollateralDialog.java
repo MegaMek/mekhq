@@ -42,13 +42,11 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Unit;
-import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Part;

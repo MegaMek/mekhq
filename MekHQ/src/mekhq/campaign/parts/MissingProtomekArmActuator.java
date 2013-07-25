@@ -23,14 +23,12 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Protomech;
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
+import megamek.common.Protomech;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.work.IAcquisitionWork;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

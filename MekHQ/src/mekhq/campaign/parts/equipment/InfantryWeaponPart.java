@@ -27,7 +27,6 @@ import megamek.common.EquipmentType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.parts.MissingPart;
-import mekhq.campaign.parts.Part;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

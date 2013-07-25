@@ -27,7 +27,6 @@ import megamek.common.MiscType;
 import megamek.common.Mounted;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.MissingPart;
-import mekhq.campaign.parts.Part;
 
 /**
  *

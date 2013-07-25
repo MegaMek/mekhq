@@ -112,7 +112,7 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
     private void updateJumpships(Entity en) {
         if (en instanceof Warship) {
             if (en.getDocks() > 0) {
-                warhipWithDocsOwner = true;
+                warhipWithDocksOwner = true;
             } else {
                 warshipOwner = true;
             }
@@ -359,7 +359,7 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
         sb.append("    Dropship Capacity:    ").append(getTransportPercent().toPlainString()).append("%\n");
         sb.append("    Jumpship?             ").append(jumpshipOwner ? "Yes" : "No").append("\n");
         sb.append("    Warship w/out Dock?   ").append(warshipOwner ? "Yes" : "No").append("\n");
-        sb.append("    Warship w/ Dock?      ").append(warhipWithDocsOwner ? "Yes" : "No").append("\n\n");
+        sb.append("    Warship w/ Dock?      ").append(warhipWithDocksOwner ? "Yes" : "No").append("\n\n");
 
         sb.append("Technology:                     ").append(getTechValue()).append("\n");
         sb.append("    # Clan Units:         ").append(countClan).append("\n");

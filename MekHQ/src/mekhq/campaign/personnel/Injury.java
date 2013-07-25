@@ -26,7 +26,6 @@ import java.util.UUID;
 
 import mekhq.MekHQ;
 import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.personnel.Person;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

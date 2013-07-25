@@ -23,21 +23,19 @@ package mekhq.campaign;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.UUID;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.common.Entity;
 import mekhq.MekHQ;
 import mekhq.Version;
-import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  *  An arraylist of IAcquisitionWork
