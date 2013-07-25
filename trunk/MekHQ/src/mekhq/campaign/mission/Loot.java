@@ -21,26 +21,13 @@
 package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.UUID;
 
 import megamek.common.Entity;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlSerializable;
-import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.Unit;
 import mekhq.campaign.finances.Transaction;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.parts.Part;
-
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 
 /**

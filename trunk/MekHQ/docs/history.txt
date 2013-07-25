@@ -70,6 +70,7 @@ Also allow folders that just end in Male or Female (ie ralgith_Female)
 + WIP [#193]: Financial issue - incorrect value on Jumpship sale
 + Feature: Prisoners and Bondsmen. You can now set this via the right click menu.
 + Bug: Prisoners and Bondsmen get paid.
++ Cargo Weight and Capacity on status bar
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement

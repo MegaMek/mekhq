@@ -27,7 +27,6 @@ import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.ILocationExposureStatus;
-import megamek.common.Mech;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.TargetRoll;

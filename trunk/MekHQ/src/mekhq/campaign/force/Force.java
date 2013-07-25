@@ -58,6 +58,7 @@ public class Force implements Serializable {
 	// pathway to force icon
     public static final String ROOT_ICON = "-- General --";
     public static final String ICON_NONE = "None";
+    public static final int FORCE_NONE = -1;
     private String iconCategory = ROOT_ICON;
     private String iconFileName = ICON_NONE;
 

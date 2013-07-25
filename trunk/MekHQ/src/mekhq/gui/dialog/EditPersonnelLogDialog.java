@@ -40,8 +40,8 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 
-import mekhq.campaign.LogEntry;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.LogEntry;
 import mekhq.campaign.personnel.Person;
 
 /**

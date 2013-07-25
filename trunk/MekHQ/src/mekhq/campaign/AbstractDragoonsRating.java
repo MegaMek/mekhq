@@ -72,7 +72,7 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
     protected int numberVeeBays = 0;
     protected int numberBaBays = 0;
     protected int numberInfBays = 0;
-    protected boolean warhipWithDocsOwner = false;
+    protected boolean warhipWithDocksOwner = false;
     protected boolean warshipOwner = false;
     protected boolean jumpshipOwner = false;
     protected Person commander = null;
@@ -304,7 +304,7 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
         value = Math.min(value, 25);
 
         //Only the highest of these values should be used, regardless of how many are actually owned.
-        if (warhipWithDocsOwner) {
+        if (warhipWithDocksOwner) {
             value += 30;
         } else if (warshipOwner) {
             value += 20;
@@ -464,7 +464,7 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
         numberBaBays = 0;
         numberVeeBays = 0;
         numberInfBays = 0;
-        warhipWithDocsOwner = false;
+        warhipWithDocksOwner = false;
         warshipOwner = false;
         jumpshipOwner = false;
         commander = null;

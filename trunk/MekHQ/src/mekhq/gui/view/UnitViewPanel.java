@@ -22,7 +22,6 @@ import megamek.client.ui.swing.util.FluffImageHelper;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Entity;
 import megamek.common.MechView;
-import megamek.common.Player;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import megamek.common.util.DirectoryItems;

@@ -29,7 +29,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import megamek.common.Compute;
-import mekhq.campaign.IDragoonsRating;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 

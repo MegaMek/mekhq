@@ -22,9 +22,6 @@ package mekhq.campaign;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 import java.util.UUID;
 
 import megamek.common.ASFBay;
@@ -47,10 +44,8 @@ import megamek.common.Protomech;
 import megamek.common.SmallCraft;
 import megamek.common.SmallCraftBay;
 import megamek.common.Tank;
-import megamek.common.TechConstants;
 import megamek.common.VTOL;
 import megamek.common.Warship;
-import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
@@ -139,7 +134,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
     private void updateJumpships(Entity en) {
         if (en instanceof Warship) {
             if (en.getDocks() > 0) {
-                warhipWithDocsOwner = true;
+                warhipWithDocksOwner = true;
             } else {
                 warshipOwner = true;
             }
@@ -618,7 +613,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         sb.append("    Dropship Capacity:    ").append(getTransportPercent().toPlainString()).append("\n");
         sb.append("    Jumpship?             ").append(jumpshipOwner ? "Yes" : "No").append("\n");
         sb.append("    Warship w/out Dock?   ").append(warshipOwner ? "Yes" : "No").append("\n");
-        sb.append("    Warship w/ Dock?      ").append(warhipWithDocsOwner ? "Yes" : "No").append("\n\n");
+        sb.append("    Warship w/ Dock?      ").append(warhipWithDocksOwner ? "Yes" : "No").append("\n\n");
 
         sb.append("Technology:                     ").append(getTechValue()).append("\n");
         sb.append("    # Clan Units:         ").append(countClan).append("\n");

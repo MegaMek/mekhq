@@ -23,10 +23,9 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.IArmorState;
-import megamek.common.Protomech;
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
+import megamek.common.Protomech;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;

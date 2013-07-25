@@ -92,7 +92,6 @@ import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.BuildingBlock;
 import megamek.common.util.DirectoryItems;
-import mekhq.campaign.LogEntry;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.Utilities;
@@ -519,6 +518,7 @@ public class Campaign implements Serializable {
 		unit.setId(id);
 		units.add(unit);
 		unitIds.put(id, unit);
+		removeUnitFromForce(unit); // Added to avoid the 'default force bug' when calculating cargo
 			
 		unit.initializeParts(true);
 		unit.runDiagnostic();
@@ -1754,7 +1754,7 @@ public class Campaign implements Serializable {
 		Force force = getForce(u.getForceId());
 		if(null != force) {
 			force.removeUnit(u.getId());
-			u.setForceId(-1);
+			u.setForceId(Force.FORCE_NONE);
 			u.setScenarioId(-1);
 			if(u.getEntity().hasC3i() && u.getEntity().calculateFreeC3Nodes() < 5) {
 				Vector<Unit> removedUnits = new Vector<Unit>();
@@ -5037,6 +5037,29 @@ public class Campaign implements Serializable {
                 }
             }          
         }
-        
+    }
+    
+    public double getTotalCargoCapacity() {
+    	double capacity = 0;
+    	for (UUID id : getForces().getAllUnits()) {
+    		Unit u = getUnit(id);
+    		if(u.getEntity() instanceof Dropship || u.getEntity() instanceof Jumpship) {
+    			capacity += u.getCargoCapacity();
+    		}
+    	}
+    	return capacity;
+    }
+    
+    public double getCargoTonnage() {
+    	double cargoTonnage = 0;
+    	for (Part part : getSpareParts()) {
+    		cargoTonnage += (part.getQuantity() * part.getTonnage());
+    	}
+    	for (Unit unit : getUnits()) {
+    		if (unit.getForceId() == Force.FORCE_NONE && !(unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship || unit.getEntity() instanceof SmallCraft)) {
+    			cargoTonnage += unit.getEntity().getWeight();
+    		}
+    	}
+    	return cargoTonnage;
     }
 }

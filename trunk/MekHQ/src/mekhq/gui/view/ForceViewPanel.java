@@ -25,8 +25,6 @@ import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Crew;
 import megamek.common.Entity;
-import megamek.common.Mech;
-import megamek.common.Player;
 import megamek.common.UnitType;
 import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
