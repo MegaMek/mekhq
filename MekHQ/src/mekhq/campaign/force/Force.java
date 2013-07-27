@@ -36,6 +36,7 @@ import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
+import mekhq.campaign.mission.Scenario;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -263,6 +264,10 @@ public class Force implements Serializable {
 			}
 			// We only need to clear the subForces if we're killing everything.
 			for(Force sub : getSubForces()) {
+				Scenario s = c.getScenario(sub.getScenarioId());
+				if (s != null) {
+					s.removeForce(sub.getId());
+				}
 				sub.clearScenarioIds(c);
 			}
 		} else {
