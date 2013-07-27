@@ -152,6 +152,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     protected int salary;
     private int hits;
     private int prisonerStatus;
+    
+    boolean dependent;
+    boolean commander;
         
     //assignments
     private UUID unitId;
@@ -225,6 +228,24 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         daysToWaitForHealing = 15;
         resetMinutesLeft();
         prisonerStatus = PRISONER_NOT;
+        dependent = false;
+        commander = false;
+    }
+    
+    public boolean isCommander() {
+    	return commander;
+    }
+    
+    public void setCommander(boolean tf) {
+    	commander = tf;
+    }
+    
+    public boolean isDependent() {
+    	return dependent;
+    }
+    
+    public void setDependent(boolean tf) {
+    	dependent = tf;
     }
     
     public boolean isPrisoner() {

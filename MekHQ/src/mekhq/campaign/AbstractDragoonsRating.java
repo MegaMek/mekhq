@@ -161,21 +161,41 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
     @Override
     public Person getCommander() {
         if ((commander == null)) {
+        	
+        	Person flagged = campaign.getFlaggedCommander();
+        	if (flagged != null && commanderList.indexOf(flagged) == -1) {
+        		commanderList.add(flagged);
+        	}
 
             //If the list is null, we cannot determine a commander.
             if (commanderList == null || commanderList.isEmpty()) {
                 commander = null;
-                return null;
+                return commander;
             }
 
             //Sort the list of personnel by rank.  Whoever has the highest rank is the commander.
             Collections.sort(commanderList, new Comparator<Person>() {
                 @Override
                 public int compare(Person p1, Person p2) {
-                    return ((Comparable<Integer>) p2.getRank()).compareTo(p1.getRank());
+                	int retVal = ((Comparable<Integer>) p2.getRank()).compareTo(p1.getRank());
+                	if (retVal == 0) {
+                		if (p1.isCommander()) {
+                			retVal = 1;
+                		} else if (p2.isCommander()) {
+                			retVal = -1;
+                		}
+                	}
+                    return retVal;
                 }
             });
             commander = commanderList.get(0);
+            
+            if (flagged != null && !flagged.getId().equals(commander.getId())) {
+            	campaign.addReport("<font color='red'>ERROR: "+flagged.getFullTitle()+" is flagged as CO, but "+commander.getFullTitle()+" was chosen for commander in Dragoons' Rating Calculation.</font>");
+            	campaign.addReport("<font color='red'>Setting "+commander.getFullTitle()+" as the flagged CO. Please verify this is the correct person.</font>");
+            	commander.setCommander(true);
+            	flagged.setCommander(false);
+            }
         }
 
         return commander;

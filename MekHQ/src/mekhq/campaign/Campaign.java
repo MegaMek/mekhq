@@ -1589,11 +1589,20 @@ public class Campaign implements Serializable {
 		}
 		return active;
 	}
+	
+	public Person getFlaggedCommander() {
+		for (Person p : getPersonnel()) {
+			if (p.isCommander()) {
+				return p;
+			}
+		}
+		return null;
+	}
 
 	public long getPayRoll() {
 		long salaries = 0;
 		for(Person p : personnel) {
-			if(p.isActive() && !(p.isPrisoner() || p.isBondsman())) {
+			if(p.isActive() && !p.isDependent() && !(p.isPrisoner() || p.isBondsman())) {
 				salaries += p.getSalary();
 			}
 		}

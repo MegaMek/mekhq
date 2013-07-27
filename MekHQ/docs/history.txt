@@ -73,6 +73,8 @@ Also allow folders that just end in Male or Female (ie ralgith_Female)
 + Cargo Weight and Capacity on status bar
 + Bug [#375]: No Task XP From Procurement
 + Acquisitions Table improvements (Multi-select for GM Options & Items with 0 quantity no longer hang around)
++ RFE [#68]: Dependents (0-salary AsTechs)
++ RFE [#88]: Ability to assign an overall commander and abilities
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
