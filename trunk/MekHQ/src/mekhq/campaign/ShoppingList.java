@@ -166,7 +166,6 @@ public class ShoppingList implements MekHqXmlSerializable {
             }
         }
         shoppingList = newShoppingList;
-        
     } 
     
     @Override
@@ -222,6 +221,16 @@ public class ShoppingList implements MekHqXmlSerializable {
                 ((MissingEquipmentPart)shoppingItem).restore();
             }
         }
+    }
+    
+    public void removeZeroQuantityFromList() {
+    	ArrayList<IAcquisitionWork> newShoppingList = new ArrayList<IAcquisitionWork>();
+        for(IAcquisitionWork shoppingItem : shoppingList) {
+            if(shoppingItem.getQuantity() > 0) {
+                newShoppingList.add(shoppingItem);
+            }
+        }
+        shoppingList = newShoppingList;
     }
     
     public ArrayList<IAcquisitionWork> getPartList() {
