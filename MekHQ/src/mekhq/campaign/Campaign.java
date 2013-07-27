@@ -823,7 +823,7 @@ public class Campaign implements Serializable {
 		}
 	}
 	
-	private void addPartWithoutId(Part p) {	 
+	public void addPartWithoutId(Part p) {	 
 	    if(p instanceof MissingPart && null == p.getUnitId()) {
 	        //we shouldn't have spare missing parts. I think their existence is a relic.
 	        return;
@@ -3178,9 +3178,10 @@ public class Campaign implements Serializable {
 			}
 			
 			
-			if (p != null)
+			if (p != null) {
 				p.setCampaign(retVal);
 				retVal.addPartWithoutId(p);
+			}
 		}
 
 		MekHQ.logMessage("Load Part Nodes Complete!", 4);

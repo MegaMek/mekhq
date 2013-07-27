@@ -479,17 +479,20 @@ public class CampaignGUI extends JPanel {
         lblTempMedics = new javax.swing.JLabel();
         lblCargo = new javax.swing.JLabel();
         menuBar = new javax.swing.JMenuBar();
-        javax.swing.JMenu fileMenu = new javax.swing.JMenu();
+        menuFile = new javax.swing.JMenu();
         menuLoad = new javax.swing.JMenuItem();
         menuSave = new javax.swing.JMenuItem();
         menuOptions = new javax.swing.JMenuItem();
         menuOptionsMM = new javax.swing.JMenuItem();
         menuThemes = new javax.swing.JMenu();
-        javax.swing.JMenuItem exitMenuItem = new javax.swing.JMenuItem();
+        menuExitItem = new javax.swing.JMenuItem();
         menuManage = new javax.swing.JMenu();
+        menuManageImportExport = new javax.swing.JMenu();
         miLoadForces = new javax.swing.JMenuItem();
         miExportPerson = new javax.swing.JMenuItem();
         miImportPerson = new javax.swing.JMenuItem();
+        miExportParts = new javax.swing.JMenuItem();
+        miImportParts = new javax.swing.JMenuItem();
         addFunds = new javax.swing.JMenuItem();
         miGetLoan = new javax.swing.JMenuItem();
         miMercRoster = new javax.swing.JMenuItem();
@@ -511,8 +514,8 @@ public class CampaignGUI extends JPanel {
         miFullStrengthMedics = new javax.swing.JMenuItem();
         menuCommunity = new javax.swing.JMenu();
         miChat = new javax.swing.JMenuItem();
-        javax.swing.JMenu helpMenu = new javax.swing.JMenu();
-        javax.swing.JMenuItem aboutMenuItem = new javax.swing.JMenuItem();
+        menuHelp = new javax.swing.JMenu();
+        menuAboutItem = new javax.swing.JMenuItem();
         statusPanel = new javax.swing.JPanel();
         lblPersonChoice = new javax.swing.JLabel();
         choicePerson = new javax.swing.JComboBox();
@@ -2116,8 +2119,8 @@ public class CampaignGUI extends JPanel {
 
         menuBar.setName("menuBar"); // NOI18N
 
-        fileMenu.setText(resourceMap.getString("fileMenu.text")); // NOI18N
-        fileMenu.setName("fileMenu"); // NOI18N
+        menuFile.setText(resourceMap.getString("fileMenu.text")); // NOI18N
+        menuFile.setName("fileMenu"); // NOI18N
 
         menuLoad.setText(resourceMap.getString("menuLoad.text")); // NOI18N
         menuLoad.setName("menuLoadXml"); // NOI18N
@@ -2126,7 +2129,7 @@ public class CampaignGUI extends JPanel {
                 menuLoadXmlActionPerformed(evt);
             }
         });
-        fileMenu.add(menuLoad);
+        menuFile.add(menuLoad);
 
         menuSave.setText(resourceMap.getString("menuSave.text")); // NOI18N
         menuSave.setName("menuSaveXml"); // NOI18N
@@ -2135,7 +2138,7 @@ public class CampaignGUI extends JPanel {
                 menuSaveXmlActionPerformed(evt);
             }
         });
-        fileMenu.add(menuSave);
+        menuFile.add(menuSave);
 
         menuOptions.setText(resourceMap.getString("menuOptions.text")); // NOI18N
         menuOptions.setName("menuOptions"); // NOI18N
@@ -2144,7 +2147,7 @@ public class CampaignGUI extends JPanel {
                 menuOptionsActionPerformed(evt);
             }
         });
-        fileMenu.add(menuOptions);
+        menuFile.add(menuOptions);
 
         menuOptionsMM.setText(resourceMap.getString("menuOptionsMM.text")); // NOI18N
         menuOptionsMM.setName("menuOptionsMM"); // NOI18N
@@ -2153,7 +2156,7 @@ public class CampaignGUI extends JPanel {
                 menuOptionsMMActionPerformed(evt);
             }
         });
-        fileMenu.add(menuOptionsMM);
+        menuFile.add(menuOptionsMM);
 
         miMercRoster.setText(resourceMap.getString("miMercRoster.text")); // NOI18N
         miMercRoster.addActionListener(new java.awt.event.ActionListener() {
@@ -2161,25 +2164,46 @@ public class CampaignGUI extends JPanel {
                 showMercRosterDialog();
             }
         });
-        fileMenu.add(miMercRoster);
+        menuFile.add(miMercRoster);
         
         menuThemes =new JMenu("Themes");
         refreshThemeChoices();
-        fileMenu.add(menuThemes);
+        menuFile.add(menuThemes);
 
-        exitMenuItem.setName("exitMenuItem"); // NOI18N
-        exitMenuItem.setText("Exit");
-        exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
+        menuExitItem.setName("exitMenuItem"); // NOI18N
+        menuExitItem.setText("Exit");
+        menuExitItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 getApplication().exit();
             }
         });
-        fileMenu.add(exitMenuItem);
+        menuFile.add(menuExitItem);
 
-        menuBar.add(fileMenu);
+        menuBar.add(menuFile);
 
         menuManage.setText(resourceMap.getString("menuManage.text")); // NOI18N
         menuManage.setName("menuManage"); // NOI18N
+
+        menuManageImportExport.setText(resourceMap.getString("menuManageImportExport.text")); // NOI18N
+        menuManageImportExport.setName("menuManageImportExport"); // NOI18N
+
+        miExportParts.setText(resourceMap.getString("miExportParts.text")); // NOI18N
+        miExportParts.setName("miExportParts"); // NOI18N
+        miExportParts.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miExportPartsActionPerformed(evt);
+            }
+        });
+        menuManageImportExport.add(miExportParts);
+
+        miImportParts.setText(resourceMap.getString("miImportParts.text")); // NOI18N
+        miImportParts.setName("miImportParts"); // NOI18N
+        miImportParts.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miImportPartsActionPerformed(evt);
+            }
+        });
+        menuManageImportExport.add(miImportParts);
 
         miExportPerson.setText(resourceMap.getString("miExportPerson.text")); // NOI18N
         miExportPerson.setName("miExportPerson"); // NOI18N
@@ -2188,7 +2212,7 @@ public class CampaignGUI extends JPanel {
                 miExportPersonActionPerformed(evt);
             }
         });
-        menuManage.add(miExportPerson);
+        menuManageImportExport.add(miExportPerson);
 
         miImportPerson.setText(resourceMap.getString("miImportPerson.text")); // NOI18N
         miImportPerson.setName("miImportPerson"); // NOI18N
@@ -2197,7 +2221,9 @@ public class CampaignGUI extends JPanel {
                 miImportPersonActionPerformed(evt);
             }
         });
-        menuManage.add(miImportPerson);
+        menuManageImportExport.add(miImportPerson);
+        
+        menuManage.add(menuManageImportExport);
 
         miLoadForces.setText(resourceMap.getString("miLoadForces.text")); // NOI18N
         miLoadForces.setName("miLoadForces"); // NOI18N
@@ -2376,17 +2402,17 @@ public class CampaignGUI extends JPanel {
 
         //menuBar.add(menuCommunity);
 
-        helpMenu.setText(resourceMap.getString("helpMenu.text")); // NOI18N
-        helpMenu.setName("helpMenu"); // NOI18N
-        aboutMenuItem.setName("aboutMenuItem"); // NOI18N
-        aboutMenuItem.setText("About");
-        aboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
+        menuHelp.setText(resourceMap.getString("helpMenu.text")); // NOI18N
+        menuHelp.setName("helpMenu"); // NOI18N
+        menuAboutItem.setName("aboutMenuItem"); // NOI18N
+        menuAboutItem.setText("About");
+        menuAboutItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 showAboutBox();
             }
         });
-        helpMenu.add(aboutMenuItem);
-        menuBar.add(helpMenu);
+        menuHelp.add(menuAboutItem);
+        menuBar.add(menuHelp);
 
         statusPanel.setName("statusPanel"); // NOI18N
         statusPanel.setLayout(new FlowLayout(FlowLayout.LEADING, 20, 5));
@@ -3230,6 +3256,26 @@ public class CampaignGUI extends JPanel {
         }
     }// GEN-LAST:event_miExportPersonActionPerformed
 
+
+    private void miImportPartsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miImportPersonActionPerformed
+        try {
+            loadPartsFile();
+        } catch (IOException ex) {
+            Logger.getLogger(CampaignGUI.class.getName()).log(Level.SEVERE, null,
+                    ex);
+        }
+    }// GEN-LAST:event_miImportPersonActionPerformed
+
+
+    private void miExportPartsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miExportPersonActionPerformed
+        try {
+            savePartsFile();
+        } catch (IOException ex) {
+            Logger.getLogger(CampaignGUI.class.getName()).log(Level.SEVERE, null,
+                    ex);
+        }
+    }// GEN-LAST:event_miExportPersonActionPerformed
+
     private void miPurchaseUnitActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miPurchaseUnitActionPerformed
         UnitSelectorDialog usd = new UnitSelectorDialog(true, this);
 
@@ -3734,6 +3780,203 @@ public class CampaignGUI extends JPanel {
                     "mekhqlog.txt file from this game so we can prevent this from happening in\n" +
                     "the future.",
                     "Could not export personnel",
+                    JOptionPane.ERROR_MESSAGE);
+            //restore the backup file
+            file.delete();
+            if(backupFile.exists()) {
+                Utilities.copyfile(backupFile, file);
+                backupFile.delete();
+            }
+        }
+    }
+
+    protected void loadPartsFile() throws IOException {
+        JFileChooser loadList = new JFileChooser(".");
+        loadList.setDialogTitle("Load Parts");
+
+        loadList.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File dir) {
+                if (dir.isDirectory()) {
+                    return true;
+                }
+                return dir.getName().endsWith(".parts");
+            }
+
+            @Override
+            public String getDescription() {
+                return "Parts file";
+            }
+        });
+
+        int returnVal = loadList.showOpenDialog(mainPanel);
+
+        if ((returnVal != JFileChooser.APPROVE_OPTION)
+                || (loadList.getSelectedFile() == null)) {
+            // I want a file, y'know!
+            return;
+        }
+
+        File partsFile = loadList.getSelectedFile();
+
+        if (partsFile != null) {
+            // Open up the file.
+            InputStream fis = new FileInputStream(partsFile);
+            
+            MekHQ.logMessage("Starting load of parts file from XML...");
+    		// Initialize variables.
+    		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    		Document xmlDoc = null;
+
+    		try {
+    			// Using factory get an instance of document builder
+    			DocumentBuilder db = dbf.newDocumentBuilder();
+
+    			// Parse using builder to get DOM representation of the XML file
+    			xmlDoc = db.parse(fis);
+    		} catch (Exception ex) {
+    			MekHQ.logError(ex);
+    		}
+
+    		Element partsEle = xmlDoc.getDocumentElement();
+    		NodeList nl = partsEle.getChildNodes();
+    				
+    		// Get rid of empty text nodes and adjacent text nodes...
+    		// Stupid weird parsing of XML.  At least this cleans it up.
+    		partsEle.normalize(); 
+    		
+    		Version version = new Version(partsEle.getAttribute("version"));
+
+    		//we need to iterate through three times, the first time to collect
+    		//any custom units that might not be written yet
+    		for (int x = 0; x < nl.getLength(); x++) {
+    			Node wn2 = nl.item(x);
+
+    			// If it's not an element node, we ignore it.
+    			if (wn2.getNodeType() != Node.ELEMENT_NODE)
+    				continue;
+    			
+    			if (!wn2.getNodeName().equalsIgnoreCase("part")) {
+    				// Error condition of sorts!
+    				// Errr, what should we do here?
+    				MekHQ.logMessage("Unknown node type not loaded in Parts nodes: "+wn2.getNodeName());
+
+    				continue;
+    			}
+
+    			Part p = Part.generateInstanceFromXML(wn2, version);
+    			if (p != null) {
+    				p.setCampaign(getCampaign());
+    				getCampaign().addPartWithoutId(p);
+    			}
+    		}
+    		MekHQ.logMessage("Finished load of parts file");
+        }
+
+        refreshPartsList();
+        refreshReport();
+        refreshFinancialTransactions();
+    }
+
+    private void savePartsFile() throws IOException {
+    	JFileChooser saveParts = new JFileChooser(".");
+        saveParts.setDialogTitle("Save Parts");
+        saveParts.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File dir) {
+                if (dir.isDirectory()) {
+                    return true;
+                }
+                return dir.getName().endsWith(".parts");
+            }
+
+            @Override
+            public String getDescription() {
+                return "Parts file";
+            }
+        });
+        saveParts.setSelectedFile(new File(getCampaign().getName()
+                + getCampaign().getShortDateAsString() + "_ExportedParts" + ".parts")); //$NON-NLS-1$
+        int returnVal = saveParts.showSaveDialog(mainPanel);
+
+        if ((returnVal != JFileChooser.APPROVE_OPTION)
+                || (saveParts.getSelectedFile() == null)) {
+            // I want a file, y'know!
+            return;
+        }
+
+        File file = saveParts.getSelectedFile();
+        if (file == null) {
+            // I want a file, y'know!
+            return;
+        }
+        String path = file.getPath();
+        if (!path.endsWith(".parts")) {
+            path += ".parts";
+            file = new File(path);
+        }
+        
+        //check for existing file and make a back-up if found
+        String path2 = path + "_backup";
+        File backupFile = new File(path2);
+        if(file.exists()) {     
+            Utilities.copyfile(file, backupFile);
+        }
+
+        // Then save it out to that file.
+        FileOutputStream fos = null;
+        PrintWriter pw = null;
+
+        try {
+        	int row = partsTable.getSelectedRow();
+            if(row < 0) {
+            	MekHQ.logMessage("ERROR: Cannot export parts if none are selected! Ignoring.");
+                return;
+            }
+            Part selectedPart = partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
+            int[] rows = partsTable.getSelectedRows();
+            Part[] parts = new Part[rows.length];
+            for(int i=0; i<rows.length; i++) {
+                parts[i] = partsModel.getPartAt(partsTable.convertRowIndexToModel(rows[i]));
+            }
+            fos = new FileOutputStream(file);
+            pw = new PrintWriter(new OutputStreamWriter(fos, "UTF-8"));
+
+            // File header
+    		pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+
+        	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ");
+    		// Start the XML root.
+    		pw.println("<parts version=\""
+    				+resourceMap.getString("Application.version")
+    				+"\">");
+
+            if(rows.length > 1) {
+            	for(int i=0; i<rows.length; i++) {
+            		parts[i].writeToXml(pw, 1);
+            	}
+            } else {
+            	selectedPart.writeToXml(pw, 1);
+            }
+            // Okay, we're done.
+    		// Close everything out and be done with it.
+    		pw.println("</parts>");
+            pw.flush();
+            pw.close();
+            fos.close();
+            //delete the backup file because we didn't need it
+            if(backupFile.exists()) {
+                backupFile.delete();
+            }
+            MekHQ.logMessage("Parts saved to " + file);
+        } catch (Exception ex) {
+            MekHQ.logError(ex);
+            JOptionPane.showMessageDialog(getFrame(),
+                    "Oh no! The program was unable to correctly export your parts. We know this\n" +
+                    "is annoying and apologize. Please help us out and submit a bug with the\n" +
+                    "mekhqlog.txt file from this game so we can prevent this from happening in\n" +
+                    "the future.",
+                    "Could not export parts",
                     JOptionPane.ERROR_MESSAGE);
             //restore the backup file
             file.delete();
@@ -7961,6 +8204,14 @@ public class CampaignGUI extends JPanel {
                     menuItem.setEnabled(true);
                     popup.add(menuItem);
                 }
+                menuItem = new JMenuItem("Export Personnel");
+                menuItem.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        miExportPersonActionPerformed(evt);
+                    }
+                });
+                menuItem.setEnabled(true);
+                popup.add(menuItem);
                 menu = new JMenu("GM Mode");
                 menuItem = new JMenuItem("Remove Person");
                 menuItem.setActionCommand("REMOVE");
@@ -8016,7 +8267,7 @@ public class CampaignGUI extends JPanel {
 		                menuItem = new JMenuItem("Edit Injuries");
 		                menuItem.setActionCommand("EDIT_INJURIES");
 		                menuItem.addActionListener(this);
-		                //menuItem.setEnabled(getCampaign().isGM());
+		                menuItem.setEnabled(getCampaign().isGM());
 		                menu.add(menuItem);
 	                }
                 }
@@ -9284,6 +9535,14 @@ public class CampaignGUI extends JPanel {
                     menuItem.addActionListener(this);
                     popup.add(menuItem);
                 }
+                menuItem = new JMenuItem("Export Parts");
+                menuItem.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        miExportPartsActionPerformed(evt);
+                    }
+                });
+                menuItem.setEnabled(true);
+                popup.add(menuItem);
                 // GM mode
                 menu = new JMenu("GM Mode");
                 if(areAllPartsInTransit(parts)) {
@@ -11494,8 +11753,13 @@ public class CampaignGUI extends JPanel {
     private javax.swing.JPanel mainPanel;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenu menuHire;
+    private javax.swing.JMenu menuFile;
+    private javax.swing.JMenu menuHelp;
     private javax.swing.JMenuItem menuLoad;
+    private javax.swing.JMenuItem menuAboutItem;
+    private javax.swing.JMenuItem menuExitItem;
     private javax.swing.JMenu menuManage;
+    private javax.swing.JMenu menuManageImportExport;
     private javax.swing.JMenu menuMarket;
     private javax.swing.JMenuItem menuOptions;
     private javax.swing.JMenuItem menuOptionsMM;
@@ -11516,6 +11780,8 @@ public class CampaignGUI extends JPanel {
     private javax.swing.JMenuItem miLoadForces;
     private javax.swing.JMenuItem miExportPerson;
     private javax.swing.JMenuItem miImportPerson;
+    private javax.swing.JMenuItem miExportParts;
+    private javax.swing.JMenuItem miImportParts;
     private javax.swing.JMenuItem miShoppingList;
     private javax.swing.JMenuItem miGetLoan;
     private javax.swing.JMenuItem miPurchaseUnit;
