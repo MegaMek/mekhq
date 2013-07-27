@@ -76,6 +76,8 @@ Also allow folders that just end in Male or Female (ie ralgith_Female)
 + RFE [#68]: Dependents (0-salary AsTechs)
 + RFE [#88]: Ability to assign an overall commander and abilities
 + RFE [#109]: Import/export parts
++ RFE [#77]: Add "Ammo Bin" category in Warehouse
++ RFE [#117]: Filter Parts by "In Transit"
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement

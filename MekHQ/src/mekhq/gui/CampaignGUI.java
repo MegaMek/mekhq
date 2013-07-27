@@ -285,12 +285,18 @@ public class CampaignGUI extends JPanel {
     private static final int SG_LOC      = 4;
     private static final int SG_WEAP     = 5;
     private static final int SG_AMMO     = 6;
-    private static final int SG_MISC     = 7;
-    private static final int SG_ENGINE   = 8;
-    private static final int SG_GYRO     = 9;
-    private static final int SG_ACT      = 10;
-    private static final int SG_DAMAGE   = 11;
+    private static final int SG_AMMO_BIN = 7;
+    private static final int SG_MISC     = 8;
+    private static final int SG_ENGINE   = 9;
+    private static final int SG_GYRO     = 10;
+    private static final int SG_ACT      = 11;
     private static final int SG_NUM      = 12;
+    
+    //parts views
+    private static final int SV_ALL		= 0;
+    private static final int SV_IN_TRANSIT = 1;
+    private static final int SV_DAMAGED	= 2;
+    private static final int SV_NUM		= 3;
 
     //personnel views
     private static final int PV_GENERAL = 0;
@@ -530,7 +536,9 @@ public class CampaignGUI extends JPanel {
         scrollForceView = new javax.swing.JScrollPane();
         scrollPlanetView = new javax.swing.JScrollPane();
         lblPartsChoice = new javax.swing.JLabel();
+        lblPartsChoiceView = new javax.swing.JLabel();
         choiceParts = new javax.swing.JComboBox();
+        choicePartsView = new javax.swing.JComboBox();
         panMekLab = new MekLabPanel(this);
         scrollMekLab = new javax.swing.JScrollPane();
         lblLocation = new javax.swing.JLabel();
@@ -1278,6 +1286,36 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
         panSupplies.add(choiceParts, gridBagConstraints);
+
+        lblPartsChoiceView.setText(resourceMap.getString("lblPartsChoiceView.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
+        panSupplies.add(lblPartsChoiceView, gridBagConstraints);
+
+        DefaultComboBoxModel partsGroupViewModel = new DefaultComboBoxModel();
+        for (int i = 0; i < SV_NUM; i++) {
+        	partsGroupViewModel.addElement(getPartsGroupViewName(i));
+        }
+        choicePartsView.setModel(partsGroupViewModel);
+        choicePartsView.setSelectedIndex(0);
+        choicePartsView.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                filterParts();
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
+        panSupplies.add(choicePartsView, gridBagConstraints);
        
         partsTable.setModel(partsModel);
         partsTable.setName("partsTable"); // NOI18N
@@ -1305,7 +1343,7 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -3143,6 +3181,8 @@ public class CampaignGUI extends JPanel {
             return "Weapons";
         case SG_AMMO:
             return "Ammunition";
+        case SG_AMMO_BIN:
+            return "Ammunition Bins";
         case SG_MISC:
             return "Miscellaneous Equipment";
         case SG_ENGINE:
@@ -3151,11 +3191,22 @@ public class CampaignGUI extends JPanel {
             return "Gyros";
         case SG_ACT:
             return "Actuators";
-        case SG_DAMAGE:
-            return "Damaged Parts";
         default:
             return "?";
         }
+    }
+    
+    public static String getPartsGroupViewName(int view) {
+    	switch (view) {
+    	case SV_ALL:
+    		return "All";
+    	case SV_IN_TRANSIT:
+    		return "In Transit";
+    	case SV_DAMAGED:
+    		return "Damaged";
+    	default:
+        	return "?";
+    	}
     }
 
     public static String getPersonnelViewName(int group) {
@@ -4699,41 +4750,55 @@ public class CampaignGUI extends JPanel {
     public void filterParts() {
         RowFilter<PartsTableModel, Integer> partsTypeFilter = null;
         final int nGroup = choiceParts.getSelectedIndex();
+        final int nGroupView = choicePartsView.getSelectedIndex();
         partsTypeFilter = new RowFilter<PartsTableModel,Integer>() {
             @Override
             public boolean include(Entry<? extends PartsTableModel, ? extends Integer> entry) {
                 PartsTableModel partsModel = entry.getModel();
                 Part part = partsModel.getPartAt(entry.getIdentifier());
+                boolean inGroup = false;
+                boolean inView = false;
+                
+                // Check grouping
                 if(nGroup == SG_ALL) {
-                    return true;
+                    inGroup = true;
                 } else if(nGroup == SG_ARMOR) {
-                    return (part instanceof Armor || part instanceof ProtomekArmor || part instanceof BaArmor);
+                    inGroup = (part instanceof Armor || part instanceof ProtomekArmor || part instanceof BaArmor);
                 } else if(nGroup == SG_SYSTEM) {
-                    return part instanceof MekGyro
+                    inGroup = part instanceof MekGyro
                         || part instanceof EnginePart
                         || part instanceof MekActuator
                         || part instanceof MekLifeSupport
                         || part instanceof MekSensor;
                 } else if(nGroup == SG_EQUIP) {
-                    return part instanceof EquipmentPart;
+                    inGroup = part instanceof EquipmentPart;
                 } else if(nGroup == SG_LOC) {
-                    return part instanceof MekLocation || part instanceof TankLocation;
+                    inGroup = part instanceof MekLocation || part instanceof TankLocation;
                 } else if(nGroup == SG_WEAP) {
-                    return part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof WeaponType;
+                    inGroup = part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof WeaponType;
                 } else if(nGroup == SG_AMMO) {
-                    return part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof AmmoType;
+                    inGroup = part instanceof EquipmentPart && !(part instanceof AmmoBin) && ((EquipmentPart)part).getType() instanceof AmmoType;
+                } else if(nGroup == SG_AMMO_BIN) {
+                    inGroup = part instanceof EquipmentPart && (part instanceof AmmoBin) && ((EquipmentPart)part).getType() instanceof AmmoType;
                 } else if(nGroup == SG_MISC) {
-                    return part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof MiscType;
+                    inGroup = part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof MiscType;
                 } else if(nGroup == SG_ENGINE) {
-                    return part instanceof EnginePart;
+                    inGroup = part instanceof EnginePart;
                 } else if(nGroup == SG_GYRO) {
-                    return part instanceof MekGyro;
+                    inGroup = part instanceof MekGyro;
                 } else if(nGroup == SG_ACT) {
-                    return part instanceof MekActuator;
-                } else if(nGroup == SG_DAMAGE) {
-                    return part.needsFixing();
+                    inGroup = part instanceof MekActuator;
                 }
-                return false;
+                
+                // Check view
+                if (nGroupView == SV_ALL) {
+                	inView = true;
+                } else if (nGroupView == SV_IN_TRANSIT) {
+                	inView = !part.isPresent();
+                } else if (nGroupView == SV_DAMAGED) {
+                	inView = part.needsFixing();
+                }
+                return (inGroup && inView);
             }
         };
         partsSorter.setRowFilter(partsTypeFilter);
@@ -11862,7 +11927,9 @@ public class CampaignGUI extends JPanel {
     private javax.swing.JSplitPane splitMission;
     private javax.swing.JLabel lblMission;
     private javax.swing.JComboBox choiceParts;
+    private javax.swing.JComboBox choicePartsView;
     private javax.swing.JLabel lblPartsChoice;
+    private javax.swing.JLabel lblPartsChoiceView;
     private javax.swing.JLabel lblFindPlanet;
     private JSuggestField suggestPlanet;
     private javax.swing.JButton btnCalculateJumpPath;
