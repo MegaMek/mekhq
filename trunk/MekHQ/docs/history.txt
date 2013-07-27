@@ -78,6 +78,9 @@ Also allow folders that just end in Male or Female (ie ralgith_Female)
 + RFE [#109]: Import/export parts
 + RFE [#77]: Add "Ammo Bin" category in Warehouse
 + RFE [#117]: Filter Parts by "In Transit"
++ Bug: Deploying a force, then deploying it's parent force, has the first force deployed twice.
++ Bug: Undeploy Unit doesn't correctly undeploy it's parent forces
++ RFE: [#61]: Undeploy single units from TO&E
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement

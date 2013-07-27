@@ -4048,7 +4048,6 @@ public class CampaignGUI extends JPanel {
                 return;
             }
             scenario.clearAllForcesAndPersonnel(getCampaign());
-            refreshScenarioList();
             refreshPersonnelList();
             refreshServicedUnitList();
             refreshUnitList();
@@ -5993,19 +5992,9 @@ public class CampaignGUI extends JPanel {
             } else if (command.equalsIgnoreCase("UNDEPLOY")) {
                 for (Unit unit : units) {
                     if (unit.isDeployed()) {
-                        /*
-                        if (null != unit.getPilot()) {
-                            unit.getPilot().undeploy(getCampaign());
-                        }
-                        */
-                    	Force f = getCampaign().getForce(unit.getForceId());
-                    	f.clearScenarioIds(getCampaign(), false);
-                    	getCampaign().getScenario(unit.getScenarioId()).removeForce(f.getId());
-                    	getCampaign().getScenario(unit.getScenarioId()).removeUnit(unit.getId());
-                    	unit.undeploy();
+                        undeployUnit(unit);
                     }
                 }
-                refreshScenarioList();
                 refreshPersonnelList();
                 refreshServicedUnitList();
                 refreshUnitList();
@@ -6397,14 +6386,56 @@ public class CampaignGUI extends JPanel {
                         refreshCargo();
                     }
                 }
+            } else if(command.contains("UNDEPLOY_FORCE")) {
+                for(Force force : forces) {
+                	undeployForce(force);
+                	/*int sid = force.getScenarioId();
+                    Scenario scenario = getCampaign().getScenario(sid);
+                    if(null != force && null != scenario) {
+                    	force.clearScenarioIds(getCampaign(), true);
+                    	scenario.removeForce(force.getId());
+                        for(UUID uid : force.getAllUnits()) {
+                            Unit u = getCampaign().getUnit(uid);
+                            if(null != u) {
+                            	scenario.removeUnit(u.getId());
+                            	u.undeploy();
+                            }
+                        }
+                        
+                        // We have to clear out the parents as well.
+                        Force parent = force;
+                        int prevId = force.getId();
+                        while ((parent = parent.getParentForce()) != null) {
+                        	if (parent.getScenarioId() == -1) {
+                        		break;
+                        	}
+                        	parent.clearScenarioIds(getCampaign(), false);
+                        	scenario.removeForce(parent.getId());
+                        	for (Force sub : parent.getSubForces()) {
+                        		if (sub.getId() == prevId) {
+                        			continue;
+                        		}
+                        		scenario.addForces(sub.getId());
+                        		sub.setScenarioId(scenario.getId());
+                        	}
+                        	prevId = parent.getId();
+                        }
+                    }*/
+                }
+                refreshOrganization();
+                refreshPersonnelList();
+                refreshUnitList();
+                refreshServicedUnitList();
+                refreshScenarioList();
+                refreshCargo();
             } else if(command.contains("DEPLOY_FORCE")) {
                 int sid = Integer.parseInt(target);
                 Scenario scenario = getCampaign().getScenario(sid);
                 for(Force force : forces) {
+                	force.clearScenarioIds(getCampaign(), true);
                     if(null != force && null != scenario) {
                         scenario.addForces(force.getId());
                         force.setScenarioId(scenario.getId());
-                        refreshScenarioList();
                         for(UUID uid : force.getAllUnits()) {
                             Unit u = getCampaign().getUnit(uid);
                             if(null != u) {
@@ -6484,6 +6515,16 @@ public class CampaignGUI extends JPanel {
                 refreshPersonnelList();
                 refreshScenarioList();
                 refreshUnitList();
+                refreshCargo();
+            } else if(command.contains("UNDEPLOY_UNIT")) {
+                for(Unit unit : units) {
+                    undeployUnit(unit);
+                }
+                refreshScenarioList();
+                refreshOrganization();
+                refreshPersonnelList();
+                refreshUnitList();
+                refreshServicedUnitList();
                 refreshCargo();
             } else if(command.contains("DEPLOY_UNIT")) {
                 int sid = Integer.parseInt(target);
@@ -6586,6 +6627,24 @@ public class CampaignGUI extends JPanel {
         private boolean areAllUnitsUndeployed(Vector<Unit> units) {
             for(Unit unit : units) {
                 if(unit.isDeployed()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private boolean areAllForcesDeployed(Vector<Force> forces) {
+            for(Force force : forces) {
+                if(!force.isDeployed()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        private boolean areAllUnitsDeployed(Vector<Unit> units) {
+            for(Unit unit : units) {
+                if(!unit.isDeployed()) {
                     return false;
                 }
             }
@@ -6832,6 +6891,13 @@ public class CampaignGUI extends JPanel {
                         }
                         popup.add(menu);
                     }
+                    if(areAllForcesDeployed(forces)) {
+                        menuItem = new JMenuItem("Undeploy Force");
+                        menuItem.setActionCommand("UNDEPLOY_FORCE|FORCE|empty|" + forceIds);
+                        menuItem.addActionListener(this);
+                        menuItem.setEnabled(true);
+                        popup.add(menuItem);
+                    }
                     menuItem = new JMenuItem("Remove Force");
                     menuItem.setActionCommand("REMOVE_FORCE|FORCE|empty|" + forceIds);
                     menuItem.addActionListener(this);
@@ -6971,6 +7037,13 @@ public class CampaignGUI extends JPanel {
                             MenuScroller.setScrollerFor(menu, 30);
                         }
                         popup.add(menu);
+                    }
+                    if(areAllUnitsDeployed(units)) {
+                        menuItem = new JMenuItem("Undeploy Unit");
+                        menuItem.setActionCommand("UNDEPLOY_UNIT|UNIT|empty|" + unitIds);
+                        menuItem.addActionListener(this);
+                        menuItem.setEnabled(true);
+                        popup.add(menuItem);
                     }
                 }
                 popup.show(e.getComponent(), e.getX(), e.getY());
@@ -11201,18 +11274,9 @@ public class CampaignGUI extends JPanel {
             } else if (command.equalsIgnoreCase("UNDEPLOY")) {
                 for (Unit unit : units) {
                     if (unit.isDeployed()) {
-                        //if (null != unit.getPilot()) {
-                            //unit.getPilot().undeploy(getCampaign());
-                        //}
-                    	Force f = getCampaign().getForce(unit.getForceId());
-                    	f.clearScenarioIds(getCampaign(), false);
-                    	getCampaign().getScenario(unit.getScenarioId()).removeForce(f.getId());
-                    	getCampaign().getScenario(unit.getScenarioId()).removeUnit(unit.getId());
-                    	unit.undeploy();
-                    	
+                        undeployUnit(unit);
                     }
                 }
-                refreshScenarioList();
                 refreshPersonnelList();
                 refreshServicedUnitList();
                 refreshUnitList();
@@ -11993,6 +12057,56 @@ public class CampaignGUI extends JPanel {
             //Open the dialog.
             BombsDialog dialog = new BombsDialog((Aero)unit.getEntity(), getCampaign(), frame);
             dialog.setVisible(true);
+        }
+    }
+    
+    private void undeployUnit(Unit u) {
+    	Force f = getCampaign().getForce(u.getForceId());
+    	if (f != null) {
+        	undeployForce(f, false);
+    	}
+    	getCampaign().getScenario(u.getScenarioId()).removeUnit(u.getId());
+    	u.undeploy();
+    }
+    
+    private void undeployForce(Force f) {
+    	undeployForce(f, true);
+    }
+    
+    private void undeployForce(Force f, boolean killSubs) {
+    	int sid = f.getScenarioId();
+        Scenario scenario = getCampaign().getScenario(sid);
+        if(null != f && null != scenario) {
+        	f.clearScenarioIds(getCampaign(), killSubs);
+        	scenario.removeForce(f.getId());
+        	if (killSubs) {
+	            for(UUID uid : f.getAllUnits()) {
+	                Unit u = getCampaign().getUnit(uid);
+	                if(null != u) {
+	                	scenario.removeUnit(u.getId());
+	                	u.undeploy();
+	                }
+	            }
+        	}
+            
+            // We have to clear out the parents as well.
+            Force parent = f;
+            int prevId = f.getId();
+            while ((parent = parent.getParentForce()) != null) {
+            	if (parent.getScenarioId() == -1) {
+            		break;
+            	}
+            	parent.clearScenarioIds(getCampaign(), false);
+            	scenario.removeForce(parent.getId());
+            	for (Force sub : parent.getSubForces()) {
+            		if (sub.getId() == prevId) {
+            			continue;
+            		}
+            		scenario.addForces(sub.getId());
+            		sub.setScenarioId(scenario.getId());
+            	}
+            	prevId = parent.getId();
+            }
         }
     }
 }
