@@ -7263,6 +7263,23 @@ public class CampaignGUI extends JPanel {
                     }
                 }
                 refreshPersonnelList();
+            } else if(command.equalsIgnoreCase("COMMANDER")) {
+            	selectedPerson.setCommander(!selectedPerson.isCommander());
+            	if (selectedPerson.isCommander()) {
+	            	for (Person p : getCampaign().getPersonnel()) {
+	            		if (p.isCommander() && !p.getId().equals(selectedPerson.getId())) {
+		            		p.setCommander(false);
+		            		getCampaign().addReport(p.getFullTitle()+" has been removed as the overall unit commander.");
+		            		getCampaign().personUpdated(p);
+	            		}
+	            	}
+	            	getCampaign().addReport(selectedPerson.getFullTitle()+" has been set as the overall unit commander.");
+	                getCampaign().personUpdated(selectedPerson);
+            	}
+                refreshReport();
+            } else if(command.equalsIgnoreCase("DEPENDENT")) {
+            	selectedPerson.setDependent(!selectedPerson.isDependent());
+                getCampaign().personUpdated(selectedPerson);
             } else if(command.equalsIgnoreCase("CALLSIGN")) {
                 String s = (String)JOptionPane.showInputDialog(
                         frame,
@@ -7889,6 +7906,18 @@ public class CampaignGUI extends JPanel {
                         menu.add(cbMenuItem);
                         popup.add(menu);
                     }
+                    menu = new JMenu("Special Flags...");
+                    cbMenuItem = new JCheckBoxMenuItem("Dependent");
+                    cbMenuItem.setSelected(person.isDependent());
+                    cbMenuItem.setActionCommand("DEPENDENT");
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                    cbMenuItem = new JCheckBoxMenuItem("Commander");
+                    cbMenuItem.setSelected(person.isCommander());
+                    cbMenuItem.setActionCommand("COMMANDER");
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                    popup.add(menu);
                 }
                 if(oneSelected) {
                     // change portrait
