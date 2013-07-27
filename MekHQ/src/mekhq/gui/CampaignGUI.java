@@ -1324,7 +1324,7 @@ public class CampaignGUI extends JPanel {
         acquirePartsTable.setIntercellSpacing(new Dimension(0, 0));
         acquirePartsTable.setShowGrid(false);
         acquirePartsTable.addMouseListener(new ProcurementTableMouseAdapter());
-        acquirePartsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        acquirePartsTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
         acquirePartsTable.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "ADD");
         acquirePartsTable.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, 0), "ADD");
@@ -4221,6 +4221,7 @@ public class CampaignGUI extends JPanel {
 
     public void refreshPartsList() {
         partsModel.setData(getCampaign().getSpareParts());
+        getCampaign().getShoppingList().removeZeroQuantityFromList(); // To prevent zero quantity from hanging around
         acquirePartsModel.setData(getCampaign().getShoppingList().getPartList());
     }
 
@@ -9475,7 +9476,8 @@ public class CampaignGUI extends JPanel {
             maybeShowPopup(e);
         }
         
-        private void maybeShowPopup(MouseEvent e) {
+        @SuppressWarnings("serial")
+		private void maybeShowPopup(MouseEvent e) {
             JPopupMenu popup = new JPopupMenu();
             JMenuItem menuItem;
             JMenu menu;
@@ -9488,10 +9490,13 @@ public class CampaignGUI extends JPanel {
                 return;
             }
             final int row = table.convertRowIndexToModel(table.getSelectedRow());
+            final int[] rows = table.getSelectedRows();
+            final boolean oneSelected = table.getSelectedRowCount() == 1;
             if (e.isPopupTrigger()) {              
                 // **lets fill the pop up menu**//
                 // GM mode
                 menu = new JMenu("GM Mode");
+                
                 menuItem = new JMenuItem("Procure single item now");
                 menuItem.addActionListener(new AbstractAction() {
                     @Override
@@ -9499,24 +9504,52 @@ public class CampaignGUI extends JPanel {
                         if(row < 0) {
                             return;
                         }
-                        IAcquisitionWork acquisition = model.getAcquisition(row);
-                        Object equipment = acquisition.getNewEquipment();
-                        if(equipment instanceof Part) {
-                            if(getCampaign().buyPart((Part)equipment, getCampaign().calculatePartTransitTime(0))) {
-                                getCampaign().addReport("<font color='Green'><b>" + acquisition.getAcquisitionName() + " found.</b></font>");
-                                acquisition.decrementQuantity();
-                            } else {
-                                getCampaign().addReport("<font color='red'><b>You cannot afford to purchase " + acquisition.getAcquisitionName() + "</b></font>");
-                            }
+                        if (oneSelected) {
+	                        IAcquisitionWork acquisition = model.getAcquisition(row);
+	                        Object equipment = acquisition.getNewEquipment();
+	                        if(equipment instanceof Part) {
+	                            if(getCampaign().buyPart((Part)equipment, getCampaign().calculatePartTransitTime(0))) {
+	                                getCampaign().addReport("<font color='Green'><b>" + acquisition.getAcquisitionName() + " found.</b></font>");
+	                                acquisition.decrementQuantity();
+	                            } else {
+	                                getCampaign().addReport("<font color='red'><b>You cannot afford to purchase " + acquisition.getAcquisitionName() + "</b></font>");
+	                            }
+	                        }
+	                        else if(equipment instanceof Entity) {
+	                            if(getCampaign().buyUnit((Entity)equipment, getCampaign().calculatePartTransitTime(0))) {
+	                                getCampaign().addReport("<font color='Green'><b>" + acquisition.getAcquisitionName() + " found.</b></font>");
+	                                acquisition.decrementQuantity();
+	                            } else {
+	                                getCampaign().addReport("<font color='red'><b>You cannot afford to purchase " + acquisition.getAcquisitionName() + "</b></font>");
+	                            }
+	                        }
+                        } else {
+                        	for (int curRow : rows) {
+                        		if (curRow < 0) {
+                        			continue;
+                        		}
+                        		int row = table.convertRowIndexToModel(curRow);
+    	                        IAcquisitionWork acquisition = model.getAcquisition(row);
+    	                        Object equipment = acquisition.getNewEquipment();
+    	                        if(equipment instanceof Part) {
+    	                            if(getCampaign().buyPart((Part)equipment, getCampaign().calculatePartTransitTime(0))) {
+    	                                getCampaign().addReport("<font color='Green'><b>" + acquisition.getAcquisitionName() + " found.</b></font>");
+    	                                acquisition.decrementQuantity();
+    	                            } else {
+    	                                getCampaign().addReport("<font color='red'><b>You cannot afford to purchase " + acquisition.getAcquisitionName() + "</b></font>");
+    	                            }
+    	                        }
+    	                        else if(equipment instanceof Entity) {
+    	                            if(getCampaign().buyUnit((Entity)equipment, getCampaign().calculatePartTransitTime(0))) {
+    	                                getCampaign().addReport("<font color='Green'><b>" + acquisition.getAcquisitionName() + " found.</b></font>");
+    	                                acquisition.decrementQuantity();
+    	                            } else {
+    	                                getCampaign().addReport("<font color='red'><b>You cannot afford to purchase " + acquisition.getAcquisitionName() + "</b></font>");
+    	                            }
+    	                        }
+                        	}
                         }
-                        else if(equipment instanceof Entity) {
-                            if(getCampaign().buyUnit((Entity)equipment, getCampaign().calculatePartTransitTime(0))) {
-                                getCampaign().addReport("<font color='Green'><b>" + acquisition.getAcquisitionName() + " found.</b></font>");
-                                acquisition.decrementQuantity();
-                            } else {
-                                getCampaign().addReport("<font color='red'><b>You cannot afford to purchase " + acquisition.getAcquisitionName() + "</b></font>");
-                            }
-                        }
+                        
                         refreshPartsList();
                         refreshUnitList();
                         refreshTaskList();
@@ -9534,29 +9567,62 @@ public class CampaignGUI extends JPanel {
                         if(row < 0) {
                             return;
                         }
-                        IAcquisitionWork acquisition = model.getAcquisition(row);
-                        boolean canAfford = true;
-                        while(canAfford && acquisition.getQuantity() > 0) {
-                            Object equipment = acquisition.getNewEquipment();
-                            if(equipment instanceof Part) {
-                                if(getCampaign().buyPart((Part)equipment, getCampaign().calculatePartTransitTime(0))) {
-                                    getCampaign().addReport("<font color='Green'><b>" + acquisition.getAcquisitionName() + " found.</b></font>");
-                                    acquisition.decrementQuantity();
-                                } else {
-                                    getCampaign().addReport("<font color='red'><b>You cannot afford to purchase " + acquisition.getAcquisitionName() + "</b></font>");
-                                    canAfford = false;
-                                }
-                            }
-                            else if(equipment instanceof Entity) {
-                                if(getCampaign().buyUnit((Entity)equipment, getCampaign().calculatePartTransitTime(0))) {
-                                    getCampaign().addReport("<font color='Green'><b>" + acquisition.getAcquisitionName() + " found.</b></font>");
-                                    acquisition.decrementQuantity();
-                                } else {
-                                    getCampaign().addReport("<font color='red'><b>You cannot afford to purchase " + acquisition.getAcquisitionName() + "</b></font>");
-                                    canAfford = false;
-                                }
-                            }
+                        if (oneSelected) {
+	                        IAcquisitionWork acquisition = model.getAcquisition(row);
+	                        boolean canAfford = true;
+	                        while(canAfford && acquisition.getQuantity() > 0) {
+	                            Object equipment = acquisition.getNewEquipment();
+	                            if(equipment instanceof Part) {
+	                                if(getCampaign().buyPart((Part)equipment, getCampaign().calculatePartTransitTime(0))) {
+	                                    getCampaign().addReport("<font color='Green'><b>" + acquisition.getAcquisitionName() + " found.</b></font>");
+	                                    acquisition.decrementQuantity();
+	                                } else {
+	                                    getCampaign().addReport("<font color='red'><b>You cannot afford to purchase " + acquisition.getAcquisitionName() + "</b></font>");
+	                                    canAfford = false;
+	                                }
+	                            }
+	                            else if(equipment instanceof Entity) {
+	                                if(getCampaign().buyUnit((Entity)equipment, getCampaign().calculatePartTransitTime(0))) {
+	                                    getCampaign().addReport("<font color='Green'><b>" + acquisition.getAcquisitionName() + " found.</b></font>");
+	                                    acquisition.decrementQuantity();
+	                                } else {
+	                                    getCampaign().addReport("<font color='red'><b>You cannot afford to purchase " + acquisition.getAcquisitionName() + "</b></font>");
+	                                    canAfford = false;
+	                                }
+	                            }
+	                        }
+                        } else {
+                        	for (int curRow : rows) {
+                        		if (curRow < 0) {
+                        			continue;
+                        		}
+                        		int row = table.convertRowIndexToModel(curRow);
+                        		IAcquisitionWork acquisition = model.getAcquisition(row);
+    	                        boolean canAfford = true;
+    	                        while(canAfford && acquisition.getQuantity() > 0) {
+    	                            Object equipment = acquisition.getNewEquipment();
+    	                            if(equipment instanceof Part) {
+    	                                if(getCampaign().buyPart((Part)equipment, getCampaign().calculatePartTransitTime(0))) {
+    	                                    getCampaign().addReport("<font color='Green'><b>" + acquisition.getAcquisitionName() + " found.</b></font>");
+    	                                    acquisition.decrementQuantity();
+    	                                } else {
+    	                                    getCampaign().addReport("<font color='red'><b>You cannot afford to purchase " + acquisition.getAcquisitionName() + "</b></font>");
+    	                                    canAfford = false;
+    	                                }
+    	                            }
+    	                            else if(equipment instanceof Entity) {
+    	                                if(getCampaign().buyUnit((Entity)equipment, getCampaign().calculatePartTransitTime(0))) {
+    	                                    getCampaign().addReport("<font color='Green'><b>" + acquisition.getAcquisitionName() + " found.</b></font>");
+    	                                    acquisition.decrementQuantity();
+    	                                } else {
+    	                                    getCampaign().addReport("<font color='red'><b>You cannot afford to purchase " + acquisition.getAcquisitionName() + "</b></font>");
+    	                                    canAfford = false;
+    	                                }
+    	                            }
+    	                        }
+                        	}
                         }
+                        
                         refreshPartsList();
                         refreshUnitList();
                         refreshTaskList();
@@ -9574,7 +9640,17 @@ public class CampaignGUI extends JPanel {
                         if(row < 0) {
                             return;
                         }
-                        model.removeRow(row);
+                        if (oneSelected) {
+                        	model.removeRow(row);
+                        } else {
+                        	for (int curRow : rows) {
+                        		if (curRow < 0) {
+                        			continue;
+                        		}
+                        		int row = table.convertRowIndexToModel(curRow);
+                        		model.removeRow(row);
+                        	}
+                        }
                         refreshPartsList();
                         refreshUnitList();
                         refreshTaskList();

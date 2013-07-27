@@ -1200,12 +1200,32 @@ public class Campaign implements Serializable {
 		if(target.getValue() == TargetRoll.AUTOMATIC_SUCCESS) {
 		    mos = roll - 2;
 		}
+		int xpGained = 0;
 		if(roll >= target.getValue()) {
 		    int transitDays = calculatePartTransitTime(mos);
 			report = report + acquisition.find(transitDays);
 			found = true;
+			if (person != null) {
+				if(roll == 12 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
+					xpGained += getCampaignOptions().getSuccessXP();
+				}
+				if(target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
+					person.setNTasks(person.getNTasks() + 1);
+				}
+				if(person.getNTasks() >= getCampaignOptions().getNTasksXP()) {
+					xpGained += getCampaignOptions().getTaskXP();
+					person.setNTasks(0);
+				}
+			}
 		} else {
 			report = report + acquisition.failToFind();
+			if(person != null && roll == 2 && target.getValue() != TargetRoll.AUTOMATIC_FAIL) {
+				xpGained += getCampaignOptions().getMistakeXP();
+			}
+		}
+		if(xpGained > 0) {
+			person.setXp(person.getXp() + xpGained);
+			report += " (" + xpGained + "XP gained) ";
 		}
 		addReport(report);
 		return found;
