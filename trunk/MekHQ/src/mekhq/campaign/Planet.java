@@ -62,7 +62,7 @@ public class Planet implements Serializable {
 	private static final int SPECTRAL_K = 5;
 	private static final int SPECTRAL_M = 6;
 	
-	private static final String LUM_0 = "0";
+	private static final String LUM_0   = "0";
 	private static final String LUM_IA  = "Ia";
 	private static final String LUM_IB  = "Ib";
 	private static final String LUM_II  = "II";
@@ -82,7 +82,7 @@ public class Planet implements Serializable {
 	private static final int LIFE_MAMMAL  = 7;
 	private static final int LIFE_INSECT  = 8;
 	
-	private static final int CLIMATE_ARCTIC    = 0;
+	private static final int CLIMATE_ARCTIC   = 0;
 	private static final int CLIMATE_BOREAL   = 1;
 	private static final int CLIMATE_COOLTEM  = 2; 
 	private static final int CLIMATE_WARMTEM  = 3;
@@ -97,6 +97,7 @@ public class Planet implements Serializable {
 	 * no better faction is found in the faction history given the date
 	 */
 	private ArrayList<String> factionCodes;
+	private ArrayList<String> garrisonUnits;
 	private String name;
 	private String shortName;
 	
@@ -133,11 +134,15 @@ public class Planet implements Serializable {
 	//a hash to keep track of dynamic faction changes
 	TreeMap<Date,ArrayList<String>> factionHistory;
 	
+	//a hash to keep track of dynamic garrison changes
+	TreeMap<Date,ArrayList<String>> garrisonHistory;
+	
 	public Planet() {
 		this.x = 0;
 		this.y = 0;
 		this.factionCodes = new ArrayList<String>();
 		this.factionCodes.add("CS");
+		this.garrisonUnits = new ArrayList<String>();
 		this.name = "Terra";
 		this.shortName = "Terra";
 		
@@ -274,6 +279,10 @@ public class Planet implements Serializable {
 	
 	public double getY() {
 		return y;
+	}
+	
+	public ArrayList<String> getGarrisonUnits() {
+		return garrisonUnits;
 	}
 	
 	public ArrayList<String> getBaseFactionCodes() {
