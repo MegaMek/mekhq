@@ -4552,8 +4552,8 @@ public class CampaignGUI extends JPanel {
     }
     
     protected void refreshCargo() {
-    	double cargoTonnage = getCampaign().getCargoTonnage();
-    	double cargoCapacity = getCampaign().getTotalCargoCapacity();
+    	double cargoTonnage = Double.parseDouble(new DecimalFormat("#.##").format(getCampaign().getCargoTonnage()));;
+    	double cargoCapacity = Double.parseDouble(new DecimalFormat("#.##").format(getCampaign().getTotalCargoCapacity()));;
     	String color = cargoTonnage > cargoCapacity ? "<font color='red'>" : "<font color = 'black'>";
     	String text = "<html>"+color+"<b>Cargo Tonnage/Capacity:</b> "+cargoTonnage+"/"+cargoCapacity+"</font></html>";
     	lblCargo.setText(text);
