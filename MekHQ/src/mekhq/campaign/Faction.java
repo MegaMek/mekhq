@@ -254,8 +254,8 @@ public class Faction {
             case F_C_SV:
                 return "CSV";
             case F_C_HH:
-            case F_C_OTHER:
                 return "CHH";
+            case F_C_OTHER:
             default:
                 return "IND";
         }
