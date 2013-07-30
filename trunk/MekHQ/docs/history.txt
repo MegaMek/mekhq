@@ -84,6 +84,7 @@ Also allow folders that just end in Male or Female (ie ralgith_Female)
 + WIP RFE [#70]: Garrison & Factory Tags
 + Rounding for Cargo values!
 + WIP RFE [#70]: Garrison & Factory Tags, part 2
++ Bug: Commander flag incorrect code (Swapped "Better" CO)
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
