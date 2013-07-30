@@ -180,9 +180,9 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
                 	int retVal = ((Comparable<Integer>) p2.getRank()).compareTo(p1.getRank());
                 	if (retVal == 0) {
                 		if (p1.isCommander()) {
-                			retVal = 1;
-                		} else if (p2.isCommander()) {
                 			retVal = -1;
+                		} else if (p2.isCommander()) {
+                			retVal = 1;
                 		}
                 	}
                     return retVal;
