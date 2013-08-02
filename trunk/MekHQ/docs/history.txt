@@ -86,6 +86,8 @@ Also allow folders that just end in Male or Female (ie ralgith_Female)
 + WIP RFE [#70]: Garrison & Factory Tags, part 2
 + Bug: Commander flag incorrect code (Swapped "Better" CO)
 + RFE [#80]: Alternate Missile Tracking
++ Bug: Divide by zero in new ammo tracking code
++ Completed TODO for changing how onWarehouseTab() checks which tab it's on
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement

@@ -637,11 +637,13 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 				a = (AmmoStorage)part;
 				aType = ((AmmoType)((AmmoStorage)a).getType());
 				thisType = ((AmmoType)getType()); 
-				if(isCompatibleAmmo(aType, thisType) || (aType.equals(thisType) && thisType.getMunitionType() == aType.getMunitionType())) {
-					amount += a.getShots()*aType.getRackSize()/thisType.getRackSize();
+				if(aType.equals(thisType) && thisType.getMunitionType() == aType.getMunitionType()) {
+					amount += a.getShots();
 					if (!(campaign.getCampaignOptions().useAmmoByType())) {
 						break;
 					}
+				} else if (isCompatibleAmmo(aType, thisType) && thisType.getRackSize() != 0) {
+					amount += a.getShots()*aType.getRackSize()/thisType.getRackSize();
 				}
 			}
 		}

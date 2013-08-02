@@ -5242,8 +5242,7 @@ public class CampaignGUI extends JPanel {
     }
 
     protected boolean onWarehouseTab() {
-        //TODO: dont do this with a hard number
-        return tabMain.getSelectedIndex() == 5;
+        return tabMain.getTitleAt(tabMain.getSelectedIndex()).equals(resourceMap.getString("panSupplies.TabConstraints.tabTitle"));
     }
 
     /**
