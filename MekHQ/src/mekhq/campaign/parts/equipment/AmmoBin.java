@@ -37,6 +37,7 @@ import megamek.common.Protomech;
 import megamek.common.TargetRoll;
 import megamek.common.Warship;
 import megamek.common.loaders.EntityLoadingException;
+import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -330,6 +331,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 				}
 			}
 		}
+		MekHQ.logMessage("DEBUG: Loading an ammo bin with "+shots+" shots");
 		changeAmountAvailable(-1 * shots, (AmmoType)type);
 		shotsNeeded -= shots;
 	}
@@ -349,7 +351,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	}
 	
 	public void unload(boolean changeEntity) {
-		int shots = getFullShots() - shotsNeeded;
+		int shots = 0;
 		AmmoType curType = (AmmoType)type;
 		if(null != unit && changeEntity) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);		
@@ -357,10 +359,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 				shots = mounted.getBaseShotsLeft();
 				mounted.setShotsLeft(0);
 				curType = (AmmoType)mounted.getType();
-			}		
+			}
 		}
 		shotsNeeded = getFullShots();
 		if(shots > 0) {
+			MekHQ.logMessage("DEBUG: Unloading an ammo bin of "+shots+" shots");
 			changeAmountAvailable(shots, curType);
 		}	
 	}
@@ -493,42 +496,175 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         return null;
     }
 	
-	public void changeAmountAvailable(int amount, AmmoType curType) {
+	public void swapAmmoFromCompatible(int needed, AmmoStorage as) {
+		MekHQ.logMessage("swapAmmoFromCompatible() called with amount of: "+needed);
 		AmmoStorage a = null;
-		long curMunition = curType.getMunitionType();
+		AmmoType aType = null;
+		AmmoType curType = ((AmmoType)((AmmoStorage)as).getType());
+		int converted = 0;
 		for(Part part : campaign.getSpareParts()) {
 		    if(!part.isPresent()) {
                 continue;
             }
-			if(part instanceof AmmoStorage 
-					&& ((AmmoType)((AmmoStorage)part).getType()).equals((Object)curType)
-                  	&& curMunition == ((AmmoType)((AmmoStorage)part).getType()).getMunitionType()) {
+		    MekHQ.logMessage("swapAmmoFromCompatible() 1");
+			if(part instanceof AmmoStorage) {
+				MekHQ.logMessage("swapAmmoFromCompatible() 2");
 				a = (AmmoStorage)part;
-				a.changeShots(amount);
-				break;
+				aType = ((AmmoType)a.getType());
+				if (a.isSamePartType(as)) {
+					continue;
+				}
+				if (!isCompatibleAmmo(aType, curType)) {
+					continue;
+				}
+				if (a.getShots() == 0) {
+					continue;
+				}
+				MekHQ.logMessage("swapAmmoFromCompatible() 3");
+				// Finally, do the conversion. Run until the other ammo type runs out or we have enough
+				converted = aType.getRackSize();
+				a.changeAmountAvailable(-1, aType);
+				while (converted < needed && a.getShots() > 0) {
+					converted += aType.getRackSize();
+					a.changeAmountAvailable(-1, aType);
+				}
+				needed -= converted;
+				MekHQ.logMessage("swapAmmoFromCompatible() 4");
+				// If we have enough, we're done.
+				if (converted >= needed) {
+					break;
+				}
 			}
 		}
+		converted = Math.round((float)converted/curType.getRackSize());
+		as.changeAmountAvailable(converted, curType);
+	}
+	
+	public void changeAmountAvailable(int amount, AmmoType curType) {
+		MekHQ.logMessage("changeAmountAvailable() called with amount of: "+amount);
+		AmmoStorage a = null;
+		AmmoType aType = null;
+		for(Part part : campaign.getSpareParts()) {
+			MekHQ.logMessage("1");
+		    if(!part.isPresent()) {
+                continue;
+            }
+			MekHQ.logMessage("2");
+			if(part instanceof AmmoStorage) {
+				MekHQ.logMessage("3");
+				aType = ((AmmoType)((AmmoStorage)part).getType());
+				if(aType.equals((Object)curType) && curType.getMunitionType() == aType.getMunitionType()) {
+					a = (AmmoStorage)part;
+					MekHQ.logMessage("4: "+a.getShots());
+					if (amount < 0 && campaign.getCampaignOptions().useAmmoByType() && a.getShots() < Math.abs(amount)) {
+						MekHQ.logMessage("4.a");
+						swapAmmoFromCompatible(Math.abs(amount) * aType.getRackSize(), a);
+					}
+					MekHQ.logMessage("4.b");
+					a.changeShots(amount);
+					break;
+				}
+			}
+		}
+		MekHQ.logMessage("5");
 		if(null != a && a.getShots() <= 0) {
+			MekHQ.logMessage("5.a");
 			campaign.removePart(a);
 		} else if(null == a && amount > 0) {
-			campaign.addPart(new AmmoStorage(1,curType,amount,campaign), 0);
+			MekHQ.logMessage("5.b");
+			campaign.addPart(new AmmoStorage(1, curType, amount, campaign), 0);
+		} else if (a == null && amount < 0 && campaign.getCampaignOptions().useAmmoByType()) {
+			MekHQ.logMessage("5.c");
+			campaign.addPart(new AmmoStorage(1 , curType ,0, campaign), 0);
+			changeAmountAvailable(amount, curType);
 		}
+		MekHQ.logMessage("End");
+	}
+	
+	public boolean isCompatibleAmmo(AmmoType a1, AmmoType a2) {
+		
+		// If the option isn't on, we don't use this!
+		if (!(campaign.getCampaignOptions().useAmmoByType())) {
+			return false;
+		}
+		
+		// NPE protection
+		if (a1 == null || a2 == null) {
+			return false;
+		}
+		
+		// Now we begin to compare
+		boolean result = false;
+		
+		// MML Launchers, ugh.
+		if ((a1.getAmmoType() == AmmoType.T_MML || a2.getAmmoType() == AmmoType.T_MML)
+				&& a1.getMunitionType() == a2.getMunitionType()) {
+			// LRMs...
+			if (a1.getAmmoType() == AmmoType.T_MML && a1.hasFlag(AmmoType.F_MML_LRM) && a2.getAmmoType() == AmmoType.T_LRM) {
+				result = true;
+			} else if (a2.getAmmoType() == AmmoType.T_MML && a2.hasFlag(AmmoType.F_MML_LRM) && a1.getAmmoType() == AmmoType.T_LRM) {
+				result = true;
+			}
+			// SRMs
+			if (a1.getAmmoType() == AmmoType.T_MML && !a1.hasFlag(AmmoType.F_MML_LRM) && a2.getAmmoType() == AmmoType.T_SRM) {
+				result = true;
+			} else if (a2.getAmmoType() == AmmoType.T_MML && !a2.hasFlag(AmmoType.F_MML_LRM) && a1.getAmmoType() == AmmoType.T_SRM) {
+				result = true;
+			}
+		}
+		
+		// AR-10 Launchers, ugh.
+		/*if (a1.getAmmoType() == AmmoType.T_AR10 || a2.getAmmoType() == AmmoType.T_AR10) {
+			// Barracuda
+			if (a1.getAmmoType() == AmmoType.T_AR10 && a1.hasFlag(AmmoType.F_AR10_BARRACUDA) && a2.getAmmoType() == AmmoType.T_BARRACUDA) {
+				result = true;
+			} else if (a2.getAmmoType() == AmmoType.T_AR10 && a2.hasFlag(AmmoType.F_AR10_BARRACUDA) && a1.getAmmoType() == AmmoType.T_BARRACUDA) {
+				result = true;
+			}
+			// Killer Whale
+			if (a1.getAmmoType() == AmmoType.T_AR10 && a1.hasFlag(AmmoType.F_AR10_KILLER_WHALE) && a2.getAmmoType() == AmmoType.T_KILLER_WHALE) {
+				result = true;
+			} else if (a2.getAmmoType() == AmmoType.T_AR10 && a2.hasFlag(AmmoType.F_AR10_KILLER_WHALE) && a1.getAmmoType() == AmmoType.T_KILLER_WHALE) {
+				result = true;
+			}
+			// White Shark
+			if (a1.getAmmoType() == AmmoType.T_AR10 && a1.hasFlag(AmmoType.F_AR10_WHITE_SHARK) && a2.getAmmoType() == AmmoType.T_WHITE_SHARK) {
+				result = true;
+			} else if (a2.getAmmoType() == AmmoType.T_AR10 && a2.hasFlag(AmmoType.F_AR10_WHITE_SHARK) && a1.getAmmoType() == AmmoType.T_WHITE_SHARK) {
+				result = true;
+			}
+		}*/
+		
+		// General Launchers
+		if (a1.getAmmoType() == a2.getAmmoType() && a1.getMunitionType() == a2.getMunitionType()) {
+			result = true;
+		}
+		
+		return result;
 	}
 	
 	public int getAmountAvailable() {
+		int amount = 0;
+		AmmoStorage a = null;
+		AmmoType aType = null;
+		AmmoType thisType = null;
 		for(Part part : campaign.getSpareParts()) {
 		    if(!part.isPresent()) {
 		        continue;
 		    }
 			if(part instanceof AmmoStorage) {
-				AmmoStorage a = (AmmoStorage)part;
-				if(((AmmoType)((AmmoStorage)a).getType()).equals((Object)getType())
-						&& ((AmmoType)getType()).getMunitionType() == ((AmmoType)((AmmoStorage)part).getType()).getMunitionType()) {
-					return a.getShots();
+				a = (AmmoStorage)part;
+				aType = ((AmmoType)((AmmoStorage)a).getType());
+				thisType = ((AmmoType)getType()); 
+				if(isCompatibleAmmo(aType, thisType) || (aType.equals(thisType) && thisType.getMunitionType() == aType.getMunitionType())) {
+					amount += a.getShots()*aType.getRackSize()/thisType.getRackSize();
+					if (!(campaign.getCampaignOptions().useAmmoByType())) {
+						break;
+					}
 				}
 			}
 		}
-		return 0;
+		return amount;
 	}
 	
 	public boolean isEnoughSpareAmmoAvailable() {
