@@ -28,6 +28,7 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
+import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Era;
@@ -124,6 +125,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
     
     public void changeShots(int s) {
+    	MekHQ.logMessage("DEBUG: AmmoStorage.changeShots() called with "+s+" shots");
     	shots = Math.max(0, shots + s);
     }
     

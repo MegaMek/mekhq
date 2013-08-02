@@ -219,6 +219,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private javax.swing.JCheckBox allowClanPurchasesBox;
     private javax.swing.JCheckBox allowISPurchasesBox;
     private javax.swing.JCheckBox allowCanonOnlyBox;
+    private javax.swing.JCheckBox useAmmoByTypeBox;
     private javax.swing.JCheckBox disallowSLUnitsBox;
     private javax.swing.JLabel lblTechLevel;
     private javax.swing.JComboBox choiceTechLevel;
@@ -304,6 +305,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         allowClanPurchasesBox.setSelected(options.allowClanPurchases());
         allowISPurchasesBox.setSelected(options.allowISPurchases());
         allowCanonOnlyBox.setSelected(options.allowCanonOnly());
+        useAmmoByTypeBox.setSelected(options.useAmmoByType());
 
         useQuirksBox.setSelected(options.useQuirks());
         chkSupportStaffOnly.setSelected(options.isAcquisitionSupportStaffOnly());
@@ -383,6 +385,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         allowClanPurchasesBox = new javax.swing.JCheckBox();
         allowISPurchasesBox = new javax.swing.JCheckBox();
         allowCanonOnlyBox = new javax.swing.JCheckBox();
+        useAmmoByTypeBox = new javax.swing.JCheckBox();
         choiceTechLevel = new javax.swing.JComboBox();
         btnOkay = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
@@ -785,6 +788,15 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panTech.add(allowCanonOnlyBox, gridBagConstraints);
         
+        lblTechLevel = new JLabel(resourceMap.getString("lblTechLevel.text")); // NOI18N
+        lblTechLevel.setName("lblTechLevel"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panTech.add(lblTechLevel, gridBagConstraints);
+       
         DefaultComboBoxModel techLevelComboBoxModel = new DefaultComboBoxModel();
         techLevelComboBoxModel.addElement(CampaignOptions.getTechLevelName(CampaignOptions.TECH_INTRO));
         techLevelComboBoxModel.addElement(CampaignOptions.getTechLevelName(CampaignOptions.TECH_STANDARD));
@@ -802,15 +814,17 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panTech.add(choiceTechLevel, gridBagConstraints);
 
-        lblTechLevel = new JLabel(resourceMap.getString("lblTechLevel.text")); // NOI18N
-        lblTechLevel.setName("lblTechLevel"); // NOI18N
+        useAmmoByTypeBox.setText(resourceMap.getString("useAmmoByTypeBox.text")); // NOI18N
+        useAmmoByTypeBox.setToolTipText(resourceMap.getString("useAmmoByTypeBox.toolTipText")); // NOI18N
+        useAmmoByTypeBox.setName("useAmmoByTypeBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panTech.add(lblTechLevel, gridBagConstraints);
-       
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panTech.add(useAmmoByTypeBox, gridBagConstraints);
+        
         tabOptions.addTab(resourceMap.getString("panTech.TabConstraints.tabTitle"), panTech); // NOI18N
         
         panPersonnel.setName("panPersonnel"); // NOI18N
@@ -2324,6 +2338,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    if(!allowCanonOnlyBox.isSelected()) {
 	    	campaign.getGameOptions().getOption("canon_only").setValue(false);
 	    }
+	    options.setUseAmmoByType(useAmmoByTypeBox.isSelected());
 	    options.setTechLevel(choiceTechLevel.getSelectedIndex());
 	    if(choiceTechLevel.getSelectedIndex() > 0) {
 	    	campaign.getGameOptions().getOption("allow_advanced_units").setValue(true);
