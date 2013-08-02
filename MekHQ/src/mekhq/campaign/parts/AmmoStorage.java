@@ -125,7 +125,6 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
     
     public void changeShots(int s) {
-    	MekHQ.logMessage("DEBUG: AmmoStorage.changeShots() called with "+s+" shots");
     	shots = Math.max(0, shots + s);
     }
     

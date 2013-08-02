@@ -331,7 +331,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 				}
 			}
 		}
-		MekHQ.logMessage("DEBUG: Loading an ammo bin with "+shots+" shots");
 		changeAmountAvailable(-1 * shots, (AmmoType)type);
 		shotsNeeded -= shots;
 	}
@@ -363,7 +362,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		}
 		shotsNeeded = getFullShots();
 		if(shots > 0) {
-			MekHQ.logMessage("DEBUG: Unloading an ammo bin of "+shots+" shots");
 			changeAmountAvailable(shots, curType);
 		}	
 	}
@@ -497,7 +495,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 	
 	public void swapAmmoFromCompatible(int needed, AmmoStorage as) {
-		MekHQ.logMessage("swapAmmoFromCompatible() called with amount of: "+needed);
 		AmmoStorage a = null;
 		AmmoType aType = null;
 		AmmoType curType = ((AmmoType)((AmmoStorage)as).getType());
@@ -506,9 +503,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		    if(!part.isPresent()) {
                 continue;
             }
-		    MekHQ.logMessage("swapAmmoFromCompatible() 1");
-			if(part instanceof AmmoStorage) {
-				MekHQ.logMessage("swapAmmoFromCompatible() 2");
+		    if(part instanceof AmmoStorage) {
 				a = (AmmoStorage)part;
 				aType = ((AmmoType)a.getType());
 				if (a.isSamePartType(as)) {
@@ -520,7 +515,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 				if (a.getShots() == 0) {
 					continue;
 				}
-				MekHQ.logMessage("swapAmmoFromCompatible() 3");
 				// Finally, do the conversion. Run until the other ammo type runs out or we have enough
 				converted = aType.getRackSize();
 				a.changeAmountAvailable(-1, aType);
@@ -529,7 +523,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 					a.changeAmountAvailable(-1, aType);
 				}
 				needed -= converted;
-				MekHQ.logMessage("swapAmmoFromCompatible() 4");
 				// If we have enough, we're done.
 				if (converted >= needed) {
 					break;
@@ -541,44 +534,32 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	}
 	
 	public void changeAmountAvailable(int amount, AmmoType curType) {
-		MekHQ.logMessage("changeAmountAvailable() called with amount of: "+amount);
 		AmmoStorage a = null;
 		AmmoType aType = null;
 		for(Part part : campaign.getSpareParts()) {
-			MekHQ.logMessage("1");
 		    if(!part.isPresent()) {
                 continue;
             }
-			MekHQ.logMessage("2");
 			if(part instanceof AmmoStorage) {
-				MekHQ.logMessage("3");
 				aType = ((AmmoType)((AmmoStorage)part).getType());
 				if(aType.equals((Object)curType) && curType.getMunitionType() == aType.getMunitionType()) {
 					a = (AmmoStorage)part;
-					MekHQ.logMessage("4: "+a.getShots());
 					if (amount < 0 && campaign.getCampaignOptions().useAmmoByType() && a.getShots() < Math.abs(amount)) {
-						MekHQ.logMessage("4.a");
 						swapAmmoFromCompatible(Math.abs(amount) * aType.getRackSize(), a);
 					}
-					MekHQ.logMessage("4.b");
 					a.changeShots(amount);
 					break;
 				}
 			}
 		}
-		MekHQ.logMessage("5");
 		if(null != a && a.getShots() <= 0) {
-			MekHQ.logMessage("5.a");
 			campaign.removePart(a);
 		} else if(null == a && amount > 0) {
-			MekHQ.logMessage("5.b");
 			campaign.addPart(new AmmoStorage(1, curType, amount, campaign), 0);
 		} else if (a == null && amount < 0 && campaign.getCampaignOptions().useAmmoByType()) {
-			MekHQ.logMessage("5.c");
 			campaign.addPart(new AmmoStorage(1 , curType ,0, campaign), 0);
 			changeAmountAvailable(amount, curType);
 		}
-		MekHQ.logMessage("End");
 	}
 	
 	public boolean isCompatibleAmmo(AmmoType a1, AmmoType a2) {
