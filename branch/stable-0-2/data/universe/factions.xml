@@ -260,7 +260,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 	<faction>
 		<shortname>CJF</shortname>
 		<fullname>Clan Jade Falcon</fullname>
-		<startingPlanet>Ironhold,Ironhold,Ironhold,Ironhold,Ironhold,Ironhold,Ironhold,Wotan,Wotan</startingPlanet>
+		<startingPlanet>Ironhold,Ironhold,Ironhold,Ironhold,Ironhold,Ironhold,Ironhold,Sudeten,Sudeten</startingPlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>172,208,115</colorRGB>

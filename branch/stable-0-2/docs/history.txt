@@ -18,6 +18,7 @@ v0.2.1 (SVN)
 + Updated getTechLevel() calls to include a year for compatibility with MegaMek.
 + Bug 373: Warship (dropships? jumpships?) can have scheduled tasks worked on twice per day [#373]
 + Bug [#343]: MegaMek server cannot be restarted if it terminates prematurely (doesn't reach the victory phase)
++ Planetary Data Update 37
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method
