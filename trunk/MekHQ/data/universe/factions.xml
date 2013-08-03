@@ -260,7 +260,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 	<faction>
 		<shortname>CJF</shortname>
 		<fullname>Clan Jade Falcon</fullname>
-		<startingPlanet>Ironhold,Ironhold,Ironhold,Ironhold,Ironhold,Ironhold,Ironhold,Wotan,Wotan</startingPlanet>
+		<startingPlanet>Ironhold,Ironhold,Ironhold,Ironhold,Ironhold,Ironhold,Ironhold,Sudeten,Sudeten</startingPlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>172,208,115</colorRGB>
@@ -541,6 +541,16 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>165,94,160</colorRGB>
+		<periphery>false</periphery>
+		<clan>false</clan>
+	</faction>
+	<faction>
+		<shortname>FWLR</shortname>
+		<fullname>Free Worlds League Rebels</fullname>
+		<startingPlanet>New Delos,New Delos,New Delos,New Delos,New Delos,New Delos,New Delos,New Delos,New Delos</startingPlanet>
+		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+		<nameGenerator>FWL</nameGenerator>
+		<colorRGB>68,212,228</colorRGB>
 		<periphery>false</periphery>
 		<clan>false</clan>
 	</faction>
@@ -1278,6 +1288,86 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>240,230,140</colorRGB>
 		<periphery>true</periphery>
+		<clan>false</clan>
+	</faction>
+	<faction>
+		<shortname>SA</shortname>
+		<fullname>Senatorial Alliance</fullname>
+		<startingPlanet>, , , , , , , ,Augustine</startingPlanet>
+		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>255,102,153</colorRGB>
+		<periphery>false</periphery>
+		<clan>false</clan>
+	</faction>
+	<faction>
+		<shortname>TTU</shortname>
+		<fullname>Tall Trees Union</fullname>
+		<startingPlanet>, , , , , , , ,Tall Trees</startingPlanet>
+		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+		<nameGenerator>CC</nameGenerator>
+		<colorRGB>153,153,51</colorRGB>
+		<periphery>false</periphery>
+		<clan>false</clan>
+	</faction>
+	<faction>
+		<shortname>ShA</shortname>
+		<fullname>Shiloh Alliance</fullname>
+		<startingPlanet>, , , , , , , ,Shiloh</startingPlanet>
+		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+		<nameGenerator>FWL</nameGenerator>
+		<colorRGB>97,26,92</colorRGB>
+		<periphery>false</periphery>
+		<clan>false</clan>
+	</faction>
+	<faction>
+		<shortname>CvW</shortname>
+		<fullname>Covenant Worlds</fullname>
+		<startingPlanet>, , , , , , , ,Bordon</startingPlanet>
+		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+		<nameGenerator>FWL</nameGenerator>
+		<colorRGB>102,51,51</colorRGB>
+		<periphery>false</periphery>
+		<clan>false</clan>
+	</faction>
+	<faction>
+		<shortname>PC</shortname>
+		<fullname>Protectorate Coalition</fullname>
+		<startingPlanet>, , , , , , , ,Rochelle</startingPlanet>
+		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+		<nameGenerator>FWL</nameGenerator>
+		<colorRGB>51,51,102</colorRGB>
+		<periphery>false</periphery>
+		<clan>false</clan>
+	</faction>
+	<faction>
+		<shortname>MiC</shortname>
+		<fullname>Milton Combine</fullname>
+		<startingPlanet>, , , , , , , ,Milton</startingPlanet>
+		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+		<nameGenerator>FWL</nameGenerator>
+		<colorRGB>255,0,51</colorRGB>
+		<periphery>false</periphery>
+		<clan>false</clan>
+	</faction>
+	<faction>
+		<shortname>CP</shortname>
+		<fullname>Clan Protectorate</fullname>
+		<startingPlanet>, , , , , , , ,Marik</startingPlanet>
+		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+		<nameGenerator>Clan</nameGenerator>
+		<colorRGB>153,255,51</colorRGB>
+		<periphery>false</periphery>
+		<clan>true</clan>
+	</faction>
+	<faction>
+		<shortname>RR</shortname>
+		<fullname>Republic Remnant</fullname>
+		<startingPlanet>, , , , , , , ,Callison</startingPlanet>
+		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>128,40,0</colorRGB>
+		<periphery>false</periphery>
 		<clan>false</clan>
 	</faction>
 </factions>

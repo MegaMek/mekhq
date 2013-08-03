@@ -91,7 +91,8 @@ Also allow folders that just end in Male or Female (ie ralgith_Female)
 + NPE when attempting to resolve via MekHQ launching MegaMek due to new
     "Prisoners and Bondsmen" code that should have been commented out.
 + Added "Undamaged" to Warehouse sorting
-+ WIP RFE [#99]/[#63]: Overview Summary / Statistics page (So far only the basic layout and the Dragoons Rating section are finished) 
++ WIP RFE [#99]/[#63]: Overview Summary / Statistics page (So far only the basic layout and the Dragoons Rating section are finished)
++ Planetary Data Update 37 
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
