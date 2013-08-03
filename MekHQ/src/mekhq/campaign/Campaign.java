@@ -151,7 +151,7 @@ public class Campaign implements Serializable {
 	// we will use the same basic system (borrowed from MegaMek) for tracking
 	// all three
 	// OK now we have more, parts, personnel, forces, missions, and scenarios.
-	//TODO: do we really need to track this in an array and hashtable? 
+	//TODO: do we really need to track this in an array and hashtable?
 	//It seems like we could track in a hashtable and then iterate through the keys of the hash
 	//to create an arraylist on demand
 	private ArrayList<SupportTeam> teams = new ArrayList<SupportTeam>();
@@ -5094,5 +5094,98 @@ public class Campaign implements Serializable {
     		}
     	}
     	return cargoTonnage;
+    }
+    
+    public String getCombatPersonnelDetails() {
+    	int[] countPersonByType = new int[Person.T_SPACE_GUNNER+1];
+    	int countTotal = 0;
+    	int countInjured = 0;
+    	long salary = 0;
+    	
+    	for (Person p : getPersonnel()) {
+    		// Add them to the total count
+    		if (p.getPrimaryRole() <= Person.T_SPACE_GUNNER && !p.isPrisoner() && !p.isBondsman()) {
+    			countPersonByType[p.getPrimaryRole()]++;
+    			countTotal++;
+    			if (p.getInjuries().size() > 0 || p.getHits() > 0) {
+    				countInjured++;
+    			}
+    			salary += p.getSalary();
+    		}
+    	}
+    	
+        StringBuffer sb = new StringBuffer("Combat Personnel\n\n");
+        
+        String buffer = "";
+
+        buffer = String.format("%-30s        %4s\n", "Total Combat Personnel", countTotal);
+        sb.append(buffer);
+        
+        for (int i = Person.T_NONE+1; i <= Person.T_SPACE_GUNNER; i++) {
+        	buffer = String.format("    %-30s    %4s\n", Person.getRoleDesc(i), countPersonByType[i]);
+        	sb.append(buffer);
+        }
+        
+        buffer = String.format("%-30s        %4s\n", "Injured Combat Personnel", countInjured);
+        sb.append("\n"+buffer);
+        
+        sb.append("\nMonthly Salary For Combat Personnel: "+salary);
+
+        return new String(sb);
+    }
+    
+    public String getSupportPersonnelDetails() {
+    	int[] countPersonByType = new int[Person.T_NUM];
+    	int countTotal = 0;
+    	int countInjured = 0;
+    	long salary = 0;
+    	int prisoners = 0;
+    	int bondsmen = 0;
+    	
+    	for (Person p : getPersonnel()) {
+    		// Add them to the total count
+    		if (p.getPrimaryRole() > Person.T_SPACE_GUNNER && !p.isPrisoner() && !p.isBondsman()) {
+    			countPersonByType[p.getPrimaryRole()]++;
+    			countTotal++;
+    			if (p.getInjuries().size() > 0 || p.getHits() > 0) {
+    				countInjured++;
+    			}
+    			salary += p.getSalary();
+    		}
+			if (p.isPrisoner()) {
+				prisoners++;
+    			if (p.getInjuries().size() > 0 || p.getHits() > 0) {
+    				countInjured++;
+    			}
+			}
+			if (p.isBondsman()) {
+				bondsmen++;
+    			if (p.getInjuries().size() > 0 || p.getHits() > 0) {
+    				countInjured++;
+    			}
+			}
+    	}
+    	
+        StringBuffer sb = new StringBuffer("Support Personnel\n\n");
+        
+        String buffer = "";
+
+        buffer = String.format("%-30s        %4s\n", "Total Support Personnel", countTotal);
+        sb.append(buffer);
+        
+        for (int i = Person.T_NAVIGATOR; i < Person.T_NUM; i++) {
+        	buffer = String.format("    %-30s    %4s\n", Person.getRoleDesc(i), countPersonByType[i]);
+        	sb.append(buffer);
+        }
+        
+        buffer = String.format("%-30s        %4s\n", "Injured Support Personnel", countInjured);
+        sb.append("\n"+buffer);
+        
+        sb.append("\nMonthly Salary For Support Personnel: "+salary);
+
+        sb.append(String.format("\nYou have "+prisoners+" prisoner%s", prisoners == 1 ? "" : "s"));
+        sb.append(String.format("\nYou have "+bondsmen+" %s", bondsmen == 1 ? "bondsman" : "bondsmen"));
+
+        return new String(sb);
     }
 }

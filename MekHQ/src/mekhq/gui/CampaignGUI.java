@@ -415,9 +415,9 @@ public class CampaignGUI extends JPanel {
         scrollOverviewParts = new javax.swing.JScrollPane();
         overviewPartsTable = new javax.swing.JTable();
         scrollOverviewCombatPersonnel = new javax.swing.JScrollPane();
-        overviewCombatPersonnelTable = new javax.swing.JTable();
+        overviewCombatPersonnelArea = new javax.swing.JTextArea();
         scrollOverviewSupportPersonnel = new javax.swing.JScrollPane();
-        overviewSupportPersonnelTable = new javax.swing.JTable();
+        overviewSupportPersonnelArea = new javax.swing.JTextArea();
         scrollOverviewHangar = new javax.swing.JScrollPane();
         overviewHangarTable = new javax.swing.JTable();
         scrollOverviewDragoonsRating = new javax.swing.JScrollPane();
@@ -2089,48 +2089,25 @@ public class CampaignGUI extends JPanel {
         tabOverview.setName("tabOverview"); // NOI18N
         tabOverview.setPreferredSize(new java.awt.Dimension(800, 300));
         
-        //TODO: overviewCombatPersonnelTable.setModel(overviewCombatPersonnelModel);
-        overviewCombatPersonnelTable.setName("overviewCombatPersonnelTable"); // NOI18N
-        overviewCombatPersonnelTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        //TODO: overviewCombatPersonnelTable.addMouseListener(overviewCombatPersonnelMouseAdapter);
-        overviewCombatPersonnelTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        /*column = null;
-        for (int i = 0; i < LoanTableModel.N_COL; i++) {
-            column = overviewCombatPersonnelTable.getColumnModel().getColumn(i);
-            column.setPreferredWidth(overviewCombatPersonnelModel.getColumnWidth(i));
-            column.setCellRenderer(overviewCombatPersonnelModel.getRenderer());
-        }*/
-        overviewCombatPersonnelTable.setIntercellSpacing(new Dimension(0, 0));
-        overviewCombatPersonnelTable.setShowGrid(false);
-        scrollOverviewCombatPersonnel.setViewportView(overviewCombatPersonnelTable);
+        overviewCombatPersonnelArea.setName("overviewCombatPersonnelArea"); // NOI18N
+        overviewCombatPersonnelArea.setLineWrap(true);
+        overviewCombatPersonnelArea.setWrapStyleWord(true);
+        overviewCombatPersonnelArea.setFont(new Font("Courier New", Font.PLAIN, 18));
+        overviewCombatPersonnelArea.setText(getCampaign().getCombatPersonnelDetails());
+        overviewCombatPersonnelArea.setEditable(false);
+        overviewCombatPersonnelArea.setName("overviewCombatPersonnelArea"); // NOI18N
+        scrollOverviewCombatPersonnel.setViewportView(overviewCombatPersonnelArea);
         tabOverview.addTab(resourceMap.getString("scrollOverviewCombatPersonnel.TabConstraints.tabTitle"), scrollOverviewCombatPersonnel);
         
-        //TODO: overviewSupportPersonnelTable.setModel(overviewSupportPersonnelModel);
-        overviewSupportPersonnelTable.setName("overviewSupportPersonnelTable"); // NOI18N
-        overviewSupportPersonnelTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        //TODO: overviewSupportPersonnelTable.addMouseListener(overviewSupportPersonnelMouseAdapter);
-        overviewSupportPersonnelTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        /*column = null;
-        for (int i = 0; i < LoanTableModel.N_COL; i++) {
-            column = overviewSupportPersonnelTable.getColumnModel().getColumn(i);
-            column.setPreferredWidth(overviewSupportPersonnelModel.getColumnWidth(i));
-            column.setCellRenderer(overviewSupportPersonnelModel.getRenderer());
-        }*/
-        overviewSupportPersonnelTable.setIntercellSpacing(new Dimension(0, 0));
-        overviewSupportPersonnelTable.setShowGrid(false);
-        scrollOverviewSupportPersonnel.setViewportView(overviewSupportPersonnelTable);
+        overviewSupportPersonnelArea.setName("overviewSupportPersonnelArea"); // NOI18N
+        overviewSupportPersonnelArea.setLineWrap(true);
+        overviewSupportPersonnelArea.setWrapStyleWord(true);
+        overviewSupportPersonnelArea.setFont(new Font("Courier New", Font.PLAIN, 18));
+        overviewSupportPersonnelArea.setText(getCampaign().getSupportPersonnelDetails());
+        overviewSupportPersonnelArea.setEditable(false);
+        overviewSupportPersonnelArea.setName("overviewSupportPersonnelArea"); // NOI18N
+        scrollOverviewSupportPersonnel.setViewportView(overviewSupportPersonnelArea);
         tabOverview.addTab(resourceMap.getString("scrollOverviewSupportPersonnel.TabConstraints.tabTitle"), scrollOverviewSupportPersonnel);
-        
-        rating = DragoonsRatingFactory.getDragoonsRating(getCampaign());
-        rating.reInitialize();
-        overviewDragoonsRatingArea.setLineWrap(true);
-        overviewDragoonsRatingArea.setWrapStyleWord(true);
-        overviewDragoonsRatingArea.setFont(new Font("Courier New", Font.PLAIN, 12));
-        overviewDragoonsRatingArea.setText(rating.getDetails());
-        overviewDragoonsRatingArea.setEditable(false);
-        overviewDragoonsRatingArea.setName("overviewDragoonsRatingTable"); // NOI18N
-        scrollOverviewDragoonsRating.setViewportView(overviewDragoonsRatingArea);
-        tabOverview.addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"), scrollOverviewDragoonsRating);
         
         //TODO: overviewHangarTable.setModel(overviewHangarModel);
         overviewHangarTable.setName("overviewHangarTable"); // NOI18N
@@ -2163,6 +2140,17 @@ public class CampaignGUI extends JPanel {
         overviewPartsTable.setShowGrid(false);
         scrollOverviewParts.setViewportView(overviewPartsTable);
         tabOverview.addTab(resourceMap.getString("scrollOverviewParts.TabConstraints.tabTitle"), scrollOverviewParts);
+        
+        rating = DragoonsRatingFactory.getDragoonsRating(getCampaign());
+        rating.reInitialize();
+        overviewDragoonsRatingArea.setLineWrap(true);
+        overviewDragoonsRatingArea.setWrapStyleWord(true);
+        overviewDragoonsRatingArea.setFont(new Font("Courier New", Font.PLAIN, 18));
+        overviewDragoonsRatingArea.setText(rating.getDetails());
+        overviewDragoonsRatingArea.setEditable(false);
+        overviewDragoonsRatingArea.setName("overviewDragoonsRatingArea"); // NOI18N
+        scrollOverviewDragoonsRating.setViewportView(overviewDragoonsRatingArea);
+        tabOverview.addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"), scrollOverviewDragoonsRating);
         
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -3558,7 +3546,7 @@ public class CampaignGUI extends JPanel {
         refreshOverview();
     }
     
-    private void refreshOverview() {
+    public void refreshOverview() {
         if (!getCampaign().getCampaignOptions().useDragoonRating()) {
         	tabOverview.removeTabAt(tabOverview.indexOfComponent(scrollOverviewDragoonsRating));
         } else {
@@ -3566,6 +3554,10 @@ public class CampaignGUI extends JPanel {
         		tabOverview.addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"), scrollOverviewDragoonsRating);
         	}
         }
+        
+        overviewDragoonsRatingArea.setText(rating.getDetails());
+        overviewCombatPersonnelArea.setText(getCampaign().getCombatPersonnelDetails());
+        overviewSupportPersonnelArea.setText(getCampaign().getSupportPersonnelDetails());
     }
 
     private void refreshPersonnelView() {
@@ -3577,7 +3569,7 @@ public class CampaignGUI extends JPanel {
         Person selectedPerson = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
         scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, getCampaign(), getPortraits()));
         //This odd code is to make sure that the scrollbar stays at the top
-        //I cant just call it here, because it ends up getting reset somewhere later
+        //I can't just call it here, because it ends up getting reset somewhere later
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 scrollPersonnelView.getVerticalScrollBar().setValue(0);
@@ -3594,13 +3586,12 @@ public class CampaignGUI extends JPanel {
         Unit selectedUnit = unitModel.getUnit(unitTable.convertRowIndexToModel(row));
         scrollUnitView.setViewportView(new UnitViewPanel(selectedUnit, getCampaign(), getCamos(), getMechTiles()));
         //This odd code is to make sure that the scrollbar stays at the top
-        //I cant just call it here, because it ends up getting reset somewhere later
+        //I can't just call it here, because it ends up getting reset somewhere later
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 scrollUnitView.getVerticalScrollBar().setValue(0);
             }
         });
-
     }
 
     private void refreshScenarioView() {
@@ -3618,7 +3609,7 @@ public class CampaignGUI extends JPanel {
         Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
         scrollScenarioView.setViewportView(new ScenarioViewPanel(scenario, getCampaign(), this));
         //This odd code is to make sure that the scrollbar stays at the top
-        //I cant just call it here, because it ends up getting reset somewhere later
+        //I can't just call it here, because it ends up getting reset somewhere later
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 scrollScenarioView.getVerticalScrollBar().setValue(0);
@@ -3654,7 +3645,7 @@ public class CampaignGUI extends JPanel {
             tabUnit.add("Unit", new UnitViewPanel(u, getCampaign(), getCamos(), getMechTiles()));
             scrollForceView.setViewportView(tabUnit);
             //This odd code is to make sure that the scrollbar stays at the top
-            //I cant just call it here, because it ends up getting reset somewhere later
+            //I can't just call it here, because it ends up getting reset somewhere later
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     scrollForceView.getVerticalScrollBar().setValue(0);
@@ -4487,7 +4478,7 @@ public class CampaignGUI extends JPanel {
                     scrollMissionView.setViewportView(new MissionViewPanel(m));
                 }
                 //This odd code is to make sure that the scrollbar stays at the top
-                //I cant just call it here, because it ends up getting reset somewhere later
+                //I can't just call it here, because it ends up getting reset somewhere later
                 javax.swing.SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         scrollMissionView.getVerticalScrollBar().setValue(0);
@@ -12116,9 +12107,9 @@ public class CampaignGUI extends JPanel {
     private javax.swing.JScrollPane scrollOverviewParts;
     private javax.swing.JTable overviewPartsTable;
     private javax.swing.JScrollPane scrollOverviewCombatPersonnel;
-    private javax.swing.JTable overviewCombatPersonnelTable;
+    private javax.swing.JTextArea overviewCombatPersonnelArea;
     private javax.swing.JScrollPane scrollOverviewSupportPersonnel;
-    private javax.swing.JTable overviewSupportPersonnelTable;
+    private javax.swing.JTextArea overviewSupportPersonnelArea;
     private javax.swing.JScrollPane scrollOverviewHangar;
     private javax.swing.JTable overviewHangarTable;
     private javax.swing.JScrollPane scrollOverviewDragoonsRating;
