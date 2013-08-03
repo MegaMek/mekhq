@@ -350,6 +350,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		campaignGUI.refreshAcquireList();
 		campaignGUI.refreshPartsList();
 		campaignGUI.refreshFinancialTransactions();
+        campaignGUI.refreshOverview();
     }
     
     public static String getPartsGroupName(int group) {

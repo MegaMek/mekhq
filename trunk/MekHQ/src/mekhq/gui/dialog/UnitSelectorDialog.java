@@ -387,6 +387,7 @@ public class UnitSelectorDialog extends JDialog {
 	        hqView.refreshServicedUnitList();
 	        hqView.refreshFinancialTransactions();
 	        hqView.refreshReport();
+	        hqView.refreshOverview();
 	    }
 	    // Necessary if the user wants to buy the same unit twice without reselecting it
 	    UnitChanged(null);
@@ -398,6 +399,7 @@ public class UnitSelectorDialog extends JDialog {
 	        hqView.refreshUnitList();
             hqView.refreshServicedUnitList();
             hqView.refreshReport();
+            hqView.refreshOverview();
 	    }
 	    // Necessary if the GM wants to add the same unit twice without reselecting it
 	    UnitChanged(null);

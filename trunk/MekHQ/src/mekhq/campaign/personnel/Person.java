@@ -1208,6 +1208,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	
 	public int getSalary() {
 		
+		if (isPrisoner() || isBondsman()) {
+			return 0;
+		}
+		
 		if(salary > -1) {
 			return salary;
 		}
