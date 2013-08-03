@@ -204,12 +204,12 @@ public class ResolveScenarioTracker {
 					if(null != e.getCrew()) {
 						if(!e.getCrew().getExternalIdAsString().equals("-1")) {
 							pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
-						} else {
+						/*} else {
 							for (Person p : Utilities.generateRandomCrewWithCombinedSkill(e, campaign)) {
 								campaign.makePrisoner(p);
 								MekHQ.logMessage("DEBUG: Adding "+p.getName()+" to the newPilots hash");
 								newPilots.put(p.getId(), p);
-							}
+							}*/
 						}
 					}
 				}
@@ -233,12 +233,12 @@ public class ResolveScenarioTracker {
 				if(null != e.getCrew()) {
 					if(!e.getCrew().getExternalIdAsString().equals("-1")) {
 						pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
-					} else {
+					/*} else {
 						for (Person p : Utilities.generateRandomCrewWithCombinedSkill(e, campaign)) {
 							campaign.makePrisoner(p);
 							MekHQ.logMessage("DEBUG: Adding "+p.getName()+" to the newPilots hash");
 							newPilots.put(p.getId(), p);
-						}
+						}*/
 					}
 				}
             }
@@ -257,12 +257,12 @@ public class ResolveScenarioTracker {
 					if(!e.getCrew().getExternalIdAsString().equals("-1")
 					        && (controlsField || e.getCrew().isDead())) {
 						pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
-					} else {
+					/*} else {
 						for (Person p : Utilities.generateRandomCrewWithCombinedSkill(e, campaign)) {
 							campaign.makePrisoner(p);
 							MekHQ.logMessage("DEBUG: Adding "+p.getName()+" to the newPilots hash");
 							newPilots.put(p.getId(), p);
-						}
+						}*/
 					}
 				}
         	} else if(e.getOwner().isEnemyOf(client.getLocalPlayer())) {
@@ -551,7 +551,7 @@ public class ResolveScenarioTracker {
 				if(!pilot.getExternalIdAsString().equals("-1")) {
 					pilots.put(UUID.fromString(pilot.getExternalIdAsString()), pilot);
 				} else { // We can currently only add crews if we have an entity associated with them.
-					for (Entity e : parser.getEntities()) {
+					/*for (Entity e : parser.getEntities()) {
 						if (!e.getCrew().equals(pilot)) {
 							MekHQ.logMessage("DEBUG: Pilots do no match");
 							continue;
@@ -562,7 +562,7 @@ public class ResolveScenarioTracker {
 							newPilots.put(p.getId(), p);
 						}
 						break;
-					}
+					}*/
 				}
 			}
 		}
