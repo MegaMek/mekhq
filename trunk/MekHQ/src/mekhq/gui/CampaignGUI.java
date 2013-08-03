@@ -517,7 +517,7 @@ public class CampaignGUI extends JPanel {
         addFunds = new javax.swing.JMenuItem();
         miGetLoan = new javax.swing.JMenuItem();
         miMercRoster = new javax.swing.JMenuItem();
-        miShoppingList = new javax.swing.JMenuItem();
+        //miShoppingList = new javax.swing.JMenuItem();
         menuMarket = new javax.swing.JMenu();
         miPurchaseUnit = new javax.swing.JMenuItem();
         miBuyParts = new javax.swing.JMenuItem();
@@ -563,7 +563,7 @@ public class CampaignGUI extends JPanel {
         tabMain.setToolTipText(resourceMap.getString("tabMain.toolTipText")); // NOI18N
         tabMain.setMinimumSize(new java.awt.Dimension(600, 200));
         tabMain.setName("tabMain"); // NOI18N
-        tabMain.setPreferredSize(new java.awt.Dimension(1200, 500));
+        tabMain.setPreferredSize(new java.awt.Dimension(900, 300));
 
         panOrganization.setName("panOrganization"); // NOI18N
         panOrganization.setLayout(new java.awt.GridBagLayout());
@@ -12094,7 +12094,7 @@ public class CampaignGUI extends JPanel {
     private javax.swing.JMenuItem miImportPerson;
     private javax.swing.JMenuItem miExportParts;
     private javax.swing.JMenuItem miImportParts;
-    private javax.swing.JMenuItem miShoppingList;
+    //private javax.swing.JMenuItem miShoppingList;
     private javax.swing.JMenuItem miGetLoan;
     private javax.swing.JMenuItem miPurchaseUnit;
     private javax.swing.JMenuItem miBuyParts;
