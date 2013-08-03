@@ -8310,7 +8310,7 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 		<faction>FWL</faction>
 		<factionChange>
 			<date>3015-01-13</date>
-			<faction>FWLmFWLR</faction>
+			<faction>FWL,FWLR</faction>
 		</factionChange>
 		<factionChange>
 			<date>3015-01-22</date>
