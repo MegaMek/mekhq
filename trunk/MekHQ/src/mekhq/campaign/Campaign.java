@@ -578,6 +578,9 @@ public class Campaign implements Serializable {
 			addReport("<font color='red'><b>Cannot have someone who is both a prisoner and a bondsman, there is an error in the code.</b></font>");
 			return false;
 		}
+		if (p == null) {
+			return false;
+		}
 		// Only pay if option set and this isn't a prisoner or bondsman
 	    if(getCampaignOptions().payForRecruitment() && !(prisoner || bondsman)) {
 	        if(!getFinances().debit(2 * p.getSalary(), Transaction.C_SALARY, "recruitment of " + p.getName(), getCalendar().getTime())) {
