@@ -4427,7 +4427,12 @@ public class Campaign implements Serializable {
     }
     
     public void setStartingPlanet() {
-    	location = new CurrentLocation(Planets.getInstance().getPlanets().get(getFaction().getStartingPlanet(getEra())), 0);
+    	Planet startingPlanet = Planets.getInstance().getPlanets().get(getFaction().getStartingPlanet(getEra()));
+    	if (startingPlanet == null) {
+    		location = new CurrentLocation(Planets.getInstance().getPlanets().get("Terra"), 0);
+    	} else {
+    		location = new CurrentLocation(startingPlanet, 0);
+    	}
     }
     
     public void addLogEntry(Person p, LogEntry entry) {
