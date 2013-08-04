@@ -421,7 +421,7 @@ public class CampaignGUI extends JPanel {
         scrollOverviewSupportPersonnel = new javax.swing.JScrollPane();
         overviewSupportPersonnelArea = new javax.swing.JTextArea();
         scrollOverviewHangar = new javax.swing.JScrollPane();
-        overviewHangarTable = new javax.swing.JTable();
+        overviewHangarTree = new javax.swing.JTree();
         scrollOverviewDragoonsRating = new javax.swing.JScrollPane();
         overviewDragoonsRatingArea = new javax.swing.JTextArea(20,60);
         lblFindPlanet = new javax.swing.JLabel();
@@ -2092,39 +2092,39 @@ public class CampaignGUI extends JPanel {
         tabOverview.setPreferredSize(new java.awt.Dimension(800, 300));
         
         overviewCombatPersonnelArea.setName("overviewCombatPersonnelArea"); // NOI18N
-        overviewCombatPersonnelArea.setLineWrap(true);
-        overviewCombatPersonnelArea.setWrapStyleWord(true);
+        overviewCombatPersonnelArea.setLineWrap(false);
         overviewCombatPersonnelArea.setFont(new Font("Courier New", Font.PLAIN, 18));
         overviewCombatPersonnelArea.setText(getCampaign().getCombatPersonnelDetails());
         overviewCombatPersonnelArea.setEditable(false);
         overviewCombatPersonnelArea.setName("overviewCombatPersonnelArea"); // NOI18N
+        scrollOverviewCombatPersonnel.setMinimumSize(new java.awt.Dimension(350, 400));
+        scrollOverviewCombatPersonnel.setPreferredSize(new java.awt.Dimension(350, 400));
         scrollOverviewCombatPersonnel.setViewportView(overviewCombatPersonnelArea);
-        tabOverview.addTab(resourceMap.getString("scrollOverviewCombatPersonnel.TabConstraints.tabTitle"), scrollOverviewCombatPersonnel);
-        
         overviewSupportPersonnelArea.setName("overviewSupportPersonnelArea"); // NOI18N
-        overviewSupportPersonnelArea.setLineWrap(true);
-        overviewSupportPersonnelArea.setWrapStyleWord(true);
+        overviewSupportPersonnelArea.setLineWrap(false);
         overviewSupportPersonnelArea.setFont(new Font("Courier New", Font.PLAIN, 18));
         overviewSupportPersonnelArea.setText(getCampaign().getSupportPersonnelDetails());
         overviewSupportPersonnelArea.setEditable(false);
         overviewSupportPersonnelArea.setName("overviewSupportPersonnelArea"); // NOI18N
         scrollOverviewSupportPersonnel.setViewportView(overviewSupportPersonnelArea);
-        tabOverview.addTab(resourceMap.getString("scrollOverviewSupportPersonnel.TabConstraints.tabTitle"), scrollOverviewSupportPersonnel);
+        scrollOverviewSupportPersonnel.setMinimumSize(new java.awt.Dimension(350, 400));
+        scrollOverviewSupportPersonnel.setPreferredSize(new java.awt.Dimension(350, 400));
         
-        //TODO: overviewHangarTable.setModel(overviewHangarModel);
-        overviewHangarTable.setName("overviewHangarTable"); // NOI18N
-        overviewHangarTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        //TODO: overviewHangarTable.addMouseListener(overviewHangarMouseAdapter);
-        overviewHangarTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        /*column = null;
-        for (int i = 0; i < LoanTableModel.N_COL; i++) {
-            column = overviewHangarTable.getColumnModel().getColumn(i);
-            column.setPreferredWidth(overviewHangarModel.getColumnWidth(i));
-            column.setCellRenderer(overviewHangarModel.getRenderer());
-        }*/
-        overviewHangarTable.setIntercellSpacing(new Dimension(0, 0));
-        overviewHangarTable.setShowGrid(false);
-        scrollOverviewHangar.setViewportView(overviewHangarTable);
+        splitOverviewPersonnel = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT, scrollOverviewCombatPersonnel, scrollOverviewSupportPersonnel);
+        splitOverviewPersonnel.setName("splitOverviewPersonnel");
+        splitOverviewPersonnel.setOneTouchExpandable(true);
+        splitOverviewPersonnel.setResizeWeight(0.5);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        tabOverview.addTab(resourceMap.getString("scrollOverviewPersonnel.TabConstraints.tabTitle"), splitOverviewPersonnel);
+        
+        //TODO: overviewHangarTree.setModel(overviewHangarModel);
+        overviewHangarTree.setName("overviewHangarTree"); // NOI18N
+        scrollOverviewHangar.setViewportView(overviewHangarTree);
         tabOverview.addTab(resourceMap.getString("scrollOverviewHangar.TabConstraints.tabTitle"), scrollOverviewHangar);
         
         //TODO: overviewPartsTable.setModel(overviewPartsModel);
@@ -2145,8 +2145,7 @@ public class CampaignGUI extends JPanel {
         
         rating = DragoonsRatingFactory.getDragoonsRating(getCampaign());
         rating.reInitialize();
-        overviewDragoonsRatingArea.setLineWrap(true);
-        overviewDragoonsRatingArea.setWrapStyleWord(true);
+        overviewDragoonsRatingArea.setLineWrap(false);
         overviewDragoonsRatingArea.setFont(new Font("Courier New", Font.PLAIN, 18));
         overviewDragoonsRatingArea.setText(rating.getDetails());
         overviewDragoonsRatingArea.setEditable(false);
@@ -12113,8 +12112,9 @@ public class CampaignGUI extends JPanel {
     private javax.swing.JTextArea overviewCombatPersonnelArea;
     private javax.swing.JScrollPane scrollOverviewSupportPersonnel;
     private javax.swing.JTextArea overviewSupportPersonnelArea;
+    private javax.swing.JSplitPane splitOverviewPersonnel;
     private javax.swing.JScrollPane scrollOverviewHangar;
-    private javax.swing.JTable overviewHangarTable;
+    private javax.swing.JTree overviewHangarTree;
     private javax.swing.JScrollPane scrollOverviewDragoonsRating;
     private javax.swing.JTextArea overviewDragoonsRatingArea;
     private IDragoonsRating rating;
