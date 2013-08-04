@@ -97,6 +97,7 @@ v0.3.1 (SVN)
 + Bug: NPE when using a starting faction at a era where it has already died out (ie. Smoke Jaguars in 3067)
 + Condensed Overview personnel tabs into a single tab with a split pane.
 + Updated the data/mechfiles folder with the current (MM r9679) data in zipped format
++ Data [#2]: Sorensons Sabres Campaign Pack
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
