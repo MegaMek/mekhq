@@ -18578,6 +18578,14 @@ Of added benefit, the canyons and mountains that cover much of the planet were d
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
+			<date>3071-05-14</date>
+			<faction>LA,CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-08-02</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
 			<date>3079-01-01</date>
 			<faction>CJF</faction>
 		</factionChange>
@@ -38822,7 +38830,7 @@ Rio only sports two continents, both which sit astride the equator: Grando and P
 		</factionChange>
 		<factionChange>
 			<date>3071-01-01</date>
-			<faction>FS,WoB</faction>
+			<faction>FS,WOB</faction>
 		</factionChange>
 		<factionChange>
 			<date>3075-01-01</date>
