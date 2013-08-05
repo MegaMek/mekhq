@@ -8,6 +8,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.Properties;
 import java.util.UUID;
 
 import javax.swing.SwingWorker;
@@ -29,6 +30,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
     private Statement statement = null;
     private Connection connect = null;
     private PreparedStatement preparedStatement = null;
+    private Properties conProperties;
 
     //we also need some hashes to cross-reference stuff by id
     HashMap<String, Integer> skillHash;
@@ -54,9 +56,12 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
     }
   
     public void connect() throws SQLException {
+    	conProperties = new Properties();
+    	conProperties.put("user", username);
+    	conProperties.put("password", passwd);
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            connect = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/?user=" + username + "&password=" + passwd);
+            connect = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + table, conProperties);
         } catch (SQLException e) {
             throw e;
         } catch (ClassNotFoundException e) {
@@ -79,6 +84,9 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         writeEquipmentData();
         //TODO: writeContractData
         //TODO: write logs?
+        
+        // Needed because otherwise progress isn't reaching 100 and the progress meter stays open
+        setProgress(100);
 
     }
     
@@ -524,7 +532,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
 
         progressNote = "Uploading equipment data";
         determineProgress();
-        for(Unit u: campaign.getUnits()) {
+        for(Unit u : campaign.getUnits()) {
             try {
                 preparedStatement = connect.prepareStatement("UPDATE " + table + ".equipment SET type=?, name=?, subtype=?, crew=?, weight=?, regnumber=?, notes=? WHERE uuid=?"); 
                 preparedStatement.setInt(1, UnitType.determineUnitTypeCode(u.getEntity())+1);
@@ -629,14 +637,14 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(){
+    protected Void doInBackground() {
         writeCampaignData();
         return null;
     }
     
     @Override
     public void done() {
-        close();  
+        close();
     }
     
     public String getProgressNote() {

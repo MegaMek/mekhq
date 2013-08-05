@@ -98,6 +98,8 @@ v0.3.1 (SVN)
 + Condensed Overview personnel tabs into a single tab with a split pane.
 + Updated the data/mechfiles folder with the current (MM r9679) data in zipped format
 + Data [#2]: Sorensons Sabres Campaign Pack
++ Bug: URL Escape NPE for MercRosterAccess
++ Bug: Merc Roster Upload never completes
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement

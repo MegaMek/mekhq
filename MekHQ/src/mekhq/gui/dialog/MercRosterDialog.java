@@ -180,7 +180,7 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
                 "Uploading data to MercRoster",
                 access.getProgressNote(), 0, 100);
         try {
-            access.connect();        
+            access.connect();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(frame,
                     "Could not connect to the mysql database. Check your entries and confirm\n" +
