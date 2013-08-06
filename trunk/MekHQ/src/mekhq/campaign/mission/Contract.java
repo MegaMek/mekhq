@@ -382,7 +382,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		}
 		
 		//calculate support amount
-		supportAmount = (long)((straightSupport/100.0) * c.getSupportPayRoll() * getLength());
+		supportAmount = (long)((straightSupport/100.0) * c.getMaintenanceCosts() * getLength());
 		
 		//calculate transportation costs
 		if(null != c.getPlanet(planetName)) {
