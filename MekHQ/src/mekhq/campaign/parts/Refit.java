@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -641,7 +642,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		}
 	}
 	
-	public void begin() throws EntityLoadingException {
+	public void begin() throws EntityLoadingException, FileAlreadyExistsException {
 	    if(customJob) {
             saveCustomization();
         }
@@ -984,25 +985,43 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		oldUnit.resetPilotAndEntity();
 	}
 	
-	public void saveCustomization() throws EntityLoadingException {
+	public void saveCustomization() throws EntityLoadingException, FileAlreadyExistsException {
 		UnitUtil.compactCriticals(newEntity);
 	    UnitUtil.reIndexCrits(newEntity);
 	
 		String fileName = MhqFileUtil.escapeReservedCharacters(newEntity.getChassis() + " " + newEntity.getModel());
 	    String sCustomsDir = "data/mechfiles/customs/";
+		String sCustomsDirCampaign = sCustomsDir+oldUnit.campaign.getName()+"/";
 	    File customsDir = new File(sCustomsDir);
 	    if(!customsDir.exists()) {
 	    	customsDir.mkdir();
 	    }
+	    File customsDirCampaign = new File(sCustomsDirCampaign);
+	    if(!customsDirCampaign.exists()) {
+	    	customsDir.mkdir();
+	    }
+	    
 	    try {
 	        if (newEntity instanceof Mech) {
-	            FileOutputStream out = new FileOutputStream(sCustomsDir + File.separator + fileName + ".mtf");
+			    //if this file already exists then don't overwrite it or we will end up with a bunch of copies
+				String fileOutName = sCustomsDir + File.separator + fileName + ".mtf";
+                String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".mtf";
+                if((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
+                    throw new FileAlreadyExistsException(fileNameCampaign);
+                }
+	            FileOutputStream out = new FileOutputStream(fileNameCampaign);
 	            PrintStream p = new PrintStream(out);
 	            p.println(((Mech) newEntity).getMtf());
 	            p.close();
 	            out.close();
 	        } else {
-	            BLKFile.encode(sCustomsDir + File.separator + fileName + ".blk", newEntity);
+			    //if this file already exists then don't overwrite it or we will end up with a bunch of copies
+				String fileOutName = sCustomsDir + File.separator + fileName + ".blk";
+                String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".blk";
+                if((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
+                	throw new FileAlreadyExistsException(fileNameCampaign);
+                }
+	            BLKFile.encode(fileNameCampaign, newEntity);
 	        }
 	    } catch (Exception ex) {
 	        ex.printStackTrace();

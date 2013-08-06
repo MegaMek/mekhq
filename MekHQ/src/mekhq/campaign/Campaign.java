@@ -189,7 +189,7 @@ public class Campaign implements Serializable {
 
 	private GameOptions gameOptions;
 
-	private String name;
+	private static String name;
 
 	private RandomNameGenerator rng;
 	
@@ -2913,8 +2913,13 @@ public class Campaign implements Serializable {
 	
 	private static void processCustom(Campaign retVal, Node wn) {
 		String sCustomsDir = "data/mechfiles/customs/";
+		String sCustomsDirCampaign = sCustomsDir+name+"/";
 	    File customsDir = new File(sCustomsDir);
 	    if(!customsDir.exists()) {
+	    	customsDir.mkdir();
+	    }
+	    File customsDirCampaign = new File(sCustomsDirCampaign);
+	    if(!customsDirCampaign.exists()) {
 	    	customsDir.mkdir();
 	    }
 		
@@ -2944,11 +2949,12 @@ public class Campaign implements Serializable {
 			try {
 			    //if this file already exists then don't overwrite it or we will end up with a bunch of copies
 				String fileName = sCustomsDir + File.separator + name + ".mtf";
-				if((new File(fileName)).exists()) {
-				    return;
-				}
+                String fileNameCampaign = sCustomsDirCampaign + File.separator + name + ".mtf";
+                if((new File(fileName)).exists() || (new File(fileNameCampaign)).exists()) {
+                    return;
+                }
 			    MekHQ.logMessage("Loading Custom unit from XML...", 4);
-				FileOutputStream out = new FileOutputStream(fileName);
+				FileOutputStream out = new FileOutputStream(fileNameCampaign);
 				PrintStream p = new PrintStream(out);
 				p.println(mtf);
 				p.close();
@@ -2962,12 +2968,13 @@ public class Campaign implements Serializable {
 		if(null != name && null != blk) {
 			try {
 			    //if this file already exists then don't overwrite it or we will end up with a bunch of copies
-                String fileName = sCustomsDir + File.separator + name + ".mtf";
-                if((new File(fileName)).exists()) {
+                String fileName = sCustomsDir + File.separator + name + ".blk";
+                String fileNameCampaign = sCustomsDirCampaign + File.separator + name + ".blk";
+                if((new File(fileName)).exists() || (new File(fileNameCampaign)).exists()) {
                     return;
                 }
 				MekHQ.logMessage("Loading Custom unit from XML...", 4);
-				FileOutputStream out = new FileOutputStream(sCustomsDir + File.separator + name + ".blk");
+				FileOutputStream out = new FileOutputStream(fileNameCampaign);
 				PrintStream p = new PrintStream(out);
 				p.println(blk);
 				p.close();
