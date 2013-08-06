@@ -103,6 +103,7 @@ v0.3.1 (SVN)
 + RFE: Customizations embedded in data/customs/<campaign name>/ folders for ease of sorting.
 + RFE: Percentage based maintenance costs
 + Bug: Support costs calculated off payroll, should be off maintenance
++ Bug: Edit Injury dialog doesn't refresh the Infirmary
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
