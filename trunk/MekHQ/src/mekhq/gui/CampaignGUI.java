@@ -55,6 +55,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
+import java.nio.file.FileAlreadyExistsException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -3533,7 +3534,13 @@ public class CampaignGUI extends JPanel {
                     "Could not customize unit",
                     JOptionPane.ERROR_MESSAGE);
             return;
-        }
+        } catch (FileAlreadyExistsException e) {
+            JOptionPane.showMessageDialog(null,
+                    "A file already exists with the custom name you are trying to use. Please choose a different name. (Unit name and model)",
+                    "File Already Exists",
+                    JOptionPane.ERROR_MESSAGE);
+			return;
+		}
         getCampaign().refit(r);
         panMekLab.clearUnit();
         refreshReport();
@@ -11374,25 +11381,50 @@ public class CampaignGUI extends JPanel {
                 refreshOverview();
             } else if (command.equalsIgnoreCase("TAG_CUSTOM")) {
                 String sCustomsDir = "data/mechfiles/customs/";
-                File customsDir = new File(sCustomsDir);
-                if(!customsDir.exists()) {
-                    customsDir.mkdir();
-                }
+        		String sCustomsDirCampaign = sCustomsDir+getCampaign().getName()+"/";
+        	    File customsDir = new File(sCustomsDir);
+        	    if(!customsDir.exists()) {
+        	    	customsDir.mkdir();
+        	    }
+        	    File customsDirCampaign = new File(sCustomsDirCampaign);
+        	    if(!customsDirCampaign.exists()) {
+        	    	customsDir.mkdir();
+        	    }
                 for (Unit unit : units) {
                     String fileName = unit.getEntity().getChassis() + " " + unit.getEntity().getModel();
                     try {
-                        if (unit.getEntity() instanceof Mech) {
-                            FileOutputStream out = new FileOutputStream(sCustomsDir + File.separator + fileName + ".mtf");
-                            PrintStream p = new PrintStream(out);
-                            p.println(((Mech) unit.getEntity()).getMtf());
-                            p.close();
-                            out.close();
-                        } else {
-                            BLKFile.encode(sCustomsDir + File.separator + fileName + ".blk", unit.getEntity());
-                        }
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
+            	        if (unit.getEntity() instanceof Mech) {
+            			    //if this file already exists then don't overwrite it or we will end up with a bunch of copies
+            				String fileOutName = sCustomsDir + File.separator + fileName + ".mtf";
+                            String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".mtf";
+                            if((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
+                                JOptionPane.showMessageDialog(null,
+                                        "A file already exists for this unit, cannot tag as custom. (Unit name and model)",
+                                        "File Already Exists",
+                                        JOptionPane.ERROR_MESSAGE);
+                    			return;
+                            }
+            	            FileOutputStream out = new FileOutputStream(fileNameCampaign);
+            	            PrintStream p = new PrintStream(out);
+            	            p.println(((Mech) unit.getEntity()).getMtf());
+            	            p.close();
+            	            out.close();
+            	        } else {
+            			    //if this file already exists then don't overwrite it or we will end up with a bunch of copies
+            				String fileOutName = sCustomsDir + File.separator + fileName + ".blk";
+                            String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".blk";
+                            if((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
+                                JOptionPane.showMessageDialog(null,
+                                        "A file already exists for this unit, cannot tag as custom. (Unit name and model)",
+                                        "File Already Exists",
+                                        JOptionPane.ERROR_MESSAGE);
+                    			return;
+                            }
+            	            BLKFile.encode(fileNameCampaign, unit.getEntity());
+            	        }
+            	    } catch (Exception ex) {
+            	        ex.printStackTrace();
+            	    }
                     getCampaign().addCustom(unit.getEntity().getChassis() + " " + unit.getEntity().getModel());
                 }
                 MechSummaryCache.getInstance().loadMechData();
