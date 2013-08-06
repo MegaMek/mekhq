@@ -7862,6 +7862,7 @@ public class CampaignGUI extends JPanel {
             } else if (command.equalsIgnoreCase("EDIT_INJURIES")) {
                 EditPersonnelInjuriesDialog epid = new EditPersonnelInjuriesDialog(getFrame(), true, getCampaign(), selectedPerson);
                 epid.setVisible(true);
+                refreshPatientList();
                 refreshPersonnelList();
                 refreshOverview();
             }
