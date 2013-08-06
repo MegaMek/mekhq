@@ -6,5 +6,7 @@
 	<classpathentry kind="lib" path="MegaMek.jar"/>
 	<classpathentry kind="lib" path="MegaMekLab.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/MegaMek"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/MegaMekLab"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -103,6 +103,7 @@ public class CampaignOptions implements Serializable {
     private double usedPartsValue;
     private double damagedPartsValue;
     private double canceledOrderReimbursement;
+    private boolean usePercentageMaint; // Unofficial
 
     //contract related
     private boolean equipmentContractBase;
@@ -173,6 +174,7 @@ public class CampaignOptions implements Serializable {
         allowISPurchases = true;
         allowCanonOnly = false;
         useAmmoByType = false;
+        usePercentageMaint = false;
         techLevel = TECH_EXPERIMENTAL;
         scenarioXP = 1;
         killsForXP = 0;
@@ -579,6 +581,14 @@ public class CampaignOptions implements Serializable {
     	useAmmoByType = b;
     }
     
+    public boolean usePercentageMaint() {
+    	return usePercentageMaint;
+    }
+    
+    public void setUsePercentageMaint(boolean b) {
+    	usePercentageMaint = b;
+    }
+    
     public int getTechLevel() {
     	return techLevel;
     }
@@ -813,6 +823,7 @@ public class CampaignOptions implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "allowISPurchases", allowISPurchases);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "allowCanonOnly", allowCanonOnly);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useAmmoByType", useAmmoByType);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "usePercentageMaint", usePercentageMaint);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "waitingPeriod", waitingPeriod);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "acquisitionSkill", acquisitionSkill);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "acquisitionSupportStaffOnly", acquisitionSupportStaffOnly);
@@ -1075,6 +1086,11 @@ public class CampaignOptions implements Serializable {
 					retVal.useAmmoByType = true;
 				else
 					retVal.useAmmoByType = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("usePercentageMaint")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.usePercentageMaint = true;
+				else
+					retVal.usePercentageMaint = false;
 			} else if (wn2.getNodeName().equalsIgnoreCase("techLevel")) {
 				retVal.techLevel = Integer.parseInt(wn2.getTextContent().trim());
 			} else if (wn2.getNodeName().equalsIgnoreCase("useDragoonRating")) {

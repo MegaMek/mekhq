@@ -1380,36 +1380,70 @@ public class Unit implements MekHqXmlSerializable {
     public int getMaintenanceCost() {
     	Entity en = getEntity();
     	Boolean isOmni = en.isOmni();
-    	if(en instanceof Mech) {
-    		if(isOmni) {
-    			return 100;
-    		} else {
-    			return 75;
-    		}
-    	} else if(en instanceof Warship) {
-    		return 5000;
-    	} else if(en instanceof Jumpship) {
-    		return 800;
-    	} else if(en instanceof Dropship) {
-    		return 500;
-    	} else if(en instanceof ConvFighter) {
-    		return 50;
-    	} else if(en instanceof Aero) {
-    		if(isOmni) {
-    			return 125;
-    		} else  {
-    			return 65;
-    		}
-    	} else if(en instanceof VTOL) {
-    		return 65;
-    	} else if(en instanceof Tank) {
-    		return 25;
-    	} else if(en instanceof BattleArmor) {
-    		return ((BattleArmor)en).getTroopers() * 50;
-    	} else if(en instanceof Infantry) {
-    		return ((Infantry)en).getSquadN()*10;
+    	double mCost = 0;
+    	double value = 0;
+    	
+    	//we will assume sale value for now, but make this customizable
+        if(campaign.getCampaignOptions().useEquipmentContractSaleValue()) {
+            value += getSellValue();
+        } else {
+            value += getBuyCost();
+        }
+        
+    	if (campaign.getCampaignOptions().usePercentageMaint()) {
+	    	if(en instanceof Mech) {
+	    		mCost = value * 0.02;
+	    	} else if(en instanceof Warship) {
+	    		mCost = value * 0.07;
+	    	} else if(en instanceof Jumpship) {
+	    		mCost = value * 0.06;
+	    	} else if(en instanceof Dropship) {
+	    		mCost = value * 0.05;
+	    	} else if(en instanceof ConvFighter) {
+	    		mCost = value * 0.03;
+	    	} else if(en instanceof Aero) {
+	    		mCost = value * 0.04;
+	    	} else if(en instanceof VTOL) {
+	    		mCost = value * 0.02;
+	    	} else if(en instanceof Tank) {
+	    		mCost = value * 0.015;
+	    	} else if(en instanceof BattleArmor) {
+	    		mCost = value * 0.03;
+	    	} else if(en instanceof Infantry) {
+	    		mCost = value * 0.005;
+	    	}
+    	} else {
+	    	if(en instanceof Mech) {
+	    		if(isOmni) {
+	    			return 100;
+	    		} else {
+	    			return 75;
+	    		}
+	    	} else if(en instanceof Warship) {
+	    		return 5000;
+	    	} else if(en instanceof Jumpship) {
+	    		return 800;
+	    	} else if(en instanceof Dropship) {
+	    		return 500;
+	    	} else if(en instanceof ConvFighter) {
+	    		return 50;
+	    	} else if(en instanceof Aero) {
+	    		if(isOmni) {
+	    			return 125;
+	    		} else  {
+	    			return 65;
+	    		}
+	    	} else if(en instanceof VTOL) {
+	    		return 65;
+	    	} else if(en instanceof Tank) {
+	    		return 25;
+	    	} else if(en instanceof BattleArmor) {
+	    		return ((BattleArmor)en).getTroopers() * 50;
+	    	} else if(en instanceof Infantry) {
+	    		return ((Infantry)en).getSquadN()*10;
+	    	}
     	}
-    	return 0;
+    	return (int)Math.ceil(mCost/52);
     }
     
     public void addPart(Part part) {
