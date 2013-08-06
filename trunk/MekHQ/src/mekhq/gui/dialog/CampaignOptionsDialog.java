@@ -166,6 +166,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox chkEquipContractSaleValue;
     private JCheckBox chkBLCSaleValue;
     private JSpinner spnOrderRefund;
+    private javax.swing.JCheckBox usePercentageMaintBox;
 
     private javax.swing.JTextArea textRanks;
     private javax.swing.JScrollPane scrRanks;
@@ -297,6 +298,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         payForTransportBox.setSelected(options.payForTransport());
         payForRecruitmentBox.setSelected(options.payForRecruitment());
         useLoanLimitsBox.setSelected(options.useLoanLimits());
+        usePercentageMaintBox.setSelected(options.usePercentageMaint());
 
         sellUnitsBox.setSelected(options.canSellUnits());
         sellPartsBox.setSelected(options.canSellParts());
@@ -1067,6 +1069,17 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panFinances.add(useLoanLimitsBox, gridBagConstraints);
+        
+        // Unofficial maintenance costs
+        usePercentageMaintBox = new JCheckBox(resourceMap.getString("usePercentageMaintBox.text")); // NOI18N
+        usePercentageMaintBox.setToolTipText(resourceMap.getString("usePercentageMaintBox.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panFinances.add(usePercentageMaintBox, gridBagConstraints);
         
         
         clanPriceModifierLabel.setText(resourceMap.getString("clanPriceModifierLabel.text")); // NOI18N
@@ -2287,6 +2300,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    options.setPayForTransport(payForTransportBox.isSelected());
 	    options.setPayForRecruitment(payForRecruitmentBox.isSelected());
 	    options.setLoanLimits(useLoanLimitsBox.isSelected());
+	    options.setUsePercentageMaint(usePercentageMaintBox.isSelected());
 	    options.setSellUnits(sellUnitsBox.isSelected());
 	    options.setSellParts(sellPartsBox.isSelected());
 	

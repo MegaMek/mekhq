@@ -101,6 +101,7 @@ v0.3.1 (SVN)
 + Bug: URL Escape NPE for MercRosterAccess
 + Bug: Merc Roster Upload never completes
 + RFE: Customizations embedded in data/customs/<campaign name>/ folders for ease of sorting.
++ RFE: Percentage based maintenance costs
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
