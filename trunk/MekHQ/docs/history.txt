@@ -104,6 +104,7 @@ v0.3.1 (SVN)
 + RFE: Percentage based maintenance costs
 + Bug: Support costs calculated off payroll, should be off maintenance
 + Bug: Edit Injury dialog doesn't refresh the Infirmary
++ Added a bit of logging for Refits when a part is null in the method to check if all parts have arrived
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement

@@ -732,6 +732,12 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		boolean retVal = false;
 		for (int pid : newUnitParts) {
 			Part part = oldUnit.campaign.getPart(pid);
+			if (part == null) {
+				if(null == part) {
+					MekHQ.logMessage("part with id " + pid + " not found for refit of " + getDesc());
+					continue;
+				}
+			}
 			if (!part.isPresent()) {
 				retVal = true;
 				break;
