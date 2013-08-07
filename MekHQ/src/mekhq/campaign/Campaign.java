@@ -5112,17 +5112,29 @@ public class Campaign implements Serializable {
     	int[] countPersonByType = new int[Person.T_SPACE_GUNNER+1];
     	int countTotal = 0;
     	int countInjured = 0;
+    	int countMIA = 0;
+    	int countKIA = 0;
+    	int countRetired = 0;
     	long salary = 0;
     	
     	for (Person p : getPersonnel()) {
     		// Add them to the total count
-    		if (p.getPrimaryRole() <= Person.T_SPACE_GUNNER && !p.isPrisoner() && !p.isBondsman()) {
+    		if (p.getPrimaryRole() <= Person.T_SPACE_GUNNER && !p.isPrisoner() && !p.isBondsman() && p.isActive()) {
     			countPersonByType[p.getPrimaryRole()]++;
     			countTotal++;
-    			if (p.getInjuries().size() > 0 || p.getHits() > 0) {
+    			if (getCampaignOptions().useAdvancedMedical() && p.getInjuries().size() > 0) {
+    				countInjured++;
+    				MekHQ.logMessage(p.getName()+" is returning an arraylist of injuries for the purposes of counting");
+    			} else if (p.getHits() > 0) {
     				countInjured++;
     			}
     			salary += p.getSalary();
+    		} else if (p.getPrimaryRole() <= Person.T_SPACE_GUNNER && p.getStatus() == Person.S_RETIRED) {
+    			countRetired++;
+    		} else if (p.getPrimaryRole() <= Person.T_SPACE_GUNNER && p.getStatus() == Person.S_MIA) {
+    			countMIA++;
+    		} else if (p.getPrimaryRole() <= Person.T_SPACE_GUNNER && p.getStatus() == Person.S_KIA) {
+    			countKIA++;
     		}
     	}
     	
@@ -5137,9 +5149,15 @@ public class Campaign implements Serializable {
         	buffer = String.format("    %-30s    %4s\n", Person.getRoleDesc(i), countPersonByType[i]);
         	sb.append(buffer);
         }
-        
+
         buffer = String.format("%-30s        %4s\n", "Injured Combat Personnel", countInjured);
         sb.append("\n"+buffer);
+        buffer = String.format("%-30s        %4s\n", "MIA Combat Personnel", countMIA);
+        sb.append(buffer);
+        buffer = String.format("%-30s        %4s\n", "KIA Combat Personnel", countKIA);
+        sb.append(buffer);
+        buffer = String.format("%-30s        %4s\n", "Retired Combat Personnel", countRetired);
+        sb.append(buffer);
         
         sb.append("\nMonthly Salary For Combat Personnel: "+salary);
 
@@ -5150,32 +5168,39 @@ public class Campaign implements Serializable {
     	int[] countPersonByType = new int[Person.T_NUM];
     	int countTotal = 0;
     	int countInjured = 0;
+    	int countMIA = 0;
+    	int countKIA = 0;
+    	int countRetired = 0;
     	long salary = 0;
     	int prisoners = 0;
     	int bondsmen = 0;
     	
     	for (Person p : getPersonnel()) {
     		// Add them to the total count
-    		if (p.getPrimaryRole() > Person.T_SPACE_GUNNER && !p.isPrisoner() && !p.isBondsman()) {
+    		if (p.getPrimaryRole() > Person.T_SPACE_GUNNER && !p.isPrisoner() && !p.isBondsman() && p.isActive()) {
     			countPersonByType[p.getPrimaryRole()]++;
     			countTotal++;
     			if (p.getInjuries().size() > 0 || p.getHits() > 0) {
     				countInjured++;
     			}
     			salary += p.getSalary();
-    		}
-			if (p.isPrisoner()) {
+    		} else if (p.isPrisoner()) {
 				prisoners++;
     			if (p.getInjuries().size() > 0 || p.getHits() > 0) {
     				countInjured++;
     			}
-			}
-			if (p.isBondsman()) {
+			} else if (p.isBondsman()) {
 				bondsmen++;
     			if (p.getInjuries().size() > 0 || p.getHits() > 0) {
     				countInjured++;
     			}
-			}
+			} else if (p.getPrimaryRole() > Person.T_SPACE_GUNNER && p.getStatus() == Person.S_RETIRED) {
+    			countRetired++;
+    		} else if (p.getPrimaryRole() > Person.T_SPACE_GUNNER && p.getStatus() == Person.S_MIA) {
+    			countMIA++;
+    		} else if (p.getPrimaryRole() > Person.T_SPACE_GUNNER && p.getStatus() == Person.S_KIA) {
+    			countKIA++;
+    		}
     	}
     	
         StringBuffer sb = new StringBuffer("Support Personnel\n\n");
@@ -5192,6 +5217,12 @@ public class Campaign implements Serializable {
         
         buffer = String.format("%-30s        %4s\n", "Injured Support Personnel", countInjured);
         sb.append("\n"+buffer);
+        buffer = String.format("%-30s        %4s\n", "MIA Support Personnel", countMIA);
+        sb.append(buffer);
+        buffer = String.format("%-30s        %4s\n", "KIA Support Personnel", countKIA);
+        sb.append(buffer);
+        buffer = String.format("%-30s        %4s\n", "Retired Support Personnel", countRetired);
+        sb.append(buffer);
         
         sb.append("\nMonthly Salary For Support Personnel: "+salary);
 

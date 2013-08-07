@@ -105,7 +105,8 @@ v0.3.1 (SVN)
 + Bug: Support costs calculated off payroll, should be off maintenance
 + Bug: Edit Injury dialog doesn't refresh the Infirmary
 + Added a bit of logging for Refits when a part is null in the method to check if all parts have arrived
-+ Cargo Tonnage/Capacity label causes NumberFormatException due to localization of numeric strings
++ Bug: Cargo Tonnage/Capacity label causes NumberFormatException due to localization of numeric strings
++ Bug: Personnel Overview incorrectly showing MIA/KIA/Retired personnel in the active counts
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
