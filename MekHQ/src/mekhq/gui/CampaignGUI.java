@@ -6651,6 +6651,42 @@ public class CampaignGUI extends JPanel {
                 refreshServicedUnitList();
                 refreshCargo();
                 refreshOverview();
+            } else if(command.contains("GOTO_UNIT")) {
+                for(Unit unit : units) {
+                	tabMain.setSelectedIndex(tabMain.indexOfTab(resourceMap.getString("panHangar.TabConstraints.tabTitle")));
+                    for (Unit u : unitModel.data) {
+                    	if (u.getId().equals(unit.getId())) {
+                    		int index = unitTable.convertRowIndexToView(unitModel.data.indexOf(u));
+                    		unitTable.setRowSelectionInterval(index, index);
+                    		break;
+                    	}
+                    }
+                }
+                refreshScenarioList();
+                refreshOrganization();
+                refreshPersonnelList();
+                refreshUnitList();
+                refreshServicedUnitList();
+                refreshCargo();
+                refreshOverview();
+            } else if(command.contains("GOTO_PILOT")) {
+            	for(Unit unit : units) {
+                    tabMain.setSelectedIndex(tabMain.indexOfTab(resourceMap.getString("panPersonnel.TabConstraints.tabTitle")));
+                    for (Person p : personModel.data) {
+                    	if (p.getId().equals(unit.getCommander().getId())) {
+                    		int index = personnelTable.convertRowIndexToView(personModel.data.indexOf(p));
+                    		personnelTable.setRowSelectionInterval(index, index);
+                    		break;
+                    	}
+                    }
+                }
+                refreshScenarioList();
+                refreshOrganization();
+                refreshPersonnelList();
+                refreshUnitList();
+                refreshServicedUnitList();
+                refreshCargo();
+                refreshOverview();
             } else if(command.contains("DEPLOY_UNIT")) {
                 int sid = Integer.parseInt(target);
                 Scenario scenario = getCampaign().getScenario(sid);
@@ -7167,6 +7203,18 @@ public class CampaignGUI extends JPanel {
                     if(areAllUnitsDeployed(units)) {
                         menuItem = new JMenuItem("Undeploy Unit");
                         menuItem.setActionCommand("UNDEPLOY_UNIT|UNIT|empty|" + unitIds);
+                        menuItem.addActionListener(this);
+                        menuItem.setEnabled(true);
+                        popup.add(menuItem);
+                    }
+                    if (!multipleSelection) {
+                        menuItem = new JMenuItem("Go to Unit in Hangar");
+                        menuItem.setActionCommand("GOTO_UNIT|UNIT|empty|" + unitIds);
+                        menuItem.addActionListener(this);
+                        menuItem.setEnabled(true);
+                        popup.add(menuItem);
+                        menuItem = new JMenuItem("Go to Pilot/Commander in Personnel");
+                        menuItem.setActionCommand("GOTO_PILOT|UNIT|empty|" + unitIds);
                         menuItem.addActionListener(this);
                         menuItem.setEnabled(true);
                         popup.add(menuItem);
