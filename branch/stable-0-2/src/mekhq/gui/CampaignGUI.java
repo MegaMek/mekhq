@@ -6478,7 +6478,7 @@ public class CampaignGUI extends JPanel {
                             || (0 == JOptionPane.showConfirmDialog(
                                     null,
                                     "Do you really want to change the status of "
-                                    + person.getDesc()
+                                    + person.getFullTitle()
                                     + " to a non-active status?", "KIA?",
                                     JOptionPane.YES_NO_OPTION))) {
                         getCampaign().changeStatus(person, selected);
@@ -6505,7 +6505,7 @@ public class CampaignGUI extends JPanel {
                             .showConfirmDialog(
                                     null,
                                     "Do you really want to remove "
-                                    + person.getDesc() + "?",
+                                    + person.getFullTitle() + "?",
                                     "Remove?", JOptionPane.YES_NO_OPTION)) {
                         getCampaign().removePerson(person.getId());
                     }
