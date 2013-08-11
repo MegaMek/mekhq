@@ -122,8 +122,10 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import javax.xml.parsers.DocumentBuilder;
@@ -135,11 +137,14 @@ import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
+import megamek.common.ConvFighter;
 import megamek.common.Crew;
 import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
+import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;
+import megamek.common.GunEmplacement;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.Mech;
@@ -148,11 +153,16 @@ import megamek.common.MechView;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.Player;
+import megamek.common.Protomech;
 import megamek.common.SmallCraft;
+import megamek.common.SupportTank;
+import megamek.common.SupportVTOL;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
+import megamek.common.VTOL;
+import megamek.common.Warship;
 import megamek.common.WeaponType;
 import megamek.common.XMLStreamParser;
 import megamek.common.loaders.BLKFile;
@@ -323,6 +333,183 @@ public class CampaignGUI extends JPanel {
     private MekHQ app;
 
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI");
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTable DocTable;
+    private javax.swing.JTable partsTable;
+    private javax.swing.JTable acquirePartsTable;
+    private javax.swing.JTable TaskTable;
+    private javax.swing.JTable AcquisitionTable;
+    private javax.swing.JTable TechTable;
+    private javax.swing.JTable whTechTable;
+    private javax.swing.JTable servicedUnitTable;
+    private javax.swing.JTable unitTable;
+    private javax.swing.JTable personnelTable;
+    private javax.swing.JTable acquireUnitsTable;
+    private javax.swing.JTable scenarioTable;
+    private javax.swing.JTable financeTable;
+    private javax.swing.JTable loanTable;
+    private javax.swing.JMenuItem addFunds;
+    private javax.swing.JButton btnAdvanceDay;
+    private javax.swing.JButton btnAssignDoc;
+    private javax.swing.JButton btnUnassignDoc;
+    private javax.swing.JButton btnDoTask;
+    private javax.swing.JButton btnDoTaskWarehouse;
+    private javax.swing.JToggleButton btnGMMode;
+    private javax.swing.JToggleButton btnOvertime;
+    private javax.swing.JToggleButton btnShowAllTechs;
+    private javax.swing.JToggleButton btnShowAllTechsWarehouse;
+    private javax.swing.JScrollPane scrTextTarget;
+    private javax.swing.JScrollPane scrollPartsTable;
+    private javax.swing.JLabel lblTarget;
+    private javax.swing.JLabel lblTargetNum;
+    private javax.swing.JLabel lblTargetNumWarehouse;
+    private javax.swing.JPanel mainPanel;
+    private javax.swing.JMenuBar menuBar;
+    private javax.swing.JMenu menuHire;
+    private javax.swing.JMenu menuFile;
+    private javax.swing.JMenu menuHelp;
+    private javax.swing.JMenuItem menuLoad;
+    private javax.swing.JMenuItem menuAboutItem;
+    private javax.swing.JMenuItem menuExitItem;
+    private javax.swing.JMenu menuManage;
+    private javax.swing.JMenu menuManageImportExport;
+    private javax.swing.JMenu menuMarket;
+    private javax.swing.JMenuItem menuOptions;
+    private javax.swing.JMenuItem menuOptionsMM;
+    private javax.swing.JMenu menuThemes;
+    private javax.swing.JMenuItem menuSave;
+    private javax.swing.JMenuItem miMercRoster;
+    private javax.swing.JMenuItem miHireBulk;
+    private javax.swing.JMenuItem miHireAstechs;
+    private javax.swing.JMenuItem miFireAstechs;
+    private javax.swing.JMenuItem miFireAllAstechs;
+    private javax.swing.JMenuItem miFullStrengthAstechs;
+    private javax.swing.JMenu menuAstechPool;
+    private javax.swing.JMenuItem miHireMedics;
+    private javax.swing.JMenuItem miFireMedics;
+    private javax.swing.JMenuItem miFireAllMedics;
+    private javax.swing.JMenuItem miFullStrengthMedics;
+    private javax.swing.JMenu menuMedicPool;
+    private javax.swing.JMenuItem miLoadForces;
+    private javax.swing.JMenuItem miExportPerson;
+    private javax.swing.JMenuItem miImportPerson;
+    private javax.swing.JMenuItem miExportParts;
+    private javax.swing.JMenuItem miImportParts;
+    //private javax.swing.JMenuItem miShoppingList;
+    private javax.swing.JMenuItem miGetLoan;
+    private javax.swing.JMenuItem miPurchaseUnit;
+    private javax.swing.JMenuItem miBuyParts;
+    private javax.swing.JMenu menuCommunity;
+    private javax.swing.JMenuItem miChat;
+    private javax.swing.JPanel panFinances;
+    private javax.swing.JPanel panHangar;
+    private javax.swing.JPanel panOrganization;
+    private javax.swing.JPanel panRepairBay;
+    private javax.swing.JPanel panInfirmary;
+    private javax.swing.JPanel panPersonnel;
+    private javax.swing.JPanel panBriefing;
+    private javax.swing.JPanel panScenario;
+    private javax.swing.JPanel panSupplies;
+    private javax.swing.JPanel panDoTask;
+    private javax.swing.JPanel panMapView;
+    private javax.swing.JPanel panOverview;
+    private javax.swing.JTabbedPane tabOverview;
+    private javax.swing.JScrollPane scrollOverviewParts;
+    private javax.swing.JTable overviewPartsTable;
+    private javax.swing.JScrollPane scrollOverviewCombatPersonnel;
+    private javax.swing.JTextArea overviewCombatPersonnelArea;
+    private javax.swing.JScrollPane scrollOverviewSupportPersonnel;
+    private javax.swing.JTextArea overviewSupportPersonnelArea;
+    private javax.swing.JSplitPane splitOverviewPersonnel;
+    private javax.swing.JScrollPane scrollOverviewHangar;
+    private javax.swing.JTree overviewHangarTree;
+    private DefaultMutableTreeNode top;
+    private javax.swing.JScrollPane scrollOverviewDragoonsRating;
+    private javax.swing.JTextArea overviewDragoonsRatingArea;
+    private IDragoonsRating rating;
+    private javax.swing.JScrollPane scrollDocTable;
+    private javax.swing.JScrollPane scrollUnassignedPatient;
+    private javax.swing.JScrollPane scrollTaskTable;
+    private javax.swing.JScrollPane scrollAcquisitionTable;
+    private javax.swing.JScrollPane scrollTechTable;
+    private javax.swing.JScrollPane scrollWhTechTable;
+    private javax.swing.JScrollPane scrollServicedUnitTable;
+    private javax.swing.JScrollPane scrollServicedUnitView;
+    private javax.swing.JScrollPane scrollPersonnelTable;
+    private javax.swing.JScrollPane scrollScenarioTable;
+    private javax.swing.JScrollPane scrollUnitTable;
+    private javax.swing.JScrollPane scrollFinanceTable;
+    private javax.swing.JScrollPane scrollLoanTable;
+    private javax.swing.JTextPane txtServicedUnitView;
+    private javax.swing.JSplitPane splitServicedUnits;
+    private javax.swing.JPanel statusPanel;
+    private javax.swing.JTabbedPane tabMain;
+    private javax.swing.JTabbedPane tabTasks;
+    private javax.swing.JTextArea textTarget;
+    private javax.swing.JTextArea textTargetWarehouse;
+    private javax.swing.JLabel astechPoolLabel;
+    private javax.swing.JLabel astechPoolLabelWarehouse;
+    private javax.swing.JTextPane txtPaneReport;
+    private javax.swing.JScrollPane txtPaneReportScrollPane;
+    private javax.swing.JComboBox choicePerson;
+    private javax.swing.JLabel lblPersonChoice;
+    private javax.swing.JComboBox choicePersonView;
+    private javax.swing.JLabel lblPersonView;
+    private javax.swing.JScrollPane scrollPersonnelView;
+    private javax.swing.JSplitPane splitPersonnel;
+    private javax.swing.JComboBox choiceUnit;
+    private javax.swing.JLabel lblUnitChoice;
+    private javax.swing.JComboBox choiceUnitView;
+    private javax.swing.JLabel lblUnitView;
+    private javax.swing.JScrollPane scrollUnitView;
+    private javax.swing.JSplitPane splitUnit;
+    private javax.swing.JScrollPane scrollOrgTree;
+    private javax.swing.JTree orgTree;
+    private javax.swing.JSplitPane splitOrg;
+    private javax.swing.JScrollPane scrollForceView;
+    InterstellarMapPanel panMap;
+    private javax.swing.JSplitPane splitMap;
+    private javax.swing.JScrollPane scrollPlanetView;
+    private javax.swing.JComboBox choiceMission;
+    private javax.swing.JScrollPane scrollMissionView;
+    private javax.swing.JScrollPane scrollScenarioView;
+    private javax.swing.JPanel panMissionButtons;
+    private javax.swing.JPanel panScenarioButtons;
+    private javax.swing.JButton btnAddScenario;
+    private javax.swing.JButton btnAddMission;
+    private javax.swing.JButton btnEditMission;
+    private javax.swing.JButton btnCompleteMission;
+    private javax.swing.JButton btnDeleteMission;
+    private javax.swing.JButton btnStartGame;
+    private javax.swing.JButton btnLoadGame;
+    private javax.swing.JButton btnPrintRS;
+    private javax.swing.JButton btnGetMul;
+    private javax.swing.JButton btnClearAssignedUnits;
+    private javax.swing.JButton btnResolveScenario;
+    private javax.swing.JSplitPane splitBrief;
+    private javax.swing.JSplitPane splitMission;
+    private javax.swing.JLabel lblMission;
+    private javax.swing.JComboBox choiceParts;
+    private javax.swing.JComboBox choicePartsView;
+    private javax.swing.JLabel lblPartsChoice;
+    private javax.swing.JLabel lblPartsChoiceView;
+    private javax.swing.JLabel lblFindPlanet;
+    private JSuggestField suggestPlanet;
+    private javax.swing.JButton btnCalculateJumpPath;
+    private javax.swing.JButton btnBeginTransit;
+    private MekLabPanel panMekLab;
+    private javax.swing.JScrollPane scrollMekLab;
+    private javax.swing.JLabel lblLocation;
+    private JList listAssignedPatient;
+    private JList listUnassignedPatient;
+    // End of variables declaration//GEN-END:variables
+
+    private javax.swing.JLabel lblRating;
+    private javax.swing.JLabel lblFunds;
+    private javax.swing.JLabel lblTempAstechs;
+    private javax.swing.JLabel lblTempMedics;
+    private javax.swing.JLabel lblCargo;
         
     private TaskTableModel taskModel = new TaskTableModel();
     private AcquisitionTableModel acquireModel = new AcquisitionTableModel();
@@ -422,7 +609,8 @@ public class CampaignGUI extends JPanel {
         scrollOverviewSupportPersonnel = new javax.swing.JScrollPane();
         overviewSupportPersonnelArea = new javax.swing.JTextArea();
         scrollOverviewHangar = new javax.swing.JScrollPane();
-        overviewHangarTree = new javax.swing.JTree();
+    	top = new DefaultMutableTreeNode("Hangar");
+        overviewHangarTree = new javax.swing.JTree(top);
         scrollOverviewDragoonsRating = new javax.swing.JScrollPane();
         overviewDragoonsRatingArea = new javax.swing.JTextArea(20,60);
         lblFindPlanet = new javax.swing.JLabel();
@@ -2122,9 +2310,8 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         tabOverview.addTab(resourceMap.getString("scrollOverviewPersonnel.TabConstraints.tabTitle"), splitOverviewPersonnel);
-        
-        //TODO: overviewHangarTree.setModel(overviewHangarModel);
-        overviewHangarTree.setName("overviewHangarTree"); // NOI18N
+
+    	overviewHangarTree.setName("overviewHangarTree"); // NOI18N
         scrollOverviewHangar.setViewportView(overviewHangarTree);
         tabOverview.addTab(resourceMap.getString("scrollOverviewHangar.TabConstraints.tabTitle"), scrollOverviewHangar);
         
@@ -3567,6 +3754,924 @@ public class CampaignGUI extends JPanel {
         overviewDragoonsRatingArea.setText(rating.getDetails());
         overviewCombatPersonnelArea.setText(getCampaign().getCombatPersonnelDetails());
         overviewSupportPersonnelArea.setText(getCampaign().getSupportPersonnelDetails());
+        refreshOverviewHangar();
+    }
+    
+    public void  refreshOverviewHangar() {
+    	top.removeAllChildren();
+    	
+    	// BattleMechs
+    	boolean expandMechs = false;
+    	int countMechs = 0;
+    	int countBattleMechs = 0;
+    	int countOmniMechs = 0;
+    	int colossalMech = 0;
+    	int assaultMech = 0;
+    	int heavyMech = 0;
+    	int mediumMech = 0;
+    	int lightMech = 0;
+    	int ultralightMech = 0;
+    	int colossalOmniMech = 0;
+    	int assaultOmniMech = 0;
+    	int heavyOmniMech = 0;
+    	int mediumOmniMech = 0;
+    	int lightOmniMech = 0;
+    	int ultralightOmniMech = 0;
+    	
+    	// ASF
+    	boolean expandASF = false;
+    	int countASF = 0;
+    	int countStandardASF = 0;
+    	int countOmniASF = 0;
+    	int countLightASF = 0;
+    	int countMediumASF = 0;
+    	int countHeavyASF = 0;
+    	int countOmniLightASF = 0;
+    	int countOmniMediumASF = 0;
+    	int countOmniHeavyASF = 0;
+    	
+    	// Vehicles
+    	boolean expandVees = false;
+    	int countVees = 0;
+    	int countStandardVees = 0;
+    	int countOmniVees = 0;
+    	int countVTOL = 0;
+    	int countVTOLLight = 0;
+    	int countSub = 0;
+    	int countSubColossal = 0;
+    	int countSubAssault = 0;
+    	int countSubHeavy = 0;
+    	int countSubMedium = 0;
+    	int countSubLight = 0;
+    	int countNaval = 0;
+    	int countNavalColossal = 0;
+    	int countNavalAssault = 0;
+    	int countNavalHeavy = 0;
+    	int countNavalMedium = 0;
+    	int countNavalLight = 0;
+    	int countWiGE = 0;
+    	int countWiGEAssault = 0;
+    	int countWiGEHeavy = 0;
+    	int countWiGEMedium = 0;
+    	int countWiGELight = 0;
+    	int countTracked = 0;
+    	int countTrackedColossal = 0;
+    	int countTrackedAssault = 0;
+    	int countTrackedHeavy = 0;
+    	int countTrackedMedium = 0;
+    	int countTrackedLight = 0;
+    	int countWheeled = 0;
+    	int countWheeledAssault = 0;
+    	int countWheeledHeavy = 0;
+    	int countWheeledMedium = 0;
+    	int countWheeledLight = 0;
+    	int countHover = 0;
+    	int countHoverMedium = 0;
+    	int countHoverLight = 0;
+    	int countHydrofoil = 0;
+    	int countHydrofoilAssault = 0;
+    	int countHydrofoilHeavy = 0;
+    	int countHydrofoilMedium = 0;
+    	int countHydrofoilLight = 0;
+    	int countOmniVTOL = 0;
+    	int countOmniVTOLLight = 0;
+    	int countOmniSub = 0;
+    	int countOmniSubColossal = 0;
+    	int countOmniSubAssault = 0;
+    	int countOmniSubHeavy = 0;
+    	int countOmniSubMedium = 0;
+    	int countOmniSubLight = 0;
+    	int countOmniNaval = 0;
+    	int countOmniNavalColossal = 0;
+    	int countOmniNavalAssault = 0;
+    	int countOmniNavalHeavy = 0;
+    	int countOmniNavalMedium = 0;
+    	int countOmniNavalLight = 0;
+    	int countOmniWiGE = 0;
+    	int countOmniWiGEAssault = 0;
+    	int countOmniWiGEHeavy = 0;
+    	int countOmniWiGEMedium = 0;
+    	int countOmniWiGELight = 0;
+    	int countOmniTracked = 0;
+    	int countOmniTrackedColossal = 0;
+    	int countOmniTrackedAssault = 0;
+    	int countOmniTrackedHeavy = 0;
+    	int countOmniTrackedMedium = 0;
+    	int countOmniTrackedLight = 0;
+    	int countOmniWheeled = 0;
+    	int countOmniWheeledAssault = 0;
+    	int countOmniWheeledHeavy = 0;
+    	int countOmniWheeledMedium = 0;
+    	int countOmniWheeledLight = 0;
+    	int countOmniHover = 0;
+    	int countOmniHoverMedium = 0;
+    	int countOmniHoverLight = 0;
+    	int countOmniHydrofoil = 0;
+    	int countOmniHydrofoilAssault = 0;
+    	int countOmniHydrofoilHeavy = 0;
+    	int countOmniHydrofoilMedium = 0;
+    	int countOmniHydrofoilLight = 0;
+    	
+    	// Support Vees
+    	boolean expandSupportVees = false;
+    	int countSupportVees = 0;
+    	int countSupportStandardVees = 0;
+    	int countSupportOmniVees = 0;
+    	int countSupportVTOL = 0;
+    	/*int countVTOLLight = 0;
+    	int countSub = 0;
+    	int countSubColossal = 0;
+    	int countSubAssault = 0;
+    	int countSubHeavy = 0;
+    	int countSubMedium = 0;
+    	int countSubLight = 0;
+    	int countNaval = 0;
+    	int countNavalColossal = 0;
+    	int countNavalAssault = 0;
+    	int countNavalHeavy = 0;
+    	int countNavalMedium = 0;
+    	int countNavalLight = 0;
+    	int countWiGE = 0;
+    	int countWiGEAssault = 0;
+    	int countWiGEHeavy = 0;
+    	int countWiGEMedium = 0;
+    	int countWiGELight = 0;
+    	int countTracked = 0;
+    	int countTrackedColossal = 0;
+    	int countTrackedAssault = 0;
+    	int countTrackedHeavy = 0;
+    	int countTrackedMedium = 0;
+    	int countTrackedLight = 0;
+    	int countWheeled = 0;
+    	int countWheeledAssault = 0;
+    	int countWheeledHeavy = 0;
+    	int countWheeledMedium = 0;
+    	int countWheeledLight = 0;
+    	int countHover = 0;
+    	int countHoverMedium = 0;
+    	int countHoverLight = 0;
+    	int countHydrofoil = 0;
+    	int countHydrofoilAssault = 0;
+    	int countHydrofoilHeavy = 0;
+    	int countHydrofoilMedium = 0;
+    	int countHydrofoilLight = 0;
+    	int countOmniVTOL = 0;
+    	int countOmniVTOLLight = 0;
+    	int countOmniSub = 0;
+    	int countOmniSubColossal = 0;
+    	int countOmniSubAssault = 0;
+    	int countOmniSubHeavy = 0;
+    	int countOmniSubMedium = 0;
+    	int countOmniSubLight = 0;
+    	int countOmniNaval = 0;
+    	int countOmniNavalColossal = 0;
+    	int countOmniNavalAssault = 0;
+    	int countOmniNavalHeavy = 0;
+    	int countOmniNavalMedium = 0;
+    	int countOmniNavalLight = 0;
+    	int countOmniWiGE = 0;
+    	int countOmniWiGEAssault = 0;
+    	int countOmniWiGEHeavy = 0;
+    	int countOmniWiGEMedium = 0;
+    	int countOmniWiGELight = 0;
+    	int countOmniTracked = 0;
+    	int countOmniTrackedColossal = 0;
+    	int countOmniTrackedAssault = 0;
+    	int countOmniTrackedHeavy = 0;
+    	int countOmniTrackedMedium = 0;
+    	int countOmniTrackedLight = 0;
+    	int countOmniWheeled = 0;
+    	int countOmniWheeledAssault = 0;
+    	int countOmniWheeledHeavy = 0;
+    	int countOmniWheeledMedium = 0;
+    	int countOmniWheeledLight = 0;
+    	int countOmniHover = 0;
+    	int countOmniHoverMedium = 0;
+    	int countOmniHoverLight = 0;
+    	int countOmniHydrofoil = 0;
+    	int countOmniHydrofoilAssault = 0;
+    	int countOmniHydrofoilHeavy = 0;
+    	int countOmniHydrofoilMedium = 0;
+    	int countOmniHydrofoilLight = 0;*/
+    	
+    	// Turrets
+    	int countGE = 0;
+    	
+    	
+    	// Gather data and load it into the tree
+    	for (Unit u : getCampaign().getUnits()) {
+    		Entity e = u.getEntity();
+    		if (e instanceof Mech) {
+    			countMechs++;
+    			if (e.isOmni()) {
+    				countOmniMechs++;
+    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
+	    				ultralightOmniMech++;
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+	    				lightOmniMech++;
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+	    				mediumOmniMech++;
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+	    				heavyOmniMech++;
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+	    				assaultOmniMech++;
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+    					colossalOmniMech++;
+	    			}
+    			} else {
+        			countBattleMechs++;
+        			if (e.getWeightClass() == EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
+	    				ultralightMech++;
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+	    				lightMech++;
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+	    				mediumMech++;
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+	    				heavyMech++;
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+	    				assaultMech++;
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+	    				colossalMech++;
+	    			}
+    			}
+    		} else if (e instanceof ConvFighter) {
+    			
+            } else if (e instanceof Warship) {
+    			
+        	} else if (e instanceof Jumpship) {
+    			
+        	} else if (e instanceof Dropship) {
+    			
+        	} else if (e instanceof SmallCraft) {
+    			
+        	} else if (e instanceof Aero) {
+    			countASF++;
+    			if (e.isOmni()) {
+    				countOmniASF++;
+    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+	    				countOmniLightASF++;
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+	    				countOmniMediumASF++;
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+	    				countOmniHeavyASF++;
+	    			}
+    			} else {
+    				countStandardASF++;
+    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+	    				countLightASF++;
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+	    				countMediumASF++;
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+	    				countHeavyASF++;
+	    			}
+    			}
+        	} else if (e instanceof GunEmplacement) {
+    			countGE++;
+    		} else if (e instanceof SupportTank || e instanceof SupportVTOL) {
+    			continue;
+    		} else if (e instanceof Tank) {
+    			countVees++;
+    			if (e.isOmni()) {
+    				countOmniVees++;
+    				if (e instanceof VTOL) {
+	    				countOmniVTOL++;
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				countOmniVTOLLight++;
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.TRACKED) {
+	    				countOmniTracked++;
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				countOmniTrackedLight++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				countOmniTrackedMedium++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+		    				countOmniTrackedHeavy++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+		    				countOmniTrackedAssault++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+		    				countOmniTrackedColossal++;
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.WHEELED) {
+	    				countOmniWheeled++;
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				countOmniWheeledLight++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				countOmniWheeledMedium++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+		    				countOmniWheeledHeavy++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+		    				countOmniWheeledAssault++;
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.HOVER) {
+	    				countOmniHover++;
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				countOmniHoverLight++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				countOmniHoverMedium++;
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.WIGE) {
+	    				countOmniWiGE++;
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				countOmniWiGELight++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				countOmniWiGEMedium++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+		    				countOmniWiGEHeavy++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+		    				countOmniWiGEAssault++;
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.NAVAL) {
+	    				countOmniNaval++;
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				countOmniNavalLight++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				countOmniNavalMedium++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+		    				countOmniNavalHeavy++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+		    				countOmniNavalAssault++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+	    					countOmniNavalColossal++;
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.SUBMARINE) {
+	    				countOmniSub++;
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				countOmniSubLight++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				countOmniSubMedium++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+		    				countOmniSubHeavy++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+		    				countOmniSubAssault++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+	    					countOmniSubColossal++;
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.HYDROFOIL) {
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				countOmniHydrofoilLight++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				countOmniHydrofoilMedium++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+		    				countOmniHydrofoilHeavy++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+		    				countOmniHydrofoilAssault++;
+		    			}
+	    			}
+    			} else {
+    				countStandardVees++;
+    				if (e instanceof VTOL) {
+	    				countVTOL++;
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				countVTOLLight++;
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.TRACKED) {
+	    				countTracked++;
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				countTrackedLight++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				countTrackedMedium++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+		    				countTrackedHeavy++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+		    				countTrackedAssault++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+		    				countTrackedColossal++;
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.WHEELED) {
+	    				countWheeled++;
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				countWheeledLight++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				countWheeledMedium++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+		    				countWheeledHeavy++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+		    				countWheeledAssault++;
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.HOVER) {
+	    				countHover++;
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				countHoverLight++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				countHoverMedium++;
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.WIGE) {
+	    				countWiGE++;
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				countWiGELight++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				countWiGEMedium++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+		    				countWiGEHeavy++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+		    				countWiGEAssault++;
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.NAVAL) {
+	    				countNaval++;
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				countNavalLight++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				countNavalMedium++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+		    				countNavalHeavy++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+		    				countNavalAssault++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+	    					countNavalColossal++;
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.SUBMARINE) {
+	    				countSub++;
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				countSubLight++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				countSubMedium++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+		    				countSubHeavy++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+		    				countSubAssault++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+	    					countSubColossal++;
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.HYDROFOIL) {
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				countHydrofoilLight++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				countHydrofoilMedium++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+		    				countHydrofoilHeavy++;
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+		    				countHydrofoilAssault++;
+		    			}
+	    			}
+    			}
+    		}
+    	}
+    	
+    	// Mech Nodes
+    	final DefaultMutableTreeNode mechs = new DefaultMutableTreeNode("'Mechs: "+countMechs);
+    	DefaultMutableTreeNode battlemechs = new DefaultMutableTreeNode("BattleMechs: "+countBattleMechs);
+    	DefaultMutableTreeNode omnis = new DefaultMutableTreeNode("OmniMechs: "+countOmniMechs);
+    	mechs.add(battlemechs);
+    	mechs.add(omnis);
+    	DefaultMutableTreeNode colossalmechs = new DefaultMutableTreeNode("Colossal: "+colossalMech);
+    	battlemechs.add(colossalmechs);
+    	DefaultMutableTreeNode assaultmechs = new DefaultMutableTreeNode("Assault: "+assaultMech);
+    	battlemechs.add(assaultmechs);
+    	DefaultMutableTreeNode heavymechs = new DefaultMutableTreeNode("Heavy: "+heavyMech);
+    	battlemechs.add(heavymechs);
+    	DefaultMutableTreeNode mediummechs = new DefaultMutableTreeNode("Medium: "+mediumMech);
+    	battlemechs.add(mediummechs);
+    	DefaultMutableTreeNode lightmechs = new DefaultMutableTreeNode("Light: "+lightMech);
+    	battlemechs.add(lightmechs);
+    	DefaultMutableTreeNode ultralightmechs = new DefaultMutableTreeNode("Ultralight: "+ultralightMech);
+    	battlemechs.add(ultralightmechs);
+    	DefaultMutableTreeNode colossalomnis = new DefaultMutableTreeNode("Colossal: "+colossalOmniMech);
+    	omnis.add(colossalomnis);
+    	DefaultMutableTreeNode assaultomnis = new DefaultMutableTreeNode("Assault: "+assaultOmniMech);
+    	omnis.add(assaultomnis);
+    	DefaultMutableTreeNode heavyomnis = new DefaultMutableTreeNode("Heavy: "+heavyOmniMech);
+    	omnis.add(heavyomnis);
+    	DefaultMutableTreeNode mediumomnis = new DefaultMutableTreeNode("Medium: "+mediumOmniMech);
+    	omnis.add(mediumomnis);
+    	DefaultMutableTreeNode lightomnis = new DefaultMutableTreeNode("Light: "+lightOmniMech);
+    	omnis.add(lightomnis);
+    	DefaultMutableTreeNode ultralightomnis = new DefaultMutableTreeNode("Ultralight: "+ultralightOmniMech);
+    	omnis.add(ultralightomnis);
+    	top.add(mechs);
+    	
+    	// ASF Nodes
+    	final DefaultMutableTreeNode ASF = new DefaultMutableTreeNode("'Aerospace Fighters: "+countASF);
+    	DefaultMutableTreeNode sASF = new DefaultMutableTreeNode("Standard Fighters: "+countStandardASF);
+    	DefaultMutableTreeNode oASF = new DefaultMutableTreeNode("OmniFighters: "+countOmniASF);
+    	ASF.add(sASF);
+    	ASF.add(oASF);
+    	DefaultMutableTreeNode sHeavyASF = new DefaultMutableTreeNode("Heavy: "+countHeavyASF);
+    	sASF.add(sHeavyASF);
+    	DefaultMutableTreeNode sMediumASF = new DefaultMutableTreeNode("Medium: "+countMediumASF);
+    	sASF.add(sMediumASF);
+    	DefaultMutableTreeNode sLightASF = new DefaultMutableTreeNode("Light: "+countLightASF);
+    	sASF.add(sLightASF);
+    	DefaultMutableTreeNode oHeavyASF = new DefaultMutableTreeNode("Heavy: "+countHeavyASF);
+    	oASF.add(oHeavyASF);
+    	DefaultMutableTreeNode oMediumASF = new DefaultMutableTreeNode("Medium: "+countMediumASF);
+    	oASF.add(oMediumASF);
+    	DefaultMutableTreeNode oLightASF = new DefaultMutableTreeNode("Light: "+countLightASF);
+    	oASF.add(oLightASF);
+    	top.add(ASF);
+    	
+    	// Vee Nodes
+    	final DefaultMutableTreeNode vees = new DefaultMutableTreeNode("Vehicles: "+countVees);
+    	DefaultMutableTreeNode sVees = new DefaultMutableTreeNode("Standard: "+countStandardVees);
+    	DefaultMutableTreeNode oVees = new DefaultMutableTreeNode("OmniVees: "+countOmniVees);
+    	vees.add(sVees);
+    	vees.add(oVees);
+    	DefaultMutableTreeNode sTracked = new DefaultMutableTreeNode("Tracked: "+countTracked);
+    	sVees.add(sTracked);
+    	DefaultMutableTreeNode sTrackedColossal = new DefaultMutableTreeNode("Super Heavy: "+countTrackedColossal);
+    	sTracked.add(sTrackedColossal);
+    	DefaultMutableTreeNode sTrackedAssault = new DefaultMutableTreeNode("Assault: "+countTrackedAssault);
+    	sTracked.add(sTrackedAssault);
+    	DefaultMutableTreeNode sTrackedHeavy = new DefaultMutableTreeNode("Heavy: "+countTrackedHeavy);
+    	sTracked.add(sTrackedHeavy);
+    	DefaultMutableTreeNode sTrackedMedium = new DefaultMutableTreeNode("Medium: "+countTrackedMedium);
+    	sTracked.add(sTrackedMedium);
+    	DefaultMutableTreeNode sTrackedLight = new DefaultMutableTreeNode("Light: "+countTrackedLight);
+    	sTracked.add(sTrackedLight);
+    	DefaultMutableTreeNode oTracked = new DefaultMutableTreeNode("Tracked: "+countOmniTracked);
+    	oVees.add(oTracked);
+    	DefaultMutableTreeNode oTrackedColossal = new DefaultMutableTreeNode("Super Heavy: "+countOmniTrackedColossal);
+    	oTracked.add(oTrackedColossal);
+    	DefaultMutableTreeNode oTrackedAssault = new DefaultMutableTreeNode("Assault: "+countOmniTrackedAssault);
+    	oTracked.add(oTrackedAssault);
+    	DefaultMutableTreeNode oTrackedHeavy = new DefaultMutableTreeNode("Heavy: "+countOmniTrackedHeavy);
+    	oTracked.add(oTrackedHeavy);
+    	DefaultMutableTreeNode oTrackedMedium = new DefaultMutableTreeNode("Medium: "+countOmniTrackedMedium);
+    	oTracked.add(oTrackedMedium);
+    	DefaultMutableTreeNode oTrackedLight = new DefaultMutableTreeNode("Light: "+countOmniTrackedLight);
+    	oTracked.add(oTrackedLight);
+    	DefaultMutableTreeNode sWheeled = new DefaultMutableTreeNode("Wheeled: "+countWheeled);
+    	sVees.add(sWheeled);
+    	DefaultMutableTreeNode sWheeledAssault = new DefaultMutableTreeNode("Assault: "+countWheeledAssault);
+    	sWheeled.add(sWheeledAssault);
+    	DefaultMutableTreeNode sWheeledHeavy = new DefaultMutableTreeNode("Heavy: "+countWheeledHeavy);
+    	sWheeled.add(sWheeledHeavy);
+    	DefaultMutableTreeNode sWheeledMedium = new DefaultMutableTreeNode("Medium: "+countWheeledMedium);
+    	sWheeled.add(sWheeledMedium);
+    	DefaultMutableTreeNode sWheeledLight = new DefaultMutableTreeNode("Light: "+countWheeledLight);
+    	sWheeled.add(sWheeledLight);
+    	DefaultMutableTreeNode oWheeled = new DefaultMutableTreeNode("Wheeled: "+countOmniWheeled);
+    	oVees.add(oWheeled);
+    	DefaultMutableTreeNode oWheeledAssault = new DefaultMutableTreeNode("Assault: "+countOmniWheeledAssault);
+    	oWheeled.add(oWheeledAssault);
+    	DefaultMutableTreeNode oWheeledHeavy = new DefaultMutableTreeNode("Heavy: "+countOmniWheeledHeavy);
+    	oWheeled.add(oWheeledHeavy);
+    	DefaultMutableTreeNode oWheeledMedium = new DefaultMutableTreeNode("Medium: "+countOmniWheeledMedium);
+    	oWheeled.add(oWheeledMedium);
+    	DefaultMutableTreeNode oWheeledLight = new DefaultMutableTreeNode("Light: "+countOmniWheeledLight);
+    	oWheeled.add(oWheeledLight);
+    	DefaultMutableTreeNode sHover = new DefaultMutableTreeNode("Hover: "+countHover);
+    	sVees.add(sHover);
+    	DefaultMutableTreeNode sHoverMedium = new DefaultMutableTreeNode("Medium: "+countHoverMedium);
+    	sHover.add(sHoverMedium);
+    	DefaultMutableTreeNode sHoverLight = new DefaultMutableTreeNode("Light: "+countHoverLight);
+    	sHover.add(sHoverLight);
+    	DefaultMutableTreeNode oHover = new DefaultMutableTreeNode("Hover: "+countOmniHover);
+    	oVees.add(oHover);
+    	DefaultMutableTreeNode oHoverMedium = new DefaultMutableTreeNode("Medium: "+countOmniHoverMedium);
+    	oHover.add(oHoverMedium);
+    	DefaultMutableTreeNode oHoverLight = new DefaultMutableTreeNode("Light: "+countOmniHoverLight);
+    	oHover.add(oHoverLight);
+    	DefaultMutableTreeNode sVTOL = new DefaultMutableTreeNode("VTOL: "+countVTOL);
+    	sVees.add(sVTOL);
+    	DefaultMutableTreeNode sVTOLLight = new DefaultMutableTreeNode("Light: "+countVTOLLight);
+    	sVTOL.add(sVTOLLight);
+    	DefaultMutableTreeNode oVTOL = new DefaultMutableTreeNode("VTOL: "+countOmniVTOL);
+    	oVees.add(oVTOL);
+    	DefaultMutableTreeNode oVTOLLight = new DefaultMutableTreeNode("Light: "+countOmniVTOLLight);
+    	oVTOL.add(oVTOLLight);
+    	DefaultMutableTreeNode sWiGE = new DefaultMutableTreeNode("WiGE: "+countWiGE);
+    	sVees.add(sWiGE);
+    	DefaultMutableTreeNode sWiGEAssault = new DefaultMutableTreeNode("Assault: "+countWiGEAssault);
+    	sWiGE.add(sWiGEAssault);
+    	DefaultMutableTreeNode sWiGEHeavy = new DefaultMutableTreeNode("Heavy: "+countWiGEHeavy);
+    	sWiGE.add(sWiGEHeavy);
+    	DefaultMutableTreeNode sWiGEMedium = new DefaultMutableTreeNode("Medium: "+countWiGEMedium);
+    	sWiGE.add(sWiGEMedium);
+    	DefaultMutableTreeNode sWiGELight = new DefaultMutableTreeNode("Light: "+countWiGELight);
+    	sWiGE.add(sWiGELight);
+    	DefaultMutableTreeNode oWiGE = new DefaultMutableTreeNode("WiGE: "+countOmniWiGE);
+    	oVees.add(oWiGE);
+    	DefaultMutableTreeNode oWiGEAssault = new DefaultMutableTreeNode("Assault: "+countOmniWiGEAssault);
+    	oWiGE.add(oWiGEAssault);
+    	DefaultMutableTreeNode oWiGEHeavy = new DefaultMutableTreeNode("Heavy: "+countOmniWiGEHeavy);
+    	oWiGE.add(oWiGEHeavy);
+    	DefaultMutableTreeNode oWiGEMedium = new DefaultMutableTreeNode("Medium: "+countOmniWiGEMedium);
+    	oWiGE.add(oWiGEMedium);
+    	DefaultMutableTreeNode oWiGELight = new DefaultMutableTreeNode("Light: "+countOmniWiGELight);
+    	oWiGE.add(oWiGELight);
+    	DefaultMutableTreeNode sNaval = new DefaultMutableTreeNode("Naval: "+countNaval);
+    	sVees.add(sNaval);
+    	DefaultMutableTreeNode sNavalColossal = new DefaultMutableTreeNode("Super Heavy: "+countNavalColossal);
+    	sNaval.add(sNavalColossal);
+    	DefaultMutableTreeNode sNavalAssault = new DefaultMutableTreeNode("Assault: "+countNavalAssault);
+    	sNaval.add(sNavalAssault);
+    	DefaultMutableTreeNode sNavalHeavy = new DefaultMutableTreeNode("Heavy: "+countNavalHeavy);
+    	sNaval.add(sNavalHeavy);
+    	DefaultMutableTreeNode sNavalMedium = new DefaultMutableTreeNode("Medium: "+countNavalMedium);
+    	sNaval.add(sNavalMedium);
+    	DefaultMutableTreeNode sNavalLight = new DefaultMutableTreeNode("Light: "+countNavalLight);
+    	sNaval.add(sNavalLight);
+    	DefaultMutableTreeNode oNaval = new DefaultMutableTreeNode("Naval: "+countOmniNaval);
+    	oVees.add(oNaval);
+    	DefaultMutableTreeNode oNavalColossal = new DefaultMutableTreeNode("Super Heavy: "+countOmniNavalColossal);
+    	oNaval.add(oNavalColossal);
+    	DefaultMutableTreeNode oNavalAssault = new DefaultMutableTreeNode("Assault: "+countOmniNavalAssault);
+    	oNaval.add(oNavalAssault);
+    	DefaultMutableTreeNode oNavalHeavy = new DefaultMutableTreeNode("Heavy: "+countOmniNavalHeavy);
+    	oNaval.add(oNavalHeavy);
+    	DefaultMutableTreeNode oNavalMedium = new DefaultMutableTreeNode("Medium: "+countOmniNavalMedium);
+    	oNaval.add(oNavalMedium);
+    	DefaultMutableTreeNode oNavalLight = new DefaultMutableTreeNode("Light: "+countOmniNavalLight);
+    	oNaval.add(oNavalLight);
+    	DefaultMutableTreeNode sSub = new DefaultMutableTreeNode("Sub: "+countSub);
+    	sVees.add(sSub);
+    	DefaultMutableTreeNode sSubColossal = new DefaultMutableTreeNode("Super Heavy: "+countSubColossal);
+    	sSub.add(sSubColossal);
+    	DefaultMutableTreeNode sSubAssault = new DefaultMutableTreeNode("Assault: "+countSubAssault);
+    	sSub.add(sSubAssault);
+    	DefaultMutableTreeNode sSubHeavy = new DefaultMutableTreeNode("Heavy: "+countSubHeavy);
+    	sSub.add(sSubHeavy);
+    	DefaultMutableTreeNode sSubMedium = new DefaultMutableTreeNode("Medium: "+countSubMedium);
+    	sSub.add(sSubMedium);
+    	DefaultMutableTreeNode sSubLight = new DefaultMutableTreeNode("Light: "+countSubLight);
+    	sSub.add(sSubLight);
+    	DefaultMutableTreeNode oSub = new DefaultMutableTreeNode("Sub: "+countOmniSub);
+    	oVees.add(oSub);
+    	DefaultMutableTreeNode oSubColossal = new DefaultMutableTreeNode("Super Heavy: "+countOmniSubColossal);
+    	oSub.add(oSubColossal);
+    	DefaultMutableTreeNode oSubAssault = new DefaultMutableTreeNode("Assault: "+countOmniSubAssault);
+    	oSub.add(oSubAssault);
+    	DefaultMutableTreeNode oSubHeavy = new DefaultMutableTreeNode("Heavy: "+countOmniSubHeavy);
+    	oSub.add(oSubHeavy);
+    	DefaultMutableTreeNode oSubMedium = new DefaultMutableTreeNode("Medium: "+countOmniSubMedium);
+    	oSub.add(oSubMedium);
+    	DefaultMutableTreeNode oSubLight = new DefaultMutableTreeNode("Light: "+countOmniSubLight);
+    	oSub.add(oSubLight);
+    	DefaultMutableTreeNode sHydrofoil = new DefaultMutableTreeNode("Hydrofoil: "+countHydrofoil);
+    	sVees.add(sHydrofoil);
+    	DefaultMutableTreeNode sHydrofoilAssault = new DefaultMutableTreeNode("Assault: "+countHydrofoilAssault);
+    	sHydrofoil.add(sHydrofoilAssault);
+    	DefaultMutableTreeNode sHydrofoilHeavy = new DefaultMutableTreeNode("Heavy: "+countHydrofoilHeavy);
+    	sHydrofoil.add(sHydrofoilHeavy);
+    	DefaultMutableTreeNode sHydrofoilMedium = new DefaultMutableTreeNode("Medium: "+countHydrofoilMedium);
+    	sHydrofoil.add(sHydrofoilMedium);
+    	DefaultMutableTreeNode sHydrofoilLight = new DefaultMutableTreeNode("Light: "+countHydrofoilLight);
+    	sHydrofoil.add(sHydrofoilLight);
+    	DefaultMutableTreeNode oHydrofoil = new DefaultMutableTreeNode("Hydrofoil: "+countOmniHydrofoil);
+    	oVees.add(oHydrofoil);
+    	DefaultMutableTreeNode oHydrofoilAssault = new DefaultMutableTreeNode("Assault: "+countOmniHydrofoilAssault);
+    	oHydrofoil.add(oHydrofoilAssault);
+    	DefaultMutableTreeNode oHydrofoilHeavy = new DefaultMutableTreeNode("Heavy: "+countOmniHydrofoilHeavy);
+    	oHydrofoil.add(oHydrofoilHeavy);
+    	DefaultMutableTreeNode oHydrofoilMedium = new DefaultMutableTreeNode("Medium: "+countOmniHydrofoilMedium);
+    	oHydrofoil.add(oHydrofoilMedium);
+    	DefaultMutableTreeNode oHydrofoilLight = new DefaultMutableTreeNode("Light: "+countOmniHydrofoilLight);
+    	oHydrofoil.add(oHydrofoilLight);
+    	top.add(vees);
+    	
+    	// Turrets
+    	final DefaultMutableTreeNode ge = new DefaultMutableTreeNode("Gun Emplacements: "+countGE);
+    	top.add(ge);
+    	
+    	for (Unit u : getCampaign().getUnits()) {
+    		Entity e = u.getEntity();
+    		if (e instanceof Mech) {
+    			expandMechs = true;
+    			if (e.isOmni()) {
+    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
+    					ultralightomnis.add(new DefaultMutableTreeNode(u.getName()));
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+    					lightomnis.add(new DefaultMutableTreeNode(u.getName()));
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+    					mediumomnis.add(new DefaultMutableTreeNode(u.getName()));
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+    					heavyomnis.add(new DefaultMutableTreeNode(u.getName()));
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+    					assaultomnis.add(new DefaultMutableTreeNode(u.getName()));
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+    					colossalomnis.add(new DefaultMutableTreeNode(u.getName()));
+	    			}
+    			} else {
+    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
+	    				ultralightmechs.add(new DefaultMutableTreeNode(u.getName()));
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+	    				lightmechs.add(new DefaultMutableTreeNode(u.getName()));
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+	    				mediummechs.add(new DefaultMutableTreeNode(u.getName()));
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+	    				heavymechs.add(new DefaultMutableTreeNode(u.getName()));
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+	    				assaultmechs.add(new DefaultMutableTreeNode(u.getName()));
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+    					colossalmechs.add(new DefaultMutableTreeNode(u.getName()));
+	    			}
+    			}
+    		} else if (e instanceof ConvFighter) {
+    			
+            } else if (e instanceof Warship) {
+    			
+        	} else if (e instanceof Jumpship) {
+    			
+        	} else if (e instanceof Dropship) {
+    			
+        	} else if (e instanceof SmallCraft) {
+    			
+        	} else if (e instanceof Aero) {
+        		expandASF = true;
+    			if (e.isOmni()) {
+    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+	    				oLightASF.add(new DefaultMutableTreeNode(u.getName()));
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+	    				oMediumASF.add(new DefaultMutableTreeNode(u.getName()));
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+	    				oHeavyASF.add(new DefaultMutableTreeNode(u.getName()));
+	    			}
+    			} else {
+    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+	    				sLightASF.add(new DefaultMutableTreeNode(u.getName()));
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+	    				sMediumASF.add(new DefaultMutableTreeNode(u.getName()));
+	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+	    				sHeavyASF.add(new DefaultMutableTreeNode(u.getName()));
+	    			}
+    			}
+        	} else if (e instanceof GunEmplacement) {
+    			ge.add(new DefaultMutableTreeNode(u.getName()));
+    		} else if (e instanceof SupportTank || e instanceof SupportVTOL) {
+    			continue;
+    		} else if (e instanceof Tank) {
+    			expandVees = true;
+    			if (e.isOmni()) {
+    				if (e instanceof VTOL) {
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				oVTOLLight.add(new DefaultMutableTreeNode(u.getName()));
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.TRACKED) {
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				oTrackedLight.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				oTrackedMedium.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+		    				oTrackedHeavy.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+		    				oTrackedAssault.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+		    				oTrackedColossal.add(new DefaultMutableTreeNode(u.getName()));
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.WHEELED) {
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				oWheeledLight.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				oWheeledMedium.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+		    				oWheeledHeavy.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+		    				oWheeledAssault.add(new DefaultMutableTreeNode(u.getName()));
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.HOVER) {
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				oHoverLight.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				oHoverMedium.add(new DefaultMutableTreeNode(u.getName()));
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.WIGE) {
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				oWiGELight.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				oWiGEMedium.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+		    				oWiGEHeavy.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+		    				oWiGEAssault.add(new DefaultMutableTreeNode(u.getName()));
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.NAVAL) {
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				oNavalLight.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				oNavalMedium.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+		    				oNavalHeavy.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+		    				oNavalAssault.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+		    				oNavalColossal.add(new DefaultMutableTreeNode(u.getName()));
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.SUBMARINE) {
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				oSubLight.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				oSubMedium.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+		    				oSubHeavy.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+		    				oSubAssault.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+		    				oSubColossal.add(new DefaultMutableTreeNode(u.getName()));
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.HYDROFOIL) {
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				oHydrofoilLight.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				oHydrofoilMedium.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+		    				oHydrofoilHeavy.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+		    				oHydrofoilAssault.add(new DefaultMutableTreeNode(u.getName()));
+		    			}
+	    			}
+    			} else {
+    				if (e instanceof VTOL) {
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				sVTOLLight.add(new DefaultMutableTreeNode(u.getName()));
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.TRACKED) {
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				sTrackedLight.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				sTrackedMedium.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+		    				sTrackedHeavy.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+		    				sTrackedAssault.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+		    				sTrackedColossal.add(new DefaultMutableTreeNode(u.getName()));
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.WHEELED) {
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				sWheeledLight.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				sWheeledMedium.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+		    				sWheeledHeavy.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+		    				sWheeledAssault.add(new DefaultMutableTreeNode(u.getName()));
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.HOVER) {
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				sHoverLight.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				sHoverMedium.add(new DefaultMutableTreeNode(u.getName()));
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.WIGE) {
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				sWiGELight.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				sWiGEMedium.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+		    				sWiGEHeavy.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+		    				sWiGEAssault.add(new DefaultMutableTreeNode(u.getName()));
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.NAVAL) {
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				sNavalLight.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				sNavalMedium.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+		    				sNavalHeavy.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+		    				sNavalAssault.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+		    				sNavalColossal.add(new DefaultMutableTreeNode(u.getName()));
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.SUBMARINE) {
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				sSubLight.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				sSubMedium.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+		    				sSubHeavy.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+		    				sSubAssault.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
+		    				sSubColossal.add(new DefaultMutableTreeNode(u.getName()));
+		    			}
+	    			} else if (e.getMovementMode() == EntityMovementMode.HYDROFOIL) {
+	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+		    				sHydrofoilLight.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+		    				sHydrofoilMedium.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+		    				sHydrofoilHeavy.add(new DefaultMutableTreeNode(u.getName()));
+		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+		    				sHydrofoilAssault.add(new DefaultMutableTreeNode(u.getName()));
+		    			}
+	    			}
+    			}
+    		}
+    	}
+    	
+    	// Reset our UI
+    	final boolean expandMechsFinal = expandMechs;
+    	final boolean expandASFFinal = expandASF;
+    	final boolean expandVeesFinal = expandVees;
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                overviewHangarTree.updateUI();
+                overviewHangarTree.setSelectionPath(null);
+                overviewHangarTree.expandPath(new TreePath(top.getPath()));
+                if (expandMechsFinal) {
+                	overviewHangarTree.expandPath(new TreePath(mechs.getPath()));
+                }
+                if (expandASFFinal) {
+                	overviewHangarTree.expandPath(new TreePath(ASF.getPath()));
+                }
+                if (expandVeesFinal) {
+                	overviewHangarTree.expandPath(new TreePath(vees.getPath()));
+                }
+                
+            }
+        });
     }
 
     private void refreshPersonnelView() {
@@ -12107,182 +13212,6 @@ public class CampaignGUI extends JPanel {
             return false;  
         }  
     }
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTable DocTable;
-    private javax.swing.JTable partsTable;
-    private javax.swing.JTable acquirePartsTable;
-    private javax.swing.JTable TaskTable;
-    private javax.swing.JTable AcquisitionTable;
-    private javax.swing.JTable TechTable;
-    private javax.swing.JTable whTechTable;
-    private javax.swing.JTable servicedUnitTable;
-    private javax.swing.JTable unitTable;
-    private javax.swing.JTable personnelTable;
-    private javax.swing.JTable acquireUnitsTable;
-    private javax.swing.JTable scenarioTable;
-    private javax.swing.JTable financeTable;
-    private javax.swing.JTable loanTable;
-    private javax.swing.JMenuItem addFunds;
-    private javax.swing.JButton btnAdvanceDay;
-    private javax.swing.JButton btnAssignDoc;
-    private javax.swing.JButton btnUnassignDoc;
-    private javax.swing.JButton btnDoTask;
-    private javax.swing.JButton btnDoTaskWarehouse;
-    private javax.swing.JToggleButton btnGMMode;
-    private javax.swing.JToggleButton btnOvertime;
-    private javax.swing.JToggleButton btnShowAllTechs;
-    private javax.swing.JToggleButton btnShowAllTechsWarehouse;
-    private javax.swing.JScrollPane scrTextTarget;
-    private javax.swing.JScrollPane scrollPartsTable;
-    private javax.swing.JLabel lblTarget;
-    private javax.swing.JLabel lblTargetNum;
-    private javax.swing.JLabel lblTargetNumWarehouse;
-    private javax.swing.JPanel mainPanel;
-    private javax.swing.JMenuBar menuBar;
-    private javax.swing.JMenu menuHire;
-    private javax.swing.JMenu menuFile;
-    private javax.swing.JMenu menuHelp;
-    private javax.swing.JMenuItem menuLoad;
-    private javax.swing.JMenuItem menuAboutItem;
-    private javax.swing.JMenuItem menuExitItem;
-    private javax.swing.JMenu menuManage;
-    private javax.swing.JMenu menuManageImportExport;
-    private javax.swing.JMenu menuMarket;
-    private javax.swing.JMenuItem menuOptions;
-    private javax.swing.JMenuItem menuOptionsMM;
-    private javax.swing.JMenu menuThemes;
-    private javax.swing.JMenuItem menuSave;
-    private javax.swing.JMenuItem miMercRoster;
-    private javax.swing.JMenuItem miHireBulk;
-    private javax.swing.JMenuItem miHireAstechs;
-    private javax.swing.JMenuItem miFireAstechs;
-    private javax.swing.JMenuItem miFireAllAstechs;
-    private javax.swing.JMenuItem miFullStrengthAstechs;
-    private javax.swing.JMenu menuAstechPool;
-    private javax.swing.JMenuItem miHireMedics;
-    private javax.swing.JMenuItem miFireMedics;
-    private javax.swing.JMenuItem miFireAllMedics;
-    private javax.swing.JMenuItem miFullStrengthMedics;
-    private javax.swing.JMenu menuMedicPool;
-    private javax.swing.JMenuItem miLoadForces;
-    private javax.swing.JMenuItem miExportPerson;
-    private javax.swing.JMenuItem miImportPerson;
-    private javax.swing.JMenuItem miExportParts;
-    private javax.swing.JMenuItem miImportParts;
-    //private javax.swing.JMenuItem miShoppingList;
-    private javax.swing.JMenuItem miGetLoan;
-    private javax.swing.JMenuItem miPurchaseUnit;
-    private javax.swing.JMenuItem miBuyParts;
-    private javax.swing.JMenu menuCommunity;
-    private javax.swing.JMenuItem miChat;
-    private javax.swing.JPanel panFinances;
-    private javax.swing.JPanel panHangar;
-    private javax.swing.JPanel panOrganization;
-    private javax.swing.JPanel panRepairBay;
-    private javax.swing.JPanel panInfirmary;
-    private javax.swing.JPanel panPersonnel;
-    private javax.swing.JPanel panBriefing;
-    private javax.swing.JPanel panScenario;
-    private javax.swing.JPanel panSupplies;
-    private javax.swing.JPanel panDoTask;
-    private javax.swing.JPanel panMapView;
-    private javax.swing.JPanel panOverview;
-    private javax.swing.JTabbedPane tabOverview;
-    private javax.swing.JScrollPane scrollOverviewParts;
-    private javax.swing.JTable overviewPartsTable;
-    private javax.swing.JScrollPane scrollOverviewCombatPersonnel;
-    private javax.swing.JTextArea overviewCombatPersonnelArea;
-    private javax.swing.JScrollPane scrollOverviewSupportPersonnel;
-    private javax.swing.JTextArea overviewSupportPersonnelArea;
-    private javax.swing.JSplitPane splitOverviewPersonnel;
-    private javax.swing.JScrollPane scrollOverviewHangar;
-    private javax.swing.JTree overviewHangarTree;
-    private javax.swing.JScrollPane scrollOverviewDragoonsRating;
-    private javax.swing.JTextArea overviewDragoonsRatingArea;
-    private IDragoonsRating rating;
-    private javax.swing.JScrollPane scrollDocTable;
-    private javax.swing.JScrollPane scrollUnassignedPatient;
-    private javax.swing.JScrollPane scrollTaskTable;
-    private javax.swing.JScrollPane scrollAcquisitionTable;
-    private javax.swing.JScrollPane scrollTechTable;
-    private javax.swing.JScrollPane scrollWhTechTable;
-    private javax.swing.JScrollPane scrollServicedUnitTable;
-    private javax.swing.JScrollPane scrollServicedUnitView;
-    private javax.swing.JScrollPane scrollPersonnelTable;
-    private javax.swing.JScrollPane scrollScenarioTable;
-    private javax.swing.JScrollPane scrollUnitTable;
-    private javax.swing.JScrollPane scrollFinanceTable;
-    private javax.swing.JScrollPane scrollLoanTable;
-    private javax.swing.JTextPane txtServicedUnitView;
-    private javax.swing.JSplitPane splitServicedUnits;
-    private javax.swing.JPanel statusPanel;
-    private javax.swing.JTabbedPane tabMain;
-    private javax.swing.JTabbedPane tabTasks;
-    private javax.swing.JTextArea textTarget;
-    private javax.swing.JTextArea textTargetWarehouse;
-    private javax.swing.JLabel astechPoolLabel;
-    private javax.swing.JLabel astechPoolLabelWarehouse;
-    private javax.swing.JTextPane txtPaneReport;
-    private javax.swing.JScrollPane txtPaneReportScrollPane;
-    private javax.swing.JComboBox choicePerson;
-    private javax.swing.JLabel lblPersonChoice;
-    private javax.swing.JComboBox choicePersonView;
-    private javax.swing.JLabel lblPersonView;
-    private javax.swing.JScrollPane scrollPersonnelView;
-    private javax.swing.JSplitPane splitPersonnel;
-    private javax.swing.JComboBox choiceUnit;
-    private javax.swing.JLabel lblUnitChoice;
-    private javax.swing.JComboBox choiceUnitView;
-    private javax.swing.JLabel lblUnitView;
-    private javax.swing.JScrollPane scrollUnitView;
-    private javax.swing.JSplitPane splitUnit;
-    private javax.swing.JScrollPane scrollOrgTree;
-    private javax.swing.JTree orgTree;
-    private javax.swing.JSplitPane splitOrg;
-    private javax.swing.JScrollPane scrollForceView;
-    InterstellarMapPanel panMap;
-    private javax.swing.JSplitPane splitMap;
-    private javax.swing.JScrollPane scrollPlanetView;
-    private javax.swing.JComboBox choiceMission;
-    private javax.swing.JScrollPane scrollMissionView;
-    private javax.swing.JScrollPane scrollScenarioView;
-    private javax.swing.JPanel panMissionButtons;
-    private javax.swing.JPanel panScenarioButtons;
-    private javax.swing.JButton btnAddScenario;
-    private javax.swing.JButton btnAddMission;
-    private javax.swing.JButton btnEditMission;
-    private javax.swing.JButton btnCompleteMission;
-    private javax.swing.JButton btnDeleteMission;
-    private javax.swing.JButton btnStartGame;
-    private javax.swing.JButton btnLoadGame;
-    private javax.swing.JButton btnPrintRS;
-    private javax.swing.JButton btnGetMul;
-    private javax.swing.JButton btnClearAssignedUnits;
-    private javax.swing.JButton btnResolveScenario;
-    private javax.swing.JSplitPane splitBrief;
-    private javax.swing.JSplitPane splitMission;
-    private javax.swing.JLabel lblMission;
-    private javax.swing.JComboBox choiceParts;
-    private javax.swing.JComboBox choicePartsView;
-    private javax.swing.JLabel lblPartsChoice;
-    private javax.swing.JLabel lblPartsChoiceView;
-    private javax.swing.JLabel lblFindPlanet;
-    private JSuggestField suggestPlanet;
-    private javax.swing.JButton btnCalculateJumpPath;
-    private javax.swing.JButton btnBeginTransit;
-    private MekLabPanel panMekLab;
-    private javax.swing.JScrollPane scrollMekLab;
-    private javax.swing.JLabel lblLocation;
-    private JList listAssignedPatient;
-    private JList listUnassignedPatient;
-    // End of variables declaration//GEN-END:variables
-
-    private javax.swing.JLabel lblRating;
-    private javax.swing.JLabel lblFunds;
-    private javax.swing.JLabel lblTempAstechs;
-    private javax.swing.JLabel lblTempMedics;
-    private javax.swing.JLabel lblCargo;
     
 
     private JDialog aboutBox;

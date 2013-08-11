@@ -109,6 +109,8 @@ v0.3.1 (SVN)
 + Bug: Personnel Overview incorrectly showing MIA/KIA/Retired personnel in the active counts
 + Bug: Removing a person or changing their status does not display their name in the confirmation dialog
 + RFE: Right click unit in TO&E has option to go to unit in hangar and to go to pilot/commander in personnel
++ WIP RFE [#99]/[#63]: Overview Summary / Statistics page
+    (Hangar overview now has Mechs, ASF, Combat Vehicles, and Gun Emplacements. Other units later)
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
