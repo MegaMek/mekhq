@@ -2754,7 +2754,6 @@ public class CampaignGUI extends JPanel {
         statusPanel.add(lblTempAstechs);
         refreshTempMedics();
         statusPanel.add(lblTempMedics);
-        refreshCargo();
         statusPanel.add(lblCargo);
 
         refreshServicedUnitList();
@@ -5793,12 +5792,14 @@ public class CampaignGUI extends JPanel {
     }
     
     protected void refreshCargo() {
-    	double cargoTonnage = getCampaign().getCargoTonnage();
+    	double cargoTonnage = getCampaign().getCargoTonnage(false);
+    	double cargoTonnageInTransit = getCampaign().getCargoTonnage(true);
     	double cargoCapacity = getCampaign().getTotalCargoCapacity();
     	String cargoTonnageString = new DecimalFormat("#.##").format(cargoTonnage);
+    	String cargoTonnageInTransitString = new DecimalFormat("#.##").format(cargoTonnageInTransit);
     	String cargoCapacityString = new DecimalFormat("#.##").format(cargoCapacity);
     	String color = cargoTonnage > cargoCapacity ? "<font color='red'>" : "<font color = 'black'>";
-    	String text = "<html>"+color+"<b>Cargo Tonnage/Capacity:</b> "+cargoTonnageString+"/"+cargoCapacityString+"</font></html>";
+    	String text = "<html>"+color+"<b>Cargo Tonnage (+In Transit)/Capacity:</b> "+cargoTonnageString+"("+cargoTonnageInTransitString+")/"+cargoCapacityString+"</font></html>";
     	lblCargo.setText(text);
     }
 
