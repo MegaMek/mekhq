@@ -112,6 +112,8 @@ v0.3.1 (SVN)
 + WIP RFE [#99]/[#63]: Overview Summary / Statistics page
     (Hangar overview now has Mechs, ASF, Combat Vehicles, and Gun Emplacements. Other units later)
 + Bug: Cargo counts "In Transit" too
++ WIP RFE [#99]/[#63]: Overview Summary / Statistics page (Hangar Overview Finished)
++ Added unit name to refit confirmation dialog
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement

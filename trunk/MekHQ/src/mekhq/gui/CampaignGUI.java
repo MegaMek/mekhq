@@ -155,6 +155,7 @@ import megamek.common.Mounted;
 import megamek.common.Player;
 import megamek.common.Protomech;
 import megamek.common.SmallCraft;
+import megamek.common.SpaceStation;
 import megamek.common.SupportTank;
 import megamek.common.SupportVTOL;
 import megamek.common.Tank;
@@ -424,6 +425,8 @@ public class CampaignGUI extends JPanel {
     private javax.swing.JSplitPane splitOverviewPersonnel;
     private javax.swing.JScrollPane scrollOverviewHangar;
     private javax.swing.JTree overviewHangarTree;
+    private javax.swing.JTextArea overviewHangarArea;
+    private javax.swing.JSplitPane splitOverviewHangar;
     private DefaultMutableTreeNode top;
     private javax.swing.JScrollPane scrollOverviewDragoonsRating;
     private javax.swing.JTextArea overviewDragoonsRatingArea;
@@ -611,6 +614,8 @@ public class CampaignGUI extends JPanel {
         scrollOverviewHangar = new javax.swing.JScrollPane();
     	top = new DefaultMutableTreeNode("Hangar");
         overviewHangarTree = new javax.swing.JTree(top);
+        overviewHangarArea = new javax.swing.JTextArea();
+        splitOverviewHangar = new javax.swing.JSplitPane();
         scrollOverviewDragoonsRating = new javax.swing.JScrollPane();
         overviewDragoonsRatingArea = new javax.swing.JTextArea(20,60);
         lblFindPlanet = new javax.swing.JLabel();
@@ -2313,7 +2318,23 @@ public class CampaignGUI extends JPanel {
 
     	overviewHangarTree.setName("overviewHangarTree"); // NOI18N
         scrollOverviewHangar.setViewportView(overviewHangarTree);
-        tabOverview.addTab(resourceMap.getString("scrollOverviewHangar.TabConstraints.tabTitle"), scrollOverviewHangar);
+        overviewHangarArea.setName("overviewHangarArea"); // NOI18N
+        overviewHangarArea.setLineWrap(false);
+        overviewHangarArea.setFont(new Font("Courier New", Font.PLAIN, 18));
+        overviewHangarArea.setText("");
+        overviewHangarArea.setEditable(false);
+        overviewHangarArea.setName("overviewHangarArea"); // NOI18N
+        splitOverviewHangar = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT, scrollOverviewHangar, overviewHangarArea);
+        splitOverviewHangar.setName("splitOverviewHangar");
+        splitOverviewHangar.setOneTouchExpandable(true);
+        splitOverviewHangar.setResizeWeight(0.5);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        tabOverview.addTab(resourceMap.getString("scrollOverviewHangar.TabConstraints.tabTitle"), splitOverviewHangar);
         
         //TODO: overviewPartsTable.setModel(overviewPartsModel);
         overviewPartsTable.setName("overviewPartsTable"); // NOI18N
@@ -3707,7 +3728,7 @@ public class CampaignGUI extends JPanel {
         //check to see if user really wants to do it - give some info on what will be done
         //TODO: better information
         if(0 != JOptionPane.showConfirmDialog(null,
-                "Are you sure you want to refit this unit?"
+                "Are you sure you want to refit "+r.getUnit().getName()+"?"
             , "Proceed?",
                 JOptionPane.YES_NO_OPTION)) {
             return;
@@ -3871,90 +3892,128 @@ public class CampaignGUI extends JPanel {
     	int countOmniHydrofoilMedium = 0;
     	int countOmniHydrofoilLight = 0;
     	
+    	// Battle Armor and Infantry
+    	boolean expandInfantry = false;
+    	int countInfantry = 0;
+    	int countFootInfantry = 0;
+    	int countJumpInfantry = 0;
+    	int countMotorizedInfantry = 0;
+    	int countMechanizedInfantry = 0;
+    	int countBA = 0;
+    	int countBAPAL = 0;
+    	int countBALight = 0;
+    	int countBAMedium = 0;
+    	int countBAHeavy = 0;
+    	int countBAAssault = 0;
+    	
+    	// Jumpships, Warships, Dropships, and SmallCraft
+    	boolean expandSpace = false;
+    	int countSpace = 0;
+    	int countJumpships = 0;
+    	int countWarships = 0;
+    	int countLargeWS = 0;
+    	int countSmallWS = 0;
+    	int countDropships = 0;
+    	int countLargeDS = 0;
+    	int countMediumDS = 0;
+    	int countSmallDS = 0;
+    	int countSmallCraft = 0;
+    	
+    	// Conventional Fighters
+    	int countConv = 0;
+    	
     	// Support Vees
-    	boolean expandSupportVees = false;
+    	/*boolean expandSupportVees = false;
     	int countSupportVees = 0;
     	int countSupportStandardVees = 0;
     	int countSupportOmniVees = 0;
     	int countSupportVTOL = 0;
-    	/*int countVTOLLight = 0;
-    	int countSub = 0;
-    	int countSubColossal = 0;
-    	int countSubAssault = 0;
-    	int countSubHeavy = 0;
-    	int countSubMedium = 0;
-    	int countSubLight = 0;
-    	int countNaval = 0;
-    	int countNavalColossal = 0;
-    	int countNavalAssault = 0;
-    	int countNavalHeavy = 0;
-    	int countNavalMedium = 0;
-    	int countNavalLight = 0;
-    	int countWiGE = 0;
-    	int countWiGEAssault = 0;
-    	int countWiGEHeavy = 0;
-    	int countWiGEMedium = 0;
-    	int countWiGELight = 0;
-    	int countTracked = 0;
-    	int countTrackedColossal = 0;
-    	int countTrackedAssault = 0;
-    	int countTrackedHeavy = 0;
-    	int countTrackedMedium = 0;
-    	int countTrackedLight = 0;
-    	int countWheeled = 0;
-    	int countWheeledAssault = 0;
-    	int countWheeledHeavy = 0;
-    	int countWheeledMedium = 0;
-    	int countWheeledLight = 0;
-    	int countHover = 0;
-    	int countHoverMedium = 0;
-    	int countHoverLight = 0;
-    	int countHydrofoil = 0;
-    	int countHydrofoilAssault = 0;
-    	int countHydrofoilHeavy = 0;
-    	int countHydrofoilMedium = 0;
-    	int countHydrofoilLight = 0;
-    	int countOmniVTOL = 0;
-    	int countOmniVTOLLight = 0;
-    	int countOmniSub = 0;
-    	int countOmniSubColossal = 0;
-    	int countOmniSubAssault = 0;
-    	int countOmniSubHeavy = 0;
-    	int countOmniSubMedium = 0;
-    	int countOmniSubLight = 0;
-    	int countOmniNaval = 0;
-    	int countOmniNavalColossal = 0;
-    	int countOmniNavalAssault = 0;
-    	int countOmniNavalHeavy = 0;
-    	int countOmniNavalMedium = 0;
-    	int countOmniNavalLight = 0;
-    	int countOmniWiGE = 0;
-    	int countOmniWiGEAssault = 0;
-    	int countOmniWiGEHeavy = 0;
-    	int countOmniWiGEMedium = 0;
-    	int countOmniWiGELight = 0;
-    	int countOmniTracked = 0;
-    	int countOmniTrackedColossal = 0;
-    	int countOmniTrackedAssault = 0;
-    	int countOmniTrackedHeavy = 0;
-    	int countOmniTrackedMedium = 0;
-    	int countOmniTrackedLight = 0;
-    	int countOmniWheeled = 0;
-    	int countOmniWheeledAssault = 0;
-    	int countOmniWheeledHeavy = 0;
-    	int countOmniWheeledMedium = 0;
-    	int countOmniWheeledLight = 0;
-    	int countOmniHover = 0;
-    	int countOmniHoverMedium = 0;
-    	int countOmniHoverLight = 0;
-    	int countOmniHydrofoil = 0;
-    	int countOmniHydrofoilAssault = 0;
-    	int countOmniHydrofoilHeavy = 0;
-    	int countOmniHydrofoilMedium = 0;
-    	int countOmniHydrofoilLight = 0;*/
+    	int countSupportVTOLLight = 0;
+    	int countSupportSub = 0;
+    	int countSupportSubColossal = 0;
+    	int countSupportSubAssault = 0;
+    	int countSupportSubHeavy = 0;
+    	int countSupportSubMedium = 0;
+    	int countSupportSubLight = 0;
+    	int countSupportNaval = 0;
+    	int countSupportNavalColossal = 0;
+    	int countSupportNavalAssault = 0;
+    	int countSupportNavalHeavy = 0;
+    	int countSupportNavalMedium = 0;
+    	int countSupportNavalLight = 0;
+    	int countSupportWiGE = 0;
+    	int countSupportWiGEAssault = 0;
+    	int countSupportWiGEHeavy = 0;
+    	int countSupportWiGEMedium = 0;
+    	int countSupportWiGELight = 0;
+    	int countSupportTracked = 0;
+    	int countSupportTrackedColossal = 0;
+    	int countSupportTrackedAssault = 0;
+    	int countSupportTrackedHeavy = 0;
+    	int countSupportTrackedMedium = 0;
+    	int countSupportTrackedLight = 0;
+    	int countSupportWheeled = 0;
+    	int countSupportWheeledAssault = 0;
+    	int countSupportWheeledHeavy = 0;
+    	int countSupportWheeledMedium = 0;
+    	int countSupportWheeledLight = 0;
+    	int countSupportHover = 0;
+    	int countSupportHoverMedium = 0;
+    	int countSupportHoverLight = 0;
+    	int countSupportHydrofoil = 0;
+    	int countSupportHydrofoilAssault = 0;
+    	int countSupportHydrofoilHeavy = 0;
+    	int countSupportHydrofoilMedium = 0;
+    	int countSupportHydrofoilLight = 0;
+    	int countSupportOmniVTOL = 0;
+    	int countSupportOmniVTOLLight = 0;
+    	int countSupportOmniSub = 0;
+    	int countSupportOmniSubColossal = 0;
+    	int countSupportOmniSubAssault = 0;
+    	int countSupportOmniSubHeavy = 0;
+    	int countSupportOmniSubMedium = 0;
+    	int countSupportOmniSubLight = 0;
+    	int countSupportOmniNaval = 0;
+    	int countSupportOmniNavalColossal = 0;
+    	int countSupportOmniNavalAssault = 0;
+    	int countSupportOmniNavalHeavy = 0;
+    	int countSupportOmniNavalMedium = 0;
+    	int countSupportOmniNavalLight = 0;
+    	int countSupportOmniWiGE = 0;
+    	int countSupportOmniWiGEAssault = 0;
+    	int countSupportOmniWiGEHeavy = 0;
+    	int countSupportOmniWiGEMedium = 0;
+    	int countSupportOmniWiGELight = 0;
+    	int countSupportOmniTracked = 0;
+    	int countSupportOmniTrackedColossal = 0;
+    	int countSupportOmniTrackedAssault = 0;
+    	int countSupportOmniTrackedHeavy = 0;
+    	int countSupportOmniTrackedMedium = 0;
+    	int countSupportOmniTrackedLight = 0;
+    	int countSupportOmniWheeled = 0;
+    	int countSupportOmniWheeledAssault = 0;
+    	int countSupportOmniWheeledHeavy = 0;
+    	int countSupportOmniWheeledMedium = 0;
+    	int countSupportOmniWheeledLight = 0;
+    	int countSupportOmniHover = 0;
+    	int countSupportOmniHoverMedium = 0;
+    	int countSupportOmniHoverLight = 0;
+    	int countSupportOmniHydrofoil = 0;
+    	int countSupportOmniHydrofoilAssault = 0;
+    	int countSupportOmniHydrofoilHeavy = 0;
+    	int countSupportOmniHydrofoilMedium = 0;
+    	int countSupportOmniHydrofoilLight = 0;*/
     	
     	// Turrets
     	int countGE = 0;
+    	
+    	// Protomechs
+    	boolean expandProtos = false;
+    	int countProtos = 0;
+    	int countLightProtos = 0;
+    	int countMediumProtos = 0;
+    	int countHeavyProtos = 0;
+    	int countAssaultProtos = 0;
     	
     	
     	// Gather data and load it into the tree
@@ -3994,15 +4053,33 @@ public class CampaignGUI extends JPanel {
 	    			}
     			}
     		} else if (e instanceof ConvFighter) {
-    			
+    			countConv++;
+    		} else if (e instanceof SpaceStation) {
+    			continue;
             } else if (e instanceof Warship) {
-    			
+    			countSpace++;
+    			countWarships++;
+    			if (e.getWeightClass() == EntityWeightClass.WEIGHT_SMALL_WAR) {
+    				countSmallWS++;
+    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_LARGE_WAR) {
+    				countLargeWS++;
+    			}
         	} else if (e instanceof Jumpship) {
-    			
+    			countSpace++;
+    			countJumpships++;
         	} else if (e instanceof Dropship) {
-    			
+    			countSpace++;
+    			countDropships++;
+    			if (e.getWeightClass() == EntityWeightClass.WEIGHT_SMALL_DROP) {
+    				countSmallDS++;
+    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM_DROP) {
+    				countMediumDS++;
+    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_LARGE_DROP) {
+    				countLargeDS++;
+    			}
         	} else if (e instanceof SmallCraft) {
-    			
+    			countSpace++;
+    			countSmallCraft++;
         	} else if (e instanceof Aero) {
     			countASF++;
     			if (e.isOmni()) {
@@ -4023,6 +4100,17 @@ public class CampaignGUI extends JPanel {
 	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
 	    				countHeavyASF++;
 	    			}
+    			}
+    		} else if (e instanceof Protomech) {
+    			countProtos++;
+    			if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+    				countLightProtos++;
+    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+    				countMediumProtos++;
+    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+    				countHeavyProtos++;
+    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+    				countAssaultProtos++;
     			}
         	} else if (e instanceof GunEmplacement) {
     			countGE++;
@@ -4203,6 +4291,30 @@ public class CampaignGUI extends JPanel {
 		    			}
 	    			}
     			}
+    		} else if (e instanceof BattleArmor) {
+    			countBA++;
+    			if (e.getWeightClass() == EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
+        			countBAPAL++;
+    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+        			countBALight++;
+    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+        			countBAMedium++;
+    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+        			countBAHeavy++;
+    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+        			countBAAssault++;
+    			}
+    		} else if (e instanceof Infantry) {
+    			countInfantry++;
+    			if (((Infantry) e).isMechanized()) {
+    				countMechanizedInfantry++;
+    			} else if (e.getMovementMode() == EntityMovementMode.INF_JUMP) {
+    				countJumpInfantry++;
+    			} else if (e.getMovementMode() == EntityMovementMode.INF_LEG) {
+    				countFootInfantry++;
+    			} else if (e.getMovementMode() == EntityMovementMode.INF_MOTORIZED) {
+    				countMotorizedInfantry++;
+    			}
     		}
     	}
     	
@@ -4250,11 +4362,11 @@ public class CampaignGUI extends JPanel {
     	sASF.add(sMediumASF);
     	DefaultMutableTreeNode sLightASF = new DefaultMutableTreeNode("Light: "+countLightASF);
     	sASF.add(sLightASF);
-    	DefaultMutableTreeNode oHeavyASF = new DefaultMutableTreeNode("Heavy: "+countHeavyASF);
+    	DefaultMutableTreeNode oHeavyASF = new DefaultMutableTreeNode("Heavy: "+countOmniHeavyASF);
     	oASF.add(oHeavyASF);
-    	DefaultMutableTreeNode oMediumASF = new DefaultMutableTreeNode("Medium: "+countMediumASF);
+    	DefaultMutableTreeNode oMediumASF = new DefaultMutableTreeNode("Medium: "+countOmniMediumASF);
     	oASF.add(oMediumASF);
-    	DefaultMutableTreeNode oLightASF = new DefaultMutableTreeNode("Light: "+countLightASF);
+    	DefaultMutableTreeNode oLightASF = new DefaultMutableTreeNode("Light: "+countOmniLightASF);
     	oASF.add(oLightASF);
     	top.add(ASF);
     	
@@ -4418,9 +4530,74 @@ public class CampaignGUI extends JPanel {
     	oHydrofoil.add(oHydrofoilLight);
     	top.add(vees);
     	
+    	// Conventional Fighters
+    	final DefaultMutableTreeNode conv = new DefaultMutableTreeNode("Conventional Fighters: "+countConv);
+    	top.add(conv);
+    	
+    	// Infantry Nodes
+    	int allInfantry = (countInfantry+countBA);
+    	final DefaultMutableTreeNode inf = new DefaultMutableTreeNode("Infantry: "+allInfantry);
+    	DefaultMutableTreeNode cInf = new DefaultMutableTreeNode("Conventional: "+countInfantry);
+    	DefaultMutableTreeNode BAInf = new DefaultMutableTreeNode("Battle Armor: "+countBA);
+    	inf.add(cInf);
+    	inf.add(BAInf);
+    	DefaultMutableTreeNode infFoot = new DefaultMutableTreeNode("Foot Platoons: "+countFootInfantry);
+    	cInf.add(infFoot);
+    	DefaultMutableTreeNode infJump = new DefaultMutableTreeNode("Jump Platoons: "+countJumpInfantry);
+    	cInf.add(infJump);
+    	DefaultMutableTreeNode infMechanized = new DefaultMutableTreeNode("Mechanized Platoons: "+countMechanizedInfantry);
+    	cInf.add(infMechanized);
+    	DefaultMutableTreeNode infMotorized = new DefaultMutableTreeNode("Motorized Platoons: "+countMotorizedInfantry);
+    	cInf.add(infMotorized);
+    	DefaultMutableTreeNode baPAL = new DefaultMutableTreeNode("PAL/Exoskeleton: "+countBAPAL);
+    	BAInf.add(baPAL);
+    	DefaultMutableTreeNode baLight = new DefaultMutableTreeNode("Light: "+countBALight);
+    	BAInf.add(baLight);
+    	DefaultMutableTreeNode baMedium = new DefaultMutableTreeNode("Medium: "+countBAMedium);
+    	BAInf.add(baMedium);
+    	DefaultMutableTreeNode baHeavy = new DefaultMutableTreeNode("Heavy: "+countBAHeavy);
+    	BAInf.add(baHeavy);
+    	DefaultMutableTreeNode baAssault = new DefaultMutableTreeNode("Assault: "+countBAAssault);
+    	BAInf.add(baAssault);
+    	top.add(inf);
+    	
+    	// Protomechs
+    	final DefaultMutableTreeNode protos = new DefaultMutableTreeNode("Protomechs: "+countProtos);
+    	DefaultMutableTreeNode plight = new DefaultMutableTreeNode("Light: "+countLightProtos);
+    	protos.add(plight);
+    	DefaultMutableTreeNode pmedium = new DefaultMutableTreeNode("Medium: "+countMediumProtos);
+    	protos.add(pmedium);
+    	DefaultMutableTreeNode pheavy = new DefaultMutableTreeNode("Heavy: "+countHeavyProtos);
+    	protos.add(pheavy);
+    	DefaultMutableTreeNode passault = new DefaultMutableTreeNode("Assault: "+countAssaultProtos);
+    	protos.add(passault);
+    	top.add(protos);
+    	
     	// Turrets
     	final DefaultMutableTreeNode ge = new DefaultMutableTreeNode("Gun Emplacements: "+countGE);
     	top.add(ge);
+    	
+    	// Space
+    	final DefaultMutableTreeNode space = new DefaultMutableTreeNode("Spacecraft: "+countSpace);
+    	DefaultMutableTreeNode ws = new DefaultMutableTreeNode("Warships: "+countWarships);
+    	space.add(ws);
+    	DefaultMutableTreeNode js = new DefaultMutableTreeNode("Jumpships: "+countJumpships);
+    	space.add(js);
+    	DefaultMutableTreeNode ds = new DefaultMutableTreeNode("Dropships: "+countDropships);
+    	space.add(ds);
+    	DefaultMutableTreeNode sc = new DefaultMutableTreeNode("Small Craft: "+countSmallCraft);
+    	space.add(sc);
+    	DefaultMutableTreeNode smws = new DefaultMutableTreeNode("Small Warships: "+countSmallWS);
+    	ws.add(smws);
+    	DefaultMutableTreeNode lgws = new DefaultMutableTreeNode("Large Warships: "+countLargeWS);
+    	ws.add(lgws);
+    	DefaultMutableTreeNode smds = new DefaultMutableTreeNode("Small Dropships: "+countSmallDS);
+    	ds.add(smds);
+    	DefaultMutableTreeNode mdds = new DefaultMutableTreeNode("Medium Dropships: "+countMediumDS);
+    	ds.add(mdds);
+    	DefaultMutableTreeNode lgds = new DefaultMutableTreeNode("Large Dropships: "+countLargeDS);
+    	ds.add(lgds);
+    	top.add(space);
     	
     	for (Unit u : getCampaign().getUnits()) {
     		Entity e = u.getEntity();
@@ -4456,15 +4633,29 @@ public class CampaignGUI extends JPanel {
 	    			}
     			}
     		} else if (e instanceof ConvFighter) {
-    			
+    			conv.add(new DefaultMutableTreeNode(u.getName()));
             } else if (e instanceof Warship) {
-    			
+    			expandSpace = true;
+    			if (e.getWeightClass() == EntityWeightClass.WEIGHT_SMALL_WAR) {
+    				smws.add(new DefaultMutableTreeNode(u.getName()));
+    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_LARGE_WAR) {
+    				lgws.add(new DefaultMutableTreeNode(u.getName()));
+    			}
         	} else if (e instanceof Jumpship) {
-    			
+    			expandSpace = true;
+    			js.add(new DefaultMutableTreeNode(u.getName()));
         	} else if (e instanceof Dropship) {
-    			
+    			expandSpace = true;
+    			if (e.getWeightClass() == EntityWeightClass.WEIGHT_SMALL_DROP) {
+    				smds.add(new DefaultMutableTreeNode(u.getName()));
+    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM_DROP) {
+    				mdds.add(new DefaultMutableTreeNode(u.getName()));
+    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_LARGE_DROP) {
+    				lgds.add(new DefaultMutableTreeNode(u.getName()));
+    			}
         	} else if (e instanceof SmallCraft) {
-    			
+    			expandSpace = true;
+    			sc.add(new DefaultMutableTreeNode(u.getName()));
         	} else if (e instanceof Aero) {
         		expandASF = true;
     			if (e.isOmni()) {
@@ -4483,6 +4674,17 @@ public class CampaignGUI extends JPanel {
 	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
 	    				sHeavyASF.add(new DefaultMutableTreeNode(u.getName()));
 	    			}
+    			}
+        	} else if (e instanceof Protomech) {
+        		expandProtos = true;
+    			if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+    				plight.add(new DefaultMutableTreeNode(u.getName()));
+    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+    				pmedium.add(new DefaultMutableTreeNode(u.getName()));
+    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+    				pheavy.add(new DefaultMutableTreeNode(u.getName()));
+    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+    				passault.add(new DefaultMutableTreeNode(u.getName()));
     			}
         	} else if (e instanceof GunEmplacement) {
     			ge.add(new DefaultMutableTreeNode(u.getName()));
@@ -4647,6 +4849,30 @@ public class CampaignGUI extends JPanel {
 		    			}
 	    			}
     			}
+    		} else if (e instanceof BattleArmor) {
+    			expandInfantry = true;
+    			if (e.getWeightClass() == EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
+    				baPAL.add(new DefaultMutableTreeNode(u.getName()));
+    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
+    				baLight.add(new DefaultMutableTreeNode(u.getName()));
+    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
+    				baMedium.add(new DefaultMutableTreeNode(u.getName()));
+    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
+    				baHeavy.add(new DefaultMutableTreeNode(u.getName()));
+    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
+    				baAssault.add(new DefaultMutableTreeNode(u.getName()));
+    			}
+    		} else if (e instanceof Infantry) {
+    			expandInfantry = true;
+    			if (((Infantry) e).isMechanized()) {
+    				infMechanized.add(new DefaultMutableTreeNode(u.getName()));
+    			} else if (e.getMovementMode() == EntityMovementMode.INF_JUMP) {
+    				infJump.add(new DefaultMutableTreeNode(u.getName()));
+    			} else if (e.getMovementMode() == EntityMovementMode.INF_LEG) {
+    				infFoot.add(new DefaultMutableTreeNode(u.getName()));
+    			} else if (e.getMovementMode() == EntityMovementMode.INF_MOTORIZED) {
+    				infMotorized.add(new DefaultMutableTreeNode(u.getName()));
+    			}
     		}
     	}
     	
@@ -4654,6 +4880,9 @@ public class CampaignGUI extends JPanel {
     	final boolean expandMechsFinal = expandMechs;
     	final boolean expandASFFinal = expandASF;
     	final boolean expandVeesFinal = expandVees;
+    	final boolean expandInfantryFinal = expandInfantry; 
+    	final boolean expandSpaceFinal = expandSpace;
+    	final boolean expandProtosFinal = expandProtos;
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 overviewHangarTree.updateUI();
@@ -4668,9 +4897,41 @@ public class CampaignGUI extends JPanel {
                 if (expandVeesFinal) {
                 	overviewHangarTree.expandPath(new TreePath(vees.getPath()));
                 }
+                if (expandInfantryFinal) {
+                	overviewHangarTree.expandPath(new TreePath(inf.getPath()));
+                }
+                if (expandSpaceFinal) {
+                	overviewHangarTree.expandPath(new TreePath(space.getPath()));
+                }
+                if (expandProtosFinal) {
+                	overviewHangarTree.expandPath(new TreePath(protos.getPath()));
+                }
                 
             }
         });
+        
+        int countInTransit = 0;
+        int countPresent = 0;
+        int countDamaged = 0;
+        int countDeployed = 0;
+        for (Unit u : getCampaign().getUnits()) {
+        	if (u.isPresent()) {
+        		countPresent++;
+        	} else {
+        		countInTransit++;
+        	}
+        	if (u.isDamaged()) {
+        		countDamaged++;
+        	}
+        	if (u.isDeployed()) {
+        		countDeployed++;
+        	}
+        }
+        overviewHangarArea.setText("Total Units: "+getCampaign().getUnits().size()+
+        		"\n  Present: "+countPresent+
+        		"\n  In Transit: "+countInTransit+
+        		"\n  Damaged: "+countDamaged+
+        		"\n  Deployed: "+countDeployed);
     }
 
     private void refreshPersonnelView() {
@@ -5799,7 +6060,7 @@ public class CampaignGUI extends JPanel {
     	String cargoTonnageInTransitString = new DecimalFormat("#.##").format(cargoTonnageInTransit);
     	String cargoCapacityString = new DecimalFormat("#.##").format(cargoCapacity);
     	String color = cargoTonnage > cargoCapacity ? "<font color='red'>" : "<font color = 'black'>";
-    	String text = "<html>"+color+"<b>Cargo Tonnage (+In Transit)/Capacity:</b> "+cargoTonnageString+"("+cargoTonnageInTransitString+")/"+cargoCapacityString+"</font></html>";
+    	String text = "<html>"+color+"<b>Cargo Tonnage (+In Transit)/Capacity:</b> "+cargoTonnageString+" ("+cargoTonnageInTransitString+")/"+cargoCapacityString+"</font></html>";
     	lblCargo.setText(text);
     }
 
