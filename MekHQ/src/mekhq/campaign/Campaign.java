@@ -5095,12 +5095,18 @@ public class Campaign implements Serializable {
     	return capacity;
     }
     
-    public double getCargoTonnage() {
+    public double getCargoTonnage(boolean inTransit) {
     	double cargoTonnage = 0;
     	for (Part part : getSpareParts()) {
+    		if (!inTransit && !part.isPresent()) {
+    			continue;
+    		}
     		cargoTonnage += (part.getQuantity() * part.getTonnage());
     	}
     	for (Unit unit : getUnits()) {
+    		if (!inTransit && !unit.isPresent()) {
+    			continue;
+    		}
     		if (unit.getForceId() == Force.FORCE_NONE && !(unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship || unit.getEntity() instanceof SmallCraft)) {
     			cargoTonnage += unit.getEntity().getWeight();
     		}
