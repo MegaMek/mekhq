@@ -155,6 +155,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     
     boolean dependent;
     boolean commander;
+    boolean isClanTech;
         
     //assignments
     private UUID unitId;
@@ -230,6 +231,15 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         prisonerStatus = PRISONER_NOT;
         dependent = false;
         commander = false;
+        isClanTech = false;
+    }
+    
+    public boolean isClanTech() {
+    	return isClanTech;
+    }
+    
+    public void setIsClanTech(boolean tf) {
+    	isClanTech = tf;
     }
     
     public boolean isCommander() {

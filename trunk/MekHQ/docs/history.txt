@@ -114,6 +114,7 @@ v0.3.1 (SVN)
 + Bug: Cargo counts "In Transit" too
 + WIP RFE [#99]/[#63]: Overview Summary / Statistics page (Hangar Overview Finished)
 + Added unit name to refit confirmation dialog
++ RFE: Clan Trained Technician flag for captured clan techs to ignore the modifier for clan equipment
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
