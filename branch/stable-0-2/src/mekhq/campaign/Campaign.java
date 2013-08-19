@@ -92,7 +92,6 @@ import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.BuildingBlock;
 import megamek.common.util.DirectoryItems;
-import mekhq.campaign.LogEntry;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.Utilities;
