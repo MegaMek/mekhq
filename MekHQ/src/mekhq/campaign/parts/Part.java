@@ -720,7 +720,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	        }
 		}
         mods.addModifier(Availability.getTechModifier(getTechRating()), "tech rating " + EquipmentType.getRatingName(getTechRating()));
-		if(!campaign.getFaction().isClan() && isClanTechBase()) {
+		if(!campaign.getFaction().isClan() && isClanTechBase() && !(campaign.getPerson(getAssignedTeamId()).isClanTech())) {
 			mods.addModifier(2, "clan tech");
 		}
         return mods;

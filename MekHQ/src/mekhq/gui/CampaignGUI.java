@@ -9231,6 +9231,9 @@ public class CampaignGUI extends JPanel {
             } else if(command.equalsIgnoreCase("DEPENDENT")) {
             	selectedPerson.setDependent(!selectedPerson.isDependent());
                 getCampaign().personUpdated(selectedPerson);
+            } else if(command.equalsIgnoreCase("CLANTECH")) {
+            	selectedPerson.setIsClanTech(!selectedPerson.isClanTech());
+                getCampaign().personUpdated(selectedPerson);
             } else if(command.equalsIgnoreCase("CALLSIGN")) {
                 String s = (String)JOptionPane.showInputDialog(
                         frame,
@@ -9873,6 +9876,13 @@ public class CampaignGUI extends JPanel {
                     cbMenuItem.setActionCommand("COMMANDER");
                     cbMenuItem.addActionListener(this);
                     menu.add(cbMenuItem);
+                    cbMenuItem = new JCheckBoxMenuItem("Clan Trained Technician");
+                    cbMenuItem.setSelected(person.isClanTech());
+                    cbMenuItem.setActionCommand("CLANTECH");
+                    cbMenuItem.addActionListener(this);
+                    if (person.isTech()) {
+                    	menu.add(cbMenuItem);
+                    }
                     popup.add(menu);
                 }
                 if(oneSelected) {
