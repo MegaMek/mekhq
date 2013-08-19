@@ -50,7 +50,6 @@ import megamek.common.Mounted;
 import megamek.common.Tank;
 import megamek.common.XMLStreamParser;
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
