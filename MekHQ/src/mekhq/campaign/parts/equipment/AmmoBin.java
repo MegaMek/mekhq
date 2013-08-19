@@ -37,7 +37,6 @@ import megamek.common.Protomech;
 import megamek.common.TargetRoll;
 import megamek.common.Warship;
 import megamek.common.loaders.EntityLoadingException;
-import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
