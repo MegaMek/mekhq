@@ -115,6 +115,7 @@ v0.3.1 (SVN)
 + WIP RFE [#99]/[#63]: Overview Summary / Statistics page (Hangar Overview Finished)
 + Added unit name to refit confirmation dialog
 + RFE: Clan Trained Technician flag for captured clan techs to ignore the modifier for clan equipment
++ Bug: Commander, Dependent, and Clan Trained Technician flags not saving/loading in XML
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement

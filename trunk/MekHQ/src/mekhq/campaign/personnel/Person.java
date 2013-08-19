@@ -737,6 +737,18 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				+secondaryRole
 				+"</secondaryRole>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<commander>"
+				+MekHqXmlUtil.escape(Boolean.toString(commander))
+				+"</commander>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<dependent>"
+				+MekHqXmlUtil.escape(Boolean.toString(dependent))
+				+"</dependent>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<isClanTech>"
+				+MekHqXmlUtil.escape(Boolean.toString(isClanTech))
+				+"</isClanTech>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<biography>"
 				+MekHqXmlUtil.escape(biography)
 				+"</biography>");
@@ -895,6 +907,21 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 					retVal.name = wn2.getTextContent();
 				} else if(wn2.getNodeName().equalsIgnoreCase("callsign")) {
 					retVal.callsign = wn2.getTextContent();
+				} else if (wn2.getNodeName().equalsIgnoreCase("commander")) {
+					if (wn2.getTextContent().equalsIgnoreCase("true"))
+						retVal.commander = true;
+					else
+						retVal.commander = false;
+				} else if (wn2.getNodeName().equalsIgnoreCase("dependent")) {
+					if (wn2.getTextContent().equalsIgnoreCase("true"))
+						retVal.dependent = true;
+					else
+						retVal.dependent = false;
+				} else if (wn2.getNodeName().equalsIgnoreCase("isClanTech")) {
+					if (wn2.getTextContent().equalsIgnoreCase("true"))
+						retVal.isClanTech = true;
+					else
+						retVal.isClanTech = false;
 				} else if (wn2.getNodeName().equalsIgnoreCase("biography")) {
 					retVal.biography = wn2.getTextContent();
 				} else if (wn2.getNodeName().equalsIgnoreCase("primaryRole")) {
