@@ -1382,7 +1382,7 @@ public class Campaign implements Serializable {
 		report = report + ",  needs " + target.getValueAsString() + " and rolls " + roll + ":";
 		int xpGained = 0;
 		if(roll >= target.getValue()) {
-			report = report + partWork.succeed();	
+			report = report + partWork.succeed();
 			if(roll == 12 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
 				xpGained += getCampaignOptions().getSuccessXP();
 			}
