@@ -2912,8 +2912,8 @@ public class Campaign implements Serializable {
 	}
 	
 	private static void processCustom(Campaign retVal, Node wn) {
-		String sCustomsDir = "data/mechfiles/customs/";
-		String sCustomsDirCampaign = sCustomsDir+name+"/";
+		String sCustomsDir = "data"+File.separator+"mechfiles"+File.separator+"customs";
+		String sCustomsDirCampaign = sCustomsDir+File.separator+name;
 	    File customsDir = new File(sCustomsDir);
 	    if(!customsDir.exists()) {
 	    	customsDir.mkdir();
