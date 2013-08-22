@@ -996,8 +996,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	    UnitUtil.reIndexCrits(newEntity);
 	
 		String fileName = MhqFileUtil.escapeReservedCharacters(newEntity.getChassis() + " " + newEntity.getModel());
-	    String sCustomsDir = "data/mechfiles/customs/";
-		String sCustomsDirCampaign = sCustomsDir+oldUnit.campaign.getName()+"/";
+	    String sCustomsDir = "data"+File.separator+"mechfiles"+File.separator+"customs";
+		String sCustomsDirCampaign = sCustomsDir+File.separator+oldUnit.campaign.getName();
 	    File customsDir = new File(sCustomsDir);
 	    if(!customsDir.exists()) {
 	    	customsDir.mkdir();

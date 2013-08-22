@@ -118,6 +118,7 @@ v0.3.1 (SVN)
 + Bug: Commander, Dependent, and Clan Trained Technician flags not saving/loading in XML
 + Bug: Machine Gun Ammo reloads working incorrectly
 + Bug: NPE with new clan trained tech check
++ Bug: Bad hardcoded file separators with custom units created in the MekLab
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
