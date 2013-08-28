@@ -7071,6 +7071,13 @@ public class CampaignGUI extends JPanel {
                         cbMenuItem.setActionCommand("EDGE|edge_when_explosion");
                         cbMenuItem.addActionListener(this);
                         menu.add(cbMenuItem);
+                        cbMenuItem = new JCheckBoxMenuItem("MASC Failures");
+                        if (person.getOptions().booleanOption("edge_when_masc_fails")) {
+                            cbMenuItem.setSelected(true);
+                        }
+                        cbMenuItem.setActionCommand("EDGE|edge_when_masc_fails");
+                        cbMenuItem.addActionListener(this);
+                        menu.add(cbMenuItem);
                         popup.add(menu);
                     }
                 }
