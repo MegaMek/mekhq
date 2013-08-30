@@ -154,12 +154,12 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 				return bestPart;
 			}
 		}
-		//dont just return with the first part if it is damaged
+		// don't just return with the first part if it is damaged
 		for(Part part : campaign.getSpareParts()) {
 			if(part.isReservedForRefit() || part.isBeingWorkedOn() || part.isReservedForReplacement() || !part.isPresent()) {
 				continue;
 			}
-			//TODO: check for being present
+			
 			if(isAcceptableReplacement(part, refit)) {
 				if(null == bestPart) {
 					bestPart = part;

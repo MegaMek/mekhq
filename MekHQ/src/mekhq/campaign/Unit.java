@@ -113,6 +113,7 @@ import mekhq.campaign.parts.MissingProtomekLocation;
 import mekhq.campaign.parts.MissingProtomekSensor;
 import mekhq.campaign.parts.MissingRotor;
 import mekhq.campaign.parts.MissingSpacecraftEngine;
+import mekhq.campaign.parts.MissingThrusters;
 import mekhq.campaign.parts.MissingTurret;
 import mekhq.campaign.parts.MissingVeeSensor;
 import mekhq.campaign.parts.MissingVeeStabiliser;
@@ -129,6 +130,7 @@ import mekhq.campaign.parts.Rotor;
 import mekhq.campaign.parts.SpacecraftEngine;
 import mekhq.campaign.parts.StructuralIntegrity;
 import mekhq.campaign.parts.TankLocation;
+import mekhq.campaign.parts.Thrusters;
 import mekhq.campaign.parts.Turret;
 import mekhq.campaign.parts.TurretLock;
 import mekhq.campaign.parts.VeeSensor;
@@ -211,6 +213,7 @@ public class Unit implements MekHqXmlSerializable {
 	private Person engineer;
 	
 	//for backwards compatability with 0.1.8, but otherwise is no longer used 
+	@SuppressWarnings("unused")
 	private int pilotId = -1;
 	
 	private String history;
@@ -857,7 +860,6 @@ public class Unit implements MekHqXmlSerializable {
 		long partsValue = 0;
 		for(Part part : parts) {
 			partsValue += part.getActualValue() * part.getQuantity();
-			long pv = part.getActualValue() * part.getQuantity();
 		}
 		//TODO: we need to adjust this for equipment that doesn't show up as parts
 		//Spacecraft need: drive unit, computer, and bridge
@@ -900,8 +902,6 @@ public class Unit implements MekHqXmlSerializable {
 		        }
 		        partsValue += driveCost;
 		        
-		        // Attitude Thrusters
-		        partsValue += 10000;
 		        // Docking Collars
 		        partsValue += 100000 * js.getDocks();
 		        // HPG
@@ -1513,6 +1513,8 @@ public class Unit implements MekHqXmlSerializable {
     	Part protoRightArmActuator = null;
     	Part protoLegsActuator = null;
         ArrayList<Part> protoJumpJets = new ArrayList<Part>();
+        Part aeroThrustersLeft = null;
+        Part aeroThrustersRight = null;
     	
     	for(Part part : parts) {
     		if(part instanceof MekGyro || part instanceof MissingMekGyro) {
@@ -1692,8 +1694,13 @@ public class Unit implements MekHqXmlSerializable {
                 protoLegsActuator = part;
             } else if(part instanceof ProtomekJumpJet || part instanceof MissingProtomekJumpJet) {
                 protoJumpJets.add(part);
-            } 
-    		
+            } else if (part instanceof Thrusters || part instanceof MissingThrusters) {
+            	if (((Thrusters) part).isLeftThrusters()) {
+            		aeroThrustersLeft = ((Thrusters) part);
+            	} else {
+            		aeroThrustersRight = ((Thrusters) part);
+            	}
+            }
     	}
     	//now check to see what is null
     	for(int i = 0; i<locations.length; i++) {
@@ -1988,6 +1995,16 @@ public class Unit implements MekHqXmlSerializable {
     			addPart(aHeatSink);
     			partsToAdd.add(aHeatSink);
     			hsinks--;
+    		}
+    		if (aeroThrustersLeft == null) {
+    			aeroThrustersLeft = new Thrusters(0, campaign, true);
+    			addPart(aeroThrustersLeft);
+    			partsToAdd.add(aeroThrustersLeft);
+    		}
+    		if (aeroThrustersRight == null) {
+    			aeroThrustersRight = new Thrusters(0, campaign, false);
+    			addPart(aeroThrustersRight);
+    			partsToAdd.add(aeroThrustersRight);
     		}
      	}
     	if(entity instanceof Tank) {

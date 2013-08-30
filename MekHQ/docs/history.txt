@@ -120,6 +120,7 @@ v0.3.1 (SVN)
 + Bug: NPE with new clan trained tech check
 + Bug: Bad hardcoded file separators with custom units created in the MekLab
 + Bug: Missing MASC Edge check
++ Bug [#378]: Thruster Repair (Missing Thruster Part)
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
