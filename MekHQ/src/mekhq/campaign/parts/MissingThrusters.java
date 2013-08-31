@@ -37,12 +37,11 @@ import org.w3c.dom.NodeList;
  */
 public class MissingThrusters extends MissingPart {
 	
-	private boolean isLeftThrusters = false; 
-
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 2806921577150714477L;
+	private static final long serialVersionUID = -7402791453470647853L;
+	private boolean isLeftThrusters = false;
 
 	public MissingThrusters() {
     	this(0, null);

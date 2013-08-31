@@ -39,12 +39,11 @@ import org.w3c.dom.NodeList;
  */
 public class Thrusters extends Part {
 	
-	private boolean isLeftThrusters = false;
-
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -717866644605314883L;
+	private static final long serialVersionUID = -336290094932539638L;
+	private boolean isLeftThrusters = false;
 
 	public Thrusters() {
     	this(0, null);
