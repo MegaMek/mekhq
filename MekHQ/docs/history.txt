@@ -121,6 +121,7 @@ v0.3.1 (SVN)
 + Bug: Bad hardcoded file separators with custom units created in the MekLab
 + Bug: Missing MASC Edge check
 + Bug [#378]: Thruster Repair (Missing Thruster Part)
++ Bug [383]: Weapons with incorrect multiple weights in Parts Store
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
