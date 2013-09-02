@@ -2920,7 +2920,7 @@ public class Campaign implements Serializable {
 	    }
 	    File customsDirCampaign = new File(sCustomsDirCampaign);
 	    if(!customsDirCampaign.exists()) {
-	    	customsDir.mkdir();
+	    	customsDirCampaign.mkdir();
 	    }
 		
 		NodeList wList = wn.getChildNodes();

@@ -1004,7 +1004,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	    }
 	    File customsDirCampaign = new File(sCustomsDirCampaign);
 	    if(!customsDirCampaign.exists()) {
-	    	customsDir.mkdir();
+	    	customsDirCampaign.mkdir();
 	    }
 	    
 	    try {
