@@ -543,9 +543,9 @@ public class EquipmentPart extends Part {
      * equipment parts whose "uniqueness" depends on more than the item tonnage
      */
     public static boolean hasVariableTonnage(EquipmentType type) {
-    	return type.hasFlag(MiscType.F_TARGCOMP) ||
+    	return (type instanceof MiscType && (type.hasFlag(MiscType.F_TARGCOMP) ||
     			type.hasFlag(MiscType.F_CLUB) ||
-    			type.hasFlag(MiscType.F_TALON);    			
+    			type.hasFlag(MiscType.F_TALON)));    			
     }
     
     public static double getStartingTonnage(EquipmentType type) {

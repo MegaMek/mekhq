@@ -23,6 +23,7 @@ v0.2.1 (SVN)
 + Data [#2]: Sorensons Sabres Campaign Pack 
 + Bug: Removing a person or changing their status does not display their name in the confirmation dialog
 + Bug: Missing MASC Edge check
++ Bug [383]: Weapons with incorrect multiple weights in Parts Store
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method

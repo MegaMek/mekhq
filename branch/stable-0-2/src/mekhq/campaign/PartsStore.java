@@ -35,6 +35,7 @@ import megamek.common.verifier.TestEntity;
 import megamek.common.weapons.BayWeapon;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.infantry.InfantryWeapon;
+import mekhq.MekHQ;
 import mekhq.campaign.parts.AeroHeatSink;
 import mekhq.campaign.parts.AeroSensor;
 import mekhq.campaign.parts.AmmoStorage;
@@ -113,8 +114,7 @@ public class PartsStore implements Serializable {
             //TODO: we are still adding a lot of non-hittable equipment
 			if(et instanceof AmmoType) {
 				parts.add(new AmmoStorage(0, et, ((AmmoType)et).getShots(), c));
-			}
-			else if(et instanceof MiscType && (et.hasFlag(MiscType.F_HEAT_SINK) || et.hasFlag(MiscType.F_DOUBLE_HEAT_SINK))) {
+			} else if(et instanceof MiscType && (et.hasFlag(MiscType.F_HEAT_SINK) || et.hasFlag(MiscType.F_DOUBLE_HEAT_SINK))) {
             	parts.add(new HeatSink(0, et, -1, c));
 			} else if(et instanceof MiscType && et.hasFlag(MiscType.F_JUMP_JET)) {
 				parts.add(new JumpJet(55, et, -1, c));
@@ -122,10 +122,9 @@ public class PartsStore implements Serializable {
 				parts.add(new JumpJet(100, et, -1, c));
 			} else if ((et instanceof MiscType && et.hasFlag(MiscType.F_BA_EQUIPMENT))
 					|| (et instanceof MiscType && et.hasFlag(MiscType.F_TANK_EQUIPMENT) && et.hasFlag(MiscType.F_CHASSIS_MODIFICATION))
-					||et instanceof InfantryWeapon 
+					|| et instanceof InfantryWeapon 
 					|| et instanceof BayWeapon
 					|| et instanceof InfantryAttack) {
-				//TODO: need to also get rid of infantry attacks (like Swarm Mek)
 				continue;
 			} else if(et instanceof MiscType && et.hasFlag(MiscType.F_MASC)) {
 				if(et.hasSubType(MiscType.S_SUPERCHARGER)) {
