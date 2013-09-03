@@ -8375,7 +8375,9 @@ public class CampaignGUI extends JPanel {
                         menuItem.setEnabled(true);
                         popup.add(menuItem);
                         menu = new JMenu("Add Unit");
+                        menu.setEnabled(false);
                         //only add units that have commanders
+                        // Or Gun Emplacements!
                         for(Unit u : getCampaign().getUnits()) {
                             if(null != u.getCommander()) {
                                 Person p = u.getCommander();
@@ -8385,6 +8387,17 @@ public class CampaignGUI extends JPanel {
                                     menuItem.addActionListener(this);
                                     menuItem.setEnabled(!u.isDeployed());
                                     menu.add(menuItem);
+                                    menu.setEnabled(true);
+                                }
+                            }
+                            if(u.getEntity() instanceof GunEmplacement) {
+                                if(u.getForceId() < 1 && u.isPresent()) {
+                                	menuItem = new JMenuItem("AutoTurret, " + u.getName());
+                                    menuItem.setActionCommand("ADD_UNIT|FORCE|"  + u.getId() + "|" + forceIds);
+                                    menuItem.addActionListener(this);
+                                    menuItem.setEnabled(!u.isDeployed());
+                                    menu.add(menuItem);
+                                    menu.setEnabled(true);
                                 }
                             }
                         }
@@ -8400,6 +8413,7 @@ public class CampaignGUI extends JPanel {
                     }
                     if(areAllForcesUndeployed(forces)) {
                         menu = new JMenu("Deploy Force");
+                        menu.setEnabled(false);
                         JMenu missionMenu;
                         for(Mission m : getCampaign().getMissions()) {
                             if(!m.isActive()) {
@@ -8413,6 +8427,7 @@ public class CampaignGUI extends JPanel {
                                     menuItem.addActionListener(this);
                                     menuItem.setEnabled(true);
                                     missionMenu.add(menuItem);
+                                    menu.setEnabled(true);
                                 }
                             }
                             menu.add(missionMenu);
@@ -8623,6 +8638,9 @@ public class CampaignGUI extends JPanel {
 
             if(value instanceof Unit) {
                 String name = "<font color='red'>No Crew</font>";
+                if (((Unit) value).getEntity() instanceof GunEmplacement) {
+                	name = "AutoTurret";
+                }
                 String uname = "";
                 String c3network = "";
                 Unit u = (Unit)value;
