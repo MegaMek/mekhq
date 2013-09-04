@@ -159,6 +159,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JSpinner spnHealWaitingPeriod;
     private JSpinner spnNaturalHealWaitingPeriod;
 
+    private javax.swing.JCheckBox useDamageMargin;
+    private JSpinner spnDamageMargin;
     
     private JRadioButton btnContractEquipment;
     private JRadioButton btnContractPersonnel;
@@ -300,6 +302,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useLoanLimitsBox.setSelected(options.useLoanLimits());
         usePercentageMaintBox.setSelected(options.usePercentageMaint());
 
+        useDamageMargin.setSelected(options.isDestroyByMargin());
+
+        
         sellUnitsBox.setSelected(options.canSellUnits());
         sellPartsBox.setSelected(options.canSellParts());
         
@@ -393,6 +398,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         btnCancel = new javax.swing.JButton();
         textRanks = new javax.swing.JTextArea();
         scrRanks = new javax.swing.JScrollPane();
+
+        useDamageMargin = new javax.swing.JCheckBox();
 
         chkSupportStaffOnly = new JCheckBox();
         
@@ -570,11 +577,49 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubRepair.add(useQuirksBox, gridBagConstraints);
 
+        useDamageMargin.setText(resourceMap.getString("useDamageMargin.text")); // NOI18N
+        useDamageMargin.setToolTipText(resourceMap.getString("useDamageMargin.toolTipText")); // NOI18N   
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubRepair.add(useDamageMargin, gridBagConstraints);
+      
+        useDamageMargin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                if(useDamageMargin.isSelected()) {
+                    spnDamageMargin.setEnabled(true);
+                } else {
+                    spnDamageMargin.setEnabled(false);
+                }
+            }
+        });
+        
+        spnDamageMargin = new JSpinner(new SpinnerNumberModel(options.getDestroyMargin(), 1, 20, 1));
+        ((JSpinner.DefaultEditor)spnDamageMargin.getEditor()).getTextField().setEditable(false);
+        spnDamageMargin.setEnabled(options.isDestroyByMargin());
+        
+        JPanel pnlDamageMargin = new JPanel();
+        pnlDamageMargin.add(new JLabel("Margin:"));      
+        pnlDamageMargin.add(spnDamageMargin);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubRepair.add(pnlDamageMargin, gridBagConstraints);
+        
         spnAcquireWaitingPeriod = new JSpinner(new SpinnerNumberModel(options.getWaitingPeriod(), 1, 365, 1));
         ((JSpinner.DefaultEditor)spnAcquireWaitingPeriod.getEditor()).getTextField().setEditable(false);
       
@@ -2249,6 +2294,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setDragoonsRatingMethod(CampaignOptions.DragoonsRatingMethod.getDragoonsRatingMethod((String)dragoonsRatingMethodCombo.getSelectedItem()));
 	    options.setFactionForNames(useFactionForNamesBox.isSelected());
 	    options.setTactics(useTacticsBox.isSelected());
+	    options.setDestroyByMargin(useDamageMargin.isSelected());
+	    options.setDestroyMargin((Integer)spnDamageMargin.getModel().getValue());
 	    if(useTacticsBox.isSelected()) {
 	    	campaign.getGameOptions().getOption("command_init").setValue(true);
 	    } else {

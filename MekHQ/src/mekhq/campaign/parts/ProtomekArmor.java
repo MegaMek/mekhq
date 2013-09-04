@@ -122,7 +122,9 @@ public class ProtomekArmor extends Part implements IAcquisitionWork {
         toReturn += getDetails() + "<br/>";
         if(getAmountAvailable() > 0) {
             toReturn += "" + getTimeLeft() + " minutes" + scheduled;
-            toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
+            if(!getCampaign().getCampaignOptions().isDestroyByMargin()) {
+                toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
+            }
             toReturn += " " + bonus;
         }
         if (getMode() != Modes.MODE_NORMAL) {

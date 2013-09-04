@@ -125,6 +125,7 @@ v0.3.1 (SVN)
 + Bug: NPE (Again) when trying to save to a campaign named folder if the folder doesn't exist
 + Bug [#384]: Gun Emplacements cannot be added to TO&E
 + Modified TO&E Menus to disable submenus with no items in them
++ unofficial option to destroy/damage parts by the margin of failure rather than by skill level of tech
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement

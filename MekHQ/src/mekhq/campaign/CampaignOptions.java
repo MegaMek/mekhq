@@ -137,6 +137,10 @@ public class CampaignOptions implements Serializable {
     private int targetIdleXP;
     private int monthsIdleXP;
 
+    //repair related
+    private boolean destroyByMargin;
+    private int destroyMargin;
+    
     //Dragoon's Rating
     private DragoonsRatingMethod dragoonsRatingMethod;
     
@@ -213,6 +217,8 @@ public class CampaignOptions implements Serializable {
         isAcquisitionPenalty = 0;
         healWaitingPeriod = 1;
         naturalHealingWaitingPeriod = 15;
+        destroyByMargin = true;
+        destroyMargin = 4;
         
     }
 
@@ -779,6 +785,22 @@ public class CampaignOptions implements Serializable {
         naturalHealingWaitingPeriod = d;
     }
     
+    public boolean isDestroyByMargin() {
+        return destroyByMargin;
+    }
+    
+    public void setDestroyByMargin(boolean b) {
+        destroyByMargin = b;
+    }
+    
+    public int getDestroyMargin() {
+        return destroyMargin;
+    }
+    
+    public void setDestroyMargin(int d) {
+        destroyMargin = d;
+    }
+    
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "clanPriceModifier", clanPriceModifier); //private double clanPriceModifier;
@@ -845,7 +867,9 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForRecruitment", payForRecruitment);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "healWaitingPeriod", healWaitingPeriod);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "naturalHealingWaitingPeriod", naturalHealingWaitingPeriod);
-        
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "destroyByMargin", destroyByMargin);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "destroyMargin", destroyMargin);
+
 
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<usePortraitForType>"
@@ -1111,7 +1135,14 @@ public class CampaignOptions implements Serializable {
 					else
 						retVal.usePortraitForType[i] = false;
 				}
-			} 
+			} else if (wn2.getNodeName().equalsIgnoreCase("destroyByMargin")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true"))
+                    retVal.destroyByMargin = true;
+                else
+                    retVal.destroyByMargin = false;
+            } else if (wn2.getNodeName().equalsIgnoreCase("destroyMargin")) {
+                retVal.destroyMargin = Integer.parseInt(wn2.getTextContent().trim());
+            } 
 		}
 
 		MekHQ.logMessage("Load Campaign Options Complete!", 4);
