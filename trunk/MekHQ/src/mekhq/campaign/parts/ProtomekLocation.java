@@ -571,17 +571,23 @@ public class ProtomekLocation extends Part {
             toReturn += "<b>Seal " + getName() + "</b><br/>";
         }
         toReturn += getDetails() + "<br/>";
-        toReturn += "" + getTimeLeft() + " minutes" + scheduled;
-        if(isBlownOff()) {
-            String bonus = getAllMods().getValueAsString();
-            if (getAllMods().getValue() > -1) {
-                bonus = "+" + bonus;
-            }
-            bonus = "(" + bonus + ")";
-            toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
-            toReturn += " " + bonus;
-            if (getMode() != Modes.MODE_NORMAL) {
-                toReturn += "<br/><i>" + getCurrentModeName() + "</i>";
+        if(getSkillMin() > SkillType.EXP_ELITE) {
+            toReturn += "<font color='red'>Impossible</font>";
+        } else {
+            toReturn += "" + getTimeLeft() + " minutes" + scheduled;
+            if(isBlownOff()) {
+                String bonus = getAllMods().getValueAsString();
+                if (getAllMods().getValue() > -1) {
+                    bonus = "+" + bonus;
+                }
+                bonus = "(" + bonus + ")";
+                if(!getCampaign().getCampaignOptions().isDestroyByMargin()) {
+                    toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
+                }
+                toReturn += " " + bonus;
+                if (getMode() != Modes.MODE_NORMAL) {
+                    toReturn += "<br/><i>" + getCurrentModeName() + "</i>";
+                }
             }
         }
         toReturn += "</font></html>";

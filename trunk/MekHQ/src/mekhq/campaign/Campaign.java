@@ -1395,7 +1395,18 @@ public class Campaign implements Serializable {
 			}
 		} else {
 			int modePenalty = Modes.getModeExperienceReduction(partWork.getMode());
-			report = report + partWork.fail(tech.getSkillForWorkingOn(partWork).getExperienceLevel()-modePenalty);
+			int effectiveSkillLvl = tech.getSkillForWorkingOn(partWork).getExperienceLevel()-modePenalty;
+			if(getCampaignOptions().isDestroyByMargin()) {
+                if(getCampaignOptions().getDestroyMargin() > (target.getValue() - roll)) {
+                    //not destroyed - set the effective level as low as possible
+                    effectiveSkillLvl = SkillType.EXP_ULTRA_GREEN;
+                } else {
+                    //destroyed - set the effective level to elite
+                    effectiveSkillLvl = SkillType.EXP_ELITE;
+                }
+            }
+			report = report + partWork.fail(effectiveSkillLvl);
+			
 			if(roll == 2 && target.getValue() != TargetRoll.AUTOMATIC_FAIL) {
 				xpGained += getCampaignOptions().getMistakeXP();
 			}
@@ -3926,8 +3937,11 @@ public class Campaign implements Serializable {
         if(null == skill) {
         	return new TargetRoll(TargetRoll.IMPOSSIBLE, "Assigned tech does not have the right skills");
         }
-        if(partWork.getSkillMin() > (skill.getExperienceLevel()-modePenalty)) {
+        if(!getCampaignOptions().isDestroyByMargin() && partWork.getSkillMin() > (skill.getExperienceLevel()-modePenalty)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is beyond this tech's skill level");
+        }
+        if(partWork.getSkillMin() > SkillType.EXP_ELITE) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is impossible.");
         }
         if(!partWork.needsFixing() && !partWork.isSalvaging()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is not needed.");

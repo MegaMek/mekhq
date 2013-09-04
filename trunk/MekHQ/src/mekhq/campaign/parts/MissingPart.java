@@ -102,13 +102,18 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		//}
 		toReturn += ">";
 		toReturn += "<b>Replace " + getName() + "</b><br/>";
-		toReturn += getDetails() + "<br/>";
-		toReturn += "" + getTimeLeft() + " minutes" + scheduled;
-		toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
-		toReturn += " " + bonus;
-		if (getMode() != Modes.MODE_NORMAL) {
-			toReturn += "<br/><i>" + getCurrentModeName() + "</i>";
-		}
+		if(getSkillMin() > SkillType.EXP_ELITE) {
+            toReturn += "<font color='red'>Impossible</font>";
+        } else {
+            toReturn += "" + getTimeLeft() + " minutes" + scheduled;
+            if(!getCampaign().getCampaignOptions().isDestroyByMargin()) {
+                toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
+            }
+            toReturn += " " + bonus;
+            if (getMode() != Modes.MODE_NORMAL) {
+                toReturn += "<br/><i>" + getCurrentModeName() + "</i>";
+            }
+        }
 		toReturn += "</font></html>";
 		return toReturn;
 	}
