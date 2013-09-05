@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 //import java.io.file.FileAlreadyExistsException;
@@ -642,8 +643,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		}
 	}
 	
-	//public void begin() throws EntityLoadingException, FileAlreadyExistsException {
-	public void begin() throws EntityLoadingException {
+	public void begin() throws EntityLoadingException, IOException {
 	    if(customJob) {
             saveCustomization();
         }
@@ -992,8 +992,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		oldUnit.resetPilotAndEntity();
 	}
 	
-	//public void saveCustomization() throws EntityLoadingException, FileAlreadyExistsException {
-	public void saveCustomization() throws EntityLoadingException {
+	public void saveCustomization() throws EntityLoadingException, IOException {
 		UnitUtil.compactCriticals(newEntity);
 	    UnitUtil.reIndexCrits(newEntity);
 	
@@ -1015,7 +1014,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				String fileOutName = sCustomsDir + File.separator + fileName + ".mtf";
                 String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".mtf";
                 if((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
-                    //throw new FileAlreadyExistsException(fileNameCampaign);
+                    throw new IOException("A file already exists with the custom name "+fileNameCampaign+". Please choose a different name. (Unit name and/or model)");
                 }
 	            FileOutputStream out = new FileOutputStream(fileNameCampaign);
 	            PrintStream p = new PrintStream(out);

@@ -3741,13 +3741,13 @@ public class CampaignGUI extends JPanel {
                     "Could not customize unit",
                     JOptionPane.ERROR_MESSAGE);
             return;
-        } /*catch (FileAlreadyExistsException e) {
+        } catch(IOException e) {
             JOptionPane.showMessageDialog(null,
-                    "A file already exists with the custom name you are trying to use. Please choose a different name. (Unit name and model)",
-                    "File Already Exists",
+                    e.getMessage(),
+                    "IO Exception",
                     JOptionPane.ERROR_MESSAGE);
 			return;
-		}*/
+		}
         getCampaign().refit(r);
         panMekLab.clearUnit();
         refreshReport();
