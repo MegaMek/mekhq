@@ -1,5 +1,7 @@
 VERSION HISTORY
 ----------------------------------
+v0.3.2 (SVN)
+
 v0.3.1 (2013-09-5)
 + Planetary Data Update 36
 + New MegaMekLab.jar
