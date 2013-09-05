@@ -55,7 +55,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
-import java.nio.file.FileAlreadyExistsException;
+//import java.nio.file.FileAlreadyExistsException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -3741,13 +3741,13 @@ public class CampaignGUI extends JPanel {
                     "Could not customize unit",
                     JOptionPane.ERROR_MESSAGE);
             return;
-        } catch (FileAlreadyExistsException e) {
+        } /*catch (FileAlreadyExistsException e) {
             JOptionPane.showMessageDialog(null,
                     "A file already exists with the custom name you are trying to use. Please choose a different name. (Unit name and model)",
                     "File Already Exists",
                     JOptionPane.ERROR_MESSAGE);
 			return;
-		}
+		}*/
         getCampaign().refit(r);
         panMekLab.clearUnit();
         refreshReport();
