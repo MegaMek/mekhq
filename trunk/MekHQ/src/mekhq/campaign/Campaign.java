@@ -5144,7 +5144,6 @@ public class Campaign implements Serializable {
     			countTotal++;
     			if (getCampaignOptions().useAdvancedMedical() && p.getInjuries().size() > 0) {
     				countInjured++;
-    				MekHQ.logMessage(p.getName()+" is returning an arraylist of injuries for the purposes of counting");
     			} else if (p.getHits() > 0) {
     				countInjured++;
     			}
