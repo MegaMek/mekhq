@@ -2579,6 +2579,7 @@ public class CampaignGUI extends JPanel {
                 miLoadForcesActionPerformed(evt);
             }
         });
+        miLoadForces.setEnabled(false);
         menuManage.add(miLoadForces);
 
         addFunds.setText(resourceMap.getString("addFunds.text")); // NOI18N
