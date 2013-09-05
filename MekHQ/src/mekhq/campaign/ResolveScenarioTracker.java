@@ -272,7 +272,7 @@ public class ResolveScenarioTracker {
         		} else {
         			killCredits.put(e.getDisplayName(), "None");
         		}
-        		if(e.isSalvage()) {
+        		if(e.isSalvage() && controlsField) {
         			if(e instanceof Infantry && !(e instanceof BattleArmor)) {
 						continue;
 					}
