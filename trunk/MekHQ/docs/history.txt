@@ -127,6 +127,7 @@ v0.3.1 (SVN)
 + Modified TO&E Menus to disable submenus with no items in them
 + unofficial option to destroy/damage parts by the margin of failure rather than by skill level of tech
 + Bug: NPE when resolving with a Gun Emplacement in your deployed forces
++ Bug: When using advanced medical option injured pilots not hightlighted in red on TO&E
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
