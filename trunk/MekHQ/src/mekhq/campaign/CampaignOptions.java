@@ -217,7 +217,7 @@ public class CampaignOptions implements Serializable {
         isAcquisitionPenalty = 0;
         healWaitingPeriod = 1;
         naturalHealingWaitingPeriod = 15;
-        destroyByMargin = true;
+        destroyByMargin = false;
         destroyMargin = 4;
         
     }
