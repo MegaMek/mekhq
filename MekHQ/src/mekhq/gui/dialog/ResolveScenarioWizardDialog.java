@@ -46,6 +46,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 
 import megamek.common.Entity;
+import megamek.common.GunEmplacement;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.Unit;
@@ -448,7 +449,11 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
         	}
     		for(Unit u : tracker.getUnits()) {	
     			idx++;
-    			assignModel.addElement(u.getCommander().getFullTitle() + ", " + u.getName());
+    			if (u.getEntity() instanceof GunEmplacement) {
+    				assignModel.addElement("AutoTurret, " + u.getName());
+    			} else {
+    				assignModel.addElement(u.getCommander().getFullTitle() + ", " + u.getName());
+    			}
     			if(u.getId().toString().equals(tracker.getKillCredits().get(killName))) {
     				selected = idx;
     			}
