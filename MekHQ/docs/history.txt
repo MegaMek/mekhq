@@ -129,6 +129,7 @@ v0.3.1 (2013-09-5)
 + Bug: NPE when resolving with a Gun Emplacement in your deployed forces
 + Bug: When using advanced medical option injured pilots not hightlighted in red on TO&E
 + Bug: salvage being added even if not in control of field when resolving through megamek
++ Rewrote file exists exception to use IOException instead of Java 7's FileAlreadyExistsException
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
