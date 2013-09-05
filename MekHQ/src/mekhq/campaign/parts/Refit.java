@@ -25,7 +25,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.nio.file.FileAlreadyExistsException;
+//import java.io.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -642,7 +642,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		}
 	}
 	
-	public void begin() throws EntityLoadingException, FileAlreadyExistsException {
+	//public void begin() throws EntityLoadingException, FileAlreadyExistsException {
+	public void begin() throws EntityLoadingException {
 	    if(customJob) {
             saveCustomization();
         }
@@ -991,7 +992,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		oldUnit.resetPilotAndEntity();
 	}
 	
-	public void saveCustomization() throws EntityLoadingException, FileAlreadyExistsException {
+	//public void saveCustomization() throws EntityLoadingException, FileAlreadyExistsException {
+	public void saveCustomization() throws EntityLoadingException {
 		UnitUtil.compactCriticals(newEntity);
 	    UnitUtil.reIndexCrits(newEntity);
 	
@@ -1013,7 +1015,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				String fileOutName = sCustomsDir + File.separator + fileName + ".mtf";
                 String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".mtf";
                 if((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
-                    throw new FileAlreadyExistsException(fileNameCampaign);
+                    //throw new FileAlreadyExistsException(fileNameCampaign);
                 }
 	            FileOutputStream out = new FileOutputStream(fileNameCampaign);
 	            PrintStream p = new PrintStream(out);
@@ -1025,7 +1027,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				String fileOutName = sCustomsDir + File.separator + fileName + ".blk";
                 String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".blk";
                 if((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
-                	throw new FileAlreadyExistsException(fileNameCampaign);
+                	//throw new FileAlreadyExistsException(fileNameCampaign);
                 }
 	            BLKFile.encode(fileNameCampaign, newEntity);
 	        }
