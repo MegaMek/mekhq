@@ -693,4 +693,15 @@ public class Armor extends Part implements IAcquisitionWork {
         }
         return report;
     }
+    
+    public void doMaintenanceDamage(int d) {
+        int current = unit.getEntity().getArmor(location, rear);
+        if(d >= current) {
+            unit.getEntity().setArmor(IArmorState.ARMOR_DESTROYED, location, rear);
+        } else {
+            unit.getEntity().setArmor(current - d, location, rear);
+
+       }
+       updateConditionFromEntity();
+    }
 }

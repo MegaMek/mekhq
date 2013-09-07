@@ -35,6 +35,7 @@ import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
 import megamek.common.Bay;
 import megamek.common.CargoBay;
+import megamek.common.Compute;
 import megamek.common.ConvFighter;
 import megamek.common.Crew;
 import megamek.common.CriticalSlot;
@@ -42,6 +43,7 @@ import megamek.common.Dropship;
 import megamek.common.Engine;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
+import megamek.common.EntityWeightClass;
 import megamek.common.EquipmentType;
 import megamek.common.HeavyVehicleBay;
 import megamek.common.IArmorState;
@@ -59,6 +61,7 @@ import megamek.common.QuadMech;
 import megamek.common.SmallCraft;
 import megamek.common.SmallCraftBay;
 import megamek.common.SpaceStation;
+import megamek.common.SupportTank;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
@@ -146,6 +149,7 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingHeatSink;
 import mekhq.campaign.parts.equipment.MissingJumpJet;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 
@@ -173,19 +177,11 @@ public class Unit implements MekHqXmlSerializable {
 	public static final int STATE_HEAVY_DAMAGE = 2;
 	public static final int STATE_CRIPPLED = 3;
 
-	public static final int QUALITY_A = 0;
-	public static final int QUALITY_B = 1;
-	public static final int QUALITY_C = 2;
-	public static final int QUALITY_D = 3;
-	public static final int QUALITY_E = 4;
-	public static final int QUALITY_F = 5;
-
 	protected Entity entity;
 	private int site;
 	private boolean salvaged;
 	private UUID id;
 	private int oldId;
-	private int quality;
 	
 	//assignments
 	private int forceId;
@@ -195,13 +191,17 @@ public class Unit implements MekHqXmlSerializable {
 	private ArrayList<UUID> gunners;
 	private ArrayList<UUID> vesselCrew;
 	private UUID navigator;
+	private UUID tech;
+	
+	private int daysSinceMaintenance;
+	private int daysActivelyMaintained;
+	private int astechDaysMaintained;
 	
 	//old ids for reverse compatability
 	private ArrayList<Integer> oldDrivers;
 	private ArrayList<Integer> oldGunners;
 	private ArrayList<Integer> oldVesselCrew;
 	private Integer oldNavigator;
-	
 	
 	public Campaign campaign;
 
@@ -230,12 +230,12 @@ public class Unit implements MekHqXmlSerializable {
 		this.site = SITE_BAY;
 		this.salvaged = false;
 		this.campaign = c;
-		this.quality = QUALITY_D;
 		this.parts = new ArrayList<Part>();
 		this.drivers = new ArrayList<UUID>();
 		this.gunners = new ArrayList<UUID>();  
 		this.vesselCrew = new ArrayList<UUID>();    
 		this.navigator = null;
+		this.tech = null;
 		this.oldDrivers = new ArrayList<Integer>();
 		this.oldGunners = new ArrayList<Integer>();  
 		this.oldVesselCrew = new ArrayList<Integer>();    
@@ -244,6 +244,9 @@ public class Unit implements MekHqXmlSerializable {
 		this.refit = null;
 		this.engineer = null;
 		this.history = "";
+		this.daysSinceMaintenance = 0;
+		this.daysActivelyMaintained = 0;
+		this.astechDaysMaintained = 0;
 		reCalc();
 	}
 	
@@ -260,29 +263,6 @@ public class Unit implements MekHqXmlSerializable {
 		default:
 			return "Unknown";
 		}
-	}
-	
-	public static String getQualityName(int quality) {
-		switch(quality) {
-		case QUALITY_A:
-			return "A";
-		case QUALITY_B:
-			return "B";
-		case QUALITY_C:
-			return "C";
-		case QUALITY_D:
-			return "D";
-		case QUALITY_E:
-			return "E";
-		case QUALITY_F:
-			return "F";
-		default:
-			return "?";
-		}
-	}
-	
-	public String getQualityName() {
-		return getQualityName(getQuality());
 	}
 	
 	public String getStatus() {
@@ -335,14 +315,6 @@ public class Unit implements MekHqXmlSerializable {
 		this.site = i;
 	}
 
-	public int getQuality() {
-		return quality;
-	}
-	
-	public void setQuality(int q) {
-		this.quality = q;
-	}
-	
 	public boolean isSalvage() {
 		return salvaged;
 	}
@@ -1204,8 +1176,6 @@ public class Unit implements MekHqXmlSerializable {
 				+ "\" type=\"" + this.getClass().getName() + "\">");
 
 		pw1.println(MekHqXmlUtil.writeEntityToXmlString(entity, indentLvl+1, campaign.getEntities()));
-		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<quality>"
-				+ quality + "</quality>");
 		for(UUID did : drivers) {
 			pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<driverId>"
 					+ did.toString() + "</driverId>");
@@ -1224,6 +1194,12 @@ public class Unit implements MekHqXmlSerializable {
 					+navigator.toString()
 					+"</navigatorId>");
 		}
+		if(null != tech) {
+            pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
+                    +"<techId>"
+                    +tech.toString()
+                    +"</techId>");
+        }
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<salvaged>"
 				+ salvaged + "</salvaged>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<site>" + site
@@ -1240,6 +1216,18 @@ public class Unit implements MekHqXmlSerializable {
 				+"<daysToArrival>"
 				+daysToArrival
 				+"</daysToArrival>");
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
+                +"<daysSinceMaintenance>"
+                +daysSinceMaintenance
+                +"</daysSinceMaintenance>");
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
+                +"<daysActivelyMaintained>"
+                +daysActivelyMaintained
+                +"</daysActivelyMaintained>");
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
+                +"<astechDaysMaintained>"
+                +astechDaysMaintained
+                +"</astechDaysMaintained>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
                 +"<history>"
                 +MekHqXmlUtil.escape(history)
@@ -1267,14 +1255,18 @@ public class Unit implements MekHqXmlSerializable {
 			for (int x=0; x<nl.getLength(); x++) {
 				Node wn2 = nl.item(x);
 				
-				if (wn2.getNodeName().equalsIgnoreCase("quality")) {
-					retVal.quality = Integer.parseInt(wn2.getTextContent());
-				} else if (wn2.getNodeName().equalsIgnoreCase("site")) {
+				if (wn2.getNodeName().equalsIgnoreCase("site")) {
 					retVal.site = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("pilotId")) {
 					retVal.pilotId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("daysToArrival")) {
                     retVal.daysToArrival = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("daysActivelyMaintained")) {
+                    retVal.daysActivelyMaintained = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("daysSinceMaintenance")) {
+                    retVal.daysSinceMaintenance = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("astechDaysMaintained")) {
+                    retVal.astechDaysMaintained = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("driverId")) {
 					if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
 						retVal.oldDrivers.add(Integer.parseInt(wn2.getTextContent()));
@@ -1301,7 +1293,13 @@ public class Unit implements MekHqXmlSerializable {
 							retVal.navigator = UUID.fromString(wn2.getTextContent());
 						}
 					}
-				} else if (wn2.getNodeName().equalsIgnoreCase("forceId")) {
+				} 
+				else if (wn2.getNodeName().equalsIgnoreCase("techId")) {
+				    if(!wn2.getTextContent().equals("null")) {
+				        retVal.tech = UUID.fromString(wn2.getTextContent());
+				    }
+                } 
+				else if (wn2.getNodeName().equalsIgnoreCase("forceId")) {
 					retVal.forceId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
 					retVal.scenarioId = Integer.parseInt(wn2.getTextContent());
@@ -1768,6 +1766,10 @@ public class Unit implements MekHqXmlSerializable {
     		}
     	}
     	for(Mounted m : entity.getEquipment()) {
+    	    if(m.getLocation() == Entity.LOC_NONE) {
+                //FIXME: is this ok? - are there any valid parts in LOC_NONE?
+                continue;
+            }
     		if(m.getType().isHittable()) {
     			if(m.getType() instanceof AmmoType) {
     				int eqnum = entity.getEquipmentNum(m);
@@ -2450,6 +2452,10 @@ public class Unit implements MekHqXmlSerializable {
     	return entity instanceof Jumpship && !(entity instanceof SpaceStation) && navigator == null;
     }
     
+    public boolean canTakeTech() {
+        return tech == null && !(entity instanceof Jumpship) && !(entity instanceof SmallCraft);
+    }
+    
     public boolean canTakeMoreGunners() {
     	int nGunners = gunners.size();
     	return nGunners < getTotalGunnerNeeds();
@@ -2519,6 +2525,12 @@ public class Unit implements MekHqXmlSerializable {
 		p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
     }
     
+    public void setTech(Person p) {
+        tech = p.getId();
+        p.setUnitId(getId());
+        p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
+    }
+    
     public void addPilotOrSoldier(Person p) {
     	drivers.add(p.getId());
     	gunners.add(p.getId());
@@ -2534,6 +2546,9 @@ public class Unit implements MekHqXmlSerializable {
     	vesselCrew.remove(p.getId());
     	if(p.getId().equals(navigator)) {
     		navigator = null;
+    	}
+    	if(p.getId().equals(tech)) {
+    	    tech = null;
     	}
     	resetPilotAndEntity();
     	if(log) {
@@ -2590,6 +2605,13 @@ public class Unit implements MekHqXmlSerializable {
     		}
     	}
     	return crew;
+    }
+    
+    public Person getTech() {
+        if(null != tech) {
+            return campaign.getPerson(tech);
+        }
+        return null;
     }
     
     public ArrayList<Person> getActiveCrew() {
@@ -2680,6 +2702,10 @@ public class Unit implements MekHqXmlSerializable {
     	return engineer;
     }
     
+    public UUID getTechId() {
+        return tech;
+    }
+    
     public int getOldId() {
     	return oldId;
     }
@@ -2756,5 +2782,132 @@ public class Unit implements MekHqXmlSerializable {
     
     public boolean isPresent() {
         return daysToArrival == 0;
+    }
+    
+    public int getMaintenanceTime() {     
+        if(getEntity() instanceof Mech) {
+            switch(getEntity().getWeightClass()) {
+            case EntityWeightClass.WEIGHT_ULTRA_LIGHT:
+                return 30;
+            case EntityWeightClass.WEIGHT_LIGHT:
+                return 45;
+            case EntityWeightClass.WEIGHT_MEDIUM:
+                return 60;
+            case EntityWeightClass.WEIGHT_HEAVY:
+                return 75;
+            case EntityWeightClass.WEIGHT_ASSAULT:
+            default:
+                return  90;
+            }
+        }
+        if(getEntity() instanceof Protomech) {
+            return 20;
+        }
+        if(getEntity() instanceof BattleArmor) {
+            return 10;
+        }
+        if(getEntity() instanceof ConvFighter) {
+            return 45;
+        }
+        if(getEntity() instanceof Aero 
+                && !(getEntity() instanceof SmallCraft)
+                && !(getEntity() instanceof Jumpship)) {
+            switch(getEntity().getWeightClass()) {
+            
+            }
+        }
+        if(getEntity() instanceof SupportTank) {
+            switch(getEntity().getWeightClass()) {
+            case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
+                return 20;
+            case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
+                return 35;
+            case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
+            default:
+                return  100;
+            }
+        }
+        if(getEntity() instanceof Tank) {
+            switch(getEntity().getWeightClass()) {
+            case EntityWeightClass.WEIGHT_LIGHT:
+                return 30;
+            case EntityWeightClass.WEIGHT_MEDIUM:
+                return 50;
+            case EntityWeightClass.WEIGHT_HEAVY:
+                return 75;
+            case EntityWeightClass.WEIGHT_ASSAULT:
+                return 90;
+            case EntityWeightClass.WEIGHT_SUPER_HEAVY:
+            default:
+                return  120;
+            }
+        }       
+        //the rest get support from crews, so zero
+        return 0;
+    }
+    
+    public void incrementDaysSinceMaintenance(boolean maintained, int astechs) {
+        daysSinceMaintenance++;
+        astechDaysMaintained += astechs;
+        if(maintained) {
+            daysActivelyMaintained++;
+        }
+    }
+    
+    public void resetDaysSinceMaintenance() {
+        daysSinceMaintenance = 0;
+        daysActivelyMaintained = 0;
+        astechDaysMaintained = 0;
+    }
+    
+    public int getDaysSinceMaintenance() {
+        return daysSinceMaintenance;
+    }
+    
+    //there are no official rules about partial maintenance
+    //lets say less than half is +2
+    //more than half is +1 penalty
+    //also we will take the average rounded down of the number of astechs to figure out 
+    //shorthanded penalty
+    public double getMaintainedPct() {
+        return (daysActivelyMaintained/(double)daysSinceMaintenance);
+    }
+    
+    public boolean isFullyMaintained() {
+        return daysActivelyMaintained == daysSinceMaintenance;
+    }
+    
+    public int getAstechsMaintained() {
+        return (int)Math.floor((1.0 * astechDaysMaintained) / daysSinceMaintenance);
+    }
+    
+    public int getQuality() {
+        int nParts = 0;
+        int sumQuality = 0;
+        for(Part p : getParts()) {
+            //no rules about this but lets assume missing parts are quality A
+            if(p instanceof MissingPart) {
+                nParts++;
+            }
+            else if(p.needsMaintenance()) {
+                nParts++;
+                sumQuality += p.getQuality();
+            }
+        }
+        if(nParts == 0) {
+            return Part.QUALITY_D;
+        }
+        return (int)Math.round((1.0 * sumQuality)/nParts);
+    }
+    
+    public String getQualityName() {
+        return Part.getQualityName(getQuality());
+    }
+    
+    public boolean requiresMaintenance() {
+        if(isDeployed() || !isPresent()) {
+            return false;
+        }
+        return true;
     }
 }

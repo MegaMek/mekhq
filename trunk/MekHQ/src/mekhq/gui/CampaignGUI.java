@@ -3273,6 +3273,9 @@ public class CampaignGUI extends JPanel {
             refreshReport();
             return;
         }
+        if(nagShortMaintenance()) {
+            return;
+        }
         getCampaign().newDay();
         refreshServicedUnitList();
         refreshUnitList();
@@ -3294,6 +3297,41 @@ public class CampaignGUI extends JPanel {
         panMap.repaint();
     }// GEN-LAST:event_btnAdvanceDayActionPerformed
 
+    private boolean nagShortMaintenance() {
+        if(!getCampaign().getCampaignOptions().checkMaintenance()) {
+            return false;
+        }
+        Vector<Unit> notMaintained = new Vector<Unit>();
+        int totalAstechMinutesNeeded = 0;
+        for(Unit u : getCampaign().getUnits()) {
+            if(u.requiresMaintenance() && null == u.getTechId()) {
+                notMaintained.add(u);
+            } else {
+                totalAstechMinutesNeeded += (u.getMaintenanceTime() * 6);
+            }
+        }
+        
+        if(notMaintained.size() > 0) {
+            if(0 != JOptionPane.showConfirmDialog(null,
+                    "You have unmaintained units. Do you really wish to advance the day?", 
+                    "Unmaintained Units",
+                    JOptionPane.YES_NO_OPTION)) {
+                return true;
+            }
+        }
+        
+        if(getCampaign().getAstechPoolMinutes() < totalAstechMinutesNeeded) {
+            if(0 != JOptionPane.showConfirmDialog(null,
+                    "You do not have enough astechs to provide for full maintenance. Do you wish to proceed?", 
+                    "Astech shortage",
+                    JOptionPane.YES_NO_OPTION)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
     private void btnAssignDocActionPerformed(java.awt.event.ActionEvent evt) {
         Person doctor = getSelectedDoctor();
         for(Person p : getSelectedUnassignedPatients()) {
@@ -6668,6 +6706,7 @@ public class CampaignGUI extends JPanel {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUALITY), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH_CRW), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DEPLOY), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_BV), false);
@@ -6685,6 +6724,7 @@ public class CampaignGUI extends JPanel {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUALITY), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH_CRW), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DEPLOY), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_BV), true);
@@ -6702,6 +6742,7 @@ public class CampaignGUI extends JPanel {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUALITY), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH_CRW), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DEPLOY), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_BV), false);
@@ -8998,6 +9039,22 @@ public class CampaignGUI extends JPanel {
                 refreshOrganization();
                 refreshCargo();
                 refreshOverview();
+            } else if (command.contains("ADD_TECH")) {
+                UUID selected = UUID.fromString(st.nextToken());
+                Unit u = getCampaign().getUnit(selected);
+                if(null != u) {
+                    if(u.canTakeTech()) {
+                        u.setTech(selectedPerson);
+                    }
+                }
+                u.resetPilotAndEntity();
+                u.runDiagnostic();
+                refreshServicedUnitList();
+                refreshUnitList();
+                refreshPersonnelList();
+                refreshOrganization();
+                refreshCargo();
+                refreshOverview();
             } else if (command.contains("IMPROVE")) {
                 String type = st.nextToken();
                 int cost =  Integer.parseInt(st.nextToken());
@@ -9517,6 +9574,7 @@ public class CampaignGUI extends JPanel {
                         JMenu driverMenu = new JMenu("As Driver");
                         JMenu gunnerMenu = new JMenu("As Gunner");
                         JMenu soldierMenu = new JMenu("As Soldier");
+                        JMenu techMenu = new JMenu("As Tech");
                         JMenu navMenu = new JMenu("As Navigator");
                         cbMenuItem = new JCheckBoxMenuItem("None");
                         /*if(!person.isAssigned()) {
@@ -9580,6 +9638,13 @@ public class CampaignGUI extends JPanel {
                                     navMenu.add(cbMenuItem);
                                 }
                             }
+                            if(unit.canTakeTech() && person.canTech(unit.getEntity())) {
+                                cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                                //TODO: check the box
+                                cbMenuItem.setActionCommand("ADD_TECH|" + unit.getId());
+                                cbMenuItem.addActionListener(this);
+                                techMenu.add(cbMenuItem);
+                            }
                         }
                         if(pilotMenu.getItemCount() > 0) {
                             menu.add(pilotMenu);
@@ -9615,6 +9680,12 @@ public class CampaignGUI extends JPanel {
                             menu.add(soldierMenu);
                             if(soldierMenu.getItemCount() > 20) {
                                 MenuScroller.setScrollerFor(soldierMenu, 20);
+                            }
+                        }
+                        if(techMenu.getItemCount() > 0) {
+                            menu.add(techMenu);
+                            if(techMenu.getItemCount() > 20) {
+                                MenuScroller.setScrollerFor(techMenu, 20);
                             }
                         }
                         menu.setEnabled(!person.isDeployed(getCampaign()));
@@ -12440,12 +12511,13 @@ public class CampaignGUI extends JPanel {
         private final static int COL_STATUS   =   8;
         private final static int COL_PILOT    =   9;
         private final static int COL_CREW     =   10;
-        private final static int COL_DEPLOY   =   11;
-        private final static int COL_BV        =  12;
-        private final static int COL_REPAIR  =    13;
-        private final static int COL_PARTS    =   14;
-        private final static int COL_QUIRKS   =   15;
-        private final static int N_COL =          16;
+        private final static int COL_TECH_CRW =   11;
+        private final static int COL_DEPLOY   =   12;
+        private final static int COL_BV        =  13;
+        private final static int COL_REPAIR  =    14;
+        private final static int COL_PARTS    =   15;
+        private final static int COL_QUIRKS   =   16;
+        private final static int N_COL =          17;
 
         private ArrayList<Unit> data = new ArrayList<Unit>();
 
@@ -12478,6 +12550,8 @@ public class CampaignGUI extends JPanel {
                     return "Status";
                 case COL_PILOT:
                     return "Assigned to";
+                case COL_TECH_CRW:
+                    return "Tech";
                 case COL_CREW:
                     return "Crew";
                 case COL_BV:
@@ -12508,6 +12582,7 @@ public class CampaignGUI extends JPanel {
             case COL_PILOT:
             case COL_TECH:
             case COL_NAME:
+            case COL_TECH_CRW:
                 return 150;
             default:
                 return 20;
@@ -12610,6 +12685,13 @@ public class CampaignGUI extends JPanel {
             }
             if(col == COL_STATUS) {
                 return u.getStatus();
+            }
+            if(col == COL_TECH_CRW) {
+                if(null != u.getTech()) {
+                    return u.getTech().getFullTitle();
+                } else {
+                    return "-";
+                }
             }
             if(col == COL_PILOT) {
                 if(!u.isPresent()) {

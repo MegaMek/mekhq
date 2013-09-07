@@ -38,6 +38,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.ResourceBundle;
@@ -1428,13 +1429,6 @@ public class Campaign implements Serializable {
 		addReport("<p/><b>" + getDateAsString() + "</b>");
 
 		location.newDay(this);
-		
-		// Moved for bug #373: Warship (dropships? jumpships?) can have scheduled tasks worked on twice per day
-		for(Unit u : getUnits()) { 
-			if(null != u.getEngineer()) {
-				u.getEngineer().resetMinutesLeft();
-			}
-		}
 	
 		for (Person p : getPersonnel()) {
 			if(!p.isActive()) {
@@ -1494,6 +1488,23 @@ public class Campaign implements Serializable {
 		}
 		resetAstechMinutes();
 		
+		shoppingList.newDay(this);
+        
+        for(Unit u : getUnits()) {
+            if(null != u.getEngineer()) {
+                u.getEngineer().resetMinutesLeft();
+            }
+            if(u.isRefitting()) {
+                refit(u.getRefit());
+            }
+            else if(u.isPresent()) {
+                //do maintenance checks
+                doMaintenance(u);   
+            } else {
+                u.checkArrival();
+            }
+        }
+		
 		//need to check for assigned tasks in two steps to avoid
 		//concurrent mod problems
 		ArrayList<Integer> assignedPartIds = new ArrayList<Integer>();
@@ -1535,16 +1546,7 @@ public class Campaign implements Serializable {
 			}
 		}
 		
-		shoppingList.newDay(this);
 		
-		for(Unit u : getUnits()) {
-			if(u.isRefitting()) {
-				refit(u.getRefit());
-			}
-			if(!u.isPresent()) {
-			    u.checkArrival();
-			}
-		}
 		
 		DecimalFormat formatter = new DecimalFormat();
 		//check for a new year
@@ -1670,6 +1672,11 @@ public class Campaign implements Serializable {
 		// remove any personnel from this unit
 		for(Person p : unit.getCrew()) {
 			unit.remove(p, true);
+		}
+		
+		Person tech = unit.getTech();
+		if(null != tech) {
+		    unit.remove(tech, true);
 		}
 
 		//remove unit from any forces
@@ -2492,17 +2499,27 @@ public class Campaign implements Serializable {
 			Unit u = retVal.getUnit(prt.getUnitId());
 			prt.setUnit(u);
 			if(null != u) {
+			    //get rid of any equipmentparts without locations or mounteds
+                if(prt instanceof EquipmentPart) {
+                    Mounted m = u.getEntity().getEquipment(((EquipmentPart)prt).getEquipmentNum());
+                    if(null == m || m.getLocation() == Entity.LOC_NONE) {
+                        removeParts.add(prt);
+                    }
+                }
 			    //if actuators on units have no location (on version 1.23 and earlier) then remove them and let initializeParts (called later) create new ones
-                if(prt instanceof MekActuator && ((MekActuator)prt).getLocation() == Entity.LOC_NONE) {
+                else if(prt instanceof MekActuator && ((MekActuator)prt).getLocation() == Entity.LOC_NONE) {
                     removeParts.add(prt);
-                } else if(prt instanceof MissingMekActuator && ((MissingMekActuator)prt).getLocation() == Entity.LOC_NONE) {
+                } 
+                else if(prt instanceof MissingMekActuator && ((MissingMekActuator)prt).getLocation() == Entity.LOC_NONE) {
                     removeParts.add(prt);
-                } else {
+                } 
+                else {
     				u.addPart(prt);
     				if(prt instanceof AmmoBin) {
     					((AmmoBin)prt).restoreMunitionType();
     				}
                 }			
+                
 			} else if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 16) {
 				prt.setSalvaging(false);
 				//this seems weird but we need to get difficulty and time 
@@ -4016,6 +4033,52 @@ public class Campaign implements Serializable {
         return target;
     }
 	
+	   public TargetRoll getTargetForMaintenance(IPartWork partWork, Person tech) {       
+	       int value = 10;
+	       String skillLevel = "Unmaintained";
+	       if(null != tech) {
+	           Skill skill = tech.getSkillForWorkingOn(partWork);
+	           if(null != skill) {
+	               value = skill.getFinalSkillValue();
+	               skillLevel = SkillType.getExperienceLevelName(skill.getExperienceLevel());
+	           }
+	       }
+	      
+	       TargetRoll target = new TargetRoll(value, skillLevel);
+	       if(target.getValue() == TargetRoll.IMPOSSIBLE) {
+	           return target;
+	       }
+	       
+	       target.append(partWork.getAllModsForMaintenance());
+	       
+	       if(getCampaignOptions().useEraMods()) {
+	           target.addModifier(getFaction().getEraMod(getEra()), "era");
+	       }
+	       
+	       if(null != partWork.getUnit()) {
+    	       //we have no official rules for what happens when a tech is only assigned
+    	       //for part of the maintenance cycle, so we will create our own penalties
+    	       if(partWork.getUnit().getMaintainedPct() < .5) {
+    	           target.addModifier(2, "partial maintenance");
+    	       } else if(partWork.getUnit().getMaintainedPct() < 1) {
+                   target.addModifier(1, "partial maintenance");
+    	       }
+    	        
+    	       //the astech issue is crazy, because you can actually be better off not maintaining
+    	       //than going it short-handed, but that is just the way it is.
+    	       //Still, there is also some fuzziness about what happens if you are short astechs 
+    	       //for part of the cycle. We will keep keep track of the total "astech days" used over
+    	       //the cycle and take the average per day rounding down as our team size
+    	       int helpers = partWork.getUnit().getAstechsMaintained();
+    	       int helpMod = getShorthandedMod(helpers, false);
+    	       if(helpMod > 0) {
+    	           target.addModifier(helpMod, "shorthanded");
+    	       }
+	       }   
+	           
+	       return target;
+	    }
+	
 	public TargetRoll getTargetForAcquisition(IAcquisitionWork acquisition, Person person) {
 	    return getTargetForAcquisition(acquisition, person, true);
 	}
@@ -5249,5 +5312,178 @@ public class Campaign implements Serializable {
         sb.append(String.format("\nYou have "+bondsmen+" %s", bondsmen == 1 ? "bondsman" : "bondsmen"));
 
         return new String(sb);
+    }
+    
+    public void doMaintenance(Unit u) {
+        //skip this if deployed
+        if(!u.requiresMaintenance()) {
+            return;
+        }
+        //lets start by checking times
+        Person tech = null;
+        int minutesUsed = u.getMaintenanceTime();
+        if(null != u.getTechId()) {
+            tech = getPerson(u.getTechId());
+        }
+        int astechsUsed = getAvailableAstechs(minutesUsed, false);
+        boolean maintained = null != tech && tech.getMinutesLeft() > minutesUsed;
+        if(maintained) {
+            //use the time
+            tech.setMinutesLeft(tech.getMinutesLeft() - minutesUsed);
+            astechPoolMinutes -= astechsUsed * minutesUsed;
+        }
+        u.incrementDaysSinceMaintenance(maintained, astechsUsed);
+        if(getCampaignOptions().checkMaintenance() &&
+                u.getDaysSinceMaintenance() >= getCampaignOptions().getMaintenanceCycleDays()) {
+            //its time for a maintenance check
+            int qualityOrig = u.getQuality();
+            String techName = "Nobody";
+            if(null != tech) {
+                techName = tech.getName();
+            }
+            //dont do actual damage until we clear the for loop to avoid concurrent mod problems
+            //put it into a hash - 4 points of damage will mean destruction
+            HashMap<Integer, Integer> partsToDamage = new HashMap<Integer, Integer>();
+            for(Part p : u.getParts()) {
+                String partReport = u.getName() + ": " + techName + " maintaining " + p.getName() + " (Quality " + p.getQualityName() + ")";
+                if(!p.needsMaintenance()) {
+                    continue;
+                }
+                TargetRoll target = getTargetForMaintenance(p, tech);
+                partReport += ", TN " + target.getValue() + "[" + target.getDesc() + "]";
+                int roll= Compute.d6(2);
+                int margin = roll - target.getValue();
+                partReport += " rolled a " + roll + ", margin of " + margin;                 
+                switch(p.getQuality()) {
+                case Part.QUALITY_F:
+                    if(margin < -2) {
+                        p.decreaseQuality();
+                        if(margin < -6) {
+                            partsToDamage.put(p.getId(), 1);
+                        }
+                    }
+                    if(margin >= 6) {
+                        //TODO: award XP point (make this optional)
+                    }
+                    break;
+                case Part.QUALITY_E:
+                    if(margin < -2) {
+                        p.decreaseQuality();
+                        if(margin < -5) {
+                            partsToDamage.put(p.getId(), 1);
+                        }
+                    }
+                    if(margin >= 6) {
+                        p.improveQuality();
+                    }
+                    break;
+                case Part.QUALITY_D:
+                    if(margin < -3) {
+                        p.decreaseQuality();
+                        if(margin < -4) {
+                            partsToDamage.put(p.getId(), 1);
+                        }
+                    }
+                    if(margin >= 5) {
+                        p.improveQuality();
+                    }
+                    break;
+                case Part.QUALITY_C:
+                    if(margin < -6) {
+                        partsToDamage.put(p.getId(), 2);
+                        }
+                    else if(margin < -3) {
+                        partsToDamage.put(p.getId(), 1);
+                    }
+                    if(margin < -4) {
+                        p.decreaseQuality();
+                    }
+                    if(margin >= 5) {
+                        p.improveQuality();
+                    }
+                    break;
+                case Part.QUALITY_B:
+                    if(margin < -6) {
+                        partsToDamage.put(p.getId(), 2);
+                    }
+                    else if(margin < -2) {
+                        partsToDamage.put(p.getId(), 1);
+                    }
+                    if(margin < -5) {
+                        p.decreaseQuality();
+                    }
+                    if(margin >= 4) {
+                        p.improveQuality();
+                    }
+                    break;
+                case Part.QUALITY_A:
+                    if(margin < -6) {
+                        partsToDamage.put(p.getId(), 4);
+                    }
+                    else if(margin < -4) {
+                        partsToDamage.put(p.getId(), 3);
+                    }
+                    else if(margin == -4) {
+                        partsToDamage.put(p.getId(), 2);
+                    }
+                    else if(margin < -1) {
+                        partsToDamage.put(p.getId(), 1);
+                    }
+                    if(margin >= 4) {
+                        p.improveQuality();
+                    }
+                    break;
+                }
+                partReport += ": new quality is " + p.getQualityName();
+                if(null != partsToDamage.get(p.getId())) {
+                    if(partsToDamage.get(p.getId()) > 3) {
+                        partReport += ", part destroyed";
+                    } else {
+                        partReport += ", part damaged";
+                    }
+                }
+                //TODO: make logging an option - or put the latest report into each part
+                MekHQ.logMessage(partReport);
+            }
+            String damageList = "";
+            String destroyList = "";
+            for(int key : partsToDamage.keySet()) {
+                Part p = getPart(key);
+                if(null != p) {
+                    int damage = partsToDamage.get(key);
+                    if(damage > 3) {
+                        destroyList += p.getName() + ", ";
+                        p.remove(false);
+                    } else {
+                        p.doMaintenanceDamage(damage);
+                        damageList += p.getName() + ", ";
+                    }
+                }
+            }
+            damageList = damageList.replaceAll(", $", "");
+            destroyList = destroyList.replaceAll(", $", "");
+
+            u.resetDaysSinceMaintenance();
+            int quality = u.getQuality();
+            String qualityString = "";
+            if(quality > qualityOrig) {
+                qualityString = "<font color='green'>Overall quality improves from " + Part.getQualityName(qualityOrig) + " to " + Part.getQualityName(quality) + "</font>";
+            } else if(quality < qualityOrig) {
+                qualityString = "<font color='red'>Overall quality declines from " + Part.getQualityName(qualityOrig) + " to " + Part.getQualityName(quality) + "</font>";
+            } else {
+                qualityString = "Overall quality remains " + Part.getQualityName(quality);
+            }
+            String damageString = "";
+            if(!damageList.isEmpty()) {
+                damageString += "Damage was suffered to " + damageList + ". ";
+            }
+            if(!destroyList.isEmpty()) {
+                damageString += "The following parts were destroyed: " + destroyList + ".";
+            }
+            if(!damageString.isEmpty()) {
+                 damageString = "<b><font color='red'>" + damageString + "</b></font>";
+            }
+            addReport(techName + " performs maintenance on " + u.getName() + ". " + qualityString + ". " + damageString);
+        }
     }
 }

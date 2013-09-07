@@ -791,4 +791,11 @@ public class MekLocation extends Part {
         }
     }
 	
+	 public void doMaintenanceDamage(int d) {
+	     int points = unit.getEntity().getInternal(loc);
+         points = Math.max(points -d, 1);
+         unit.getEntity().setInternal(points, loc);
+         updateConditionFromEntity();
+	 }
+	
 }

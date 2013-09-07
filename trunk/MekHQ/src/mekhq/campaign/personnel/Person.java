@@ -1863,6 +1863,22 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	return false;
     }
     
+    public boolean canTech(Entity ent) {
+        if(ent instanceof Mech || ent instanceof Protomech) {
+            return hasSkill(SkillType.S_TECH_MECH);
+        }
+        else if(ent instanceof Aero) {
+            return hasSkill(SkillType.S_TECH_AERO);
+        }
+        else if(ent instanceof BattleArmor) {
+            return hasSkill(SkillType.S_TECH_BA);
+        }
+        else if(ent instanceof Tank) {
+            return hasSkill(SkillType.S_TECH_MECHANIC);
+        }
+        return false;
+    }
+    
     public UUID getUnitId() {
     	return unitId;
     }

@@ -556,4 +556,10 @@ public class ProtomekArmor extends Part implements IAcquisitionWork {
         }
         return report;
     }
+    
+    public void doMaintenanceDamage(int d) {
+        d = Math.min(d, amount);
+        unit.getEntity().setArmor(d, location);
+        updateConditionFromEntity();
+    }
 }
