@@ -91,7 +91,10 @@
 
     <target name="localdev-init" depends="checkOSMac, checkOSWindows, checkOSUNIX">
 		<tstamp />
-		<delete dir="${localdir}" />		
+		<delete dir="${localdir}" />
+        <delete dir="${svndir}" />
+    	<input message="Please enter path to MegaMek root folder (ex ../megamek or c:\megamek):" addproperty="mmdir" />
+    	<input message="Please enter path to MegaMekLab root folder (ex ../megameklab or c:\megameklab):" addproperty="mmldir" />
 	</target>
 	
 	<!-- following localdev-* tasks get, build & package the current version from local sources -->
