@@ -358,5 +358,10 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         }
         return report;
     }
+    
+    @Override
+    public boolean needsMaintenance() {
+        return true;
+    }
 }
 

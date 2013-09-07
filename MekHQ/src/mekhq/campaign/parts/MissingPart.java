@@ -382,5 +382,10 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		}
 		
 	}
+	
+	@Override
+	public boolean needsMaintenance() {
+        return false;
+    }
 }
 

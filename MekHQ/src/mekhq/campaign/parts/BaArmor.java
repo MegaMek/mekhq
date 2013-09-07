@@ -728,4 +728,10 @@ public class BaArmor extends Part implements IAcquisitionWork {
         //TODO: we have no way to retrieve some armor types
         return T_STANDARD;
     }
+    
+    public void doMaintenanceDamage(int d) {
+        d = Math.min(d, amount);
+        unit.getEntity().setArmor(d, location);
+        updateConditionFromEntity();
+    }
 }

@@ -162,6 +162,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private javax.swing.JCheckBox useDamageMargin;
     private JSpinner spnDamageMargin;
     
+    private javax.swing.JCheckBox checkMaintenance;
+    private JSpinner spnMaintenanceDays;
+    private JSpinner spnMaintenanceBonus;
+    private javax.swing.JCheckBox useQualityMaintenance;
+
+    
     private JRadioButton btnContractEquipment;
     private JRadioButton btnContractPersonnel;
     private JSpinner spnEquipPercent;
@@ -303,6 +309,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         usePercentageMaintBox.setSelected(options.usePercentageMaint());
 
         useDamageMargin.setSelected(options.isDestroyByMargin());
+        useQualityMaintenance.setSelected(options.useQualityMaintenance());
+        checkMaintenance.setSelected(options.checkMaintenance());
 
         
         sellUnitsBox.setSelected(options.canSellUnits());
@@ -399,7 +407,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         textRanks = new javax.swing.JTextArea();
         scrRanks = new javax.swing.JScrollPane();
 
-        useDamageMargin = new javax.swing.JCheckBox();
+        useDamageMargin = new JCheckBox();
+        useQualityMaintenance = new JCheckBox();
+        checkMaintenance = new JCheckBox();
 
         chkSupportStaffOnly = new JCheckBox();
         
@@ -547,15 +557,18 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panRepair.setLayout(new java.awt.GridLayout(2,2));
 
         JPanel panSubRepair = new JPanel(new GridBagLayout());
+        JPanel panSubMaintenance = new JPanel(new GridBagLayout());
         JPanel panSubAcquire = new JPanel(new GridBagLayout());
         JPanel panSubDelivery = new JPanel(new GridBagLayout());
 
         panSubRepair.setBorder(BorderFactory.createTitledBorder("Repair"));
+        panSubMaintenance.setBorder(BorderFactory.createTitledBorder("Maintenance"));
         panSubAcquire.setBorder(BorderFactory.createTitledBorder("Acquisition"));
         panSubDelivery.setBorder(BorderFactory.createTitledBorder("Delivery"));
 
         panRepair.add(panSubRepair);
         panRepair.add(panSubAcquire);
+        panRepair.add(panSubMaintenance);
         panRepair.add(panSubDelivery);
 
         useEraModsCheckBox.setText(resourceMap.getString("useEraModsCheckBox.text")); // NOI18N
@@ -619,6 +632,78 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubRepair.add(pnlDamageMargin, gridBagConstraints);
+        
+        checkMaintenance.setText(resourceMap.getString("checkMaintenance.text")); // NOI18N
+        checkMaintenance.setToolTipText(resourceMap.getString("checkMaintenance.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubMaintenance.add(checkMaintenance, gridBagConstraints);
+      
+        checkMaintenance.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                if(checkMaintenance.isSelected()) {
+                    spnMaintenanceDays.setEnabled(true);
+                    useQualityMaintenance.setEnabled(true);
+                    spnMaintenanceBonus.setEnabled(true);
+                } else {
+                    spnMaintenanceDays.setEnabled(false);
+                    useQualityMaintenance.setEnabled(false);
+                    spnMaintenanceBonus.setEnabled(false);
+                }
+            }
+        });
+        
+        spnMaintenanceDays = new JSpinner(new SpinnerNumberModel(options.getMaintenanceCycleDays(), 1, 365, 1));
+        ((JSpinner.DefaultEditor)spnMaintenanceDays.getEditor()).getTextField().setEditable(false);
+        spnMaintenanceDays.setEnabled(options.checkMaintenance());
+        
+        JPanel pnlMaintenanceDays = new JPanel();
+        pnlMaintenanceDays.add(spnMaintenanceDays);
+        pnlMaintenanceDays.add(new JLabel("Maintenance cycle length in days"));      
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubMaintenance.add(pnlMaintenanceDays, gridBagConstraints);
+        
+        spnMaintenanceBonus = new JSpinner(new SpinnerNumberModel(options.getMaintenanceBonus(), -13, 13, 1));
+        ((JSpinner.DefaultEditor)spnMaintenanceBonus.getEditor()).getTextField().setEditable(false);
+        spnMaintenanceBonus.setEnabled(options.checkMaintenance());
+        spnMaintenanceBonus.setToolTipText(resourceMap.getString("spnMaintenanceBonus.toolTipText")); // NOI18N   
+
+        
+        JPanel pnlMaintenanceBonus = new JPanel();
+        pnlMaintenanceBonus.add(spnMaintenanceBonus);
+        pnlMaintenanceBonus.add(new JLabel("Maintenance modifier"));      
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubMaintenance.add(pnlMaintenanceBonus, gridBagConstraints);
+        
+        useQualityMaintenance.setText(resourceMap.getString("useQualityMaintenance.text")); // NOI18N
+        useQualityMaintenance.setToolTipText(resourceMap.getString("useQualityMaintenance.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubMaintenance.add(useQualityMaintenance, gridBagConstraints);
         
         spnAcquireWaitingPeriod = new JSpinner(new SpinnerNumberModel(options.getWaitingPeriod(), 1, 365, 1));
         ((JSpinner.DefaultEditor)spnAcquireWaitingPeriod.getEditor()).getTextField().setEditable(false);

@@ -59,11 +59,8 @@ public class CampaignOptions implements Serializable {
     //FIXME: This needs to be localized
     public final static String [] REPAIR_SYSTEM_NAMES = {"Strat Ops", "Warchest Custom", "Generic Spare Parts"};
 
-    private double clanPriceModifier;
     private boolean useFactionForNames;
-    private int repairSystem;
     private boolean useDragoonRating;
-    private boolean useEraMods;
     
     //personnel related
     private boolean useTactics;
@@ -104,6 +101,7 @@ public class CampaignOptions implements Serializable {
     private double damagedPartsValue;
     private double canceledOrderReimbursement;
     private boolean usePercentageMaint; // Unofficial
+    private double clanPriceModifier;
 
     //contract related
     private boolean equipmentContractBase;
@@ -140,6 +138,14 @@ public class CampaignOptions implements Serializable {
     //repair related
     private boolean destroyByMargin;
     private int destroyMargin;
+    private int repairSystem;
+    private boolean useEraMods;
+    
+    //maintenance related
+    private boolean checkMaintenance;
+    private int maintenanceCycleDays;
+    private int maintenanceBonus;
+    private boolean useQualityMaintenance;
     
     //Dragoon's Rating
     private DragoonsRatingMethod dragoonsRatingMethod;
@@ -219,6 +225,10 @@ public class CampaignOptions implements Serializable {
         naturalHealingWaitingPeriod = 15;
         destroyByMargin = false;
         destroyMargin = 4;
+        maintenanceCycleDays = 7;
+        maintenanceBonus = -1;
+        useQualityMaintenance = true;
+        checkMaintenance = true;
         
     }
 
@@ -785,6 +795,38 @@ public class CampaignOptions implements Serializable {
         naturalHealingWaitingPeriod = d;
     }
     
+    public int getMaintenanceCycleDays() {
+        return maintenanceCycleDays;
+    }
+    
+    public void setMaintenanceCycleDays(int d) {
+        maintenanceCycleDays = d;
+    }
+    
+    public int getMaintenanceBonus() {
+        return maintenanceBonus;
+    }
+    
+    public void setMaintenanceBonus(int d) {
+        maintenanceBonus = d;
+    }
+    
+    public boolean useQualityMaintenance() {
+        return useQualityMaintenance;
+    }
+    
+    public void setUseQualityMaintenance(boolean b) {
+        useQualityMaintenance = b;
+    }
+    
+    public boolean checkMaintenance() {
+        return checkMaintenance;
+    }
+    
+    public void setCheckMaintenance(boolean b) {
+        checkMaintenance = b;
+    }
+    
     public boolean isDestroyByMargin() {
         return destroyByMargin;
     }
@@ -869,6 +911,10 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "naturalHealingWaitingPeriod", naturalHealingWaitingPeriod);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "destroyByMargin", destroyByMargin);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "destroyMargin", destroyMargin);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "maintenanceCycleDays", maintenanceCycleDays);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "maintenanceBonus", maintenanceBonus);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useQualityMaintenance", useQualityMaintenance);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "checkMaintenance", checkMaintenance);
 
 
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -1142,6 +1188,20 @@ public class CampaignOptions implements Serializable {
                     retVal.destroyByMargin = false;
             } else if (wn2.getNodeName().equalsIgnoreCase("destroyMargin")) {
                 retVal.destroyMargin = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceCycleDays")) {
+                retVal.maintenanceCycleDays = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceBonus")) {
+                retVal.maintenanceBonus = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useQualityMaintenance")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true"))
+                    retVal.useQualityMaintenance = true;
+                else
+                    retVal.useQualityMaintenance = false;
+            } else if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true"))
+                    retVal.checkMaintenance = true;
+                else
+                    retVal.checkMaintenance = false;
             } 
 		}
 

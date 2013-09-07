@@ -315,4 +315,11 @@ public class TankLocation extends Part {
 	 public boolean isRightTechType(String skillType) {
 		 return skillType.equals(SkillType.S_TECH_MECHANIC);
 	 }
+	 
+	 public void doMaintenanceDamage(int d) {
+         int points = unit.getEntity().getInternal(loc);
+         points = Math.max(points -d, 1);
+         unit.getEntity().setInternal(points, loc);
+         updateConditionFromEntity();
+     }
 }

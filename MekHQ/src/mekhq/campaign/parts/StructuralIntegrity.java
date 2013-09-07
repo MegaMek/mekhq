@@ -221,4 +221,11 @@ public class StructuralIntegrity extends Part {
 		return pointsNeeded > 0;
 	}
 	
+	public void doMaintenanceDamage(int d) {
+        int points = ((Aero)unit.getEntity()).getSI();
+        points = Math.max(points - d, 1);
+        ((Aero)unit.getEntity()).setSI(points);
+        updateConditionFromEntity();
+    }
+	
 }

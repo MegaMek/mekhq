@@ -79,6 +79,13 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	public static final int T_IS   = 1;
 	public static final int T_CLAN = 2;
 
+	public static final int QUALITY_A = 0;
+    public static final int QUALITY_B = 1;
+    public static final int QUALITY_C = 2;
+    public static final int QUALITY_D = 3;
+    public static final int QUALITY_E = 4;
+    public static final int QUALITY_F = 5;
+	
 	private static final String[] partTypeLabels = { "Armor", "Weapon", "Ammo",
 			"Equipment Part", "Mek Actuator", "Mek Engine", "Mek Gyro",
 			"Mek Life Support", "Mek Body Part", "Mek Sensor",
@@ -115,6 +122,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	//boolean to indicate whether the repair status on this part is set to salvage or 
 	//to repair
 	protected boolean salvaging;
+	
+	protected int quality;
 	
 	protected boolean brandNew;
 	
@@ -171,7 +180,31 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.brandNew = true;
 		this.quantity = 1;
 		this.replacementId = -1;
+		this.quality = QUALITY_D;
 	}
+	
+	public static String getQualityName(int quality) {
+        switch(quality) {
+        case QUALITY_A:
+            return "A";
+        case QUALITY_B:
+            return "B";
+        case QUALITY_C:
+            return "C";
+        case QUALITY_D:
+            return "D";
+        case QUALITY_E:
+            return "E";
+        case QUALITY_F:
+            return "F";
+        default:
+            return "?";
+        }
+    }
+    
+    public String getQualityName() {
+        return getQualityName(getQuality());
+    }
 
 	public void setId(int id) {
 		this.id = id;
@@ -725,7 +758,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	            mods.addModifier(1, "difficult to maintain");
 	        }
 		}
-        mods.addModifier(Availability.getTechModifier(getTechRating()), "tech rating " + EquipmentType.getRatingName(getTechRating()));
 		if(!campaign.getFaction().isClan() && isClanTechBase()) {
 			if (campaign.getPerson(getAssignedTeamId()) == null) {
 				mods.addModifier(2, "clan tech");
@@ -733,7 +765,78 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				mods.addModifier(2, "clan tech");
 			}
 		}
+		
+		switch(quality) {
+		case QUALITY_A:
+            mods.addModifier(3, "Quality A");
+            break;
+		case QUALITY_B:
+            mods.addModifier(2, "Quality B");
+            break;
+		case QUALITY_C:
+            mods.addModifier(1, "Quality C");
+            break;
+		case QUALITY_D:
+            mods.addModifier(0, "Quality D");
+            break;
+		case QUALITY_E:
+            mods.addModifier(-1, "Quality E");
+            break;
+		case QUALITY_F:
+            mods.addModifier(-2, "Quality F");
+            break;
+		}
+		
         return mods;
+	}
+	
+	public TargetRoll getAllModsForMaintenance() {
+	    //according to StratOps you get a -1 mod when checking on individual parts
+	    //but we will make this user customizable
+	    TargetRoll mods = new TargetRoll(campaign.getCampaignOptions().getMaintenanceBonus(), "maintenance");
+        mods.addModifier(Availability.getTechModifier(getTechRating()), "tech rating " + EquipmentType.getRatingName(getTechRating()));
+    
+	    if(null != unit) {
+	        mods.append(unit.getSiteMod());
+	        if(unit.getEntity().hasQuirk("easy_maintain")) {
+	            mods.addModifier(-1, "easy to maintain");
+	        }
+	        else if(unit.getEntity().hasQuirk("difficult_maintain")) {
+	            mods.addModifier(1, "difficult to maintain");
+	        }
+	    }
+	    if(!campaign.getFaction().isClan() && isClanTechBase()) {
+	        if (campaign.getPerson(getAssignedTeamId()) == null) {
+	            mods.addModifier(2, "clan tech");
+	        } else if (!campaign.getPerson(getAssignedTeamId()).isClanTech()) {
+	            mods.addModifier(2, "clan tech");
+	        }
+	    }
+	        
+	    if(campaign.getCampaignOptions().useQualityMaintenance()) {
+    	    switch(quality) {
+    	    case QUALITY_A:
+    	        mods.addModifier(3, "Quality A");
+    	        break;
+    	    case QUALITY_B:
+    	        mods.addModifier(2, "Quality B");
+    	        break;
+    	    case QUALITY_C:
+    	        mods.addModifier(1, "Quality C");
+    	        break;
+    	    case QUALITY_D:
+    	        mods.addModifier(0, "Quality D");
+    	        break;
+    	    case QUALITY_E:
+    	        mods.addModifier(-1, "Quality E");
+    	        break;
+    	    case QUALITY_F:
+    	        mods.addModifier(-2, "Quality F");
+    	        break;
+    	    }
+	    }
+	        
+	    return mods;
 	}
 
 	public String getCurrentModeName() {
@@ -977,6 +1080,28 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
      */
     public IAcquisitionWork getAcquisitionWork() {
         return getMissingPart();
+    }
+    
+    public void doMaintenanceDamage(int d) {
+        hits += d;
+        updateConditionFromPart();
+        updateConditionFromEntity();
+    }
+    
+    public int getQuality() {
+        return quality;
+    }
+    
+    public void improveQuality() {
+        quality += 1;
+    }
+    
+    public void decreaseQuality() {
+        quality -= 1;
+    }
+    
+    public boolean needsMaintenance() {
+        return true;
     }
 }
 

@@ -22,6 +22,7 @@ package mekhq.campaign.work;
 
 import java.util.UUID;
 
+import megamek.common.TargetRoll;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.MissingPart;
 
@@ -44,6 +45,8 @@ public interface IPartWork extends IWork {
 	public void resetOvertime();
 	public void resetRepairStatus();
 	public boolean isRightTechType(String skillType);
+	
+	public TargetRoll getAllModsForMaintenance();
 	
 	public UUID getAssignedTeamId();
 	public void setTeamId(UUID id);
