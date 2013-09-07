@@ -163,6 +163,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JSpinner spnDamageMargin;
     
     private javax.swing.JCheckBox checkMaintenance;
+    private javax.swing.JCheckBox logMaintenance;
     private JSpinner spnMaintenanceDays;
     private JSpinner spnMaintenanceBonus;
     private javax.swing.JCheckBox useQualityMaintenance;
@@ -311,6 +312,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useDamageMargin.setSelected(options.isDestroyByMargin());
         useQualityMaintenance.setSelected(options.useQualityMaintenance());
         checkMaintenance.setSelected(options.checkMaintenance());
+        logMaintenance.setSelected(options.logMaintenance());
 
         
         sellUnitsBox.setSelected(options.canSellUnits());
@@ -410,6 +412,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useDamageMargin = new JCheckBox();
         useQualityMaintenance = new JCheckBox();
         checkMaintenance = new JCheckBox();
+        logMaintenance = new JCheckBox();
 
         chkSupportStaffOnly = new JCheckBox();
         
@@ -650,10 +653,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                     spnMaintenanceDays.setEnabled(true);
                     useQualityMaintenance.setEnabled(true);
                     spnMaintenanceBonus.setEnabled(true);
+                    logMaintenance.setEnabled(true);
                 } else {
                     spnMaintenanceDays.setEnabled(false);
                     useQualityMaintenance.setEnabled(false);
                     spnMaintenanceBonus.setEnabled(false);
+                    logMaintenance.setEnabled(false);
                 }
             }
         });
@@ -700,10 +705,21 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubMaintenance.add(useQualityMaintenance, gridBagConstraints);
+        
+        logMaintenance.setText(resourceMap.getString("logMaintenance.text")); // NOI18N
+        logMaintenance.setToolTipText(resourceMap.getString("logMaintenance.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panSubMaintenance.add(useQualityMaintenance, gridBagConstraints);
+        panSubMaintenance.add(logMaintenance, gridBagConstraints);
         
         spnAcquireWaitingPeriod = new JSpinner(new SpinnerNumberModel(options.getWaitingPeriod(), 1, 365, 1));
         ((JSpinner.DefaultEditor)spnAcquireWaitingPeriod.getEditor()).getTextField().setEditable(false);
@@ -2386,6 +2402,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    } else {
 	    	campaign.getGameOptions().getOption("command_init").setValue(false);
 	    }
+	    options.setCheckMaintenance(checkMaintenance.isSelected());
+        options.setUseQualityMaintenance(useQualityMaintenance.isSelected());
+        options.setLogMaintenance(logMaintenance.isSelected());
+        options.setMaintenanceBonus((Integer)spnMaintenanceBonus.getModel().getValue());
+        options.setMaintenanceCycleDays((Integer)spnMaintenanceDays.getModel().getValue());	    
 	    options.setInitBonus(useInitBonusBox.isSelected());
 	    if(useInitBonusBox.isSelected()) {
 	    	campaign.getGameOptions().getOption("individual_initiative").setValue(true);
