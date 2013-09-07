@@ -5442,8 +5442,9 @@ public class Campaign implements Serializable {
                         partReport += ", part damaged";
                     }
                 }
-                //TODO: make logging an option - or put the latest report into each part
-                MekHQ.logMessage(partReport);
+                if(getCampaignOptions().logMaintenance()) {
+                    MekHQ.logMessage(partReport);
+                }
             }
             String damageList = "";
             String destroyList = "";

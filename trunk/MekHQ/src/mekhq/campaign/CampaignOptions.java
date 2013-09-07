@@ -146,6 +146,7 @@ public class CampaignOptions implements Serializable {
     private int maintenanceCycleDays;
     private int maintenanceBonus;
     private boolean useQualityMaintenance;
+    private boolean logMaintenance;
     
     //Dragoon's Rating
     private DragoonsRatingMethod dragoonsRatingMethod;
@@ -229,6 +230,7 @@ public class CampaignOptions implements Serializable {
         maintenanceBonus = -1;
         useQualityMaintenance = true;
         checkMaintenance = true;
+        logMaintenance = true;
         
     }
 
@@ -827,6 +829,14 @@ public class CampaignOptions implements Serializable {
         checkMaintenance = b;
     }
     
+    public boolean logMaintenance() {
+        return logMaintenance;
+    }
+    
+    public void setLogMaintenance(boolean b) {
+        logMaintenance = b;
+    }
+    
     public boolean isDestroyByMargin() {
         return destroyByMargin;
     }
@@ -915,6 +925,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "maintenanceBonus", maintenanceBonus);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useQualityMaintenance", useQualityMaintenance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "checkMaintenance", checkMaintenance);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "logMaintenance", logMaintenance);
 
 
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -1202,6 +1213,11 @@ public class CampaignOptions implements Serializable {
                     retVal.checkMaintenance = true;
                 else
                     retVal.checkMaintenance = false;
+            } else if (wn2.getNodeName().equalsIgnoreCase("logMaintenance")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true"))
+                    retVal.logMaintenance = true;
+                else
+                    retVal.logMaintenance = false;
             } 
 		}
 
