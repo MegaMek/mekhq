@@ -2579,7 +2579,7 @@ public class CampaignGUI extends JPanel {
                 miLoadForcesActionPerformed(evt);
             }
         });
-        miLoadForces.setEnabled(false);
+		// miLoadForces.setEnabled(false);
         menuManage.add(miLoadForces);
 
         addFunds.setText(resourceMap.getString("addFunds.text")); // NOI18N
@@ -3002,11 +3002,11 @@ public class CampaignGUI extends JPanel {
     private void doTask() {// GEN-FIRST:event_btnDoTaskActionPerformed
         int selectedRow = -1;
         int partId = -1;
-        int selectedTechRow = -1;
+		// int selectedTechRow = -1;
         Person tech = getSelectedTech();
         if(onWarehouseTab()) {
             selectedRow = partsTable.getSelectedRow();
-            selectedTechRow = whTechTable.getSelectedRow();
+			// selectedTechRow = whTechTable.getSelectedRow();
             Part part = getSelectedTask();
             if(null == part) {
                 return;
@@ -3028,7 +3028,7 @@ public class CampaignGUI extends JPanel {
         }
         else if(repairsSelected()) {
             selectedRow = TaskTable.getSelectedRow();
-            selectedTechRow = TechTable.getSelectedRow();
+			// selectedTechRow = TechTable.getSelectedRow();
             Part part = getSelectedTask();
             if(null == part) {
                 return;
@@ -6228,7 +6228,17 @@ public class CampaignGUI extends JPanel {
                     }
                 }
                 if(null != tech) {
+                	boolean wasNull = false;
+					// Temporarily set the Team ID if it isn't already.
+					// This is needed for the Clan Tech flag
+                	if (part.getAssignedTeamId() == null) {
+						part.setTeamId(tech.getId());
+                		wasNull = true;
+					}
                     target = getCampaign().getTargetFor(part, tech);
+					if (wasNull) { // If it was null, make it null again
+						part.setTeamId(null);
+					}
                 }
             }
         }

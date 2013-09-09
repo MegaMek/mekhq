@@ -1349,7 +1349,9 @@ public class Campaign implements Serializable {
 	}
 
 	public void fixPart(IPartWork partWork, Person tech) {
+		partWork.setTeamId(tech.getId());
 		TargetRoll target = getTargetFor(partWork, tech);
+		partWork.setTeamId(null);
 		String report = "";
 		String action = " fix ";
 		// TODO: this should really be a method on the part

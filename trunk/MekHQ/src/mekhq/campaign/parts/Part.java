@@ -35,6 +35,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
@@ -758,10 +759,11 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	            mods.addModifier(1, "difficult to maintain");
 	        }
 		}
+		Person tech = campaign.getPerson(getAssignedTeamId());
 		if(!campaign.getFaction().isClan() && isClanTechBase()) {
-			if (campaign.getPerson(getAssignedTeamId()) == null) {
+			if (tech == null) {
 				mods.addModifier(2, "clan tech");
-			} else if (!campaign.getPerson(getAssignedTeamId()).isClanTech()) {
+			} else if (!tech.isClanTech()) {
 				mods.addModifier(2, "clan tech");
 			}
 		}
