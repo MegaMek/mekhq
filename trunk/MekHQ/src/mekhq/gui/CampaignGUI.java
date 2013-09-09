@@ -6401,7 +6401,7 @@ public class CampaignGUI extends JPanel {
                 if(part.getSkillMin() > SkillType.EXP_ELITE) {
                     return false;
                 }
-                return (!getCampaign().getCampaignOptions().isDestroyByMargin() && part.getSkillMin() <= (skill.getExperienceLevel()-modePenalty));
+                return (getCampaign().getCampaignOptions().isDestroyByMargin() || part.getSkillMin() <= (skill.getExperienceLevel()-modePenalty));
             }
         };
         if(warehouse) {

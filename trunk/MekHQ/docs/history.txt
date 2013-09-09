@@ -5,6 +5,7 @@ v0.3.2 (SVN)
 + Bug: maintenance options not being saved
 + added optional logging of maintenance rolls
 + Bug: Non-active personnel showing in infirmary when they have injuries under advanced injuries rules.
++ Bug 386: Missing help text for Finances tab
 
 v0.3.1 (2013-09-5)
 + Planetary Data Update 36
