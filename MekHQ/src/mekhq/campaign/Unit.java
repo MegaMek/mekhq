@@ -2527,7 +2527,7 @@ public class Unit implements MekHqXmlSerializable {
     
     public void setTech(Person p) {
         tech = p.getId();
-        p.setUnitId(getId());
+        p.addTechUnitID(getId());
         p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
     }
     
@@ -2540,17 +2540,19 @@ public class Unit implements MekHqXmlSerializable {
     }
     
     public void remove(Person p, boolean log) {
-    	p.setUnitId(null);
-    	drivers.remove(p.getId());
-    	gunners.remove(p.getId());
-    	vesselCrew.remove(p.getId());
-    	if(p.getId().equals(navigator)) {
-    		navigator = null;
-    	}
-    	if(p.getId().equals(tech)) {
-    	    tech = null;
-    	}
-    	resetPilotAndEntity();
+        if(p.getId().equals(tech)) {
+            tech = null;
+            p.removeTechUnitId(getId());
+        } else {
+        	p.setUnitId(null);
+        	drivers.remove(p.getId());
+        	gunners.remove(p.getId());
+        	vesselCrew.remove(p.getId());
+        	if(p.getId().equals(navigator)) {
+        		navigator = null;
+        	}      	
+        	resetPilotAndEntity();
+        }
     	if(log) {
     		p.addLogEntry(campaign.getDate(), "Removed from " + getName());
     	}

@@ -8,6 +8,7 @@ v0.3.2 (SVN)
 + Bug [#386]: Missing help text for Finances tab
 + Bug [#388]: Penalty For Clan Tech Still Applied w/ Clan Trained Techs
 + RFE 122: Personnel kill tracking
++ allow assignment of tech to more than one maintenance job
 
 v0.3.1 (2013-09-5)
 + Planetary Data Update 36
