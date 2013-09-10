@@ -5,7 +5,6 @@ v0.3.2 (SVN)
 + Bug: maintenance options not being saved
 + added optional logging of maintenance rolls
 + Bug: Non-active personnel showing in infirmary when they have injuries under advanced injuries rules.
-+ Bug [#386]: Missing help text for Finances tab
 + Bug [#388]: Penalty For Clan Tech Still Applied w/ Clan Trained Techs
 + RFE 122: Personnel kill tracking
 + allow assignment of tech to more than one maintenance job
@@ -17,7 +16,7 @@ v0.3.2 (SVN)
 + Bug [#391]: Repair tasks no longer show if the replacement part is available or not
 + Bug [#392]: Scenario Force Icons do not size the same as the TO&E
 + Bug: GM Mode Complete Task for Ammo Acquisition fails and reports: You shouldn't be here (AmmoBin.find())
-+ Bug [#386]: Missing help text for Finances tab 
++ Bug [#386]: Missing help text for Finances tab
 
 v0.3.1 (2013-09-5)
 + Planetary Data Update 36
