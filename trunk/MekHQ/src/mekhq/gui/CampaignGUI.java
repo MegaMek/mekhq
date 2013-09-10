@@ -8926,6 +8926,20 @@ public class CampaignGUI extends JPanel {
                 if(null != u) {
                     u.remove(selectedPerson, true);
                 }
+                //check for tech unit assignments
+                if(!selectedPerson.getTechUnitIDs().isEmpty()) {
+                    //I need to create a new array list to avoid concurrent problems
+                    ArrayList<UUID> temp = new ArrayList<UUID>();
+                    for(UUID i : selectedPerson.getTechUnitIDs()) {
+                        temp.add(i);
+                    }
+                    for(UUID i : temp) {
+                        u = getCampaign().getUnit(i);
+                        if(null != u) {
+                            u.remove(selectedPerson, true);
+                        }
+                    }             
+                }
                 refreshServicedUnitList();
                 refreshUnitList();
                 refreshPersonnelList();
@@ -9655,8 +9669,8 @@ public class CampaignGUI extends JPanel {
                                     navMenu.add(cbMenuItem);
                                 }
                             }
-                            if(unit.canTakeTech() && person.canTech(unit.getEntity())) {
-                                cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                            if(unit.canTakeTech() && person.canTech(unit.getEntity()) && (person.getMaintenanceTimeUsing(getCampaign()) + unit.getMaintenanceTime()) <= 480) {
+                                cbMenuItem = new JCheckBoxMenuItem(unit.getName() + " (" + unit.getMaintenanceTime() + " minutes/day)");
                                 //TODO: check the box
                                 cbMenuItem.setActionCommand("ADD_TECH|" + unit.getId());
                                 cbMenuItem.addActionListener(this);
@@ -10307,6 +10321,20 @@ public class CampaignGUI extends JPanel {
                 return p.getAbilityList(PilotOptions.LVL3_ADVANTAGES);
             case COL_NIMP:
                 return p.getAbilityList(PilotOptions.MD_ADVANTAGES);
+            case COL_ASSIGN:
+                if(p.getTechUnitIDs().size() > 1) {
+                    String toReturn = "<html>";
+                    for(UUID id : p.getTechUnitIDs()) {
+                        Unit u = getCampaign().getUnit(id);
+                        if(null != u) {
+                            toReturn += u.getName() + "<br>";
+                        }
+                    }
+                    toReturn += "</html>";
+                    return toReturn;
+                } else {
+                    return null;
+                }
             default:
                 return null;
             }
@@ -10619,6 +10647,17 @@ public class CampaignGUI extends JPanel {
                     }
                     return name;
                 }
+                //check for tech
+                if(!p.getTechUnitIDs().isEmpty()) {
+                    if(p.getTechUnitIDs().size() == 1) {
+                        u = getCampaign().getUnit(p.getTechUnitIDs().get(0));
+                        if(null != u) {
+                            return u.getName() + " (" + p.getMaintenanceTimeUsing(getCampaign()) + "m)";
+                        }
+                    } else {
+                        return "" + p.getTechUnitIDs().size() + " units (" + p.getMaintenanceTimeUsing(getCampaign()) + "m)";
+                    }
+                }             
                 return "-";
             }
             if(col == COL_XP) {

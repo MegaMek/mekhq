@@ -160,6 +160,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     //assignments
     private UUID unitId;
     protected UUID doctorId;
+    //TODO: save this to XML
+    private ArrayList<UUID> techUnitIds;
     //for reverse compatability v0.1.8 and earlier
     protected int teamId = -1;
     
@@ -232,6 +234,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         dependent = false;
         commander = false;
         isClanTech = false;
+        techUnitIds = new ArrayList<UUID>();
     }
     
     public boolean isClanTech() {
@@ -861,6 +864,16 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 					+String.valueOf(getOptionList("::", PilotOptions.MD_ADVANTAGES))
 					+"</implants>");
 		}
+		if(!techUnitIds.isEmpty()) {
+            pw1.println(MekHqXmlUtil.indentStr(indent+1) +"<techUnitIds>");
+            for(UUID id : techUnitIds) {
+                pw1.println(MekHqXmlUtil.indentStr(indent+2)
+                        +"<id>"
+                        +id.toString()
+                        +"</id>");
+            }
+            pw1.println(MekHqXmlUtil.indentStr(indent+1) +"</techUnitIds>");
+        }
 		if(!personnelLog.isEmpty()) {
 			pw1.println(MekHqXmlUtil.indentStr(indent+1) +"<personnelLog>");
 			for(LogEntry entry : personnelLog) {
@@ -1015,7 +1028,24 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 					if(null != s && null != s.getType()) {
 						retVal.skills.put(s.getType().getName(), s);
 					}
-				} else if (wn2.getNodeName().equalsIgnoreCase("personnelLog")) {
+				} else if (wn2.getNodeName().equalsIgnoreCase("techUnitIds")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y=0; y<nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE)
+                            continue;
+                        
+                        if (!wn3.getNodeName().equalsIgnoreCase("id")) {
+                            // Error condition of sorts!
+                            // Errr, what should we do here?
+                            MekHQ.logMessage("Unknown node type not loaded in techUnitIds nodes: "+wn3.getNodeName());
+                            continue;
+                        }                  
+                        retVal.techUnitIds.add(UUID.fromString(wn3.getTextContent()));
+
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelLog")) {
 					NodeList nl2 = wn2.getChildNodes();
 					for (int y=0; y<nl2.getLength(); y++) {
 						Node wn3 = nl2.item(y);
@@ -1879,12 +1909,35 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         return false;
     }
     
+    public int getMaintenanceTimeUsing(Campaign c) {
+        int time = 0;
+        for(UUID id : getTechUnitIDs()) {
+            Unit u = c.getUnit(id);
+            if(null != u) {
+                time += u.getMaintenanceTime();
+            }
+        }
+        return time;
+    }
+    
     public UUID getUnitId() {
     	return unitId;
     }
     
     public void setUnitId(UUID i) {
     	unitId = i;
+    }
+    
+    public void removeTechUnitId(UUID i) {
+        techUnitIds.remove(i);
+    }
+    
+    public void addTechUnitID(UUID i) {
+        techUnitIds.add(i);
+    }
+    
+    public ArrayList<UUID> getTechUnitIDs() {
+        return techUnitIds;
     }
     
     public int getOldSupportTeamId() {
