@@ -137,6 +137,12 @@ public class Ranks implements Serializable {
 	}
 	
 	public int getRankOrder(String rank) {
+		if (rank.equals("Prisoner")) {
+			return -2;
+		}
+		if (rank.equals("Bondsman")) {
+			return -1;
+		}
 		return ranks.indexOf(rank);
 	}
 	
