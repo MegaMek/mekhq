@@ -467,8 +467,10 @@ public class EquipmentPart extends Part {
     private int resolveVariableCost(boolean isArmored) {
     	double varCost = 0;
         if (type instanceof MiscType) {           
-            if (type.hasFlag(MiscType.F_DRONE_CARRIER_CONTROL)) {
+        	if (type.hasFlag(MiscType.F_DRONE_CARRIER_CONTROL)) {
                 varCost = getTonnage() * 10000;
+            } else if (type.hasFlag(MiscType.F_OFF_ROAD)) {
+            	varCost = 10 * getTonnage() * getTonnage();
             } else if (type.hasFlag(MiscType.F_FLOTATION_HULL) || type.hasFlag(MiscType.F_VACUUM_PROTECTION) || type.hasFlag(MiscType.F_ENVIRONMENTAL_SEALING) || type.hasFlag(MiscType.F_OFF_ROAD)) {
                 //??
             } else if (type.hasFlag(MiscType.F_LIMITED_AMPHIBIOUS) || type.hasFlag((MiscType.F_FULLY_AMPHIBIOUS))) {

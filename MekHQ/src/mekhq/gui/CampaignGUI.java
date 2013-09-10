@@ -7195,6 +7195,9 @@ public class CampaignGUI extends JPanel {
         public void actionPerformed(ActionEvent action) {
             String command = action.getActionCommand();
             IAcquisitionWork acquisitionWork = acquireModel.getAcquisitionAt(AcquisitionTable.convertRowIndexToModel(AcquisitionTable.getSelectedRow()));
+            if(acquisitionWork instanceof AmmoBin) {
+            	acquisitionWork = ((AmmoBin) acquisitionWork).getAcquisitionWork();
+            }
             if(null == acquisitionWork) {
                 return;
             }
@@ -7228,10 +7231,8 @@ public class CampaignGUI extends JPanel {
                 if(row < 0) {
                     return;
                 }
-                IAcquisitionWork acquisitionWork = acquireModel.getAcquisitionAt(row);
                 JMenuItem menuItem = null;
                 JMenu menu = null;
-                JCheckBoxMenuItem cbMenuItem = null;
                 menu = new JMenu("GM Mode");
                 popup.add(menu);
                 // Auto complete task
