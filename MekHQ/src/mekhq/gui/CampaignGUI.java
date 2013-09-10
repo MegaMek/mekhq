@@ -12865,7 +12865,25 @@ public class CampaignGUI extends JPanel {
                     refreshReport();
                     refreshCargo();
                     refreshOverview();
-            } else if (command.equalsIgnoreCase("SELL")) {
+            } else if (command.contains("ASSIGN")) {
+                String sel = command.split(":")[1];
+                UUID id = UUID.fromString(sel);
+                Person tech = getCampaign().getPerson(id);
+                if(null != tech) {
+                    //remove any existing techs
+                    if(null != selectedUnit.getTech()) {
+                        selectedUnit.remove(selectedUnit.getTech(), true);
+                    }
+                    selectedUnit.setTech(tech);
+                }
+                refreshServicedUnitList();
+                refreshUnitList();
+                refreshTechsList();
+                refreshPersonnelList();
+                refreshReport();
+                refreshCargo();
+                refreshOverview();
+        } else if (command.equalsIgnoreCase("SELL")) {
                 for (Unit unit : units) {
                     if (!unit.isDeployed()) {
                         long sellValue = unit.getSellValue();
@@ -13285,6 +13303,30 @@ public class CampaignGUI extends JPanel {
                     cbMenuItem.setEnabled(!unit.isDeployed() && !unit.isRefitting());
                     menu.add(cbMenuItem);
                     popup.add(menu);
+                }
+                if(oneSelected && unit.requiresMaintenance()) {
+                    menu = new JMenu("Assign Tech");
+                    for(Person tech : getCampaign().getTechs()) {
+                        if(tech.canTech(unit.getEntity()) 
+                                && (tech.getMaintenanceTimeUsing(getCampaign()) + unit.getMaintenanceTime()) <= 480) {
+                            String skillLvl = "Unknown";
+                            if(null != tech.getSkillForWorkingOn(unit)) {
+                                skillLvl = SkillType.getExperienceLevelName(tech.getSkillForWorkingOn(unit).getExperienceLevel());
+                            }
+                            cbMenuItem = new JCheckBoxMenuItem(tech.getFullTitle() + " (" + skillLvl + ", " + tech.getMaintenanceTimeUsing(getCampaign()) + "m)");                          
+                            cbMenuItem.setActionCommand("ASSIGN:" + tech.getId());
+                            cbMenuItem.setEnabled(!unit.isDeployed() && !unit.isRefitting());
+                            if(null != unit.getTechId() && unit.getTechId().equals(tech.getId())) {
+                                cbMenuItem.setSelected(true);
+                            } else {
+                                cbMenuItem.addActionListener(this);
+                            }
+                            menu.add(cbMenuItem);
+                        }
+                    }
+                    if(menu.getItemCount() > 0) {
+                        popup.add(menu);
+                    }
                 }
                 if(oneSelected && unit.getEntity() instanceof Infantry && !(unit.getEntity() instanceof BattleArmor)) {
                     menuItem = new JMenuItem("Disband");

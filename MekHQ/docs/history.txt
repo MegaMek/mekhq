@@ -10,6 +10,7 @@ v0.3.2 (SVN)
 + RFE 122: Personnel kill tracking
 + allow assignment of tech to more than one maintenance job
 + show unit status column on general view
++ assign tech for maintenance from unit context menu
 
 v0.3.1 (2013-09-5)
 + Planetary Data Update 36
