@@ -417,6 +417,8 @@ public class CampaignGUI extends JPanel {
     private javax.swing.JTabbedPane tabOverview;
     private javax.swing.JScrollPane scrollOverviewParts;
     private javax.swing.JTable overviewPartsTable;
+    private javax.swing.JScrollPane scrollOverviewTransport;
+    private javax.swing.JTextArea overviewTransportArea;
     private javax.swing.JScrollPane scrollOverviewCombatPersonnel;
     private javax.swing.JTextArea overviewCombatPersonnelArea;
     private javax.swing.JScrollPane scrollOverviewSupportPersonnel;
@@ -606,6 +608,8 @@ public class CampaignGUI extends JPanel {
         tabOverview = new javax.swing.JTabbedPane();
         scrollOverviewParts = new javax.swing.JScrollPane();
         overviewPartsTable = new javax.swing.JTable();
+        scrollOverviewTransport = new javax.swing.JScrollPane();
+        overviewTransportArea = new javax.swing.JTextArea();
         scrollOverviewCombatPersonnel = new javax.swing.JScrollPane();
         overviewCombatPersonnelArea = new javax.swing.JTextArea();
         scrollOverviewSupportPersonnel = new javax.swing.JScrollPane();
@@ -2284,6 +2288,19 @@ public class CampaignGUI extends JPanel {
         tabOverview.setName("tabOverview"); // NOI18N
         tabOverview.setPreferredSize(new java.awt.Dimension(800, 300));
         
+        overviewTransportArea.setName("overviewTransportArea"); // NOI18N
+        overviewTransportArea.setLineWrap(false);
+        overviewTransportArea.setFont(new Font("Courier New", Font.PLAIN, 18));
+        overviewTransportArea.setText(getCampaign().getCombatPersonnelDetails());
+        overviewTransportArea.setEditable(false);
+        overviewTransportArea.setName("overviewTransportArea"); // NOI18N
+        scrollOverviewTransport.setToolTipText(resourceMap.getString("scrollOverviewTransport.TabConstraints.toolTipText")); // NOI18N
+        scrollOverviewTransport.setMinimumSize(new java.awt.Dimension(350, 400));
+        scrollOverviewTransport.setPreferredSize(new java.awt.Dimension(350, 400));
+        scrollOverviewTransport.setViewportView(overviewTransportArea);
+        tabOverview.addTab(resourceMap.getString("scrollOverviewTransport.TabConstraints.tabTitle"), scrollOverviewTransport);
+        
+        
         overviewCombatPersonnelArea.setName("overviewCombatPersonnelArea"); // NOI18N
         overviewCombatPersonnelArea.setLineWrap(false);
         overviewCombatPersonnelArea.setFont(new Font("Courier New", Font.PLAIN, 18));
@@ -3812,6 +3829,7 @@ public class CampaignGUI extends JPanel {
         overviewDragoonsRatingArea.setText(rating.getDetails());
         overviewCombatPersonnelArea.setText(getCampaign().getCombatPersonnelDetails());
         overviewSupportPersonnelArea.setText(getCampaign().getSupportPersonnelDetails());
+        overviewTransportArea.setText(getCampaign().getTransportDetails());
         refreshOverviewHangar();
     }
     
@@ -6093,7 +6111,7 @@ public class CampaignGUI extends JPanel {
     protected void refreshCargo() {
     	double cargoTonnage = getCampaign().getCargoTonnage(false);
     	double cargoTonnageInTransit = getCampaign().getCargoTonnage(true);
-    	double cargoCapacity = getCampaign().getTotalCargoCapacity();
+    	double cargoCapacity = getCampaign().getTotalCombinedCargoCapacity();
     	String cargoTonnageString = new DecimalFormat("#.##").format(cargoTonnage);
     	String cargoTonnageInTransitString = new DecimalFormat("#.##").format(cargoTonnageInTransit);
     	String cargoCapacityString = new DecimalFormat("#.##").format(cargoCapacity);

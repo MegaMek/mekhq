@@ -102,6 +102,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		//}
 		toReturn += ">";
 		toReturn += "<b>Replace " + getName() + "</b><br/>";
+		toReturn += getDetails() + "<br/>";
 		if(getSkillMin() > SkillType.EXP_ELITE) {
             toReturn += "<font color='red'>Impossible</font>";
         } else {

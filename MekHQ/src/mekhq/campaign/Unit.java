@@ -33,6 +33,7 @@ import megamek.common.ASFBay;
 import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
+import megamek.common.BattleArmorBay;
 import megamek.common.Bay;
 import megamek.common.CargoBay;
 import megamek.common.Compute;
@@ -49,18 +50,26 @@ import megamek.common.HeavyVehicleBay;
 import megamek.common.IArmorState;
 import megamek.common.ILocationExposureStatus;
 import megamek.common.Infantry;
+import megamek.common.InfantryBay;
+import megamek.common.InsulatedCargoBay;
 import megamek.common.Jumpship;
 import megamek.common.LightVehicleBay;
+import megamek.common.LiquidCargoBay;
+import megamek.common.LivestockCargoBay;
 import megamek.common.Mech;
 import megamek.common.MechBay;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
+import megamek.common.PillionSeatCargoBay;
 import megamek.common.Player;
 import megamek.common.Protomech;
+import megamek.common.ProtomechBay;
 import megamek.common.QuadMech;
+import megamek.common.RefrigeratedCargoBay;
 import megamek.common.SmallCraft;
 import megamek.common.SmallCraftBay;
 import megamek.common.SpaceStation;
+import megamek.common.StandardSeatCargoBay;
 import megamek.common.SupportTank;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
@@ -944,8 +953,138 @@ public class Unit implements MekHqXmlSerializable {
 			if (bay instanceof CargoBay) {
 				capacity += bay.getCapacity();
 			}
+			if (bay instanceof PillionSeatCargoBay) {
+				capacity += bay.getCapacity();
+			}
+			if (bay instanceof StandardSeatCargoBay) {
+				capacity += bay.getCapacity();
+			}
 		}
 		return capacity;
+	}
+	
+	public double getRefrigeratedCargoCapacity() {
+		double capacity = 0;
+		for (Bay bay : entity.getTransportBays()) {
+			if (bay instanceof RefrigeratedCargoBay) {
+				capacity += bay.getCapacity();
+			}
+		}
+		return capacity;
+	}
+	
+	public double getLiquidCargoCapacity() {
+		double capacity = 0;
+		for (Bay bay : entity.getTransportBays()) {
+			if (bay instanceof LiquidCargoBay) {
+				capacity += bay.getCapacity();
+			}
+		}
+		return capacity;
+	}
+	
+	public double getLivestockCargoCapacity() {
+		double capacity = 0;
+		for (Bay bay : entity.getTransportBays()) {
+			if (bay instanceof LivestockCargoBay) {
+				capacity += bay.getCapacity();
+			}
+		}
+		return capacity;
+	}
+	
+	public double getInsulatedCargoCapacity() {
+		double capacity = 0;
+		for (Bay bay : entity.getTransportBays()) {
+			if (bay instanceof InsulatedCargoBay) {
+				capacity += bay.getCapacity();
+			}
+		}
+		return capacity;
+	}
+	
+	public int getDocks() {
+		return getEntity().getDocks();
+	}
+	
+	public int getLightVehicleCapacity() {
+		int bays = 0;
+		for (Bay b : getEntity().getTransportBays()) {
+			if (b instanceof LightVehicleBay) {
+				bays += b.getCapacity();
+			}
+		}
+		return bays;
+	}
+	
+	public int getHeavyVehicleCapacity() {
+		int bays = 0;
+		for (Bay b : getEntity().getTransportBays()) {
+			if (b instanceof HeavyVehicleBay) {
+				bays += b.getCapacity();
+			}
+		}
+		return bays;
+	}
+	
+	public int getBattleArmorCapacity() {
+		int bays = 0;
+		for (Bay b : getEntity().getTransportBays()) {
+			if (b instanceof BattleArmorBay) {
+				bays += b.getCapacity();
+			}
+		}
+		return bays;
+	}
+	
+	public int getInfantryCapacity() {
+		int bays = 0;
+		for (Bay b : getEntity().getTransportBays()) {
+			if (b instanceof InfantryBay) {
+				bays += b.getCapacity();
+			}
+		}
+		return bays;
+	}
+	
+	public int getASFCapacity() {
+		int bays = 0;
+		for (Bay b : getEntity().getTransportBays()) {
+			if (b instanceof ASFBay) {
+				bays += b.getCapacity();
+			}
+		}
+		return bays;
+	}
+	
+	public int getSmallCraftCapacity() {
+		int bays = 0;
+		for (Bay b : getEntity().getTransportBays()) {
+			if (b instanceof SmallCraftBay) {
+				bays += b.getCapacity();
+			}
+		}
+		return bays;
+	}
+	
+	public int getMechCapacity() {
+		int bays = 0;
+		for (Bay b : getEntity().getTransportBays()) {
+			if (b instanceof MechBay) {
+				bays += b.getCapacity();
+			}
+		}
+		return bays;
+	}
+	
+	public int getProtomechCapacity() {
+		int bays = 0;
+		for (Bay b : getEntity().getTransportBays()) {
+			if (b instanceof ProtomechBay) {
+				bays += b.getCapacity();
+			}
+		}
+		return bays;
 	}
 	
 	public double getUnitCostMultiplier() {
