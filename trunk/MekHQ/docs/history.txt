@@ -16,6 +16,7 @@ v0.3.2 (SVN)
 + Bug: Prisoners & Bondsmen mixed when sorting by rank
 + Bug [#391]: Repair tasks no longer show if the replacement part is available or not
 + Bug [#392]: Scenario Force Icons do not size the same as the TO&E
++ Bug: GM Mode Complete Task for Ammo Acquisition fails and reports: You shouldn't be here (AmmoBin.find())
 
 v0.3.1 (2013-09-5)
 + Planetary Data Update 36
