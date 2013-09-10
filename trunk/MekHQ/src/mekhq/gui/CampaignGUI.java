@@ -6721,11 +6721,10 @@ public class CampaignGUI extends JPanel {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_COST), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MAINTAIN), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUALITY), false);
-            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH_CRW), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW), false);
-            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DEPLOY), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_BV), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PARTS), false);
@@ -6743,7 +6742,6 @@ public class CampaignGUI extends JPanel {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH_CRW), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW), true);
-            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DEPLOY), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_BV), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PARTS), false);
@@ -6761,7 +6759,6 @@ public class CampaignGUI extends JPanel {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH_CRW), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW), true);
-            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DEPLOY), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_BV), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PARTS), true);
@@ -12568,18 +12565,17 @@ public class CampaignGUI extends JPanel {
         private final static int COL_TECH     =   3;
         private final static int COL_WEIGHT =     4;
         private final static int COL_COST    =    5;
-        private final static int COL_MAINTAIN  =  6;
+        private final static int COL_STATUS   =   6;
         private final static int COL_QUALITY  =   7;
-        private final static int COL_STATUS   =   8;
-        private final static int COL_PILOT    =   9;
-        private final static int COL_CREW     =   10;
-        private final static int COL_TECH_CRW =   11;
-        private final static int COL_DEPLOY   =   12;
-        private final static int COL_BV        =  13;
-        private final static int COL_REPAIR  =    14;
-        private final static int COL_PARTS    =   15;
-        private final static int COL_QUIRKS   =   16;
-        private final static int N_COL =          17;
+        private final static int COL_PILOT    =   8;
+        private final static int COL_CREW     =   9;
+        private final static int COL_TECH_CRW =   10;
+        private final static int COL_MAINTAIN  =  11;
+        private final static int COL_BV        =  12;
+        private final static int COL_REPAIR  =    13;
+        private final static int COL_PARTS    =   14;
+        private final static int COL_QUIRKS   =   15;
+        private final static int N_COL =          16;
 
         private ArrayList<Unit> data = new ArrayList<Unit>();
 
@@ -12624,8 +12620,6 @@ public class CampaignGUI extends JPanel {
                     return "# Parts";
                 case COL_QUIRKS:
                     return "Quirks";
-                case COL_DEPLOY:
-                    return "Deployed";
                 case COL_MAINTAIN:
                     return "Maintenance Costs";
                 default:
@@ -12655,7 +12649,6 @@ public class CampaignGUI extends JPanel {
             switch(col) {
             case COL_QUALITY:
             case COL_QUIRKS:
-            case COL_DEPLOY:
             case COL_CREW:
                 return SwingConstants.CENTER;
             case COL_WEIGHT:
@@ -12756,9 +12749,6 @@ public class CampaignGUI extends JPanel {
                 }
             }
             if(col == COL_PILOT) {
-                if(!u.isPresent()) {
-                    return "In transit (" + u.getDaysToArrival() + " days)";
-                }
                 if(null == u.getCommander()) {
                     return "-";
                 } else {
@@ -12780,13 +12770,6 @@ public class CampaignGUI extends JPanel {
             }
             if(col == COL_QUIRKS) {
                 return e.countQuirks();
-            }
-            if(col == COL_DEPLOY) {
-                if(u.isDeployed()) {
-                    return "Y";
-                } else {
-                    return "N";
-                }
             }
             if(col == COL_CREW) {
                 return u.getActiveCrew().size() + "/" + u.getFullCrewSize();
