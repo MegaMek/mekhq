@@ -266,6 +266,12 @@ public class Unit implements MekHqXmlSerializable {
 	}
 	
 	public String getStatus() {
+	    if(isDeployed()) {
+	        return "Deployed";
+	    }
+	    if(!isPresent()) {
+            return "In transit (" + getDaysToArrival() + " days)";
+        }
 		if(isRefitting()) {
 			return "Refitting";
 		}
