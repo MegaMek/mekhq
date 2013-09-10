@@ -319,8 +319,13 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
             Image portrait = null;
             try {
            	 portrait = (Image) getView().getForceIcons().getItem(category, file);
-           	 if(null == portrait) {
-           		portrait = (Image) getView().getForceIcons().getItem("", "empty.png");
+           	if(null != portrait) {
+                portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
+            } else {
+                portrait = (Image) getView().getForceIcons().getItem("", "empty.png");
+                if(null != portrait) {
+                    portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
+                }
            	 }
            	 return new ImageIcon(portrait);
             } catch (Exception err) {
