@@ -160,7 +160,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     //assignments
     private UUID unitId;
     protected UUID doctorId;
-    //TODO: save this to XML
     private ArrayList<UUID> techUnitIds;
     //for reverse compatability v0.1.8 and earlier
     protected int teamId = -1;
@@ -2028,7 +2027,63 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
     
     public Skill getSkillForWorkingOn(IPartWork part) {
-    	Unit unit = part.getUnit();
+        Unit unit = part.getUnit();
+        Skill skill = getSkillForWorkingOn(unit);
+        if(null != skill) {
+            return skill;
+        }
+        //check spare parts
+        //return the best one
+        if(part.isRightTechType(SkillType.S_TECH_MECH) && hasSkill(SkillType.S_TECH_MECH)) {
+            skill = getSkill(SkillType.S_TECH_MECH);
+        }
+        if(part.isRightTechType(SkillType.S_TECH_BA) && hasSkill(SkillType.S_TECH_BA)) {
+            if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_BA).getFinalSkillValue()) {
+                skill = getSkill(SkillType.S_TECH_BA);
+            }
+        }
+        if(part.isRightTechType(SkillType.S_TECH_AERO) && hasSkill(SkillType.S_TECH_AERO)) {
+            if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_AERO).getFinalSkillValue()) {
+                skill = getSkill(SkillType.S_TECH_AERO);
+            }
+        }
+        if(part.isRightTechType(SkillType.S_TECH_MECHANIC) && hasSkill(SkillType.S_TECH_MECHANIC)) {
+            if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue()) {
+                skill = getSkill(SkillType.S_TECH_MECHANIC);
+            }
+        }
+        if(part.isRightTechType(SkillType.S_TECH_VESSEL) && hasSkill(SkillType.S_TECH_VESSEL)) {
+            if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_VESSEL).getFinalSkillValue()) {
+                skill = getSkill(SkillType.S_TECH_VESSEL);
+            }
+        }
+        if(null != skill) {
+            return skill;
+        }
+        //if we are still here then we didn't have the right tech skill, so return the highest
+        //of any tech skills that we do have
+        if(hasSkill(SkillType.S_TECH_MECH)) {
+            skill = getSkill(SkillType.S_TECH_MECH);
+        }
+        if(hasSkill(SkillType.S_TECH_BA)) {
+            if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_BA).getFinalSkillValue()) {
+                skill = getSkill(SkillType.S_TECH_BA);
+            }
+        }
+        if(hasSkill(SkillType.S_TECH_MECHANIC)) {
+            if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue()) {
+                skill = getSkill(SkillType.S_TECH_MECHANIC);
+            }
+        }
+        if(hasSkill(SkillType.S_TECH_AERO)) {
+            if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_AERO).getFinalSkillValue()) {
+                skill = getSkill(SkillType.S_TECH_AERO);
+            }
+        }
+        return skill;
+    }
+    
+    public Skill getSkillForWorkingOn(Unit unit) {
     	if(null != unit && unit.getEntity() instanceof Mech && hasSkill(SkillType.S_TECH_MECH)) {
     		return getSkill(SkillType.S_TECH_MECH);
     	}
@@ -2048,56 +2103,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     			&& hasSkill(SkillType.S_TECH_AERO)) {
     		return getSkill(SkillType.S_TECH_AERO);
     	}
-    	//check spare parts
-    	//return the best one
-    	Skill skill = null;
-    	if(part.isRightTechType(SkillType.S_TECH_MECH) && hasSkill(SkillType.S_TECH_MECH)) {
-    		skill = getSkill(SkillType.S_TECH_MECH);
-    	}
-    	if(part.isRightTechType(SkillType.S_TECH_BA) && hasSkill(SkillType.S_TECH_BA)) {
-    		if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_BA).getFinalSkillValue()) {
-    			skill = getSkill(SkillType.S_TECH_BA);
-    		}
-    	}
-    	if(part.isRightTechType(SkillType.S_TECH_AERO) && hasSkill(SkillType.S_TECH_AERO)) {
-    		if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_AERO).getFinalSkillValue()) {
-    			skill = getSkill(SkillType.S_TECH_AERO);
-    		}
-    	}
-    	if(part.isRightTechType(SkillType.S_TECH_MECHANIC) && hasSkill(SkillType.S_TECH_MECHANIC)) {
-    		if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue()) {
-    			skill = getSkill(SkillType.S_TECH_MECHANIC);
-    		}
-    	}
-    	if(part.isRightTechType(SkillType.S_TECH_VESSEL) && hasSkill(SkillType.S_TECH_VESSEL)) {
-    		if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_VESSEL).getFinalSkillValue()) {
-    			skill = getSkill(SkillType.S_TECH_VESSEL);
-    		}
-    	}
-    	if(null != skill) {
-    		return skill;
-    	}
-    	//if we are still here then we didn't have the right tech skill, so return the highest
-    	//of any tech skills that we do have
-    	if(hasSkill(SkillType.S_TECH_MECH)) {
-    		skill = getSkill(SkillType.S_TECH_MECH);
-    	}
-    	if(hasSkill(SkillType.S_TECH_BA)) {
-    		if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_BA).getFinalSkillValue()) {
-    			skill = getSkill(SkillType.S_TECH_BA);
-    		}
-    	}
-    	if(hasSkill(SkillType.S_TECH_MECHANIC)) {
-    		if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue()) {
-    			skill = getSkill(SkillType.S_TECH_MECHANIC);
-    		}
-    	}
-    	if(hasSkill(SkillType.S_TECH_AERO)) {
-    		if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_AERO).getFinalSkillValue()) {
-    			skill = getSkill(SkillType.S_TECH_AERO);
-    		}
-    	}
-    	return skill;
+    	return null;   	
     }
     
     public Skill getSkillForWorkingOn(IAcquisitionWork acquisition, String skillName) {

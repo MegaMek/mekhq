@@ -2459,7 +2459,7 @@ public class Unit implements MekHqXmlSerializable {
     }
     
     public boolean canTakeTech() {
-        return tech == null && !(entity instanceof Jumpship) && !(entity instanceof SmallCraft);
+        return tech == null && requiresMaintenance() && !(entity instanceof Jumpship) && !(entity instanceof SmallCraft);
     }
     
     public boolean canTakeMoreGunners() {
@@ -2914,6 +2914,9 @@ public class Unit implements MekHqXmlSerializable {
     
     public boolean requiresMaintenance() {
         if(isDeployed() || !isPresent()) {
+            return false;
+        }
+        if(getEntity() instanceof Infantry && !(getEntity() instanceof BattleArmor)) {
             return false;
         }
         return true;
