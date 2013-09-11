@@ -274,6 +274,15 @@ public class Unit implements MekHqXmlSerializable {
 		}
 	}
 	
+	/** 
+	 * A convenience function to tell whether the unit can be acted upon
+	 * e.g. assigned pilots, techs, repaired, etc.
+	 * @return
+	 */
+	public boolean isAvailable() {
+	    return isPresent() && !isDeployed() && !isRefitting();
+	}
+	
 	public String getStatus() {
 	    if(isDeployed()) {
 	        return "Deployed";
@@ -2481,10 +2490,12 @@ public class Unit implements MekHqXmlSerializable {
     		minutesLeft = engineer.getMinutesLeft();
     		overtimeLeft = engineer.getOvertimeLeft();    		
     	}
-    	if(entity instanceof Dropship || entity instanceof Jumpship) {
+    	if(isSelfCrewed() && vesselCrew.size() > 0) {
     		int nCrew = 0;
         	int sumSkill = 0;
         	int sumBonus = 0;
+        	String engineerName = "Nobody";
+        	int bestRank = -1;
         	for(UUID pid : vesselCrew) {
         		Person p = campaign.getPerson(pid);
         		if(null == p) {
@@ -2495,12 +2506,19 @@ public class Unit implements MekHqXmlSerializable {
         			sumBonus += p.getSkill(SkillType.S_TECH_VESSEL).getBonus();
         			nCrew++;
         		}
+        		if(p.getRank() > bestRank) {
+        		    engineerName = p.getName();
+        		    bestRank = p.getRank();
+        		}
         	}
-    		engineer = new Person(commander.getName(), campaign.getRanks());
+    		engineer = new Person(engineerName, campaign.getRanks());
     		engineer.setMinutesLeft(minutesLeft);
     		engineer.setOvertimeLeft(overtimeLeft);
     		engineer.setId(commander.getId());
     		engineer.setPrimaryRole(Person.T_SPACE_CREW);
+    		if(bestRank > -1) {
+    		    engineer.setRank(bestRank);
+    		}
         	if(nCrew > 0) {
         		engineer.addSkill(SkillType.S_TECH_VESSEL, sumSkill/nCrew, sumBonus/nCrew);
         	}
@@ -2755,6 +2773,9 @@ public class Unit implements MekHqXmlSerializable {
     }
     
     public Person getTech() {
+        if(null != engineer) {
+            return engineer;
+        }
         if(null != tech) {
             return campaign.getPerson(tech);
         }
@@ -3052,12 +3073,16 @@ public class Unit implements MekHqXmlSerializable {
     }
     
     public boolean requiresMaintenance() {
-        if(isDeployed() || !isPresent()) {
+        if(!isAvailable()) {
             return false;
         }
         if(getEntity() instanceof Infantry && !(getEntity() instanceof BattleArmor)) {
             return false;
         }
         return true;
+    }
+    
+    public boolean isSelfCrewed() {
+        return (getEntity() instanceof SmallCraft || getEntity() instanceof Jumpship);
     }
 }

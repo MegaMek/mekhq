@@ -18,6 +18,8 @@ v0.3.2 (SVN)
 + Bug: GM Mode Complete Task for Ammo Acquisition fails and reports: You shouldn't be here (AmmoBin.find())
 + Bug [#386]: Missing help text for Finances tab
 + RFE [#108]: MM and MML histories & other docs
++ maintenance fixes for self-maintained vessels
++ added a Unit.isAvailable convenience function for units that are not deployed, are present, and not refitting and whatever else in the future would disallow making various types of changes
 
 v0.3.1 (2013-09-5)
 + Planetary Data Update 36

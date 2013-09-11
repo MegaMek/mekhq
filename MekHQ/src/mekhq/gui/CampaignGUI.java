@@ -3051,7 +3051,7 @@ public class CampaignGUI extends JPanel {
                 return;
             }
             Unit u = part.getUnit();
-            if(u.getEntity() instanceof Dropship || u.getEntity() instanceof Jumpship) {
+            if(null != u && u.isSelfCrewed()) {
                 tech = u.getEngineer();
             }
             if(null == tech) {
@@ -3321,10 +3321,13 @@ public class CampaignGUI extends JPanel {
         Vector<Unit> notMaintained = new Vector<Unit>();
         int totalAstechMinutesNeeded = 0;
         for(Unit u : getCampaign().getUnits()) {
-            if(u.requiresMaintenance() && null == u.getTechId()) {
+            if(u.requiresMaintenance() && null == u.getTech()) {
                 notMaintained.add(u);
             } else {
-                totalAstechMinutesNeeded += (u.getMaintenanceTime() * 6);
+                //only add astech minutes for non-crewed units
+                if(null == u.getEngineer()) {
+                    totalAstechMinutesNeeded += (u.getMaintenanceTime() * 6);
+                }
             }
         }
         
@@ -6239,7 +6242,7 @@ public class CampaignGUI extends JPanel {
             if(null != part) {
                 Unit u = part.getUnit();
                 Person tech = getSelectedTech();
-                if(null != u && (u.getEntity() instanceof Dropship || u.getEntity() instanceof Jumpship)) {
+                if(null != u && u.isSelfCrewed()) {
                     tech = u.getEngineer();
                     if(null == tech) {
                         target = new TargetRoll(TargetRoll.IMPOSSIBLE, "You must have a crew assigned to large vessels to attempt repairs.");
@@ -7643,7 +7646,7 @@ public class CampaignGUI extends JPanel {
                     }
                     menu.add(cbMenuItem);
                 }
-                menu.setEnabled(!unit.isDeployed());
+                menu.setEnabled(unit.isAvailable());
                 popup.add(menu);
                 // assign all tasks to a certain tech
                 menu = new JMenu("Assign all tasks");
@@ -7656,7 +7659,7 @@ public class CampaignGUI extends JPanel {
                     menu.add(menuItem);
                     i++;
                 }
-                menu.setEnabled(!unit.isDeployed());
+                menu.setEnabled(unit.isAvailable());
                 if(menu.getItemCount() > 20) {
                     MenuScroller.setScrollerFor(menu, 20);
                 }
@@ -7685,22 +7688,21 @@ public class CampaignGUI extends JPanel {
                     }
                     menu.add(ammoMenu);
                 }
-                menu.setEnabled(!unit.isDeployed());
+                menu.setEnabled(unit.isAvailable());
                 popup.add(menu);
                 // Salvage / Repair
                 if (unit.isSalvage()) {
                     menuItem = new JMenuItem("Repair");
                     menuItem.setActionCommand("REPAIR");
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(!unit.isDeployed()
-                            && unit.isRepairable() && !unit.isRefitting());
+                    menuItem.setEnabled(unit.isAvailable()
+                            && unit.isRepairable());
                     popup.add(menuItem);
                 } else {
                     menuItem = new JMenuItem("Salvage");
                     menuItem.setActionCommand("SALVAGE");
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(!unit.isDeployed()
-                            && !unit.isRefitting());
+                    menuItem.setEnabled(unit.isAvailable());
                     popup.add(menuItem);
                 }
                 popup.show(e.getComponent(), e.getX(), e.getY());
@@ -8230,9 +8232,9 @@ public class CampaignGUI extends JPanel {
             return true;
         }
         
-        private boolean areAllUnitsUndeployed(Vector<Unit> units) {
+        private boolean areAllUnitsAvailable(Vector<Unit> units) {
             for(Unit unit : units) {
-                if(unit.isDeployed()) {
+                if(!unit.isAvailable()) {
                     return false;
                 }
             }
@@ -8463,7 +8465,7 @@ public class CampaignGUI extends JPanel {
                                     menuItem = new JMenuItem(p.getFullTitle() + ", " + u.getName());
                                     menuItem.setActionCommand("ADD_UNIT|FORCE|"  + u.getId() + "|" + forceIds);
                                     menuItem.addActionListener(this);
-                                    menuItem.setEnabled(!u.isDeployed());
+                                    menuItem.setEnabled(u.isAvailable());
                                     menu.add(menuItem);
                                     menu.setEnabled(true);
                                 }
@@ -8473,7 +8475,7 @@ public class CampaignGUI extends JPanel {
                                 	menuItem = new JMenuItem("AutoTurret, " + u.getName());
                                     menuItem.setActionCommand("ADD_UNIT|FORCE|"  + u.getId() + "|" + forceIds);
                                     menuItem.addActionListener(this);
-                                    menuItem.setEnabled(!u.isDeployed());
+                                    menuItem.setEnabled(u.isAvailable());
                                     menu.add(menuItem);
                                     menu.setEnabled(true);
                                 }
@@ -8632,7 +8634,7 @@ public class CampaignGUI extends JPanel {
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
                     popup.add(menuItem);
-                    if(areAllUnitsUndeployed(units)) {
+                    if(areAllUnitsAvailable(units)) {
                         menu = new JMenu("Deploy Unit");
                         JMenu missionMenu;
                         for(Mission m : getCampaign().getMissions()) {
@@ -9631,7 +9633,7 @@ public class CampaignGUI extends JPanel {
                         cbMenuItem.addActionListener(this);
                         menu.add(cbMenuItem);
                         for (Unit unit : getCampaign().getUnits()) {
-                            if(unit.isDeployed() || !unit.isPresent()) {
+                            if(!unit.isAvailable()) {
                                 continue;
                             }
                             if(unit.usesSoloPilot()) {
@@ -13252,7 +13254,7 @@ public class CampaignGUI extends JPanel {
                     }
                     menu.add(cbMenuItem);
                 }
-                menu.setEnabled(!unit.isDeployed() && !unit.isRefitting());
+                menu.setEnabled(unit.isAvailable());
                 popup.add(menu);
                 
                 // Camo
@@ -13288,7 +13290,7 @@ public class CampaignGUI extends JPanel {
                         }
                         menu.add(ammoMenu);
                     }
-                    menu.setEnabled(!unit.isDeployed() && !unit.isRefitting());
+                    menu.setEnabled(unit.isAvailable());
                     if(menu.getItemCount() > 20) {
                         MenuScroller.setScrollerFor(menu, 20);
                     }
@@ -13303,15 +13305,14 @@ public class CampaignGUI extends JPanel {
                 // Salvage / Repair
                 if(oneSelected && !(unit.getEntity() instanceof Infantry && !(unit.getEntity() instanceof BattleArmor))) {
                     menu = new JMenu("Repair Status");
-                    menu.setEnabled(!unit.isDeployed() && !unit.isRefitting());
+                    menu.setEnabled(unit.isAvailable());
                     cbMenuItem = new JCheckBoxMenuItem("Repair");
                     if(!unit.isSalvage()) {
                         cbMenuItem.setSelected(true);
                     }
                     cbMenuItem.setActionCommand("REPAIR");
                     cbMenuItem.addActionListener(this);
-                    cbMenuItem.setEnabled(!unit.isDeployed()  && !unit.isRefitting()
-                            && unit.isRepairable());
+                    cbMenuItem.setEnabled(unit.isAvailable() && unit.isRepairable());
                     menu.add(cbMenuItem);
                     cbMenuItem = new JCheckBoxMenuItem("Salvage");
                     if(unit.isSalvage()) {
@@ -13319,11 +13320,11 @@ public class CampaignGUI extends JPanel {
                     }
                     cbMenuItem.setActionCommand("SALVAGE");
                     cbMenuItem.addActionListener(this);
-                    cbMenuItem.setEnabled(!unit.isDeployed() && !unit.isRefitting());
+                    cbMenuItem.setEnabled(unit.isAvailable());
                     menu.add(cbMenuItem);
                     popup.add(menu);
                 }
-                if(oneSelected && unit.requiresMaintenance()) {
+                if(oneSelected && unit.requiresMaintenance() && unit.isAvailable()) {
                     menu = new JMenu("Assign Tech");
                     for(Person tech : getCampaign().getTechs()) {
                         if(tech.canTech(unit.getEntity()) 
@@ -13334,7 +13335,7 @@ public class CampaignGUI extends JPanel {
                             }
                             cbMenuItem = new JCheckBoxMenuItem(tech.getFullTitle() + " (" + skillLvl + ", " + tech.getMaintenanceTimeUsing(getCampaign()) + "m)");                          
                             cbMenuItem.setActionCommand("ASSIGN:" + tech.getId());
-                            cbMenuItem.setEnabled(!unit.isDeployed() && !unit.isRefitting());
+                            cbMenuItem.setEnabled(true);
                             if(null != unit.getTechId() && unit.getTechId().equals(tech.getId())) {
                                 cbMenuItem.setSelected(true);
                             } else {
@@ -13351,7 +13352,7 @@ public class CampaignGUI extends JPanel {
                     menuItem = new JMenuItem("Disband");
                     menuItem.setActionCommand("DISBAND");
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(!unit.isDeployed());
+                    menuItem.setEnabled(unit.isAvailable());
                     popup.add(menuItem);
                 }
                 // Customize
@@ -13362,7 +13363,7 @@ public class CampaignGUI extends JPanel {
                     menuItem = new JMenuItem("Choose Refit Kit...");
                     menuItem.setActionCommand("REFIT_KIT");
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(!unit.isRefitting()
+                    menuItem.setEnabled(unit.isAvailable()
                             && (unit.getEntity() instanceof megamek.common.Mech ||
                                     unit.getEntity() instanceof megamek.common.Tank
                                     || (unit.getEntity() instanceof Infantry && !(unit.getEntity() instanceof BattleArmor))));
@@ -13370,7 +13371,7 @@ public class CampaignGUI extends JPanel {
                     menuItem = new JMenuItem("Customize in Mek Lab...");
                     menuItem.setActionCommand("CUSTOMIZE");
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(!unit.isRefitting()
+                    menuItem.setEnabled(unit.isAvailable()
                             && (unit.getEntity() instanceof megamek.common.Mech ||
                                     unit.getEntity() instanceof megamek.common.Tank
                                     || (unit.getEntity() instanceof Infantry && !(unit.getEntity() instanceof BattleArmor))));
@@ -13382,7 +13383,7 @@ public class CampaignGUI extends JPanel {
                         menuItem.setEnabled(true);
                         menu.add(menuItem);
                     }
-                    menu.setEnabled(!unit.isDeployed() && unit.isRepairable());
+                    menu.setEnabled(unit.isAvailable() && unit.isRepairable());
                     popup.add(menu);
                 }
                 //fill with personnel
@@ -13390,7 +13391,7 @@ public class CampaignGUI extends JPanel {
                     menuItem = new JMenuItem("Hire full complement");
                     menuItem.setActionCommand("HIRE_FULL");
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(!unit.isDeployed());
+                    menuItem.setEnabled(unit.isAvailable());
                     popup.add(menuItem);
                 }
                 if(oneSelected && !getCampaign().isCustom(unit)) {
