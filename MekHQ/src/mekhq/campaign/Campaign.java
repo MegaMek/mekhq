@@ -185,7 +185,7 @@ public class Campaign implements Serializable {
 	private int lastScenarioId;
 
 	// I need to put a basic game object in campaign so that I can
-	// asssign it to the entities, otherwise some entity methods may get NPE
+	// assign it to the entities, otherwise some entity methods may get NPE
 	// if they try to call up game options
 	private Game game;
 	private Player player;
@@ -228,7 +228,7 @@ public class Campaign implements Serializable {
 	private RandomSkillPreferences rskillPrefs = new RandomSkillPreferences();
 
 	private ShoppingList shoppingList;
-
+	
 	public Campaign() {
 		game = new Game();
 		player = new Player(0, "self");
@@ -1313,9 +1313,6 @@ public class Campaign implements Serializable {
 	    }
 	    //don't allow overtime minutes for mothballing because its cheating
 	    //since you dont roll
-	    if(tech.getName().contains("Joe")) {
-	        int bob = 1;
-	    }
 	    int minutes = Math.min(tech.getMinutesLeft(), u.getMothballTime());
 	    //check astech time
 	    if(!u.isSelfCrewed() && astechPoolMinutes < minutes * 6) {
@@ -1701,6 +1698,10 @@ public class Campaign implements Serializable {
 			// clear the ledger
 			finances.newFiscalYear(calendar.getTime());
 		}
+		/*
+		 * Now that we have maintenance checks in for real, we are going to pay maintenance
+		 * on individual units when they come up for their maintenance checks and apply a +1 penalty
+		 * if the cash is not there
 		if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
 			// maintenance costs
 			if (campaignOptions.payForMaintain()) {
@@ -1711,10 +1712,10 @@ public class Campaign implements Serializable {
 							+ formatter.format(getMaintenanceCosts())
 							+ " C-bills in maintenance costs");
 				} else {
-					addReport("<font color='red'><b>You cannot afford to pay maintenance costs!</b></font> Lucky for you that maintenance is not implemented yet.");
+					addReport("<font color='red'><b>You cannot afford to pay maintenance costs!</b></font> Units will make their next maintenance check at a disadvantage.");
 				}
 			}
-		}
+		}*/
 		if (calendar.get(Calendar.DAY_OF_MONTH) == 1) {
 			// check for contract payments
 			for (Contract contract : getActiveContracts()) {
@@ -1807,7 +1808,7 @@ public class Campaign implements Serializable {
 	public long getMaintenanceCosts() {
 		long costs = 0;
 		for (Unit u : units) {
-			if (!u.isSalvage()) {
+			if (u.requiresMaintenance() && null != u.getTech()) {
 				costs += u.getMaintenanceCost();
 			}
 		}
@@ -6236,19 +6237,16 @@ public class Campaign implements Serializable {
 	}
 
 	public void doMaintenance(Unit u) {
-		// skip this if deployed
 		if (!u.requiresMaintenance()) {
 			return;
 		}
 		// lets start by checking times
 		Person tech = u.getTech();
-		if(null != tech && tech.getName().contains("Joe")) {
-		    int bob = 1;
-		}
 		int minutesUsed = u.getMaintenanceTime();
 		int astechsUsed = getAvailableAstechs(minutesUsed, false);
 		boolean maintained = null != tech
 				&& tech.getMinutesLeft() > minutesUsed;
+		boolean paidMaintenance = true;
 		if (maintained) {
 			// use the time
 			tech.setMinutesLeft(tech.getMinutesLeft() - minutesUsed);
@@ -6263,6 +6261,15 @@ public class Campaign implements Serializable {
 			String techName = "Nobody";
 			if (null != tech) {
 				techName = tech.getName();
+				//maybe use the money
+	            if (campaignOptions.payForMaintain()) {
+	                if (finances.debit(u.getMaintenanceCost(),
+	                        Transaction.C_MAINTAIN, "Maintenance for " + u.getName(),
+	                        calendar.getTime())) {
+	                } else {
+	                    paidMaintenance = false;
+	                }
+	            }
 			}
 			// dont do actual damage until we clear the for loop to avoid
 			// concurrent mod problems
@@ -6276,6 +6283,10 @@ public class Campaign implements Serializable {
 					continue;
 				}
 				TargetRoll target = getTargetForMaintenance(p, tech);
+				if(!paidMaintenance) {
+				    //I should probably make this modifier user inputtable
+				    target.addModifier(1, "did not pay maintenance");
+				}
 				partReport += ", TN " + target.getValue() + "["
 						+ target.getDesc() + "]";
 				int roll = Compute.d6(2);
@@ -6415,8 +6426,12 @@ public class Campaign implements Serializable {
 				damageString = "<b><font color='red'>" + damageString
 						+ "</b></font>";
 			}
+			String paidString = "";
+			if(!paidMaintenance) {
+			    paidString = "<font color='red'>Could not afford maintenance costs, so check is at a penalty.</font>";
+			}
 			addReport(techName + " performs maintenance on " + u.getName()
-					+ ". " + qualityString + ". " + damageString);
+					+ ". " + paidString + qualityString + ". " + damageString);
 		}
 	}
 }
