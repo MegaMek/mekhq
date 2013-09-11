@@ -23,6 +23,7 @@ v0.3.2 (SVN)
 + allow mothballing of units
 + graphical display option for personnel and unit table
 + pay individual unit maintenance costs when maintenance cycle is up instead of weekly all at once
++ used parts value options depend on quality rating
 
 v0.3.1 (2013-09-5)
 + Planetary Data Update 36
