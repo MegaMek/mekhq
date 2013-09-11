@@ -28,9 +28,11 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.DataFlavor;
@@ -132,10 +134,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import megamek.client.ui.Messages;
 import megamek.client.ui.swing.MechTileset;
+import megamek.client.ui.swing.ChatLounge.MekInfo;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
+import megamek.common.Configuration;
 import megamek.common.ConvFighter;
 import megamek.common.Crew;
 import megamek.common.Dropship;
@@ -313,20 +317,22 @@ public class CampaignGUI extends JPanel {
     private static final int SV_NUM			= 4;
 
     //personnel views
-    private static final int PV_GENERAL = 0;
-    private static final int PV_PILOT   = 1;
-    private static final int PV_INF     = 2;
-    private static final int PV_TACTIC  = 3;
-    private static final int PV_TECH    = 4;
-    private static final int PV_ADMIN   = 5;
-    private static final int PV_FLUFF   = 6;
-    private static final int PV_NUM     = 7;
+    private static final int PV_GRAPHIC = 0;
+    private static final int PV_GENERAL = 1;
+    private static final int PV_PILOT   = 2;
+    private static final int PV_INF     = 3;
+    private static final int PV_TACTIC  = 4;
+    private static final int PV_TECH    = 5;
+    private static final int PV_ADMIN   = 6;
+    private static final int PV_FLUFF   = 7;
+    private static final int PV_NUM     = 8;
 
     //unit views
-    private static final int UV_GENERAL = 0;
-    private static final int UV_DETAILS = 1;
-    private static final int UV_STATUS  = 2;
-    private static final int UV_NUM     = 3;
+    private static final int UV_GRAPHIC = 0;
+    private static final int UV_GENERAL = 1;
+    private static final int UV_DETAILS = 2;
+    private static final int UV_STATUS  = 3;
+    private static final int UV_NUM     = 4;
 
     private JFrame frame;
 
@@ -3583,6 +3589,8 @@ public class CampaignGUI extends JPanel {
 
     public static String getPersonnelViewName(int group) {
         switch(group) {
+        case PV_GRAPHIC:
+            return "Graphic";
         case PV_GENERAL:
             return "General";
         case PV_PILOT:
@@ -3604,6 +3612,8 @@ public class CampaignGUI extends JPanel {
 
     public static String getUnitViewName(int group) {
         switch(group) {
+        case UV_GRAPHIC:
+            return "Graphic";
         case UV_GENERAL:
             return "General";
         case UV_DETAILS:
@@ -6479,10 +6489,71 @@ public class CampaignGUI extends JPanel {
     }
 
     private void changePersonnelView() {
-
+        
         int view = choicePersonView.getSelectedIndex();
         XTableColumnModel columnModel = (XTableColumnModel)personnelTable.getColumnModel();
-        if(view == PV_GENERAL) {
+        personnelTable.setRowHeight(15);
+        
+        
+        //set the renderer
+        TableColumn column = null;
+        for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
+            column = columnModel.getColumnByModelIndex(i);
+            column.setCellRenderer(personModel.getRenderer());
+            if(i == PersonnelTableModel.COL_RANK) {
+                if(view == PV_GRAPHIC) {
+                    column.setPreferredWidth(125);
+                    column.setHeaderValue("Person");
+                } else {
+                    column.setPreferredWidth(personModel.getColumnWidth(i));
+                    column.setHeaderValue("Rank");
+                }
+            }
+        }
+        
+        if(view == PV_GRAPHIC) {
+            personnelTable.setRowHeight(80);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NAME), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_CALL), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_AGE), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GENDER), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TYPE), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SKILL), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_FORCE), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_MECH), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_AERO), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_JET), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SPACE), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_VEE), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NVEE), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_VTOL), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_BA), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SMALL_ARMS), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ANTI_MECH), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ARTY), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TACTICS), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_STRATEGY), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_MECH), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_AERO), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_VEE), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_BA), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_MEDICAL), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ADMIN), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NEG), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SCROUNGE), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TOUGH), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_EDGE), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NABIL), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NIMP), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_HITS), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_KILLS), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
+        }
+        else if(view == PV_GENERAL) {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_CALL), false);
@@ -6769,7 +6840,44 @@ public class CampaignGUI extends JPanel {
 
         int view = choiceUnitView.getSelectedIndex();
         XTableColumnModel columnModel = (XTableColumnModel)unitTable.getColumnModel();
-        if(view == PV_GENERAL) {
+        unitTable.setRowHeight(15);
+              
+        //set the renderer
+        TableColumn column = null;
+        for (int i = 0; i < UnitTableModel.N_COL; i++) {
+            column = columnModel.getColumnByModelIndex(i);
+            column.setCellRenderer(unitModel.getRenderer());
+            if(i == UnitTableModel.COL_WCLASS) {
+                if(view == UV_GRAPHIC) {
+                    column.setPreferredWidth(125);
+                    column.setHeaderValue("Unit");
+                } else {
+                    column.setPreferredWidth(personModel.getColumnWidth(i));
+                    column.setHeaderValue("Weight Class");
+                }
+            }
+        }
+        
+        if(view == UV_GRAPHIC) {
+            unitTable.setRowHeight(80);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WCLASS), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WEIGHT), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_COST), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MAINTAIN), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUALITY), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH_CRW), true);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_BV), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PARTS), false);
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUIRKS), false);
+        } 
+        else if(view == UV_GENERAL) {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WCLASS), true);
@@ -10742,7 +10850,10 @@ public class CampaignGUI extends JPanel {
             return "?";
         }
 
-        public PersonnelTableModel.Renderer getRenderer() {
+        public TableCellRenderer getRenderer() {
+            if(choicePersonView.getSelectedIndex() == PV_GRAPHIC) {
+                return new PersonnelTableModel.VisualRenderer(getCamos(), getPortraits(), getMechTiles());
+            }
             return new PersonnelTableModel.Renderer();
         }
 
@@ -10779,7 +10890,297 @@ public class CampaignGUI extends JPanel {
             }
 
         }
+        
+        public class VisualRenderer extends MekInfo implements TableCellRenderer {
 
+            private static final long serialVersionUID = -9154596036677641620L;
+
+            public VisualRenderer(DirectoryItems camos, DirectoryItems portraits,
+                    MechTileset mt) {
+                super(camos, portraits, mt);
+            }
+            
+            public Component getTableCellRendererComponent(JTable table,
+                    Object value, boolean isSelected, boolean hasFocus,
+                    int row, int column) {
+                Component c = this;
+                int actualCol = table.convertColumnIndexToModel(column);
+                int actualRow = table.convertRowIndexToModel(row);
+                setText(getValueAt(actualRow, actualCol).toString(), isSelected);
+                Person p = getPerson(actualRow);
+                if (actualCol == COL_RANK) {
+                    setPortrait(p);
+                    setText(p.getFullDesc(), isSelected);
+                }
+                if(actualCol == COL_ASSIGN) {
+                    Unit u = getCampaign().getUnit(p.getUnitId());
+                    if(!p.getTechUnitIDs().isEmpty()) {
+                        u = getCampaign().getUnit(p.getTechUnitIDs().get(0));
+                    }
+                    if(null != u) {
+                        String desc = "<html><b>" + u.getName() + "</b><br>";
+                        desc += u.getEntity().getWeightClassName();
+                        if(!(u.getEntity() instanceof Dropship || u.getEntity() instanceof Jumpship)) {
+                            desc += " " + UnitType.getTypeDisplayableName(UnitType.determineUnitTypeCode(u.getEntity()));
+                        }
+                        desc += "<br>" + u.getStatus() + "</html>";
+                        setText(desc, isSelected);
+                        Image mekImage = getImageFor(u);
+                        if(null != mekImage) {
+                            setImage(mekImage);
+                        } else {
+                            clearImage();
+                        }
+                    } else {
+                        clearImage();
+                    }
+                }
+                if(actualCol == COL_FORCE) {
+                    Force force = getCampaign().getForceFor(p);
+                    if(null != force) {
+                        String desc = "<html><b>" + force.getName() + "</b>";
+                        Force parent = force.getParentForce();
+                        //cut off after three lines and don't include the top level
+                        int lines = 1;
+                        while(parent != null && null != parent.getParentForce() && lines < 4) {
+                            desc += "<br>" + parent.getName();
+                            lines++;
+                            parent = parent.getParentForce();
+                        }
+                        desc += "</html>";
+                        setText(desc, isSelected);
+                        Image forceImage = getImageFor(force);
+                        if(null != forceImage) {
+                            setImage(forceImage);
+                        } else {
+                            clearImage();
+                        }
+                    } else {
+                        clearImage();
+                    }
+                }
+                if(actualCol == COL_HITS) {
+                    Image hitImage = getHitsImage(p.getHits());
+                    if(null != hitImage) {
+                        setImage(hitImage);
+                        setText("", isSelected);
+                    } else {
+                        clearImage();
+                        setText("", isSelected);
+                    }
+                }
+                
+                if (isSelected) {
+                    c.setBackground(Color.DARK_GRAY);
+                } else {
+                    // tiger stripes
+                    if ((row % 2) == 0) {
+                        c.setBackground(new Color(220, 220, 220));
+                    } else {
+                        c.setBackground(Color.WHITE);
+                        
+                    }
+                }
+                return c;
+            }
+            
+            private Image getHitsImage(int hits) {
+                switch(hits) {
+                case 1:
+                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/onehit.png");
+                case 2:
+                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/twohits.png");
+                case 3:
+                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/threehits.png");
+                case 4:
+                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/fourhits.png");
+                case 5:
+                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/fivehits.png");
+                case 6:
+                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/sixhits.png");
+                }
+                return null;
+            }
+        }
+    }
+    
+    public class MekInfo extends JPanel {
+
+        /**
+         *
+         */
+        private static final long serialVersionUID = -7337823041775639463L;
+
+        private JLabel lblImage;
+        private JLabel lblLoad;
+        DirectoryItems camos;
+        DirectoryItems portraits;
+        MechTileset mt;
+
+        public MekInfo(DirectoryItems camos, DirectoryItems portraits, MechTileset mt) {
+            this.camos = camos;
+            this.portraits = portraits;
+            this.mt = mt;
+            lblImage = new JLabel();
+            lblLoad = new JLabel();
+
+            GridBagLayout gridbag = new GridBagLayout();
+            GridBagConstraints c = new GridBagConstraints();
+            setLayout(gridbag);
+
+            c.fill = GridBagConstraints.NONE;
+            c.insets = new Insets(1, 1, 1, 1);
+            c.gridx = 0;
+            c.gridy = 0;
+            c.weightx = 0.0;
+            c.weighty = 0.0;
+            c.gridwidth = 1;
+            c.gridheight = 1;
+            c.anchor = GridBagConstraints.CENTER;
+            gridbag.setConstraints(lblLoad, c);
+            add(lblLoad);
+
+            c.fill = GridBagConstraints.BOTH;
+            c.insets = new Insets(1, 1, 1, 1);
+            c.gridx = 1;
+            c.gridy = 0;
+            c.weightx = 1.0;
+            c.weighty = 1.0;
+            c.gridwidth = 1;
+            c.gridheight = 1;
+            c.anchor = GridBagConstraints.NORTHWEST;
+            gridbag.setConstraints(lblImage, c);
+            add(lblImage);
+
+            lblImage.setBorder(BorderFactory.createEmptyBorder());
+        }
+
+        public void setText(String s, boolean isSelected) {
+            String color = "black";
+            if (isSelected) {
+                color = "white";
+            }
+            lblImage.setText("<html><font size='2' color='" + color + "'>" + s
+                    + "</font></html>");
+        }
+
+        public void clearImage() {
+            lblImage.setIcon(null);
+        }
+
+        public void setImage(Image img) {
+            lblImage.setIcon(new ImageIcon(img));
+        }
+
+        public JLabel getLabel() {
+            return lblImage;
+        }
+
+        public void setLoad(boolean load) {
+            // if this is a loaded unit then do something with lblLoad to make
+            // it show up
+            // otherwise clear lblLoad
+            if (load) {
+                lblLoad.setText(" +");
+            } else {
+                lblLoad.setText("");
+            }
+        }
+        
+        protected Image getImageFor(Unit u) {
+            
+            if(null == mt) { 
+                return null;
+            }
+            Image base = mt.imageFor(u.getEntity(), this, -1);
+            int tint = PlayerColors.getColorRGB(u.campaign.getColorIndex());
+            EntityImage entityImage = new EntityImage(base, tint, getCamo(u), this);
+            return entityImage.loadPreviewImage();
+        }
+        
+        protected Image getCamo(Unit unit) {
+            // Try to get the player's camo file.
+            Image camo = null;
+            try {
+                camo = (Image) camos.getItem(unit.getCamoCategory(), unit.getCamoFileName());
+            } catch (Exception err) {
+                err.printStackTrace();
+            }
+            return camo;
+        }
+        
+        protected void setPortrait(Person p) {
+
+            String category = p.getPortraitCategory();
+            String file = p.getPortraitFileName();
+
+            // Return a null if the player has selected no portrait file.
+            if ((null == category) || (null == file)) {
+                return;
+            }
+
+            if (Crew.ROOT_PORTRAIT.equals(category)) {
+                category = "";
+            }
+
+            if (Crew.PORTRAIT_NONE.equals(file)) {
+                file = "default.gif";
+            }
+
+            // Try to get the player's portrait file.
+            Image portrait = null;
+            try {
+                portrait = (Image) portraits.getItem(category, file);
+                if (null == portrait) {
+                    // the image could not be found so switch to default one
+                    p.setPortraitCategory(Crew.ROOT_PORTRAIT);
+                    category = "";
+                    p.setPortraitFileName(Crew.PORTRAIT_NONE);
+                    file = "default.gif";
+                    portrait = (Image) portraits.getItem(category, file);
+                }
+                // make sure no images are longer than 72 pixels
+                if (null != portrait) {
+                    portrait = portrait.getScaledInstance(-1, 58,
+                            Image.SCALE_SMOOTH);
+                    setImage(portrait);
+                }
+            } catch (Exception err) {
+                err.printStackTrace();
+            }
+        }
+        
+        protected Image getImageFor(Force force) {
+            String category = force.getIconCategory();
+            String file = force.getIconFileName();
+
+            if(Crew.ROOT_PORTRAIT.equals(category)) {
+             category = "";
+            }
+
+            // Return a null if the player has selected no portrait file.
+            if ((null == category) || (null == file) || Crew.PORTRAIT_NONE.equals(file)) {
+             file = "empty.png";
+            }
+
+            // Try to get the player's portrait file.
+            Image portrait = null;
+            try {
+             portrait = (Image) getForceIcons().getItem(category, file);
+            if(null != portrait) {
+                portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
+            } else {
+                portrait = (Image) getForceIcons().getItem("", "empty.png");
+                if(null != portrait) {
+                    portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
+                }
+            }
+            return portrait;
+            } catch (Exception err) {
+                err.printStackTrace();
+                return null;
+            }
+       }
     }
 
     /**
@@ -12834,7 +13235,10 @@ public class CampaignGUI extends JPanel {
             return "?";
         }
 
-        public UnitTableModel.Renderer getRenderer() {
+        public TableCellRenderer getRenderer() {
+            if(choiceUnitView.getSelectedIndex() == UV_GRAPHIC) {
+                return new UnitTableModel.VisualRenderer(getCamos(), getPortraits(), getMechTiles());
+            }
             return new UnitTableModel.Renderer();
         }
 
@@ -12895,6 +13299,76 @@ public class CampaignGUI extends JPanel {
                 return this;
             }
 
+        }
+        
+        public class VisualRenderer extends MekInfo implements TableCellRenderer {
+
+            private static final long serialVersionUID = -9154596036677641620L;
+
+            public VisualRenderer(DirectoryItems camos, DirectoryItems portraits,
+                    MechTileset mt) {
+                super(camos, portraits, mt);
+            }
+            
+            public Component getTableCellRendererComponent(JTable table,
+                    Object value, boolean isSelected, boolean hasFocus,
+                    int row, int column) {
+                Component c = this;
+                int actualCol = table.convertColumnIndexToModel(column);
+                int actualRow = table.convertRowIndexToModel(row);
+                setText(getValueAt(actualRow, actualCol).toString(), isSelected);
+                Unit u = getUnit(actualRow);
+                if (actualCol == COL_PILOT) {
+                    Person p = u.getCommander();
+                    if(null != p) {
+                        setPortrait(p);
+                        setText(p.getFullDesc(), isSelected);
+                    } else {
+                        clearImage();
+                    }
+                }
+                if (actualCol == COL_TECH_CRW) {
+                    Person p = u.getTech();
+                    if(null != p) {
+                        setPortrait(p);
+                        setText(p.getFullDesc(), isSelected);
+                    } else {
+                        clearImage();
+                    }
+                }
+                if(actualCol == COL_WCLASS) {
+                    if(null != u) {
+                        String desc = "<html><b>" + u.getName() + "</b><br>";
+                        desc += u.getEntity().getWeightClassName();
+                        if(!(u.getEntity() instanceof Dropship || u.getEntity() instanceof Jumpship)) {
+                            desc += " " + UnitType.getTypeDisplayableName(UnitType.determineUnitTypeCode(u.getEntity()));
+                        }
+                        desc += "<br>" + u.getStatus() + "</html>";
+                        setText(desc, isSelected);
+                        Image mekImage = getImageFor(u);
+                        if(null != mekImage) {
+                            setImage(mekImage);
+                        } else {
+                            clearImage();
+                        }
+                    } else {
+                        clearImage();
+                    }
+                }
+                
+                if (isSelected) {
+                    c.setBackground(Color.DARK_GRAY);
+                } else {
+                    // tiger stripes
+                    if ((row % 2) == 0) {
+                        c.setBackground(new Color(220, 220, 220));
+                    } else {
+                        c.setBackground(Color.WHITE);
+                        
+                    }
+                }
+                return c;
+            }
         }
 
     }

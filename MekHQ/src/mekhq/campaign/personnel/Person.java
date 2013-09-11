@@ -1537,6 +1537,18 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         return toReturn;
     }
 	
+	/**
+	 * returns a full description in html format that will be used for the graphical display in 
+	 * the personnel table
+	 * @return
+	 */
+	public String getFullDesc() {
+        String toReturn = "<html><font size='2'><b>" + getFullTitle() + "</b><br/>";
+        toReturn += getSkillSummary() + " " + getRoleDesc();
+        toReturn += "</font></html>";
+        return toReturn;
+    }
+	
 	public String getFullTitle() {
 		String rank = ranks.getRank(getRank());
 		if(rank.equalsIgnoreCase("None")) {
