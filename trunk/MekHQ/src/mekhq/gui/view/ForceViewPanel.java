@@ -521,10 +521,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
     
     public String getSummaryFor(Person person) {
         String toReturn = "<html><font size='2'><b>" + person.getFullTitle() + "</b><br/>";
-        toReturn += person.getRoleDesc();
-       // Pilot pilot = ((PilotPerson)person).getPilot();
-        //toReturn += " (" + pilot.getGunnery() + "/" + pilot.getPiloting() + ")<br/>";
-        //toReturn += pilot.getStatusDesc();
+        toReturn += person.getSkillSummary() + " " + person.getRoleDesc();
         toReturn += "</font></html>";
         return toReturn;
     }
