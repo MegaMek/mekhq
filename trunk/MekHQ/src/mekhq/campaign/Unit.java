@@ -1563,7 +1563,17 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	}
     }
     
+    /**
+     * The weekly maintenance cycle combined with a user defined maintenance cycle length
+     * is confusing and difficult to manage so lets just make maintenance costs relative 
+     * to the length of the maintenance cycle that the user defined
+     * @return
+     */
     public int getMaintenanceCost() {
+        return (int)Math.ceil(getWeeklyMaintenanceCost() * (campaign.getCampaignOptions().getMaintenanceCycleDays() / 7.0));
+    }
+    
+    public int getWeeklyMaintenanceCost() {
     	Entity en = getEntity();
     	Boolean isOmni = en.isOmni();
     	double mCost = 0;
