@@ -690,7 +690,7 @@ public class Campaign implements Serializable {
 	public ArrayList<Unit> getServiceableUnits() {
 		ArrayList<Unit> service = new ArrayList<Unit>();
 		for (Unit u : getUnits()) {
-			if (u.isDeployed() || u.isRefitting()) {
+			if (!u.isAvailable()) {
 				continue;
 			}
 			if (u.isSalvage() || !u.isRepairable()) {
@@ -986,6 +986,7 @@ public class Campaign implements Serializable {
 	 * @param unitId
 	 * @return
 	 */
+	/*
 	public String getUnitDesc(UUID unitId) {
 		Unit unit = getUnit(unitId);
 		String toReturn = "<html><font size='2'";
@@ -1008,11 +1009,12 @@ public class Campaign implements Serializable {
 		 * numberFormat.format(cost) + " " + (cost != 0 ? "CBills" : "CBill");
 		 * toReturn += "Repair cost : " + text + "<br/>"; }
 		 */
-
+/*
 		toReturn += "</font>";
 		toReturn += "</html>";
 		return toReturn;
 	}
+*/
 
 	public String healPerson(Person medWork, Person doctor) {
 		String report = "";
@@ -4184,9 +4186,9 @@ public class Campaign implements Serializable {
 	public TargetRoll getTargetFor(IPartWork partWork, Person tech) {
 		Skill skill = tech.getSkillForWorkingOn(partWork);
 		int modePenalty = Modes.getModeExperienceReduction(partWork.getMode());
-		if (null != partWork.getUnit() && partWork.getUnit().isDeployed()) {
+		if (null != partWork.getUnit() && !partWork.getUnit().isAvailable()) {
 			return new TargetRoll(TargetRoll.IMPOSSIBLE,
-					"This unit is currently deployed!");
+					"This unit is not currently available!");
 		}
 		if (partWork.getAssignedTeamId() != null
 				&& !partWork.getAssignedTeamId().equals(tech.getId())) {
@@ -4268,8 +4270,23 @@ public class Campaign implements Serializable {
 				minutes = tech.getMinutesLeft();
 			}
 		}
-		int helpers = getAvailableAstechs(minutes, isOvertime);
-		int helpMod = getShorthandedMod(helpers, false);
+		int helpMod = 0;
+		if(null != partWork.getUnit() && partWork.getUnit().isSelfCrewed()) {
+		    int hits = 0;
+		    if(null != partWork.getUnit().getEntity().getCrew()) {
+		        hits = partWork.getUnit().getEntity().getCrew().getHits();
+		    } else {
+		        hits = 6;
+		    }
+		    helpMod = getShorthandedModForCrews(hits);
+		} else {
+		    int helpers = getAvailableAstechs(minutes, isOvertime);
+		    helpMod = getShorthandedMod(helpers, false);
+		    // we may have just gone overtime with our helpers
+	        if (!isOvertime && astechPoolMinutes < (minutes * helpers)) {
+	            target.addModifier(3, "overtime astechs");
+	        }
+		}
 		if (null != partWork.getUnit()
 				&& (partWork.getUnit().getEntity() instanceof Dropship || partWork
 						.getUnit().getEntity() instanceof Jumpship)) {
@@ -4280,10 +4297,6 @@ public class Campaign implements Serializable {
 		}
 		if (helpMod > 0) {
 			target.addModifier(helpMod, "shorthanded");
-		}
-		// we may have just gone overtime with our helpers
-		if (!isOvertime && astechPoolMinutes < (minutes * helpers)) {
-			target.addModifier(3, "overtime astechs");
 		}
 		return target;
 	}
@@ -4331,8 +4344,19 @@ public class Campaign implements Serializable {
 			// "astech days" used over
 			// the cycle and take the average per day rounding down as our team
 			// size
-			int helpers = partWork.getUnit().getAstechsMaintained();
-			int helpMod = getShorthandedMod(helpers, false);
+			int helpMod = 0;
+	        if(null != partWork.getUnit() && partWork.getUnit().isSelfCrewed()) {
+	            int hits = 0;
+	            if(null != partWork.getUnit().getEntity().getCrew()) {
+	                hits = partWork.getUnit().getEntity().getCrew().getHits();
+	            } else {
+	                hits = 6;
+	            }
+	            helpMod = getShorthandedModForCrews(hits);
+	        } else {
+	            int helpers = partWork.getUnit().getAstechsMaintained();
+	            helpMod = getShorthandedMod(helpers, false);
+	        }
 			if (helpMod > 0) {
 				target.addModifier(helpMod, "shorthanded");
 			}
@@ -4494,6 +4518,20 @@ public class Campaign implements Serializable {
 		}
 		return helpMod;
 	}
+	
+	public int getShorthandedModForCrews(int hits) {
+        int helpMod = 0;
+        if (hits >= 5) {
+            helpMod = 4;
+        } else if (hits == 4) {
+            helpMod = 3;
+        } else if (hits == 3) {
+            helpMod = 2;
+        } else if (hits > 0) {
+            helpMod = 1;
+        }
+        return helpMod;
+    }
 
 	public int getMedicsPerDoctor() {
 		int ndocs = getDoctors().size();
@@ -6148,11 +6186,8 @@ public class Campaign implements Serializable {
 			return;
 		}
 		// lets start by checking times
-		Person tech = null;
+		Person tech = u.getTech();
 		int minutesUsed = u.getMaintenanceTime();
-		if (null != u.getTechId()) {
-			tech = getPerson(u.getTechId());
-		}
 		int astechsUsed = getAvailableAstechs(minutesUsed, false);
 		boolean maintained = null != tech
 				&& tech.getMinutesLeft() > minutesUsed;
