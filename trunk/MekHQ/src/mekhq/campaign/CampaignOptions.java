@@ -97,7 +97,7 @@ public class CampaignOptions implements Serializable {
     private boolean sellUnits;
     private boolean sellParts;
     private boolean useLoanLimits;
-    private double usedPartsValue;
+    private double[] usedPartsValue;
     private double damagedPartsValue;
     private double canceledOrderReimbursement;
     private boolean usePercentageMaint; // Unofficial
@@ -194,7 +194,13 @@ public class CampaignOptions implements Serializable {
         tasksXP = 1;
         mistakeXP = 0;
         successXP = 0;
-        usedPartsValue = 0.5;
+        usedPartsValue = new double[6];
+        usedPartsValue[0] = 0.1;
+        usedPartsValue[1] = 0.2;
+        usedPartsValue[2] = 0.3;
+        usedPartsValue[3] = 0.5;
+        usedPartsValue[4] = 0.7;
+        usedPartsValue[5] = 0.9;
         damagedPartsValue = 0.33;
         canceledOrderReimbursement = 0.5;
         usePortraitForType = new boolean[Person.T_NUM];
@@ -300,12 +306,12 @@ public class CampaignOptions implements Serializable {
         this.clanPriceModifier = d;
     }
     
-    public double getUsedPartsValue() {
-        return usedPartsValue;
+    public double getUsedPartsValue(int quality) {
+        return usedPartsValue[quality];
     }
     
-    public void setUsedPartsValue(double d) {
-        this.usedPartsValue = d;
+    public void setUsedPartsValue(double d, int quality) {
+        this.usedPartsValue[quality] = d;
     }
     
     public double getDamagedPartsValue() {
@@ -877,7 +883,12 @@ public class CampaignOptions implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForOverhead", payForOverhead);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForMaintain", payForMaintain);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForTransport", payForTransport);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "usedPartsValue", usedPartsValue);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "usedPartsValueA", usedPartsValue[0]);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "usedPartsValueB", usedPartsValue[1]);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "usedPartsValueC", usedPartsValue[2]);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "usedPartsValueD", usedPartsValue[3]);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "usedPartsValueE", usedPartsValue[4]);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "usedPartsValueF", usedPartsValue[5]);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "damagedPartsValue", damagedPartsValue);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "canceledOrderReimbursement", canceledOrderReimbursement);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "sellUnits", sellUnits);
@@ -1068,9 +1079,19 @@ public class CampaignOptions implements Serializable {
 					retVal.sellParts = true;
 				else
 					retVal.sellParts = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValue")) {
-				retVal.usedPartsValue = Double.parseDouble(wn2.getTextContent().trim());
-			} else if (wn2.getNodeName().equalsIgnoreCase("damagedPartsValue")) {
+			} else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueA")) {
+				retVal.usedPartsValue[0] = Double.parseDouble(wn2.getTextContent().trim());
+			} else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueB")) {
+                retVal.usedPartsValue[1] = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueC")) {
+                retVal.usedPartsValue[2] = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueD")) {
+                retVal.usedPartsValue[3] = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueE")) {
+                retVal.usedPartsValue[4] = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueF")) {
+                retVal.usedPartsValue[5] = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("damagedPartsValue")) {
 				retVal.damagedPartsValue = Double.parseDouble(wn2.getTextContent().trim());
 			} else if (wn2.getNodeName().equalsIgnoreCase("canceledOrderReimbursement")) {
                 retVal.canceledOrderReimbursement = Double.parseDouble(wn2.getTextContent().trim());

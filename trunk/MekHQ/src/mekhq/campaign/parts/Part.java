@@ -262,7 +262,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 			cost *= campaign.getCampaignOptions().getDamagedPartsValue();
 			//TODO: parts that cant be fixed should also be further reduced in price
 		} else if(!isBrandNew()) {
-			cost *= campaign.getCampaignOptions().getUsedPartsValue();
+			cost *= campaign.getCampaignOptions().getUsedPartsValue(getQuality());
 		}
 		return cost;
 	}
