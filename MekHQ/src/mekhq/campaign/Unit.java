@@ -161,6 +161,8 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.campaign.work.IMothballWork;
+import mekhq.campaign.work.Modes;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -172,7 +174,7 @@ import org.w3c.dom.NodeList;
  * 
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Unit implements MekHqXmlSerializable {
+public class Unit implements MekHqXmlSerializable, IMothballWork {
 
     public static final int SITE_FIELD = 0;
 	public static final int SITE_MOBILE_BASE = 1;
@@ -200,7 +202,12 @@ public class Unit implements MekHqXmlSerializable {
 	private ArrayList<UUID> gunners;
 	private ArrayList<UUID> vesselCrew;
 	private UUID navigator;
+	//this is the id of the tech assigned for maintenance if any
 	private UUID tech;
+	
+	//mothballing variables - if mothball time is not zero then mothballing/activating is in progress
+	private int mothballTime;
+	private boolean mothballed;
 	
 	private int daysSinceMaintenance;
 	private int daysActivelyMaintained;
@@ -245,6 +252,8 @@ public class Unit implements MekHqXmlSerializable {
 		this.vesselCrew = new ArrayList<UUID>();    
 		this.navigator = null;
 		this.tech = null;
+		this.mothballTime = 0;
+		this.mothballed = false;
 		this.oldDrivers = new ArrayList<Integer>();
 		this.oldGunners = new ArrayList<Integer>();  
 		this.oldVesselCrew = new ArrayList<Integer>();    
@@ -280,10 +289,20 @@ public class Unit implements MekHqXmlSerializable {
 	 * @return
 	 */
 	public boolean isAvailable() {
-	    return isPresent() && !isDeployed() && !isRefitting();
+	    return isPresent() && !isDeployed() && !isRefitting() && !isMothballing() && !isMothballed();
 	}
 	
 	public String getStatus() {
+	    if(isMothballing()) {
+            if(isMothballed()) {
+                return "Activating (" + getMothballTime() + "m)";
+            } else {
+                return "Mothballing (" + getMothballTime() + "m)";
+            }
+        }
+	    if(isMothballed()) {
+	        return "Mothballed";
+	    }	    
 	    if(isDeployed()) {
 	        return "Deployed";
 	    }
@@ -1383,6 +1402,14 @@ public class Unit implements MekHqXmlSerializable {
                 +astechDaysMaintained
                 +"</astechDaysMaintained>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
+                +"<mothballTime>"
+                +mothballTime
+                +"</mothballTime>");
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
+                +"<mothballed>"
+                +mothballed
+                +"</mothballed>");
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
                 +"<history>"
                 +MekHqXmlUtil.escape(history)
                 +"</history>");
@@ -1419,6 +1446,8 @@ public class Unit implements MekHqXmlSerializable {
                     retVal.daysActivelyMaintained = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysSinceMaintenance")) {
                     retVal.daysSinceMaintenance = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("mothballTime")) {
+                    retVal.mothballTime = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("astechDaysMaintained")) {
                     retVal.astechDaysMaintained = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("driverId")) {
@@ -1462,7 +1491,12 @@ public class Unit implements MekHqXmlSerializable {
 						retVal.salvaged = true;
 					else
 						retVal.salvaged = false;
-				} else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
+				} else if (wn2.getNodeName().equalsIgnoreCase("mothballed")) {
+                    if (wn2.getTextContent().equalsIgnoreCase("true"))
+                        retVal.mothballed = true;
+                    else
+                        retVal.mothballed = false;
+                } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
 					retVal.entity = MekHqXmlUtil.getEntityFromXmlString(wn2);
 				} else if (wn2.getNodeName().equalsIgnoreCase("refit")) {
 					retVal.refit = Refit.generateInstanceFromXML(wn2, retVal, version);
@@ -2511,16 +2545,28 @@ public class Unit implements MekHqXmlSerializable {
         		    bestRank = p.getRank();
         		}
         	}
-    		engineer = new Person(engineerName, campaign.getRanks());
-    		engineer.setMinutesLeft(minutesLeft);
-    		engineer.setOvertimeLeft(overtimeLeft);
-    		engineer.setId(commander.getId());
-    		engineer.setPrimaryRole(Person.T_SPACE_CREW);
-    		if(bestRank > -1) {
-    		    engineer.setRank(bestRank);
-    		}
         	if(nCrew > 0) {
-        		engineer.addSkill(SkillType.S_TECH_VESSEL, sumSkill/nCrew, sumBonus/nCrew);
+        		engineer = new Person(engineerName, campaign.getRanks());
+        		engineer.setMinutesLeft(minutesLeft);
+        		engineer.setOvertimeLeft(overtimeLeft);
+        		engineer.setId(commander.getId());
+        		engineer.setPrimaryRole(Person.T_SPACE_CREW);
+        		if(bestRank > -1) {
+        		    engineer.setRank(bestRank);
+        		}
+                engineer.addSkill(SkillType.S_TECH_VESSEL, sumSkill/nCrew, sumBonus/nCrew);
+        	} else {
+        	    engineer = null;
+        	    //cancel any mothballing if this happens
+        	    if(isMothballing()) {
+        	        mothballTime = 0;
+        	    }
+        	    //remove any scheduled tasks
+        	    for(Part p : getParts()) {
+        	        if(null != p.getAssignedTeamId()) {
+        	            p.cancelAssignment();
+        	        }
+        	    }
         	}
     	}
     	pilot.setToughness(commander.getToughness());
@@ -2782,6 +2828,69 @@ public class Unit implements MekHqXmlSerializable {
         return null;
     }
     
+    public boolean isMothballing() {
+        return mothballTime > 0;
+    }
+    
+    public int getMothballTime() {
+        return mothballTime;
+    }
+    
+    public void setMothballTime(int t) {
+        mothballTime = t;
+    }
+    
+    public boolean isMothballed() {
+        return mothballed;
+    }
+    
+    public void setMothballed(boolean b) {
+        this.mothballed = b;
+        if(mothballed) {
+            //remove any other personnel
+            for(Person p : getCrew()) {
+                remove(p, true);
+            }
+            if(null != tech) {
+                remove(getTech(), true);
+            }
+            resetPilotAndEntity();
+        } else {
+            //start maintenance cycle over again
+            resetDaysSinceMaintenance();
+        }
+    }
+    
+    public void startMothballing(UUID id) {
+        //set this person as tech
+        if(!isSelfCrewed() && null != tech && !tech.equals(id)) {
+            if(null != getTech()) {
+                remove(getTech(), true);
+            }
+        }
+        tech = id;
+        //dont remove personnel yet, because self crewed units need their crews to mothball
+        campaign.removeUnitFromForce(this);
+        //clear any assigned tasks
+        for(Part p : getParts()) {
+            p.cancelAssignment();
+        }
+        //set mothballing time
+        if(getEntity() instanceof Infantry) {
+            mothballTime = 480;
+        } 
+        else if(getEntity() instanceof Dropship || getEntity() instanceof Jumpship) {
+            mothballTime = 480 * (int)Math.ceil(getEntity().getWeight()/500.0);
+        } else {
+            if(isMothballed()) {
+                mothballTime = 480;
+            } else {
+                mothballTime = 960;
+            }
+        }
+        campaign.mothball(this);
+    }
+    
     public ArrayList<Person> getActiveCrew() {
     	ArrayList<Person> crew = new ArrayList<Person>();
     	for(UUID id : drivers) {
@@ -2873,7 +2982,7 @@ public class Unit implements MekHqXmlSerializable {
     public UUID getTechId() {
         return tech;
     }
-    
+
     public int getOldId() {
     	return oldId;
     }
@@ -3084,5 +3193,54 @@ public class Unit implements MekHqXmlSerializable {
     
     public boolean isSelfCrewed() {
         return (getEntity() instanceof SmallCraft || getEntity() instanceof Jumpship);
+    }
+
+    
+    /*MOTHBALL RELATED STUFF*/
+    
+    @Override
+    public boolean needsFixing() {
+        return isMothballing();
+    }
+
+    @Override
+    public int getDifficulty() {
+        return TargetRoll.AUTOMATIC_SUCCESS;
+    }
+
+    @Override
+    public TargetRoll getAllMods() {
+        TargetRoll mods = new TargetRoll(getDifficulty(), "difficulty");
+        return mods;
+    }
+    
+    @Override
+    public String fail(int rating) {
+        return "you shouldn't be here.";
+    }
+
+    @Override
+    public String succeed() {
+        mothballTime = 0;
+        if(null != getTech()) {
+            remove(getTech(), false);
+        }
+        if(isMothballed()) {
+            mothballed = true;
+            return "Activation of " + getName() + " complete.";
+        } else {
+            mothballed = false;
+            return "Mothballing of " + getName() + " complete.";
+        }
+    }
+
+    @Override
+    public UUID getAssignedTeamId() {
+        return getTechId();
+    }
+
+    @Override
+    public int getMode() {
+        return Modes.MODE_NORMAL;
     }
 }

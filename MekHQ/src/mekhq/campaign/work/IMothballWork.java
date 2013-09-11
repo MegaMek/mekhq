@@ -1,7 +1,7 @@
 /*
- * IWork.java
+ * IMothballWork.java
  * 
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2013 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
  * This file is part of MekHQ.
  * 
@@ -20,29 +20,10 @@
  */
 package mekhq.campaign.work;
 
-import java.util.UUID;
-
-import megamek.common.TargetRoll;
-
-
 /**
  * 
  * @author Jay
  */
-public abstract interface IWork {
-
-	public abstract boolean needsFixing();
-	
-	public abstract int getDifficulty();
-	
-	public abstract TargetRoll getAllMods();
-	
-	public abstract String succeed();
-	
-	public abstract String fail(int rating);
-	
-	public abstract UUID getAssignedTeamId();
-
-	public abstract int getMode();
-	
+public interface IMothballWork extends IWork {
+    
 }
