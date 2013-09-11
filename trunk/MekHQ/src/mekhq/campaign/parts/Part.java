@@ -1107,5 +1107,12 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     public boolean needsMaintenance() {
         return true;
     }
+    
+    public void cancelAssignment() {
+        setTeamId(null);
+        resetOvertime();
+        resetTimeSpent();
+        setShorthandedMod(0);
+    }
 }
 

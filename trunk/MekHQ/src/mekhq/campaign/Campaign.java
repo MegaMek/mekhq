@@ -1303,6 +1303,50 @@ public class Campaign implements Serializable {
 		return found;
 	}
 
+	public void mothball(Unit u) {
+	    Person tech = u.getTech();
+	    if(null == tech) {
+	        //uh-oh
+	        //TODO: report someting
+	        addReport("No tech assigned to the mothballing of " + u.getName());
+	        return;
+	    }
+	    //don't allow overtime minutes for mothballing because its cheating
+	    //since you dont roll
+	    if(tech.getName().contains("Joe")) {
+	        int bob = 1;
+	    }
+	    int minutes = Math.min(tech.getMinutesLeft(), u.getMothballTime());
+	    //check astech time
+	    if(!u.isSelfCrewed() && astechPoolMinutes < minutes * 6) {
+	        //uh-oh
+	        addReport("Not enough astechs to work on mothballing of " + u.getName());
+	        return;
+	    }
+	    u.setMothballTime(u.getMothballTime() - minutes);
+	    String action = " mothballing ";
+	    if(u.isMothballed()) {
+	        action = " activating ";
+	    }
+	    String report = tech.getFullTitle() + " spent " + minutes + " minutes" + action + u.getName();
+	    if(!u.isMothballing()) {
+	        if(u.isMothballed()) {
+	            u.setMothballed(false);
+	            report += ". Activation complete.";
+	        } else {
+	            u.setMothballed(true);
+	            report += ". Mothballing complete.";
+	        }
+	    } else {
+	        report += ". " + u.getMothballTime() + " minutes remaining.";
+	    }
+	    tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
+	    if(!u.isSelfCrewed()) {
+	        astechPoolMinutes -= 6 * minutes;
+	    }
+	    addReport(report);	    
+	}
+	
 	public void refit(Refit r) {
 		Person tech = getPerson(r.getAssignedTeamId());
 		if (null == tech) {
@@ -1583,18 +1627,29 @@ public class Campaign implements Serializable {
 
 		shoppingList.newDay(this);
 
+		//need to loop through units twice, the first time to do all maintenance and the second
+		//time to do whatever else. Otherwise, maintenance minutes might get sucked up by other
+		//stuff
 		for (Unit u : getUnits()) {
 			if (null != u.getEngineer()) {
 				u.getEngineer().resetMinutesLeft();
 			}
+			
+			// do maintenance checks
+            doMaintenance(u);
+			
+		}
+		
+		for (Unit u : getUnits()) {
 			if (u.isRefitting()) {
 				refit(u.getRefit());
-			} else if (u.isPresent()) {
-				// do maintenance checks
-				doMaintenance(u);
-			} else {
-				u.checkArrival();
 			}
+			if(u.isMothballing()) {
+			    mothball(u);
+			}
+			if (!u.isPresent()) {
+                u.checkArrival();
+			}		
 		}
 
 		// need to check for assigned tasks in two steps to avoid
@@ -6187,6 +6242,9 @@ public class Campaign implements Serializable {
 		}
 		// lets start by checking times
 		Person tech = u.getTech();
+		if(null != tech && tech.getName().contains("Joe")) {
+		    int bob = 1;
+		}
 		int minutesUsed = u.getMaintenanceTime();
 		int astechsUsed = getAvailableAstechs(minutesUsed, false);
 		boolean maintained = null != tech

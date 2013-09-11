@@ -3819,6 +3819,42 @@ public class CampaignGUI extends JPanel {
         refreshOverview();
     }
     
+    public UUID selectTech(Unit u, String desc) {
+        String name;
+        HashMap<String,Person> techHash = new HashMap<String,Person>();
+        for(Person tech : getCampaign().getTechs()) {
+            if(tech.canTech(u.getEntity())) {
+                name = tech.getName() + ", " + SkillType.getExperienceLevelName(tech.getSkillForWorkingOn(u).getExperienceLevel());
+                techHash.put(name, tech);
+            }
+        }
+        if(techHash.isEmpty()) {
+            JOptionPane.showMessageDialog(frame,
+                    "You have no techs available.",
+                    "No Techs",
+                    JOptionPane.WARNING_MESSAGE);
+            return null;
+        }
+        String[] techNames = new String[techHash.keySet().size()];
+        int i = 0;
+        for(String n : techHash.keySet()) {
+            techNames[i] = n;
+            i++;
+        }
+        String s = (String)JOptionPane.showInputDialog(
+                frame,
+                "Which tech should work on " + desc + "?",
+                "Select Tech",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                techNames,
+                techNames[0]);
+        if(null == s) {
+            return null;
+        }
+        return techHash.get(s).getId();
+    }
+    
     public void refreshOverview() {
     	int drIndex = tabOverview.indexOfComponent(scrollOverviewDragoonsRating);
         if (!getCampaign().getCampaignOptions().useDragoonRating() && drIndex != -1) {
@@ -12833,6 +12869,14 @@ public class CampaignGUI extends JPanel {
                     else if(u.isRefitting()) {
                         setBackground(Color.CYAN);
                     }
+                    else if ((null != u)
+                            && (u.isMothballing())) {
+                        setBackground(new Color(153,153,255));
+                    } 
+                    else if ((null != u)
+                            && (u.isMothballed())) {
+                        setBackground(new Color(204, 204, 255));
+                    } 
                     else if (null != u && !u.isRepairable()) {
                         setBackground(new Color(190, 150, 55));
                     } else if ((null != u) && !u.isFunctional()) {
@@ -13197,6 +13241,47 @@ public class CampaignGUI extends JPanel {
                 refreshReport();
                 refreshCargo();
                 refreshOverview();
+            } else if (command.equalsIgnoreCase("MOTHBALL")) {
+                UUID id = null;
+                if(!selectedUnit.isSelfCrewed()) {
+                    id = selectTech(selectedUnit, "mothball");
+                    if(null == id) {
+                        return;
+                    }
+                }
+                if(null != selectedUnit) {
+                    selectedUnit.startMothballing(id);
+                }
+                refreshUnitList();
+                refreshServicedUnitList();
+                refreshReport();
+                refreshCargo();
+                refreshOverview();
+            } else if (command.equalsIgnoreCase("ACTIVATE")) {
+                UUID id = null;
+                if(!selectedUnit.isSelfCrewed()) {
+                    id = selectTech(selectedUnit, "activation");
+                    if(null == id) {
+                        return;
+                    }
+                }
+                if(null != selectedUnit) {
+                    selectedUnit.startMothballing(id);
+                }
+                refreshUnitList();
+                refreshServicedUnitList();
+                refreshReport();
+                refreshCargo();
+                refreshOverview();
+            } else if (command.equalsIgnoreCase("CANCEL_MOTHBALL")) {
+                if(null != selectedUnit) {
+                    selectedUnit.setMothballTime(0);
+                }
+                refreshUnitList();
+                refreshServicedUnitList();
+                refreshReport();
+                refreshCargo();
+                refreshOverview();
             }
         }
 
@@ -13256,16 +13341,7 @@ public class CampaignGUI extends JPanel {
                 }
                 menu.setEnabled(unit.isAvailable());
                 popup.add(menu);
-                
-                // Camo
-                if(oneSelected) {
-	                menuItem = new JMenuItem(resourceMap.getString("customizeMenu.individualCamo.text"));
-	                menuItem.setActionCommand("INDI_CAMO");
-	                menuItem.addActionListener(this);
-	                menuItem.setEnabled(true);
-	                popup.add(menuItem);
-                }
-                
+                            
                 // swap ammo
                 if(oneSelected) {
                     menu = new JMenu("Swap ammo");
@@ -13323,6 +13399,27 @@ public class CampaignGUI extends JPanel {
                     cbMenuItem.setEnabled(unit.isAvailable());
                     menu.add(cbMenuItem);
                     popup.add(menu);
+                }
+                if(oneSelected  && !(unit.getEntity() instanceof Infantry && !(unit.getEntity() instanceof BattleArmor))) {
+                    if(unit.isMothballing()) {
+                        menuItem = new JMenuItem("Cancel Mothballing/Activation");
+                        menuItem.setActionCommand("CANCEL_MOTHBALL");
+                        menuItem.addActionListener(this);
+                        menuItem.setEnabled(true);
+                        popup.add(menuItem);
+                    } else if(unit.isMothballed()) {
+                        menuItem = new JMenuItem("Activate Unit");
+                        menuItem.setActionCommand("ACTIVATE");
+                        menuItem.addActionListener(this);
+                        menuItem.setEnabled(!unit.isSelfCrewed() || null != unit.getEngineer());
+                        popup.add(menuItem);
+                    } else {
+                        menuItem = new JMenuItem("Mothball Unit");
+                        menuItem.setActionCommand("MOTHBALL");
+                        menuItem.addActionListener(this);
+                        menuItem.setEnabled(unit.isAvailable() && (!unit.isSelfCrewed() || null != unit.getEngineer()));
+                        popup.add(menuItem);
+                    } 
                 }
                 if(oneSelected && unit.requiresMaintenance() && unit.isAvailable()) {
                     menu = new JMenu("Assign Tech");
@@ -13392,6 +13489,14 @@ public class CampaignGUI extends JPanel {
                     menuItem.setActionCommand("HIRE_FULL");
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(unit.isAvailable());
+                    popup.add(menuItem);
+                }
+                // Camo
+                if(oneSelected) {
+                    menuItem = new JMenuItem(resourceMap.getString("customizeMenu.individualCamo.text"));
+                    menuItem.setActionCommand("INDI_CAMO");
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(true);
                     popup.add(menuItem);
                 }
                 if(oneSelected && !getCampaign().isCustom(unit)) {
