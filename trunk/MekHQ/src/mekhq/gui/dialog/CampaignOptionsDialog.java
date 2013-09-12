@@ -159,6 +159,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     
     private JSpinner spnHealWaitingPeriod;
     private JSpinner spnNaturalHealWaitingPeriod;
+    private JCheckBox useRandomHitsForVees;
+    private JSpinner spnMinimumHitsForVees;
+
 
     private javax.swing.JCheckBox useDamageMargin;
     private JSpinner spnDamageMargin;
@@ -1103,6 +1106,32 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         //gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panPersonnel.add(pnlNaturalHealWaitingPeriod, gridBagConstraints);
+        
+        spnMinimumHitsForVees = new JSpinner(new SpinnerNumberModel(options.getMinimumHitsForVees(), 1, 5, 1));
+        ((JSpinner.DefaultEditor)spnMinimumHitsForVees.getEditor()).getTextField().setEditable(false);    
+        JPanel panMinimumHitsForVees = new JPanel();
+        panMinimumHitsForVees.add(spnMinimumHitsForVees);
+        panMinimumHitsForVees.add(new JLabel("Minimum number of hits for wounded crews and infantry"));      
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 11;
+        gridBagConstraints.gridwidth = 2;
+        //gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panPersonnel.add(panMinimumHitsForVees, gridBagConstraints);
+        
+        useRandomHitsForVees = new JCheckBox();
+        useRandomHitsForVees.setSelected(options.useRandomHitsForVees());
+        useRandomHitsForVees.setText(resourceMap.getString("useRandomHitsForVees.text")); // NOI18N
+        useRandomHitsForVees.setToolTipText(resourceMap.getString("useRandomHitsForVees.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 12;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panPersonnel.add(useRandomHitsForVees, gridBagConstraints);
+        
         
         tabOptions.addTab(resourceMap.getString("panPersonnel.TabConstraints.tabTitle"), panPersonnel); // NOI18N
         
@@ -2526,6 +2555,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    //we need to reset healing time options through the campaign because we may need to 
 	    //loop through personnel to make adjustments
 	    campaign.setHealingTimeOptions((Integer)spnHealWaitingPeriod.getModel().getValue(), (Integer)spnNaturalHealWaitingPeriod.getModel().getValue());
+	    
+	    options.setMinimumHitsForVees((Integer)spnMinimumHitsForVees.getModel().getValue());
+	    options.setUseRandomHitsForVees(useRandomHitsForVees.isSelected());
 	    
 	    rskillPrefs.setOverallRecruitBonus((Integer)spnOverallRecruitBonus.getModel().getValue());	 
 	    for(int i = 0; i < Person.T_NUM; i++) {

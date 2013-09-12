@@ -74,7 +74,9 @@ public class CampaignOptions implements Serializable {
     private int naturalHealingWaitingPeriod;
     private boolean useAdvancedMedical; // Unofficial
     private boolean useDylansRandomXp; // Unofficial
-    
+    private boolean useRandomHitsForVees;
+    private int minimumHitsForVees;
+
     //unit related
     private boolean useQuirks;
     
@@ -237,6 +239,8 @@ public class CampaignOptions implements Serializable {
         useQualityMaintenance = true;
         checkMaintenance = true;
         logMaintenance = true;
+        useRandomHitsForVees = false;
+        minimumHitsForVees = 1;
         
     }
 
@@ -859,6 +863,22 @@ public class CampaignOptions implements Serializable {
         destroyMargin = d;
     }
     
+    public boolean useRandomHitsForVees() {
+        return useRandomHitsForVees;
+    }
+    
+    public void setUseRandomHitsForVees(boolean b) {
+        useRandomHitsForVees = b;
+    }
+    
+    public int getMinimumHitsForVees() {
+        return minimumHitsForVees;
+    }
+    
+    public void setMinimumHitsForVees(int d) {
+        minimumHitsForVees = d;
+    }
+    
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "clanPriceModifier", clanPriceModifier); //private double clanPriceModifier;
@@ -937,6 +957,8 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useQualityMaintenance", useQualityMaintenance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "checkMaintenance", checkMaintenance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "logMaintenance", logMaintenance);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useRandomHitsForVees", useRandomHitsForVees);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "minimumHitsForVees", minimumHitsForVees);
 
 
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -1239,6 +1261,13 @@ public class CampaignOptions implements Serializable {
                     retVal.logMaintenance = true;
                 else
                     retVal.logMaintenance = false;
+            } else if (wn2.getNodeName().equalsIgnoreCase("minimumHitsForVees")) {
+                retVal.minimumHitsForVees = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVees")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true"))
+                    retVal.useRandomHitsForVees = true;
+                else
+                    retVal.useRandomHitsForVees = false;
             } 
 		}
 
