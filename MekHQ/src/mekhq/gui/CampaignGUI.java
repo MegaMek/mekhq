@@ -385,7 +385,8 @@ public class CampaignGUI extends JPanel {
     private javax.swing.JMenuItem menuAboutItem;
     private javax.swing.JMenuItem menuExitItem;
     private javax.swing.JMenu menuManage;
-    private javax.swing.JMenu menuManageImportExport;
+    private javax.swing.JMenu menuExport;
+    private javax.swing.JMenu menuImport;
     private javax.swing.JMenu menuMarket;
     private javax.swing.JMenuItem menuOptions;
     private javax.swing.JMenuItem menuOptionsMM;
@@ -404,6 +405,8 @@ public class CampaignGUI extends JPanel {
     private javax.swing.JMenuItem miFullStrengthMedics;
     private javax.swing.JMenu menuMedicPool;
     private javax.swing.JMenuItem miLoadForces;
+    private javax.swing.JMenuItem miExportPersonCSV;
+    private javax.swing.JMenuItem miExportUnitCSV;
     private javax.swing.JMenuItem miExportPerson;
     private javax.swing.JMenuItem miImportPerson;
     private javax.swing.JMenuItem miExportParts;
@@ -688,9 +691,12 @@ public class CampaignGUI extends JPanel {
         menuThemes = new javax.swing.JMenu();
         menuExitItem = new javax.swing.JMenuItem();
         menuManage = new javax.swing.JMenu();
-        menuManageImportExport = new javax.swing.JMenu();
+        menuExport = new javax.swing.JMenu();
+        menuImport = new javax.swing.JMenu();
         miLoadForces = new javax.swing.JMenuItem();
         miExportPerson = new javax.swing.JMenuItem();
+        miExportPersonCSV = new javax.swing.JMenuItem();
+        miExportUnitCSV = new javax.swing.JMenuItem();
         miImportPerson = new javax.swing.JMenuItem();
         miExportParts = new javax.swing.JMenuItem();
         miImportParts = new javax.swing.JMenuItem();
@@ -2378,6 +2384,89 @@ public class CampaignGUI extends JPanel {
         });
         menuFile.add(menuSave);
 
+        menuImport.setText(resourceMap.getString("menuImport.text")); // NOI18N
+        menuExport.setText(resourceMap.getString("menuExport.text")); // NOI18N
+
+        /* 
+         * Taharqa: I think it is confusing and bad gui feng-shui to put this in the menu
+         * even though it is driven by user selections that might not even be in the 
+         * visible tab at the moment. If we keep this it should be for all personnel and parts
+         * and be clearly labeled as such
+         * 
+        miExportPerson.setText(resourceMap.getString("miExportPerson.text")); // NOI18N
+        miExportPerson.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miExportPersonActionPerformed(evt);
+            }
+        });
+        menuExport.add(miExportPerson);
+        
+        miExportParts.setText(resourceMap.getString("miExportParts.text")); // NOI18N
+        miExportParts.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miExportPartsActionPerformed(evt);
+            }
+        });
+        menuExport.add(miExportParts);
+        */
+        
+        miExportPersonCSV.setText(resourceMap.getString("miExportPersonCSV.text")); // NOI18N
+        miExportPersonCSV.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportTable(personnelTable, getCampaign().getName()
+                        + getCampaign().getShortDateAsString() + "_ExportedPersonnel" + ".csv");
+            }
+        });
+        menuExport.add(miExportPersonCSV);
+        
+        miExportUnitCSV.setText(resourceMap.getString("miExportUnitCSV.text")); // NOI18N
+        miExportUnitCSV.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportTable(unitTable, getCampaign().getName()
+                        + getCampaign().getShortDateAsString() + "_ExportedUnit" + ".csv");
+            }
+        });
+        menuExport.add(miExportUnitCSV);
+        
+        miImportPerson.setText(resourceMap.getString("miImportPerson.text")); // NOI18N
+        miImportPerson.setName("miImportPerson"); // NOI18N
+        miImportPerson.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miImportPersonActionPerformed(evt);
+            }
+        });
+        menuImport.add(miImportPerson);      
+        
+        miImportParts.setText(resourceMap.getString("miImportParts.text")); // NOI18N
+        miImportParts.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miImportPartsActionPerformed(evt);
+            }
+        });
+        menuImport.add(miImportParts);
+        
+        miLoadForces.setText(resourceMap.getString("miLoadForces.text")); // NOI18N
+        miLoadForces.setName("miLoadForces"); // NOI18N
+        miLoadForces.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miLoadForcesActionPerformed(evt);
+            }
+        });
+        miLoadForces.setEnabled(false);
+        menuImport.add(miLoadForces);
+
+        menuFile.add(menuImport);
+        menuFile.add(menuExport);
+
+        
+        miMercRoster.setText(resourceMap.getString("miMercRoster.text")); // NOI18N
+        miMercRoster.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showMercRosterDialog();
+            }
+        });
+        menuFile.add(miMercRoster);
+        
         menuOptions.setText(resourceMap.getString("menuOptions.text")); // NOI18N
         menuOptions.setName("menuOptions"); // NOI18N
         menuOptions.addActionListener(new java.awt.event.ActionListener() {
@@ -2394,15 +2483,8 @@ public class CampaignGUI extends JPanel {
                 menuOptionsMMActionPerformed(evt);
             }
         });
+        
         menuFile.add(menuOptionsMM);
-
-        miMercRoster.setText(resourceMap.getString("miMercRoster.text")); // NOI18N
-        miMercRoster.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showMercRosterDialog();
-            }
-        });
-        menuFile.add(miMercRoster);
         
         menuThemes =new JMenu("Themes");
         refreshThemeChoices();
@@ -2419,60 +2501,13 @@ public class CampaignGUI extends JPanel {
 
         menuBar.add(menuFile);
 
-        menuManage.setText(resourceMap.getString("menuManage.text")); // NOI18N
-        menuManage.setName("menuManage"); // NOI18N
-
-        menuManageImportExport.setText(resourceMap.getString("menuManageImportExport.text")); // NOI18N
-        menuManageImportExport.setName("menuManageImportExport"); // NOI18N
-
-        miExportParts.setText(resourceMap.getString("miExportParts.text")); // NOI18N
-        miExportParts.setName("miExportParts"); // NOI18N
-        miExportParts.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miExportPartsActionPerformed(evt);
-            }
-        });
-        menuManageImportExport.add(miExportParts);
-
-        miImportParts.setText(resourceMap.getString("miImportParts.text")); // NOI18N
-        miImportParts.setName("miImportParts"); // NOI18N
-        miImportParts.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miImportPartsActionPerformed(evt);
-            }
-        });
-        menuManageImportExport.add(miImportParts);
-
-        miExportPerson.setText(resourceMap.getString("miExportPerson.text")); // NOI18N
-        miExportPerson.setName("miExportPerson"); // NOI18N
-        miExportPerson.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miExportPersonActionPerformed(evt);
-            }
-        });
-        menuManageImportExport.add(miExportPerson);
-
-        miImportPerson.setText(resourceMap.getString("miImportPerson.text")); // NOI18N
-        miImportPerson.setName("miImportPerson"); // NOI18N
-        miImportPerson.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miImportPersonActionPerformed(evt);
-            }
-        });
-        menuManageImportExport.add(miImportPerson);
         
-        menuManage.add(menuManageImportExport);
 
-        miLoadForces.setText(resourceMap.getString("miLoadForces.text")); // NOI18N
-        miLoadForces.setName("miLoadForces"); // NOI18N
-        miLoadForces.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miLoadForcesActionPerformed(evt);
-            }
-        });
-		// miLoadForces.setEnabled(false);
-        menuManage.add(miLoadForces);
+        /*
+         * Taharqa: I am disabling the manage menu now because all its stuff has 
+         *  been moved elsewhere in menus or buttons
 
+        menuManage.setText(resourceMap.getString("menuManage.text")); // NOI18N
         addFunds.setText(resourceMap.getString("addFunds.text")); // NOI18N
         addFunds.setName("addFunds"); // NOI18N
         addFunds.addActionListener(new java.awt.event.ActionListener() {
@@ -2492,6 +2527,7 @@ public class CampaignGUI extends JPanel {
         menuManage.add(miGetLoan);
         
         menuBar.add(menuManage);
+         */
 
         menuMarket.setText(resourceMap.getString("menuMarket.text")); // NOI18N
         menuMarket.setName("menuMarket"); // NOI18N
@@ -4364,6 +4400,53 @@ public class CampaignGUI extends JPanel {
                 backupFile.delete();
             }
         }
+    }
+    
+    private void exportTable(JTable table, String suggestedName) {
+        JFileChooser fileChooser = new JFileChooser(".");
+        fileChooser.setDialogTitle("Save Table");
+        fileChooser.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File dir) {
+                if (dir.isDirectory()) {
+                    return true;
+                }
+                return dir.getName().endsWith(".csv");
+            }
+
+            @Override
+            public String getDescription() {
+                return "comma-separated text file";
+            }
+        });
+        fileChooser.setSelectedFile(new File(suggestedName)); //$NON-NLS-1$
+        int returnVal = fileChooser.showSaveDialog(mainPanel);
+
+        if ((returnVal != JFileChooser.APPROVE_OPTION)
+                || (fileChooser.getSelectedFile() == null)) {
+            // I want a file, y'know!
+            return;
+        }
+
+        File file = fileChooser.getSelectedFile();
+        if (file == null) {
+            // I want a file, y'know!
+            return;
+        }
+        String path = file.getPath();
+        if (!path.endsWith(".csv")) {
+            path += ".csv";
+            file = new File(path);
+        }
+        
+        //check for existing file and make a back-up if found
+        String path2 = path + "_backup";
+        File backupFile = new File(path2);
+        if(file.exists()) {     
+            Utilities.copyfile(file, backupFile);
+        }
+
+        Utilities.exportTabletoCSV(table, file);
     }
 
     protected void clearAssignedUnits() {

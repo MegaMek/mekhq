@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +39,9 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Vector;
+
+import javax.swing.JTable;
+import javax.swing.table.TableModel;
 
 import megamek.common.Aero;
 import megamek.common.AmmoType;
@@ -996,5 +1000,49 @@ public class Utilities {
 	    	return 1;
 	    }
 	    return diff;
+	}
+	
+	/**
+	 * export a jtable to TSV
+	 * code derived from:
+	 * https://sites.google.com/site/teachmemrxymon/java/export-records-from-jtable-to-ms-excel
+	 * @param table
+	 * @param file
+	 */
+	public static void exportTabletoCSV(JTable table, File file){
+	    try{
+	        TableModel model = table.getModel();
+	        FileWriter csv = new FileWriter(file);
+
+	        for(int i = 0; i < model.getColumnCount(); i++) {
+	            String s = model.getColumnName(i);
+	            if(null == s) {
+                    s = "";
+                }
+                if (s.contains("\"")) {
+                    s = s.replace("\"", "\"\"");
+                }
+                s = "\"" + s + "\"";
+                csv.write(s+",");
+	        }
+	        csv.write("\n");
+
+	        for(int i=0; i< model.getRowCount(); i++) {
+	            for(int j=0; j < model.getColumnCount(); j++) {
+	                String s = model.getValueAt(i,j).toString();
+	                if(null == s) {
+	                    s = "";
+	                }
+	                if (s.contains("\"")) {
+	                    s = s.replace("\"", "\"\"");
+	                }
+	                s = "\"" + s + "\"";
+	                csv.write(s+",");
+	            }
+	            csv.write("\n");
+	        }
+	        csv.close();
+
+	    }catch(IOException e){ System.out.println(e); }
 	}
 }
