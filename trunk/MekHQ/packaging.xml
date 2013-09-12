@@ -44,11 +44,13 @@
     <!-- svnroot used for svn authentification -->
     <property name="svnroot" value="svn://svn.code.sf.net/p/mekhq/code/trunk/MekHQ" />
     <property name="svndata" value="svn://svn.code.sf.net/p/megamek/code/trunk/megamek/data" />
+    <property name="svnconf" value="svn://svn.code.sf.net/p/megamek/code/trunk/megamek/mmconf" />
     <property name="svnlibs" value="svn://svn.code.sf.net/p/megamek/code/trunk/megamek/lib" />
     <property name="svnmmdocs" value="svn://svn.code.sf.net/p/megamek/code/trunk/megamek/docs" />
     <property name="svnmmldocs" value="svn://svn.code.sf.net/p/megameklab/code/trunk/docs" />
     <property name="svnrsheets" value="svn://svn.code.sf.net/p/megameklab/code/trunk/data/images/recordsheets" />
     <property name="svnmmlpng" value="svn://svn.code.sf.net/p/megameklab/code/trunk/data/images/misc/megameklab.png" />
+    <property name="svnmmlproperties" value="svn://svn.code.sf.net/p/megameklab/code/trunk/mmconf/megameklab.properties" />
 
 
     <property name="timestampfile" value="${logdir}/timestamp" />
@@ -157,6 +159,23 @@
             <arg line="export ${svnmmlpng} ${svndir}/${datadir}/images/misc/megameklab.png" />
         </exec>
         <delete dir="${svndir}/${datadir}-OLD" />
+        <!--now we need to replace our mmconf with the latest from the MM svn
+            but first we need to back it up because we will need to keep a few 
+            things-->
+        <move file="${svndir}/${confdir}" tofile="${svndir}/${confdir}-OLD"/>
+        <exec executable="svn">
+            <arg line="export ${svnconf} ${svndir}/${confdir}" />
+        </exec>
+        <!-- ok now move some stuff back into mmconf that needs to be there-->
+        <copy todir="${svndir}/${confdir}">
+            <fileset dir="${svndir}/${confdir}-OLD" >
+                <include name="mekhq.properties" />
+            </fileset>
+        </copy>
+    	<exec executable="svn">
+            <arg line="export ${svnmmlproperties} ${svndir}/${confdir}/megameklab.properties" />
+    	</exec>
+        <delete dir="${svndir}/${confdir}-OLD" />
     </target>
     
     <target name="svndev-build" depends="svndev-get" description="compile project from SVN and generate JAR file" >

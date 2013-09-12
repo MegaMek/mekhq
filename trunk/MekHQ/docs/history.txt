@@ -33,6 +33,7 @@ v0.3.2 (SVN)
 + Fixed megamek.4j.xml file to force inclusion of new xml save libs
 + new Report class - allows for flexible inclusion of various generated reports
 + moved overview items to a reports menu
++ more packaging fixes to pull files from other projects automatically
 
 v0.3.1 (2013-09-5)
 + Planetary Data Update 36

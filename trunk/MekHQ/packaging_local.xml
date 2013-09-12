@@ -157,7 +157,26 @@
             <fileset dir="${mmldir}/${datadir}/images/misc" >
             </fileset>
         </copy>
-        <delete dir="${localdir}/${datadir}-OLD" />
+        <delete dir="${svndir}/${datadir}-OLD" />
+        <!--now we need to replace our mmconf with the latest from the MM svn
+            but first we need to back it up because we will need to keep a few 
+            things-->
+        <move file="${localdir}/${confdir}" tofile="${localdir}/${confdir}-OLD"/>
+        <copy todir="${localdir}/${confdir}">
+            <fileset dir="${mmdir}/${confdir}">
+            </fileset>
+        </copy>
+        <!-- ok now move some stuff back into mmconf that needs to be there-->
+        <copy todir="${localdir}/${confdir}">
+            <fileset dir="${localdir}/${confdir}-OLD" >
+                <include name="mekhq.properties" />
+            </fileset>
+        </copy>
+        <copy todir="${localdir}/${confdir}">
+            <fileset dir="${mmldir}/${confdir}" >
+            </fileset>
+        </copy>
+        <delete dir="${localdir}/${confdir}-OLD" />
 	</target>
 	
 	<target name="localdev-build" depends="localdev-get" description="compile project from local source and generate JAR file" >
