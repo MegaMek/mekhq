@@ -31,6 +31,8 @@ v0.3.2 (SVN)
 + Bug: mekhq.png in data/images/misc wasn't being included in releases
 + Bug: new graphical hits images not included with either packaging file
 + Fixed megamek.4j.xml file to force inclusion of new xml save libs
++ new Report class - allows for flexible inclusion of various generated reports
++ moved overview items to a reports menu
 
 v0.3.1 (2013-09-5)
 + Planetary Data Update 36
