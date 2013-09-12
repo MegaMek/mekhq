@@ -445,10 +445,11 @@ public class ResolveScenarioTracker {
 					}
 				} else {
 					//we have a multi-crewed vee
+				    boolean wounded = false;
 					if(null == en) {
 						status.setMissing(true);
 					}
-					if(en instanceof Tank) {
+					else if(en instanceof Tank) {
 						boolean destroyed = false;
 						for(int loc = 0; loc < en.locations(); loc++) {
 							if(loc == Tank.LOC_TURRET || loc == Tank.LOC_TURRET_2 || loc == Tank.LOC_BODY) {
@@ -461,21 +462,21 @@ public class ResolveScenarioTracker {
 						}
 						if(destroyed || null == en.getCrew() || en.getCrew().isDead()) {
 							if(Compute.d6(2) >= 7) {
-								status.setHits(1);
+							    wounded = true;
 							} else {
 								status.setHits(6);
 							}
 						}
 						else if(((Tank)en).isDriverHit() && u.isDriver(p)) {
 							if(Compute.d6(2) >= 7) {
-								status.setHits(1);
+                                wounded = true;
 							} else {
 								status.setHits(6);
 							}
 						}
 						else if(((Tank)en).isCommanderHit() && u.isCommander(p)) {
 							if(Compute.d6(2) >= 7) {
-								status.setHits(1);
+                                wounded = true;
 							} else {
 								status.setHits(6);
 							}
@@ -485,18 +486,21 @@ public class ResolveScenarioTracker {
 						if(casualtiesAssigned < casualties) {
 							casualtiesAssigned++;
 							if(Compute.d6(2) >= 7) {
-								status.setHits(1);
+                                wounded = true;
 							} else {
 								status.setHits(6);
 							}
 						}
 					}
-				}
-				if (campaign.getCampaignOptions().useAdvancedMedical()) {
-					if ((en instanceof Tank || en instanceof Infantry) && status.getHits() == 1) {
-						status.setHits(Compute.randomInt(5)+1);
+					if(wounded) {
+					    int hits = campaign.getCampaignOptions().getMinimumHitsForVees();
+					    if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVees()) {
+					        int range = 6 - hits;
+	                        hits = hits + Compute.randomInt(range);
+	                    }
+	                    status.setHits(hits);
 					}
-				}
+				}		
 				status.setXP(campaign.getCampaignOptions().getScenarioXP());
 				peopleStatus.put(p.getId(), status);
 			}
@@ -707,7 +711,9 @@ public class ResolveScenarioTracker {
 				continue;
 			}
 			person.setXp(person.getXp() + status.xp);
-			person.setHits(status.getHits());
+			if(status.getHits() > person.getHits()) {
+			    person.setHits(status.getHits());
+			}
 			person.addLogEntry(campaign.getDate(), "Participated in " + scenario.getName() + " during mission " + m.getName());
 			for(Kill k : status.getKills()) {
 				campaign.addKill(k);
