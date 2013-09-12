@@ -2528,7 +2528,9 @@ public class Campaign implements Serializable {
 				// Okay, so what element is it?
 				String xn = wn.getNodeName();
 
-				if (xn.equalsIgnoreCase("custom")) {
+				if (xn.equalsIgnoreCase("info")) { // This is needed so that the campaign name gets set in retVal
+					processInfoNode(retVal, wn, version);
+				} else if (xn.equalsIgnoreCase("custom")) {
 					processCustom(retVal, wn);
 				}
 			} else {
@@ -3168,7 +3170,7 @@ public class Campaign implements Serializable {
 	private static void processCustom(Campaign retVal, Node wn) {
 		String sCustomsDir = "data" + File.separator + "mechfiles"
 				+ File.separator + "customs";
-		String sCustomsDirCampaign = sCustomsDir + File.separator + name;
+		String sCustomsDirCampaign = sCustomsDir + File.separator + retVal.getName();
 		File customsDir = new File(sCustomsDir);
 		if (!customsDir.exists()) {
 			customsDir.mkdir();
@@ -3200,6 +3202,7 @@ public class Campaign implements Serializable {
 				blk = wn2.getTextContent();
 			}
 		}
+		retVal.addCustom(name);
 		if (null != name && null != mtf) {
 			try {
 				// if this file already exists then don't overwrite it or we
@@ -3217,7 +3220,6 @@ public class Campaign implements Serializable {
 				p.println(mtf);
 				p.close();
 				out.close();
-				retVal.addCustom(name);
 				MekHQ.logMessage("Loaded Custom Unit!", 4);
 			} catch (Exception ex) {
 				ex.printStackTrace();
@@ -3240,7 +3242,6 @@ public class Campaign implements Serializable {
 				p.println(blk);
 				p.close();
 				out.close();
-				retVal.addCustom(name);
 				MekHQ.logMessage("Loaded Custom Unit!", 4);
 			} catch (Exception ex) {
 				ex.printStackTrace();

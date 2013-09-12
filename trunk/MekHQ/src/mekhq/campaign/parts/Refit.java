@@ -1026,7 +1026,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				String fileOutName = sCustomsDir + File.separator + fileName + ".blk";
                 String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".blk";
                 if((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
-                	//throw new FileAlreadyExistsException(fileNameCampaign);
+                	throw new IOException("A file already exists with the custom name "+fileNameCampaign+". Please choose a different name. (Unit name and/or model)");
                 }
 	            BLKFile.encode(fileNameCampaign, newEntity);
 	        }
