@@ -430,25 +430,6 @@ public class CampaignGUI extends JPanel {
     private javax.swing.JPanel panSupplies;
     private javax.swing.JPanel panDoTask;
     private javax.swing.JPanel panMapView;
-    private javax.swing.JPanel panOverview;
-    private javax.swing.JTabbedPane tabOverview;
-    private javax.swing.JScrollPane scrollOverviewParts;
-    private javax.swing.JTable overviewPartsTable;
-    private javax.swing.JScrollPane scrollOverviewTransport;
-    private javax.swing.JTextArea overviewTransportArea;
-    private javax.swing.JScrollPane scrollOverviewCombatPersonnel;
-    private javax.swing.JTextArea overviewCombatPersonnelArea;
-    private javax.swing.JScrollPane scrollOverviewSupportPersonnel;
-    private javax.swing.JTextArea overviewSupportPersonnelArea;
-    private javax.swing.JSplitPane splitOverviewPersonnel;
-    private javax.swing.JScrollPane scrollOverviewHangar;
-    private javax.swing.JTree overviewHangarTree;
-    private javax.swing.JTextArea overviewHangarArea;
-    private javax.swing.JSplitPane splitOverviewHangar;
-    private DefaultMutableTreeNode top;
-    private javax.swing.JScrollPane scrollOverviewDragoonsRating;
-    private javax.swing.JTextArea overviewDragoonsRatingArea;
-    private IDragoonsRating rating;
     private javax.swing.JScrollPane scrollDocTable;
     private javax.swing.JScrollPane scrollUnassignedPatient;
     private javax.swing.JScrollPane scrollTaskTable;
@@ -621,23 +602,6 @@ public class CampaignGUI extends JPanel {
         panBriefing = new javax.swing.JPanel();
         panScenario = new javax.swing.JPanel();
         panMapView = new javax.swing.JPanel();
-        panOverview = new javax.swing.JPanel();
-        tabOverview = new javax.swing.JTabbedPane();
-        scrollOverviewParts = new javax.swing.JScrollPane();
-        overviewPartsTable = new javax.swing.JTable();
-        scrollOverviewTransport = new javax.swing.JScrollPane();
-        overviewTransportArea = new javax.swing.JTextArea();
-        scrollOverviewCombatPersonnel = new javax.swing.JScrollPane();
-        overviewCombatPersonnelArea = new javax.swing.JTextArea();
-        scrollOverviewSupportPersonnel = new javax.swing.JScrollPane();
-        overviewSupportPersonnelArea = new javax.swing.JTextArea();
-        scrollOverviewHangar = new javax.swing.JScrollPane();
-    	top = new DefaultMutableTreeNode("Hangar");
-        overviewHangarTree = new javax.swing.JTree(top);
-        overviewHangarArea = new javax.swing.JTextArea();
-        splitOverviewHangar = new javax.swing.JSplitPane();
-        scrollOverviewDragoonsRating = new javax.swing.JScrollPane();
-        overviewDragoonsRatingArea = new javax.swing.JTextArea(20,60);
         lblFindPlanet = new javax.swing.JLabel();
         btnCalculateJumpPath = new javax.swing.JButton();
         btnBeginTransit = new javax.swing.JButton();
@@ -2301,118 +2265,6 @@ public class CampaignGUI extends JPanel {
                 resourceMap.getString("panFinances.TabConstraints.tabTitle"),
                 panFinances); // NOI18N
         
-        // Overview tab
-        panOverview.setName("panelOverview"); // NOI18N
-        panOverview.setLayout(new java.awt.GridBagLayout());
-
-        tabOverview.setToolTipText(resourceMap.getString("tabOverview.toolTipText")); // NOI18N
-        tabOverview.setMinimumSize(new java.awt.Dimension(250, 250));
-        tabOverview.setName("tabOverview"); // NOI18N
-        tabOverview.setPreferredSize(new java.awt.Dimension(800, 300));
-        
-        overviewTransportArea.setName("overviewTransportArea"); // NOI18N
-        overviewTransportArea.setLineWrap(false);
-        overviewTransportArea.setFont(new Font("Courier New", Font.PLAIN, 18));
-        overviewTransportArea.setText(getCampaign().getCombatPersonnelDetails());
-        overviewTransportArea.setEditable(false);
-        overviewTransportArea.setName("overviewTransportArea"); // NOI18N
-        scrollOverviewTransport.setToolTipText(resourceMap.getString("scrollOverviewTransport.TabConstraints.toolTipText")); // NOI18N
-        scrollOverviewTransport.setMinimumSize(new java.awt.Dimension(350, 400));
-        scrollOverviewTransport.setPreferredSize(new java.awt.Dimension(350, 400));
-        scrollOverviewTransport.setViewportView(overviewTransportArea);
-        tabOverview.addTab(resourceMap.getString("scrollOverviewTransport.TabConstraints.tabTitle"), scrollOverviewTransport);
-        
-        
-        overviewCombatPersonnelArea.setName("overviewCombatPersonnelArea"); // NOI18N
-        overviewCombatPersonnelArea.setLineWrap(false);
-        overviewCombatPersonnelArea.setFont(new Font("Courier New", Font.PLAIN, 18));
-        overviewCombatPersonnelArea.setText(getCampaign().getCombatPersonnelDetails());
-        overviewCombatPersonnelArea.setEditable(false);
-        overviewCombatPersonnelArea.setName("overviewCombatPersonnelArea"); // NOI18N
-        scrollOverviewCombatPersonnel.setMinimumSize(new java.awt.Dimension(350, 400));
-        scrollOverviewCombatPersonnel.setPreferredSize(new java.awt.Dimension(350, 400));
-        scrollOverviewCombatPersonnel.setViewportView(overviewCombatPersonnelArea);
-        overviewSupportPersonnelArea.setName("overviewSupportPersonnelArea"); // NOI18N
-        overviewSupportPersonnelArea.setLineWrap(false);
-        overviewSupportPersonnelArea.setFont(new Font("Courier New", Font.PLAIN, 18));
-        overviewSupportPersonnelArea.setText(getCampaign().getSupportPersonnelDetails());
-        overviewSupportPersonnelArea.setEditable(false);
-        overviewSupportPersonnelArea.setName("overviewSupportPersonnelArea"); // NOI18N
-        scrollOverviewSupportPersonnel.setViewportView(overviewSupportPersonnelArea);
-        scrollOverviewSupportPersonnel.setMinimumSize(new java.awt.Dimension(350, 400));
-        scrollOverviewSupportPersonnel.setPreferredSize(new java.awt.Dimension(350, 400));
-        
-        splitOverviewPersonnel = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT, scrollOverviewCombatPersonnel, scrollOverviewSupportPersonnel);
-        splitOverviewPersonnel.setName("splitOverviewPersonnel");
-        splitOverviewPersonnel.setOneTouchExpandable(true);
-        splitOverviewPersonnel.setResizeWeight(0.5);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        tabOverview.addTab(resourceMap.getString("scrollOverviewPersonnel.TabConstraints.tabTitle"), splitOverviewPersonnel);
-
-    	overviewHangarTree.setName("overviewHangarTree"); // NOI18N
-        scrollOverviewHangar.setViewportView(overviewHangarTree);
-        overviewHangarArea.setName("overviewHangarArea"); // NOI18N
-        overviewHangarArea.setLineWrap(false);
-        overviewHangarArea.setFont(new Font("Courier New", Font.PLAIN, 18));
-        overviewHangarArea.setText("");
-        overviewHangarArea.setEditable(false);
-        overviewHangarArea.setName("overviewHangarArea"); // NOI18N
-        splitOverviewHangar = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT, scrollOverviewHangar, overviewHangarArea);
-        splitOverviewHangar.setName("splitOverviewHangar");
-        splitOverviewHangar.setOneTouchExpandable(true);
-        splitOverviewHangar.setResizeWeight(0.5);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        tabOverview.addTab(resourceMap.getString("scrollOverviewHangar.TabConstraints.tabTitle"), splitOverviewHangar);
-        
-        //TODO: overviewPartsTable.setModel(overviewPartsModel);
-        overviewPartsTable.setName("overviewPartsTable"); // NOI18N
-        overviewPartsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        //TODO: overviewPartsTable.addMouseListener(overviewPartsMouseAdapter);
-        overviewPartsTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        /*column = null;
-        for (int i = 0; i < LoanTableModel.N_COL; i++) {
-            column = overviewPartsTable.getColumnModel().getColumn(i);
-            column.setPreferredWidth(overviewPartsModel.getColumnWidth(i));
-            column.setCellRenderer(overviewPartsModel.getRenderer());
-        }*/
-        overviewPartsTable.setIntercellSpacing(new Dimension(0, 0));
-        overviewPartsTable.setShowGrid(false);
-        scrollOverviewParts.setViewportView(overviewPartsTable);
-        tabOverview.addTab(resourceMap.getString("scrollOverviewParts.TabConstraints.tabTitle"), scrollOverviewParts);
-        
-        rating = DragoonsRatingFactory.getDragoonsRating(getCampaign());
-        rating.reInitialize();
-        overviewDragoonsRatingArea.setLineWrap(false);
-        overviewDragoonsRatingArea.setFont(new Font("Courier New", Font.PLAIN, 18));
-        overviewDragoonsRatingArea.setText(rating.getDetails());
-        overviewDragoonsRatingArea.setEditable(false);
-        overviewDragoonsRatingArea.setName("overviewDragoonsRatingArea"); // NOI18N
-        scrollOverviewDragoonsRating.setViewportView(overviewDragoonsRatingArea);
-        tabOverview.addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"), scrollOverviewDragoonsRating);
-        
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        //gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-        panOverview.add(tabOverview, gridBagConstraints);
-        
-        //tabMain.addTab(resourceMap.getString("panOverview.TabConstraints.tabTitle"), panOverview); // NOI18N
-        refreshOverview();
-
         mainPanel.setAutoscrolls(true);
         mainPanel.setName("mainPanel"); // NOI18N
         mainPanel.setLayout(new java.awt.GridBagLayout());
@@ -2872,7 +2724,6 @@ public class CampaignGUI extends JPanel {
         refreshTempAstechs();
         refreshTempMedics();
         refreshCargo();
-        refreshOverview();
         panMap.setCampaign(getCampaign());
 
         setLayout(new BorderLayout());
@@ -3178,7 +3029,6 @@ public class CampaignGUI extends JPanel {
         refreshFunds();
         refreshFinancialTransactions();
         refreshCargo();
-        refreshOverview();
 
         //get the selected row back for tasks
         if(selectedRow != -1) {
@@ -3368,7 +3218,6 @@ public class CampaignGUI extends JPanel {
         refreshFunds();
         refreshFinancialTransactions();
         refreshCargo();
-        refreshOverview();
         panMap.repaint();
     }// GEN-LAST:event_btnAdvanceDayActionPerformed
 
@@ -3696,7 +3545,6 @@ public class CampaignGUI extends JPanel {
         refreshCalendar();
         changePersonnelView();
         refreshPersonnelList();
-        refreshOverview();
         panMap.repaint();
     }// GEN-LAST:event_menuOptionsActionPerformed
 
@@ -3709,7 +3557,6 @@ public class CampaignGUI extends JPanel {
             refreshCalendar();
             changePersonnelView();
             refreshPersonnelList();
-            refreshOverview();
         }
     }// GEN-LAST:event_menuOptionsActionPerformed
 
@@ -3774,7 +3621,6 @@ public class CampaignGUI extends JPanel {
         refreshFunds();
         refreshFinancialTransactions();
         refreshCargo();
-        refreshOverview();
     }// GEN-LAST:event_miPurchaseUnitActionPerformed
 
     private void buyParts() {
@@ -3783,7 +3629,6 @@ public class CampaignGUI extends JPanel {
         refreshPartsList();
         refreshAcquireList();
         refreshCargo();
-        refreshOverview();
     }
     
     private void showNewLoanDialog() {
@@ -3878,7 +3723,6 @@ public class CampaignGUI extends JPanel {
         refreshOrganization();
         refreshPartsList();
         refreshCargo();
-        refreshOverview();
     }
     
     private void showReport(Report report) {
@@ -3920,1180 +3764,6 @@ public class CampaignGUI extends JPanel {
             return null;
         }
         return techHash.get(s).getId();
-    }
-    
-    public void refreshOverview() {
-    	int drIndex = tabOverview.indexOfComponent(scrollOverviewDragoonsRating);
-        if (!getCampaign().getCampaignOptions().useDragoonRating() && drIndex != -1) {
-        	tabOverview.removeTabAt(drIndex);
-        } else {
-        	if (drIndex == -1) {
-        		tabOverview.addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"), scrollOverviewDragoonsRating);
-        	}
-        }
-        
-        overviewDragoonsRatingArea.setText(rating.getDetails());
-        overviewCombatPersonnelArea.setText(getCampaign().getCombatPersonnelDetails());
-        overviewSupportPersonnelArea.setText(getCampaign().getSupportPersonnelDetails());
-        overviewTransportArea.setText(getCampaign().getTransportDetails());
-        refreshOverviewHangar();
-    }
-    
-    public void  refreshOverviewHangar() {
-    	top.removeAllChildren();
-    	
-    	// BattleMechs
-    	boolean expandMechs = false;
-    	int countMechs = 0;
-    	int countBattleMechs = 0;
-    	int countOmniMechs = 0;
-    	int colossalMech = 0;
-    	int assaultMech = 0;
-    	int heavyMech = 0;
-    	int mediumMech = 0;
-    	int lightMech = 0;
-    	int ultralightMech = 0;
-    	int colossalOmniMech = 0;
-    	int assaultOmniMech = 0;
-    	int heavyOmniMech = 0;
-    	int mediumOmniMech = 0;
-    	int lightOmniMech = 0;
-    	int ultralightOmniMech = 0;
-    	
-    	// ASF
-    	boolean expandASF = false;
-    	int countASF = 0;
-    	int countStandardASF = 0;
-    	int countOmniASF = 0;
-    	int countLightASF = 0;
-    	int countMediumASF = 0;
-    	int countHeavyASF = 0;
-    	int countOmniLightASF = 0;
-    	int countOmniMediumASF = 0;
-    	int countOmniHeavyASF = 0;
-    	
-    	// Vehicles
-    	boolean expandVees = false;
-    	int countVees = 0;
-    	int countStandardVees = 0;
-    	int countOmniVees = 0;
-    	int countVTOL = 0;
-    	int countVTOLLight = 0;
-    	int countSub = 0;
-    	int countSubColossal = 0;
-    	int countSubAssault = 0;
-    	int countSubHeavy = 0;
-    	int countSubMedium = 0;
-    	int countSubLight = 0;
-    	int countNaval = 0;
-    	int countNavalColossal = 0;
-    	int countNavalAssault = 0;
-    	int countNavalHeavy = 0;
-    	int countNavalMedium = 0;
-    	int countNavalLight = 0;
-    	int countWiGE = 0;
-    	int countWiGEAssault = 0;
-    	int countWiGEHeavy = 0;
-    	int countWiGEMedium = 0;
-    	int countWiGELight = 0;
-    	int countTracked = 0;
-    	int countTrackedColossal = 0;
-    	int countTrackedAssault = 0;
-    	int countTrackedHeavy = 0;
-    	int countTrackedMedium = 0;
-    	int countTrackedLight = 0;
-    	int countWheeled = 0;
-    	int countWheeledAssault = 0;
-    	int countWheeledHeavy = 0;
-    	int countWheeledMedium = 0;
-    	int countWheeledLight = 0;
-    	int countHover = 0;
-    	int countHoverMedium = 0;
-    	int countHoverLight = 0;
-    	int countHydrofoil = 0;
-    	int countHydrofoilAssault = 0;
-    	int countHydrofoilHeavy = 0;
-    	int countHydrofoilMedium = 0;
-    	int countHydrofoilLight = 0;
-    	int countOmniVTOL = 0;
-    	int countOmniVTOLLight = 0;
-    	int countOmniSub = 0;
-    	int countOmniSubColossal = 0;
-    	int countOmniSubAssault = 0;
-    	int countOmniSubHeavy = 0;
-    	int countOmniSubMedium = 0;
-    	int countOmniSubLight = 0;
-    	int countOmniNaval = 0;
-    	int countOmniNavalColossal = 0;
-    	int countOmniNavalAssault = 0;
-    	int countOmniNavalHeavy = 0;
-    	int countOmniNavalMedium = 0;
-    	int countOmniNavalLight = 0;
-    	int countOmniWiGE = 0;
-    	int countOmniWiGEAssault = 0;
-    	int countOmniWiGEHeavy = 0;
-    	int countOmniWiGEMedium = 0;
-    	int countOmniWiGELight = 0;
-    	int countOmniTracked = 0;
-    	int countOmniTrackedColossal = 0;
-    	int countOmniTrackedAssault = 0;
-    	int countOmniTrackedHeavy = 0;
-    	int countOmniTrackedMedium = 0;
-    	int countOmniTrackedLight = 0;
-    	int countOmniWheeled = 0;
-    	int countOmniWheeledAssault = 0;
-    	int countOmniWheeledHeavy = 0;
-    	int countOmniWheeledMedium = 0;
-    	int countOmniWheeledLight = 0;
-    	int countOmniHover = 0;
-    	int countOmniHoverMedium = 0;
-    	int countOmniHoverLight = 0;
-    	int countOmniHydrofoil = 0;
-    	int countOmniHydrofoilAssault = 0;
-    	int countOmniHydrofoilHeavy = 0;
-    	int countOmniHydrofoilMedium = 0;
-    	int countOmniHydrofoilLight = 0;
-    	
-    	// Battle Armor and Infantry
-    	boolean expandInfantry = false;
-    	int countInfantry = 0;
-    	int countFootInfantry = 0;
-    	int countJumpInfantry = 0;
-    	int countMotorizedInfantry = 0;
-    	int countMechanizedInfantry = 0;
-    	int countBA = 0;
-    	int countBAPAL = 0;
-    	int countBALight = 0;
-    	int countBAMedium = 0;
-    	int countBAHeavy = 0;
-    	int countBAAssault = 0;
-    	
-    	// Jumpships, Warships, Dropships, and SmallCraft
-    	boolean expandSpace = false;
-    	int countSpace = 0;
-    	int countJumpships = 0;
-    	int countWarships = 0;
-    	int countLargeWS = 0;
-    	int countSmallWS = 0;
-    	int countDropships = 0;
-    	int countLargeDS = 0;
-    	int countMediumDS = 0;
-    	int countSmallDS = 0;
-    	int countSmallCraft = 0;
-    	
-    	// Conventional Fighters
-    	int countConv = 0;
-    	
-    	// Support Vees
-    	/*boolean expandSupportVees = false;
-    	int countSupportVees = 0;
-    	int countSupportStandardVees = 0;
-    	int countSupportOmniVees = 0;
-    	int countSupportVTOL = 0;
-    	int countSupportVTOLLight = 0;
-    	int countSupportSub = 0;
-    	int countSupportSubColossal = 0;
-    	int countSupportSubAssault = 0;
-    	int countSupportSubHeavy = 0;
-    	int countSupportSubMedium = 0;
-    	int countSupportSubLight = 0;
-    	int countSupportNaval = 0;
-    	int countSupportNavalColossal = 0;
-    	int countSupportNavalAssault = 0;
-    	int countSupportNavalHeavy = 0;
-    	int countSupportNavalMedium = 0;
-    	int countSupportNavalLight = 0;
-    	int countSupportWiGE = 0;
-    	int countSupportWiGEAssault = 0;
-    	int countSupportWiGEHeavy = 0;
-    	int countSupportWiGEMedium = 0;
-    	int countSupportWiGELight = 0;
-    	int countSupportTracked = 0;
-    	int countSupportTrackedColossal = 0;
-    	int countSupportTrackedAssault = 0;
-    	int countSupportTrackedHeavy = 0;
-    	int countSupportTrackedMedium = 0;
-    	int countSupportTrackedLight = 0;
-    	int countSupportWheeled = 0;
-    	int countSupportWheeledAssault = 0;
-    	int countSupportWheeledHeavy = 0;
-    	int countSupportWheeledMedium = 0;
-    	int countSupportWheeledLight = 0;
-    	int countSupportHover = 0;
-    	int countSupportHoverMedium = 0;
-    	int countSupportHoverLight = 0;
-    	int countSupportHydrofoil = 0;
-    	int countSupportHydrofoilAssault = 0;
-    	int countSupportHydrofoilHeavy = 0;
-    	int countSupportHydrofoilMedium = 0;
-    	int countSupportHydrofoilLight = 0;
-    	int countSupportOmniVTOL = 0;
-    	int countSupportOmniVTOLLight = 0;
-    	int countSupportOmniSub = 0;
-    	int countSupportOmniSubColossal = 0;
-    	int countSupportOmniSubAssault = 0;
-    	int countSupportOmniSubHeavy = 0;
-    	int countSupportOmniSubMedium = 0;
-    	int countSupportOmniSubLight = 0;
-    	int countSupportOmniNaval = 0;
-    	int countSupportOmniNavalColossal = 0;
-    	int countSupportOmniNavalAssault = 0;
-    	int countSupportOmniNavalHeavy = 0;
-    	int countSupportOmniNavalMedium = 0;
-    	int countSupportOmniNavalLight = 0;
-    	int countSupportOmniWiGE = 0;
-    	int countSupportOmniWiGEAssault = 0;
-    	int countSupportOmniWiGEHeavy = 0;
-    	int countSupportOmniWiGEMedium = 0;
-    	int countSupportOmniWiGELight = 0;
-    	int countSupportOmniTracked = 0;
-    	int countSupportOmniTrackedColossal = 0;
-    	int countSupportOmniTrackedAssault = 0;
-    	int countSupportOmniTrackedHeavy = 0;
-    	int countSupportOmniTrackedMedium = 0;
-    	int countSupportOmniTrackedLight = 0;
-    	int countSupportOmniWheeled = 0;
-    	int countSupportOmniWheeledAssault = 0;
-    	int countSupportOmniWheeledHeavy = 0;
-    	int countSupportOmniWheeledMedium = 0;
-    	int countSupportOmniWheeledLight = 0;
-    	int countSupportOmniHover = 0;
-    	int countSupportOmniHoverMedium = 0;
-    	int countSupportOmniHoverLight = 0;
-    	int countSupportOmniHydrofoil = 0;
-    	int countSupportOmniHydrofoilAssault = 0;
-    	int countSupportOmniHydrofoilHeavy = 0;
-    	int countSupportOmniHydrofoilMedium = 0;
-    	int countSupportOmniHydrofoilLight = 0;*/
-    	
-    	// Turrets
-    	int countGE = 0;
-    	
-    	// Protomechs
-    	boolean expandProtos = false;
-    	int countProtos = 0;
-    	int countLightProtos = 0;
-    	int countMediumProtos = 0;
-    	int countHeavyProtos = 0;
-    	int countAssaultProtos = 0;
-    	
-    	
-    	// Gather data and load it into the tree
-    	for (Unit u : getCampaign().getUnits()) {
-    		Entity e = u.getEntity();
-    		if (e instanceof Mech) {
-    			countMechs++;
-    			if (e.isOmni()) {
-    				countOmniMechs++;
-    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
-	    				ultralightOmniMech++;
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-	    				lightOmniMech++;
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-	    				mediumOmniMech++;
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-	    				heavyOmniMech++;
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-	    				assaultOmniMech++;
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
-    					colossalOmniMech++;
-	    			}
-    			} else {
-        			countBattleMechs++;
-        			if (e.getWeightClass() == EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
-	    				ultralightMech++;
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-	    				lightMech++;
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-	    				mediumMech++;
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-	    				heavyMech++;
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-	    				assaultMech++;
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
-	    				colossalMech++;
-	    			}
-    			}
-    		} else if (e instanceof ConvFighter) {
-    			countConv++;
-    		} else if (e instanceof SpaceStation) {
-    			continue;
-            } else if (e instanceof Warship) {
-    			countSpace++;
-    			countWarships++;
-    			if (e.getWeightClass() == EntityWeightClass.WEIGHT_SMALL_WAR) {
-    				countSmallWS++;
-    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_LARGE_WAR) {
-    				countLargeWS++;
-    			}
-        	} else if (e instanceof Jumpship) {
-    			countSpace++;
-    			countJumpships++;
-        	} else if (e instanceof Dropship) {
-    			countSpace++;
-    			countDropships++;
-    			if (e.getWeightClass() == EntityWeightClass.WEIGHT_SMALL_DROP) {
-    				countSmallDS++;
-    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM_DROP) {
-    				countMediumDS++;
-    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_LARGE_DROP) {
-    				countLargeDS++;
-    			}
-        	} else if (e instanceof SmallCraft) {
-    			countSpace++;
-    			countSmallCraft++;
-        	} else if (e instanceof Aero) {
-    			countASF++;
-    			if (e.isOmni()) {
-    				countOmniASF++;
-    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-	    				countOmniLightASF++;
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-	    				countOmniMediumASF++;
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-	    				countOmniHeavyASF++;
-	    			}
-    			} else {
-    				countStandardASF++;
-    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-	    				countLightASF++;
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-	    				countMediumASF++;
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-	    				countHeavyASF++;
-	    			}
-    			}
-    		} else if (e instanceof Protomech) {
-    			countProtos++;
-    			if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-    				countLightProtos++;
-    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-    				countMediumProtos++;
-    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-    				countHeavyProtos++;
-    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-    				countAssaultProtos++;
-    			}
-        	} else if (e instanceof GunEmplacement) {
-    			countGE++;
-    		} else if (e instanceof SupportTank || e instanceof SupportVTOL) {
-    			continue;
-    		} else if (e instanceof Tank) {
-    			countVees++;
-    			if (e.isOmni()) {
-    				countOmniVees++;
-    				if (e instanceof VTOL) {
-	    				countOmniVTOL++;
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				countOmniVTOLLight++;
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.TRACKED) {
-	    				countOmniTracked++;
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				countOmniTrackedLight++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				countOmniTrackedMedium++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-		    				countOmniTrackedHeavy++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-		    				countOmniTrackedAssault++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
-		    				countOmniTrackedColossal++;
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.WHEELED) {
-	    				countOmniWheeled++;
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				countOmniWheeledLight++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				countOmniWheeledMedium++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-		    				countOmniWheeledHeavy++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-		    				countOmniWheeledAssault++;
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.HOVER) {
-	    				countOmniHover++;
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				countOmniHoverLight++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				countOmniHoverMedium++;
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.WIGE) {
-	    				countOmniWiGE++;
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				countOmniWiGELight++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				countOmniWiGEMedium++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-		    				countOmniWiGEHeavy++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-		    				countOmniWiGEAssault++;
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.NAVAL) {
-	    				countOmniNaval++;
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				countOmniNavalLight++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				countOmniNavalMedium++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-		    				countOmniNavalHeavy++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-		    				countOmniNavalAssault++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
-	    					countOmniNavalColossal++;
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.SUBMARINE) {
-	    				countOmniSub++;
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				countOmniSubLight++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				countOmniSubMedium++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-		    				countOmniSubHeavy++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-		    				countOmniSubAssault++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
-	    					countOmniSubColossal++;
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.HYDROFOIL) {
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				countOmniHydrofoilLight++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				countOmniHydrofoilMedium++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-		    				countOmniHydrofoilHeavy++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-		    				countOmniHydrofoilAssault++;
-		    			}
-	    			}
-    			} else {
-    				countStandardVees++;
-    				if (e instanceof VTOL) {
-	    				countVTOL++;
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				countVTOLLight++;
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.TRACKED) {
-	    				countTracked++;
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				countTrackedLight++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				countTrackedMedium++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-		    				countTrackedHeavy++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-		    				countTrackedAssault++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
-		    				countTrackedColossal++;
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.WHEELED) {
-	    				countWheeled++;
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				countWheeledLight++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				countWheeledMedium++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-		    				countWheeledHeavy++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-		    				countWheeledAssault++;
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.HOVER) {
-	    				countHover++;
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				countHoverLight++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				countHoverMedium++;
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.WIGE) {
-	    				countWiGE++;
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				countWiGELight++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				countWiGEMedium++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-		    				countWiGEHeavy++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-		    				countWiGEAssault++;
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.NAVAL) {
-	    				countNaval++;
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				countNavalLight++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				countNavalMedium++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-		    				countNavalHeavy++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-		    				countNavalAssault++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
-	    					countNavalColossal++;
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.SUBMARINE) {
-	    				countSub++;
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				countSubLight++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				countSubMedium++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-		    				countSubHeavy++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-		    				countSubAssault++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
-	    					countSubColossal++;
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.HYDROFOIL) {
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				countHydrofoilLight++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				countHydrofoilMedium++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-		    				countHydrofoilHeavy++;
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-		    				countHydrofoilAssault++;
-		    			}
-	    			}
-    			}
-    		} else if (e instanceof BattleArmor) {
-    			countBA++;
-    			if (e.getWeightClass() == EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
-        			countBAPAL++;
-    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-        			countBALight++;
-    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-        			countBAMedium++;
-    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-        			countBAHeavy++;
-    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-        			countBAAssault++;
-    			}
-    		} else if (e instanceof Infantry) {
-    			countInfantry++;
-    			if (((Infantry) e).isMechanized()) {
-    				countMechanizedInfantry++;
-    			} else if (e.getMovementMode() == EntityMovementMode.INF_JUMP) {
-    				countJumpInfantry++;
-    			} else if (e.getMovementMode() == EntityMovementMode.INF_LEG) {
-    				countFootInfantry++;
-    			} else if (e.getMovementMode() == EntityMovementMode.INF_MOTORIZED) {
-    				countMotorizedInfantry++;
-    			}
-    		}
-    	}
-    	
-    	// Mech Nodes
-    	final DefaultMutableTreeNode mechs = new DefaultMutableTreeNode("'Mechs: "+countMechs);
-    	DefaultMutableTreeNode battlemechs = new DefaultMutableTreeNode("BattleMechs: "+countBattleMechs);
-    	DefaultMutableTreeNode omnis = new DefaultMutableTreeNode("OmniMechs: "+countOmniMechs);
-    	mechs.add(battlemechs);
-    	mechs.add(omnis);
-    	DefaultMutableTreeNode colossalmechs = new DefaultMutableTreeNode("Colossal: "+colossalMech);
-    	battlemechs.add(colossalmechs);
-    	DefaultMutableTreeNode assaultmechs = new DefaultMutableTreeNode("Assault: "+assaultMech);
-    	battlemechs.add(assaultmechs);
-    	DefaultMutableTreeNode heavymechs = new DefaultMutableTreeNode("Heavy: "+heavyMech);
-    	battlemechs.add(heavymechs);
-    	DefaultMutableTreeNode mediummechs = new DefaultMutableTreeNode("Medium: "+mediumMech);
-    	battlemechs.add(mediummechs);
-    	DefaultMutableTreeNode lightmechs = new DefaultMutableTreeNode("Light: "+lightMech);
-    	battlemechs.add(lightmechs);
-    	DefaultMutableTreeNode ultralightmechs = new DefaultMutableTreeNode("Ultralight: "+ultralightMech);
-    	battlemechs.add(ultralightmechs);
-    	DefaultMutableTreeNode colossalomnis = new DefaultMutableTreeNode("Colossal: "+colossalOmniMech);
-    	omnis.add(colossalomnis);
-    	DefaultMutableTreeNode assaultomnis = new DefaultMutableTreeNode("Assault: "+assaultOmniMech);
-    	omnis.add(assaultomnis);
-    	DefaultMutableTreeNode heavyomnis = new DefaultMutableTreeNode("Heavy: "+heavyOmniMech);
-    	omnis.add(heavyomnis);
-    	DefaultMutableTreeNode mediumomnis = new DefaultMutableTreeNode("Medium: "+mediumOmniMech);
-    	omnis.add(mediumomnis);
-    	DefaultMutableTreeNode lightomnis = new DefaultMutableTreeNode("Light: "+lightOmniMech);
-    	omnis.add(lightomnis);
-    	DefaultMutableTreeNode ultralightomnis = new DefaultMutableTreeNode("Ultralight: "+ultralightOmniMech);
-    	omnis.add(ultralightomnis);
-    	top.add(mechs);
-    	
-    	// ASF Nodes
-    	final DefaultMutableTreeNode ASF = new DefaultMutableTreeNode("'Aerospace Fighters: "+countASF);
-    	DefaultMutableTreeNode sASF = new DefaultMutableTreeNode("Standard Fighters: "+countStandardASF);
-    	DefaultMutableTreeNode oASF = new DefaultMutableTreeNode("OmniFighters: "+countOmniASF);
-    	ASF.add(sASF);
-    	ASF.add(oASF);
-    	DefaultMutableTreeNode sHeavyASF = new DefaultMutableTreeNode("Heavy: "+countHeavyASF);
-    	sASF.add(sHeavyASF);
-    	DefaultMutableTreeNode sMediumASF = new DefaultMutableTreeNode("Medium: "+countMediumASF);
-    	sASF.add(sMediumASF);
-    	DefaultMutableTreeNode sLightASF = new DefaultMutableTreeNode("Light: "+countLightASF);
-    	sASF.add(sLightASF);
-    	DefaultMutableTreeNode oHeavyASF = new DefaultMutableTreeNode("Heavy: "+countOmniHeavyASF);
-    	oASF.add(oHeavyASF);
-    	DefaultMutableTreeNode oMediumASF = new DefaultMutableTreeNode("Medium: "+countOmniMediumASF);
-    	oASF.add(oMediumASF);
-    	DefaultMutableTreeNode oLightASF = new DefaultMutableTreeNode("Light: "+countOmniLightASF);
-    	oASF.add(oLightASF);
-    	top.add(ASF);
-    	
-    	// Vee Nodes
-    	final DefaultMutableTreeNode vees = new DefaultMutableTreeNode("Vehicles: "+countVees);
-    	DefaultMutableTreeNode sVees = new DefaultMutableTreeNode("Standard: "+countStandardVees);
-    	DefaultMutableTreeNode oVees = new DefaultMutableTreeNode("OmniVees: "+countOmniVees);
-    	vees.add(sVees);
-    	vees.add(oVees);
-    	DefaultMutableTreeNode sTracked = new DefaultMutableTreeNode("Tracked: "+countTracked);
-    	sVees.add(sTracked);
-    	DefaultMutableTreeNode sTrackedColossal = new DefaultMutableTreeNode("Super Heavy: "+countTrackedColossal);
-    	sTracked.add(sTrackedColossal);
-    	DefaultMutableTreeNode sTrackedAssault = new DefaultMutableTreeNode("Assault: "+countTrackedAssault);
-    	sTracked.add(sTrackedAssault);
-    	DefaultMutableTreeNode sTrackedHeavy = new DefaultMutableTreeNode("Heavy: "+countTrackedHeavy);
-    	sTracked.add(sTrackedHeavy);
-    	DefaultMutableTreeNode sTrackedMedium = new DefaultMutableTreeNode("Medium: "+countTrackedMedium);
-    	sTracked.add(sTrackedMedium);
-    	DefaultMutableTreeNode sTrackedLight = new DefaultMutableTreeNode("Light: "+countTrackedLight);
-    	sTracked.add(sTrackedLight);
-    	DefaultMutableTreeNode oTracked = new DefaultMutableTreeNode("Tracked: "+countOmniTracked);
-    	oVees.add(oTracked);
-    	DefaultMutableTreeNode oTrackedColossal = new DefaultMutableTreeNode("Super Heavy: "+countOmniTrackedColossal);
-    	oTracked.add(oTrackedColossal);
-    	DefaultMutableTreeNode oTrackedAssault = new DefaultMutableTreeNode("Assault: "+countOmniTrackedAssault);
-    	oTracked.add(oTrackedAssault);
-    	DefaultMutableTreeNode oTrackedHeavy = new DefaultMutableTreeNode("Heavy: "+countOmniTrackedHeavy);
-    	oTracked.add(oTrackedHeavy);
-    	DefaultMutableTreeNode oTrackedMedium = new DefaultMutableTreeNode("Medium: "+countOmniTrackedMedium);
-    	oTracked.add(oTrackedMedium);
-    	DefaultMutableTreeNode oTrackedLight = new DefaultMutableTreeNode("Light: "+countOmniTrackedLight);
-    	oTracked.add(oTrackedLight);
-    	DefaultMutableTreeNode sWheeled = new DefaultMutableTreeNode("Wheeled: "+countWheeled);
-    	sVees.add(sWheeled);
-    	DefaultMutableTreeNode sWheeledAssault = new DefaultMutableTreeNode("Assault: "+countWheeledAssault);
-    	sWheeled.add(sWheeledAssault);
-    	DefaultMutableTreeNode sWheeledHeavy = new DefaultMutableTreeNode("Heavy: "+countWheeledHeavy);
-    	sWheeled.add(sWheeledHeavy);
-    	DefaultMutableTreeNode sWheeledMedium = new DefaultMutableTreeNode("Medium: "+countWheeledMedium);
-    	sWheeled.add(sWheeledMedium);
-    	DefaultMutableTreeNode sWheeledLight = new DefaultMutableTreeNode("Light: "+countWheeledLight);
-    	sWheeled.add(sWheeledLight);
-    	DefaultMutableTreeNode oWheeled = new DefaultMutableTreeNode("Wheeled: "+countOmniWheeled);
-    	oVees.add(oWheeled);
-    	DefaultMutableTreeNode oWheeledAssault = new DefaultMutableTreeNode("Assault: "+countOmniWheeledAssault);
-    	oWheeled.add(oWheeledAssault);
-    	DefaultMutableTreeNode oWheeledHeavy = new DefaultMutableTreeNode("Heavy: "+countOmniWheeledHeavy);
-    	oWheeled.add(oWheeledHeavy);
-    	DefaultMutableTreeNode oWheeledMedium = new DefaultMutableTreeNode("Medium: "+countOmniWheeledMedium);
-    	oWheeled.add(oWheeledMedium);
-    	DefaultMutableTreeNode oWheeledLight = new DefaultMutableTreeNode("Light: "+countOmniWheeledLight);
-    	oWheeled.add(oWheeledLight);
-    	DefaultMutableTreeNode sHover = new DefaultMutableTreeNode("Hover: "+countHover);
-    	sVees.add(sHover);
-    	DefaultMutableTreeNode sHoverMedium = new DefaultMutableTreeNode("Medium: "+countHoverMedium);
-    	sHover.add(sHoverMedium);
-    	DefaultMutableTreeNode sHoverLight = new DefaultMutableTreeNode("Light: "+countHoverLight);
-    	sHover.add(sHoverLight);
-    	DefaultMutableTreeNode oHover = new DefaultMutableTreeNode("Hover: "+countOmniHover);
-    	oVees.add(oHover);
-    	DefaultMutableTreeNode oHoverMedium = new DefaultMutableTreeNode("Medium: "+countOmniHoverMedium);
-    	oHover.add(oHoverMedium);
-    	DefaultMutableTreeNode oHoverLight = new DefaultMutableTreeNode("Light: "+countOmniHoverLight);
-    	oHover.add(oHoverLight);
-    	DefaultMutableTreeNode sVTOL = new DefaultMutableTreeNode("VTOL: "+countVTOL);
-    	sVees.add(sVTOL);
-    	DefaultMutableTreeNode sVTOLLight = new DefaultMutableTreeNode("Light: "+countVTOLLight);
-    	sVTOL.add(sVTOLLight);
-    	DefaultMutableTreeNode oVTOL = new DefaultMutableTreeNode("VTOL: "+countOmniVTOL);
-    	oVees.add(oVTOL);
-    	DefaultMutableTreeNode oVTOLLight = new DefaultMutableTreeNode("Light: "+countOmniVTOLLight);
-    	oVTOL.add(oVTOLLight);
-    	DefaultMutableTreeNode sWiGE = new DefaultMutableTreeNode("WiGE: "+countWiGE);
-    	sVees.add(sWiGE);
-    	DefaultMutableTreeNode sWiGEAssault = new DefaultMutableTreeNode("Assault: "+countWiGEAssault);
-    	sWiGE.add(sWiGEAssault);
-    	DefaultMutableTreeNode sWiGEHeavy = new DefaultMutableTreeNode("Heavy: "+countWiGEHeavy);
-    	sWiGE.add(sWiGEHeavy);
-    	DefaultMutableTreeNode sWiGEMedium = new DefaultMutableTreeNode("Medium: "+countWiGEMedium);
-    	sWiGE.add(sWiGEMedium);
-    	DefaultMutableTreeNode sWiGELight = new DefaultMutableTreeNode("Light: "+countWiGELight);
-    	sWiGE.add(sWiGELight);
-    	DefaultMutableTreeNode oWiGE = new DefaultMutableTreeNode("WiGE: "+countOmniWiGE);
-    	oVees.add(oWiGE);
-    	DefaultMutableTreeNode oWiGEAssault = new DefaultMutableTreeNode("Assault: "+countOmniWiGEAssault);
-    	oWiGE.add(oWiGEAssault);
-    	DefaultMutableTreeNode oWiGEHeavy = new DefaultMutableTreeNode("Heavy: "+countOmniWiGEHeavy);
-    	oWiGE.add(oWiGEHeavy);
-    	DefaultMutableTreeNode oWiGEMedium = new DefaultMutableTreeNode("Medium: "+countOmniWiGEMedium);
-    	oWiGE.add(oWiGEMedium);
-    	DefaultMutableTreeNode oWiGELight = new DefaultMutableTreeNode("Light: "+countOmniWiGELight);
-    	oWiGE.add(oWiGELight);
-    	DefaultMutableTreeNode sNaval = new DefaultMutableTreeNode("Naval: "+countNaval);
-    	sVees.add(sNaval);
-    	DefaultMutableTreeNode sNavalColossal = new DefaultMutableTreeNode("Super Heavy: "+countNavalColossal);
-    	sNaval.add(sNavalColossal);
-    	DefaultMutableTreeNode sNavalAssault = new DefaultMutableTreeNode("Assault: "+countNavalAssault);
-    	sNaval.add(sNavalAssault);
-    	DefaultMutableTreeNode sNavalHeavy = new DefaultMutableTreeNode("Heavy: "+countNavalHeavy);
-    	sNaval.add(sNavalHeavy);
-    	DefaultMutableTreeNode sNavalMedium = new DefaultMutableTreeNode("Medium: "+countNavalMedium);
-    	sNaval.add(sNavalMedium);
-    	DefaultMutableTreeNode sNavalLight = new DefaultMutableTreeNode("Light: "+countNavalLight);
-    	sNaval.add(sNavalLight);
-    	DefaultMutableTreeNode oNaval = new DefaultMutableTreeNode("Naval: "+countOmniNaval);
-    	oVees.add(oNaval);
-    	DefaultMutableTreeNode oNavalColossal = new DefaultMutableTreeNode("Super Heavy: "+countOmniNavalColossal);
-    	oNaval.add(oNavalColossal);
-    	DefaultMutableTreeNode oNavalAssault = new DefaultMutableTreeNode("Assault: "+countOmniNavalAssault);
-    	oNaval.add(oNavalAssault);
-    	DefaultMutableTreeNode oNavalHeavy = new DefaultMutableTreeNode("Heavy: "+countOmniNavalHeavy);
-    	oNaval.add(oNavalHeavy);
-    	DefaultMutableTreeNode oNavalMedium = new DefaultMutableTreeNode("Medium: "+countOmniNavalMedium);
-    	oNaval.add(oNavalMedium);
-    	DefaultMutableTreeNode oNavalLight = new DefaultMutableTreeNode("Light: "+countOmniNavalLight);
-    	oNaval.add(oNavalLight);
-    	DefaultMutableTreeNode sSub = new DefaultMutableTreeNode("Sub: "+countSub);
-    	sVees.add(sSub);
-    	DefaultMutableTreeNode sSubColossal = new DefaultMutableTreeNode("Super Heavy: "+countSubColossal);
-    	sSub.add(sSubColossal);
-    	DefaultMutableTreeNode sSubAssault = new DefaultMutableTreeNode("Assault: "+countSubAssault);
-    	sSub.add(sSubAssault);
-    	DefaultMutableTreeNode sSubHeavy = new DefaultMutableTreeNode("Heavy: "+countSubHeavy);
-    	sSub.add(sSubHeavy);
-    	DefaultMutableTreeNode sSubMedium = new DefaultMutableTreeNode("Medium: "+countSubMedium);
-    	sSub.add(sSubMedium);
-    	DefaultMutableTreeNode sSubLight = new DefaultMutableTreeNode("Light: "+countSubLight);
-    	sSub.add(sSubLight);
-    	DefaultMutableTreeNode oSub = new DefaultMutableTreeNode("Sub: "+countOmniSub);
-    	oVees.add(oSub);
-    	DefaultMutableTreeNode oSubColossal = new DefaultMutableTreeNode("Super Heavy: "+countOmniSubColossal);
-    	oSub.add(oSubColossal);
-    	DefaultMutableTreeNode oSubAssault = new DefaultMutableTreeNode("Assault: "+countOmniSubAssault);
-    	oSub.add(oSubAssault);
-    	DefaultMutableTreeNode oSubHeavy = new DefaultMutableTreeNode("Heavy: "+countOmniSubHeavy);
-    	oSub.add(oSubHeavy);
-    	DefaultMutableTreeNode oSubMedium = new DefaultMutableTreeNode("Medium: "+countOmniSubMedium);
-    	oSub.add(oSubMedium);
-    	DefaultMutableTreeNode oSubLight = new DefaultMutableTreeNode("Light: "+countOmniSubLight);
-    	oSub.add(oSubLight);
-    	DefaultMutableTreeNode sHydrofoil = new DefaultMutableTreeNode("Hydrofoil: "+countHydrofoil);
-    	sVees.add(sHydrofoil);
-    	DefaultMutableTreeNode sHydrofoilAssault = new DefaultMutableTreeNode("Assault: "+countHydrofoilAssault);
-    	sHydrofoil.add(sHydrofoilAssault);
-    	DefaultMutableTreeNode sHydrofoilHeavy = new DefaultMutableTreeNode("Heavy: "+countHydrofoilHeavy);
-    	sHydrofoil.add(sHydrofoilHeavy);
-    	DefaultMutableTreeNode sHydrofoilMedium = new DefaultMutableTreeNode("Medium: "+countHydrofoilMedium);
-    	sHydrofoil.add(sHydrofoilMedium);
-    	DefaultMutableTreeNode sHydrofoilLight = new DefaultMutableTreeNode("Light: "+countHydrofoilLight);
-    	sHydrofoil.add(sHydrofoilLight);
-    	DefaultMutableTreeNode oHydrofoil = new DefaultMutableTreeNode("Hydrofoil: "+countOmniHydrofoil);
-    	oVees.add(oHydrofoil);
-    	DefaultMutableTreeNode oHydrofoilAssault = new DefaultMutableTreeNode("Assault: "+countOmniHydrofoilAssault);
-    	oHydrofoil.add(oHydrofoilAssault);
-    	DefaultMutableTreeNode oHydrofoilHeavy = new DefaultMutableTreeNode("Heavy: "+countOmniHydrofoilHeavy);
-    	oHydrofoil.add(oHydrofoilHeavy);
-    	DefaultMutableTreeNode oHydrofoilMedium = new DefaultMutableTreeNode("Medium: "+countOmniHydrofoilMedium);
-    	oHydrofoil.add(oHydrofoilMedium);
-    	DefaultMutableTreeNode oHydrofoilLight = new DefaultMutableTreeNode("Light: "+countOmniHydrofoilLight);
-    	oHydrofoil.add(oHydrofoilLight);
-    	top.add(vees);
-    	
-    	// Conventional Fighters
-    	final DefaultMutableTreeNode conv = new DefaultMutableTreeNode("Conventional Fighters: "+countConv);
-    	top.add(conv);
-    	
-    	// Infantry Nodes
-    	int allInfantry = (countInfantry+countBA);
-    	final DefaultMutableTreeNode inf = new DefaultMutableTreeNode("Infantry: "+allInfantry);
-    	DefaultMutableTreeNode cInf = new DefaultMutableTreeNode("Conventional: "+countInfantry);
-    	DefaultMutableTreeNode BAInf = new DefaultMutableTreeNode("Battle Armor: "+countBA);
-    	inf.add(cInf);
-    	inf.add(BAInf);
-    	DefaultMutableTreeNode infFoot = new DefaultMutableTreeNode("Foot Platoons: "+countFootInfantry);
-    	cInf.add(infFoot);
-    	DefaultMutableTreeNode infJump = new DefaultMutableTreeNode("Jump Platoons: "+countJumpInfantry);
-    	cInf.add(infJump);
-    	DefaultMutableTreeNode infMechanized = new DefaultMutableTreeNode("Mechanized Platoons: "+countMechanizedInfantry);
-    	cInf.add(infMechanized);
-    	DefaultMutableTreeNode infMotorized = new DefaultMutableTreeNode("Motorized Platoons: "+countMotorizedInfantry);
-    	cInf.add(infMotorized);
-    	DefaultMutableTreeNode baPAL = new DefaultMutableTreeNode("PAL/Exoskeleton: "+countBAPAL);
-    	BAInf.add(baPAL);
-    	DefaultMutableTreeNode baLight = new DefaultMutableTreeNode("Light: "+countBALight);
-    	BAInf.add(baLight);
-    	DefaultMutableTreeNode baMedium = new DefaultMutableTreeNode("Medium: "+countBAMedium);
-    	BAInf.add(baMedium);
-    	DefaultMutableTreeNode baHeavy = new DefaultMutableTreeNode("Heavy: "+countBAHeavy);
-    	BAInf.add(baHeavy);
-    	DefaultMutableTreeNode baAssault = new DefaultMutableTreeNode("Assault: "+countBAAssault);
-    	BAInf.add(baAssault);
-    	top.add(inf);
-    	
-    	// Protomechs
-    	final DefaultMutableTreeNode protos = new DefaultMutableTreeNode("Protomechs: "+countProtos);
-    	DefaultMutableTreeNode plight = new DefaultMutableTreeNode("Light: "+countLightProtos);
-    	protos.add(plight);
-    	DefaultMutableTreeNode pmedium = new DefaultMutableTreeNode("Medium: "+countMediumProtos);
-    	protos.add(pmedium);
-    	DefaultMutableTreeNode pheavy = new DefaultMutableTreeNode("Heavy: "+countHeavyProtos);
-    	protos.add(pheavy);
-    	DefaultMutableTreeNode passault = new DefaultMutableTreeNode("Assault: "+countAssaultProtos);
-    	protos.add(passault);
-    	top.add(protos);
-    	
-    	// Turrets
-    	final DefaultMutableTreeNode ge = new DefaultMutableTreeNode("Gun Emplacements: "+countGE);
-    	top.add(ge);
-    	
-    	// Space
-    	final DefaultMutableTreeNode space = new DefaultMutableTreeNode("Spacecraft: "+countSpace);
-    	DefaultMutableTreeNode ws = new DefaultMutableTreeNode("Warships: "+countWarships);
-    	space.add(ws);
-    	DefaultMutableTreeNode js = new DefaultMutableTreeNode("Jumpships: "+countJumpships);
-    	space.add(js);
-    	DefaultMutableTreeNode ds = new DefaultMutableTreeNode("Dropships: "+countDropships);
-    	space.add(ds);
-    	DefaultMutableTreeNode sc = new DefaultMutableTreeNode("Small Craft: "+countSmallCraft);
-    	space.add(sc);
-    	DefaultMutableTreeNode smws = new DefaultMutableTreeNode("Small Warships: "+countSmallWS);
-    	ws.add(smws);
-    	DefaultMutableTreeNode lgws = new DefaultMutableTreeNode("Large Warships: "+countLargeWS);
-    	ws.add(lgws);
-    	DefaultMutableTreeNode smds = new DefaultMutableTreeNode("Small Dropships: "+countSmallDS);
-    	ds.add(smds);
-    	DefaultMutableTreeNode mdds = new DefaultMutableTreeNode("Medium Dropships: "+countMediumDS);
-    	ds.add(mdds);
-    	DefaultMutableTreeNode lgds = new DefaultMutableTreeNode("Large Dropships: "+countLargeDS);
-    	ds.add(lgds);
-    	top.add(space);
-    	
-    	for (Unit u : getCampaign().getUnits()) {
-    		Entity e = u.getEntity();
-    		if (e instanceof Mech) {
-    			expandMechs = true;
-    			if (e.isOmni()) {
-    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
-    					ultralightomnis.add(new DefaultMutableTreeNode(u.getName()));
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-    					lightomnis.add(new DefaultMutableTreeNode(u.getName()));
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-    					mediumomnis.add(new DefaultMutableTreeNode(u.getName()));
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-    					heavyomnis.add(new DefaultMutableTreeNode(u.getName()));
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-    					assaultomnis.add(new DefaultMutableTreeNode(u.getName()));
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
-    					colossalomnis.add(new DefaultMutableTreeNode(u.getName()));
-	    			}
-    			} else {
-    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
-	    				ultralightmechs.add(new DefaultMutableTreeNode(u.getName()));
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-	    				lightmechs.add(new DefaultMutableTreeNode(u.getName()));
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-	    				mediummechs.add(new DefaultMutableTreeNode(u.getName()));
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-	    				heavymechs.add(new DefaultMutableTreeNode(u.getName()));
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-	    				assaultmechs.add(new DefaultMutableTreeNode(u.getName()));
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
-    					colossalmechs.add(new DefaultMutableTreeNode(u.getName()));
-	    			}
-    			}
-    		} else if (e instanceof ConvFighter) {
-    			conv.add(new DefaultMutableTreeNode(u.getName()));
-            } else if (e instanceof Warship) {
-    			expandSpace = true;
-    			if (e.getWeightClass() == EntityWeightClass.WEIGHT_SMALL_WAR) {
-    				smws.add(new DefaultMutableTreeNode(u.getName()));
-    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_LARGE_WAR) {
-    				lgws.add(new DefaultMutableTreeNode(u.getName()));
-    			}
-        	} else if (e instanceof Jumpship) {
-    			expandSpace = true;
-    			js.add(new DefaultMutableTreeNode(u.getName()));
-        	} else if (e instanceof Dropship) {
-    			expandSpace = true;
-    			if (e.getWeightClass() == EntityWeightClass.WEIGHT_SMALL_DROP) {
-    				smds.add(new DefaultMutableTreeNode(u.getName()));
-    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM_DROP) {
-    				mdds.add(new DefaultMutableTreeNode(u.getName()));
-    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_LARGE_DROP) {
-    				lgds.add(new DefaultMutableTreeNode(u.getName()));
-    			}
-        	} else if (e instanceof SmallCraft) {
-    			expandSpace = true;
-    			sc.add(new DefaultMutableTreeNode(u.getName()));
-        	} else if (e instanceof Aero) {
-        		expandASF = true;
-    			if (e.isOmni()) {
-    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-	    				oLightASF.add(new DefaultMutableTreeNode(u.getName()));
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-	    				oMediumASF.add(new DefaultMutableTreeNode(u.getName()));
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-	    				oHeavyASF.add(new DefaultMutableTreeNode(u.getName()));
-	    			}
-    			} else {
-    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-	    				sLightASF.add(new DefaultMutableTreeNode(u.getName()));
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-	    				sMediumASF.add(new DefaultMutableTreeNode(u.getName()));
-	    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-	    				sHeavyASF.add(new DefaultMutableTreeNode(u.getName()));
-	    			}
-    			}
-        	} else if (e instanceof Protomech) {
-        		expandProtos = true;
-    			if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-    				plight.add(new DefaultMutableTreeNode(u.getName()));
-    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-    				pmedium.add(new DefaultMutableTreeNode(u.getName()));
-    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-    				pheavy.add(new DefaultMutableTreeNode(u.getName()));
-    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-    				passault.add(new DefaultMutableTreeNode(u.getName()));
-    			}
-        	} else if (e instanceof GunEmplacement) {
-    			ge.add(new DefaultMutableTreeNode(u.getName()));
-    		} else if (e instanceof SupportTank || e instanceof SupportVTOL) {
-    			continue;
-    		} else if (e instanceof Tank) {
-    			expandVees = true;
-    			if (e.isOmni()) {
-    				if (e instanceof VTOL) {
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				oVTOLLight.add(new DefaultMutableTreeNode(u.getName()));
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.TRACKED) {
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				oTrackedLight.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				oTrackedMedium.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-		    				oTrackedHeavy.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-		    				oTrackedAssault.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
-		    				oTrackedColossal.add(new DefaultMutableTreeNode(u.getName()));
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.WHEELED) {
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				oWheeledLight.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				oWheeledMedium.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-		    				oWheeledHeavy.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-		    				oWheeledAssault.add(new DefaultMutableTreeNode(u.getName()));
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.HOVER) {
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				oHoverLight.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				oHoverMedium.add(new DefaultMutableTreeNode(u.getName()));
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.WIGE) {
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				oWiGELight.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				oWiGEMedium.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-		    				oWiGEHeavy.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-		    				oWiGEAssault.add(new DefaultMutableTreeNode(u.getName()));
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.NAVAL) {
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				oNavalLight.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				oNavalMedium.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-		    				oNavalHeavy.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-		    				oNavalAssault.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
-		    				oNavalColossal.add(new DefaultMutableTreeNode(u.getName()));
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.SUBMARINE) {
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				oSubLight.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				oSubMedium.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-		    				oSubHeavy.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-		    				oSubAssault.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
-		    				oSubColossal.add(new DefaultMutableTreeNode(u.getName()));
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.HYDROFOIL) {
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				oHydrofoilLight.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				oHydrofoilMedium.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-		    				oHydrofoilHeavy.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-		    				oHydrofoilAssault.add(new DefaultMutableTreeNode(u.getName()));
-		    			}
-	    			}
-    			} else {
-    				if (e instanceof VTOL) {
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				sVTOLLight.add(new DefaultMutableTreeNode(u.getName()));
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.TRACKED) {
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				sTrackedLight.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				sTrackedMedium.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-		    				sTrackedHeavy.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-		    				sTrackedAssault.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
-		    				sTrackedColossal.add(new DefaultMutableTreeNode(u.getName()));
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.WHEELED) {
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				sWheeledLight.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				sWheeledMedium.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-		    				sWheeledHeavy.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-		    				sWheeledAssault.add(new DefaultMutableTreeNode(u.getName()));
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.HOVER) {
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				sHoverLight.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				sHoverMedium.add(new DefaultMutableTreeNode(u.getName()));
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.WIGE) {
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				sWiGELight.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				sWiGEMedium.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-		    				sWiGEHeavy.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-		    				sWiGEAssault.add(new DefaultMutableTreeNode(u.getName()));
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.NAVAL) {
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				sNavalLight.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				sNavalMedium.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-		    				sNavalHeavy.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-		    				sNavalAssault.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
-		    				sNavalColossal.add(new DefaultMutableTreeNode(u.getName()));
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.SUBMARINE) {
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				sSubLight.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				sSubMedium.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-		    				sSubHeavy.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-		    				sSubAssault.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_COLOSSAL) {
-		    				sSubColossal.add(new DefaultMutableTreeNode(u.getName()));
-		    			}
-	    			} else if (e.getMovementMode() == EntityMovementMode.HYDROFOIL) {
-	    				if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-		    				sHydrofoilLight.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-		    				sHydrofoilMedium.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-		    				sHydrofoilHeavy.add(new DefaultMutableTreeNode(u.getName()));
-		    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-		    				sHydrofoilAssault.add(new DefaultMutableTreeNode(u.getName()));
-		    			}
-	    			}
-    			}
-    		} else if (e instanceof BattleArmor) {
-    			expandInfantry = true;
-    			if (e.getWeightClass() == EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
-    				baPAL.add(new DefaultMutableTreeNode(u.getName()));
-    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
-    				baLight.add(new DefaultMutableTreeNode(u.getName()));
-    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
-    				baMedium.add(new DefaultMutableTreeNode(u.getName()));
-    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_HEAVY) {
-    				baHeavy.add(new DefaultMutableTreeNode(u.getName()));
-    			} else if (e.getWeightClass() == EntityWeightClass.WEIGHT_ASSAULT) {
-    				baAssault.add(new DefaultMutableTreeNode(u.getName()));
-    			}
-    		} else if (e instanceof Infantry) {
-    			expandInfantry = true;
-    			if (((Infantry) e).isMechanized()) {
-    				infMechanized.add(new DefaultMutableTreeNode(u.getName()));
-    			} else if (e.getMovementMode() == EntityMovementMode.INF_JUMP) {
-    				infJump.add(new DefaultMutableTreeNode(u.getName()));
-    			} else if (e.getMovementMode() == EntityMovementMode.INF_LEG) {
-    				infFoot.add(new DefaultMutableTreeNode(u.getName()));
-    			} else if (e.getMovementMode() == EntityMovementMode.INF_MOTORIZED) {
-    				infMotorized.add(new DefaultMutableTreeNode(u.getName()));
-    			}
-    		}
-    	}
-    	
-    	// Reset our UI
-    	final boolean expandMechsFinal = expandMechs;
-    	final boolean expandASFFinal = expandASF;
-    	final boolean expandVeesFinal = expandVees;
-    	final boolean expandInfantryFinal = expandInfantry; 
-    	final boolean expandSpaceFinal = expandSpace;
-    	final boolean expandProtosFinal = expandProtos;
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                overviewHangarTree.updateUI();
-                overviewHangarTree.setSelectionPath(null);
-                overviewHangarTree.expandPath(new TreePath(top.getPath()));
-                if (expandMechsFinal) {
-                	overviewHangarTree.expandPath(new TreePath(mechs.getPath()));
-                }
-                if (expandASFFinal) {
-                	overviewHangarTree.expandPath(new TreePath(ASF.getPath()));
-                }
-                if (expandVeesFinal) {
-                	overviewHangarTree.expandPath(new TreePath(vees.getPath()));
-                }
-                if (expandInfantryFinal) {
-                	overviewHangarTree.expandPath(new TreePath(inf.getPath()));
-                }
-                if (expandSpaceFinal) {
-                	overviewHangarTree.expandPath(new TreePath(space.getPath()));
-                }
-                if (expandProtosFinal) {
-                	overviewHangarTree.expandPath(new TreePath(protos.getPath()));
-                }
-                
-            }
-        });
-        
-        int countInTransit = 0;
-        int countPresent = 0;
-        int countDamaged = 0;
-        int countDeployed = 0;
-        for (Unit u : getCampaign().getUnits()) {
-        	if (u.isPresent()) {
-        		countPresent++;
-        	} else {
-        		countInTransit++;
-        	}
-        	if (u.isDamaged()) {
-        		countDamaged++;
-        	}
-        	if (u.isDeployed()) {
-        		countDeployed++;
-        	}
-        }
-        overviewHangarArea.setText("Total Units: "+getCampaign().getUnits().size()+
-        		"\n  Present: "+countPresent+
-        		"\n  In Transit: "+countInTransit+
-        		"\n  Damaged: "+countDamaged+
-        		"\n  Deployed: "+countDeployed);
     }
 
     private void refreshPersonnelView() {
@@ -5294,7 +3964,6 @@ public class CampaignGUI extends JPanel {
         refreshPatientList();
         refreshReport();
         refreshCargo();
-        refreshOverview();
     }
 
     protected void loadPersonFile() throws IOException {
@@ -5389,7 +4058,6 @@ public class CampaignGUI extends JPanel {
         refreshDoctorsList();
         refreshReport();
         refreshFinancialTransactions();
-        refreshOverview();
     }
 
     private void savePersonFile() throws IOException {
@@ -5721,7 +4389,6 @@ public class CampaignGUI extends JPanel {
             refreshPersonnelList();
             refreshScenarioList();
             refreshCargo();
-            refreshOverview();
         }
     }
 
@@ -5758,7 +4425,6 @@ public class CampaignGUI extends JPanel {
         changeMission();
         refreshFinancialTransactions();
         refreshCargo();
-        refreshOverview();
     }
 
     protected void printRecordSheets() {
@@ -5953,7 +4619,6 @@ public class CampaignGUI extends JPanel {
         refreshPatientList();
         refreshPersonnelList();
         refreshCargo();
-        refreshOverview();
 
         if (undeployed.length() > 0) {
             JOptionPane.showMessageDialog(
@@ -7165,7 +5830,6 @@ public class CampaignGUI extends JPanel {
                 refreshAcquireList();
                 refreshReport();
                 refreshCargo();
-                refreshOverview();
             } else if (command.contains("SWAP_AMMO")) {
                 /*
                 WorkItem task = taskModel.getTaskAt(TaskTable.getSelectedRow());
@@ -7196,7 +5860,6 @@ public class CampaignGUI extends JPanel {
                 refreshUnitView();
                 refreshAcquireList();
                 refreshCargo();
-                refreshOverview();
             } else if (command.contains("UNASSIGN")) {
             /*  for (WorkItem task : tasks) {
                     task.resetTimeSpent();
@@ -7240,7 +5903,6 @@ public class CampaignGUI extends JPanel {
                     refreshAcquireList();
                     refreshPartsList();
                     refreshCargo();
-                    refreshOverview();
                 }
             }
         }
@@ -7414,7 +6076,6 @@ public class CampaignGUI extends JPanel {
                 refreshAcquireList();
                 refreshPartsList();
                 refreshCargo();
-                refreshOverview();
             }
         }
     
@@ -7732,7 +6393,6 @@ public class CampaignGUI extends JPanel {
                 refreshServicedUnitList();
                 refreshUnitList();
                 refreshCargo();
-                refreshOverview();
             } else if (command.contains("CHANGE_SITE")) {
                 for (Unit unit : units) {
                     if (!unit.isDeployed()) {
@@ -7748,7 +6408,6 @@ public class CampaignGUI extends JPanel {
                 refreshTaskList();
                 refreshAcquireList();
                 refreshCargo();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("SALVAGE")) {
                 for (Unit unit : units) {
                     if (!unit.isDeployed()) {
@@ -7759,7 +6418,6 @@ public class CampaignGUI extends JPanel {
                 refreshServicedUnitList();
                 refreshUnitList();
                 refreshCargo();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("REPAIR")) {
                 for (Unit unit : units) {
                     if (!unit.isDeployed() && unit.isRepairable()) {
@@ -7770,7 +6428,6 @@ public class CampaignGUI extends JPanel {
                 refreshServicedUnitList();
                 refreshUnitList();
                 refreshCargo();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("REMOVE")) {
                 for (Unit unit : units) {
                     if (!unit.isDeployed()) {
@@ -7787,7 +6444,6 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshReport();
                 refreshCargo();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("UNDEPLOY")) {
                 for (Unit unit : units) {
                     if (unit.isDeployed()) {
@@ -7806,7 +6462,6 @@ public class CampaignGUI extends JPanel {
                 refreshPatientList();
                 refreshScenarioList();
                 refreshCargo();
-                refreshOverview();
             }
         }
 
@@ -8182,7 +6837,6 @@ public class CampaignGUI extends JPanel {
                         refreshUnitList();
                         refreshServicedUnitList();
                         refreshCargo();
-                        refreshOverview();
                     }
                 }
             } else if(command.contains("UNDEPLOY_FORCE")) {
@@ -8195,7 +6849,6 @@ public class CampaignGUI extends JPanel {
                 refreshServicedUnitList();
                 refreshScenarioList();
                 refreshCargo();
-                refreshOverview();
             } else if(command.contains("DEPLOY_FORCE")) {
                 int sid = Integer.parseInt(target);
                 Scenario scenario = getCampaign().getScenario(sid);
@@ -8218,7 +6871,6 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshServicedUnitList();
                 refreshCargo();
-                refreshOverview();
             } else if(command.contains("CHANGE_ICON")) {
                 if(null != singleForce) {
                     PortraitChoiceDialog pcd = new PortraitChoiceDialog(getFrame(), true,
@@ -8270,7 +6922,6 @@ public class CampaignGUI extends JPanel {
                 refreshScenarioList();
                 refreshUnitList();
                 refreshCargo();
-                refreshOverview();
             } else if(command.contains("REMOVE_UNIT")) {
                 for(Unit unit : units) {
                     if(null != unit) {
@@ -8286,7 +6937,6 @@ public class CampaignGUI extends JPanel {
                 refreshScenarioList();
                 refreshUnitList();
                 refreshCargo();
-                refreshOverview();
             } else if(command.contains("UNDEPLOY_UNIT")) {
                 for(Unit unit : units) {
                     undeployUnit(unit);
@@ -8297,7 +6947,6 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshServicedUnitList();
                 refreshCargo();
-                refreshOverview();
             } else if(command.contains("GOTO_UNIT")) {
                 for(Unit unit : units) {
                 	tabMain.setSelectedIndex(tabMain.indexOfTab(resourceMap.getString("panHangar.TabConstraints.tabTitle")));
@@ -8315,7 +6964,6 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshServicedUnitList();
                 refreshCargo();
-                refreshOverview();
             } else if(command.contains("GOTO_PILOT")) {
             	for(Unit unit : units) {
                     tabMain.setSelectedIndex(tabMain.indexOfTab(resourceMap.getString("panPersonnel.TabConstraints.tabTitle")));
@@ -8333,7 +6981,6 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshServicedUnitList();
                 refreshCargo();
-                refreshOverview();
             } else if(command.contains("DEPLOY_UNIT")) {
                 int sid = Integer.parseInt(target);
                 Scenario scenario = getCampaign().getScenario(sid);
@@ -8350,7 +6997,6 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshServicedUnitList();
                 refreshCargo();
-                refreshOverview();
             } else if(command.contains("C3I")) {
                 //don't set them directly, set the C3i UUIDs and then 
                 //run refreshNetworks on the campaign 
@@ -9109,7 +7755,6 @@ public class CampaignGUI extends JPanel {
                 refreshDoctorsList();
                 refreshOrganization();
                 refreshCargo();
-                refreshOverview();
             } else if(command.contains("PROLE")) {
                 int role = Integer.parseInt(st.nextToken());
                 for(Person person : people) {
@@ -9124,7 +7769,6 @@ public class CampaignGUI extends JPanel {
                 refreshDoctorsList();
                 refreshOrganization();
                 refreshCargo();
-                refreshOverview();
             } else if(command.contains("SROLE")) {
                 int role = Integer.parseInt(st.nextToken());
                 for(Person person : people) {
@@ -9139,7 +7783,6 @@ public class CampaignGUI extends JPanel {
                 refreshDoctorsList();
                 refreshOrganization();
                 refreshCargo();
-                refreshOverview();
             } else if (command.contains("REMOVE_UNIT")) {
                 Unit u = getCampaign().getUnit(selectedPerson.getUnitId());
                 if(null != u) {
@@ -9164,7 +7807,6 @@ public class CampaignGUI extends JPanel {
                 refreshPersonnelList();
                 refreshOrganization();
                 refreshCargo();
-                refreshOverview();
             } else if (command.contains("ADD_PILOT")) {
                 UUID selected = UUID.fromString(st.nextToken());
                 Unit u = getCampaign().getUnit(selected);
@@ -9182,7 +7824,6 @@ public class CampaignGUI extends JPanel {
                 refreshPersonnelList();
                 refreshOrganization();
                 refreshCargo();
-                refreshOverview();
             } else if (command.contains("ADD_SOLDIER")) {
                 UUID selected = UUID.fromString(st.nextToken());
                 Unit u = getCampaign().getUnit(selected);
@@ -9204,7 +7845,6 @@ public class CampaignGUI extends JPanel {
                 refreshPersonnelList();
                 refreshOrganization();
                 refreshCargo();
-                refreshOverview();
             } else if (command.contains("ADD_DRIVER")) {
                 UUID selected = UUID.fromString(st.nextToken());
                 Unit u = getCampaign().getUnit(selected);
@@ -9222,7 +7862,6 @@ public class CampaignGUI extends JPanel {
                 refreshPersonnelList();
                 refreshOrganization();
                 refreshCargo();
-                refreshOverview();
             } else if (command.contains("ADD_GUNNER")) {
                 UUID selected = UUID.fromString(st.nextToken());
                 Unit u = getCampaign().getUnit(selected);
@@ -9244,7 +7883,6 @@ public class CampaignGUI extends JPanel {
                 refreshPersonnelList();
                 refreshOrganization();
                 refreshCargo();
-                refreshOverview();
             } else if (command.contains("ADD_CREW")) {
                 UUID selected = UUID.fromString(st.nextToken());
                 Unit u = getCampaign().getUnit(selected);
@@ -9266,7 +7904,6 @@ public class CampaignGUI extends JPanel {
                 refreshPersonnelList();
                 refreshOrganization();
                 refreshCargo();
-                refreshOverview();
             } else if (command.contains("ADD_NAV")) {
                 UUID selected = UUID.fromString(st.nextToken());
                 Unit u = getCampaign().getUnit(selected);
@@ -9288,7 +7925,6 @@ public class CampaignGUI extends JPanel {
                 refreshPersonnelList();
                 refreshOrganization();
                 refreshCargo();
-                refreshOverview();
             } else if (command.contains("ADD_TECH")) {
                 UUID selected = UUID.fromString(st.nextToken());
                 Unit u = getCampaign().getUnit(selected);
@@ -9304,7 +7940,6 @@ public class CampaignGUI extends JPanel {
                 refreshPersonnelList();
                 refreshOrganization();
                 refreshCargo();
-                refreshOverview();
             } else if (command.contains("IMPROVE")) {
                 String type = st.nextToken();
                 int cost =  Integer.parseInt(st.nextToken());
@@ -9320,7 +7955,6 @@ public class CampaignGUI extends JPanel {
                 refreshReport();
                 refreshOrganization();
                 refreshCargo();
-                refreshOverview();
             } else if (command.contains("ABILITY")) {
                 String selected = st.nextToken();
                 int cost =  Integer.parseInt(st.nextToken());
@@ -9335,7 +7969,6 @@ public class CampaignGUI extends JPanel {
                 refreshDoctorsList();
                 refreshReport();
                 refreshCargo();
-                refreshOverview();
             } else if (command.contains("WSPECIALIST")) {
                 String selected = st.nextToken();
                 int cost =  Integer.parseInt(st.nextToken());
@@ -9350,7 +7983,6 @@ public class CampaignGUI extends JPanel {
                 refreshDoctorsList();
                 refreshReport();
                 refreshCargo();
-                refreshOverview();
             } else if (command.contains("SPECIALIST")) {
                 String selected = st.nextToken();
                 int cost =  Integer.parseInt(st.nextToken());
@@ -9365,7 +7997,6 @@ public class CampaignGUI extends JPanel {
                 refreshDoctorsList();
                 refreshReport();
                 refreshCargo();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("STATUS")) {
                 int selected = Integer.parseInt(st.nextToken());
                 for(Person person : people) {
@@ -9389,7 +8020,6 @@ public class CampaignGUI extends JPanel {
                 refreshReport();
                 refreshOrganization();
                 refreshCargo();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("PRISONER_STATUS")) {
                 int selected = Integer.parseInt(st.nextToken());
                 for(Person person : people) {
@@ -9405,14 +8035,12 @@ public class CampaignGUI extends JPanel {
                 refreshReport();
                 refreshOrganization();
                 refreshCargo();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("EDGE")) {
                 String trigger = st.nextToken();
                 selectedPerson.changeEdgeTrigger(trigger);
                 getCampaign().personUpdated(selectedPerson);
                 refreshPersonnelList();
                 refreshPersonnelView();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("REMOVE")) {
                 for(Person person : people) {
                     if (0 == JOptionPane
@@ -9433,7 +8061,6 @@ public class CampaignGUI extends JPanel {
                 refreshOrganization();
                 refreshReport();
                 refreshCargo();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("EDIT")) {
                 CustomizePersonDialog npd = new CustomizePersonDialog(getFrame(), true,
                         selectedPerson,
@@ -9447,7 +8074,6 @@ public class CampaignGUI extends JPanel {
                 refreshPersonnelList();
                 refreshOrganization();
                 refreshCargo();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("HEAL")) {
                 for(Person person : people) {
                     person.setHits(0);
@@ -9461,7 +8087,6 @@ public class CampaignGUI extends JPanel {
                 refreshPersonnelList();
                 refreshOrganization();
                 refreshCargo();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("PORTRAIT")) {
                 PortraitChoiceDialog pcd = new PortraitChoiceDialog(getFrame(), true,
                         selectedPerson.getPortraitCategory(),
@@ -9473,7 +8098,6 @@ public class CampaignGUI extends JPanel {
                 refreshPatientList();
                 refreshPersonnelList();
                 refreshOrganization();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("BIOGRAPHY")) {
                 TextAreaDialog tad = new TextAreaDialog(getFrame(), true,
                         "Edit Biography",
@@ -9483,14 +8107,12 @@ public class CampaignGUI extends JPanel {
                     selectedPerson.setBiography(tad.getText());
                 }
                 refreshPersonnelList();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("XP_ADD")) {
                 for(Person person : people) {
                     person.setXp(person.getXp() + 1);
                 }
                 refreshPatientList();
                 refreshPersonnelList();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("XP_SET")) {
                 PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
                         getFrame(), true, "XP", selectedPerson.getXp(), 0, Math.max(selectedPerson.getXp()+10,100));
@@ -9501,7 +8123,6 @@ public class CampaignGUI extends JPanel {
                 }
                 refreshPatientList();
                 refreshPersonnelList();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("EDGE_SET")) {
                 PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
                         getFrame(), true, "Edge", selectedPerson.getEdge(), 0, 10);
@@ -9512,7 +8133,6 @@ public class CampaignGUI extends JPanel {
                     getCampaign().personUpdated(person);
                 }
                 refreshPersonnelList();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("KILL")) {
                 KillDialog nkd = new KillDialog(getFrame(), true, new Kill(selectedPerson.getId(), "?", "Bare Hands", getCampaign().getDate()), selectedPerson.getName());
                 nkd.setVisible(true);
@@ -9520,17 +8140,14 @@ public class CampaignGUI extends JPanel {
                     getCampaign().addKill(nkd.getKill());
                 }
                 refreshPersonnelList();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("KILL_LOG")) {
                 EditKillLogDialog ekld = new EditKillLogDialog(getFrame(), true, getCampaign(), selectedPerson);
                 ekld.setVisible(true);
                 refreshPersonnelList();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("LOG")) {
                 EditPersonnelLogDialog epld = new EditPersonnelLogDialog(getFrame(), true, getCampaign(), selectedPerson);
                 epld.setVisible(true);
                 refreshPersonnelList();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("LOG_SINGLE")) {
                 EditLogEntryDialog eeld = new EditLogEntryDialog(frame, true, new LogEntry(getCampaign().getDate(), ""));
                 eeld.setVisible(true);
@@ -9541,7 +8158,6 @@ public class CampaignGUI extends JPanel {
                     }
                 }
                 refreshPersonnelList();
-                refreshOverview();
             } else if(command.equalsIgnoreCase("COMMANDER")) {
             	selectedPerson.setCommander(!selectedPerson.isCommander());
             	if (selectedPerson.isCommander()) {
@@ -9576,7 +8192,6 @@ public class CampaignGUI extends JPanel {
                 }
                 getCampaign().personUpdated(selectedPerson);
                 refreshPersonnelList();
-                refreshOverview();
             } else if(command.equalsIgnoreCase("CLEAR_INJURIES")) {
             	for(Person person : people) {
             		person.clearInjuries();
@@ -9587,7 +8202,6 @@ public class CampaignGUI extends JPanel {
                 }
                 refreshPatientList();
                 refreshPersonnelList();
-                refreshOverview();
             } else if(command.contains("REMOVE_INJURY")) {
                 String sel = command.split(":")[1];
                 Injury toRemove = null;
@@ -9606,13 +8220,11 @@ public class CampaignGUI extends JPanel {
                 }
                 refreshPatientList();
                 refreshPersonnelList();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("EDIT_INJURIES")) {
                 EditPersonnelInjuriesDialog epid = new EditPersonnelInjuriesDialog(getFrame(), true, getCampaign(), selectedPerson);
                 epid.setVisible(true);
                 refreshPatientList();
                 refreshPersonnelList();
-                refreshOverview();
             }
         }
 
@@ -11726,7 +10338,6 @@ public class CampaignGUI extends JPanel {
                 refreshFunds();
                 refreshFinancialTransactions();
                 refreshCargo();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("SELL_ALL")) {
                 for(Part p : parts) {
                     if(null != p) {
@@ -11744,7 +10355,6 @@ public class CampaignGUI extends JPanel {
                 refreshFunds();
                 refreshFinancialTransactions();
                 refreshCargo();
-                refreshOverview();
             } else if(command.equalsIgnoreCase("SELL_N")) {
                 if(null != selectedPart) {
                     int n = selectedPart.getQuantity();
@@ -11774,7 +10384,6 @@ public class CampaignGUI extends JPanel {
                 refreshAcquireList();
                 refreshReport();
                 refreshCargo();
-                refreshOverview();
             }
             else if (command.equalsIgnoreCase("ARRIVE")) {
                 for(Part p : parts) {
@@ -11787,7 +10396,6 @@ public class CampaignGUI extends JPanel {
                 refreshAcquireList();
                 refreshReport();
                 refreshCargo();
-                refreshOverview();
             }
             else if (command.equalsIgnoreCase("REMOVE")) {
                 for(Part p : parts) {
@@ -11800,14 +10408,12 @@ public class CampaignGUI extends JPanel {
                 refreshAcquireList();
                 refreshReport();
                 refreshCargo();
-                refreshOverview();
             } else if (command.contains("CHANGE_MODE")) {
                 String sel = command.split(":")[1];
                 int selected = Integer.parseInt(sel);
                 selectedPart.setMode(selected);
                 refreshPartsList();
                 refreshCargo();
-                refreshOverview();
             }
         }
 
@@ -12246,7 +10852,6 @@ public class CampaignGUI extends JPanel {
                         refreshAcquireList();    
                         refreshReport();
                         refreshCargo();
-                        refreshOverview();
                     }                  
                 });
                 menuItem.setEnabled(getCampaign().isGM());
@@ -12320,7 +10925,6 @@ public class CampaignGUI extends JPanel {
                         refreshAcquireList();    
                         refreshReport();
                         refreshCargo();
-                        refreshOverview();
                     }                  
                 });
                 menuItem.setEnabled(getCampaign().isGM());
@@ -12348,7 +10952,6 @@ public class CampaignGUI extends JPanel {
                         refreshTaskList();
                         refreshAcquireList();
                         refreshCargo();
-                        refreshOverview();
                     }                  
                 });
                 menuItem.setEnabled(getCampaign().isGM());
@@ -12523,7 +11126,6 @@ public class CampaignGUI extends JPanel {
                     refreshPersonnelList();
                     refreshUnitList();
                     refreshCargo();
-                    refreshOverview();
                 }
                 
             }
@@ -13008,7 +11610,6 @@ public class CampaignGUI extends JPanel {
                     refreshReport();
                     refreshPartsList();
                     refreshCargo();
-                    refreshOverview();
                 }
             } else if(command.equalsIgnoreCase("PAY_BALANCE")) {
                 getCampaign().payOffLoan(selectedLoan);
@@ -13451,7 +12052,6 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshOrganization();
                 refreshCargo();
-                refreshOverview();
             } else if (command.contains("QUIRK")) {
                 String sel = command.split(":")[1];
                     selectedUnit.acquireQuirk(sel, true);
@@ -13460,7 +12060,6 @@ public class CampaignGUI extends JPanel {
                     refreshTechsList();
                     refreshReport();
                     refreshCargo();
-                    refreshOverview();
             } else if (command.contains("ASSIGN")) {
                 String sel = command.split(":")[1];
                 UUID id = UUID.fromString(sel);
@@ -13478,7 +12077,6 @@ public class CampaignGUI extends JPanel {
                 refreshPersonnelList();
                 refreshReport();
                 refreshCargo();
-                refreshOverview();
         } else if (command.equalsIgnoreCase("SELL")) {
                 for (Unit unit : units) {
                     if (!unit.isDeployed()) {
@@ -13503,7 +12101,6 @@ public class CampaignGUI extends JPanel {
                 refreshFunds();
                 refreshFinancialTransactions();
                 refreshCargo();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("LOSS")) {
                 for (Unit unit : units) {
                     if (0 == JOptionPane.showConfirmDialog(null,
@@ -13520,7 +12117,6 @@ public class CampaignGUI extends JPanel {
                 refreshOrganization();
                 refreshReport();
                 refreshCargo();
-                refreshOverview();
             } else if (command.contains("SWAP_AMMO")) {
                 String sel = command.split(":")[1];
                 int selAmmoId = Integer.parseInt(sel);
@@ -13537,7 +12133,6 @@ public class CampaignGUI extends JPanel {
                 refreshServicedUnitList();
                 refreshUnitList();
                 refreshCargo();
-                refreshOverview();
             } else if (command.contains("CHANGE_SITE")) {
                 for (Unit unit : units) {
                     if (!unit.isDeployed()) {
@@ -13553,7 +12148,6 @@ public class CampaignGUI extends JPanel {
                 refreshTaskList();
                 refreshAcquireList();
                 refreshCargo();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("SALVAGE")) {
                 for (Unit unit : units) {
                     if (!unit.isDeployed()) {
@@ -13564,7 +12158,6 @@ public class CampaignGUI extends JPanel {
                 refreshServicedUnitList();
                 refreshUnitList();
                 refreshCargo();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("REPAIR")) {
                 for (Unit unit : units) {
                     if (!unit.isDeployed() && unit.isRepairable()) {
@@ -13575,7 +12168,6 @@ public class CampaignGUI extends JPanel {
                 refreshServicedUnitList();
                 refreshUnitList();
                 refreshCargo();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("TAG_CUSTOM")) {
                 String sCustomsDir = "data/mechfiles/customs/";
         		String sCustomsDirCampaign = sCustomsDir+getCampaign().getName()+"/";
@@ -13643,7 +12235,6 @@ public class CampaignGUI extends JPanel {
                 refreshOrganization();
                 refreshReport();
                 refreshCargo();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("DISBAND")) {
                 for (Unit unit : units) {
                     if (!unit.isDeployed()) {
@@ -13670,7 +12261,6 @@ public class CampaignGUI extends JPanel {
                 refreshOrganization();
                 refreshReport();
                 refreshCargo();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("UNDEPLOY")) {
                 for (Unit unit : units) {
                     if (unit.isDeployed()) {
@@ -13689,7 +12279,6 @@ public class CampaignGUI extends JPanel {
                 refreshPatientList();
                 refreshScenarioList();
                 refreshCargo();
-                refreshOverview();
             } else if(command.contains("HIRE_FULL")) {
                 for(Unit unit : units) {
                     getCampaign().hirePersonnelFor(unit.getId());
@@ -13701,7 +12290,6 @@ public class CampaignGUI extends JPanel {
                 refreshFinancialTransactions();
                 refreshReport();
                 refreshCargo();
-                refreshOverview();
             } else if (command.contains("CUSTOMIZE")
                     && !command.contains("CANCEL")) {
                 panMekLab.loadUnit(selectedUnit);
@@ -13714,7 +12302,6 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshPartsList();
                 refreshCargo();
-                refreshOverview();
             } else if(command.contains("REFIT_KIT")) {
                 ChooseRefitDialog crd = new ChooseRefitDialog(getFrame(), true, getCampaign(), selectedUnit, getCampaignGUI());
                 crd.setVisible(true);
@@ -13728,7 +12315,6 @@ public class CampaignGUI extends JPanel {
                         selectedUnit.setHistory(tad.getText());
                         refreshUnitList();
                         refreshCargo();
-                        refreshOverview();
                     }
                 }
             }
@@ -13762,7 +12348,6 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshReport();
                 refreshCargo();
-                refreshOverview();
             }
             else if (command.equalsIgnoreCase("ARRIVE")) {
                 if(null != selectedUnit) {
@@ -13771,7 +12356,6 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshReport();
                 refreshCargo();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("MOTHBALL")) {
                 UUID id = null;
                 if(!selectedUnit.isSelfCrewed()) {
@@ -13787,7 +12371,6 @@ public class CampaignGUI extends JPanel {
                 refreshServicedUnitList();
                 refreshReport();
                 refreshCargo();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("ACTIVATE")) {
                 UUID id = null;
                 if(!selectedUnit.isSelfCrewed()) {
@@ -13803,7 +12386,6 @@ public class CampaignGUI extends JPanel {
                 refreshServicedUnitList();
                 refreshReport();
                 refreshCargo();
-                refreshOverview();
             } else if (command.equalsIgnoreCase("CANCEL_MOTHBALL")) {
                 if(null != selectedUnit) {
                     selectedUnit.setMothballTime(0);
@@ -13812,7 +12394,6 @@ public class CampaignGUI extends JPanel {
                 refreshServicedUnitList();
                 refreshReport();
                 refreshCargo();
-                refreshOverview();
             }
         }
 
