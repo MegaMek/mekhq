@@ -212,6 +212,11 @@ import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.report.HangarReport;
+import mekhq.campaign.report.PersonnelReport;
+import mekhq.campaign.report.RatingReport;
+import mekhq.campaign.report.Report;
+import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.Modes;
 import mekhq.gui.dialog.AddFundsDialog;
@@ -245,6 +250,7 @@ import mekhq.gui.dialog.PopupValueChoiceDialog;
 import mekhq.gui.dialog.PortraitChoiceDialog;
 import mekhq.gui.dialog.QuirksDialog;
 import mekhq.gui.dialog.RefitNameDialog;
+import mekhq.gui.dialog.ReportDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.dialog.UnitSelectorDialog;
@@ -406,6 +412,11 @@ public class CampaignGUI extends JPanel {
     private javax.swing.JMenuItem miGetLoan;
     private javax.swing.JMenuItem miPurchaseUnit;
     private javax.swing.JMenuItem miBuyParts;
+    private javax.swing.JMenu menuReports;
+    private javax.swing.JMenuItem miDragoonsRating;
+    private javax.swing.JMenuItem miPersonnelReport;
+    private javax.swing.JMenuItem miTransportReport;
+    private javax.swing.JMenuItem miHangarBreakdown;
     private javax.swing.JMenu menuCommunity;
     private javax.swing.JMenuItem miChat;
     private javax.swing.JPanel panFinances;
@@ -738,6 +749,11 @@ public class CampaignGUI extends JPanel {
         miFireAllMedics = new javax.swing.JMenuItem();
         menuMedicPool = new javax.swing.JMenu();
         miFullStrengthMedics = new javax.swing.JMenuItem();
+        menuReports = new javax.swing.JMenu();
+        miDragoonsRating = new javax.swing.JMenuItem();
+        miPersonnelReport = new javax.swing.JMenuItem();
+        miTransportReport = new javax.swing.JMenuItem();
+        miHangarBreakdown = new javax.swing.JMenuItem();
         menuCommunity = new javax.swing.JMenu();
         miChat = new javax.swing.JMenuItem();
         menuHelp = new javax.swing.JMenu();
@@ -2394,7 +2410,7 @@ public class CampaignGUI extends JPanel {
         //gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         panOverview.add(tabOverview, gridBagConstraints);
         
-        tabMain.addTab(resourceMap.getString("panOverview.TabConstraints.tabTitle"), panOverview); // NOI18N
+        //tabMain.addTab(resourceMap.getString("panOverview.TabConstraints.tabTitle"), panOverview); // NOI18N
         refreshOverview();
 
         mainPanel.setAutoscrolls(true);
@@ -2759,6 +2775,42 @@ public class CampaignGUI extends JPanel {
         menuMarket.add(menuMedicPool);
         menuBar.add(menuMarket);
 
+        menuReports.setText(resourceMap.getString("menuReports.text")); // NOI18N
+
+        miDragoonsRating.setText(resourceMap.getString("miDragoonsRating.text")); // NOI18N
+        miDragoonsRating.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showReport(new RatingReport(getCampaign()));
+            }
+        });
+        menuReports.add(miDragoonsRating);
+        
+        miPersonnelReport.setText(resourceMap.getString("miPersonnelReport.text")); // NOI18N
+        miPersonnelReport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showReport(new PersonnelReport(getCampaign()));
+            }
+        });
+        menuReports.add(miPersonnelReport);
+        
+        miHangarBreakdown.setText(resourceMap.getString("miHangarBreakdown.text")); // NOI18N
+        miHangarBreakdown.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showReport(new HangarReport(getCampaign()));
+            }
+        });
+        menuReports.add(miHangarBreakdown);
+        
+        miTransportReport.setText(resourceMap.getString("miTransportReport.text")); // NOI18N
+        miTransportReport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showReport(new TransportReport(getCampaign()));
+            }
+        });
+        menuReports.add(miTransportReport);
+        
+        menuBar.add(menuReports);
+        
         menuCommunity.setText(resourceMap.getString("menuCommunity.text")); // NOI18N
         menuCommunity.setName("menuCommunity"); // NOI18N
 
@@ -3827,6 +3879,11 @@ public class CampaignGUI extends JPanel {
         refreshPartsList();
         refreshCargo();
         refreshOverview();
+    }
+    
+    private void showReport(Report report) {
+        ReportDialog rd = new ReportDialog(getFrame(), report);
+        rd.setVisible(true);
     }
     
     public UUID selectTech(Unit u, String desc) {
