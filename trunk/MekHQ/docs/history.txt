@@ -35,6 +35,7 @@ v0.3.2 (SVN)
 + moved overview items to a reports menu
 + more packaging fixes to pull files from other projects automatically
 + removed overview tab code from CampaignGUI
++ export personnel and unit tables as CSV
 
 v0.3.1 (2013-09-5)
 + Planetary Data Update 36
