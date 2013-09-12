@@ -34,6 +34,7 @@
 	<property name="datadir" value="data" />
 	<property name="apidocsdir" value="apidocs" />
 	<property name="docdir" value="docs" />
+    <property name="svndir" value="svndev" />
 	<property name="localdir" value="localdev" />
 	<property name="util" value="packaging_utils" />
 	
@@ -99,11 +100,64 @@
 	
 	<!-- following localdev-* tasks get, build & package the current version from local sources -->
 	<target name="localdev-get" depends="localdev-init" description="get the local source">
-		<copy todir="${localdir}" >  
+		<copy todir="${localdir}">  
 			<fileset dir="${basedir}">
 				<exclude name="${localdir}" />
 			</fileset>
 		</copy>
+		<!--now we need to replace our data with the latest from the MM svn
+            but first we need to back it up because we will need to keep a few 
+            things-->
+        <move file="${localdir}/${datadir}" tofile="${localdir}/${datadir}-OLD"/>
+        <copy todir="${localdir}/${datadir}">
+        	<fileset dir="${mmdir}/${datadir}">
+        	</fileset>
+        </copy>
+        <!-- now add in record sheet vector images -->
+        <copy todir="${localdir}/${datadir}/images/recordsheets">
+            <fileset dir="${mmldir}/${datadir}/images/recordsheets">
+            </fileset>
+        </copy>
+        <!-- now add in lib files -->
+        <copy todir="${localdir}/${libdir}">
+            <fileset dir="${mmdir}/${libdir}">
+            </fileset>
+        </copy>
+        <!-- now add in doc files -->
+        <copy todir="${localdir}/${docdir}/docs-megamek">
+            <fileset dir="${mmdir}/${docdir}">
+            </fileset>
+        </copy>
+        <copy todir="${localdir}/${docdir}/docs-megameklab">
+            <fileset dir="${mmldir}/${docdir}">
+            </fileset>
+        </copy>
+        <!-- ok now move some stuff back into data that needs to be there-->
+        <copy todir="${localdir}/${datadir}">
+            <fileset dir="${localdir}/${datadir}-OLD" >
+                <include name="universe/" />
+                <include name="fonts/" />
+                <include name="images/force/" />
+                <include name="images/portraits/FoxsTeeth/" />
+                <include name="images/fluff/mech/*.png" />
+                <include name="images/misc/mekhq-load.png" />
+                <include name="images/misc/mekhq-splash.png" />
+                <include name="images/misc/tools.png" />
+                <include name="images/misc/mekhq.png" />
+            </fileset>
+        </copy>
+        <!-- grab the new graphical hits -->
+        <copy todir="${localdir}/${datadir}/images/misc">
+            <fileset dir="${localdir}/${datadir}-OLD/images/misc" >
+                <include name="hits/" />
+            </fileset>
+        </copy>
+        <!-- grab the megameklab misc images -->
+        <copy todir="${localdir}/${datadir}/images/misc">
+            <fileset dir="${mmldir}/${datadir}/images/misc" >
+            </fileset>
+        </copy>
+        <delete dir="${localdir}/${datadir}-OLD" />
 	</target>
 	
 	<target name="localdev-build" depends="localdev-get" description="compile project from local source and generate JAR file" >

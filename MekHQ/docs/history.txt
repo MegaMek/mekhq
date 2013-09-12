@@ -24,6 +24,13 @@ v0.3.2 (SVN)
 + graphical display option for personnel and unit table
 + pay individual unit maintenance costs when maintenance cycle is up instead of weekly all at once
 + used parts value options depend on quality rating
++ Bug: Customs files created when loading a campaign get saved under a "My Campaign" folder because campaign name isn't set yet
++ Bug: Customs disappearing from campaign saves
++ packaging_local.xml updated to keep in line with full packaging.xml functionality
++ docs folder cleaned up to prevent duplicates now that we import the megamek and megameklab docs
++ Bug: mekhq.png in data/images/misc wasn't being included in releases
++ Bug: new graphical hits images not included with either packaging file
++ Fixed megamek.4j.xml file to force inclusion of new xml save libs
 
 v0.3.1 (2013-09-5)
 + Planetary Data Update 36

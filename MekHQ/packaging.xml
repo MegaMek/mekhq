@@ -35,6 +35,7 @@
     <property name="apidocsdir" value="apidocs" />
     <property name="docdir" value="docs" />
     <property name="svndir" value="svndev" />
+    <property name="localdir" value="localdev" />
     <property name="util" value="packaging_utils" />
     
     <!-- same as builddir but under svn -->
@@ -47,6 +48,7 @@
     <property name="svnmmdocs" value="svn://svn.code.sf.net/p/megamek/code/trunk/megamek/docs" />
     <property name="svnmmldocs" value="svn://svn.code.sf.net/p/megameklab/code/trunk/docs" />
     <property name="svnrsheets" value="svn://svn.code.sf.net/p/megameklab/code/trunk/data/images/recordsheets" />
+    <property name="svnmmlpng" value="svn://svn.code.sf.net/p/megameklab/code/trunk/data/images/misc/megameklab.png" />
 
 
     <property name="timestampfile" value="${logdir}/timestamp" />
@@ -141,8 +143,19 @@
                 <include name="images/misc/mekhq-load.png" />
                 <include name="images/misc/mekhq-splash.png" />
                 <include name="images/misc/tools.png" />
+                <include name="images/misc/mekhq.png" />
             </fileset>
         </copy>
+    	<!-- grab the new graphical hits -->
+        <copy todir="${svndir}/${datadir}/images/misc">
+            <fileset dir="${svndir}/${datadir}-OLD/images/misc" >
+                <include name="hits/" />
+            </fileset>
+        </copy>
+        <!-- grab the megameklab misc images -->
+        <exec executable="svn">
+            <arg line="export ${svnmmlpng} ${svndir}/${datadir}/images/misc/megameklab.png" />
+        </exec>
         <delete dir="${svndir}/${datadir}-OLD" />
     </target>
     
