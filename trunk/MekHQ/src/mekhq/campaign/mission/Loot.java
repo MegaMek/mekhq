@@ -21,11 +21,22 @@
 package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.UUID;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import megamek.common.Entity;
+import megamek.common.MechFileParser;
+import megamek.common.MechSummary;
+import megamek.common.MechSummaryCache;
+import megamek.common.loaders.EntityLoadingException;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlSerializable;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.parts.Part;
 
@@ -36,31 +47,98 @@ import mekhq.campaign.parts.Part;
  */
 public class Loot implements MekHqXmlSerializable {
    
+    private String name;
     private long cash;
     private ArrayList<Entity> units;
     private ArrayList<Part> parts;
     //Personnel?
     
     public Loot() {
+        name = "None";
         cash = 0;
         units = new ArrayList<Entity>();
         parts = new ArrayList<Part>();
+    }
+    
+    @Override
+    public Object clone() {
+        Loot newLoot = new Loot();
+        newLoot.name = name;
+        newLoot.cash = cash;
+        newLoot.units = units;
+        newLoot.parts = parts;
+        return newLoot;
+    }
+    
+    public String getName() {
+        return name;
+    }
+    
+    public void setName(String s) {
+        name = s;
     }
     
     public void setCash(long c) {
         cash = c;
     }
     
+    public long getCash() {
+        return cash;
+    }
+    
     public void addUnit(Entity e) {
         units.add(e);
+    }
+    
+    public ArrayList<Entity> getUnits() {
+        return units;
+    }
+    
+    public void clearUnits() {
+        units = new ArrayList<Entity>();
+    }
+    
+    public ArrayList<Part> getParts() {
+        return parts;
     }
     
     public void addPart(Part p) {
         parts.add(p);
     }
     
-    public void getLoot(Campaign campaign) {
-        campaign.getFinances().credit(cash, Transaction.C_MISC, "loot", campaign.getDate());
+    public String getShortDescription() {
+        String desc = getName() + " - ";
+        if(cash > 0) {
+            desc += DecimalFormat.getIntegerInstance().format(cash) + " C-bills";
+        }
+        if(units.size() > 0) {
+            String s = units.size() + " unit";
+            if(units.size() > 1) {
+                s += "s";
+            }
+            if(cash > 0) {
+                s = ", " + s;
+            }
+            desc += s;
+        }
+        if(parts.size() > 0) {
+            String s = parts.size() + " part";
+            if(parts.size() > 1) {
+                s += "s";
+            }
+            if(cash > 0 || units.size() > 0) {
+                s = ", " + s;
+            }
+            desc += s;
+        }
+        return desc;
+    }
+    
+    public void get(Campaign campaign, Scenario s) {
+        //TODO: put in some reports
+        if(cash > 0) {
+            campaign.getFinances().credit(cash, Transaction.C_MISC, "Reward for " + getName() + " during " + s.getName(), campaign.getDate());
+        }
         for(Entity e : units) {
             campaign.addUnit(e, false, 0);
         }
@@ -70,57 +148,37 @@ public class Loot implements MekHqXmlSerializable {
     }
     
     public void writeToXml(PrintWriter pw1, int indent) {
-     /*   SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<scenario id=\""
-                +id
-                +"\" type=\""
-                +this.getClass().getName()
-                +"\">");
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "<loot>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<name>"
                 +MekHqXmlUtil.escape(name)
                 +"</name>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<desc>"
-                +MekHqXmlUtil.escape(desc)
-                +"</desc>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<report>"
-                +MekHqXmlUtil.escape(report)
-                +"</report>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<status>"
-                +status
-                +"</status>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<id>"
-                +id
-                +"</id>");
-        if(null != stub) {
-            stub.writeToXml(pw1, indent+1);
+                +"<cash>"
+                +cash
+                +"</cash>");
+        if(units.size() > 0) {
+            pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<units>");
+            for(Entity e : units) {
+                String lookupName = e.getChassis() + " " + e.getModel();
+                lookupName.replaceAll("\\s+$", "");
+                pw1.println(MekHqXmlUtil.indentStr(indent+2)
+                        +"<entityName>"
+                        +lookupName
+                        +"</entityName>");
+            }
+            pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</units>");
         }
-        if(null != date) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                    +"<date>"
-                    +df.format(date)
-                    +"</date>");
-        }
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</scenario>");
-        */
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "</loot>");
     }
     
- /*   public static Scenario generateInstanceFromXML(Node wn) {
-        Scenario retVal = null;
-        NamedNodeMap attrs = wn.getAttributes();
-        Node classNameNode = attrs.getNamedItem("type");
-        String className = classNameNode.getTextContent();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        
+    public static Loot generateInstanceFromXML(Node wn) {
+        Loot retVal = null;
+       
         try {
-            // Instantiate the correct child class, and call its parsing function.
-            retVal = (Scenario) Class.forName(className).newInstance();
+            retVal = new Loot();
             
-            // Okay, now load Part-specific fields!
+            // Okay, now load specific fields!
             NodeList nl = wn.getChildNodes();
             
             for (int x=0; x<nl.getLength(); x++) {
@@ -128,28 +186,41 @@ public class Loot implements MekHqXmlSerializable {
                 
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.name = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
-                    retVal.status = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
-                    retVal.id = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
-                    retVal.setDesc(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("report")) {
-                    retVal.setReport(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("forceStub")) {
-                    retVal.stub = ForceStub.generateInstanceFromXML(wn2);
-                } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
-                    retVal.date = df.parse(wn2.getTextContent().trim());
-                }
+                } else if (wn2.getNodeName().equalsIgnoreCase("cash")) {
+                    retVal.cash = Long.parseLong(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("units")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y=0; y<nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE)
+                            continue;
+                        
+                        if (!wn3.getNodeName().equalsIgnoreCase("entityName")) {
+                            // Error condition of sorts!
+                            // Errr, what should we do here?
+                            MekHQ.logMessage("Unknown node type not loaded in techUnitIds nodes: "+wn3.getNodeName());
+                            continue;
+                        }               
+                        MechSummary summary = MechSummaryCache.getInstance().getMech(wn3.getTextContent());
+                        if(null == summary) {
+                            throw(new EntityLoadingException());
+                        }
+                        Entity e = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+                        if(null == e) {
+                             continue;
+                        }
+                        retVal.units.add(e);
+                    }
+                } 
             }
         } catch (Exception ex) {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.logError(ex);
         }
         
         return retVal;
-    }*/
+    }
     
 }

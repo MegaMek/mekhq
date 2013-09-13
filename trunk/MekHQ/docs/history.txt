@@ -37,6 +37,7 @@ v0.3.2 (SVN)
 + removed overview tab code from CampaignGUI
 + export personnel and unit tables as CSV
 + unofficial option to set minimum hits and randomize hits for wounded multi-vehicle crews and infantry
++ new feature: add potential loot (currently money and units) to scenario that can be added during scenario resolution
 
 v0.3.1 (2013-09-5)
 + Planetary Data Update 36

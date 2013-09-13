@@ -14,6 +14,7 @@ import java.util.Vector;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -24,6 +25,7 @@ import megamek.common.Crew;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
+import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Scenario;
 import mekhq.gui.CampaignGUI;
 
@@ -165,6 +167,30 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(txtDesc, gridBagConstraints);
 		
+		if(scenario.getLoot().size() > 0) {
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 3;
+	        gridBagConstraints.gridwidth = 2;
+	        gridBagConstraints.weightx = 1.0;
+	        gridBagConstraints.weighty = 0.0;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+	        pnlStats.add(new JLabel("<html><b>Potential Rewards:</b></html>"), gridBagConstraints);
+	        
+	        for(Loot loot : scenario.getLoot()) {
+	            gridBagConstraints.gridx = 0;
+	            gridBagConstraints.gridy++;
+	            gridBagConstraints.gridwidth = 2;
+	            gridBagConstraints.weightx = 1.0;
+	            gridBagConstraints.weighty = 0.0;
+	            gridBagConstraints.insets = new java.awt.Insets(0, 10, 5, 0);
+	            gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+	            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+	            pnlStats.add(new JLabel(loot.getShortDescription()), gridBagConstraints);	            
+	        }
+		}
 		
     }
     

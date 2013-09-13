@@ -27,6 +27,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 
+import megamek.common.Entity;
+import megamek.common.MechFileParser;
+import megamek.common.MechSummary;
+import megamek.common.MechSummaryCache;
+import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
@@ -69,6 +74,9 @@ public class Scenario implements Serializable {
 	private int missionId;
 	private ForceStub stub;
 	
+	//allow multiple loot objects for meeting different mission objectives
+	private ArrayList<Loot> loots;
+	
 	public Scenario() {
 		this(null);
 	}
@@ -81,6 +89,7 @@ public class Scenario implements Serializable {
 		this.date = null;
 		this.subForceIds = new ArrayList<Integer>();
 		this.unitIds = new ArrayList<UUID>();
+		this.loots = new ArrayList<Loot>();
 	}
 	
 	public static String getStatusName(int s) {
@@ -280,6 +289,13 @@ public class Scenario implements Serializable {
 		if(null != stub) {
 			stub.writeToXml(pw1, indent+1);
 		}
+		if(loots.size() > 0 && status == S_CURRENT) {
+		    pw1.println(MekHqXmlUtil.indentStr(indent+1)+"<loots>");
+		    for(Loot l : loots) {
+		        l.writeToXml(pw1, indent+2);     
+		    }
+		    pw1.println(MekHqXmlUtil.indentStr(indent+1)+"</loots>");
+		}
 		if(null != date) {
 			pw1.println(MekHqXmlUtil.indentStr(indent+1)
 					+"<date>"
@@ -321,6 +337,23 @@ public class Scenario implements Serializable {
 					retVal.stub = ForceStub.generateInstanceFromXML(wn2);
 				} else if (wn2.getNodeName().equalsIgnoreCase("date")) {
 					retVal.date = df.parse(wn2.getTextContent().trim());
+				} else if (wn2.getNodeName().equalsIgnoreCase("loots")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y=0; y<nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE)
+                            continue;
+                        
+                        if (!wn3.getNodeName().equalsIgnoreCase("loot")) {
+                            // Error condition of sorts!
+                            // Errr, what should we do here?
+                            MekHQ.logMessage("Unknown node type not loaded in techUnitIds nodes: "+wn3.getNodeName());
+                            continue;
+                        }               
+                        Loot loot = Loot.generateInstanceFromXML(wn3);
+                        retVal.loots.add(loot);
+                    }
 				}
 			}
 		} catch (Exception ex) {
@@ -331,6 +364,14 @@ public class Scenario implements Serializable {
 		}
 		
 		return retVal;
+	}
+	
+	public ArrayList<Loot> getLoot() {
+	    return loots;
+	}
+	
+	public void addLoot(Loot l) {
+	    loots.add(l);
 	}
 	
 }
