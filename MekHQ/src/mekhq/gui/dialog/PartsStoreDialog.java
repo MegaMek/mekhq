@@ -111,7 +111,8 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     private DecimalFormat formatter;
     private PartsTableModel partsModel;
 	private TableRowSorter<PartsTableModel> partsSorter;
-    
+    boolean addToCampaign;
+	
     private JTable partsTable;
     private JScrollPane scrollPartsTable;
     private JPanel panFilter;

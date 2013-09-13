@@ -27,6 +27,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.text.DecimalFormat;
@@ -51,6 +52,7 @@ import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.Unit;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Scenario;
 
 /**
@@ -64,9 +66,10 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
 	final static String PILOTPANEL   = "Pilot Status";
 	final static String SALVAGEPANEL = "Claim Salvage";
 	final static String KILLPANEL    = "Assign Kills";
+	final static String REWARDPANEL    = "Collect Rewards";
 	final static String PREVIEWPANEL = "Preview";
 
-	final static String[] panelOrder = {UNITSPANEL,PILOTPANEL,SALVAGEPANEL,KILLPANEL,PREVIEWPANEL};
+	final static String[] panelOrder = {UNITSPANEL,PILOTPANEL,SALVAGEPANEL,KILLPANEL,REWARDPANEL,PREVIEWPANEL};
 	
 	private ResolveScenarioTracker tracker;
     
@@ -86,8 +89,9 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
     private JPanel pnlPilotStatus;
     private JPanel pnlSalvage;
     private JPanel pnlKills;
+    private JPanel pnlRewards;
     private JPanel pnlPreview;
- 
+    
     /*
      * Missing units panel components
      */
@@ -127,6 +131,12 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
     private Hashtable<String, JComboBox> killChoices;
     
     /*
+     * Collect Rewards components
+     */
+    private ArrayList<JCheckBox> lootBoxes;
+    private ArrayList<Loot> loots;
+
+    /*
      * Preview Panel components
      */
     private javax.swing.JComboBox choiceStatus;
@@ -144,12 +154,14 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
     private javax.swing.JTextArea txtMissingPilots;
     private javax.swing.JTextArea txtDeadPilots;
     private javax.swing.JTextArea txtSalvage;
+    private javax.swing.JTextArea txtRewards;
     private javax.swing.JLabel lblStatus;
     
     public ResolveScenarioWizardDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
         super(parent, modal);
         this.tracker = t;
         missingUnits = tracker.getMissingUnits();
+        loots = tracker.getPotentialLoot();
         salvageables = new ArrayList<Unit>();
         if(tracker.getMission() instanceof Contract) {
 	        salvageEmployer = ((Contract)tracker.getMission()).getSalvagedByEmployer();
@@ -479,6 +491,34 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
     	pnlMain.add(pnlKills, KILLPANEL);
     	
     	/*
+         * Collect Rewards Panel
+         */
+        pnlRewards = new JPanel();
+        pnlRewards.setLayout(new GridBagLayout()); 
+        lootBoxes = new ArrayList<JCheckBox>();
+        i = 0;
+        j = 0;
+        for(Loot loot : loots) {
+            j++;
+            box = new JCheckBox(loot.getShortDescription());
+            box.setSelected(false);
+            lootBoxes.add(box);
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = i;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.weightx = 1.0;
+            if(j == (loots.size())) {
+                gridBagConstraints.weighty = 1.0;
+            }
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+            pnlRewards.add(box, gridBagConstraints);
+            i++;
+        }
+        pnlMain.add(pnlRewards, REWARDPANEL);
+    	
+    	/*
     	 * Preview Panel
     	 */
     	pnlPreview = new JPanel();
@@ -498,6 +538,7 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
         txtMissingPilots = new javax.swing.JTextArea();
         txtDeadPilots = new javax.swing.JTextArea();
         txtSalvage = new javax.swing.JTextArea();
+        txtRewards = new javax.swing.JTextArea();
         lblStatus = new javax.swing.JLabel();
     	
         pnlPreview.setLayout(new GridBagLayout());
@@ -526,6 +567,24 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         pnlPreview.add(pnlStatus, gridBagConstraints);
 		
+        txtRewards.setText(resourceMap.getString("none"));
+        txtRewards.setEditable(false);
+        txtRewards.setLineWrap(true);
+        txtRewards.setWrapStyleWord(true);
+        txtRewards.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder(resourceMap.getString("txtRewards.title")),
+                BorderFactory.createEmptyBorder(5,5,5,5)));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.weightx = 1;
+        gridBagConstraints.weighty = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        pnlPreview.add(new JScrollPane(txtRewards), gridBagConstraints);
+        
         txtReport.setText("");
         txtReport.setName("txtReport");
         txtReport.setEditable(true);
@@ -539,7 +598,7 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
         scrReport.setMinimumSize(new Dimension(500,200));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
@@ -559,7 +618,7 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
         scrRecoveredUnits.setViewportView(txtRecoveredUnits);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.5;
@@ -579,7 +638,7 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
         scrRecoveredPilots.setViewportView(txtRecoveredPilots);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.5;
@@ -599,7 +658,7 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
         scrMissingUnits.setViewportView(txtMissingUnits);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.5;
@@ -619,7 +678,7 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
         scrMissingPilots.setViewportView(txtMissingPilots);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.5;
@@ -639,7 +698,7 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
         scrSalvage.setViewportView(txtSalvage);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.5;
@@ -659,7 +718,7 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
         scrDeadPilots.setViewportView(txtDeadPilots);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.5;
@@ -796,6 +855,9 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
     	else if(currentPanel.equals(PREVIEWPANEL)) {
     		txtInstructions.setText(resourceMap.getString("txtInstructions.text.preview"));
     	}
+    	else if(currentPanel.equals(REWARDPANEL)) {
+            txtInstructions.setText(resourceMap.getString("txtInstructions.text.reward"));
+        }
     	else {
     		txtInstructions.setText("");
     	}
@@ -905,6 +967,14 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
     	}
     	tracker.assignKills();
     	
+    	//now get loot
+        for(int i = 0; i < lootBoxes.size(); i++) {
+            JCheckBox box = lootBoxes.get(i);
+            if(box.isSelected()) {
+                tracker.addLoot(loots.get(i));
+            } 
+        }
+        
     	//now process
     	tracker.resolveScenario(choiceStatus.getSelectedIndex()+1,txtReport.getText());
     	this.setVisible(false);
@@ -928,6 +998,9 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
     	else if(panelName.equals(KILLPANEL)) {
     		return !tracker.getKillCredits().isEmpty();
     	}
+    	if(panelName.equals(REWARDPANEL)) {
+            return loots.size() > 0;
+        }
     	else if(panelName.equals(PREVIEWPANEL)) {
     		return true;
     	}
@@ -1012,5 +1085,16 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
     		} 
     	}
         txtSalvage.setText(salvageUnits);
+        
+        //now rewards
+        String claimed = "";
+        for(int i = 0; i < lootBoxes.size(); i++) {
+            JCheckBox box = lootBoxes.get(i);
+            if(box.isSelected()) {
+                claimed += loots.get(i).getShortDescription() + "\n";
+            } 
+        }
+        txtRewards.setText(claimed);
+        
     }
 }

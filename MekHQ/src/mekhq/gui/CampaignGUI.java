@@ -3647,7 +3647,7 @@ public class CampaignGUI extends JPanel {
     }// GEN-LAST:event_miExportPersonActionPerformed
 
     private void miPurchaseUnitActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miPurchaseUnitActionPerformed
-        UnitSelectorDialog usd = new UnitSelectorDialog(true, this);
+        UnitSelectorDialog usd = new UnitSelectorDialog(getFrame(), this, getCampaign(), true);
 
         usd.setVisible(true);
         refreshServicedUnitList();

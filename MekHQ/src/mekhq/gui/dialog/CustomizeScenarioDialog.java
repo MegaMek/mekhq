@@ -27,17 +27,26 @@ import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.table.TableColumn;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.gui.LootTableModel;
 
 /**
  *
@@ -53,7 +62,30 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     private Date date;
     private SimpleDateFormat dateFormatter;
 
-    /** Creates new form NewTeamDialog */
+    private LootTableModel lootModel;
+    
+    private javax.swing.JButton btnAdd;
+    private javax.swing.JButton btnEdit;
+    private javax.swing.JButton btnDelete;
+    private ArrayList<Loot> loots;
+    private JTable lootTable;
+    private JPanel panLoot;
+    
+    private javax.swing.JPanel panMain;
+    private javax.swing.JPanel panBtn;
+    private javax.swing.JButton btnClose;
+    private javax.swing.JButton btnOK;
+    private javax.swing.JLabel lblName;
+    private javax.swing.JTextField txtName;
+    private javax.swing.JTextArea txtDesc;
+    private javax.swing.JScrollPane scrDesc;
+    private javax.swing.JTextArea txtReport;
+    private javax.swing.JScrollPane scrReport;
+    private javax.swing.JComboBox choiceStatus;
+    private javax.swing.JLabel lblStatus;
+    private javax.swing.JButton btnDate;
+
+    
     public CustomizeScenarioDialog(java.awt.Frame parent, boolean modal, Scenario s, Mission m, Campaign c) {
         super(parent, modal);
         this.frame = parent;
@@ -71,6 +103,11 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         	date = campaign.getCalendar().getTime();
         }
         dateFormatter = new SimpleDateFormat("MM/dd/yyyy");
+        loots = new ArrayList<Loot>();
+        for(Loot loot : scenario.getLoot()) {
+            loots.add((Loot)loot.clone());
+        }
+        lootModel = new LootTableModel(loots);
         initComponents();
         setLocationRelativeTo(parent);
     }
@@ -157,6 +194,21 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
 	        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
 	        panMain.add(btnDate, gridBagConstraints);
 
+        } else {          
+            initLootPanel();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+            panLoot.setPreferredSize(new Dimension(400,150));
+            panLoot.setMinimumSize(new Dimension(400,150));
+            panLoot.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createTitledBorder("Potential Rewards"),
+                    BorderFactory.createEmptyBorder(5,5,5,5)));
+            panMain.add(panLoot, gridBagConstraints);
+            
+            
         }
         
         txtDesc.setText(scenario.getDescription());
@@ -230,7 +282,6 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         
         pack();
     }
-
     
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
     	scenario.setName(txtName.getText());
@@ -239,6 +290,9 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     		scenario.setReport(txtReport.getText());
     		scenario.setStatus(choiceStatus.getSelectedIndex()+1);
     		scenario.setDate(date);
+    	}
+    	for(Loot loot : lootModel.getAllLoot()) {
+    	    scenario.addLoot(loot);
     	}
     	if(newScenario) {
     		campaign.addScenario(scenario, mission);
@@ -273,24 +327,101 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         }
     }
     
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel panMain;
-    private javax.swing.JPanel panBtn;
-    private javax.swing.JButton btnClose;
-    private javax.swing.JButton btnOK;
-    private javax.swing.JLabel lblName;
-    private javax.swing.JTextField txtName;
-    private javax.swing.JTextArea txtDesc;
-    private javax.swing.JScrollPane scrDesc;
-    private javax.swing.JTextArea txtReport;
-    private javax.swing.JScrollPane scrReport;
-    private javax.swing.JComboBox choiceStatus;
-    private javax.swing.JLabel lblStatus;
-    private javax.swing.JButton btnDate;
+    private void initLootPanel() {
+        panLoot = new JPanel(new BorderLayout());
+        
+        JPanel panBtns = new JPanel(new GridLayout(1,0));
+        btnAdd = new JButton("Add Loot"); // NOI18N
+        btnAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addLoot();
+            }
+        });
+        panBtns.add(btnAdd);
+        
+        btnEdit = new JButton("Edit Loot"); // NOI18N
+        btnEdit.setEnabled(false);
+        btnEdit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editLoot();
+            }
+        });
+        panBtns.add(btnEdit);
+        
+        btnDelete = new JButton("Delete Loot"); // NOI18N
+        btnDelete.setEnabled(false);
+        btnDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+               deleteLoot();
+            }
+        });
+        panBtns.add(btnDelete);
+        panLoot.add(panBtns, BorderLayout.PAGE_START);
+        
+        lootTable = new JTable(lootModel);
+        TableColumn column = null;
+        for (int i = 0; i < LootTableModel.N_COL; i++) {
+            column = lootTable.getColumnModel().getColumn(i);
+            column.setPreferredWidth(lootModel.getColumnWidth(i));
+            column.setCellRenderer(lootModel.getRenderer());
+        }
+        lootTable.setIntercellSpacing(new Dimension(0, 0));
+        lootTable.setShowGrid(false);
+        lootTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        lootTable.getSelectionModel().addListSelectionListener(
+                new javax.swing.event.ListSelectionListener() {
+                    public void valueChanged(
+                            javax.swing.event.ListSelectionEvent evt) {
+                        lootTableValueChanged(evt);
+                    }
+                });
 
-
-
-
-    // End of variables declaration//GEN-END:variables
-
+        panLoot.add(new JScrollPane(lootTable), BorderLayout.CENTER);
+    }
+    
+    private void lootTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
+        int row = lootTable.getSelectedRow();
+        btnDelete.setEnabled(row != -1);
+        btnEdit.setEnabled(row != -1);
+    }
+   
+    private void addLoot() {
+        LootDialog ekld = new LootDialog(frame, true, new Loot(), campaign);
+        ekld.setVisible(true);
+        if(null != ekld.getLoot()) {
+            lootModel.addLoot(ekld.getLoot());
+        }
+        refreshTable();
+    }
+    
+    private void editLoot() {
+        Loot loot = lootModel.getLootAt(lootTable.getSelectedRow());
+        if(null != loot) {
+            LootDialog ekld = new LootDialog(frame, true, loot, campaign);
+            ekld.setVisible(true);
+            refreshTable();
+        }
+    }
+    
+    private void deleteLoot() {
+        int row = lootTable.getSelectedRow();
+        if(-1 != row) {
+            loots.remove(row);
+        }
+        refreshTable();
+    }
+    
+    private void refreshTable() {
+        int selectedRow = lootTable.getSelectedRow();
+        lootModel.setData(loots);
+        if(selectedRow != -1) {
+            if(lootTable.getRowCount() > 0) {
+                if(lootTable.getRowCount() == selectedRow) {
+                    lootTable.setRowSelectionInterval(selectedRow-1, selectedRow-1);
+                } else {
+                    lootTable.setRowSelectionInterval(selectedRow, selectedRow);
+                }
+            }
+        }
+    }
 }

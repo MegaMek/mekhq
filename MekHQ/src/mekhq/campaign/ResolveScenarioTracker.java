@@ -52,6 +52,7 @@ import megamek.common.XMLStreamParser;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Part;
@@ -73,6 +74,8 @@ public class ResolveScenarioTracker {
 	ArrayList<Unit> actualSalvage;
 	ArrayList<Unit> leftoverSalvage;
 	ArrayList<Unit> units;
+	ArrayList<Loot> potentialLoot;
+	ArrayList<Loot> actualLoot;
 	Hashtable<UUID, PersonStatus> peopleStatus;
 	Hashtable<String, String> killCredits;
 	Campaign campaign;
@@ -92,6 +95,8 @@ public class ResolveScenarioTracker {
 		mia = new Hashtable<UUID, Crew>();
 		newPilots = new Hashtable<UUID, Person>();
 		units = new ArrayList<Unit>();
+		potentialLoot = scenario.getLoot();
+		actualLoot = new ArrayList<Loot>();
 		peopleStatus = new Hashtable<UUID, PersonStatus>();
 		killCredits = new Hashtable<String, String>();
 		for(UUID uid : scenario.getForces(campaign).getAllUnits()) {
@@ -806,7 +811,12 @@ public class ResolveScenarioTracker {
 			} else {
 				((Contract)getMission()).addSalvageByEmployer(value);
 			}
-		}		
+		}
+		
+		for(Loot loot : actualLoot) {
+		    loot.get(campaign, scenario);
+		}
+		
 		scenario.setStatus(resolution);
 		scenario.setReport(report);
 		scenario.clearAllForcesAndPersonnel(campaign);	
@@ -887,7 +897,14 @@ public class ResolveScenarioTracker {
 		entities.put(u.getId(), u.getEntity());
 	}
 	
+	public ArrayList<Loot> getPotentialLoot() {
+	    return potentialLoot;
+	}
 
+	public void addLoot(Loot loot) {
+	    actualLoot.add(loot);
+	}
+	
 	/**
 	 * This object is used to track the status of a particular personnel. At the present, 
 	 * we track the person's missing status, hits, and XP
