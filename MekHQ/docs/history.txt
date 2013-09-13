@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.2 (SVN)
+v0.3.2 (2013-09-13)
 + maintenance checks (WIP)
 + Bug: maintenance options not being saved
 + added optional logging of maintenance rolls
