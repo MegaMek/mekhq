@@ -6176,12 +6176,12 @@ public class Campaign implements Serializable {
 					countInjured++;
 				}
 				salary += p.getSalary();
-			} else if (p.isPrisoner()) {
+			} else if (p.isPrisoner() && p.isActive()) {
 				prisoners++;
 				if (p.getInjuries().size() > 0 || p.getHits() > 0) {
 					countInjured++;
 				}
-			} else if (p.isBondsman()) {
+			} else if (p.isBondsman() && p.isActive()) {
 				bondsmen++;
 				if (p.getInjuries().size() > 0 || p.getHits() > 0) {
 					countInjured++;
