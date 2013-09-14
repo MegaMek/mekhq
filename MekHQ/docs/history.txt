@@ -1,5 +1,7 @@
 VERSION HISTORY
 ----------------------------------
+v0.3.3 (SVN)
+
 v0.3.2 (2013-09-13)
 + maintenance checks (WIP)
 + Bug: maintenance options not being saved
