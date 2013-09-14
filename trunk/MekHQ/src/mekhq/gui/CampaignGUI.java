@@ -12401,6 +12401,10 @@ public class CampaignGUI extends JPanel {
                     }
                 }
             }
+            else if (command.contains("REMOVE_INDI_CAMO")) {
+            	selectedUnit.getEntity().setCamoCategory(null);
+                selectedUnit.getEntity().setCamoFileName(null);
+            }
             else if (command.contains("INDI_CAMO")) {
                 String category = selectedUnit.getCamoCategory();
                 if ("".equals(category)) {
@@ -12649,15 +12653,17 @@ public class CampaignGUI extends JPanel {
                 }
                 // Customize
                 if(oneSelected && (unit.getEntity() instanceof Mech 
-                        || unit.getEntity() instanceof Tank 
+                        || unit.getEntity() instanceof Tank
+                		|| unit.getEntity() instanceof Aero
                         || (unit.getEntity() instanceof Infantry && !(unit.getEntity() instanceof BattleArmor)))) {
                     menu = new JMenu("Customize");
                     menuItem = new JMenuItem("Choose Refit Kit...");
                     menuItem.setActionCommand("REFIT_KIT");
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(unit.isAvailable()
-                            && (unit.getEntity() instanceof megamek.common.Mech ||
-                                    unit.getEntity() instanceof megamek.common.Tank
+                            && (unit.getEntity() instanceof megamek.common.Mech
+                            		|| unit.getEntity() instanceof megamek.common.Tank
+                            		|| unit.getEntity() instanceof megamek.common.Aero
                                     || (unit.getEntity() instanceof Infantry && !(unit.getEntity() instanceof BattleArmor))));
                     menu.add(menuItem);
                     menuItem = new JMenuItem("Customize in Mek Lab...");
@@ -12688,11 +12694,19 @@ public class CampaignGUI extends JPanel {
                 }
                 // Camo
                 if(oneSelected) {
-                    menuItem = new JMenuItem(resourceMap.getString("customizeMenu.individualCamo.text"));
-                    menuItem.setActionCommand("INDI_CAMO");
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(true);
-                    popup.add(menuItem);
+                	if (!unit.isEntityCamo()) {
+	                    menuItem = new JMenuItem(resourceMap.getString("customizeMenu.individualCamo.text"));
+	                    menuItem.setActionCommand("INDI_CAMO");
+	                    menuItem.addActionListener(this);
+	                    menuItem.setEnabled(true);
+	                    popup.add(menuItem);
+                	} else {
+	                    menuItem = new JMenuItem(resourceMap.getString("customizeMenu.removeIndividualCamo.text"));
+	                    menuItem.setActionCommand("REMOVE_INDI_CAMO");
+	                    menuItem.addActionListener(this);
+	                    menuItem.setEnabled(true);
+	                    popup.add(menuItem);
+                	}
                 }
                 if(oneSelected && !getCampaign().isCustom(unit)) {
                     menuItem = new JMenuItem("Tag as a custom unit");

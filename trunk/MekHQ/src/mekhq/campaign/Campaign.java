@@ -519,8 +519,6 @@ public class Campaign implements Serializable {
 		// reset the game object
 		en.setOwner(player);
 		en.setGame(game);
-		en.setCamoCategory(null);
-		en.setCamoFileName(null);
 
 		UUID id = UUID.randomUUID();
 		// check for the very rare chance of getting same id
@@ -4243,7 +4241,7 @@ public class Campaign implements Serializable {
 	public TargetRoll getTargetFor(IPartWork partWork, Person tech) {
 		Skill skill = tech.getSkillForWorkingOn(partWork);
 		int modePenalty = Modes.getModeExperienceReduction(partWork.getMode());
-		if (null != partWork.getUnit() && !partWork.getUnit().isAvailable()) {
+		if (null != partWork.getUnit() && !partWork.getUnit().isAvailable(partWork instanceof Refit)) {
 			return new TargetRoll(TargetRoll.IMPOSSIBLE,
 					"This unit is not currently available!");
 		}
