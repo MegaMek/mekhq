@@ -1624,6 +1624,10 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	    	} else if(en instanceof Infantry) {
 	    		mCost = value * 0.005;
 	    	}
+	    	// Mothballed Units cost only 10% to maintain
+	    	if(isMothballed()) {
+	    		mCost *= .1;
+	    	}
     	} else {
 	    	if(en instanceof Mech) {
 	    		if(isOmni) {
