@@ -1046,7 +1046,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		/*} catch (EntityLoadingException ex) {
 			Logger.getLogger(CampaignGUI.class.getName())
 					.log(Level.SEVERE, null, ex);
-		}*/	
+		}*/
 	    
 	}
 	

@@ -1,6 +1,10 @@
 VERSION HISTORY
 ----------------------------------
 v0.3.3 (SVN)
++ Bug: Refits always return an IMPOSSIBLE target roll
++ RFE: Allow ASF to be Refit (but not customized)
++ Bug: No way to remove individual camo
++ Bug: Individual camo always set on refit completion 
 
 v0.3.2 (2013-09-13)
 + maintenance checks (WIP)

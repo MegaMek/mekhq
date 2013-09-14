@@ -243,6 +243,10 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	
 	public Unit(Entity en, Campaign c) {
 		this.entity = en;
+		if (entity != null) {
+			entity.setCamoCategory(null);
+			entity.setCamoFileName(null);
+		}
 		this.site = SITE_BAY;
 		this.salvaged = false;
 		this.campaign = c;
@@ -289,6 +293,18 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	 * @return
 	 */
 	public boolean isAvailable() {
+		return isAvailable(false);
+	}
+		
+	/** 
+	 * A convenience function to tell whether the unit can be acted upon
+	 * e.g. assigned pilots, techs, repaired, etc.
+	 * @return
+	 */
+	public boolean isAvailable(boolean ignoreRefit) {
+		if (ignoreRefit) {
+			return isPresent() && !isDeployed() && !isMothballing() && !isMothballed();
+		}
 	    return isPresent() && !isDeployed() && !isRefitting() && !isMothballing() && !isMothballed();
 	}
 	
@@ -3031,7 +3047,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	return null;
     }
      
-    private boolean isEntityCamo() {
+    public boolean isEntityCamo() {
         if ((null != entity) && (null != entity.getCamoCategory())
                 && (!Player.NO_CAMO.equals(entity.getCamoFileName()))) {
             return true;
