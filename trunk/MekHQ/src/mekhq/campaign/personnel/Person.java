@@ -401,8 +401,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     
     public void setName(String n) {
     	this.name = n;
-    	//TODO: fix this
-    	//resetPilotName();
+    }
+    
+    public String getHyperlinkedName() {
+        return "<a href='PERSON:" + getId() + "'>" + getName() + "</a>";
     }
     
     public String getCallsign() {
@@ -1562,6 +1564,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		}
 		return rank + " " + getName();
 	}
+	
+	public String getHyperlinkedFullTitle() {
+        return "<a href='PERSON:" + getId() + "'>" + getFullTitle() + "</a>";
+    }
 	
 	public void setRankSystem(Ranks r) {
 		this.ranks = r;

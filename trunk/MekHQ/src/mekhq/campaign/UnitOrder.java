@@ -114,7 +114,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
 
     @Override
     public String getAcquisitionName() {
-        return getName();
+        return getHyperlinkedName();
     }
 
     @Override
@@ -307,7 +307,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
 
     @Override
     public String getShoppingListReport(int quantity) {
-        return getName() + " added to procurement list.";
+        return getHyperlinkedName() + " added to procurement list.";
     }
     
     /*
