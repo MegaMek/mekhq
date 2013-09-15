@@ -114,6 +114,8 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -2298,7 +2300,19 @@ public class CampaignGUI extends JPanel {
         txtPaneReport.setText(getCampaign().getCurrentReportHTML());
         txtPaneReport.setName("txtPaneReport"); // NOI18N
         txtPaneReportScrollPane.setViewportView(txtPaneReport);
+        HyperlinkListener l = new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent e) {
+                if (HyperlinkEvent.EventType.ACTIVATED == e.getEventType()) {
+                    //pane.setPage(e.getURL());
+                    JOptionPane.showMessageDialog(frame, e.getDescription());                   
+                }
 
+            }
+
+        };
+        txtPaneReport.addHyperlinkListener(l);        
+        
         txtPaneReportScrollPane.setMinimumSize(new java.awt.Dimension(250,100));
         txtPaneReportScrollPane.setPreferredSize(new java.awt.Dimension(250, 100));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -4947,7 +4961,6 @@ public class CampaignGUI extends JPanel {
     }
 
     public void refreshReport() {
-        txtPaneReport.setText(getCampaign().getCurrentReportHTML());
         txtPaneReport.setCaretPosition(0);
     }
 

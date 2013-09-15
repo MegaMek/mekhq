@@ -535,6 +535,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                 +"<replacementId>"
                 +replacementId
                 +"</replacementId>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<quality>"
+                +quality
+                +"</quality>");
 	}
 	
 	protected void writeToXmlEnd(PrintWriter pw1, int indent) {
@@ -661,7 +665,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				}
 				else if (wn2.getNodeName().equalsIgnoreCase("replacementId")) {
 					retVal.replacementId = Integer.parseInt(wn2.getTextContent());
-				} 
+				} else if (wn2.getNodeName().equalsIgnoreCase("quality")) {
+                    retVal.quality = Integer.parseInt(wn2.getTextContent());
+                } 
 			}
 		} catch (Exception ex) {
 			// Errrr, apparently either the class name was invalid...
