@@ -7,6 +7,7 @@ v0.3.3 (SVN)
 + Bug: Individual camo always set on refit completion
 + Bug: Inactive Prisoners and Bondsmen included in count on summary
 + Mothballed units only cost 10% to maintain using unofficial maintenance costs
++ Bug: part quality not saved to campaign xml
 
 v0.3.2 (2013-09-13)
 + maintenance checks (WIP)
