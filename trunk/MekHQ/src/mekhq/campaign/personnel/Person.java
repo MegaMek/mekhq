@@ -1867,11 +1867,14 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	else if(ent instanceof Aero) {
     		return hasSkill(SkillType.S_PILOT_AERO);
     	}
+    	else if(ent instanceof BattleArmor) {
+    		return hasSkill(SkillType.S_GUN_BA);
+    	}
     	else if(ent instanceof Infantry) {
-    		return true;
+    		return hasSkill(SkillType.S_SMALL_ARMS);
     	}
     	else if(ent instanceof Protomech) {
-    	    return true;
+    		return hasSkill(SkillType.S_GUN_PROTO);
     	}
     	return false;
     }

@@ -7880,24 +7880,26 @@ public class CampaignGUI extends JPanel {
                 refreshOrganization();
                 refreshCargo();
             } else if (command.contains("REMOVE_UNIT")) {
-                Unit u = getCampaign().getUnit(selectedPerson.getUnitId());
-                if(null != u) {
-                    u.remove(selectedPerson, true);
-                }
-                //check for tech unit assignments
-                if(!selectedPerson.getTechUnitIDs().isEmpty()) {
-                    //I need to create a new array list to avoid concurrent problems
-                    ArrayList<UUID> temp = new ArrayList<UUID>();
-                    for(UUID i : selectedPerson.getTechUnitIDs()) {
-                        temp.add(i);
-                    }
-                    for(UUID i : temp) {
-                        u = getCampaign().getUnit(i);
-                        if(null != u) {
-                            u.remove(selectedPerson, true);
-                        }
-                    }             
-                }
+            	for(Person person : people) {
+	                Unit u = getCampaign().getUnit(person.getUnitId());
+	                if(null != u) {
+	                    u.remove(person, true);
+	                }
+	                //check for tech unit assignments
+	                if(!person.getTechUnitIDs().isEmpty()) {
+	                    //I need to create a new array list to avoid concurrent problems
+	                    ArrayList<UUID> temp = new ArrayList<UUID>();
+	                    for(UUID i : person.getTechUnitIDs()) {
+	                        temp.add(i);
+	                    }
+	                    for(UUID i : temp) {
+	                        u = getCampaign().getUnit(i);
+	                        if(null != u) {
+	                            u.remove(person, true);
+	                        }
+	                    }             
+	                }
+            	}
                 refreshServicedUnitList();
                 refreshUnitList();
                 refreshPersonnelList();
@@ -7950,6 +7952,27 @@ public class CampaignGUI extends JPanel {
                 }
                 if(null != u) {
                     u.addDriver(selectedPerson);
+                }
+                u.resetPilotAndEntity();
+                u.runDiagnostic();
+                refreshServicedUnitList();
+                refreshUnitList();
+                refreshPersonnelList();
+                refreshOrganization();
+                refreshCargo();
+            } else if (command.contains("ADD_VESSEL_PILOT")) {
+                UUID selected = UUID.fromString(st.nextToken());
+                Unit u = getCampaign().getUnit(selected);
+                if(null != u) {
+                    for (Person p : people) {
+                        if (u.canTakeMoreDrivers()) {
+                            Unit oldUnit = getCampaign().getUnit(p.getUnitId());
+                            if(null != oldUnit) {
+                                oldUnit.remove(p, true);
+                            }
+                            u.addDriver(p);
+                        }
+                    }
                 }
                 u.resetPilotAndEntity();
                 u.runDiagnostic();
@@ -8525,22 +8548,22 @@ public class CampaignGUI extends JPanel {
                 }
                 popup.add(menu);
                 // switch pilot
+                menu = new JMenu("Assign to Unit");
+                JMenu pilotMenu = new JMenu("As Pilot");
+                JMenu crewMenu = new JMenu("As Crewmember");
+                JMenu driverMenu = new JMenu("As Driver");
+                JMenu gunnerMenu = new JMenu("As Gunner");
+                JMenu soldierMenu = new JMenu("As Soldier");
+                JMenu techMenu = new JMenu("As Tech");
+                JMenu navMenu = new JMenu("As Navigator");
+                cbMenuItem = new JCheckBoxMenuItem("None");
+                /*if(!person.isAssigned()) {
+                    cbMenuItem.setSelected(true);
+                }*/
+                cbMenuItem.setActionCommand("REMOVE_UNIT|" + -1);
+                cbMenuItem.addActionListener(this);
+                menu.add(cbMenuItem);
                 if(oneSelected && person.isActive() && !(person.isPrisoner() || person.isBondsman())) {
-                        menu = new JMenu("Assign to Unit");
-                        JMenu pilotMenu = new JMenu("As Pilot");
-                        JMenu crewMenu = new JMenu("As Crewmember");
-                        JMenu driverMenu = new JMenu("As Driver");
-                        JMenu gunnerMenu = new JMenu("As Gunner");
-                        JMenu soldierMenu = new JMenu("As Soldier");
-                        JMenu techMenu = new JMenu("As Tech");
-                        JMenu navMenu = new JMenu("As Navigator");
-                        cbMenuItem = new JCheckBoxMenuItem("None");
-                        /*if(!person.isAssigned()) {
-                            cbMenuItem.setSelected(true);
-                        }*/
-                        cbMenuItem.setActionCommand("REMOVE_UNIT|" + -1);
-                        cbMenuItem.addActionListener(this);
-                        menu.add(cbMenuItem);
                         for (Unit unit : getCampaign().getUnits()) {
                             if(!unit.isAvailable()) {
                                 continue;
@@ -8563,7 +8586,7 @@ public class CampaignGUI extends JPanel {
                                     soldierMenu.add(cbMenuItem);
                                 }
                             } else {
-                                if(unit.canTakeMoreDrivers() && person.canDrive(unit.getEntity())) {
+                            	if(unit.canTakeMoreDrivers() && person.canDrive(unit.getEntity())) {
                                     cbMenuItem = new JCheckBoxMenuItem(unit.getName());
                                     //TODO: check the box
                                     cbMenuItem.setActionCommand("ADD_DRIVER|" + unit.getId());
@@ -8649,15 +8672,14 @@ public class CampaignGUI extends JPanel {
                         menu.setEnabled(!person.isDeployed(getCampaign()));
                         popup.add(menu);
                 } else if (areAllActive(selected)  && areAllEligible(selected)) {
-                    JMenu pilotMenu = new JMenu("As Pilot");
-                    JMenu crewMenu = new JMenu("As Crewmember");
-                    JMenu driverMenu = new JMenu("As Driver");
-                    JMenu gunnerMenu = new JMenu("As Gunner");
-                    JMenu soldierMenu = new JMenu("As Soldier");
-                    JMenu navMenu = new JMenu("As Navigator");
-                    if (areAllInfantry(selected)) {
-                        menu = new JMenu("Assign to Unit");
-                        for (Unit unit : getCampaign().getUnits()) {
+                    for (Unit unit : getCampaign().getUnits()) {
+                        if(!unit.isAvailable()) {
+                            continue;
+                        }
+	                    if (areAllInfantry(selected)) {
+                        	if (!(unit.getEntity() instanceof Infantry) || unit.getEntity() instanceof BattleArmor) {
+                        		continue;
+                        	}
                             if(unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
                                 cbMenuItem = new JCheckBoxMenuItem(unit.getName());
                                 //TODO: check the box
@@ -8665,18 +8687,12 @@ public class CampaignGUI extends JPanel {
                                 cbMenuItem.addActionListener(this);
                                 soldierMenu.add(cbMenuItem);
                             }
-                        }
-                        if(soldierMenu.getItemCount() > 0) {
-                            menu.add(soldierMenu);
-                            if(soldierMenu.getItemCount() > 20) {
-                                MenuScroller.setScrollerFor(soldierMenu, 20);
-                            }
-                        }
-                        menu.setEnabled(!person.isDeployed(getCampaign()));
-                        popup.add(menu);
-                    } else if (areAllBattleArmor(selected)) {
-                        menu = new JMenu("Assign to Unit");
-                        for (Unit unit : getCampaign().getUnits()) {
+	                        menu.setEnabled(!person.isDeployed(getCampaign()));
+	                        popup.add(menu);
+	                    } else if (areAllBattleArmor(selected)) {
+                        	if (!(unit.getEntity() instanceof BattleArmor)) {
+                        		continue;
+                        	}
                             if(unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
                                 cbMenuItem = new JCheckBoxMenuItem(unit.getName());
                                 //TODO: check the box
@@ -8684,18 +8700,12 @@ public class CampaignGUI extends JPanel {
                                 cbMenuItem.addActionListener(this);
                                 soldierMenu.add(cbMenuItem);
                             }
-                        }
-                        if(soldierMenu.getItemCount() > 0) {
-                            menu.add(soldierMenu);
-                            if(soldierMenu.getItemCount() > 20) {
-                                MenuScroller.setScrollerFor(soldierMenu, 20);
-                            }
-                        }
-                        menu.setEnabled(!person.isDeployed(getCampaign()));
-                        popup.add(menu);
-                    } else if (areAllVeeGunners(selected)) {
-                        menu = new JMenu("Assign to Unit");
-                        for (Unit unit : getCampaign().getUnits()) {
+	                        menu.setEnabled(!person.isDeployed(getCampaign()));
+	                        popup.add(menu);
+	                    } else if (areAllVeeGunners(selected)) {
+                        	if (!(unit.getEntity() instanceof Tank)) {
+                        		continue;
+                        	}
                             if(unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
                                 cbMenuItem = new JCheckBoxMenuItem(unit.getName());
                                 //TODO: check the box
@@ -8703,10 +8713,10 @@ public class CampaignGUI extends JPanel {
                                 cbMenuItem.addActionListener(this);
                                 gunnerMenu.add(cbMenuItem);
                             }
-                        }
-                    } else if (areAllVesselGunners(selected)) {
-                        menu = new JMenu("Assign to Unit");
-                        for (Unit unit : getCampaign().getUnits()) {
+	                    } else if (areAllVesselGunners(selected)) {
+                        	if (!(unit.getEntity() instanceof Aero)) {
+                        		continue;
+                        	}
                             if(unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
                                 cbMenuItem = new JCheckBoxMenuItem(unit.getName());
                                 //TODO: check the box
@@ -8714,10 +8724,10 @@ public class CampaignGUI extends JPanel {
                                 cbMenuItem.addActionListener(this);
                                 gunnerMenu.add(cbMenuItem);
                             }
-                        }
-                    } else if (areAllVesselCrew(selected)) {
-                        menu = new JMenu("Assign to Unit");
-                        for (Unit unit : getCampaign().getUnits()) {
+	                    } else if (areAllVesselCrew(selected)) {
+                        	if (!(unit.getEntity() instanceof Aero)) {
+                        		continue;
+                        	}
                         	if(unit.canTakeMoreVesselCrew() && person.hasSkill(SkillType.S_TECH_VESSEL)) {
                                 cbMenuItem = new JCheckBoxMenuItem(unit.getName());
                                 //TODO: check the box
@@ -8725,21 +8735,21 @@ public class CampaignGUI extends JPanel {
                                 cbMenuItem.addActionListener(this);
                                 crewMenu.add(cbMenuItem);
                             }
-                        }
-                    } else if (areAllVesselPilots(selected)) {
-                        menu = new JMenu("Assign to Unit");
-                        for (Unit unit : getCampaign().getUnits()) {
+	                    } else if (areAllVesselPilots(selected)) {
+                        	if (!(unit.getEntity() instanceof Aero)) {
+                        		continue;
+                        	}
                             if(unit.canTakeMoreDrivers() && person.canDrive(unit.getEntity())) {
                                 cbMenuItem = new JCheckBoxMenuItem(unit.getName());
                                 //TODO: check the box
-                                cbMenuItem.setActionCommand("ADD_PILOT|" + unit.getId());
+                                cbMenuItem.setActionCommand("ADD_VESSEL_PILOT|" + unit.getId());
                                 cbMenuItem.addActionListener(this);
                                 pilotMenu.add(cbMenuItem);
                             }
-                        }
-                    } else if (areAllVesselNavigators(selected)) {
-                        menu = new JMenu("Assign to Unit");
-                        for (Unit unit : getCampaign().getUnits()) {
+	                    } else if (areAllVesselNavigators(selected)) {
+                        	if (!(unit.getEntity() instanceof Aero)) {
+                        		continue;
+                        	}
                         	if(unit.canTakeNavigator() && person.hasSkill(SkillType.S_NAV)) {
                                 cbMenuItem = new JCheckBoxMenuItem(unit.getName());
                                 //TODO: check the box
@@ -8747,46 +8757,52 @@ public class CampaignGUI extends JPanel {
                                 cbMenuItem.addActionListener(this);
                                 navMenu.add(cbMenuItem);
                             }
+	                    }
+                        if(soldierMenu.getItemCount() > 0) {
+                            menu.add(soldierMenu);
+                            if(soldierMenu.getItemCount() > 20) {
+                                MenuScroller.setScrollerFor(soldierMenu, 20);
+                            }
                         }
+	                    if(pilotMenu.getItemCount() > 0) {
+	                        menu.add(pilotMenu);
+	                        if(pilotMenu.getItemCount() > 20) {
+	                            MenuScroller.setScrollerFor(pilotMenu, 20);
+	                        }
+	                    }
+	                    if(driverMenu.getItemCount() > 0) {
+	                        menu.add(driverMenu);
+	                        if(driverMenu.getItemCount() > 20) {
+	                            MenuScroller.setScrollerFor(driverMenu, 20);
+	                        }
+	                    }
+	                    if(crewMenu.getItemCount() > 0) {
+	                        menu.add(crewMenu);
+	                        if(crewMenu.getItemCount() > 20) {
+	                            MenuScroller.setScrollerFor(crewMenu, 20);
+	                        }
+	                    }
+	                    if(navMenu.getItemCount() > 0) {
+	                        menu.add(navMenu);
+	                        if(navMenu.getItemCount() > 20) {
+	                            MenuScroller.setScrollerFor(navMenu, 20);
+	                        }
+	                    }
+	                    if(gunnerMenu.getItemCount() > 0) {
+	                        menu.add(gunnerMenu);
+	                        if(gunnerMenu.getItemCount() > 20) {
+	                            MenuScroller.setScrollerFor(gunnerMenu, 20);
+	                        }
+	                    }
+	                    if(soldierMenu.getItemCount() > 0) {
+	                        menu.add(soldierMenu);
+	                        if(soldierMenu.getItemCount() > 20) {
+	                            MenuScroller.setScrollerFor(soldierMenu, 20);
+	                        }
+	                    }
+	                    menu.setEnabled(!person.isDeployed(getCampaign()));
+	                    popup.add(menu);
                     }
-                    if(pilotMenu.getItemCount() > 0) {
-                        menu.add(pilotMenu);
-                        if(pilotMenu.getItemCount() > 20) {
-                            MenuScroller.setScrollerFor(pilotMenu, 20);
-                        }
-                    }
-                    if(driverMenu.getItemCount() > 0) {
-                        menu.add(driverMenu);
-                        if(driverMenu.getItemCount() > 20) {
-                            MenuScroller.setScrollerFor(driverMenu, 20);
-                        }
-                    }
-                    if(crewMenu.getItemCount() > 0) {
-                        menu.add(crewMenu);
-                        if(crewMenu.getItemCount() > 20) {
-                            MenuScroller.setScrollerFor(crewMenu, 20);
-                        }
-                    }
-                    if(navMenu.getItemCount() > 0) {
-                        menu.add(navMenu);
-                        if(navMenu.getItemCount() > 20) {
-                            MenuScroller.setScrollerFor(navMenu, 20);
-                        }
-                    }
-                    if(gunnerMenu.getItemCount() > 0) {
-                        menu.add(gunnerMenu);
-                        if(gunnerMenu.getItemCount() > 20) {
-                            MenuScroller.setScrollerFor(gunnerMenu, 20);
-                        }
-                    }
-                    if(soldierMenu.getItemCount() > 0) {
-                        menu.add(soldierMenu);
-                        if(soldierMenu.getItemCount() > 20) {
-                            MenuScroller.setScrollerFor(soldierMenu, 20);
-                        }
-                    }
-                    menu.setEnabled(!person.isDeployed(getCampaign()));
-                    popup.add(menu);
                 }
                 if(oneSelected && person.isActive()) {
                     menu = new JMenu("Spend XP");
