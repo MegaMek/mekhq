@@ -219,6 +219,8 @@ public class Campaign implements Serializable {
 	private Finances finances;
 
 	private CurrentLocation location;
+	
+	private News news;
 
 	private PartsStore partsStore;
 
@@ -260,6 +262,7 @@ public class Campaign implements Serializable {
 		game.setOptions(gameOptions);
 		customs = new ArrayList<String>();
 		shoppingList = new ShoppingList();
+		news = new News(calendar.get(Calendar.YEAR));
 	}
 
 	public String getName() {
@@ -1544,10 +1547,24 @@ public class Campaign implements Serializable {
 		addReport(report);
 	}
 
+	public void reloadNews() {
+        news.loadNewsFor(calendar.get(Calendar.YEAR));
+
+	}
+	
 	public void newDay() {
 		calendar.add(Calendar.DAY_OF_MONTH, 1);
 		currentReport.clear();
 		addReport("<b>" + getDateAsString() + "</b>");
+		
+		if(calendar.get(Calendar.DAY_OF_YEAR) == 1) {
+		    reloadNews();
+		}
+		
+		//read the news
+		for(NewsItem article : news.fetchNewsFor(calendar.getTime())) {
+		    addReport(article.getHeadlineForReport());
+		}
 
 		location.newDay(this);
 

@@ -12,6 +12,7 @@ v0.3.3 (SVN)
 + Bug [#397]: Mass Assign Units Can Cause Unit To Show Too Many Assigned
 + html tags in report link to unit and personnel views, use unit.getHyperlinkedName(), person.getHyperlinkedName(), and person.getHyperlinkedFullTitle() in report strings
 + changed report to display only one day of activity
++ news reports (see data/universe/news.xml for details and example)
 
 v0.3.2 (2013-09-13)
 + maintenance checks (WIP)

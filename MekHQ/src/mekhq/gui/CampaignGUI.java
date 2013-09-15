@@ -246,6 +246,7 @@ import mekhq.gui.dialog.MercRosterDialog;
 import mekhq.gui.dialog.MissionTypeDialog;
 import mekhq.gui.dialog.NewLoanDialog;
 import mekhq.gui.dialog.NewRecruitDialog;
+import mekhq.gui.dialog.NewsReportDialog;
 import mekhq.gui.dialog.PartsStoreDialog;
 import mekhq.gui.dialog.PayCollateralDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
@@ -3262,6 +3263,11 @@ public class CampaignGUI extends JPanel {
             personnelTable.scrollRectToVisible(personnelTable.getCellRect(row, 0, true));
         }
     }
+    
+    public void showNews(String headline, String article) {
+        NewsReportDialog nrd = new NewsReportDialog(frame, headline, article);
+        nrd.setVisible(true);
+    }
 
     private void taskTabChanged() {
         filterTechs(false);
@@ -3641,6 +3647,7 @@ public class CampaignGUI extends JPanel {
                 getCampaign(), getCamos());
         cod.setVisible(true);
         refreshCalendar();
+        getCampaign().reloadNews();
         changePersonnelView();
         refreshPersonnelList();
         panMap.repaint();
