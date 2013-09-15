@@ -112,6 +112,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     private PartsTableModel partsModel;
 	private TableRowSorter<PartsTableModel> partsSorter;
     boolean addToCampaign;
+    Part selectedPart = null;
 	
     private JTable partsTable;
     private JScrollPane scrollPartsTable;
@@ -126,17 +127,24 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     private JButton btnBuy;
     private JButton btnClose;
     
-    /** Creates new form NewTeamDialog */
+    /** Creates new form PartsStoreDialog */
     public PartsStoreDialog(boolean modal, CampaignGUI gui) {
-        super(gui.getFrame(), modal);
-        this.frame = gui.getFrame();  
+    	this(gui.getFrame(), modal, gui, gui.getCampaign(), true);
+    }
+    
+    /** Creates new form PartsStoreDialog */
+    public PartsStoreDialog(Frame frame, boolean modal, CampaignGUI gui, Campaign campaign, boolean add) {
+        super(frame, modal);
+        this.frame = frame;  
         this.campaignGUI = gui;
-        campaign = campaignGUI.getCampaign();
+        this.campaign = campaign;
+        this.addToCampaign = add;
         formatter = new DecimalFormat();
         partsModel = new PartsTableModel(campaign.getPartsStore().getInventory());
         initComponents();
         filterParts();
         setLocationRelativeTo(frame);
+        selectedPart = null;
     }
 
     private void initComponents() {
@@ -152,7 +160,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		partsTable.setName("partsTable"); // NOI18N
 		partsSorter = new TableRowSorter<PartsTableModel>(partsModel);
 		partsSorter.setComparator(PartsTableModel.COL_TARGET, new TargetSorter());
-        partsSorter.setComparator(PartsTableModel.COL_COST, campaignGUI.new FormattedNumberSorter());
+        partsSorter.setComparator(PartsTableModel.COL_COST, new FormattedNumberSorter());
         partsTable.setRowSorter(partsSorter);
 		TableColumn column = null;
         for (int i = 0; i < PartsTableModel.N_COL; i++) {
@@ -223,43 +231,64 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		getContentPane().add(panFilter, BorderLayout.PAGE_START);
 
 		panButtons = new JPanel();
-		btnAdd = new JButton(resourceMap.getString("btnAdd.text"));
-		btnAdd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addPart(false, false);
-            }
-        });
-		btnAdd.setEnabled(campaignGUI.getCampaign().isGM());
-		btnBuyBulk = new JButton(resourceMap.getString("btnBuyBulk.text"));
-		btnBuyBulk.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	addPart(true, true);
-                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_TARGET);
-                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_TRANSIT);
-                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_SUPPLY);
-                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_QUEUE);
-            }
-        });
-		btnBuy = new JButton(resourceMap.getString("btnBuy.text"));
-		btnBuy.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addPart(true, false);
-                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_TARGET);
-                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_TRANSIT);
-                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_SUPPLY);
-                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_QUEUE);            }
-        });
-		btnClose = new JButton(resourceMap.getString("btnClose.text"));
-		btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                setVisible(false);
-            }
-        });
-		panButtons.setLayout(new GridBagLayout());
-		panButtons.add(btnBuyBulk, new GridBagConstraints());
-		panButtons.add(btnBuy, new GridBagConstraints());
-		panButtons.add(btnAdd, new GridBagConstraints());
-		panButtons.add(btnClose, new GridBagConstraints());
+		if (addToCampaign) {
+			btnAdd = new JButton(resourceMap.getString("btnAdd.text"));
+			btnAdd.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	                addPart(false, false);
+	            }
+	        });
+			btnAdd.setEnabled(campaign.isGM());
+			btnBuyBulk = new JButton(resourceMap.getString("btnBuyBulk.text"));
+			btnBuyBulk.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	            	addPart(true, true);
+	                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_TARGET);
+	                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_TRANSIT);
+	                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_SUPPLY);
+	                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_QUEUE);
+	            }
+	        });
+			btnBuy = new JButton(resourceMap.getString("btnBuy.text"));
+			btnBuy.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	                addPart(true, false);
+	                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_TARGET);
+	                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_TRANSIT);
+	                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_SUPPLY);
+	                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_QUEUE);            }
+	        });
+			btnClose = new JButton(resourceMap.getString("btnClose.text"));
+			btnClose.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	                setVisible(false);
+	            }
+	        });
+			panButtons.setLayout(new GridBagLayout());
+			panButtons.add(btnBuyBulk, new GridBagConstraints());
+			panButtons.add(btnBuy, new GridBagConstraints());
+			panButtons.add(btnAdd, new GridBagConstraints());
+			panButtons.add(btnClose, new GridBagConstraints());
+		} else {
+            //if we arent adding the unit to the campaign, then different buttons
+            btnAdd = new JButton("Add");
+			btnAdd.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	                setSelectedPart();
+	                setVisible(false);
+	            }
+	        });
+            panButtons.add(btnAdd, new GridBagConstraints());
+            
+            btnClose = new JButton("Cancel"); // NOI18N
+			btnClose.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	            	selectedPart = null;
+	                setVisible(false);
+	            }
+	        });
+            panButtons.add(btnClose, new GridBagConstraints());
+		}
 		getContentPane().add(panButtons, BorderLayout.PAGE_END);		
 		this.setPreferredSize(new Dimension(700,600));
         pack();
@@ -351,6 +380,18 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		campaignGUI.refreshAcquireList();
 		campaignGUI.refreshPartsList();
 		campaignGUI.refreshFinancialTransactions();
+    }
+    
+    private void setSelectedPart() {
+    	int row = partsTable.getSelectedRow();
+		if(row < 0) {
+			return;
+		}
+		selectedPart = partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
+    }
+    
+    public Part getPart() {
+    	return selectedPart;
     }
     
     public static String getPartsGroupName(int group) {
@@ -635,4 +676,33 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 
         }
     }
+	
+	/**
+	 * A comparator for numbers that have been formatted with DecimalFormat
+	 * @author Jay Lawson
+	 *
+	 */
+	public class FormattedNumberSorter implements Comparator<String> {
+
+		@Override
+		public int compare(String s0, String s1) {
+			//lets find the weight class integer for each name
+			DecimalFormat format = new DecimalFormat();
+			int l0 = 0;
+			try {
+				l0 = format.parse(s0).intValue();
+			} catch (java.text.ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			int l1 = 0;
+			try {
+				l1 = format.parse(s1).intValue();
+			} catch (java.text.ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return ((Comparable<Integer>)l0).compareTo(l1);
+		}
+	}
 }

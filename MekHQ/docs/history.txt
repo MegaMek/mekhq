@@ -13,6 +13,7 @@ v0.3.3 (SVN)
 + html tags in report link to unit and personnel views, use unit.getHyperlinkedName(), person.getHyperlinkedName(), and person.getHyperlinkedFullTitle() in report strings
 + changed report to display only one day of activity
 + news reports (see data/universe/news.xml for details and example)
++ Implemented parts loot (Just a quick hack to make it work, full re-write to be like Units will be for Taharqa if he wants)
 
 v0.3.2 (2013-09-13)
 + maintenance checks (WIP)
