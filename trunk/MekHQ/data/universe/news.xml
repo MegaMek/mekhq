@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+news.xml
+9/15/2013
+Jay Lawson
+This file defines defines a set of news item that will display in the daily report frame of MekHQ. 
+
+Here is a description of what goes in each newsItem tag
+headline - This is the headline that will appear in the daily report and in the title of the full article.
+           This item should always be defined.
+date - the date of the news item in YYYY-MM-DD format. This is required.
+desc - a longer description of the news item. This is optional, but must be present for the "read more" link. 
+       It should always be surrounded by <![CDATA[stuff]]> and may contain html markup.
+service - an optional tag for the news service doing the reporing
+location - an optional tag for the location of the news report
+ -->
+<news>
+	<newsItem>
+		<headline>Mercenary Treachery</headline>
+		<date>3068-01-02</date>
+		<desc><![CDATA[It seems that for every mercenary command of sterling character (such as Wolf’s Dragoons, the Kell Hounds or the Twelfth Vegan Rangers), 
+		there is one for whom money is the only thing that matters. The Word of Blake highlighted this with deadly clarity when they bought Waco’s Rangers, Smithson’s 
+		Chinese Bandits, the Tiger Sharks and the 51st Dark Panzer Jaegers and unleashed them on Harlech. Now to this roll of dishonor must be added the Broadsword Legion. 
+		Hired by Wolf’s Dragoons in their moment of need, the Legion turned on their employers as the Dragoons battled to defend their homes from the onslaught of the Blakists’ 
+		Sixth and Tenth Divisions.<p>At the height of this second battle of Outreach, just as it appeared the defenders were gaining the upper hand, the Broadsword Legion launched a 
+		furious assault on the rear of the Dragoons’ Wolf Spiders Battalion. Pinned between the Legion and the Blakist Diplomacy of Force III-Alpha, the Wolf Spiders (proud holders 
+		of the Black Widow Battalion legacy) were almost annihilated before they could rally. That costly act of treachery further weakened the Dragoons. In an apparent effort to 
+		finish off the famed mercenaries once and for all, the Blakists reportedly launched devastating strategic attacks against the planet from orbit.<p>Across the Inner Sphere, 
+		the same question is being asked: Who will next turn their coat? Which mercenary command will turn on its employers and do the evil bidding of the Word of Blake? This 
+		fear has already led to tragedy on Epsilon Indi, where the Com Guards Second Division launched an unprovoked attack on the Tooth of Ymir. Reportedly, relations between the 
+		Com Guards and the mercenaries had been strained ever since the mercenary unit arrived on-world.<p>Faced with overwhelming odds, Colonel Shadwell wisely ordered the battered 
+		Tooth to surrender. Following an exhaustive investigation, Precentor Regis Grandi has reluctantly been forced to concede that no tangible proof exists linking the Tooth with 
+		the Word of Blake. The Tooth of Ymir, now under the minimum strength stipulated by their contract, is reportedly headed for Arc-Royal to rebuild. In the meantime, many mercenary 
+		commanders are left nervously wondering how long it will be before their equally nervous employers turn on them.]]></desc>
+		<service>INN</service>
+		<location>Outreach</location>
+	</newsItem>
+</news>
