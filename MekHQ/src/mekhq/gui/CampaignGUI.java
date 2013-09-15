@@ -751,6 +751,8 @@ public class CampaignGUI extends JPanel {
         scrollMekLab = new javax.swing.JScrollPane();
         lblLocation = new javax.swing.JLabel();
 
+        ReportHyperlinkListener reportHLL = new ReportHyperlinkListener(this);
+        
         ArrayList <RowSorter.SortKey> sortKeys;
 
         tabMain.setToolTipText(resourceMap.getString("tabMain.toolTipText")); // NOI18N
@@ -2298,21 +2300,8 @@ public class CampaignGUI extends JPanel {
                 .getString("txtPaneReport.contentType")); // NOI18N
         txtPaneReport.setEditable(false);
         txtPaneReport.setText(getCampaign().getCurrentReportHTML());
-        txtPaneReport.setName("txtPaneReport"); // NOI18N
-        txtPaneReportScrollPane.setViewportView(txtPaneReport);
-        HyperlinkListener l = new HyperlinkListener() {
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent e) {
-                if (HyperlinkEvent.EventType.ACTIVATED == e.getEventType()) {
-                    //pane.setPage(e.getURL());
-                    JOptionPane.showMessageDialog(frame, e.getDescription());                   
-                }
-
-            }
-
-        };
-        txtPaneReport.addHyperlinkListener(l);        
-        
+        txtPaneReport.addHyperlinkListener(reportHLL);
+        txtPaneReportScrollPane.setViewportView(txtPaneReport);     
         txtPaneReportScrollPane.setMinimumSize(new java.awt.Dimension(250,100));
         txtPaneReportScrollPane.setPreferredSize(new java.awt.Dimension(250, 100));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -3212,6 +3201,65 @@ public class CampaignGUI extends JPanel {
                 MechView mv = new MechView(unit.getEntity(), false);
                 txtServicedUnitView.setText("<div style='font: 12pt monospaced'>" + mv.getMechReadoutBasic() + "<br>" + mv.getMechReadoutLoadout() + "</div>");
             }
+        }
+    }
+    
+    public void focusOnUnit(UUID id) {
+        if(null == id) {
+            return;
+        }
+        tabMain.setSelectedIndex(4);
+        int row = -1;
+        for(int i=0; i< unitTable.getRowCount(); i++) {
+            if(unitModel.getUnit(unitTable.convertRowIndexToModel(i)).getId().equals(id)) {
+                row = i;
+                break;
+            }
+        }
+        if(row == -1) {
+            //try expanding the filter to all units
+            choiceUnit.setSelectedIndex(0);
+            for(int i=0; i< unitTable.getRowCount(); i++) {
+                if(unitModel.getUnit(unitTable.convertRowIndexToModel(i)).getId().equals(id)) {
+                    row = i;
+                    break;
+                }
+            }
+            
+        }
+        if(row != -1) {
+            unitTable.setRowSelectionInterval(row, row);
+            unitTable.scrollRectToVisible(unitTable.getCellRect(row, 0, true));
+        }
+        
+    }
+    
+    public void focusOnPerson(UUID id) {
+        if(null == id) {
+            return;
+        }
+        tabMain.setSelectedIndex(3);
+        int row = -1;
+        for(int i=0; i< personnelTable.getRowCount(); i++) {
+            if(personModel.getPerson(personnelTable.convertRowIndexToModel(i)).getId().equals(id)) {
+                row = i;
+                break;
+            }
+        }
+        if(row == -1) {
+            //try expanding the filter to all units
+            choicePerson.setSelectedIndex(0);
+            for(int i=0; i< personnelTable.getRowCount(); i++) {
+                if(personModel.getPerson(personnelTable.convertRowIndexToModel(i)).getId().equals(id)) {
+                    row = i;
+                    break;
+                }
+            }
+            
+        }
+        if(row != -1) {
+            personnelTable.setRowSelectionInterval(row, row);
+            personnelTable.scrollRectToVisible(personnelTable.getCellRect(row, 0, true));
         }
     }
 
@@ -4961,6 +5009,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void refreshReport() {
+        txtPaneReport.setText(getCampaign().getCurrentReportHTML());
         txtPaneReport.setCaretPosition(0);
     }
 
@@ -8065,7 +8114,7 @@ public class CampaignGUI extends JPanel {
                 selectedPerson.improveSkill(type);
                 getCampaign().personUpdated(selectedPerson);
                 selectedPerson.setXp(selectedPerson.getXp() - cost);
-                getCampaign().addReport(selectedPerson.getName() + " improved " + type + "!");
+                getCampaign().addReport(selectedPerson.getHyperlinkedName() + " improved " + type + "!");
                 refreshServicedUnitList();
                 refreshUnitList();
                 refreshPersonnelList();
@@ -8283,11 +8332,11 @@ public class CampaignGUI extends JPanel {
 	            	for (Person p : getCampaign().getPersonnel()) {
 	            		if (p.isCommander() && !p.getId().equals(selectedPerson.getId())) {
 		            		p.setCommander(false);
-		            		getCampaign().addReport(p.getFullTitle()+" has been removed as the overall unit commander.");
+		            		getCampaign().addReport(p.getHyperlinkedFullTitle()+" has been removed as the overall unit commander.");
 		            		getCampaign().personUpdated(p);
 	            		}
 	            	}
-	            	getCampaign().addReport(selectedPerson.getFullTitle()+" has been set as the overall unit commander.");
+	            	getCampaign().addReport(selectedPerson.getHyperlinkedFullTitle()+" has been set as the overall unit commander.");
 	                getCampaign().personUpdated(selectedPerson);
             	}
                 refreshReport();

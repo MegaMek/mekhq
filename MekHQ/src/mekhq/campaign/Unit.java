@@ -3000,6 +3000,10 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	return entity.getShortName();
     }
     
+    public String getHyperlinkedName() {
+        return "<a href='UNIT:" + getId() + "'>" + entity.getShortName() + "</a>";
+    }
+    
     @Override
     public boolean equals(Object o) {
     	return o instanceof Unit && ((Unit)o).getId().equals(id) && ((Unit)o).getName().equals(getName());
@@ -3257,10 +3261,10 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
         }
         if(isMothballed()) {
             mothballed = true;
-            return "Activation of " + getName() + " complete.";
+            return "Activation of " + getHyperlinkedName() + " complete.";
         } else {
             mothballed = false;
-            return "Mothballing of " + getName() + " complete.";
+            return "Mothballing of " + getHyperlinkedName() + " complete.";
         }
     }
 

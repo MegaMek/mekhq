@@ -775,7 +775,7 @@ public class ResolveScenarioTracker {
 				}
 				//check for BLC
 				long newValue = unit.getValueOfAllMissingParts();
-				campaign.addReport(unit.getName() + " has been recovered.");
+				campaign.addReport(unit.getHyperlinkedName() + " has been recovered.");
 				if(blc > 0 && newValue > currentValue) {
 					long finalValue = (long)(blc * (newValue - currentValue));
 					campaign.getFinances().credit(finalValue, Transaction.C_BLC, "Battle loss compensation (parts) for " + unit.getName(), campaign.getCalendar().getTime());

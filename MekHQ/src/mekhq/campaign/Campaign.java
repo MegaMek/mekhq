@@ -552,7 +552,7 @@ public class Campaign implements Serializable {
 		game.addEntity(en.getId(), en);
 
 		checkDuplicateNamesDuringAdd(en);
-		addReport(unit.getName() + " has been added to the unit roster.");
+		addReport(unit.getHyperlinkedName() + " has been added to the unit roster.");
 	}
 
 	public ArrayList<Unit> getUnits() {
@@ -610,7 +610,7 @@ public class Campaign implements Serializable {
 		p.setId(id);
 		personnel.add(p);
 		personnelIds.put(id, p);
-		addReport(p.getName() + " has been added to the personnel roster.");
+		addReport(p.getHyperlinkedName() + " has been added to the personnel roster.");
 		if (p.getPrimaryRole() == Person.T_ASTECH) {
 			astechPoolMinutes += 480;
 			astechPoolOvertime += 240;
@@ -648,7 +648,7 @@ public class Campaign implements Serializable {
 		p.setRankSystem(ranks);
 		addPersonWithoutId(p);
 		if (log) {
-			addReport(p.getName() + " has been added to the personnel roster.");
+			addReport(p.getHyperlinkedName() + " has been added to the personnel roster.");
 		}
 		if (p.getPrimaryRole() == Person.T_ASTECH) {
 			astechPoolMinutes += 480;
@@ -1019,7 +1019,7 @@ public class Campaign implements Serializable {
 		if (getCampaignOptions().useAdvancedMedical()) {
 			return advancedMedicalHealPerson(medWork, doctor);
 		}
-		report += doctor.getName() + " attempts to heal "
+		report += doctor.getHyperlinkedFullTitle() + " attempts to heal "
 				+ medWork.getPatientName();
 		TargetRoll target = getTargetFor(medWork, doctor);
 		int roll = Compute.d6(2);
@@ -1124,9 +1124,9 @@ public class Campaign implements Serializable {
 					injury.setTime((int) Math.max(
 							Math.ceil(injury.getTime() * 1.2),
 							injury.getTime() + 5));
-					report = report + doctor.getName()
+					report = report + doctor.getHyperlinkedFullTitle()
 							+ " made a mistake in the treatment of "
-							+ medWork.getName() + " and caused "
+							+ medWork.getHyperlinkedName() + " and caused "
 							+ medWork.getGenderPronoun(Person.PRONOUN_HISHER)
 							+ " " + injury.getName() + " to worsen.";
 					if (Compute.randomInt(100) < (fumble / 4)) {
@@ -1140,9 +1140,9 @@ public class Campaign implements Serializable {
 					}
 				} else if (roll > critSuccess) {
 					injury.setTime((int) Math.floor(injury.getTime() * 90 / 100));
-					report = report + doctor.getName()
+					report = report + doctor.getHyperlinkedFullTitle()
 							+ " performed some amazing work in treating "
-							+ medWork.getName() + "'s " + injury.getName()
+							+ medWork.getHyperlinkedName() + "'s " + injury.getName()
 							+ " (10% less time to heal)";
 					if (roll > Math.min(98,
 							99 - Math.round(99 - critSuccess) / 10)) {
@@ -1155,8 +1155,8 @@ public class Campaign implements Serializable {
 						doctor.setNTasks(0);
 					}
 					doctor.setNTasks(doctor.getNTasks() + 1);
-					report = report + doctor.getName()
-							+ " successfully treated " + medWork.getName();
+					report = report + doctor.getHyperlinkedFullTitle()
+							+ " successfully treated " + medWork.getHyperlinkedName();
 				}
 				injury.setWorkedOn(true);
 				Unit u = getUnit(medWork.getUnitId());
@@ -1164,7 +1164,7 @@ public class Campaign implements Serializable {
 					u.resetPilotAndEntity();
 				}
 			} else {
-				report = report + medWork.getName()
+				report = report + medWork.getHyperlinkedName()
 						+ " spent time resting to heal "
 						+ medWork.getGenderPronoun(Person.PRONOUN_HISHER) + " "
 						+ injury.getName() + "!";
@@ -1258,7 +1258,7 @@ public class Campaign implements Serializable {
 			return false;
 		}
 		if (null != person) {
-			report += person.getName() + " ";
+			report += person.getHyperlinkedFullTitle() + " ";
 		}
 		report += "attempts to find " + acquisition.getAcquisitionName();
 		int roll = Compute.d6(2);
@@ -1306,7 +1306,7 @@ public class Campaign implements Serializable {
 	    if(null == tech) {
 	        //uh-oh
 	        //TODO: report someting
-	        addReport("No tech assigned to the mothballing of " + u.getName());
+	        addReport("No tech assigned to the mothballing of " + u.getHyperlinkedName());
 	        return;
 	    }
 	    //don't allow overtime minutes for mothballing because its cheating
@@ -1315,7 +1315,7 @@ public class Campaign implements Serializable {
 	    //check astech time
 	    if(!u.isSelfCrewed() && astechPoolMinutes < minutes * 6) {
 	        //uh-oh
-	        addReport("Not enough astechs to work on mothballing of " + u.getName());
+	        addReport("Not enough astechs to work on mothballing of " + u.getHyperlinkedName());
 	        return;
 	    }
 	    u.setMothballTime(u.getMothballTime() - minutes);
@@ -1323,7 +1323,7 @@ public class Campaign implements Serializable {
 	    if(u.isMothballed()) {
 	        action = " activating ";
 	    }
-	    String report = tech.getFullTitle() + " spent " + minutes + " minutes" + action + u.getName();
+	    String report = tech.getHyperlinkedFullTitle() + " spent " + minutes + " minutes" + action + u.getHyperlinkedName();
 	    if(!u.isMothballing()) {
 	        if(u.isMothballed()) {
 	            u.setMothballed(false);
@@ -1356,7 +1356,7 @@ public class Campaign implements Serializable {
 		if (!r.acquireParts()) {
 			return;
 		}
-		String report = tech.getName() + " works on " + r.getPartName();
+		String report = tech.getHyperlinkedFullTitle() + " works on " + r.getPartName();
 		int minutes = r.getTimeLeft();
 		if (minutes > tech.getMinutesLeft()) {
 			r.addTimeSpent(tech.getMinutesLeft());
@@ -1435,7 +1435,7 @@ public class Campaign implements Serializable {
 				return;
 			}
 		}
-		report += tech.getName() + " attempts to" + action
+		report += tech.getHyperlinkedFullTitle() + " attempts to" + action
 				+ partWork.getPartName();
 		int minutes = partWork.getTimeLeft();
 		int minutesUsed = minutes;
@@ -1546,7 +1546,8 @@ public class Campaign implements Serializable {
 
 	public void newDay() {
 		calendar.add(Calendar.DAY_OF_MONTH, 1);
-		addReport("<p/><b>" + getDateAsString() + "</b>");
+		currentReport.clear();
+		addReport("<b>" + getDateAsString() + "</b>");
 
 		location.newDay(this);
 
@@ -1593,7 +1594,7 @@ public class Campaign implements Serializable {
 							 * }
 							 */
 						}
-						addReport(p.getName() + " spent time resting to heal "
+						addReport(p.getHyperlinkedFullTitle() + " spent time resting to heal "
 								+ p.getGenderPronoun(Person.PRONOUN_HISHER)
 								+ " " + injury.getName() + "!");
 					}
@@ -1610,7 +1611,7 @@ public class Campaign implements Serializable {
 				if (p.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
 					if (Compute.d6(2) >= getCampaignOptions().getTargetIdleXP()) {
 						p.setXp(p.getXp() + getCampaignOptions().getIdleXP());
-						addReport(p.getFullTitle() + " has gained "
+						addReport(p.getHyperlinkedFullTitle() + " has gained "
 								+ getCampaignOptions().getIdleXP() + " XP");
 					}
 					p.setIdleMonths(0);
@@ -2060,11 +2061,7 @@ public class Campaign implements Serializable {
 	}
 
 	public void addReport(String r) {
-		int maxLine = 150;
-		while (currentReport.size() > maxLine) {
-			currentReport.remove(currentReport.size() - 1);
-		}
-		currentReport.add(0, r);
+		currentReport.add(r);
 	}
 
 	public void addReports(ArrayList<String> reports) {
@@ -6259,11 +6256,11 @@ public class Campaign implements Serializable {
 			int qualityOrig = u.getQuality();
 			String techName = "Nobody";
 			if (null != tech) {
-				techName = tech.getName();
+				techName = tech.getHyperlinkedFullTitle();
 				//maybe use the money
 	            if (campaignOptions.payForMaintain()) {
 	                if (finances.debit(u.getMaintenanceCost(),
-	                        Transaction.C_MAINTAIN, "Maintenance for " + u.getName(),
+	                        Transaction.C_MAINTAIN, "Maintenance for " + u.getHyperlinkedName(),
 	                        calendar.getTime())) {
 	                } else {
 	                    paidMaintenance = false;
@@ -6275,7 +6272,7 @@ public class Campaign implements Serializable {
 			// put it into a hash - 4 points of damage will mean destruction
 			HashMap<Integer, Integer> partsToDamage = new HashMap<Integer, Integer>();
 			for (Part p : u.getParts()) {
-				String partReport = u.getName() + ": " + techName
+				String partReport = u.getHyperlinkedName() + ": " + techName
 						+ " maintaining " + p.getName() + " (Quality "
 						+ p.getQualityName() + ")";
 				if (!p.needsMaintenance()) {
@@ -6429,7 +6426,7 @@ public class Campaign implements Serializable {
 			if(!paidMaintenance) {
 			    paidString = "<font color='red'>Could not afford maintenance costs, so check is at a penalty.</font>";
 			}
-			addReport(techName + " performs maintenance on " + u.getName()
+			addReport(techName + " performs maintenance on " + u.getHyperlinkedName()
 					+ ". " + paidString + qualityString + ". " + damageString);
 		}
 	}

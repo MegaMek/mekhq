@@ -10,6 +10,8 @@ v0.3.3 (SVN)
 + Bug: part quality not saved to campaign xml
 + Bug: Mass assign menus were incorrectly letting you assign people to roles they don't fit
 + Bug [#397]: Mass Assign Units Can Cause Unit To Show Too Many Assigned
++ html tags in report link to unit and personnel views, use unit.getHyperlinkedName(), person.getHyperlinkedName(), and person.getHyperlinkedFullTitle() in report strings
++ changed report to display only one day of activity
 
 v0.3.2 (2013-09-13)
 + maintenance checks (WIP)
