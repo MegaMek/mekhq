@@ -8,6 +8,8 @@ v0.3.3 (SVN)
 + Bug: Inactive Prisoners and Bondsmen included in count on summary
 + Mothballed units only cost 10% to maintain using unofficial maintenance costs
 + Bug: part quality not saved to campaign xml
++ Bug: Mass assign menus were incorrectly letting you assign people to roles they don't fit
++ Bug [#397]: Mass Assign Units Can Cause Unit To Show Too Many Assigned
 
 v0.3.2 (2013-09-13)
 + maintenance checks (WIP)
