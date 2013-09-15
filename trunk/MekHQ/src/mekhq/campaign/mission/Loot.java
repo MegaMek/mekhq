@@ -106,6 +106,10 @@ public class Loot implements MekHqXmlSerializable {
         parts.add(p);
     }
     
+    public void clearParts() {
+        parts = new ArrayList<Part>();
+    }
+    
     public String getShortDescription() {
         String desc = getName() + " - ";
         if(cash > 0) {

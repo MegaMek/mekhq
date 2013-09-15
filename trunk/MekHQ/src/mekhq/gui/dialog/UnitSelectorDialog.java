@@ -122,7 +122,7 @@ public class UnitSelectorDialog extends JDialog {
         asd = new AdvancedSearchDialog(frame);
         initComponents();
         
-        MechSummary [] allMechs = MechSummaryCache.getInstance().getAllMechs();
+        MechSummary[] allMechs = MechSummaryCache.getInstance().getAllMechs();
         setMechs(allMechs);
         setLocationRelativeTo(frame);
     }

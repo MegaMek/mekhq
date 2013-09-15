@@ -22,9 +22,7 @@
 package mekhq.gui.dialog;
 
 import java.awt.Frame;
-import java.awt.List;
 import java.util.ArrayList;
-
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -39,6 +37,7 @@ import javax.swing.SpinnerNumberModel;
 import megamek.common.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Loot;
+import mekhq.campaign.parts.Part;
 
 /**
  *
@@ -50,6 +49,7 @@ public class LootDialog extends javax.swing.JDialog {
     private Loot loot;
     private boolean cancelled;
     private ArrayList<Entity> units;
+    private ArrayList<Part> parts;
     private Campaign campaign;
        
     private JButton btnOK;
@@ -63,6 +63,7 @@ public class LootDialog extends javax.swing.JDialog {
     private JList listUnits;
     private JList listParts;
     private JScrollPane scrUnits;
+    private JScrollPane scrParts;
 
     /** Creates new form NewTeamDialog */
     public LootDialog(java.awt.Frame parent, boolean modal, Loot l, Campaign c) {
@@ -72,8 +73,12 @@ public class LootDialog extends javax.swing.JDialog {
         this.campaign = c;
         cancelled = true;
         units = new ArrayList<Entity>();
+        parts = new ArrayList<Part>();
         for(Entity e : l.getUnits()) {
             units.add(e);
+        }
+        for(Part p : l.getParts()) {
+            parts.add(p);
         }
         initComponents();
         setLocationRelativeTo(parent);
@@ -195,7 +200,7 @@ public class LootDialog extends javax.swing.JDialog {
                 });
         refreshUnitList();
         getContentPane().add(scrUnits, gridBagConstraints);
-        /*
+        
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
@@ -205,6 +210,11 @@ public class LootDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel("Parts"), gridBagConstraints);
         
+        btnAddPart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addPart();
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
@@ -213,6 +223,12 @@ public class LootDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         getContentPane().add(btnAddPart, gridBagConstraints);
         
+        btnRemovePart.setEnabled(false);
+        btnRemovePart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+               removePart();
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 4;
@@ -230,8 +246,17 @@ public class LootDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        getContentPane().add(new JScrollPane(listParts), gridBagConstraints);
-        */
+        scrParts = new JScrollPane(listParts);
+        listParts.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        listParts.getSelectionModel().addListSelectionListener(
+                new javax.swing.event.ListSelectionListener() {
+                    public void valueChanged(
+                            javax.swing.event.ListSelectionEvent evt) {
+                        listPartsValueChanged();
+                    }
+                });
+        refreshPartList();
+        getContentPane().add(scrParts, gridBagConstraints);
         
         btnOK.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -280,14 +305,44 @@ public class LootDialog extends javax.swing.JDialog {
         }
         refreshUnitList();
     }
+    
+    private void removeUnit() {
+        int row = listUnits.getSelectedIndex();
+        if(-1 != row) {
+            units.remove(row);
+        }
+        refreshUnitList();
+    }
+    
+    private void addPart() {
+        PartsStoreDialog psd = new PartsStoreDialog(frame, true, null, campaign, false);
+        psd.setVisible(true);
+        Part p = psd.getPart();
+        if(null != p) {
+            parts.add(p);
+        }
+        refreshPartList();
+    }
+    
+    private void removePart() {
+        int row = listParts.getSelectedIndex();
+        if(-1 != row) {
+            parts.remove(row);
+        }
+        refreshPartList();
+    }
  
     private void done() {
         loot.setName(txtName.getText());
         loot.setCash((int)Math.ceil((Double)spnCash.getModel().getValue()));
         cancelled = false;
         loot.clearUnits();
+        loot.clearParts();
         for(Entity e : units) {
             loot.addUnit(e);
+        }
+        for(Part p : parts) {
+            loot.addPart(p);
         }
         this.setVisible(false);
     }
@@ -312,18 +367,36 @@ public class LootDialog extends javax.swing.JDialog {
             }
         }
     }
+ 
+    private void refreshPartList() {
+        int selectedRow = listParts.getSelectedIndex();
+        DefaultListModel model = (DefaultListModel)listParts.getModel();
+        model.removeAllElements();
+        //listUnits.removeAll();
+        for(Part p : parts) {
+            model.addElement(p.getName());
+            //listParts.add(e.getDisplayName());
+        }
+        scrParts.setViewportView(listParts);
+        if(selectedRow != -1) {
+            if(((DefaultListModel)listParts.getModel()).getSize() > 0) {
+                if(((DefaultListModel)listParts.getModel()).getSize() == selectedRow) {
+                    listParts.setSelectedIndex(selectedRow-1);
+                } else {
+                    listParts.setSelectedIndex(selectedRow);
+                }
+            }
+        }
+    }
     
     private void listUnitsValueChanged() {
         int row = listUnits.getSelectedIndex();
         btnRemoveUnit.setEnabled(row != -1);
     }
     
-    private void removeUnit() {
-        int row = listUnits.getSelectedIndex();
-        if(-1 != row) {
-            units.remove(row);
-        }
-        refreshUnitList();
+    private void listPartsValueChanged() {
+        int row = listParts.getSelectedIndex();
+        btnRemovePart.setEnabled(row != -1);
     }
 
 }
