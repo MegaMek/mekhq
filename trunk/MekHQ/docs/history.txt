@@ -14,6 +14,9 @@ v0.3.3 (SVN)
 + changed report to display only one day of activity
 + news reports (see data/universe/news.xml for details and example)
 + Implemented parts loot (Just a quick hack to make it work, full re-write to be like Units will be for Taharqa if he wants)
++ Bug [#398]: Assigning Tech to Large Craft Maintenance
++ Bug: assigning of techs to Small Craft maintenance and repair confused - should always use Aero tech
++ Bug [#396]: assign tech list oversized without scrolling
 
 v0.3.2 (2013-09-13)
 + maintenance checks (WIP)

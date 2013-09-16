@@ -2692,7 +2692,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     }
     
     public boolean canTakeTech() {
-        return tech == null && requiresMaintenance() && !(entity instanceof Jumpship) && !(entity instanceof SmallCraft);
+        return tech == null && requiresMaintenance() && !isSelfCrewed();
     }
     
     public boolean canTakeMoreGunners() {
@@ -3120,11 +3120,20 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
         if(getEntity() instanceof ConvFighter) {
             return 45;
         }
+        if(getEntity() instanceof SmallCraft) {
+            return 90;
+        }
         if(getEntity() instanceof Aero 
-                && !(getEntity() instanceof SmallCraft)
+                && !(getEntity() instanceof Dropship)
                 && !(getEntity() instanceof Jumpship)) {
             switch(getEntity().getWeightClass()) {
-            
+            case EntityWeightClass.WEIGHT_LIGHT:
+                return 45;
+            case EntityWeightClass.WEIGHT_MEDIUM:
+                return 60;
+            case EntityWeightClass.WEIGHT_HEAVY:
+            default:
+                return  75;
             }
         }
         if(getEntity() instanceof SupportTank) {
@@ -3226,7 +3235,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     }
     
     public boolean isSelfCrewed() {
-        return (getEntity() instanceof SmallCraft || getEntity() instanceof Jumpship);
+        return (getEntity() instanceof Dropship || getEntity() instanceof Jumpship);
     }
 
     

@@ -9757,7 +9757,7 @@ public class CampaignGUI extends JPanel {
                     if(null != u) {
                         String desc = "<html><b>" + u.getName() + "</b><br>";
                         desc += u.getEntity().getWeightClassName();
-                        if(!(u.getEntity() instanceof Dropship || u.getEntity() instanceof Jumpship)) {
+                        if(!(u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship)) {
                             desc += " " + UnitType.getTypeDisplayableName(UnitType.determineUnitTypeCode(u.getEntity()));
                         }
                         desc += "<br>" + u.getStatus() + "</html>";
@@ -12166,7 +12166,7 @@ public class CampaignGUI extends JPanel {
                     if(null != u) {
                         String desc = "<html><b>" + u.getName() + "</b><br>";
                         desc += u.getEntity().getWeightClassName();
-                        if(!(u.getEntity() instanceof Dropship || u.getEntity() instanceof Jumpship)) {
+                        if(!(u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship)) {
                             desc += " " + UnitType.getTypeDisplayableName(UnitType.determineUnitTypeCode(u.getEntity()));
                         }
                         desc += "<br>" + u.getStatus() + "</html>";
@@ -12705,7 +12705,7 @@ public class CampaignGUI extends JPanel {
                         popup.add(menuItem);
                     } 
                 }
-                if(oneSelected && unit.requiresMaintenance() && unit.isAvailable()) {
+                if(oneSelected && unit.requiresMaintenance() && !unit.isSelfCrewed() && unit.isAvailable()) {
                     menu = new JMenu("Assign Tech");
                     for(Person tech : getCampaign().getTechs()) {
                         if(tech.canTech(unit.getEntity()) 
@@ -12727,6 +12727,9 @@ public class CampaignGUI extends JPanel {
                     }
                     if(menu.getItemCount() > 0) {
                         popup.add(menu);
+                        if(menu.getItemCount() > 20) {
+                            MenuScroller.setScrollerFor(menu, 20);
+                        }
                     }
                 }
                 if(oneSelected && unit.getEntity() instanceof Infantry && !(unit.getEntity() instanceof BattleArmor)) {
