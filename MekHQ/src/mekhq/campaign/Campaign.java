@@ -6289,7 +6289,7 @@ public class Campaign implements Serializable {
 			// put it into a hash - 4 points of damage will mean destruction
 			HashMap<Integer, Integer> partsToDamage = new HashMap<Integer, Integer>();
 			for (Part p : u.getParts()) {
-				String partReport = u.getHyperlinkedName() + ": " + techName
+				String partReport = u.getName() + ": " + techName
 						+ " maintaining " + p.getName() + " (Quality "
 						+ p.getQualityName() + ")";
 				if (!p.needsMaintenance()) {

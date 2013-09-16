@@ -41,6 +41,7 @@ import megamek.common.BattleArmor;
 import megamek.common.Compute;
 import megamek.common.ConvFighter;
 import megamek.common.Crew;
+import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.Infantry;
@@ -2114,12 +2115,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	if(null != unit && unit.getEntity() instanceof Tank && hasSkill(SkillType.S_TECH_MECHANIC)) {
     		return getSkill(SkillType.S_TECH_MECHANIC);
     	}
-    	if(null != unit && (unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship)
+    	if(null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)
     			&& hasSkill(SkillType.S_TECH_VESSEL)) {
     		return getSkill(SkillType.S_TECH_VESSEL);
     	}
     	if(null != unit && unit.getEntity() instanceof Aero 
-    			&& !(unit.getEntity() instanceof SmallCraft) 
+    			&& !(unit.getEntity() instanceof Dropship) 
     			&& !(unit.getEntity() instanceof Jumpship) 
     			&& hasSkill(SkillType.S_TECH_AERO)) {
     		return getSkill(SkillType.S_TECH_AERO);
@@ -2239,7 +2240,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	if(unit.getEntity() instanceof Tank) {
     		return hasSkill(SkillType.S_TECH_MECHANIC);
     	}
-    	if(unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
+    	if(unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship) {
     		return hasSkill(SkillType.S_TECH_VESSEL);
     	}
     	if(unit.getEntity() instanceof Aero) {
