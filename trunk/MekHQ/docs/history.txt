@@ -20,6 +20,7 @@ v0.3.3 (SVN)
 + RFE: Personnel Market - This market should be used in place of Hire and Hire in Bulk
   options and provides a more realistic atmosphere of transient personnel availability
 + Bug: Personnel Market shows rank instead of Person for Graphic, and vice versa for General
++ Bug: Personnel Market incorrect renderer
 
 v0.3.2 (2013-09-13)
 + maintenance checks (WIP)

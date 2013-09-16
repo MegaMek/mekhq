@@ -5839,7 +5839,7 @@ public class CampaignGUI extends JPanel {
         return getApplication().getPortraits();
     }
 
-    protected DirectoryItems getCamos() {
+    public DirectoryItems getCamos() {
         return getApplication().getCamos();
     }
 
@@ -5847,7 +5847,7 @@ public class CampaignGUI extends JPanel {
         return getApplication().getForceIcons();
     }
 
-    protected MechTileset getMechTiles() {
+    public MechTileset getMechTiles() {
         return getApplication().getMechTiles();
     }
 

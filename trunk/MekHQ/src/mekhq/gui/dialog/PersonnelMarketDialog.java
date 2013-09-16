@@ -21,6 +21,7 @@ import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SortOrder;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -200,7 +201,7 @@ public class PersonnelMarketDialog extends JDialog {
         }
         tablePersonnel.setIntercellSpacing(new Dimension(0, 0));
         tablePersonnel.setShowGrid(false);
-        column.setCellRenderer(personnelModel.getRenderer());
+        column.setCellRenderer(getRenderer());
         scrollTablePersonnel.setViewportView(tablePersonnel);
         
         scrollPersonnelView.setMinimumSize(new java.awt.Dimension(500, 600));
@@ -333,7 +334,7 @@ public class PersonnelMarketDialog extends JDialog {
         TableColumn column = null;
         for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
             column = columnModel.getColumnByModelIndex(i);
-            column.setCellRenderer(personnelModel.getRenderer());
+            column.setCellRenderer(getRenderer());
             if(i == PersonnelTableModel.COL_RANK) {
                 if(view == CampaignGUI.PV_GRAPHIC) {
                     column.setPreferredWidth(125);
@@ -707,6 +708,13 @@ public class PersonnelMarketDialog extends JDialog {
         filterPersonnel();
         changePersonnelView();
         super.setVisible(visible);
+    }
+	
+	public TableCellRenderer getRenderer() {
+        if(choicePersonView.getSelectedIndex() == CampaignGUI.PV_GRAPHIC) {
+            return personnelModel.new VisualRenderer(hqView.getCamos(), portraits, hqView.getMechTiles());
+        }
+        return personnelModel.new Renderer();
     }
 
     public static String getPersonnelGroupName(int group) {
