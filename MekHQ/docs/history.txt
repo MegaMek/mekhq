@@ -23,6 +23,8 @@ v0.3.3 (SVN)
 + Bug: Personnel Market incorrect renderer
 + last maintenance report now kept for each unit, no more logging
 + Bug [#400]: personnel ages in the personnel market
++ refactored BasicInfo and Sorter classes from CampaignGUI into separate files
++ used separate PersonnelTableModel for PersonnelMarketDialog.java
 
 v0.3.2 (2013-09-13)
 + maintenance checks (WIP)

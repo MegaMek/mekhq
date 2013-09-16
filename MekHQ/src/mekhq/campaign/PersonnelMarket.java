@@ -34,8 +34,6 @@ import mekhq.MekHQ;
 import mekhq.Version;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.team.SupportTeam;
-import mekhq.campaign.team.TechTeam;
 
 public class PersonnelMarket {
 	private ArrayList<Person> personnel = new ArrayList<Person>();

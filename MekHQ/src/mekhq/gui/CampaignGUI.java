@@ -260,6 +260,14 @@ import mekhq.gui.dialog.ReportDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.dialog.UnitSelectorDialog;
+import mekhq.gui.sorter.BonusSorter;
+import mekhq.gui.sorter.FormattedNumberSorter;
+import mekhq.gui.sorter.LevelSorter;
+import mekhq.gui.sorter.RankSorter;
+import mekhq.gui.sorter.TargetSorter;
+import mekhq.gui.sorter.UnitStatusSorter;
+import mekhq.gui.sorter.UnitTypeSorter;
+import mekhq.gui.sorter.WeightClassSorter;
 import mekhq.gui.view.ContractViewPanel;
 import mekhq.gui.view.ForceViewPanel;
 import mekhq.gui.view.JumpPathViewPanel;
@@ -1237,7 +1245,7 @@ public class CampaignGUI extends JPanel {
         personnelTable.setColumnModel(personColumnModel);
         personnelTable.createDefaultColumnsFromModel();
         personnelSorter = new TableRowSorter<PersonnelTableModel>(personModel);
-        personnelSorter.setComparator(PersonnelTableModel.COL_RANK, new RankSorter());
+        personnelSorter.setComparator(PersonnelTableModel.COL_RANK, new RankSorter(getCampaign()));
         personnelSorter.setComparator(PersonnelTableModel.COL_SKILL, new LevelSorter());
         personnelSorter.setComparator(PersonnelTableModel.COL_TACTICS, new BonusSorter());
         personnelSorter.setComparator(PersonnelTableModel.COL_TOUGH, new BonusSorter());
@@ -5887,45 +5895,6 @@ public class CampaignGUI extends JPanel {
     /**
      * A table model for displaying work items
      */
-    public abstract class ArrayTableModel extends AbstractTableModel {
-        private static final long serialVersionUID = 9081706049165214129L;
-        protected String[] columnNames;
-        protected ArrayList<?> data;
-
-        public int getRowCount() {
-            return data.size();
-        }
-
-        public int getColumnCount() {
-            return 1;
-        }
-
-        @Override
-        public String getColumnName(int column) {
-            return columnNames[column];
-        }
-
-        @Override
-        public Class<? extends Object> getColumnClass(int c) {
-            return getValueAt(0, c).getClass();
-        }
-
-        @Override
-        public boolean isCellEditable(int row, int col) {
-            return false;
-        }
-
-        // fill table with values
-        public void setData(ArrayList<?> array) {
-            data = array;
-            fireTableDataChanged();
-        }
-
-    }
-
-    /**
-     * A table model for displaying work items
-     */
     public class TaskTableModel extends ArrayTableModel {
         private static final long serialVersionUID = -6256038046416893994L;
 
@@ -5952,14 +5921,14 @@ public class CampaignGUI extends JPanel {
         }
 
         public TaskTableModel.Renderer getRenderer() {
-            return new TaskTableModel.Renderer(getCamos(), getPortraits(), getMechTiles());
+            return new TaskTableModel.Renderer(getCamos(), getPortraits(), getForceIcons(), getMechTiles());
         }
 
         public class Renderer extends BasicInfo implements TableCellRenderer {
 
-            public Renderer(DirectoryItems camos, DirectoryItems portraits,
+            public Renderer(DirectoryItems camos, DirectoryItems portraits, DirectoryItems force, 
                     MechTileset mt) {
-                super(camos, portraits, mt);
+                super(camos, portraits, force, mt);
             }
 
             private static final long serialVersionUID = -3052618135259621130L;
@@ -5973,14 +5942,12 @@ public class CampaignGUI extends JPanel {
                 Image imgTool = getToolkit().getImage("data/images/misc/tools.png"); //$NON-NLS-1$
                 this.setImage(imgTool);
                 setOpaque(true);
-                setText("<html>" + getValueAt(actualRow, actualCol).toString() + "</html>");
-                //setToolTipText(task.getToolTip());
+                setText("<html>" + getValueAt(actualRow, actualCol).toString() + "</html>", "black");
                 if (isSelected) {
-                    select();
+                    highlightBorder();
                 } else {
-                    unselect();
+                    unhighlightBorder();
                 }
-
                 return c;
             }
 
@@ -6138,41 +6105,7 @@ public class CampaignGUI extends JPanel {
                     menuItem.setEnabled(!part.isBeingWorkedOn());
                     popup.add(menuItem);
                 }
-                // Remove assigned team for scheduled tasks
-                /*
-                menuItem = new JMenuItem("Remove Assigned Team");
-                menuItem.setActionCommand("UNASSIGN");
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(task.isAssigned());
-                popup.add(menuItem);
-                */
-                /*
-                if (task instanceof ReloadItem) {
-                    ReloadItem reload = (ReloadItem) task;
-                    Entity en = reload.getUnit().getEntity();
-                    Mounted m = reload.getMounted();
-                    // Swap ammo
-                    menu = new JMenu("Swap Ammo");
-                    int i = 0;
-                    AmmoType curType = (AmmoType) m.getType();
-                    for (AmmoType atype : Utilities
-                            .getMunitionsFor(en, curType)) {
-                        cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
-                        if (atype.equals(curType)) {
-                            cbMenuItem.setSelected(true);
-                        } else {
-                            cbMenuItem.setActionCommand("SWAP_AMMO:" + i);
-                            cbMenuItem.addActionListener(this);
-                        }
-                        menu.add(cbMenuItem);
-                        i++;
-                    }
-                    if(menu.getItemCount() > 20) {
-                        MenuScroller.setScrollerFor(menu, 20);
-                    }
-                    popup.add(menu);
-                }
-                */
+               
                 menu = new JMenu("GM Mode");
                 popup.add(menu);
                 // Auto complete task
@@ -6210,13 +6143,13 @@ public class CampaignGUI extends JPanel {
         }
 
         public AcquisitionTableModel.Renderer getRenderer() {
-            return new AcquisitionTableModel.Renderer(getCamos(), getPortraits(), getMechTiles());
+            return new AcquisitionTableModel.Renderer(getCamos(), getPortraits(), getForceIcons(), getMechTiles());
         }
 
         public class Renderer extends BasicInfo implements TableCellRenderer {
-            public Renderer(DirectoryItems camos, DirectoryItems portraits,
+            public Renderer(DirectoryItems camos, DirectoryItems portraits, DirectoryItems force, 
                     MechTileset mt) {
-                super(camos, portraits, mt);
+                super(camos, portraits, force, mt);
             }
 
             private static final long serialVersionUID = -3052618135259621130L;
@@ -6229,14 +6162,13 @@ public class CampaignGUI extends JPanel {
                 Image imgTool = getToolkit().getImage("data/images/misc/tools.png"); //$NON-NLS-1$
                 this.setImage(imgTool);
                 setOpaque(true);
-                setText(getValueAt(row, column).toString());
-                //setToolTipText(task.getToolTip());
+                setText(getValueAt(row, column).toString(), "black");
                 if (isSelected) {
-                    select();
+                    highlightBorder();
                 } else {
-                    unselect();
+                    unhighlightBorder();
                 }
-
+                
                 c.setBackground(new Color(220, 220, 220));
                 return c;
             }
@@ -6773,13 +6705,13 @@ public class CampaignGUI extends JPanel {
         }
 
         public TechTableModel.Renderer getRenderer() {
-            return new TechTableModel.Renderer(getCamos(), getPortraits(), getMechTiles());
+            return new TechTableModel.Renderer(getCamos(), getPortraits(), getForceIcons(), getMechTiles());
         }
 
         public class Renderer extends BasicInfo implements TableCellRenderer {
-            public Renderer(DirectoryItems camos, DirectoryItems portraits,
+            public Renderer(DirectoryItems camos, DirectoryItems portraits, DirectoryItems force, 
                     MechTileset mt) {
-                super(camos, portraits, mt);
+                super(camos, portraits, force, mt);
             }
 
             private static final long serialVersionUID = -4951696376098422679L;
@@ -6791,12 +6723,11 @@ public class CampaignGUI extends JPanel {
                 int actualRow = table.convertRowIndexToModel(row);
                 setOpaque(true);
                 setPortrait(getTechAt(actualRow));
-                setText(getTechAt(actualRow).getTechDesc(getCampaign().isOvertimeAllowed()));
-                // setToolTipText(getCampaign().getToolTipFor(u));
+                setText(getTechAt(actualRow).getTechDesc(getCampaign().isOvertimeAllowed()), "black");
                 if (isSelected) {
-                    select();
+                    highlightBorder();
                 } else {
-                    unselect();
+                    unhighlightBorder();
                 }
                 c.setBackground(new Color(220, 220, 220));
                 return c;
@@ -6834,13 +6765,13 @@ public class CampaignGUI extends JPanel {
             return patients.size();
         }
         public PatientTableModel.Renderer getRenderer() {
-            return new PatientTableModel.Renderer(getCamos(), getPortraits(), getMechTiles());
+            return new PatientTableModel.Renderer(getCamos(), getPortraits(), getForceIcons(), getMechTiles());
         }
 
         public class Renderer extends BasicInfo implements ListCellRenderer {
-            public Renderer(DirectoryItems camos, DirectoryItems portraits,
+            public Renderer(DirectoryItems camos, DirectoryItems portraits, DirectoryItems force, 
                     MechTileset mt) {
-                super(camos, portraits, mt);
+                super(camos, portraits, force, mt);
             }
 
             private static final long serialVersionUID = -406535109900807837L;
@@ -6855,26 +6786,16 @@ public class CampaignGUI extends JPanel {
                 setOpaque(true);
                 Person p = (Person)getElementAt(index);
                 if (getCampaign().getCampaignOptions().useAdvancedMedical()) {
-                	setText(p.getInjuriesDesc());
+                	setText(p.getInjuriesDesc(), "black");
                 } else {
-                	setText(p.getPatientDesc());
+                	setText(p.getPatientDesc(), "black");
+                }
+                if (isSelected) {
+                    highlightBorder();
+                } else {
+                    unhighlightBorder();
                 }
                 setPortrait(p);
-
-                if (isSelected) {
-                    select();
-                } else {
-                    unselect();
-                }
-/*
-                if ((null != p) && p.isDeployed(getCampaign())) {
-                    c.setBackground(Color.GRAY);
-                } else if ((null != p) && p.needsFixing()) {
-                    c.setBackground(new Color(205, 92, 92));
-                } else {
-                    c.setBackground(new Color(220, 220, 220));
-                }
-*/
                 return c;
             }
         }
@@ -9724,7 +9645,7 @@ public class CampaignGUI extends JPanel {
 
         public TableCellRenderer getRenderer() {
             if(choicePersonView.getSelectedIndex() == PV_GRAPHIC) {
-                return new PersonnelTableModel.VisualRenderer(getCamos(), getPortraits(), getMechTiles());
+                return new PersonnelTableModel.VisualRenderer(getCamos(), getPortraits(), getForceIcons(), getMechTiles());
             }
             return new PersonnelTableModel.Renderer();
         }
@@ -9763,13 +9684,13 @@ public class CampaignGUI extends JPanel {
 
         }
         
-        public class VisualRenderer extends MekInfo implements TableCellRenderer {
+        public class VisualRenderer extends BasicInfo implements TableCellRenderer {
 
             private static final long serialVersionUID = -9154596036677641620L;
 
-            public VisualRenderer(DirectoryItems camos, DirectoryItems portraits,
+            public VisualRenderer(DirectoryItems camos, DirectoryItems portraits, DirectoryItems force, 
                     MechTileset mt) {
-                super(camos, portraits, mt);
+                super(camos, portraits, force, mt);
             }
             
             public Component getTableCellRendererComponent(JTable table,
@@ -9778,11 +9699,15 @@ public class CampaignGUI extends JPanel {
                 Component c = this;
                 int actualCol = table.convertColumnIndexToModel(column);
                 int actualRow = table.convertRowIndexToModel(row);
-                setText(getValueAt(actualRow, actualCol).toString(), isSelected);
+                setText(getValueAt(actualRow, actualCol).toString(), "black");
                 Person p = getPerson(actualRow);
+                String color = "black";
+                if(isSelected) {
+                    color = "white";
+                }
                 if (actualCol == COL_RANK) {
                     setPortrait(p);
-                    setText(p.getFullDesc(), isSelected);
+                    setText(p.getFullDesc(), color);
                 }
                 if(actualCol == COL_ASSIGN) {
                     Unit u = getCampaign().getUnit(p.getUnitId());
@@ -9796,7 +9721,7 @@ public class CampaignGUI extends JPanel {
                             desc += " " + UnitType.getTypeDisplayableName(UnitType.determineUnitTypeCode(u.getEntity()));
                         }
                         desc += "<br>" + u.getStatus() + "</html>";
-                        setText(desc, isSelected);
+                        setText(desc, color);
                         Image mekImage = getImageFor(u);
                         if(null != mekImage) {
                             setImage(mekImage);
@@ -9820,7 +9745,7 @@ public class CampaignGUI extends JPanel {
                             parent = parent.getParentForce();
                         }
                         desc += "</html>";
-                        setText(desc, isSelected);
+                        setText(desc, color);
                         Image forceImage = getImageFor(force);
                         if(null != forceImage) {
                             setImage(forceImage);
@@ -9835,10 +9760,10 @@ public class CampaignGUI extends JPanel {
                     Image hitImage = getHitsImage(p.getHits());
                     if(null != hitImage) {
                         setImage(hitImage);
-                        setText("", isSelected);
+                        setText("", color);
                     } else {
                         clearImage();
-                        setText("", isSelected);
+                        setText("", color);
                     }
                 }
                 
@@ -9876,441 +9801,6 @@ public class CampaignGUI extends JPanel {
         }
     }
     
-    public class MekInfo extends JPanel {
-
-        /**
-         *
-         */
-        private static final long serialVersionUID = -7337823041775639463L;
-
-        private JLabel lblImage;
-        private JLabel lblLoad;
-        DirectoryItems camos;
-        DirectoryItems portraits;
-        MechTileset mt;
-
-        public MekInfo(DirectoryItems camos, DirectoryItems portraits, MechTileset mt) {
-            this.camos = camos;
-            this.portraits = portraits;
-            this.mt = mt;
-            lblImage = new JLabel();
-            lblLoad = new JLabel();
-
-            GridBagLayout gridbag = new GridBagLayout();
-            GridBagConstraints c = new GridBagConstraints();
-            setLayout(gridbag);
-
-            c.fill = GridBagConstraints.NONE;
-            c.insets = new Insets(1, 1, 1, 1);
-            c.gridx = 0;
-            c.gridy = 0;
-            c.weightx = 0.0;
-            c.weighty = 0.0;
-            c.gridwidth = 1;
-            c.gridheight = 1;
-            c.anchor = GridBagConstraints.CENTER;
-            gridbag.setConstraints(lblLoad, c);
-            add(lblLoad);
-
-            c.fill = GridBagConstraints.BOTH;
-            c.insets = new Insets(1, 1, 1, 1);
-            c.gridx = 1;
-            c.gridy = 0;
-            c.weightx = 1.0;
-            c.weighty = 1.0;
-            c.gridwidth = 1;
-            c.gridheight = 1;
-            c.anchor = GridBagConstraints.NORTHWEST;
-            gridbag.setConstraints(lblImage, c);
-            add(lblImage);
-
-            lblImage.setBorder(BorderFactory.createEmptyBorder());
-        }
-
-        public void setText(String s, boolean isSelected) {
-            String color = "black";
-            if (isSelected) {
-                color = "white";
-            }
-            lblImage.setText("<html><font size='2' color='" + color + "'>" + s
-                    + "</font></html>");
-        }
-
-        public void clearImage() {
-            lblImage.setIcon(null);
-        }
-
-        public void setImage(Image img) {
-            lblImage.setIcon(new ImageIcon(img));
-        }
-
-        public JLabel getLabel() {
-            return lblImage;
-        }
-
-        public void setLoad(boolean load) {
-            // if this is a loaded unit then do something with lblLoad to make
-            // it show up
-            // otherwise clear lblLoad
-            if (load) {
-                lblLoad.setText(" +");
-            } else {
-                lblLoad.setText("");
-            }
-        }
-        
-        protected Image getImageFor(Unit u) {
-            
-            if(null == mt) { 
-                return null;
-            }
-            Image base = mt.imageFor(u.getEntity(), this, -1);
-            int tint = PlayerColors.getColorRGB(u.campaign.getColorIndex());
-            EntityImage entityImage = new EntityImage(base, tint, getCamo(u), this);
-            return entityImage.loadPreviewImage();
-        }
-        
-        protected Image getCamo(Unit unit) {
-            // Try to get the player's camo file.
-            Image camo = null;
-            try {
-                camo = (Image) camos.getItem(unit.getCamoCategory(), unit.getCamoFileName());
-            } catch (Exception err) {
-                err.printStackTrace();
-            }
-            return camo;
-        }
-        
-        protected void setPortrait(Person p) {
-
-            String category = p.getPortraitCategory();
-            String file = p.getPortraitFileName();
-
-            // Return a null if the player has selected no portrait file.
-            if ((null == category) || (null == file)) {
-                return;
-            }
-
-            if (Crew.ROOT_PORTRAIT.equals(category)) {
-                category = "";
-            }
-
-            if (Crew.PORTRAIT_NONE.equals(file)) {
-                file = "default.gif";
-            }
-
-            // Try to get the player's portrait file.
-            Image portrait = null;
-            try {
-                portrait = (Image) portraits.getItem(category, file);
-                if (null == portrait) {
-                    // the image could not be found so switch to default one
-                    p.setPortraitCategory(Crew.ROOT_PORTRAIT);
-                    category = "";
-                    p.setPortraitFileName(Crew.PORTRAIT_NONE);
-                    file = "default.gif";
-                    portrait = (Image) portraits.getItem(category, file);
-                }
-                // make sure no images are longer than 72 pixels
-                if (null != portrait) {
-                    portrait = portrait.getScaledInstance(-1, 58,
-                            Image.SCALE_SMOOTH);
-                    setImage(portrait);
-                }
-            } catch (Exception err) {
-                err.printStackTrace();
-            }
-        }
-        
-        protected Image getImageFor(Force force) {
-            String category = force.getIconCategory();
-            String file = force.getIconFileName();
-
-            if(Crew.ROOT_PORTRAIT.equals(category)) {
-             category = "";
-            }
-
-            // Return a null if the player has selected no portrait file.
-            if ((null == category) || (null == file) || Crew.PORTRAIT_NONE.equals(file)) {
-             file = "empty.png";
-            }
-
-            // Try to get the player's portrait file.
-            Image portrait = null;
-            try {
-             portrait = (Image) getForceIcons().getItem(category, file);
-            if(null != portrait) {
-                portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
-            } else {
-                portrait = (Image) getForceIcons().getItem("", "empty.png");
-                if(null != portrait) {
-                    portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
-                }
-            }
-            return portrait;
-            } catch (Exception err) {
-                err.printStackTrace();
-                return null;
-            }
-       }
-    }
-
-    /**
-     * A comparator for ranks written as strings with "-" sorted to the bottom always
-     * @author Jay Lawson
-     *
-     */
-    public class RankSorter implements Comparator<String> {
-
-        @Override
-        public int compare(String s0, String s1) {
-            if(s0.equals("-") && s1.equals("-")) {
-                return 0;
-            } else if(s0.equals("-")) {
-                return 1;
-            } else if(s1.equals("-")) {
-                return -1;
-            } else {
-                //get the numbers associated with each rank string
-                int r0 = getCampaign().getRanks().getRankOrder(s0);
-                int r1 = getCampaign().getRanks().getRankOrder(s1);
-                return ((Comparable<Integer>)r0).compareTo(r1);
-            }
-        }
-    }
-
-    /**
-     * A comparator for skills written as strings with "-" sorted to the bottom always
-     * @author Jay Lawson
-     *
-     */
-    public class SkillSorter implements Comparator<String> {
-
-        @Override
-        public int compare(String s0, String s1) {
-            if(s0.equals("-") && s1.equals("-")) {
-                return 0;
-            } else if(s0.equals("-")) {
-                return 1;
-            } else if(s1.equals("-")) {
-                return -1;
-            } else {
-                return ((Comparable<String>)s0).compareTo(s1);
-            }
-        }
-    }
-
-    /**
-     * A comparator that sorts techs by skill level
-     * @author Jay Lawson
-     *
-     */
-    public class TechSorter implements Comparator<Person> {
-
-        @Override
-        public int compare(Person p0, Person p1) {
-            return ((Comparable<Integer>)p0.getBestTechLevel()).compareTo(p1.getBestTechLevel());
-        }
-    }
-
-    /**
-     * A comparator for bonuses written as strings with "-" sorted to the bottom always
-     * @author Jay Lawson
-     *
-     */
-    public class BonusSorter implements Comparator<String> {
-
-        @Override
-        public int compare(String s0, String s1) {
-            if(s0.equals("-") && s1.equals("-")) {
-                return 0;
-            } else if(s0.equals("-")) {
-                return 1;
-            } else if(s1.equals("-")) {
-                return -1;
-            } else {
-                return ((Comparable<String>)s1).compareTo(s0);
-            }
-        }
-    }
-
-    /**
-     * A comparator for skills levels (e.g. Regular, Veteran, etc)
-     *   * @author Jay Lawson
-     *
-     */
-    public class LevelSorter implements Comparator<String> {
-
-        @Override
-        public int compare(String s0, String s1) {
-            if(s0.equals("-") && s1.equals("-")) {
-                return 0;
-            } else if(s0.equals("-")) {
-                return -1;
-            } else if(s1.equals("-")) {
-                return 1;
-            } else {
-                //probably easiest to turn into numbers and then sort that way
-                int l0 = 0;
-                int l1 = 0;
-                if(s0.contains("Green")) {
-                    l0 = 1;
-                }
-                if(s1.contains("Green")) {
-                    l1 = 1;
-                }
-                if(s0.contains("Regular")) {
-                    l0 = 2;
-                }
-                if(s1.contains("Regular")) {
-                    l1 = 2;
-                }
-                if(s0.contains("Veteran")) {
-                    l0 = 3;
-                }
-                if(s1.contains("Veteran")) {
-                    l1 = 3;
-                }
-                if(s0.contains("Elite")) {
-                    l0 = 4;
-                }
-                if(s1.contains("Elite")) {
-                    l1 = 4;
-                }
-                return ((Comparable<Integer>)l0).compareTo(l1);
-            }
-        }
-    }
-
-    /**
-     * A comparator for unit status strings
-     * @author Jay Lawson
-     *
-     */
-    public class UnitStatusSorter implements Comparator<String> {
-
-        @Override
-        public int compare(String s0, String s1) {
-            //probably easiest to turn into numbers and then sort that way
-            int l0 = 0;
-            int l1 = 0;
-            if(s0.contains("Salvage")) {
-                l0 = 1;
-            }
-            if(s1.contains("Salvage")) {
-                l1 = 1;
-            }
-            if(s0.contains("Inoperable")) {
-                l0 = 2;
-            }
-            if(s1.contains("Inoperable")) {
-                l1 = 2;
-            }
-            if(s0.contains("Crippled")) {
-                l0 = 3;
-            }
-            if(s1.contains("Crippled")) {
-                l1 = 3;
-            }
-            if(s0.contains("Heavy")) {
-                l0 = 4;
-            }
-            if(s1.contains("Heavy")) {
-                l1 = 4;
-            }
-            if(s0.contains("Light")) {
-                l0 = 5;
-            }
-            if(s1.contains("Light")) {
-                l1 = 5;
-            }
-            if(s0.contains("Undamaged")) {
-                l0 = 6;
-            }
-            if(s1.contains("Undamaged")) {
-                l1 = 6;
-            }
-            return ((Comparable<Integer>)l0).compareTo(l1);
-        }
-    }
-
-    /**
-     * A comparator for unit weight classes
-     * @author Jay Lawson
-     *
-     */
-    public class WeightClassSorter implements Comparator<String> {
-
-        @Override
-        public int compare(String s0, String s1) {
-            //lets find the weight class integer for each name
-            int l0 = 0;
-            int l1 = 0;
-            for(int i = 0; i < EntityWeightClass.SIZE; i++) {
-                if(EntityWeightClass.getClassName(i).equals(s0)) {
-                    l0 = i;
-                }
-                if(EntityWeightClass.getClassName(i).equals(s1)) {
-                    l1 = i;
-                }
-            }
-            return ((Comparable<Integer>)l0).compareTo(l1);
-        }
-    }
-
-    /**
-     * A comparator for unit types
-     * @author Jay Lawson
-     *
-     */
-    public class UnitTypeSorter implements Comparator<String> {
-
-        @Override
-        public int compare(String s0, String s1) {
-            //lets find the weight class integer for each name
-            int l0 = 0;
-            int l1 = 0;
-            for(int i = 0; i <= UnitType.SPACE_STATION; i++) {
-                if(UnitType.getTypeDisplayableName(i).equals(s0)) {
-                    l0 = i;
-                }
-                if(UnitType.getTypeDisplayableName(i).equals(s1)) {
-                    l1 = i;
-                }
-            }
-            return ((Comparable<Integer>)l1).compareTo(l0);
-        }
-    }
-
-    /**
-     * A comparator for numbers that have been formatted with DecimalFormat
-     * @author Jay Lawson
-     *
-     */
-    public class FormattedNumberSorter implements Comparator<String> {
-
-        @Override
-        public int compare(String s0, String s1) {
-            //lets find the weight class integer for each name
-            DecimalFormat format = new DecimalFormat();
-            int l0 = 0;
-            try {
-                l0 = format.parse(s0).intValue();
-            } catch (java.text.ParseException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            int l1 = 0;
-            try {
-                l1 = format.parse(s1).intValue();
-            } catch (java.text.ParseException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            return ((Comparable<Integer>)l0).compareTo(l1);
-        }
-    }
-
     /**
      * A table model for displaying doctors
      */
@@ -10331,13 +9821,13 @@ public class CampaignGUI extends JPanel {
         }
 
         public DocTableModel.Renderer getRenderer() {
-            return new DocTableModel.Renderer(getCamos(), getPortraits(), getMechTiles());
+            return new DocTableModel.Renderer(getCamos(), getPortraits(), getForceIcons(), getMechTiles());
         }
 
         public class Renderer extends BasicInfo implements TableCellRenderer {
-            public Renderer(DirectoryItems camos, DirectoryItems portraits,
+            public Renderer(DirectoryItems camos, DirectoryItems portraits, DirectoryItems force, 
                     MechTileset mt) {
-                super(camos, portraits, mt);
+                super(camos, portraits, force, mt);
             }
 
             private static final long serialVersionUID = -818080358678474607L;
@@ -10348,12 +9838,12 @@ public class CampaignGUI extends JPanel {
                 Component c = this;
                 setOpaque(true);
                 setPortrait(getDoctorAt(row));
-                setText(getValueAt(row, column).toString());
+                setText(getValueAt(row, column).toString(), "black");
                 //setToolTipText(getCampaign().getTargetFor(getDoctorAt(row), getDoctorAt(row)).getDesc());
                 if (isSelected) {
-                    select();
+                    highlightBorder();
                 } else {
-                    unselect();
+                    unhighlightBorder();
                 }
                 c.setBackground(new Color(220, 220, 220));
                 return c;
@@ -11167,45 +10657,7 @@ public class CampaignGUI extends JPanel {
         }
     }
     
-    /**
-     * A comparator for target numbers written as strings
-     * @author Jay Lawson
-     *
-     */
-    public class TargetSorter implements Comparator<String> {
-
-        @Override
-        public int compare(String s0, String s1) {
-            s0 = s0.replaceAll("\\+", "");
-            s1 = s1.replaceAll("\\+", "");
-            int r0 = 0;
-            int r1 = 0;
-            if(s0.equals("Impossible")) {
-                r0 = Integer.MAX_VALUE;
-            }
-            else if(s0.equals("Automatic Failure")) {
-                r0 = Integer.MAX_VALUE-1;
-            }
-            else if(s0.equals("Automatic Success")) {
-                r0 = Integer.MIN_VALUE;
-            } else {
-                r0 = Integer.parseInt(s0);
-            }   
-            if(s1.equals("Impossible")) {
-                r1 = Integer.MAX_VALUE;
-            }
-            else if(s1.equals("Automatic Failure")) {
-                r1 = Integer.MAX_VALUE-1;
-            }
-            else if(s1.equals("Automatic Success")) {
-                r1 = Integer.MIN_VALUE;
-            } else {
-                r1 = Integer.parseInt(s1);
-            }   
-            return ((Comparable<Integer>)r0).compareTo(r1);
-
-        }
-    }
+    
 
     /**
      * A table model for displaying scenarios
@@ -12098,7 +11550,7 @@ public class CampaignGUI extends JPanel {
 
         public TableCellRenderer getRenderer() {
             if(choiceUnitView.getSelectedIndex() == UV_GRAPHIC) {
-                return new UnitTableModel.VisualRenderer(getCamos(), getPortraits(), getMechTiles());
+                return new UnitTableModel.VisualRenderer(getCamos(), getPortraits(), getForceIcons(), getMechTiles());
             }
             return new UnitTableModel.Renderer();
         }
@@ -12162,13 +11614,13 @@ public class CampaignGUI extends JPanel {
 
         }
         
-        public class VisualRenderer extends MekInfo implements TableCellRenderer {
+        public class VisualRenderer extends BasicInfo implements TableCellRenderer {
 
             private static final long serialVersionUID = -9154596036677641620L;
 
-            public VisualRenderer(DirectoryItems camos, DirectoryItems portraits,
+            public VisualRenderer(DirectoryItems camos, DirectoryItems portraits, DirectoryItems force, 
                     MechTileset mt) {
-                super(camos, portraits, mt);
+                super(camos, portraits, force, mt);
             }
             
             public Component getTableCellRendererComponent(JTable table,
@@ -12177,13 +11629,17 @@ public class CampaignGUI extends JPanel {
                 Component c = this;
                 int actualCol = table.convertColumnIndexToModel(column);
                 int actualRow = table.convertRowIndexToModel(row);
-                setText(getValueAt(actualRow, actualCol).toString(), isSelected);
+                String color = "black";
+                if(isSelected) {
+                    color = "white";
+                }
+                setText(getValueAt(actualRow, actualCol).toString(), color);
                 Unit u = getUnit(actualRow);
                 if (actualCol == COL_PILOT) {
                     Person p = u.getCommander();
                     if(null != p) {
                         setPortrait(p);
-                        setText(p.getFullDesc(), isSelected);
+                        setText(p.getFullDesc(), color);
                     } else {
                         clearImage();
                     }
@@ -12192,7 +11648,7 @@ public class CampaignGUI extends JPanel {
                     Person p = u.getTech();
                     if(null != p) {
                         setPortrait(p);
-                        setText(p.getFullDesc(), isSelected);
+                        setText(p.getFullDesc(), color);
                     } else {
                         clearImage();
                     }
@@ -12205,7 +11661,7 @@ public class CampaignGUI extends JPanel {
                             desc += " " + UnitType.getTypeDisplayableName(UnitType.determineUnitTypeCode(u.getEntity()));
                         }
                         desc += "<br>" + u.getStatus() + "</html>";
-                        setText(desc, isSelected);
+                        setText(desc, color);
                         Image mekImage = getImageFor(u);
                         if(null != mekImage) {
                             setImage(mekImage);
@@ -12893,125 +12349,7 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    public class BasicInfo extends javax.swing.JPanel {
-        private static final long serialVersionUID = -2890605770494694319L;
-        DirectoryItems camos;
-        DirectoryItems portraits;
-        MechTileset mt;
-
-        public BasicInfo(DirectoryItems camos, DirectoryItems portraits, MechTileset mt) {
-            this.camos = camos;
-            this.portraits = portraits;
-            this.mt = mt;
-            initComponents();
-        }
-
-        private void initComponents() {
-            lblImage = new javax.swing.JLabel();
-            setName("Form"); // NOI18N
-            setLayout(new java.awt.GridLayout(1, 0));
-            lblImage.setText(""); // NOI18N
-            lblImage.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-            lblImage.setName("lblImage"); // NOI18N
-            add(lblImage);
-        }// </editor-fold>//GEN-END:initComponents
-
-        public void setText(String text) {
-            lblImage.setText(text);
-        }
-
-        public void setImage(Image img) {
-            lblImage.setIcon(new ImageIcon(img));
-        }
-
-        public void select() {
-            lblImage.setBorder(new javax.swing.border.LineBorder(Color.BLACK, 5, true));
-        }
-
-        public void unselect() {
-            lblImage.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        }
-
-        /**
-         * sets the image as a portrait for the given person.
-         */
-        public void setPortrait(Person person) {
-
-            String category = person.getPortraitCategory();
-            String file = person.getPortraitFileName();
-
-            if(Crew.ROOT_PORTRAIT.equals(category)) {
-                category = "";
-            }
-
-            // Return a null if the player has selected no portrait file.
-            if ((null == category) || (null == file) || Crew.PORTRAIT_NONE.equals(file)) {
-                file = "default.gif";
-            }
-
-            // Try to get the player's portrait file.
-            Image portrait = null;
-            try {
-                portrait = (Image) portraits.getItem(category, file);
-                if(null != portrait) {
-                    portrait = portrait.getScaledInstance(60, -1, Image.SCALE_DEFAULT);
-                } else {
-                    portrait = (Image) portraits.getItem("", "default.gif");
-                    if(null != portrait) {
-                        portrait = portrait.getScaledInstance(60, -1, Image.SCALE_DEFAULT);
-                    }
-                }
-                this.setImage(portrait);
-            } catch (Exception err) {
-                err.printStackTrace();
-            }
-        }
-
-        public void setUnit(Unit u) {
-            Image unit = getImageFor(u, lblImage);
-            setImage(unit);
-        }
-
-        public Image getImageFor(Unit u, Component c) {
-
-            if(null == mt) {
-                return null;
-            }
-            Image base = mt.imageFor(u.getEntity(), c, -1);
-            int tint = PlayerColors.getColorRGB(u.campaign.getColorIndex());
-            EntityImage entityImage = new EntityImage(base, tint, getCamo(u.campaign), c);
-            return entityImage.loadPreviewImage();
-        }
-
-        public Image getCamo(Campaign c) {
-
-            // Return a null if the campaign has selected no camo file.
-            if (null == c.getCamoCategory()
-                    || Player.NO_CAMO.equals(c.getCamoCategory())) {
-                return null;
-            }
-
-            // Try to get the player's camo file.
-            Image camo = null;
-            try {
-
-                // Translate the root camo directory name.
-                String category = c.getCamoCategory();
-                if (Player.ROOT_CAMO.equals(category))
-                    category = ""; //$NON-NLS-1$
-                camo = (Image) camos.getItem(category, c.getCamoFileName());
-
-            } catch (Exception err) {
-                err.printStackTrace();
-            }
-            return camo;
-        }
-
-        // Variables declaration - do not modify//GEN-BEGIN:variables
-        private javax.swing.JLabel lblImage;
-        // End of variables declaration//GEN-END:variables
-
-    }
+    
 
     public class OrgTreeTransferHandler extends TransferHandler {
 
