@@ -17,6 +17,8 @@ v0.3.3 (SVN)
 + Bug [#398]: Assigning Tech to Large Craft Maintenance
 + Bug: assigning of techs to Small Craft maintenance and repair confused - should always use Aero tech
 + Bug [#396]: assign tech list oversized without scrolling
++ RFE: Personnel Market - This market should be used in place of Hire and Hire in Bulk
+  options and provides a more realistic atmosphere of transient personnel availability
 
 v0.3.2 (2013-09-13)
 + maintenance checks (WIP)

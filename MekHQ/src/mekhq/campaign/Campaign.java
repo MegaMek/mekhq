@@ -231,6 +231,8 @@ public class Campaign implements Serializable {
 
 	private ShoppingList shoppingList;
 	
+	private PersonnelMarket personnelMarket;
+	
 	public Campaign() {
 		game = new Game();
 		player = new Player(0, "self");
@@ -263,6 +265,7 @@ public class Campaign implements Serializable {
 		customs = new ArrayList<String>();
 		shoppingList = new ShoppingList();
 		news = new News(calendar.get(Calendar.YEAR));
+		personnelMarket = new PersonnelMarket(this);
 	}
 
 	public String getName() {
@@ -316,6 +319,10 @@ public class Campaign implements Serializable {
 
 	public ShoppingList getShoppingList() {
 		return shoppingList;
+	}
+
+	public PersonnelMarket getPersonnelMarket() {
+		return personnelMarket;
 	}
 
 	/**
@@ -1567,6 +1574,9 @@ public class Campaign implements Serializable {
 		}
 
 		location.newDay(this);
+		
+		// Manage the personnel market
+		personnelMarket.generatePersonnelForDay(this);
 
 		for (Person p : getPersonnel()) {
 			if (!p.isActive()) {
@@ -2350,6 +2360,9 @@ public class Campaign implements Serializable {
 		writeArrayAndHashToXml(pw1, 1, "parts", parts, partIds); // Parts
 
 		writeGameOptions(pw1);
+		
+		// Personnel Market
+		personnelMarket.writeToXml(pw1, 1);
 
 		writeCustoms(pw1);
 		// Okay, we're done.
@@ -2633,6 +2646,9 @@ public class Campaign implements Serializable {
 					processKillNodes(retVal, wn, version);
 				} else if (xn.equalsIgnoreCase("shoppingList")) {
 					retVal.shoppingList = ShoppingList.generateInstanceFromXML(
+							wn, retVal, version);
+				} else if (xn.equalsIgnoreCase("personnelMarket")) {
+					retVal.personnelMarket = PersonnelMarket.generateInstanceFromXML(
 							wn, retVal, version);
 				}
 

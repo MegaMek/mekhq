@@ -221,6 +221,7 @@ import mekhq.campaign.report.Report;
 import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.Modes;
+import mekhq.gui.ReportHyperlinkListener;
 import mekhq.gui.dialog.AddFundsDialog;
 import mekhq.gui.dialog.BombsDialog;
 import mekhq.gui.dialog.CamoChoiceDialog;
@@ -249,6 +250,7 @@ import mekhq.gui.dialog.NewRecruitDialog;
 import mekhq.gui.dialog.NewsReportDialog;
 import mekhq.gui.dialog.PartsStoreDialog;
 import mekhq.gui.dialog.PayCollateralDialog;
+import mekhq.gui.dialog.PersonnelMarketDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
 import mekhq.gui.dialog.PortraitChoiceDialog;
 import mekhq.gui.dialog.QuirksDialog;
@@ -284,24 +286,24 @@ public class CampaignGUI extends JPanel {
     private static final long serialVersionUID = -687162569841072579L;
 
     //personnel filter groups
-    private static final int PG_ACTIVE =  0;
-    private static final int PG_COMBAT =  1;
-    private static final int PG_SUPPORT = 2;
-    private static final int PG_MW =      3;
-    private static final int PG_CREW =    4;
-    private static final int PG_PILOT =   5;
-    private static final int PG_CPILOT =  6;
-    private static final int PG_PROTO =   7;
-    private static final int PG_BA =      8;
-    private static final int PG_SOLDIER = 9;
-    private static final int PG_VESSEL =  10;
-    private static final int PG_TECH =    11;
-    private static final int PG_DOC =     12;
-    private static final int PG_ADMIN =   13;
-    private static final int PG_RETIRE =  14;
-    private static final int PG_MIA =     15;
-    private static final int PG_KIA =     16;
-    private static final int PG_NUM =     17;
+    public static final int PG_ACTIVE =  0;
+    public static final int PG_COMBAT =  1;
+    public static final int PG_SUPPORT = 2;
+    public static final int PG_MW =      3;
+    public static final int PG_CREW =    4;
+    public static final int PG_PILOT =   5;
+    public static final int PG_CPILOT =  6;
+    public static final int PG_PROTO =   7;
+    public static final int PG_BA =      8;
+    public static final int PG_SOLDIER = 9;
+    public static final int PG_VESSEL =  10;
+    public static final int PG_TECH =    11;
+    public static final int PG_DOC =     12;
+    public static final int PG_ADMIN =   13;
+    public static final int PG_RETIRE =  14;
+    public static final int PG_MIA =     15;
+    public static final int PG_KIA =     16;
+    public static final int PG_NUM =     17;
 
     //parts filter groups
     private static final int SG_ALL      = 0;
@@ -326,15 +328,15 @@ public class CampaignGUI extends JPanel {
     private static final int SV_NUM			= 4;
 
     //personnel views
-    private static final int PV_GRAPHIC = 0;
-    private static final int PV_GENERAL = 1;
-    private static final int PV_PILOT   = 2;
-    private static final int PV_INF     = 3;
-    private static final int PV_TACTIC  = 4;
-    private static final int PV_TECH    = 5;
-    private static final int PV_ADMIN   = 6;
-    private static final int PV_FLUFF   = 7;
-    private static final int PV_NUM     = 8;
+    public static final int PV_GRAPHIC = 0;
+    public static final int PV_GENERAL = 1;
+    public static final int PV_PILOT   = 2;
+    public static final int PV_INF     = 3;
+    public static final int PV_TACTIC  = 4;
+    public static final int PV_TECH    = 5;
+    public static final int PV_ADMIN   = 6;
+    public static final int PV_FLUFF   = 7;
+    public static final int PV_NUM     = 8;
 
     //unit views
     private static final int UV_GRAPHIC = 0;
@@ -397,6 +399,8 @@ public class CampaignGUI extends JPanel {
     private javax.swing.JMenuItem menuSave;
     private javax.swing.JMenuItem miMercRoster;
     private javax.swing.JMenuItem miHireBulk;
+    private javax.swing.JMenuItem miHire;
+    private javax.swing.JMenuItem miPersonnelMarket;
     private javax.swing.JMenuItem miHireAstechs;
     private javax.swing.JMenuItem miFireAstechs;
     private javax.swing.JMenuItem miFireAllAstechs;
@@ -712,6 +716,8 @@ public class CampaignGUI extends JPanel {
         miBuyParts = new javax.swing.JMenuItem();
         menuHire = new javax.swing.JMenu();
         miHireBulk = new javax.swing.JMenuItem();
+        miHire = new javax.swing.JMenuItem();
+        miPersonnelMarket = new javax.swing.JMenuItem();
         miHireAstechs = new javax.swing.JMenuItem();
         miFireAstechs = new javax.swing.JMenuItem();
         miFireAllAstechs = new javax.swing.JMenuItem();
@@ -2535,6 +2541,16 @@ public class CampaignGUI extends JPanel {
 
         menuMarket.setText(resourceMap.getString("menuMarket.text")); // NOI18N
         menuMarket.setName("menuMarket"); // NOI18N
+        
+        // Personnel Market
+        miPersonnelMarket.setText("Personnel Market");
+        miPersonnelMarket.setName("miPersonnelMarket");
+        miPersonnelMarket.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	hirePersonMarket(evt);
+            }
+        });
+        menuMarket.add(miPersonnelMarket);
 
         miPurchaseUnit.setText(resourceMap.getString("miPurchaseUnit.text")); // NOI18N
         miPurchaseUnit.setName("miPurchaseUnit"); // NOI18N
@@ -2562,7 +2578,6 @@ public class CampaignGUI extends JPanel {
         menuMarket.add(miHireBulk);
         menuHire.setText(resourceMap.getString("menuHire.text")); // NOI18N
         menuHire.setName("menuHire"); // NOI18N
-        JMenuItem miHire;
         for(int i = Person.T_MECHWARRIOR; i < Person.T_NUM; i++) {
             miHire = new JMenuItem();
             miHire.setText(Person.getRoleDesc(i)); // NOI18N
@@ -3397,6 +3412,13 @@ public class CampaignGUI extends JPanel {
                 getCampaign(),
                 this, getPortraits());
         npd.setVisible(true);
+    }
+
+    private void hirePersonMarket(java.awt.event.ActionEvent evt) {
+        PersonnelMarketDialog pmd = new PersonnelMarketDialog(getFrame(), this,
+                getCampaign(),
+                getPortraits());
+        pmd.setVisible(true);
     }
 
     private void hireBulkPersonnel() {
@@ -9138,46 +9160,46 @@ public class CampaignGUI extends JPanel {
 
         private static final long serialVersionUID = -5207167419079014157L;
 
-        private final static int COL_RANK =    0;
-        private final static int COL_NAME =    1;
-        private final static int COL_CALL =    2;
-        private final static int COL_AGE =     3;
-        private final static int COL_GENDER =  4;
-        private final static int COL_SKILL =   5;
-        private final static int COL_TYPE =    6;
-        private final static int COL_ASSIGN =  7;
-        private final static int COL_FORCE  =  8;
-        private final static int COL_DEPLOY =  9;
-        private final static int COL_MECH =       10;
-        private final static int COL_AERO =       11;
-        private final static int COL_JET =        12;
-        private final static int COL_VEE =        13;
-        private final static int COL_VTOL       = 14;
-        private final static int COL_NVEE       = 15;
-        private final static int COL_SPACE     =  16;
-        private final static int COL_ARTY     =   17;
-        private final static int COL_GUN_BA     = 18;
-        private final static int COL_SMALL_ARMS = 19;
-        private final static int COL_ANTI_MECH  = 20;
-        private final static int COL_TACTICS    = 21;
-        private final static int COL_STRATEGY   = 22;
-        private final static int COL_TECH_MECH  = 23;
-        private final static int COL_TECH_AERO  = 24;
-        private final static int COL_TECH_VEE   = 25;
-        private final static int COL_TECH_BA    = 26;
-        private final static int COL_MEDICAL    = 27;
-        private final static int COL_ADMIN      = 28;
-        private final static int COL_NEG        = 29;
-        private final static int COL_SCROUNGE   = 30;
-        private final static int COL_TOUGH =   31;
-        private final static int COL_EDGE  =   32;
-        private final static int COL_NABIL =   33;
-        private final static int COL_NIMP  =   34;
-        private final static int COL_HITS  =   35;
-        private final static int COL_KILLS  =  36;
-        private final static int COL_SALARY =  37;
-        private final static int COL_XP =      38;
-        private final static int N_COL =       39;
+        public final static int COL_RANK =    0;
+        public final static int COL_NAME =    1;
+        public final static int COL_CALL =    2;
+        public final static int COL_AGE =     3;
+        public final static int COL_GENDER =  4;
+        public final static int COL_SKILL =   5;
+        public final static int COL_TYPE =    6;
+        public final static int COL_ASSIGN =  7;
+        public final static int COL_FORCE  =  8;
+        public final static int COL_DEPLOY =  9;
+        public final static int COL_MECH =       10;
+        public final static int COL_AERO =       11;
+        public final static int COL_JET =        12;
+        public final static int COL_VEE =        13;
+        public final static int COL_VTOL       = 14;
+        public final static int COL_NVEE       = 15;
+        public final static int COL_SPACE     =  16;
+        public final static int COL_ARTY     =   17;
+        public final static int COL_GUN_BA     = 18;
+        public final static int COL_SMALL_ARMS = 19;
+        public final static int COL_ANTI_MECH  = 20;
+        public final static int COL_TACTICS    = 21;
+        public final static int COL_STRATEGY   = 22;
+        public final static int COL_TECH_MECH  = 23;
+        public final static int COL_TECH_AERO  = 24;
+        public final static int COL_TECH_VEE   = 25;
+        public final static int COL_TECH_BA    = 26;
+        public final static int COL_MEDICAL    = 27;
+        public final static int COL_ADMIN      = 28;
+        public final static int COL_NEG        = 29;
+        public final static int COL_SCROUNGE   = 30;
+        public final static int COL_TOUGH =   31;
+        public final static int COL_EDGE  =   32;
+        public final static int COL_NABIL =   33;
+        public final static int COL_NIMP  =   34;
+        public final static int COL_HITS  =   35;
+        public final static int COL_KILLS  =  36;
+        public final static int COL_SALARY =  37;
+        public final static int COL_XP =      38;
+        public final static int N_COL =       39;
 
         private ArrayList<Person> data = new ArrayList<Person>();
 
