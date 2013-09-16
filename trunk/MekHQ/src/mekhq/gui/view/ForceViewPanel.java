@@ -27,6 +27,7 @@ import megamek.common.Crew;
 import megamek.common.Entity;
 import megamek.common.UnitType;
 import megamek.common.util.DirectoryItems;
+import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Unit;
 import mekhq.campaign.force.Force;
@@ -47,11 +48,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 	private Force force;
 	private Campaign campaign;
 	
-	private DirectoryItems portraits;
-	private DirectoryItems forceIcons;
-	private DirectoryItems camos;
-	private MechTileset mt;
-
+	private IconPackage icons;
 
 	private javax.swing.JLabel lblIcon;
 	private javax.swing.JPanel pnlStats;
@@ -71,13 +68,10 @@ public class ForceViewPanel extends javax.swing.JPanel {
 	private javax.swing.JLabel lblCost2;
 	
 	
-	public ForceViewPanel(Force f, Campaign c, DirectoryItems portraits, DirectoryItems ficons, DirectoryItems camos, MechTileset mt) {
+	public ForceViewPanel(Force f, Campaign c, IconPackage icons) {
 		this.force = f;
 		this.campaign = c;
-		this.portraits = portraits;
-		this.forceIcons = ficons;
-		this.camos = camos;
-		this.mt = mt;
+		this.icons = icons;
 		initComponents();
 	}
 	
@@ -166,13 +160,13 @@ public class ForceViewPanel extends javax.swing.JPanel {
         // Try to get the player's portrait file.
         Image portrait = null;        
         try {
-            portrait = (Image) forceIcons.getItem(category, file);
+            portrait = (Image) icons.getForceIcons().getItem(category, file);
             if(null != portrait) {
             	if(portrait.getWidth(lbl) > scale) { 
             		portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_DEFAULT);  
             	}
             } else {
-            	portrait = (Image) forceIcons.getItem("", "empty.png");
+            	portrait = (Image) icons.getForceIcons().getItem("", "empty.png");
             }
             ImageIcon icon = new ImageIcon(portrait);
             lbl.setIcon(icon);
@@ -482,11 +476,11 @@ public class ForceViewPanel extends javax.swing.JPanel {
         // Try to get the player's portrait file.
         Image portrait = null;
         try {
-            portrait = (Image) portraits.getItem(category, file);
+            portrait = (Image) icons.getPortraits().getItem(category, file);
             if(null != portrait) {
                 portrait = portrait.getScaledInstance(72, -1, Image.SCALE_DEFAULT);               
             } else {
-            	portrait = (Image) portraits.getItem("", "default.gif");
+            	portrait = (Image) icons.getPortraits().getItem("", "default.gif");
             	if(null != portrait) {
                     portrait = portrait.getScaledInstance(72, -1, Image.SCALE_DEFAULT);               
             	}
@@ -499,10 +493,10 @@ public class ForceViewPanel extends javax.swing.JPanel {
     
     private Image getImageFor(Unit u, Component c) {
         
-		if(null == mt) { 
+		if(null == icons.getMechTiles()) { 
 			return null;
 		}
-        Image base = mt.imageFor(u.getEntity(), c, -1);
+        Image base = icons.getMechTiles().imageFor(u.getEntity(), c, -1);
         int tint = PlayerColors.getColorRGB(u.campaign.getColorIndex());
         EntityImage entityImage = new EntityImage(base, tint, getCamo(u), c);
         return entityImage.loadPreviewImage();
@@ -512,7 +506,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
         // Try to get the player's camo file.
         Image camo = null;
         try {
-            camo = (Image) camos.getItem(unit.getCamoCategory(), unit.getCamoFileName());
+            camo = (Image) icons.getCamos().getItem(unit.getCamoCategory(), unit.getCamoFileName());
         } catch (Exception err) {
             err.printStackTrace();
         }

@@ -92,12 +92,8 @@ public class MekHQ implements GameListener {
     private Campaign campaign;
     private CampaignGUI campaigngui;
     
-    //the various directory items we need to access
-	private DirectoryItems portraits;
-    private DirectoryItems camos;
-    private DirectoryItems forceIcons;
-	protected static MechTileset mt;
-	
+    private IconPackage iconPackage = new IconPackage();
+    
 	private Properties preferences;
 	
 	/**
@@ -255,58 +251,6 @@ public class MekHQ implements GameListener {
     
     public void setCampaign(Campaign c) {
     	campaign = c;
-    }
-    
-    public void loadDirectories() {
-    	if(null == portraits) {
-		    try {
-		        portraits = new DirectoryItems(new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
-		                PortraitFileFactory.getInstance());
-		    } catch (Exception e) {
-		        portraits = null;
-		    }
-    	}
-    	if(null == camos) {
-		    try {
-		        camos = new DirectoryItems(new File("data/images/camo"), "", //$NON-NLS-1$ //$NON-NLS-2$
-		                ImageFileFactory.getInstance());
-		    } catch (Exception e) {
-		        camos = null;
-		    }
-    	}
-    	if(null == forceIcons) {
-		    try {
-		        forceIcons = new DirectoryItems(new File("data/images/force"), "", //$NON-NLS-1$ //$NON-NLS-2$
-		                PortraitFileFactory.getInstance());
-		    } catch (Exception e) {
-		        forceIcons = null;
-		    }
-    	}
-    	if(null == mt) {
-		    mt = new MechTileset(Configuration.unitImagesDir());
-		    try {
-		        mt.loadFromFile("mechset.txt");
-		    } catch (IOException ex) {
-		    	MekHQ.logError(ex);
-		        //TODO: do something here
-		    }
-    	}
-    }
-    
-    public DirectoryItems getPortraits() {
-    	return portraits;
-    }
-    
-    public DirectoryItems getCamos() {
-    	return camos;
-    }
-    
-    public DirectoryItems getForceIcons() {
-    	return forceIcons;
-    }
-    
-    public MechTileset getMechTiles() {
-    	return mt;
     }
     
     public void startHost(Scenario scenario, boolean loadSavegame, ArrayList<Unit> meks) {
@@ -474,5 +418,9 @@ public class MekHQ implements GameListener {
 	public void gameTurnChange(GameTurnChangeEvent e) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public IconPackage getIconPackage() {
+	    return iconPackage;
 	}
 }

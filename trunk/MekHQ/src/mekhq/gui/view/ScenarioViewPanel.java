@@ -22,6 +22,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 import megamek.common.Crew;
+import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
@@ -43,7 +44,7 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
 	private Scenario scenario;
 	private Campaign campaign;
 	private ForceStub forces;
-	private CampaignGUI view;
+	private IconPackage icons;
 	
 	private javax.swing.JPanel pnlStats;
 	private javax.swing.JTextArea txtDesc;
@@ -53,21 +54,17 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
 	
 	private StubTreeModel forceModel;
 	
-	public ScenarioViewPanel(Scenario s, Campaign c, CampaignGUI v) {
+	public ScenarioViewPanel(Scenario s, Campaign c, IconPackage i) {
 		this.scenario = s;
 		this.campaign = c;
+		this.icons = i;
 		if(s.isCurrent()) {
 			this.forces = new ForceStub(s.getForces(campaign), campaign);
 		} else {
 			this.forces = s.getForceStub();
 		}
-		this.view = v;
 		forceModel = new StubTreeModel(forces);
 		initComponents();
-	}
-	
-	private CampaignGUI getView() {
-		return view;
 	}
 	
 	private void initComponents() {
@@ -312,11 +309,11 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
         	// Try to get the player's portrait file.
             Image portrait = null;
             try {
-                portrait = (Image) getView().getPortraits().getItem(category, file);
+                portrait = (Image) icons.getPortraits().getItem(category, file);
                 if(null != portrait) {
                     portrait = portrait.getScaledInstance(50, -1, Image.SCALE_DEFAULT);               
                 } else {
-                	portrait = (Image) getView().getPortraits().getItem("", "default.gif");
+                	portrait = (Image) icons.getPortraits().getItem("", "default.gif");
                 	if(null != portrait) {
                         portrait = portrait.getScaledInstance(50, -1, Image.SCALE_DEFAULT);               
                 	}
@@ -344,11 +341,11 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
             // Try to get the player's portrait file.
             Image portrait = null;
             try {
-           	 portrait = (Image) getView().getForceIcons().getItem(category, file);
+           	 portrait = (Image) icons.getForceIcons().getItem(category, file);
            	if(null != portrait) {
                 portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
             } else {
-                portrait = (Image) getView().getForceIcons().getItem("", "empty.png");
+                portrait = (Image) icons.getForceIcons().getItem("", "empty.png");
                 if(null != portrait) {
                     portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
                 }

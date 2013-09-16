@@ -18,6 +18,7 @@ import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Crew;
 import megamek.common.util.DirectoryItems;
+import mekhq.IconPackage;
 import mekhq.campaign.Unit;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
@@ -37,17 +38,11 @@ public class BasicInfo extends JPanel {
 
         private JLabel lblImage;
         private JLabel lblLoad;
-        DirectoryItems camos;
-        DirectoryItems portraits;
-        private DirectoryItems forceIcons;
-        MechTileset mt;
+        IconPackage icons;
         
 
-        public BasicInfo(DirectoryItems camos, DirectoryItems portraits, DirectoryItems force, MechTileset mt) {
-            this.camos = camos;
-            this.portraits = portraits;
-            this.forceIcons = force;
-            this.mt = mt;
+        public BasicInfo(IconPackage i) {
+            this.icons = i;
             lblImage = new JLabel();
             lblLoad = new JLabel();
 
@@ -121,10 +116,10 @@ public class BasicInfo extends JPanel {
         
         protected Image getImageFor(Unit u) {
             
-            if(null == mt) { 
+            if(null == icons.getMechTiles()) { 
                 return null;
             }
-            Image base = mt.imageFor(u.getEntity(), this, -1);
+            Image base = icons.getMechTiles().imageFor(u.getEntity(), this, -1);
             int tint = PlayerColors.getColorRGB(u.campaign.getColorIndex());
             EntityImage entityImage = new EntityImage(base, tint, getCamo(u), this);
             return entityImage.loadPreviewImage();
@@ -134,7 +129,7 @@ public class BasicInfo extends JPanel {
             // Try to get the player's camo file.
             Image camo = null;
             try {
-                camo = (Image) camos.getItem(unit.getCamoCategory(), unit.getCamoFileName());
+                camo = (Image) icons.getCamos().getItem(unit.getCamoCategory(), unit.getCamoFileName());
             } catch (Exception err) {
                 err.printStackTrace();
             }
@@ -162,14 +157,14 @@ public class BasicInfo extends JPanel {
             // Try to get the player's portrait file.
             Image portrait = null;
             try {
-                portrait = (Image) portraits.getItem(category, file);
+                portrait = (Image) icons.getPortraits().getItem(category, file);
                 if (null == portrait) {
                     // the image could not be found so switch to default one
                     p.setPortraitCategory(Crew.ROOT_PORTRAIT);
                     category = "";
                     p.setPortraitFileName(Crew.PORTRAIT_NONE);
                     file = "default.gif";
-                    portrait = (Image) portraits.getItem(category, file);
+                    portrait = (Image) icons.getPortraits().getItem(category, file);
                 }
                 // make sure no images are longer than 72 pixels
                 if (null != portrait) {
@@ -198,11 +193,11 @@ public class BasicInfo extends JPanel {
             // Try to get the player's portrait file.
             Image portrait = null;
             try {
-             portrait = (Image) forceIcons.getItem(category, file);
+             portrait = (Image) icons.getForceIcons().getItem(category, file);
             if(null != portrait) {
                 portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
             } else {
-                portrait = (Image) forceIcons.getItem("", "empty.png");
+                portrait = (Image) icons.getForceIcons().getItem("", "empty.png");
                 if(null != portrait) {
                     portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
                 }
