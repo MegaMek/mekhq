@@ -316,8 +316,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useDamageMargin.setSelected(options.isDestroyByMargin());
         useQualityMaintenance.setSelected(options.useQualityMaintenance());
         checkMaintenance.setSelected(options.checkMaintenance());
-        logMaintenance.setSelected(options.logMaintenance());
-
         
         sellUnitsBox.setSelected(options.canSellUnits());
         sellPartsBox.setSelected(options.canSellParts());
@@ -2444,7 +2442,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    }
 	    options.setCheckMaintenance(checkMaintenance.isSelected());
         options.setUseQualityMaintenance(useQualityMaintenance.isSelected());
-        options.setLogMaintenance(logMaintenance.isSelected());
         options.setMaintenanceBonus((Integer)spnMaintenanceBonus.getModel().getValue());
         options.setMaintenanceCycleDays((Integer)spnMaintenanceDays.getModel().getValue());	    
 	    options.setInitBonus(useInitBonusBox.isSelected());

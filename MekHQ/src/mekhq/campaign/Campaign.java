@@ -6288,8 +6288,10 @@ public class Campaign implements Serializable {
 			// its time for a maintenance check
 			int qualityOrig = u.getQuality();
 			String techName = "Nobody";
+			String techNameLinked = techName;
 			if (null != tech) {
-				techName = tech.getHyperlinkedFullTitle();
+			    techName = tech.getFullTitle();
+				techNameLinked = tech.getHyperlinkedFullTitle();
 				//maybe use the money
 	            if (campaignOptions.payForMaintain()) {
 	                if (finances.debit(u.getMaintenanceCost(),
@@ -6304,13 +6306,13 @@ public class Campaign implements Serializable {
 			// concurrent mod problems
 			// put it into a hash - 4 points of damage will mean destruction
 			HashMap<Integer, Integer> partsToDamage = new HashMap<Integer, Integer>();
+			String maintenanceReport = "<emph>" + techName + " performing maintenance</emph><br><br>";
 			for (Part p : u.getParts()) {
-				String partReport = u.getName() + ": " + techName
-						+ " maintaining " + p.getName() + " (Quality "
-						+ p.getQualityName() + ")";
+				String partReport = "<b>" + p.getName() + "</b> (Quality " + p.getQualityName() + ")";
 				if (!p.needsMaintenance()) {
 					continue;
 				}
+				int oldQuality = p.getQuality();
 				TargetRoll target = getTargetForMaintenance(p, tech);
 				if(!paidMaintenance) {
 				    //I should probably make this modifier user inputtable
@@ -6396,17 +6398,22 @@ public class Campaign implements Serializable {
 					}
 					break;
 				}
-				partReport += ": new quality is " + p.getQualityName();
+				if(p.getQuality() > oldQuality) {
+				    partReport += ": <font color='green'>new quality is " + p.getQualityName() + "</font>";
+				}
+				else if(p.getQuality() < oldQuality) {
+                    partReport += ": <font color='red'>new quality is " + p.getQualityName() + "</font>";
+				} else {
+                    partReport += ": quality remains " + p.getQualityName();
+				}
 				if (null != partsToDamage.get(p.getId())) {
 					if (partsToDamage.get(p.getId()) > 3) {
-						partReport += ", part destroyed";
+						partReport += ", <font color='red'><b>part destroyed</b></font>";
 					} else {
-						partReport += ", part damaged";
+						partReport += ", <font color='red'><b>part damaged</b></font>";
 					}
 				}
-				if (getCampaignOptions().logMaintenance()) {
-					MekHQ.logMessage(partReport);
-				}
+				maintenanceReport += partReport + "<br>";
 			}
 			String damageList = "";
 			String destroyList = "";
@@ -6423,10 +6430,10 @@ public class Campaign implements Serializable {
 					}
 				}
 			}
+			u.resetDaysSinceMaintenance();
+			u.setLastMaintenanceReport(maintenanceReport);
 			damageList = damageList.replaceAll(", $", "");
 			destroyList = destroyList.replaceAll(", $", "");
-
-			u.resetDaysSinceMaintenance();
 			int quality = u.getQuality();
 			String qualityString = "";
 			if (quality > qualityOrig) {
@@ -6459,8 +6466,8 @@ public class Campaign implements Serializable {
 			if(!paidMaintenance) {
 			    paidString = "<font color='red'>Could not afford maintenance costs, so check is at a penalty.</font>";
 			}
-			addReport(techName + " performs maintenance on " + u.getHyperlinkedName()
-					+ ". " + paidString + qualityString + ". " + damageString);
+			addReport(techNameLinked + " performs maintenance on " + u.getHyperlinkedName()
+					+ ". " + paidString + qualityString + ". " + damageString + " [<a href='MAINTENANCE|" + u.getId() + "'>Get details</a>]");
 		}
 	}
 }

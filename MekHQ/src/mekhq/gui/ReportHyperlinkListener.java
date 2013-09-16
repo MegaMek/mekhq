@@ -33,6 +33,8 @@ public class ReportHyperlinkListener implements HyperlinkListener {
     public static final String UNIT = "UNIT";
     public static final String PERSON = "PERSON";
     public static final String NEWS = "NEWS";
+    public static final String MAINTENANCE = "MAINTENANCE";
+
 
     private CampaignGUI campaignGUI;
   
@@ -54,6 +56,10 @@ public class ReportHyperlinkListener implements HyperlinkListener {
             else if(e.getDescription().startsWith(NEWS)) {
                 String desc[] = e.getDescription().split("\\|");
                 campaignGUI.showNews(desc[1],desc[2]);
+            }
+            else if(e.getDescription().startsWith(MAINTENANCE)) {
+                UUID id = UUID.fromString(e.getDescription().split("\\|")[1]);
+                campaignGUI.showMaintenanceReport(id);
             }
         }
     }
