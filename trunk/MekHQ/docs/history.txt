@@ -22,6 +22,7 @@ v0.3.3 (SVN)
 + Bug: Personnel Market shows rank instead of Person for Graphic, and vice versa for General
 + Bug: Personnel Market incorrect renderer
 + last maintenance report now kept for each unit, no more logging
++ Bug [#400]: personnel ages in the personnel market
 
 v0.3.2 (2013-09-13)
 + maintenance checks (WIP)

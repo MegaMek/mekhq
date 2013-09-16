@@ -265,7 +265,7 @@ public class Campaign implements Serializable {
 		customs = new ArrayList<String>();
 		shoppingList = new ShoppingList();
 		news = new News(calendar.get(Calendar.YEAR));
-		personnelMarket = new PersonnelMarket(this);
+		personnelMarket = new PersonnelMarket();
 	}
 
 	public String getName() {
@@ -323,6 +323,10 @@ public class Campaign implements Serializable {
 
 	public PersonnelMarket getPersonnelMarket() {
 		return personnelMarket;
+	}
+	
+	public void generateNewPersonnelMarket() {
+		personnelMarket.generatePersonnelForDay(this);
 	}
 
 	/**
@@ -2597,6 +2601,8 @@ public class Campaign implements Serializable {
 			}
 		}
 
+		boolean foundPersonnelMarket = false;
+		
 		// Okay, lets iterate through the children, eh?
 		for (int x = 0; x < nl.getLength(); x++) {
 			Node wn = nl.item(x);
@@ -2650,6 +2656,7 @@ public class Campaign implements Serializable {
 				} else if (xn.equalsIgnoreCase("personnelMarket")) {
 					retVal.personnelMarket = PersonnelMarket.generateInstanceFromXML(
 							wn, retVal, version);
+					foundPersonnelMarket = true;
 				}
 
 			} else {
@@ -2658,6 +2665,11 @@ public class Campaign implements Serializable {
 				// We can safely ignore it even if it isn't, for now.
 				continue;
 			}
+		}
+		
+		// If we don't have a personnel market, create one.
+		if (!foundPersonnelMarket) {
+			retVal.personnelMarket = new PersonnelMarket(retVal);
 		}
 
 		// Okay, after we've gone through all the nodes and constructed the

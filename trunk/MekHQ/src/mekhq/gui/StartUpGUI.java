@@ -66,7 +66,7 @@ public class StartUpGUI extends javax.swing.JPanel {
         btnNewGame.setMaximumSize(new Dimension(200, 25));
         btnNewGame.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	newCampaign();  	
+            	newCampaign();
             }
         });
         btnLoadGame = new javax.swing.JButton(resourceMap.getString("btnLoadGame.text"));
@@ -77,7 +77,7 @@ public class StartUpGUI extends javax.swing.JPanel {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
             	File f = selectLoadCampaignFile();
             	if(null != f) {
-                	loadCampaign(f);  	
+                	loadCampaign(f);
             	}
             }
         });
@@ -90,7 +90,7 @@ public class StartUpGUI extends javax.swing.JPanel {
         }
         btnLastSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	loadCampaign(lastSave);  	
+            	loadCampaign(lastSave);
             }
         });
         btnQuit = new javax.swing.JButton(resourceMap.getString("btnQuit.text"));
