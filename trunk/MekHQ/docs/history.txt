@@ -26,6 +26,7 @@ v0.3.3 (SVN)
 + refactored BasicInfo and Sorter classes from CampaignGUI into separate files
 + used separate PersonnelTableModel for PersonnelMarketDialog.java
 + refactored PersonnelTableModel to a separate class (experimental)
++ Bug: No maintenance costs when not using the new StratOps maintenance options
 
 v0.3.2 (2013-09-13)
 + maintenance checks (WIP)
