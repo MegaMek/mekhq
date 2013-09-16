@@ -11,7 +11,6 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
-import java.util.UUID;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -30,8 +29,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.XTableColumnModel;
 import mekhq.gui.CampaignGUI.PersonnelTableModel;
+import mekhq.gui.XTableColumnModel;
 import mekhq.gui.view.PersonViewPanel;
 
 /**
@@ -336,7 +335,7 @@ public class PersonnelMarketDialog extends JDialog {
             column = columnModel.getColumnByModelIndex(i);
             column.setCellRenderer(personnelModel.getRenderer());
             if(i == PersonnelTableModel.COL_RANK) {
-                if(view == CampaignGUI.PV_GENERAL) {
+                if(view == CampaignGUI.PV_GRAPHIC) {
                     column.setPreferredWidth(125);
                     column.setHeaderValue("Person");
                 } else {
