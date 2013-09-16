@@ -46,7 +46,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
-import mekhq.gui.LootTableModel;
+import mekhq.gui.model.LootTableModel;
 
 /**
  *

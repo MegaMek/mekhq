@@ -177,6 +177,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import megameklab.com.util.UnitPrintManager;
+import mekhq.IconPackage;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.Version;
@@ -260,6 +261,8 @@ import mekhq.gui.dialog.ReportDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.dialog.UnitSelectorDialog;
+import mekhq.gui.model.ArrayTableModel;
+import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.sorter.BonusSorter;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.LevelSorter;
@@ -539,7 +542,7 @@ public class CampaignGUI extends JPanel {
     private PatientTableModel assignedPatientModel = new PatientTableModel();
     private PatientTableModel unassignedPatientModel = new PatientTableModel();
     private DocTableModel doctorsModel = new DocTableModel();
-    private PersonnelTableModel personModel = new PersonnelTableModel();
+    private PersonnelTableModel personModel;
     private UnitTableModel unitModel = new UnitTableModel();
     private PartsTableModel partsModel = new PartsTableModel();
     private ProcurementTableModel acquirePartsModel = new ProcurementTableModel();
@@ -576,6 +579,8 @@ public class CampaignGUI extends JPanel {
 
         this.app = app;
 
+        personModel = new PersonnelTableModel(getCampaign());
+        
         unitMouseAdapter = new UnitTableMouseAdapter();
         servicedUnitMouseAdapter = new ServicedUnitsTableMouseAdapter();
         partsMouseAdapter = new PartsTableMouseAdapter();
@@ -1261,7 +1266,7 @@ public class CampaignGUI extends JPanel {
         for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
             column = personnelTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(personModel.getColumnWidth(i));
-            column.setCellRenderer(personModel.getRenderer());
+            column.setCellRenderer(personModel.getRenderer(choicePersonView.getSelectedIndex(), getIconPackage()));
         }
         personnelTable.setIntercellSpacing(new Dimension(0, 0));
         personnelTable.setShowGrid(false);
@@ -3419,14 +3424,14 @@ public class CampaignGUI extends JPanel {
         NewRecruitDialog npd = new NewRecruitDialog(getFrame(), true,
                 getCampaign().newPerson(type),
                 getCampaign(),
-                this, getPortraits());
+                this, getIconPackage().getPortraits());
         npd.setVisible(true);
     }
 
     private void hirePersonMarket(java.awt.event.ActionEvent evt) {
         PersonnelMarketDialog pmd = new PersonnelMarketDialog(getFrame(), this,
                 getCampaign(),
-                getPortraits());
+                getIconPackage().getPortraits());
         pmd.setVisible(true);
     }
 
@@ -3675,7 +3680,7 @@ public class CampaignGUI extends JPanel {
 
     private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuOptionsActionPerformed
         CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), true,
-                getCampaign(), getCamos());
+                getCampaign(), getIconPackage().getCamos());
         cod.setVisible(true);
         refreshCalendar();
         getCampaign().reloadNews();
@@ -3921,7 +3926,7 @@ public class CampaignGUI extends JPanel {
             return;
         }
         Person selectedPerson = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
-        scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, getCampaign(), getPortraits()));
+        scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, getCampaign(), getIconPackage().getPortraits()));
         //This odd code is to make sure that the scrollbar stays at the top
         //I can't just call it here, because it ends up getting reset somewhere later
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -3938,7 +3943,7 @@ public class CampaignGUI extends JPanel {
             return;
         }
         Unit selectedUnit = unitModel.getUnit(unitTable.convertRowIndexToModel(row));
-        scrollUnitView.setViewportView(new UnitViewPanel(selectedUnit, getCampaign(), getCamos(), getMechTiles()));
+        scrollUnitView.setViewportView(new UnitViewPanel(selectedUnit, getCampaign(), getIconPackage().getCamos(), getIconPackage().getMechTiles()));
         //This odd code is to make sure that the scrollbar stays at the top
         //I can't just call it here, because it ends up getting reset somewhere later
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -3961,7 +3966,7 @@ public class CampaignGUI extends JPanel {
             return;
         }
         Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
-        scrollScenarioView.setViewportView(new ScenarioViewPanel(scenario, getCampaign(), this));
+        scrollScenarioView.setViewportView(new ScenarioViewPanel(scenario, getCampaign(), getIconPackage()));
         //This odd code is to make sure that the scrollbar stays at the top
         //I can't just call it here, because it ends up getting reset somewhere later
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -3994,9 +3999,9 @@ public class CampaignGUI extends JPanel {
                 if(u.usesSoloPilot()) {
                     name = "Pilot";
                 }
-                tabUnit.add(name, new PersonViewPanel(p, getCampaign(), getPortraits()));
+                tabUnit.add(name, new PersonViewPanel(p, getCampaign(), getIconPackage().getPortraits()));
             }
-            tabUnit.add("Unit", new UnitViewPanel(u, getCampaign(), getCamos(), getMechTiles()));
+            tabUnit.add("Unit", new UnitViewPanel(u, getCampaign(), getIconPackage().getCamos(), getIconPackage().getMechTiles()));
             scrollForceView.setViewportView(tabUnit);
             //This odd code is to make sure that the scrollbar stays at the top
             //I can't just call it here, because it ends up getting reset somewhere later
@@ -4006,7 +4011,7 @@ public class CampaignGUI extends JPanel {
                 }
             });
         } else if (node instanceof Force) {
-            scrollForceView.setViewportView(new ForceViewPanel((Force)node, getCampaign(), getPortraits(), getForceIcons(), getCamos(), getMechTiles()));
+            scrollForceView.setViewportView(new ForceViewPanel((Force)node, getCampaign(), getIconPackage()));
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     scrollForceView.getVerticalScrollBar().setValue(0);
@@ -4845,7 +4850,7 @@ public class CampaignGUI extends JPanel {
                 selectedUUID = p.getId();
             }
         }
-        personModel.setData(getCampaign().getPersonnel());
+        personModel.refreshData();
         //try to put the focus back on same person if they are still available
         for(int row = 0; row < personnelTable.getRowCount(); row++) {
             Person p = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
@@ -5416,7 +5421,7 @@ public class CampaignGUI extends JPanel {
         TableColumn column = null;
         for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
             column = columnModel.getColumnByModelIndex(i);
-            column.setCellRenderer(personModel.getRenderer());
+            column.setCellRenderer(personModel.getRenderer(choicePersonView.getSelectedIndex(), getIconPackage()));
             if(i == PersonnelTableModel.COL_RANK) {
                 if(view == PV_GRAPHIC) {
                     column.setPreferredWidth(125);
@@ -5856,20 +5861,8 @@ public class CampaignGUI extends JPanel {
         return getApplication().getCampaign();
     }
 
-    public DirectoryItems getPortraits() {
-        return getApplication().getPortraits();
-    }
-
-    public DirectoryItems getCamos() {
-        return getApplication().getCamos();
-    }
-
-    public DirectoryItems getForceIcons() {
-        return getApplication().getForceIcons();
-    }
-
-    public MechTileset getMechTiles() {
-        return getApplication().getMechTiles();
+    public IconPackage getIconPackage() {
+        return getApplication().getIconPackage();
     }
 
     public JFrame getFrame() {
@@ -5921,14 +5914,13 @@ public class CampaignGUI extends JPanel {
         }
 
         public TaskTableModel.Renderer getRenderer() {
-            return new TaskTableModel.Renderer(getCamos(), getPortraits(), getForceIcons(), getMechTiles());
+            return new TaskTableModel.Renderer(getIconPackage());
         }
 
         public class Renderer extends BasicInfo implements TableCellRenderer {
 
-            public Renderer(DirectoryItems camos, DirectoryItems portraits, DirectoryItems force, 
-                    MechTileset mt) {
-                super(camos, portraits, force, mt);
+            public Renderer(IconPackage icons) {
+                super(icons);
             }
 
             private static final long serialVersionUID = -3052618135259621130L;
@@ -6143,13 +6135,12 @@ public class CampaignGUI extends JPanel {
         }
 
         public AcquisitionTableModel.Renderer getRenderer() {
-            return new AcquisitionTableModel.Renderer(getCamos(), getPortraits(), getForceIcons(), getMechTiles());
+            return new AcquisitionTableModel.Renderer(getIconPackage());
         }
 
         public class Renderer extends BasicInfo implements TableCellRenderer {
-            public Renderer(DirectoryItems camos, DirectoryItems portraits, DirectoryItems force, 
-                    MechTileset mt) {
-                super(camos, portraits, force, mt);
+            public Renderer(IconPackage icons) {
+                super(icons);
             }
 
             private static final long serialVersionUID = -3052618135259621130L;
@@ -6705,13 +6696,12 @@ public class CampaignGUI extends JPanel {
         }
 
         public TechTableModel.Renderer getRenderer() {
-            return new TechTableModel.Renderer(getCamos(), getPortraits(), getForceIcons(), getMechTiles());
+            return new TechTableModel.Renderer(getIconPackage());
         }
 
         public class Renderer extends BasicInfo implements TableCellRenderer {
-            public Renderer(DirectoryItems camos, DirectoryItems portraits, DirectoryItems force, 
-                    MechTileset mt) {
-                super(camos, portraits, force, mt);
+            public Renderer(IconPackage icons) {
+                super(icons);
             }
 
             private static final long serialVersionUID = -4951696376098422679L;
@@ -6765,13 +6755,12 @@ public class CampaignGUI extends JPanel {
             return patients.size();
         }
         public PatientTableModel.Renderer getRenderer() {
-            return new PatientTableModel.Renderer(getCamos(), getPortraits(), getForceIcons(), getMechTiles());
+            return new PatientTableModel.Renderer(getIconPackage());
         }
 
         public class Renderer extends BasicInfo implements ListCellRenderer {
-            public Renderer(DirectoryItems camos, DirectoryItems portraits, DirectoryItems force, 
-                    MechTileset mt) {
-                super(camos, portraits, force, mt);
+            public Renderer(IconPackage icons) {
+                super(icons);
             }
 
             private static final long serialVersionUID = -406535109900807837L;
@@ -6983,7 +6972,7 @@ public class CampaignGUI extends JPanel {
                 if(null != singleForce) {
                     PortraitChoiceDialog pcd = new PortraitChoiceDialog(getFrame(), true,
                             singleForce.getIconCategory(),
-                            singleForce.getIconFileName(), getForceIcons());
+                            singleForce.getIconFileName(), getIconPackage().getForceIcons());
                     pcd.setVisible(true);
                     singleForce.setIconCategory(pcd.getCategory());
                     singleForce.setIconFileName(pcd.getFileName());
@@ -7075,13 +7064,13 @@ public class CampaignGUI extends JPanel {
             } else if(command.contains("GOTO_PILOT")) {
             	for(Unit unit : units) {
                     tabMain.setSelectedIndex(tabMain.indexOfTab(resourceMap.getString("panPersonnel.TabConstraints.tabTitle")));
-                    for (Person p : personModel.data) {
+          /*          for (Person p : personModel.data) {
                     	if (p.getId().equals(unit.getCommander().getId())) {
                     		int index = personnelTable.convertRowIndexToView(personModel.data.indexOf(p));
                     		personnelTable.setRowSelectionInterval(index, index);
                     		break;
                     	}
-                    }
+                    }*/
                 }
                 refreshScenarioList();
                 refreshOrganization();
@@ -7778,11 +7767,11 @@ public class CampaignGUI extends JPanel {
             // Try to get the player's portrait file.
             Image portrait = null;
             try {
-                portrait = (Image) getPortraits().getItem(category, file);
+                portrait = (Image) getIconPackage().getPortraits().getItem(category, file);
                 if(null != portrait) {
                     portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
                 } else {
-                    portrait = (Image) getPortraits().getItem("", "default.gif");
+                    portrait = (Image) getIconPackage().getPortraits().getItem("", "default.gif");
                     if(null != portrait) {
                         portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
                     }
@@ -7810,11 +7799,11 @@ public class CampaignGUI extends JPanel {
             // Try to get the player's portrait file.
             Image portrait = null;
             try {
-             portrait = (Image) getForceIcons().getItem(category, file);
+             portrait = (Image) getIconPackage().getForceIcons().getItem(category, file);
             if(null != portrait) {
                 portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
             } else {
-                portrait = (Image) getForceIcons().getItem("", "empty.png");
+                portrait = (Image) getIconPackage().getForceIcons().getItem("", "empty.png");
                 if(null != portrait) {
                     portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
                 }
@@ -8221,7 +8210,7 @@ public class CampaignGUI extends JPanel {
             } else if (command.equalsIgnoreCase("PORTRAIT")) {
                 PortraitChoiceDialog pcd = new PortraitChoiceDialog(getFrame(), true,
                         selectedPerson.getPortraitCategory(),
-                        selectedPerson.getPortraitFileName(), getPortraits());
+                        selectedPerson.getPortraitFileName(), getIconPackage().getPortraits());
                 pcd.setVisible(true);
                 selectedPerson.setPortraitCategory(pcd.getCategory());
                 selectedPerson.setPortraitFileName(pcd.getFileName());
@@ -9086,720 +9075,7 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    /**
-     * A table Model for displaying information about personnel
-     * @author Jay lawson
-     */
-    public class PersonnelTableModel extends AbstractTableModel {
 
-        private static final long serialVersionUID = -5207167419079014157L;
-
-        public final static int COL_RANK =    0;
-        public final static int COL_NAME =    1;
-        public final static int COL_CALL =    2;
-        public final static int COL_AGE =     3;
-        public final static int COL_GENDER =  4;
-        public final static int COL_SKILL =   5;
-        public final static int COL_TYPE =    6;
-        public final static int COL_ASSIGN =  7;
-        public final static int COL_FORCE  =  8;
-        public final static int COL_DEPLOY =  9;
-        public final static int COL_MECH =       10;
-        public final static int COL_AERO =       11;
-        public final static int COL_JET =        12;
-        public final static int COL_VEE =        13;
-        public final static int COL_VTOL       = 14;
-        public final static int COL_NVEE       = 15;
-        public final static int COL_SPACE     =  16;
-        public final static int COL_ARTY     =   17;
-        public final static int COL_GUN_BA     = 18;
-        public final static int COL_SMALL_ARMS = 19;
-        public final static int COL_ANTI_MECH  = 20;
-        public final static int COL_TACTICS    = 21;
-        public final static int COL_STRATEGY   = 22;
-        public final static int COL_TECH_MECH  = 23;
-        public final static int COL_TECH_AERO  = 24;
-        public final static int COL_TECH_VEE   = 25;
-        public final static int COL_TECH_BA    = 26;
-        public final static int COL_MEDICAL    = 27;
-        public final static int COL_ADMIN      = 28;
-        public final static int COL_NEG        = 29;
-        public final static int COL_SCROUNGE   = 30;
-        public final static int COL_TOUGH =   31;
-        public final static int COL_EDGE  =   32;
-        public final static int COL_NABIL =   33;
-        public final static int COL_NIMP  =   34;
-        public final static int COL_HITS  =   35;
-        public final static int COL_KILLS  =  36;
-        public final static int COL_SALARY =  37;
-        public final static int COL_XP =      38;
-        public final static int N_COL =       39;
-
-        private ArrayList<Person> data = new ArrayList<Person>();
-
-        public int getRowCount() {
-            return data.size();
-        }
-
-        public int getColumnCount() {
-            return N_COL;
-        }
-
-        @Override
-        public String getColumnName(int column) {
-            switch(column) {
-                case COL_RANK:
-                    return "Rank";
-                case COL_NAME:
-                    return "Name";
-                case COL_CALL:
-                    return "Callsign";
-                case COL_AGE:
-                    return "Age";
-                case COL_GENDER:
-                    return "Gender";
-                case COL_TYPE:
-                    return "Role";
-                case COL_MECH:
-                    return "Mech";
-                case COL_AERO:
-                    return "Aero";
-                case COL_JET:
-                    return "Aircraft";
-                case COL_VEE:
-                    return "Vehicle";
-                case COL_VTOL:
-                    return "VTOL";
-                case COL_NVEE:
-                    return "Naval";
-                case COL_SPACE:
-                    return "Spacecraft";
-                case COL_ARTY:
-                    return "Artillery";
-                case COL_GUN_BA:
-                    return "G/Battlesuit";
-                case COL_SMALL_ARMS:
-                    return "Small Arms";
-                case COL_ANTI_MECH:
-                    return "Anti-Mech";
-                case COL_TACTICS:
-                    return "Tactics";
-                case COL_STRATEGY:
-                    return "Strategy";
-                case COL_TECH_MECH:
-                    return "Tech/Mech";
-                case COL_TECH_AERO:
-                    return "Tech/Aero";
-                case COL_TECH_VEE:
-                    return "Mechanic";
-                case COL_TECH_BA:
-                    return "Tech/BA";
-                case COL_MEDICAL:
-                    return "Medical";
-                case COL_ADMIN:
-                    return "Admin";
-                case COL_NEG:
-                    return "Negotiation";
-                case COL_SCROUNGE:
-                    return "Scrounge";
-                case COL_TOUGH:
-                    return "Toughness";
-                case COL_SKILL:
-                    return "Skill Level";
-                case COL_ASSIGN:
-                    return "Unit Assignment";
-                case COL_EDGE:
-                    return "Edge";
-                case COL_NABIL:
-                    return "# Abilities";
-                case COL_NIMP:
-                    return "# Implants";
-                case COL_HITS:
-                    return "Hits";
-                case COL_XP:
-                    return "XP";
-                case COL_DEPLOY:
-                    return "Deployed";
-                case COL_FORCE:
-                    return "Force";
-                case COL_SALARY:
-                    return "Salary";
-                case COL_KILLS:
-                    return "Kills";
-                default:
-                    return "?";
-            }
-        }
-
-        public int getColumnWidth(int c) {
-            switch(c) {
-            case COL_RANK:
-            case COL_DEPLOY:
-                return 70;
-            case COL_CALL:
-            case COL_SALARY:
-            case COL_SKILL:
-                return 50;
-            case COL_TYPE:
-            case COL_FORCE:
-                return 100;
-            case COL_NAME:
-            case COL_ASSIGN:
-                return 125;
-            default:
-                return 20;
-            }
-        }
-
-        public int getAlignment(int col) {
-            switch(col) {
-            case COL_SALARY:
-                return SwingConstants.RIGHT;
-            case COL_RANK:
-            case COL_NAME:
-            case COL_GENDER:
-            case COL_TYPE:
-            case COL_DEPLOY:
-            case COL_FORCE:
-            case COL_ASSIGN:
-            case COL_SKILL:
-                return SwingConstants.LEFT;
-            default:
-                return SwingConstants.CENTER;
-            }
-        }
-
-        public String getTooltip(int row, int col) {
-            Person p = data.get(row);
-            switch(col) {
-            case COL_NABIL:
-                return p.getAbilityList(PilotOptions.LVL3_ADVANTAGES);
-            case COL_NIMP:
-                return p.getAbilityList(PilotOptions.MD_ADVANTAGES);
-            case COL_ASSIGN:
-                if(p.getTechUnitIDs().size() > 1) {
-                    String toReturn = "<html>";
-                    for(UUID id : p.getTechUnitIDs()) {
-                        Unit u = getCampaign().getUnit(id);
-                        if(null != u) {
-                            toReturn += u.getName() + "<br>";
-                        }
-                    }
-                    toReturn += "</html>";
-                    return toReturn;
-                } else {
-                    return null;
-                }
-            default:
-                return null;
-            }
-        }
-
-        @Override
-        public Class<?> getColumnClass(int c) {
-            return getValueAt(0, c).getClass();
-        }
-
-        @Override
-        public boolean isCellEditable(int row, int col) {
-            return false;
-        }
-
-        public Person getPerson(int i) {
-            if( i >= data.size()) {
-                return null;
-            }
-            return data.get(i);
-        }
-
-        //fill table with values
-        public void setData(ArrayList<Person> people) {
-            data = people;
-            fireTableDataChanged();
-        }
-
-        public boolean isDeployed(int row) {
-            return getPerson(row).isDeployed(getCampaign());
-        }
-
-        public Object getValueAt(int row, int col) {
-            Person p;
-            DecimalFormat formatter = new DecimalFormat();
-            if(data.isEmpty()) {
-                return "";
-            } else {
-                p = data.get(row);
-            }
-            if(col == COL_RANK) {
-                return getCampaign().getRanks().getRank(p.getRank());
-            }
-            if(col == COL_NAME) {
-                return p.getName();
-            }
-            if(col == COL_CALL) {
-                return p.getCallsign();
-            }
-            if(col == COL_GENDER) {
-                return p.getGenderName();
-            }
-            if(col == COL_AGE) {
-                return p.getAge(getCampaign().getCalendar());
-            }
-            if(col == COL_TYPE) {
-                return p.getRoleDesc();
-            }
-            if(col == COL_MECH) {
-                String toReturn = "";
-                if(p.hasSkill(SkillType.S_GUN_MECH)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                toReturn += "/";
-                if(p.hasSkill(SkillType.S_PILOT_MECH)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_PILOT_MECH).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                return toReturn;
-            }
-            if(col == COL_AERO) {
-                String toReturn = "";
-                if(p.hasSkill(SkillType.S_GUN_AERO)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                toReturn += "/";
-                if(p.hasSkill(SkillType.S_PILOT_AERO)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                return toReturn;
-
-            }
-            if(col == COL_JET) {
-                String toReturn = "";
-                if(p.hasSkill(SkillType.S_GUN_JET)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_GUN_JET).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                toReturn += "/";
-                if(p.hasSkill(SkillType.S_PILOT_JET)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_PILOT_JET).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                return toReturn;
-
-            }
-            if(col == COL_SPACE) {
-                String toReturn = "";
-                if(p.hasSkill(SkillType.S_GUN_SPACE)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                toReturn += "/";
-                if(p.hasSkill(SkillType.S_PILOT_SPACE)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                return toReturn;
-
-            }
-            if(col == COL_VEE) {
-                String toReturn = "";
-                if(p.hasSkill(SkillType.S_GUN_VEE)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                toReturn += "/";
-                if(p.hasSkill(SkillType.S_PILOT_GVEE)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_PILOT_GVEE).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                return toReturn;
-
-            }
-            if(col == COL_NVEE) {
-                String toReturn = "";
-                if(p.hasSkill(SkillType.S_GUN_VEE)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                toReturn += "/";
-                if(p.hasSkill(SkillType.S_PILOT_NVEE)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_PILOT_NVEE).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                return toReturn;
-
-            }
-            if(col == COL_VTOL) {
-                String toReturn = "";
-                if(p.hasSkill(SkillType.S_GUN_VEE)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                toReturn += "/";
-                if(p.hasSkill(SkillType.S_PILOT_VTOL)) {
-                    toReturn += Integer.toString(p.getSkill(SkillType.S_PILOT_VTOL).getFinalSkillValue());
-                } else {
-                    toReturn += "-";
-                }
-                return toReturn;
-
-            }
-            if(col == COL_GUN_BA) {
-                if(p.hasSkill(SkillType.S_GUN_BA)) {
-                    return Integer.toString(p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue());
-                } else {
-                    return "-";
-                }
-            }
-            if(col == COL_ANTI_MECH) {
-                if(p.hasSkill(SkillType.S_ANTI_MECH)) {
-                    return Integer.toString(p.getSkill(SkillType.S_ANTI_MECH).getFinalSkillValue());
-                } else {
-                    return "-";
-                }
-            }
-            if(col == COL_SMALL_ARMS) {
-                if(p.hasSkill(SkillType.S_SMALL_ARMS)) {
-                    return Integer.toString(p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue());
-                } else {
-                    return "-";
-                }
-            }
-            if(col == COL_ARTY) {
-                if(p.hasSkill(SkillType.S_ARTILLERY)) {
-                    return Integer.toString(p.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue());
-                } else {
-                    return "-";
-                }
-            }
-            if(col == COL_TACTICS) {
-                if(p.hasSkill(SkillType.S_TACTICS)) {
-                    return Integer.toString(p.getSkill(SkillType.S_TACTICS).getFinalSkillValue());
-                } else {
-                    return "-";
-                }
-            }
-            if(col == COL_STRATEGY) {
-                if(p.hasSkill(SkillType.S_STRATEGY)) {
-                    return Integer.toString(p.getSkill(SkillType.S_STRATEGY).getFinalSkillValue());
-                } else {
-                    return "-";
-                }
-            }
-            if(col == COL_TECH_MECH) {
-                if(p.hasSkill(SkillType.S_TECH_MECH)) {
-                    return Integer.toString(p.getSkill(SkillType.S_TECH_MECH).getFinalSkillValue());
-                } else {
-                    return "-";
-                }
-            }
-            if(col == COL_TECH_AERO) {
-                if(p.hasSkill(SkillType.S_TECH_AERO)) {
-                    return Integer.toString(p.getSkill(SkillType.S_TECH_AERO).getFinalSkillValue());
-                } else {
-                    return "-";
-                }
-            }
-            if(col == COL_TECH_VEE) {
-                if(p.hasSkill(SkillType.S_TECH_MECHANIC)) {
-                    return Integer.toString(p.getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue());
-                } else {
-                    return "-";
-                }
-            }
-            if(col == COL_TECH_BA) {
-                if(p.hasSkill(SkillType.S_TECH_BA)) {
-                    return Integer.toString(p.getSkill(SkillType.S_TECH_BA).getFinalSkillValue());
-                } else {
-                    return "-";
-                }
-            }
-            if(col == COL_MEDICAL) {
-                if(p.hasSkill(SkillType.S_DOCTOR)) {
-                    return Integer.toString(p.getSkill(SkillType.S_DOCTOR).getFinalSkillValue());
-                } else {
-                    return "-";
-                }
-            }
-            if(col == COL_ADMIN) {
-                if(p.hasSkill(SkillType.S_ADMIN)) {
-                    return Integer.toString(p.getSkill(SkillType.S_ADMIN).getFinalSkillValue());
-                } else {
-                    return "-";
-                }
-            }
-            if(col == COL_NEG) {
-                if(p.hasSkill(SkillType.S_NEG)) {
-                    return Integer.toString(p.getSkill(SkillType.S_NEG).getFinalSkillValue());
-                } else {
-                    return "-";
-                }
-            }
-            if(col == COL_SCROUNGE) {
-                if(p.hasSkill(SkillType.S_SCROUNGE)) {
-                    return Integer.toString(p.getSkill(SkillType.S_SCROUNGE).getFinalSkillValue());
-                } else {
-                    return "-";
-                }
-            }
-            if(col == COL_TOUGH) {
-                return "?";
-            }
-            if(col == COL_EDGE) {
-                return Integer.toString(p.getEdge());
-            }
-            if(col == COL_NABIL) {
-                return Integer.toString(p.countOptions(PilotOptions.LVL3_ADVANTAGES));
-            }
-            if(col == COL_NIMP) {
-                return Integer.toString(p.countOptions(PilotOptions.MD_ADVANTAGES));
-
-            }
-            if(col == COL_HITS) {
-                return p.getHits();
-            }
-            if(col == COL_SKILL) {
-                return p.getSkillSummary();
-            }
-            if(col == COL_ASSIGN) {
-                Unit u = getCampaign().getUnit(p.getUnitId());
-                if(null != u) {
-                    String name = u.getName();
-                    if(u.getEntity() instanceof Tank) {
-                        if(u.isDriver(p)) {
-                            name = name + " [Driver]";
-                        } else {
-                            name = name + " [Gunner]";
-                        }
-                    }
-                    if(u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
-                        if(u.isNavigator(p)) {
-                            name = name + " [Navigator]";
-                        }
-                        else if(u.isDriver(p)) {
-                            name =  name + " [Pilot]";
-                        }
-                        else if(u.isGunner(p)) {
-                            name = name + " [Gunner]";
-                        } else {
-                            name = name + " [Crew]";
-                        }
-                    }
-                    return name;
-                }
-                //check for tech
-                if(!p.getTechUnitIDs().isEmpty()) {
-                    if(p.getTechUnitIDs().size() == 1) {
-                        u = getCampaign().getUnit(p.getTechUnitIDs().get(0));
-                        if(null != u) {
-                            return u.getName() + " (" + p.getMaintenanceTimeUsing(getCampaign()) + "m)";
-                        }
-                    } else {
-                        return "" + p.getTechUnitIDs().size() + " units (" + p.getMaintenanceTimeUsing(getCampaign()) + "m)";
-                    }
-                }             
-                return "-";
-            }
-            if(col == COL_XP) {
-                return p.getXp();
-            }
-            if(col == COL_DEPLOY) {
-                Unit u = getCampaign().getUnit(p.getUnitId());
-                if(null != u && u.isDeployed()) {
-                    return getCampaign().getScenario(u.getScenarioId()).getName();
-                } else {
-                    return "-";
-                }
-            }
-            if(col == COL_FORCE) {
-                Force force = getCampaign().getForceFor(p);
-                if(null != force) {
-                    return force.getName();
-                } else {
-                    return "None";
-                }
-            }
-            if(col == COL_SALARY) {
-                return formatter.format(p.getSalary());
-            }
-            if(col == COL_KILLS) {
-                return getCampaign().getKillsFor(p.getId()).size();
-            }
-            return "?";
-        }
-
-        public TableCellRenderer getRenderer() {
-            if(choicePersonView.getSelectedIndex() == PV_GRAPHIC) {
-                return new PersonnelTableModel.VisualRenderer(getCamos(), getPortraits(), getForceIcons(), getMechTiles());
-            }
-            return new PersonnelTableModel.Renderer();
-        }
-
-        public class Renderer extends DefaultTableCellRenderer {
-
-            private static final long serialVersionUID = 9054581142945717303L;
-
-            public Component getTableCellRendererComponent(JTable table,
-                    Object value, boolean isSelected, boolean hasFocus,
-                    int row, int column) {
-                super.getTableCellRendererComponent(table, value, isSelected,
-                        hasFocus, row, column);
-                setOpaque(true);
-                int actualCol = table.convertColumnIndexToModel(column);
-                int actualRow = table.convertRowIndexToModel(row);
-                setHorizontalAlignment(getAlignment(actualCol));
-                setToolTipText(getTooltip(actualRow, actualCol));
-
-                setForeground(Color.BLACK);
-                if (isSelected) {
-                    setBackground(Color.DARK_GRAY);
-                    setForeground(Color.WHITE);
-                } else {
-                    // tiger stripes
-                    if (isDeployed(actualRow)) {
-                        setBackground(Color.LIGHT_GRAY);
-                    } else if((Integer)getValueAt(actualRow,COL_HITS) > 0 || data.get(actualRow).hasInjuries(true)) {
-                        setBackground(Color.RED);
-                    } else {
-                        setBackground(Color.WHITE);
-                    }
-                }
-                return this;
-            }
-
-        }
-        
-        public class VisualRenderer extends BasicInfo implements TableCellRenderer {
-
-            private static final long serialVersionUID = -9154596036677641620L;
-
-            public VisualRenderer(DirectoryItems camos, DirectoryItems portraits, DirectoryItems force, 
-                    MechTileset mt) {
-                super(camos, portraits, force, mt);
-            }
-            
-            public Component getTableCellRendererComponent(JTable table,
-                    Object value, boolean isSelected, boolean hasFocus,
-                    int row, int column) {
-                Component c = this;
-                int actualCol = table.convertColumnIndexToModel(column);
-                int actualRow = table.convertRowIndexToModel(row);
-                setText(getValueAt(actualRow, actualCol).toString(), "black");
-                Person p = getPerson(actualRow);
-                String color = "black";
-                if(isSelected) {
-                    color = "white";
-                }
-                if (actualCol == COL_RANK) {
-                    setPortrait(p);
-                    setText(p.getFullDesc(), color);
-                }
-                if(actualCol == COL_ASSIGN) {
-                    Unit u = getCampaign().getUnit(p.getUnitId());
-                    if(!p.getTechUnitIDs().isEmpty()) {
-                        u = getCampaign().getUnit(p.getTechUnitIDs().get(0));
-                    }
-                    if(null != u) {
-                        String desc = "<html><b>" + u.getName() + "</b><br>";
-                        desc += u.getEntity().getWeightClassName();
-                        if(!(u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship)) {
-                            desc += " " + UnitType.getTypeDisplayableName(UnitType.determineUnitTypeCode(u.getEntity()));
-                        }
-                        desc += "<br>" + u.getStatus() + "</html>";
-                        setText(desc, color);
-                        Image mekImage = getImageFor(u);
-                        if(null != mekImage) {
-                            setImage(mekImage);
-                        } else {
-                            clearImage();
-                        }
-                    } else {
-                        clearImage();
-                    }
-                }
-                if(actualCol == COL_FORCE) {
-                    Force force = getCampaign().getForceFor(p);
-                    if(null != force) {
-                        String desc = "<html><b>" + force.getName() + "</b>";
-                        Force parent = force.getParentForce();
-                        //cut off after three lines and don't include the top level
-                        int lines = 1;
-                        while(parent != null && null != parent.getParentForce() && lines < 4) {
-                            desc += "<br>" + parent.getName();
-                            lines++;
-                            parent = parent.getParentForce();
-                        }
-                        desc += "</html>";
-                        setText(desc, color);
-                        Image forceImage = getImageFor(force);
-                        if(null != forceImage) {
-                            setImage(forceImage);
-                        } else {
-                            clearImage();
-                        }
-                    } else {
-                        clearImage();
-                    }
-                }
-                if(actualCol == COL_HITS) {
-                    Image hitImage = getHitsImage(p.getHits());
-                    if(null != hitImage) {
-                        setImage(hitImage);
-                        setText("", color);
-                    } else {
-                        clearImage();
-                        setText("", color);
-                    }
-                }
-                
-                if (isSelected) {
-                    c.setBackground(Color.DARK_GRAY);
-                } else {
-                    // tiger stripes
-                    if ((row % 2) == 0) {
-                        c.setBackground(new Color(220, 220, 220));
-                    } else {
-                        c.setBackground(Color.WHITE);
-                        
-                    }
-                }
-                return c;
-            }
-            
-            private Image getHitsImage(int hits) {
-                switch(hits) {
-                case 1:
-                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/onehit.png");
-                case 2:
-                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/twohits.png");
-                case 3:
-                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/threehits.png");
-                case 4:
-                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/fourhits.png");
-                case 5:
-                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/fivehits.png");
-                case 6:
-                    return Toolkit.getDefaultToolkit().getImage("data/images/misc/hits/sixhits.png");
-                }
-                return null;
-            }
-        }
-    }
     
     /**
      * A table model for displaying doctors
@@ -9821,13 +9097,12 @@ public class CampaignGUI extends JPanel {
         }
 
         public DocTableModel.Renderer getRenderer() {
-            return new DocTableModel.Renderer(getCamos(), getPortraits(), getForceIcons(), getMechTiles());
+            return new DocTableModel.Renderer(getIconPackage());
         }
 
         public class Renderer extends BasicInfo implements TableCellRenderer {
-            public Renderer(DirectoryItems camos, DirectoryItems portraits, DirectoryItems force, 
-                    MechTileset mt) {
-                super(camos, portraits, force, mt);
+            public Renderer(IconPackage icons) {
+                super(icons);
             }
 
             private static final long serialVersionUID = -818080358678474607L;
@@ -11550,7 +10825,7 @@ public class CampaignGUI extends JPanel {
 
         public TableCellRenderer getRenderer() {
             if(choiceUnitView.getSelectedIndex() == UV_GRAPHIC) {
-                return new UnitTableModel.VisualRenderer(getCamos(), getPortraits(), getForceIcons(), getMechTiles());
+                return new UnitTableModel.VisualRenderer(getIconPackage());
             }
             return new UnitTableModel.Renderer();
         }
@@ -11618,9 +10893,8 @@ public class CampaignGUI extends JPanel {
 
             private static final long serialVersionUID = -9154596036677641620L;
 
-            public VisualRenderer(DirectoryItems camos, DirectoryItems portraits, DirectoryItems force, 
-                    MechTileset mt) {
-                super(camos, portraits, force, mt);
+            public VisualRenderer(IconPackage icons) {
+                super(icons);
             }
             
             public Component getTableCellRendererComponent(JTable table,
@@ -11989,7 +11263,7 @@ public class CampaignGUI extends JPanel {
                     category = Player.ROOT_CAMO;
                 }
                 CamoChoiceDialog ccd = new CamoChoiceDialog(getFrame(), true, category, selectedUnit.getCamoFileName(),
-                        getCampaign().getColorIndex(), getCamos());
+                        getCampaign().getColorIndex(), getIconPackage().getCamos());
                 ccd.setLocationRelativeTo(getFrame());
                 ccd.setVisible(true);
 

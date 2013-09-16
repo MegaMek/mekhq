@@ -140,7 +140,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             }
             setProgress(2);
     		//load in directory items and tilesets
-    		app.loadDirectories();
+    		app.getIconPackage().loadDirectories();
             setProgress(3);
             boolean newCampaign = false;
             if(null == fileCampaign) {
@@ -187,7 +187,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             setProgress(4);
             if(newCampaign) {
             	setVisible(false);
-            	CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(frame, true, campaign, app.getCamos());
+            	CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(frame, true, campaign, app.getIconPackage().getCamos());
             	optionsDialog.setVisible(true);
         		if(optionsDialog.wasCancelled()) {
         			cancelled = true;
