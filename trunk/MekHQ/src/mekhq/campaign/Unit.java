@@ -222,6 +222,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	public Campaign campaign;
 
 	private ArrayList<Part> parts;
+	private String lastMaintenanceReport;
 
 	private Refit refit;
 	
@@ -269,6 +270,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 		this.daysSinceMaintenance = 0;
 		this.daysActivelyMaintained = 0;
 		this.astechDaysMaintained = 0;
+		this.lastMaintenanceReport = null;
 		reCalc();
 	}
 	
@@ -1432,6 +1434,12 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 		if(null != refit) {
 			refit.writeToXml(pw1, indentLvl+1);
 		}
+		if(null != lastMaintenanceReport) {
+		    pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
+		            +"<lastMaintenanceReport><![CDATA["
+	                +lastMaintenanceReport
+	                +"]]></lastMaintenanceReport>");
+		}
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "</unit>");
 	}
 
@@ -1518,7 +1526,9 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 					retVal.refit = Refit.generateInstanceFromXML(wn2, retVal, version);
 				} else if (wn2.getNodeName().equalsIgnoreCase("history")) {
 					retVal.history = wn2.getTextContent();
-				}
+				} else if (wn2.getNodeName().equalsIgnoreCase("lastMaintenanceReport")) {
+                    retVal.lastMaintenanceReport = wn2.getTextContent();
+                } 
 			}
 		} catch (Exception ex) {
 			// Doh!
@@ -3286,4 +3296,24 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     public int getMode() {
         return Modes.MODE_NORMAL;
     }
+    
+    
+    public String getLastMaintenanceReport() {
+        return lastMaintenanceReport;
+    }
+    
+    public void setLastMaintenanceReport(String r) {
+        lastMaintenanceReport = r;
+    }
+    /*
+    public String getLastMaintenanceReport() {
+        String report = "";
+        for(Part part : parts) {
+            if(part.needsMaintenance() && null != part.getLastMaintenanceReport()) {
+                report += part.getLastMaintenanceReport() + "<br>";
+            }
+        }
+        return report;
+    }
+    */
 }

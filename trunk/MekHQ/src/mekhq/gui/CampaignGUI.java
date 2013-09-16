@@ -242,6 +242,7 @@ import mekhq.gui.dialog.EditTransactionDialog;
 import mekhq.gui.dialog.GameOptionsDialog;
 import mekhq.gui.dialog.HireBulkPersonnelDialog;
 import mekhq.gui.dialog.KillDialog;
+import mekhq.gui.dialog.MaintenanceReportDialog;
 import mekhq.gui.dialog.MekHQAboutBox;
 import mekhq.gui.dialog.MercRosterDialog;
 import mekhq.gui.dialog.MissionTypeDialog;
@@ -3855,6 +3856,18 @@ public class CampaignGUI extends JPanel {
     private void showReport(Report report) {
         ReportDialog rd = new ReportDialog(getFrame(), report);
         rd.setVisible(true);
+    }
+    
+    public void showMaintenanceReport(UUID id) {
+        if(null == id) {
+            return;
+        }
+        Unit u = getCampaign().getUnit(id);
+        if(null == u) {
+            return;
+        }
+        MaintenanceReportDialog mrd = new MaintenanceReportDialog(getFrame(), u);
+        mrd.setVisible(true);
     }
     
     public UUID selectTech(Unit u, String desc) {
@@ -12250,6 +12263,8 @@ public class CampaignGUI extends JPanel {
                     refreshTechsList();
                     refreshReport();
                     refreshCargo();
+            } else if (command.contains("MAINTENANCE_REPORT")) {
+                showMaintenanceReport(selectedUnit.getId());
             } else if (command.contains("ASSIGN")) {
                 String sel = command.split(":")[1];
                 UUID id = UUID.fromString(sel);
@@ -12753,6 +12768,12 @@ public class CampaignGUI extends JPanel {
                             MenuScroller.setScrollerFor(menu, 20);
                         }
                     }
+                }
+                if(oneSelected && unit.requiresMaintenance()) {
+                    menuItem = new JMenuItem("Show Last Maintenance Report");
+                    menuItem.setActionCommand("MAINTENANCE_REPORT");
+                    menuItem.addActionListener(this);
+                    popup.add(menuItem);
                 }
                 if(oneSelected && unit.getEntity() instanceof Infantry && !(unit.getEntity() instanceof BattleArmor)) {
                     menuItem = new JMenuItem("Disband");

@@ -21,6 +21,7 @@ v0.3.3 (SVN)
   options and provides a more realistic atmosphere of transient personnel availability
 + Bug: Personnel Market shows rank instead of Person for Graphic, and vice versa for General
 + Bug: Personnel Market incorrect renderer
++ last maintenance report now kept for each unit, no more logging
 
 v0.3.2 (2013-09-13)
 + maintenance checks (WIP)
