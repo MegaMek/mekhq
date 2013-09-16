@@ -1732,20 +1732,25 @@ public class Campaign implements Serializable {
 		 * Now that we have maintenance checks in for real, we are going to pay maintenance
 		 * on individual units when they come up for their maintenance checks and apply a +1 penalty
 		 * if the cash is not there
-		if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
-			// maintenance costs
-			if (campaignOptions.payForMaintain()) {
-				if (finances.debit(getMaintenanceCosts(),
-						Transaction.C_MAINTAIN, "Weekly Maintenance",
-						calendar.getTime())) {
-					addReport("Your account has been debited for "
-							+ formatter.format(getMaintenanceCosts())
-							+ " C-bills in maintenance costs");
-				} else {
-					addReport("<font color='red'><b>You cannot afford to pay maintenance costs!</b></font> Units will make their next maintenance check at a disadvantage.");
+		 * Dylan - Except when we're not using the maint cycle options at all!
+		 */
+		if (!getCampaignOptions().checkMaintenance()) {
+			if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
+				// maintenance costs
+				if (campaignOptions.payForMaintain()) {
+					if (finances.debit(getMaintenanceCosts(),
+							Transaction.C_MAINTAIN, "Weekly Maintenance",
+							calendar.getTime())) {
+						addReport("Your account has been debited for "
+								+ formatter.format(getMaintenanceCosts())
+								+ " C-bills in maintenance costs");
+					} else {
+						addReport("<font color='red'><b>You cannot afford to pay maintenance costs!</b></font>");
+					}
 				}
 			}
-		}*/
+		}
+		
 		if (calendar.get(Calendar.DAY_OF_MONTH) == 1) {
 			// check for contract payments
 			for (Contract contract : getActiveContracts()) {
