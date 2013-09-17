@@ -150,9 +150,9 @@ public class PersonnelMarketDialog extends JDialog {
         panelFilterBtns.add(lblPersonView, gridBagConstraints);
 
         DefaultComboBoxModel personViewModel = new DefaultComboBoxModel();
-        for (int i = 0; i < CampaignGUI.PV_NUM; i++) {
-            personViewModel.addElement(CampaignGUI.getPersonnelViewName(i));
-        }
+        //for (int i = 0; i < PV_NUM; i++) {
+            personViewModel.addElement(CampaignGUI.getPersonnelViewName(0));
+        //}
         choicePersonView.setModel(personViewModel);
         choicePersonView.setName("choicePersonView"); // NOI18N
         choicePersonView.setSelectedIndex(1);
@@ -712,9 +712,9 @@ public class PersonnelMarketDialog extends JDialog {
     }
 	
 	public TableCellRenderer getRenderer() {
-        if(choicePersonView.getSelectedIndex() == CampaignGUI.PV_GRAPHIC) {
+        //if(choicePersonView.getSelectedIndex() == CampaignGUI.PV_GRAPHIC) {
             //return personnelModel.new VisualRenderer(hqView.getCamos(), portraits, hqView.getMechTiles());
-        }
+       // }
         return personnelModel.new Renderer();
     }
 
