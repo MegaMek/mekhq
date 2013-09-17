@@ -351,6 +351,10 @@ public class InfantryArmorPart extends Part {
 		return new InfantryArmorPart(getUnitTonnage(), campaign, damageDivisor, encumbering, dest, sneak_camo, sneak_ecm, sneak_ir, spaceSuit);
 	}
 	
+	@Override
+    public boolean needsMaintenance() {
+        return false;
+    }
 	
 	
 }

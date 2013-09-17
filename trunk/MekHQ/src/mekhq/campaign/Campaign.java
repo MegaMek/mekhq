@@ -2761,6 +2761,9 @@ public class Campaign implements Serializable {
 				} else if (prt instanceof MissingMekActuator
 						&& ((MissingMekActuator) prt).getLocation() == Entity.LOC_NONE) {
 					removeParts.add(prt);
+				} else if((u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) && (prt instanceof EnginePart || prt instanceof MissingEnginePart)) {
+				    //units from earlier versions might have the wrong kind of engine
+				    removeParts.add(prt);
 				} else {
 					u.addPart(prt);
 					if (prt instanceof AmmoBin) {
