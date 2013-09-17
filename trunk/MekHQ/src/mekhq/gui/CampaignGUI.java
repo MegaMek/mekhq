@@ -23,15 +23,12 @@ package mekhq.gui;
 import gd.xml.ParseException;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.Window;
@@ -43,7 +40,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
@@ -57,11 +53,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
-//import java.nio.file.FileAlreadyExistsException;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -74,12 +67,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
-import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DropMode;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
@@ -90,6 +80,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -103,7 +94,6 @@ import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
-import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
@@ -116,77 +106,47 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.MouseInputAdapter;
-import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import megamek.client.ui.Messages;
-import megamek.client.ui.swing.MechTileset;
-import megamek.client.ui.swing.ChatLounge.MekInfo;
-import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
-import megamek.common.Configuration;
-import megamek.common.ConvFighter;
 import megamek.common.Crew;
-import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
-import megamek.common.EntityMovementMode;
-import megamek.common.EntityWeightClass;
 import megamek.common.GunEmplacement;
 import megamek.common.Infantry;
-import megamek.common.Jumpship;
 import megamek.common.Mech;
 import megamek.common.MechSummaryCache;
 import megamek.common.MechView;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.Player;
-import megamek.common.Protomech;
-import megamek.common.SmallCraft;
-import megamek.common.SpaceStation;
-import megamek.common.SupportTank;
-import megamek.common.SupportVTOL;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
-import megamek.common.TechConstants;
 import megamek.common.UnitType;
-import megamek.common.VTOL;
-import megamek.common.Warship;
 import megamek.common.WeaponType;
 import megamek.common.XMLStreamParser;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
-import megamek.common.util.DirectoryItems;
 import megameklab.com.util.UnitPrintManager;
 import mekhq.IconPackage;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.DragoonsRatingFactory;
-import mekhq.campaign.IDragoonsRating;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.Kill;
 import mekhq.campaign.LogEntry;
@@ -237,7 +197,6 @@ import mekhq.gui.dialog.CustomizeMissionDialog;
 import mekhq.gui.dialog.CustomizePersonDialog;
 import mekhq.gui.dialog.CustomizeScenarioDialog;
 import mekhq.gui.dialog.DataLoadingDialog;
-import mekhq.gui.dialog.DragoonsRatingDialog;
 import mekhq.gui.dialog.EditKillLogDialog;
 import mekhq.gui.dialog.EditLogEntryDialog;
 import mekhq.gui.dialog.EditPersonnelInjuriesDialog;
@@ -265,10 +224,10 @@ import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.dialog.UnitSelectorDialog;
 import mekhq.gui.model.AcquisitionTableModel;
-import mekhq.gui.model.DataTableModel;
 import mekhq.gui.model.DocTableModel;
 import mekhq.gui.model.FinanceTableModel;
 import mekhq.gui.model.LoanTableModel;
+import mekhq.gui.model.OrgTreeModel;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.PatientTableModel;
 import mekhq.gui.model.PersonnelTableModel;
@@ -377,161 +336,133 @@ public class CampaignGUI extends JPanel {
 
     private MekHQ app;
 
-    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI");
+    private ResourceBundle resourceMap;
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTable docTable;
-    private javax.swing.JTable partsTable;
-    private javax.swing.JTable acquirePartsTable;
-    private javax.swing.JTable taskTable;
-    private javax.swing.JTable acquisitionTable;
-    private javax.swing.JTable techTable;
-    private javax.swing.JTable whTechTable;
-    private javax.swing.JTable servicedUnitTable;
-    private javax.swing.JTable unitTable;
-    private javax.swing.JTable personnelTable;
-    private javax.swing.JTable acquireUnitsTable;
-    private javax.swing.JTable scenarioTable;
-    private javax.swing.JTable financeTable;
-    private javax.swing.JTable loanTable;
-    private javax.swing.JButton btnAdvanceDay;
-    private javax.swing.JButton btnAssignDoc;
-    private javax.swing.JButton btnUnassignDoc;
-    private javax.swing.JButton btnDoTask;
-    private javax.swing.JButton btnDoTaskWarehouse;
-    private javax.swing.JToggleButton btnGMMode;
-    private javax.swing.JToggleButton btnOvertime;
-    private javax.swing.JToggleButton btnShowAllTechs;
-    private javax.swing.JToggleButton btnShowAllTechsWarehouse;
-    private javax.swing.JScrollPane scrTextTarget;
-    private javax.swing.JScrollPane scrollPartsTable;
-    private javax.swing.JLabel lblTargetNum;
-    private javax.swing.JLabel lblTargetNumWarehouse;
-    private javax.swing.JPanel mainPanel;
-    private javax.swing.JMenuBar menuBar;
-    private javax.swing.JMenu menuHire;
-    private javax.swing.JMenu menuFile;
-    private javax.swing.JMenu menuHelp;
-    private javax.swing.JMenuItem menuLoad;
-    private javax.swing.JMenuItem menuAboutItem;
-    private javax.swing.JMenuItem menuExitItem;
-    private javax.swing.JMenu menuExport;
-    private javax.swing.JMenu menuImport;
-    private javax.swing.JMenu menuMarket;
-    private javax.swing.JMenuItem menuOptions;
-    private javax.swing.JMenuItem menuOptionsMM;
-    private javax.swing.JMenu menuThemes;
-    private javax.swing.JMenuItem menuSave;
-    private javax.swing.JMenuItem miMercRoster;
-    private javax.swing.JMenuItem miHireBulk;
-    private javax.swing.JMenuItem miHire;
-    private javax.swing.JMenuItem miPersonnelMarket;
-    private javax.swing.JMenuItem miHireAstechs;
-    private javax.swing.JMenuItem miFireAstechs;
-    private javax.swing.JMenuItem miFireAllAstechs;
-    private javax.swing.JMenuItem miFullStrengthAstechs;
-    private javax.swing.JMenu menuAstechPool;
-    private javax.swing.JMenuItem miHireMedics;
-    private javax.swing.JMenuItem miFireMedics;
-    private javax.swing.JMenuItem miFireAllMedics;
-    private javax.swing.JMenuItem miFullStrengthMedics;
-    private javax.swing.JMenu menuMedicPool;
-    private javax.swing.JMenuItem miLoadForces;
-    private javax.swing.JMenuItem miExportPersonCSV;
-    private javax.swing.JMenuItem miExportUnitCSV;
-    private javax.swing.JMenuItem miImportPerson;
-    private javax.swing.JMenuItem miImportParts;
-    private javax.swing.JMenuItem miPurchaseUnit;
-    private javax.swing.JMenuItem miBuyParts;
-    private javax.swing.JMenu menuReports;
-    private javax.swing.JMenuItem miDragoonsRating;
-    private javax.swing.JMenuItem miPersonnelReport;
-    private javax.swing.JMenuItem miTransportReport;
-    private javax.swing.JMenuItem miHangarBreakdown;
-    private javax.swing.JMenu menuCommunity;
-    private javax.swing.JMenuItem miChat;
-    private javax.swing.JPanel panFinances;
-    private javax.swing.JPanel panHangar;
-    private javax.swing.JPanel panOrganization;
-    private javax.swing.JPanel panRepairBay;
-    private javax.swing.JPanel panInfirmary;
-    private javax.swing.JPanel panPersonnel;
-    private javax.swing.JPanel panBriefing;
-    private javax.swing.JPanel panScenario;
-    private javax.swing.JPanel panSupplies;
-    private javax.swing.JPanel panDoTask;
-    private javax.swing.JPanel panMapView;
-    private javax.swing.JScrollPane scrollDocTable;
-    private javax.swing.JScrollPane scrollUnassignedPatient;
-    private javax.swing.JScrollPane scrollTaskTable;
-    private javax.swing.JScrollPane scrollAcquisitionTable;
-    private javax.swing.JScrollPane scrollTechTable;
-    private javax.swing.JScrollPane scrollWhTechTable;
-    private javax.swing.JScrollPane scrollServicedUnitTable;
-    private javax.swing.JScrollPane scrollServicedUnitView;
-    private javax.swing.JScrollPane scrollScenarioTable;
-    private javax.swing.JScrollPane scrollUnitTable;
-    private javax.swing.JScrollPane scrollFinanceTable;
-    private javax.swing.JScrollPane scrollLoanTable;
-    private javax.swing.JTextPane txtServicedUnitView;
-    private javax.swing.JSplitPane splitServicedUnits;
-    private javax.swing.JSplitPane splitWarehouse;
-    private javax.swing.JPanel statusPanel;
-    private javax.swing.JTabbedPane tabMain;
-    private javax.swing.JTabbedPane tabTasks;
-    private javax.swing.JTextArea textTarget;
-    private javax.swing.JTextArea textTargetWarehouse;
-    private javax.swing.JLabel astechPoolLabel;
-    private javax.swing.JLabel astechPoolLabelWarehouse;
-    private javax.swing.JTextPane txtPaneReport;
-    private javax.swing.JScrollPane txtPaneReportScrollPane;
-    private javax.swing.JComboBox choicePerson;
-    private javax.swing.JComboBox choicePersonView;
-    private javax.swing.JScrollPane scrollPersonnelView;
-    private javax.swing.JSplitPane splitPersonnel;
-    private javax.swing.JComboBox choiceUnit;
-    private javax.swing.JComboBox choiceUnitView;
-    private javax.swing.JScrollPane scrollUnitView;
-    private javax.swing.JSplitPane splitUnit;
-    private javax.swing.JTree orgTree;
-    private javax.swing.JSplitPane splitOrg;
-    private javax.swing.JScrollPane scrollForceView;
+    /*for the main panel*/
+    private JPanel mainPanel;
+    private JTabbedPane tabMain;
+    private JButton btnAdvanceDay;
+    private JTextPane txtPaneReport;
+    private JLabel lblLocation;
+    
+    /*For the menu bar*/
+    private JMenuBar menuBar;
+    private JMenu menuThemes;
+    
+    /*For the TO&E tab*/
+    private JPanel panOrganization;
+    private JTree orgTree;
+    private JSplitPane splitOrg;
+    private JScrollPane scrollForceView;
+    
+    /*For the briefing room tab*/
+    private JPanel panBriefing;
+    private JPanel panScenario;
+    private JSplitPane splitBrief;
+    private JSplitPane splitMission;
+    private JTable scenarioTable;
+    private JComboBox choiceMission;
+    private JScrollPane scrollMissionView;
+    private JScrollPane scrollScenarioView;
+    private JPanel panMissionButtons;
+    private JPanel panScenarioButtons;
+    private JButton btnAddScenario;
+    private JButton btnAddMission;
+    private JButton btnEditMission;
+    private JButton btnCompleteMission;
+    private JButton btnDeleteMission;
+    private JButton btnStartGame;
+    private JButton btnLoadGame;
+    private JButton btnPrintRS;
+    private JButton btnGetMul;
+    private JButton btnClearAssignedUnits;
+    private JButton btnResolveScenario;
+  
+    /*For the map tab*/
+    private JPanel panMapView;
     InterstellarMapPanel panMap;
-    private javax.swing.JSplitPane splitMap;
-    private javax.swing.JScrollPane scrollPlanetView;
-    private javax.swing.JComboBox choiceMission;
-    private javax.swing.JScrollPane scrollMissionView;
-    private javax.swing.JScrollPane scrollScenarioView;
-    private javax.swing.JPanel panMissionButtons;
-    private javax.swing.JPanel panScenarioButtons;
-    private javax.swing.JButton btnAddScenario;
-    private javax.swing.JButton btnAddMission;
-    private javax.swing.JButton btnEditMission;
-    private javax.swing.JButton btnCompleteMission;
-    private javax.swing.JButton btnDeleteMission;
-    private javax.swing.JButton btnStartGame;
-    private javax.swing.JButton btnLoadGame;
-    private javax.swing.JButton btnPrintRS;
-    private javax.swing.JButton btnGetMul;
-    private javax.swing.JButton btnClearAssignedUnits;
-    private javax.swing.JButton btnResolveScenario;
-    private javax.swing.JSplitPane splitBrief;
-    private javax.swing.JSplitPane splitMission;
-    private javax.swing.JComboBox choiceParts;
-    private javax.swing.JComboBox choicePartsView;
+    private JSplitPane splitMap;
+    private JScrollPane scrollPlanetView;
     private JSuggestField suggestPlanet;
-    private MekLabPanel panMekLab;
-    private javax.swing.JScrollPane scrollMekLab;
-    private javax.swing.JLabel lblLocation;
+
+    /*For the personnel tab*/
+    private JPanel panPersonnel;
+    private JSplitPane splitPersonnel;
+    private JTable personnelTable;
+    private JComboBox choicePerson;
+    private JComboBox choicePersonView;
+    private JScrollPane scrollPersonnelView;
+    
+    /*For the hangar tab*/
+    private JPanel panHangar;
+    private JSplitPane splitUnit;
+    private JTable unitTable;
+    private JTable acquireUnitsTable;
+    private JComboBox choiceUnit;
+    private JComboBox choiceUnitView;
+    private JScrollPane scrollUnitView;
+    
+    /*For the warehouse tab*/
+    private JPanel panSupplies;
+    private JSplitPane splitWarehouse;
+    private JTable partsTable;
+    private JTable acquirePartsTable;
+    private JTable whTechTable;
+    private JButton btnDoTaskWarehouse;
+    private JToggleButton btnShowAllTechsWarehouse;
+    private JLabel lblTargetNumWarehouse;
+    private JTextArea textTargetWarehouse;
+    private JLabel astechPoolLabelWarehouse;
+    private JComboBox choiceParts;
+    private JComboBox choicePartsView;
+
+    /*For the repair bay tab*/
+    private JPanel panRepairBay;
+    private JPanel panDoTask;
+    private JTabbedPane tabTasks;
+    private JSplitPane splitServicedUnits;
+    private JTable servicedUnitTable;
+    private JTable taskTable;
+    private JTable acquisitionTable;
+    private JTable techTable;
+    private JButton btnDoTask;
+    private JToggleButton btnShowAllTechs;
+    private JScrollPane scrTextTarget;
+    private JScrollPane scrollPartsTable;
+    private JLabel lblTargetNum;
+    private JTextPane txtServicedUnitView;
+    private JTextArea textTarget;
+    private JLabel astechPoolLabel;
+    
+    /*For the infirmary tab*/
+    private JPanel panInfirmary;
+    private JTable docTable;
+    private JButton btnAssignDoc;
+    private JButton btnUnassignDoc;
     private JList listAssignedPatient;
     private JList listUnassignedPatient;
+    
+    /*For the mek lab tab*/
+    private MekLabPanel panMekLab;
+    
+    /*For the finances tab*/
+    private JPanel panFinances;
+    private JTable financeTable;
+    private JTable loanTable;
+    private JTextArea areaNetWorth;
+    private JButton btnAddFunds;
 
-    private javax.swing.JLabel lblRating;
-    private javax.swing.JLabel lblFunds;
-    private javax.swing.JLabel lblTempAstechs;
-    private javax.swing.JLabel lblTempMedics;
-    private javax.swing.JLabel lblCargo;
+    /*Components for the status panel*/
+    private JPanel statusPanel;
+    private JToggleButton btnGMMode;
+    private JToggleButton btnOvertime;
+    private JLabel lblRating;
+    private JLabel lblFunds;
+    private JLabel lblTempAstechs;
+    private JLabel lblTempMedics;
+    private JLabel lblCargo;
         
+    /*Table models that we will need*/
     private TaskTableModel taskModel;
     private AcquisitionTableModel acquireModel;
     private ServicedUnitTableModel servicedUnitModel;
@@ -549,6 +480,7 @@ public class CampaignGUI extends JPanel {
     private ScenarioTableModel scenarioModel;
     private OrgTreeModel orgModel;
     
+    /*table sorters for tables that can be filtered*/
     private TableRowSorter<PersonnelTableModel> personnelSorter;
     private TableRowSorter<PartsTableModel> partsSorter;
     private TableRowSorter<ProcurementTableModel> acquirePartsSorter;
@@ -558,9 +490,6 @@ public class CampaignGUI extends JPanel {
     private TableRowSorter<TechTableModel> whTechSorter;
     
     ReportHyperlinkListener reportHLL;
-    
-    private JTextArea areaNetWorth;
-    private JButton btnAddFunds;
     
     public int selectedMission;
 
@@ -572,10 +501,8 @@ public class CampaignGUI extends JPanel {
     }
 
     public void showAboutBox() {
-        if (aboutBox == null) {
-            aboutBox = new MekHQAboutBox(getFrame());
-            aboutBox.setLocationRelativeTo(getFrame());
-        }
+        MekHQAboutBox aboutBox = new MekHQAboutBox(getFrame());
+        aboutBox.setLocationRelativeTo(getFrame());
         aboutBox.setVisible(true);
     }
 
@@ -586,71 +513,12 @@ public class CampaignGUI extends JPanel {
      */
     private void initComponents() {
     	
-    	
-        java.awt.GridBagConstraints gridBagConstraints;
-
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI");
+        
         frame = new JFrame("MekHQ"); //$NON-NLS-1$
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-
-        mainPanel = new javax.swing.JPanel();
-        tabMain = new javax.swing.JTabbedPane();
-        txtPaneReportScrollPane = new javax.swing.JScrollPane();
-        txtPaneReport = new javax.swing.JTextPane();
-        btnAdvanceDay = new javax.swing.JButton();
-        btnOvertime = new javax.swing.JToggleButton();
-        btnShowAllTechs = new javax.swing.JToggleButton();
-        btnShowAllTechsWarehouse = new javax.swing.JToggleButton();
-        btnGMMode = new javax.swing.JToggleButton();
-        lblRating = new javax.swing.JLabel();
-        lblFunds = new javax.swing.JLabel();
-        lblTempAstechs = new javax.swing.JLabel();
-        lblTempMedics = new javax.swing.JLabel();
-        lblCargo = new javax.swing.JLabel();
-        menuBar = new javax.swing.JMenuBar();
-        menuFile = new javax.swing.JMenu();
-        menuLoad = new javax.swing.JMenuItem();
-        menuSave = new javax.swing.JMenuItem();
-        menuOptions = new javax.swing.JMenuItem();
-        menuOptionsMM = new javax.swing.JMenuItem();
-        menuThemes = new javax.swing.JMenu();
-        menuExitItem = new javax.swing.JMenuItem();
-        menuExport = new javax.swing.JMenu();
-        menuImport = new javax.swing.JMenu();
-        miLoadForces = new javax.swing.JMenuItem();
-        miExportPersonCSV = new javax.swing.JMenuItem();
-        miExportUnitCSV = new javax.swing.JMenuItem();
-        miImportPerson = new javax.swing.JMenuItem();
-        miImportParts = new javax.swing.JMenuItem();
-        miMercRoster = new javax.swing.JMenuItem();
-        menuMarket = new javax.swing.JMenu();
-        miPurchaseUnit = new javax.swing.JMenuItem();
-        miBuyParts = new javax.swing.JMenuItem();
-        menuHire = new javax.swing.JMenu();
-        miHireBulk = new javax.swing.JMenuItem();
-        miHire = new javax.swing.JMenuItem();
-        miPersonnelMarket = new javax.swing.JMenuItem();
-        miHireAstechs = new javax.swing.JMenuItem();
-        miFireAstechs = new javax.swing.JMenuItem();
-        miFireAllAstechs = new javax.swing.JMenuItem();
-        menuAstechPool = new javax.swing.JMenu();
-        miFullStrengthAstechs = new javax.swing.JMenuItem();
-        miHireMedics = new javax.swing.JMenuItem();
-        miFireMedics = new javax.swing.JMenuItem();
-        miFireAllMedics = new javax.swing.JMenuItem();
-        menuMedicPool = new javax.swing.JMenu();
-        miFullStrengthMedics = new javax.swing.JMenuItem();
-        menuReports = new javax.swing.JMenu();
-        miDragoonsRating = new javax.swing.JMenuItem();
-        miPersonnelReport = new javax.swing.JMenuItem();
-        miTransportReport = new javax.swing.JMenuItem();
-        miHangarBreakdown = new javax.swing.JMenuItem();
-        menuCommunity = new javax.swing.JMenu();
-        miChat = new javax.swing.JMenuItem();
-        menuHelp = new javax.swing.JMenu();
-        menuAboutItem = new javax.swing.JMenuItem();
-        statusPanel = new javax.swing.JPanel();    
-        lblLocation = new javax.swing.JLabel();
         
+        tabMain = new JTabbedPane();
         tabMain.setToolTipText(resourceMap.getString("tabMain.toolTipText")); // NOI18N
         tabMain.setMinimumSize(new java.awt.Dimension(600, 200));
         tabMain.setPreferredSize(new java.awt.Dimension(900, 300));
@@ -697,492 +565,17 @@ public class CampaignGUI extends JPanel {
                 panInfirmary); // NOI18N
 
         panMekLab = new MekLabPanel(this);
-        scrollMekLab = new JScrollPane(panMekLab);
         tabMain.addTab(
                 resourceMap.getString("panMekLab.TabConstraints.tabTitle"),
-                scrollMekLab); // NOI18N
+                new JScrollPane(panMekLab)); // NOI18N
 
         initFinanceTab();
         tabMain.addTab(
                 resourceMap.getString("panFinances.TabConstraints.tabTitle"),
                 panFinances); // NOI18N
         
-        mainPanel.setAutoscrolls(true);
-        mainPanel.setName("mainPanel"); // NOI18N
-        mainPanel.setLayout(new java.awt.GridBagLayout());
-
-        lblLocation.setMinimumSize(new java.awt.Dimension(250,100));
-        lblLocation.setPreferredSize(new java.awt.Dimension(250, 100));
-        lblLocation.setText(getCampaign().getLocation().getReport(getCampaign().getCalendar().getTime())); // NOI18N
-        lblLocation.setName("lblLocation"); // NOI18N
-        lblLocation.setVerticalAlignment(SwingConstants.TOP);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-        mainPanel.add(lblLocation, gridBagConstraints);
-
-
-        txtPaneReportScrollPane.setName("txtPaneReportScrollPane"); // NOI18N
-        txtPaneReport.setContentType(resourceMap
-                .getString("txtPaneReport.contentType")); // NOI18N
-        txtPaneReport.setEditable(false);
-        txtPaneReport.setText(getCampaign().getCurrentReportHTML());
-        txtPaneReport.addHyperlinkListener(reportHLL);
-        txtPaneReportScrollPane.setViewportView(txtPaneReport);     
-        txtPaneReportScrollPane.setMinimumSize(new java.awt.Dimension(250,100));
-        txtPaneReportScrollPane.setPreferredSize(new java.awt.Dimension(250, 100));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-        mainPanel.add(txtPaneReportScrollPane, gridBagConstraints);
-
-        btnAdvanceDay.setText(resourceMap.getString("btnAdvanceDay.text")); // NOI18N
-        btnAdvanceDay.setToolTipText(resourceMap
-                .getString("btnAdvanceDay.toolTipText")); // NOI18N
-        btnAdvanceDay.setName("btnAdvanceDay"); // NOI18N
-        btnAdvanceDay.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAdvanceDayActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-        mainPanel.add(btnAdvanceDay, gridBagConstraints);
-
-        btnGMMode.setText(resourceMap.getString("btnGMMode.text")); // NOI18N
-        btnGMMode
-                .setToolTipText(resourceMap.getString("btnGMMode.toolTipText")); // NOI18N
-        btnGMMode.setName("btnGMMode"); // NOI18N
-        btnGMMode.setSelected(getCampaign().isGM());
-        btnGMMode.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGMModeActionPerformed(evt);
-            }
-        });
-
-        btnOvertime.setText(resourceMap.getString("btnOvertime.text")); // NOI18N
-        btnOvertime.setToolTipText(resourceMap
-                .getString("btnOvertime.toolTipText")); // NOI18N
-        btnOvertime.setName("btnOvertime"); // NOI18N
-        btnOvertime.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOvertimeActionPerformed(evt);
-            }
-        });
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        //gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-        mainPanel.add(tabMain, gridBagConstraints);
-
-        menuBar.setName("menuBar"); // NOI18N
-
-        menuFile.setText(resourceMap.getString("fileMenu.text")); // NOI18N
-        menuFile.setName("fileMenu"); // NOI18N
-
-        menuLoad.setText(resourceMap.getString("menuLoad.text")); // NOI18N
-        menuLoad.setName("menuLoadXml"); // NOI18N
-        menuLoad.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuLoadXmlActionPerformed(evt);
-            }
-        });
-        menuFile.add(menuLoad);
-
-        menuSave.setText(resourceMap.getString("menuSave.text")); // NOI18N
-        menuSave.setName("menuSaveXml"); // NOI18N
-        menuSave.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuSaveXmlActionPerformed(evt);
-            }
-        });
-        menuFile.add(menuSave);
-
-        menuImport.setText(resourceMap.getString("menuImport.text")); // NOI18N
-        menuExport.setText(resourceMap.getString("menuExport.text")); // NOI18N
-
-        /* 
-         * Taharqa: I think it is confusing and bad gui feng-shui to put this in the menu
-         * even though it is driven by user selections that might not even be in the 
-         * visible tab at the moment. If we keep this it should be for all personnel and parts
-         * and be clearly labeled as such
-         * 
-        miExportPerson.setText(resourceMap.getString("miExportPerson.text")); // NOI18N
-        miExportPerson.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miExportPersonActionPerformed(evt);
-            }
-        });
-        menuExport.add(miExportPerson);
-        
-        miExportParts.setText(resourceMap.getString("miExportParts.text")); // NOI18N
-        miExportParts.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miExportPartsActionPerformed(evt);
-            }
-        });
-        menuExport.add(miExportParts);
-        */
-        
-        miExportPersonCSV.setText(resourceMap.getString("miExportPersonCSV.text")); // NOI18N
-        miExportPersonCSV.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exportTable(personnelTable, getCampaign().getName()
-                        + getCampaign().getShortDateAsString() + "_ExportedPersonnel" + ".csv");
-            }
-        });
-        menuExport.add(miExportPersonCSV);
-        
-        miExportUnitCSV.setText(resourceMap.getString("miExportUnitCSV.text")); // NOI18N
-        miExportUnitCSV.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exportTable(unitTable, getCampaign().getName()
-                        + getCampaign().getShortDateAsString() + "_ExportedUnit" + ".csv");
-            }
-        });
-        menuExport.add(miExportUnitCSV);
-        
-        miImportPerson.setText(resourceMap.getString("miImportPerson.text")); // NOI18N
-        miImportPerson.setName("miImportPerson"); // NOI18N
-        miImportPerson.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miImportPersonActionPerformed(evt);
-            }
-        });
-        menuImport.add(miImportPerson);      
-        
-        miImportParts.setText(resourceMap.getString("miImportParts.text")); // NOI18N
-        miImportParts.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miImportPartsActionPerformed(evt);
-            }
-        });
-        menuImport.add(miImportParts);
-        
-        miLoadForces.setText(resourceMap.getString("miLoadForces.text")); // NOI18N
-        miLoadForces.setName("miLoadForces"); // NOI18N
-        miLoadForces.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miLoadForcesActionPerformed(evt);
-            }
-        });
-        miLoadForces.setEnabled(false);
-        menuImport.add(miLoadForces);
-
-        menuFile.add(menuImport);
-        menuFile.add(menuExport);
-
-        
-        miMercRoster.setText(resourceMap.getString("miMercRoster.text")); // NOI18N
-        miMercRoster.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showMercRosterDialog();
-            }
-        });
-        menuFile.add(miMercRoster);
-        
-        menuOptions.setText(resourceMap.getString("menuOptions.text")); // NOI18N
-        menuOptions.setName("menuOptions"); // NOI18N
-        menuOptions.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuOptionsActionPerformed(evt);
-            }
-        });
-        menuFile.add(menuOptions);
-
-        menuOptionsMM.setText(resourceMap.getString("menuOptionsMM.text")); // NOI18N
-        menuOptionsMM.setName("menuOptionsMM"); // NOI18N
-        menuOptionsMM.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuOptionsMMActionPerformed(evt);
-            }
-        });
-        
-        menuFile.add(menuOptionsMM);
-        
-        menuThemes =new JMenu("Themes");
-        refreshThemeChoices();
-        menuFile.add(menuThemes);
-
-        menuExitItem.setName("exitMenuItem"); // NOI18N
-        menuExitItem.setText("Exit");
-        menuExitItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                getApplication().exit();
-            }
-        });
-        menuFile.add(menuExitItem);
-
-        menuBar.add(menuFile);
-
-        
-
-        /*
-         * Taharqa: I am disabling the manage menu now because all its stuff has 
-         *  been moved elsewhere in menus or buttons
-
-        menuManage.setText(resourceMap.getString("menuManage.text")); // NOI18N
-        addFunds.setText(resourceMap.getString("addFunds.text")); // NOI18N
-        addFunds.setName("addFunds"); // NOI18N
-        addFunds.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addFundsActionPerformed(evt);
-            }
-        });
-        menuManage.add(addFunds);
-
-        
-        miGetLoan.setText(resourceMap.getString("miGetLoan.text")); // NOI18N
-        miGetLoan.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showNewLoanDialog();
-            }
-        });
-        menuManage.add(miGetLoan);
-        
-        menuBar.add(menuManage);
-         */
-
-        menuMarket.setText(resourceMap.getString("menuMarket.text")); // NOI18N
-        menuMarket.setName("menuMarket"); // NOI18N
-        
-        // Personnel Market
-        miPersonnelMarket.setText("Personnel Market");
-        miPersonnelMarket.setName("miPersonnelMarket");
-        miPersonnelMarket.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	hirePersonMarket(evt);
-            }
-        });
-        menuMarket.add(miPersonnelMarket);
-
-        miPurchaseUnit.setText(resourceMap.getString("miPurchaseUnit.text")); // NOI18N
-        miPurchaseUnit.setName("miPurchaseUnit"); // NOI18N
-        miPurchaseUnit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miPurchaseUnitActionPerformed(evt);
-            }
-        });
-        menuMarket.add(miPurchaseUnit);
-
-        miBuyParts.setText(resourceMap.getString("miBuyParts.text")); // NOI18N
-        miPurchaseUnit.setName("miBuyParts"); // NOI18N
-        miBuyParts.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buyParts();
-            }
-        });
-        menuMarket.add(miBuyParts);
-        miHireBulk.setText("Hire Personnel in Bulk");
-        miHireBulk.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                hireBulkPersonnel();
-            }
-        });
-        menuMarket.add(miHireBulk);
-        menuHire.setText(resourceMap.getString("menuHire.text")); // NOI18N
-        menuHire.setName("menuHire"); // NOI18N
-        for(int i = Person.T_MECHWARRIOR; i < Person.T_NUM; i++) {
-            miHire = new JMenuItem();
-            miHire.setText(Person.getRoleDesc(i)); // NOI18N
-            miHire.setActionCommand(Integer.toString(i));
-            miHire.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    hirePerson(evt);
-                }
-            });
-            menuHire.add(miHire);
-        }
-        menuMarket.add(menuHire);
-        menuAstechPool.setText("Astech Pool");
-        miHireAstechs.setText("Hire Astechs");
-        miHireAstechs.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Hire How Many Astechs?", 1, 0, 100);
-                pvcd.setVisible(true);
-                getCampaign().increaseAstechPool(pvcd.getValue());
-                refreshTechsList();
-                refreshTempAstechs();
-            }
-        });
-        menuAstechPool.add(miHireAstechs);
-        miFireAstechs.setText("Release Astechs");
-        miFireAstechs.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Release How Many Astechs?", 1, 0, getCampaign().getAstechPool());
-                pvcd.setVisible(true);
-                getCampaign().decreaseAstechPool(pvcd.getValue());
-                refreshTechsList();
-                refreshTempAstechs();
-            }
-        });
-        menuAstechPool.add(miFireAstechs);
-        miFullStrengthAstechs.setText("Bring All Tech Teams to Full Strength");
-        miFullStrengthAstechs.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                int need = (getCampaign().getTechs().size() * 6) - getCampaign().getNumberAstechs();
-                if(need > 0) {
-                    getCampaign().increaseAstechPool(need);
-                }
-                refreshTechsList();
-                refreshTempAstechs();
-            }
-        });
-        menuAstechPool.add(miFullStrengthAstechs);
-        miFireAllAstechs.setText("Release All Astechs from Pool");
-        miFireAllAstechs.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                getCampaign().decreaseAstechPool(getCampaign().getAstechPool());
-                refreshTechsList();
-                refreshTempAstechs();
-            }
-        });
-        menuAstechPool.add(miFireAllAstechs);
-        menuMarket.add(menuAstechPool);
-        menuMedicPool.setText("Medic Pool");
-        miHireMedics.setText("Hire Medics");
-        miHireMedics.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Hire How Many Medics?", 1, 0, 100);
-                pvcd.setVisible(true);
-                getCampaign().increaseMedicPool(pvcd.getValue());
-                refreshDoctorsList();
-                refreshTempMedics();
-            }
-        });
-        menuMedicPool.add(miHireMedics);
-        miFireMedics.setText("Release Medics");
-        miFireMedics.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Release How Many Medics?", 1, 0, getCampaign().getMedicPool());
-                pvcd.setVisible(true);
-                getCampaign().decreaseMedicPool(pvcd.getValue());
-                refreshDoctorsList();
-                refreshTempMedics();
-            }
-        });
-        menuMedicPool.add(miFireMedics);
-        miFullStrengthMedics.setText("Bring All Medical Teams to Full Strength");
-        miFullStrengthMedics.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                int need = (getCampaign().getDoctors().size() * 4) - getCampaign().getNumberMedics();
-                if(need > 0) {
-                    getCampaign().increaseMedicPool(need);
-                }
-                refreshDoctorsList();
-                refreshTempMedics();
-            }
-        });
-        menuMedicPool.add(miFullStrengthMedics);
-        miFireAllMedics.setText("Release All Medics from Pool");
-        miFireAllMedics.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                getCampaign().decreaseMedicPool(getCampaign().getMedicPool());
-                refreshDoctorsList();
-                refreshTempMedics();
-            }
-        });
-        menuMedicPool.add(miFireAllMedics);
-        menuMarket.add(menuMedicPool);
-        menuBar.add(menuMarket);
-
-        menuReports.setText(resourceMap.getString("menuReports.text")); // NOI18N
-
-        miDragoonsRating.setText(resourceMap.getString("miDragoonsRating.text")); // NOI18N
-        miDragoonsRating.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showReport(new RatingReport(getCampaign()));
-            }
-        });
-        menuReports.add(miDragoonsRating);
-        
-        miPersonnelReport.setText(resourceMap.getString("miPersonnelReport.text")); // NOI18N
-        miPersonnelReport.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showReport(new PersonnelReport(getCampaign()));
-            }
-        });
-        menuReports.add(miPersonnelReport);
-        
-        miHangarBreakdown.setText(resourceMap.getString("miHangarBreakdown.text")); // NOI18N
-        miHangarBreakdown.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showReport(new HangarReport(getCampaign()));
-            }
-        });
-        menuReports.add(miHangarBreakdown);
-        
-        miTransportReport.setText(resourceMap.getString("miTransportReport.text")); // NOI18N
-        miTransportReport.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showReport(new TransportReport(getCampaign()));
-            }
-        });
-        menuReports.add(miTransportReport);
-        
-        menuBar.add(menuReports);
-        
-        menuCommunity.setText(resourceMap.getString("menuCommunity.text")); // NOI18N
-        menuCommunity.setName("menuCommunity"); // NOI18N
-
-        miChat.setText(resourceMap.getString("miChat.text")); // NOI18N
-        miChat.setName("miChat"); // NOI18N
-        miChat.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miChatActionPerformed(evt);
-            }
-        });
-        menuCommunity.add(miChat);
-
-        //menuBar.add(menuCommunity);
-
-        menuHelp.setText(resourceMap.getString("helpMenu.text")); // NOI18N
-        menuHelp.setName("helpMenu"); // NOI18N
-        menuAboutItem.setName("aboutMenuItem"); // NOI18N
-        menuAboutItem.setText("About");
-        menuAboutItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showAboutBox();
-            }
-        });
-        menuHelp.add(menuAboutItem);
-        menuBar.add(menuHelp);
-
-        statusPanel.setName("statusPanel"); // NOI18N
-        statusPanel.setLayout(new FlowLayout(FlowLayout.LEADING, 20, 5));
-
-        statusPanel.add(btnGMMode);
-        statusPanel.add(btnOvertime);
-        refreshRating();
-        statusPanel.add(lblRating);
-        refreshFunds();
-        statusPanel.add(lblFunds);
-        refreshTempAstechs();
-        statusPanel.add(lblTempAstechs);
-        refreshTempMedics();
-        statusPanel.add(lblTempMedics);
-        statusPanel.add(lblCargo);
+        initMain();
+        initStatusBar();
 
         refreshServicedUnitList();
         refreshUnitList();
@@ -1197,6 +590,7 @@ public class CampaignGUI extends JPanel {
         refreshCalendar();
         refreshReport();
         refreshFunds();
+        refreshRating();
         refreshFinancialTransactions();
         refreshOrganization();
         refreshMissions();
@@ -1204,7 +598,7 @@ public class CampaignGUI extends JPanel {
         refreshTempAstechs();
         refreshTempMedics();
         refreshCargo();
-        panMap.setCampaign(getCampaign());
+        refreshScenarioList();
 
         setLayout(new BorderLayout());
         add(mainPanel, BorderLayout.CENTER);
@@ -1223,6 +617,7 @@ public class CampaignGUI extends JPanel {
         // Move the window
         frame.setLocation(x, y);
 
+        initMenu();
         frame.setJMenuBar(menuBar);
         frame.getContentPane().setLayout(new BorderLayout());
         frame.getContentPane().add(this, BorderLayout.CENTER);
@@ -1246,10 +641,10 @@ public class CampaignGUI extends JPanel {
         
         panOrganization = new JPanel(new GridBagLayout());
 
-        orgModel = new OrgTreeModel(getCampaign().getForces());
+        orgModel = new OrgTreeModel(getCampaign());
         orgTree = new JTree(orgModel);
         orgTree.addMouseListener(new OrgTreeMouseAdapter());
-        orgTree.setCellRenderer(new ForceRenderer());
+        orgTree.setCellRenderer(new ForceRenderer(getIconPackage()));
         orgTree.setRowHeight(60);
         orgTree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         orgTree.addTreeSelectionListener(new TreeSelectionListener() {
@@ -1266,7 +661,7 @@ public class CampaignGUI extends JPanel {
         scrollForceView.setPreferredSize(new java.awt.Dimension(550, 600));
         scrollForceView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
-        splitOrg = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT,new JScrollPane(orgTree), scrollForceView);
+        splitOrg = new JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT,new JScrollPane(orgTree), scrollForceView);
         splitOrg.setOneTouchExpandable(true);
         splitOrg.setResizeWeight(1.0);
         splitOrg.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
@@ -1392,14 +787,13 @@ public class CampaignGUI extends JPanel {
         scenarioTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         scenarioTable.addMouseListener(new ScenarioTableMouseAdapter());
         scenarioTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        refreshScenarioList();
         scenarioTable.setIntercellSpacing(new Dimension(0, 0));
         scenarioTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 refreshScenarioView();
             }
         });
-        scrollScenarioTable = new JScrollPane(scenarioTable);
+        JScrollPane scrollScenarioTable = new JScrollPane(scenarioTable);
         scrollScenarioTable.setMinimumSize(new java.awt.Dimension(200, 200));
         scrollScenarioTable.setPreferredSize(new java.awt.Dimension(200, 200));
 
@@ -1502,9 +896,7 @@ public class CampaignGUI extends JPanel {
                 changeMission();
                 refreshScenarioView();
             }
-        });   
-        
-        refreshMissions();
+        });           
     }
     
     private void initMap() {
@@ -1598,6 +990,8 @@ public class CampaignGUI extends JPanel {
                 refreshPlanetView();
             }
         });
+        
+        panMap.setCampaign(getCampaign());
     }
     
     private void initPersonnelTab() {
@@ -1817,8 +1211,6 @@ public class CampaignGUI extends JPanel {
                 refreshUnitView();
             }
         });
-
-        scrollUnitTable = new JScrollPane(unitTable);
         
         acquireUnitsModel = new ProcurementTableModel(getCampaign());
         acquireUnitsTable = new JTable(acquireUnitsModel);
@@ -1879,7 +1271,7 @@ public class CampaignGUI extends JPanel {
         panAcquireUnit.setMinimumSize(new Dimension(200,200));
         panAcquireUnit.setPreferredSize(new Dimension(200,200));
         
-        JSplitPane splitLeftUnit = new JSplitPane(javax.swing.JSplitPane.VERTICAL_SPLIT,scrollUnitTable, panAcquireUnit);
+        JSplitPane splitLeftUnit = new JSplitPane(javax.swing.JSplitPane.VERTICAL_SPLIT,new JScrollPane(unitTable), panAcquireUnit);
         splitLeftUnit.setOneTouchExpandable(true);
         splitLeftUnit.setResizeWeight(1.0);
         
@@ -2157,7 +1549,7 @@ public class CampaignGUI extends JPanel {
         ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
         sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
         whTechSorter.setSortKeys(sortKeys);
-        scrollWhTechTable = new JScrollPane(whTechTable);
+        JScrollPane scrollWhTechTable = new JScrollPane(whTechTable);
         scrollWhTechTable.setMinimumSize(new java.awt.Dimension(200, 200));
         scrollWhTechTable.setPreferredSize(new java.awt.Dimension(300, 300));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -2223,16 +1615,15 @@ public class CampaignGUI extends JPanel {
                     }
                 });
         servicedUnitTable.addMouseListener(new ServicedUnitsTableMouseAdapter());
-        scrollServicedUnitTable = new JScrollPane(servicedUnitTable);
+        JScrollPane scrollServicedUnitTable = new JScrollPane(servicedUnitTable);
         scrollServicedUnitTable.setMinimumSize(new java.awt.Dimension(350, 200));
         scrollServicedUnitTable.setPreferredSize(new java.awt.Dimension(350, 200));
 
         txtServicedUnitView = new JTextPane();
         txtServicedUnitView.setEditable(false);
         txtServicedUnitView.setContentType("text/html");
-        scrollServicedUnitView = new JScrollPane(txtServicedUnitView);
+        JScrollPane scrollServicedUnitView = new JScrollPane(txtServicedUnitView);
         scrollServicedUnitView.setMinimumSize(new java.awt.Dimension(350, 400));
-        scrollServicedUnitView.setName("scrollServicedUnitView"); // NOI18N
         scrollServicedUnitView.setPreferredSize(new java.awt.Dimension(350, 400));
         
         splitServicedUnits = new JSplitPane(JSplitPane.VERTICAL_SPLIT,scrollServicedUnitTable, scrollServicedUnitView);
@@ -2263,7 +1654,7 @@ public class CampaignGUI extends JPanel {
         sortKeys = new ArrayList<RowSorter.SortKey>();
         sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
         techSorter.setSortKeys(sortKeys);
-        scrollTechTable = new JScrollPane(techTable);
+        JScrollPane scrollTechTable = new JScrollPane(techTable);
         scrollTechTable.setMinimumSize(new java.awt.Dimension(200, 200));
         scrollTechTable.setPreferredSize(new java.awt.Dimension(300, 300));
 
@@ -2346,7 +1737,7 @@ public class CampaignGUI extends JPanel {
                     }
                 });
         taskTable.addMouseListener(new TaskTableMouseAdapter());
-        scrollTaskTable = new JScrollPane(taskTable);
+        JScrollPane scrollTaskTable = new JScrollPane(taskTable);
         scrollTaskTable.setMinimumSize(new java.awt.Dimension(200, 200));
         scrollTaskTable.setPreferredSize(new java.awt.Dimension(300, 300));
 
@@ -2360,11 +1751,11 @@ public class CampaignGUI extends JPanel {
                 new javax.swing.event.ListSelectionListener() {
                     public void valueChanged(
                             javax.swing.event.ListSelectionEvent evt) {
-                        AcquisitionTableValueChanged(evt);
+                        acquisitionTableValueChanged(evt);
                     }
                 });
         acquisitionTable.addMouseListener(new AcquisitionTableMouseAdapter());
-        scrollAcquisitionTable = new JScrollPane(acquisitionTable);
+        JScrollPane scrollAcquisitionTable = new JScrollPane(acquisitionTable);
         scrollAcquisitionTable.setMinimumSize(new java.awt.Dimension(200, 200));
         scrollAcquisitionTable.setPreferredSize(new java.awt.Dimension(300, 300));
 
@@ -2468,7 +1859,7 @@ public class CampaignGUI extends JPanel {
                         docTableValueChanged(evt);
                     }
                 });
-        scrollDocTable = new JScrollPane(docTable);
+        JScrollPane scrollDocTable = new JScrollPane(docTable);
         scrollDocTable.setMinimumSize(new java.awt.Dimension(300, 300));
         scrollDocTable.setPreferredSize(new java.awt.Dimension(300, 300));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -2538,7 +1929,7 @@ public class CampaignGUI extends JPanel {
                         patientTableValueChanged();
                     }
                 });
-        scrollUnassignedPatient = new JScrollPane(listUnassignedPatient);
+        JScrollPane scrollUnassignedPatient = new JScrollPane(listUnassignedPatient);
         scrollUnassignedPatient.setMinimumSize(new java.awt.Dimension(300, 200));
         scrollUnassignedPatient.setPreferredSize(new java.awt.Dimension(300, 300));
 
@@ -2585,7 +1976,6 @@ public class CampaignGUI extends JPanel {
         }
         financeTable.setIntercellSpacing(new Dimension(0, 0));
         financeTable.setShowGrid(false);
-        scrollFinanceTable = new JScrollPane(financeTable);
      
         loanModel = new LoanTableModel();
         loanTable = new JTable(loanModel);
@@ -2600,7 +1990,7 @@ public class CampaignGUI extends JPanel {
         }
         loanTable.setIntercellSpacing(new Dimension(0, 0));
         loanTable.setShowGrid(false);
-        scrollLoanTable = new JScrollPane(loanTable);
+        JScrollPane scrollLoanTable = new JScrollPane(loanTable);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -2610,7 +2000,7 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         JPanel panBalance = new JPanel(new GridBagLayout());
-        panBalance.add(scrollFinanceTable, gridBagConstraints);
+        panBalance.add(new JScrollPane(financeTable), gridBagConstraints);
         panBalance.setBorder(BorderFactory.createTitledBorder("Balance Sheet"));
         JPanel panLoan = new JPanel(new GridBagLayout());
         panLoan.add(scrollLoanTable, gridBagConstraints);
@@ -2686,7 +2076,457 @@ public class CampaignGUI extends JPanel {
         
 
     }
+    
+    private void initMenu() {
+        
+        menuBar = new JMenuBar();
+        
+        /*File Menu*/
+        JMenu menuFile = new JMenu(resourceMap.getString("fileMenu.text")); // NOI18N
 
+        JMenuItem menuLoad = new JMenuItem(resourceMap.getString("menuLoad.text")); // NOI18N
+        menuLoad.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuLoadXmlActionPerformed(evt);
+            }
+        });
+        menuFile.add(menuLoad);
+
+        JMenuItem menuSave = new JMenuItem(resourceMap.getString("menuSave.text")); // NOI18N
+        menuSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuSaveXmlActionPerformed(evt);
+            }
+        });
+        menuFile.add(menuSave);
+
+        JMenu menuImport = new JMenu(resourceMap.getString("menuImport.text")); // NOI18N
+        JMenu menuExport = new JMenu(resourceMap.getString("menuExport.text")); // NOI18N
+
+        /* 
+         * Taharqa: I think it is confusing and bad gui feng-shui to put this in the menu
+         * even though it is driven by user selections that might not even be in the 
+         * visible tab at the moment. If we keep this it should be for all personnel and parts
+         * and be clearly labeled as such
+         * 
+        miExportPerson.setText(resourceMap.getString("miExportPerson.text")); // NOI18N
+        miExportPerson.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miExportPersonActionPerformed(evt);
+            }
+        });
+        menuExport.add(miExportPerson);
+        
+        miExportParts.setText(resourceMap.getString("miExportParts.text")); // NOI18N
+        miExportParts.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miExportPartsActionPerformed(evt);
+            }
+        });
+        menuExport.add(miExportParts);
+        */
+        
+        JMenuItem miExportPersonCSV = new JMenuItem(resourceMap.getString("miExportPersonCSV.text")); // NOI18N
+        miExportPersonCSV.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportTable(personnelTable, getCampaign().getName()
+                        + getCampaign().getShortDateAsString() + "_ExportedPersonnel" + ".csv");
+            }
+        });
+        menuExport.add(miExportPersonCSV);
+        
+        JMenuItem miExportUnitCSV = new JMenuItem(resourceMap.getString("miExportUnitCSV.text")); // NOI18N
+        miExportUnitCSV.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportTable(unitTable, getCampaign().getName()
+                        + getCampaign().getShortDateAsString() + "_ExportedUnit" + ".csv");
+            }
+        });
+        menuExport.add(miExportUnitCSV);
+        
+        JMenuItem miImportPerson = new JMenuItem(resourceMap.getString("miImportPerson.text")); // NOI18N
+        miImportPerson.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miImportPersonActionPerformed(evt);
+            }
+        });
+        menuImport.add(miImportPerson);      
+        
+        JMenuItem miImportParts = new JMenuItem(resourceMap.getString("miImportParts.text")); // NOI18N
+        miImportParts.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miImportPartsActionPerformed(evt);
+            }
+        });
+        menuImport.add(miImportParts);
+        
+        JMenuItem miLoadForces = new JMenuItem(resourceMap.getString("miLoadForces.text")); // NOI18N
+        miLoadForces.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miLoadForcesActionPerformed(evt);
+            }
+        });
+        miLoadForces.setEnabled(false);
+        menuImport.add(miLoadForces);
+
+        menuFile.add(menuImport);
+        menuFile.add(menuExport);
+
+        
+        JMenuItem miMercRoster = new JMenuItem(resourceMap.getString("miMercRoster.text")); // NOI18N
+        miMercRoster.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showMercRosterDialog();
+            }
+        });
+        menuFile.add(miMercRoster);
+        
+        JMenuItem menuOptions = new JMenuItem(resourceMap.getString("menuOptions.text")); // NOI18N
+        menuOptions.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuOptionsActionPerformed(evt);
+            }
+        });
+        menuFile.add(menuOptions);
+
+        JMenuItem menuOptionsMM = new JMenuItem(resourceMap.getString("menuOptionsMM.text")); // NOI18N
+        menuOptionsMM.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuOptionsMMActionPerformed(evt);
+            }
+        });
+        
+        menuFile.add(menuOptionsMM);
+        
+        menuThemes =new JMenu("Themes");
+        refreshThemeChoices();
+        menuFile.add(menuThemes);
+
+        JMenuItem menuExitItem = new JMenuItem("Exit");
+        menuExitItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                getApplication().exit();
+            }
+        });
+        menuFile.add(menuExitItem);
+
+        menuBar.add(menuFile);
+
+        JMenu menuMarket = new JMenu(resourceMap.getString("menuMarket.text")); // NOI18N
+        
+        // Personnel Market
+        JMenuItem miPersonnelMarket = new JMenuItem("Personnel Market");
+        miPersonnelMarket.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                hirePersonMarket(evt);
+            }
+        });
+        menuMarket.add(miPersonnelMarket);
+
+        JMenuItem miPurchaseUnit = new JMenuItem(resourceMap.getString("miPurchaseUnit.text")); // NOI18N
+        miPurchaseUnit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miPurchaseUnitActionPerformed(evt);
+            }
+        });
+        menuMarket.add(miPurchaseUnit);
+
+        JMenuItem miBuyParts = new JMenuItem(resourceMap.getString("miBuyParts.text")); // NOI18N
+        miBuyParts.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buyParts();
+            }
+        });
+        menuMarket.add(miBuyParts);
+        JMenuItem miHireBulk = new JMenuItem("Hire Personnel in Bulk");
+        miHireBulk.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                hireBulkPersonnel();
+            }
+        });
+        menuMarket.add(miHireBulk);
+        
+        JMenu menuHire = new JMenu(resourceMap.getString("menuHire.text")); // NOI18N
+        
+        JMenuItem miHire;
+        for(int i = Person.T_MECHWARRIOR; i < Person.T_NUM; i++) {
+            miHire = new JMenuItem(Person.getRoleDesc(i)); // NOI18N
+            miHire.setActionCommand(Integer.toString(i));
+            miHire.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    hirePerson(evt);
+                }
+            });
+            menuHire.add(miHire);
+        }
+        menuMarket.add(menuHire);
+        
+        JMenu menuAstechPool = new JMenu("Astech Pool");
+       
+        JMenuItem miHireAstechs = new JMenuItem("Hire Astechs");
+        miHireAstechs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Hire How Many Astechs?", 1, 0, 100);
+                pvcd.setVisible(true);
+                getCampaign().increaseAstechPool(pvcd.getValue());
+                refreshTechsList();
+                refreshTempAstechs();
+            }
+        });
+        menuAstechPool.add(miHireAstechs);
+        
+        JMenuItem miFireAstechs = new JMenuItem("Release Astechs");
+        miFireAstechs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Release How Many Astechs?", 1, 0, getCampaign().getAstechPool());
+                pvcd.setVisible(true);
+                getCampaign().decreaseAstechPool(pvcd.getValue());
+                refreshTechsList();
+                refreshTempAstechs();
+            }
+        });
+        menuAstechPool.add(miFireAstechs);
+        
+        JMenuItem miFullStrengthAstechs = new JMenuItem("Bring All Tech Teams to Full Strength");
+        miFullStrengthAstechs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                int need = (getCampaign().getTechs().size() * 6) - getCampaign().getNumberAstechs();
+                if(need > 0) {
+                    getCampaign().increaseAstechPool(need);
+                }
+                refreshTechsList();
+                refreshTempAstechs();
+            }
+        });
+        menuAstechPool.add(miFullStrengthAstechs);
+        
+        JMenuItem miFireAllAstechs = new JMenuItem("Release All Astechs from Pool");
+        miFireAllAstechs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                getCampaign().decreaseAstechPool(getCampaign().getAstechPool());
+                refreshTechsList();
+                refreshTempAstechs();
+            }
+        });
+        menuAstechPool.add(miFireAllAstechs);
+        menuMarket.add(menuAstechPool);
+        
+        JMenu menuMedicPool = new JMenu("Medic Pool");
+        JMenuItem miHireMedics = new JMenuItem("Hire Medics");
+        miHireMedics.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Hire How Many Medics?", 1, 0, 100);
+                pvcd.setVisible(true);
+                getCampaign().increaseMedicPool(pvcd.getValue());
+                refreshDoctorsList();
+                refreshTempMedics();
+            }
+        });
+        menuMedicPool.add(miHireMedics);
+        
+        JMenuItem miFireMedics = new JMenuItem("Release Medics");
+        miFireMedics.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Release How Many Medics?", 1, 0, getCampaign().getMedicPool());
+                pvcd.setVisible(true);
+                getCampaign().decreaseMedicPool(pvcd.getValue());
+                refreshDoctorsList();
+                refreshTempMedics();
+            }
+        });
+        menuMedicPool.add(miFireMedics);
+        JMenuItem miFullStrengthMedics = new JMenuItem("Bring All Medical Teams to Full Strength");
+        miFullStrengthMedics.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                int need = (getCampaign().getDoctors().size() * 4) - getCampaign().getNumberMedics();
+                if(need > 0) {
+                    getCampaign().increaseMedicPool(need);
+                }
+                refreshDoctorsList();
+                refreshTempMedics();
+            }
+        });
+        menuMedicPool.add(miFullStrengthMedics);
+        JMenuItem miFireAllMedics = new JMenuItem("Release All Medics from Pool");
+        miFireAllMedics.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                getCampaign().decreaseMedicPool(getCampaign().getMedicPool());
+                refreshDoctorsList();
+                refreshTempMedics();
+            }
+        });
+        menuMedicPool.add(miFireAllMedics);
+        menuMarket.add(menuMedicPool);
+        menuBar.add(menuMarket);
+
+        JMenu menuReports = new JMenu(resourceMap.getString("menuReports.text")); // NOI18N
+
+        JMenuItem miDragoonsRating = new JMenuItem(resourceMap.getString("miDragoonsRating.text")); // NOI18N
+        miDragoonsRating.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showReport(new RatingReport(getCampaign()));
+            }
+        });
+        menuReports.add(miDragoonsRating);
+        
+        JMenuItem miPersonnelReport = new JMenuItem(resourceMap.getString("miPersonnelReport.text")); // NOI18N
+        miPersonnelReport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showReport(new PersonnelReport(getCampaign()));
+            }
+        });
+        menuReports.add(miPersonnelReport);
+        
+        JMenuItem miHangarBreakdown = new JMenuItem(resourceMap.getString("miHangarBreakdown.text")); // NOI18N
+        miHangarBreakdown.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showReport(new HangarReport(getCampaign()));
+            }
+        });
+        menuReports.add(miHangarBreakdown);
+        
+        JMenuItem miTransportReport = new JMenuItem(resourceMap.getString("miTransportReport.text")); // NOI18N
+        miTransportReport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showReport(new TransportReport(getCampaign()));
+            }
+        });
+        menuReports.add(miTransportReport);
+        
+        menuBar.add(menuReports);
+        
+        JMenu menuCommunity = new JMenu(resourceMap.getString("menuCommunity.text")); // NOI18N
+
+        JMenuItem miChat = new JMenuItem(resourceMap.getString("miChat.text")); // NOI18N
+        miChat.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miChatActionPerformed(evt);
+            }
+        });
+        menuCommunity.add(miChat);
+
+        //menuBar.add(menuCommunity);
+
+        JMenu menuHelp = new JMenu(resourceMap.getString("helpMenu.text")); // NOI18N
+        menuHelp.setName("helpMenu"); // NOI18N
+        JMenuItem menuAboutItem = new JMenuItem("aboutMenuItem"); // NOI18N
+        menuAboutItem.setText("About");
+        menuAboutItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showAboutBox();
+            }
+        });
+        menuHelp.add(menuAboutItem);
+        menuBar.add(menuHelp);
+    }
+
+    private void initMain() {
+        GridBagConstraints gridBagConstraints;
+        mainPanel = new JPanel(new GridBagLayout());
+        mainPanel.setAutoscrolls(true);
+        
+        lblLocation = new JLabel(getCampaign().getLocation().getReport(getCampaign().getCalendar().getTime())); // NOI18N
+        lblLocation.setMinimumSize(new java.awt.Dimension(250,100));
+        lblLocation.setPreferredSize(new java.awt.Dimension(250, 100));
+        lblLocation.setName("lblLocation"); // NOI18N
+        lblLocation.setVerticalAlignment(SwingConstants.TOP);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+        mainPanel.add(lblLocation, gridBagConstraints);
+
+
+        txtPaneReport = new JTextPane();
+        txtPaneReport.setContentType(resourceMap.getString("txtPaneReport.contentType")); // NOI18N
+        txtPaneReport.setEditable(false);
+        txtPaneReport.setText(getCampaign().getCurrentReportHTML());
+        txtPaneReport.addHyperlinkListener(reportHLL);
+        JScrollPane txtPaneReportScrollPane = new JScrollPane(txtPaneReport);     
+        txtPaneReportScrollPane.setMinimumSize(new java.awt.Dimension(250,100));
+        txtPaneReportScrollPane.setPreferredSize(new java.awt.Dimension(250, 100));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+        mainPanel.add(txtPaneReportScrollPane, gridBagConstraints);
+
+        btnAdvanceDay = new JButton(resourceMap.getString("btnAdvanceDay.text")); // NOI18N
+        btnAdvanceDay.setToolTipText(resourceMap.getString("btnAdvanceDay.toolTipText")); // NOI18N
+        btnAdvanceDay.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                advanceDay();
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+        mainPanel.add(btnAdvanceDay, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        //gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+        mainPanel.add(tabMain, gridBagConstraints);
+
+        
+        
+    }
+    
+    private void initStatusBar() {
+        
+        statusPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 20, 5));
+             
+        btnGMMode = new JToggleButton(resourceMap.getString("btnGMMode.text")); // NOI18N
+        btnGMMode.setToolTipText(resourceMap.getString("btnGMMode.toolTipText")); // NOI18N
+        btnGMMode.setSelected(getCampaign().isGM());
+        btnGMMode.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGMModeActionPerformed(evt);
+            }
+        });
+
+        btnOvertime = new JToggleButton(resourceMap.getString("btnOvertime.text")); // NOI18N
+        btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText")); // NOI18N
+        btnOvertime.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnOvertimeActionPerformed(evt);
+            }
+        });
+
+        statusPanel.add(btnGMMode);
+        statusPanel.add(btnOvertime);
+        
+        lblRating = new JLabel();
+        lblFunds = new JLabel();
+        lblTempAstechs = new JLabel();
+        lblTempMedics = new JLabel();
+        lblCargo = new  JLabel();  
+        
+        statusPanel.add(lblRating);
+        statusPanel.add(lblFunds);
+        statusPanel.add(lblTempAstechs);
+        statusPanel.add(lblTempMedics);
+        statusPanel.add(lblCargo);
+    }
+    
     private static void enableFullScreenMode(Window window) {
         String className = "com.apple.eawt.FullScreenUtilities";
         String methodName = "setWindowCanFullScreen";
@@ -3072,7 +2912,7 @@ public class CampaignGUI extends JPanel {
         updateTechTarget();
     }
 
-    private void AcquisitionTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
+    private void acquisitionTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
         filterTechs(false);
         updateTechTarget();
     }
@@ -3175,7 +3015,7 @@ public class CampaignGUI extends JPanel {
         updateTechTarget();
     }
 
-    private void btnAdvanceDayActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnAdvanceDayActionPerformed
+    private void advanceDay() {
         //first check for overdue loan payments - dont allow advancement until these are addressed
         long overdueAmount = getCampaign().getFinances().checkOverdueLoanPayments(getCampaign());
         if(overdueAmount > 0) {
@@ -6157,68 +5997,6 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    public class OrgTreeModel implements TreeModel {
-
-        private Force rootForce;
-        private Vector<TreeModelListener> listeners = new Vector<TreeModelListener>();
-
-        public OrgTreeModel(Force root) {
-            rootForce = root;
-        }
-
-        @Override
-        public Object getChild(Object parent, int index) {
-            if(parent instanceof Force) {
-                return ((Force)parent).getAllChildren(getCampaign()).get(index);
-            }
-            return null;
-        }
-
-        @Override
-        public int getChildCount(Object parent) {
-            if(parent instanceof Force) {
-                return ((Force)parent).getAllChildren(getCampaign()).size();
-            }
-            return 0;
-        }
-
-        @Override
-        public int getIndexOfChild(Object parent, Object child) {
-            if(parent instanceof Force) {
-                return ((Force)parent).getAllChildren(getCampaign()).indexOf(child);
-            }
-            return 0;
-        }
-
-        @Override
-        public Object getRoot() {
-            return rootForce;
-        }
-
-        @Override
-        public boolean isLeaf(Object node) {
-            return node instanceof Unit || (node instanceof Force && ((Force)node).getAllChildren(getCampaign()).size() == 0);
-        }
-
-        @Override
-        public void valueForPathChanged(TreePath arg0, Object arg1) {
-            // TODO Auto-generated method stub
-
-        }
-
-        public void addTreeModelListener( TreeModelListener listener ) {
-              if ( listener != null && !listeners.contains( listener ) ) {
-                 listeners.addElement( listener );
-              }
-           }
-
-           public void removeTreeModelListener( TreeModelListener listener ) {
-              if ( listener != null ) {
-                 listeners.removeElement( listener );
-              }
-           }
-    }
-
     public class OrgTreeMouseAdapter extends MouseInputAdapter implements
     ActionListener {
 
@@ -6410,39 +6188,13 @@ public class CampaignGUI extends JPanel {
                 refreshServicedUnitList();
                 refreshCargo();
             } else if(command.contains("GOTO_UNIT")) {
-              /*  for(Unit unit : units) {
-                	tabMain.setSelectedIndex(tabMain.indexOfTab(resourceMap.getString("panHangar.TabConstraints.tabTitle")));
-                    for (Unit u : unitModel.data) {
-                    	if (u.getId().equals(unit.getId())) {
-                    		int index = unitTable.convertRowIndexToView(unitModel.data.indexOf(u));
-                    		unitTable.setRowSelectionInterval(index, index);
-                    		break;
-                    	}
-                    }
-                }*/
-                refreshScenarioList();
-                refreshOrganization();
-                refreshPersonnelList();
-                refreshUnitList();
-                refreshServicedUnitList();
-                refreshCargo();
-            } else if(command.contains("GOTO_PILOT")) {
-            	for(Unit unit : units) {
-                    tabMain.setSelectedIndex(tabMain.indexOfTab(resourceMap.getString("panPersonnel.TabConstraints.tabTitle")));
-          /*          for (Person p : personModel.data) {
-                    	if (p.getId().equals(unit.getCommander().getId())) {
-                    		int index = personnelTable.convertRowIndexToView(personModel.data.indexOf(p));
-                    		personnelTable.setRowSelectionInterval(index, index);
-                    		break;
-                    	}
-                    }*/
+                if(null != singleUnit) {
+                    focusOnUnit(singleUnit.getId());
                 }
-                refreshScenarioList();
-                refreshOrganization();
-                refreshPersonnelList();
-                refreshUnitList();
-                refreshServicedUnitList();
-                refreshCargo();
+            } else if(command.contains("GOTO_PILOT")) {
+                if(null != singleUnit && null != singleUnit.getCommander()) {
+                    focusOnPerson(singleUnit.getCommander().getId());
+                }
             } else if(command.contains("DEPLOY_UNIT")) {
                 int sid = Integer.parseInt(target);
                 Scenario scenario = getCampaign().getScenario(sid);
@@ -6996,190 +6748,7 @@ public class CampaignGUI extends JPanel {
 
     }
 
-    public class ForceRenderer extends DefaultTreeCellRenderer {
-
-        private static final long serialVersionUID = -553191867660269247L;
-
-        public ForceRenderer() {
-
-        }
-
-        public Component getTreeCellRendererComponent(
-                            JTree tree,
-                            Object value,
-                            boolean sel,
-                            boolean expanded,
-                            boolean leaf,
-                            int row,
-                            boolean hasFocus) {
-
-            super.getTreeCellRendererComponent(
-                            tree, value, sel,
-                            expanded, leaf, row,
-                            hasFocus);
-            setOpaque(true);
-            setBackground(Color.WHITE);
-            setForeground(Color.BLACK);
-            if(sel) {
-                setBackground(Color.DARK_GRAY);
-                setForeground(Color.WHITE);
-            }
-
-            if(value instanceof Unit) {
-                String name = "<font color='red'>No Crew</font>";
-                if (((Unit) value).getEntity() instanceof GunEmplacement) {
-                	name = "AutoTurret";
-                }
-                String uname = "";
-                String c3network = "";
-                Unit u = (Unit)value;
-                Person pp = u.getCommander();
-                if(null != pp) {
-                    name = pp.getFullTitle();
-                    name += " (" + u.getEntity().getCrew().getGunnery() + "/" + u.getEntity().getCrew().getPiloting() + ")";
-                    if(pp.needsFixing()) {
-                        name = "<font color='red'>" + name + "</font>";
-                    }
-                }
-                uname = "<i>" + u.getName() + "</i>";
-                if(u.isDamaged()) {
-                    uname = "<font color='red'>" + uname + "</font>";
-                }
-                Entity entity = u.getEntity();
-                if (entity.hasC3i()) {
-                    if (entity.calculateFreeC3Nodes() >= 5) {
-                        c3network += Messages.getString("ChatLounge.C3iNone");
-                    } else {
-                         c3network += c3network += Messages
-                                 .getString("ChatLounge.C3iNetwork")
-                                 + entity.getC3NetId();
-                         if (entity.calculateFreeC3Nodes() > 0) {
-                             c3network += Messages.getString("ChatLounge.C3Nodes",
-                                     new Object[] { entity.calculateFreeC3Nodes() });
-                         }
-                     }
-                 } else if (entity.hasC3()) {
-                     if (entity.C3MasterIs(entity)) {
-                         c3network += Messages.getString("ChatLounge.C3Master");
-                         c3network += Messages.getString("ChatLounge.C3MNodes",
-                                     new Object[] { entity.calculateFreeC3MNodes() });
-                         if(entity.hasC3MM()) {
-                            c3network += Messages.getString("ChatLounge.C3SNodes",
-                                     new Object[] { entity.calculateFreeC3Nodes() });
-                         }
-                     } else if (!entity.hasC3S()) {
-                         c3network += Messages.getString("ChatLounge.C3Master");
-                         c3network += Messages.getString("ChatLounge.C3SNodes",
-                                     new Object[] { entity.calculateFreeC3Nodes() });
-                         // an independent master might also be a slave to a company
-                         // master
-                         if (entity.getC3Master() != null) {
-                             c3network += "<br>" + Messages.getString("ChatLounge.C3Slave") + entity.getC3Master().getShortName(); //$NON-NLS-1$
-                         }
-                     } else if (entity.getC3Master() != null) {
-                         c3network += Messages.getString("ChatLounge.C3Slave") + entity.getC3Master().getShortName(); //$NON-NLS-1$
-                     } else {
-                         c3network += Messages.getString("ChatLounge.C3None");
-                     }
-                }
-                if(!c3network.isEmpty()) {
-                    c3network = "<br><i>" + c3network + "</i>";
-                }
-                setText("<html>" + name + ", " + uname + c3network + "</html>");
-                if(u.isDeployed() && !sel) {
-                    setBackground(Color.LIGHT_GRAY);
-                }
-            }
-            if(value instanceof Force) {
-                if(!hasFocus && ((Force)value).isDeployed()) {
-                    setBackground(Color.LIGHT_GRAY);
-                }
-            }
-            setIcon(getIcon(value));
-
-
-
-            return this;
-        }
-
-        protected Icon getIcon(Object node) {
-
-            if(node instanceof Unit) {
-                return getIconFrom((Unit)node);
-            } else if(node instanceof Force) {
-                return getIconFrom((Force)node);
-            } else {
-                return null;
-            }
-        }
-
-        protected Icon getIconFrom(Unit unit) {
-            Person person = unit.getCommander();
-            if(null == person) {
-                return null;
-            }
-            String category = person.getPortraitCategory();
-            String file = person.getPortraitFileName();
-
-            if(Crew.ROOT_PORTRAIT.equals(category)) {
-                category = "";
-            }
-
-            // Return a null if the player has selected no portrait file.
-            if ((null == category) || (null == file) || Crew.PORTRAIT_NONE.equals(file)) {
-                file = "default.gif";
-            }
-            // Try to get the player's portrait file.
-            Image portrait = null;
-            try {
-                portrait = (Image) getIconPackage().getPortraits().getItem(category, file);
-                if(null != portrait) {
-                    portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
-                } else {
-                    portrait = (Image) getIconPackage().getPortraits().getItem("", "default.gif");
-                    if(null != portrait) {
-                        portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
-                    }
-                }
-                return new ImageIcon(portrait);
-            } catch (Exception err) {
-                err.printStackTrace();
-                return null;
-            }
-        }
-
-        protected Icon getIconFrom(Force force) {
-            String category = force.getIconCategory();
-            String file = force.getIconFileName();
-
-            if(Crew.ROOT_PORTRAIT.equals(category)) {
-             category = "";
-            }
-
-            // Return a null if the player has selected no portrait file.
-            if ((null == category) || (null == file) || Crew.PORTRAIT_NONE.equals(file)) {
-             file = "empty.png";
-            }
-
-            // Try to get the player's portrait file.
-            Image portrait = null;
-            try {
-             portrait = (Image) getIconPackage().getForceIcons().getItem(category, file);
-            if(null != portrait) {
-                portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
-            } else {
-                portrait = (Image) getIconPackage().getForceIcons().getItem("", "empty.png");
-                if(null != portrait) {
-                    portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
-                }
-            }
-            return new ImageIcon(portrait);
-            } catch (Exception err) {
-             err.printStackTrace();
-             return null;
-            }
-       }
-    }
+    
 
     public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             ActionListener {
@@ -9517,6 +9086,18 @@ public class CampaignGUI extends JPanel {
                 refreshServicedUnitList();
                 refreshReport();
                 refreshCargo();
+            } else if(command.equalsIgnoreCase("BOMBS")) {
+                if(null != selectedUnit && selectedUnit.getEntity() instanceof Aero) {
+                    BombsDialog dialog = new BombsDialog((Aero)selectedUnit.getEntity(), getCampaign(), frame);
+                    dialog.setVisible(true);
+                    refreshUnitList();
+                }
+            } else if(command.equalsIgnoreCase("QUIRKS")) {
+                if(null != selectedUnit) {
+                    QuirksDialog dialog = new QuirksDialog(selectedUnit.getEntity(), frame);
+                    dialog.setVisible(true);
+                    refreshUnitList();
+                }
             }
         }
 
@@ -9609,9 +9190,10 @@ public class CampaignGUI extends JPanel {
                 }
                 //Select bombs.
                 if (oneSelected && (unit.getEntity() instanceof Aero)) {
-                    JMenuItem bombItem = new JMenuItem("Select Bombs");
-                    bombItem.addActionListener(new BombMenuListener(unit));
-                    popup.add(bombItem);
+                    menuItem = new JMenuItem("Select Bombs");
+                    menuItem.setActionCommand("BOMBS");
+                    menuItem.addActionListener(this);
+                    popup.add(menuItem);
                 }
                 // Salvage / Repair
                 if(oneSelected && !(unit.getEntity() instanceof Infantry && !(unit.getEntity() instanceof BattleArmor))) {
@@ -9761,9 +9343,10 @@ public class CampaignGUI extends JPanel {
                     popup.add(menuItem);
                 }
                 if(oneSelected && getCampaign().getCampaignOptions().useQuirks()) {
-                    JMenuItem quirkItem = new JMenuItem("Edit Quirks");
-                    quirkItem.addActionListener(new QuirkMenuListener(unit));
-                    popup.add(quirkItem);
+                    menuItem = new JMenuItem("Edit Quirks");
+                    menuItem.setActionCommand("QUIRKS");
+                    menuItem.addActionListener(this);
+                    popup.add(menuItem);
                 }
                 if(oneSelected) {
                     menuItem = new JMenuItem("Edit Unit History...");
@@ -9941,55 +9524,6 @@ public class CampaignGUI extends JPanel {
             }
             return false;  
         }  
-    }
-    
-
-    private JDialog aboutBox;
-
-    /**
-     * Private inner class to handle opening the {@link QuirksDialog} with the appropriate arguments.
-     */
-    private class QuirkMenuListener implements ActionListener {
-        
-        private Unit unit;
-
-        /**
-         * Creates the listener for the Quirks menu item.
-         * @param unit The {@link Unit} being edited.
-         */
-        public QuirkMenuListener(Unit unit) {
-            this.unit = unit;
-        }
-        
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            //Open the dialog.
-            QuirksDialog dialog = new QuirksDialog(unit.getEntity(), frame);
-            dialog.setVisible(true);
-        }
-    }
-
-    /**
-     * Private inner class to handle opening the {@link QuirksDialog} with the appropriate arguments.
-     */
-    private class BombMenuListener implements ActionListener {
-
-        private Unit unit;
-
-        /**
-         * Creates the listener for the Quirks menu item.
-         * @param unit The {@link Unit} being edited.
-         */
-        public BombMenuListener(Unit unit) {
-            this.unit = unit;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            //Open the dialog.
-            BombsDialog dialog = new BombsDialog((Aero)unit.getEntity(), getCampaign(), frame);
-            dialog.setVisible(true);
-        }
     }
     
     private void undeployUnit(Unit u) {
