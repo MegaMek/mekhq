@@ -28,6 +28,7 @@ v0.3.3 (SVN)
 + refactored PersonnelTableModel to a separate class (experimental)
 + Bug: No maintenance costs when not using the new StratOps maintenance options
 + Major refactoring of CampaignGUI, phase one - all TableModels and initComponents refactored
++ Major refactoring of CampaignGUI, phase two - cleanup
 
 v0.3.2 (2013-09-13)
 + maintenance checks (WIP)
