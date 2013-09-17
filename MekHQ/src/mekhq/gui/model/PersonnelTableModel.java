@@ -10,17 +10,14 @@ import java.util.UUID;
 
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
-import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
-import megamek.client.ui.swing.MechTileset;
 import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.UnitType;
 import megamek.common.options.PilotOptions;
-import megamek.common.util.DirectoryItems;
 import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Unit;
@@ -34,7 +31,7 @@ import mekhq.gui.CampaignGUI;
      * A table Model for displaying information about personnel
      * @author Jay lawson
      */
-    public class PersonnelTableModel extends AbstractTableModel {
+    public class PersonnelTableModel extends DataTableModel {
 
         private static final long serialVersionUID = -5207167419079014157L;
 
@@ -82,15 +79,11 @@ import mekhq.gui.CampaignGUI;
         public final static int N_COL =       39;
 
         public PersonnelTableModel(Campaign c) {
+            data = new ArrayList<Person>();
             campaign = c;
         }
-        
-        private ArrayList<Person> data = new ArrayList<Person>();
-
-        public int getRowCount() {
-            return data.size();
-        }
-
+ 
+        @Override
         public int getColumnCount() {
             return N_COL;
         }
@@ -220,7 +213,7 @@ import mekhq.gui.CampaignGUI;
         }
 
         public String getTooltip(int row, int col) {
-            Person p = data.get(row);
+            Person p = getPerson(row);
             switch(col) {
             case COL_NABIL:
                 return p.getAbilityList(PilotOptions.LVL3_ADVANTAGES);
@@ -259,13 +252,7 @@ import mekhq.gui.CampaignGUI;
             if( i >= data.size()) {
                 return null;
             }
-            return data.get(i);
-        }
-
-        //fill table with values
-        public void setData(ArrayList<Person> people) {
-            data = people;
-            fireTableDataChanged();
+            return (Person)data.get(i);
         }
 
         public boolean isDeployed(int row) {
@@ -278,7 +265,7 @@ import mekhq.gui.CampaignGUI;
             if(data.isEmpty()) {
                 return "";
             } else {
-                p = data.get(row);
+                p = getPerson(row);
             }
             if(col == COL_RANK) {
                 return getCampaign().getRanks().getRank(p.getRank());
@@ -601,8 +588,8 @@ import mekhq.gui.CampaignGUI;
             setData(getCampaign().getPersonnel());
         }
 
-        public TableCellRenderer getRenderer(int index, IconPackage icons) {
-            if(index == CampaignGUI.PV_GRAPHIC) {
+        public TableCellRenderer getRenderer(boolean graphic, IconPackage icons) {
+            if(graphic) {
                 return new PersonnelTableModel.VisualRenderer(icons);
             }
             return new PersonnelTableModel.Renderer();
@@ -631,7 +618,7 @@ import mekhq.gui.CampaignGUI;
                     // tiger stripes
                     if (isDeployed(actualRow)) {
                         setBackground(Color.LIGHT_GRAY);
-                    } else if((Integer)getValueAt(actualRow,COL_HITS) > 0 || data.get(actualRow).hasInjuries(true)) {
+                    } else if((Integer)getValueAt(actualRow,COL_HITS) > 0 || getPerson(actualRow).hasInjuries(true)) {
                         setBackground(Color.RED);
                     } else {
                         setBackground(Color.WHITE);
