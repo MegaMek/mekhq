@@ -29,6 +29,7 @@ v0.3.3 (SVN)
 + Bug: No maintenance costs when not using the new StratOps maintenance options
 + Major refactoring of CampaignGUI, phase one - all TableModels and initComponents refactored
 + Major refactoring of CampaignGUI, phase two - cleanup
++ backwards compatability - large vessels had enginepart in addition to spacecraft engine leading to inflated values
 
 v0.3.2 (2013-09-13)
 + maintenance checks (WIP)

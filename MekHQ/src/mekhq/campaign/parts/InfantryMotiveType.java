@@ -210,4 +210,8 @@ public class InfantryMotiveType extends Part {
 		return mode;
 	}
 	
+	@Override
+    public boolean needsMaintenance() {
+        return false;
+    }
 }
