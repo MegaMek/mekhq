@@ -30,6 +30,15 @@ v0.3.3 (SVN)
 + Major refactoring of CampaignGUI, phase one - all TableModels and initComponents refactored
 + Major refactoring of CampaignGUI, phase two - cleanup
 + backwards compatability - large vessels had enginepart in addition to spacecraft engine leading to inflated values
++ Major update to the Personnel Market (WIP)
+  There are now four methods of randomization to choose from.
+  Dylan's method and the Random (original implementation) method both generate daily, but don't "clear"
+  Dylan's method uses a weighted version of the Random method to frequently choose personnel for your most common unit type(s)
+  Random method is totally random, though it now has options on how personnel are removed based on roll on 2d6 (if it's less than that target)  
+  FM:Mercs Revised method is as close as I could code to what that book offers with a couple of TODO for roll modifiers
+  StratOps method follows the rules in StratOps based on whatever you set your Maint. Cycle as
+  This is still a WIP and there are currently no tooltips for the options.
++ Bug: Report pane not scrolling with reports
 
 v0.3.2 (2013-09-13)
 + maintenance checks (WIP)

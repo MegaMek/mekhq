@@ -113,6 +113,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
+import javax.swing.text.DefaultCaret;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import javax.xml.parsers.DocumentBuilder;
@@ -2446,6 +2447,8 @@ public class CampaignGUI extends JPanel {
         txtPaneReport.setEditable(false);
         txtPaneReport.setText(getCampaign().getCurrentReportHTML());
         txtPaneReport.addHyperlinkListener(reportHLL);
+        DefaultCaret caret = (DefaultCaret)txtPaneReport.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         JScrollPane txtPaneReportScrollPane = new JScrollPane(txtPaneReport);     
         txtPaneReportScrollPane.setMinimumSize(new java.awt.Dimension(250,100));
         txtPaneReportScrollPane.setPreferredSize(new java.awt.Dimension(250, 100));
@@ -4762,7 +4765,7 @@ public class CampaignGUI extends JPanel {
 
     public void refreshReport() {
         txtPaneReport.setText(getCampaign().getCurrentReportHTML());
-        txtPaneReport.setCaretPosition(0);
+        //txtPaneReport.setCaretPosition(txtPaneReport.getDocument().getLength());
     }
 
     public void refreshOrganization() {
