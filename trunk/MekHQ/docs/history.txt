@@ -39,6 +39,8 @@ v0.3.3 (SVN)
   StratOps method follows the rules in StratOps based on whatever you set your Maint. Cycle as
   This is still a WIP and there are currently no tooltips for the options.
 + Bug: Report pane not scrolling with reports
++ Updated MM and MML jar files
++ Updated UnitSelectorDialog to be compatible with new MM jar
 
 v0.3.2 (2013-09-13)
 + maintenance checks (WIP)
