@@ -256,7 +256,7 @@ public class CampaignOptions implements Serializable {
         personnelMarketRandomRegularRemoval = 6;
         personnelMarketRandomGreenRemoval = 4;
         personnelMarketRandomUltraGreenRemoval = 4;
-        personnelMarketDylansWeight = 0.4;
+        personnelMarketDylansWeight = 0.3;
         
     }
 
