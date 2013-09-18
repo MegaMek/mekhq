@@ -42,6 +42,7 @@ v0.3.3 (SVN)
 + Updated MM and MML jar files
 + Updated UnitSelectorDialog to be compatible with new MM jar
 + Bug: Dylan's Method in Personnel Market incorrect percentage conversion
++ Bug [#401]: Personnel Market Sorts Incorrectly
 
 v0.3.2 (2013-09-13)
 + maintenance checks (WIP)
