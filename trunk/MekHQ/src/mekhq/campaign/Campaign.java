@@ -2641,7 +2641,7 @@ public class Campaign implements Serializable {
 				} else if (xn.equalsIgnoreCase("units")) {
 					processUnitNodes(retVal, wn, version);
 				} else if (xn.equalsIgnoreCase("missions")) {
-					processMissionNodes(retVal, wn);
+					processMissionNodes(retVal, wn, version);
 				} else if (xn.equalsIgnoreCase("forces")) {
 					processForces(retVal, wn, version);
 				} else if (xn.equalsIgnoreCase("finances")) {
@@ -3297,7 +3297,7 @@ public class Campaign implements Serializable {
 		}
 	}
 
-	private static void processMissionNodes(Campaign retVal, Node wn) {
+	private static void processMissionNodes(Campaign retVal, Node wn, Version version) {
 		MekHQ.logMessage("Loading Mission Nodes from XML...", 4);
 
 		NodeList wList = wn.getChildNodes();
@@ -3319,7 +3319,7 @@ public class Campaign implements Serializable {
 				continue;
 			}
 
-			Mission m = Mission.generateInstanceFromXML(wn2);
+			Mission m = Mission.generateInstanceFromXML(wn2, retVal, version);
 
 			if (m != null) {
 				// add scenarios to the scenarioId hash

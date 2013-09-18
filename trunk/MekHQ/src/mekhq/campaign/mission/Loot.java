@@ -34,6 +34,7 @@ import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
+import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
@@ -161,22 +162,22 @@ public class Loot implements MekHqXmlSerializable {
                 +"<cash>"
                 +cash
                 +"</cash>");
-        if(units.size() > 0) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<units>");
-            for(Entity e : units) {
-                String lookupName = e.getChassis() + " " + e.getModel();
-                lookupName.replaceAll("\\s+$", "");
-                pw1.println(MekHqXmlUtil.indentStr(indent+2)
-                        +"<entityName>"
-                        +lookupName
-                        +"</entityName>");
-            }
-            pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</units>");
+        for(Entity e : units) {
+            String lookupName = e.getChassis() + " " + e.getModel();
+            lookupName.replaceAll("\\s+$", "");
+            pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                    +"<entityName>"
+                    +lookupName
+                    +"</entityName>");
         }
+        for(Part p : parts) {
+            p.writeToXml(pw1, indent+1);
+        }
+        
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</loot>");
     }
     
-    public static Loot generateInstanceFromXML(Node wn) {
+    public static Loot generateInstanceFromXML(Node wn, Campaign c, Version version) {
         Loot retVal = null;
        
         try {
@@ -192,31 +193,21 @@ public class Loot implements MekHqXmlSerializable {
                     retVal.name = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("cash")) {
                     retVal.cash = Long.parseLong(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("units")) {
-                    NodeList nl2 = wn2.getChildNodes();
-                    for (int y=0; y<nl2.getLength(); y++) {
-                        Node wn3 = nl2.item(y);
-                        // If it's not an element node, we ignore it.
-                        if (wn3.getNodeType() != Node.ELEMENT_NODE)
-                            continue;
-                        
-                        if (!wn3.getNodeName().equalsIgnoreCase("entityName")) {
-                            // Error condition of sorts!
-                            // Errr, what should we do here?
-                            MekHQ.logMessage("Unknown node type not loaded in techUnitIds nodes: "+wn3.getNodeName());
-                            continue;
-                        }               
-                        MechSummary summary = MechSummaryCache.getInstance().getMech(wn3.getTextContent());
-                        if(null == summary) {
-                            throw(new EntityLoadingException());
-                        }
-                        Entity e = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
-                        if(null == e) {
-                             continue;
-                        }
-                        retVal.units.add(e);
+                } else if (wn2.getNodeName().equalsIgnoreCase("entityName")) {              
+                    MechSummary summary = MechSummaryCache.getInstance().getMech(wn2.getTextContent());
+                    if(null == summary) {
+                        throw(new EntityLoadingException());
                     }
-                } 
+                    Entity e = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+                    if(null == e) {
+                        continue;
+                    }
+                    retVal.units.add(e);
+                } else if (wn2.getNodeName().equalsIgnoreCase("part")) {
+                    Part p = Part.generateInstanceFromXML(wn2, version);
+                    p.setCampaign(c);
+                    retVal.parts.add(p);
+                }
             }
         } catch (Exception ex) {
             // Errrr, apparently either the class name was invalid...

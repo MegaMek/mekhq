@@ -33,6 +33,7 @@ import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
+import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
@@ -306,7 +307,7 @@ public class Scenario implements Serializable {
 		
 	}
 	
-	public static Scenario generateInstanceFromXML(Node wn) {
+	public static Scenario generateInstanceFromXML(Node wn, Campaign c, Version version) {
 		Scenario retVal = null;
 		NamedNodeMap attrs = wn.getAttributes();
 		Node classNameNode = attrs.getNamedItem("type");
@@ -351,7 +352,7 @@ public class Scenario implements Serializable {
                             MekHQ.logMessage("Unknown node type not loaded in techUnitIds nodes: "+wn3.getNodeName());
                             continue;
                         }               
-                        Loot loot = Loot.generateInstanceFromXML(wn3);
+                        Loot loot = Loot.generateInstanceFromXML(wn3, c, version);
                         retVal.loots.add(loot);
                     }
 				}
