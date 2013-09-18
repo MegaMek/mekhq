@@ -72,23 +72,8 @@ public class PersonnelMarket {
 		}
 		
 		switch (c.getCampaignOptions().getPersonnelMarketType()) {
-		case TYPE_DYLANS:
-			roll = Compute.d6(2);
-			if (roll == 12) {
-				q = 6;
-			} else if (roll < 12) {
-				q = 5;
-			} else if (roll < 10) {
-				q = 4;
-			} else if (roll < 8) {
-				q = 3;
-			} else if (roll < 5) {
-				q = 2;
-			} else if (roll < 3) {
-				q = 1;
-			} else if (roll == 1) {
-				q = 0;
-			}
+		case TYPE_DYLANS: // TODO: Add in extra infantry and vehicle crews
+			q = generateRandomQuantity();
 			
 			ArrayList<Long> mtf = new ArrayList<Long>();
 			long mostTypes = getUnitMainForceTypes(c);
@@ -114,9 +99,11 @@ public class PersonnelMarket {
 				mtf.add(Entity.ETYPE_MECH);
 			}
 			
+			
+			int weight = (int)(c.getCampaignOptions().getPersonnelMarketDylansWeight() * 100);
 			for (int i = 0; i < q; i++) {
-				if (Compute.randomInt(99) < c.getCampaignOptions().getPersonnelMarketDylansWeight() * 10) {
-					long choice = mtf.get(Compute.randomInt(mtf.size()-1));
+				long choice = mtf.get(Compute.randomInt(Math.max(mtf.size()-1, 1)));
+				if (Compute.randomInt(99) < weight) {
 					if (choice == Entity.ETYPE_MECH) {
 						p = c.newPerson(Person.T_MECHWARRIOR);
 					} else if (choice == Entity.ETYPE_TANK) {
@@ -268,22 +255,7 @@ public class PersonnelMarket {
 			break;
 		case TYPE_RANDOM:
 		default: // default is random
-			roll = Compute.d6(2);
-			if (roll == 12) {
-				q = 6;
-			} else if (roll < 12) {
-				q = 5;
-			} else if (roll < 10) {
-				q = 4;
-			} else if (roll < 8) {
-				q = 3;
-			} else if (roll < 5) {
-				q = 2;
-			} else if (roll < 3) {
-				q = 1;
-			} else if (roll == 1) {
-				q = 0;
-			}
+			q = generateRandomQuantity();
 			
 			for (int i = 0; i < q; i++) {
 				roll = Compute.randomInt(Person.T_NUM-1);
@@ -535,6 +507,27 @@ public class PersonnelMarket {
 		}
 		if (most == proto) {
 			retval = retval | Entity.ETYPE_PROTOMECH;
+		}
+		return retval;
+	}
+	
+	public int generateRandomQuantity() {
+		int roll = Compute.d6(2);
+		int retval = 0;
+		if (roll == 12) {
+			retval = 6;
+		} else if (roll < 12) {
+			retval = 5;
+		} else if (roll < 10) {
+			retval = 4;
+		} else if (roll < 8) {
+			retval = 3;
+		} else if (roll < 5) {
+			retval = 2;
+		} else if (roll < 3) {
+			retval = 1;
+		} else if (roll == 1) {
+			retval = 0;
 		}
 		return retval;
 	}
