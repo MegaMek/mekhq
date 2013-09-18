@@ -26,6 +26,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 
 import mekhq.MekHQ;
+import mekhq.Version;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 
@@ -236,7 +238,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 		//do nothing
 	}
 	
-	public static Mission generateInstanceFromXML(Node wn) {
+	public static Mission generateInstanceFromXML(Node wn, Campaign c, Version version) {
 		Mission retVal = null;
 		NamedNodeMap attrs = wn.getAttributes();
 		Node classNameNode = attrs.getNamedItem("type");
@@ -280,7 +282,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 
 							continue;
 						}
-						Scenario s = Scenario.generateInstanceFromXML(wn3);
+						Scenario s = Scenario.generateInstanceFromXML(wn3, c, version);
 						retVal.addScenario(s);
 					}
 				} 
