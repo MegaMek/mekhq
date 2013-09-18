@@ -44,6 +44,7 @@ v0.3.3 (SVN)
 + Bug: Dylan's Method in Personnel Market incorrect percentage conversion
 + Bug [#401]: Personnel Market Sorts Incorrectly
 + Bug: parts in Loot not saved to XML
++ Bug: advanced search dialog shenanigans
 
 v0.3.2 (2013-09-13)
 + maintenance checks (WIP)
