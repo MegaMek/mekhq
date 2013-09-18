@@ -119,7 +119,7 @@ public class UnitSelectorDialog extends JDialog {
         this.hqView = view;
         this.campaign = c;
         formatter = new DecimalFormat();
-        asd = new AdvancedSearchDialog(frame, campaign.getCalendar().get(GregorianCalendar.YEAR));
+        asd = new AdvancedSearchDialog(frame);
         initComponents();
         
         MechSummary[] allMechs = MechSummaryCache.getInstance().getAllMechs();
