@@ -76,6 +76,16 @@ public class CampaignOptions implements Serializable {
     private boolean useDylansRandomXp; // Unofficial
     private boolean useRandomHitsForVees;
     private int minimumHitsForVees;
+    
+    //personnel market related
+    private boolean personnelMarketReportRefresh;
+    private int personnelMarketType;
+    private int personnelMarketRandomEliteRemoval;
+    private int personnelMarketRandomVeteranRemoval;
+    private int personnelMarketRandomRegularRemoval;
+    private int personnelMarketRandomGreenRemoval;
+    private int personnelMarketRandomUltraGreenRemoval;
+    private double personnelMarketDylansWeight;
 
     //unit related
     private boolean useQuirks;
@@ -239,6 +249,14 @@ public class CampaignOptions implements Serializable {
         checkMaintenance = true;
         useRandomHitsForVees = false;
         minimumHitsForVees = 1;
+        personnelMarketReportRefresh = true;
+        personnelMarketType = PersonnelMarket.TYPE_STRAT_OPS;
+        personnelMarketRandomEliteRemoval = 10;
+        personnelMarketRandomVeteranRemoval = 8;
+        personnelMarketRandomRegularRemoval = 6;
+        personnelMarketRandomGreenRemoval = 4;
+        personnelMarketRandomUltraGreenRemoval = 4;
+        personnelMarketDylansWeight = 0.4;
         
     }
 
@@ -420,7 +438,70 @@ public class CampaignOptions implements Serializable {
     	this.useDylansRandomXp = b;
     }
     
+    // Personnel Market
+    public boolean getPersonnelMarketReportRefresh() {
+    	return personnelMarketReportRefresh;
+    }
     
+    public void setPersonnelMarketReportRefresh(boolean b) {
+    	personnelMarketReportRefresh = b;
+    }
+    
+    public int getPersonnelMarketType() {
+    	return personnelMarketType;
+    }
+    
+    public void setPersonnelMarketType(int t) {
+    	personnelMarketType = t;
+    }
+    
+    public int getPersonnelMarketRandomEliteRemoval() {
+    	return personnelMarketRandomEliteRemoval;
+    }
+    
+    public void setPersonnelMarketRandomEliteRemoval(int i) {
+    	personnelMarketRandomEliteRemoval = i;
+    }
+    
+    public int getPersonnelMarketRandomVeteranRemoval() {
+    	return personnelMarketRandomVeteranRemoval;
+    }
+    
+    public void setPersonnelMarketRandomVeteranRemoval(int i) {
+    	personnelMarketRandomVeteranRemoval = i;
+    }
+    
+    public int getPersonnelMarketRandomRegularRemoval() {
+    	return personnelMarketRandomRegularRemoval;
+    }
+    
+    public void setPersonnelMarketRandomRegularRemoval(int i) {
+    	personnelMarketRandomRegularRemoval = i;
+    }
+    
+    public int getPersonnelMarketRandomGreenRemoval() {
+    	return personnelMarketRandomGreenRemoval;
+    }
+    
+    public void setPersonnelMarketRandomGreenRemoval(int i) {
+    	personnelMarketRandomGreenRemoval = i;
+    }
+    
+    public int getPersonnelMarketRandomUltraGreenRemoval() {
+    	return personnelMarketRandomUltraGreenRemoval;
+    }
+    
+    public void setPersonnelMarketRandomUltraGreenRemoval(int i) {
+    	personnelMarketRandomUltraGreenRemoval = i;
+    }
+    
+    public double getPersonnelMarketDylansWeight() {
+    	return personnelMarketDylansWeight;
+    }
+    
+    public void setPersonnelMarketDylansWeight(double d) {
+    	personnelMarketDylansWeight = d;
+    }
     
     public boolean payForParts() {
     	return payForParts;
@@ -948,6 +1029,14 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "checkMaintenance", checkMaintenance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useRandomHitsForVees", useRandomHitsForVees);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "minimumHitsForVees", minimumHitsForVees);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "personnelMarketType", personnelMarketType);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "personnelMarketRandomEliteRemoval", personnelMarketRandomEliteRemoval);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "personnelMarketRandomVeteranRemoval", personnelMarketRandomVeteranRemoval);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "personnelMarketRandomRegularRemoval", personnelMarketRandomRegularRemoval);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "personnelMarketRandomGreenRemoval", personnelMarketRandomGreenRemoval);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "personnelMarketRandomUltraGreenRemoval", personnelMarketRandomUltraGreenRemoval);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "personnelMarketReportRefresh", personnelMarketReportRefresh);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "personnelMarketDylansWeight", personnelMarketDylansWeight);
 
 
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -1252,7 +1341,23 @@ public class CampaignOptions implements Serializable {
                     retVal.useRandomHitsForVees = true;
                 else
                     retVal.useRandomHitsForVees = false;
-            } 
+            } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) {
+            	retVal.personnelMarketType = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomEliteRemoval")) {
+            	retVal.personnelMarketRandomEliteRemoval = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomVeteranRemoval")) {
+            	retVal.personnelMarketRandomVeteranRemoval = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomRegularRemoval")) {
+            	retVal.personnelMarketRandomRegularRemoval = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomGreenRemoval")) {
+            	retVal.personnelMarketRandomGreenRemoval = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomUltraGreenRemoval")) {
+            	retVal.personnelMarketRandomUltraGreenRemoval = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketReportRefresh")) {
+            	retVal.personnelMarketReportRefresh = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketDylansWeight")) {
+            	retVal.personnelMarketDylansWeight = Double.parseDouble(wn2.getTextContent().trim());
+            }
 		}
 
 		MekHQ.logMessage("Load Campaign Options Complete!", 4);
