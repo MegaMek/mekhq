@@ -222,10 +222,6 @@ public class PersonnelMarketDialog extends JDialog {
         pack();
     }
 
-	private void comboPersonTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboUnitTypeActionPerformed
-	    filterPersonnel();
-	}
-
 	public Person getPerson() {
 	    return selectedPerson;
 	}
