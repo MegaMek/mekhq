@@ -61,9 +61,9 @@ public class PersonnelMarketDialog extends JDialog {
     private javax.swing.JButton btnHire;
     private javax.swing.JButton btnClose;
     private javax.swing.JComboBox comboPersonType;
-    private javax.swing.JComboBox choicePersonView;
+    //private javax.swing.JComboBox choicePersonView;
     private javax.swing.JLabel lblPersonChoice;
-    private javax.swing.JLabel lblPersonView;
+    //private javax.swing.JLabel lblPersonView;
     private javax.swing.JPanel panelOKBtns;
     private javax.swing.JPanel panelMain;
     private javax.swing.JPanel panelFilterBtns;
@@ -101,8 +101,8 @@ public class PersonnelMarketDialog extends JDialog {
         btnHire = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
         lblPersonChoice = new javax.swing.JLabel();
-        choicePersonView = new javax.swing.JComboBox();
-        lblPersonView = new javax.swing.JLabel();
+        //choicePersonView = new javax.swing.JComboBox();
+        //lblPersonView = new javax.swing.JLabel();
 
 		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitSelectorDialog");
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -267,7 +267,7 @@ public class PersonnelMarketDialog extends JDialog {
 	
     private void filterPersonnel() {
         RowFilter<PersonnelTableModel, Integer> personTypeFilter = null;
-        final int nRole = comboPersonType.getSelectedIndex();
+        final int nGroup = comboPersonType.getSelectedIndex();
         //If current expression doesn't parse, don't update.
         try {
             personTypeFilter = new RowFilter<PersonnelTableModel,Integer>() {
@@ -275,15 +275,31 @@ public class PersonnelMarketDialog extends JDialog {
                 public boolean include(Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
                     PersonnelTableModel personModel = entry.getModel();
                 	Person person = personModel.getPerson(entry.getIdentifier());
-                	// We want everyone
-                	if (nRole == Person.T_NONE) {
-                		return true;
-                	}
-                	// Otherwise, only if we match the filter! 
-                	if (person.getPrimaryRole() == nRole) {
-                		return true;
-                	}
-                	return false;
+                	int type = person.getPrimaryRole();
+                    if ((nGroup == CampaignGUI.PG_ACTIVE) ||
+                            (nGroup == CampaignGUI.PG_COMBAT && type <= Person.T_SPACE_GUNNER) ||
+                            (nGroup == CampaignGUI.PG_SUPPORT && type > Person.T_SPACE_GUNNER) ||
+                            (nGroup == CampaignGUI.PG_MW && type == Person.T_MECHWARRIOR) ||
+                            (nGroup == CampaignGUI.PG_CREW && (type == Person.T_GVEE_DRIVER || type == Person.T_NVEE_DRIVER || type == Person.T_VTOL_PILOT || type == Person.T_VEE_GUNNER)) ||
+                            (nGroup == CampaignGUI.PG_PILOT && type == Person.T_AERO_PILOT) ||
+                            (nGroup == CampaignGUI.PG_CPILOT && type == Person.T_CONV_PILOT) ||
+                            (nGroup == CampaignGUI.PG_PROTO && type == Person.T_PROTO_PILOT) ||
+                            (nGroup == CampaignGUI.PG_BA && type == Person.T_BA) ||
+                            (nGroup == CampaignGUI.PG_SOLDIER && type == Person.T_INFANTRY) ||
+                            (nGroup == CampaignGUI.PG_VESSEL && (type == Person.T_SPACE_PILOT || type == Person.T_SPACE_CREW || type == Person.T_SPACE_GUNNER || type == Person.T_NAVIGATOR)) ||
+                            (nGroup == CampaignGUI.PG_TECH && type >= Person.T_MECH_TECH && type < Person.T_DOCTOR) ||
+                            (nGroup == CampaignGUI.PG_DOC && ((type == Person.T_DOCTOR) || (type == Person.T_MEDIC))) ||
+                            (nGroup == CampaignGUI.PG_ADMIN && type > Person.T_MEDIC)
+                            ) {
+                        return person.isActive();
+                    } else if(nGroup == CampaignGUI.PG_RETIRE) {
+                        return person.getStatus() == Person.S_RETIRED;
+                    } else if(nGroup == CampaignGUI.PG_MIA) {
+                        return person.getStatus() == Person.S_MIA;
+                    } else if(nGroup == CampaignGUI.PG_KIA) {
+                        return person.getStatus() == Person.S_KIA;
+                    }
+                    return false;
                 }
             };
         } catch (java.util.regex.PatternSyntaxException e) {
