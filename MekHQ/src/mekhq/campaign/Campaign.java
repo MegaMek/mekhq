@@ -4429,7 +4429,7 @@ public class Campaign implements Serializable {
 			target.addModifier(getFaction().getEraMod(getEra()), "era");
 		}
 
-		if (null != partWork.getUnit()) {
+		if (null != partWork.getUnit() && null != tech) {
 			// we have no official rules for what happens when a tech is only
 			// assigned
 			// for part of the maintenance cycle, so we will create our own
@@ -6477,7 +6477,7 @@ public class Campaign implements Serializable {
 			}
 			if (!damageString.isEmpty()) {
 				damageString = "<b><font color='red'>" + damageString
-						+ "</b></font>";
+						+ "</b></font> [<a href='REPAIR|" + u.getId() + "'>Repair bay</a>]";
 			}
 			String paidString = "";
 			if(!paidMaintenance) {

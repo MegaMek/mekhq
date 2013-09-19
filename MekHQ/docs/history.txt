@@ -50,6 +50,9 @@ v0.3.3 (SVN)
 + report text pane restructured into a vertical and detachable split pane
 + double-clicking on personnel and unit table expands and collapses the view
 + determine initial size based on users screen size
++ couple of grammatical corrections
++ Bug: partial repair penalty applied to unmaintained units
++ added Repair bay hyperlink to units damaged by maintenance
 
 v0.3.2 (2013-09-13)
 + maintenance checks (WIP)

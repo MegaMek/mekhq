@@ -108,7 +108,7 @@ public class CurrentLocation implements Serializable {
 		} else {
 			toReturn += "<i>" + Math.round(100.0*getTransitTime())/100.0 + " days out </i>";
 		}
-		toReturn += ",<i>" + Math.round(100.0*rechargeTime/currentPlanet.getRechargeTime()) + "% charged</i>";
+		toReturn += ", <i>" + Math.round(100.0*rechargeTime/currentPlanet.getRechargeTime()) + "% charged</i>";
 		return "<html>" + toReturn + "</html>";
 	}
 	

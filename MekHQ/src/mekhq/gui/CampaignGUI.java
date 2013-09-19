@@ -3023,6 +3023,32 @@ public class CampaignGUI extends JPanel {
         
     }
     
+    public void focusOnUnitInRepairBay(UUID id) {
+        if(null == id) {
+            return;
+        }
+        if(mainPanel.getDividerLocation() < 700 ) {
+            if(mainPanel.getLastDividerLocation() > 700) {
+                mainPanel.setDividerLocation(mainPanel.getLastDividerLocation());
+            } else {
+                mainPanel.resetToPreferredSizes();
+            }
+        }
+        tabMain.setSelectedIndex(6);
+        int row = -1;
+        for(int i=0; i< servicedUnitTable.getRowCount(); i++) {
+            if(servicedUnitModel.getUnit(servicedUnitTable.convertRowIndexToModel(i)).getId().equals(id)) {
+                row = i;
+                break;
+            }
+        }
+        if(row != -1) {
+            servicedUnitTable.setRowSelectionInterval(row, row);
+            servicedUnitTable.scrollRectToVisible(servicedUnitTable.getCellRect(row, 0, true));
+        }
+        
+    }
+    
     public void focusOnPerson(UUID id) {
         if(null == id) {
             return;
