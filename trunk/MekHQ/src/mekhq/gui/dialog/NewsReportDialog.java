@@ -11,6 +11,7 @@ import java.util.ResourceBundle;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.border.EmptyBorder;
 
 /**
  *
@@ -37,12 +38,15 @@ public class NewsReportDialog extends javax.swing.JDialog {
 
         txtNews = new JTextPane();
         txtNews.setContentType("text/html");
-        
+        txtNews.setEditable(false);
+        JScrollPane scrNews = new JScrollPane(txtNews);
+        scrNews.setBorder( new EmptyBorder(2,10,2,2));
+
         setLayout(new java.awt.BorderLayout());
         
         txtNews.setEditable(false);
         
-        getContentPane().add(new JScrollPane(txtNews), BorderLayout.CENTER);
+        getContentPane().add(scrNews, BorderLayout.CENTER);
     }
     
 }

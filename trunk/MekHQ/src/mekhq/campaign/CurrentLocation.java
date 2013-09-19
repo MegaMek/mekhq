@@ -96,19 +96,19 @@ public class CurrentLocation implements Serializable {
 	
 	public String getReport(Date date) {
 		String toReturn = "<b>Current Location</b><br>";
-		toReturn += currentPlanet.getShortDesc(date) + "<br>";
+		toReturn += currentPlanet.getShortDesc(date) + "<br> ";
 		if(null != jumpPath && !jumpPath.isEmpty()) {
-			toReturn += "In transit to " + jumpPath.getLastPlanet().getShortName() + "<br>";
+			toReturn += "In transit to " + jumpPath.getLastPlanet().getShortName() + " ";
 		}
 		if(isOnPlanet()) {
-			toReturn += "<i>On Planet</i><br>";
+			toReturn += "<i>On Planet</i>";
 		} 
 		else if(isAtJumpPoint()) {
-			toReturn += "<i>At Jump Point</i><br>";
+			toReturn += "<i>At Jump Point</i>";
 		} else {
-			toReturn += "<i>" + Math.round(100.0*getTransitTime())/100.0 + " days out </i><br>";
+			toReturn += "<i>" + Math.round(100.0*getTransitTime())/100.0 + " days out </i>";
 		}
-		toReturn += "<i>" + Math.round(100.0*rechargeTime/currentPlanet.getRechargeTime()) + "% charged</i>";
+		toReturn += ",<i>" + Math.round(100.0*rechargeTime/currentPlanet.getRechargeTime()) + "% charged</i>";
 		return "<html>" + toReturn + "</html>";
 	}
 	
