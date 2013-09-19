@@ -34,6 +34,7 @@ public class ReportHyperlinkListener implements HyperlinkListener {
     public static final String PERSON = "PERSON";
     public static final String NEWS = "NEWS";
     public static final String MAINTENANCE = "MAINTENANCE";
+    public static final String PERSONNEL_MARKET = "PERSONNEL_MARKET";
 
 
     private CampaignGUI campaignGUI;
@@ -48,6 +49,10 @@ public class ReportHyperlinkListener implements HyperlinkListener {
             if(e.getDescription().startsWith(UNIT)) {
                 UUID id = UUID.fromString(e.getDescription().split(":")[1]);
                 campaignGUI.focusOnUnit(id);
+            }
+            // Must come before PERSON since it starts with PERSON as well
+            else if(e.getDescription().startsWith(PERSONNEL_MARKET)) {
+            	campaignGUI.hirePersonMarket();
             }
             else if(e.getDescription().startsWith(PERSON)) {
                 UUID id = UUID.fromString(e.getDescription().split(":")[1]);

@@ -2219,7 +2219,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miPersonnelMarket = new JMenuItem("Personnel Market");
         miPersonnelMarket.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                hirePersonMarket(evt);
+                hirePersonMarket();
             }
         });
         menuMarket.add(miPersonnelMarket);
@@ -3128,7 +3128,7 @@ public class CampaignGUI extends JPanel {
         npd.setVisible(true);
     }
 
-    private void hirePersonMarket(java.awt.event.ActionEvent evt) {
+    public void hirePersonMarket() {
         PersonnelMarketDialog pmd = new PersonnelMarketDialog(getFrame(), this,
                 getCampaign(),
                 getIconPackage().getPortraits());
