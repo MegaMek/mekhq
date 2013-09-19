@@ -275,7 +275,7 @@ public class PersonnelMarket {
 		}
 		
 		if (report) {
-			c.addReport("Personnel Market Refreshed<br>");
+			c.addReport("<a href='PERSONNEL_MARKET'>Personnel Market Refreshed</a><br>");
 		}
 	}
 	
