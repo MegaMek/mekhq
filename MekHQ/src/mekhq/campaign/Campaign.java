@@ -944,7 +944,7 @@ public class Campaign implements Serializable {
 		String toReturn = "";
 		// lets do the report backwards
 		for (String s : currentReport) {
-			toReturn += s + "<br/>";
+			toReturn += s + "<br/><br/>";
 		}
 		return toReturn;
 	}
@@ -6435,25 +6435,23 @@ public class Campaign implements Serializable {
 				}
 				maintenanceReport += partReport + "<br>";
 			}
-			String damageList = "";
-			String destroyList = "";
+			int nDamage = 0;
+			int nDestroy = 0;
 			for (int key : partsToDamage.keySet()) {
 				Part p = getPart(key);
 				if (null != p) {
 					int damage = partsToDamage.get(key);
 					if (damage > 3) {
-						destroyList += p.getName() + ", ";
+						nDestroy++;
 						p.remove(false);
 					} else {
 						p.doMaintenanceDamage(damage);
-						damageList += p.getName() + ", ";
+						nDamage++;
 					}
 				}
 			}
 			u.resetDaysSinceMaintenance();
 			u.setLastMaintenanceReport(maintenanceReport);
-			damageList = damageList.replaceAll(", $", "");
-			destroyList = destroyList.replaceAll(", $", "");
 			int quality = u.getQuality();
 			String qualityString = "";
 			if (quality > qualityOrig) {
@@ -6471,12 +6469,11 @@ public class Campaign implements Serializable {
 						+ Part.getQualityName(quality);
 			}
 			String damageString = "";
-			if (!damageList.isEmpty()) {
-				damageString += "Damage was suffered to " + damageList + ". ";
+			if (nDamage > 0) {
+				damageString += nDamage +" parts were damaged. ";
 			}
-			if (!destroyList.isEmpty()) {
-				damageString += "The following parts were destroyed: "
-						+ destroyList + ".";
+			if (nDestroy > 0) {
+				damageString += nDestroy +  " parts were destroyed.";
 			}
 			if (!damageString.isEmpty()) {
 				damageString = "<b><font color='red'>" + damageString

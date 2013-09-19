@@ -12,6 +12,7 @@ import java.awt.Frame;
 import javax.swing.JDialog;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.border.EmptyBorder;
 
 import mekhq.campaign.report.Report;
 
@@ -32,7 +33,6 @@ public class ReportDialog extends JDialog {
         txtReport = report.getReport();
         initComponents();   
         setMinimumSize(new Dimension(400, 500));
-        //setPreferredSize(new Dimension(400, 500));
         setLocationRelativeTo(parent);
     }
     
@@ -42,7 +42,8 @@ public class ReportDialog extends JDialog {
         
         scrReport = new JScrollPane(txtReport);
         txtReport.setEditable(false);
-
+        scrReport.setBorder( new EmptyBorder(2,10,2,2));
+        
         getContentPane().add(scrReport, BorderLayout.CENTER);
     
     }
