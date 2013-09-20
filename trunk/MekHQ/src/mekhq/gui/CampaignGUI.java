@@ -8860,7 +8860,7 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshOrganization();
                 refreshCargo();
-            } else if (command.contains("QUIRK")) {
+            }/* else if (command.contains("QUIRK")) {
                 String sel = command.split(":")[1];
                     selectedUnit.acquireQuirk(sel, true);
                     refreshServicedUnitList();
@@ -8868,7 +8868,7 @@ public class CampaignGUI extends JPanel {
                     refreshTechsList();
                     refreshReport();
                     refreshCargo();
-            } else if (command.contains("MAINTENANCE_REPORT")) {
+            }*/ else if (command.contains("MAINTENANCE_REPORT")) {
                 showMaintenanceReport(selectedUnit.getId());
             } else if (command.contains("ASSIGN")) {
                 String sel = command.split(":")[1];
