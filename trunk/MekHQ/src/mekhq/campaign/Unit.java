@@ -3060,9 +3060,9 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	}
     }
     
-    public Part getPartForCriticalSlot(int index, int loc) {
+    public Part getPartForEquipmentNum(int index, int loc) {
     	for(Part p : parts) {
-    		if(p.isPartForCriticalSlot(index, loc)) {
+    		if(p.isPartForEquipmentNum(index, loc)) {
     			return p;
     		}
     	}

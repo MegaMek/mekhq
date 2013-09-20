@@ -347,7 +347,7 @@ public class ResolveScenarioTracker {
 					String strIndex = Integer.toString(cs.getIndex());
 					//check to make sure this equipment wasnt already damaged
 					if(null != u) {
-						Part p = u.getPartForCriticalSlot(cs.getIndex(), loc);
+						Part p = u.getPartForEquipmentNum(cs.getIndex(), loc);
 						if(null != p && p.getHits() > 0) {
 							continue;
 						}

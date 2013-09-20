@@ -56,6 +56,8 @@ v0.3.3 (SVN)
 + Added CampaignGUI.getTabIndexByName()
 + Bug: CampaignGUI.focusOnUnit() and CampaignGUI.focusOnPerson() using hard coded indexes (now uses CampaignGUI.getTabIndexByName())
 + Bug: Phantom Weapons on ASFs as a result of weapon groups not being filtered out in Unit.initializeParts()
++ Bug: Phantom Weapons due to EquipmentParts being skipped during campaign file loading
+   I've added a routine that should remove these phantom parts as well
 
 v0.3.2 (2013-09-13)
 + maintenance checks (WIP)
