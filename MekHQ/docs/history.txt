@@ -53,6 +53,8 @@ v0.3.3 (SVN)
 + couple of grammatical corrections
 + Bug: partial repair penalty applied to unmaintained units
 + added Repair bay hyperlink to units damaged by maintenance
++ Added CampaignGUI.getTabIndexByName()
++ Bug: CampaignGUI.focusOnUnit() and CampaignGUI.focusOnPerson() using hard coded indexes (now uses CampaignGUI.getTabIndexByName())
 
 v0.3.2 (2013-09-13)
 + maintenance checks (WIP)

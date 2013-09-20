@@ -2997,7 +2997,7 @@ public class CampaignGUI extends JPanel {
             }
         }
         splitUnit.resetToPreferredSizes();
-        tabMain.setSelectedIndex(4);
+        tabMain.setSelectedIndex(getTabIndexByName(resourceMap.getString("panHangar.TabConstraints.tabTitle")));
         int row = -1;
         for(int i=0; i< unitTable.getRowCount(); i++) {
             if(unitModel.getUnit(unitTable.convertRowIndexToModel(i)).getId().equals(id)) {
@@ -3061,7 +3061,7 @@ public class CampaignGUI extends JPanel {
             }
         }
         splitPersonnel.resetToPreferredSizes();
-        tabMain.setSelectedIndex(3);
+        tabMain.setSelectedIndex(getTabIndexByName(resourceMap.getString("panPersonnel.TabConstraints.tabTitle")));
         int row = -1;
         for(int i=0; i< personnelTable.getRowCount(); i++) {
             if(personModel.getPerson(personnelTable.convertRowIndexToModel(i)).getId().equals(id)) {
@@ -5642,6 +5642,17 @@ public class CampaignGUI extends JPanel {
 
     protected boolean onWarehouseTab() {
         return tabMain.getTitleAt(tabMain.getSelectedIndex()).equals(resourceMap.getString("panSupplies.TabConstraints.tabTitle"));
+    }
+
+    public int getTabIndexByName(String tabTitle) {
+        int retVal = -1;
+    	for (int i = 0; i < tabMain.getTabCount();  i++ ) {
+    		if (tabMain.getTitleAt(i).equals(tabTitle)) {
+    			retVal = i;
+    			break;
+    		}
+    	}
+    	return retVal;
     }
 
     public class TaskTableMouseAdapter extends MouseInputAdapter implements
