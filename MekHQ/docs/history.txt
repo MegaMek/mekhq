@@ -1,5 +1,7 @@
 VERSION HISTORY
 ----------------------------------
+v0.3.4 (SVN)
+
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
 + RFE: Allow ASF to be Refit (but not customized)
