@@ -1205,140 +1205,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	}
 
 	public int getDamageState() {
-
-		if (getEntity() instanceof Mech) {
-			Mech mech = (Mech) getEntity();
-
-			int nbEngineCrits = 0;
-			int nbGyroHit = 0;
-			int nbSensorHits = 0;
-			int nbLimbsWithInternalDamage = 0;
-			int nbTorsoWithInternalDamage = 0;
-			boolean hasDestroyedTorso = false;
-			int nbWeaponsUnusable = 0;
-			int nbCrits = 0;
-			int nbLimbsWithArmorDamage = 0;
-
-			if (mech.isLocationBad(Mech.LOC_LT)
-					|| mech.isLocationBad(Mech.LOC_RT)
-					|| mech.isLocationBad(Mech.LOC_CT))
-				hasDestroyedTorso = true;
-
-			for (int i = 0; i < mech.locations(); i++) {
-				nbEngineCrits += mech.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
-						Mech.SYSTEM_ENGINE, i);
-				nbGyroHit += mech.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
-						Mech.SYSTEM_GYRO, i);
-				nbSensorHits += mech.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
-						Mech.SYSTEM_SENSORS, i);
-				if (mech.getInternal(i) < mech.getOInternal(i)) {
-					nbLimbsWithInternalDamage++;
-					if (i == Mech.LOC_LT || i == Mech.LOC_LT
-							|| i == Mech.LOC_RT)
-						nbTorsoWithInternalDamage++;
-				}
-				if (mech.getArmor(i) < mech.getOArmor(i))
-					nbLimbsWithArmorDamage++;
-				if (mech.hasRearArmor(i)) {
-					if (mech.getArmor(i, true) < mech.getOArmor(i, true))
-						nbLimbsWithArmorDamage++;
-				}
-			}
-
-			Iterator<Mounted> itWeapons = mech.getWeapons();
-			while (itWeapons.hasNext()) {
-				Mounted weapon = itWeapons.next();
-				if (weapon.isInoperable())
-					nbWeaponsUnusable++;
-			}
-
-			for (int loc = 0; loc < mech.locations(); loc++) {
-				int nbCriticalSlots = mech.getNumberOfCriticals(loc);
-				for (int crit = 0; crit < nbCriticalSlots; crit++) {
-					CriticalSlot criticalSlot = mech.getCritical(loc, crit);
-					if (criticalSlot != null) {
-						if (criticalSlot.isDamaged() || criticalSlot.isHit()
-								|| criticalSlot.isDestroyed())
-							nbCrits++;
-					}
-				}
-			}
-
-			if (hasDestroyedTorso || (nbEngineCrits >= 2)
-					|| (nbEngineCrits == 1 && nbGyroHit >= 1)
-					|| (nbSensorHits >= 2) || (nbLimbsWithInternalDamage >= 3)
-					|| (nbTorsoWithInternalDamage >= 2)
-					|| (nbWeaponsUnusable >= mech.getWeaponList().size())) {
-				return Unit.STATE_CRIPPLED;
-			} else if (nbLimbsWithInternalDamage >= 1 || nbCrits >= 1) {
-				return Unit.STATE_HEAVY_DAMAGE;
-			} else if (nbLimbsWithArmorDamage >= 1) {
-				return Unit.STATE_LIGHT_DAMAGE;
-			} else {
-				return Unit.STATE_UNDAMAGED;
-			}
-		} else if (getEntity() instanceof Tank) {
-			Tank tank = (Tank) getEntity();
-
-			int nbWeaponsDestroyed = 0;
-			int nbLimbsWithArmorDamage = 0;
-			int nbLimbsWithInternalDamage = 0;
-			int nbLimbsWithAllArmorDestroyed = 0;
-			int nbCrits = 0;
-
-			for (int i = 0; i < tank.locations(); i++) {
-				if (tank.getInternal(i) < tank.getOInternal(i)) {
-					nbLimbsWithInternalDamage++;
-				}
-
-				if (tank.getArmor(i) < tank.getOArmor(i))
-					nbLimbsWithArmorDamage++;
-
-				if (tank.hasRearArmor(i)) {
-					if (tank.getArmor(i, true) < tank.getOArmor(i, true))
-						nbLimbsWithArmorDamage++;
-
-					if (tank.getArmor(i, true) == 0
-							&& tank.getOArmor(i, true) > 0)
-						nbLimbsWithAllArmorDestroyed++;
-				}
-
-				if (tank.getArmor(i) == 0 && tank.getOArmor(i) > 0)
-					nbLimbsWithAllArmorDestroyed++;
-			}
-
-			Iterator<Mounted> itWeapons = tank.getWeapons();
-			while (itWeapons.hasNext()) {
-				Mounted weapon = itWeapons.next();
-				if (weapon.isInoperable())
-					nbWeaponsDestroyed++;
-			}
-
-			for (int loc = 0; loc < tank.locations(); loc++) {
-				int nbCriticalSlots = tank.getNumberOfCriticals(loc);
-				for (int crit = 0; crit < nbCriticalSlots; crit++) {
-					CriticalSlot criticalSlot = tank.getCritical(loc, crit);
-					if (criticalSlot != null) {
-						if (criticalSlot.isDamaged() || criticalSlot.isHit()
-								|| criticalSlot.isDestroyed())
-							nbCrits++;
-					}
-				}
-			}
-
-			if (nbLimbsWithAllArmorDestroyed >= 1
-					|| nbWeaponsDestroyed >= tank.getWeaponList().size()) {
-				return Unit.STATE_CRIPPLED;
-			} else if (nbLimbsWithInternalDamage >= 1 || nbCrits >= 1) {
-				return Unit.STATE_HEAVY_DAMAGE;
-			} else if (nbLimbsWithArmorDamage >= 1) {
-				return Unit.STATE_LIGHT_DAMAGE;
-			} else {
-				return Unit.STATE_UNDAMAGED;
-			}
-		} else {
-			return Unit.STATE_UNDAMAGED;
-		}
+	    return getDamageState(getEntity());
 	}
 
 	public int getFullBaseValueOfParts() {
@@ -3309,15 +3176,142 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     public void setLastMaintenanceReport(String r) {
         lastMaintenanceReport = r;
     }
-    /*
-    public String getLastMaintenanceReport() {
-        String report = "";
-        for(Part part : parts) {
-            if(part.needsMaintenance() && null != part.getLastMaintenanceReport()) {
-                report += part.getLastMaintenanceReport() + "<br>";
+    
+    public static int getDamageState(Entity en) {
+
+        if (en instanceof Mech) {
+            Mech mech = (Mech) en;
+
+            int nbEngineCrits = 0;
+            int nbGyroHit = 0;
+            int nbSensorHits = 0;
+            int nbLimbsWithInternalDamage = 0;
+            int nbTorsoWithInternalDamage = 0;
+            boolean hasDestroyedTorso = false;
+            int nbWeaponsUnusable = 0;
+            int nbCrits = 0;
+            int nbLimbsWithArmorDamage = 0;
+
+            if (mech.isLocationBad(Mech.LOC_LT)
+                    || mech.isLocationBad(Mech.LOC_RT)
+                    || mech.isLocationBad(Mech.LOC_CT))
+                hasDestroyedTorso = true;
+
+            for (int i = 0; i < mech.locations(); i++) {
+                nbEngineCrits += mech.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
+                        Mech.SYSTEM_ENGINE, i);
+                nbGyroHit += mech.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
+                        Mech.SYSTEM_GYRO, i);
+                nbSensorHits += mech.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
+                        Mech.SYSTEM_SENSORS, i);
+                if (mech.getInternal(i) < mech.getOInternal(i)) {
+                    nbLimbsWithInternalDamage++;
+                    if (i == Mech.LOC_LT || i == Mech.LOC_LT
+                            || i == Mech.LOC_RT)
+                        nbTorsoWithInternalDamage++;
+                }
+                if (mech.getArmor(i) < mech.getOArmor(i))
+                    nbLimbsWithArmorDamage++;
+                if (mech.hasRearArmor(i)) {
+                    if (mech.getArmor(i, true) < mech.getOArmor(i, true))
+                        nbLimbsWithArmorDamage++;
+                }
             }
+
+            Iterator<Mounted> itWeapons = mech.getWeapons();
+            while (itWeapons.hasNext()) {
+                Mounted weapon = itWeapons.next();
+                if (weapon.isInoperable())
+                    nbWeaponsUnusable++;
+            }
+
+            for (int loc = 0; loc < mech.locations(); loc++) {
+                int nbCriticalSlots = mech.getNumberOfCriticals(loc);
+                for (int crit = 0; crit < nbCriticalSlots; crit++) {
+                    CriticalSlot criticalSlot = mech.getCritical(loc, crit);
+                    if (criticalSlot != null) {
+                        if (criticalSlot.isDamaged() || criticalSlot.isHit()
+                                || criticalSlot.isDestroyed())
+                            nbCrits++;
+                    }
+                }
+            }
+
+            if (hasDestroyedTorso || (nbEngineCrits >= 2)
+                    || (nbEngineCrits == 1 && nbGyroHit >= 1)
+                    || (nbSensorHits >= 2) || (nbLimbsWithInternalDamage >= 3)
+                    || (nbTorsoWithInternalDamage >= 2)
+                    || (nbWeaponsUnusable >= mech.getWeaponList().size())) {
+                return Unit.STATE_CRIPPLED;
+            } else if (nbLimbsWithInternalDamage >= 1 || nbCrits >= 1) {
+                return Unit.STATE_HEAVY_DAMAGE;
+            } else if (nbLimbsWithArmorDamage >= 1) {
+                return Unit.STATE_LIGHT_DAMAGE;
+            } else {
+                return Unit.STATE_UNDAMAGED;
+            }
+        } else if (en instanceof Tank) {
+            Tank tank = (Tank) en;
+
+            int nbWeaponsDestroyed = 0;
+            int nbLimbsWithArmorDamage = 0;
+            int nbLimbsWithInternalDamage = 0;
+            int nbLimbsWithAllArmorDestroyed = 0;
+            int nbCrits = 0;
+
+            for (int i = 0; i < tank.locations(); i++) {
+                if (tank.getInternal(i) < tank.getOInternal(i)) {
+                    nbLimbsWithInternalDamage++;
+                }
+
+                if (tank.getArmor(i) < tank.getOArmor(i))
+                    nbLimbsWithArmorDamage++;
+
+                if (tank.hasRearArmor(i)) {
+                    if (tank.getArmor(i, true) < tank.getOArmor(i, true))
+                        nbLimbsWithArmorDamage++;
+
+                    if (tank.getArmor(i, true) == 0
+                            && tank.getOArmor(i, true) > 0)
+                        nbLimbsWithAllArmorDestroyed++;
+                }
+
+                if (tank.getArmor(i) == 0 && tank.getOArmor(i) > 0)
+                    nbLimbsWithAllArmorDestroyed++;
+            }
+
+            Iterator<Mounted> itWeapons = tank.getWeapons();
+            while (itWeapons.hasNext()) {
+                Mounted weapon = itWeapons.next();
+                if (weapon.isInoperable())
+                    nbWeaponsDestroyed++;
+            }
+
+            for (int loc = 0; loc < tank.locations(); loc++) {
+                int nbCriticalSlots = tank.getNumberOfCriticals(loc);
+                for (int crit = 0; crit < nbCriticalSlots; crit++) {
+                    CriticalSlot criticalSlot = tank.getCritical(loc, crit);
+                    if (criticalSlot != null) {
+                        if (criticalSlot.isDamaged() || criticalSlot.isHit()
+                                || criticalSlot.isDestroyed())
+                            nbCrits++;
+                    }
+                }
+            }
+
+            if (nbLimbsWithAllArmorDestroyed >= 1
+                    || nbWeaponsDestroyed >= tank.getWeaponList().size()) {
+                return Unit.STATE_CRIPPLED;
+            } else if (nbLimbsWithInternalDamage >= 1 || nbCrits >= 1) {
+                return Unit.STATE_HEAVY_DAMAGE;
+            } else if (nbLimbsWithArmorDamage >= 1) {
+                return Unit.STATE_LIGHT_DAMAGE;
+            } else {
+                return Unit.STATE_UNDAMAGED;
+            }
+        } else {
+            return Unit.STATE_UNDAMAGED;
         }
-        return report;
     }
-    */
+    
 }

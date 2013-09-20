@@ -25,11 +25,18 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -41,15 +48,21 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 
+import megamek.client.ui.Messages;
+import megamek.client.ui.swing.MechEditorDialog;
+import megamek.client.ui.swing.MechViewPanel;
 import megamek.common.Entity;
 import megamek.common.GunEmplacement;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
+import mekhq.campaign.ResolveScenarioTracker.UnitStatus;
 import mekhq.campaign.Unit;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
@@ -59,10 +72,10 @@ import mekhq.campaign.mission.Scenario;
  *
  * @author  Taharqa
  */
-public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
+public class ResolveScenarioWizardDialog extends JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
 	
-	final static String UNITSPANEL   = "Missing Units";
+	final static String UNITSPANEL   = "Unit Status";
 	final static String PILOTPANEL   = "Pilot Status";
 	final static String SALVAGEPANEL = "Claim Salvage";
 	final static String KILLPANEL    = "Assign Kills";
@@ -70,6 +83,8 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
 	final static String PREVIEWPANEL = "Preview";
 
 	final static String[] panelOrder = {UNITSPANEL,PILOTPANEL,SALVAGEPANEL,KILLPANEL,REWARDPANEL,PREVIEWPANEL};
+	
+	private JFrame frame;
 	
 	private ResolveScenarioTracker tracker;
     
@@ -85,7 +100,7 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
     
     private JScrollPane scrMain;
     private JPanel pnlMain;
-    private JPanel pnlMissingUnits;
+    private JPanel pnlUnitStatus;
     private JPanel pnlPilotStatus;
     private JPanel pnlSalvage;
     private JPanel pnlKills;
@@ -93,17 +108,20 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
     private JPanel pnlPreview;
     
     /*
-     * Missing units panel components
+     * Unit status panel components
      */
-    private ArrayList<JCheckBox> unitBoxes;
-    private ArrayList<Unit> missingUnits;
+    private ArrayList<JCheckBox> chksTotaled;
+    private ArrayList<JButton> btnsViewUnit;
+    private ArrayList<JButton> btnsEditUnit;
+    private ArrayList<UnitStatus> ustatuses;
+    private ArrayList<JLabel> lblsUnitName;
     
     /*
      * Pilot status panel components
      */
     private ArrayList<JCheckBox> miaBtns;
     private ArrayList<JSlider> hitSliders;
-    private ArrayList<PersonStatus> statuses;
+    private ArrayList<PersonStatus> pstatuses;
     
     /*
      * Salvage panel components
@@ -157,10 +175,10 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
     private javax.swing.JTextArea txtRewards;
     private javax.swing.JLabel lblStatus;
     
-    public ResolveScenarioWizardDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
+    public ResolveScenarioWizardDialog(JFrame parent, boolean modal, ResolveScenarioTracker t) {
         super(parent, modal);
+        this.frame = parent;
         this.tracker = t;
-        missingUnits = tracker.getMissingUnits();
         loots = tracker.getPotentialLoot();
         salvageables = new ArrayList<Unit>();
         if(tracker.getMission() instanceof Contract) {
@@ -179,7 +197,7 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
     	java.awt.GridBagConstraints gridBagConstraints;
 
     	cardLayout = new CardLayout();
-    	
+    	    	
     	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveScenarioWizardDialog");
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
@@ -209,34 +227,75 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
         pnlMain = new JPanel(cardLayout); 
        
     	/*
-    	 * Missing Units Panel
+    	 * Unit Status Panel
     	 */
-    	pnlMissingUnits = new JPanel();
-        pnlMissingUnits.setLayout(new GridBagLayout()); 
-        unitBoxes = new ArrayList<JCheckBox>();
-        JCheckBox box;
-        int i = 0;
+        
+    	pnlUnitStatus = new JPanel();
+    	pnlUnitStatus.setLayout(new GridBagLayout()); 
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        pnlUnitStatus.add(new JLabel(resourceMap.getString("totaled")), gridBagConstraints);
+        chksTotaled = new ArrayList<JCheckBox>();
+        ustatuses = new ArrayList<UnitStatus>();
+        btnsViewUnit = new ArrayList<JButton>();
+        btnsEditUnit = new ArrayList<JButton>();
+        lblsUnitName = new ArrayList<JLabel>();
+        int i = 2;
         int j = 0;
-        for(Unit u : missingUnits) {
-        	j++;
-        	box = new JCheckBox(u.getName());
-        	box.setSelected(false);
-        	unitBoxes.add(box);
-        	gridBagConstraints = new java.awt.GridBagConstraints();
+        JLabel nameLbl;
+        JCheckBox chkTotaled;
+        JButton btnViewUnit;
+        JButton btnEditUnit;
+        j = 0;
+        for(UUID id : tracker.getUnitsStatus().keySet()) {
+            UnitStatus status = tracker.getUnitsStatus().get(id);
+            ustatuses.add(status);
+            nameLbl = new JLabel(status.getDesc());
+            lblsUnitName.add(nameLbl);
+            chkTotaled = new JCheckBox("");
+            chkTotaled.setSelected(status.isTotalLoss());
+            chkTotaled.setName(Integer.toString(j));
+            chkTotaled.setActionCommand(id.toString());
+            chksTotaled.add(chkTotaled);
+            chkTotaled.addItemListener(new CheckTotalListener());
+            btnViewUnit = new JButton("View Unit");
+            btnViewUnit.setEnabled(!status.isTotalLoss());
+            btnViewUnit.setActionCommand(id.toString());
+            btnViewUnit.addActionListener(new ViewUnitListener());
+            btnsViewUnit.add(btnViewUnit);
+            btnEditUnit = new JButton("Edit Unit");
+            btnEditUnit.setEnabled(!status.isTotalLoss());
+            btnEditUnit.setActionCommand(id.toString());
+            btnEditUnit.setName(Integer.toString(j));
+            btnEditUnit.addActionListener(new EditUnitListener());
+            btnsEditUnit.add(btnEditUnit);
+            gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
+            gridBagConstraints.gridwidth = 1;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.weightx = 1.0;
-            if(j == (missingUnits.size())) {
-            	gridBagConstraints.weighty = 1.0;
-            }
             gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-            pnlMissingUnits.add(box, gridBagConstraints);
+            gridBagConstraints.weightx = 0.0;
+            j++;
+            if(j == tracker.getPeopleStatus().keySet().size()) {
+                gridBagConstraints.weighty = 1.0;
+            }
+            pnlUnitStatus.add(nameLbl, gridBagConstraints);
+            gridBagConstraints.gridx = 1;
+            pnlUnitStatus.add(chkTotaled, gridBagConstraints);
+            gridBagConstraints.gridx = 2;
+            pnlUnitStatus.add(btnViewUnit, gridBagConstraints);
+            gridBagConstraints.gridx = 3;
+            gridBagConstraints.weightx = 1.0;
+            pnlUnitStatus.add(btnEditUnit, gridBagConstraints);
             i++;
-        }
-    	pnlMain.add(pnlMissingUnits, UNITSPANEL);
-   
+        }       
+        pnlMain.add(pnlUnitStatus, UNITSPANEL);
+    	
     	/*
     	 * Pilot Status Panel
     	 */
@@ -259,9 +318,8 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
         pnlPilotStatus.add(new JLabel(resourceMap.getString("mia")), gridBagConstraints);
         miaBtns = new ArrayList<JCheckBox>();
         hitSliders = new ArrayList<JSlider>();
-        statuses = new ArrayList<PersonStatus>();
+        pstatuses = new ArrayList<PersonStatus>();
         i = 2;
-        JLabel nameLbl;
         JCheckBox miaCheck;
         JSlider hitSlider; 
         Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
@@ -276,7 +334,7 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
         for(UUID pid : tracker.getPeopleStatus().keySet()) {
         	j++;
         	PersonStatus status = tracker.getPeopleStatus().get(pid);
-        	statuses.add(status);
+        	pstatuses.add(status);
         	nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
         	miaCheck = new JCheckBox("");
         	miaBtns.add(miaCheck);
@@ -392,6 +450,7 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
         }
         i++;
         j = 0;
+        JCheckBox box;
         for(Entity en : tracker.getPotentialSalvage()) {
         	j++;
         	Unit u = new Unit(en, tracker.getCampaign());
@@ -929,17 +988,20 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
     
     private void finish() {
     	
-    	//missing units
-    	for(int i = 0; i < unitBoxes.size(); i++) {
-    		JCheckBox box = unitBoxes.get(i);
-    		if(box.isSelected()) {
-    			tracker.recoverUnit(missingUnits.get(i));
+        
+    	//unit status
+    	for(int i = 0; i < chksTotaled.size(); i++) {
+    		JCheckBox box = chksTotaled.get(i);
+    		UUID id = UUID.fromString(box.getActionCommand());
+    		if(null == id || null == tracker.getUnitsStatus().get(id)) {
+    		    continue;
     		}
+    		tracker.getUnitsStatus().get(id).setTotalLoss(box.isSelected()); 
     	}
     	
     	//now personnel
-    	for(int i = 0; i < statuses.size(); i++) {
-    		PersonStatus status = statuses.get(i);
+    	for(int i = 0; i < pstatuses.size(); i++) {
+    		PersonStatus status = pstatuses.get(i);
     		status.setMissing(miaBtns.get(i).isSelected());
     		status.setHits(hitSliders.get(i).getValue());
     	}
@@ -986,7 +1048,7 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
     
     private boolean usePanel(String panelName) {
     	if(panelName.equals(UNITSPANEL)) {
-    		return missingUnits.size() > 0;
+    		return tracker.getUnitsStatus().keySet().size() > 0;
     	}
     	else if(panelName.equals(PILOTPANEL)) {
     		return tracker.getPeopleStatus().keySet().size() > 0;
@@ -1045,8 +1107,8 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
         String missingNames = "";
         String kiaNames = "";
         String recoverNames = "";
-        for(int i = 0; i < statuses.size(); i++) {
-    		PersonStatus status = statuses.get(i);
+        for(int i = 0; i < pstatuses.size(); i++) {
+    		PersonStatus status = pstatuses.get(i);
     		if(hitSliders.get(i).getValue() >= 6) {
     			kiaNames  += status.getName() + "\n";
     		} else if(miaBtns.get(i).isSelected()) {
@@ -1059,20 +1121,18 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
         txtMissingPilots.setText(missingNames);
         txtDeadPilots.setText(kiaNames);
         
+ 
         //now units
         String recoverUnits = "";
         String missUnits = "";
-        for(Unit u : tracker.getRecoveredUnits()) {
-        	recoverUnits += u.getName() + "\n";
+        for(int i = 0; i < chksTotaled.size(); i++) {
+            String name = ustatuses.get(i).getName();
+            if(chksTotaled.get(i).isSelected()) {
+                missUnits += name + "\n";
+            } else {
+                recoverUnits += name + "\n";
+            }
         }
-        for(int i = 0; i < unitBoxes.size(); i++) {
-    		JCheckBox box = unitBoxes.get(i);
-    		if(box.isSelected()) {
-    			recoverUnits += missingUnits.get(i).getName() + "\n";
-    		} else {
-    			missUnits += missingUnits.get(i).getName() + "\n";
-    		}
-    	}
         txtRecoveredUnits.setText(recoverUnits);
         txtMissingUnits.setText(missUnits);
         
@@ -1096,5 +1156,90 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
         }
         txtRewards.setText(claimed);
         
+    }
+    
+    private void showUnit(UUID id) {
+        //TODO: I am not sure I like the pop up dialog, might just make this a view on this
+        //dialog
+        UnitStatus ustatus = tracker.getUnitsStatus().get(id);
+        if(null == ustatus || null == ustatus.getEntity()) {
+            return;
+        }
+        Entity entity = ustatus.getEntity();
+        final JDialog dialog = new JDialog(frame, "Unit View", true); //$NON-NLS-1$
+        MechViewPanel mvp = new MechViewPanel();
+        mvp.setMech(entity);
+        JButton btn = new JButton(Messages.getString("Okay")); //$NON-NLS-1$
+        btn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dialog.setVisible(false);
+            }
+        });
+
+        dialog.getContentPane().setLayout(new GridBagLayout());
+        GridBagConstraints c;
+
+        c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 0;
+        c.fill = GridBagConstraints.BOTH;
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.weightx = 1.0;
+        c.weighty = 1.0;
+        dialog.getContentPane().add(mvp, c);
+
+        c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 1;
+        c.fill = GridBagConstraints.NONE;
+        c.anchor = GridBagConstraints.CENTER;
+        c.weightx = 0.0;
+        c.weighty = 0.0;
+        dialog.getContentPane().add(btn, c);
+        dialog.setSize(mvp.getBestWidth(), mvp.getBestHeight() + 75);
+        dialog.validate();
+        dialog.setLocationRelativeTo(frame);
+        dialog.setVisible(true);
+    }
+    
+    private void editUnit(UUID id, int idx) {
+        UnitStatus ustatus = tracker.getUnitsStatus().get(id);
+        if(null == ustatus || null == ustatus.getEntity()) {
+            return;
+        }
+        Entity entity = ustatus.getEntity();
+        MechEditorDialog med = new MechEditorDialog(frame, entity);
+        med.setVisible(true);
+        JLabel name = lblsUnitName.get(idx);
+        name.setText(ustatus.getDesc());
+    }
+    
+    private class CheckTotalListener implements ItemListener {
+
+        @Override
+        public void itemStateChanged(ItemEvent evt) {
+            int idx = Integer.parseInt(((JCheckBox)evt.getItem()).getName());
+            btnsViewUnit.get(idx).setEnabled(!chksTotaled.get(idx).isSelected());
+            btnsEditUnit.get(idx).setEnabled(!chksTotaled.get(idx).isSelected());
+        }
+    }
+    
+    private class ViewUnitListener implements ActionListener {
+       
+        @Override
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+            UUID id = UUID.fromString(evt.getActionCommand());
+            showUnit(id);        
+        }
+    }
+    
+    private class EditUnitListener implements ActionListener {
+        
+        @Override
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+            UUID id = UUID.fromString(evt.getActionCommand());
+            int idx = Integer.parseInt(((JButton)evt.getSource()).getName());
+            editUnit(id, idx);
+        }
     }
 }

@@ -59,6 +59,8 @@ v0.3.3 (SVN)
 + Bug: Phantom Weapons due to EquipmentParts being skipped during campaign file loading
    I've added a routine that should remove these phantom parts as well
 + Bug [#404]: Unable to assign Quirks to mechs
++ new MegaMek.jar
++ resolve scenario wizard now allows for viewing and editing of all units
 
 v0.3.2 (2013-09-13)
 + maintenance checks (WIP)

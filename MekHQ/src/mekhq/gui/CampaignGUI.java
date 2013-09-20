@@ -119,6 +119,7 @@ import javax.swing.tree.TreeSelectionModel;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import megamek.client.ui.swing.MechEditorDialog;
 import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
@@ -4397,13 +4398,13 @@ public class CampaignGUI extends JPanel {
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE) ==
                 JOptionPane.YES_OPTION;
-        ResolveScenarioTracker tracker = new ResolveScenarioTracker(scenario, getCampaign());
+        ResolveScenarioTracker tracker = new ResolveScenarioTracker(scenario, getCampaign(), control);
         ChooseMulFilesDialog chooseFilesDialog = new ChooseMulFilesDialog(getFrame(), true, tracker, control);
         chooseFilesDialog.setVisible(true);
         if(chooseFilesDialog.wasCancelled()) {
             return;
         }
-        tracker.postProcessEntities(control);
+        //tracker.postProcessEntities(control);
         ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(getFrame(), true, tracker);
         resolveDialog.setVisible(true);
 
@@ -9220,6 +9221,16 @@ public class CampaignGUI extends JPanel {
                     dialog.setVisible(true);
                     refreshUnitList();
                 }
+            } else if(command.equalsIgnoreCase("EDIT_DAMAGE")) {
+                if(null != selectedUnit) {
+                    MechEditorDialog med = new MechEditorDialog(frame, selectedUnit.getEntity());
+                    med.setVisible(true);
+                    selectedUnit.runDiagnostic();
+                    refreshUnitList();
+                    refreshServicedUnitList();
+                    refreshOrganization();
+                    refreshTaskList();
+                }
             }
         }
         
@@ -9518,6 +9529,11 @@ public class CampaignGUI extends JPanel {
                 menuItem.setActionCommand("UNDEPLOY");
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(getCampaign().isGM() && unit.isDeployed());
+                menu.add(menuItem);
+                menuItem = new JMenuItem("Edit Damage...");
+                menuItem.setActionCommand("EDIT_DAMAGE");
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(getCampaign().isGM());
                 menu.add(menuItem);
                 popup.addSeparator();
                 popup.add(menu);

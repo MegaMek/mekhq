@@ -46,9 +46,13 @@ import megamek.common.Entity;
 import megamek.common.IArmorState;
 import megamek.common.Infantry;
 import megamek.common.Mech;
+import megamek.common.MechFileParser;
+import megamek.common.MechSummary;
+import megamek.common.MechSummaryCache;
 import megamek.common.Mounted;
 import megamek.common.Tank;
 import megamek.common.XMLStreamParser;
+import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Contract;
@@ -66,8 +70,9 @@ import mekhq.campaign.personnel.Person;
  */
 public class ResolveScenarioTracker {
 	
-	Hashtable<UUID, Entity> entities;
-	Hashtable<UUID, Crew> pilots;
+	//Hashtable<UUID, Entity> entities;
+	Hashtable<UUID, UnitStatus> unitsStatus;
+    Hashtable<UUID, Crew> pilots;
 	Hashtable<UUID, Crew> mia;
 	Hashtable<UUID, Person> newPilots;
 	ArrayList<Entity> potentialSalvage;
@@ -83,11 +88,13 @@ public class ResolveScenarioTracker {
 	JFileChooser unitList;
 	JFileChooser salvageList;
 	Client client;
+	Boolean control;
 	
-	public ResolveScenarioTracker(Scenario s, Campaign c) {
+	public ResolveScenarioTracker(Scenario s, Campaign c, boolean ctrl) {
 		this.scenario = s;
 		this.campaign = c;
-		entities = new Hashtable<UUID, Entity>();
+		this.control = ctrl;
+		unitsStatus = new Hashtable<UUID, UnitStatus>();
 		potentialSalvage = new ArrayList<Entity>();
 		actualSalvage = new ArrayList<Unit>();
 		leftoverSalvage = new ArrayList<Unit>();
@@ -104,6 +111,7 @@ public class ResolveScenarioTracker {
 			if(null != u) {
 				units.add(u);
 			}
+			unitsStatus.put(uid, new UnitStatus(u.getName(), u.getEntity().getChassis(), u.getEntity().getModel()));
 		}
 		unitList = new JFileChooser(".");
 		unitList.setDialogTitle("Load Units");
@@ -194,16 +202,20 @@ public class ResolveScenarioTracker {
 		checkStatusOfPersonnel();
 	}
 	
-	public void processGame(boolean controlsField) {
+	public void processGame() {
 
 		int pid = client.getLocalPlayer().getId();
 		
 		for (Enumeration<Entity> iter = client.game.getEntities(); iter.hasMoreElements();) {
 			Entity e = iter.nextElement();
 			if(e.getOwnerId() == pid) {
-				if(e.canEscape() || controlsField) {
+				if(e.canEscape() || control) {
 					if(!e.getExternalIdAsString().equals("-1")) {
-						entities.put(UUID.fromString(e.getExternalIdAsString()), e);
+					    UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
+						if(null != status) {
+						    status.assignFoundEntity(e);
+						}
+					    //entities.put(UUID.fromString(e.getExternalIdAsString()), e);
 					}
 					if(null != e.getCrew()) {
 						if(!e.getCrew().getExternalIdAsString().equals("-1")) {
@@ -218,7 +230,7 @@ public class ResolveScenarioTracker {
 					}
 				}
 			} else if(e.getOwner().isEnemyOf(client.getLocalPlayer())) {
-				if(!e.canEscape() && controlsField) {
+				if(!e.canEscape() && control) {
 					killCredits.put(e.getDisplayName(), "None");
 					if(e instanceof Infantry && !(e instanceof BattleArmor)) {
 						continue;
@@ -232,7 +244,11 @@ public class ResolveScenarioTracker {
             Entity e = iter.nextElement();
             if(e.getOwnerId() == pid) {
             	if(!e.getExternalIdAsString().equals("-1")) {
-					entities.put(UUID.fromString(e.getExternalIdAsString()), e);
+            	    UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
+                    if(null != status) {
+                        status.assignFoundEntity(e);
+                    }
+					//entities.put(UUID.fromString(e.getExternalIdAsString()), e);
 				}
 				if(null != e.getCrew()) {
 					if(!e.getCrew().getExternalIdAsString().equals("-1")) {
@@ -253,13 +269,17 @@ public class ResolveScenarioTracker {
         while (wrecks.hasMoreElements()) {
         	Entity e = wrecks.nextElement();
         	if(e.getOwnerId() == pid) {
-        		if(!e.getExternalIdAsString().equals("-1") && controlsField && e.isSalvage()) {
-					entities.put(UUID.fromString(e.getExternalIdAsString()), e);
+        		if(!e.getExternalIdAsString().equals("-1") && control && e.isSalvage()) {
+        		    UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
+                    if(null != status) {
+                        status.assignFoundEntity(e);
+                    }
+        		    //entities.put(UUID.fromString(e.getExternalIdAsString()), e);
 				}
 				if(null != e.getCrew()) {
 				    //get dead crew members even if you don't control the battlefield
 					if(!e.getCrew().getExternalIdAsString().equals("-1")
-					        && (controlsField || e.getCrew().isDead())) {
+					        && (control || e.getCrew().isDead())) {
 						pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
 					/*} else {
 						for (Person p : Utilities.generateRandomCrewWithCombinedSkill(e, campaign)) {
@@ -277,7 +297,7 @@ public class ResolveScenarioTracker {
         		} else {
         			killCredits.put(e.getDisplayName(), "None");
         		}
-        		if(e.isSalvage() && controlsField) {
+        		if(e.isSalvage() && control) {
         			if(e instanceof Infantry && !(e instanceof BattleArmor)) {
 						continue;
 					}
@@ -375,6 +395,8 @@ public class ResolveScenarioTracker {
 		}
 	}
 	
+	/*
+	 * FIXME: This should happen in the resolve scenario section after all damage has been entered
 	public void postProcessEntities(boolean controlsField) {
 		for(UUID id : entities.keySet()) {
 			Entity en = entities.get(id);
@@ -386,7 +408,7 @@ public class ResolveScenarioTracker {
 		for(Entity en : potentialSalvage) {
 			checkForEquipmentStatus(en, controlsField);
 		}
-	}
+	}*/
 	
 	private ArrayList<Person> shuffleCrew(ArrayList<Person> source) {
 	    ArrayList<Person> sortedList = new ArrayList<Person>();
@@ -428,7 +450,12 @@ public class ResolveScenarioTracker {
 		for(Unit u : units) {
 			//shuffling the crew ensures that casualties are randomly assigned in multi-crew units
 			ArrayList<Person> crew = shuffleCrew(u.getActiveCrew());
-			Entity en = entities.get(u.getId());
+			Entity en = null;
+			UnitStatus ustatus = unitsStatus.get(u.getId());
+			if(null != ustatus) {
+			    en = ustatus.getEntity();
+			}
+			//Entity en = entities.get(u.getId());
 			int casualties = 0;
 			int casualtiesAssigned = 0;
 			if(null != en && en instanceof Infantry && u.getEntity() instanceof Infantry) {
@@ -550,7 +577,11 @@ public class ResolveScenarioTracker {
 			// Add the units from the file.
 			for (Entity entity : parser.getEntities()) {
 				if(!entity.getExternalIdAsString().equals("-1")) {
-					entities.put(UUID.fromString(entity.getExternalIdAsString()), entity);
+				    UnitStatus status = unitsStatus.get(UUID.fromString(entity.getExternalIdAsString()));
+                    if(null != status) {
+                        status.assignFoundEntity(entity);
+                    }
+					//entities.put(UUID.fromString(entity.getExternalIdAsString()), entity);
 				}
 			}
 
@@ -611,7 +642,11 @@ public class ResolveScenarioTracker {
     				//some of the players units and personnel may be in the salvage pile, so 
     				//lets check for these first
     				if(!entity.getExternalIdAsString().equals("-1") && foundMatch(entity, units)) {
-    					entities.put(UUID.fromString(entity.getExternalIdAsString()), entity);
+    				    UnitStatus status = unitsStatus.get(UUID.fromString(entity.getExternalIdAsString()));
+                        if(null != status) {
+                            status.assignFoundEntity(entity);
+                        }
+    				    //entities.put(UUID.fromString(entity.getExternalIdAsString()), entity);
     					if(null != entity.getCrew()) {
     						pilots.put(UUID.fromString(entity.getCrew().getExternalIdAsString()), entity.getCrew());
     					}
@@ -748,8 +783,14 @@ public class ResolveScenarioTracker {
 		
 		//now lets update all units
 		for(Unit unit : units) {
-			Entity en = entities.get(unit.getId());
-			if(null == en) {
+		    UnitStatus ustatus = unitsStatus.get(unit.getId());
+		    if(null == ustatus) {
+		        //shouldnt happen
+		        continue;
+		    }
+		    Entity en = ustatus.getEntity();
+			//Entity en = entities.get(unit.getId());
+			if(ustatus.isTotalLoss()) {
 				//missing unit
 				if(blc > 0) {
 				    long unitValue = 0;
@@ -765,6 +806,7 @@ public class ResolveScenarioTracker {
 				}
 				campaign.removeUnit(unit.getId());
 			} else {
+			    checkForEquipmentStatus(en, control);
 				long currentValue = unit.getValueOfAllMissingParts();
 				campaign.clearGameData(en);
 				unit.setEntity(en);
@@ -787,6 +829,7 @@ public class ResolveScenarioTracker {
 		
 		//now lets take care of salvage
 		for(Unit salvageUnit : actualSalvage) {
+		    checkForEquipmentStatus(salvageUnit.getEntity(), control);
 			campaign.clearGameData(salvageUnit.getEntity());
 			campaign.addUnit(salvageUnit.getEntity(), false, 0);
 			//if this is a contract, add to th salvaged value
@@ -873,28 +916,8 @@ public class ResolveScenarioTracker {
 		return peopleStatus;
 	}
 	
-	public ArrayList<Unit> getMissingUnits() {
-		ArrayList<Unit> missing = new ArrayList<Unit>();
-		for(Unit u : units) {
-			if(null == entities.get(u.getId())) {
-				missing.add(u);
-			}
-		}
-		return missing;
-	}
-	
-	public ArrayList<Unit> getRecoveredUnits() {
-		ArrayList<Unit> recovered = new ArrayList<Unit>();
-		for(Unit u : units) {
-			if(null != entities.get(u.getId())) {
-				recovered.add(u);
-			}
-		}
-		return recovered;
-	}
-	
-	public void recoverUnit(Unit u) {
-		entities.put(u.getId(), u.getEntity());
+	public Hashtable<UUID, UnitStatus> getUnitsStatus() {
+	    return unitsStatus;
 	}
 	
 	public ArrayList<Loot> getPotentialLoot() {
@@ -1016,4 +1039,84 @@ public class ResolveScenarioTracker {
 			return kills;
 		}
 	}
+	
+	/**
+     * This object is used to track the status of a particular unit.
+     * @author Jay Lawson
+     *
+     */
+    public class UnitStatus {
+        
+        private String name;
+        private String chassis;
+        private String model;
+        private boolean totalLoss;
+        private Entity entity;
+        private boolean remove;
+        
+        public UnitStatus(String name, String c, String m) {
+            this.name = name;
+            chassis = c;
+            model = m;
+            remove = false;
+            //assume its a total loss until we find something that says otherwise
+            totalLoss = true;
+            //create a brand new entity until we find one
+            MechSummary summary = MechSummaryCache.getInstance().getMech(getLookupName());
+            if(null == summary) {
+                
+            } else {
+                try {
+                    entity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+                } catch (EntityLoadingException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
+ 
+        public String getName() {
+            return name;
+        }
+        
+        public String getLookupName() {
+            String s = chassis + " " + model;
+            s = s.trim();
+            return s;
+        }
+        
+        public Entity getEntity() {
+            return entity;
+        }
+        
+        public void assignFoundEntity(Entity e) {
+            totalLoss = false;
+            entity = e;
+        }
+        
+        public boolean isTotalLoss() {
+            return totalLoss;
+        }
+        
+        public void setTotalLoss(boolean b) {
+            totalLoss = b;
+        }
+        
+        public String getDesc() {
+            int damage = Unit.getDamageState(getEntity());  
+            String color = "black";
+            if(damage == Unit.STATE_LIGHT_DAMAGE) {
+                color = "green";
+            }
+            if(damage == Unit.STATE_HEAVY_DAMAGE) {
+                color = "green";
+            }
+            if(damage == Unit.STATE_CRIPPLED) {
+                color = "red";
+            }
+            String s = "<html><b>" + getName() + "</b><br><font color='" + color + "'>"+ Unit.getDamageStateName(damage)+ "</font></html>";
+            return s;
+
+        }
+    }
 }
