@@ -1019,7 +1019,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		return false;
 	}
 	
-	public boolean isPartForCriticalSlot(int index, int loc) {
+	public boolean isPartForEquipmentNum(int index, int loc) {
 		return false;
 	}
 

@@ -210,7 +210,7 @@ public class ProtomekSensor extends Part {
     }
     
     @Override
-    public boolean isPartForCriticalSlot(int index, int loc) {
+    public boolean isPartForEquipmentNum(int index, int loc) {
         return false;//index == type && loc == location;
     }
     

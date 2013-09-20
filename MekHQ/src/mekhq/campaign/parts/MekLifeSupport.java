@@ -221,7 +221,7 @@ public class MekLifeSupport extends Part {
 	}
 	
 	@Override
-	public boolean isPartForCriticalSlot(int index, int loc) {
+	public boolean isPartForEquipmentNum(int index, int loc) {
 		return Mech.SYSTEM_LIFE_SUPPORT == index;
 	}
 	
