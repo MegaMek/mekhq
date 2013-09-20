@@ -1998,6 +1998,10 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
                 //FIXME: is this ok? - are there any valid parts in LOC_NONE?
                 continue;
             }
+    	    // We want to ignore weapon groups so that we don't get phantom weapons
+    	    if (m.isWeaponGroup()) {
+    	    	continue;
+    	    }
     		if(m.getType().isHittable()) {
     			if(m.getType() instanceof AmmoType) {
     				int eqnum = entity.getEquipmentNum(m);

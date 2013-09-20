@@ -55,6 +55,7 @@ v0.3.3 (SVN)
 + added Repair bay hyperlink to units damaged by maintenance
 + Added CampaignGUI.getTabIndexByName()
 + Bug: CampaignGUI.focusOnUnit() and CampaignGUI.focusOnPerson() using hard coded indexes (now uses CampaignGUI.getTabIndexByName())
++ Bug: Phantom Weapons on ASFs as a result of weapon groups not being filtered out in Unit.initializeParts()
 
 v0.3.2 (2013-09-13)
 + maintenance checks (WIP)
