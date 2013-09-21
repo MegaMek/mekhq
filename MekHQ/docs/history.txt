@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.3.4 (SVN)
++ Bug: Moved Report Log not scrolling again (don't force set caret to 0 on refresh)
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
