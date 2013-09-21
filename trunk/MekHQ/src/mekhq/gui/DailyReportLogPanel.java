@@ -23,7 +23,6 @@ package mekhq.gui;
 
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -78,7 +77,6 @@ public class DailyReportLogPanel extends JPanel {
 
     public void refreshLog(String s) {
         txtLog.setText(s);
-        txtLog.setCaretPosition(0);
     }
 
 }
