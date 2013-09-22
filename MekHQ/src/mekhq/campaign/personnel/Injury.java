@@ -1,5 +1,5 @@
 /*
- * Injury.java
+ * java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -24,7 +24,9 @@ package mekhq.campaign.personnel;
 import java.io.PrintWriter;
 import java.util.UUID;
 
+import megamek.common.Compute;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -72,15 +74,15 @@ public class Injury {
 		extended = false;
 	}
 	
-	public Injury(int time, String text, int loc, int type, int num, boolean workedOn) {
-		this(time, text, loc, type, num, workedOn, false);
+	public Injury(int time, String text, int loc, int type, int num, boolean perm) {
+		this(time, text, loc, type, num, perm, false);
 	}
 
-	public Injury(int time, String text, int loc, int type, int num, boolean workedOn, boolean perm) {
-		this(time, text, loc, type, num, workedOn, false, false);
+	public Injury(int time, String text, int loc, int type, int num, boolean perm, boolean workedOn) {
+		this(time, text, loc, type, num, workedOn, perm, false);
 	}
 	
-	public Injury(int time, String text, int loc, int type, int num, boolean workedOn, boolean perm, boolean extended) {
+	public Injury(int time, String text, int loc, int type, int num, boolean perm, boolean workedOn, boolean extended) {
 		setTime(time);
 		setOriginalTime(time);
 		setFluff(text);
@@ -437,5 +439,225 @@ public class Injury {
 		}
 		
 		return buffer;
+	}
+	
+	public static String generateInjuryFluffText(int type, int location, int genderType) {
+		String name;
+		switch (location) {
+		case Person.BODY_HEAD:
+			name = "head";
+			break;
+		case Person.BODY_LEFT_LEG:
+			name = "left leg";
+			if (Compute.randomInt(10) < 2) {
+				name = "left foot";
+			}
+			break;
+		case Person.BODY_LEFT_ARM:
+			name = "left arm";
+			if (Compute.randomInt(10) < 2) {
+				name = "left hand";
+			}
+			break;
+		case Person.BODY_CHEST:
+			name = "chest";
+			break;
+		case Person.BODY_ABDOMEN:
+			name = "abdomen";
+			break;
+		case Person.BODY_RIGHT_ARM:
+			name = "right arm";
+			if (Compute.randomInt(10) < 2) {
+				name = "right hand";
+			}
+			break;
+		case Person.BODY_RIGHT_LEG:
+			name = "right leg";
+			if (Compute.randomInt(10) < 2) {
+				name = "right foot";
+			}
+			break;
+		default:
+			name = "Unknown";
+			break;
+		}
+		
+		switch (type) {
+		case INJ_CUT:
+			return "Some cuts on "+Person.getGenderPronoun(genderType)+" "+name;
+		case INJ_BRUISE:
+			return "A bruise on "+Person.getGenderPronoun(genderType)+" "+name;
+		case INJ_LACERATION:
+			return "A laceration on "+Person.getGenderPronoun(genderType)+" "+name;
+		case INJ_SPRAIN:
+			return "A sprained "+name;
+		case INJ_CONCUSSION:
+			return "A concussion";
+		case INJ_BROKEN_RIB:
+			return "A broken rib";
+		case INJ_BRUISED_KIDNEY:
+			return "A bruised kidney";
+		case INJ_BROKEN_LIMB:
+			return "A broken "+name;
+		case INJ_BROKEN_COLLAR_BONE:
+			return "A broken collar bone";
+		case INJ_INTERNAL_BLEEDING:
+			return "Internal bleeding";
+		case INJ_LOST_LIMB:
+			return "Lost "+Person.getGenderPronoun(genderType)+" "+name;
+		case INJ_CEREBRAL_CONTUSION:
+			return "A cerebral contusion";
+		case INJ_PUNCTURED_LUNG:
+			return "A punctured lung";
+		case INJ_CTE:
+			return "Chronic traumatic encephalopathy";
+		case INJ_BROKEN_BACK:
+			return "A broken back";
+		default:
+			System.err.println("ERROR: Default CASE reached in (Advanced Medical Section) Person.generateFluffText()");
+			break;
+		}
+		return "";
+	}
+	
+	public static int getInjuryTypeByLocation(int loc, int roll, int hit_location) {
+		switch (loc) {
+		case Person.BODY_LEFT_ARM:
+		case Person.BODY_RIGHT_ARM:
+		case Person.BODY_LEFT_LEG:
+		case Person.BODY_RIGHT_LEG:
+			if (hit_location == 1) {
+				if (roll == 2) {
+					return INJ_CUT;
+				} else {
+					return INJ_BRUISE;
+				}
+			} else if (hit_location == 2) {
+				return INJ_SPRAIN;
+			} else if (hit_location == 3) {
+				return INJ_BROKEN_LIMB;
+			} else if (hit_location > 3) {
+				return INJ_LOST_LIMB;
+			}
+			break;
+		case Person.BODY_HEAD:
+			if (hit_location == 1) {
+				return INJ_LACERATION;
+			} else if (hit_location == 2 || hit_location == 3) {
+				return INJ_CONCUSSION;
+			} else if (hit_location == 4) {
+				return INJ_CEREBRAL_CONTUSION;
+			} else if (hit_location > 4) {
+				return INJ_CTE;
+			}
+			break;
+		case Person.BODY_CHEST:
+			if (hit_location == 1) {
+				if (roll == 2) {
+					return INJ_CUT;
+				} else {
+					return INJ_BRUISE;
+				}
+			} else if (hit_location == 2) {
+				return INJ_BROKEN_RIB;
+			} else if (hit_location == 3) {
+				return INJ_BROKEN_COLLAR_BONE;
+			} else if (hit_location == 4) {
+				return INJ_PUNCTURED_LUNG;
+			} else if (hit_location > 4) {
+				return INJ_BROKEN_BACK;
+			}
+			break;
+		case Person.BODY_ABDOMEN:
+			if (hit_location == 1) {
+				if (roll == 2) {
+					return INJ_CUT;
+				} else {
+					return INJ_BRUISE;
+				}
+			} else if (hit_location == 2) {
+				return INJ_BRUISED_KIDNEY;
+			} else if (hit_location > 2) {
+				return INJ_INTERNAL_BLEEDING;
+			}
+			break;
+		}
+		return 0;
+	}
+	
+	public static int generateHealingTime(Campaign c, int type, int hits, Person p) {
+		int rand = Compute.randomInt(100);
+		int mod = 0;
+		int time;
+		if (rand < 5) {
+			if (Compute.d6() < 4) {
+				mod += rand;
+			} else {
+				mod -= rand;
+			}
+		}
+		switch (type) {
+		case INJ_CUT:
+		case INJ_BRUISE:
+		case INJ_LACERATION:
+			time = Compute.d6()+5;
+			break;
+		case INJ_SPRAIN:
+			time = 12;
+			break;
+		case INJ_CONCUSSION:
+			if (hits > 2) {
+				time = (14*3);
+			} else {
+				time = 14;
+			}
+			break;
+		case INJ_BROKEN_RIB:
+			time = 20;
+			break;
+		case INJ_BRUISED_KIDNEY:
+			time = 10;
+			break;
+		case INJ_BROKEN_LIMB:
+			time = 30;
+			break;
+		case INJ_BROKEN_COLLAR_BONE:
+			time = 22;
+			break;
+		case INJ_INTERNAL_BLEEDING:
+			time = 20;
+			if (hits == 4) {
+				time = time * 2;
+			} if (hits == 5) {
+				time = time * 3;
+			}
+			break;
+		case INJ_LOST_LIMB:
+			time = 28;
+			break;
+		case INJ_CEREBRAL_CONTUSION:
+			time = 90;
+			break;
+		case INJ_PUNCTURED_LUNG:
+			time = 20;
+			break;
+		case INJ_CTE:
+			time = 180;
+			break;
+		case INJ_BROKEN_BACK:
+			time = 150;
+			break;
+		default:
+			System.err.println("ERROR: Default CASE reached in (Advanced Medical Section) Person.generateHealingTime()");
+			return Compute.d6()+5;
+		}
+		if (mod < 0) {
+			time += Math.floor((time * mod / 100));
+		}
+		if (mod > 0) {
+			time += Math.ceil((time * mod / 100));
+		}
+		time = Math.round(time * p.getAbilityTimeModifier(c) / 100);
+		return time;
 	}
 }

@@ -1899,7 +1899,7 @@ public class Campaign implements Serializable {
 		}
 		removeAllPatientsFor(person);
 
-		addReport(person.getDesc()
+		addReport(person.getFullTitle()
 				+ " has been removed from the personnel roster.");
 		personnel.remove(person);
 		personnelIds.remove(id);
