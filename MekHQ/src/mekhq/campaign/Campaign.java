@@ -126,6 +126,7 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingMASC;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.team.SupportTeam;
@@ -634,8 +635,8 @@ public class Campaign implements Serializable {
 			astechPoolOvertime += 120;
 		}
 		String rankEntry = "";
-		if (p.getRank() > 0) {
-			rankEntry = " as a " + getRanks().getRank(p.getRank());
+		if (p.getRankOrder() > 0) {
+			rankEntry = " as a " + p.getRank().getName();
 		}
 		if (prisoner) {
 			p.setPrisoner();
@@ -673,8 +674,8 @@ public class Campaign implements Serializable {
 			astechPoolOvertime += 120;
 		}
 		String rankEntry = "";
-		if (p.getRank() > 0) {
-			rankEntry = " as a " + getRanks().getRank(p.getRank());
+		if (p.getRankOrder() > 0) {
+			rankEntry = " as a " + p.getRank().getName();
 		}
 		p.addLogEntry(getDate(), "Joined " + getName() + rankEntry);
 	}
@@ -2275,13 +2276,17 @@ public class Campaign implements Serializable {
 
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "name", name);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "faction", factionCode);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "ranks", ranks.getRankSystem());
+		//MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "ranks", ranks.getRankSystem());
+		/*
+		 * TODO: reimplement saving ranks to XML
 		if (ranks.getRankSystem() == Ranks.RS_CUSTOM) {
 			MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "officerCut",
 					ranks.getOfficerCut());
 			MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "rankNames",
 					ranks.getRankNameList());
 		}
+		*/
+	    ranks.writeToXml(pw1, 2);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "nameGen",
 				rng.getChosenFaction());
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "percentFemale",
@@ -3541,6 +3546,9 @@ public class Campaign implements Serializable {
 			Version version) throws DOMException, ParseException {
 		NodeList nl = wni.getChildNodes();
 
+        String rankNames = null;
+        int officerCut = 0;
+        
 		// Okay, lets iterate through the children, eh?
 		for (int x = 0; x < nl.getLength(); x++) {
 			Node wn = nl.item(x);
@@ -3623,18 +3631,13 @@ public class Campaign implements Serializable {
 					} else {
 						retVal.factionCode = wn.getTextContent();
 					}
-				} else if (xn.equalsIgnoreCase("ranks")) {
-					int rankSystem = Integer.parseInt(wn.getTextContent()
-							.trim());
-					if (rankSystem != Ranks.RS_CUSTOM) {
-						retVal.ranks = new Ranks(rankSystem);
-					}
 				} else if (xn.equalsIgnoreCase("officerCut")) {
-					retVal.ranks.setOfficerCut(Integer.parseInt(wn
-							.getTextContent().trim()));
+					officerCut = Integer.parseInt(wn.getTextContent().trim());
 				} else if (xn.equalsIgnoreCase("rankNames")) {
-					retVal.ranks.setRanksFromList(wn.getTextContent().trim());
-				} else if (xn.equalsIgnoreCase("gmMode")) {
+					rankNames = wn.getTextContent().trim();
+				} else if (xn.equalsIgnoreCase("ranks")) {
+                    retVal.ranks = Ranks.generateInstanceFromXML(wn);
+                }else if (xn.equalsIgnoreCase("gmMode")) {
 					if (wn.getTextContent().trim().equals("true"))
 						retVal.gmMode = true;
 					else
@@ -3681,6 +3684,10 @@ public class Campaign implements Serializable {
 				}
 			}
 		}
+		if(null != rankNames) {
+            //backwards compatability
+            retVal.getRanks().setRanksFromList(rankNames, officerCut);  
+        }
 	}
 
 	public ArrayList<Planet> getPlanets() {
@@ -4680,7 +4687,7 @@ public class Campaign implements Serializable {
 			p.addLogEntry(getDate(), "Freed");
 			break;
 		case Person.PRISONER_YES:
-			if (p.getRank() > 0) {
+			if (p.getRankOrder() > 0) {
 				changeRank(p, 0, true); // They don't get to have a rank. Their
 										// rank is Prisoner or Bondsman.
 			}
@@ -4688,7 +4695,7 @@ public class Campaign implements Serializable {
 			p.addLogEntry(getDate(), "Made Prisoner");
 			break;
 		case Person.PRISONER_BONDSMAN:
-			if (p.getRank() > 0) {
+			if (p.getRankOrder() > 0) {
 				changeRank(p, 0, true); // They don't get to have a rank. Their
 										// rank is Prisoner or Bondsman.
 			}
@@ -4737,12 +4744,12 @@ public class Campaign implements Serializable {
 
 	public void changeRank(Person person, int rank, boolean report) {
 		if (report) {
-			if (rank > person.getRank()) {
+			if (rank > person.getRankOrder()) {
 				person.addLogEntry(getDate(), "Promoted to "
-						+ getRanks().getRank(rank));
-			} else if (rank < person.getRank()) {
+						+ getRanks().getRank(rank).getName());
+			} else if (rank < person.getRankOrder()) {
 				person.addLogEntry(getDate(), "Demoted to "
-						+ getRanks().getRank(rank));
+						+ getRanks().getRank(rank).getName());
 			}
 		}
 		person.setRank(rank);

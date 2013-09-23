@@ -3,7 +3,7 @@ package mekhq.gui.sorter;
 import java.util.Comparator;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Ranks;
+import mekhq.campaign.personnel.Ranks;
 
  /**
      * A comparator for ranks written as strings with "-" sorted to the bottom always

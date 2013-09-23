@@ -17,6 +17,7 @@ import javax.swing.ScrollPaneConstants;
 import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.Rank;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.view.PersonViewPanel;
 
@@ -110,8 +111,8 @@ public class NewRecruitDialog extends javax.swing.JDialog {
         panSidebar.setLayout(new java.awt.GridLayout(6,1));
         
         DefaultComboBoxModel ranksModel = new DefaultComboBoxModel();
-        for(String rank : campaign.getRanks().getAllRanks()) {
-        	ranksModel.addElement(rank);
+        for(Rank rank : campaign.getRanks().getAllRanks()) {
+        	ranksModel.addElement(rank.getName());
         }
         choiceRanks.setModel(ranksModel);
         choiceRanks.setName("choiceRanks"); // NOI18N

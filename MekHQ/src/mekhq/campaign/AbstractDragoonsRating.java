@@ -177,7 +177,7 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
             Collections.sort(commanderList, new Comparator<Person>() {
                 @Override
                 public int compare(Person p1, Person p2) {
-                	int retVal = ((Comparable<Integer>) p2.getRank()).compareTo(p1.getRank());
+                	int retVal = ((Comparable<Integer>) p2.getRankOrder()).compareTo(p1.getRankOrder());
                 	if (retVal == 0) {
                 		if (p1.isCommander()) {
                 			retVal = -1;

@@ -19,6 +19,7 @@ import javax.swing.SpinnerNumberModel;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.Rank;
 import mekhq.gui.CampaignGUI;
 
 
@@ -109,8 +110,8 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
         getContentPane().add(lblRank, gridBagConstraints);
         
         DefaultComboBoxModel rankModel = new DefaultComboBoxModel();
-        for(String rank : campaign.getRanks().getAllRanks()) {
-        	rankModel.addElement(rank);
+        for(Rank rank : campaign.getRanks().getAllRanks()) {
+        	rankModel.addElement(rank.getName());
         }
         choiceRanks.setModel(rankModel);
         choiceRanks.setName("choiceRanks"); // NOI18N

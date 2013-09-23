@@ -176,6 +176,7 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.Rank;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.report.HangarReport;
@@ -7517,10 +7518,10 @@ public class CampaignGUI extends JPanel {
                 if (areAllEligible(selected)) {
 	                menu = new JMenu("Change Rank");
 	                int rankOrder = 0;
-	                for(String rank : getCampaign().getRanks().getAllRanks()) {
-	                    cbMenuItem = new JCheckBoxMenuItem(rank);
+	                for(Rank rank : getCampaign().getRanks().getAllRanks()) {
+	                    cbMenuItem = new JCheckBoxMenuItem(rank.getName());
 	                    cbMenuItem.setActionCommand("RANK|" + rankOrder);
-	                    if(person.getRank() == rankOrder) {
+	                    if(person.getRankOrder() == rankOrder) {
 	                        cbMenuItem.setSelected(true);
 	                    }
 	                    cbMenuItem.addActionListener(this);
