@@ -268,7 +268,7 @@ import mekhq.gui.CampaignGUI;
                 p = getPerson(row);
             }
             if(col == COL_RANK) {
-                return getCampaign().getRanks().getRank(p.getRank());
+                return p.getRank().getName();
             }
             if(col == COL_NAME) {
                 return p.getName();

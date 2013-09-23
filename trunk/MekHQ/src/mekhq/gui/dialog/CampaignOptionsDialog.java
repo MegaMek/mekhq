@@ -72,9 +72,9 @@ import mekhq.campaign.Era;
 import mekhq.campaign.Faction;
 import mekhq.campaign.PersonnelMarket;
 import mekhq.campaign.RandomSkillPreferences;
-import mekhq.campaign.Ranks;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.SkillType;
 
 /**

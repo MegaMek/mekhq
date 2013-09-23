@@ -19,10 +19,21 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign;
+package mekhq.campaign.personnel;
 
-import java.io.Serializable;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import mekhq.MekHQ;
+import mekhq.Version;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.Scenario;
 
 /**
  * This object will keep track of rank information. It will keep information
@@ -31,10 +42,8 @@ import java.util.ArrayList;
  * set of names
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Ranks implements Serializable {
+public class Ranks {
 	
-	private static final long serialVersionUID = -2054016720766034618L;
-
 	//pre-fab rank systems
 	public static final int RS_CUSTOM = -1;
 	public static final int RS_SL =  0;
@@ -59,10 +68,8 @@ public class Ranks implements Serializable {
 	public static final int RANK_PRISONER = -2;
 	
 	private int rankSystem;
-	private ArrayList<String> ranks;
-	//an int indicating where the officer ranks start
-	private int officer;
-
+	private ArrayList<Rank> ranks;
+	
 	public static String[] getRankSystem(int system) {
 		return rankSystems[system];
 	}
@@ -97,43 +104,51 @@ public class Ranks implements Serializable {
 	public Ranks(int system) {
 		rankSystem = system;
 		useRankSystem(rankSystem);
-		officer = officerCut[rankSystem];
 	}
 	
-	public ArrayList<String> getAllRanks() {
+	public ArrayList<Rank> getAllRanks() {
 		return ranks;
 	}
 	
 	public void useRankSystem(int system) {
-		ranks = new ArrayList<String>();
+		ranks = new ArrayList<Rank>();
 		if(system >= rankSystems.length) {
 			system = RS_SL;
 		}
 		for (int i = 0; i < rankSystems[system].length; i++) {
-			ranks.add(rankSystems[system][i]);
-		}
-		if(system < officerCut.length) {
-			officer = officerCut[system];
+			ranks.add(new Rank(rankSystems[system][i], officerCut[system] >= i,  1.0));
 		}
 	}
 	
 	public void setCustomRanks(ArrayList<String> customRanks, int offCut) {
-		ranks = customRanks;
+	    ranks = new ArrayList<Rank>();
+        for (int i = 0; i < customRanks.size(); i++) {
+            ranks.add(new Rank(customRanks.get(i), offCut <= i,  1.0));
+        }
 		rankSystem = RS_CUSTOM;
-		officer = offCut;
 	}
 	
-	public String getRank(int r) {
+	public Rank getRank(int r) {
 		if(r >= ranks.size()) {
-			return "Unknown";
+		    //assign the highest rank
+		    r = ranks.size() - 1;
 		}
 		if (r == RANK_BONDSMAN) { // Bondsman
-			return "Bondsman";
+			return new Rank("Bondsman", false, 0.0);
 		}
 		if (r == RANK_PRISONER) { // Prisoners
-			return "Prisoner";
+            return new Rank("Prisoner", false, 0.0);
 		}
 		return ranks.get(r);
+	}
+	
+	public int getOfficerCut() {
+	    for(int i = 0; i < ranks.size(); i++) {
+            if(ranks.get(i).isOfficer()) {
+                return i;
+            }
+        }
+        return ranks.size() - 1;
 	}
 	
 	public int getRankOrder(String rank) {
@@ -143,7 +158,12 @@ public class Ranks implements Serializable {
 		if (rank.equals("Bondsman")) {
 			return -1;
 		}
-		return ranks.indexOf(rank);
+		for(int i = 0; i < ranks.size(); i++) {
+		    if(ranks.get(i).getName().equals(rank)) {
+		        return i;
+		    }
+		}
+		return 0;
 	}
 	
 	public int getRankSystem() {
@@ -157,23 +177,11 @@ public class Ranks implements Serializable {
 		}	
 	}
 	
-	public boolean isOfficer(int rank) {
-		return rank >= officer;
-	}
-	
-	public int getOfficerCut() {
-		return officer;
-	}
-	
-	public void setOfficerCut(int i) {
-		officer = i;
-	}
-	
 	public String getRankNameList() {
 		String rankNames = "";
 		int i = 0;
-		for(String name : getAllRanks()) {
-			rankNames += name;
+		for(Rank rank : getAllRanks()) {
+			rankNames += rank.getName();
 			i++;
 			if(i < getAllRanks().size()) {
 				rankNames += ",";
@@ -182,14 +190,58 @@ public class Ranks implements Serializable {
 		return rankNames;
 	}
 	
-	public void setRanksFromList(String names) {
-		ranks = new ArrayList<String>();
-		String[] rankNames = names.split(",");
-		for(String rankName : rankNames) {
-			ranks.add(rankName);
+	//Keep this for reverse compatability in loading campaigns
+	public void setRanksFromList(String names, int officerCut) {
+		ArrayList<String> rankNames = new ArrayList<String>();
+		String[] rnames = names.split(",");
+		for(String rname : rnames) {
+			rankNames.add(rname);
 		}
-		rankSystem = RS_CUSTOM;
+		setCustomRanks(rankNames, officerCut);
 	}
 	
+	
+	public void writeToXml(PrintWriter pw1, int indent) {
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "<ranks>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<rankSystem>"
+                +rankSystem
+                +"</rankSystem>");
+        for(Rank r : ranks) {
+            r.writeToXml(pw1, indent+1);
+        }
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "</ranks>");
+    }
+	
+	public static Ranks generateInstanceFromXML(Node wn) {
+        Ranks retVal = new Ranks();
+        
+        ArrayList<Rank> ranks = new ArrayList<Rank>();
+        int rankSystem = RS_SL;
+        
+        try {  
+            NodeList nl = wn.getChildNodes();
+            
+            for (int x=0; x<nl.getLength(); x++) {
+                Node wn2 = nl.item(x);
+                
+                if (wn2.getNodeName().equalsIgnoreCase("rankSystem")) {
+                    rankSystem = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
+                    ranks.add(Rank.generateInstanceFromXML(wn2));
+                } 
+            }
+        } catch (Exception ex) {
+            // Errrr, apparently either the class name was invalid...
+            // Or the listed name doesn't exist.
+            // Doh!
+            MekHQ.logError(ex);
+        }
+        
+        retVal.rankSystem = rankSystem;
+        retVal.ranks = ranks;
+        
+        return retVal;
+    }
 	
 }

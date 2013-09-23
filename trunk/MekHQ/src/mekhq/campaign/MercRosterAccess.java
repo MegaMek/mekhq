@@ -16,6 +16,7 @@ import javax.swing.SwingWorker;
 import megamek.common.UnitType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.Rank;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 
@@ -117,10 +118,10 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         try {
             statement.execute("TRUNCATE TABLE " + table + ".ranks");
             int i = 0;
-            for(String rank : campaign.getRanks().getAllRanks()) {
+            for(Rank rank : campaign.getRanks().getAllRanks()) {
                 preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".ranks (number, rankname) VALUES (?, ?)");
                 preparedStatement.setInt(1, i);
-                preparedStatement.setString(2, truncateString(rank, 45));
+                preparedStatement.setString(2, truncateString(rank.getName(), 45));
                 preparedStatement.executeUpdate();
                 i++;
                 progressTicker++;
@@ -445,7 +446,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             }
             try {
                 preparedStatement = connect.prepareStatement("UPDATE " + table + ".crew SET rank=?, lname=?, fname=?, callsign=?, status=?, parent=?, crewnumber=?, joiningdate=?, notes=?, bday=? WHERE uuid=?"); 
-                preparedStatement.setInt(1, p.getRank());
+                preparedStatement.setInt(1, p.getRankOrder());
                 preparedStatement.setString(2, truncateString(parseLastName(p.getName()),30));
                 preparedStatement.setString(3, truncateString(parseFirstName(p.getName()), 30));
                 preparedStatement.setString(4, truncateString(p.getCallsign(), 30));
@@ -461,7 +462,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 if(preparedStatement.executeUpdate() < 1) {
                     //no prior record so insert
                     preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".crew (rank, lname, fname, callsign, status, parent, crewnumber, joiningdate, notes, bday, uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                    preparedStatement.setInt(1, p.getRank());
+                    preparedStatement.setInt(1, p.getRankOrder());
                     preparedStatement.setString(2, truncateString(parseLastName(p.getName()),30));
                     preparedStatement.setString(3, truncateString(parseFirstName(p.getName()), 30));
                     preparedStatement.setString(4, truncateString(p.getCallsign(), 30));

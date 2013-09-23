@@ -63,7 +63,6 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.LogEntry;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.Ranks;
 import mekhq.campaign.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IMedicalWork;
@@ -147,7 +146,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     private PilotOptions options = new PilotOptions();
     private int toughness;
     
-    private int rank;
     private int status;
     protected int xp;
     protected int salary;
@@ -179,6 +177,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     
     //need to pass in the rank system
     private Ranks ranks;
+    private int rankOrder;
     
     //stuff to track for support teams
     protected int minutesLeft;
@@ -213,7 +212,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         xp = 0;
         gender = G_MALE;
         birthday = new GregorianCalendar(3042, Calendar.JANUARY, 1);
-        rank = 0;
+        rankOrder = 0;
         status = S_ACTIVE;
         hits = 0;
         skills = new Hashtable<String,Skill>();
@@ -787,7 +786,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				+"</gender>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<rank>"
-				+rank
+				+rankOrder
 				+"</rank>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<nTasks>"
@@ -968,7 +967,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				} else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
 					retVal.gender = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
-					retVal.rank = Integer.parseInt(wn2.getTextContent());
+					retVal.rankOrder = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("doctorId")) {
 					if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
 						retVal.oldDoctorId = Integer.parseInt(wn2.getTextContent());
@@ -1331,7 +1330,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		}
 		
 		double offMult = 0.6;
-		if(ranks.isOfficer(getRank())) {
+		if(getRank().isOfficer()) {
 			offMult = 1.2;
 		}
 		
@@ -1351,18 +1350,16 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		//TODO: Add era mod to salary calc..
 	}
 	
-	public int getRank() {
-		if (isPrisoner()) {
-			return Ranks.RANK_PRISONER;
-		}
-		if (isBondsman()) {
-			return Ranks.RANK_BONDSMAN;
-		}
-		return rank;
+	public int getRankOrder() {
+	    return rankOrder;
+	}
+	
+	public Rank getRank() {
+		return ranks.getRank(rankOrder);
 	}
 	
 	public void setRank(int r) {
-		this.rank = r;
+		this.rankOrder = r;
 	}
 
 	public String getSkillSummary() {
@@ -1553,7 +1550,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
 	
 	public String getFullTitle() {
-		String rank = ranks.getRank(getRank());
+		String rank = getRank().getName();
 		if(rank.equalsIgnoreCase("None")) {
 			if (isPrisoner()) {
 				return "Prisoner "+getName();
