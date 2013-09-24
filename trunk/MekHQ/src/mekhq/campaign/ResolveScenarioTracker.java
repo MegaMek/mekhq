@@ -61,6 +61,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.Kill;
 
 /**
  * This object will be the main workforce for the scenario

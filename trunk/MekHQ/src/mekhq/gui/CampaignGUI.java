@@ -148,7 +148,6 @@ import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
-import mekhq.campaign.Kill;
 import mekhq.campaign.LogEntry;
 import mekhq.campaign.Planet;
 import mekhq.campaign.ResolveScenarioTracker;
@@ -205,8 +204,10 @@ import mekhq.gui.dialog.EditPersonnelLogDialog;
 import mekhq.gui.dialog.EditTransactionDialog;
 import mekhq.gui.dialog.GameOptionsDialog;
 import mekhq.gui.dialog.HireBulkPersonnelDialog;
+import mekhq.campaign.Kill;
 import mekhq.gui.dialog.KillDialog;
 import mekhq.gui.dialog.MaintenanceReportDialog;
+import mekhq.gui.dialog.ManageAssetsDialog;
 import mekhq.gui.dialog.MekHQAboutBox;
 import mekhq.gui.dialog.MercRosterDialog;
 import mekhq.gui.dialog.MissionTypeDialog;
@@ -456,6 +457,7 @@ public class CampaignGUI extends JPanel {
     private JTable loanTable;
     private JTextArea areaNetWorth;
     private JButton btnAddFunds;
+    private JButton btnManageAssets;
 
     /*Components for the status panel*/
     private JPanel statusPanel;
@@ -2064,7 +2066,7 @@ public class CampaignGUI extends JPanel {
         
         JPanel panelFinanceRight = new JPanel(new BorderLayout());
 
-        JPanel pnlFinanceBtns = new JPanel(new GridLayout(1,2));
+        JPanel pnlFinanceBtns = new JPanel(new GridLayout(2,2));
         btnAddFunds = new JButton("Add Funds (GM)");
         btnAddFunds.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -2080,9 +2082,16 @@ public class CampaignGUI extends JPanel {
             }
         });
         pnlFinanceBtns.add(btnGetLoan);
-        //pnlFinanceBtns.add(new JButton("Manage Asset"));
-        //pnlFinanceBtns.add(new JButton("Manage Income"));
-
+        
+        btnManageAssets = new JButton("Manage Assets (GM)");
+        btnManageAssets.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                manageAssets();
+            }
+        });
+        btnManageAssets.setEnabled(getCampaign().isGM());
+        pnlFinanceBtns.add(btnManageAssets);
+        
         panelFinanceRight.add(pnlFinanceBtns, BorderLayout.NORTH);
         
         areaNetWorth = new JTextArea();
@@ -3479,6 +3488,8 @@ public class CampaignGUI extends JPanel {
     private void btnGMModeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnGMModeActionPerformed
         getCampaign().setGMMode(btnGMMode.isSelected());
         btnAddFunds.setEnabled(btnGMMode.isSelected());
+        btnManageAssets.setEnabled(btnGMMode.isSelected());
+
     }// GEN-LAST:event_btnGMModeActionPerformed
 
     private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuOptionsActionPerformed
@@ -3835,7 +3846,7 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    private void addFundsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_addFundsActionPerformed
+    private void addFundsActionPerformed(java.awt.event.ActionEvent evt) {
         AddFundsDialog addFundsDialog = new AddFundsDialog(null, true);
         addFundsDialog.setVisible(true);
         long funds = addFundsDialog.getFundsQuantity();
@@ -3845,8 +3856,17 @@ public class CampaignGUI extends JPanel {
         refreshReport();
         refreshFunds();
         refreshFinancialTransactions();
-    }// GEN-LAST:event_addFundsActionPerformed
+    }
 
+    private void manageAssets() {
+        ManageAssetsDialog mad = new ManageAssetsDialog(getFrame(), getCampaign());
+        mad.setVisible(true);
+        refreshReport();
+        refreshFunds();
+        refreshFinancialTransactions();
+    }
+
+    
     protected void loadListFile(boolean allowNewPilots) throws IOException {
         JFileChooser loadList = new JFileChooser(".");
         loadList.setDialogTitle("Load Units");
@@ -8814,6 +8834,7 @@ public class CampaignGUI extends JPanel {
                                 }
                             }
                         }
+                        getCampaign().getFinances().setAssets(pcd.getRemainingAssets());
                     }
                     refreshFinancialTransactions();
                     refreshUnitList();

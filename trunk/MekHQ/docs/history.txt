@@ -12,6 +12,7 @@ v0.3.4 (SVN)
 + added campaign variable to personnel, removed it as a passed in variable from all personnel methods
 + added campaign options to adjust salary parameters
 + feature: set specific salary for a person
++ set up fake assets for loan collateral and income streams
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

@@ -23,11 +23,11 @@ import megamek.common.Crew;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Kill;
 import mekhq.campaign.LogEntry;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.Kill;
 
 /**
  * A custom panel that gets filled in with goodies from a Person record
