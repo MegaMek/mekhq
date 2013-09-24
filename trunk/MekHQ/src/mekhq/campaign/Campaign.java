@@ -660,7 +660,6 @@ public class Campaign implements Serializable {
 		while (null != personnelIds.get(p.getId())) {
 			p.setId(UUID.randomUUID());
 		}
-		p.setRankSystem(ranks);
 		addPersonWithoutId(p);
 		if (log) {
 			addReport(p.getHyperlinkedName() + " has been added to the personnel roster.");
@@ -2841,9 +2840,7 @@ public class Campaign implements Serializable {
 		// All personnel need the rank reference fixed
 		for (int x = 0; x < retVal.personnel.size(); x++) {
 			Person psn = retVal.personnel.get(x);
-
-			psn.setRankSystem(retVal.ranks);
-
+			
 			// skill types might need resetting
 			psn.resetSkillTypes();
 
@@ -3087,7 +3084,7 @@ public class Campaign implements Serializable {
 				continue;
 			}
 
-			Person p = Person.generateInstanceFromXML(wn2, version);
+			Person p = Person.generateInstanceFromXML(wn2, retVal, version);
 
 			if (p != null) {
 				retVal.addPersonWithoutId(p);
@@ -3727,7 +3724,7 @@ public class Campaign implements Serializable {
 	 */
 	public Person newPerson(int type) {
 		boolean isFemale = getRNG().isFemale();
-		Person person = new Person();
+		Person person = new Person(this);
 		if (isFemale) {
 			person.setGender(Person.G_FEMALE);
 		}
@@ -3996,7 +3993,6 @@ public class Campaign implements Serializable {
 				nabil--;
 			}
 		}
-		person.setRankSystem(ranks);
 		if (getCampaignOptions().usePortraitForType(type)) {
 			assignRandomPortraitFor(person);
 		}
@@ -4581,7 +4577,7 @@ public class Campaign implements Serializable {
 		int astechs = astechPool;
 		for (Person p : personnel) {
 			if ((p.getPrimaryRole() == Person.T_ASTECH) && p.isActive()
-					&& !p.isDeployed(this)) {
+					&& !p.isDeployed()) {
 				astechs++;
 			}
 		}
@@ -4592,7 +4588,7 @@ public class Campaign implements Serializable {
 		int astechs = 0;
 		for (Person p : personnel) {
 			if ((p.getSecondaryRole() == Person.T_ASTECH) && p.isActive()
-					&& !p.isDeployed(this)) {
+					&& !p.isDeployed()) {
 				astechs++;
 			}
 		}
@@ -4673,7 +4669,7 @@ public class Campaign implements Serializable {
 		int medics = medicPool;
 		for (Person p : personnel) {
 			if ((p.getPrimaryRole() == Person.T_MEDIC || p.getSecondaryRole() == Person.T_MEDIC)
-					&& p.isActive() && !p.isDeployed(this)) {
+					&& p.isActive() && !p.isDeployed()) {
 				medics++;
 			}
 		}

@@ -27,7 +27,7 @@ public class DocTableModel extends DataTableModel {
     }
 
     public Object getValueAt(int row, int col) {
-        return ((Person) data.get(row)).getDocDesc(getCampaign());
+        return ((Person) data.get(row)).getDocDesc();
     }
 
     public Person getDoctorAt(int row) {

@@ -657,7 +657,7 @@ public class Injury {
 		if (mod > 0) {
 			time += Math.ceil((time * mod / 100));
 		}
-		time = Math.round(time * p.getAbilityTimeModifier(c) / 100);
+		time = Math.round(time * p.getAbilityTimeModifier() / 100);
 		return time;
 	}
 }

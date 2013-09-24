@@ -9,6 +9,7 @@ v0.3.4 (SVN)
 + use a proper rank object to record rank
 + new table for entering in rank information in campaign options with optional payment multipliers
 + changed structure of the rank tab in CampaignOptionsDialog
++ added campaign variable to personnel, removed it as a passed in variable from all personnel methods
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
