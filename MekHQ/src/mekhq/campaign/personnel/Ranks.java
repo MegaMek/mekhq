@@ -23,17 +23,15 @@ package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Vector;
 
-import org.w3c.dom.NamedNodeMap;
+import javax.swing.table.DefaultTableModel;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import mekhq.MekHQ;
-import mekhq.Version;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
 
 /**
  * This object will keep track of rank information. It will keep information
@@ -45,7 +43,6 @@ import mekhq.campaign.mission.Scenario;
 public class Ranks {
 	
 	//pre-fab rank systems
-	public static final int RS_CUSTOM = -1;
 	public static final int RS_SL =  0;
 	public static final int RS_FS =  1;
 	public static final int RS_LA =  2;
@@ -53,7 +50,8 @@ public class Ranks {
 	public static final int RS_CC =  4;
 	public static final int RS_DC =  5;
 	public static final int RS_CL =  6;
-	public static final int RS_NUM = 7;
+	public static final int RS_CUSTOM = 7;
+	public static final int RS_NUM = 8;
 	private static final String[][] rankSystems = {
 		{"None","Recruit","Private","Corporal","Sergeant","Master Sergeant","Warrant Officer","Lieutenant","Captain","Major","Colonel","Lt. General","Major General","General","Commanding General"},
 		{"None","Recruit","Private","Private, FC","Corporal","Sergeant","Sergeant-Major","Command Sergeant-Major","Cadet","Subaltern","Leftenant","Captain","Major","Leftenant Colonel","Colonel","Leftenant General","Major General","General","Marshal","Field Marshal","Marshal of the Armies"},
@@ -113,10 +111,11 @@ public class Ranks {
 	public void useRankSystem(int system) {
 		ranks = new ArrayList<Rank>();
 		if(system >= rankSystems.length) {
-			system = RS_SL;
+			ranks.add(new Rank("Unknown", false, 1.0));
+			return;
 		}
 		for (int i = 0; i < rankSystems[system].length; i++) {
-			ranks.add(new Rank(rankSystems[system][i], officerCut[system] >= i,  1.0));
+			ranks.add(new Rank(rankSystems[system][i], officerCut[system] <= i,  1.0));
 		}
 	}
 	
@@ -243,5 +242,34 @@ public class Ranks {
         
         return retVal;
     }
+	
+	public String[][] getRanksArray() {
+        String[][] array = new String[ranks.size()][3];
+        int i = 0;
+        for(Rank rank : ranks) {
+            array[i][0] = rank.getName();
+            array[i][1] = Boolean.toString(rank.isOfficer());
+            array[i][2] = Double.toString(rank.getPayMultiplier());
+            i++;
+        }
+        return array;
+    }
+	
+	public void setRanksFromModel(DefaultTableModel model) {
+        ranks = new ArrayList<Rank>();
+	    Vector<Vector> vectors = model.getDataVector();
+	    for(Vector<Object> row : vectors) {
+	        String name = (String)row.get(0);
+	        Boolean officer = Boolean.parseBoolean((String)row.get(1));
+            String mult = (String)row.get(2);
+            double payMult = 1.0;
+            try {
+                payMult = Double.parseDouble(mult);
+            } catch(NumberFormatException ex) {
+                MekHQ.logMessage("encountered a non-double value for payment multipliers in the rank table");
+            }
+	        ranks.add(new Rank(name, officer, payMult));
+	    }
+	}
 	
 }
