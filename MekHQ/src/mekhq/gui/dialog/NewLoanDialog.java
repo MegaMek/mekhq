@@ -49,6 +49,7 @@ import javax.swing.event.DocumentListener;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.DragoonsRatingFactory;
 import mekhq.campaign.IDragoonsRating;
+import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
 
 /**
@@ -276,8 +277,8 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         sldLength.addChangeListener(this);
 
         DefaultComboBoxModel scheduleModel = new DefaultComboBoxModel();
-        for(int i = 0; i < Loan.SCHEDULE_NUM; i++) {
-            scheduleModel.addElement(Loan.getScheduleName(i));
+        for(int i = 0; i < Finances.SCHEDULE_NUM; i++) {
+            scheduleModel.addElement(Finances.getScheduleName(i));
         }
         choiceSchedule = new JComboBox(scheduleModel);
         choiceSchedule.setSelectedIndex(loan.getPaymentSchedule());
@@ -552,7 +553,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         lblAPR.setText(loan.getInterestRate() + "%");
         lblCollateralPct.setText(loan.getCollateralPercent() + "%");
         lblYears.setText(loan.getYears() + " years");
-        lblSchedule.setText(Loan.getScheduleName(loan.getPaymentSchedule()));
+        lblSchedule.setText(Finances.getScheduleName(loan.getPaymentSchedule()));
         lblPrincipal.setText(formatter.format(loan.getPrincipal()));
         lblFirstPayment.setText(SimpleDateFormat.getDateInstance().format(loan.getNextPayDate()));
         lblPayAmount.setText(formatter.format(loan.getPaymentAmount()));

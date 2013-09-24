@@ -47,6 +47,7 @@ import javax.swing.event.ChangeListener;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Unit;
+import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Part;
@@ -69,6 +70,7 @@ public class PayCollateralDialog extends JDialog {
     private Loan loan;
     
     private ArrayList<JCheckBox> unitBoxes;
+    private ArrayList<JCheckBox> assetBoxes;
     private ArrayList<JSlider> partSliders;
     private JProgressBar barAmount;
     private JButton btnPay;
@@ -225,10 +227,43 @@ public class PayCollateralDialog extends JDialog {
         });
         panBtn.add(btnCancel);
 
+        assetBoxes = new ArrayList<JCheckBox>();
+        i = 0;
+        j = 0;
+        JPanel pnlAssets = new JPanel(new GridBagLayout());
+        for(Asset a : campaign.getFinances().getAllAssets()) {
+            j++;
+            box = new JCheckBox(a.getName() + " (" + DecimalFormat.getInstance().format(a.getValue()) + "C-bills)");
+            box.setSelected(false);
+            box.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent evt) {
+                    updateAmount();
+                }
+            });
+            assetBoxes.add(box);
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = i;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.weightx = 1.0;
+            if(j == (campaign.getFinances().getAllAssets().size())) {
+                gridBagConstraints.weighty = 1.0;
+            }
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+            pnlAssets.add(box, gridBagConstraints);
+            i++;
+        }
+        JScrollPane scrAssets = new JScrollPane(pnlAssets);
+        scrAssets.setMinimumSize(new java.awt.Dimension(400, 300));
+        scrAssets.setPreferredSize(new java.awt.Dimension(400, 300));
+        
         updateAmount();
         
         panMain.add("Units", scrUnits);
         panMain.add("Parts", scrParts);
+        panMain.add("Assets", scrAssets);
         getContentPane().add(panInfo, BorderLayout.PAGE_START);
         getContentPane().add(panMain, BorderLayout.CENTER);
         getContentPane().add(panBtn, BorderLayout.PAGE_END);
@@ -270,6 +305,12 @@ public class PayCollateralDialog extends JDialog {
             }
             
         }
+        for(int i = 0; i < assetBoxes.size(); i++) {
+            JCheckBox box = assetBoxes.get(i);
+            if(box.isSelected()) {
+                amount += campaign.getFinances().getAllAssets().get(i).getValue();
+            }
+        }
         int percent = Math.round(100 * amount / loan.getCollateralAmount());
         if(percent < 100) {
             btnPay.setEnabled(false);
@@ -301,6 +342,17 @@ public class PayCollateralDialog extends JDialog {
             }
         }
         return parts;
+    }
+    
+    public ArrayList<Asset> getRemainingAssets() {
+        ArrayList<Asset> newAssets = new ArrayList<Asset>();
+        for(int i = 0; i < assetBoxes.size(); i++) {
+            JCheckBox box = assetBoxes.get(i);
+            if(!box.isSelected()) {
+                newAssets.add(campaign.getFinances().getAllAssets().get(i));
+            }
+        }
+        return newAssets;
     }
     
 }

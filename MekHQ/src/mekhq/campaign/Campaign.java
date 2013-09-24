@@ -99,6 +99,7 @@ import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.Version;
+import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Transaction;
@@ -136,6 +137,7 @@ import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.Modes;
 import mekhq.gui.PortraitFileFactory;
+import mekhq.campaign.Kill;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -5565,7 +5567,7 @@ public class Campaign implements Serializable {
 		monthlyExpenses = maintenance + salaries + overhead;
 
 		long assets = cash + mech + vee + ba + infantry + largeCraft
-				+ smallCraft + proto;
+				+ smallCraft + proto + getFinances().getTotalAssetValue();
 		long liabilities = loans;
 		long netWorth = assets - liabilities;
 		int longest = Math.max(DecimalFormat.getInstance().format(liabilities)
@@ -5619,8 +5621,26 @@ public class Campaign implements Serializable {
 		}
 		sb.append("       Spare Parts....... ")
 				.append(String.format(formatted, DecimalFormat.getInstance()
-						.format(spareParts))).append("\n\n");
-		// sb.append("       Other Assets........ ").append("").append("\n\n");
+						.format(spareParts))).append("\n");
+		
+		if(getFinances().getAllAssets().size() > 0) {
+		    for(Asset asset : getFinances().getAllAssets()) {
+		        String assetName = asset.getName();
+		        if(assetName.length() > 18) {
+		            assetName = assetName.substring(0, 17);
+		        } else {
+		            int numPeriods = 18 - assetName.length();
+		            for(int i = 0; i < numPeriods; i++) {
+		                assetName += ".";
+		            }           
+		        }
+		        assetName += " ";
+		        sb.append("       ").append(assetName)
+                .append(String.format(formatted, DecimalFormat.getInstance()
+                        .format(asset.getValue()))).append("\n");
+		    }
+		}
+		sb.append("\n");
 		sb.append("    Liabilities.......... ")
 				.append(String.format(formatted, DecimalFormat.getInstance()
 						.format(liabilities))).append("\n");

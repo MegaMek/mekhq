@@ -10,6 +10,7 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
 
 /**
@@ -86,7 +87,7 @@ public class LoanTableModel extends DataTableModel {
             return DecimalFormat.getInstance().format(loan.getPrincipal());
         }
         if(col == COL_SCHEDULE) {
-            return Loan.getScheduleName(loan.getPaymentSchedule());
+            return Finances.getScheduleName(loan.getPaymentSchedule());
         }
         if(col == COL_RATE) {
             return loan.getInterestRate() + "%";

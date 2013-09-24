@@ -41,13 +41,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Loan implements MekHqXmlSerializable {
-
-    public static final int SCHEDULE_BIWEEKLY  = 0;
-    public static final int SCHEDULE_MONTHLY   = 1;
-    public static final int SCHEDULE_QUARTERLY = 2;
-    public static final int SCHEDULE_YEARLY    = 3;
-    public static final int SCHEDULE_NUM       = 4;
-
+    
     // If you add more Canon institutions, please add them at the beginning and change the next line.
     // The first four of these are Canon, the rest are made up.
     private static final String[] madeUpInstitutions = {"Southern Bank and Trust" /* Canon */, "The Alliance Reserve Bank" /* Canon */,
@@ -97,17 +91,17 @@ public class Loan implements MekHqXmlSerializable {
         //payment
         int grace = 1;
         switch(schedule) {
-        case SCHEDULE_BIWEEKLY:
+        case Finances.SCHEDULE_BIWEEKLY:
             grace = 2;
             break;
-        case SCHEDULE_QUARTERLY:
+        case Finances.SCHEDULE_QUARTERLY:
             grace = 3;
             break;
         }
         while(keepGoing) {
             nextPayment.add(GregorianCalendar.DAY_OF_YEAR, 1);
             switch(schedule) {
-            case SCHEDULE_BIWEEKLY:
+            case Finances.SCHEDULE_BIWEEKLY:
                 if(nextPayment.get(Calendar.DAY_OF_WEEK) == 1) {
                     if(grace > 0) {
                         grace--;
@@ -117,7 +111,7 @@ public class Loan implements MekHqXmlSerializable {
                     }
                 }
                 break;
-            case SCHEDULE_MONTHLY:
+            case Finances.SCHEDULE_MONTHLY:
                 if(nextPayment.get(Calendar.DAY_OF_MONTH) == 1) {
                     if(grace > 0) {
                         grace--;
@@ -127,7 +121,7 @@ public class Loan implements MekHqXmlSerializable {
                     }
                 }
                 break;
-            case SCHEDULE_QUARTERLY:
+            case Finances.SCHEDULE_QUARTERLY:
                 if(nextPayment.get(Calendar.DAY_OF_MONTH) == 1) {
                     if(grace > 0) {
                         grace--;
@@ -137,7 +131,7 @@ public class Loan implements MekHqXmlSerializable {
                     }
                 }
                 break;
-            case SCHEDULE_YEARLY:
+            case Finances.SCHEDULE_YEARLY:
                 if(nextPayment.get(Calendar.DAY_OF_YEAR) == 1) {
                     if(grace > 0) {
                         grace--;
@@ -161,16 +155,16 @@ public class Loan implements MekHqXmlSerializable {
         //figure out actual rate from APR
         int denom = 1;
         switch(schedule) {
-        case SCHEDULE_BIWEEKLY:
+        case Finances.SCHEDULE_BIWEEKLY:
             denom = 26;
             break;
-        case SCHEDULE_MONTHLY:
+        case Finances.SCHEDULE_MONTHLY:
             denom = 12;
             break;
-        case SCHEDULE_QUARTERLY:
+        case Finances.SCHEDULE_QUARTERLY:
             denom = 4;
             break;
-        case SCHEDULE_YEARLY:
+        case Finances.SCHEDULE_YEARLY:
             denom = 1;
             break;
         }
@@ -227,16 +221,16 @@ public class Loan implements MekHqXmlSerializable {
     
     public void paidLoan() {      
         switch(schedule) {
-        case SCHEDULE_BIWEEKLY:
+        case Finances.SCHEDULE_BIWEEKLY:
             nextPayment.add(GregorianCalendar.WEEK_OF_YEAR, 2);
             break;
-        case SCHEDULE_MONTHLY:
+        case Finances.SCHEDULE_MONTHLY:
             nextPayment.add(GregorianCalendar.MONTH, 1);
             break;
-        case SCHEDULE_QUARTERLY:
+        case Finances.SCHEDULE_QUARTERLY:
             nextPayment.add(GregorianCalendar.MONTH, 3);
             break;
-        case SCHEDULE_YEARLY:
+        case Finances.SCHEDULE_YEARLY:
             nextPayment.add(GregorianCalendar.YEAR, 1);
             break;
         }
@@ -378,36 +372,20 @@ public class Loan implements MekHqXmlSerializable {
         return retVal;
     }
     
-    
-    public static String getScheduleName(int schedule) {
-        switch(schedule) {
-        case SCHEDULE_BIWEEKLY:
-            return "Bi-Weekly";
-        case SCHEDULE_MONTHLY:
-            return "Monthly";
-        case SCHEDULE_QUARTERLY:
-            return "Quarterly";
-        case SCHEDULE_YEARLY:
-            return "Yearly";
-        default:
-            return "?";
-        }
-    }
-    
     public static Loan getBaseLoanFor(int rating, GregorianCalendar cal) {
         //we are going to treat the score from StellarOps the same as dragoons score
         //TODO: pirates and government forces
         if(rating <= 0) {
-            return new Loan(10000000, 35, 80, 1, SCHEDULE_MONTHLY, cal);
+            return new Loan(10000000, 35, 80, 1, Finances.SCHEDULE_MONTHLY, cal);
         }
         else if(rating < 5) {
-            return new Loan(10000000, 20, 60, 1, SCHEDULE_MONTHLY, cal);
+            return new Loan(10000000, 20, 60, 1, Finances.SCHEDULE_MONTHLY, cal);
         } else if(rating < 10) {
-            return new Loan(10000000, 15, 40, 2, SCHEDULE_MONTHLY, cal);
+            return new Loan(10000000, 15, 40, 2, Finances.SCHEDULE_MONTHLY, cal);
         } else if(rating < 14) {
-            return new Loan(10000000, 10, 25, 3, SCHEDULE_MONTHLY, cal);
+            return new Loan(10000000, 10, 25, 3, Finances.SCHEDULE_MONTHLY, cal);
         } else {
-            return new Loan(10000000, 7, 15, 5, SCHEDULE_MONTHLY, cal);
+            return new Loan(10000000, 7, 15, 5, Finances.SCHEDULE_MONTHLY, cal);
         }
         
     }

@@ -26,6 +26,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
@@ -50,14 +51,36 @@ public class Finances implements Serializable {
 	
 	private ArrayList<Transaction> transactions;
 	private ArrayList<Loan> loans;
+	private ArrayList<Asset> assets;
 	private int loanDefaults;
 	private int failCollateral;
 	private Date wentIntoDebt;
 
+    public static final int SCHEDULE_BIWEEKLY  = 0;
+    public static final int SCHEDULE_MONTHLY   = 1;
+    public static final int SCHEDULE_QUARTERLY = 2;
+    public static final int SCHEDULE_YEARLY    = 3;
+    public static final int SCHEDULE_NUM       = 4;  
+    
+    public static String getScheduleName(int schedule) {
+        switch(schedule) {
+        case Finances.SCHEDULE_BIWEEKLY:
+            return "Bi-Weekly";
+        case Finances.SCHEDULE_MONTHLY:
+            return "Monthly";
+        case Finances.SCHEDULE_QUARTERLY:
+            return "Quarterly";
+        case Finances.SCHEDULE_YEARLY:
+            return "Yearly";
+        default:
+            return "?";
+        }
+    }
 	
 	public Finances() {
 		transactions = new ArrayList<Transaction>();
 	    loans = new ArrayList<Loan>();
+	    assets = new ArrayList<Asset>();
 	    loanDefaults = 0;
 	    failCollateral = 0;
 	    wentIntoDebt = null;
@@ -135,6 +158,10 @@ public class Finances implements Serializable {
 	    return loans;
 	}
 	
+	public ArrayList<Asset> getAllAssets() {
+	    return assets;
+	}
+	
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<finances>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -146,6 +173,9 @@ public class Finances implements Serializable {
 		}
 		for(Loan loan : loans) {
             loan.writeToXml(pw1, indent+1);
+        }
+		for(Asset asset : assets) {
+            asset.writeToXml(pw1, indent+1);
         }
 		if(null != wentIntoDebt) {
     		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
@@ -164,6 +194,9 @@ public class Finances implements Serializable {
 			 }
 			 else if (wn2.getNodeName().equalsIgnoreCase("loan")) {
                  retVal.loans.add(Loan.generateInstanceFromXML(wn2));
+             }
+			 else if (wn2.getNodeName().equalsIgnoreCase("asset")) {
+                 retVal.assets.add(Asset.generateInstanceFromXML(wn2));
              }
 			 else if (wn2.getNodeName().equalsIgnoreCase("loanDefaults")) {
                  retVal.loanDefaults = Integer.parseInt(wn2.getTextContent().trim());
@@ -211,6 +244,15 @@ public class Finances implements Serializable {
             wentIntoDebt = null;
         }
 	    loans = newLoans;
+	    for(Asset asset : assets) {
+	        if(asset.getSchedule() == SCHEDULE_YEARLY && campaign.calendar.get(Calendar.DAY_OF_YEAR) == 1) {
+	            credit(asset.getIncome(), Transaction.C_MISC, "income from " + asset.getName(), campaign.getCalendar().getTime());
+                campaign.addReport("Your account has been credited for " + DecimalFormat.getInstance().format(asset.getIncome()) + " C-bills from " + asset.getName());
+	        } else if(asset.getSchedule() == SCHEDULE_MONTHLY && campaign.calendar.get(Calendar.DAY_OF_MONTH) == 1) {
+	            credit(asset.getIncome(), Transaction.C_MISC, "income from " + asset.getName(), campaign.getCalendar().getTime());
+                campaign.addReport("Your account has been credited for " + DecimalFormat.getInstance().format(asset.getIncome()) + " C-bills from " + asset.getName());
+	        }
+	    }
 	}
 	
 	public long checkOverdueLoanPayments(Campaign campaign) {
@@ -269,7 +311,19 @@ public class Finances implements Serializable {
 	    return amount;
 	}
 	
+	public long getTotalAssetValue() {
+	    long amount = 0;
+	    for(Asset asset : assets) {
+	        amount += asset.getValue();
+	    }
+	    return amount;
+	}
+	
+	public void setAssets(ArrayList<Asset> newAssets) {
+	    assets = newAssets;
+	}
+	
 	public long getMaxCollateral(Campaign c) {
-        return c.getTotalEquipmentValue() - getTotalLoanCollateral();
+        return c.getTotalEquipmentValue() + getTotalAssetValue() - getTotalLoanCollateral();
     }
 }
