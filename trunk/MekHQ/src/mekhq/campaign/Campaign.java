@@ -3548,6 +3548,7 @@ public class Campaign implements Serializable {
 
         String rankNames = null;
         int officerCut = 0;
+        int rankSystem = -1;
         
 		// Okay, lets iterate through the children, eh?
 		for (int x = 0; x < nl.getLength(); x++) {
@@ -3636,8 +3637,12 @@ public class Campaign implements Serializable {
 				} else if (xn.equalsIgnoreCase("rankNames")) {
 					rankNames = wn.getTextContent().trim();
 				} else if (xn.equalsIgnoreCase("ranks")) {
-                    retVal.ranks = Ranks.generateInstanceFromXML(wn);
-                }else if (xn.equalsIgnoreCase("gmMode")) {
+				    if(version.getMinorVersion() < 3 || (version.getMinorVersion() == 3 && version.getSnapshot() < 4)) {
+				        rankSystem = Integer.parseInt(wn.getTextContent().trim());
+				    } else {
+				        retVal.ranks = Ranks.generateInstanceFromXML(wn);
+				    }
+                } else if (xn.equalsIgnoreCase("gmMode")) {
 					if (wn.getTextContent().trim().equals("true"))
 						retVal.gmMode = true;
 					else
@@ -3686,8 +3691,11 @@ public class Campaign implements Serializable {
 		}
 		if(null != rankNames) {
             //backwards compatability
-            retVal.getRanks().setRanksFromList(rankNames, officerCut);  
+            retVal.ranks.setRanksFromList(rankNames, officerCut);  
         }
+		if(rankSystem != -1) {
+		    retVal.ranks.useRankSystem(rankSystem);
+		}
 	}
 
 	public ArrayList<Planet> getPlanets() {

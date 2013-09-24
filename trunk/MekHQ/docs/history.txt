@@ -7,6 +7,7 @@ v0.3.4 (SVN)
 + Refactor some Advanced Healing methods from Person to Injury where they belonged (as static methods)
 + Bug [#411] Hanger - sort by Status failure
 + use a proper rank object to record rank
++ new table for entering in rank information in campaign options with optional payment multipliers
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
