@@ -236,6 +236,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         commander = false;
         isClanTech = false;
         techUnitIds = new ArrayList<UUID>();
+        salary = -1;
     }
     
     public boolean isClanTech() {
@@ -1209,73 +1210,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		return retVal;
 	}
 	
-	public static int getSalary(int role) {
-		int base = 0;
-		switch (role) {
-    	case T_MECHWARRIOR:
-			base = 1500;
-			break;
-		case T_GVEE_DRIVER:
-		case T_NVEE_DRIVER:
-		case T_VTOL_PILOT:
-		case T_VEE_GUNNER:
-		case T_CONV_PILOT:
-			base = 900;
-			break;
-		case T_AERO_PILOT:
-			base = 1500;
-			break;
-		case T_PROTO_PILOT:
-			//TODO: Confirm ProtoMech pilots should be paid as BA pilots?
-			base = 960;
-			break;
-		case T_BA:
-			base = 960;
-			break;
-		case T_INFANTRY:
-			base = 750;
-			break;
-		case T_SPACE_PILOT:
-		case T_SPACE_CREW:
-		case T_SPACE_GUNNER:
-		case T_NAVIGATOR:
-			base = 1000;
-			break;
-		case T_MECH_TECH:
-			base = 800;
-			break;
-		case T_MECHANIC:
-			base = 640;
-			break;
-		case T_AERO_TECH:
-			base = 800;
-			break;
-		case T_BA_TECH:
-			base = 800;
-			break;
-		case T_ASTECH:
-			base = 640;
-			break;
-		case T_DOCTOR:
-			base = 1500;
-			break;
-		case T_MEDIC:
-			base = 640;
-			break;
-		case T_ADMIN_COM:
-		case T_ADMIN_LOG:
-		case T_ADMIN_TRA:
-		case T_ADMIN_HR:
-			base = 320;
-			break;
-		case T_NUM:
-			// Not a real pilot type. If someone has this, they don't get paid!
-			base = 0;
-			break;
-		}
-		return base;
-	}
-	
 	public int getSalary() {
 		
 		if (isPrisoner() || isBondsman()) {
@@ -1287,68 +1221,30 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		}
 		
 		//if salary is -1, then use the standard amounts
-		int primaryBase = getSalary(getPrimaryRole());
-		
-		switch(getExperienceLevel(false)) {
-		case SkillType.EXP_ULTRA_GREEN:
-			primaryBase *= 0.5;
-			break;
-		case SkillType.EXP_GREEN:
-			primaryBase *= 0.6;
-			break;
-		case SkillType.EXP_VETERAN:
-			primaryBase *= 1.6;
-			break;
-		case SkillType.EXP_ELITE:
-			primaryBase *= 3.2;
-			break;
-		default:
+		int primaryBase = campaign.getCampaignOptions().getBaseSalary(getPrimaryRole());
+		primaryBase *= campaign.getCampaignOptions().getSalaryXpMultiplier(getExperienceLevel(false));
+		if(hasSkill(SkillType.S_ANTI_MECH) && (getPrimaryRole() == T_INFANTRY || getPrimaryRole() == T_BA)) {
+		    primaryBase *= campaign.getCampaignOptions().getSalaryAntiMekMultiplier();
 		}
 		
-		if(getPrimaryRole() == T_ASTECH || getPrimaryRole() == T_MEDIC) {
-			primaryBase *= 0.5;
-		}
+		int secondaryBase =  campaign.getCampaignOptions().getBaseSalary(getSecondaryRole())/2 ;
+		secondaryBase *= campaign.getCampaignOptions().getSalaryXpMultiplier(getExperienceLevel(true));
+		if(hasSkill(SkillType.S_ANTI_MECH) && (getSecondaryRole() == T_INFANTRY || getSecondaryRole() == T_BA)) {
+            secondaryBase *= campaign.getCampaignOptions().getSalaryAntiMekMultiplier();
+        }
 		
-		int secondaryBase = getSalary(getSecondaryRole())/2 ;
-
-		switch(getExperienceLevel(true)) {
-		case SkillType.EXP_ULTRA_GREEN:
-			secondaryBase *= 0.5;
-			break;
-		case SkillType.EXP_GREEN:
-			secondaryBase *= 0.6;
-			break;
-		case SkillType.EXP_VETERAN:
-			secondaryBase *= 1.6;
-			break;
-		case SkillType.EXP_ELITE:
-			secondaryBase *= 3.2;
-			break;
-		default:
-		}
+		int totalBase = primaryBase + secondaryBase;
 		
-		if(getSecondaryRole() == T_ASTECH || getSecondaryRole() == T_MEDIC) {
-			secondaryBase *= 0.5;
-		}
-		
-		double offMult = 0.6;
 		if(getRank().isOfficer()) {
-			offMult = 1.2;
+			totalBase *=  campaign.getCampaignOptions().getSalaryCommissionMultiplier();
+		} else {
+		    totalBase *= campaign.getCampaignOptions().getSalaryEnlistedMultiplier();
 		}
 		
-		double antiMekMult = 1.0;
-		if(hasSkill(SkillType.S_ANTI_MECH)) {
-			antiMekMult = 1.5;
-		}
+		totalBase *= getRank().getPayMultiplier();
 		
-		return (int)((primaryBase+secondaryBase)  * offMult * antiMekMult);
-		//TODO: Add conventional aircraft pilots.
-		//TODO: Add vessel crewmen (DropShip).
-		//TODO: Add vessel crewmen (JumpShip).
-		//TODO: Add vessel crewmen (WarShip).
-		
-		//TODO: Properly pay large ship crews for actual size.
-		
+		return totalBase;
+		//TODO: distinguish dropship, jumpship, and warship crew		
 		//TODO: Add era mod to salary calc..
 	}
 	
