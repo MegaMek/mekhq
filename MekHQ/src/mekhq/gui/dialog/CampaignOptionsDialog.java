@@ -171,6 +171,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private javax.swing.JCheckBox sellUnitsBox;
     private javax.swing.JCheckBox sellPartsBox;
 
+    private JTextField[] txtSalaryBase;
+    private JSpinner[] spnSalaryXp;
+    private JSpinner spnSalaryCommision;
+    private JSpinner spnSalaryEnlisted;
+    private JSpinner spnSalaryAntiMek;
+    
     private JSpinner spnHealWaitingPeriod;
     private JSpinner spnNaturalHealWaitingPeriod;
     private JCheckBox useRandomHitsForVees;
@@ -1151,6 +1157,115 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panPersonnel.add(useRandomHitsForVees, gridBagConstraints);
 
+        JPanel panSalary = new JPanel(new GridBagLayout());
+        panSalary.setBorder(BorderFactory.createTitledBorder("Salary"));
+        
+        JPanel panMultiplier = new JPanel(new GridLayout(1,3));
+        panMultiplier.setBorder(BorderFactory.createTitledBorder("Multipliers"));
+        spnSalaryCommision = new JSpinner(new SpinnerNumberModel(options.getSalaryCommissionMultiplier(), 0, 10, 0.05));
+        ((JSpinner.DefaultEditor)spnSalaryCommision.getEditor()).getTextField().setEditable(false);      
+        JPanel panSalaryCommission = new JPanel();
+        panSalaryCommission.add(spnSalaryCommision);
+        panSalaryCommission.add(new JLabel("Commissioned")); 
+        panMultiplier.add(panSalaryCommission);
+        
+        spnSalaryEnlisted = new JSpinner(new SpinnerNumberModel(options.getSalaryEnlistedMultiplier(), 0, 10, 0.05));
+        ((JSpinner.DefaultEditor)spnSalaryEnlisted.getEditor()).getTextField().setEditable(false);      
+        JPanel panSalaryEnlisted = new JPanel();
+        panSalaryEnlisted.add(spnSalaryEnlisted);
+        panSalaryEnlisted.add(new JLabel("Enlisted")); 
+        panMultiplier.add(panSalaryEnlisted);
+        
+        spnSalaryAntiMek = new JSpinner(new SpinnerNumberModel(options.getSalaryAntiMekMultiplier(), 0, 10, 0.05));
+        ((JSpinner.DefaultEditor)spnSalaryAntiMek.getEditor()).getTextField().setEditable(false);      
+        JPanel panSalaryAntiMek = new JPanel();
+        panSalaryAntiMek.add(spnSalaryAntiMek);
+        panSalaryAntiMek.add(new JLabel("Anti-Mek")); 
+        panMultiplier.add(panSalaryAntiMek);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSalary.add(panMultiplier, gridBagConstraints);
+        
+        JPanel panXpMultiplier = new JPanel(new GridLayout(2,3));
+        panXpMultiplier.setBorder(BorderFactory.createTitledBorder("Experience Multipliers"));
+        spnSalaryXp = new JSpinner[5];
+        JSpinner spnXpSalary;
+        JPanel panXpSalary;
+        for(int i = 0; i < 5; i++) {
+            spnXpSalary = new JSpinner(new SpinnerNumberModel(options.getSalaryXpMultiplier(i), 0, 10, 0.05));
+            ((JSpinner.DefaultEditor)spnXpSalary.getEditor()).getTextField().setEditable(false);      
+            panXpSalary = new JPanel();
+            panXpSalary.add(spnXpSalary);
+            panXpSalary.add(new JLabel(SkillType.getExperienceLevelName(i))); 
+            panXpMultiplier.add(panXpSalary);
+            spnSalaryXp[i] = spnXpSalary;          
+        }
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSalary.add(panXpMultiplier, gridBagConstraints);
+        
+        JPanel panAllTypes = new JPanel(new GridLayout(Person.T_NUM/2,2));
+        JTextField txtType;
+        JPanel panType;
+        txtSalaryBase = new JTextField[Person.T_NUM];
+        for(int i = 1; i < Person.T_NUM; i++) {
+            txtType = new JTextField();
+            txtType.setText(Integer.toString(options.getBaseSalary(i)));
+            txtType.setPreferredSize(new Dimension(75,20));
+            panType = new JPanel(new GridBagLayout());
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 0;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 0.0;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            panType.add(new JLabel(Person.getRoleDesc(i)), gridBagConstraints);
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = 0;
+            gridBagConstraints.weightx = 0.0;
+            gridBagConstraints.weighty = 0.0;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            panType.add(txtType, gridBagConstraints);
+            txtSalaryBase[i] = txtType;
+            panAllTypes.add(panType);
+        }
+        JScrollPane scrSalaryBase = new JScrollPane(panAllTypes);
+        scrSalaryBase.setBorder(BorderFactory.createTitledBorder("Base Salaries"));
+        scrSalaryBase.setOpaque(false);
+        scrSalaryBase.setPreferredSize(new Dimension(200,200));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSalary.add(scrSalaryBase, gridBagConstraints);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 13;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panPersonnel.add(panSalary, gridBagConstraints);
+        
 
         tabOptions.addTab(resourceMap.getString("panPersonnel.TabConstraints.tabTitle"), panPersonnel); // NOI18N
 
@@ -2781,6 +2896,23 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         rskillPrefs.setSpecialAbilBonus(SkillType.EXP_VETERAN, (Integer)spnAbilVet.getModel().getValue());
         rskillPrefs.setSpecialAbilBonus(SkillType.EXP_ELITE, (Integer)spnAbilElite.getModel().getValue());
 
+        //start salary
+        for(int i = 1; i < Person.T_NUM; i++) {
+            try {
+                int salary = Integer.parseInt(txtSalaryBase[i].getText());
+                options.setBaseSalary(salary, i);
+            } catch(NumberFormatException ex) {
+                //dont change it
+            }
+        }
+        for(int i = 0; i < 5; i++) {
+            options.setSalaryXpMultiplier((Double)spnSalaryXp[i].getModel().getValue(), i);
+        }
+        options.setSalaryCommissionMultiplier((Double)spnSalaryCommision.getModel().getValue());
+        options.setSalaryEnlistedMultiplier((Double)spnSalaryEnlisted.getModel().getValue());
+        options.setSalaryAntiMekMultiplier((Double)spnSalaryAntiMek.getModel().getValue());
+        //end salary
+        
         // Start Personnel Market
         options.setPersonnelMarketDylansWeight((Double)personnelMarketDylansWeight.getValue());
         options.setPersonnelMarketRandomEliteRemoval(Integer.parseInt(personnelMarketRandomEliteRemoval.getText()));

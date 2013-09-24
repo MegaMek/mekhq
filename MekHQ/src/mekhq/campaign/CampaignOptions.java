@@ -27,6 +27,7 @@ import java.io.Serializable;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -162,6 +163,13 @@ public class CampaignOptions implements Serializable {
     //Dragoon's Rating
     private DragoonsRatingMethod dragoonsRatingMethod;
     
+    //salary related
+    private int[] salaryTypeBase;
+    private double[] salaryXpMultiplier;
+    private double salaryCommissionMultiplier;
+    private double salaryEnlistedMultiplier;
+    private double salaryAntiMekMultiplier;
+    
     //random portraits related
     private boolean[] usePortraitForType;
 
@@ -257,7 +265,42 @@ public class CampaignOptions implements Serializable {
         personnelMarketRandomGreenRemoval = 4;
         personnelMarketRandomUltraGreenRemoval = 4;
         personnelMarketDylansWeight = 0.3;
-        
+        salaryTypeBase = new int[Person.T_NUM];
+        salaryTypeBase[Person.T_MECHWARRIOR] = 1500;
+        salaryTypeBase[Person.T_AERO_PILOT] = 1500;
+        salaryTypeBase[Person.T_VEE_GUNNER] = 900;
+        salaryTypeBase[Person.T_GVEE_DRIVER] = 900;
+        salaryTypeBase[Person.T_NVEE_DRIVER] = 900;
+        salaryTypeBase[Person.T_VTOL_PILOT] = 900;
+        salaryTypeBase[Person.T_CONV_PILOT] = 900;
+        salaryTypeBase[Person.T_INFANTRY] = 750;
+        salaryTypeBase[Person.T_BA] = 960;
+        salaryTypeBase[Person.T_SPACE_PILOT] = 1000;
+        salaryTypeBase[Person.T_SPACE_GUNNER] = 1000;
+        salaryTypeBase[Person.T_SPACE_CREW] = 1000;
+        salaryTypeBase[Person.T_NAVIGATOR] = 1000;
+        salaryTypeBase[Person.T_DOCTOR] = 1500;
+        salaryTypeBase[Person.T_ADMIN_COM] = 500;
+        salaryTypeBase[Person.T_ADMIN_HR] = 500;
+        salaryTypeBase[Person.T_ADMIN_LOG] = 500;
+        salaryTypeBase[Person.T_ADMIN_TRA] = 500;
+        salaryTypeBase[Person.T_MECH_TECH] = 800;
+        salaryTypeBase[Person.T_AERO_TECH] = 800;
+        salaryTypeBase[Person.T_BA_TECH] = 800;
+        salaryTypeBase[Person.T_MECHANIC] = 800;
+        salaryTypeBase[Person.T_ASTECH] = 400;
+        salaryTypeBase[Person.T_MEDIC] = 400;
+        salaryTypeBase[Person.T_PROTO_PILOT] = 960;
+        salaryXpMultiplier = new double[5];
+        salaryXpMultiplier[SkillType.EXP_ULTRA_GREEN] = 0.6;
+        salaryXpMultiplier[SkillType.EXP_GREEN] = 0.6;
+        salaryXpMultiplier[SkillType.EXP_REGULAR] = 1.0;
+        salaryXpMultiplier[SkillType.EXP_VETERAN] = 1.6;
+        salaryXpMultiplier[SkillType.EXP_ELITE] = 3.2;
+        salaryAntiMekMultiplier = 1.5;
+        salaryCommissionMultiplier = 1.2;
+        salaryEnlistedMultiplier = 1.0;
+
     }
 
     public DragoonsRatingMethod getDragoonsRatingMethod() {
@@ -950,6 +993,58 @@ public class CampaignOptions implements Serializable {
         minimumHitsForVees = d;
     }
     
+    public int getBaseSalary(int type) {
+        if(type < 0 || type >= salaryTypeBase.length) {
+            return 0;
+        }
+        return salaryTypeBase[type];
+    }
+    
+    public void setBaseSalary(int base, int type) {
+        if(type < 0 || type >= salaryTypeBase.length) {
+            return;
+        }
+        this.salaryTypeBase[type] = base;
+    }
+    
+    public double getSalaryXpMultiplier(int xp) {
+        if(xp < 0 || xp >= salaryXpMultiplier.length) {
+            return 1.0;
+        }
+        return salaryXpMultiplier[xp];
+    }
+    
+    public void setSalaryXpMultiplier(double d, int xp) {
+        if(xp < 0 || xp >= salaryXpMultiplier.length) {
+            return;
+        }
+        this.salaryXpMultiplier[xp] = d;
+    }
+    
+    public double getSalaryEnlistedMultiplier() {
+        return salaryEnlistedMultiplier;
+    }
+    
+    public void setSalaryEnlistedMultiplier(double d) {
+        salaryEnlistedMultiplier = d;
+    }
+    
+    public double getSalaryCommissionMultiplier() {
+        return salaryCommissionMultiplier;
+    }
+    
+    public void setSalaryCommissionMultiplier(double d) {
+        salaryCommissionMultiplier = d;
+    }
+    
+    public double getSalaryAntiMekMultiplier() {
+        return salaryAntiMekMultiplier;
+    }
+    
+    public void setSalaryAntiMekMultiplier(double d) {
+        salaryAntiMekMultiplier = d;
+    }
+    
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "clanPriceModifier", clanPriceModifier); //private double clanPriceModifier;
@@ -1037,8 +1132,18 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "personnelMarketRandomUltraGreenRemoval", personnelMarketRandomUltraGreenRemoval);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "personnelMarketReportRefresh", personnelMarketReportRefresh);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "personnelMarketDylansWeight", personnelMarketDylansWeight);
-
-
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "salaryEnlistedMultiplier", salaryEnlistedMultiplier);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "salaryCommissionMultiplier", salaryCommissionMultiplier);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "salaryAntiMekMultiplier", salaryAntiMekMultiplier);
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<salaryTypeBase>"
+                +Utilities.printIntegerArray(salaryTypeBase)
+                +"</salaryTypeBase>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<salaryXpMultiplier>"
+                +Utilities.printDoubleArray(salaryXpMultiplier)
+                +"</salaryXpMultiplier>");
+        
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<usePortraitForType>"
 				+Utilities.printBooleanArray(usePortraitForType)
@@ -1357,7 +1462,23 @@ public class CampaignOptions implements Serializable {
             	retVal.personnelMarketReportRefresh = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketDylansWeight")) {
             	retVal.personnelMarketDylansWeight = Double.parseDouble(wn2.getTextContent().trim());
-            }
+            } else if (wn2.getNodeName().equalsIgnoreCase("salaryCommissionMultiplier")) {
+                retVal.salaryCommissionMultiplier = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("salaryEnlistedMultiplier")) {
+                retVal.salaryEnlistedMultiplier = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("salaryAntiMekMultiplier")) {
+                retVal.salaryAntiMekMultiplier = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("salaryTypeBase")) {
+                String[] values = wn2.getTextContent().split(",");
+                for(int i = 0; i < values.length; i++) {
+                    retVal.salaryTypeBase[i] = Integer.parseInt(values[i]);
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("salaryXpMultiplier")) {
+                String[] values = wn2.getTextContent().split(",");
+                for(int i = 0; i < values.length; i++) {
+                    retVal.salaryXpMultiplier[i] = Double.parseDouble(values[i]);
+                }
+            } 
 		}
 
 		MekHQ.logMessage("Load Campaign Options Complete!", 4);

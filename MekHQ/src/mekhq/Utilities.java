@@ -812,6 +812,17 @@ public class Utilities {
 		return values;
 	}
 	
+	public static String printDoubleArray(double[] array) {
+        String values = "";
+        for(int i = 0; i < array.length; i++) {
+            values += Double.toString(array[i]);
+            if(i < (array.length-1)) {
+                values += ",";
+            }
+        }
+        return values;
+    }
+	
 	public static String printBooleanArray(boolean[] array) {
 		String values = "";
 		for(int i = 0; i < array.length; i++) {

@@ -10,6 +10,7 @@ v0.3.4 (SVN)
 + new table for entering in rank information in campaign options with optional payment multipliers
 + changed structure of the rank tab in CampaignOptionsDialog
 + added campaign variable to personnel, removed it as a passed in variable from all personnel methods
++ added campaign options to adjust salary parameters
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
