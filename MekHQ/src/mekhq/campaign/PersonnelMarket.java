@@ -379,7 +379,7 @@ public class PersonnelMarket {
 					continue;
 				}
 
-				Person p = Person.generateInstanceFromXML(wn2, version);
+				Person p = Person.generateInstanceFromXML(wn2, c, version);
 
 				if (p != null) {
 					retVal.personnel.add(p);
@@ -395,8 +395,6 @@ public class PersonnelMarket {
 		// All personnel need the rank reference fixed
 		for (int x = 0; x < retVal.personnel.size(); x++) {
 			Person psn = retVal.personnel.get(x);
-
-			psn.setRankSystem(c.getRanks());
 
 			// skill types might need resetting
 			psn.resetSkillTypes();

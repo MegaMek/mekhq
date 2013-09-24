@@ -2457,7 +2457,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
         		}
         	}
         	if(nCrew > 0) {
-        		engineer = new Person(engineerName, campaign.getRanks());
+        		engineer = new Person(engineerName, campaign);
         		engineer.setMinutesLeft(minutesLeft);
         		engineer.setOvertimeLeft(overtimeLeft);
         		engineer.setId(commander.getId());

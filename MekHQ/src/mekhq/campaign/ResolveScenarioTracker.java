@@ -765,7 +765,7 @@ public class ResolveScenarioTracker {
 				campaign.changeStatus(person, Person.S_KIA);
 			}
 			if (campaign.getCampaignOptions().useAdvancedMedical()) {
-				person.diagnose(status.getHits(), campaign);
+				person.diagnose(status.getHits());
 			}
 			if (status.isBondsman()) {
 				person.setBondsman();

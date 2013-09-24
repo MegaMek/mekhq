@@ -256,7 +256,7 @@ import mekhq.gui.CampaignGUI;
         }
 
         public boolean isDeployed(int row) {
-            return getPerson(row).isDeployed(getCampaign());
+            return getPerson(row).isDeployed();
         }
 
         public Object getValueAt(int row, int col) {
@@ -544,10 +544,10 @@ import mekhq.gui.CampaignGUI;
                     if(p.getTechUnitIDs().size() == 1) {
                         u = getCampaign().getUnit(p.getTechUnitIDs().get(0));
                         if(null != u) {
-                            return u.getName() + " (" + p.getMaintenanceTimeUsing(getCampaign()) + "m)";
+                            return u.getName() + " (" + p.getMaintenanceTimeUsing() + "m)";
                         }
                     } else {
-                        return "" + p.getTechUnitIDs().size() + " units (" + p.getMaintenanceTimeUsing(getCampaign()) + "m)";
+                        return "" + p.getTechUnitIDs().size() + " units (" + p.getMaintenanceTimeUsing() + "m)";
                     }
                 }             
                 return "-";

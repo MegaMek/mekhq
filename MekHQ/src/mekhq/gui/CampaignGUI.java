@@ -3984,7 +3984,7 @@ public class CampaignGUI extends JPanel {
     				continue;
     			}
 
-    			Person p = Person.generateInstanceFromXML(wn2, version);
+    			Person p = Person.generateInstanceFromXML(wn2, getCampaign(), version);
     			if(getCampaign().getPerson(p.getId()) != null && getCampaign().getPerson(p.getId()).getName().equals(p.getName())) {
     				MekHQ.logMessage("ERROR: Cannot load person who exists, ignoring. (Name: "+p.getName()+")");
     				p = null;
@@ -7671,7 +7671,7 @@ public class CampaignGUI extends JPanel {
                                     navMenu.add(cbMenuItem);
                                 }
                             }
-                            if(unit.canTakeTech() && person.canTech(unit.getEntity()) && (person.getMaintenanceTimeUsing(getCampaign()) + unit.getMaintenanceTime()) <= 480) {
+                            if(unit.canTakeTech() && person.canTech(unit.getEntity()) && (person.getMaintenanceTimeUsing() + unit.getMaintenanceTime()) <= 480) {
                                 cbMenuItem = new JCheckBoxMenuItem(unit.getName() + " (" + unit.getMaintenanceTime() + " minutes/day)");
                                 //TODO: check the box
                                 cbMenuItem.setActionCommand("ADD_TECH|" + unit.getId());
@@ -7721,7 +7721,7 @@ public class CampaignGUI extends JPanel {
                                 MenuScroller.setScrollerFor(techMenu, 20);
                             }
                         }
-                        menu.setEnabled(!person.isDeployed(getCampaign()));
+                        menu.setEnabled(!person.isDeployed());
                         popup.add(menu);
                 } else if (areAllActive(selected)  && areAllEligible(selected)) {
                     for (Unit unit : getCampaign().getUnits()) {
@@ -7739,7 +7739,7 @@ public class CampaignGUI extends JPanel {
                                 cbMenuItem.addActionListener(this);
                                 soldierMenu.add(cbMenuItem);
                             }
-	                        menu.setEnabled(!person.isDeployed(getCampaign()));
+	                        menu.setEnabled(!person.isDeployed());
 	                        popup.add(menu);
 	                    } else if (areAllBattleArmor(selected)) {
                         	if (!(unit.getEntity() instanceof BattleArmor)) {
@@ -7752,7 +7752,7 @@ public class CampaignGUI extends JPanel {
                                 cbMenuItem.addActionListener(this);
                                 soldierMenu.add(cbMenuItem);
                             }
-	                        menu.setEnabled(!person.isDeployed(getCampaign()));
+	                        menu.setEnabled(!person.isDeployed());
 	                        popup.add(menu);
 	                    } else if (areAllVeeGunners(selected)) {
                         	if (!(unit.getEntity() instanceof Tank)) {
@@ -7852,7 +7852,7 @@ public class CampaignGUI extends JPanel {
 	                            MenuScroller.setScrollerFor(soldierMenu, 20);
 	                        }
 	                    }
-	                    menu.setEnabled(!person.isDeployed(getCampaign()));
+	                    menu.setEnabled(!person.isDeployed());
 	                    popup.add(menu);
                     }
                 }
@@ -9386,12 +9386,12 @@ public class CampaignGUI extends JPanel {
                     menu = new JMenu("Assign Tech");
                     for(Person tech : getCampaign().getTechs()) {
                         if(tech.canTech(unit.getEntity()) 
-                                && (tech.getMaintenanceTimeUsing(getCampaign()) + unit.getMaintenanceTime()) <= 480) {
+                                && (tech.getMaintenanceTimeUsing() + unit.getMaintenanceTime()) <= 480) {
                             String skillLvl = "Unknown";
                             if(null != tech.getSkillForWorkingOn(unit)) {
                                 skillLvl = SkillType.getExperienceLevelName(tech.getSkillForWorkingOn(unit).getExperienceLevel());
                             }
-                            cbMenuItem = new JCheckBoxMenuItem(tech.getFullTitle() + " (" + skillLvl + ", " + tech.getMaintenanceTimeUsing(getCampaign()) + "m)");                          
+                            cbMenuItem = new JCheckBoxMenuItem(tech.getFullTitle() + " (" + skillLvl + ", " + tech.getMaintenanceTimeUsing() + "m)");                          
                             cbMenuItem.setActionCommand("ASSIGN:" + tech.getId());
                             cbMenuItem.setEnabled(true);
                             if(null != unit.getTechId() && unit.getTechId().equals(tech.getId())) {
