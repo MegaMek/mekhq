@@ -2301,6 +2301,9 @@ public class CampaignGUI extends JPanel {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Hire How Many Astechs?", 1, 0, 100);
                 pvcd.setVisible(true);
+                if(pvcd.getValue() < 0) {
+                    return;
+                }
                 getCampaign().increaseAstechPool(pvcd.getValue());
                 refreshTechsList();
                 refreshTempAstechs();
@@ -2313,6 +2316,9 @@ public class CampaignGUI extends JPanel {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Release How Many Astechs?", 1, 0, getCampaign().getAstechPool());
                 pvcd.setVisible(true);
+                if(pvcd.getValue() < 0) {
+                    return;
+                }
                 getCampaign().decreaseAstechPool(pvcd.getValue());
                 refreshTechsList();
                 refreshTempAstechs();
@@ -2350,6 +2356,9 @@ public class CampaignGUI extends JPanel {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Hire How Many Medics?", 1, 0, 100);
                 pvcd.setVisible(true);
+                if(pvcd.getValue() < 0) {
+                    return;
+                }
                 getCampaign().increaseMedicPool(pvcd.getValue());
                 refreshDoctorsList();
                 refreshTempMedics();
@@ -2362,6 +2371,9 @@ public class CampaignGUI extends JPanel {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Release How Many Medics?", 1, 0, getCampaign().getMedicPool());
                 pvcd.setVisible(true);
+                if(pvcd.getValue() < 0) {
+                    return;
+                }
                 getCampaign().decreaseMedicPool(pvcd.getValue());
                 refreshDoctorsList();
                 refreshTempMedics();
@@ -7274,6 +7286,9 @@ public class CampaignGUI extends JPanel {
                 PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
                         getFrame(), true, "XP", selectedPerson.getXp(), 0, Math.max(selectedPerson.getXp()+10,100));
                 pvcd.setVisible(true);
+                if(pvcd.getValue() < 0) {
+                    return;
+                }
                 int i = pvcd.getValue();
                 for(Person person : people) {
                     person.setXp(i);
@@ -7284,6 +7299,9 @@ public class CampaignGUI extends JPanel {
                 PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
                         getFrame(), true, "Edge", selectedPerson.getEdge(), 0, 10);
                 pvcd.setVisible(true);
+                if(pvcd.getValue() < 0) {
+                    return;
+                }
                 int i = pvcd.getValue();
                 for(Person person : people) {
                     person.setEdge(i);
@@ -7382,7 +7400,18 @@ public class CampaignGUI extends JPanel {
                 epid.setVisible(true);
                 refreshPatientList();
                 refreshPersonnelList();
-            }
+            } else if(command.equalsIgnoreCase("SALARY")) {
+                PopupValueChoiceDialog pcvd = new PopupValueChoiceDialog(frame, true, "Change Salary", selectedPerson.getSalary(), 0, 100000);
+                pcvd.setVisible(true);
+                int salary = pcvd.getValue();
+                if(salary < 0) {
+                    return;
+                }
+                for(Person person : people) {
+                    person.setSalary(salary);
+                }
+                refreshPersonnelList();
+            } 
         }
 
         @Override
@@ -7599,6 +7628,14 @@ public class CampaignGUI extends JPanel {
                     MenuScroller.setScrollerFor(menu, 20);
                 }
                 popup.add(menu);
+                // change salary
+                if(getCampaign().getCampaignOptions().payForSalaries()) {
+                    menuItem = new JMenuItem("Set Salary...");
+                    menuItem.setActionCommand("SALARY");
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(areAllActive(selected));
+                    popup.add(menuItem);
+                }
                 // switch pilot
                 menu = new JMenu("Assign to Unit");
                 JMenu pilotMenu = new JMenu("As Pilot");
@@ -8184,6 +8221,9 @@ public class CampaignGUI extends JPanel {
                     PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
                             getFrame(), true, "Sell How Many " + selectedPart.getName() + "s?", 1, 1, n);
                     pvcd.setVisible(true);
+                    if(pvcd.getValue() < 0) {
+                        return;
+                    }
                     int q = pvcd.getValue();
                     getCampaign().sellPart(selectedPart, q);
                 }
