@@ -84,7 +84,7 @@ public class PopupValueChoiceDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_btnDoneActionPerformed
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoneActionPerformed
-        value.getModel().setValue(0);
+        value.getModel().setValue(-1);
     	this.setVisible(false);
     }
     
