@@ -32,6 +32,7 @@ import org.w3c.dom.NodeList;
 
 import mekhq.MekHQ;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.gui.dialog.CampaignOptionsDialog.RankTableModel;
 
 /**
  * This object will keep track of rank information. It will keep information
@@ -243,31 +244,25 @@ public class Ranks {
         return retVal;
     }
 	
-	public String[][] getRanksArray() {
-        String[][] array = new String[ranks.size()][3];
+	public Object[][] getRanksArray() {
+        Object[][] array = new Object[ranks.size()][3];
         int i = 0;
         for(Rank rank : ranks) {
             array[i][0] = rank.getName();
-            array[i][1] = Boolean.toString(rank.isOfficer());
-            array[i][2] = Double.toString(rank.getPayMultiplier());
+            array[i][1] = rank.isOfficer();
+            array[i][2] = rank.getPayMultiplier();
             i++;
         }
         return array;
     }
 	
-	public void setRanksFromModel(DefaultTableModel model) {
+	public void setRanksFromModel(RankTableModel model) {
         ranks = new ArrayList<Rank>();
 	    Vector<Vector> vectors = model.getDataVector();
 	    for(Vector<Object> row : vectors) {
 	        String name = (String)row.get(0);
-	        Boolean officer = Boolean.parseBoolean((String)row.get(1));
-            String mult = (String)row.get(2);
-            double payMult = 1.0;
-            try {
-                payMult = Double.parseDouble(mult);
-            } catch(NumberFormatException ex) {
-                MekHQ.logMessage("encountered a non-double value for payment multipliers in the rank table");
-            }
+	        Boolean officer = (Boolean)row.get(1);
+            double payMult = (Double)row.get(2);
 	        ranks.add(new Rank(name, officer, payMult));
 	    }
 	}

@@ -18,13 +18,21 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.EventObject;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -33,12 +41,14 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -50,6 +60,7 @@ import javax.swing.JViewport;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -57,6 +68,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Player;
@@ -71,10 +83,12 @@ import mekhq.campaign.Era;
 import mekhq.campaign.Faction;
 import mekhq.campaign.PersonnelMarket;
 import mekhq.campaign.RandomSkillPreferences;
+import mekhq.campaign.finances.Loan;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.gui.model.DataTableModel;
 
 /**
  *
@@ -200,7 +214,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private javax.swing.JCheckBox usePercentageMaintBox;
 
     private javax.swing.JTable tableRanks;
-    private DefaultTableModel ranksModel;
+    private RankTableModel ranksModel;
     private javax.swing.JScrollPane scrRanks;
     private JButton btnAddRank;
     private JButton btnDeleteRank;
@@ -2092,8 +2106,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                 addRank();
             }
         });
-        
-        
+
+
         btnDeleteRank = new JButton("Remove Rank");
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
@@ -2106,8 +2120,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             }
         });
         btnDeleteRank.setEnabled(false);
-                
-        ranksModel = new DefaultTableModel(campaign.getRanks().getRanksArray(), rankColNames);
+
+        ranksModel = new RankTableModel(campaign.getRanks().getRanksArray(), rankColNames);
         tableRanks = new JTable(ranksModel);
         tableRanks.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableRanks.setRowSelectionAllowed(false);
@@ -2116,6 +2130,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         tableRanks.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         tableRanks.setIntercellSpacing(new Dimension(0, 0));
         tableRanks.setShowGrid(false);
+        TableColumnModel tcm = tableRanks.getColumnModel();
+        tcm.getColumn(0).setPreferredWidth(300);
+        tcm.getColumn(1).setPreferredWidth(100);
+        tcm.getColumn(2).setPreferredWidth(100);
+        tcm.getColumn(2).setCellEditor(new SpinnerEditor());
         tableRanks.getSelectionModel().addListSelectionListener(
                 new javax.swing.event.ListSelectionListener() {
                     public void valueChanged(
@@ -2124,18 +2143,43 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                     }
                 });
         scrRanks.setViewportView(tableRanks);
-    
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.gridwidth = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panRank.add(scrRanks, gridBagConstraints);
 
+        scrRanks.setMinimumSize(new Dimension(500, 500));
+        scrRanks.setPreferredSize(new Dimension(500, 500));
+        scrRanks.setMaximumSize(new Dimension(500, 500));
+        
+        JTextArea txtInstructionsRanks = new javax.swing.JTextArea();
+        txtInstructionsRanks.setText(resourceMap.getString("txtInstructionsRanks.text"));
+        txtInstructionsRanks.setEditable(false);
+        txtInstructionsRanks.setLineWrap(true);
+        txtInstructionsRanks.setWrapStyleWord(true);
+        txtInstructionsRanks.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder(resourceMap.getString("txtInstructionsRanks.title")),
+                BorderFactory.createEmptyBorder(5,5,5,5)));
+        txtInstructionsRanks.setOpaque(false);
+        txtInstructionsRanks.setMinimumSize(new Dimension(550,120));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panRank.add(txtInstructionsRanks, gridBagConstraints);
+        
         tabOptions.addTab(resourceMap.getString("panRank.TabConstraints.tabTitle"), panRank); // NOI18N
 
         panNameGen.setName("panNameGen"); // NOI18N
@@ -2515,28 +2559,28 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         Ranks ranks = new Ranks(comboRanks.getSelectedIndex());
         ranksModel.setDataVector(ranks.getRanksArray(), rankColNames);
     }
-    
+
     private void tableRanksValueChanged(javax.swing.event.ListSelectionEvent evt) {
         int row = tableRanks.getSelectedRow();
         btnDeleteRank.setEnabled(row != -1);
     }
-    
+
     private void addRank() {
-        String[] rank = {"Unknown", "false", "1.0"};
+        Object[] rank = {"Unknown", false, 1.0};
         int row = tableRanks.getSelectedRow();
         if(row == -1) {
             if(ranksModel.getRowCount() > 0) {
-                rank[1] = (String)ranksModel.getValueAt(ranksModel.getRowCount()-1, 1);
+                rank[1] = ranksModel.getValueAt(ranksModel.getRowCount()-1, 1);
             }
             ranksModel.addRow(rank);
             tableRanks.setRowSelectionInterval(tableRanks.getRowCount()-1, tableRanks.getRowCount()-1);
         } else {
-            rank[1] = (String)ranksModel.getValueAt(row, 1);
+            rank[1] = ranksModel.getValueAt(row, 1);
             ranksModel.insertRow(row+1, rank);
             tableRanks.setRowSelectionInterval(row+1, row+1);
         }
     }
-    
+
     private void removeRank() {
         int row = tableRanks.getSelectedRow();
         if(row >-1) {
@@ -3009,6 +3053,108 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
                 return this;
             }
+        }
+    }
+
+    public class RankTableModel extends DefaultTableModel {
+        private static final long serialVersionUID = 534443424190075264L;
+
+        public final static int COL_NAME      =    0;
+        public final static int COL_OFFICER       =   1;
+        public final static int COL_PAYMULT  =   2;
+
+        public RankTableModel(Object[][] ranksArray, String[] rankColNames) {
+            super(ranksArray, rankColNames);
+        }
+
+        @Override
+        public Class<?> getColumnClass(int c) {
+            return getValueAt(0, c).getClass();
+        }
+    }
+    
+    public static class SpinnerEditor extends DefaultCellEditor
+    {
+        JSpinner spinner;
+        JSpinner.NumberEditor editor;
+        JTextField textField;
+        boolean valueSet;
+
+        // Initializes the spinner.
+        public SpinnerEditor() {
+            super(new JTextField());
+            spinner = new JSpinner(new SpinnerNumberModel(1.0, 0, 10, 0.05));
+            editor = ((JSpinner.NumberEditor)spinner.getEditor());
+            textField = editor.getTextField();
+            textField.addFocusListener( new FocusListener() {
+                public void focusGained( FocusEvent fe ) {
+                    System.err.println("Got focus");
+                    //textField.setSelectionStart(0);
+                    //textField.setSelectionEnd(1);
+                    SwingUtilities.invokeLater( new Runnable() {
+                        public void run() {
+                            if ( valueSet ) {
+                                textField.setCaretPosition(1);
+                            }
+                        }
+                    });
+                }
+                public void focusLost( FocusEvent fe ) {
+                }
+            });
+            textField.addActionListener( new ActionListener() {
+                public void actionPerformed( ActionEvent ae ) {
+                    stopCellEditing();
+                }
+            });
+        }
+
+        // Prepares the spinner component and returns it.
+        public Component getTableCellEditorComponent(
+            JTable table, Object value, boolean isSelected, int row, int column
+        ) {
+            if ( !valueSet ) {
+                spinner.setValue(value);
+            }
+            SwingUtilities.invokeLater( new Runnable() {
+                public void run() {
+                    textField.requestFocus();
+                }
+            });
+            return spinner;
+        }
+
+        public boolean isCellEditable( EventObject eo ) {
+            System.err.println("isCellEditable");
+            if ( eo instanceof KeyEvent ) {
+                KeyEvent ke = (KeyEvent)eo;
+                System.err.println("key event: "+ke.getKeyChar());
+                textField.setText(String.valueOf(ke.getKeyChar()));
+                //textField.select(1,1);
+                //textField.setCaretPosition(1);
+                //textField.moveCaretPosition(1);
+                valueSet = true;
+            } else {
+                valueSet = false;
+            }
+            return true;
+        }
+
+        // Returns the spinners current value.
+        public Object getCellEditorValue() {
+            return spinner.getValue();
+        }
+
+        public boolean stopCellEditing() {
+            System.err.println("Stopping edit");
+            try {
+                editor.commitEdit();
+                spinner.commitEdit();
+            } catch ( java.text.ParseException e ) {
+                JOptionPane.showMessageDialog(null,
+                    "Invalid value, discarding.");
+            }
+            return super.stopCellEditing();
         }
     }
 
