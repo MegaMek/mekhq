@@ -1599,7 +1599,7 @@ public class Campaign implements Serializable {
 						addReport(healPerson(p, doctor));
 					}
 				} else if (p.checkNaturalHealing(15)) {
-					addReport(p.getDesc() + " heals naturally!");
+					addReport(p.getHyperlinkedFullTitle() + " heals naturally!");
 					Unit u = getUnit(p.getUnitId());
 					if (null != u) {
 						u.resetPilotAndEntity();
@@ -3734,10 +3734,7 @@ public class Campaign implements Serializable {
 		int expLvl = Utilities.generateExpLevel(rskillPrefs
 				.getOverallRecruitBonus() + rskillPrefs.getRecruitBonus(type));
 		GregorianCalendar birthdate = (GregorianCalendar) getCalendar().clone();
-		birthdate.set(
-				Calendar.YEAR,
-				birthdate.get(Calendar.YEAR)
-						- Utilities.getAgeByExpLevel(expLvl));
+		birthdate.set(Calendar.YEAR,birthdate.get(Calendar.YEAR) - Utilities.getAgeByExpLevel(expLvl));
 		// choose a random day and month
 		int randomDay = Compute.randomInt(365) + 1;
 		if (birthdate.isLeapYear(birthdate.get(Calendar.YEAR))) {
@@ -3749,15 +3746,47 @@ public class Campaign implements Serializable {
 		if (getCampaignOptions().useDylansRandomXp()) {
 			person.setXp(Utilities.generateRandomExp());
 		}
-		person.setDaysToWaitForHealing(getCampaignOptions()
-				.getNaturalHealingWaitingPeriod());
+		person.setDaysToWaitForHealing(getCampaignOptions().getNaturalHealingWaitingPeriod());
+		//check for clan phenotypes
 		int bonus = 0;
+		if(person.isClanner()) {
+    		switch(type) {
+    		case (Person.T_MECHWARRIOR):
+                if(Utilities.rollProbability(getCampaignOptions().getProbPhenoMW())) {
+                   person.setPhenotype(Person.PHENOTYPE_MW); 
+                   bonus = 1;
+                }
+    		    break;
+    	      case (Person.T_GVEE_DRIVER):
+    	      case (Person.T_NVEE_DRIVER):
+    	      case (Person.T_VTOL_PILOT):
+    	      case (Person.T_VEE_GUNNER):
+    	          if(Utilities.rollProbability(getCampaignOptions().getProbPhenoVee())) {
+                      person.setPhenotype(Person.PHENOTYPE_VEE); 
+                      bonus = 1;
+                   }
+                   break;
+    	        case (Person.T_CONV_PILOT):
+    	        case (Person.T_AERO_PILOT):
+    	        case (Person.T_PROTO_PILOT):
+                    if(Utilities.rollProbability(getCampaignOptions().getProbPhenoAero())) {
+                        person.setPhenotype(Person.PHENOTYPE_AERO); 
+                        bonus = 1;
+                     }
+                     break;
+    	        case (Person.T_BA):
+                    if(Utilities.rollProbability(getCampaignOptions().getProbPhenoBA())) {
+                        person.setPhenotype(Person.PHENOTYPE_BA); 
+                        bonus = 1;
+                     }
+                     break;
+    	        default:
+    	            break;
+    		}
+		}
 		// set default skills
 		switch (type) {
 		case (Person.T_MECHWARRIOR):
-			if (getFaction().isClan()) {
-				bonus = 1;
-			}
 			person.addSkill(SkillType.S_PILOT_MECH, expLvl,
 					rskillPrefs.randomizeSkill(), bonus);
 			person.addSkill(SkillType.S_GUN_MECH, expLvl,
@@ -3775,7 +3804,7 @@ public class Campaign implements Serializable {
 			person.addSkill(SkillType.S_GUN_VEE, expLvl,
 					rskillPrefs.randomizeSkill(), bonus);
 			break;
-		case (Person.T_VTOL_PILOT):
+        case (Person.T_VTOL_PILOT):
 			person.addSkill(SkillType.S_PILOT_VTOL, expLvl,
 					rskillPrefs.randomizeSkill(), bonus);
 			person.addSkill(SkillType.S_GUN_VEE, expLvl,
@@ -3792,9 +3821,6 @@ public class Campaign implements Serializable {
 					rskillPrefs.randomizeSkill(), bonus);
 			break;
 		case (Person.T_AERO_PILOT):
-			if (getFaction().isClan()) {
-				bonus = 1;
-			}
 			person.addSkill(SkillType.S_PILOT_AERO, expLvl,
 					rskillPrefs.randomizeSkill(), bonus);
 			person.addSkill(SkillType.S_GUN_AERO, expLvl,
@@ -3805,9 +3831,6 @@ public class Campaign implements Serializable {
 					rskillPrefs.randomizeSkill(), bonus);
 			break;
 		case (Person.T_BA):
-			if (getFaction().isClan()) {
-				bonus = 1;
-			}
 			person.addSkill(SkillType.S_GUN_BA, expLvl,
 					rskillPrefs.randomizeSkill(), bonus);
 			person.addSkill(SkillType.S_ANTI_MECH, expLvl,
@@ -6219,7 +6242,7 @@ public class Campaign implements Serializable {
 		sb.append(buffer);
 
 		for (int i = Person.T_NONE + 1; i <= Person.T_SPACE_GUNNER; i++) {
-			buffer = String.format("    %-30s    %4s\n", Person.getRoleDesc(i),
+			buffer = String.format("    %-30s    %4s\n", Person.getRoleDesc(i, getFaction().isClan()),
 					countPersonByType[i]);
 			sb.append(buffer);
 		}
@@ -6294,7 +6317,7 @@ public class Campaign implements Serializable {
 		sb.append(buffer);
 
 		for (int i = Person.T_NAVIGATOR; i < Person.T_NUM; i++) {
-			buffer = String.format("    %-30s    %4s\n", Person.getRoleDesc(i),
+			buffer = String.format("    %-30s    %4s\n", Person.getRoleDesc(i, getFaction().isClan()),
 					countPersonByType[i]);
 			sb.append(buffer);
 		}

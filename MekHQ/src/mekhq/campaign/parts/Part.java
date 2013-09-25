@@ -766,11 +766,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	        }
 		}
 		Person tech = campaign.getPerson(getAssignedTeamId());
-		if(!campaign.getFaction().isClan() && (isClanTechBase()
-				|| (this instanceof MekLocation && this.getUnit() != null && this.getUnit().getEntity().isClan()))) {
+		if(isClanTechBase() || (this instanceof MekLocation && this.getUnit() != null && this.getUnit().getEntity().isClan())) {
 			if (tech == null) {
 				mods.addModifier(2, "clan tech");
-			} else if (!tech.isClanTech()) {
+			} else if (!tech.isClanner()) {
 				mods.addModifier(2, "clan tech");
 			}
 		}
@@ -814,11 +813,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	            mods.addModifier(1, "difficult to maintain");
 	        }
 	    }
-	    if(!campaign.getFaction().isClan() && (isClanTechBase()
-				|| (this instanceof MekLocation && this.getUnit() != null && this.getUnit().getEntity().isClan()))) {
+	    if(isClanTechBase() || (this instanceof MekLocation && this.getUnit() != null && this.getUnit().getEntity().isClan())) {
 	        if (campaign.getPerson(getAssignedTeamId()) == null) {
 	            mods.addModifier(2, "clan tech");
-	        } else if (!campaign.getPerson(getAssignedTeamId()).isClanTech()) {
+	        } else if (!campaign.getPerson(getAssignedTeamId()).isClanner()) {
 	            mods.addModifier(2, "clan tech");
 	        }
 	    }

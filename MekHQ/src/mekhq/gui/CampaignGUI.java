@@ -2292,7 +2292,7 @@ public class CampaignGUI extends JPanel {
         
         JMenuItem miHire;
         for(int i = Person.T_MECHWARRIOR; i < Person.T_NUM; i++) {
-            miHire = new JMenuItem(Person.getRoleDesc(i)); // NOI18N
+            miHire = new JMenuItem(Person.getRoleDesc(i, getCampaign().getFaction().isClan())); // NOI18N
             miHire.setActionCommand(Integer.toString(i));
             miHire.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -6077,7 +6077,7 @@ public class CampaignGUI extends JPanel {
                 menu = new JMenu("Assign all tasks");
                 i = 0;
                 for (Person tech : getCampaign().getTechs()) {
-                    menuItem = new JMenuItem(tech.getDesc());
+                    menuItem = new JMenuItem(tech.getName());
                     menuItem.setActionCommand("ASSIGN_TECH:" + i);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(tech.getMinutesLeft() > 0);
@@ -7370,9 +7370,6 @@ public class CampaignGUI extends JPanel {
             } else if(command.equalsIgnoreCase("DEPENDENT")) {
             	selectedPerson.setDependent(!selectedPerson.isDependent());
                 getCampaign().personUpdated(selectedPerson);
-            } else if(command.equalsIgnoreCase("CLANTECH")) {
-            	selectedPerson.setIsClanTech(!selectedPerson.isClanTech());
-                getCampaign().personUpdated(selectedPerson);
             } else if(command.equalsIgnoreCase("CALLSIGN")) {
                 String s = (String)JOptionPane.showInputDialog(
                         frame,
@@ -7610,7 +7607,7 @@ public class CampaignGUI extends JPanel {
                 menu = new JMenu("Change Primary Role");
                 for(int i = Person.T_MECHWARRIOR; i < Person.T_NUM; i++) {
                     if(person.canPerformRole(i) && person.getSecondaryRole() != i) {
-                        cbMenuItem = new JCheckBoxMenuItem(Person.getRoleDesc(i));
+                        cbMenuItem = new JCheckBoxMenuItem(Person.getRoleDesc(i, getCampaign().getFaction().isClan()));
                         cbMenuItem.setActionCommand("PROLE|" + i);
                         if(person.getPrimaryRole() == i) {
                             cbMenuItem.setSelected(true);
@@ -7634,7 +7631,7 @@ public class CampaignGUI extends JPanel {
                         if(person.getPrimaryRole() == Person.T_DOCTOR && i == Person.T_MEDIC) {
                             continue;
                         }
-                        cbMenuItem = new JCheckBoxMenuItem(Person.getRoleDesc(i));
+                        cbMenuItem = new JCheckBoxMenuItem(Person.getRoleDesc(i, getCampaign().getFaction().isClan()));
                         cbMenuItem.setActionCommand("SROLE|" + i);
                         if(person.getSecondaryRole() == i) {
                             cbMenuItem.setSelected(true);
@@ -8058,13 +8055,6 @@ public class CampaignGUI extends JPanel {
                     cbMenuItem.setActionCommand("COMMANDER");
                     cbMenuItem.addActionListener(this);
                     menu.add(cbMenuItem);
-                    cbMenuItem = new JCheckBoxMenuItem("Clan Trained Technician");
-                    cbMenuItem.setSelected(person.isClanTech());
-                    cbMenuItem.setActionCommand("CLANTECH");
-                    cbMenuItem.addActionListener(this);
-                    if (person.isTech()) {
-                    	menu.add(cbMenuItem);
-                    }
                     popup.add(menu);
                 }
                 if(oneSelected) {

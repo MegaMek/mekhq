@@ -303,7 +303,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                     break;
                 }
                 preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".crewtypes (type, squad, vehicletype, prefpos, equipment) VALUES (?, ?, ?, ?, ?)");
-                preparedStatement.setString(1, truncateString(Person.getRoleDesc(i), 45));
+                preparedStatement.setString(1, truncateString(Person.getRoleDesc(i, campaign.getFaction().isClan()), 45));
                 preparedStatement.setInt(2, 0);
                 preparedStatement.setInt(3, 1);
                 preparedStatement.setInt(4, i);

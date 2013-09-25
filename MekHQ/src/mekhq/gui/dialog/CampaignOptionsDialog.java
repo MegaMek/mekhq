@@ -294,6 +294,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JSpinner spnAbilReg;
     private JSpinner spnAbilVet;
     private JSpinner spnAbilElite;
+    private JSpinner spnProbPhenoMW;
+    private JSpinner spnProbPhenoAero;
+    private JSpinner spnProbPhenoBA;
+    private JSpinner spnProbPhenoVee;
 
     private javax.swing.JPanel panRandomPortrait;
     private JCheckBox[] chkUsePortrait;
@@ -1231,7 +1235,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             gridBagConstraints.weighty = 0.0;
             gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-            panType.add(new JLabel(Person.getRoleDesc(i)), gridBagConstraints);
+            panType.add(new JLabel(Person.getRoleDesc(i,false)), gridBagConstraints);
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 0;
@@ -1992,7 +1996,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             gridBagConstraints.gridx = 1;
             gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 1.0;
-            panRecruit.add(new JLabel(Person.getRoleDesc(i)), gridBagConstraints);
+            panRecruit.add(new JLabel(Person.getRoleDesc(i,false)), gridBagConstraints);
             panTypeRecruitBonus.add(panRecruit);
         }
 
@@ -2009,6 +2013,38 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panRandomSkill.add(chkExtraRandom, gridBagConstraints);
 
+        JPanel panClanPheno = new JPanel(new GridLayout(2,2));
+        spnProbPhenoMW = new JSpinner(new SpinnerNumberModel(options.getProbPhenoMW(),0,100,5));
+        ((JSpinner.DefaultEditor)spnProbPhenoMW.getEditor()).getTextField().setEditable(false);
+        JPanel panPhenoMW = new JPanel();
+        panPhenoMW.add(spnProbPhenoMW);
+        panPhenoMW.add(new JLabel("Mechwarrior"));
+        panPhenoMW.setToolTipText(resourceMap.getString("panPhenoMW.toolTipText"));
+        panClanPheno.add(panPhenoMW);
+        spnProbPhenoAero = new JSpinner(new SpinnerNumberModel(options.getProbPhenoAero(),0,100,5));
+        ((JSpinner.DefaultEditor)spnProbPhenoAero.getEditor()).getTextField().setEditable(false);
+        JPanel panPhenoAero = new JPanel();
+        panPhenoAero.add(spnProbPhenoAero);
+        panPhenoAero.add(new JLabel("Aero Pilot"));
+        panPhenoAero.setToolTipText(resourceMap.getString("panPhenoMW.toolTipText"));
+        panClanPheno.add(panPhenoAero);
+        spnProbPhenoBA = new JSpinner(new SpinnerNumberModel(options.getProbPhenoBA(),0,100,5));
+        ((JSpinner.DefaultEditor)spnProbPhenoBA.getEditor()).getTextField().setEditable(false);
+        JPanel panPhenoBA = new JPanel();
+        panPhenoBA.add(spnProbPhenoBA);
+        panPhenoBA.add(new JLabel("Elemental"));
+        panPhenoBA.setToolTipText(resourceMap.getString("panPhenoMW.toolTipText"));
+        panClanPheno.add(panPhenoBA);        
+        spnProbPhenoVee = new JSpinner(new SpinnerNumberModel(options.getProbPhenoVee(),0,100,5));
+        ((JSpinner.DefaultEditor)spnProbPhenoVee.getEditor()).getTextField().setEditable(false);
+        JPanel panPhenoVee = new JPanel();
+        panPhenoVee.add(spnProbPhenoVee);
+        panPhenoVee.add(new JLabel("Vehicle"));
+        panPhenoVee.setToolTipText(resourceMap.getString("panPhenoMW.toolTipText"));
+        panClanPheno.add(panPhenoVee);  
+        
+        panClanPheno.setBorder(BorderFactory.createTitledBorder("Trueborn Phenotype Probabilites"));
+        
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -2016,12 +2052,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        panRandomSkill.add(chkClanBonus, gridBagConstraints);
+        panRandomSkill.add(panClanPheno, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 4;
+        gridBagConstraints.gridheight = 3;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -2373,7 +2409,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         chkUsePortrait = new JCheckBox[Person.T_NUM];
         JCheckBox box;
         for(int i = 0; i < Person.T_NUM; i++) {
-            box = new JCheckBox(Person.getRoleDesc(i));
+            box = new JCheckBox(Person.getRoleDesc(i, false));
             box.setSelected(options.usePortraitForType(i));
             panUsePortrait.add(box);
             chkUsePortrait[i] = box;
@@ -2896,6 +2932,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         rskillPrefs.setSpecialAbilBonus(SkillType.EXP_VETERAN, (Integer)spnAbilVet.getModel().getValue());
         rskillPrefs.setSpecialAbilBonus(SkillType.EXP_ELITE, (Integer)spnAbilElite.getModel().getValue());
 
+        options.setProbPhenoMW((Integer)spnProbPhenoMW.getModel().getValue());
+        options.setProbPhenoAero((Integer)spnProbPhenoAero.getModel().getValue());
+        options.setProbPhenoBA((Integer)spnProbPhenoBA.getModel().getValue());
+        options.setProbPhenoVee((Integer)spnProbPhenoVee.getModel().getValue());
+        
         //start salary
         for(int i = 1; i < Person.T_NUM; i++) {
             try {
