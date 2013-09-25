@@ -1907,6 +1907,18 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         return time;
     }
     
+    public boolean isMothballing() {
+        if(!isTech()) {
+            return false;
+        }
+        for(Unit u : campaign.getUnits()) {
+            if(u.isMothballing() && u.getTechId().equals(id)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public UUID getUnitId() {
     	return unitId;
     }
