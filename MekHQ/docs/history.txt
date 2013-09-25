@@ -14,6 +14,7 @@ v0.3.4 (SVN)
 + feature: set specific salary for a person
 + set up fake assets for loan collateral and income streams
 + clan phenotypes - you can choose the percentage of recruits for each type that should be trueborn in options
++ backwards compatability for clan phenotypes
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

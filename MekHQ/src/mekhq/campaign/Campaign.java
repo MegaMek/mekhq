@@ -2838,7 +2838,7 @@ public class Campaign implements Serializable {
 		for (Part prt : removeParts) {
 			retVal.removePart(prt);
 		}
-
+		
 		// All personnel need the rank reference fixed
 		for (int x = 0; x < retVal.personnel.size(); x++) {
 			Person psn = retVal.personnel.get(x);
@@ -2846,6 +2846,29 @@ public class Campaign implements Serializable {
 			// skill types might need resetting
 			psn.resetSkillTypes();
 
+			//versions before 0.3.4 did not have proper clan phenotypes
+	        if(version.getMinorVersion() <= 3 && version.getSnapshot() < 4 && retVal.getFaction().isClan()) {
+	            //assume personnel are clan and trueborn if the right role
+	            psn.setClanner(true);
+	            switch(psn.getPrimaryRole()) {
+	            case Person.T_MECHWARRIOR:
+	                psn.setPhenotype(Person.PHENOTYPE_MW);
+	                break;
+	            case Person.T_AERO_PILOT:
+	            case Person.T_CONV_PILOT:
+	                psn.setPhenotype(Person.PHENOTYPE_AERO);
+	            case Person.T_BA:
+	                psn.setPhenotype(Person.PHENOTYPE_BA);
+	            case Person.T_VEE_GUNNER:
+	            case Person.T_GVEE_DRIVER:
+	            case Person.T_NVEE_DRIVER:
+	            case Person.T_VTOL_PILOT:
+	                psn.setPhenotype(Person.PHENOTYPE_VEE);
+	            default:
+	                psn.setPhenotype(Person.PHENOTYPE_NONE);
+	            }
+	        }
+			
 			// reverse compatability check for assigning support personnel
 			// characteristics from their support team
 			if (psn.getOldSupportTeamId() >= 0) {
