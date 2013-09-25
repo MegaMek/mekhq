@@ -77,6 +77,7 @@ public class CampaignOptions implements Serializable {
     private boolean useDylansRandomXp; // Unofficial
     private boolean useRandomHitsForVees;
     private int minimumHitsForVees;
+    private boolean tougherHealing;
     
     //personnel market related
     private boolean personnelMarketReportRefresh;
@@ -310,6 +311,7 @@ public class CampaignOptions implements Serializable {
         probPhenoAero = 95;
         probPhenoBA = 100;
         probPhenoVee = 0;
+        tougherHealing = false;
 
     }
 
@@ -1088,6 +1090,14 @@ public class CampaignOptions implements Serializable {
         salaryAntiMekMultiplier = d;
     }
     
+    public boolean useTougherHealing() {
+        return tougherHealing;
+    }
+    
+    public void setTougherHealing(boolean b) {
+        tougherHealing = b;
+    }
+    
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "clanPriceModifier", clanPriceModifier); //private double clanPriceModifier;
@@ -1182,7 +1192,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "probPhenoAero", probPhenoAero);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "probPhenoBA", probPhenoBA);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "probPhenoVee", probPhenoVee);
-
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "tougherHealing", tougherHealing);
         
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<salaryTypeBase>"
@@ -1535,6 +1545,8 @@ public class CampaignOptions implements Serializable {
                 retVal.probPhenoBA = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoVee")) {
                 retVal.probPhenoVee = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("tougherHealing")) {
+                retVal.tougherHealing = Boolean.parseBoolean(wn2.getTextContent().trim());
             } 
 		}
 
