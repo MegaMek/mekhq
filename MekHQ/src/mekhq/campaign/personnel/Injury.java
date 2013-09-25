@@ -484,11 +484,11 @@ public class Injury {
 		
 		switch (type) {
 		case INJ_CUT:
-			return "Some cuts on "+Person.getGenderPronoun(genderType)+" "+name;
+			return "Some cuts on "+Person.getGenderPronoun(genderType, Person.PRONOUN_HISHER)+" "+name;
 		case INJ_BRUISE:
-			return "A bruise on "+Person.getGenderPronoun(genderType)+" "+name;
+			return "A bruise on "+Person.getGenderPronoun(genderType, Person.PRONOUN_HISHER)+" "+name;
 		case INJ_LACERATION:
-			return "A laceration on "+Person.getGenderPronoun(genderType)+" "+name;
+			return "A laceration on "+Person.getGenderPronoun(genderType, Person.PRONOUN_HISHER)+" "+name;
 		case INJ_SPRAIN:
 			return "A sprained "+name;
 		case INJ_CONCUSSION:
@@ -504,7 +504,7 @@ public class Injury {
 		case INJ_INTERNAL_BLEEDING:
 			return "Internal bleeding";
 		case INJ_LOST_LIMB:
-			return "Lost "+Person.getGenderPronoun(genderType)+" "+name;
+			return "Lost "+Person.getGenderPronoun(genderType, Person.PRONOUN_HISHER)+" "+name;
 		case INJ_CEREBRAL_CONTUSION:
 			return "A cerebral contusion";
 		case INJ_PUNCTURED_LUNG:
