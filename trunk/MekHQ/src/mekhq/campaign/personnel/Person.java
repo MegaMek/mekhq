@@ -126,7 +126,16 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public static final int PRISONER_YES = 1;
     public static final int PRISONER_BONDSMAN = 2;
     public static final int PRISONER_NUM = 3;
-	
+    
+    //phenotypes
+    public static final int PHENOTYPE_NONE = 0;
+    public static final int PHENOTYPE_MW   = 1;
+    public static final int PHENOTYPE_BA   = 2;
+    public static final int PHENOTYPE_AERO = 3;
+    public static final int PHENOTYPE_VEE  = 4;
+    public static final int PHENOTYPE_NUM  = 5;
+
+    
     protected UUID id;
     protected int oldId;
     
@@ -155,7 +164,11 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     boolean dependent;
     boolean commander;
     boolean isClanTech;
-        
+    
+    //phenotype and background
+    private int phenotype;
+    private boolean clan;
+    
     //assignments
     private UUID unitId;
     protected UUID doctorId;
@@ -237,14 +250,32 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         isClanTech = false;
         techUnitIds = new ArrayList<UUID>();
         salary = -1;
+        phenotype = PHENOTYPE_NONE;
+        clan = campaign.getFaction().isClan();
     }
     
-    public boolean isClanTech() {
-    	return isClanTech;
+    public int getPhenotype() {
+        return phenotype;
     }
     
-    public void setIsClanTech(boolean tf) {
-    	isClanTech = tf;
+    public void setPhenotype(int i) {
+        phenotype = i;
+    }
+    
+    public boolean isClanner() {
+        return clan;
+    }
+    
+    public void setClanner(boolean b) {
+        clan = b;
+    }
+    
+    public String getBackgroundName() {
+        if(isClanner()) {
+            return getPhenotypeName();
+        } else {
+            return "Inner Sphere";
+        }
     }
     
     public boolean isCommander() {
@@ -378,7 +409,46 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
     
     public String getStatusName() {
-    	return getStatusName(status);
+        return getStatusName(status);
+    }
+            
+    public static String getPhenotypeName(int pheno) {
+        switch(pheno) {
+        case PHENOTYPE_NONE:
+            return "Freeborn";
+        case PHENOTYPE_MW:
+            return "Trueborn Mechwarrior";
+        case PHENOTYPE_AERO:
+            return "Trueborn Pilot";
+        case PHENOTYPE_VEE:
+            return "Trueborn Vehicle Crew";
+        case PHENOTYPE_BA:
+            return "Trueborn Elemental";
+        default:
+            return "?";
+        }
+    }
+    
+    public static String getPhenotypeShortName(int pheno) {
+        switch(pheno) {
+        case PHENOTYPE_NONE:
+            return "Freeborn";
+        case PHENOTYPE_MW:
+        case PHENOTYPE_AERO:
+        case PHENOTYPE_VEE:
+        case PHENOTYPE_BA:
+            return "Trueborn";
+        default:
+            return "?";
+        }
+    }
+    
+    public String getPhenotypeName() {
+        return getPhenotypeName(phenotype);
+    }
+    
+    public String getPhenotypeShortName() {
+        return getPhenotypeShortName(phenotype);
     }
     
     public static String getPrisonerStatusName(int status) {
@@ -485,7 +555,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
 
 
-    public static String getRoleDesc(int type) {
+    public static String getRoleDesc(int type, boolean clan) {
         switch(type) {
         	case(T_NONE):
         		return "None";
@@ -506,7 +576,11 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
             case(T_PROTO_PILOT):
                 return "Proto Pilot";
             case(T_BA):
-                return "Battle Armor Pilot";
+                if(clan) {
+                    return "Elemental";
+                } else {
+                    return "Battle Armor Pilot";
+                }
             case(T_INFANTRY):
                 return "Soldier";
             case(T_SPACE_PILOT):
@@ -553,11 +627,15 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
     
     public String getPrimaryRoleDesc() {
-        return getRoleDesc(primaryRole);
+        String bgPrefix = "";
+        if(isClanner()) {
+            bgPrefix = getPhenotypeShortName() + " ";
+        }
+        return bgPrefix + getRoleDesc(primaryRole, campaign.getFaction().isClan());
     }
     
     public String getSecondaryRoleDesc() {
-        return getRoleDesc(secondaryRole);
+        return getRoleDesc(secondaryRole, campaign.getFaction().isClan());
     }
     
     public boolean canPerformRole(int role) {
@@ -1269,7 +1347,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	}
 
 	public String toString() {
-		return getDesc();
+		return getName();
 	}
 	
 	public int getExperienceLevel(boolean secondary) {
@@ -1421,16 +1499,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 			return -1;
 		}
     }
-	
-	public String getDesc() {
-		//String care = "";
-		//String status = "";
-		//if(pilot.getHits() > 0) {
-		//	status = " (" + pilot.getStatusDesc() + ")";
-		//}
-		//return care + pilot.getName() + " [" + pilot.getGunnery() + "/" + pilot.getPiloting() + " " + getTypeDesc() + "]" + status;
-		return "";
-	}
 	
 	public String getPatientDesc() {
         String toReturn = "<html><font size='2'><b>" + getFullTitle() + "</b><br/>";

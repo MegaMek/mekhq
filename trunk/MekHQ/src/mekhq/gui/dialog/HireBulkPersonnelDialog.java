@@ -88,7 +88,7 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
         
         DefaultComboBoxModel personTypeModel = new DefaultComboBoxModel();
         for(int i = 1; i < Person.T_NUM; i++) {
-        	personTypeModel.addElement(Person.getRoleDesc(i));
+        	personTypeModel.addElement(Person.getRoleDesc(i,campaign.getFaction().isClan()));
         }
         choiceType.setModel(personTypeModel);
         choiceType.setName("choiceType"); // NOI18N

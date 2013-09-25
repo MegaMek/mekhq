@@ -170,6 +170,12 @@ public class CampaignOptions implements Serializable {
     private double salaryEnlistedMultiplier;
     private double salaryAntiMekMultiplier;
     
+    //phenotype related
+    private int probPhenoMW;
+    private int probPhenoAero;
+    private int probPhenoBA;
+    private int probPhenoVee;
+
     //random portraits related
     private boolean[] usePortraitForType;
 
@@ -300,6 +306,10 @@ public class CampaignOptions implements Serializable {
         salaryAntiMekMultiplier = 1.5;
         salaryCommissionMultiplier = 1.2;
         salaryEnlistedMultiplier = 1.0;
+        probPhenoMW = 95;
+        probPhenoAero = 95;
+        probPhenoBA = 100;
+        probPhenoVee = 0;
 
     }
 
@@ -747,6 +757,39 @@ public class CampaignOptions implements Serializable {
     	techLevel = lvl;
     }
     
+    public int getProbPhenoMW() {
+        return probPhenoMW;
+    }
+    
+    public void setProbPhenoMW(int p) {
+        probPhenoMW = p;
+    }
+    
+    public int getProbPhenoAero() {
+        return probPhenoAero;
+    }
+    
+    public void setProbPhenoAero(int p) {
+        probPhenoAero = p;
+    }
+    
+    public int getProbPhenoBA() {
+        return probPhenoBA;
+    }
+    
+    public void setProbPhenoBA(int p) {
+        probPhenoBA = p;
+    }
+    
+    public int getProbPhenoVee() {
+        return probPhenoVee;
+    }
+    
+    public void setProbPhenoVee(int p) {
+        probPhenoVee = p;
+    }
+    
+    
     public boolean usePortraitForType(int type) {
     	if(type < 0 || type >= usePortraitForType.length) {
     		return false;
@@ -1135,6 +1178,12 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "salaryEnlistedMultiplier", salaryEnlistedMultiplier);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "salaryCommissionMultiplier", salaryCommissionMultiplier);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "salaryAntiMekMultiplier", salaryAntiMekMultiplier);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "probPhenoMW", probPhenoMW);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "probPhenoAero", probPhenoAero);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "probPhenoBA", probPhenoBA);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "probPhenoVee", probPhenoVee);
+
+        
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<salaryTypeBase>"
                 +Utilities.printIntegerArray(salaryTypeBase)
@@ -1478,6 +1527,14 @@ public class CampaignOptions implements Serializable {
                 for(int i = 0; i < values.length; i++) {
                     retVal.salaryXpMultiplier[i] = Double.parseDouble(values[i]);
                 }
+            } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoMW")) {
+                retVal.probPhenoMW = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoAero")) {
+                retVal.probPhenoAero = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoBA")) {
+                retVal.probPhenoBA = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoVee")) {
+                retVal.probPhenoVee = Integer.parseInt(wn2.getTextContent().trim());
             } 
 		}
 
