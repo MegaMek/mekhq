@@ -32,7 +32,7 @@ public class Modes {
 	public static final int MODE_RUSH_THREE = 6;
 	public static final int MODE_N = 7;
 	
-	public static int getModeMod(int mode) {
+	public static int getModeMod(int mode, boolean includeRush) {
 		switch (mode) {
 		case MODE_EXTRA_DOUBLE:
 			return -1;
@@ -40,6 +40,18 @@ public class Modes {
 			return -2;
 		case MODE_EXTRA_QUAD:
 			return -3;
+		case MODE_RUSH_ONE:
+            if(includeRush) {
+                return 1;
+            }
+        case MODE_RUSH_TWO:
+            if(includeRush) {
+                return 2;
+            }
+        case MODE_RUSH_THREE:
+            if(includeRush) {
+                return 3;
+            }
 		default:
 			return 0;
 		}

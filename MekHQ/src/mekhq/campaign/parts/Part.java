@@ -753,8 +753,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	@Override
 	public TargetRoll getAllMods() {
 		TargetRoll mods = new TargetRoll(getDifficulty(), "difficulty");
-		if (Modes.getModeMod(mode) != 0) {
-			mods.addModifier(Modes.getModeMod(mode), getCurrentModeName());
+		if (Modes.getModeMod(mode,campaign.getCampaignOptions().isDestroyByMargin()) != 0) {
+			mods.addModifier(Modes.getModeMod(mode,campaign.getCampaignOptions().isDestroyByMargin()), getCurrentModeName());
 		}
 		if(null != unit) {
 			mods.append(unit.getSiteMod());
@@ -909,6 +909,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
 	public void setSalvaging(boolean b) {
 		this.salvaging = b;
+		this.mode = Modes.MODE_NORMAL;
 	}
 	
 	public String checkScrappable() {

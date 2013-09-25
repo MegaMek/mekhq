@@ -5814,20 +5814,23 @@ public class CampaignGUI extends JPanel {
                 JMenu menu = null;
                 JCheckBoxMenuItem cbMenuItem = null;
                 // Mode (extra time, rush job, ...
-                menu = new JMenu("Mode");
-                for (int i = 0; i < Modes.MODE_N; i++) {
-                    cbMenuItem = new JCheckBoxMenuItem(
-                            Modes.getModeName(i));
-                    if (part.getMode() == i) {
-                        cbMenuItem.setSelected(true);
-                    } else {
-                        cbMenuItem.setActionCommand("CHANGE_MODE:" + i);
-                        cbMenuItem.addActionListener(this);
+                //dont allow automatic success jobs to change mode
+                if(part.getAllMods().getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
+                    menu = new JMenu("Mode");
+                    for (int i = 0; i < Modes.MODE_N; i++) {
+                        cbMenuItem = new JCheckBoxMenuItem(
+                                Modes.getModeName(i));
+                        if (part.getMode() == i) {
+                            cbMenuItem.setSelected(true);
+                        } else {
+                            cbMenuItem.setActionCommand("CHANGE_MODE:" + i);
+                            cbMenuItem.addActionListener(this);
+                        }
+                        cbMenuItem.setEnabled(!part.isBeingWorkedOn());
+                        menu.add(cbMenuItem);
                     }
-                    cbMenuItem.setEnabled(!part.isBeingWorkedOn());
-                    menu.add(cbMenuItem);
+                    popup.add(menu);
                 }
-                popup.add(menu);
                 // Scrap component
                 if(!part.canNeverScrap()) {
                     menuItem = new JMenuItem("Scrap component");
