@@ -18,6 +18,7 @@ v0.3.4 (SVN)
 + unofficial option for tougher healing checks depending on the number of hits
 + Bug [#394]: Mothball Techs not removed from list of available techs
 + Bug [#402]: Rush Jobs and Tech Skill Level
++ Bug: gender variable set as static in Personnel, so all personnel same gender
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

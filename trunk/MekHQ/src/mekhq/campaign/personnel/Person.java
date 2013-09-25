@@ -141,7 +141,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     
     private String name;
     private String callsign;
-    protected static int gender;
+    private int gender;
 
     private int primaryRole;
     private int secondaryRole;
@@ -347,7 +347,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	}
     }
     
-    public static String getGenderPronoun(int variant) {
+    public String getGenderPronoun(int variant) {
     	return getGenderPronoun(gender, variant);
     }
     
