@@ -830,9 +830,13 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				+MekHqXmlUtil.escape(Boolean.toString(dependent))
 				+"</dependent>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<isClanTech>"
-				+MekHqXmlUtil.escape(Boolean.toString(isClanTech))
-				+"</isClanTech>");
+				+"<clan>"
+				+clan
+				+"</clan>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<phenotype>"
+                +phenotype
+                +"</phenotype>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<biography>"
 				+MekHqXmlUtil.escape(biography)
@@ -1012,12 +1016,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 						retVal.dependent = true;
 					else
 						retVal.dependent = false;
-				} else if (wn2.getNodeName().equalsIgnoreCase("isClanTech")) {
-					if (wn2.getTextContent().equalsIgnoreCase("true"))
-						retVal.isClanTech = true;
-					else
-						retVal.isClanTech = false;
-				} else if (wn2.getNodeName().equalsIgnoreCase("biography")) {
+				} else if (wn2.getNodeName().equalsIgnoreCase("isClanTech") 
+				        || wn2.getNodeName().equalsIgnoreCase("clan")) {
+					retVal.clan = Boolean.parseBoolean(wn2.getTextContent().trim());
+				} else if (wn2.getNodeName().equalsIgnoreCase("phenotype")) {
+                    retVal.phenotype = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("biography")) {
 					retVal.biography = wn2.getTextContent();
 				} else if (wn2.getNodeName().equalsIgnoreCase("primaryRole")) {
 					retVal.primaryRole = Integer.parseInt(wn2.getTextContent());
