@@ -4402,6 +4402,12 @@ public class Campaign implements Serializable {
 					"infantry refit");
 		}
 
+		//if we are using the MoF rule, then we will ignore mode penalty here
+		//and instead assign it as a straight penalty
+		if(getCampaignOptions().isDestroyByMargin()) {
+		    modePenalty = 0;
+		}
+		
 		// this is ugly, if the mode penalty drops you to green, you drop two
 		// levels instead of two
 		int value = skill.getFinalSkillValue() + modePenalty;

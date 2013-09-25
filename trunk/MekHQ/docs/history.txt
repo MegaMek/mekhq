@@ -17,6 +17,7 @@ v0.3.4 (SVN)
 + backwards compatability for clan phenotypes
 + unofficial option for tougher healing checks depending on the number of hits
 + Bug [#394]: Mothball Techs not removed from list of available techs
++ Bug [#402]: Rush Jobs and Tech Skill Level
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
