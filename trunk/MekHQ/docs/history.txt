@@ -16,6 +16,7 @@ v0.3.4 (SVN)
 + clan phenotypes - you can choose the percentage of recruits for each type that should be trueborn in options
 + backwards compatability for clan phenotypes
 + unofficial option for tougher healing checks depending on the number of hits
++ Bug [#394]: Mothball Techs not removed from list of available techs
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

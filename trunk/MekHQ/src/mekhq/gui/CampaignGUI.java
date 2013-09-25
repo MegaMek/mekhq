@@ -3701,8 +3701,8 @@ public class CampaignGUI extends JPanel {
         String name;
         HashMap<String,Person> techHash = new HashMap<String,Person>();
         for(Person tech : getCampaign().getTechs()) {
-            if(tech.canTech(u.getEntity())) {
-                name = tech.getName() + ", " + SkillType.getExperienceLevelName(tech.getSkillForWorkingOn(u).getExperienceLevel());
+            if(tech.canTech(u.getEntity()) && !tech.isMothballing()) {
+                name = tech.getName() + ", " + SkillType.getExperienceLevelName(tech.getSkillForWorkingOn(u).getExperienceLevel()) + " ("+ (480 - tech.getMaintenanceTimeUsing())  + "min)";
                 techHash.put(name, tech);
             }
         }
