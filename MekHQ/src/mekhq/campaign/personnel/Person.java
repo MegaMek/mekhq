@@ -1544,6 +1544,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
 	@Override
 	public int getDifficulty() {
+	    if(campaign.getCampaignOptions().useTougherHealing()) {
+	        return Math.max(0, getHits()-2);
+	    }
 		return 0;
 	}
 

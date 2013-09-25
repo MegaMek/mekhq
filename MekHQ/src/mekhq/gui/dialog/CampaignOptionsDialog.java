@@ -181,7 +181,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JSpinner spnNaturalHealWaitingPeriod;
     private JCheckBox useRandomHitsForVees;
     private JSpinner spnMinimumHitsForVees;
-
+    private JCheckBox useTougherHealing;
+    
     // Start Personnel Market
     private JPanel panPersonnelMarket;
     private JComboBox personnelMarketType;
@@ -1161,6 +1162,17 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panPersonnel.add(useRandomHitsForVees, gridBagConstraints);
 
+        useTougherHealing = new JCheckBox(resourceMap.getString("useTougherHealing.text"));
+        useTougherHealing.setSelected(options.useTougherHealing());
+        useTougherHealing.setToolTipText(resourceMap.getString("useTougherHealing.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 13;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panPersonnel.add(useTougherHealing, gridBagConstraints);
+        
         JPanel panSalary = new JPanel(new GridBagLayout());
         panSalary.setBorder(BorderFactory.createTitledBorder("Salary"));
         
@@ -1263,7 +1275,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 13;
+        gridBagConstraints.gridheight = 14;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -2910,6 +2922,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         options.setMinimumHitsForVees((Integer)spnMinimumHitsForVees.getModel().getValue());
         options.setUseRandomHitsForVees(useRandomHitsForVees.isSelected());
+        options.setTougherHealing(useTougherHealing.isSelected());
 
         rskillPrefs.setOverallRecruitBonus((Integer)spnOverallRecruitBonus.getModel().getValue());	 
         for(int i = 0; i < Person.T_NUM; i++) {
