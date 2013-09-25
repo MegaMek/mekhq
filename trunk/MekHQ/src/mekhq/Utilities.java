@@ -701,7 +701,7 @@ public class Utilities {
 		return Compute.randomInt(100) <= prob;
 	}
 	
-	public static int getAgeByExpLevel(int expLevel) {
+	public static int getAgeByExpLevel(int expLevel, boolean clan) {
 		int baseage = 19;
 		int ndice = 1;
 		switch(expLevel) {
@@ -719,11 +719,14 @@ public class Utilities {
 		int age = baseage;
 		while(ndice > 0) {
 			int roll = Compute.d6();
-			age += roll;
 			//reroll all sixes once
 			if(roll == 6) {
-				age += (Compute.d6()-1);
+				roll += (Compute.d6()-1);
 			}
+			if(clan) {
+			    roll = (int)Math.ceil(roll/2.0);
+			}
+			age += roll;
 			ndice--;
 		}
 		return age;
