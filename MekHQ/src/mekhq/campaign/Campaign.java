@@ -3756,15 +3756,6 @@ public class Campaign implements Serializable {
 		person.setName(getRNG().generate(isFemale));
 		int expLvl = Utilities.generateExpLevel(rskillPrefs
 				.getOverallRecruitBonus() + rskillPrefs.getRecruitBonus(type));
-		GregorianCalendar birthdate = (GregorianCalendar) getCalendar().clone();
-		birthdate.set(Calendar.YEAR,birthdate.get(Calendar.YEAR) - Utilities.getAgeByExpLevel(expLvl));
-		// choose a random day and month
-		int randomDay = Compute.randomInt(365) + 1;
-		if (birthdate.isLeapYear(birthdate.get(Calendar.YEAR))) {
-			randomDay = Compute.randomInt(366) + 1;
-		}
-		birthdate.set(Calendar.DAY_OF_YEAR, randomDay);
-		person.setBirthday(birthdate);
 		person.setPrimaryRole(type);
 		if (getCampaignOptions().useDylansRandomXp()) {
 			person.setXp(Utilities.generateRandomExp());
@@ -3807,6 +3798,15 @@ public class Campaign implements Serializable {
     	            break;
     		}
 		}
+		GregorianCalendar birthdate = (GregorianCalendar) getCalendar().clone();
+        birthdate.set(Calendar.YEAR,birthdate.get(Calendar.YEAR) - Utilities.getAgeByExpLevel(expLvl, person.isClanner() && person.getPhenotype() != Person.PHENOTYPE_NONE));
+        // choose a random day and month
+        int randomDay = Compute.randomInt(365) + 1;
+        if (birthdate.isLeapYear(birthdate.get(Calendar.YEAR))) {
+            randomDay = Compute.randomInt(366) + 1;
+        }
+        birthdate.set(Calendar.DAY_OF_YEAR, randomDay);
+        person.setBirthday(birthdate);
 		// set default skills
 		switch (type) {
 		case (Person.T_MECHWARRIOR):

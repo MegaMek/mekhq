@@ -20,6 +20,7 @@ v0.3.4 (SVN)
 + Bug [#402]: Rush Jobs and Tech Skill Level
 + Bug: gender variable set as static in Personnel, so all personnel same gender
 + Bug: background and phenotype not saved to xml
++ adjusted age randomizer to make clanners younger (trueborns only)
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
