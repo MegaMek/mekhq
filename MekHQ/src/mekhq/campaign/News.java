@@ -26,10 +26,16 @@ import org.w3c.dom.NodeList;
  */
 public class News {
     
+    //we need two hashes - one to access by date and the other by an id
     private Hashtable<Date, ArrayList<NewsItem>> archive;
-
+    private Hashtable<Integer, NewsItem> news;
+    
     public News(int year) {
         loadNewsFor(year);
+    }
+    
+    public NewsItem getNewsItem(int id) {
+        return news.get(id);
     }
     
     public ArrayList<NewsItem> fetchNewsFor(Date d) {
@@ -42,6 +48,8 @@ public class News {
     
     public void loadNewsFor(int year) {
         archive = new Hashtable<Date, ArrayList<NewsItem>>();
+        news = new Hashtable<Integer, NewsItem>();
+        int id = 0;
         MekHQ.logMessage("Starting load of news data for " + year + " from XML...");
         // Initialize variables.
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -112,7 +120,9 @@ public class News {
                         items.add(newsItem);
                         archive.put(newsItem.getDate(), items);
                     }
-                    
+                    newsItem.setId(id);
+                    news.put(id, newsItem);
+                    id++;
                 }
             }
         }   

@@ -195,6 +195,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         		} else {
         			campaign.setStartingPlanet();
         			campaign.generateNewPersonnelMarket();
+        			campaign.reloadNews();
         			campaign.addReport("<b>" + campaign.getDateAsString() + "</b>");
         		}
             }

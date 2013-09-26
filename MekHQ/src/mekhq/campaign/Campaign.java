@@ -332,6 +332,10 @@ public class Campaign implements Serializable {
 		personnelMarket.generatePersonnelForDay(this);
 	}
 
+	public News getNews() {
+	    return news;
+	}
+	
 	/**
 	 * Add force to an existing superforce. This method will also assign the
 	 * force an id and place it in the forceId hash
@@ -2987,6 +2991,8 @@ public class Campaign implements Serializable {
 				}
 			}
 		}
+		
+		retVal.reloadNews();
 
 		MekHQ.logMessage("Load of campaign file complete!");
 

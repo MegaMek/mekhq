@@ -13,6 +13,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
 
+import mekhq.campaign.NewsItem;
+
 /**
  *
  * @author Jay Lawson
@@ -23,11 +25,11 @@ public class NewsReportDialog extends javax.swing.JDialog {
 
     private JTextPane txtNews;
 
-    public NewsReportDialog(java.awt.Frame parent, String headline, String article) {
+    public NewsReportDialog(java.awt.Frame parent, NewsItem news) {
         super(parent, false);
-        setTitle(headline);
+        setTitle(news.getHeadline());
         initComponents();     
-        txtNews.setText(article);
+        txtNews.setText(news.getFullDescription());
         txtNews.setCaretPosition(0);
         setMinimumSize(new Dimension(500, 300));
         setPreferredSize(new Dimension(500, 300));

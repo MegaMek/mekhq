@@ -60,8 +60,8 @@ public class ReportHyperlinkListener implements HyperlinkListener {
                 campaignGUI.focusOnPerson(id);
             }
             else if(e.getDescription().startsWith(NEWS)) {
-                String desc[] = e.getDescription().split("\\|");
-                campaignGUI.showNews(desc[1],desc[2]);
+                int id =  Integer.parseInt(e.getDescription().split("\\|")[1]);
+                campaignGUI.showNews(id);
             }
             else if(e.getDescription().startsWith(MAINTENANCE)) {
                 UUID id = UUID.fromString(e.getDescription().split("\\|")[1]);
