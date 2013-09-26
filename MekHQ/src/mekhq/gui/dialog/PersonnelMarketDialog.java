@@ -37,6 +37,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.XTableColumnModel;
+import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.LevelSorter;
 import mekhq.gui.view.PersonViewPanel;
@@ -80,11 +82,10 @@ public class PersonnelMarketDialog extends JDialog {
         hqView = view;
         campaign = c;
         this.portraits = portraits;
-        personnelModel = new PersonnelTableModel();
         personnelMarket = c.getPersonnelMarket();
+        personnelModel = new PersonnelTableModel(campaign);
         initComponents();
         filterPersonnel();
-        personnelModel.setData(personnelMarket.getPersonnel());
         setLocationRelativeTo(frame);
     }
 
@@ -148,6 +149,7 @@ public class PersonnelMarketDialog extends JDialog {
         tablePersonnel.setModel(personnelModel);
         tablePersonnel.setName("tablePersonnel"); // NOI18N
         tablePersonnel.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        tablePersonnel.setColumnModel(new XTableColumnModel());
         tablePersonnel.createDefaultColumnsFromModel();
         sorter = new TableRowSorter<PersonnelTableModel>(personnelModel);
         sorter.setComparator(PersonnelTableModel.COL_SKILL, new LevelSorter());
@@ -164,10 +166,16 @@ public class PersonnelMarketDialog extends JDialog {
         });
         TableColumn column = null;
         for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
-            column = tablePersonnel.getColumnModel().getColumn(i);
+            column = ((XTableColumnModel)tablePersonnel.getColumnModel()).getColumnByModelIndex(i);
             column.setPreferredWidth(personnelModel.getColumnWidth(i));
-            column.setCellRenderer(personnelModel.getRenderer());
+            column.setCellRenderer(personnelModel.getRenderer(false, null));
+            if(i != PersonnelTableModel.COL_NAME && i != PersonnelTableModel.COL_TYPE
+                    && i != PersonnelTableModel.COL_SKILL && i != PersonnelTableModel.COL_AGE
+                    && i != PersonnelTableModel.COL_GENDER) {
+                ((XTableColumnModel)tablePersonnel.getColumnModel()).setColumnVisible(column, false);
+            }
         }
+
         tablePersonnel.setIntercellSpacing(new Dimension(0, 0));
         tablePersonnel.setShowGrid(false);
         column.setCellRenderer(getRenderer());
@@ -390,182 +398,5 @@ public class PersonnelMarketDialog extends JDialog {
             return "?";
         }
     }
-
-    
-    
-    /**
-    * A table Model for displaying information about personnel
-    * @author Jay lawson
-    */
-   private class PersonnelTableModel extends AbstractTableModel {
-
-       private static final long serialVersionUID = -5207167419079014157L;
-
-       public final static int COL_NAME =    0;
-       public final static int COL_AGE =     1;
-       public final static int COL_SKILL =   2;
-       public final static int COL_TYPE =    3;
-       public final static int COL_NABIL  =  4;
-       public final static int COL_SALARY =  5;
-       public final static int COL_XP =      6;
-       public final static int N_COL =       7;
-
-       private ArrayList<Person> data = new ArrayList<Person>();
-
-       public int getRowCount() {
-           return data.size();
-       }
-
-       public int getColumnCount() {
-           return N_COL;
-       }
-
-       @Override
-       public String getColumnName(int column) {
-           switch(column) {
-               case COL_NAME:
-                   return "Name";
-               case COL_AGE:
-                   return "Age";
-               case COL_TYPE:
-                   return "Role";
-               case COL_XP:
-                   return "XP";
-               case COL_SALARY:
-                   return "Salary";
-               case COL_SKILL:
-                   return "Skill Level";
-               case COL_NABIL:
-                   return "# SPA";
-               default:
-                   return "?";
-           }
-       }
-
-       public int getColumnWidth(int c) {
-           switch(c) {
-           case COL_SKILL:
-               return 50;
-           case COL_TYPE:
-               return 125;
-           case COL_NAME:
-               return 125;
-           default:
-               return 20;
-           }
-       }
-
-       public int getAlignment(int col) {
-           switch(col) {
-           case COL_SALARY:
-               return SwingConstants.RIGHT;
-           case COL_NAME:
-           case COL_TYPE:
-           case COL_SKILL:
-               return SwingConstants.LEFT;
-           default:
-               return SwingConstants.CENTER;
-           }
-       }
-
-       public String getTooltip(int row, int col) {
-           Person p = data.get(row);
-           switch(col) {
-           case COL_NABIL:
-               return p.getAbilityList(PilotOptions.LVL3_ADVANTAGES);
-           default:
-               return null;
-           }
-       }
-
-       @Override
-       public Class<?> getColumnClass(int c) {
-           return getValueAt(0, c).getClass();
-       }
-
-       @Override
-       public boolean isCellEditable(int row, int col) {
-           return false;
-       }
-
-       public Person getPerson(int i) {
-           if( i >= data.size()) {
-               return null;
-           }
-           return data.get(i);
-       }
-
-       //fill table with values
-       public void setData(ArrayList<Person> people) {
-           data = people;
-           fireTableDataChanged();
-       }
-       
-       public Object getValueAt(int row, int col) {
-           Person p;
-           DecimalFormat formatter = new DecimalFormat();
-           if(data.isEmpty()) {
-               return "";
-           } else {
-               p = data.get(row);
-           }
-           if(col == COL_NAME) {
-               return p.getName();
-           }
-           if(col == COL_AGE) {
-               return p.getAge(campaign.getCalendar());
-           }
-           if(col == COL_TYPE) {
-               return p.getRoleDesc();
-           }
-           if(col == COL_NABIL) {
-               return Integer.toString(p.countOptions(PilotOptions.LVL3_ADVANTAGES));
-           }
-           if(col == COL_SKILL) {
-               return p.getSkillSummary();
-           }
-           if(col == COL_XP) {
-               return p.getXp();
-           }
-           if(col == COL_SALARY) {
-               return formatter.format(p.getSalary());
-           }
-           return "?";
-       }
-
-       public TableCellRenderer getRenderer() {
-          /* if(choicePersonView.getSelectedIndex() == PV_GRAPHIC) {
-               return new PersonnelTableModel.VisualRenderer(getCamos(), getPortraits(), getMechTiles());
-           }*/
-           return new PersonnelTableModel.Renderer();
-       }
-
-       public class Renderer extends DefaultTableCellRenderer {
-
-           private static final long serialVersionUID = 9054581142945717303L;
-
-           public Component getTableCellRendererComponent(JTable table,
-                   Object value, boolean isSelected, boolean hasFocus,
-                   int row, int column) {
-               super.getTableCellRendererComponent(table, value, isSelected,
-                       hasFocus, row, column);
-               setOpaque(true);
-               int actualCol = table.convertColumnIndexToModel(column);
-               int actualRow = table.convertRowIndexToModel(row);
-               setHorizontalAlignment(getAlignment(actualCol));
-               setToolTipText(getTooltip(actualRow, actualCol));
-
-               setForeground(Color.BLACK);
-               if (isSelected) {
-                   setBackground(Color.DARK_GRAY);
-                   setForeground(Color.WHITE);
-               } else {
-                   setBackground(Color.WHITE);
-               }
-               return this;
-           }
-
-       }
-   }
     
 }
