@@ -149,6 +149,7 @@ import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.LogEntry;
+import mekhq.campaign.NewsItem;
 import mekhq.campaign.Planet;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.Unit;
@@ -3105,9 +3106,12 @@ public class CampaignGUI extends JPanel {
         }
     }
     
-    public void showNews(String headline, String article) {
-        NewsReportDialog nrd = new NewsReportDialog(frame, headline, article);
-        nrd.setVisible(true);
+    public void showNews(int id) {
+        NewsItem news = getCampaign().getNews().getNewsItem(id);
+        if(null != news) {
+            NewsReportDialog nrd = new NewsReportDialog(frame, news);
+            nrd.setVisible(true);
+        }
     }
 
     private void taskTabChanged() {

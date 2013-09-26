@@ -44,6 +44,8 @@ public class NewsItem {
     private String description;
     private String service;
     private String location;
+    //ids will only be assigned when news is read in for the year
+    private int id;
     
     public NewsItem() {
         this.headline = "None";
@@ -67,6 +69,14 @@ public class NewsItem {
 
     public Date getDate() {
         return date;
+    }
+    
+    public int getId() {
+        return id;
+    }
+    
+    public void setId(int i) {
+        id = i;
     }
     
     public int getYear() {
@@ -95,7 +105,7 @@ public class NewsItem {
     public String getHeadlineForReport() {
         String s = getPrefix() + "<b>" + getHeadline() + "</b>";
         if(null != description) {
-            s += " [<a href='NEWS|" + getHeadline() + "|" + getFullDescription() + "'>read more</a>]";
+            s += " [<a href='NEWS|" + getId() + "'>read more</a>]";
         }
         return s;
     }

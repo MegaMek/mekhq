@@ -21,6 +21,7 @@ v0.3.4 (SVN)
 + Bug: gender variable set as static in Personnel, so all personnel same gender
 + Bug: background and phenotype not saved to xml
 + adjusted age randomizer to make clanners younger (trueborns only)
++ Bug [#414]: News.xml Issues
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
