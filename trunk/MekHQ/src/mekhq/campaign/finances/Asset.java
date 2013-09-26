@@ -23,8 +23,8 @@ package mekhq.campaign.finances;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.MekHqXmlSerializable;
-import mekhq.campaign.MekHqXmlUtil;
+import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

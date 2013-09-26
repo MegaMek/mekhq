@@ -19,8 +19,8 @@ import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Unit;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 
 /**

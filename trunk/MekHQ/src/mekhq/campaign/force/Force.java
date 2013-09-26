@@ -32,11 +32,11 @@ import java.util.UUID;
 import java.util.Vector;
 
 import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.Unit;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.unit.Unit;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -199,7 +199,7 @@ public class Force implements Serializable {
 	/**
 	 * Add a unit id to the units vector. In general, this 
 	 * should not be called directly to add unid because they will
-	 * not be assigned a force id. Use {@link Campaign#addUnitToForce(mekhq.campaign.Unit, int)}
+	 * not be assigned a force id. Use {@link Campaign#addUnitToForce(mekhq.campaign.unit.Unit, int)}
 	 * instead
 	 * @param uid
 	 */
@@ -208,7 +208,7 @@ public class Force implements Serializable {
 	}
 	
 	/**
-	 * This should not be directly called except by {@link Campaign#RemoveUnitFromForce(mekhq.campaign.Unit)}
+	 * This should not be directly called except by {@link Campaign#RemoveUnitFromForce(mekhq.campaign.unit.Unit)}
 	 * instead
 	 * @param id
 	 */

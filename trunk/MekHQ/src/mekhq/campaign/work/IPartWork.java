@@ -23,8 +23,8 @@ package mekhq.campaign.work;
 import java.util.UUID;
 
 import megamek.common.TargetRoll;
-import mekhq.campaign.Unit;
 import mekhq.campaign.parts.MissingPart;
+import mekhq.campaign.unit.Unit;
 
 /**
  * 

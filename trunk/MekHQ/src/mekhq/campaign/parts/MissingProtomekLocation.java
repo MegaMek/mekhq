@@ -29,9 +29,9 @@ import megamek.common.IArmorState;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.TechConstants;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.Unit;
+import mekhq.campaign.unit.Unit;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

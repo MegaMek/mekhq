@@ -13,7 +13,7 @@ import megamek.common.Entity;
 import megamek.common.Infantry;
 import megamek.common.UnitType;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Unit;
+import mekhq.campaign.unit.Unit;
 
 /**
  * A table model for displaying units that are being serviced in the repair bay

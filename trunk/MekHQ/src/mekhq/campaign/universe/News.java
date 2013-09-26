@@ -1,4 +1,4 @@
-package mekhq.campaign;
+package mekhq.campaign.universe;
 
 import java.io.FileInputStream;
 import java.text.ParseException;

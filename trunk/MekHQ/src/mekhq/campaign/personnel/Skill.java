@@ -26,8 +26,8 @@ import java.io.Serializable;
 
 import megamek.common.Compute;
 import mekhq.MekHQ;
-import mekhq.campaign.MekHqXmlSerializable;
-import mekhq.campaign.MekHqXmlUtil;
+import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

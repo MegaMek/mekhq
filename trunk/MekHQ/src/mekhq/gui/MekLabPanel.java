@@ -60,8 +60,8 @@ import megameklab.com.util.RefreshListener;
 import megameklab.com.util.UnitUtil;
 import mekhq.MekHQ;
 import mekhq.Utilities;
-import mekhq.campaign.Unit;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.unit.Unit;
 
 public class MekLabPanel extends JPanel {
 

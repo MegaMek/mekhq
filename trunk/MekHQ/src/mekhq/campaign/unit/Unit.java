@@ -19,7 +19,7 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign;
+package mekhq.campaign.unit;
 
 import java.io.PrintWriter;
 import java.math.BigInteger;
@@ -84,7 +84,10 @@ import megamek.common.weapons.BayWeapon;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.MekHQ;
+import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
 import mekhq.Version;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AeroHeatSink;
 import mekhq.campaign.parts.AeroLifeSupport;
 import mekhq.campaign.parts.AeroSensor;

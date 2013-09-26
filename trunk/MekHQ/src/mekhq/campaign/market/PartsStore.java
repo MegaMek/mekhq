@@ -19,7 +19,7 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign;
+package mekhq.campaign.market;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -37,6 +37,7 @@ import megamek.common.weapons.BayWeapon;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AeroHeatSink;
 import mekhq.campaign.parts.AeroSensor;
 import mekhq.campaign.parts.AmmoStorage;

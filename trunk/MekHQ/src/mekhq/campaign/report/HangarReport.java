@@ -52,7 +52,7 @@ import megamek.common.Tank;
 import megamek.common.VTOL;
 import megamek.common.Warship;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Unit;
+import mekhq.campaign.unit.Unit;
 
 
 

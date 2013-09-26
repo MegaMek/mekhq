@@ -19,7 +19,7 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign;
+package mekhq.campaign.market;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -34,7 +34,9 @@ import org.w3c.dom.NodeList;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
 import mekhq.Version;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 

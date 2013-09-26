@@ -7,8 +7,8 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Unit;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.unit.Unit;
 
 public class OrgTreeModel implements TreeModel {
 

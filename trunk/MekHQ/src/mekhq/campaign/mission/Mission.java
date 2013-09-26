@@ -26,10 +26,10 @@ import java.text.ParseException;
 import java.util.ArrayList;
 
 import mekhq.MekHQ;
+import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.MekHqXmlSerializable;
-import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;

@@ -42,8 +42,8 @@ import megamek.common.MechSummaryCache;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Faction;
-import mekhq.campaign.Planets;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Planets;
 
 public class DataLoadingDialog extends JDialog implements PropertyChangeListener {
 

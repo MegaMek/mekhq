@@ -25,8 +25,8 @@ import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

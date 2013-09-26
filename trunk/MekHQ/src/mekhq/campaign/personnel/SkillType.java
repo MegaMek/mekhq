@@ -39,8 +39,8 @@ import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.VTOL;
 import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
 import mekhq.Version;
-import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

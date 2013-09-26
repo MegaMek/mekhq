@@ -46,11 +46,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Unit;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.unit.Unit;
 
 /**
  * A dialog to decide how you want to pay off collateral when you 

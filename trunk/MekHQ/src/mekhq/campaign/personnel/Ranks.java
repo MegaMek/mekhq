@@ -31,7 +31,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import mekhq.MekHQ;
-import mekhq.campaign.MekHqXmlUtil;
+import mekhq.MekHqXmlUtil;
 import mekhq.gui.dialog.CampaignOptionsDialog.RankTableModel;
 
 /**

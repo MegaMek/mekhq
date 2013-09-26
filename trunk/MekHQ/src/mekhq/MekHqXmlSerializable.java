@@ -1,4 +1,4 @@
-package mekhq.campaign;
+package mekhq;
 
 import java.io.PrintWriter;
 

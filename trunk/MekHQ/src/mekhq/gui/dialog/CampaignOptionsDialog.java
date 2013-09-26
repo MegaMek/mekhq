@@ -79,15 +79,15 @@ import megamek.common.util.DirectoryItems;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.Era;
-import mekhq.campaign.Faction;
-import mekhq.campaign.PersonnelMarket;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.finances.Loan;
+import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.universe.Era;
+import mekhq.campaign.universe.Faction;
 import mekhq.gui.model.DataTableModel;
 
 /**

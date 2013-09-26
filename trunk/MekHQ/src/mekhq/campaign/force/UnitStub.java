@@ -26,9 +26,9 @@ import java.io.Serializable;
 
 import megamek.common.Crew;
 import mekhq.MekHQ;
-import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.Unit;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

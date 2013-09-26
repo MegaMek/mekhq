@@ -24,8 +24,8 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.EntityMovementMode;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

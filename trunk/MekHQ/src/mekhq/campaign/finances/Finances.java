@@ -30,9 +30,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;

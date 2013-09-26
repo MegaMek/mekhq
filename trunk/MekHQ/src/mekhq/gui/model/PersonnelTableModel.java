@@ -20,10 +20,10 @@ import megamek.common.UnitType;
 import megamek.common.options.PilotOptions;
 import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Unit;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.CampaignGUI;
 

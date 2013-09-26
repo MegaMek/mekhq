@@ -47,10 +47,10 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.DragoonsRatingFactory;
-import mekhq.campaign.IDragoonsRating;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
+import mekhq.campaign.rating.DragoonsRatingFactory;
+import mekhq.campaign.rating.IDragoonsRating;
 
 /**
  *

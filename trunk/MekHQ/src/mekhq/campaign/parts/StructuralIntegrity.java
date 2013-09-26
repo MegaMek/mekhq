@@ -29,8 +29,8 @@ import megamek.common.Dropship;
 import megamek.common.EquipmentType;
 import megamek.common.SmallCraft;
 import megamek.common.TechConstants;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

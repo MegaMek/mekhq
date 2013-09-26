@@ -14,9 +14,9 @@ import megamek.common.Crew;
 import megamek.common.Entity;
 import megamek.common.GunEmplacement;
 import mekhq.IconPackage;
-import mekhq.campaign.Unit;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
 
 public class ForceRenderer extends DefaultTreeCellRenderer {
 

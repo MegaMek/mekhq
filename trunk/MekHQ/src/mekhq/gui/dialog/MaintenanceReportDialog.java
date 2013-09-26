@@ -11,7 +11,7 @@ import java.awt.Dimension;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
-import mekhq.campaign.Unit;
+import mekhq.campaign.unit.Unit;
 
 /**
  *

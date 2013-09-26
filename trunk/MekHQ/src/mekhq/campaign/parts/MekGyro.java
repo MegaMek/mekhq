@@ -27,8 +27,8 @@ import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import megamek.common.TechConstants;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.personnel.SkillType;
 
 import org.w3c.dom.Node;

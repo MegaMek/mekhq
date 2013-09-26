@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign;
+package mekhq.campaign.rating;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
