@@ -63,10 +63,10 @@ import megamek.common.GunEmplacement;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.ResolveScenarioTracker.UnitStatus;
-import mekhq.campaign.Unit;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.unit.Unit;
 
 /**
  *

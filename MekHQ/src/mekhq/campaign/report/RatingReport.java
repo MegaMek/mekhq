@@ -25,8 +25,8 @@ import java.awt.Font;
 import javax.swing.JTextPane;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.DragoonsRatingFactory;
-import mekhq.campaign.IDragoonsRating;
+import mekhq.campaign.rating.DragoonsRatingFactory;
+import mekhq.campaign.rating.IDragoonsRating;
 
 
 

@@ -54,7 +54,7 @@ import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.UnitOrder;
+import mekhq.campaign.unit.UnitOrder;
 import mekhq.gui.CampaignGUI;
 
 /**

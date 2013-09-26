@@ -55,8 +55,8 @@ import megamek.common.MechView;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Unit;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 
 

@@ -96,6 +96,8 @@ import megamek.common.options.PilotOptions;
 import megamek.common.util.BuildingBlock;
 import megamek.common.util.DirectoryItems;
 import mekhq.MekHQ;
+import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
 import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.Version;
@@ -104,6 +106,9 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.market.PartsStore;
+import mekhq.campaign.market.PersonnelMarket;
+import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
@@ -130,8 +135,15 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.team.SupportTeam;
-import mekhq.campaign.team.TechTeam;
+import mekhq.campaign.rating.DragoonsRatingFactory;
+import mekhq.campaign.rating.IDragoonsRating;
+import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Era;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.News;
+import mekhq.campaign.universe.NewsItem;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.Planets;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IPartWork;
@@ -160,8 +172,6 @@ public class Campaign implements Serializable {
 	// It seems like we could track in a hashtable and then iterate through the
 	// keys of the hash
 	// to create an arraylist on demand
-	private ArrayList<SupportTeam> teams = new ArrayList<SupportTeam>();
-	private Hashtable<Integer, SupportTeam> teamIds = new Hashtable<Integer, SupportTeam>();
 	private ArrayList<Unit> units = new ArrayList<Unit>();
 	private Hashtable<UUID, Unit> unitIds = new Hashtable<UUID, Unit>();
 	private ArrayList<Person> personnel = new ArrayList<Person>();
@@ -409,28 +419,6 @@ public class Campaign implements Serializable {
 			force.addUnit(u.getId());
 			u.setScenarioId(force.getScenarioId());
 		}
-	}
-
-	/**
-	 * Add a support team to the campaign
-	 * 
-	 * @param t
-	 *            The support team to be added
-	 */
-	public void addTeam(SupportTeam t) {
-		int id = lastTeamId + 1;
-		t.setId(id);
-		teams.add(t);
-		teamIds.put(new Integer(id), t);
-		lastTeamId = id;
-	}
-
-	private void addTeamWithoutId(SupportTeam t) {
-		teams.add(t);
-		teamIds.put(new Integer(t.getId()), t);
-
-		if (t.getId() > lastTeamId)
-			lastTeamId = t.getId();
 	}
 
 	/**
@@ -2346,7 +2334,6 @@ public class Campaign implements Serializable {
 			getCampaignOptions().writeToXml(pw1, 1);
 
 		// Lists of objects:
-		writeArrayAndHashToXml(pw1, 1, "teams", teams, teamIds); // Teams
 		writeArrayAndHashToXmlforUUID(pw1, 1, "units", units, unitIds); // Units
 		writeArrayAndHashToXmlforUUID(pw1, 1, "personnel", personnel,
 				personnelIds); // Personnel
@@ -2646,8 +2633,6 @@ public class Campaign implements Serializable {
 					processPartNodes(retVal, wn, version);
 				} else if (xn.equalsIgnoreCase("personnel")) {
 					processPersonnelNodes(retVal, wn, version);
-				} else if (xn.equalsIgnoreCase("teams")) {
-					processTeamNodes(retVal, wn);
 				} else if (xn.equalsIgnoreCase("units")) {
 					processUnitNodes(retVal, wn, version);
 				} else if (xn.equalsIgnoreCase("missions")) {
@@ -2713,17 +2698,7 @@ public class Campaign implements Serializable {
 			retVal.campaignOptions.setTechLevel(retVal.campaignOptions
 					.getTechLevel() + 1);
 		}
-
-		// First, iterate through Support Teams;
-		// they have a reference to the Campaign object.
-		for (int x = 0; x < retVal.teams.size(); x++) {
-			SupportTeam st = retVal.teams.get(x);
-
-			// Okay, last trigger a reCalc.
-			// This should fix some holes in the data.
-			st.reCalc();
-		}
-
+		
 		// loop through forces to set force id
 		for (int fid : retVal.forceIds.keySet()) {
 			Force f = retVal.forceIds.get(fid);
@@ -2872,51 +2847,6 @@ public class Campaign implements Serializable {
 	                psn.setPhenotype(Person.PHENOTYPE_NONE);
 	            }
 	        }
-			
-			// reverse compatability check for assigning support personnel
-			// characteristics from their support team
-			if (psn.getOldSupportTeamId() >= 0) {
-				SupportTeam t = retVal.teamIds.get(psn.getOldSupportTeamId());
-				psn.setName(t.getName());
-				int lvl = 0;
-				switch (t.getRating()) {
-				case 0:
-					lvl = 1;
-					break;
-				case 1:
-					lvl = 3;
-					break;
-				case 2:
-					lvl = 4;
-					break;
-				case 3:
-					lvl = 5;
-					break;
-				}
-				if (t instanceof TechTeam) {
-					switch (((TechTeam) t).getType()) {
-					case TechTeam.T_MECH:
-						psn.setPrimaryRole(Person.T_MECH_TECH);
-						psn.addSkill(SkillType.S_TECH_MECH, lvl, 0);
-						break;
-					case TechTeam.T_MECHANIC:
-						psn.setPrimaryRole(Person.T_MECHANIC);
-						psn.addSkill(SkillType.S_TECH_MECHANIC, lvl, 0);
-						break;
-					case TechTeam.T_AERO:
-						psn.setPrimaryRole(Person.T_AERO_TECH);
-						psn.addSkill(SkillType.S_TECH_AERO, lvl, 0);
-						break;
-					case TechTeam.T_BA:
-						psn.setPrimaryRole(Person.T_BA_TECH);
-						psn.addSkill(SkillType.S_TECH_BA, lvl, 0);
-						break;
-					}
-				} else {
-					psn.setPrimaryRole(Person.T_DOCTOR);
-					psn.addSkill(SkillType.S_DOCTOR, lvl, 0);
-				}
-			}
 		}
 
 		// Okay, Units, need their pilot references fixed.
@@ -3370,38 +3300,6 @@ public class Campaign implements Serializable {
 		}
 
 		MekHQ.logMessage("Load Mission Nodes Complete!", 4);
-	}
-
-	private static void processTeamNodes(Campaign retVal, Node wn) {
-		MekHQ.logMessage("Loading Team Nodes from XML...", 4);
-
-		NodeList wList = wn.getChildNodes();
-
-		// Okay, lets iterate through the children, eh?
-		for (int x = 0; x < wList.getLength(); x++) {
-			Node wn2 = wList.item(x);
-
-			// If it's not an element node, we ignore it.
-			if (wn2.getNodeType() != Node.ELEMENT_NODE)
-				continue;
-
-			if (!wn2.getNodeName().equalsIgnoreCase("supportTeam")) {
-				// Error condition of sorts!
-				// Errr, what should we do here?
-				MekHQ.logMessage("Unknown node type not loaded in Team nodes: "
-						+ wn2.getNodeName());
-
-				continue;
-			}
-
-			SupportTeam t = SupportTeam.generateInstanceFromXML(wn2);
-
-			if (t != null) {
-				retVal.addTeamWithoutId(t);
-			}
-		}
-
-		MekHQ.logMessage("Load Team Nodes Complete!", 4);
 	}
 
 	private static String checkUnits(Node wn) {

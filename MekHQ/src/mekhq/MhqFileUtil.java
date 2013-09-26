@@ -1,4 +1,4 @@
-package mekhq.campaign;
+package mekhq;
 
 public class MhqFileUtil {
     public static String escapeReservedCharacters (String text) {

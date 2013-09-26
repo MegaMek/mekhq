@@ -27,9 +27,9 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Faction;
 import mekhq.campaign.JumpPath;
-import mekhq.campaign.Planet;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Planet;
 
 
 /**

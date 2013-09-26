@@ -26,6 +26,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.universe.Planet;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

@@ -28,11 +28,11 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
+import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Era;
-import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.universe.Era;
 import mekhq.campaign.work.IAcquisitionWork;
 
 import org.w3c.dom.Node;

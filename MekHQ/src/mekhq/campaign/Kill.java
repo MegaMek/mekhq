@@ -29,6 +29,7 @@ import java.util.Hashtable;
 import java.util.UUID;
 
 import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 
 import org.w3c.dom.Node;

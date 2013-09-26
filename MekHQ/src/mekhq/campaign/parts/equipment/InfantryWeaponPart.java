@@ -24,8 +24,8 @@ package mekhq.campaign.parts.equipment;
 import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.parts.MissingPart;
 
 import org.w3c.dom.Node;

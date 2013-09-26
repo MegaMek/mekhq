@@ -19,7 +19,7 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign;
+package mekhq.campaign.unit;
 
 
 import java.io.PrintWriter;
@@ -42,7 +42,10 @@ import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
+import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
 import mekhq.Version;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.work.IAcquisitionWork;
 

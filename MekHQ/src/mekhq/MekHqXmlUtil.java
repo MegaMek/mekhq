@@ -1,4 +1,4 @@
-package mekhq.campaign;
+package mekhq;
 
 import gd.xml.ParseException;
 
@@ -35,7 +35,6 @@ import megamek.common.Tank;
 import megamek.common.WeaponType;
 import megamek.common.XMLStreamParser;
 import megamek.common.util.StringUtil;
-import mekhq.MekHQ;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;

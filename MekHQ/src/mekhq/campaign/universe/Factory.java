@@ -1,5 +1,5 @@
 /*
- * Garrison.java
+ * Factory.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * Written by Dylan Myers <ralgith@gmail.com>
@@ -20,7 +20,7 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign;
+package mekhq.campaign.universe;
 
 import java.text.ParseException;
 
@@ -28,20 +28,26 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class Garrison {
+public class Factory {
 	private String shortname;
 	private String fullname;
 	private String nameGenerator;
+	private String owner; // Faction shortname that owns it
+	private String planet;
 	private boolean clan;
 	
-	public Garrison() {
-		this("SGU", "Some Garrison Unit");
+	// TODO: Need some more variables here for holding units and components produced
+	
+	public Factory() {
+		this("GF", "Generic Factory");
 	}
 	
-	public Garrison(String sname, String fname) {
+	public Factory(String sname, String fname) {
 		shortname = sname;
 		fullname = fname;
 		nameGenerator = "General";
+		owner = "IND";
+		planet = "";
 		clan = false;
 	}
 
@@ -51,6 +57,14 @@ public class Garrison {
 
 	public String getFullName() {
 		return fullname;
+	}
+	
+	public String getOwner() {
+		return owner;
+	}
+	
+	public String getPlanet() {
+		return planet;
 	}
 	
 	public boolean isClan() {
@@ -65,8 +79,8 @@ public class Garrison {
 		return nameGenerator;
 	}
     
-    public static Garrison getFactionFromXML(Node wn) throws DOMException, ParseException {
-    	Garrison retVal = new Garrison();
+    public static Factory getFactionFromXML(Node wn) throws DOMException, ParseException {
+		Factory retVal = new Factory();
 		NodeList nl = wn.getChildNodes();
 		
 		for (int x=0; x<nl.getLength(); x++) {
@@ -82,6 +96,8 @@ public class Garrison {
 					retVal.clan = true;
 				else
 					retVal.clan = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("planet")) {
+				retVal.planet = wn2.getTextContent();
 			} 
 		}
 		return retVal;

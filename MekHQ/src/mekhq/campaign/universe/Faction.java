@@ -19,7 +19,7 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign;
+package mekhq.campaign.universe;
 
 import java.awt.Color;
 import java.io.FileInputStream;
@@ -33,6 +33,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import megamek.common.EquipmentType;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 
 import org.w3c.dom.DOMException;

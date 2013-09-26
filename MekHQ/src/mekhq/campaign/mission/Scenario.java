@@ -33,12 +33,12 @@ import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.Unit;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceStub;
+import mekhq.campaign.unit.Unit;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;

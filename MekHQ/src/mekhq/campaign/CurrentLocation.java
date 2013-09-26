@@ -26,7 +26,9 @@ import java.io.Serializable;
 import java.util.Date;
 
 import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.universe.Planet;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

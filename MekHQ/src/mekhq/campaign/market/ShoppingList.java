@@ -19,19 +19,24 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign;
+package mekhq.campaign.market;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import megamek.common.Entity;
 import mekhq.MekHQ;
+import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
 import mekhq.Version;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.work.IAcquisitionWork;
 
 import org.w3c.dom.Node;

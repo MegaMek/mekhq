@@ -20,7 +20,7 @@ import megamek.client.ui.swing.ClientGUI;
 import megamek.common.Entity;
 import megamek.common.IGame;
 import megamek.common.preference.PreferenceManager;
-import mekhq.campaign.Unit;
+import mekhq.campaign.unit.Unit;
 
 class GameThread extends Thread implements CloseClientListener {
 

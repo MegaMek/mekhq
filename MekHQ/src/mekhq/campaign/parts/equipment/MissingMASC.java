@@ -25,10 +25,10 @@ import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.Unit;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.unit.Unit;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

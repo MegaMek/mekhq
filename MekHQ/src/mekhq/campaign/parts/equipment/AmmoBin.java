@@ -37,15 +37,15 @@ import megamek.common.Protomech;
 import megamek.common.TargetRoll;
 import megamek.common.Warship;
 import megamek.common.loaders.EntityLoadingException;
+import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.Era;
-import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.universe.Era;
 import mekhq.campaign.work.IAcquisitionWork;
 
 import org.w3c.dom.Node;

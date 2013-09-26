@@ -34,7 +34,7 @@ import javax.swing.table.TableRowSorter;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.PersonnelMarket;
+import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.sorter.FormattedNumberSorter;

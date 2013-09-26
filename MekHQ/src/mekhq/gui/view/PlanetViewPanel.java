@@ -12,7 +12,7 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Planet;
+import mekhq.campaign.universe.Planet;
 
 /**
  * A custom panel that gets filled in with goodies from a Planet record

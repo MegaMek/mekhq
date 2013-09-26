@@ -19,9 +19,9 @@ import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Crew;
 import megamek.common.util.DirectoryItems;
 import mekhq.IconPackage;
-import mekhq.campaign.Unit;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
 
 /**
  * An extension of JPanel that is intended to be used for visual table renderers

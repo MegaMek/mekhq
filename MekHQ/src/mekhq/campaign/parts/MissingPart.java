@@ -27,10 +27,10 @@ import java.util.UUID;
 
 import megamek.common.EquipmentType;
 import megamek.common.TargetRoll;
+import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.MekHqXmlSerializable;
-import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;

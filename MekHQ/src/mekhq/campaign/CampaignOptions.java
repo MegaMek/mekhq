@@ -25,7 +25,9 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 
 import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
+import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 

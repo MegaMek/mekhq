@@ -29,8 +29,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import megamek.common.Compute;
-import mekhq.campaign.MekHqXmlSerializable;
-import mekhq.campaign.MekHqXmlUtil;
+import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;

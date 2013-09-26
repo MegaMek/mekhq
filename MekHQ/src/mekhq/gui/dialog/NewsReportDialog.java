@@ -13,7 +13,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
 
-import mekhq.campaign.NewsItem;
+import mekhq.campaign.universe.NewsItem;
 
 /**
  *

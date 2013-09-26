@@ -26,6 +26,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import mekhq.MekHQ;
+import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

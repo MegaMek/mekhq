@@ -18,7 +18,11 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign;
+package mekhq.campaign.rating;
+
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.CampaignOptions.DragoonsRatingMethod;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)

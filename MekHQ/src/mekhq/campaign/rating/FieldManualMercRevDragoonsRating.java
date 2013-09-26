@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign;
+package mekhq.campaign.rating;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -46,9 +46,11 @@ import megamek.common.SmallCraftBay;
 import megamek.common.Tank;
 import megamek.common.VTOL;
 import megamek.common.Warship;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.unit.Unit;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)

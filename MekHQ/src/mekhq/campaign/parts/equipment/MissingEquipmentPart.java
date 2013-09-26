@@ -27,12 +27,12 @@ import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mounted;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Era;
-import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.Unit;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Era;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

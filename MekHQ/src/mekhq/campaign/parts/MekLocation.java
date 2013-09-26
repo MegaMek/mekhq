@@ -31,8 +31,8 @@ import megamek.common.Mech;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.Modes;
 

@@ -26,7 +26,7 @@ import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Unit;
+import mekhq.campaign.unit.Unit;
 import mekhq.gui.EntityImage;
 /**
  * A custom panel that gets filled in with goodies from a unit record
