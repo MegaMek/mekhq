@@ -26,11 +26,9 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.GregorianCalendar;
@@ -80,7 +78,6 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
-import mekhq.campaign.finances.Loan;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -88,7 +85,6 @@ import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
-import mekhq.gui.model.DataTableModel;
 
 /**
  *
@@ -271,7 +267,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private javax.swing.JCheckBox allowISPurchasesBox;
     private javax.swing.JCheckBox allowCanonOnlyBox;
     private javax.swing.JCheckBox useAmmoByTypeBox;
-    private javax.swing.JCheckBox disallowSLUnitsBox;
+    //private javax.swing.JCheckBox disallowSLUnitsBox;
     private javax.swing.JLabel lblTechLevel;
     private javax.swing.JComboBox choiceTechLevel;
 

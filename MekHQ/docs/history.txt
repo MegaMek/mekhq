@@ -27,6 +27,10 @@ v0.3.4 (SVN)
 + Minor Planetary Data Update
 + Added entries in News.xml for 3009-3014, 3048-3049, and 3058-3061
 + RFE [#130]: Limit to acquisition per character
++ RFE [#100]: GM Tab/Tools: "Dice" + Notification Scheduling
+  This is a very basic implementation for now. Only contains a dice roller.
+  Dialog is non-modal, so you can open it and continue to interact with the
+  main GUI.
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
