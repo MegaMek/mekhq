@@ -31,40 +31,40 @@ import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 
+import mekhq.campaign.rating.UnitRatingMethod;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- *
  * @author natit
  */
 public class CampaignOptions implements Serializable {
-	private static final long serialVersionUID = 5698008431749303602L;
-	
-	public final static int TECH_INTRO        = 0;
-	public final static int TECH_STANDARD     = 1;
-	public final static int TECH_ADVANCED     = 2;
-	public final static int TECH_EXPERIMENTAL = 3;
-	public final static int TECH_UNOFFICIAL   = 4;
-	
-	public final static int TRANSIT_UNIT_DAY   = 0;
-	public final static int TRANSIT_UNIT_WEEK  = 1;
-    public final static int TRANSIT_UNIT_MONTH = 2;
-    public final static int TRANSIT_UNIT_NUM   = 3;
+    private static final long serialVersionUID = 5698008431749303602L;
 
-	
-	public final static String S_TECH = "Tech";
-	public final static String S_AUTO = "Automatic Success";
-	
-	public final static int REPAIR_SYSTEM_STRATOPS = 0;
+    public final static int TECH_INTRO = 0;
+    public final static int TECH_STANDARD = 1;
+    public final static int TECH_ADVANCED = 2;
+    public final static int TECH_EXPERIMENTAL = 3;
+    public final static int TECH_UNOFFICIAL = 4;
+
+    public final static int TRANSIT_UNIT_DAY = 0;
+    public final static int TRANSIT_UNIT_WEEK = 1;
+    public final static int TRANSIT_UNIT_MONTH = 2;
+    public final static int TRANSIT_UNIT_NUM = 3;
+
+
+    public final static String S_TECH = "Tech";
+    public final static String S_AUTO = "Automatic Success";
+
+    public final static int REPAIR_SYSTEM_STRATOPS = 0;
     public final static int REPAIR_SYSTEM_WARCHEST_CUSTOM = 1;
     public final static int REPAIR_SYSTEM_GENERIC_PARTS = 2;
     //FIXME: This needs to be localized
-    public final static String [] REPAIR_SYSTEM_NAMES = {"Strat Ops", "Warchest Custom", "Generic Spare Parts"};
+    public final static String[] REPAIR_SYSTEM_NAMES = {"Strat Ops", "Warchest Custom", "Generic Spare Parts"};
 
     private boolean useFactionForNames;
-    private boolean useDragoonRating;
-    
+    private boolean useUnitRating;
+
     //personnel related
     private boolean useTactics;
     private boolean useInitBonus;
@@ -81,7 +81,7 @@ public class CampaignOptions implements Serializable {
     private int minimumHitsForVees;
     private boolean tougherHealing;
     private int maxAcquisitions;
-    
+
     //personnel market related
     private boolean personnelMarketReportRefresh;
     private int personnelMarketType;
@@ -94,7 +94,7 @@ public class CampaignOptions implements Serializable {
 
     //unit related
     private boolean useQuirks;
-    
+
     //tech and unit limits
     private boolean limitByYear;
     private boolean allowClanPurchases;
@@ -102,7 +102,7 @@ public class CampaignOptions implements Serializable {
     private boolean allowCanonOnly;
     private int techLevel;
     private boolean useAmmoByType; // Unofficial
-    
+
     //finance related
     private boolean payForParts;
     private boolean payForUnits;
@@ -125,7 +125,7 @@ public class CampaignOptions implements Serializable {
     private double equipmentContractPercent;
     private boolean equipmentContractSaleValue;
     private boolean blcSaleValue;
-    
+
     //acquisition related
     private int waitingPeriod;
     private String acquisitionSkill;
@@ -139,7 +139,7 @@ public class CampaignOptions implements Serializable {
     private int acquireMinimumTimeUnit;
     private int clanAcquisitionPenalty;
     private int isAcquisitionPenalty;
-    
+
     //xp related
     private int scenarioXP;
     private int killsForXP;
@@ -157,23 +157,23 @@ public class CampaignOptions implements Serializable {
     private int destroyMargin;
     private int repairSystem;
     private boolean useEraMods;
-    
+
     //maintenance related
     private boolean checkMaintenance;
     private int maintenanceCycleDays;
     private int maintenanceBonus;
     private boolean useQualityMaintenance;
-    
+
     //Dragoon's Rating
-    private DragoonsRatingMethod dragoonsRatingMethod;
-    
+    private UnitRatingMethod unitRatingMethod;
+
     //salary related
     private int[] salaryTypeBase;
     private double[] salaryXpMultiplier;
     private double salaryCommissionMultiplier;
     private double salaryEnlistedMultiplier;
     private double salaryAntiMekMultiplier;
-    
+
     //phenotype related
     private int probPhenoMW;
     private int probPhenoAero;
@@ -183,12 +183,12 @@ public class CampaignOptions implements Serializable {
     //random portraits related
     private boolean[] usePortraitForType;
 
-    public CampaignOptions () {
+    public CampaignOptions() {
         clanPriceModifier = 1.0;
         useFactionForNames = true;
-        repairSystem = REPAIR_SYSTEM_STRATOPS; 
+        repairSystem = REPAIR_SYSTEM_STRATOPS;
         useEraMods = false;
-        useDragoonRating = true;
+        useUnitRating = true;
         useTactics = false;
         useInitBonus = false;
         useToughness = false;
@@ -233,14 +233,14 @@ public class CampaignOptions implements Serializable {
         damagedPartsValue = 0.33;
         canceledOrderReimbursement = 0.5;
         usePortraitForType = new boolean[Person.T_NUM];
-        for(int i = 0; i < Person.T_NUM; i++) {
-        	usePortraitForType[i] = false;
+        for (int i = 0; i < Person.T_NUM; i++) {
+            usePortraitForType[i] = false;
         }
         usePortraitForType[Person.T_MECHWARRIOR] = true;
         idleXP = 0;
         targetIdleXP = 10;
         monthsIdleXP = 2;
-        dragoonsRatingMethod = DragoonsRatingMethod.TAHARQA;
+        unitRatingMethod = UnitRatingMethod.INTERSTELLAR_OPS;
         waitingPeriod = 7;
         acquisitionSkill = S_TECH;
         acquisitionSupportStaffOnly = true;
@@ -319,1046 +319,1069 @@ public class CampaignOptions implements Serializable {
 
     }
 
-    public DragoonsRatingMethod getDragoonsRatingMethod() {
-        return dragoonsRatingMethod;
+    public UnitRatingMethod getUnitRatingMethod() {
+        return unitRatingMethod;
     }
 
-    public void setDragoonsRatingMethod(DragoonsRatingMethod method) {
-        this.dragoonsRatingMethod = method;
+    public void setUnitRatingMethod(UnitRatingMethod method) {
+        this.unitRatingMethod = method;
     }
 
-    public static String getRepairSystemName (int repairSystem) {
+    public static String getRepairSystemName(int repairSystem) {
         return REPAIR_SYSTEM_NAMES[repairSystem];
     }
-    
+
     public static String getTechLevelName(int lvl) {
-    	switch(lvl) {
-    	case TECH_INTRO:
-    		return "Introductory";
-    	case TECH_STANDARD:
-    		return "Standard";
-    	case TECH_ADVANCED:
-    		return "Advanced";
-    	case TECH_EXPERIMENTAL:
-    		return "Experimental";
-    	case TECH_UNOFFICIAL:
-            return "Unofficial";
-    	default:
-    		return "Unknown";	
-    	}
-    }
-    
-    public static String getTransitUnitName(int unit) {
-        switch(unit) {
-        case TRANSIT_UNIT_DAY:
-            return "Days";
-        case TRANSIT_UNIT_WEEK:
-            return "Weeks";
-        case TRANSIT_UNIT_MONTH:
-            return "Months";
-        default:
-            return "Unknown";   
+        switch (lvl) {
+            case TECH_INTRO:
+                return "Introductory";
+            case TECH_STANDARD:
+                return "Standard";
+            case TECH_ADVANCED:
+                return "Advanced";
+            case TECH_EXPERIMENTAL:
+                return "Experimental";
+            case TECH_UNOFFICIAL:
+                return "Unofficial";
+            default:
+                return "Unknown";
         }
     }
-    
+
+    public static String getTransitUnitName(int unit) {
+        switch (unit) {
+            case TRANSIT_UNIT_DAY:
+                return "Days";
+            case TRANSIT_UNIT_WEEK:
+                return "Weeks";
+            case TRANSIT_UNIT_MONTH:
+                return "Months";
+            default:
+                return "Unknown";
+        }
+    }
+
     public boolean useEraMods() {
         return useEraMods;
     }
-    
+
     public void setEraMods(boolean b) {
         this.useEraMods = b;
     }
-    
+
     public boolean useDragoonRating() {
-        return useDragoonRating;
+        return useUnitRating;
     }
-    
+
     public void setDragoonRating(boolean b) {
-        this.useDragoonRating = b;
+        this.useUnitRating = b;
     }
-  
+
     public double getClanPriceModifier() {
         return clanPriceModifier;
     }
-    
+
     public void setClanPriceModifier(double d) {
         this.clanPriceModifier = d;
     }
-    
+
     public double getUsedPartsValue(int quality) {
         return usedPartsValue[quality];
     }
-    
+
     public void setUsedPartsValue(double d, int quality) {
         this.usedPartsValue[quality] = d;
     }
-    
+
     public double getDamagedPartsValue() {
         return damagedPartsValue;
     }
-    
+
     public void setDamagedPartsValue(double d) {
         this.damagedPartsValue = d;
     }
-    
+
     public double GetCanceledOrderReimbursement() {
         return canceledOrderReimbursement;
     }
-    
+
     public void setCanceledOrderReimbursement(double d) {
         this.canceledOrderReimbursement = d;
     }
-    
+
     public int getRepairSystem() {
         return repairSystem;
     }
-    
+
     public void setRepairSystem(int i) {
         this.repairSystem = i;
     }
-    
+
     public boolean useFactionForNames() {
         return useFactionForNames;
     }
-    
+
     public void setFactionForNames(boolean b) {
         this.useFactionForNames = b;
     }
-    
+
     public boolean useTactics() {
-    	return useTactics;
+        return useTactics;
     }
-   
+
     public void setTactics(boolean b) {
-    	this.useTactics = b;
+        this.useTactics = b;
     }
-    
+
     public boolean useInitBonus() {
-    	return useInitBonus;
+        return useInitBonus;
     }
-   
+
     public void setInitBonus(boolean b) {
-    	this.useInitBonus = b;
+        this.useInitBonus = b;
     }
-    
+
     public boolean useToughness() {
-    	return useToughness;
+        return useToughness;
     }
-   
+
     public void setToughness(boolean b) {
-    	this.useToughness = b;
+        this.useToughness = b;
     }
-    
+
     public boolean useArtillery() {
-    	return useArtillery;
+        return useArtillery;
     }
-   
+
     public void setArtillery(boolean b) {
-    	this.useArtillery = b;
+        this.useArtillery = b;
     }
-    
+
     public boolean useAbilities() {
-    	return useAbilities;
+        return useAbilities;
     }
-   
+
     public void setAbilities(boolean b) {
-    	this.useAbilities = b;
+        this.useAbilities = b;
     }
-    
+
     public boolean useEdge() {
-    	return useEdge;
+        return useEdge;
     }
-   
+
     public void setEdge(boolean b) {
-    	this.useEdge = b;
+        this.useEdge = b;
     }
-    
+
     public boolean useImplants() {
-    	return useImplants;
+        return useImplants;
     }
-   
+
     public void setImplants(boolean b) {
-    	this.useImplants = b;
+        this.useImplants = b;
     }
-    
+
     public boolean useAdvancedMedical() {
-    	return useAdvancedMedical;
+        return useAdvancedMedical;
     }
-   
+
     public void setAdvancedMedical(boolean b) {
-    	this.useAdvancedMedical = b;
+        this.useAdvancedMedical = b;
     }
-    
+
     public boolean useDylansRandomXp() {
-    	return useDylansRandomXp;
+        return useDylansRandomXp;
     }
-   
+
     public void setDylansRandomXp(boolean b) {
-    	this.useDylansRandomXp = b;
+        this.useDylansRandomXp = b;
     }
-    
+
     // Personnel Market
     public boolean getPersonnelMarketReportRefresh() {
-    	return personnelMarketReportRefresh;
+        return personnelMarketReportRefresh;
     }
-    
+
     public void setPersonnelMarketReportRefresh(boolean b) {
-    	personnelMarketReportRefresh = b;
+        personnelMarketReportRefresh = b;
     }
-    
+
     public int getPersonnelMarketType() {
-    	return personnelMarketType;
+        return personnelMarketType;
     }
-    
+
     public void setPersonnelMarketType(int t) {
-    	personnelMarketType = t;
+        personnelMarketType = t;
     }
-    
+
     public int getPersonnelMarketRandomEliteRemoval() {
-    	return personnelMarketRandomEliteRemoval;
+        return personnelMarketRandomEliteRemoval;
     }
-    
+
     public void setPersonnelMarketRandomEliteRemoval(int i) {
-    	personnelMarketRandomEliteRemoval = i;
+        personnelMarketRandomEliteRemoval = i;
     }
-    
+
     public int getPersonnelMarketRandomVeteranRemoval() {
-    	return personnelMarketRandomVeteranRemoval;
+        return personnelMarketRandomVeteranRemoval;
     }
-    
+
     public void setPersonnelMarketRandomVeteranRemoval(int i) {
-    	personnelMarketRandomVeteranRemoval = i;
+        personnelMarketRandomVeteranRemoval = i;
     }
-    
+
     public int getPersonnelMarketRandomRegularRemoval() {
-    	return personnelMarketRandomRegularRemoval;
+        return personnelMarketRandomRegularRemoval;
     }
-    
+
     public void setPersonnelMarketRandomRegularRemoval(int i) {
-    	personnelMarketRandomRegularRemoval = i;
+        personnelMarketRandomRegularRemoval = i;
     }
-    
+
     public int getPersonnelMarketRandomGreenRemoval() {
-    	return personnelMarketRandomGreenRemoval;
+        return personnelMarketRandomGreenRemoval;
     }
-    
+
     public void setPersonnelMarketRandomGreenRemoval(int i) {
-    	personnelMarketRandomGreenRemoval = i;
+        personnelMarketRandomGreenRemoval = i;
     }
-    
+
     public int getPersonnelMarketRandomUltraGreenRemoval() {
-    	return personnelMarketRandomUltraGreenRemoval;
+        return personnelMarketRandomUltraGreenRemoval;
     }
-    
+
     public void setPersonnelMarketRandomUltraGreenRemoval(int i) {
-    	personnelMarketRandomUltraGreenRemoval = i;
+        personnelMarketRandomUltraGreenRemoval = i;
     }
-    
+
     public double getPersonnelMarketDylansWeight() {
-    	return personnelMarketDylansWeight;
+        return personnelMarketDylansWeight;
     }
-    
+
     public void setPersonnelMarketDylansWeight(double d) {
-    	personnelMarketDylansWeight = d;
+        personnelMarketDylansWeight = d;
     }
-    
+
     public boolean payForParts() {
-    	return payForParts;
+        return payForParts;
     }
-    
+
     public void setPayForParts(boolean b) {
-    	this.payForParts = b;
+        this.payForParts = b;
     }
-    
+
     public boolean payForUnits() {
-    	return payForUnits;
+        return payForUnits;
     }
-    
+
     public void setPayForUnits(boolean b) {
-    	this.payForUnits = b;
+        this.payForUnits = b;
     }
-    
+
     public boolean payForSalaries() {
-    	return payForSalaries;
+        return payForSalaries;
     }
-    
+
     public void setPayForSalaries(boolean b) {
-    	this.payForSalaries = b;
+        this.payForSalaries = b;
     }
-    
+
     public boolean payForRecruitment() {
         return payForRecruitment;
     }
-    
+
     public void setPayForRecruitment(boolean b) {
         this.payForRecruitment = b;
     }
-    
+
     public boolean payForOverhead() {
-    	return payForOverhead;
+        return payForOverhead;
     }
-    
+
     public void setPayForOverhead(boolean b) {
-    	this.payForOverhead = b;
+        this.payForOverhead = b;
     }
-    
+
     public boolean payForMaintain() {
-    	return payForMaintain;
+        return payForMaintain;
     }
-    
+
     public void setPayForMaintain(boolean b) {
-    	this.payForMaintain = b;
+        this.payForMaintain = b;
     }
-    
+
     public boolean payForTransport() {
-    	return payForTransport;
+        return payForTransport;
     }
-    
+
     public void setPayForTransport(boolean b) {
-    	this.payForTransport = b;
+        this.payForTransport = b;
     }
-    
+
     public boolean canSellUnits() {
-    	return  sellUnits;
+        return sellUnits;
     }
-    
+
     public void setSellUnits(boolean b) {
-    	this.sellUnits = b;
+        this.sellUnits = b;
     }
-    
+
     public boolean canSellParts() {
-    	return  sellParts;
+        return sellParts;
     }
-    
+
     public void setSellParts(boolean b) {
-    	this.sellParts = b;
+        this.sellParts = b;
     }
-    
+
     public boolean useLoanLimits() {
         return useLoanLimits;
     }
-   
+
     public void setLoanLimits(boolean b) {
         this.useLoanLimits = b;
     }
-    
+
     public boolean useQuirks() {
-    	return useQuirks;
+        return useQuirks;
     }
-   
+
     public void setQuirks(boolean b) {
-    	this.useQuirks = b;
+        this.useQuirks = b;
     }
-    
+
     public int getScenarioXP() {
-    	return scenarioXP;
+        return scenarioXP;
     }
-    
+
     public void setScenarioXP(int xp) {
-    	scenarioXP = xp;
+        scenarioXP = xp;
     }
-    
+
     public int getKillsForXP() {
-    	return killsForXP;
+        return killsForXP;
     }
-    
+
     public void setKillsForXP(int k) {
-    	killsForXP = k;
+        killsForXP = k;
     }
-    
+
     public int getKillXPAward() {
-    	return killXPAward;
+        return killXPAward;
     }
-    
+
     public void setKillXPAward(int xp) {
-    	killXPAward = xp;
+        killXPAward = xp;
     }
-    
+
     public int getNTasksXP() {
-    	return nTasksXP;
+        return nTasksXP;
     }
-    
+
     public void setNTasksXP(int xp) {
-    	nTasksXP = xp;
+        nTasksXP = xp;
     }
-    
+
     public int getTaskXP() {
-    	return tasksXP;
+        return tasksXP;
     }
-    
+
     public void setTaskXP(int b) {
-    	tasksXP = b;
+        tasksXP = b;
     }
-    
+
     public int getMistakeXP() {
-    	return mistakeXP;
+        return mistakeXP;
     }
-    
+
     public void setMistakeXP(int b) {
-    	mistakeXP = b;
+        mistakeXP = b;
     }
-    
+
     public int getSuccessXP() {
-    	return successXP;
+        return successXP;
     }
-    
+
     public void setSuccessXP(int b) {
-    	successXP = b;
+        successXP = b;
     }
-    
-    
+
+
     public boolean limitByYear() {
-    	return limitByYear;
+        return limitByYear;
     }
-    
+
     public void setLimitByYear(boolean b) {
-    	limitByYear = b;
+        limitByYear = b;
     }
-    
+
     public boolean allowClanPurchases() {
-    	return allowClanPurchases;
+        return allowClanPurchases;
     }
-    
+
     public void setAllowClanPurchases(boolean b) {
-    	allowClanPurchases = b;
+        allowClanPurchases = b;
     }
-    
+
     public boolean allowISPurchases() {
-    	return allowISPurchases;
+        return allowISPurchases;
     }
-    
+
     public void setAllowISPurchases(boolean b) {
-    	allowISPurchases = b;
+        allowISPurchases = b;
     }
-    
+
     public boolean allowCanonOnly() {
-    	return allowCanonOnly;
+        return allowCanonOnly;
     }
-    
+
     public void setAllowCanonOnly(boolean b) {
-    	allowCanonOnly = b;
+        allowCanonOnly = b;
     }
-    
+
     public boolean useAmmoByType() {
-    	return useAmmoByType;
+        return useAmmoByType;
     }
-    
+
     public void setUseAmmoByType(boolean b) {
-    	useAmmoByType = b;
+        useAmmoByType = b;
     }
-    
+
     public boolean usePercentageMaint() {
-    	return usePercentageMaint;
+        return usePercentageMaint;
     }
-    
+
     public void setUsePercentageMaint(boolean b) {
-    	usePercentageMaint = b;
+        usePercentageMaint = b;
     }
-    
+
     public int getTechLevel() {
-    	return techLevel;
+        return techLevel;
     }
-    
+
     public void setTechLevel(int lvl) {
-    	techLevel = lvl;
+        techLevel = lvl;
     }
-    
+
     public int getProbPhenoMW() {
         return probPhenoMW;
     }
-    
+
     public void setProbPhenoMW(int p) {
         probPhenoMW = p;
     }
-    
+
     public int getProbPhenoAero() {
         return probPhenoAero;
     }
-    
+
     public void setProbPhenoAero(int p) {
         probPhenoAero = p;
     }
-    
+
     public int getProbPhenoBA() {
         return probPhenoBA;
     }
-    
+
     public void setProbPhenoBA(int p) {
         probPhenoBA = p;
     }
-    
+
     public int getProbPhenoVee() {
         return probPhenoVee;
     }
-    
+
     public void setProbPhenoVee(int p) {
         probPhenoVee = p;
     }
-    
-    
+
+
     public boolean usePortraitForType(int type) {
-    	if(type < 0 || type >= usePortraitForType.length) {
-    		return false;
-    	}
-    	return usePortraitForType[type];
+        if (type < 0 || type >= usePortraitForType.length) {
+            return false;
+        }
+        return usePortraitForType[type];
     }
-    
+
     public void setUsePortraitForType(int type, boolean b) {
-    	if(type < 0 || type >= usePortraitForType.length) {
-    		return;
-    	}
-    	usePortraitForType[type] = b;
+        if (type < 0 || type >= usePortraitForType.length) {
+            return;
+        }
+        usePortraitForType[type] = b;
     }
-    
+
     public int getIdleXP() {
-    	return idleXP;
+        return idleXP;
     }
-    
+
     public void setIdleXP(int xp) {
-    	idleXP = xp;
+        idleXP = xp;
     }
-    
+
     public int getTargetIdleXP() {
-    	return targetIdleXP;
+        return targetIdleXP;
     }
-    
+
     public void setTargetIdleXP(int xp) {
-    	targetIdleXP = xp;
+        targetIdleXP = xp;
     }
-    
+
     public int getMonthsIdleXP() {
-    	return monthsIdleXP;
+        return monthsIdleXP;
     }
-    
+
     public void setMonthsIdleXP(int m) {
-    	monthsIdleXP = m;
+        monthsIdleXP = m;
     }
-    
+
     public int getWaitingPeriod() {
         return waitingPeriod;
     }
-    
+
     public void setWaitingPeriod(int d) {
         waitingPeriod = d;
     }
-    
+
     public String getAcquisitionSkill() {
         return acquisitionSkill;
     }
-    
+
     public void setAcquisitionSkill(String skill) {
         acquisitionSkill = skill;
     }
-    
+
     public void setAcquisitionSupportStaffOnly(boolean b) {
         this.acquisitionSupportStaffOnly = b;
     }
-    
+
     public boolean isAcquisitionSupportStaffOnly() {
         return acquisitionSupportStaffOnly;
     }
-   
+
     public int getNDiceTransitTime() {
         return nDiceTransitTime;
     }
-    
+
     public void setNDiceTransitTime(int d) {
         nDiceTransitTime = d;
     }
-    
+
     public int getConstantTransitTime() {
         return constantTransitTime;
     }
-    
+
     public void setConstantTransitTime(int d) {
         constantTransitTime = d;
     }
-    
+
     public int getUnitTransitTime() {
         return unitTransitTime;
     }
-    
+
     public void setUnitTransitTime(int d) {
         unitTransitTime = d;
     }
-    
+
     public int getAcquireMosUnit() {
         return acquireMosUnit;
     }
-    
+
     public void setAcquireMosUnit(int b) {
         acquireMosUnit = b;
     }
-    
+
     public int getAcquireMosBonus() {
         return acquireMosBonus;
     }
-    
+
     public void setAcquireMosBonus(int b) {
         acquireMosBonus = b;
     }
-    
+
     public int getAcquireMinimumTimeUnit() {
         return acquireMinimumTimeUnit;
     }
-    
+
     public void setAcquireMinimumTimeUnit(int b) {
         acquireMinimumTimeUnit = b;
     }
-    
+
     public int getAcquireMinimumTime() {
         return acquireMinimumTime;
     }
-    
+
     public void setAcquireMinimumTime(int b) {
         acquireMinimumTime = b;
     }
-    
+
     public double getEquipmentContractPercent() {
         return equipmentContractPercent;
     }
-    
+
     public void setEquipmentContractPercent(double b) {
         equipmentContractPercent = b;
     }
-    
+
     public boolean useEquipmentContractBase() {
         return equipmentContractBase;
     }
-    
+
     public void setEquipmentContractBase(boolean b) {
         this.equipmentContractBase = b;
     }
-    
+
     public boolean useEquipmentContractSaleValue() {
         return equipmentContractSaleValue;
     }
-    
+
     public void setEquipmentContractSaleValue(boolean b) {
         this.equipmentContractSaleValue = b;
     }
-    
+
     public boolean useBLCSaleValue() {
         return blcSaleValue;
     }
-    
+
     public void setBLCSaleValue(boolean b) {
         this.blcSaleValue = b;
     }
-    
+
     public int getClanAcquisitionPenalty() {
         return clanAcquisitionPenalty;
     }
-    
+
     public void setClanAcquisitionPenalty(int b) {
         clanAcquisitionPenalty = b;
     }
-    
+
     public int getIsAcquisitionPenalty() {
         return isAcquisitionPenalty;
     }
-    
+
     public void setIsAcquisitionPenalty(int b) {
         isAcquisitionPenalty = b;
     }
-    
+
     public int getHealingWaitingPeriod() {
         return healWaitingPeriod;
     }
-    
+
     public void setHealingWaitingPeriod(int d) {
         healWaitingPeriod = d;
     }
-    
+
     public int getNaturalHealingWaitingPeriod() {
         return naturalHealingWaitingPeriod;
     }
-    
+
     public void setNaturalHealingWaitingPeriod(int d) {
         naturalHealingWaitingPeriod = d;
     }
-    
+
     public int getMaintenanceCycleDays() {
         return maintenanceCycleDays;
     }
-    
+
     public void setMaintenanceCycleDays(int d) {
         maintenanceCycleDays = d;
     }
-    
+
     public int getMaintenanceBonus() {
         return maintenanceBonus;
     }
-    
+
     public void setMaintenanceBonus(int d) {
         maintenanceBonus = d;
     }
-    
+
     public boolean useQualityMaintenance() {
         return useQualityMaintenance;
     }
-    
+
     public void setUseQualityMaintenance(boolean b) {
         useQualityMaintenance = b;
     }
-    
+
     public boolean checkMaintenance() {
         return checkMaintenance;
     }
-    
+
     public void setCheckMaintenance(boolean b) {
         checkMaintenance = b;
     }
-    
+
     public boolean isDestroyByMargin() {
         return destroyByMargin;
     }
-    
+
     public void setDestroyByMargin(boolean b) {
         destroyByMargin = b;
     }
-    
+
     public int getDestroyMargin() {
         return destroyMargin;
     }
-    
+
     public void setDestroyMargin(int d) {
         destroyMargin = d;
     }
-    
+
     public boolean useRandomHitsForVees() {
         return useRandomHitsForVees;
     }
-    
+
     public void setUseRandomHitsForVees(boolean b) {
         useRandomHitsForVees = b;
     }
-    
+
     public int getMaxAcquisitions() {
         return maxAcquisitions;
     }
-    
+
     public void setMaxAcquisitions(int d) {
-    	maxAcquisitions = d;
+        maxAcquisitions = d;
     }
-    
+
     public int getMinimumHitsForVees() {
         return minimumHitsForVees;
     }
-    
+
     public void setMinimumHitsForVees(int d) {
         minimumHitsForVees = d;
     }
-    
+
     public int getBaseSalary(int type) {
-        if(type < 0 || type >= salaryTypeBase.length) {
+        if (type < 0 || type >= salaryTypeBase.length) {
             return 0;
         }
         return salaryTypeBase[type];
     }
-    
+
     public void setBaseSalary(int base, int type) {
-        if(type < 0 || type >= salaryTypeBase.length) {
+        if (type < 0 || type >= salaryTypeBase.length) {
             return;
         }
         this.salaryTypeBase[type] = base;
     }
-    
+
     public double getSalaryXpMultiplier(int xp) {
-        if(xp < 0 || xp >= salaryXpMultiplier.length) {
+        if (xp < 0 || xp >= salaryXpMultiplier.length) {
             return 1.0;
         }
         return salaryXpMultiplier[xp];
     }
-    
+
     public void setSalaryXpMultiplier(double d, int xp) {
-        if(xp < 0 || xp >= salaryXpMultiplier.length) {
+        if (xp < 0 || xp >= salaryXpMultiplier.length) {
             return;
         }
         this.salaryXpMultiplier[xp] = d;
     }
-    
+
     public double getSalaryEnlistedMultiplier() {
         return salaryEnlistedMultiplier;
     }
-    
+
     public void setSalaryEnlistedMultiplier(double d) {
         salaryEnlistedMultiplier = d;
     }
-    
+
     public double getSalaryCommissionMultiplier() {
         return salaryCommissionMultiplier;
     }
-    
+
     public void setSalaryCommissionMultiplier(double d) {
         salaryCommissionMultiplier = d;
     }
-    
+
     public double getSalaryAntiMekMultiplier() {
         return salaryAntiMekMultiplier;
     }
-    
+
     public void setSalaryAntiMekMultiplier(double d) {
         salaryAntiMekMultiplier = d;
     }
-    
+
     public boolean useTougherHealing() {
         return tougherHealing;
     }
-    
+
     public void setTougherHealing(boolean b) {
         tougherHealing = b;
     }
-    
-	public void writeToXml(PrintWriter pw1, int indent) {
-		pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "clanPriceModifier", clanPriceModifier); //private double clanPriceModifier;
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useFactionForNames", useFactionForNames); //private boolean useFinances;
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "repairSystem", repairSystem); //private int repairSystem;
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useDragoonRating", useDragoonRating);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "dragoonsRatingMethod", dragoonsRatingMethod.getDescription());
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useEraMods", useEraMods); 
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useTactics", useTactics);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useInitBonus", useInitBonus);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useToughness", useToughness);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useArtillery", useArtillery);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useAbilities", useAbilities);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useEdge", useEdge);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useImplants", useImplants);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useAdvancedMedical", useAdvancedMedical);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useDylansRandomXp", useDylansRandomXp);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useQuirks", useQuirks);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForParts", payForParts);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForUnits", payForUnits);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForSalaries", payForSalaries);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForOverhead", payForOverhead);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForMaintain", payForMaintain);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForTransport", payForTransport);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "usedPartsValueA", usedPartsValue[0]);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "usedPartsValueB", usedPartsValue[1]);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "usedPartsValueC", usedPartsValue[2]);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "usedPartsValueD", usedPartsValue[3]);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "usedPartsValueE", usedPartsValue[4]);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "usedPartsValueF", usedPartsValue[5]);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "damagedPartsValue", damagedPartsValue);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "canceledOrderReimbursement", canceledOrderReimbursement);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "sellUnits", sellUnits);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "sellParts", sellParts);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "scenarioXP", scenarioXP);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "killsForXP", killsForXP);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "killXPAward", killXPAward);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "nTasksXP", nTasksXP);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "tasksXP", tasksXP);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "mistakeXP", mistakeXP);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "successXP", successXP);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "idleXP", idleXP);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "targetIdleXP", targetIdleXP);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "monthsIdleXP", monthsIdleXP);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "limitByYear", limitByYear);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "allowClanPurchases", allowClanPurchases);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "allowISPurchases", allowISPurchases);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "allowCanonOnly", allowCanonOnly);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useAmmoByType", useAmmoByType);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "usePercentageMaint", usePercentageMaint);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "waitingPeriod", waitingPeriod);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "acquisitionSkill", acquisitionSkill);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "acquisitionSupportStaffOnly", acquisitionSupportStaffOnly);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "techLevel", techLevel);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "nDiceTransitTime", nDiceTransitTime);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "constantTransitTime", constantTransitTime);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "unitTransitTime", unitTransitTime);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "acquireMosBonus", acquireMosBonus);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "acquireMosUnit", acquireMosUnit);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "acquireMinimumTime", acquireMinimumTime);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "acquireMinimumTimeUnit", acquireMinimumTimeUnit);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "equipmentContractPercent", equipmentContractPercent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "equipmentContractBase", equipmentContractBase);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "equipmentContractSaleValue", equipmentContractSaleValue);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "blcSaleValue", blcSaleValue);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "clanAcquisitionPenalty", clanAcquisitionPenalty);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "isAcquisitionPenalty", isAcquisitionPenalty);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useLoanLimits", useLoanLimits);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForRecruitment", payForRecruitment);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "healWaitingPeriod", healWaitingPeriod);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "naturalHealingWaitingPeriod", naturalHealingWaitingPeriod);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "destroyByMargin", destroyByMargin);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "destroyMargin", destroyMargin);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "maintenanceCycleDays", maintenanceCycleDays);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "maintenanceBonus", maintenanceBonus);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useQualityMaintenance", useQualityMaintenance);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "checkMaintenance", checkMaintenance);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useRandomHitsForVees", useRandomHitsForVees);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "minimumHitsForVees", minimumHitsForVees);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "maxAcquisitions", maxAcquisitions);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "personnelMarketType", personnelMarketType);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "personnelMarketRandomEliteRemoval", personnelMarketRandomEliteRemoval);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "personnelMarketRandomVeteranRemoval", personnelMarketRandomVeteranRemoval);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "personnelMarketRandomRegularRemoval", personnelMarketRandomRegularRemoval);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "personnelMarketRandomGreenRemoval", personnelMarketRandomGreenRemoval);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "personnelMarketRandomUltraGreenRemoval", personnelMarketRandomUltraGreenRemoval);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "personnelMarketReportRefresh", personnelMarketReportRefresh);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "personnelMarketDylansWeight", personnelMarketDylansWeight);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "salaryEnlistedMultiplier", salaryEnlistedMultiplier);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "salaryCommissionMultiplier", salaryCommissionMultiplier);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "salaryAntiMekMultiplier", salaryAntiMekMultiplier);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "probPhenoMW", probPhenoMW);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "probPhenoAero", probPhenoAero);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "probPhenoBA", probPhenoBA);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "probPhenoVee", probPhenoVee);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "tougherHealing", tougherHealing);
-        
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<salaryTypeBase>"
-                +Utilities.printIntegerArray(salaryTypeBase)
-                +"</salaryTypeBase>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<salaryXpMultiplier>"
-                +Utilities.printDoubleArray(salaryXpMultiplier)
-                +"</salaryXpMultiplier>");
-        
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<usePortraitForType>"
-				+Utilities.printBooleanArray(usePortraitForType)
-				+"</usePortraitForType>");
-		pw1.println(MekHqXmlUtil.indentStr(indent) + "</campaignOptions>");
-	}
 
-	public static CampaignOptions generateCampaignOptionsFromXml(Node wn) {
-		MekHQ.logMessage("Loading Campaign Options from XML...", 4);
+    public void writeToXml(PrintWriter pw1, int indent) {
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanPriceModifier", clanPriceModifier); //private double clanPriceModifier;
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useFactionForNames", useFactionForNames); //private boolean useFinances;
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "repairSystem", repairSystem); //private int repairSystem;
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnitRating", useUnitRating);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitRatingMethod", unitRatingMethod.getDescription());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useEraMods", useEraMods);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTactics", useTactics);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useInitBonus", useInitBonus);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useToughness", useToughness);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useArtillery", useArtillery);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAbilities", useAbilities);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useEdge", useEdge);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useImplants", useImplants);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAdvancedMedical", useAdvancedMedical);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useDylansRandomXp", useDylansRandomXp);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useQuirks", useQuirks);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForParts", payForParts);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForUnits", payForUnits);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForSalaries", payForSalaries);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForOverhead", payForOverhead);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForMaintain", payForMaintain);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForTransport", payForTransport);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueA", usedPartsValue[0]);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueB", usedPartsValue[1]);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueC", usedPartsValue[2]);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueD", usedPartsValue[3]);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueE", usedPartsValue[4]);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueF", usedPartsValue[5]);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "damagedPartsValue", damagedPartsValue);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "canceledOrderReimbursement", canceledOrderReimbursement);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "sellUnits", sellUnits);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "sellParts", sellParts);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "scenarioXP", scenarioXP);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "killsForXP", killsForXP);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "killXPAward", killXPAward);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "nTasksXP", nTasksXP);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "tasksXP", tasksXP);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "mistakeXP", mistakeXP);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "successXP", successXP);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "idleXP", idleXP);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "targetIdleXP", targetIdleXP);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "monthsIdleXP", monthsIdleXP);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "limitByYear", limitByYear);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowClanPurchases", allowClanPurchases);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowISPurchases", allowISPurchases);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowCanonOnly", allowCanonOnly);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAmmoByType", useAmmoByType);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePercentageMaint", usePercentageMaint);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "waitingPeriod", waitingPeriod);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquisitionSkill", acquisitionSkill);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquisitionSupportStaffOnly", acquisitionSupportStaffOnly);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "techLevel", techLevel);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "nDiceTransitTime", nDiceTransitTime);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "constantTransitTime", constantTransitTime);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitTransitTime", unitTransitTime);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquireMosBonus", acquireMosBonus);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquireMosUnit", acquireMosUnit);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquireMinimumTime", acquireMinimumTime);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquireMinimumTimeUnit", acquireMinimumTimeUnit);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentContractPercent", equipmentContractPercent);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentContractBase", equipmentContractBase);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentContractSaleValue", equipmentContractSaleValue);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "blcSaleValue", blcSaleValue);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanAcquisitionPenalty", clanAcquisitionPenalty);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "isAcquisitionPenalty", isAcquisitionPenalty);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useLoanLimits", useLoanLimits);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForRecruitment", payForRecruitment);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "healWaitingPeriod", healWaitingPeriod);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "naturalHealingWaitingPeriod", naturalHealingWaitingPeriod);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "destroyByMargin", destroyByMargin);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "destroyMargin", destroyMargin);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maintenanceCycleDays", maintenanceCycleDays);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maintenanceBonus", maintenanceBonus);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useQualityMaintenance", useQualityMaintenance);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "checkMaintenance", checkMaintenance);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomHitsForVees", useRandomHitsForVees);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minimumHitsForVees", minimumHitsForVees);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maxAcquisitions", maxAcquisitions);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketType", personnelMarketType);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomEliteRemoval", personnelMarketRandomEliteRemoval);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomVeteranRemoval", personnelMarketRandomVeteranRemoval);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomRegularRemoval", personnelMarketRandomRegularRemoval);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomGreenRemoval", personnelMarketRandomGreenRemoval);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomUltraGreenRemoval", personnelMarketRandomUltraGreenRemoval);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketReportRefresh", personnelMarketReportRefresh);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketDylansWeight", personnelMarketDylansWeight);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "salaryEnlistedMultiplier", salaryEnlistedMultiplier);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "salaryCommissionMultiplier", salaryCommissionMultiplier);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "salaryAntiMekMultiplier", salaryAntiMekMultiplier);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "probPhenoMW", probPhenoMW);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "probPhenoAero", probPhenoAero);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "probPhenoBA", probPhenoBA);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "probPhenoVee", probPhenoVee);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "tougherHealing", tougherHealing);
 
-		wn.normalize();
-		CampaignOptions retVal = new CampaignOptions();
-		NodeList wList = wn.getChildNodes();
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                    + "<salaryTypeBase>"
+                    + Utilities.printIntegerArray(salaryTypeBase)
+                    + "</salaryTypeBase>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                    + "<salaryXpMultiplier>"
+                    + Utilities.printDoubleArray(salaryXpMultiplier)
+                    + "</salaryXpMultiplier>");
 
-		// Okay, lets iterate through the children, eh?
-		for (int x = 0; x < wList.getLength(); x++) {
-			Node wn2 = wList.item(x);
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                    + "<usePortraitForType>"
+                    + Utilities.printBooleanArray(usePortraitForType)
+                    + "</usePortraitForType>");
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "</campaignOptions>");
+    }
 
-			// If it's not an element node, we ignore it.
-			if (wn2.getNodeType() != Node.ELEMENT_NODE)
-				continue;
-			
-			MekHQ.logMessage("---",5);
-			MekHQ.logMessage(wn2.getNodeName(),5);
-			MekHQ.logMessage("\t"+wn2.getTextContent(),5);
+    public static CampaignOptions generateCampaignOptionsFromXml(Node wn) {
+        MekHQ.logMessage("Loading Campaign Options from XML...", 4);
 
-			if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) {
-				retVal.clanPriceModifier = Double.parseDouble(wn2.getTextContent());
-			} else if (wn2.getNodeName().equalsIgnoreCase("useFactionForNames")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.useFactionForNames = true;
-				else
-					retVal.useFactionForNames = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("repairSystem")) {
-				retVal.repairSystem = Integer.parseInt(wn2.getTextContent());
-			} else if (wn2.getNodeName().equalsIgnoreCase("useEraMods")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.useEraMods = true;
-				else
-					retVal.useEraMods = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("useTactics")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.useTactics = true;
-				else
-					retVal.useTactics = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("useInitBonus")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.useInitBonus = true;
-				else
-					retVal.useInitBonus = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("useToughness")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.useToughness = true;
-				else
-					retVal.useToughness = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("useArtillery")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.useArtillery = true;
-				else
-					retVal.useArtillery = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("useAbilities")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.useAbilities = true;
-				else
-					retVal.useAbilities = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("useEdge")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.useEdge = true;
-				else
-					retVal.useEdge = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("useImplants")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.useImplants = true;
-				else
-					retVal.useImplants = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("useAdvancedMedical")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.useAdvancedMedical = true;
-				else
-					retVal.useAdvancedMedical = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("useDylansRandomXp")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.useDylansRandomXp = true;
-				else
-					retVal.useDylansRandomXp = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("useQuirks")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.useQuirks = true;
-				else
-					retVal.useQuirks = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("payForParts")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.payForParts = true;
-				else
-					retVal.payForParts = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("payForUnits")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.payForUnits = true;
-				else
-					retVal.payForUnits = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("payForSalaries")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.payForSalaries = true;
-				else
-					retVal.payForSalaries = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("payForOverhead")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.payForOverhead = true;
-				else
-					retVal.payForOverhead = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("payForMaintain")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.payForMaintain = true;
-				else
-					retVal.payForMaintain = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("payForTransport")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.payForTransport = true;
-				else
-					retVal.payForTransport = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("payForRecruitment")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true"))
+        wn.normalize();
+        CampaignOptions retVal = new CampaignOptions();
+        NodeList wList = wn.getChildNodes();
+
+        // Okay, lets iterate through the children, eh?
+        for (int x = 0; x < wList.getLength(); x++) {
+            Node wn2 = wList.item(x);
+
+            // If it's not an element node, we ignore it.
+            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            MekHQ.logMessage("---", 5);
+            MekHQ.logMessage(wn2.getNodeName(), 5);
+            MekHQ.logMessage("\t" + wn2.getTextContent(), 5);
+
+            if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) {
+                retVal.clanPriceModifier = Double.parseDouble(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useFactionForNames")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.useFactionForNames = true;
+                } else {
+                    retVal.useFactionForNames = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("repairSystem")) {
+                retVal.repairSystem = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useEraMods")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.useEraMods = true;
+                } else {
+                    retVal.useEraMods = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("useTactics")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.useTactics = true;
+                } else {
+                    retVal.useTactics = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("useInitBonus")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.useInitBonus = true;
+                } else {
+                    retVal.useInitBonus = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("useToughness")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.useToughness = true;
+                } else {
+                    retVal.useToughness = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("useArtillery")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.useArtillery = true;
+                } else {
+                    retVal.useArtillery = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("useAbilities")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.useAbilities = true;
+                } else {
+                    retVal.useAbilities = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("useEdge")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.useEdge = true;
+                } else {
+                    retVal.useEdge = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("useImplants")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.useImplants = true;
+                } else {
+                    retVal.useImplants = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("useAdvancedMedical")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.useAdvancedMedical = true;
+                } else {
+                    retVal.useAdvancedMedical = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("useDylansRandomXp")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.useDylansRandomXp = true;
+                } else {
+                    retVal.useDylansRandomXp = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("useQuirks")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.useQuirks = true;
+                } else {
+                    retVal.useQuirks = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("payForParts")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.payForParts = true;
+                } else {
+                    retVal.payForParts = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("payForUnits")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.payForUnits = true;
+                } else {
+                    retVal.payForUnits = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("payForSalaries")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.payForSalaries = true;
+                } else {
+                    retVal.payForSalaries = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("payForOverhead")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.payForOverhead = true;
+                } else {
+                    retVal.payForOverhead = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("payForMaintain")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.payForMaintain = true;
+                } else {
+                    retVal.payForMaintain = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("payForTransport")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.payForTransport = true;
+                } else {
+                    retVal.payForTransport = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("payForRecruitment")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
                     retVal.payForRecruitment = true;
-                else
+                } else {
                     retVal.payForRecruitment = false;
+                }
             } else if (wn2.getNodeName().equalsIgnoreCase("useLoanLimits")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true"))
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
                     retVal.useLoanLimits = true;
-                else
+                } else {
                     retVal.useLoanLimits = false;
+                }
             } else if (wn2.getNodeName().equalsIgnoreCase("sellUnits")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.sellUnits = true;
-				else
-					retVal.sellUnits = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("sellParts")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.sellParts = true;
-				else
-					retVal.sellParts = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueA")) {
-				retVal.usedPartsValue[0] = Double.parseDouble(wn2.getTextContent().trim());
-			} else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueB")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.sellUnits = true;
+                } else {
+                    retVal.sellUnits = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("sellParts")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.sellParts = true;
+                } else {
+                    retVal.sellParts = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueA")) {
+                retVal.usedPartsValue[0] = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueB")) {
                 retVal.usedPartsValue[1] = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueC")) {
                 retVal.usedPartsValue[2] = Double.parseDouble(wn2.getTextContent().trim());
@@ -1369,30 +1392,30 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueF")) {
                 retVal.usedPartsValue[5] = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("damagedPartsValue")) {
-				retVal.damagedPartsValue = Double.parseDouble(wn2.getTextContent().trim());
-			} else if (wn2.getNodeName().equalsIgnoreCase("canceledOrderReimbursement")) {
+                retVal.damagedPartsValue = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("canceledOrderReimbursement")) {
                 retVal.canceledOrderReimbursement = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("scenarioXP")) {
-				retVal.scenarioXP = Integer.parseInt(wn2.getTextContent().trim());
-			} else if (wn2.getNodeName().equalsIgnoreCase("killsForXP")) {
-				retVal.killsForXP = Integer.parseInt(wn2.getTextContent().trim());
-			} else if (wn2.getNodeName().equalsIgnoreCase("killXPAward")) {
-				retVal.killXPAward = Integer.parseInt(wn2.getTextContent().trim());
-			} else if (wn2.getNodeName().equalsIgnoreCase("nTasksXP")) {
-				retVal.nTasksXP = Integer.parseInt(wn2.getTextContent().trim());
-			} else if (wn2.getNodeName().equalsIgnoreCase("tasksXP")) {
-				retVal.tasksXP = Integer.parseInt(wn2.getTextContent().trim());
-			} else if (wn2.getNodeName().equalsIgnoreCase("successXP")) {
-				retVal.successXP = Integer.parseInt(wn2.getTextContent().trim());
-			} else if (wn2.getNodeName().equalsIgnoreCase("mistakeXP")) {
-				retVal.mistakeXP = Integer.parseInt(wn2.getTextContent().trim());
-			} else if (wn2.getNodeName().equalsIgnoreCase("idleXP")) {
-				retVal.idleXP = Integer.parseInt(wn2.getTextContent().trim());
-			} else if (wn2.getNodeName().equalsIgnoreCase("targetIdleXP")) {
-				retVal.targetIdleXP = Integer.parseInt(wn2.getTextContent().trim());
-			} else if (wn2.getNodeName().equalsIgnoreCase("monthsIdleXP")) {
-				retVal.monthsIdleXP = Integer.parseInt(wn2.getTextContent().trim());
-			} else if (wn2.getNodeName().equalsIgnoreCase("waitingPeriod")) {
+                retVal.scenarioXP = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("killsForXP")) {
+                retVal.killsForXP = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("killXPAward")) {
+                retVal.killXPAward = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("nTasksXP")) {
+                retVal.nTasksXP = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("tasksXP")) {
+                retVal.tasksXP = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("successXP")) {
+                retVal.successXP = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("mistakeXP")) {
+                retVal.mistakeXP = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("idleXP")) {
+                retVal.idleXP = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("targetIdleXP")) {
+                retVal.targetIdleXP = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("monthsIdleXP")) {
+                retVal.monthsIdleXP = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("waitingPeriod")) {
                 retVal.waitingPeriod = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("healWaitingPeriod")) {
                 retVal.healWaitingPeriod = Integer.parseInt(wn2.getTextContent().trim());
@@ -1421,80 +1444,93 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractPercent")) {
                 retVal.equipmentContractPercent = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractBase")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true"))
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
                     retVal.equipmentContractBase = true;
-                else
+                } else {
                     retVal.equipmentContractBase = false;
-            } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractSaleValue")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true"))
-                    retVal.equipmentContractSaleValue = true;
-                else
-                    retVal.equipmentContractSaleValue = false;
-            } else if (wn2.getNodeName().equalsIgnoreCase("blcSaleValue")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true"))
-                    retVal.blcSaleValue = true;
-                else
-                    retVal.blcSaleValue = false;
-            } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionSupportStaffOnly")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true"))
-                    retVal.acquisitionSupportStaffOnly = true;
-                else
-                    retVal.acquisitionSupportStaffOnly = false;
-            } else if (wn2.getNodeName().equalsIgnoreCase("limitByYear")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.limitByYear = true;
-				else
-					retVal.limitByYear = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("allowClanPurchases")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.allowClanPurchases = true;
-				else
-					retVal.allowClanPurchases = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("allowISPurchases")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.allowISPurchases = true;
-				else
-					retVal.allowISPurchases = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("allowCanonOnly")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.allowCanonOnly = true;
-				else
-					retVal.allowCanonOnly = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("useAmmoByType")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.useAmmoByType = true;
-				else
-					retVal.useAmmoByType = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("usePercentageMaint")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.usePercentageMaint = true;
-				else
-					retVal.usePercentageMaint = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("techLevel")) {
-				retVal.techLevel = Integer.parseInt(wn2.getTextContent().trim());
-			} else if (wn2.getNodeName().equalsIgnoreCase("useDragoonRating")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.useDragoonRating = true;
-				else
-					retVal.useDragoonRating = false;
-            } else if (wn2.getNodeName().equalsIgnoreCase("dragoonsRatingMethod")) {
-                if (!wn2.getTextContent().isEmpty() && (wn2.getTextContent() != null)) {
-                    DragoonsRatingMethod method = DragoonsRatingMethod.getDragoonsRatingMethod(wn2.getTextContent());
-                    retVal.setDragoonsRatingMethod((method != null) ? method : DragoonsRatingMethod.TAHARQA);
                 }
-			} else if (wn2.getNodeName().equalsIgnoreCase("usePortraitForType")) {
-			 	String[] values = wn2.getTextContent().split(",");
-				for(int i = 0; i < values.length; i++) {
-					if (values[i].equalsIgnoreCase("true"))
-						retVal.usePortraitForType[i] = true;
-					else
-						retVal.usePortraitForType[i] = false;
-				}
-			} else if (wn2.getNodeName().equalsIgnoreCase("destroyByMargin")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true"))
+            } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractSaleValue")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.equipmentContractSaleValue = true;
+                } else {
+                    retVal.equipmentContractSaleValue = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("blcSaleValue")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.blcSaleValue = true;
+                } else {
+                    retVal.blcSaleValue = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionSupportStaffOnly")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.acquisitionSupportStaffOnly = true;
+                } else {
+                    retVal.acquisitionSupportStaffOnly = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("limitByYear")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.limitByYear = true;
+                } else {
+                    retVal.limitByYear = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("allowClanPurchases")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.allowClanPurchases = true;
+                } else {
+                    retVal.allowClanPurchases = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("allowISPurchases")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.allowISPurchases = true;
+                } else {
+                    retVal.allowISPurchases = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("allowCanonOnly")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.allowCanonOnly = true;
+                } else {
+                    retVal.allowCanonOnly = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("useAmmoByType")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.useAmmoByType = true;
+                } else {
+                    retVal.useAmmoByType = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("usePercentageMaint")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.usePercentageMaint = true;
+                } else {
+                    retVal.usePercentageMaint = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("techLevel")) {
+                retVal.techLevel = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useUnitRating")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.useUnitRating = true;
+                } else {
+                    retVal.useUnitRating = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("unitRatingMethod")) {
+                if (!wn2.getTextContent().isEmpty() && (wn2.getTextContent() != null)) {
+                    UnitRatingMethod method = UnitRatingMethod.getUnitRatingMethod(wn2.getTextContent());
+                    retVal.setUnitRatingMethod((method != null) ? method : UnitRatingMethod.INTERSTELLAR_OPS);
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("usePortraitForType")) {
+                String[] values = wn2.getTextContent().split(",");
+                for (int i = 0; i < values.length; i++) {
+                    if (values[i].equalsIgnoreCase("true")) {
+                        retVal.usePortraitForType[i] = true;
+                    } else {
+                        retVal.usePortraitForType[i] = false;
+                    }
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("destroyByMargin")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
                     retVal.destroyByMargin = true;
-                else
+                } else {
                     retVal.destroyByMargin = false;
+                }
             } else if (wn2.getNodeName().equalsIgnoreCase("destroyMargin")) {
                 retVal.destroyMargin = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceCycleDays")) {
@@ -1502,40 +1538,43 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceBonus")) {
                 retVal.maintenanceBonus = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useQualityMaintenance")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true"))
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
                     retVal.useQualityMaintenance = true;
-                else
+                } else {
                     retVal.useQualityMaintenance = false;
+                }
             } else if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true"))
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
                     retVal.checkMaintenance = true;
-                else
+                } else {
                     retVal.checkMaintenance = false;
+                }
             } else if (wn2.getNodeName().equalsIgnoreCase("minimumHitsForVees")) {
                 retVal.minimumHitsForVees = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("maxAcquisitions")) {
                 retVal.maxAcquisitions = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVees")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true"))
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
                     retVal.useRandomHitsForVees = true;
-                else
+                } else {
                     retVal.useRandomHitsForVees = false;
+                }
             } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) {
-            	retVal.personnelMarketType = Integer.parseInt(wn2.getTextContent().trim());
+                retVal.personnelMarketType = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomEliteRemoval")) {
-            	retVal.personnelMarketRandomEliteRemoval = Integer.parseInt(wn2.getTextContent().trim());
+                retVal.personnelMarketRandomEliteRemoval = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomVeteranRemoval")) {
-            	retVal.personnelMarketRandomVeteranRemoval = Integer.parseInt(wn2.getTextContent().trim());
+                retVal.personnelMarketRandomVeteranRemoval = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomRegularRemoval")) {
-            	retVal.personnelMarketRandomRegularRemoval = Integer.parseInt(wn2.getTextContent().trim());
+                retVal.personnelMarketRandomRegularRemoval = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomGreenRemoval")) {
-            	retVal.personnelMarketRandomGreenRemoval = Integer.parseInt(wn2.getTextContent().trim());
+                retVal.personnelMarketRandomGreenRemoval = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomUltraGreenRemoval")) {
-            	retVal.personnelMarketRandomUltraGreenRemoval = Integer.parseInt(wn2.getTextContent().trim());
+                retVal.personnelMarketRandomUltraGreenRemoval = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketReportRefresh")) {
-            	retVal.personnelMarketReportRefresh = Boolean.parseBoolean(wn2.getTextContent().trim());
+                retVal.personnelMarketReportRefresh = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketDylansWeight")) {
-            	retVal.personnelMarketDylansWeight = Double.parseDouble(wn2.getTextContent().trim());
+                retVal.personnelMarketDylansWeight = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryCommissionMultiplier")) {
                 retVal.salaryCommissionMultiplier = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryEnlistedMultiplier")) {
@@ -1544,12 +1583,12 @@ public class CampaignOptions implements Serializable {
                 retVal.salaryAntiMekMultiplier = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryTypeBase")) {
                 String[] values = wn2.getTextContent().split(",");
-                for(int i = 0; i < values.length; i++) {
+                for (int i = 0; i < values.length; i++) {
                     retVal.salaryTypeBase[i] = Integer.parseInt(values[i]);
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryXpMultiplier")) {
                 String[] values = wn2.getTextContent().split(",");
-                for(int i = 0; i < values.length; i++) {
+                for (int i = 0; i < values.length; i++) {
                     retVal.salaryXpMultiplier[i] = Double.parseDouble(values[i]);
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoMW")) {
@@ -1562,13 +1601,13 @@ public class CampaignOptions implements Serializable {
                 retVal.probPhenoVee = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("tougherHealing")) {
                 retVal.tougherHealing = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } 
-		}
+            }
+        }
 
-		MekHQ.logMessage("Load Campaign Options Complete!", 4);
+        MekHQ.logMessage("Load Campaign Options Complete!", 4);
 
-		return retVal;
-	}
+        return retVal;
+    }
 
     public enum DragoonsRatingMethod {
         TAHARQA("Taharqa"),

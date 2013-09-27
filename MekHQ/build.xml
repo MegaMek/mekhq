@@ -1,73 +1,121 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- This is an ant build file. See: "http://jakarta.apache.org/ant"-->
 <project default="jar" name="MekHQ">
-	<!-- Global properties for this build -->
-	<property name="src" value="src">
-	</property>
-	<property name="build" value="${basedir}/classes">
-	</property>
-	<property name="mekhq" value="MekHQ.jar">
-	</property>
-	<property name="jarmanifest" value="manifest.txt">
-	</property>
-	<path id="project.classpath">
-		<pathelement path="${build}">
-		</pathelement>
-		<fileset dir="${basedir}">
-			<include
-				name="MegaMek.jar"
-			>
-			</include>
-			<include
-				name="MegaMekLab.jar">
-			</include>
-		</fileset>
-	</path>
-	<target depends="clean" description="Initialize system before build" name="init">
-		<!-- Create the time stamp -->
-		<tstamp>
-		</tstamp>
-		<!-- Ensure that the build directory exists. -->
-		<mkdir dir="${build}">
-		</mkdir>
-	</target>
-	<target depends="init" description="Compile java sources into class files" name="compile">
-		<javac
-			classpathref="project.classpath"
-			debug="true"
-			deprecation="true"
-			destdir="${build}"
-			srcdir="${src}"
-			target="1.6"
-			source="1.6"
-		>
-		</javac>
-	</target>
-	<target description="Remove all compiled and generated files" name="clean">
-		<!-- Delete the ${build} directory tree -->
-		<delete file="${mekhq}">
-		</delete>
-		<delete dir="${build}">
-		</delete>
-	</target>
-	<target
-		depends="compile"
-		description="Create application jar file"
-		name="jar"
-	>
-		<delete file="${mekhq}">
-		</delete>
-		<jar
-			basedir="${build}"
-			compress="true"
-			destfile="${mekhq}"
-			excludes=""
-			includes="**"
-			jarfile="${mekhq}"
-			manifest="manifest.txt"
-		>		
-			<fileset dir="${src}" includes="**/*.properties" />
-		</jar>
-	</target>
-	
+    <!-- Global properties for this build -->
+    <property name="src" value="src"/>
+    <property name="build" value="${basedir}/classes"/>
+    <property name="mekhq" value="MekHQ.jar"/>
+    <property name="jarmanifest" value="manifest.txt"/>
+    <property name="libdir" value="lib"/>
+    <property name="libdir.test" value="lib-test"/>
+    <property name="dir.build.test" location="${build}/test"/>
+    <property name="dir.test.src" location="unittests"/>
+    <property name="dir.build.teststaging" location="${build}/teststaging"/>
+    <property name="dir.build.testreport" location="${build}/testreport"/>
+
+    <path id="project.classpath">
+        <pathelement path="${build}">
+        </pathelement>
+        <fileset dir="${basedir}">
+            <include
+                    name="MegaMek.jar"
+                    >
+            </include>
+            <include
+                    name="MegaMekLab.jar">
+            </include>
+        </fileset>
+    </path>
+
+    <path id="classpath">
+        <fileset dir="${libdir}" includes="*.jar"/>
+    </path>
+    <path id="classpath.compile-unittest">
+        <path refid="classpath"/>
+        <pathelement location="${build}"/>
+        <fileset dir="${libdir.test}"/>
+    </path>
+    <path id="classpath.run-unittest">
+        <path refid="classpath.compile-unittest"/>
+        <pathelement location="${dir.build.test}"/>
+    </path>
+
+    <target depends="clean" description="Initialize system before build" name="init">
+        <!-- Create the time stamp -->
+        <tstamp>
+        </tstamp>
+        <!-- Ensure that the build directory exists. -->
+        <mkdir dir="${build}">
+        </mkdir>
+    </target>
+    <target depends="init" description="Compile java sources into class files" name="compile">
+        <javac
+                classpathref="project.classpath"
+                debug="true"
+                deprecation="true"
+                destdir="${build}"
+                srcdir="${src}"
+                target="1.6"
+                source="1.6"
+                >
+        </javac>
+    </target>
+    <target description="Remove all compiled and generated files" name="clean">
+        <!-- Delete the ${build} directory tree -->
+        <delete file="${mekhq}">
+        </delete>
+        <delete dir="${build}">
+        </delete>
+    </target>
+    <target
+            depends="compile,unit.test"
+            description="Create application jar file"
+            name="jar"
+            >
+        <delete file="${mekhq}">
+        </delete>
+        <jar
+                basedir="${build}"
+                compress="true"
+                destfile="${mekhq}"
+                excludes=""
+                includes="**"
+                jarfile="${mekhq}"
+                manifest="manifest.txt"
+                >
+            <fileset dir="${src}" includes="**/*.properties"/>
+        </jar>
+    </target>
+
+    <target name="compileTests" depends="compile" unless="skip.tests">
+        <delete dir="${dir.build.test}"/>
+        <mkdir dir="${dir.build.test}"/>
+        <javac srcdir="${dir.test.src}" destdir="${dir.build.test}" includeantruntime="false" debug="true">
+            <classpath refid="classpath.compile-unittest"/>
+        </javac>
+    </target>
+
+    <target depends="compileTests" name="unit.test">
+        <delete dir="${dir.build.teststaging}"/>
+        <delete dir="${dir.build.testreport}"/>
+        <mkdir dir="${dir.build.teststaging}"/>
+        <mkdir dir="${dir.build.testreport}"/>
+
+        <junit fork="true" maxmemory="256m" showoutput="true" printsummary="yes" forkmode="once" haltonfailure="true"
+               haltonerror="true" failureproperty="tests.failed">
+            <classpath refid="classpath.run-unittest"/>
+            <formatter type="xml" usefile="true"/>
+            <batchtest fork="true" todir="${dir.build.teststaging}">
+                <fileset dir="${dir.build.test}">
+                    <include name="**/*Test.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+
+        <junitreport todir="${dir.build.testreport}">
+            <fileset dir="${dir.build.teststaging}">
+                <include name="TEST-*.xml"/>
+            </fileset>
+        </junitreport>
+    </target>
 </project>

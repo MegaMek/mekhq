@@ -34,6 +34,7 @@ v0.3.4 (SVN)
 + Bug: No revision detection in Version.java meaning no revision check for new rank system
   to be compatible with revision based releases
 + Bug: Personnel Market always empty after TableModel change
++ Bug [#412]: Support Ratings - Field Manual Mercs (rev) fixed.  Interstellar Ops Reputation coming soon.
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

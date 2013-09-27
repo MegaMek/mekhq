@@ -35,18 +35,18 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.rating.DragoonsRatingFactory;
-import mekhq.campaign.rating.IDragoonsRating;
+import mekhq.campaign.rating.UnitRatingFactory;
+import mekhq.campaign.rating.IUnitRating;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
- * @version %I% %G%
+ * @version %Id%
  * @since 3/15/2012
  */
-public class DragoonsRatingDialog extends JDialog implements ActionListener {
+public class UnitRatingDialog extends JDialog implements ActionListener {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 5644262476831277348L;
 
@@ -55,9 +55,9 @@ public class DragoonsRatingDialog extends JDialog implements ActionListener {
     private JButton okayButton;
     private JButton aboutButton;
     private Campaign campaign;
-    private IDragoonsRating rating;
+    private IUnitRating rating;
 
-    public DragoonsRatingDialog(Frame parent, boolean modal, Campaign campaign) {
+    public UnitRatingDialog(Frame parent, boolean modal, Campaign campaign) {
         super(parent, TITLE, modal);
         this.campaign = campaign;
         initGUI();
@@ -78,7 +78,7 @@ public class DragoonsRatingDialog extends JDialog implements ActionListener {
     private JPanel getMainPanel() {
         JPanel panel = new JPanel(new BorderLayout());
 
-        JTextArea descriptionArea = new JTextArea(20,60);
+        JTextArea descriptionArea = new JTextArea(20, 60);
         descriptionArea.setLineWrap(true);
         descriptionArea.setWrapStyleWord(true);
         descriptionArea.setFont(new Font("Courier New", Font.PLAIN, 12));
@@ -92,31 +92,31 @@ public class DragoonsRatingDialog extends JDialog implements ActionListener {
     }
 
     private void getDragoonsRating() {
-        rating = DragoonsRatingFactory.getDragoonsRating(campaign);
+        rating = UnitRatingFactory.getUnitRating(campaign);
         rating.reInitialize();
     }
 
     private JPanel getButtonPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 4, 4));
-        
+
         okayButton = new JButton("OK");
         okayButton.setMnemonic('o');
         okayButton.addActionListener(this);
         panel.add(okayButton);
-        
+
         aboutButton = new JButton("?");
         aboutButton.setMnemonic('?');
         aboutButton.addActionListener(this);
         panel.add(aboutButton);
-        
+
         return panel;
     }
 
-    @Override
     public void actionPerformed(ActionEvent e) {
         if (okayButton.equals(e.getSource())) {
             this.setVisible(false);
-        } if (aboutButton.equals(e.getSource())) {
+        }
+        if (aboutButton.equals(e.getSource())) {
             JOptionPane.showMessageDialog(this, rating.getHelpText(), "About Dragoons Rating", JOptionPane.INFORMATION_MESSAGE);
         }
     }

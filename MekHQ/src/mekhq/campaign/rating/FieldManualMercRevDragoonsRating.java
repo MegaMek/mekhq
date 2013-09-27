@@ -54,19 +54,19 @@ import mekhq.campaign.unit.Unit;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
- * @version %I% %G%
+ * @version %Id%
  * @since 3/12/2012
  */
-public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
+public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
     private final BigDecimal HUNDRED = new BigDecimal(100);
 
-    private int techSupportNeeded         = 0;
-    private int medSupportNeeded          = 0;
-    private int adminSupportNeeded        = 0;
+    private int techSupportNeeded = 0;
+    private int medSupportNeeded = 0;
+    private int adminSupportNeeded = 0;
     private int dropJumpShipSupportNeeded = 0;
-    private int techSupportAvailable      = 0;
-    private int medSupportAvailable       = 0;
+    private int techSupportAvailable = 0;
+    private int medSupportAvailable = 0;
     private int adminSupportAvailable;
 
     public FieldManualMercRevDragoonsRating(Campaign campaign) {
@@ -118,7 +118,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         calcAdminSupportHoursNeeded();
     }
 
-    private void updateAvailableSupport() {
+    protected void updateAvailableSupport() {
         for (Person p : campaign.getPersonnel()) {
             if (!p.isActive()) {
                 continue;
@@ -136,7 +136,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
     private void updateJumpships(Entity en) {
         if (en instanceof Warship) {
             if (en.getDocks() > 0) {
-                warhipWithDocksOwner = true;
+                warhipWithDocsOwner = true;
             } else {
                 warshipOwner = true;
             }
@@ -188,8 +188,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         if (en instanceof Mech) {
             hoursNeeded = Math.floor(en.getWeight() / 5) + 40;
         } else if (en instanceof Warship ||
-                en instanceof Jumpship ||
-                en instanceof Dropship) {
+                   en instanceof Jumpship ||
+                   en instanceof Dropship) {
             // according to FMMR, this should be tracked separately because it only applies to admin support but not
             // technical support.
             updateDropJumpShipSupportNeeds(en);
@@ -284,20 +284,24 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         int leftOver = campaign.getPersonnel().size() - (numSquads * 7);
 
         medSupportNeeded = (numSquads * 4) +
-                (3 + (new BigDecimal(leftOver).divide(new BigDecimal(5), 0, RoundingMode.HALF_EVEN).intValue()));
+                           (3 + (new BigDecimal(leftOver).divide(new BigDecimal(5), 0, RoundingMode.HALF_EVEN).intValue()));
+    }
+
+    protected int getMedicalSupportHoursNeeded() {
+        return medSupportNeeded;
     }
 
     private void calcAdminSupportHoursNeeded() {
         int personnelCount = 0;
         for (Person p : campaign.getPersonnel()) {
             if ((p.getPrimaryRole() == Person.T_ADMIN_TRA) ||
-                    (p.getPrimaryRole() == Person.T_ADMIN_COM) ||
-                    (p.getPrimaryRole() == Person.T_ADMIN_LOG) ||
-                    (p.getPrimaryRole() == Person.T_ADMIN_HR) ||
-                    (p.getSecondaryRole() == Person.T_ADMIN_HR) ||
-                    (p.getSecondaryRole() == Person.T_ADMIN_TRA) ||
-                    (p.getSecondaryRole() == Person.T_ADMIN_COM) ||
-                    (p.getSecondaryRole() == Person.T_ADMIN_LOG)) {
+                (p.getPrimaryRole() == Person.T_ADMIN_COM) ||
+                (p.getPrimaryRole() == Person.T_ADMIN_LOG) ||
+                (p.getPrimaryRole() == Person.T_ADMIN_HR) ||
+                (p.getSecondaryRole() == Person.T_ADMIN_HR) ||
+                (p.getSecondaryRole() == Person.T_ADMIN_TRA) ||
+                (p.getSecondaryRole() == Person.T_ADMIN_COM) ||
+                (p.getSecondaryRole() == Person.T_ADMIN_LOG)) {
                 continue;
             }
             personnelCount++;
@@ -331,7 +335,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         // Get the highest tech skill this person has.
         int highestSkill = SkillType.EXP_ULTRA_GREEN;
         for (String s : techSkills) {
-            if(p.hasSkill(s)) {
+            if (p.hasSkill(s)) {
                 int rank = p.getSkill(s).getExperienceLevel();
                 if (rank > highestSkill) {
                     highestSkill = rank;
@@ -404,7 +408,6 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         return score;
     }
 
-    @Override
     public int getExperienceValue() {
         BigDecimal averageExperience = calcAverageExperience();
         if (averageExperience.compareTo(greenThreshold) >= 0) {
@@ -417,7 +420,6 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         return 40;
     }
 
-    @Override
     public int getCommanderValue() {
         if (getCommander() == null) {
             return 0;
@@ -454,16 +456,27 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         return value;
     }
 
-    private BigDecimal getMedicalSupportPercentage() {
-        if (medSupportAvailable <= 0) {
+    public int getMedicalSupportAvailable() {
+        int medicPoolMinutes = campaign.getNumberMedics() * 20;
+        return medSupportAvailable + medicPoolMinutes;
+    }
+
+    public int getTechSupportAvailable() {
+        int astechPoolMinutes = campaign.getNumberAstechs() * 20;
+        return techSupportAvailable + astechPoolMinutes;
+    }
+
+    protected BigDecimal getMedicalSupportPercentage() {
+        if (getMedicalSupportAvailable() <= 0) {
             return BigDecimal.ZERO;
         }
-        if (medSupportNeeded <= 0) {
-            return BigDecimal.ZERO;
+        if (getMedicalSupportHoursNeeded() <= 0) {
+            return HUNDRED;
         }
 
-        BigDecimal percent = new BigDecimal(medSupportAvailable).divide(new BigDecimal(medSupportNeeded), PRECISION, HALF_EVEN).multiply(
-                HUNDRED).setScale(0, RoundingMode.DOWN);
+        BigDecimal percent = new BigDecimal(getMedicalSupportAvailable())
+                .divide(new BigDecimal(getMedicalSupportHoursNeeded()), PRECISION, HALF_EVEN)
+                .multiply(HUNDRED).setScale(0, RoundingMode.DOWN);
 
         return (percent.compareTo(HUNDRED) > 0 ? HUNDRED : percent);
     }
@@ -505,15 +518,16 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
     }
 
     private BigDecimal getTechSupportPercentage() {
-        if (techSupportAvailable <= 0) {
+        if (getTechSupportAvailable() <= 0) {
             return BigDecimal.ZERO;
         }
         if (techSupportNeeded <= 0) {
             return HUNDRED;
         }
 
-        BigDecimal percent = new BigDecimal(techSupportAvailable).divide(new BigDecimal(techSupportNeeded), PRECISION, HALF_EVEN).multiply(
-                HUNDRED).setScale(0, RoundingMode.DOWN);
+        BigDecimal percent = new BigDecimal(getTechSupportAvailable())
+                .divide(new BigDecimal(techSupportNeeded), PRECISION, HALF_EVEN)
+                .multiply(HUNDRED).setScale(0, RoundingMode.DOWN);
 
         return (percent.compareTo(HUNDRED) > 0 ? HUNDRED : percent);
     }
@@ -529,7 +543,6 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         return percent.setScale(0, RoundingMode.DOWN).intValue() * 5;
     }
 
-    @Override
     public int getSupportValue() {
         return getTechSupportValue() + getMedicalSupportValue() + getAdminValue();
     }
@@ -583,18 +596,16 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
     }
     */
 
-    @Override
     public int getFinancialValue() {
-        int score = campaign.getFinances().getPartialYearsInDebt(campaign.getCalendar()) * -10;
+        int score = campaign.getFinances().getFullYearsInDebt(campaign.getCalendar()) * -10;
         score -= 25 * campaign.getFinances().getLoanDefaults();
         score -= 10 * campaign.getFinances().getFailedCollateral();
-        
+
         return score;
     }
 
-    @Override
     public String getDetails() {
-        StringBuffer sb = new StringBuffer("Dragoons Rating:                " + getDragoonRating() + "\n");
+        StringBuffer sb = new StringBuffer("Dragoons Rating:                " + getUnitRating() + "\n");
         sb.append("    Method: FM: Mercenaries (rev)\n\n");
 
         sb.append("Quality:                        ").append(getExperienceValue()).append("\n");
@@ -615,7 +626,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         sb.append("    Dropship Capacity:    ").append(getTransportPercent().toPlainString()).append("\n");
         sb.append("    Jumpship?             ").append(jumpshipOwner ? "Yes" : "No").append("\n");
         sb.append("    Warship w/out Dock?   ").append(warshipOwner ? "Yes" : "No").append("\n");
-        sb.append("    Warship w/ Dock?      ").append(warhipWithDocksOwner ? "Yes" : "No").append("\n\n");
+        sb.append("    Warship w/ Dock?      ").append(warhipWithDocsOwner ? "Yes" : "No").append("\n\n");
 
         sb.append("Technology:                     ").append(getTechValue()).append("\n");
         sb.append("    # Clan Units:         ").append(countClan).append("\n");
@@ -629,25 +640,23 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         sb.append("    HR Support:           ").append(getAdminSupportPercentage().toPlainString()).append("%\n\n");
 
         sb.append("Financial:                      ").append(getFinancialValue()).append("\n");
-        sb.append("    Years in Debt:        ").append(campaign.getFinances().getPartialYearsInDebt(campaign.getCalendar())).append("\n");
+        sb.append("    Years in Debt:        ").append(campaign.getFinances().getFullYearsInDebt(campaign.getCalendar())).append("\n");
         sb.append("    Loan Defaults:        ").append(campaign.getFinances().getLoanDefaults()).append("\n");
         sb.append("    No Collateral Payment:").append(campaign.getFinances().getFailedCollateral()).append("\n\n");
 
         return new String(sb);
     }
 
-    @Override
     public String getHelpText() {
         return "Method: FM: Mercenaries (rev)\n" +
-                "An attempt to match the FM: Mercenaries (rev) method for calculating the Dragoon's rating as closely as possible.\n" +
-                "Known differences include the following:\n" +
-                "+ Command: Does not incorporate any positive or negative traits from AToW or BRPG3." +
-                "+ Transportation: This is computed by individual unit rather than by lance/star/squadron.\n" +
-                "    Auxiliary vessels are not accounted for.\n" +
-                "+ Support: Artillery weapons & Naval vessels are not accounted for.";
+               "An attempt to match the FM: Mercenaries (rev) method for calculating the Dragoon's rating as closely as possible.\n" +
+               "Known differences include the following:\n" +
+               "+ Command: Does not incorporate any positive or negative traits from AToW or BRPG3." +
+               "+ Transportation: This is computed by individual unit rather than by lance/star/squadron.\n" +
+               "    Auxiliary vessels are not accounted for.\n" +
+               "+ Support: Artillery weapons & Naval vessels are not accounted for.";
     }
 
-    @Override
     public BigDecimal getTransportPercent() {
         //Find out how short of transport bays we are.
         int numberWithoutTransport = Math.max((numberMech - numberMechBays), 0);

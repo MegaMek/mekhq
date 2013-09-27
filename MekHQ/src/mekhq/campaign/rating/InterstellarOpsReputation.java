@@ -50,12 +50,12 @@ import mekhq.campaign.unit.Unit;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
- * @version %I% %G%
+ * @version %Id%
  * @since 3/12/2012
  */
-public class TaharqaDragoonsRating extends AbstractDragoonsRating {
+public class InterstellarOpsReputation extends AbstractUnitRating {
 
-    public TaharqaDragoonsRating(Campaign campaign) {
+    public InterstellarOpsReputation(Campaign campaign) {
         super(campaign);
     }
 
@@ -66,15 +66,16 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
             } else {
                 totalSkillLevels = totalSkillLevels.add(value.multiply(
                         new BigDecimal(
-                                (u.getEntity().getCrew().getGunnery() + u.getEntity().getCrew().getPiloting())/2)));
+                                (u.getEntity().getCrew().getGunnery() + u.getEntity().getCrew().getPiloting()) / 2)));
             }
         }
     }
 
     @Override
     protected void initValues() {
-        if (initialized)
+        if (initialized) {
             return;
+        }
 
         super.initValues();
         for (UUID uid : campaign.getForces().getAllUnits()) {
@@ -114,7 +115,7 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
     private void updateJumpships(Entity en) {
         if (en instanceof Warship) {
             if (en.getDocks() > 0) {
-                warhipWithDocksOwner = true;
+                warhipWithDocsOwner = true;
             } else {
                 warshipOwner = true;
             }
@@ -180,17 +181,16 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
         } else if ((en instanceof Aero) && !(en instanceof Dropship) && !(en instanceof Jumpship)) {
             numberAero++;
         } else if (en instanceof BattleArmor) {
-            numberBa += ((Infantry)en).getSquadSize();
+            numberBa += ((Infantry) en).getSquadSize();
             numberBaSquads++;
         } else if (en instanceof Infantry) {
-            numberSoldiers += ((Infantry)en).getSquadN() * ((Infantry)en).getSquadSize();
+            numberSoldiers += ((Infantry) en).getSquadN() * ((Infantry) en).getSquadSize();
             numberInfSquads++;
         } else {
             numberOther++;
         }
     }
 
-    @Override
     public int getExperienceValue() {
         if (getNumberUnits().compareTo(BigDecimal.ZERO) == 0) {
             return 0;
@@ -207,7 +207,6 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
         }
     }
 
-    @Override
     public int getCommanderValue() {
         if (getCommander() == null) {
             return 0;
@@ -239,63 +238,66 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
     }
 
     /**
-     * Returns the number of aerospace units in excess of aero techs in the unit.
-     * If there are more techs than aerospace units, a value of 0 is returned.
+     * Returns the number of aerospace units in excess of aero techs in the unit. If there are more techs than aerospace
+     * units, a value of 0 is returned.
      *
      * @return
      */
     public BigDecimal getUnsupportedAero() {
         BigDecimal aeroRatio = new BigDecimal(numberAero).subtract(aeroTech);
-        if (aeroRatio.compareTo(BigDecimal.ZERO) > 0)
+        if (aeroRatio.compareTo(BigDecimal.ZERO) > 0) {
             return aeroRatio;
+        }
 
         return BigDecimal.ZERO;
     }
 
     /**
-     * Returns the number of vehicles in excess of mechanics in the unit.
-     * If there are more mechanics than vehicles, a value of 0 is returned.
+     * Returns the number of vehicles in excess of mechanics in the unit. If there are more mechanics than vehicles, a
+     * value of 0 is returned.
      *
      * @return
      */
     public BigDecimal getUnsupportedVee() {
         BigDecimal veeRatio = new BigDecimal(numberVee).subtract(veeTech);
-        if (veeRatio.compareTo(BigDecimal.ZERO) > 0)
+        if (veeRatio.compareTo(BigDecimal.ZERO) > 0) {
             return veeRatio;
+        }
 
         return BigDecimal.ZERO;
     }
 
 
     /**
-     * Returns the number of battle armor units in excess of ba techs in the unit.
-     * If there are more techs than battle armor units, a value of 0 is returned.
+     * Returns the number of battle armor units in excess of ba techs in the unit. If there are more techs than battle
+     * armor units, a value of 0 is returned.
      *
      * @return
      */
     public BigDecimal getUnsupportedBa() {
         BigDecimal baRatio = new BigDecimal(numberBa).subtract(baTech);
-        if (baRatio.compareTo(BigDecimal.ZERO) > 0)
+        if (baRatio.compareTo(BigDecimal.ZERO) > 0) {
             return baRatio;
+        }
 
         return BigDecimal.ZERO;
     }
 
     /**
-     * Returns the number of mechs in excess of mech techs in the unit.  If there are more techs than mechs, a value
-     * of 0 is returned.
+     * Returns the number of mechs in excess of mech techs in the unit.  If there are more techs than mechs, a value of
+     * 0 is returned.
      *
      * @return
      */
     public BigDecimal getUnsupportedMechs() {
         BigDecimal mechRatio = new BigDecimal(numberMech).subtract(mechTech);
-        if (mechRatio.compareTo(BigDecimal.ZERO) > 0)
+        if (mechRatio.compareTo(BigDecimal.ZERO) > 0) {
             return mechRatio;
+        }
 
         return BigDecimal.ZERO;
     }
 
-    @Override
     public int getSupportValue() {
         //support rating
         //TODO: this is a bit tricky because the role of astechs changed and we
@@ -315,8 +317,9 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
             unsupportedPct = supportNeeds.divide(getNumberUnits(), PRECISION, HALF_EVEN);
         }
         supportPercent = BigDecimal.ONE.subtract(unsupportedPct);
-        if (supportPercent.compareTo(BigDecimal.ONE) > 0)
+        if (supportPercent.compareTo(BigDecimal.ONE) > 0) {
             supportPercent = BigDecimal.ONE;
+        }
         supportPercent = supportPercent.multiply(new BigDecimal("100"));
 
         //Find out how far above 60% we are. If we're below 60%, return a value of 0.
@@ -330,7 +333,6 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
         return scoredSupport.multiply(new BigDecimal("5")).intValue();
     }
 
-    @Override
     public int getFinancialValue() {
         int score = campaign.getFinances().getFullYearsInDebt(campaign.getCalendar()) * -10;
         score -= 25 * campaign.getFinances().getLoanDefaults();
@@ -338,10 +340,10 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
         return score;
     }
 
-    @Override
     public String getDetails() {
-        StringBuffer sb = new StringBuffer("Dragoons Rating:                " + getDragoonRating() + "\n");
-        sb.append("    Method: Default\n\n");
+        StringBuffer sb = new StringBuffer("Unit Rating:                " + getUnitRating() + "\n");
+        sb.append("    Method: Interstellar Ops Reputation\n");
+        sb.append("        NOTE: This is an incomplete implementation of the IntOps Beta Rules.\n\n");
 
         sb.append("Quality:                        ").append(getExperienceValue()).append("\n");
         sb.append("    Average Experience:   ").append(getExperienceLevelName(calcAverageExperience())).append("\n\n");
@@ -361,7 +363,7 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
         sb.append("    Dropship Capacity:    ").append(getTransportPercent().toPlainString()).append("%\n");
         sb.append("    Jumpship?             ").append(jumpshipOwner ? "Yes" : "No").append("\n");
         sb.append("    Warship w/out Dock?   ").append(warshipOwner ? "Yes" : "No").append("\n");
-        sb.append("    Warship w/ Dock?      ").append(warhipWithDocksOwner ? "Yes" : "No").append("\n\n");
+        sb.append("    Warship w/ Dock?      ").append(warhipWithDocsOwner ? "Yes" : "No").append("\n\n");
 
         sb.append("Technology:                     ").append(getTechValue()).append("\n");
         sb.append("    # Clan Units:         ").append(countClan).append("\n");
@@ -400,13 +402,12 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
         return score;
     }
 
-    @Override
     public String getHelpText() {
-        return "Method: Taharqa Dragoons Rating\n" +
-                "Dragoon's Rating method introduced by Taharqa with version v0.1.11 (2011-12-09).";
+        return "Method: Interstellar Ops Reputation\n" +
+               "Interstellar Ops Reputation method using rules found in " +
+               "'Interstellar Operations Beta - Force Operations.pdf'.  Incomplete";
     }
 
-    @Override
     public BigDecimal getTransportPercent() {
         //Find out how short of transport bays we are.
         int numberWithoutTransport = Math.max((numberMech - numberMechBays), 0);
