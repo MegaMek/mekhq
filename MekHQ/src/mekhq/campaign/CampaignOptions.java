@@ -80,6 +80,7 @@ public class CampaignOptions implements Serializable {
     private boolean useRandomHitsForVees;
     private int minimumHitsForVees;
     private boolean tougherHealing;
+    private int maxAcquisitions;
     
     //personnel market related
     private boolean personnelMarketReportRefresh;
@@ -266,6 +267,7 @@ public class CampaignOptions implements Serializable {
         checkMaintenance = true;
         useRandomHitsForVees = false;
         minimumHitsForVees = 1;
+        maxAcquisitions = 0;
         personnelMarketReportRefresh = true;
         personnelMarketType = PersonnelMarket.TYPE_STRAT_OPS;
         personnelMarketRandomEliteRemoval = 10;
@@ -1032,6 +1034,14 @@ public class CampaignOptions implements Serializable {
         useRandomHitsForVees = b;
     }
     
+    public int getMaxAcquisitions() {
+        return maxAcquisitions;
+    }
+    
+    public void setMaxAcquisitions(int d) {
+    	maxAcquisitions = d;
+    }
+    
     public int getMinimumHitsForVees() {
         return minimumHitsForVees;
     }
@@ -1179,6 +1189,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "checkMaintenance", checkMaintenance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useRandomHitsForVees", useRandomHitsForVees);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "minimumHitsForVees", minimumHitsForVees);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "maxAcquisitions", maxAcquisitions);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "personnelMarketType", personnelMarketType);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "personnelMarketRandomEliteRemoval", personnelMarketRandomEliteRemoval);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "personnelMarketRandomVeteranRemoval", personnelMarketRandomVeteranRemoval);
@@ -1502,6 +1513,8 @@ public class CampaignOptions implements Serializable {
                     retVal.checkMaintenance = false;
             } else if (wn2.getNodeName().equalsIgnoreCase("minimumHitsForVees")) {
                 retVal.minimumHitsForVees = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("maxAcquisitions")) {
+                retVal.maxAcquisitions = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVees")) {
                 if (wn2.getTextContent().equalsIgnoreCase("true"))
                     retVal.useRandomHitsForVees = true;

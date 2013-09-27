@@ -7,11 +7,8 @@
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
@@ -24,14 +21,10 @@ import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SortOrder;
-import javax.swing.SwingConstants;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
-import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.PersonnelMarket;
@@ -63,9 +56,7 @@ public class PersonnelMarketDialog extends JDialog {
     private javax.swing.JButton btnHire;
     private javax.swing.JButton btnClose;
     private javax.swing.JComboBox comboPersonType;
-    //private javax.swing.JComboBox choicePersonView;
     private javax.swing.JLabel lblPersonChoice;
-    //private javax.swing.JLabel lblPersonView;
     private javax.swing.JPanel panelOKBtns;
     private javax.swing.JPanel panelMain;
     private javax.swing.JPanel panelFilterBtns;

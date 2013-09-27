@@ -108,7 +108,7 @@ public class ShoppingList implements MekHqXmlSerializable {
         }
         Person person = campaign.getLogisticsPerson();
         if(null == person && !campaign.getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
-            campaign.addReport("Your force has no one capable of acquiring equipment.");
+            campaign.addReport("Your force has no one currently capable of acquiring equipment.");
             return;
         }
         for(IAcquisitionWork shoppingItem : shoppingList) {

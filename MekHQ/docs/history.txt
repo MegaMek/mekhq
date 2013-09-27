@@ -26,6 +26,7 @@ v0.3.4 (SVN)
 + removed PersonnelMarketDialog.personnelTableModel and ServicedUnitTableModel - they use PersonnelTableModel and UnitTableModel, respectively
 + Minor Planetary Data Update
 + Added entries in News.xml for 3009-3014, 3048-3049, and 3058-3061
++ RFE [#130]: Limit to acquisition per character
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
