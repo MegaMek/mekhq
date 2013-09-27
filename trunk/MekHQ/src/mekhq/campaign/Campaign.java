@@ -1285,6 +1285,8 @@ public class Campaign implements Serializable {
                     xpGained += getCampaignOptions().getTaskXP();
                     person.setNTasks(0);
                 }
+                // The person should have their acquisitions incremented
+                person.incrementAcquisition();
             }
         } else {
             report = report + acquisition.failToFind();
@@ -1297,9 +1299,6 @@ public class Campaign implements Serializable {
             person.setXp(person.getXp() + xpGained);
             report += " (" + xpGained + "XP gained) ";
         }
-
-        // The person should have their acquisitions incremented
-        person.incrementAcquisition();
 
         addReport(report);
         return found;
