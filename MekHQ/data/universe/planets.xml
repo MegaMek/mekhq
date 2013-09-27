@@ -892,7 +892,11 @@ Alarion is primarily settled by people of German, Romanian and English descent.<
 		<name>Albiero</name>
 		<xcood>151.79</xcood>
 		<ycood>359.9</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2650-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3050-07-01</date>
 			<faction>CSJ</faction>
@@ -1263,7 +1267,19 @@ Alcor was overlooked during the Jihad, the only known fighting that took place i
 		<name>Algedi</name>
 		<xcood>66.76</xcood>
 		<ycood>96.24</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3075-01-01</date>
 			<faction>AB</faction>
@@ -6407,7 +6423,15 @@ Bithinian Ballistics</desc>
 		<name>Bjarred</name>
 		<xcood>245.15</xcood>
 		<ycood>411.8</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2250-01-01</date>
+			<faction>OMA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3050-03-01</date>
 			<faction>CSJ</faction>
@@ -7820,7 +7844,19 @@ The children of Bucklands tend to view their planet as boring and the majority s
 		<name>Buckminster</name>
 		<xcood>17.73</xcood>
 		<ycood>156.22</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>  
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>2821-12-31</date>
 			<faction>DC</faction>
@@ -7831,6 +7867,14 @@ The children of Bucklands tend to view their planet as boring and the majority s
 		</factionChange>
 		<factionChange>
 			<date>2899-12-31</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-04-24</date>
+			<faction>WoB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-04-30</date>
 			<faction>DC</faction>
 		</factionChange>
 		<spectralClass>A</spectralClass>
@@ -11615,10 +11659,14 @@ A large portion of the population on Crossing is made up of retired AFFS veteran
 		<name>Csesztreg</name>
 		<xcood>-69.89</xcood>
 		<ycood>394.85</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>DC</faction>
+			<date>2573-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
+			<factionChange>
+			<date>2944-07-01</date>
+		<faction>DC</faction>
 		</factionChange>
 		<factionChange>
 			<date>3030-01-01</date>
@@ -13382,7 +13430,7 @@ Bowie Industries</desc>
 		<ycood>15.39</ycood>
 		<faction>UND</faction>
 		<factionChange>
-			<date>2172-08-01</date>
+			<date>2117-01-01</date>
 			<faction>TA</faction>
 		</factionChange>
 		<factionChange>
@@ -13398,11 +13446,23 @@ Bowie Industries</desc>
 			<faction>DC</faction>
 		</factionChange> 
 		<factionChange>
-			<date>2341-01-01</date>
+			<date>2327-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2786-01-06</date>
+			<date>2766-12-27</date>
+			<faction>TH,RWR</faction>
+		</factionChange>
+		<factionChange>
+			<date>2767-01-10</date>
+			<faction>RWR</faction>
+		</factionChange>
+		<factionChange>
+			<date>2778-01-10</date>
+			<faction>TH</faction>
+		</factionChange>
+		<factionChange>
+			<date>2788-01-06</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -13432,6 +13492,14 @@ Bowie Industries</desc>
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3133-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>3138-01-01</date>
+			<faction>DC</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>3</subtype>
@@ -21347,7 +21415,12 @@ Hunan was relatively peaceful throughout its history and did not see any militar
 		<percentWater>60</percentWater>
 		<lifeForm>6</lifeForm>
 		<hpg>A</hpg>
-		<desc>No description available.</desc>
+		<satellite>Sentry</satellite>
+		<landMass>Jaguar Prime (Lootera)</landMass>
+		<landMass>Abysmal</landMass>
+		<desc>3065: Huntress is a planet of varied climates and two continents. Abysmal is the smaller of the two continents and is dominated by deserts and badlands. Jaguar Prime is larger and is home to most of the planet's population centers, including Lootera, the planetary capital. Jaguar Prime is home to many different climates, from desert to rain forest, plains and mountains. The continent is crossed with several mountain ranges, including the northern Jaguar's Fangs, the Fangs includes Mount Szabo which overlooks the capital city. To the eastern edge of the continent is the unimaginatively named Eastern Mountains. The continent is also home to several large bodies of water, from the Black Shikari River, to Liberation Sea and the expansive Dhuan Swamp to the south. Jaguar Prime is home to almost constant grey cloud-cover and occasional fierce storms. Jaguar Prime is home to several other cities, though they are smaller than Lootera, such as Bagera, Myer, Pahn City and New Andery.
+		
+Huntress was the capital of Clan Smoke Jaguar and their primary holding. They had complete control over the planet, with the exception of a small research facility, which they gifted to the Jade Falcons prior to the start of Operation Revival. As the home of the Smoke Jaguar Clan, Huntress is home to the  Jaguar's Gene Center, a massive pyramidal structure and home to the giftakes of all of their bloodnamed warriors. The planet is also home to significant manufacturing and research facilities, as well as training and military command centers. Most of the planet's military production, bases and monuments were destroyed by Task Forces Serpent and Bull Dog, during the Inner Sphere's Jaguar Annihilation.</desc>
 	</planet>
 	<planet>
 		<name>Hurik</name>
@@ -21548,7 +21621,19 @@ Hunan was relatively peaceful throughout its history and did not see any militar
 		<name>Idlewind</name>
 		<xcood>124.66</xcood>
 		<ycood>432.93</ycood>
-		<faction>DC</faction>
+		 <faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>  
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3050-03-01</date>
 			<faction>CSJ</faction>
@@ -21556,6 +21641,10 @@ Hunan was relatively peaceful throughout its history and did not see any militar
 		<factionChange>
 			<date>3059-09-18</date>
 			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3104-07-01</date>
+			<faction>RD</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -22242,7 +22331,19 @@ Irian’s terrain is best described as bland. The planet’s terrain is dominate
 		<name>Irurzun</name>
 		<xcood>188.56</xcood>
 		<ycood>98.58</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>     
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange>  
 		<spectralClass>G</spectralClass>
 		<subtype>4</subtype>
 		<luminosity>V</luminosity>
@@ -23063,7 +23164,19 @@ Jonathan has a 20 hour day and takes 745 standard days to orbit its sun.</desc>
 		<name>Kagoshima</name>
 		<xcood>202.9</xcood>
 		<ycood>257.15</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>   
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>1</subtype>
 		<luminosity>V</luminosity>
@@ -23152,7 +23265,19 @@ Jonathan has a 20 hour day and takes 745 standard days to orbit its sun.</desc>
 		<name>Kajikazawa</name>
 		<xcood>89.19</xcood>
 		<ycood>143.96</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>     
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>5</subtype>
 		<luminosity>IV</luminosity>
@@ -23838,7 +23963,19 @@ The Blakist Holy War destroyed much of Kawich‘s industry, but The Republic of 
 		<name>Kaznejoy</name>
 		<xcood>332.52</xcood>
 		<ycood>133.79</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>     
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>4</subtype>
 		<luminosity>V</luminosity>
@@ -24662,9 +24799,13 @@ The Combine agreed to cede Kimball II to Devlin Stone‘s Republic of the Sphere
 		<name>Kirchbach</name>
 		<xcood>-39.38</xcood>
 		<ycood>386.24</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2418-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2825-07-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -29137,7 +29278,19 @@ Matsu has 30 hour days and orbits its sun every 1034 standard days. This results
 		<name>Matsuida</name>
 		<xcood>280.88</xcood>
 		<ycood>130.14</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>     
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3068-11-15</date>
 			<faction>DC,FS</faction>
@@ -30727,7 +30880,19 @@ These episodic invasions kept Mirach from realizing its true potential, and the 
 		<name>Miyada</name>
 		<xcood>312.96</xcood>
 		<ycood>247.24</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>   
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange> 
 	</planet>
 	<planet>
 		<name>Mizar</name>
@@ -32052,7 +32217,7 @@ Federated News Services</desc>
 			<faction>PoR</faction>
 		</factionChange>
 		<factionChange>
-			<date>2337-01-01</date>
+			<date>2347-01-01</date>
 			<faction>PoR,DC</faction>
 		</factionChange>
 		<factionChange>
@@ -32079,14 +32244,30 @@ Federated News Services</desc>
 			<date>3071-05-08</date>
 			<faction>CHH</faction>
 		</factionChange>
+		<factionChange>
+			<date>3104-07-01</date>
+			<faction>RD</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>New Caledonia</name>
 		<xcood>-59.72</xcood>
 		<ycood>409.2</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>  
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2843-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -32941,7 +33122,7 @@ As word slowly spread, New Rhodes III became a pleasure destination from across 
 			<faction>IND</faction>
 		</factionChange>   
 		<factionChange>
-			<date>2302-12-01</date>
+			<date>2302-03-01</date>
 			<faction>AG</faction>
 		</factionChange>   
 		<factionChange>
@@ -33378,7 +33559,19 @@ Like other worlds, Ningpo was not immune to the effects of the Word of Blake's J
 		<name>Ningxia</name>
 		<xcood>317.65</xcood>
 		<ycood>316.09</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>   
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange> 
 		<spectralClass>K</spectralClass>
 		<subtype>0</subtype>
 		<luminosity>V</luminosity>
@@ -35993,12 +36186,8 @@ Alphard Trading Corporation [destroyed 3075]</desc>
 		<ycood>312.7</ycood>
 		<faction>UND</faction>
 		<factionChange>
-			<date>2172-08-01</date>
-			<faction>TA</faction>
-		</factionChange>
-		<factionChange>
-			<date>2242-01-01</date>
-			<faction>IND</faction>
+			<date>2212-01-01</date>
+			<faction>OMA</faction>
 		</factionChange>
 		<factionChange>
 			<date>2310-03-06</date>
@@ -36756,7 +36945,19 @@ Hadrian Mechanized Industries</desc>
 		<name>Pondicherry</name>
 		<xcood>405.28</xcood>
 		<ycood>241.24</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>   
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Porrima</name>
@@ -37367,14 +37568,26 @@ While the planet was once home to a sprawling Brigadier Corporation ‘Mech fact
 		<name>Proserpina</name>
 		<xcood>161.17</xcood>
 		<ycood>34.16</ycood>
-		<faction>FS</faction>
+		<faction>UND</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2319-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3134-01-01</date>
+			<faction>DC</faction>
 		</factionChange>
 		<spectralClass>K</spectralClass>
 		<subtype>2</subtype>
@@ -37444,7 +37657,19 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 		<name>Qandahar</name>
 		<xcood>320.78</xcood>
 		<ycood>361.47</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2673-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange> 
+			<date>3077-11-03</date>
+			<faction>IND</faction>
+		</factionChange> 
+		<factionChange> 
+			<date>3078-04-15</date>
+			<faction>DC</faction>
+		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>0</subtype>
 		<luminosity>IV</luminosity>
@@ -37761,7 +37986,23 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 		<name>Radstadt</name>
 		<xcood>41.73</xcood>
 		<ycood>319.48</ycood>
-		<faction>DC</faction>
+		 <faction>UND</faction>
+		<factionChange>
+			<date>2250-01-01</date>
+			<faction>PoR</faction>
+		</factionChange> 
+		<factionChange>
+			<date>2354-01-01</date>
+			<faction>PoR,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2367-01-01</date>
+			<faction>PoR</faction>
+		</factionChange>
+		<factionChange>
+			<date>2510-06-01</date>
+			<faction>DC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3030-01-01</date>
 			<faction>LA</faction>
@@ -37781,6 +38022,10 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 		<factionChange>
 			<date>3062-01-01</date>
 			<faction>CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3074-03-07</date>
+			<faction>ABN</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.93</gravity>
@@ -38077,7 +38322,7 @@ Hope Industrial Works</desc>
 			<faction>PoR</faction>
 		</factionChange> 
 		<factionChange>
-			<date>2367-01-01</date>
+			<date>2357-01-01</date>
 			<faction>PoR,DC</faction>
 		</factionChange>
 		<factionChange>
@@ -38109,7 +38354,7 @@ Hope Industrial Works</desc>
 			<faction>CGB</faction>
 		</factionChange>
 		<factionChange>
-			<date>3103-01-01</date>
+			<date>3103-03-13</date>
 			<faction>RD</faction>
 		</factionChange>
 		<spectralClass>K</spectralClass>
@@ -39426,9 +39671,21 @@ Foxx Infantry Systems</desc>
 		<name>Rubigen</name>
 		<xcood>30.77</xcood>
 		<ycood>219.85</ycood>
-		<faction>LA</faction>
+		 <faction>UND</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2825-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -39438,6 +39695,10 @@ Foxx Infantry Systems</desc>
 		<factionChange>
 			<date>3052-04-22</date>
 			<faction>CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3103-03-13</date>
+			<faction>RD</faction>
 		</factionChange>
 		<nadirCharge>True</nadirCharge>
 		<zenithCharge>True</zenithCharge>
@@ -42104,7 +42365,19 @@ Saroyan Special Production</desc>
 		<name>Sighisoara</name>
 		<xcood>305.14</xcood>
 		<ycood>240.46</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>   
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Sigma Mare</name>
@@ -44322,7 +44595,11 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 		<name>Susquehanna</name>
 		<xcood>52.68</xcood>
 		<ycood>424.32</ycood>
+		<faction>UND</faction>
+			<factionChange>
+			<date>2500-01-01</date>
 		<faction>DC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3034-03-13</date>
 			<faction>FRR</faction>
@@ -44330,6 +44607,10 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 		<factionChange>
 			<date>3050-05-01</date>
 			<faction>CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3103-03-13</date>
+			<faction>RD</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -44585,7 +44866,19 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 		<name>Tabayama</name>
 		<xcood>411.28</xcood>
 		<ycood>235.24</ycood>
-		<faction>OA</faction>
+		 <faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>   
+		<factionChange>
+			<date>2413-01-01</date>
+			<faction>OA</faction>
+		</factionChange>
 		<factionChange>
 			<date>2581-08-11</date>
 			<faction>OA,DC</faction>
@@ -45864,7 +46157,19 @@ Tharkad Aerospace Group</desc>
 		<name>Thessalonika</name>
 		<xcood>74.85</xcood>
 		<ycood>307.48</ycood>
-		<faction>DC</faction>
+		 <faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>  
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3051-11-01</date>
 			<faction>CGB,DC</faction>
@@ -45872,6 +46177,10 @@ Tharkad Aerospace Group</desc>
 		<factionChange>
 			<date>3051-11-08</date>
 			<faction>CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3103-03-13</date>
+			<faction>RD</faction>
 		</factionChange>
 		<nadirCharge>True</nadirCharge>
 		<zenithCharge>True</zenithCharge>
@@ -46020,7 +46329,31 @@ Tharkad Aerospace Group</desc>
 		<name>Thule</name>
 		<xcood>93.89</xcood>
 		<ycood>459.27</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2250-01-01</date>
+			<faction>PoR</faction>
+		</factionChange> 
+		<factionChange>
+			<date>2333-09-01</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2334-01-01</date>
+			<faction>PoR</faction>
+		</factionChange>
+		<factionChange>
+			<date>2354-01-01</date>
+			<faction>PoR,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2367-01-01</date>
+			<faction>PoR</faction>
+		</factionChange>
+		<factionChange>
+			<date>2510-06-01</date>
+			<faction>DC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3034-03-13</date>
 			<faction>FRR</faction>
@@ -46040,6 +46373,10 @@ Tharkad Aerospace Group</desc>
 		<factionChange>
 			<date>3074-08-30</date>
 			<faction>CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3103-03-13</date>
+			<faction>RD</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.97</gravity>
@@ -47109,7 +47446,7 @@ Gutierrez Aerospace</desc>
 			<faction>PoR</faction>
 		</factionChange> 
 		<factionChange>
-			<date>2337-01-01</date>
+			<date>2347-01-01</date>
 			<faction>PoR,DC</faction>
 		</factionChange>
 		<factionChange>
@@ -47119,10 +47456,6 @@ Gutierrez Aerospace</desc>
 		<factionChange>
 			<date>2510-06-01</date>
 			<faction>DC</faction>
-		</factionChange>
-		<factionChange>
-			<date>3034-03-13</date>
-			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
 			<date>3034-03-13</date>
@@ -47139,6 +47472,10 @@ Gutierrez Aerospace</desc>
 		<factionChange>
 			<date>3067-04-01</date>
 			<faction>CDS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3132-07-01</date>
+			<faction>RD</faction>
 		</factionChange>
 		<pressure>4</pressure>
 		<gravity>1.03</gravity>
@@ -47162,8 +47499,11 @@ Gutierrez Aerospace</desc>
 		<landMass>Heimdal</landMass>
 		<landMass>Nidaros</landMass>
 		<hpg>B</hpg>
-		<landMass>(Misby Flats)</landMass>
-		<desc>Trondheim is a volatile young planet with regular seismic activity, which usually means there are at least a handful of volcanoes erupting at any one time. These regular eruptions result in long, excessively hot, summers and short, extremely cold, winters, due to the excessive volcanic ash in the atmosphere. The extreme temperatures can make life unpleasant on Trondheim but the extremes are not to the point where the planet is uninhabitable. The benefit of the seismic activity and volcanoes is that rare metals and minerals are made easily accessible after eruptions and the planet’s mining industry has supported a number of major mining corporations for centuries. During its time in the Combine, there were a number of protests, rebellions and attempted revolutions, which often resulted in a crackdown by the DCMS and ISF. The planetary capital of Trondheim is Misby Flats.</desc>
+		<desc>Trondheim is a volatile young planet with regular seismic activity, which usually means there are at least a handful of volcanoes erupting at any one time. These regular eruptions result in long, excessively hot, summers and short, extremely cold, winters, due to the excessive volcanic ash in the atmosphere. The extreme temperatures can make life unpleasant on Trondheim but the extremes are not to the point where the planet is uninhabitable. The benefit of the seismic activity and volcanoes is that rare metals and minerals are made easily accessible after eruptions and the planet’s mining industry has supported a number of major mining corporations for centuries. During its time in the Combine, there were a number of protests, rebellions and attempted revolutions, which often resulted in a crackdown by the DCMS and ISF. The planetary capital of Trondheim is Misby Flats.
+		
+Manufacturing centers:
+Amau Electronics
+New York Vehicle Y2 Facility [Created 3068]</desc>
 	</planet>
 	<planet>
 		<name>Trondheim (Periphery)</name>
@@ -48373,7 +48713,7 @@ In the centuries of the Succession Wars, Unukalhai was largely overlooked by inv
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2895-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -48395,6 +48735,14 @@ In the centuries of the Succession Wars, Unukalhai was largely overlooked by inv
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3133-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>3136-01-01</date>
+			<faction>RD</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.98</gravity>
@@ -50490,7 +50838,19 @@ Woodstock‘s third continent, Essex, is the only blemish on this otherwise beau
 		<name>Xinyang</name>
 		<xcood>114.23</xcood>
 		<ycood>227.16</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>     
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>0</subtype>
 		<luminosity>V</luminosity>
