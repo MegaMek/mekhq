@@ -206,6 +206,7 @@ import mekhq.gui.dialog.EditTransactionDialog;
 import mekhq.gui.dialog.GameOptionsDialog;
 import mekhq.gui.dialog.HireBulkPersonnelDialog;
 import mekhq.campaign.Kill;
+import mekhq.gui.dialog.GMToolsDialog;
 import mekhq.gui.dialog.KillDialog;
 import mekhq.gui.dialog.MaintenanceReportDialog;
 import mekhq.gui.dialog.ManageAssetsDialog;
@@ -507,6 +508,7 @@ public class CampaignGUI extends JPanel {
     public int selectedMission;
     
     private DailyReportLogDialog logDialog;
+    private GMToolsDialog gmTools;
 
     public CampaignGUI(MekHQ app) {
         this.app = app;        
@@ -540,6 +542,10 @@ public class CampaignGUI extends JPanel {
         miAttachLog.setEnabled(false);
         this.revalidate();
         this.repaint();
+    }
+    
+    public void showGMToolsDialog() {
+    	gmTools.setVisible(true);
     }
     
     private void initComponents() {
@@ -2477,6 +2483,7 @@ public class CampaignGUI extends JPanel {
             }
         });
         menuView.add(miDetachLog);
+        
         miAttachLog = new JMenuItem("Attach Daily Report Log"); // NOI18N
         miAttachLog.setEnabled(false);
         miAttachLog.addActionListener(new java.awt.event.ActionListener() {
@@ -2485,6 +2492,16 @@ public class CampaignGUI extends JPanel {
             }
         });
         menuView.add(miAttachLog);
+        
+        JMenuItem miGMToolsDialog = new JMenuItem("Show GM Tools Dialog");
+        miGMToolsDialog.setEnabled(true);
+        miGMToolsDialog.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent evt) {
+        		showGMToolsDialog();
+        	}
+        });
+        menuView.add(miGMToolsDialog);
+        
         menuBar.add(menuView);
         
         JMenu menuHelp = new JMenu(resourceMap.getString("helpMenu.text")); // NOI18N
@@ -2507,6 +2524,7 @@ public class CampaignGUI extends JPanel {
         panLog = new DailyReportLogPanel(reportHLL);
         panLog.setMinimumSize(new java.awt.Dimension(150,100));
         logDialog = new DailyReportLogDialog(getFrame(), this, reportHLL);
+        gmTools = new GMToolsDialog(getFrame());
         
         mainPanel = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT, tabMain, panLog);
         mainPanel.setOneTouchExpandable(true);
