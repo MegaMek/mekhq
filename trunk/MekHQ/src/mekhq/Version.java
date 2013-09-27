@@ -32,6 +32,7 @@ public class Version {
     private int snapshot;
     private int minor;
     private int major;
+    private int revision = -1;
     
     public Version(String version) {
         if(null != version && version.length() > 0) {
@@ -45,9 +46,15 @@ public class Version {
             if (snap.indexOf("-") > 0) {
                 temp = snap.split("\\-");
                 snap = temp[0];
+                String rev = temp[1].replace("r", "");
+                revision = Integer.parseInt(rev);
             }
             snapshot = Integer.parseInt(snap);
         }
+    }
+    
+    public int getRevision() {
+        return revision;
     }
     
     public int getSnapshot() {
