@@ -255,6 +255,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JComboBox choiceAcquireSkill;
     private JSpinner spnAcquireClanPenalty;
     private JSpinner spnAcquireIsPenalty;
+    private JTextField txtMaxAcquisitions;
 
 
     private JSpinner spnNDiceTransitTime;
@@ -834,12 +835,31 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubAcquire.add(pnlIsPenalty, gridBagConstraints);
+        
+        txtMaxAcquisitions = new JTextField(4);
+        txtMaxAcquisitions.setText(Integer.toString(options.getMaxAcquisitions()));
+        txtMaxAcquisitions.setHorizontalAlignment(JTextField.RIGHT);
+        txtMaxAcquisitions.setName("txtName"); // NOI18N
+
+        JPanel pnlMaxAcquisitions = new JPanel();
+        pnlMaxAcquisitions.add(txtMaxAcquisitions);
+        pnlMaxAcquisitions.add(new JLabel("Maximum Acquisitions Per Cycle (0 for unlimited)"));      
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panSubAcquire.add(pnlIsPenalty, gridBagConstraints);
+        panSubAcquire.add(pnlMaxAcquisitions, gridBagConstraints);
 
 
         spnNDiceTransitTime = new JSpinner(new SpinnerNumberModel(options.getNDiceTransitTime(), 0, 365, 1));
@@ -2874,6 +2894,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setAcquisitionSupportStaffOnly(chkSupportStaffOnly.isSelected());
         options.setClanAcquisitionPenalty((Integer)spnAcquireClanPenalty.getModel().getValue());
         options.setIsAcquisitionPenalty((Integer)spnAcquireIsPenalty.getModel().getValue());
+        options.setMaxAcquisitions(Integer.parseInt(txtMaxAcquisitions.getText()));
 
 
         options.setNDiceTransitTime((Integer)spnNDiceTransitTime.getModel().getValue());

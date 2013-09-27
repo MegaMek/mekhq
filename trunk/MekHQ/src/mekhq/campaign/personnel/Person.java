@@ -157,6 +157,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     
     private int status;
     protected int xp;
+    protected int acquisitions;
     protected int salary;
     private int hits;
     private int prisonerStatus;
@@ -225,6 +226,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         portraitCategory = Crew.ROOT_PORTRAIT;
         portraitFile = Crew.PORTRAIT_NONE;
         xp = 0;
+        acquisitions = 0;
         gender = G_MALE;
         birthday = new GregorianCalendar(3042, Calendar.JANUARY, 1);
         rankOrder = 0;
@@ -752,6 +754,18 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public void setXp(int xp) {
         this.xp = xp;
+    }
+
+    public int getAcquisitions() {
+        return acquisitions;
+    }
+
+    public void setAcquisition(int a) {
+        acquisitions = a;
+    }
+
+    public void incrementAcquisition() {
+        acquisitions++;
     }
 
     public UUID getAssignedTeamId() {

@@ -1225,6 +1225,7 @@ public class Campaign implements Serializable {
 
 	public Person getLogisticsPerson() {
 		int bestSkill = -1;
+		int maxAcquisitions = getCampaignOptions().getMaxAcquisitions();
 		Person admin = null;
 		String skill = getCampaignOptions().getAcquisitionSkill();
 		if (skill.equals(CampaignOptions.S_AUTO)) {
@@ -1233,6 +1234,9 @@ public class Campaign implements Serializable {
 			for (Person p : personnel) {
 				if (getCampaignOptions().isAcquisitionSupportStaffOnly()
 						&& !p.isSupport()) {
+					continue;
+				}
+				if (maxAcquisitions > 0 && p.getAcquisitions() >= maxAcquisitions) {
 					continue;
 				}
 				if (p.isActive() && null != p.getBestTechSkill()
@@ -1245,6 +1249,9 @@ public class Campaign implements Serializable {
 			for (Person p : personnel) {
 				if (getCampaignOptions().isAcquisitionSupportStaffOnly()
 						&& !p.isSupport()) {
+					continue;
+				}
+				if (maxAcquisitions > 0 && p.getAcquisitions() >= maxAcquisitions) {
 					continue;
 				}
 				if (p.isActive() && p.hasSkill(skill)
@@ -1305,6 +1312,10 @@ public class Campaign implements Serializable {
 			person.setXp(person.getXp() + xpGained);
 			report += " (" + xpGained + "XP gained) ";
 		}
+		
+		// The person should have their acquisitions incremented
+		person.incrementAcquisition();
+		
 		addReport(report);
 		return found;
 	}
@@ -1581,6 +1592,8 @@ public class Campaign implements Serializable {
 				continue;
 			}
 			p.resetMinutesLeft();
+			// Reset acquisitions made to 0
+			p.setAcquisition(0);
 			if (p.needsFixing()
 					|| (getCampaignOptions().useAdvancedMedical() && p
 							.needsAMFixing())) {
