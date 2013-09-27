@@ -16,6 +16,534 @@ location - an optional tag for the location of the news report
  -->
 <news>
 	<newsItem>
+		<headline>Archon Married</headline>
+		<date>3009-03-18</date>
+		<desc><![CDATA[According to officials on Tharkad, Archon Katrina Steiner married long-time lover and Duke of Donegal, Arthur Luvon less than a week ago. The Lyran Commonwealth is celebration the wedding of their beloved Archon. Archon Steiner and Duke Luvon have been romantically linked since at least 3005 - hopefully the marriage of the two will produce an heir and quiet some of the current pretenders to the Lyran throne. That is all for our Commonwealth Update - back to local news.]]></desc>
+		<service>INN</service>
+		<location>Tharkad</location>
+	</newsItem>
+	<newsItem>
+		<headline>Heir to the Throne</headline>
+		<date>3010-02-27</date>
+		<desc><![CDATA[The Lyran Commonwealth is celebrating the birth of the new heir to the nation's throne. Archon Katrina was reported to have given birth earlier this month and today officials at the Triad finally confirmed it. They also added that mother and daughter are doing well. The entire Commonwealth welcomes Melissa Steiner and we at Tharkad Broadcasting hope for a bright future for her.]]></desc>
+		<service>TBC</service>
+		<location>Tharkad</location>
+	</newsItem>
+	<newsItem>
+		<headline>Merlin's Debut</headline>
+		<date>3010-05-15</date>
+		<desc><![CDATA[The military community was shocked earlier this month to learn that the Mountain Wolf BattleMechs (MWBM) factory on Alpheratz was rebuilt in secret by the Outworld's Alliance and just recently produced its first new BattleMech. Even more surprising was the news that the 'Mech was of a brand new design, dubbed the Merlin by MWBM, it is a sturdy heavy 'Mech that uses parts common throughout the Inner Sphere and Periphery. The news of a new 'Mech has the military community quite excited as this is the first entirely new design in over 100 years. MWBM is reported to already have a line of customers interested in pruchasing the new 'Mechs just as quickly as they can make them.]]></desc>
+		<service>INN</service>
+		<location>Alpheratz</location>
+	</newsItem>
+	<newsItem>
+		<headline>Obituary: Duke Arthur Luvon</headline>
+		<date>3010-06-05</date>
+		<desc><![CDATA[It is a sad day for the Commonwealth and especially Archon Katrina and her infant daughter Melissa - we have just received an official report that Arthur Luvon, Duke of Donegal, husband to Archon Katrina, and father to Melissa, passed away yesterday. Duke Luvon has reportedly been battling cancer for some time now. Those of us here at Donegal Broadcasting were deeply saddened by the loss of our Duke and our condolences go out to the royal family.]]></desc>
+		<service>DBC</service>
+		<location>Donegal</location>
+	</newsItem>
+	<newsItem>
+		<headline>8th Galedon Regulars Formed</headline>
+		<date>3011-03-19</date>
+		<desc><![CDATA[There are reports of heightened security throughout the Federated Sun's Draconis March after news leaked that the Draconis Combine recently reformed the 8th Galedon Regulars. While there is very little known about the newly reformed regiment, reports indicate the unit is comprised primarily of heavy and assault 'Mechs. While one regiment is unlikely to make an impact on the highly contested border, the addition of a new assault regiment is never welcome news.]]></desc>
+		<service>FSNS</service>
+		<location>Robinson</location>
+	</newsItem>
+	<newsItem>
+		<headline>Hell's Black Aces Formed</headline>
+		<date>3011-05-23</date>
+		<desc><![CDATA[In mercenary news, a new aerospace unit has shown up on Galatea looking for work. So far unnamed, these Capellan ex-pats recently defected from the Capellan Confederation citing long term neglect by the CCAF and fear of Chancellor Maximilian's regular “purges” of the military. The new mercenaries made off with their entire Wing of fighters, support personnel, and even a rare Vengeance class dropship. They are currently looking for high risk contracts for either a major house or under another mercenary unit to provide aerospace fighter support.]]></desc>
+		<service>INN</service>
+		<location>Galatea</location>
+	</newsItem>
+	<newsItem>
+		<headline>Hanse Davion Awarded Command of 3rd Davion Guards</headline>
+		<date>3011-06-27</date>
+		<desc><![CDATA[Earlier this month Heir-Apparent Hanse Davion was awarded full command of the illustrious 3rd Davion Guards. Hanse has been an officier in the 3rd Davion ever since he graduated with honors from the Albion Military Academy and has proven to be an exceptional officer. His graduation ranking rated him for a spot as a Lieutenant and he has steadily worked his way up the chain of command due to his success on the field.]]></desc>
+		<service>NANS</service>
+		<location>New Avalon</location>
+	</newsItem>
+	<newsItem>
+		<headline>2nd Winfield Guards Destroyed</headline>
+		<date>3011-11-22</date>
+		<desc><![CDATA[Breaking news from Sevren, after a determined assault by Combine forces, the Commonwealth defenders managed to drive off the attack, however losses were heavy. The 2nd Winfield Guards were decimated and reports indicate that the unit is completely combat ineffective and survivors will be rolled into the 1st Winfield Guards, which also suffered heavy damage. This battle represents yet another major failure by the Commonwealth's intelligence community for failing to note the relocation of such a large Combine force. If the 1st Guards had not arrived from Laurent when they did it is likely the planet Sevren would now belong to the Combine and all members of the 2nd Guard captured or killed.]]></desc>
+		<service>CP</service>
+		<location>Winfield</location>
+	</newsItem>
+	<newsItem>
+		<headline>Hanse Davion Named Governor of New Aragon</headline>
+		<date>3012-03-22</date>
+		<desc><![CDATA[Today Hanse Davion, heir to the Federated Suns, was promoted to Field-Marshal of the Capellan March, giving him command over all AFFS units along the Confederation border. This latest promotion is just one of many in Hanse's meteoric rise in power in recent years. He has worked his way from Lance commander in the 3rd Davion Guards to ultimately become the CO of the entire famed regiment barely a year ago and then barely a month ago he was appointed Military Governor of newly liberated New Aragon. The latest promotion for Hanse makes him one of the most powerful men in the Suns and is a show of great faith from his older brother First Prince Ian Davion.]]></desc>
+		<service>FSNS</service>
+		<location>New Aragon</location>
+	</newsItem>
+	<newsItem>
+		<headline>Hendrik Grimm III Founds Oberon Confederation</headline>
+		<date>3012-06-05</date>
+		<desc><![CDATA[In a surprising turn of events, self-styled King, Hendrik Grimm III has declared the founding of the Oberon Confederation. With a power base consisting of his large pirate band that has existed since at least 2855 when his grandfather, Hendrik Grimm, deserted from the LCAF along with many of the soldiers that served under him. The unit turned to piracy and made Oberon VI their base of operations and they have been plaguing surrounding system for more than a century.
+
+Oberon VI was once a jewel of the Rimworld Republic in the days of the Star League but never recovered from the ravages of the Amaris Coup. A century after the fall of the Star League the planet made for an easy target for the original Hendrik Grimm and a pirate's haven was founded and slavery became rampant.
+
+King Grimm III has promised social and political reform and a change to his ways, including using his men and 'Mechs to defend his new Confederation and to take on legitimate mercenary work for units that can be spared. What will actually become of the new nation remains to be seen. When asked for comment Lyran officials refused to make any public comments, though a few annonymously condemned Hendrik Grimm III and his "pirate nation".]]></desc>
+		<service>INN</service>
+		<location>Oberon VI</location>
+	</newsItem>
+	<newsItem>
+		<headline>Captain-General MIA?</headline>
+		<date>3012-09-15</date>
+		<desc><![CDATA[Shocking news from Atreus. Following the death of the Captain-General's second wife, Ana Stewart, and two of their children earlier this year, sources in the Captain-General's offices say that Janos Marik has completely withdrawn from the public eye and sees only a very select few people and otherwise has barely ventured from his personal suite. While various news outlets have noted the lack of public appearances by the Captain-General no one knew just how far withdrawn Janos Marik had become. What will this mean for the League if the Captain-General is absent and can he adequately lead from behind closed doors? We ask our panel of experts.]]></desc>
+		<service>SFP</service>
+		<location>Stewart</location>
+	</newsItem>
+	<newsItem>
+		<headline>Marauder II Unveiled</headline>
+		<date>3012-11-05</date>
+		<desc><![CDATA[Today, representatives of a joint General Motors and Blackwell Industries unveiled the Marauder II, a fiersome, 100-ton assault 'Mech. While the new 'Mech is 33% heavier than the original, the 'Mech has a lot in common with its lighter sire, pairing a PPC and laser in each arm, with a large laser in place of the traditional autoocannon. While the new Marauder II is slower, engineers have compensated by adding jumpjets that allow this 'Mech to jump up to 90 meters at a time. The initial line of Marauder IIs are slated for the Wolf's Dragoons, however Blackwell represntatives stated that they would begin taking orders on a first-come, first-serve basis starting in six-months.]]></desc>
+		<service>INN</service>
+		<location>Galatea</location>
+	</newsItem>
+	<newsItem>
+		<headline>Wolf's Dragoons on Carver V?</headline>
+		<date>3013-03-09</date>
+		<desc><![CDATA[INN has received reports from Carver V that the mysterious Wolf's Dragoons mercenary unit has been spotted on the Capellan Confederation planet. While Capellan officials refuse to comment, stating that they can "never discuss military deployments due to security concerns" rumors abound that the infamous mercenary unit has been deployed to garrison Carver V. If true, it would explain the lack of action from the Dragoons in recent months, though it does not take a military analyst to question why such a powerful unit would be withheld from combat.]]></desc>
+		<service>INN</service>
+		<location>Galatea</location>
+	</newsItem>
+	<newsItem>
+		<headline>Obituary: Herodias Ap Gwynn</headline>
+		<date>3013-04-12</date>
+		<desc><![CDATA[It is with great remorse that I bring you the following report. Herodias Ap Gwynn, the founder of the Pan-Humanist doctrine, was found dead earlier today. Herodias Ap Gwynn was well respected throughout the Alliance as an idealist, pacifist and philosopher, whose idea attracted hundreds if not thousands of followers to his view that humantiy shares a common path and goal. He spent his life as a conciliator, diplomat and techer, instructing his followers to offer aid to those in need and to spread peace, education and medicine throughout the known galaxy. Herodias Ap Gwynn was 60 years old, at this time the cause of death is unknown, though authorities do not suspect foul-play was involved. Ceremonies will be held on Alpheratz in two weeks, with hundreds of Pan Humanists expected to be in attendance. Officials from the organization that Herodias Ap Gwynn began decades ago promised that his works and teachings will continue even after his death.]]></desc>
+		<service>OAB</service>
+		<location>Alpheratz</location>
+	</newsItem>
+	<newsItem>
+		<headline>Kell Hounds Stop Combine Incursion</headline>
+		<date>3013-05-18</date>
+		<desc><![CDATA[Reports have finally been cleared by the AFFS that a raid on the planet Mara by the 9th Sun Zhang Academy Cadre was thwarted by the Kell Hounds mercenary regiment. Not only did the Kell Hounds manage to defeat the Cadre unit, they also captured their JumpShips, stranding 9th Cadre in the system until the Draconis Combine was able to pay reparations for the raid.]]></desc>
+		<service>NANS</service>
+		<location>Mara</location>
+	</newsItem>
+	<newsItem>
+		<headline>Obituary: Duke George Hasek</headline>
+		<date>3013-05-30</date>
+		<desc><![CDATA[We received word today that Duke George Hasek died in his sleep early this morning. The Capellan March and the Federated Suns as a whole are in mourning today after the loss of this great leader. Duke Hasek dedicated his life to bettering the planets of the Capellan March and the people living on thos planets, his loss will not soon be forgotten. Memorial and burial services will be held later this week.
+
+In addition, the ceremony to name the new Duke of New Syrtis is planned for following week. Duke George Hasek's son, Michael Hasek-Davion, will become the new Duke of New Syrtis and Field Marshal of the Capellan March. Michael Hasek-Davion has many years of experience assisting his father in running the March.]]></desc>
+		<service>NSN</service>
+		<location>New Syrtis</location>
+	</newsItem>
+	<newsItem>
+		<headline>Candace Liao Spotted With Colonel Jamie Wolf</headline>
+		<date>3013-06-01</date>
+		<desc><![CDATA[Lurid news from the Capellan Confederation; unconfirmed rumors place Duchess Candance Liao on the planet of Carver V with the Wolf's Dragoons mercenaries and suggest that the Duchess is trying to attract Colonel Jamie Wolf himself. Anonymous witnesses from the Confederation report that Candace Liao has used her position as Duchess to gain access to the famous mercenary and has been less than subtle with her intent to begin a relationship with the commander of the infamous Dragoons. Reports indicate that so far Jamie Wolf has turned down all requests from the heir to the Confederation.]]></desc>
+		<service>ISI</service>
+		<location>Carver V</location>
+	</newsItem>
+	<newsItem>
+		<headline>Federated Suns In Mourning</headline>
+		<date>3013-10-22</date>
+		<desc><![CDATA[The Federated Suns is in mourning today with the arrival of news that First Prince Ian Davion was killed yesterday while fighting on Mallory's World. Davion forces, led by General Eugene Drivers and his 17th Avalon Hussars and the local militia held off the larger Combine forces consisting of the elite 2nd Sword of Light and the 24th Dieron Regulars for 11 days before First Prince Ian Davion arrived with the 4th Davion Guards.
+
+Within a week of landing on Mallory's World, the First Prince and the 4th Guards broke the Combine's siege of Colterville, where they had the Hussars pinned. The First Prince then pushed the Davion Guards to break the 2nd Sword of Light, ordering the Hussars to guard his flank and keep the 24th at bay. Unfortunately, disaster struck with the 17th attempted an orbital drop, a specialty of the unit, on the numerical superior 24th Dieron Regulars and the 17th Hussars were crushed. The survivors fled back to Colterville and the 4th Davion Guard's flank was left unprotected.
+
+The Guards quickly found themselves surrounded, however the First Prince managed to spend more than a week evading the trap before the Guards were bottlenecked at the Desolation Pass canyons on October 21st and could no longer keep ahead of their pursuers. The fighting was brutal and the 4th Davion Guards were soon forced to pull further into the canyons. First Prince Ian Davion elected to act as rear-guard for his battered soldiers where he ultimately fell in battle.
+
+The Kell Hounds mercenaries, sent to rescue the Prince, made it to Desolation Pass moments too late to save the First Prince but they were able to drive off the 2nd Sword of Light.
+
+As the late First Prince's heir, Hanse Davion was crowned First Prince of the Federated Suns during a hasty ceremony on New Avalon earlier today. The new First Prince named Yvonne Davion as his Champion.]]></desc>
+		<service>FSNS</service>
+		<location>New Avalon</location>
+	</newsItem>
+	<newsItem>
+		<headline>1ST Federated Suns Armored Cavalry Christined</headline>
+		<date>3013-12-31</date>
+		<desc><![CDATA[3013 proved to be a tragic year as the Federated Suns saw the death of both First-Prince Ian Davion, killed in action on Mallory's World, and Duke George Hasek, lord of the Capellan March, who died in his sleep. The leadership and guidance both men provided will be greatly missed but today, the Federated Suns looks towards a brighter 3014 as this year draws to a close.
+
+In a ceremony honoring his brother, First-Prince Hanse Davion christened the 1st Federated Suns Armored Cavalry. The new regiment will be based on Ziliang and is a medium-weight unit with a strong focus on mobility and firepower. The First-Prince hand selected some of the top MechWarriors and Aerospace Pilots from across the realm to undertake his grand experiment.]]></desc>
+		<service>NANS</service>
+		<location>Ziliang</location>
+	</newsItem>
+	<newsItem>
+		<headline>Battle for Halstead Station</headline>
+		<date>3014-01-06</date>
+		<desc><![CDATA[INN has received an exclusive report that the Federated Suns' First-Prince Hanse Davion recently launched a massive invasion of the Draconis Combine planet Halstead Station. Our confidential source indicated that the invasion was authorized by the First-Prince himself after MIIO uncovered reports of a massive LosTech warehouse somewhere on the planet. Without a doubt, the First-Prince is hoping to capture the planet so that this technology can be claimed by the Suns.
+
+News from the planet seems to be cut off, however we have received initial reports from the planet which indicate the fighting is fierce between the Draconis Combine defenders and the Suns invaders.]]></desc>
+		<service>INN</service>
+		<location>Halstead Station</location>
+	</newsItem>
+	<newsItem>
+		<headline>Open Rebellion In The Free Worlds League</headline>
+		<date>3014-05-25</date>
+		<desc><![CDATA[Today, we received shocking news, out of New Delos. On May 22, Anton Marik, brother to Captain-General Janos Marik and defender of the Free World League's border with the Capellan Confederation, named himself Captain-General and called for the 'loyal sons and daughters of the League' to support him in overthrowing his brother. Pointing out his brother's recent military failures and self imposed seclusion, Anton Marik maintained that his brother is unfit to rule and must be replaced for the safety of the realm.
+
+Sources indicate that while most of the Protectorate and several minor provinces have thrown in their support with Anton Marik while the Duchy of Graham-Marik and the Duchy of Oriente have publicily declared for Captain-General Janos Marik, most provinces in the Free Worlds League have so far either not made any public declaration or have already come forward and invoked the Home Defense Act while declaring their neutrality in any potential conflicts between the brothers.
+
+We will have more as this story develops. Next, our analysts will discuss what Anton Marik's rebellion will mean for citizens across the League. Stay tuned.]]></desc>
+		<service>GB</service>
+		<location>Atreus</location>
+	</newsItem>
+	<newsItem>
+		<headline>Wolf's Dragoons in the League</headline>
+		<date>3014-06-02</date>
+		<desc><![CDATA[In surprising news, the Wolf's Dragoons have been spotted fighting along-side Anton Marik's rebel forces in the Free Worlds League civil-war. Until the Dragoons joined the fighting, they were believed to still be contracted to the Capellan Confederation performing garrison duty on Carver V. We are aware at this time if Chancelor Liao has loaned the Dragoons to Anton Marik or if they simply broke contract. One thing is sure, Wolf's Dragoons may be Anton Marik's strongest allies in his bid to dispose the Captain-General.]]></desc>
+		<service>INN</service>
+		<location>New Delos</location>
+	</newsItem>
+	<newsItem>
+		<headline>Death to Traitors</headline>
+		<date>3014-06-14</date>
+		<desc><![CDATA[Today, the Captain-General has returned from his long absence to respond to the threat of his brother Anton Marik. In a lengthy speech to Parliment, the Captain-General showed an energy and determination that has been missing in his few public appearances in recent years.
+		
+During the speech, Captain-General Janos Marik called for death to all traitors to the League and promised that all of his brother's top supporters would be brought to justice, stripped of their tiles and lands and executed as traitors.]]></desc>
+		<service>GB</service>
+		<location>Atreus</location>
+	</newsItem>
+	<newsItem>
+		<headline>Provinces Delcare Neutrality</headline>
+		<date>3014-07-10</date>
+		<desc><![CDATA[In response to Anton Marik's call for revolt against his brother Captain-General Janos Marik, and the Captain-General's call for death to all traitors, the majority of Provinces of the Free Worlds League have been quick to declare Neutrality and their intentions to stay out of all fighting in order to defend their holdings from the Confederation and Commonwealth.]]></desc>
+		<service>GB</service>
+		<location>Atreus</location>
+	</newsItem>
+	<newsItem>
+		<headline>Lyran Commonwealth Raids Free Worlds League</headline>
+		<date>3014-10-14</date>
+		<desc><![CDATA[Today, Lyran High Command confirmed reports that the Lyran Commonwealth Armed Forces have begun conducting retalitory raids into the Free Worlds League, in response to the attacks launched on planets across the Commonwealth, including Coventry and Hesperus II over the last decade. While the targets of the raids remain unknown, reports indicate that Commonwealth forces are hitting multiple worlds while the League is distracted by a civil war.]]></desc>
+		<service>TBC</service>
+		<location>Tharkad</location>
+	</newsItem>
+	<newsItem>
+		<headline>Sirian and Regulus Declare Support for Janos Marik</headline>
+		<date>3014-11-28</date>
+		<desc><![CDATA[After months of refusing to support the Captain-General in his war with his rebel brother, Anton, both Sirian and Regulus have, in exchange for substantial financial subsidies and trade rights, agreed to enter the war on behalf of Captain-General Janos Marik. This comes as a crippling blow to rebel-Anton Marik, as he has faced several military set-backs in recent weeks and the addition of fresh troops supporting the Captain-General sounds almost certain defeat for Anton.]]></desc>
+		<service>RR</service>
+		<location>Regulus</location>
+	</newsItem>
+	<newsItem>
+		<headline>Axman Unveiled</headline>
+		<date>3048-02-10</date>
+		<desc><![CDATA[Today the Federated Commonwealth unveiled a brand new design, developed by Team Banzai and the NAIS, the new <i>Axman</i> is the follow up to the iconic <i>Hatchetman</i> BattleMech. The new <i>Axman</i> weighs significantly more than its predecessor but is otherwise very similar. Both 'Mechs wield massive hatchets and are armed with large-bore auto-cannons for destroying other 'Mechs and both designs have a top speed of nearly 65 km/h and jump jets. The biggest difference between the <i>Axman</i> and the <i>Hatchetman</i>, other than their size, is the inclusion of rediscovered Lostech on the <i>Axman</i>.]]></desc>
+		<service>FCNS</service>
+		<location>New Avalon</location>
+	</newsItem>
+	<newsItem>
+		<headline>Rim Collection Charter Signed</headline>
+		<date>3048-05-14</date>
+		<desc><![CDATA[INN has just received news from the Periphery that six former Rim Worlds Republic planets have signed the Rim Collection Charter. The Charter bands these six planets together into a mutual defensive pact and the six member states hope their alliance will allow them to better defend against pirate predation and pool their resources to improve the conditions on their planets.
+
+Speaking on behalf of the new Periphery nation, Planetary Councilman Roberts explained the new nation’s goals to “Improve the living conditions for the residents of the Rim Collection planets, through improved security, pooling resources, and expanding trade with neighboring nations.” Here at INN we wish the new Rim Collection the best.]]></desc>
+		<service>INN</service>
+		<location>Gillfillan's Gold</location>
+	</newsItem>
+	<newsItem>
+		<headline>Devastator Unveiled</headline>
+		<date>3048-06-28</date>
+		<desc><![CDATA[The Federated Commonwealth unveiled a new construction line at the Norse-Storm manufacturing plant on Loxley today. A news conference held at the plant wowed reports by showing off the impressive <i>Devastator</i> assault 'Mech.
+
+The <i>Devastator</i> is rumored to have been designed by Aleksander Kerensky himself, just prior to the Amaris Coup, which resulted in only a handful of prototypes ever making it off the factory floor before the design was lost to history. The <i>Devastator</i> wasn't rediscovered until forces from the Federated Suns discovered blue prints in an abandoned Star League facility on Hoff in 3023. Unfortunately, the advanced materials and parts required meant that the <i>Devastator</i> would not see production for another two-decades, with full production only beginning earlier this year.]]></desc>
+		<service>FCNS</service>
+		<location>Loxley</location>
+	</newsItem>
+	<newsItem>
+		<headline>Avenger Dropship Upgraded</headline>
+		<date>3048-11-02</date>
+		<desc><![CDATA[Today the Federated Commonwealth unveiled the first of many upgrades to the realm's Dropship fleet. The first <i>Avenger-class</i> Assault DropShip has completed an upgrade using rediscovered weapon and cooling systems to greatly increase its combat effectiveness. The Commonwealth Admiralty reports that they expect upgrades to begin over the next few years of all Commonwealth Dropships and Jumpships.]]></desc>
+		<service>FCNS</service>
+		<location>Delavan</location>
+	</newsItem>
+	<newsItem>
+		<headline>Creation of 11th and 12th FedCom RCTs Announced</headline>
+		<date>3049-01-05</date>
+		<desc><![CDATA[Announced to much fanfare, the Armed Forces of the Federated Commonwealth christened two new Regimental Combat Teams; the 11th and 12th Federated Commonwealth RCTs will be stationed on Skye and Marcus respectively. The new commands are staffed by soldiers from throughout the Federated Commonwealth and will assist in the defense of the Sarna March.]]></desc>
+		<service>FCNS</service>
+		<location>Marcus</location>
+	</newsItem>
+	<newsItem>
+		<headline>Periphery Gone Quiet</headline>
+		<date>3049-12-10</date>
+		<desc><![CDATA[For almost four months now, the Periphery realms Elysian Fields, the Oberon Confederation, Greater Valkyrate and the Baron of Strang have all been silent. While not overly unusual due to the limited collection of HPG's in that corner of the galaxy and their limited trade with the Inner Sphere, there have been worrying reports along the border of the Federated Commonwealth and Free Rasalhague Republic that there have been refugees fleeing from some unknown attackers. While most news sources are claiming it is nothing more than a new pirate lord or simply a war between the various minor realms, the Observer is not so sure. Having spoken with several refugees, they claim that the attackers were far too organized and were using unrecognizable equipment. What does that leave us? Has the Federated Commonwealth decided it is time to capture the way-ward pirate-realms of their near-Periphery or is this the start of something far more sinister?]]></desc>
+		<service>INO</service>
+		<location>Winfield</location>
+	</newsItem>
+	<newsItem>
+		<headline>Operation Guerrero Ends</headline>
+		<date>3058-01-01</date>
+		<desc><![CDATA[The Federated Commonwealth breathes a sigh of relief as word spreads that hostilities between our nation and the Free Worlds League and their Capellan Confederation allies have come to an end after several months of brutal fighting. To say the Federated Commonwealth has had a rough year would be a major understatement; following allegations that First-Prince Victor Ian Steiner-Davion ordered Joshua Marik, heir to the Free Worlds League, replaced with a body-double while he was being treated at the New Avalon Institute of Science, the First-Prince's sister Katrina Steiner-Davion removed the Lyran half of the realm from the long standing alliance two days after the Capellan Confederation and Free Worlds League used the alleged crimes of the First-Prince as grounds to launch an invasion. On September 16th, the Capellan Confederation and the Free Worlds League launched a massive invasion of our realm, striking planets captured nearly 30 years ago during the 4th Succession War. Peace was formally declared between the Federated Commonwealth, Free Worlds League and Capellan Confederation on December 15th, 3057.]]></desc>
+		<service>NANS</service>
+		<location>New Avalon</location>
+	</newsItem>
+	<newsItem>
+		<headline>War Between Clans?</headline>
+		<date>3058-01-02</date>
+		<desc><![CDATA[Our new agency has been receiving whispers and rumors of a massive battle in the Clan Invasion Corridor between the Jade Falcons and the Wolves. As always, news from the conquered territory is scarce at best, however from what we have heard both Clans have been fighting on multiple worlds, though the reasons behind the conflict are at this time unknown. Perhaps this large-scale infighting between the Clan invaders will allow the governments of the Inner Sphere to finally remove the rampaging Clan hordes once and for all.
+
+Once piece of news that we have received from the fighting is that the notorious Black-Widow, Natasha Kerensky, was killed in combat on the planet Twycross. We have received no details of how the fearsome femme fatale died, other than that she “went down in a blaze of glory”. This ends the legend half a century in the making.]]></desc>
+		<service>INN</service>
+		<location>Arc-Royal</location>
+	</newsItem>
+	<newsItem>
+		<headline>Inner Sphere In Conflict</headline>
+		<date>3058-03-15</date>
+		<desc><![CDATA[Low-level conflict abounds across the Inner Sphere. Reports are flooding in from each realm of worlds invaded or unrest; although none of the Successor States are in open warfare, except the Lyran Alliance which has suffered a major Jade Falcon invasion.
+
+The next biggest hotbed by far is the Federated Commonwealth's Sarna March, which is now being called the Chaos March. After the recent Free Worlds League and Capellan Confederation invasion shattered the March's defenses dozens of planets have found themselves with no centralized authority and the result has been chaos. The entire area is experiencing or in fear of riots, pirates, and raids from minor neighbors and superpowers alike. However, several planets have banded together in mutual defense to form several new minor-powers, such as the Tall Trees Alliance and the resurrected Sarna Supremacy, which was originally conquered centuries ago by the Confederation. The violence has even grown to include Towne as forces from the Draconis Combine vie for supremacy and endanger the nearly decade long peace that the Federated Commonwealth has enjoyed with its once bitter enemy. 
+
+As the March descends into anarchy, even surrounding planets are being swept into the whirlwind. Terra, the birthplace of humanity, is currently the sight of a brutal battle between ComStar and the Word of Blake. Details are almost non-existent but INN has learned that ComStar forces on planet are all but defeated and the Word of Blake will soon be returning home.
+
+But by far, the most overt fighting is taking place along the Lyran Alliance border with Clan Jade Falcon. Shortly after we received word that the fighting between Clans Wolf and Jade Falcon had ended, the Jade Falcons began a vicious invasion of the Lyran Alliance; hitting multiple planets and ultimately driving for Coventry, a major manufacturing center for the Alliance. However, the planet is well defended and so far the Falcon's invasion has bogged down after landing on the planet. Reports indicate extensive losses for the Lyran forces initially defending the planet, the arrival of a mercenary coalition, hired by the Alliance and led by the Wolfs Dragoons is all that kept the planet from falling to the Falcons. Will the Alliance lose one of its manufacturing gems or will the Falcons break their beak on the tenacious Inner Sphere defenders?]]></desc>
+		<service>INN</service>
+		<location>Bryant</location>
+	</newsItem>
+	<newsItem>
+		<headline>FWLM Launches New Warships</headline>
+		<date>3058-05-05</date>
+		<desc><![CDATA[The FWLM has announced the launch of the first of two new lines of Warships. The first is the 485,000 ton <i>Impavido-class</i> Destroyer and the second is the massive 815,000 ton <i>Agamemnon-class</i> Heavy Cruiser. At least one ship from each class has already finished production or will finish production in the next week. The Free Worlds League is a safer place with the addition of these new stalwart defenders.]]></desc>
+		<service>MCT</service>
+		<location>Atreus</location>
+	</newsItem>
+	<newsItem>
+		<headline>Jade Falcons Defeated On Coventry</headline>
+		<date>3058-06-23</date>
+		<desc><![CDATA[The Jade Falcon threat has finally been removed from Coventry, thanks to the arrival of a multi-national task force. Months of bitter fighting for the planet ended peacefully when, shortly after the task force landed, the defenders and the Falcons met for peace talks. Due to the show of strength from the multi-national force, the Jade Falcons agreed to leave the system with no further fighting. This puts an end to more than three months of intense-combat for the manufacturing jewel and also brings an end to the massive Jade Falcon invasion. The multi-national coalition, led by First-Prince Victor Davion inspired Archon Katrina Steiner to invite the other nations of the Inner Sphere to a peace conference, scheduled for October 1st, to further peaceful relations between the realms of the Inner Sphere and to counter-act the Clan threat that hangs over everyone.]]></desc>
+		<service>TBC</service>
+		<location>Tharkad</location>
+	</newsItem>
+	<newsItem>
+		<headline>Capellan Confederation Launches Feng Huang Cruiser</headline>
+		<date>3058-08-02</date>
+		<desc><![CDATA[Today, the Capellan nation celebrates the launch of the first <i>Feng Huang-class</i> Cruiser. The mighty Warship weighs 970,000 tons and is large enough to take on almost any ship in existence. His Celestial Wisdom was present for the christening of this new ship and proclaimed it one of “many to come” in the next several years.]]></desc>
+		<service>CBC</service>
+		<location>Sian</location>
+	</newsItem>
+	<newsItem>
+		<headline>Sirian Lancers Reclaim Sirius and Procyon</headline>
+		<date>3058-09-28</date>
+		<desc><![CDATA[The Globe has received reports that forces from the Sirian Lancers have ventured into the 'Chaos March' to reclaim their lost homes of Sirius and Procyon after both planets failed to be reclaimed during Operation Guerrero last year. While the Lancers are rumored to have acted without orders from the FWLM, the Sirian Brigade released a statement that they felt compelled to “Secure their homes and loved ones that were stolen away nearly three-decades ago and keep their home safe from the ravages of the Chaos March.” The Globe has received no response from Atreus when we inquired on the Captain-General's view of the situation. Regardless, we at the Globe are happy to welcome our brothers and sisters from Sirius and Procyon back into the League.]]></desc>
+		<service>GB</service>
+		<location>Marik</location>
+	</newsItem>
+	<newsItem>
+		<headline>Whitting Conference Begins</headline>
+		<date>3058-10-01</date>
+		<desc><![CDATA[Today marks the start of the Whitting Conference, called by Archon Katrina Steiner to foster peaceful relations between the realms of the Inner Sphere and to end the Clan threat for good. The Whitting Conference is named for the small village on Coventry where a coalition of forces from each Inner Sphere nation conducted peace talks with the Khan of the invading Jade Falcons. Talks have only just begun but the Inner Sphere holds its breath in hope for a future of peace after centuries of war.]]></desc>
+		<service>INN</service>
+		<location>Tharkad</location>
+	</newsItem>
+	<newsItem>
+		<headline>Coordinator Nearly Assassinated?</headline>
+		<date>3058-10-12</date>
+		<desc><![CDATA[Unconfirmed reports are running rampant through the Combine and the Voice of the Dragon won't report them; on July 1st during the Coordinator's birthday ceremony forces of the DCMS attempted to kill the Dragon, Theodore Kurita himself. While word has been stifled by the Voice of the Dragon and the ISF, the Drake has received word that the traitorous attacks by supposedly loyal Combine soldiers were only stopped by the mercenary 17th Recon Regiment, better known as Camacho's Caballeros. Does this attack suggest deeper problems within the Combine? Can the forces of the DCMS be trusted to defend us or are they too busy with their own personal honor to defend the people of the Combine?]]></desc>
+		<service>Drake</service>
+		<location>Luthien</location>
+	</newsItem>
+	<newsItem>
+		<headline>Star League Reformed</headline>
+		<date>3058-11-21</date>
+		<desc><![CDATA[Today, the Lords and Great Houses of the Inner Sphere have set aside their petty bickering and power mongering to usher in a new age of peace. This morning, the Lords of the Capellan Confederation, Draconis Combine, Federated Commonwealth, Free Worlds League, Lyran Alliance, Free Rasalhague Republic, and the St. Ives Compact signed the Constitution of the Second Star League with the blessings of ComStar.
+
+The first act of the Second Star League, reformed after centuries, was to elect a new First Lord. The hostess of the Whitting Conference, Archon Katrina Steiner, started elections by nominating Chancellor Sun-Tzu Liao of the Capellan Confederation and voting passed nearly unanimously to name the leader of the Capellan Confederation First Lord of the Star League.]]></desc>
+		<service>INN</service>
+		<location>Tharkad</location>
+	</newsItem>
+	<newsItem>
+		<headline>Formation Of Tamar Cavaliers Regiment Announced</headline>
+		<date>3058-12-12</date>
+		<desc><![CDATA[Earlier today, Duke Robert Kelswa-Steiner raised a new regiment to join his House Guard, the Tamar Cavaliers. Duke Kelswa-Steiner publicly stated that the intended purpose for the new Cavaliers is to one day see Tamar and the rest of the Tamar Pact rescued from Clan tyranny and returned to the Lyran Alliance. Duke Kelswa Steiner has generously given direct command of the unit to Lyran High Command for the defense of their border with Clans Jade Falcon and Wolf.]]></desc>
+		<service>SNN</service>
+		<location>Skye</location>
+	</newsItem>
+	<newsItem>
+		<headline>Commando BattleMech Updated</headline>
+		<date>3058-01-18</date>
+		<desc><![CDATA[Today officials from the Lyran Alliance Armed Forces announced the release of the latest variant of the venerable <i>Commando</i> BattleMech line, the new COM-7S, which utilizes cutting edge technology to improve the survivability and firepower of the mainstay light 'Mech of the LAAF.]]></desc>
+		<service>TBC</service>
+		<location>Tharkad</location>
+	</newsItem>
+	<newsItem>
+		<headline>George Hasek II named Director Of The Capellan March</headline>
+		<date>3059-03-28</date>
+		<desc><![CDATA[Citing Duke Morgan Hasek-Davion's expanded role in the newly-reformed Star League Defense Force, earlier today his son George Michael Hasek was named Director of the Capellan March. This elevation of George Hasek makes him Duke of the Capellan March in all but name, giving him control of all of the Marches military forces and burdening him with the defense of the entire March. While George Hasek is young, he has shown promise since his graduation from the Sakhara Academy and his father, Duke Morgan Hasek-Davion has declared that he has the utmost faith in his sons ability and judgment.]]></desc>
+		<service>NSNS</service>
+		<location>New Syrtis</location>
+	</newsItem>
+	<newsItem>
+		<headline>Operation Bull Dog A "Success"</headline>
+		<date>3059-06-18</date>
+		<desc><![CDATA[During a press conference today, First Lord Sun-Tzu Liao announced that on May 20th, the Star League began a massive invasion, dubbed Operation Bulldog, aimed at the complete removal of Clan Smoke Jaguar forces from the Inner Sphere. This undertaking is being conducted by a massive multi-national force led Archon-Prince Victor Steiner-Davion of the Federated Commonwealth and legendary Precentor Martial Anastasius Focht. Forces from all member states of the reborn Star League are taking part in this massive invasion and the First Lord reports that the invasion so far has been a massive success, with battles progressing faster and significantly fewer casualties than anticipated.]]></desc>
+		<service>INN</service>
+		<location>Sian</location>
+	</newsItem>
+	<newsItem>
+		<headline>Clan Nova Cat Joins The Star League Defense Force</headline>
+		<date>3059-08-25</date>
+		<desc><![CDATA[Press conferences from the Star League Defense force indicate that the war against the Smoke Jaguars is progressing well and stated that Clan Nova Cat has joined the reformed Star League. This unexpected support frees up dozens of regiments for the battle with the Smoke Jaguars and all but assures that they will be unable to withstand the combined strength of the Second Star League.]]></desc>
+		<service>INN</service>
+		<location>Luthien</location>
+	</newsItem>
+	<newsItem>
+		<headline>Operation Bull Dog Stalling</headline>
+		<date>3059-12-02</date>
+		<desc><![CDATA[News from the front reports that Operation Bulldog's progress has slowed. While the operation made massive inroads into Smoke Jaguar territory in the opening months while the Clanners were caught off balance, they have since redoubled their defenses and have slowed the advances of the new Star League Defense Force. However, First Lord Sun-Tzu Liao restated his confidence in the SLDF and praised their valiant efforts and assured all people of the Inner Sphere that the war would not end until the Smoke Jaguars were defeated once and for all.]]></desc>
+		<service>Luthien</service>
+		<location>INN</location>
+	</newsItem>
+	<newsItem>
+		<headline>First Lord Meeting With Periphery Neighbors?</headline>
+		<date>3060-02-03</date>
+		<desc><![CDATA[Reports from the Taurian Concordat suggest that First Lord and Chancellor Sun-Tzu Liao is planning a meeting with Magistrix Emma Centrella from the Magistracy of Canopus and Protector of the Realm Jeffrey Calderon from the Concordat were in a meeting to discuss a potential alliance. What could this mean for the future of our realm? The meddling of Inner Sphere powers has led to nothing but ruin for our realm in the past.]]></desc>
+		<service>TBC</service>
+		<location>Taurus</location>
+	</newsItem>
+	<newsItem>
+		<headline>Formation of 2nd Janissaries Brigade Announced</headline>
+		<date>3060-06-01</date>
+		<desc><![CDATA[Today, the St. Ives Compact celebrates the creation of the 2nd Janissaries Brigade. The 2nd Janissaries are a combined arms brigade formed along the principles of the Federated Suns' Regimental Combat teams with a regiment of Battlemechs supported by multiple regiments of conventional armor, infantry, and artillery and aerospace forces. The 2nd Janissaries mean a safer St. Ives and a more secure future for our Compact.]]></desc>
+		<service>SIBC</service>
+		<location>St. Ives</location>
+	</newsItem>
+	<newsItem>
+		<headline>New Divers Optics Factory Opens</headline>
+		<date>3060-06-28</date>
+		<desc><![CDATA[Today the Combine celebrates not only the continued success of the Draconis Combine Mustered Soldiery and our allies fighting valiantly to destroy the threat of the evil Smoke Jaguars forever, but also the improvement of our great nation's powerful defense industries. Earlier today Irian BattleMechs Unlimited officially opened a new branch of Divers Optics on the planet of Kessel. Divers Optics are one of the Inner Sphere's premier creators of all types of laser weaponry and the new plant on Kessel will be making top of the line models, ensuring our warriors have only the best tools to defend the Dragon.]]></desc>
+		<service>VotD</service>
+		<location>Kessel</location>
+	</newsItem>
+	<newsItem>
+		<headline>Misrule In the Federated Commonwealth</headline>
+		<date>3060-07-17</date>
+		<desc><![CDATA[Reports continue to trickle into the Lyran Alliance from our old sister state the Federated Suns indicating growing discontent with Regent Yvonne Steiner-Davion. The people of the realm continue to suffer under the poor economy and report it continues to grow harder and harder to acquire even the most basic essentials as shipping and jobs are disrupted. There have also been reports of protests on multiple planets demanding change.]]></desc>
+		<service>AP</service>
+		<location>Tharkad</location>
+	</newsItem>
+	<newsItem>
+		<headline>Alarion Military Academy Opens</headline>
+		<date>3060-08-15</date>
+		<desc><![CDATA[Today, the Lyran Alliance Armed Forces (LAAF) held the opening ceremony for their newest Military Academy. The new Military Academy will focus on training crews, technicians and pilots of the LAAF's expanding Warship, JumpShip, DropShip and Aerospace Fighter fleet. The Alarion Military Academy has attracted some exceptionally skilled and experienced staff to ensure that our next generations of naval officers and enlisted have the best training available to keep the Alliance safe from any enemy.]]></desc>
+		<service>DBC</service>
+		<location>Alarion</location>
+	</newsItem>
+	<newsItem>
+		<headline>Coventry Military Academy Re-Opens</headline>
+		<date>3060-08-16</date>
+		<desc><![CDATA[We have more good news to report regarding the Lyran Alliance's military academies. A ceremony was just held to christen the re-opening of the Coventry Military Academy. As all of our viewers recall, the Coventry Military Academy was damaged during the Jade Falcons destructive invasion in 3058, which saw the Jade Falcons conquer several worlds before converging on Coventry with several Galaxies of 'Mechs. The Falcons were intent on capturing the planet's vital 'Mech factories and there was fierce fighting by the defending 10th Skye Rangers, Coventry Militia and the Coventry Military Academy Training Cadre. The Academy's buildings and grounds were caught in the middle of one particularly violent battle and the Academy has been rebuilding ever since the Falcons were forced off the planet.]]></desc>
+		<service>DBC</service>
+		<location>Coventry</location>
+	</newsItem>
+	<newsItem>
+		<headline>Discontent In The Federated Commonwealth</headline>
+		<date>3060-09-18</date>
+		<desc><![CDATA[Our correspondents in the Federated Suns continue to report on the rising discontent with the rule of Regent Yvonne Steiner-Davion have spilled over into full blown riots on several planets. These riots are expected to make a bad situation worse by slowing the shipment of food and other every day essentials. Polls indicate the vast majority of citizens in the Federated Suns feel Yvonne is doing a poor job of running the realm in her brother Victor's absence.]]></desc>
+		<service>AP</service>
+		<location>Tharkad</location>
+	</newsItem>
+	<newsItem>
+		<headline>Hustaing Attacked, Chancellor Missing</headline>
+		<date>3060-10-02</date>
+		<desc><![CDATA[CBC has just received news that the Blackwind Lancers, a battalion from the St. Ives Compact, launched a surprise raid on the Confederation planet of Hustaing on September 26. We have very little information to report at this time as the Word of Blake has placed the planet under a temporary blackout and is not sending or receiving any HPG messages for Hustaing. Reports indicate that First Lord of the Star League and Chancellor of the Capellan Confederation, his Celestial Wisdom Sun-Tzu Liao and his fiancé Duchess Isis Marik were scheduled to make an appearance on Hustaing the day of the attack and there have been no sightings of the Chancellor since the attack and no official word from Sian. We here at CBC hope the Celestial Wisdom is safe and this situation will be cleared up shortly.]]></desc>
+		<service>CBC</service>
+		<location>Sian</location>
+	</newsItem>
+	<newsItem>
+		<headline>Detroit Conference Attacked</headline>
+		<date>3060-10-31</date>
+		<desc><![CDATA[Disaster struck today at the Detroit Conference. The conference, attended by Protector Jeffrey Calderon and Magistrix Emma Centralla and representatives of the Capellan Confederation, due to the Chancellors uncertain status after the attack on Hustaing, were planning to discuss a potential alliance between the three realms. Unfortunately, President Sherman Maltin and several of the Colonial Marshals have taken the Protector and Magistrex hostage in a bid for independence for the Concordat's New Colony Region. For now the situation is tense as forces from the Capellan Confederation, Magistracy of Canopus and Taurian Concordat struggle to respond.]]></desc>
+		<service>TPBC</service>
+		<location>Detroit</location>
+	</newsItem>
+	<newsItem>
+		<headline>Clan Ghost Bear Here To Stay</headline>
+		<date>3060-11-01</date>
+		<desc><![CDATA[For the first time ever, a Clan Khan, specifically Khan Bjorn Jorgensson of Clan Ghost Bear, invited journalists from across the Inner Sphere to the Ghost Bear Inner Sphere capital Alshain for a press conference. During the conference the Khan announced his Clans intention to become permanent residents of the Inner Sphere and the formation of the “Ghost Bear Dominion”. Stating that the “Clan Crusade” was a failure and the Ghost Bears have decided it is time to “work towards increased cooperation between the warriors of the Clan and the citizens of our new holdings and our neighbors”. It is unclear what the formation of the new Dominion truly means for the people of the Dominion and its neighbors, however the Ghost Bear Khan expressed an interest in making the Dominion more open to the Inner Sphere than in the past, including expanded trade, especially with the nascent Free Rasalhague Republic, which has close ties to the populations on most of the captured Ghost Bear planets.]]></desc>
+		<service>INN</service>
+		<location>Alshain</location>
+	</newsItem>
+	<newsItem>
+		<headline>Chancellor Safe</headline>
+		<date>3060-11-05</date>
+		<desc><![CDATA[Today, is a day of celebration for people of the Confederation, CBC has finally received word from the planet of Hustaing and along with verification that First Lord of the Star League and our Celestial Wisdom, Chancellor Sun-Tzu Liao is safe and never landed on Hustaing. The Blackwind Lancers have been captured and  his Celestial Wisdom's fiance, Duchess Marik, was kept safe from the vile Lancers by the valiant efforts of the Hustaing Militia and Warrior House Hiritsu. The Chancellor has announced the formation of the Hustaing Warriors, a new 'Mech battalion using the 'Mechs captured from the Blackwind Lancers and raised from Hustaing locals.
+
+In his infinite wisdom, the Chancellor called an emergency meeting with the Star League council and declared a state of emergency and requested peace keeping forces from the rest of the Inner Sphere to secure and demilitarize the St. Ives border to prevent any further unsanctioned attacks by the aggressive rebellious nation. The peace-keepers are expected to arrive within the next few weeks and I am sure the people of the Confederation will feel safer knowing the mighty Star League will help ensure our safety from our belligerent neighbors.]]></desc>
+		<service>CBC</service>
+		<location>Hustaing</location>
+	</newsItem>
+	<newsItem>
+		<headline>Star League 'Peace-Keepers' Occupy St. Ives Compact</headline>
+		<date>3060-12-02</date>
+		<desc><![CDATA[Reports indicate that the first wave of “Star League Peace-keepers” have arrived in the St. Ives Compact at the behest of First Lord Liao. Five planets have been targeted for 'demilitarization' including Indicass, Vestallas, Bashuar, Brighton and Denbar. Units from the Free Worlds League, Draconis Combine, Lyran Alliance, Capellan Confederation, Magistracy of Canopus, Taurian Concordat and even our own Federated Commonwealth have made landfall. There has already been one reported incident, resulting from when a battalion of the 2nd St. Ives Lancers on Indicass, unaware of the 'Peace-keepers' intentions, opened fire on the 2nd Oriente Hussars as they unloaded from their Dropships. Reports indicate damage was minimal before the St. Ives forces were ordered to stand down by high command.]]></desc>
+		<service>NSB</service>
+		<location>New Syrtis</location>
+	</newsItem>
+	<newsItem>
+		<headline>Archon Katrina Steiner-Davion Named Regent Of Federated Commonwealth</headline>
+		<date>3060-12-22</date>
+		<desc><![CDATA[In an unexpected, though welcome, move Yvonne Steiner-Davion held a press conference earlier today and announced she abdicated her position as Regent immediately. Citing the realm's recent unrest, poor economy and the growing discontent that have plagued her short reign while her brother Archon-Prince Victor Steiner-Davion is fighting the Clans in Combine space, Yvonne has named her sister, Archon Katrina Steiner-Davion as her replacement Regent for the Federated Commonwealth. Yvonne went on to expand that she had every faith that her older sister Katrina would be able to fix the problems in the Federated Commonwealth and restore the people's faith, pointing out the great success Katrina Steiner-Davion has enjoyed while ruling the Lyran Alliance. After the press conference, reports indicated that the former Regent was leaving New Avalon and was headed for an undisclosed location. Archon-Princess Katrina Steiner-Davion held her own press conference immediately after announcing her acceptance of the new position and the great responsibilities that came with it and she thanked her sister for thinking first of the people of the Federated Commonwealth and wished her brother Victor would have remembered those same responsibilities before abandoning the realm for his crusade against the Clans.]]></desc>
+		<service>NANS</service>
+		<location>New Avalon</location>
+	</newsItem>
+	
+	<newsItem>
+		<headline>SLDF Peace-Keepers Leave St. Ives Compact</headline>
+		<date>3061-01-10</date>
+		<desc><![CDATA[In a promising turn of events, Duchess Candace Liao has convince the Star League to remove 'peace-keepers' from our border. The forces from all member nations of the Star League were put in place at the behest of First Lord Sun-Tzu Liao and most of them made landfall more than a month ago. Since then, the St. Ives Compact has held its breath as the peace-keepers attempted to disarm our border and defenders. There have been several skirmishes already between the peace-keepers and St. Ives forces. Hopefully with the removal of the Star League forces will defuse the situation. The Star League forces are scheduled to leave the Compact on January 27th.]]></desc>
+		<service>SIBC</service>
+		<location>St. Ives</location>
+	</newsItem>
+	<newsItem>
+		<headline>Capellan Confederation Invades St. Ives Compact</headline>
+		<date>3061-02-05</date>
+		<desc><![CDATA[St. Ives is in open war with the Capellan Confederation. Immediately following the removal of the Star League Peace-Keeping forces, Capellan Confederation forces landed and the invasion truly began. Reports indicate that the Compact has already lost several planets and our defenders struggle to hold back the larger Capellan Confederation. To add additional insult to injury, our 'allies' in the Federated Commonwealth have so far shown no signs of sending additional aid to help defend our realm against the voracious Confederation.]]></desc>
+		<service>SIBC</service>
+		<location>St. ives</location>
+	</newsItem>
+	<newsItem>
+		<headline>Trinity-Alliance Formed</headline>
+		<date>3061-02-28</date>
+		<desc><![CDATA[Earlier this month joint forces from the Capellan Confederation and the Magistracy of Canopus landed on Detroit and attempted to break the hostage situation where Concordat President Sherman Maltin was holding Protector Calderon and Magistrix Centrella. The forces were successful in putting down the revolt and managed to rescue Magistrix Centrella. Unfortunately, both President Maltin and Protector Calderon were killed in the fighting. Already Grover Shraplen has been named the Taurian Concordat's new Protector and reports indicate that the successful joint operation has propelled the 'Trinity-Alliance' talks forward. The Capellan Confederation has agreed to a mutual defense pact and has generously offered to send teachers, engineers and technical staff to the Magistracy and Concordat to bring both realms 'into the 31st century'.]]></desc>
+		<service>MBC</service>
+		<location>Detroir</location>
+	</newsItem>
+	<newsItem>
+		<headline>Clan Smoke Jaguar Defeated</headline>
+		<date>3061-05-15</date>
+		<desc><![CDATA[Breaking news from Luthien. Star League Defense Force General, Victor Ian Steiner-Davion has made his first public appearance in well over a year and announced the end of the Clan threat. Reports are only now being made public that Operation Bulldog, the operation to remove the Smoke Jaguars from Inner Sphere space was only the first half of the plan and was completed in a few months in 3059. The rest of the mission, Task Force Serpent, was kept completely classified until now and was a second attack sent directly to the Clan Home-worlds to destroy the Smoke Jaguars in their den. This second prong of the attack was led by Duke Morgan Hasek-Davion and General Ariana Winston, commander of the famed SLDF Eridani Light Horse. Reports indicate that both commanders were killed while on the Jaguar home-world of Huntress, though their mission was ultimately a success when the forces from Operation Bulldog, following the Smoke Jaguar forces fleeing the Inner Sphere, arrived in Clan Space.
+
+After the Jaguars were completely destroyed, Victor Steiner-Davion led his coalition forces to the Clan's capital world, Strana Mechty, and waged a trial against the Clans to end their invasion for good. Forces from each realm squared off against Clan forces and were ultimately victorious, defeating the Clans by their own rules. The Inner Sphere can breath a collective sigh of relief to know that the Clans' invasion plans have been ended and we may be able to expect peace along that front for the immediate future.
+
+Unfortunately for Victor Steiner-Davion, he returns home to find himself an Archon-Prince without a realm. Just three months ago his youngest sister Yvonne abdicated her regency to their sister Katrina Steiner-Davion. The relationship between Victor and Katrina has reportedly been strained for years, starting with the revelations that Victor attempted to replace Joshua Marik with a double, leading to Operation Guerrero, which saw Katrina remove the Lyran half of the Federated Commonwealth out of the alliance and renamed the realm the Lyran Alliance. For now, the future of the ex-Archon-Prince is unknown. Currently, he is still the commander of the Star League Defense Force and the mighty coalition he used to crush the Smoke Jaguars and stop the rest of the Clan juggernaut.]]></desc>
+		<service>INN</service>
+		<location>Luthien</location>
+	</newsItem>
+	<newsItem>
+		<headline>Clan Infighting</headline>
+		<date>3061-04-23</date>
+		<desc><![CDATA[Reports are scarce at best, however sources in the Jade Falcon Occupation Zone report that the Falcons came under attack by Clan Steel Viper at the start of the month and the Vipers seem to have once again decided to enter into the Inner Sphere. Early in the Clan Invasion the Steel Vipers shared the Falcons invasion corridor, until inter-clan battling resulted in the Falcons forcibly ejecting the Vipers from their space. While the inter-clan battling is still somewhat of a mystery to the Inner Sphere, we will have to see if the reappearance of the Steel Vipers means they are here to stay this time or not.]]></desc>
+		<service>DBC</service>
+		<location>Arc-Royal</location>
+	</newsItem>
+	<newsItem>
+		<headline>SLDF Defends The St. Ives Compact</headline>
+		<date>3061-05-02</date>
+		<desc><![CDATA[The St. Ives Compact takes heart today as Commanding General Victor Steiner-Davion of the Star League Defense Force has ordered units from the SLDF into action in the St. Ives Compact to stop the Capellan Invasion. General Steiner-Davion has dispatched elements from the elite Eridani Light Horse and Clan Nova Cat to assist the Compact in its fight for continued independence. St. Ives also takes comfort in knowing that heir-apparent Kai Allard-Liao and the elite 1st St. Ives Lancers under his command are en route to return to the Compact to bolster the realm's defense.]]></desc>
+		<service>SIBC</service>
+		<location>St. Ives</location>
+	</newsItem>
+	<newsItem>
+		<headline>Clan Nova Cat Alliance</headline>
+		<date>3061-06-10</date>
+		<desc><![CDATA[After Clan Nova Cat's formal induction into the reborn Star League, Coordinator Theodore Kurita has granted our new Nova Cat allies complete autonomy in the Irece Prefecture. The Nova Cats' great respect for the warrior-traditions of the Combine requested the honor of living in and defending the Combine from our enemies. We look forward to many years of friendship with our new allies.]]></desc>
+		<service>VotD</service>
+		<location>Luthien</location>
+	</newsItem>
+	<newsItem>
+		<headline>8th Free Worlds Legionnaires Commissioned</headline>
+		<date>3061-06-17</date>
+		<desc><![CDATA[Today the Free Worlds League Military officially commissioned the 8th Free Worlds Legionnaires, a new BattleMech regiment with air, armor and infantry support units. As with the other Legionnaires regiments, the 8th were recruited from all over the League and the new unit will bolster the defenses along the Federated Commonwealth border.]]></desc>
+		<service>GP</service>
+		<location>Atreus</location>
+	</newsItem>
+	<newsItem>
 		<headline>Mercenary Treachery</headline>
 		<date>3068-01-02</date>
 		<desc><![CDATA[It seems that for every mercenary command of sterling character (such as Wolf’s Dragoons, the Kell Hounds or the Twelfth Vegan Rangers), 
