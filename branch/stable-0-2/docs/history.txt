@@ -26,6 +26,7 @@ v0.2.1 (SVN)
 + Bug [383]: Weapons with incorrect multiple weights in Parts Store
 + Updated MM and MML jar files
 + Updated UnitSelectorDialog to be compatible with new MM jar
++ Minor planets.xml updates
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method
