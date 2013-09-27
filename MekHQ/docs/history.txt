@@ -31,6 +31,8 @@ v0.3.4 (SVN)
   This is a very basic implementation for now. Only contains a dice roller.
   Dialog is non-modal, so you can open it and continue to interact with the
   main GUI.
++ Bug: No revision detection in Version.java meaning no revision check for new rank system
+  to be compatible with revision based releases
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

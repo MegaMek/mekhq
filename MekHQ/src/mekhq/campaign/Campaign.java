@@ -3576,7 +3576,8 @@ public class Campaign implements Serializable {
 				} else if (xn.equalsIgnoreCase("rankNames")) {
 					rankNames = wn.getTextContent().trim();
 				} else if (xn.equalsIgnoreCase("ranks")) {
-				    if(version.getMinorVersion() < 3 || (version.getMinorVersion() == 3 && version.getSnapshot() < 4)) {
+				    if(version.getMinorVersion() < 3 || (version.getMinorVersion() == 3 && version.getSnapshot() < 4)
+				    		|| (version.getRevision() != -1 && version.getRevision() < 1645)) {
 				        rankSystem = Integer.parseInt(wn.getTextContent().trim());
 				    } else {
 				        retVal.ranks = Ranks.generateInstanceFromXML(wn);

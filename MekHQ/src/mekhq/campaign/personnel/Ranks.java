@@ -25,14 +25,12 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Vector;
 
-import javax.swing.table.DefaultTableModel;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.gui.dialog.CampaignOptionsDialog.RankTableModel;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * This object will keep track of rank information. It will keep information
