@@ -35,6 +35,7 @@ v0.3.4 (SVN)
   to be compatible with revision based releases
 + Bug: Personnel Market always empty after TableModel change
 + Bug [#412]: Support Ratings - Field Manual Mercs (rev) fixed.  Interstellar Ops Reputation coming soon.
++ Bug: acqusition limit check causes NPE with automatic success
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
