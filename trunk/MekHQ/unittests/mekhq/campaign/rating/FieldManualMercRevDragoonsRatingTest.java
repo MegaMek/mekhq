@@ -20,6 +20,7 @@
  */
 package mekhq.campaign.rating;
 
+import junit.framework.Assert;
 import junit.framework.TestCase;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -32,6 +33,7 @@ import org.junit.runners.JUnit4;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
@@ -66,6 +68,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         Mockito.when(mockDoctor.isDeployed()).thenReturn(false);
         Mockito.when(mockDoctor.getSkill(Mockito.eq(SkillType.S_DOCTOR))).thenReturn(mockDoctorSkillRegular);
         Mockito.when(mockDoctor.hasSkill(Mockito.eq(SkillType.S_DOCTOR))).thenReturn(true);
+        Mockito.when(mockDoctor.getRankOrder()).thenReturn(5);
 
         // Set up the tech.
         Mockito.when(mockMechTechSkillVeteran.getExperienceLevel()).thenReturn(SkillType.EXP_VETERAN);
@@ -76,6 +79,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         Mockito.when(mockTech.isDeployed()).thenReturn(false);
         Mockito.when(mockTech.getSkill(Mockito.eq(SkillType.S_TECH_MECH))).thenReturn(mockMechTechSkillVeteran);
         Mockito.when(mockTech.hasSkill(Mockito.eq(SkillType.S_TECH_MECH))).thenReturn(true);
+        Mockito.when(mockTech.getRankOrder()).thenReturn(4);
 
         Mockito.when(mockMedicSkill.getExperienceLevel()).thenReturn(SkillType.EXP_REGULAR);
         Mockito.when(mockAstechSkill.getExperienceLevel()).thenReturn(SkillType.EXP_REGULAR);
@@ -180,5 +184,47 @@ public class FieldManualMercRevDragoonsRatingTest {
         expectedHours += 20;
         testFieldManuMercRevDragoonsRating.updateAvailableSupport();
         TestCase.assertEquals(expectedHours, testFieldManuMercRevDragoonsRating.getTechSupportAvailable());
+    }
+
+    @Test
+    public void testGetCommander() {
+
+        // Test a campaign with the commander flagged.
+        Person expectedCommander = Mockito.mock(Person.class);
+        Mockito.when(mockCampaign.getFlaggedCommander()).thenReturn(expectedCommander);
+        FieldManualMercRevDragoonsRating testRating = Mockito.spy(new FieldManualMercRevDragoonsRating(mockCampaign));
+        TestCase.assertEquals(expectedCommander, testRating.getCommander());
+
+        // Test a campaign where the commander is not flagged, but there is a clear highest ranking officer.
+        testRating = Mockito.spy(new FieldManualMercRevDragoonsRating(mockCampaign));
+        Mockito.when(expectedCommander.getRankOrder()).thenReturn(10);
+        Person leftennant = Mockito.mock(Person.class);
+        Mockito.when(leftennant.getRankOrder()).thenReturn(5);
+        Person leftennant2 = Mockito.mock(Person.class);
+        Mockito.when(leftennant2.getRankOrder()).thenReturn(5);
+        List<Person> commandList = new ArrayList<Person>(3);
+        commandList.add(leftennant);
+        commandList.add(expectedCommander);
+        commandList.add(leftennant2);
+        Mockito.when(mockCampaign.getFlaggedCommander()).thenReturn(null);
+        Mockito.doReturn(commandList).when(testRating).getCommanderList();
+        TestCase.assertEquals(expectedCommander, testRating.getCommander());
+
+        // Retire the old commander.  Give one leftennant more experience than the other.
+        testRating = Mockito.spy(new FieldManualMercRevDragoonsRating(mockCampaign));
+        Mockito.when(mockCampaign.getFlaggedCommander()).thenReturn(null);
+        Mockito.doReturn(commandList).when(testRating).getCommanderList();
+        Mockito.when(expectedCommander.isActive()).thenReturn(false);
+        Mockito.when(leftennant.getExperienceLevel(Mockito.anyBoolean())).thenReturn(SkillType.EXP_VETERAN);
+        Mockito.when(leftennant.isActive()).thenReturn(true);
+        Mockito.when(leftennant2.getExperienceLevel(Mockito.anyBoolean())).thenReturn(SkillType.EXP_REGULAR);
+        Mockito.when(leftennant2.isActive()).thenReturn(true);
+        TestCase.assertEquals(leftennant, testRating.getCommander());
+
+        // Test a campaign with no flagged commander and where no ranks have been assigned.
+        testRating = Mockito.spy(new FieldManualMercRevDragoonsRating(mockCampaign));
+        Mockito.when(mockCampaign.getFlaggedCommander()).thenReturn(null);
+        Mockito.doReturn(null).when(testRating).getCommanderList();
+        TestCase.assertNull(testRating.getCommander());
     }
 }

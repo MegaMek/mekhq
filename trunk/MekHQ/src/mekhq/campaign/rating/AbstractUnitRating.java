@@ -33,7 +33,6 @@ import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -153,6 +152,10 @@ public abstract class AbstractUnitRating implements IUnitRating {
         return breachCount;
     }
 
+    protected List<Person> getCommanderList() {
+        return commanderList;
+    }
+
     /**
      * Returns the commander (highest ranking person) for this force.
      *
@@ -161,19 +164,47 @@ public abstract class AbstractUnitRating implements IUnitRating {
     public Person getCommander() {
         if ((commander == null)) {
 
-            //If the list is null, we cannot determine a commander.
+            // First, check to see if a commander as been flagged.
+            commander = campaign.getFlaggedCommander();
+            if (commander != null) {
+                return commander;
+            }
+
+            // If we don't have a list of potential commanders, we cannot determine a commander.
+            List<Person> commanderList = getCommanderList();
             if (commanderList == null || commanderList.isEmpty()) {
                 commander = null;
                 return null;
             }
 
-            //Sort the list of personnel by rank.  Whoever has the highest rank is the commander.
-            final Ranks system = campaign.getRanks();
+            //Sort the list of personnel by rank from highest to lowest.  Whoever has the highest rank is the commander.
             Collections.sort(commanderList, new Comparator<Person>() {
                 public int compare(Person p1, Person p2) {
-                    int p1Rank = system.getRankOrder(p1.getRank().getName());
-                    int p2Rank = system.getRankOrder(p2.getRank().getName());
-                    return ((Comparable<Integer>) p2Rank).compareTo(p1Rank);
+                    // Active personnel outrank inactive personnel.
+                    if (p1.isActive() && !p2.isActive()) {
+                        return -1;
+                    } else if (!p1.isActive() && p2.isActive()) {
+                        return 1;
+                    }
+
+                    // Compare rank.
+                    int p1Rank = p1.getRankOrder();
+                    int p2Rank = p2.getRankOrder();
+                    if (p1Rank > p2Rank) {
+                        return -1;
+                    } else if (p1Rank < p2Rank) {
+                        return 1;
+                    }
+
+                    // Compare expreience.
+                    int p1ExperienceLevel = p1.getExperienceLevel(false);
+                    int p2ExperienceLevel = p2.getExperienceLevel(false);
+                    if (p1ExperienceLevel > p2ExperienceLevel) {
+                        return -1;
+                    } else if (p1ExperienceLevel < p2ExperienceLevel) {
+                        return 1;
+                    }
+                    return 0;
                 }
             });
             commander = commanderList.get(0);
