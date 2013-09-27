@@ -25,9 +25,8 @@ import java.awt.Font;
 import javax.swing.JTextPane;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.rating.DragoonsRatingFactory;
-import mekhq.campaign.rating.IDragoonsRating;
-
+import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.rating.UnitRatingFactory;
 
 
 /**
@@ -36,23 +35,23 @@ import mekhq.campaign.rating.IDragoonsRating;
  * @since 3/12/2012
  */
 public class RatingReport extends Report {
-  
-    IDragoonsRating rating;
-    
+
+    IUnitRating rating;
+
     public RatingReport(Campaign c) {
         super(c);
-        rating = DragoonsRatingFactory.getDragoonsRating(getCampaign());
+        rating = UnitRatingFactory.getUnitRating(getCampaign());
     }
-    
+
     public String getTitle() {
         return "Unit Rating Report";
     }
-      
+
     public JTextPane getReport() {
         JTextPane txtReport = new JTextPane();
         txtReport.setFont(new Font("Courier New", Font.PLAIN, 12));
         txtReport.setText(rating.getDetails());
         return txtReport;
     }
-   
+
 }

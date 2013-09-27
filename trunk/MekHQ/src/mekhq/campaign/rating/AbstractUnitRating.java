@@ -33,16 +33,17 @@ import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
- * @version %I% %G%
+ * @version %Id%
  * @since 3/15/2012
  */
-public abstract class AbstractDragoonsRating implements IDragoonsRating {
+public abstract class AbstractUnitRating implements IUnitRating {
 
     protected Campaign campaign = null;
 
@@ -74,7 +75,7 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
     protected int numberVeeBays = 0;
     protected int numberBaBays = 0;
     protected int numberInfBays = 0;
-    protected boolean warhipWithDocksOwner = false;
+    protected boolean warhipWithDocsOwner = false;
     protected boolean warshipOwner = false;
     protected boolean jumpshipOwner = false;
     protected Person commander = null;
@@ -92,24 +93,21 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
      *
      * @param campaign The MekHQ {@code Campaign}
      */
-    public AbstractDragoonsRating(Campaign campaign) {
+    public AbstractUnitRating(Campaign campaign) {
         this.campaign = campaign;
         initialized = false;
     }
 
-    @Override
     public void reInitialize() {
         initialized = false;
         initValues();
         initialized = true;
     }
 
-    @Override
     public String getAverageExperience() {
         return SkillType.getExperienceLevelName(calcAverageExperience().setScale(0, RoundingMode.HALF_UP).intValue());
     }
 
-    @Override
     public int getCombatRecordValue() {
         successCount = 0;
         failCount = 0;
@@ -143,7 +141,7 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
             return getTotalSkillLevels().divide(getNumberUnits(), PRECISION, HALF_EVEN);
         }
 
-		return BigDecimal.ZERO;
+        return BigDecimal.ZERO;
     }
 
     /**
@@ -160,49 +158,30 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
      *
      * @return
      */
-    @Override
     public Person getCommander() {
         if ((commander == null)) {
-        	
-        	Person flagged = campaign.getFlaggedCommander();
-        	if (flagged != null && commanderList.indexOf(flagged) == -1) {
-        		commanderList.add(flagged);
-        	}
 
             //If the list is null, we cannot determine a commander.
             if (commanderList == null || commanderList.isEmpty()) {
                 commander = null;
-                return commander;
+                return null;
             }
 
             //Sort the list of personnel by rank.  Whoever has the highest rank is the commander.
+            final Ranks system = campaign.getRanks();
             Collections.sort(commanderList, new Comparator<Person>() {
-                @Override
                 public int compare(Person p1, Person p2) {
-                	int retVal = ((Comparable<Integer>) p2.getRankOrder()).compareTo(p1.getRankOrder());
-                	if (retVal == 0) {
-                		if (p1.isCommander()) {
-                			retVal = -1;
-                		} else if (p2.isCommander()) {
-                			retVal = 1;
-                		}
-                	}
-                    return retVal;
+                    int p1Rank = system.getRankOrder(p1.getRank().getName());
+                    int p2Rank = system.getRankOrder(p2.getRank().getName());
+                    return ((Comparable<Integer>) p2Rank).compareTo(p1Rank);
                 }
             });
             commander = commanderList.get(0);
-            
-            if (flagged != null && !flagged.getId().equals(commander.getId())) {
-            	campaign.addReport("<font color='red'>ERROR: "+flagged.getFullTitle()+" is flagged as CO, but "+commander.getFullTitle()+" was chosen for commander in Dragoons' Rating Calculation.</font>");
-            	campaign.addReport("<font color='red'>Setting "+commander.getFullTitle()+" as the flagged CO. Please verify this is the correct person.</font>");
-            	commander.setCommander(true);
-            	flagged.setCommander(false);
-            }
         }
 
         return commander;
     }
-    
+
     public int getCommanderSkill(String skillName) {
         Person commander = getCommander();
         if (commander == null) {
@@ -227,7 +206,7 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
     /**
      * Adds the tech level of the passed unit to the number of Clan or IS Advanced units in the list (as appropriate).
      *
-     * @param u The {@code Unit} to be evaluated.
+     * @param u     The {@code Unit} to be evaluated.
      * @param value The unit's value.  Most have a value of '1' but infantry and battle armor are less.
      */
     protected void updateAdvanceTechCount(Unit u, BigDecimal value) {
@@ -247,7 +226,6 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
         }
     }
 
-    @Override
     public int getTechValue() {
 
         //Make sure we have units.
@@ -293,6 +271,7 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
 
     /**
      * Returns the number of successfully completed contracts.
+     *
      * @return
      */
     public int getSuccessCount() {
@@ -304,12 +283,10 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
      *
      * @return
      */
-    @Override
     public BigDecimal getSupportPercent() {
         return supportPercent;
     }
 
-    @Override
     public int getTransportValue() {
         int value = 0;
 
@@ -326,7 +303,7 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
         value = Math.min(value, 25);
 
         //Only the highest of these values should be used, regardless of how many are actually owned.
-        if (warhipWithDocksOwner) {
+        if (warhipWithDocsOwner) {
             value += 30;
         } else if (warshipOwner) {
             value += 20;
@@ -337,77 +314,67 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
         return value;
     }
 
-    @Override
-    public int getDragoonRating(int score) {
-        if(score < 0) {
+    public int getUnitRating(int score) {
+        if (score < 0) {
             return DRAGOON_F;
-        }
-        else if(score < 46) {
+        } else if (score < 46) {
             return DRAGOON_D;
-        }
-        else if(score < 86) {
+        } else if (score < 86) {
             return DRAGOON_C;
-        }
-        else if(score < 121) {
+        } else if (score < 121) {
             return DRAGOON_B;
-        }
-        else if(score < 151) {
+        } else if (score < 151) {
             return DRAGOON_A;
-        }
-        else {
+        } else {
             return DRAGOON_ASTAR;
         }
     }
 
-    @Override
-    public String getDragoonRatingName(int rating) {
-        switch(rating) {
-        case DRAGOON_F:
-            return "F";
-        case DRAGOON_D:
-            return "D";
-        case DRAGOON_C:
-            return "C";
-        case DRAGOON_B:
-            return "B";
-        case DRAGOON_A:
-            return "A";
-        case DRAGOON_ASTAR:
-            return "A*";
-        default:
-            return "Unrated";
+    public String getUnitRatingName(int rating) {
+        switch (rating) {
+            case DRAGOON_F:
+                return "F";
+            case DRAGOON_D:
+                return "D";
+            case DRAGOON_C:
+                return "C";
+            case DRAGOON_B:
+                return "B";
+            case DRAGOON_A:
+                return "A";
+            case DRAGOON_ASTAR:
+                return "A*";
+            default:
+                return "Unrated";
         }
     }
 
-    @Override
-    public String getDragoonRating() {
+    public String getUnitRating() {
         int score = calculateDragoonRatingScore();
-        return getDragoonRatingName(getDragoonRating(score)) + " (" + score + ")";
+        return getUnitRatingName(getUnitRating(score)) + " (" + score + ")";
     }
-    
-    @Override
-    public int getDragoonsRatingAsInteger() {
-        return getDragoonRating(calculateDragoonRatingScore());
+
+    public int getUnitRatingAsInteger() {
+        return getUnitRating(calculateDragoonRatingScore());
     }
-    
-    @Override
+
     public int getScore() {
         return calculateDragoonRatingScore();
     }
-    
-    @Override 
+
     public int getModifier() {
-        return (calculateDragoonRatingScore()/10);
+        return (calculateDragoonRatingScore() / 10);
     }
 
     /**
      * Calculates the weighted value of the unit based on if it is Infantry, Battle Armor or something else.
+     *
      * @param u The {@code Unit} to be evaluated.
      * @return
      */
     protected BigDecimal getUnitValue(Unit u) {
         BigDecimal value = BigDecimal.ONE;
-        if (isConventionalInfanry(u) && (((Infantry)u.getEntity()).getSquadN() == 1)) {
+        if (isConventionalInfanry(u) && (((Infantry) u.getEntity()).getSquadN() == 1)) {
             value = new BigDecimal("0.25");
         }
         return value;
@@ -418,7 +385,7 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
     }
 
     /**
-     * Returns the sum of all experience ratings for all combat units.
+     * Returns the sum of all experience rating for all combat units.
      *
      * @return
      */
@@ -454,14 +421,14 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
     }
 
     /**
-     * Calculates the unit's Dragoon's rating.  If recalculate is TRUE, then the calculations will start over
-     * from the beginning.  If FALSE, pre-calculated score will be returned.
+     * Calculates the unit's Dragoon's rating.  If recalculate is TRUE, then the calculations will start over from the
+     * beginning.  If FALSE, pre-calculated score will be returned.
      */
     protected abstract int calculateDragoonRatingScore();
 
     /**
-     * Recalculates the dragoons rating.  If this has already been done, the initialized flag should already
-     * be set true and this method will immediately exit.
+     * Recalculates the dragoons rating.  If this has already been done, the initialized flag should already be set true
+     * and this method will immediately exit.
      */
     protected void initValues() {
         commanderList = new ArrayList<Person>();
@@ -486,7 +453,7 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
         numberBaBays = 0;
         numberVeeBays = 0;
         numberInfBays = 0;
-        warhipWithDocksOwner = false;
+        warhipWithDocsOwner = false;
         warshipOwner = false;
         jumpshipOwner = false;
         commander = null;

@@ -21,15 +21,13 @@
 package mekhq.campaign.rating;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.CampaignOptions.DragoonsRatingMethod;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
  * @version %I% %G%
  * @since 3/16/2012
  */
-public class DragoonsRatingFactory {
+public class UnitRatingFactory {
 
     /**
      * Returns the Dragoons Rating method as selected in the Campaign Options dialog.
@@ -37,13 +35,13 @@ public class DragoonsRatingFactory {
      * @param campaign
      * @return
      */
-    public static IDragoonsRating getDragoonsRating(Campaign campaign) {
-        CampaignOptions.DragoonsRatingMethod method = campaign.getCampaignOptions().getDragoonsRatingMethod();
-        if (method.equals(CampaignOptions.DragoonsRatingMethod.FLD_MAN_MERCS_REV)) {
+    public static IUnitRating getUnitRating(Campaign campaign) {
+        UnitRatingMethod method = campaign.getCampaignOptions().getUnitRatingMethod();
+        if (method.equals(UnitRatingMethod.FLD_MAN_MERCS_REV)) {
             return new FieldManualMercRevDragoonsRating(campaign);
         }
 
-        return new TaharqaDragoonsRating(campaign);
+        return new InterstellarOpsReputation(campaign);
     }
 
 }
