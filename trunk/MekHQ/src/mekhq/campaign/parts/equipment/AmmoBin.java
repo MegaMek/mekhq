@@ -712,5 +712,10 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	public boolean needsMaintenance() {
         return false;
     }
+	
+	@Override
+	public boolean isPriceAdustedForAmount() {
+        return true;
+    }
 
 }

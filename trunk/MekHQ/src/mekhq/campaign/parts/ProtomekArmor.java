@@ -73,12 +73,23 @@ public class ProtomekArmor extends Part implements IAcquisitionWork {
     
     @Override
     public double getTonnage() {
-        return 50 * amount/1000.0;
+        return 50 * getActualAmount()/1000.0;
     }
     
     @Override
     public long getCurrentValue() {
-        return amount * 625;
+        return getActualAmount() * 625;
+    }
+    
+    public int getActualAmount() {
+        if(null != unit) {
+            int currentArmor = unit.getEntity().getArmorForReal(location, false);
+            if(currentArmor < 0) {
+                currentArmor = 0;
+            }
+            return currentArmor;
+        }
+        return amount;
     }
     
     public double getTonnageNeeded() {
@@ -561,5 +572,10 @@ public class ProtomekArmor extends Part implements IAcquisitionWork {
         d = Math.min(d, amount);
         unit.getEntity().setArmor(d, location);
         updateConditionFromEntity();
+    }
+    
+    @Override
+    public boolean isPriceAdustedForAmount() {
+        return true;
     }
 }

@@ -363,5 +363,10 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     public boolean needsMaintenance() {
         return true;
     }
+    
+    @Override
+    public boolean isPriceAdustedForAmount() {
+        return true;
+    }
 }
 

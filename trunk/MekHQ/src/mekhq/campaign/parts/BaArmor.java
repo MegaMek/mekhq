@@ -169,7 +169,7 @@ public class BaArmor extends Part implements IAcquisitionWork {
     
     @Override
     public double getTonnage() {
-        return getPointTonnage(type, clan) * amount/1000.0;
+        return getPointTonnage(type, clan) * getActualAmount()/1000.0;
     }
     
     private int getPointCost() {
@@ -203,9 +203,19 @@ public class BaArmor extends Part implements IAcquisitionWork {
     
     @Override
     public long getCurrentValue() {
-        return amount * getPointCost();
+        return getActualAmount() * getPointCost();
     }
     
+    public int getActualAmount() {
+        if(null != unit) {
+            int currentArmor = unit.getEntity().getArmorForReal(location, false);
+            if(currentArmor < 0) {
+                currentArmor = 0;
+            }
+            return currentArmor;
+        }
+        return amount;
+    }
     
     
     public double getTonnageNeeded() {
@@ -733,5 +743,14 @@ public class BaArmor extends Part implements IAcquisitionWork {
         d = Math.min(d, amount);
         unit.getEntity().setArmor(d, location);
         updateConditionFromEntity();
+    }
+    
+    public void setLocation(int l) {
+        location = l;
+    }
+    
+    @Override
+    public boolean isPriceAdustedForAmount() {
+        return true;
     }
 }

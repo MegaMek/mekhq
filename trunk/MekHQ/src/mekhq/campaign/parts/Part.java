@@ -254,11 +254,15 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		return adjustCostsForCampaignOptions(getCurrentValue());
 	}
 	
+	public boolean isPriceAdustedForAmount() {
+	    return false;
+	}
+	
 	protected long adjustCostsForCampaignOptions(long cost) {
 		if(isClanTechBase()) {
 			cost *= campaign.getCampaignOptions().getClanPriceModifier();
 		}
-		if(needsFixing()) {
+		if(needsFixing() && !isPriceAdustedForAmount()) {
 			cost *= campaign.getCampaignOptions().getDamagedPartsValue();
 			//TODO: parts that cant be fixed should also be further reduced in price
 		} else if(!isBrandNew()) {
