@@ -84,7 +84,7 @@ public class Armor extends Part implements IAcquisitionWork {
         if (type == EquipmentType.T_ARMOR_HARDENED) {
             armorPerTon = 8.0;
         }
-        return amount / armorPerTon;
+        return getActualAmount() / armorPerTon;
     }
     
     @Override
@@ -174,6 +174,17 @@ public class Armor extends Part implements IAcquisitionWork {
         return type;
     }
 
+    public int getActualAmount() {
+        if(null != unit) {
+            int currentArmor = unit.getEntity().getArmorForReal(location, rear);
+            if(currentArmor < 0) {
+                currentArmor = 0;
+            }
+            return currentArmor;
+        }
+        return amount;
+    }
+    
     public int getAmount() {
         return amount;
     }
@@ -459,6 +470,7 @@ public class Armor extends Part implements IAcquisitionWork {
 		return 5;
 	}
 	
+	
 	@Override
 	public void updateConditionFromEntity() {
 		if(isReservedForRefit()) {
@@ -703,5 +715,10 @@ public class Armor extends Part implements IAcquisitionWork {
 
        }
        updateConditionFromEntity();
+    }
+    
+    @Override
+    public boolean isPriceAdustedForAmount() {
+        return true;
     }
 }

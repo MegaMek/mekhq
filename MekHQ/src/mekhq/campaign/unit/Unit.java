@@ -94,6 +94,7 @@ import mekhq.campaign.parts.AeroSensor;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Avionics;
 import mekhq.campaign.parts.BaArmor;
+import mekhq.campaign.parts.BattleArmorSuit;
 import mekhq.campaign.parts.DropshipDockingCollar;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.FireControlSystem;
@@ -110,6 +111,7 @@ import mekhq.campaign.parts.MissingAeroHeatSink;
 import mekhq.campaign.parts.MissingAeroLifeSupport;
 import mekhq.campaign.parts.MissingAeroSensor;
 import mekhq.campaign.parts.MissingAvionics;
+import mekhq.campaign.parts.MissingBattleArmorSuit;
 import mekhq.campaign.parts.MissingDropshipDockingCollar;
 import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.MissingFireControlSystem;
@@ -151,6 +153,7 @@ import mekhq.campaign.parts.TurretLock;
 import mekhq.campaign.parts.VeeSensor;
 import mekhq.campaign.parts.VeeStabiliser;
 import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.equipment.BattleArmorEquipmentPart;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.InfantryWeaponPart;
@@ -1664,6 +1667,10 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
                 locations[((ProtomekLocation)part).getLoc()] = part;   
             } else if(part instanceof MissingProtomekLocation) {
                 locations[((MissingProtomekLocation)part).getLoc()] = part;   
+            } else if(part instanceof BattleArmorSuit) {
+                locations[((BattleArmorSuit)part).getTrooper()] = part;
+            } else if(part instanceof MissingBattleArmorSuit) {
+                locations[((MissingBattleArmorSuit)part).getTrooper()] = part;
             } else if(part instanceof Armor) {
     			if(((Armor)part).isRearMounted()) {
     				armorRear[((Armor)part).getLocation()] = (Armor)part;
@@ -1833,7 +1840,11 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	    				addPart(tankLocation);
 	    				partsToAdd.add(tankLocation);
     				}
-    			}
+    			} else if(entity instanceof BattleArmor && i != 0 && i <= ((BattleArmor)entity).getSquadSize()) {
+                    BattleArmorSuit baSuit = new BattleArmorSuit((BattleArmor)entity, i, campaign);
+                    addPart(baSuit);
+                    partsToAdd.add(baSuit);
+                } 
     		}
     		if(null == armor[i]) {
     			if(entity instanceof Protomech) {
@@ -1912,10 +1923,6 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     				Part epart = equipParts.get(eqnum);
     				if(null == epart) {
     					EquipmentType type = m.getType();
-    					epart = new EquipmentPart((int)entity.getWeight(), type, eqnum, campaign);
-    					if(type instanceof MiscType && type.hasFlag(MiscType.F_MASC)) {
-        					epart = new MASC((int)entity.getWeight(), type, eqnum, campaign, erating);
-    					}
     					if(type instanceof InfantryAttack) {
 							continue;
 						}
@@ -1924,8 +1931,21 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     						//don't add weapons here for infantry, unless field guns
     						continue;
     					}
-    					addPart(epart);
-    					partsToAdd.add(epart);
+    					if(entity instanceof BattleArmor) {
+    					    //assign equipment to each individual trooper
+    					    for(int i = 1; i <= ((BattleArmor)entity).getSquadSize(); i++) {
+                                epart = new BattleArmorEquipmentPart((int)entity.getWeight(), type, eqnum, i, campaign);
+                                addPart(epart);
+                                partsToAdd.add(epart);
+    					    }
+    					} else {
+        					epart = new EquipmentPart((int)entity.getWeight(), type, eqnum, campaign);
+                            if(type instanceof MiscType && type.hasFlag(MiscType.F_MASC)) {
+                                epart = new MASC((int)entity.getWeight(), type, eqnum, campaign, erating);
+                            }
+        					addPart(epart);
+        					partsToAdd.add(epart);
+    					}
     				}
     			}
     		}
@@ -2357,12 +2377,22 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	}
     	if(entity instanceof Infantry) {
     		if(entity instanceof BattleArmor) {
-    			for(int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor)entity).getTroopers(); i++) {
-    				if(i <= nGunners) {
+    		    int ntroopers = 0;
+    			for(int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor)entity).getTroopers(); i++) {  				
+    			    if(entity.getInternal(i) < 0) {
+    			        //no suit here move along
+    			        continue;
+    			    }
+    			    if(ntroopers < nGunners) {
     		    		entity.setInternal(1, i);
+    		    		ntroopers++;
     				} else {
-    		    		entity.setInternal(IArmorState.ARMOR_DESTROYED, i);
+    		    		entity.setInternal(0, i);
     				}
+    			}
+    			if(ntroopers < nGunners) {
+    			    //TODO: we have too many soldiers assigned to the available suits - do something!
+    			    //probably remove some crew and then re-run resetentityandpilot
     			}
     		}
     		entity.setInternal(nGunners, Infantry.LOC_INFANTRY);
@@ -2515,6 +2545,16 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	public int getFullCrewSize() {
 		if(entity instanceof Tank) {
 			return (int)Math.ceil(entity.getWeight() / 15.0);
+		}
+		else if(entity instanceof BattleArmor) {
+		    int ntroopers = 0;
+		    for(int trooper = 1; trooper < entity.locations(); trooper++) {
+		        //less than zero means the suit is destroyed
+		        if(entity.getInternal(trooper) >= 0) {
+		            ntroopers++;
+		        }
+		    }
+		    return ntroopers;
 		}
 		else if(entity instanceof Infantry) {
 			return ((Infantry)entity).getSquadN() * ((Infantry)entity).getSquadSize();
