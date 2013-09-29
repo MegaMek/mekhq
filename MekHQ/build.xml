@@ -34,6 +34,15 @@
         <path refid="classpath"/>
         <pathelement location="${build}"/>
         <fileset dir="${libdir.test}"/>
+        <fileset dir="${basedir}">
+            <include
+                    name="MegaMek.jar"
+                    >
+            </include>
+            <include
+                    name="MegaMekLab.jar">
+            </include>
+        </fileset>
     </path>
     <path id="classpath.run-unittest">
         <path refid="classpath.compile-unittest"/>

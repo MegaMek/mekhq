@@ -41,6 +41,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.Vector;
@@ -931,12 +932,22 @@ public class Campaign implements Serializable {
 
     public ArrayList<Person> getTechs() {
         ArrayList<Person> techs = new ArrayList<Person>();
-        for (Person p : personnel) {
+        for (Person p : getPersonnel()) {
             if (p.isTech() && p.isActive()) {
                 techs.add(p);
             }
         }
         return techs;
+    }
+
+    public List<Person> getAdmins() {
+        List<Person> admins = new ArrayList<Person>();
+        for (Person p : getPersonnel()) {
+            if (p.isAdmin() && p.isActive()) {
+                admins.add(p);
+            }
+        }
+        return admins;
     }
 
     public boolean isWorkingOnRefit(Person p) {
@@ -953,7 +964,7 @@ public class Campaign implements Serializable {
 
     public ArrayList<Person> getDoctors() {
         ArrayList<Person> docs = new ArrayList<Person>();
-        for (Person p : personnel) {
+        for (Person p : getPersonnel()) {
             if (p.isDoctor() && p.isActive()) {
                 docs.add(p);
             }
@@ -4524,8 +4535,8 @@ public class Campaign implements Serializable {
     }
 
     public int getNumberPrimaryAstechs() {
-        int astechs = astechPool;
-        for (Person p : personnel) {
+        int astechs = getAstechPool();
+        for (Person p : getPersonnel()) {
             if ((p.getPrimaryRole() == Person.T_ASTECH) && p.isActive()
                 && !p.isDeployed()) {
                 astechs++;
@@ -4536,7 +4547,7 @@ public class Campaign implements Serializable {
 
     public int getNumberSecondaryAstechs() {
         int astechs = 0;
-        for (Person p : personnel) {
+        for (Person p : getPersonnel()) {
             if ((p.getSecondaryRole() == Person.T_ASTECH) && p.isActive()
                 && !p.isDeployed()) {
                 astechs++;

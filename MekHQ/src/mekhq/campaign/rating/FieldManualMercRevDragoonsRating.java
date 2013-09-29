@@ -59,7 +59,6 @@ import mekhq.campaign.unit.Unit;
  */
 public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
-    private final BigDecimal HUNDRED = new BigDecimal(100);
 
     private int techSupportNeeded = 0;
     private int medSupportNeeded = 0;
@@ -145,34 +144,18 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         }
     }
 
-    private void updateBayCount(Dropship ds) {
-        for (Bay bay : ds.getTransportBays()) {
-            if (bay instanceof MechBay) {
-                numberMechBays += bay.getCapacity();
-            } else if (bay instanceof BattleArmorBay) {
-                numberBaBays += bay.getCapacity();
-            } else if (bay instanceof InfantryBay) {
-                numberInfBays += bay.getCapacity();
-            } else if ((bay instanceof LightVehicleBay) || (bay instanceof HeavyVehicleBay)) {
-                numberVeeBays += bay.getCapacity();
-            } else if ((bay instanceof ASFBay) || (bay instanceof SmallCraftBay)) {
-                numberAeroBays += bay.getCapacity();
-            }
-        }
-    }
-
     private void updateUnitCounts(Entity en) {
         if (en instanceof Mech) {
-            numberMech++;
+            mechCount++;
         } else if (en instanceof Tank) {
-            numberVee++;
+            lightVeeCount++;
         } else if ((en instanceof Aero) && !(en instanceof Dropship) && !(en instanceof Jumpship)) {
-            numberAero++;
+            fighterCount++;
         } else if (en instanceof BattleArmor) {
-            numberBa += ((Infantry) en).getSquadSize();
+            battleArmorCount += ((Infantry) en).getSquadSize();
             numberBaSquads++;
         } else if (en instanceof Infantry) {
-            numberSoldiers += ((Infantry) en).getSquadN() * ((Infantry) en).getSquadSize();
+            infantryCount += ((Infantry) en).getSquadN() * ((Infantry) en).getSquadSize();
             numberInfSquads++;
         } else {
             numberOther++;
@@ -392,7 +375,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     @Override
-    protected int calculateDragoonRatingScore() {
+    protected int calculateUnitRatingScore() {
         initValues();
 
         int score = 0;
@@ -632,7 +615,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         sb.append("    # Clan Units:         ").append(countClan).append("\n");
         sb.append("    # IS2 Units:          ").append(countIS2).append("\n");
         sb.append("    Total # Units:        ")
-          .append(numberAero + numberBaSquads + numberMech + numberVee + numberOther).append("\n\n");
+          .append(fighterCount + numberBaSquads + mechCount + lightVeeCount + numberOther).append("\n\n");
 
         sb.append("Support:                        ").append(getSupportValue()).append("\n");
         sb.append("    Tech Support:         ").append(getTechSupportPercentage().toPlainString()).append("%\n");
@@ -658,16 +641,20 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     public BigDecimal getTransportPercent() {
+        // todo Superheavys.
         //Find out how short of transport bays we are.
-        int numberWithoutTransport = Math.max((numberMech - numberMechBays), 0);
-        numberWithoutTransport += Math.max((numberVee - numberVeeBays), 0);
-        numberWithoutTransport += Math.max((numberAero - numberAero), 0);
-        numberWithoutTransport += Math.max((numberBaSquads - numberBaBays), 0);
-        numberWithoutTransport += Math.max((numberInfSquads - numberInfBays), 0);
+        int numberWithoutTransport = Math.max((mechCount - mechBayCount), 0);
+        numberWithoutTransport += Math.max(protoCount - protoBayCount, 0);
+        numberWithoutTransport += Math.max((lightVeeCount - lightVeeBayCount), 0);
+        numberWithoutTransport += Math.max(heavyVeeCount - heavyVeeBayCount, 0);
+        numberWithoutTransport += Math.max((fighterCount - fighterCount), 0);
+        numberWithoutTransport += Math.max((numberBaSquads - baBayCount), 0);
+        numberWithoutTransport += Math.max((numberInfSquads - infantryBayCount), 0);
         BigDecimal transportNeeded = new BigDecimal(numberWithoutTransport);
 
         //Find the percentage of units that are transported.
-        BigDecimal totalUnits = new BigDecimal(numberMech + numberVee + numberAero + numberBaSquads + numberInfSquads);
+        BigDecimal totalUnits = new BigDecimal(mechCount + lightVeeCount + heavyVeeCount + fighterCount +
+                                               numberBaSquads + numberInfSquads);
         if (totalUnits.compareTo(BigDecimal.ZERO) == 0) {
             return BigDecimal.ZERO;
         }
