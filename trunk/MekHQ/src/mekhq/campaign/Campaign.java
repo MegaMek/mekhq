@@ -2821,7 +2821,11 @@ public class Campaign implements Serializable {
             psn.resetSkillTypes();
 
             //versions before 0.3.4 did not have proper clan phenotypes
-            if (version.getMinorVersion() <= 3 && version.getSnapshot() < 4 && retVal.getFaction().isClan()) {
+            if (version.getMajorVersion() == 0 
+                    && (version.getMinorVersion() <= 2 || 
+                         (version.getMinorVersion() <= 3 
+                         && version.getSnapshot() < 4)) 
+                    && retVal.getFaction().isClan()) {
                 //assume personnel are clan and trueborn if the right role
                 psn.setClanner(true);
                 switch (psn.getPrimaryRole()) {
@@ -2893,6 +2897,21 @@ public class Campaign implements Serializable {
                 }
             }
 
+            //get rid of BA parts before 0.3.4
+            if(unit.getEntity() instanceof BattleArmor
+                    && version.getMajorVersion() == 0 
+                    && (version.getMinorVersion() <= 2 || 
+                         (version.getMinorVersion() <= 3 
+                         && version.getSnapshot() < 4))) {
+                for(Part p : unit.getParts()) {
+                    retVal.removePart(p);
+                }
+                unit.resetParts();
+                for(int loc = 0; loc < unit.getEntity().locations(); loc++) {
+                    unit.getEntity().setInternal(0, loc);
+                }
+            }
+            
             retVal.refreshNetworks();
 
         }

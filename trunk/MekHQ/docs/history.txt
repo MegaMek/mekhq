@@ -41,6 +41,7 @@ v0.3.4 (SVN)
 + BattleArmorSuit, MissingBattleArmorSuit, BattleArmorEquipmentPart, and MissingBattleArmorEquipmentPart
 + Bug: value of armor and ammo changing when in salvage status
 + Converted "Taharqa" unit rating method to the "Interstellar Ops Reputation" unit rating method.  Still need to finish off the text breakdown and help text.
++ backwards compatatiblity for Battle Armor
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
