@@ -27,8 +27,19 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import megamek.common.ASFBay;
 import megamek.common.BattleArmor;
+import megamek.common.BattleArmorBay;
+import megamek.common.Bay;
+import megamek.common.DockingCollar;
+import megamek.common.Dropship;
+import megamek.common.HeavyVehicleBay;
 import megamek.common.Infantry;
+import megamek.common.InfantryBay;
+import megamek.common.Jumpship;
+import megamek.common.LightVehicleBay;
+import megamek.common.MechBay;
+import megamek.common.SmallCraftBay;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
@@ -44,6 +55,8 @@ import mekhq.campaign.unit.Unit;
  */
 public abstract class AbstractUnitRating implements IUnitRating {
 
+    protected static final BigDecimal HUNDRED = new BigDecimal(100);
+
     protected Campaign campaign = null;
 
     protected static final BigDecimal greenThreshold = new BigDecimal("5.5");
@@ -55,25 +68,37 @@ public abstract class AbstractUnitRating implements IUnitRating {
     protected BigDecimal numberIS2 = BigDecimal.ZERO;
     protected BigDecimal numberClan = BigDecimal.ZERO;
     protected BigDecimal totalSkillLevels = BigDecimal.ZERO;
-    protected int numberMech = 0;
-    protected int numberAero = 0;
-    protected int numberVee = 0;
-    protected int numberBa = 0;
+    protected int mechCount = 0;
+    protected int superHeavyMechCount = 0;
+    protected int protoCount = 0;
+    protected int fighterCount = 0;
+    protected int lightVeeCount = 0;
+    protected int heavyVeeCount = 0;
+    protected int superHeavyVeeCount = 0;
+    protected int battleArmorCount = 0;
     protected int numberBaSquads = 0;
-    protected int numberSoldiers = 0;
+    protected int infantryCount = 0;
     protected int numberInfSquads = 0;
+    protected int dropshipCount = 0;
+    protected int warshipCount = 0;
+    protected int jumpshipCount = 0;
     protected int numberOther = 0; // Dropships, Jumpships, Warships, etc.
     protected int countIS2 = 0;
     protected int countClan = 0;
-    protected BigDecimal mechTech = BigDecimal.ZERO;
+    protected BigDecimal mechTechCount = BigDecimal.ZERO;
     protected BigDecimal aeroTech = BigDecimal.ZERO;
     protected BigDecimal veeTech = BigDecimal.ZERO;
     protected BigDecimal baTech = BigDecimal.ZERO;
-    protected int numberMechBays = 0;
-    protected int numberAeroBays = 0;
-    protected int numberVeeBays = 0;
-    protected int numberBaBays = 0;
-    protected int numberInfBays = 0;
+    protected int mechBayCount = 0;
+    protected int superHeavyMechBayCount = 0;
+    protected int protoBayCount = 0;
+    protected int fighterBayCount = 0;
+    protected int smallCraftBayCount = 0;
+    protected int lightVeeBayCount = 0;
+    protected int heavyVeeBayCount = 0;
+    protected int baBayCount = 0;
+    protected int infantryBayCount = 0;
+    protected int dockingCollarCount = 0;
     protected boolean warhipWithDocsOwner = false;
     protected boolean warshipOwner = false;
     protected boolean jumpshipOwner = false;
@@ -268,7 +293,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         BigDecimal highTechNumber = new BigDecimal(countIS2 + (countClan * 2));
 
         //Conventional infantry does not count.
-        int numberUnits = numberAero + numberBaSquads + numberMech + numberVee + numberOther;
+        int numberUnits = fighterCount + numberBaSquads + mechCount + lightVeeCount + numberOther;
         if (numberUnits <= 0) {
             return 0;
         }
@@ -381,20 +406,20 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     public String getUnitRating() {
-        int score = calculateDragoonRatingScore();
+        int score = calculateUnitRatingScore();
         return getUnitRatingName(getUnitRating(score)) + " (" + score + ")";
     }
 
     public int getUnitRatingAsInteger() {
-        return getUnitRating(calculateDragoonRatingScore());
+        return getUnitRating(calculateUnitRatingScore());
     }
 
     public int getScore() {
-        return calculateDragoonRatingScore();
+        return calculateUnitRatingScore();
     }
 
     public int getModifier() {
-        return (calculateDragoonRatingScore() / 10);
+        return (calculateUnitRatingScore() / 10);
     }
 
     /**
@@ -452,10 +477,9 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     /**
-     * Calculates the unit's Dragoon's rating.  If recalculate is TRUE, then the calculations will start over from the
-     * beginning.  If FALSE, pre-calculated score will be returned.
+     * Calculates the unit's rating score.
      */
-    protected abstract int calculateDragoonRatingScore();
+    protected abstract int calculateUnitRatingScore();
 
     /**
      * Recalculates the dragoons rating.  If this has already been done, the initialized flag should already be set true
@@ -467,23 +491,23 @@ public abstract class AbstractUnitRating implements IUnitRating {
         numberIS2 = BigDecimal.ZERO;
         numberClan = BigDecimal.ZERO;
         totalSkillLevels = BigDecimal.ZERO;
-        numberMech = 0;
-        numberAero = 0;
-        numberVee = 0;
-        numberBa = 0;
-        numberSoldiers = 0;
+        mechCount = 0;
+        fighterCount = 0;
+        lightVeeCount = 0;
+        battleArmorCount = 0;
+        infantryCount = 0;
         numberInfSquads = 0;
         countClan = 0;
         countIS2 = 0;
-        mechTech = BigDecimal.ZERO;
+        mechTechCount = BigDecimal.ZERO;
         aeroTech = BigDecimal.ZERO;
         veeTech = BigDecimal.ZERO;
         baTech = BigDecimal.ZERO;
-        numberMechBays = 0;
-        numberAeroBays = 0;
-        numberBaBays = 0;
-        numberVeeBays = 0;
-        numberInfBays = 0;
+        mechBayCount = 0;
+        fighterBayCount = 0;
+        baBayCount = 0;
+        lightVeeBayCount = 0;
+        infantryBayCount = 0;
         warhipWithDocsOwner = false;
         warshipOwner = false;
         jumpshipOwner = false;
@@ -496,4 +520,38 @@ public abstract class AbstractUnitRating implements IUnitRating {
         highTechPercent = BigDecimal.ZERO;
     }
 
+    protected void updateBayCount(Dropship ds) {
+        // ToDo Superheavy Bays.
+        for (Bay bay : ds.getTransportBays()) {
+            if (bay instanceof MechBay) {
+                mechBayCount++;
+            } else if (bay instanceof BattleArmorBay) {
+                baBayCount++;
+            } else if (bay instanceof InfantryBay) {
+                infantryBayCount++;
+            } else if (bay instanceof LightVehicleBay) {
+                lightVeeBayCount++;
+            } else if (bay instanceof HeavyVehicleBay) {
+                heavyVeeBayCount++;
+            } else if (bay instanceof ASFBay) {
+                fighterBayCount++;
+            } else if (bay instanceof SmallCraftBay) {
+                smallCraftBayCount++;
+            }
+        }
+    }
+
+    protected void updateBayCount(Jumpship jumpship) {
+        for (Bay bay : jumpship.getTransportBays()) {
+            if (bay instanceof ASFBay) {
+                fighterBayCount++;
+            } else if (bay instanceof SmallCraftBay) {
+                smallCraftBayCount++;
+            }
+        }
+    }
+
+    protected void updateDockingCollarCount(Jumpship jumpship) {
+        dockingCollarCount += jumpship.getDockingCollars().size();
+    }
 }
