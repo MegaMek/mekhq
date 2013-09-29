@@ -3357,4 +3357,8 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
         }
     }
     
+    public void resetParts() {
+        parts = new ArrayList<Part>();
+    }
+    
 }
