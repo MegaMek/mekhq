@@ -37,6 +37,7 @@ v0.3.4 (SVN)
 + Bug [#412]: Support Ratings - Field Manual Mercs (rev) fixed.  Interstellar Ops Reputation coming soon.
 + Bug: acqusition limit check causes NPE with automatic success
 + Updated Unit Rating code to pick up the flagged commander (if set).  If no flagged commander is set, then will fall back to old method of sorting by rank and then experience.
++ Bug: Ultra-Green doesn't sort as less than Green
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
