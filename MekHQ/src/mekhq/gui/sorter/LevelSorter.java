@@ -21,29 +21,35 @@ import java.util.Comparator;
                 //probably easiest to turn into numbers and then sort that way
                 int l0 = 0;
                 int l1 = 0;
-                if(s0.contains("Green")) {
+                if(s0.contains("Ultra-Green")) {
                     l0 = 1;
                 }
-                if(s1.contains("Green")) {
+                if(s1.contains("Ultra-Green")) {
                     l1 = 1;
                 }
-                if(s0.contains("Regular")) {
+                if(s0.contains("Green")) {
                     l0 = 2;
                 }
-                if(s1.contains("Regular")) {
+                if(s1.contains("Green")) {
                     l1 = 2;
                 }
-                if(s0.contains("Veteran")) {
+                if(s0.contains("Regular")) {
                     l0 = 3;
                 }
-                if(s1.contains("Veteran")) {
+                if(s1.contains("Regular")) {
                     l1 = 3;
                 }
-                if(s0.contains("Elite")) {
+                if(s0.contains("Veteran")) {
                     l0 = 4;
                 }
-                if(s1.contains("Elite")) {
+                if(s1.contains("Veteran")) {
                     l1 = 4;
+                }
+                if(s0.contains("Elite")) {
+                    l0 = 5;
+                }
+                if(s1.contains("Elite")) {
+                    l1 = 5;
                 }
                 return ((Comparable<Integer>)l0).compareTo(l1);
             }
