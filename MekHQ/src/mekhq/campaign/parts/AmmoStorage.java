@@ -334,7 +334,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
 
     public Part getNewPart() {
-        return new AmmoStorage(1,type,((AmmoType)type).getShots(),campaign);
+        return new AmmoStorage(1,type,shots,campaign);
     }
     
     @Override

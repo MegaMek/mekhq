@@ -45,6 +45,7 @@ v0.3.4 (SVN)
 + Fixed "divide by zero" error in 'Interstellar Ops Reputation' rating method.
 + Added in the detailed breakdown and Help text for Interstellar Ops Reputation unit rating method.
 + new MM.jar
++ BattleArmorAmmoBin part
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

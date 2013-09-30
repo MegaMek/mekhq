@@ -48,10 +48,9 @@ import org.w3c.dom.NodeList;
 
 /**
  * Battle Armor suits are crazy - you cant crit the equipment in them, so 
- * if we remove the suit we should remove all the equipment with the same trooper and put it 
- * *INSIDE* the suit part - this should include BA Armor. Then when this suit is replaced somewhere else, we add those parts
- * back to the unit (with the appropriate troop number) and remove them from the suit.
- * Also we will actually track the full chassis and model name here to make substitution specific.
+ * if we remove the suit we should remove all the equipment with the same trooper and
+ * track its value and tonnage in the suit object. Then when this suit is replaced somewhere else, 
+ * we add back in the missing BA equipment parts for that trooper and change the armor as appropriate.
  * At some point, we should figure out how to handle modularity through customization
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
