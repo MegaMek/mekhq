@@ -671,7 +671,7 @@ public class InterstellarOpsReputationTest {
         // Test the example company.
         BigDecimal expectedTotalSkill = new BigDecimal("138.0");
         BigDecimal expectedAverageSkill = new BigDecimal("8.63");
-        spyReputation.initRating();
+        spyReputation.initValues();
         TestCase.assertEquals(4, spyReputation.getMechCount());
         TestCase.assertEquals(2, spyReputation.getFighterCount());
         TestCase.assertEquals(0, spyReputation.getProtoCount());
@@ -702,6 +702,8 @@ public class InterstellarOpsReputationTest {
         TestCase.assertEquals(0, spyReputation.getBattleArmorCount());
         TestCase.assertEquals(28, spyReputation.getInfantryCount());
         TestCase.assertEquals(200, spyReputation.getNonAdminPersonnelCount());
+        TestCase.assertEquals(1, spyReputation.getDropshipCount());
+        BigDecimalAssert.assertEquals(expectedTotalSkill, spyReputation.getTotalSkill(), 2);
         TestCase.assertEquals(4, spyReputation.getMechTechTeamsNeeded());
         TestCase.assertEquals(0, spyReputation.getProtoTechTeamsNeeded());
         TestCase.assertEquals(2, spyReputation.getFighterTechTeamsNeeded());
@@ -709,18 +711,58 @@ public class InterstellarOpsReputationTest {
         TestCase.assertEquals(0, spyReputation.getBattleArmorTechTeamsNeeded());
         TestCase.assertEquals(0, spyReputation.getInfantryTechTeamsNeeded());
         TestCase.assertEquals(20, spyReputation.getAdminsNeeded());
+        TestCase.assertEquals(expectedAverageSkill, spyReputation.calcAverageExperience());
+        TestCase.assertEquals(10, spyReputation.getExperienceValue());
+
+        // Test a brand new campaign.
+        buildFreshCampaign();
+        spyReputation.initValues();
+        TestCase.assertEquals(0, spyReputation.getMechCount());
+        TestCase.assertEquals(0, spyReputation.getFighterCount());
+        TestCase.assertEquals(0, spyReputation.getProtoCount());
+        TestCase.assertEquals(0, spyReputation.getVeeCount());
+        TestCase.assertEquals(0, spyReputation.getBattleArmorCount());
+        TestCase.assertEquals(0, spyReputation.getInfantryCount());
+        TestCase.assertEquals(0, spyReputation.getNonAdminPersonnelCount());
+        TestCase.assertEquals(0, spyReputation.getDropshipCount());
+        BigDecimalAssert.assertEquals(BigDecimal.ZERO, spyReputation.getTotalSkill(), 2);
+        TestCase.assertEquals(0, spyReputation.getMechTechTeamsNeeded());
+        TestCase.assertEquals(0, spyReputation.getProtoTechTeamsNeeded());
+        TestCase.assertEquals(0, spyReputation.getFighterTechTeamsNeeded());
+        TestCase.assertEquals(0, spyReputation.getVeeTechTeamsNeeded());
+        TestCase.assertEquals(0, spyReputation.getBattleArmorTechTeamsNeeded());
+        TestCase.assertEquals(0, spyReputation.getInfantryTechTeamsNeeded());
+        TestCase.assertEquals(0, spyReputation.getAdminsNeeded());
+        TestCase.assertEquals(BigDecimal.ZERO, spyReputation.calcAverageExperience());
+        TestCase.assertEquals(0, spyReputation.getExperienceValue());
+    }
+
+    private void buildFreshCampaign() {
+        Mockito.doReturn(new ArrayList<Unit>(0)).when(mockCampaign).getUnits();
+        Mockito.doReturn(new ArrayList<Person>(0)).when(mockCampaign).getPersonnel();
+        Mockito.doReturn(new ArrayList<Person>(0)).when(mockCampaign).getAdmins();
+        Mockito.doReturn(new ArrayList<Person>(0)).when(mockCampaign).getTechs();
+        Mockito.doReturn(new ArrayList<Person>(0)).when(mockCampaign).getDoctors();
+        Mockito.doReturn(0).when(mockCampaign).getAstechPool();
+        Mockito.doReturn(0).when(mockCampaign).getNumberAstechs();
+        Mockito.doReturn(null).when(mockCampaign).getFlaggedCommander();
     }
 
     @Test
     public void testGetCommanderValue() {
-        spyReputation.initRating();
+        spyReputation.initValues();
         TestCase.assertEquals(13, spyReputation.getCommanderValue());
+
+        // Test a brand new campaign.
+        buildFreshCampaign();
+        spyReputation.initValues();
+        TestCase.assertEquals(0, spyReputation.getCommanderValue());
     }
 
     @Test
     public void testGetCombatRecordValue() {
         // New company with no record.
-        spyReputation.initRating();
+        spyReputation.initValues();
         TestCase.assertEquals(0, spyReputation.getCombatRecordValue());
 
         // Add a few missions.
@@ -749,31 +791,56 @@ public class InterstellarOpsReputationTest {
 
     @Test
     public void testGetTransportValue() {
-        spyReputation.initRating();
+        spyReputation.initValues();
         TestCase.assertEquals(20, spyReputation.getTransportValue());
+
+        // Test a brand new campaign.
+        buildFreshCampaign();
+        spyReputation.initValues();
+        TestCase.assertEquals(0, spyReputation.getTransportValue());
     }
 
     @Test
     public void testGetSupportValue() {
-        spyReputation.initRating();
+        spyReputation.initValues();
         TestCase.assertEquals(-5, spyReputation.getSupportValue());
+
+        // Test a brand new campaign.
+        buildFreshCampaign();
+        spyReputation.initValues();
+        TestCase.assertEquals(0, spyReputation.getSupportValue());
     }
 
     @Test
     public void testGetFinancialValue() {
-        spyReputation.initRating();
+        spyReputation.initValues();
+        TestCase.assertEquals(0, spyReputation.getFinancialValue());
+
+        // Test a brand new campaign.
+        buildFreshCampaign();
+        spyReputation.initValues();
         TestCase.assertEquals(0, spyReputation.getFinancialValue());
     }
 
     @Test
     public void testCalculateUnitRatingScore() {
-        spyReputation.initRating();
+        spyReputation.initValues();
         TestCase.assertEquals(38, spyReputation.calculateUnitRatingScore());
+
+        // Test a brand new campaign.
+        buildFreshCampaign();
+        spyReputation.initValues();
+        TestCase.assertEquals(0, spyReputation.calculateUnitRatingScore());
     }
 
     @Test
     public void testGetReputationModifier() {
-        spyReputation.initRating();
+        spyReputation.initValues();
         TestCase.assertEquals(3, spyReputation.getReputationModifier());
+
+        // Test a brand new campaign.
+        buildFreshCampaign();
+        spyReputation.initValues();
+        TestCase.assertEquals(0, spyReputation.getReputationModifier());
     }
 }
