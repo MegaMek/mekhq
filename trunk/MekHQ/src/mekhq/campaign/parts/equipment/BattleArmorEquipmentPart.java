@@ -36,15 +36,11 @@ import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 
 /**
- * We need a special sub-class for BA equipment because there
- * should actually be multiple parts referencing the same equipment number in
- * the MegaMek entity. So we disable that equipment when any of them report being 
- * removed, but we dont destroy parts based on the condition of the entity. Since
- * equipment on BAs is never critted in combat, we should never have to update the condition
- * from the entity. Also, we need to change this to a regular equipment part when it is 
- * removed and replace it with a regular missingequipmentpart
- * 
- * 
+ * BA equipment is never critted so we are going to disable salvaging as well. It would 
+ * be nice at some point to allow for this but we would need some way in MM of tracking
+ * how many actual weapons on the squad are operational (nWeapon?)
+ * When an individual suit is removed we also remove all the equipment and keep it with
+ * the suit. See BattleArmorSuit for details.
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class BattleArmorEquipmentPart extends EquipmentPart {

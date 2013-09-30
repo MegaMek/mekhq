@@ -98,8 +98,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		if(oneShot) {
 			fullShots = 1;
 		}
-		//TODO: we need to make an adjustment for protomechs here
-		//Its a hack, but we probably need to load a fresh entity in and check what its shots are
+		//Protomechs: Its a hack, but we probably need to load a fresh entity in and check what its shots are
 		//for the same equipnum
 		if(null != unit && unit.getEntity() instanceof Protomech) {
 		    String lookupName = unit.getEntity().getChassis() + " " + unit.getEntity().getModel();

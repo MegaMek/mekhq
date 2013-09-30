@@ -153,6 +153,7 @@ import mekhq.campaign.parts.TurretLock;
 import mekhq.campaign.parts.VeeSensor;
 import mekhq.campaign.parts.VeeStabiliser;
 import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.equipment.BattleArmorAmmoBin;
 import mekhq.campaign.parts.equipment.BattleArmorEquipmentPart;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
@@ -1894,9 +1895,14 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     					oneShot = true;
     				}
     				if(null == apart) {
-    					apart = new AmmoBin((int)entity.getWeight(), m.getType(), eqnum, fullShots - m.getBaseShotsLeft(), oneShot, campaign);
+    				    if(entity instanceof BattleArmor) {
+                            apart = new BattleArmorAmmoBin((int)entity.getWeight(), m.getType(), eqnum, ((BattleArmor)entity).getSquadSize() * (fullShots - m.getBaseShotsLeft()), oneShot, campaign);
+    				    } else {
+    				        apart = new AmmoBin((int)entity.getWeight(), m.getType(), eqnum, fullShots - m.getBaseShotsLeft(), oneShot, campaign);
+    				    }
     					addPart(apart);
     					partsToAdd.add(apart);
+    				    
     				}
     			} else if(m.getType() instanceof MiscType && (m.getType().hasFlag(MiscType.F_HEAT_SINK) || m.getType().hasFlag(MiscType.F_DOUBLE_HEAT_SINK))) {
     				if(m.getLocation() == Entity.LOC_NONE) {
