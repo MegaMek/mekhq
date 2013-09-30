@@ -146,6 +146,9 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
         battleArmorCount = 0;
         infantryCount = 0;
         fighterCount = 0;
+        dropshipCount = 0;
+        jumpshipCount = 0;
+        totalSkill = BigDecimal.ZERO;
 
         List<Unit> unitList = new ArrayList<Unit>(campaign.getUnits());
         for (Unit u : unitList) {
@@ -319,8 +322,7 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
         totalSkill = totalSkill.add(skillLevel);
     }
 
-    @Override
-    protected BigDecimal calcAverageExperience() {
+    private int getTotalCombatUnits() {
         int totalCombatUnits = getMechCount();
         totalCombatUnits += getFighterCount();
         totalCombatUnits += getProtoCount();
@@ -328,6 +330,16 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
         totalCombatUnits += (getBattleArmorCount() / 5);
         totalCombatUnits += (getInfantryCount() / 28);
         totalCombatUnits += getDropshipCount();
+        return totalCombatUnits;
+    }
+
+    @Override
+    protected BigDecimal calcAverageExperience() {
+        int totalCombatUnits = getTotalCombatUnits();
+
+        if (totalCombatUnits == 0) {
+            return BigDecimal.ZERO;
+        }
 
         return totalSkill.divide(new BigDecimal(totalCombatUnits), 2, BigDecimal.ROUND_HALF_UP);
     }
@@ -371,7 +383,9 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
     // todo Combat Personnel (up to 1/4 total) may be assigned double-duty and count as 1/3 of an admin.
     // todo Distinguish between Merc and Government personnel (1/2 admin needs for gov).
 
-    protected void initRating() {
+    @Override
+    protected void initValues() {
+        super.initValues();
         updateUnitCounts();
         calcNeededTechs();
         updatePersonnelCounts();
@@ -394,6 +408,10 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
 
     @Override
     public int getExperienceValue() {
+        if (getTotalCombatUnits() == 0) {
+            return 0;
+        }
+
         final BigDecimal eliteThreshold = new BigDecimal("4.99");
         final BigDecimal vetThreshold = new BigDecimal("8.01");
         final BigDecimal regThreshold = new BigDecimal("10.99");
@@ -432,6 +450,10 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
 
     @Override
     public int getTransportValue() {
+        if (getTotalCombatUnits() == 0) {
+            return 0;
+        }
+
         int totalValue = 0;
 
         // todo Superheavys.
@@ -563,15 +585,18 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
             int totalTechTeams = mechTechTeams + fighterTechTeams + veeTechTeams + baTechTeams + generalTechTeams;
             int totalTechTeamsNeeded = mechTechTeamsNeeded + fighterTechTeamsNeeded + veeTechTeamsNeeded +
                                        battleArmorTechTeamsNeeded + protoTechTeamsNeeded + infantryTechTeamsNeeded;
-            BigDecimal percentExcess = new BigDecimal(totalTechTeams)
-                    .divide(new BigDecimal(totalTechTeamsNeeded), 5, BigDecimal.ROUND_HALF_UP)
-                    .multiply(HUNDRED);
-            if (percentExcess.compareTo(new BigDecimal(200)) > 0) {
-                totalValue += 15;
-            } else if (percentExcess.compareTo(new BigDecimal(175)) > 0) {
-                totalValue += 10;
-            } else if (percentExcess.compareTo(new BigDecimal(149)) > 0) {
-                totalValue += 5;
+            BigDecimal percentExcess = BigDecimal.ZERO;
+            if (totalTechTeams != 0) {
+                percentExcess = new BigDecimal(totalTechTeams)
+                        .divide(new BigDecimal(totalTechTeamsNeeded), 5, BigDecimal.ROUND_HALF_UP)
+                        .multiply(HUNDRED);
+                if (percentExcess.compareTo(new BigDecimal(200)) > 0) {
+                    totalValue += 15;
+                } else if (percentExcess.compareTo(new BigDecimal(175)) > 0) {
+                    totalValue += 10;
+                } else if (percentExcess.compareTo(new BigDecimal(149)) > 0) {
+                    totalValue += 5;
+                }
             }
         }
 
