@@ -23,12 +23,10 @@ package mekhq.campaign.rating;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
-import megamek.common.Bay;
 import megamek.common.ConvFighter;
 import megamek.common.Dropship;
 import megamek.common.Entity;
@@ -42,7 +40,6 @@ import megamek.common.UnitType;
 import megamek.common.VTOL;
 import megamek.common.Warship;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
@@ -68,7 +65,16 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
     private int adminsNeeded = 0;
 
     // Combat Unit Skills.
-    private BigDecimal totalSkill = BigDecimal.ZERO;
+    private BigDecimal totalSkillLevels = BigDecimal.ZERO;
+
+    private int totalTechTeams = 0;
+    private int astechTeams = 0;
+    private int mechTechTeams = 0;
+    private int fighterTechTeams = 0;
+    private int veeTechTeams = 0;
+    private int baTechTeams = 0;
+    private int generalTechTeams = 0; // ToDo: Should Protomech & Infantry techs be counted as separate skills?
+    private List<String> craftWithoutCrew = new ArrayList<String>();
 
     public InterstellarOpsReputation(Campaign campaign) {
         super(campaign);
@@ -76,10 +82,6 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
 
     public int getDropshipCount() {
         return dropshipCount;
-    }
-
-    protected BigDecimal getTotalSkill() {
-        return totalSkill;
     }
 
     protected int getNonAdminPersonnelCount() {
@@ -140,15 +142,7 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
 
     private void updateUnitCounts() {
         // Reset counts.
-        mechCount = 0;
-        protoCount = 0;
-        lightVeeCount = 0;
-        battleArmorCount = 0;
-        infantryCount = 0;
-        fighterCount = 0;
-        dropshipCount = 0;
-        jumpshipCount = 0;
-        totalSkill = BigDecimal.ZERO;
+        totalSkillLevels = BigDecimal.ZERO;
 
         List<Unit> unitList = new ArrayList<Unit>(campaign.getUnits());
         for (Unit u : unitList) {
@@ -317,9 +311,17 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
         BigDecimal skillLevel = averageGunnery;
         if (hasPilot) {
             skillLevel = skillLevel.add(averagePilot);
+        } else {
+            // Assume a piloting equal to Gunnery +1.
+            skillLevel = skillLevel.add(averageGunnery).add(BigDecimal.ONE);
         }
 
-        totalSkill = totalSkill.add(skillLevel);
+        totalSkillLevels = totalSkillLevels.add(skillLevel);
+    }
+
+    @Override
+    protected BigDecimal getNumberUnits() {
+        return new BigDecimal(getTotalCombatUnits());
     }
 
     private int getTotalCombatUnits() {
@@ -341,7 +343,7 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
             return BigDecimal.ZERO;
         }
 
-        return totalSkill.divide(new BigDecimal(totalCombatUnits), 2, BigDecimal.ROUND_HALF_UP);
+        return totalSkillLevels.divide(new BigDecimal(totalCombatUnits), 2, BigDecimal.ROUND_HALF_UP);
     }
 
     private void calcNeededTechs() {
@@ -386,6 +388,17 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
     @Override
     protected void initValues() {
         super.initValues();
+
+        mechCount = 0;
+        protoCount = 0;
+        lightVeeCount = 0;
+        battleArmorCount = 0;
+        infantryCount = 0;
+        fighterCount = 0;
+        dropshipCount = 0;
+        jumpshipCount = 0;
+        dockingCollarCount = 0;
+
         updateUnitCounts();
         calcNeededTechs();
         updatePersonnelCounts();
@@ -407,25 +420,61 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
     }
 
     @Override
-    public int getExperienceValue() {
-        if (getTotalCombatUnits() == 0) {
-            return 0;
+    public String getAverageExperience() {
+        if (getNumberUnits().compareTo(BigDecimal.ZERO) == 0) {
+            return SkillType.getExperienceLevelName(-1);
+        }
+        switch (getExperienceValue()) {
+            case 0:
+                return SkillType.getExperienceLevelName(SkillType.EXP_GREEN);
+            case 5:
+                return SkillType.getExperienceLevelName(SkillType.EXP_REGULAR);
+            case 10:
+                return SkillType.getExperienceLevelName(SkillType.EXP_VETERAN);
+            case 20:
+                return SkillType.getExperienceLevelName(SkillType.EXP_ELITE);
+            default:
+                return SkillType.getExperienceLevelName(-1);
+        }
+    }
+
+    @Override
+    protected String getExperienceLevelName(BigDecimal experience) {
+        if (getNumberUnits().compareTo(BigDecimal.ZERO) == 0) {
+            return SkillType.getExperienceLevelName(-1);
         }
 
         final BigDecimal eliteThreshold = new BigDecimal("4.99");
         final BigDecimal vetThreshold = new BigDecimal("8.01");
         final BigDecimal regThreshold = new BigDecimal("10.99");
 
-        BigDecimal averageExp = calcAverageExperience();
-        if (averageExp.compareTo(regThreshold) > 0) {
-            return 5;
-        } else if (averageExp.compareTo(vetThreshold) > 0) {
-            return 10;
-        } else if (averageExp.compareTo(eliteThreshold) > 0) {
-            return 20;
+        if (experience.compareTo(regThreshold) > 0) {
+            return SkillType.getExperienceLevelName(SkillType.EXP_GREEN);
+        } else if (experience.compareTo(vetThreshold) > 0) {
+            return SkillType.getExperienceLevelName(SkillType.EXP_REGULAR);
+        } else if (experience.compareTo(eliteThreshold) > 0) {
+            return SkillType.getExperienceLevelName(SkillType.EXP_VETERAN);
+        }
+        return SkillType.getExperienceLevelName(SkillType.EXP_ELITE);
+    }
+
+    public int getExperienceValue() {
+        if (getNumberUnits().compareTo(BigDecimal.ZERO) == 0) {
+            return 0;
         }
 
-        return 40;
+        BigDecimal averageExp = calcAverageExperience();
+        String level = getExperienceLevelName(averageExp);
+        if (SkillType.getExperienceLevelName(-1).equalsIgnoreCase(level)) {
+            return 0;
+        } else if (SkillType.getExperienceLevelName(SkillType.EXP_GREEN).equalsIgnoreCase(level)) {
+            return 0;
+        } else if (SkillType.getExperienceLevelName(SkillType.EXP_REGULAR).equalsIgnoreCase(level)) {
+            return 5;
+        } else if (SkillType.getExperienceLevelName(SkillType.EXP_VETERAN).equalsIgnoreCase(level)) {
+            return 10;
+        }
+        return 20;
     }
 
     @Override
@@ -434,10 +483,10 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
         if (commander == null) {
             return 0;
         }
-        int skillTotal = commander.getSkill(SkillType.S_LEADER).getLevel();
-        skillTotal += commander.getSkill(SkillType.S_TACTICS).getLevel();
-        skillTotal += commander.getSkill(SkillType.S_STRATEGY).getLevel();
-        skillTotal += commander.getSkill(SkillType.S_NEG).getLevel();
+        int skillTotal = getCommanderSkill(SkillType.S_LEADER);
+        skillTotal += getCommanderSkill(SkillType.S_TACTICS);
+        skillTotal += getCommanderSkill(SkillType.S_STRATEGY);
+        skillTotal += getCommanderSkill(SkillType.S_NEG);
 
         // ToDo AToW Traits.
         // ToDo MHQ would need  to support: Combat Sense, Connections, Reputation, Wealth, High CHA, Combat Paralysis
@@ -446,6 +495,24 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
         int commanderValue = skillTotal; // ToDo + positiveTraits - negativeTraits.
 
         return commanderValue > 0 ? commanderValue : 1;
+    }
+
+    @Override
+    public String getUnitRating() {
+        // Interstellar Ops Beta does not use letter-grades.
+        return getModifier() + " (" + calculateUnitRatingScore() + ")";
+    }
+
+    @Override
+    public int getUnitRating(int score) {
+        // Interstellar Ops Beta does not use letter-grades.
+        return 0;
+    }
+
+    @Override
+    public String getUnitRatingName(int rating) {
+        // Interstellar Ops Beta does not use letter-grades.
+        return "";
     }
 
     @Override
@@ -529,14 +596,16 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
 
     private int calcTechSupportValue() {
         int totalValue = 0;
+        totalTechTeams = 0;
+        astechTeams = 0;
+        mechTechTeams = 0;
+        fighterTechTeams = 0;
+        veeTechTeams = 0;
+        baTechTeams = 0;
+        generalTechTeams = 0;
 
         // How many astech teams do we have?
-        int astechTeams = campaign.getNumberAstechs() / 6;
-        int mechTechTeams = 0;
-        int fighterTechTeams = 0;
-        int veeTechTeams = 0;
-        int baTechTeams = 0;
-        int generalTechTeams = 0; // ToDo: Should Protomech & Infantry techs be counted as separate skills?
+        astechTeams = campaign.getNumberAstechs() / 6;
 
         for (Person tech : campaign.getTechs()) {
             // If we're out of astech teams, the rest of the techs are unsupporeted and don't count.
@@ -579,24 +648,25 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
             techShortage = true;
         }
 
+        totalTechTeams = mechTechTeams + fighterTechTeams + veeTechTeams + baTechTeams + generalTechTeams;
+        int totalTechTeamsNeeded = mechTechTeamsNeeded + fighterTechTeamsNeeded + veeTechTeamsNeeded +
+                                   battleArmorTechTeamsNeeded + protoTechTeamsNeeded + infantryTechTeamsNeeded;
+        supportPercent = BigDecimal.ZERO;
+        if (totalTechTeams != 0) {
+            supportPercent = new BigDecimal(totalTechTeams)
+                    .divide(new BigDecimal(totalTechTeamsNeeded), 5, BigDecimal.ROUND_HALF_UP)
+                    .multiply(HUNDRED);
+        }
+
         if (techShortage) {
             totalValue -= 5;
         } else {
-            int totalTechTeams = mechTechTeams + fighterTechTeams + veeTechTeams + baTechTeams + generalTechTeams;
-            int totalTechTeamsNeeded = mechTechTeamsNeeded + fighterTechTeamsNeeded + veeTechTeamsNeeded +
-                                       battleArmorTechTeamsNeeded + protoTechTeamsNeeded + infantryTechTeamsNeeded;
-            BigDecimal percentExcess = BigDecimal.ZERO;
-            if (totalTechTeams != 0) {
-                percentExcess = new BigDecimal(totalTechTeams)
-                        .divide(new BigDecimal(totalTechTeamsNeeded), 5, BigDecimal.ROUND_HALF_UP)
-                        .multiply(HUNDRED);
-                if (percentExcess.compareTo(new BigDecimal(200)) > 0) {
-                    totalValue += 15;
-                } else if (percentExcess.compareTo(new BigDecimal(175)) > 0) {
-                    totalValue += 10;
-                } else if (percentExcess.compareTo(new BigDecimal(149)) > 0) {
-                    totalValue += 5;
-                }
+            if (supportPercent.compareTo(new BigDecimal(200)) > 0) {
+                totalValue += 15;
+            } else if (supportPercent.compareTo(new BigDecimal(175)) > 0) {
+                totalValue += 10;
+            } else if (supportPercent.compareTo(new BigDecimal(149)) > 0) {
+                totalValue += 5;
             }
         }
 
@@ -611,15 +681,16 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
     }
 
     private int calcLargeCraftSupportValue() {
+        List<String> craftWithoutCrew = new ArrayList<String>();
         for (Unit u : campaign.getUnits()) {
             if (!(u.getEntity() instanceof Dropship) && !(u.getEntity() instanceof Jumpship)) {
                 continue;
             }
             if (u.getActiveCrew().size() < u.getFullCrewSize()) {
-                return -5;
+                craftWithoutCrew.add(u.getName());
             }
         }
-        return 0;
+        return craftWithoutCrew.size() == 0 ? 0 : -5;
     }
 
     @Override
@@ -628,6 +699,12 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
         value += calcAdminSupportValue();
         value += calcLargeCraftSupportValue();
         return value;
+    }
+
+    @Override
+    public int getTechValue() {
+        // Interstellar Ops Beta rules do not give a tech level bonus.
+        return 0;
     }
 
     @Override
@@ -650,18 +727,94 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
         return 0;
     }
 
-    public int getReputationModifier() {
+    @Override
+    public int getModifier() {
         BigDecimal reputation = new BigDecimal(calculateUnitRatingScore());
         return reputation.divide(BigDecimal.TEN, 0, RoundingMode.DOWN).intValue();
     }
 
     @Override
     public String getDetails() {
-        return null;  //ToDo
+        StringBuffer sb = new StringBuffer("Unit Reputation:                ").append(calculateUnitRatingScore())
+                                                                              .append("\n");
+        sb.append("    Method: Interstellar Ops Beta\n\n");
+
+        sb.append("Experience:                      ").append(getExperienceValue()).append("\n");
+        sb.append("    Average Experience:   ").append(getExperienceLevelName(calcAverageExperience())).append("\n\n");
+
+        sb.append("Command:                        ").append(getCommanderValue()).append("\n");
+        sb.append("    Leadership:           ").append(getCommanderSkill(SkillType.S_LEADER)).append("\n");
+        sb.append("    Negotiation:          ").append(getCommanderSkill(SkillType.S_NEG)).append("\n");
+        sb.append("    Strategy:             ").append(getCommanderSkill(SkillType.S_STRATEGY)).append("\n");
+        sb.append("    Tactics:              ").append(getCommanderSkill(SkillType.S_TACTICS)).append("\n\n");
+
+        sb.append("Combat Record:                  ").append(getCombatRecordValue()).append("\n");
+        sb.append("    Successful Missions:  ").append(getSuccessCount()).append("\n");
+        sb.append("    Failed Missions:      ").append(getFailCount()).append("\n");
+        sb.append("    Contract Breaches:    ").append(getBreachCount()).append("\n\n");
+
+        sb.append("Transportation:                 ").append(getTransportValue()).append("\n");
+        sb.append("    Mech Bays:            ").append(getMechCount()).append(" needed /").append(mechBayCount)
+          .append(" available\n");
+        sb.append("    Fighter Bays:         ").append(getFighterCount()).append(" needed /").append(fighterBayCount)
+          .append(" available\n");
+        sb.append("    Protomech Bays:       ").append(getProtoCount()).append(" needed /").append(protoBayCount)
+          .append(" available\n");
+        sb.append("    Light Vehicle Bays:   ").append(lightVeeCount).append(" needed /").append(lightVeeBayCount)
+          .append(" available\n");
+        sb.append("    Heavy Vehicle Bays:   ").append(heavyVeeCount).append(" needed /").append(heavyVeeBayCount)
+          .append(" available\n");
+        sb.append("    BA Bays:              ").append(getBattleArmorCount()/5).append(" needed /").append(baBayCount)
+          .append(" available\n");
+        sb.append("    Infantry Bays:        ").append(getInfantryCount()/28).append(" needed /").append(infantryBayCount)
+          .append(" available\n");
+        sb.append("    Docking Collars:      ").append(dropshipCount).append(" needed /").append(dockingCollarCount)
+          .append(" available\n");
+        sb.append("    Jump-Capable Ships?   ").append(jumpshipCount + warshipCount > 0 ? "Yes\n" : "No\n");
+        sb.append("\n");
+
+        sb.append("Support:                        ").append(getSupportValue()).append("\n");
+        sb.append("    Tech Support:\n");
+        sb.append("        Astech Teams:     ").append(totalTechTeams).append("\n");
+        sb.append("        Mech Techs:       ").append(mechTechTeamsNeeded).append(" needed /").append(mechTechTeams)
+          .append(" available\n");
+        sb.append("        Fighter Techs:    ").append(fighterTechTeamsNeeded).append(" needed /")
+          .append(fighterTechTeams).append(" available\n");
+        sb.append("        Tank Techs:       ").append(veeTechTeamsNeeded).append(" needed /").append(veeTechTeams)
+          .append(" available\n");
+        sb.append("        BA Techs:         ").append(battleArmorTechTeamsNeeded).append(" needed /")
+          .append(baTechTeams).append(" available\n");
+        sb.append("        Inf/Proto Techs:  ").append(infantryTechTeamsNeeded + protoTechTeamsNeeded)
+          .append(" needed /").append(generalTechTeams).append(" available\n");
+        sb.append("            NOTE:  MHQ Does not currently support Infantry and Protomech specific techs.\n");
+        sb.append("    Admin Support:        ").append(adminsNeeded).append(" needed /")
+          .append(campaign.getAdmins().size()).append(" available\n");
+        sb.append("    Large Craft Support:\n");
+        for (String s : craftWithoutCrew) {
+            sb.append("        ").append(s).append(" short crew.\n");
+        }
+        sb.append("\n");
+
+        sb.append("Financial:                      ").append(getFinancialValue()).append("\n");
+        sb.append("    In Debt?              ").append(campaign.getFinances().isInDebt() ? "Yes\n" : "No\n");
+
+        sb.append("Criminal Activity:              0 (MHQ does not currently track criminal activity.)\n");
+
+        sb.append("Inativity Modifier:             0 (MHQ does not track end dates for missions/contracts.)");
+
+        return new String(sb);
     }
 
     @Override
     public String getHelpText() {
-        return null;  //ToDo
+        return "Method: Interstellar Ops Beta\n" +
+               "An attempt to match the Interstellar Ops Beta method for calculating the Reputation as closely as possible.\n" +
+               "Known differences include the following:\n" +
+               "+ Command: Does not incorporate any positive or negative traits from AToW or BRPG3." +
+               "+ Transportation: Transportation needs of Support Personnel are not accounted for as MHQ does not track " +
+                    "Bay Personnel or Passenger Quarters.\n" +
+               "+ Support: MHQ Does not currently support Infantry and Protomech specific techs." +
+               "+ Criminal Activity: MHQ does not currently track criminal activity." +
+               "+ Inactivity: MHQ does not track end dates for missions/contracts.";
     }
 }

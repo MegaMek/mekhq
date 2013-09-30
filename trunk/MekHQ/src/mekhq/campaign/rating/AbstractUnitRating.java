@@ -462,19 +462,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         return numberUnits;
     }
 
-    protected String getExperienceLevelName(BigDecimal experience) {
-        if (experience.compareTo(greenThreshold) >= 0) {
-            return SkillType.getExperienceLevelName(SkillType.EXP_GREEN);
-        }
-        if (experience.compareTo(regularThreshold) >= 0) {
-            return SkillType.getExperienceLevelName(SkillType.EXP_REGULAR);
-        }
-        if (experience.compareTo(veteranThreshold) >= 0) {
-            return SkillType.getExperienceLevelName(SkillType.EXP_VETERAN);
-        }
-
-        return SkillType.getExperienceLevelName(SkillType.EXP_ELITE);
-    }
+    protected abstract String getExperienceLevelName(BigDecimal experience);
 
     /**
      * Calculates the unit's rating score.

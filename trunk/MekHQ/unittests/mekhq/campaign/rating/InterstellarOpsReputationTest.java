@@ -305,11 +305,11 @@ public class InterstellarOpsReputationTest {
         astechs += 6;
 
         Mockito.when(mockBulldogUnit1.getEntity()).thenReturn(mockBulldog1);
-        Mockito.when(mockBulldog1Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockMechPilot);
-        Mockito.when(mockBulldog1Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockMechGunnery);
-        Mockito.when(mockBulldog1Gunner1.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockMechGunnery);
-        Mockito.when(mockBulldog1Gunner2.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockMechGunnery);
-        Mockito.when(mockBulldog1Gunner3.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockMechGunnery);
+        Mockito.when(mockBulldog1Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
+        Mockito.when(mockBulldog1Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        Mockito.when(mockBulldog1Gunner1.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        Mockito.when(mockBulldog1Gunner2.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        Mockito.when(mockBulldog1Gunner3.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
         Mockito.when(mockBulldog1Driver.isAdmin()).thenReturn(false);
         Mockito.when(mockBulldog1Gunner1.isAdmin()).thenReturn(false);
         Mockito.when(mockBulldog1Gunner2.isAdmin()).thenReturn(false);
@@ -335,14 +335,13 @@ public class InterstellarOpsReputationTest {
         Mockito.when(mockBulldogUnit1.getCrew()).thenReturn(crew);
         astechs += 6;
 
-        Mockito.when(mockBulldog2Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockMechPilot);
-        Mockito.when(mockBulldog2Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockMechGunnery);
-        Mockito.when(mockBulldog2Gunner1.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockMechGunnery);
-        Mockito.when(mockBulldog2Gunner2.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockMechGunnery);
-        Mockito.when(mockBulldog2Gunner3.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockMechGunnery);
+        Mockito.when(mockBulldog2Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
+        Mockito.when(mockBulldog2Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        Mockito.when(mockBulldog2Gunner1.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        Mockito.when(mockBulldog2Gunner2.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        Mockito.when(mockBulldog2Gunner3.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
         Mockito.when(mockBulldogUnit2.getEntity()).thenReturn(mockBulldog2);
         Mockito.when(mockBulldog2Driver.isAdmin()).thenReturn(false);
-        Mockito.when(mockBulldog2Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockMechGunnery);
         personnelList.add(mockBulldog2Driver);
         Mockito.when(mockBulldog2Gunner1.isAdmin()).thenReturn(false);
         personnelList.add(mockBulldog2Gunner1);
@@ -367,11 +366,11 @@ public class InterstellarOpsReputationTest {
         Mockito.when(mockBulldogUnit2.getCrew()).thenReturn(crew);
         astechs += 6;
 
-        Mockito.when(mockBulldog3Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockMechPilot);
-        Mockito.when(mockBulldog3Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockMechGunnery);
-        Mockito.when(mockBulldog3Gunner1.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockMechGunnery);
-        Mockito.when(mockBulldog3Gunner2.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockMechGunnery);
-        Mockito.when(mockBulldog3Gunner3.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockMechGunnery);
+        Mockito.when(mockBulldog3Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
+        Mockito.when(mockBulldog3Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        Mockito.when(mockBulldog3Gunner1.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        Mockito.when(mockBulldog3Gunner2.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        Mockito.when(mockBulldog3Gunner3.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
         Mockito.when(mockBulldogUnit3.getEntity()).thenReturn(mockBulldog3);
         Mockito.when(mockBulldog3Driver.isAdmin()).thenReturn(false);
         personnelList.add(mockBulldog3Driver);
@@ -398,11 +397,11 @@ public class InterstellarOpsReputationTest {
         Mockito.when(mockBulldogUnit3.getCrew()).thenReturn(crew);
         astechs += 6;
 
-        Mockito.when(mockBulldog4Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockMechPilot);
-        Mockito.when(mockBulldog4Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockMechGunnery);
-        Mockito.when(mockBulldog4Gunner1.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockMechGunnery);
-        Mockito.when(mockBulldog4Gunner2.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockMechGunnery);
-        Mockito.when(mockBulldog4Gunner3.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockMechGunnery);
+        Mockito.when(mockBulldog4Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
+        Mockito.when(mockBulldog4Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        Mockito.when(mockBulldog4Gunner1.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        Mockito.when(mockBulldog4Gunner2.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        Mockito.when(mockBulldog4Gunner3.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
         Mockito.when(mockBulldogUnit4.getEntity()).thenReturn(mockBulldog4);
         Mockito.when(mockBulldog4Driver.isAdmin()).thenReturn(false);
         personnelList.add(mockBulldog4Driver);
@@ -429,9 +428,9 @@ public class InterstellarOpsReputationTest {
         Mockito.when(mockBulldogUnit4.getCrew()).thenReturn(crew);
         astechs += 6;
 
-        Mockito.when(mockPackrat1Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockMechPilot);
-        Mockito.when(mockPackrat1Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockMechGunnery);
-        Mockito.when(mockPackrat1Gunner.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockMechGunnery);
+        Mockito.when(mockPackrat1Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
+        Mockito.when(mockPackrat1Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        Mockito.when(mockPackrat1Gunner.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
         Mockito.when(mockPackratUnit1.getEntity()).thenReturn(mockPackrat1);
         Mockito.when(mockPackrat1Driver.isAdmin()).thenReturn(false);
         personnelList.add(mockPackrat1Driver);
@@ -450,9 +449,9 @@ public class InterstellarOpsReputationTest {
         Mockito.when(mockPackratUnit1.getCrew()).thenReturn(crew);
         astechs += 6;
 
-        Mockito.when(mockPackrat2Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockMechPilot);
-        Mockito.when(mockPackrat2Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockMechGunnery);
-        Mockito.when(mockPackrat2Gunner.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockMechGunnery);
+        Mockito.when(mockPackrat2Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
+        Mockito.when(mockPackrat2Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        Mockito.when(mockPackrat2Gunner.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
         Mockito.when(mockPackratUnit2.getEntity()).thenReturn(mockPackrat2);
         Mockito.when(mockPackrat2Driver.isAdmin()).thenReturn(false);
         personnelList.add(mockPackrat2Driver);
@@ -471,9 +470,9 @@ public class InterstellarOpsReputationTest {
         Mockito.when(mockPackratUnit2.getCrew()).thenReturn(crew);
         astechs += 6;
 
-        Mockito.when(mockPackrat3Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockMechPilot);
-        Mockito.when(mockPackrat3Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockMechGunnery);
-        Mockito.when(mockPackrat3Gunner.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockMechGunnery);
+        Mockito.when(mockPackrat3Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
+        Mockito.when(mockPackrat3Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        Mockito.when(mockPackrat3Gunner.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
         Mockito.when(mockPackratUnit3.getEntity()).thenReturn(mockPackrat3);
         Mockito.when(mockPackrat3Driver.isAdmin()).thenReturn(false);
         personnelList.add(mockPackrat3Driver);
@@ -492,9 +491,9 @@ public class InterstellarOpsReputationTest {
         Mockito.when(mockPackratUnit3.getCrew()).thenReturn(crew);
         astechs += 6;
 
-        Mockito.when(mockPackrat4Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockMechPilot);
-        Mockito.when(mockPackrat4Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockMechGunnery);
-        Mockito.when(mockPackrat4Gunner.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockMechGunnery);
+        Mockito.when(mockPackrat4Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
+        Mockito.when(mockPackrat4Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        Mockito.when(mockPackrat4Gunner.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
         Mockito.when(mockPackratUnit4.getEntity()).thenReturn(mockPackrat4);
         Mockito.when(mockPackrat4Driver.isAdmin()).thenReturn(false);
         personnelList.add(mockPackrat4Driver);
@@ -610,9 +609,9 @@ public class InterstellarOpsReputationTest {
         for (int i = 0; i < 24; i++) {
             Person mockCrew = Mockito.mock(Person.class);
             Mockito.when(mockCrew.isAdmin()).thenReturn(false);
-            Mockito.when(mockCrew.getSkill(SkillType.S_GUN_SPACE)).thenReturn(mockDropGunnery);
+            Mockito.when(mockCrew.getSkill(SkillType.S_GUN_SPACE)).thenReturn(mockJumpGunnery);
             if (i == 0) {
-                Mockito.when(mockCrew.getSkill(SkillType.S_PILOT_SPACE)).thenReturn(mockDropPilot);
+                Mockito.when(mockCrew.getSkill(SkillType.S_PILOT_SPACE)).thenReturn(mockJumpPilot);
             }
             invaderCrew.add(mockCrew);
             mockInvaderUnit.addPilotOrSoldier(mockCrew);
@@ -669,8 +668,8 @@ public class InterstellarOpsReputationTest {
     public void testCalculateSupportNeeds() {
 
         // Test the example company.
-        BigDecimal expectedTotalSkill = new BigDecimal("138.0");
-        BigDecimal expectedAverageSkill = new BigDecimal("8.63");
+        BigDecimal expectedTotalSkill = new BigDecimal("144.0");
+        BigDecimal expectedAverageSkill = new BigDecimal("9.00");
         spyReputation.initValues();
         TestCase.assertEquals(4, spyReputation.getMechCount());
         TestCase.assertEquals(2, spyReputation.getFighterCount());
@@ -680,7 +679,7 @@ public class InterstellarOpsReputationTest {
         TestCase.assertEquals(28, spyReputation.getInfantryCount());
         TestCase.assertEquals(200, spyReputation.getNonAdminPersonnelCount());
         TestCase.assertEquals(1, spyReputation.getDropshipCount());
-        BigDecimalAssert.assertEquals(expectedTotalSkill, spyReputation.getTotalSkill(), 2);
+        BigDecimalAssert.assertEquals(expectedTotalSkill, spyReputation.getTotalSkillLevels(), 2);
         TestCase.assertEquals(4, spyReputation.getMechTechTeamsNeeded());
         TestCase.assertEquals(0, spyReputation.getProtoTechTeamsNeeded());
         TestCase.assertEquals(2, spyReputation.getFighterTechTeamsNeeded());
@@ -689,7 +688,7 @@ public class InterstellarOpsReputationTest {
         TestCase.assertEquals(0, spyReputation.getInfantryTechTeamsNeeded());
         TestCase.assertEquals(20, spyReputation.getAdminsNeeded());
         TestCase.assertEquals(expectedAverageSkill, spyReputation.calcAverageExperience());
-        TestCase.assertEquals(10, spyReputation.getExperienceValue());
+        TestCase.assertEquals(5, spyReputation.getExperienceValue());
 
         // Add a couple of mothballed units.
         unitList.add(mockMechMothballed);
@@ -703,7 +702,7 @@ public class InterstellarOpsReputationTest {
         TestCase.assertEquals(28, spyReputation.getInfantryCount());
         TestCase.assertEquals(200, spyReputation.getNonAdminPersonnelCount());
         TestCase.assertEquals(1, spyReputation.getDropshipCount());
-        BigDecimalAssert.assertEquals(expectedTotalSkill, spyReputation.getTotalSkill(), 2);
+        BigDecimalAssert.assertEquals(expectedTotalSkill, spyReputation.getTotalSkillLevels(), 2);
         TestCase.assertEquals(4, spyReputation.getMechTechTeamsNeeded());
         TestCase.assertEquals(0, spyReputation.getProtoTechTeamsNeeded());
         TestCase.assertEquals(2, spyReputation.getFighterTechTeamsNeeded());
@@ -712,7 +711,7 @@ public class InterstellarOpsReputationTest {
         TestCase.assertEquals(0, spyReputation.getInfantryTechTeamsNeeded());
         TestCase.assertEquals(20, spyReputation.getAdminsNeeded());
         TestCase.assertEquals(expectedAverageSkill, spyReputation.calcAverageExperience());
-        TestCase.assertEquals(10, spyReputation.getExperienceValue());
+        TestCase.assertEquals(5, spyReputation.getExperienceValue());
 
         // Test a brand new campaign.
         buildFreshCampaign();
@@ -725,7 +724,7 @@ public class InterstellarOpsReputationTest {
         TestCase.assertEquals(0, spyReputation.getInfantryCount());
         TestCase.assertEquals(0, spyReputation.getNonAdminPersonnelCount());
         TestCase.assertEquals(0, spyReputation.getDropshipCount());
-        BigDecimalAssert.assertEquals(BigDecimal.ZERO, spyReputation.getTotalSkill(), 2);
+        BigDecimalAssert.assertEquals(BigDecimal.ZERO, spyReputation.getTotalSkillLevels(), 2);
         TestCase.assertEquals(0, spyReputation.getMechTechTeamsNeeded());
         TestCase.assertEquals(0, spyReputation.getProtoTechTeamsNeeded());
         TestCase.assertEquals(0, spyReputation.getFighterTechTeamsNeeded());
@@ -836,11 +835,125 @@ public class InterstellarOpsReputationTest {
     @Test
     public void testGetReputationModifier() {
         spyReputation.initValues();
-        TestCase.assertEquals(3, spyReputation.getReputationModifier());
+        TestCase.assertEquals(3, spyReputation.getModifier());
 
         // Test a brand new campaign.
         buildFreshCampaign();
         spyReputation.initValues();
-        TestCase.assertEquals(0, spyReputation.getReputationModifier());
+        TestCase.assertEquals(0, spyReputation.getModifier());
+    }
+
+    @Test
+    public void testGetAverageExperience() {
+        spyReputation.initValues();
+        TestCase.assertEquals(SkillType.getExperienceLevelName(SkillType.EXP_REGULAR),
+                              spyReputation.getAverageExperience());
+
+        // Test a brand new campaign.
+        buildFreshCampaign();
+        spyReputation.initValues();
+        TestCase.assertEquals(SkillType.getExperienceLevelName(-1),
+                              spyReputation.getAverageExperience());
+    }
+
+    @Test
+    public void testGetDetails() {
+        String expectedDetails =
+                "Unit Reputation:                33\n" +
+                "    Method: Interstellar Ops Beta\n" +
+                "\n" +
+                "Experience:                      5\n" +
+                "    Average Experience:   Regular\n" +
+                "\n" +
+                "Command:                        13\n" +
+                "    Leadership:           4\n" +
+                "    Negotiation:          5\n" +
+                "    Strategy:             2\n" +
+                "    Tactics:              2\n" +
+                "\n" +
+                "Combat Record:                  0\n" +
+                "    Successful Missions:  0\n" +
+                "    Failed Missions:      0\n" +
+                "    Contract Breaches:    0\n" +
+                "\n" +
+                "Transportation:                 20\n" +
+                "    Mech Bays:            4 needed /4 available\n" +
+                "    Fighter Bays:         2 needed /2 available\n" +
+                "    Protomech Bays:       0 needed /0 available\n" +
+                "    Light Vehicle Bays:   8 needed /22 available\n" +
+                "    Heavy Vehicle Bays:   0 needed /0 available\n" +
+                "    BA Bays:              0 needed /0 available\n" +
+                "    Infantry Bays:        1 needed /4 available\n" +
+                "    Docking Collars:      1 needed /4 available\n" +
+                "    Jump-Capable Ships?   Yes\n" +
+                "\n" +
+                "Support:                        -5\n" +
+                "    Tech Support:\n" +
+                "        Astech Teams:     14\n" +
+                "        Mech Techs:       4 needed /4 available\n" +
+                "        Fighter Techs:    2 needed /2 available\n" +
+                "        Tank Techs:       8 needed /8 available\n" +
+                "        BA Techs:         0 needed /0 available\n" +
+                "        Inf/Proto Techs:  0 needed /0 available\n" +
+                "            NOTE:  MHQ Does not currently support Infantry and Protomech specific techs.\n" +
+                "    Admin Support:        20 needed /10 available\n" +
+                "    Large Craft Support:\n" +
+                "\n" +
+                "Financial:                      0\n" +
+                "    In Debt?              No\n" +
+                "Criminal Activity:              0 (MHQ does not currently track criminal activity.)\n" +
+                "Inativity Modifier:             0 (MHQ does not track end dates for missions/contracts.)";
+        spyReputation.initValues();
+        TestCase.assertEquals(expectedDetails, spyReputation.getDetails());
+
+        // Test a brand new campaign.
+        expectedDetails =
+                "Unit Reputation:                0\n" +
+                "    Method: Interstellar Ops Beta\n" +
+                "\n" +
+                "Experience:                      0\n" +
+                "    Average Experience:   Unknown\n" +
+                "\n" +
+                "Command:                        0\n" +
+                "    Leadership:           0\n" +
+                "    Negotiation:          0\n" +
+                "    Strategy:             0\n" +
+                "    Tactics:              0\n" +
+                "\n" +
+                "Combat Record:                  0\n" +
+                "    Successful Missions:  0\n" +
+                "    Failed Missions:      0\n" +
+                "    Contract Breaches:    0\n" +
+                "\n" +
+                "Transportation:                 0\n" +
+                "    Mech Bays:            0 needed /0 available\n" +
+                "    Fighter Bays:         0 needed /0 available\n" +
+                "    Protomech Bays:       0 needed /0 available\n" +
+                "    Light Vehicle Bays:   0 needed /0 available\n" +
+                "    Heavy Vehicle Bays:   0 needed /0 available\n" +
+                "    BA Bays:              0 needed /0 available\n" +
+                "    Infantry Bays:        0 needed /0 available\n" +
+                "    Docking Collars:      0 needed /0 available\n" +
+                "    Jump-Capable Ships?   No\n" +
+                "\n" +
+                "Support:                        0\n" +
+                "    Tech Support:\n" +
+                "        Astech Teams:     0\n" +
+                "        Mech Techs:       0 needed /0 available\n" +
+                "        Fighter Techs:    0 needed /0 available\n" +
+                "        Tank Techs:       0 needed /0 available\n" +
+                "        BA Techs:         0 needed /0 available\n" +
+                "        Inf/Proto Techs:  0 needed /0 available\n" +
+                "            NOTE:  MHQ Does not currently support Infantry and Protomech specific techs.\n" +
+                "    Admin Support:        0 needed /0 available\n" +
+                "    Large Craft Support:\n" +
+                "\n" +
+                "Financial:                      0\n" +
+                "    In Debt?              No\n" +
+                "Criminal Activity:              0 (MHQ does not currently track criminal activity.)\n" +
+                "Inativity Modifier:             0 (MHQ does not track end dates for missions/contracts.)";
+        buildFreshCampaign();
+        spyReputation.initValues();
+        TestCase.assertEquals(expectedDetails, spyReputation.getDetails());
     }
 }
