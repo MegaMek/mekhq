@@ -724,7 +724,8 @@ public class UnitSelectorDialog extends JDialog {
 	        
 	        private long getPurchasePrice(MechSummary ms) {
 	        	long cost = ms.getCost();
-	        	if(ms.getUnitType().equals(UnitType.getTypeName(UnitType.INFANTRY))) {
+	        	if(ms.getUnitType().equals(UnitType.getTypeName(UnitType.INFANTRY))
+	        	        || ms.getUnitType().equals(UnitType.getTypeName(UnitType.BATTLE_ARMOR))) {
 	        		cost = ms.getAlternateCost();
 	        	}
 	        	if(TechConstants.isClan(ms.getType())) {

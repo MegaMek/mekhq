@@ -1884,77 +1884,83 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	    if (m.isWeaponGroup()) {
     	    	continue;
     	    }
-    		if(m.getType().isHittable()) {
-    			if(m.getType() instanceof AmmoType) {
-    				int eqnum = entity.getEquipmentNum(m);
-    				Part apart = ammoParts.get(eqnum);
-    				int fullShots = ((AmmoType)m.getType()).getShots();
-    				boolean oneShot = false;
-    				if(m.getLocation() == Entity.LOC_NONE) {
-    					fullShots = 1;
-    					oneShot = true;
-    				}
-    				if(null == apart) {
-    				    if(entity instanceof BattleArmor) {
-                            apart = new BattleArmorAmmoBin((int)entity.getWeight(), m.getType(), eqnum, ((BattleArmor)entity).getSquadSize() * (fullShots - m.getBaseShotsLeft()), oneShot, campaign);
-    				    } else {
-    				        apart = new AmmoBin((int)entity.getWeight(), m.getType(), eqnum, fullShots - m.getBaseShotsLeft(), oneShot, campaign);
-    				    }
-    					addPart(apart);
-    					partsToAdd.add(apart);
-    				    
-    				}
-    			} else if(m.getType() instanceof MiscType && (m.getType().hasFlag(MiscType.F_HEAT_SINK) || m.getType().hasFlag(MiscType.F_DOUBLE_HEAT_SINK))) {
-    				if(m.getLocation() == Entity.LOC_NONE) {
-    					//heat sinks located in LOC_NONE are base unhittable heat sinks
-    					continue;
-    				}
-    				int eqnum = entity.getEquipmentNum(m);
-    				Part epart = heatSinks.get(eqnum);
-    				if(null == epart) {
-    					epart = new HeatSink((int)entity.getWeight(), m.getType(), eqnum, campaign);
-    					addPart(epart);
-    					partsToAdd.add(epart);
-    				}
-    			} else if(m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_JUMP_JET)) {
-    				int eqnum = entity.getEquipmentNum(m);
-    				Part epart = jumpJets.get(eqnum);
-    				if(null == epart) {
-    					epart = new JumpJet((int)entity.getWeight(), m.getType(), eqnum, campaign);
-    					addPart(epart);
-    					partsToAdd.add(epart);
-    				}
-    			} else {
-    				int eqnum = entity.getEquipmentNum(m);
-    				Part epart = equipParts.get(eqnum);
-    				if(null == epart) {
-    					EquipmentType type = m.getType();
-    					if(type instanceof InfantryAttack) {
-							continue;
-						}
-    					if(entity instanceof Infantry && !(entity instanceof BattleArmor)
-    							&& m.getLocation() != Infantry.LOC_FIELD_GUNS) {
-    						//don't add weapons here for infantry, unless field guns
-    						continue;
-    					}
-    					if(entity instanceof BattleArmor) {
-    					    //assign equipment to each individual trooper
-    					    for(int i = 1; i <= ((BattleArmor)entity).getSquadSize(); i++) {
-                                epart = new BattleArmorEquipmentPart((int)entity.getWeight(), type, eqnum, i, campaign);
-                                addPart(epart);
-                                partsToAdd.add(epart);
-    					    }
-    					} else {
-        					epart = new EquipmentPart((int)entity.getWeight(), type, eqnum, campaign);
-                            if(type instanceof MiscType && type.hasFlag(MiscType.F_MASC)) {
-                                epart = new MASC((int)entity.getWeight(), type, eqnum, campaign, erating);
-                            }
-        					addPart(epart);
-        					partsToAdd.add(epart);
-    					}
-    				}
-    			}
-    		}
+    	    if(!m.getType().isHittable()) {
+    	        //there are some kind of non-hittable parts we might want to include for cost calculations
+    	        if(!(m.getType() instanceof MiscType 
+    	                && ((MiscType)m.getType()).hasFlag(MiscType.F_BA_MANIPULATOR))) {
+    	               continue;
+    	        }
+    	    }
+
+    	    if(m.getType() instanceof AmmoType) {
+    	        int eqnum = entity.getEquipmentNum(m);
+    	        Part apart = ammoParts.get(eqnum);
+    	        int fullShots = ((AmmoType)m.getType()).getShots();
+    	        boolean oneShot = false;
+    	        if(m.getLocation() == Entity.LOC_NONE) {
+    	            fullShots = 1;
+    	            oneShot = true;
+    	        }
+    	        if(null == apart) {
+    	            if(entity instanceof BattleArmor) {
+    	                apart = new BattleArmorAmmoBin((int)entity.getWeight(), m.getType(), eqnum, ((BattleArmor)entity).getSquadSize() * (fullShots - m.getBaseShotsLeft()), oneShot, campaign);
+    	            } else {
+    	                apart = new AmmoBin((int)entity.getWeight(), m.getType(), eqnum, fullShots - m.getBaseShotsLeft(), oneShot, campaign);
+    	            }
+    	            addPart(apart);
+    	            partsToAdd.add(apart);
+
+    	        }
+    	    } else if(m.getType() instanceof MiscType && (m.getType().hasFlag(MiscType.F_HEAT_SINK) || m.getType().hasFlag(MiscType.F_DOUBLE_HEAT_SINK))) {
+    	        if(m.getLocation() == Entity.LOC_NONE) {
+    	            //heat sinks located in LOC_NONE are base unhittable heat sinks
+    	            continue;
+    	        }
+    	        int eqnum = entity.getEquipmentNum(m);
+    	        Part epart = heatSinks.get(eqnum);
+    	        if(null == epart) {
+    	            epart = new HeatSink((int)entity.getWeight(), m.getType(), eqnum, campaign);
+    	            addPart(epart);
+    	            partsToAdd.add(epart);
+    	        }
+    	    } else if(m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_JUMP_JET)) {
+    	        int eqnum = entity.getEquipmentNum(m);
+    	        Part epart = jumpJets.get(eqnum);
+    	        if(null == epart) {
+    	            epart = new JumpJet((int)entity.getWeight(), m.getType(), eqnum, campaign);
+    	            addPart(epart);
+    	            partsToAdd.add(epart);
+    	        }
+    	    } else {
+    	        int eqnum = entity.getEquipmentNum(m);
+    	        Part epart = equipParts.get(eqnum);
+    	        if(null == epart) {
+    	            EquipmentType type = m.getType();
+    	            if(type instanceof InfantryAttack) {
+    	                continue;
+    	            }
+    	            if(entity instanceof Infantry && !(entity instanceof BattleArmor)
+    	                    && m.getLocation() != Infantry.LOC_FIELD_GUNS) {
+    	                //don't add weapons here for infantry, unless field guns
+    	                continue;
+    	            }
+    	            if(entity instanceof BattleArmor) {
+    	                //assign equipment to each individual trooper
+    	                for(int i = 1; i <= ((BattleArmor)entity).getSquadSize(); i++) {
+    	                    epart = new BattleArmorEquipmentPart((int)entity.getWeight(), type, eqnum, i, campaign);
+    	                    addPart(epart);
+    	                    partsToAdd.add(epart);
+    	                }
+    	            } else {
+    	                epart = new EquipmentPart((int)entity.getWeight(), type, eqnum, campaign);
+    	                if(type instanceof MiscType && type.hasFlag(MiscType.F_MASC)) {
+    	                    epart = new MASC((int)entity.getWeight(), type, eqnum, campaign, erating);
+    	                }
+    	                addPart(epart);
+    	                partsToAdd.add(epart);
+    	            }
+    	        }
+    	    }
     	}
     	
     	if(null == engine && !(entity instanceof Infantry)) {

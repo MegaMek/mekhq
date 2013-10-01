@@ -232,21 +232,33 @@ public class BattleArmorSuit extends Part {
         switch(weightClass) {
         case EntityWeightClass.WEIGHT_MEDIUM:
             cost += 100000;
-            cost += 75000 * jumpMP;
+            if(jumpType == EntityMovementMode.VTOL) {
+                cost += jumpMP * 100000;
+            } else {
+                cost += jumpMP * 75000;
+            }
             break;
         case EntityWeightClass.WEIGHT_HEAVY:
             cost += 200000;
-            cost += 150000 * jumpMP;
+            if(jumpType == EntityMovementMode.INF_UMU) {
+                cost += jumpMP * 100000;
+            } else {
+                cost += jumpMP * 150000;
+            }
             break;
         case EntityWeightClass.WEIGHT_ASSAULT:
             cost += 400000;
-            cost += 300000 * jumpMP;
+            if(jumpType == EntityMovementMode.INF_UMU) {
+                cost += jumpMP * 150000;
+            } else {
+                cost += jumpMP * 300000;
+            }
             break;
         default:
             cost += 50000;
             cost += 50000 * jumpMP;
         }
-        cost += 25000 * groundMP;
+        cost += 25000 * (groundMP-1);
         cost += extraCost;
         return cost;
     }

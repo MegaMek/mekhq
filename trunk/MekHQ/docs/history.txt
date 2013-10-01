@@ -46,6 +46,7 @@ v0.3.4 (SVN)
 + Added in the detailed breakdown and Help text for Interstellar Ops Reputation unit rating method.
 + new MM.jar
 + BattleArmorAmmoBin part
++ a few corrections to costs for BA parts
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
