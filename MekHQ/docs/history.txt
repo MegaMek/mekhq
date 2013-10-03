@@ -47,6 +47,7 @@ v0.3.4 (SVN)
 + new MM.jar
 + BattleArmorAmmoBin part
 + a few corrections to costs for BA parts
++ Updated MegaMek.jar (r9907)
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
