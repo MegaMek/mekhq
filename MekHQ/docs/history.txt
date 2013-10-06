@@ -50,6 +50,7 @@ v0.3.4 (SVN)
 + Updated MegaMek.jar (r9907)
 + Gender pronoun returning ?
 + Bug [#417]: Missing Backwards Compatibility for Ratings Changes
++ Bug [#419]: Transport Rating Not Included
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
