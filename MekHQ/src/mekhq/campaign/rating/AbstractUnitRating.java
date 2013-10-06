@@ -31,7 +31,6 @@ import megamek.common.ASFBay;
 import megamek.common.BattleArmor;
 import megamek.common.BattleArmorBay;
 import megamek.common.Bay;
-import megamek.common.DockingCollar;
 import megamek.common.Dropship;
 import megamek.common.HeavyVehicleBay;
 import megamek.common.Infantry;

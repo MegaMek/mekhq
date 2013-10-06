@@ -1505,13 +1505,13 @@ public class CampaignOptions implements Serializable {
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("techLevel")) {
                 retVal.techLevel = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useUnitRating")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("useUnitRating") || wn2.getNodeName().equalsIgnoreCase("useDragoonsRating")) {
                 if (wn2.getTextContent().equalsIgnoreCase("true")) {
                     retVal.useUnitRating = true;
                 } else {
                     retVal.useUnitRating = false;
                 }
-            } else if (wn2.getNodeName().equalsIgnoreCase("unitRatingMethod")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("unitRatingMethod") || wn2.getNodeName().equalsIgnoreCase("dragoonsRatingMethod")) {
                 if (!wn2.getTextContent().isEmpty() && (wn2.getTextContent() != null)) {
                     UnitRatingMethod method = UnitRatingMethod.getUnitRatingMethod(wn2.getTextContent());
                     retVal.setUnitRatingMethod((method != null) ? method : UnitRatingMethod.INTERSTELLAR_OPS);
