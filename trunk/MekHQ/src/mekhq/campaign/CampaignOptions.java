@@ -1112,8 +1112,10 @@ public class CampaignOptions implements Serializable {
 
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanPriceModifier", clanPriceModifier); //private double clanPriceModifier;
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useFactionForNames", useFactionForNames); //private boolean useFinances;
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanPriceModifier", clanPriceModifier); //private double
+        // clanPriceModifier;
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useFactionForNames", useFactionForNames); //private boolean
+        // useFinances;
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "repairSystem", repairSystem); //private int repairSystem;
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnitRating", useUnitRating);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitRatingMethod", unitRatingMethod.getDescription());
@@ -1191,11 +1193,16 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minimumHitsForVees", minimumHitsForVees);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maxAcquisitions", maxAcquisitions);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketType", personnelMarketType);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomEliteRemoval", personnelMarketRandomEliteRemoval);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomVeteranRemoval", personnelMarketRandomVeteranRemoval);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomRegularRemoval", personnelMarketRandomRegularRemoval);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomGreenRemoval", personnelMarketRandomGreenRemoval);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomUltraGreenRemoval", personnelMarketRandomUltraGreenRemoval);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomEliteRemoval",
+                                       personnelMarketRandomEliteRemoval);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomVeteranRemoval",
+                                       personnelMarketRandomVeteranRemoval);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomRegularRemoval",
+                                       personnelMarketRandomRegularRemoval);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomGreenRemoval",
+                                       personnelMarketRandomGreenRemoval);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomUltraGreenRemoval",
+                                       personnelMarketRandomUltraGreenRemoval);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketReportRefresh", personnelMarketReportRefresh);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketDylansWeight", personnelMarketDylansWeight);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "salaryEnlistedMultiplier", salaryEnlistedMultiplier);
@@ -1505,13 +1512,15 @@ public class CampaignOptions implements Serializable {
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("techLevel")) {
                 retVal.techLevel = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useUnitRating") || wn2.getNodeName().equalsIgnoreCase("useDragoonsRating")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("useUnitRating") || wn2.getNodeName().equalsIgnoreCase
+                    ("useDragoonsRating")) {
                 if (wn2.getTextContent().equalsIgnoreCase("true")) {
                     retVal.useUnitRating = true;
                 } else {
                     retVal.useUnitRating = false;
                 }
-            } else if (wn2.getNodeName().equalsIgnoreCase("unitRatingMethod") || wn2.getNodeName().equalsIgnoreCase("dragoonsRatingMethod")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("unitRatingMethod") || wn2.getNodeName().equalsIgnoreCase
+                    ("dragoonsRatingMethod")) {
                 if (!wn2.getTextContent().isEmpty() && (wn2.getTextContent() != null)) {
                     UnitRatingMethod method = UnitRatingMethod.getUnitRatingMethod(wn2.getTextContent());
                     retVal.setUnitRatingMethod((method != null) ? method : UnitRatingMethod.INTERSTELLAR_OPS);
@@ -1607,38 +1616,5 @@ public class CampaignOptions implements Serializable {
         MekHQ.logMessage("Load Campaign Options Complete!", 4);
 
         return retVal;
-    }
-
-    public enum DragoonsRatingMethod {
-        TAHARQA("Taharqa"),
-        FLD_MAN_MERCS_REV("FM: Mercenaries (rev)");
-
-        private String description;
-
-        DragoonsRatingMethod(String description) {
-            this.description = description;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public static String[] getDragoonsRatingMethodNames() {
-            String[] methods = new String[values().length];
-            for (int i = -0; i < values().length; i++) {
-                methods[i] = values()[i].getDescription();
-            }
-            return methods;
-        }
-
-        public static DragoonsRatingMethod getDragoonsRatingMethod(String description) {
-            for (DragoonsRatingMethod m : values()) {
-                if (m.getDescription().equalsIgnoreCase(description)) {
-                    return m;
-                }
-            }
-            return null;
-        }
-
     }
 }
