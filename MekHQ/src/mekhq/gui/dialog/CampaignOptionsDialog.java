@@ -407,7 +407,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panRandomPortrait = new javax.swing.JPanel();
         useEraModsCheckBox = new javax.swing.JCheckBox();
         useUnitRatingCheckBox = new javax.swing.JCheckBox();
-        unitRatingMethodCombo = new javax.swing.JComboBox(CampaignOptions.DragoonsRatingMethod.getDragoonsRatingMethodNames());
+        unitRatingMethodCombo = new javax.swing.JComboBox(UnitRatingMethod.getUnitRatingMethodNames());
         javax.swing.JLabel clanPriceModifierLabel = new javax.swing.JLabel();
         javax.swing.JLabel usedPartsValueLabel = new javax.swing.JLabel();
         javax.swing.JLabel damagedPartsValueLabel = new javax.swing.JLabel();
@@ -540,20 +540,20 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panGeneral.add(comboFaction, gridBagConstraints);
 
-        JPanel dragoonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 1, 1));
+        JPanel unitRatingPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 1, 1));
 
-        useUnitRatingCheckBox.setText(resourceMap.getString("useDragoonRatingCheckBox.text")); // NOI18N
+        useUnitRatingCheckBox.setText(resourceMap.getString("useUnitRatingCheckBox.text")); // NOI18N
         useUnitRatingCheckBox.setName("useUnitRatingCheckBox"); // NOI18N
-        dragoonsPanel.add(useUnitRatingCheckBox);
+        unitRatingPanel.add(useUnitRatingCheckBox);
 
-        dragoonsPanel.add(Box.createHorizontalStrut(10));
+        unitRatingPanel.add(Box.createHorizontalStrut(10));
 
-        JLabel dragoonsMethodLabel = new JLabel("Dragoons Rating Method:");
-        dragoonsMethodLabel.setName("dragoonsMethodLabel");
-        dragoonsPanel.add(dragoonsMethodLabel);
+        JLabel unitRatingMethodLabel = new JLabel("Unit Rating Method:");
+        unitRatingMethodLabel.setName("unitRatingMethodLabel");
+        unitRatingPanel.add(unitRatingMethodLabel);
 
         unitRatingMethodCombo.setName("unitRatingMethodCombo");
-        dragoonsPanel.add(unitRatingMethodCombo);
+        unitRatingPanel.add(unitRatingMethodCombo);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -561,7 +561,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panGeneral.add(dragoonsPanel, gridBagConstraints);
+        panGeneral.add(unitRatingPanel, gridBagConstraints);
 
         btnCamo.setMaximumSize(new java.awt.Dimension(84, 72));
         btnCamo.setMinimumSize(new java.awt.Dimension(84, 72));
@@ -1141,7 +1141,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panPersonnel.add(pnlHealWaitingPeriod, gridBagConstraints);
 
-        spnNaturalHealWaitingPeriod = new JSpinner(new SpinnerNumberModel(options.getNaturalHealingWaitingPeriod(), 1, 365, 1));
+        spnNaturalHealWaitingPeriod = new JSpinner(new SpinnerNumberModel(options.getNaturalHealingWaitingPeriod(),
+                                                                          1, 365, 1));
         ((JSpinner.DefaultEditor) spnNaturalHealWaitingPeriod.getEditor()).getTextField().setEditable(false);
         JPanel pnlNaturalHealWaitingPeriod = new JPanel();
         pnlNaturalHealWaitingPeriod.add(spnNaturalHealWaitingPeriod);
@@ -1437,7 +1438,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         spnClanPriceModifier = new JSpinner(new SpinnerNumberModel(options.getClanPriceModifier(), 1.0, null, 0.1));
         ((JSpinner.DefaultEditor) spnClanPriceModifier.getEditor()).getTextField().setEditable(false);
         ((JSpinner.DefaultEditor) spnClanPriceModifier.getEditor()).getTextField().setColumns(3);
-        spnClanPriceModifier.setToolTipText(resourceMap.getString("clanPriceModifierJFormattedTextField.toolTipText")); // NOI18N      
+        spnClanPriceModifier.setToolTipText(resourceMap.getString("clanPriceModifierJFormattedTextField.toolTipText")
+                                           ); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -1469,7 +1471,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             spnUsedPartsValue[i] = new JSpinner(new SpinnerNumberModel(options.getUsedPartsValue(i), 0.00, 1.00, 0.05));
             ((JSpinner.DefaultEditor) spnUsedPartsValue[i].getEditor()).getTextField().setEditable(false);
             ((JSpinner.DefaultEditor) spnUsedPartsValue[i].getEditor()).getTextField().setColumns(3);
-            spnUsedPartsValue[i].setToolTipText(resourceMap.getString("usedPartsValueJFormattedTextField.toolTipText")); // NOI18N
+            spnUsedPartsValue[i].setToolTipText(resourceMap.getString("usedPartsValueJFormattedTextField" +
+                                                                      ".toolTipText")); // NOI18N
             panFinances.add(spnUsedPartsValue[i], gridBagConstraints);
         }
 
@@ -1485,7 +1488,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         spnDamagedPartsValue = new JSpinner(new SpinnerNumberModel(options.getDamagedPartsValue(), 0.00, 1.00, 0.05));
         ((JSpinner.DefaultEditor) spnDamagedPartsValue.getEditor()).getTextField().setEditable(false);
         ((JSpinner.DefaultEditor) spnDamagedPartsValue.getEditor()).getTextField().setColumns(3);
-        spnDamagedPartsValue.setToolTipText(resourceMap.getString("damagedPartsValueJFormattedTextField.toolTipText")); // NOI18N
+        spnDamagedPartsValue.setToolTipText(resourceMap.getString("damagedPartsValueJFormattedTextField.toolTipText")
+                                           ); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 8;
@@ -1499,10 +1503,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panFinances.add(new JLabel("Reimbursement % (as decimal) for cancelled orders"), gridBagConstraints);
 
-        spnOrderRefund = new JSpinner(new SpinnerNumberModel(options.GetCanceledOrderReimbursement(), 0.00, 1.00, 0.05));
+        spnOrderRefund = new JSpinner(new SpinnerNumberModel(options.GetCanceledOrderReimbursement(), 0.00, 1.00,
+                                                             0.05));
         ((JSpinner.DefaultEditor) spnOrderRefund.getEditor()).getTextField().setEditable(false);
         ((JSpinner.DefaultEditor) spnOrderRefund.getEditor()).getTextField().setColumns(3);
-        //spnDamagedPartsValue.setToolTipText(resourceMap.getString("damagedPartsValueJFormattedTextField.toolTipText")); // NOI18N
+        //spnDamagedPartsValue.setToolTipText(resourceMap.getString("damagedPartsValueJFormattedTextField
+        // .toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 9;
@@ -1515,7 +1521,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panMercenary.setName("panMercenary"); // NOI18N
         panMercenary.setLayout(new java.awt.GridBagLayout());
 
-        btnContractEquipment = new JRadioButton("Base contract payment on percentage of TO&E unit value (StellarOps Beta)");
+        btnContractEquipment = new JRadioButton("Base contract payment on percentage of TO&E unit value (StellarOps " +
+                                                "Beta)");
         btnContractPersonnel = new JRadioButton("Base contract payment on personnel payroll (FMMr)");
 
         if (options.useEquipmentContractBase()) {
@@ -2162,16 +2169,20 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                 BorderFactory.createTitledBorder("Secondary Skills"),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         JPanel panTactics = new JPanel();
-        spnTacticsGreen = new JSpinner(new SpinnerNumberModel(rskillPrefs.getTacticsMod(SkillType.EXP_GREEN), -10, 10, 1));
+        spnTacticsGreen = new JSpinner(new SpinnerNumberModel(rskillPrefs.getTacticsMod(SkillType.EXP_GREEN), -10,
+                                                              10, 1));
         ((JSpinner.DefaultEditor) spnTacticsGreen.getEditor()).getTextField().setEditable(false);
         spnTacticsGreen.setToolTipText(resourceMap.getString("spnTacticsGreen.toolTipText"));
-        spnTacticsReg = new JSpinner(new SpinnerNumberModel(rskillPrefs.getTacticsMod(SkillType.EXP_REGULAR), -10, 10, 1));
+        spnTacticsReg = new JSpinner(new SpinnerNumberModel(rskillPrefs.getTacticsMod(SkillType.EXP_REGULAR), -10,
+                                                            10, 1));
         ((JSpinner.DefaultEditor) spnTacticsReg.getEditor()).getTextField().setEditable(false);
         spnTacticsReg.setToolTipText(resourceMap.getString("spnTacticsReg.toolTipText"));
-        spnTacticsVet = new JSpinner(new SpinnerNumberModel(rskillPrefs.getTacticsMod(SkillType.EXP_VETERAN), -10, 10, 1));
+        spnTacticsVet = new JSpinner(new SpinnerNumberModel(rskillPrefs.getTacticsMod(SkillType.EXP_VETERAN), -10,
+                                                            10, 1));
         ((JSpinner.DefaultEditor) spnTacticsVet.getEditor()).getTextField().setEditable(false);
         spnTacticsVet.setToolTipText(resourceMap.getString("spnTacticsVet.toolTipText"));
-        spnTacticsElite = new JSpinner(new SpinnerNumberModel(rskillPrefs.getTacticsMod(SkillType.EXP_ELITE), -10, 10, 1));
+        spnTacticsElite = new JSpinner(new SpinnerNumberModel(rskillPrefs.getTacticsMod(SkillType.EXP_ELITE), -10,
+                                                              10, 1));
         ((JSpinner.DefaultEditor) spnTacticsElite.getEditor()).getTextField().setEditable(false);
         spnTacticsElite.setToolTipText(resourceMap.getString("spnTacticsElite.toolTipText"));
         panTactics.add(spnTacticsGreen);
@@ -2200,16 +2211,20 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                 BorderFactory.createTitledBorder("Small Arms Skill"),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         JPanel panAbilities = new JPanel();
-        spnAbilGreen = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSpecialAbilBonus(SkillType.EXP_GREEN), -10, 10, 1));
+        spnAbilGreen = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSpecialAbilBonus(SkillType.EXP_GREEN), -10,
+                                                           10, 1));
         ((JSpinner.DefaultEditor) spnAbilGreen.getEditor()).getTextField().setEditable(false);
         spnAbilGreen.setToolTipText(resourceMap.getString("spnAbilGreen.toolTipText"));
-        spnAbilReg = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSpecialAbilBonus(SkillType.EXP_REGULAR), -10, 10, 1));
+        spnAbilReg = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSpecialAbilBonus(SkillType.EXP_REGULAR), -10,
+                                                         10, 1));
         ((JSpinner.DefaultEditor) spnAbilReg.getEditor()).getTextField().setEditable(false);
         spnAbilReg.setToolTipText(resourceMap.getString("spnAbilReg.toolTipText"));
-        spnAbilVet = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSpecialAbilBonus(SkillType.EXP_VETERAN), -10, 10, 1));
+        spnAbilVet = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSpecialAbilBonus(SkillType.EXP_VETERAN), -10,
+                                                         10, 1));
         ((JSpinner.DefaultEditor) spnAbilVet.getEditor()).getTextField().setEditable(false);
         spnAbilVet.setToolTipText(resourceMap.getString("spnAbilVet.toolTipText"));
-        spnAbilElite = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSpecialAbilBonus(SkillType.EXP_ELITE), -10, 10, 1));
+        spnAbilElite = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSpecialAbilBonus(SkillType.EXP_ELITE), -10,
+                                                           10, 1));
         ((JSpinner.DefaultEditor) spnAbilElite.getEditor()).getTextField().setEditable(false);
         spnAbilElite.setToolTipText(resourceMap.getString("spnAbilElite.toolTipText"));
         panAbilities.add(spnAbilGreen);
@@ -2477,7 +2492,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         personnelMarketRandomRegularRemoval = new JTextField();
         personnelMarketRandomGreenRemoval = new JTextField();
         personnelMarketRandomUltraGreenRemoval = new JTextField();
-        personnelMarketDylansWeight = new JSpinner(new SpinnerNumberModel(options.getPersonnelMarketDylansWeight(), 0.1, 0.8, 0.1));
+        personnelMarketDylansWeight = new JSpinner(new SpinnerNumberModel(options.getPersonnelMarketDylansWeight(),
+                                                                          0.1, 0.8, 0.1));
         personnelMarketTypeLabel = new JLabel("Market Type:");
         personnelMarketRandomEliteRemovalLabel = new JLabel("Random & Dylan's Elite Removal");
         personnelMarketRandomVeteranRemovalLabel = new JLabel("Random & Dylan's Veteran Removal");
@@ -2495,17 +2511,28 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         personnelMarketRandomVeteranRemoval.setText(Integer.toString(options.getPersonnelMarketRandomVeteranRemoval()));
         personnelMarketRandomRegularRemoval.setText(Integer.toString(options.getPersonnelMarketRandomRegularRemoval()));
         personnelMarketRandomGreenRemoval.setText(Integer.toString(options.getPersonnelMarketRandomGreenRemoval()));
-        personnelMarketRandomUltraGreenRemoval.setText(Integer.toString(options.getPersonnelMarketRandomUltraGreenRemoval()));
-        personnelMarketRandomEliteRemoval.setEnabled(personnelMarketType.getSelectedIndex() == PersonnelMarket.TYPE_RANDOM
-                                                     || personnelMarketType.getSelectedIndex() == PersonnelMarket.TYPE_DYLANS);
-        personnelMarketRandomVeteranRemoval.setEnabled(personnelMarketType.getSelectedIndex() == PersonnelMarket.TYPE_RANDOM
-                                                       || personnelMarketType.getSelectedIndex() == PersonnelMarket.TYPE_DYLANS);
-        personnelMarketRandomRegularRemoval.setEnabled(personnelMarketType.getSelectedIndex() == PersonnelMarket.TYPE_RANDOM
-                                                       || personnelMarketType.getSelectedIndex() == PersonnelMarket.TYPE_DYLANS);
-        personnelMarketRandomGreenRemoval.setEnabled(personnelMarketType.getSelectedIndex() == PersonnelMarket.TYPE_RANDOM
-                                                     || personnelMarketType.getSelectedIndex() == PersonnelMarket.TYPE_DYLANS);
-        personnelMarketRandomUltraGreenRemoval.setEnabled(personnelMarketType.getSelectedIndex() == PersonnelMarket.TYPE_RANDOM
-                                                          || personnelMarketType.getSelectedIndex() == PersonnelMarket.TYPE_DYLANS);
+        personnelMarketRandomUltraGreenRemoval.setText(Integer.toString(options
+                                                                                .getPersonnelMarketRandomUltraGreenRemoval()));
+        personnelMarketRandomEliteRemoval.setEnabled(personnelMarketType.getSelectedIndex() == PersonnelMarket
+                .TYPE_RANDOM
+                                                     || personnelMarketType.getSelectedIndex() == PersonnelMarket
+                .TYPE_DYLANS);
+        personnelMarketRandomVeteranRemoval.setEnabled(personnelMarketType.getSelectedIndex() == PersonnelMarket
+                .TYPE_RANDOM
+                                                       || personnelMarketType.getSelectedIndex() == PersonnelMarket
+                .TYPE_DYLANS);
+        personnelMarketRandomRegularRemoval.setEnabled(personnelMarketType.getSelectedIndex() == PersonnelMarket
+                .TYPE_RANDOM
+                                                       || personnelMarketType.getSelectedIndex() == PersonnelMarket
+                .TYPE_DYLANS);
+        personnelMarketRandomGreenRemoval.setEnabled(personnelMarketType.getSelectedIndex() == PersonnelMarket
+                .TYPE_RANDOM
+                                                     || personnelMarketType.getSelectedIndex() == PersonnelMarket
+                .TYPE_DYLANS);
+        personnelMarketRandomUltraGreenRemoval.setEnabled(personnelMarketType.getSelectedIndex() == PersonnelMarket
+                .TYPE_RANDOM
+                                                          || personnelMarketType.getSelectedIndex() ==
+                                                             PersonnelMarket.TYPE_DYLANS);
 
         panPersonnelMarket.setName("panPersonnelMarket");
         panPersonnelMarket.setLayout(new java.awt.GridBagLayout());
@@ -2522,16 +2549,26 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         personnelMarketType.setSelectedIndex(options.getPersonnelMarketType());
         personnelMarketType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                personnelMarketRandomEliteRemoval.setEnabled(personnelMarketType.getSelectedIndex() == PersonnelMarket.TYPE_RANDOM
-                                                             || personnelMarketType.getSelectedIndex() == PersonnelMarket.TYPE_DYLANS);
-                personnelMarketRandomVeteranRemoval.setEnabled(personnelMarketType.getSelectedIndex() == PersonnelMarket.TYPE_RANDOM
-                                                               || personnelMarketType.getSelectedIndex() == PersonnelMarket.TYPE_DYLANS);
-                personnelMarketRandomRegularRemoval.setEnabled(personnelMarketType.getSelectedIndex() == PersonnelMarket.TYPE_RANDOM
-                                                               || personnelMarketType.getSelectedIndex() == PersonnelMarket.TYPE_DYLANS);
-                personnelMarketRandomGreenRemoval.setEnabled(personnelMarketType.getSelectedIndex() == PersonnelMarket.TYPE_RANDOM
-                                                             || personnelMarketType.getSelectedIndex() == PersonnelMarket.TYPE_DYLANS);
-                personnelMarketRandomUltraGreenRemoval.setEnabled(personnelMarketType.getSelectedIndex() == PersonnelMarket.TYPE_RANDOM
-                                                                  || personnelMarketType.getSelectedIndex() == PersonnelMarket.TYPE_DYLANS);
+                personnelMarketRandomEliteRemoval.setEnabled(personnelMarketType.getSelectedIndex() ==
+                                                             PersonnelMarket.TYPE_RANDOM
+                                                             || personnelMarketType.getSelectedIndex() ==
+                                                                PersonnelMarket.TYPE_DYLANS);
+                personnelMarketRandomVeteranRemoval.setEnabled(personnelMarketType.getSelectedIndex() ==
+                                                               PersonnelMarket.TYPE_RANDOM
+                                                               || personnelMarketType.getSelectedIndex() ==
+                                                                  PersonnelMarket.TYPE_DYLANS);
+                personnelMarketRandomRegularRemoval.setEnabled(personnelMarketType.getSelectedIndex() ==
+                                                               PersonnelMarket.TYPE_RANDOM
+                                                               || personnelMarketType.getSelectedIndex() ==
+                                                                  PersonnelMarket.TYPE_DYLANS);
+                personnelMarketRandomGreenRemoval.setEnabled(personnelMarketType.getSelectedIndex() ==
+                                                             PersonnelMarket.TYPE_RANDOM
+                                                             || personnelMarketType.getSelectedIndex() ==
+                                                                PersonnelMarket.TYPE_DYLANS);
+                personnelMarketRandomUltraGreenRemoval.setEnabled(personnelMarketType.getSelectedIndex() ==
+                                                                  PersonnelMarket.TYPE_RANDOM
+                                                                  || personnelMarketType.getSelectedIndex() ==
+                                                                     PersonnelMarket.TYPE_DYLANS);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -2638,7 +2675,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panPersonnelMarket.add(personnelMarketRandomUltraGreenRemovalLabel, gridBagConstraints);
 
-        personnelMarketRandomUltraGreenRemoval.setText(Integer.toString(options.getPersonnelMarketRandomUltraGreenRemoval()));
+        personnelMarketRandomUltraGreenRemoval.setText(Integer.toString(options
+                                                                                .getPersonnelMarketRandomUltraGreenRemoval()));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 6;
@@ -2666,7 +2704,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panPersonnelMarket.add(personnelMarketDylansWeight, gridBagConstraints);
 
-        tabOptions.addTab(resourceMap.getString("panPersonnelMarket.TabConstraints.tabTitle"), panPersonnelMarket); // NOI18N
+        tabOptions.addTab(resourceMap.getString("panPersonnelMarket.TabConstraints.tabTitle"),
+                          panPersonnelMarket); // NOI18N
         // End Personnel Market
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -2721,7 +2760,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     }
 
     private void switchFaction() {
-        String factionCode = Faction.getFaction(Faction.choosableFactionCodes[comboFaction.getSelectedIndex()]).getNameGenerator();
+        String factionCode = Faction.getFaction(Faction.choosableFactionCodes[comboFaction.getSelectedIndex()])
+                                    .getNameGenerator();
         boolean found = false;
         for (Iterator<String> i = campaign.getRNG().getFactions(); i.hasNext(); ) {
             String nextFaction = (String) i.next();
@@ -2814,7 +2854,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setDamagedPartsValue((Double) spnDamagedPartsValue.getModel().getValue());
         options.setCanceledOrderReimbursement((Double) spnOrderRefund.getModel().getValue());
         options.setDragoonRating(useUnitRatingCheckBox.isSelected());
-        options.setUnitRatingMethod(UnitRatingMethod.getUnitRatingMethod((String) unitRatingMethodCombo.getSelectedItem()));
+        options.setUnitRatingMethod(UnitRatingMethod.getUnitRatingMethod((String) unitRatingMethodCombo
+                .getSelectedItem()));
         options.setFactionForNames(useFactionForNamesBox.isSelected());
         options.setTactics(useTacticsBox.isSelected());
         options.setDestroyByMargin(useDamageMargin.isSelected());
@@ -2936,7 +2977,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         //we need to reset healing time options through the campaign because we may need to 
         //loop through personnel to make adjustments
-        campaign.setHealingTimeOptions((Integer) spnHealWaitingPeriod.getModel().getValue(), (Integer) spnNaturalHealWaitingPeriod.getModel().getValue());
+        campaign.setHealingTimeOptions((Integer) spnHealWaitingPeriod.getModel().getValue(),
+                                       (Integer) spnNaturalHealWaitingPeriod.getModel().getValue());
 
         options.setMinimumHitsForVees((Integer) spnMinimumHitsForVees.getModel().getValue());
         options.setUseRandomHitsForVees(useRandomHitsForVees.isSelected());
@@ -2991,7 +3033,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setPersonnelMarketRandomVeteranRemoval(Integer.parseInt(personnelMarketRandomVeteranRemoval.getText()));
         options.setPersonnelMarketRandomRegularRemoval(Integer.parseInt(personnelMarketRandomRegularRemoval.getText()));
         options.setPersonnelMarketRandomGreenRemoval(Integer.parseInt(personnelMarketRandomGreenRemoval.getText()));
-        options.setPersonnelMarketRandomUltraGreenRemoval(Integer.parseInt(personnelMarketRandomUltraGreenRemoval.getText()));
+        options.setPersonnelMarketRandomUltraGreenRemoval(Integer.parseInt(personnelMarketRandomUltraGreenRemoval
+                                                                                   .getText()));
         options.setPersonnelMarketReportRefresh(personnelMarketReportRefresh.isSelected());
         options.setPersonnelMarketType(personnelMarketType.getSelectedIndex());
         // End Personnel Market

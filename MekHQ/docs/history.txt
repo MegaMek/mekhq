@@ -51,6 +51,7 @@ v0.3.4 (SVN)
 + Gender pronoun returning ?
 + Bug [#417]: Missing Backwards Compatibility for Ratings Changes
 + Bug [#419]: Transport Rating Not Included
++ Interstellar Ops Reputation was not re-initializing when rating methods were switched.
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

@@ -150,6 +150,11 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
                 continue;
             }
 
+            Person p = u.getCommander();
+            if (p != null) {
+                commanderList.add(p);
+            }
+
             Entity entity = u.getEntity();
             if (entity instanceof Mech) {
                 mechCount++;
@@ -163,13 +168,13 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
                 // Tech needs are handled by the crew directly.
                 warshipCount++;
                 updateTotalSkill(u.getCrew(), UnitType.WARSHIP);
-                updateBayCount((Warship)entity);
-                updateDockingCollarCount((Warship)entity);
+                updateBayCount((Warship) entity);
+                updateDockingCollarCount((Warship) entity);
             } else if (entity instanceof Jumpship) {
                 // Tech needs are handled by the crew directly.
                 jumpshipCount++;
-                updateBayCount((Jumpship)entity);
-                updateDockingCollarCount((Jumpship)entity);
+                updateBayCount((Jumpship) entity);
+                updateDockingCollarCount((Jumpship) entity);
             } else if (entity instanceof Aero) {
                 fighterCount++;
                 if (entity instanceof ConvFighter) {
@@ -196,11 +201,11 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
                     updateTotalSkill(u.getCrew(), UnitType.TANK);
                 }
             } else if (entity instanceof BattleArmor) {
-                int personnel = ((BattleArmor)entity).getSquadN() * ((BattleArmor)entity).getSquadSize();
+                int personnel = ((BattleArmor) entity).getSquadN() * ((BattleArmor) entity).getSquadSize();
                 battleArmorCount += personnel;
                 updateTotalSkill(u.getCrew(), UnitType.BATTLE_ARMOR);
             } else if (entity instanceof Infantry) {
-                int personnel = ((Infantry)entity).getSquadN() * ((Infantry)entity).getSquadSize();
+                int personnel = ((Infantry) entity).getSquadN() * ((Infantry) entity).getSquadSize();
                 infantryCount += personnel;
                 updateTotalSkill(u.getCrew(), UnitType.INFANTRY);
             }
@@ -233,7 +238,7 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
                     skill = p.getSkill(SkillType.S_GUN_SPACE);
                     totalGunnery += skill == null ? 0 : skill.getLevel();
                     skill = p.getSkill(SkillType.S_PILOT_SPACE);
-                    level =  skill == null ? 10 : skill.getLevel();
+                    level = skill == null ? 10 : skill.getLevel();
                     if (!hasPilot || level < totalPilot) {
                         totalPilot = level;
                         hasPilot = true;
@@ -259,7 +264,7 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
                     skill = p.getSkill(SkillType.S_GUN_VEE);
                     totalGunnery += skill == null ? 0 : skill.getLevel();
                     skill = p.getSkill(SkillType.S_PILOT_VTOL);
-                    level =  skill == null ? 10 : skill.getLevel();
+                    level = skill == null ? 10 : skill.getLevel();
                     if (!hasPilot || level < totalPilot) {
                         totalPilot = level;
                         hasPilot = true;
@@ -269,7 +274,7 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
                     skill = p.getSkill(SkillType.S_GUN_VEE);
                     totalGunnery += skill == null ? 0 : skill.getLevel();
                     skill = p.getSkill(SkillType.S_PILOT_GVEE);
-                    level =  skill == null ? 10 : skill.getLevel();
+                    level = skill == null ? 10 : skill.getLevel();
                     if (!hasPilot || level < totalPilot) {
                         totalPilot = level;
                         hasPilot = true;
@@ -557,16 +562,16 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
         } else if (fighterBayCount < fighterCount * 2) {
             doubleCapacity = false;
         }
-        if ((baBayCount) < battleArmorCount/5) {
+        if ((baBayCount) < battleArmorCount / 5) {
             fullCapacity = false;
             doubleCapacity = false;
-        } else if ((baBayCount * 2) < 2*battleArmorCount/5) {
+        } else if ((baBayCount * 2) < 2 * battleArmorCount / 5) {
             doubleCapacity = false;
         }
-        if (infantryBayCount < infantryCount/28) {
+        if (infantryBayCount < infantryCount / 28) {
             fullCapacity = false;
             doubleCapacity = false;
-        } else if (infantryBayCount < infantryCount/14 ) {
+        } else if (infantryBayCount < infantryCount / 14) {
             doubleCapacity = false;
         }
 
@@ -735,6 +740,7 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
 
     @Override
     public String getDetails() {
+        initValues();
         StringBuffer sb = new StringBuffer("Unit Reputation:                ").append(calculateUnitRatingScore())
                                                                               .append("\n");
         sb.append("    Method: Interstellar Ops Beta\n\n");
@@ -764,9 +770,10 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
           .append(" available\n");
         sb.append("    Heavy Vehicle Bays:   ").append(heavyVeeCount).append(" needed /").append(heavyVeeBayCount)
           .append(" available\n");
-        sb.append("    BA Bays:              ").append(getBattleArmorCount()/5).append(" needed /").append(baBayCount)
+        sb.append("    BA Bays:              ").append(getBattleArmorCount() / 5).append(" needed /").append(baBayCount)
           .append(" available\n");
-        sb.append("    Infantry Bays:        ").append(getInfantryCount()/28).append(" needed /").append(infantryBayCount)
+        sb.append("    Infantry Bays:        ").append(getInfantryCount() / 28).append(" needed /").append
+                (infantryBayCount)
           .append(" available\n");
         sb.append("    Docking Collars:      ").append(dropshipCount).append(" needed /").append(dockingCollarCount)
           .append(" available\n");
@@ -808,11 +815,13 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
     @Override
     public String getHelpText() {
         return "Method: Interstellar Ops Beta\n" +
-               "An attempt to match the Interstellar Ops Beta method for calculating the Reputation as closely as possible.\n" +
+               "An attempt to match the Interstellar Ops Beta method for calculating the Reputation as closely as " +
+               "possible.\n" +
                "Known differences include the following:\n" +
                "+ Command: Does not incorporate any positive or negative traits from AToW or BRPG3." +
-               "+ Transportation: Transportation needs of Support Personnel are not accounted for as MHQ does not track " +
-                    "Bay Personnel or Passenger Quarters.\n" +
+               "+ Transportation: Transportation needs of Support Personnel are not accounted for as MHQ does not " +
+               "track " +
+               "Bay Personnel or Passenger Quarters.\n" +
                "+ Support: MHQ Does not currently support Infantry and Protomech specific techs." +
                "+ Criminal Activity: MHQ does not currently track criminal activity." +
                "+ Inactivity: MHQ does not track end dates for missions/contracts.";
