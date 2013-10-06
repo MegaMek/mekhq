@@ -511,19 +511,19 @@ public abstract class AbstractUnitRating implements IUnitRating {
         // ToDo Superheavy Bays.
         for (Bay bay : ds.getTransportBays()) {
             if (bay instanceof MechBay) {
-                mechBayCount++;
+                mechBayCount += bay.getCapacity();
             } else if (bay instanceof BattleArmorBay) {
-                baBayCount++;
+                baBayCount += bay.getCapacity();
             } else if (bay instanceof InfantryBay) {
-                infantryBayCount++;
+                infantryBayCount += bay.getCapacity();
             } else if (bay instanceof LightVehicleBay) {
-                lightVeeBayCount++;
+                lightVeeBayCount += bay.getCapacity();
             } else if (bay instanceof HeavyVehicleBay) {
-                heavyVeeBayCount++;
+                heavyVeeBayCount += bay.getCapacity();
             } else if (bay instanceof ASFBay) {
-                fighterBayCount++;
+                fighterBayCount += bay.getCapacity();
             } else if (bay instanceof SmallCraftBay) {
-                smallCraftBayCount++;
+                smallCraftBayCount += bay.getCapacity();
             }
         }
     }
