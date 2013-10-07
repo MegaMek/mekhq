@@ -1513,7 +1513,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("techLevel")) {
                 retVal.techLevel = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useUnitRating") || wn2.getNodeName().equalsIgnoreCase
-                    ("useDragoonsRating")) {
+                    ("useDragoonRating")) {
                 if (wn2.getTextContent().equalsIgnoreCase("true")) {
                     retVal.useUnitRating = true;
                 } else {
