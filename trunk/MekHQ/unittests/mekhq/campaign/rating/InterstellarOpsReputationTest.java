@@ -583,9 +583,10 @@ public class InterstellarOpsReputationTest {
         for (int i = 0; i < 20; i++) {
             Person mockCrew = Mockito.mock(Person.class);
             Mockito.when(mockCrew.isAdmin()).thenReturn(false);
-            Mockito.when(mockCrew.getSkill(SkillType.S_GUN_SPACE)).thenReturn(mockDropGunnery);
             if (i == 0) {
                 Mockito.when(mockCrew.getSkill(SkillType.S_PILOT_SPACE)).thenReturn(mockDropPilot);
+            } else {
+                Mockito.when(mockCrew.getSkill(SkillType.S_GUN_SPACE)).thenReturn(mockDropGunnery);
             }
             seekerCrew.add(mockCrew);
             mockSeekerUnit.addPilotOrSoldier(mockCrew);
@@ -668,8 +669,8 @@ public class InterstellarOpsReputationTest {
     public void testCalculateSupportNeeds() {
 
         // Test the example company.
-        BigDecimal expectedTotalSkill = new BigDecimal("144.0");
-        BigDecimal expectedAverageSkill = new BigDecimal("9.00");
+        BigDecimal expectedTotalSkill = new BigDecimal("143.80");
+        BigDecimal expectedAverageSkill = new BigDecimal("8.99");
         spyReputation.initValues();
         TestCase.assertEquals(4, spyReputation.getMechCount());
         TestCase.assertEquals(2, spyReputation.getFighterCount());
