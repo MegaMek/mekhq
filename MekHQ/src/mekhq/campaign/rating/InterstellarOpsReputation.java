@@ -64,9 +64,6 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
     private int fighterTechTeamsNeeded = 0;
     private int adminsNeeded = 0;
 
-    // Combat Unit Skills.
-    private BigDecimal totalSkillLevels = BigDecimal.ZERO;
-
     private int totalTechTeams = 0;
     private int astechTeams = 0;
     private int mechTechTeams = 0;
@@ -226,8 +223,10 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
         for (Person p : crew) {
             switch (unitType) {
                 case UnitType.MEK:
-                    totalGunnery += p.getSkill(SkillType.S_GUN_MECH).getLevel();
-                    level = p.getSkill(SkillType.S_PILOT_MECH).getLevel();
+                    skill = p.getSkill(SkillType.S_GUN_MECH);
+                    totalGunnery += skill == null ? 0 : skill.getLevel();
+                    skill = p.getSkill(SkillType.S_PILOT_MECH);
+                    level = skill == null ? 10 : skill.getLevel();
                     if (!hasPilot || level < totalPilot) {
                         totalPilot = level;
                         hasPilot = true;
@@ -245,16 +244,20 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
                     }
                     break;
                 case UnitType.CONV_FIGHTER:
-                    totalGunnery += p.getSkill(SkillType.S_GUN_JET).getLevel();
-                    level = p.getSkill(SkillType.S_PILOT_JET).getLevel();
+                    skill = p.getSkill(SkillType.S_GUN_JET);
+                    totalGunnery += skill == null ? 0 : skill.getLevel();
+                    skill = p.getSkill(SkillType.S_PILOT_JET);
+                    level = skill == null ? 0 : skill.getLevel();
                     if (!hasPilot || level < totalPilot) {
                         totalPilot = level;
                         hasPilot = true;
                     }
                     break;
                 case UnitType.AERO:
-                    totalGunnery += p.getSkill(SkillType.S_GUN_AERO).getLevel();
-                    level = p.getSkill(SkillType.S_PILOT_AERO).getLevel();
+                    skill = p.getSkill(SkillType.S_GUN_AERO);
+                    totalGunnery += skill == null ? 0 : skill.getLevel();
+                    skill = p.getSkill(SkillType.S_PILOT_AERO);
+                    level = skill == null ? 0 : skill.getLevel();
                     if (!hasPilot || level < totalPilot) {
                         totalPilot = level;
                         hasPilot = true;
