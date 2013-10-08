@@ -1854,7 +1854,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
                     partsToAdd.add(a);
     			} 
     			else if(entity instanceof BattleArmor) {
-                    BaArmor a = new BaArmor((int) getEntity().getWeight(), getEntity().getOArmor(i, false), BaArmor.getArmorTypeFor(entity), i, true, campaign);
+                    BaArmor a = new BaArmor((int) getEntity().getWeight(), getEntity().getOArmor(i, false), ((BattleArmor)entity).getArmorType(1), i, true, campaign);
                     addPart(a);
                     partsToAdd.add(a);
                 } 

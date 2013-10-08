@@ -27,6 +27,7 @@ import java.util.Enumeration;
 
 import megamek.common.Aero;
 import megamek.common.AmmoType;
+import megamek.common.BattleArmor;
 import megamek.common.Engine;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
@@ -389,7 +390,7 @@ public class PartsStore implements Serializable {
 		parts.add(new Armor(0, EquipmentType.T_ARMOR_FERRO_IMP, amount, -1, false, false));
 		*/
 		parts.add(new ProtomekArmor(0, 100, -1, true, c));
-		for(int i=0; i < BaArmor.T_NUM; i++) {
+		for(int i=0; i < EquipmentType.T_ARMOR_BA_NUM; i++) {
 		    if(BaArmor.canBeIs(i)) {
 		        parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(i, false)), i, -1, false, c));
 		    }

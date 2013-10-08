@@ -50,17 +50,6 @@ import org.w3c.dom.NodeList;
  */
 public class BaArmor extends Part implements IAcquisitionWork {
     private static final long serialVersionUID = 5275226057484468868L;
-    
-    private final static int T_STANDARD           = 0;
-    private final static int T_STANDARD_PROTOTYPE = 1;
-    private final static int T_STANDARD_ADVANCED  = 2;
-    private final static int T_STEALTH_BASIC      = 3;
-    private final static int T_STEALTH            = 4;
-    private final static int T_STEALTH_IMP        = 5;
-    private final static int T_STEALTH_PROTOTYPE  = 6;
-    private final static int T_FIRE_RESIST        = 7;
-    private final static int T_MIMETIC            = 8;
-    public final static int T_NUM                 = 9;
 
     protected int amount;
     protected int amountNeeded;
@@ -68,55 +57,19 @@ public class BaArmor extends Part implements IAcquisitionWork {
     private int location;
     private boolean clan;
     
-    public static int getPointTonnage(int t, boolean isClan) {        
-        switch(t) {
-        case T_STANDARD_PROTOTYPE:
-            return 100;
-        case T_STANDARD_ADVANCED:
-            return 40;
-        case T_STEALTH:
-            if(isClan) {
-                return 35;
-            }
-            return 60;
-        case T_STEALTH_BASIC:
-            if(isClan) {
-                return 30;
-            }
-            return 55;
-        case T_STEALTH_IMP:
-            if(isClan) {
-                return 35;
-            }
-            return 60;  
-        case T_STEALTH_PROTOTYPE:
-            return 100;
-        case T_FIRE_RESIST:
-            return 30;
-        case T_MIMETIC:
-            return 50;
-        case T_STANDARD:
-        default:
-            if(isClan) {
-                return 25;
-            }
-            return 50;           
-        }
-    }
-    
     public static boolean canBeClan(int type) {
-        return type == T_STANDARD || type == T_STEALTH_BASIC 
-                || type == T_STEALTH_IMP || type == T_STEALTH
-                || type == T_FIRE_RESIST; 
+        return type == EquipmentType.T_ARMOR_BA_STANDARD || type == EquipmentType.T_ARMOR_BA_STEALTH_BASIC 
+                || type == EquipmentType.T_ARMOR_BA_STEALTH_IMP || type == EquipmentType.T_ARMOR_BA_STEALTH
+                || type == EquipmentType.T_ARMOR_BA_FIRE_RESIST; 
     }
     
     public static boolean canBeIs(int type) {
-        return type != T_FIRE_RESIST;
+        return type != EquipmentType.T_ARMOR_BA_FIRE_RESIST;
     }
     
 
     public static double getPointsPerTon(int t, boolean isClan) {
-        return 1000.0/getPointTonnage(t, isClan);
+        return 1.0/EquipmentType.getBaArmorWeightPerPoint(t, isClan);
     }
     
     public BaArmor() {
@@ -131,31 +84,31 @@ public class BaArmor extends Part implements IAcquisitionWork {
         this.type = type;
         this.clan = clan;
         switch(type) {
-        case T_STANDARD_PROTOTYPE:
+        case EquipmentType.T_ARMOR_BA_STANDARD_PROTOTYPE:
             this.name = "BA Armor (Prototype)";
             break;
-        case T_STANDARD_ADVANCED:
+        case EquipmentType.T_ARMOR_BA_STANDARD_ADVANCED:
             this.name = "BA Armor (Advanced)";
             break;
-        case T_STEALTH:
+        case EquipmentType.T_ARMOR_BA_STEALTH:
             this.name = "BA Stealth Armor";
             break;
-        case T_STEALTH_BASIC:
+        case EquipmentType.T_ARMOR_BA_STEALTH_BASIC:
             this.name = "BA Stealth Armor (Basic)";
             break;
-        case T_STEALTH_IMP:
+        case EquipmentType.T_ARMOR_BA_STEALTH_IMP:
             this.name = "BA Stealth Armor (Improved)";
             break;
-        case T_STEALTH_PROTOTYPE:
+        case EquipmentType.T_ARMOR_BA_STEALTH_PROTOTYPE:
             this.name = "BA Stealth Armor (Prototype)";
             break;
-        case T_FIRE_RESIST:
+        case EquipmentType.T_ARMOR_BA_FIRE_RESIST:
             this.name = "BA Fire Resitant Armor";
             break;
-        case T_MIMETIC:
+        case EquipmentType.T_ARMOR_BA_MIMETIC:
             this.name = "BA Mimetic Armor";
             break;
-        case T_STANDARD:
+        case EquipmentType.T_ARMOR_BA_STANDARD:
         default:
             this.name = "BA Armor";  
         }
@@ -169,25 +122,25 @@ public class BaArmor extends Part implements IAcquisitionWork {
     
     @Override
     public double getTonnage() {
-        return getPointTonnage(type, clan) * getActualAmount()/1000.0;
+        return EquipmentType.getBaArmorWeightPerPoint(type, clan) * getActualAmount();
     }
     
     private int getPointCost() {
         switch(type) {
-        case T_STANDARD_ADVANCED:
+        case EquipmentType.T_ARMOR_BA_STANDARD_ADVANCED:
             return 12500;
-        case T_MIMETIC:
-        case T_STEALTH:
+        case EquipmentType.T_ARMOR_BA_MIMETIC:
+        case EquipmentType.T_ARMOR_BA_STEALTH:
             return 15000;
-        case T_STEALTH_BASIC:
+        case EquipmentType.T_ARMOR_BA_STEALTH_BASIC:
             return 12000;
-        case T_STEALTH_IMP:
+        case EquipmentType.T_ARMOR_BA_STEALTH_IMP:
             return 20000;
-        case T_STEALTH_PROTOTYPE:
+        case EquipmentType.T_ARMOR_BA_STEALTH_PROTOTYPE:
             return 50000;
-        case T_FIRE_RESIST:
-        case T_STANDARD_PROTOTYPE:
-        case T_STANDARD:
+        case EquipmentType.T_ARMOR_BA_FIRE_RESIST:
+        case EquipmentType.T_ARMOR_BA_STANDARD_PROTOTYPE:
+        case EquipmentType.T_ARMOR_BA_STANDARD:
         default:
             return 10000;           
         }
@@ -396,15 +349,15 @@ public class BaArmor extends Part implements IAcquisitionWork {
     @Override
     public int getAvailability(int era) {
         switch(type) {
-        case T_STEALTH:
+        case EquipmentType.T_ARMOR_BA_STEALTH:
             if(era == EquipmentType.ERA_CLAN) {
                 return EquipmentType.RATING_E;
             } else {
                 return EquipmentType.RATING_X;
             } 
-        case T_STANDARD_PROTOTYPE:
-        case T_STANDARD:
-        case T_STEALTH_BASIC:
+        case EquipmentType.T_ARMOR_BA_STANDARD_PROTOTYPE:
+        case EquipmentType.T_ARMOR_BA_STANDARD:
+        case EquipmentType.T_ARMOR_BA_STEALTH_BASIC:
             if(era == EquipmentType.ERA_CLAN) {
                 return EquipmentType.RATING_E;
             } else {
@@ -715,28 +668,6 @@ public class BaArmor extends Part implements IAcquisitionWork {
             report += " have arrived";
         }
         return report;
-    }
-    
-    public static int getArmorTypeFor(Entity ba) {
-        for(Mounted m : ba.getMisc()) {
-            if(m.getType().getName().equals(BattleArmor.BASIC_STEALTH_ARMOR)) {
-                return T_STEALTH_BASIC;
-            }
-            else if(m.getType().getName().equals(BattleArmor.STANDARD_STEALTH_ARMOR)) {
-                return T_STEALTH;
-            }
-            else if(m.getType().getName().equals(BattleArmor.IMPROVED_STEALTH_ARMOR)) {
-                return T_STEALTH_IMP;
-            }
-            else if(m.getType().getName().equals(BattleArmor.MIMETIC_ARMOR)) {
-                return T_MIMETIC;
-            }
-            else if(m.getType().hasFlag(MiscType.F_FIRE_RESISTANT)) {
-                return T_FIRE_RESIST;
-            }
-        }
-        //TODO: we have no way to retrieve some armor types
-        return T_STANDARD;
     }
     
     public void doMaintenanceDamage(int d) {

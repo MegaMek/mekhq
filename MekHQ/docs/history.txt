@@ -54,6 +54,8 @@ v0.3.4 (SVN)
 + Interstellar Ops Reputation was not re-initializing when rating methods were switched.
 + Bug [#417]: Missing Backwards Compatibility for Ratings Changes minor further change
 + Bug [#420]: IO Rating Issues
++ new MM.jar
++ some fixes to BA parts
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
