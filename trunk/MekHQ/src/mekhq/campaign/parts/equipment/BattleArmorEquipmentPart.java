@@ -23,17 +23,14 @@ package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * BA equipment is never critted so we are going to disable salvaging as well. It would 

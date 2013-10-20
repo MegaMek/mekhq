@@ -25,7 +25,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
-import mekhq.gui.CampaignGUI;
 
     /**
      * A table Model for displaying information about personnel

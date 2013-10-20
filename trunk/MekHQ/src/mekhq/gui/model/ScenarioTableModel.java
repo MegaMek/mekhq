@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import javax.swing.SwingConstants;
-import javax.swing.table.AbstractTableModel;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;

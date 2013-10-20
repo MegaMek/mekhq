@@ -25,15 +25,10 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import megamek.common.BattleArmor;
-import megamek.common.CriticalSlot;
-import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
-import megamek.common.ILocationExposureStatus;
-import megamek.common.Mech;
-import megamek.common.Mounted;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import mekhq.MekHqXmlUtil;
@@ -41,7 +36,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.equipment.BattleArmorEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.work.Modes;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

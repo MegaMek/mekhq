@@ -28,7 +28,6 @@ import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Scenario;
-import mekhq.gui.CampaignGUI;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object

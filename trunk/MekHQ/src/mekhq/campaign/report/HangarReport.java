@@ -22,13 +22,8 @@ package mekhq.campaign.report;
 
 import java.awt.Font;
 
-import javax.swing.JButton;
 import javax.swing.JTextPane;
 import javax.swing.JTree;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 

@@ -27,11 +27,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 
-import megamek.common.Entity;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
-import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;

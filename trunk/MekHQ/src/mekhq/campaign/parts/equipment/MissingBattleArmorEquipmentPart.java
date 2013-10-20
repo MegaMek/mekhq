@@ -23,19 +23,13 @@ package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.CriticalSlot;
-import megamek.common.Entity;
 import megamek.common.EquipmentType;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
-import mekhq.campaign.unit.Unit;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  *

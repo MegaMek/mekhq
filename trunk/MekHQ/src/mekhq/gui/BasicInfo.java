@@ -1,7 +1,6 @@
 package mekhq.gui;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -11,13 +10,9 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTable;
-import javax.swing.table.TableCellRenderer;
 
-import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Crew;
-import megamek.common.util.DirectoryItems;
 import mekhq.IconPackage;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;

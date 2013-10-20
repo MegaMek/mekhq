@@ -28,9 +28,6 @@ import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.UUID;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.Compute;
 import megamek.common.Entity;
 import mekhq.MekHQ;
@@ -39,6 +36,9 @@ import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class PersonnelMarket {
     private ArrayList<Person> personnel = new ArrayList<Person>();
