@@ -66,7 +66,6 @@ public class PersonnelMarket {
     public void generatePersonnelForDay(Campaign c) {
         int roll;
         int q = 0;
-        boolean report = false;
         Person p;
 
         if (!personnel.isEmpty()) {
@@ -200,7 +199,6 @@ public class PersonnelMarket {
                             personnelIds.put(id, p);
                         }
                     }
-                    report = c.getCampaignOptions().getPersonnelMarketReportRefresh();
                 }
                 break;
             case TYPE_STRAT_OPS:
@@ -250,7 +248,6 @@ public class PersonnelMarket {
                     p.setId(id);
                     personnel.add(p);
                     personnelIds.put(id, p);
-                    report = c.getCampaignOptions().getPersonnelMarketReportRefresh();
                 } else {
                     incrementDaysSinceRolled();
                 }
@@ -273,10 +270,9 @@ public class PersonnelMarket {
                     personnel.add(p);
                     personnelIds.put(id, p);
                 }
-                report = c.getCampaignOptions().getPersonnelMarketReportRefresh();
         }
 
-        if (report) {
+        if (c.getCampaignOptions().getPersonnelMarketReportRefresh()) {
             c.addReport("<a href='PERSONNEL_MARKET'>Personnel market updated</a>");
         }
     }
