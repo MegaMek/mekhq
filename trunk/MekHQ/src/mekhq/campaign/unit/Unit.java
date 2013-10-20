@@ -36,7 +36,6 @@ import megamek.common.BattleArmor;
 import megamek.common.BattleArmorBay;
 import megamek.common.Bay;
 import megamek.common.CargoBay;
-import megamek.common.Compute;
 import megamek.common.ConvFighter;
 import megamek.common.Crew;
 import megamek.common.CriticalSlot;
@@ -47,7 +46,6 @@ import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;
 import megamek.common.EquipmentType;
 import megamek.common.HeavyVehicleBay;
-import megamek.common.IArmorState;
 import megamek.common.ILocationExposureStatus;
 import megamek.common.Infantry;
 import megamek.common.InfantryBay;
@@ -165,7 +163,6 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingHeatSink;
 import mekhq.campaign.parts.equipment.MissingJumpJet;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IMothballWork;
@@ -237,7 +234,6 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	private Person engineer;
 	
 	//for backwards compatability with 0.1.8, but otherwise is no longer used 
-	@SuppressWarnings("unused")
 	private int pilotId = -1;
 	
 	private String history;

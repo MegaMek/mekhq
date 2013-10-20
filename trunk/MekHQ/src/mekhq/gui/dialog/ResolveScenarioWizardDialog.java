@@ -25,18 +25,12 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -128,6 +122,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
      */
     private ArrayList<javax.swing.JCheckBox> salvageBoxes;
     private ArrayList<Unit> salvageables;
+	Hashtable<UUID, UnitStatus> salvageStatus;
+    private ArrayList<JButton> btnsSalvageViewUnit;
+    private ArrayList<JButton> btnsSalvageEditUnit;
     
     private JLabel lblSalvageValueUnit1;
     private JLabel lblSalvageValueEmployer1;
@@ -181,6 +178,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         this.tracker = t;
         loots = tracker.getPotentialLoot();
         salvageables = new ArrayList<Unit>();
+		salvageStatus = new Hashtable<UUID, UnitStatus>();
         if(tracker.getMission() instanceof Contract) {
 	        salvageEmployer = ((Contract)tracker.getMission()).getSalvagedByEmployer();
 	    	salvageUnit = ((Contract)tracker.getMission()).getSalvagedByUnit();
@@ -281,7 +279,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
             gridBagConstraints.weightx = 0.0;
             j++;
-            if(j == tracker.getPeopleStatus().keySet().size()) {
+            if(j == tracker.getUnitsStatus().keySet().size()) {
                 gridBagConstraints.weighty = 1.0;
             }
             pnlUnitStatus.add(nameLbl, gridBagConstraints);
@@ -374,6 +372,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
     	pnlSalvage = new JPanel();
         salvageBoxes = new ArrayList<JCheckBox>();
         pnlSalvage.setLayout(new GridBagLayout()); 
+        btnsSalvageViewUnit = new ArrayList<JButton>();
+        btnsSalvageEditUnit = new ArrayList<JButton>();
         JPanel pnlSalvageValue = new JPanel(new GridBagLayout());
         i = 0;
         if(tracker.getMission() instanceof Contract) {
@@ -451,12 +451,20 @@ public class ResolveScenarioWizardDialog extends JDialog {
         i++;
         j = 0;
         JCheckBox box;
+        JButton btnSalvageViewUnit;
+        JButton btnSalvageEditUnit;
         for(Entity en : tracker.getPotentialSalvage()) {
         	j++;
+        	UUID id = UUID.randomUUID();
+            en.setExternalIdAsString(id.toString());
         	Unit u = new Unit(en, tracker.getCampaign());
+            u.setId(id);
         	u.initializeParts(false);
         	u.runDiagnostic();
         	salvageables.add(u);
+        	salvageStatus.put(u.getId(), tracker.new UnitStatus(u.getName(), u.getEntity().getChassis(), u.getEntity().getModel()));
+        	UnitStatus status = salvageStatus.get(u.getId());
+        	status.assignFoundEntity(en);
         	box = new JCheckBox(en.getDisplayName() + " (" + formatter.format(u.getSellValue()) + " C-Bills)");
         	box.setSelected(false);
         	box.addItemListener(new ItemListener() {
@@ -466,17 +474,33 @@ public class ResolveScenarioWizardDialog extends JDialog {
      			}
         	});
         	salvageBoxes.add(box);
+            btnSalvageViewUnit = new JButton("View Unit");
+            btnSalvageViewUnit.setEnabled(true);
+            btnSalvageViewUnit.setActionCommand(u.getId().toString());
+            btnSalvageViewUnit.addActionListener(new ViewUnitListener(true));
+            btnsSalvageViewUnit.add(btnSalvageViewUnit);
+            btnSalvageEditUnit = new JButton("Edit Unit");
+            btnSalvageEditUnit.setEnabled(true);
+            btnSalvageEditUnit.setActionCommand(u.getId().toString());
+            btnSalvageEditUnit.setName(Integer.toString(j));
+            btnSalvageEditUnit.addActionListener(new EditUnitListener(true));
+            btnsSalvageEditUnit.add(btnSalvageEditUnit);
         	gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weightx = 0.0;
             if(j == tracker.getPotentialSalvage().size()) {
             	gridBagConstraints.weighty = 1.0;
             }
             gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
             pnlSalvage.add(box, gridBagConstraints);
+            gridBagConstraints.gridx = 1;
+            pnlSalvage.add(btnSalvageViewUnit, gridBagConstraints);
+            gridBagConstraints.gridx = 2;
+            gridBagConstraints.weightx = 1.0;
+            pnlSalvage.add(btnSalvageEditUnit, gridBagConstraints);
             i++;
         }
         checkSalvageRights();
@@ -1159,9 +1183,16 @@ public class ResolveScenarioWizardDialog extends JDialog {
     }
     
     private void showUnit(UUID id) {
+    	showUnit(id, false);
+    }
+    
+    private void showUnit(UUID id, boolean salvage) {
         //TODO: I am not sure I like the pop up dialog, might just make this a view on this
         //dialog
         UnitStatus ustatus = tracker.getUnitsStatus().get(id);
+        if (salvage) {
+        	ustatus = salvageStatus.get(id);
+        }
         if(null == ustatus || null == ustatus.getEntity()) {
             return;
         }
@@ -1203,7 +1234,14 @@ public class ResolveScenarioWizardDialog extends JDialog {
     }
     
     private void editUnit(UUID id, int idx) {
+    	editUnit(id, idx, false);
+    }
+    
+    private void editUnit(UUID id, int idx, boolean salvage) {
         UnitStatus ustatus = tracker.getUnitsStatus().get(id);
+        if (salvage) {
+        	ustatus = salvageStatus.get(id);
+        }
         if(null == ustatus || null == ustatus.getEntity()) {
             return;
         }
@@ -1225,21 +1263,37 @@ public class ResolveScenarioWizardDialog extends JDialog {
     }
     
     private class ViewUnitListener implements ActionListener {
+    	boolean salvage = false;
+        
+        public ViewUnitListener(boolean b) {
+			salvage = b;
+		}
        
-        @Override
+        public ViewUnitListener() {
+		}
+
+		@Override
         public void actionPerformed(java.awt.event.ActionEvent evt) {
             UUID id = UUID.fromString(evt.getActionCommand());
-            showUnit(id);        
+            showUnit(id, salvage);
         }
     }
     
     private class EditUnitListener implements ActionListener {
+    	boolean salvage = false;
         
-        @Override
+        public EditUnitListener(boolean b) {
+			salvage = b;
+		}
+
+		public EditUnitListener() {
+		}
+
+		@Override
         public void actionPerformed(java.awt.event.ActionEvent evt) {
             UUID id = UUID.fromString(evt.getActionCommand());
             int idx = Integer.parseInt(((JButton)evt.getSource()).getName());
-            editUnit(id, idx);
+            editUnit(id, idx, salvage);
         }
     }
 }

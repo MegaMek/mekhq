@@ -38,9 +38,6 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import megamek.client.Client;
-import megamek.client.ui.swing.MechTileset;
-import megamek.client.ui.swing.util.ImageFileFactory;
-import megamek.common.Configuration;
 import megamek.common.IGame;
 import megamek.common.event.GameBoardChangeEvent;
 import megamek.common.event.GameBoardNewEvent;
@@ -60,14 +57,12 @@ import megamek.common.event.GamePlayerDisconnectedEvent;
 import megamek.common.event.GameReportEvent;
 import megamek.common.event.GameSettingsChangeEvent;
 import megamek.common.event.GameTurnChangeEvent;
-import megamek.common.util.DirectoryItems;
 import megamek.server.Server;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.PortraitFileFactory;
 import mekhq.gui.StartUpGUI;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 

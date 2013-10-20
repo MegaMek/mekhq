@@ -56,6 +56,10 @@ v0.3.4 (SVN)
 + Bug [#420]: IO Rating Issues
 + new MM.jar
 + some fixes to BA parts
++ Added View and Edit buttons to salvage dialog
++ Bug: Salvage View and Edit buttons not showing the proper entities
++ Bug: Personnel Market "Dylan's Method" not reporting on update
++ Pulled MegaMek and MegaMekLab versions into MekHQ's About Box
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

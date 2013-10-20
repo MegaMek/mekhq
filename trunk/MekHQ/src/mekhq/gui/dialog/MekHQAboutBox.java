@@ -26,6 +26,9 @@ import java.util.ResourceBundle;
 
 import javax.swing.JFrame;
 
+import megamek.MegaMek;
+import megameklab.com.MegaMekLab;
+
 public class MekHQAboutBox extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8514528257894201641L;
 
@@ -46,6 +49,10 @@ public class MekHQAboutBox extends javax.swing.JDialog {
         javax.swing.JLabel appTitleLabel = new javax.swing.JLabel();
         javax.swing.JLabel versionLabel = new javax.swing.JLabel();
         javax.swing.JLabel appVersionLabel = new javax.swing.JLabel();
+        javax.swing.JLabel versionLabelMegaMek = new javax.swing.JLabel();
+        javax.swing.JLabel appVersionLabelMegaMek = new javax.swing.JLabel();
+        javax.swing.JLabel versionLabelMegaMekLab = new javax.swing.JLabel();
+        javax.swing.JLabel appVersionLabelMegaMekLab = new javax.swing.JLabel();
         javax.swing.JLabel homepageLabel = new javax.swing.JLabel();
         javax.swing.JLabel appHomepageLabel = new javax.swing.JLabel();
         javax.swing.JLabel appDescLabel = new javax.swing.JLabel();
@@ -83,10 +90,34 @@ public class MekHQAboutBox extends javax.swing.JDialog {
         gridBagConstraints.gridx = 1;
         getContentPane().add(appVersionLabel, gridBagConstraints);
         
+        versionLabelMegaMek.setText(resourceMap.getString("versionLabelMegaMek.text")); // NOI18N
+        versionLabelMegaMek.setName("versionLabelMegaMek"); // NOI18N
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridwidth = 1;
+        getContentPane().add(versionLabelMegaMek, gridBagConstraints);
+        
+        appVersionLabelMegaMek.setText(MegaMek.VERSION); // NOI18N
+        appVersionLabelMegaMek.setName("appVersionLabelMegaMek"); // NOI18N
+        gridBagConstraints.gridx = 1;
+        getContentPane().add(appVersionLabelMegaMek, gridBagConstraints);
+        
+        versionLabelMegaMekLab.setText(resourceMap.getString("versionLabelMegaMekLab.text")); // NOI18N
+        versionLabelMegaMekLab.setName("versionLabelMegaMekLab"); // NOI18N
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridwidth = 1;
+        getContentPane().add(versionLabelMegaMekLab, gridBagConstraints);
+        
+        appVersionLabelMegaMekLab.setText(MegaMekLab.VERSION); // NOI18N
+        appVersionLabelMegaMekLab.setName("appVersionLabelMegaMekLab"); // NOI18N
+        gridBagConstraints.gridx = 1;
+        getContentPane().add(appVersionLabelMegaMekLab, gridBagConstraints);
+        
         homepageLabel.setText(resourceMap.getString("homepageLabel.text")); // NOI18N
         homepageLabel.setName("homepageLabel"); // NOI18N
         gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 2;
+		gridBagConstraints.gridy = 4;
         getContentPane().add(homepageLabel, gridBagConstraints);
         
         appHomepageLabel.setText(mekhqProperties.getString("Application.homepage")); // NOI18N
@@ -97,7 +128,7 @@ public class MekHQAboutBox extends javax.swing.JDialog {
         
         appDescLabel.setText(mekhqProperties.getString("Application.description")); // NOI18N
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
