@@ -60,6 +60,7 @@ v0.3.4 (SVN)
 + Bug: Salvage View and Edit buttons not showing the proper entities
 + Bug: Personnel Market "Dylan's Method" not reporting on update
 + Pulled MegaMek and MegaMekLab versions into MekHQ's About Box
++ Started a new doc file containing a full MekHQ Tutorial (Tutorial is still a work in progress)
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
