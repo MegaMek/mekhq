@@ -6,22 +6,16 @@
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JDialog;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.border.EmptyBorder;
-import javax.swing.text.DefaultCaret;
 
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.ReportHyperlinkListener;
 import mekhq.gui.DailyReportLogPanel;
+import mekhq.gui.ReportHyperlinkListener;
 
 /**
  *

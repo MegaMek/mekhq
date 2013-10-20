@@ -25,12 +25,9 @@ import java.io.PrintWriter;
 import java.text.DecimalFormat;
 
 import megamek.common.Aero;
-import megamek.common.BattleArmor;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;

@@ -22,7 +22,6 @@
 package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;

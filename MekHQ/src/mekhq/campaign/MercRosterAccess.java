@@ -20,7 +20,6 @@ import mekhq.campaign.personnel.Rank;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.Kill;
 
 public class MercRosterAccess extends SwingWorker<Void, Void> {
    

@@ -150,7 +150,6 @@ import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.Modes;
 import mekhq.gui.PortraitFileFactory;
-import mekhq.campaign.Kill;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;

@@ -40,7 +40,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.LogEntry;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Finances;
 import mekhq.gui.model.DataTableModel;

@@ -21,12 +21,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import megamek.client.ui.Messages;
-import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Crew;
 import megamek.common.Entity;
 import megamek.common.UnitType;
-import megamek.common.util.DirectoryItems;
 import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;

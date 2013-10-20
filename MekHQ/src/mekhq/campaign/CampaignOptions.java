@@ -30,8 +30,8 @@ import mekhq.Utilities;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
-
 import mekhq.campaign.rating.UnitRatingMethod;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 

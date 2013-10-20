@@ -7,7 +7,6 @@ package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.util.ResourceBundle;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
