@@ -1023,17 +1023,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                 } else if (wn2.getNodeName().equalsIgnoreCase("callsign")) {
                     retVal.callsign = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("commander")) {
-                    if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                        retVal.commander = true;
-                    } else {
-                        retVal.commander = false;
-                    }
+                    retVal.commander = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("dependent")) {
-                    if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                        retVal.dependent = true;
-                    } else {
-                        retVal.dependent = false;
-                    }
+                    retVal.dependent = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("isClanTech")
                            || wn2.getNodeName().equalsIgnoreCase("clan")) {
                     retVal.clan = Boolean.parseBoolean(wn2.getTextContent().trim());
@@ -1308,6 +1300,15 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         if (retVal.id == null) {
             MekHQ.logMessage("ID not pre-defined; generating person's ID.", 5);
             retVal.id = UUID.randomUUID();
+        }
+        
+        // Prisoner and Bondsman updating
+        if (retVal.prisonerStatus != PRISONER_NOT && retVal.rankOrder == 0) {
+        	if (retVal.prisonerStatus == PRISONER_BONDSMAN) {
+        		retVal.setRank(Ranks.RANK_BONDSMAN);
+        	} else {
+        		retVal.setRank(Ranks.RANK_PRISONER);
+        	}
         }
 
         return retVal;
