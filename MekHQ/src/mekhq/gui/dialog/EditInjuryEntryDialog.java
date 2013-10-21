@@ -40,8 +40,7 @@ import mekhq.campaign.personnel.Person;
  */
 public class EditInjuryEntryDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
-    @SuppressWarnings("unused")
-	private Frame frame;
+    private Frame frame;
     private Injury injury;
     
     private javax.swing.JButton btnClose;
