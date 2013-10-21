@@ -4671,7 +4671,7 @@ public class Campaign implements Serializable {
                 break;
             case Person.PRISONER_YES:
                 if (p.getRankOrder() > 0) {
-                    changeRank(p, 0, true); // They don't get to have a rank. Their
+                    changeRank(p, Ranks.RANK_PRISONER, true); // They don't get to have a rank. Their
                     // rank is Prisoner or Bondsman.
                 }
                 p.setPrisoner();
@@ -4679,7 +4679,7 @@ public class Campaign implements Serializable {
                 break;
             case Person.PRISONER_BONDSMAN:
                 if (p.getRankOrder() > 0) {
-                    changeRank(p, 0, true); // They don't get to have a rank. Their
+                    changeRank(p, Ranks.RANK_BONDSMAN, true); // They don't get to have a rank. Their
                     // rank is Prisoner or Bondsman.
                 }
                 p.setBondsman();
