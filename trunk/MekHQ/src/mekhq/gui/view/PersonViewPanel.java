@@ -286,7 +286,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		
 		int firsty = 0;
 		
-		if(!person.getCallsign().equals("-") && person.getCallsign().length() == 0) {
+		if(!person.getCallsign().equals("-") && person.getCallsign().length() > 0) {
 			firsty++;
 			lblCall1.setName("lblCall1"); // NOI18N
 			lblCall1.setText(resourceMap.getString("lblCall1.text"));
