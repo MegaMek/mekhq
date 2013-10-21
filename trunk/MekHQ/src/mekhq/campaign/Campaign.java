@@ -204,7 +204,7 @@ public class Campaign implements Serializable {
 
     private GameOptions gameOptions;
 
-    private static String name;
+    private String name;
 
     private RandomNameGenerator rng;
 

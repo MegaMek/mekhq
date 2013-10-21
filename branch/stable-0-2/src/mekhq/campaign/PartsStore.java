@@ -35,7 +35,6 @@ import megamek.common.verifier.TestEntity;
 import megamek.common.weapons.BayWeapon;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.infantry.InfantryWeapon;
-import mekhq.MekHQ;
 import mekhq.campaign.parts.AeroHeatSink;
 import mekhq.campaign.parts.AeroSensor;
 import mekhq.campaign.parts.AmmoStorage;

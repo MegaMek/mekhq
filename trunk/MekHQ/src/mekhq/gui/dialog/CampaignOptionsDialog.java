@@ -3305,7 +3305,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     }
 
     public static class SpinnerEditor extends DefaultCellEditor {
-        JSpinner spinner;
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = -2711422398394960413L;
+		JSpinner spinner;
         JSpinner.NumberEditor editor;
         JTextField textField;
         boolean valueSet;

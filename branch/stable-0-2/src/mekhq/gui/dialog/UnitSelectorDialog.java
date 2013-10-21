@@ -39,6 +39,7 @@ import megamek.client.ui.Messages;
 import megamek.client.ui.swing.AdvancedSearchDialog;
 import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.MechViewPanel;
+import megamek.common.Configuration;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.MechFileParser;
@@ -477,7 +478,7 @@ public class UnitSelectorDialog extends JDialog {
         }
 
         if (mt == null) {
-            mt = new MechTileset("data/images/units/");
+            mt = new MechTileset(Configuration.unitImagesDir());
             try {
                 mt.loadFromFile("mechset.txt");
             } catch (IOException ex) {

@@ -76,6 +76,8 @@ public class InfantryMotiveType extends Part {
         case TRACKED:
         	name = "Tracked Infantry Vehicle";
             break;
+        default:
+        	name = "Unknown Motive Type";
 		}
 	}
 	
