@@ -994,7 +994,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	
 	public void saveCustomization() throws EntityLoadingException, IOException {
 		UnitUtil.compactCriticals(newEntity);
-	    UnitUtil.reIndexCrits(newEntity);
+	    //UnitUtil.reIndexCrits(newEntity); Method is gone?
 	
 		String fileName = MhqFileUtil.escapeReservedCharacters(newEntity.getChassis() + " " + newEntity.getModel());
 	    String sCustomsDir = "data"+File.separator+"mechfiles"+File.separator+"customs";
