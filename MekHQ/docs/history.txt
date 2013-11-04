@@ -65,6 +65,7 @@ v0.3.4 (SVN)
 + Bug: Prisoner/Bondsman not working correctly since new rank system introduced
 + New MM.jar
 + Compatibility with new MM.jar
++ New MM.jar - again (for XMLStreamParser fix)
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
