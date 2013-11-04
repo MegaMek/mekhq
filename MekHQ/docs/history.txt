@@ -63,6 +63,8 @@ v0.3.4 (SVN)
 + Started a new doc file containing a full MekHQ Tutorial (Tutorial is still a work in progress)
 + Bug: Callsign not showing
 + Bug: Prisoner/Bondsman not working correctly since new rank system introduced
++ New MM.jar
++ Compatibility with new MM.jar
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
