@@ -70,6 +70,7 @@ v0.3.4 (SVN)
 + Compatibility with new MML.jar
 + Compatibility with MegaMek & new MegaMek.jar (10231)
 + Customization of Aeros & new MegaMekLab.jar (1274)
++ Bug: All Aero subclasses were enabling the customize in lab option
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

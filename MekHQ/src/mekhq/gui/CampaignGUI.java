@@ -9506,7 +9506,7 @@ public class CampaignGUI extends JPanel {
                     menuItem.setEnabled(unit.isAvailable()
                                         && (unit.getEntity() instanceof megamek.common.Mech
                                             || unit.getEntity() instanceof megamek.common.Tank
-                                            || unit.getEntity() instanceof megamek.common.Aero
+                                            || (unit.getEntity() instanceof megamek.common.Aero && unit.getEntity().getClass() == Aero.class)
                                             || (unit.getEntity() instanceof Infantry && !(unit.getEntity() instanceof BattleArmor))));
                     menu.add(menuItem);
                     if (unit.isRefitting()) {
