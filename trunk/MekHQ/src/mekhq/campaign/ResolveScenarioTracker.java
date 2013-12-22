@@ -207,7 +207,7 @@ public class ResolveScenarioTracker {
 
 		int pid = client.getLocalPlayer().getId();
 		
-		for (Enumeration<Entity> iter = client.game.getEntities(); iter.hasMoreElements();) {
+		for (Enumeration<Entity> iter = client.getGame().getEntities(); iter.hasMoreElements();) {
 			Entity e = iter.nextElement();
 			if(e.getOwnerId() == pid) {
 				if(e.canEscape() || control) {
@@ -241,7 +241,7 @@ public class ResolveScenarioTracker {
 			}
 		}	
 		//add retreated units
-		for (Enumeration<Entity> iter = client.game.getRetreatedEntities(); iter.hasMoreElements();) {
+		for (Enumeration<Entity> iter = client.getGame().getRetreatedEntities(); iter.hasMoreElements();) {
             Entity e = iter.nextElement();
             if(e.getOwnerId() == pid) {
             	if(!e.getExternalIdAsString().equals("-1")) {
@@ -266,7 +266,7 @@ public class ResolveScenarioTracker {
         }
 		
 
-        Enumeration<Entity> wrecks = client.game.getWreckedEntities();
+        Enumeration<Entity> wrecks = client.getGame().getWreckedEntities();
         while (wrecks.hasMoreElements()) {
         	Entity e = wrecks.nextElement();
         	if(e.getOwnerId() == pid) {
@@ -291,7 +291,7 @@ public class ResolveScenarioTracker {
 					}
 				}
         	} else if(e.getOwner().isEnemyOf(client.getLocalPlayer())) {
-        		Entity killer = client.game.getEntity(e.getKillerId());
+        		Entity killer = client.getGame().getEntity(e.getKillerId());
         		if(null != killer && killer.getOwnerId() == pid) {
         			//the killer is one of your units, congrats!
         			killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());

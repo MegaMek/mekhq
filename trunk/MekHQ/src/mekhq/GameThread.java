@@ -75,17 +75,17 @@ class GameThread extends Thread implements CloseClientListener {
 
             // if game is running, shouldn't do the following, so detect the
             // phase
-            for (int i = 0; (i < 1000) && (client.game.getPhase() == IGame.Phase.PHASE_UNKNOWN); i++) {
+            for (int i = 0; (i < 1000) && (client.getGame().getPhase() == IGame.Phase.PHASE_UNKNOWN); i++) {
                 Thread.sleep(50);
             	System.out.println("Thread in unknown stage" );
             }
 
-            if (((client.game != null) && (client.game.getPhase() == IGame.Phase.PHASE_LOUNGE))) {
+            if (((client.getGame() != null) && (client.getGame().getPhase() == IGame.Phase.PHASE_LOUNGE))) {
             	System.out.println("Thread in lounge" );
             	client.getLocalPlayer().setCamoCategory(app.getCampaign().getCamoCategory());
                 client.getLocalPlayer().setCamoFileName(app.getCampaign().getCamoFileName());
             	
-                client.game.getOptions().loadOptions();
+                client.getGame().getOptions().loadOptions();
                 client.sendGameOptions("", app.getCampaign().getGameOptionsVector());
                 for (Unit unit : mechs) {
                     // Get the Entity

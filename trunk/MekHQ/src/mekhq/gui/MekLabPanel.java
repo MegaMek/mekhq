@@ -37,6 +37,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
+import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.Engine;
 import megamek.common.Entity;
@@ -50,6 +51,7 @@ import megamek.common.Tank;
 import megamek.common.WeaponType;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.verifier.EntityVerifier;
+import megamek.common.verifier.TestAero;
 import megamek.common.verifier.TestEntity;
 import megamek.common.verifier.TestInfantry;
 import megamek.common.verifier.TestMech;
@@ -190,7 +192,10 @@ public class MekLabPanel extends JPanel {
 		}
 		refit = new Refit(unit, entity, true); 
 		testEntity = null;
-		if(entity instanceof Mech) {
+		if(entity instanceof Aero) {
+			testEntity = new TestAero((Aero)entity, entityVerifier.mechOption, null);
+		}
+		else if(entity instanceof Mech) {
 			testEntity = new TestMech((Mech)entity, entityVerifier.mechOption, null);
 		}
 		else if(entity instanceof Tank) {
@@ -381,7 +386,10 @@ public class MekLabPanel extends JPanel {
     }
 	
 	private EntityPanel getCorrectLab(Entity en) {
-		if(en instanceof Mech) {
+		if(en instanceof Aero) {
+			return new AeroPanel((Aero)en);
+		}
+		else if(en instanceof Mech) {
 			return new MekPanel((Mech)en);
 		}
 		else if(en instanceof Tank) {
@@ -403,6 +411,93 @@ public class MekLabPanel extends JPanel {
 		public abstract Entity getEntity();
 	}
 	
+	private class AeroPanel extends EntityPanel {
+		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 6894731868670529166L;
+	
+		private Aero entity;
+		private megameklab.com.ui.Aero.tabs.StructureTab structureTab;
+		private megameklab.com.ui.Aero.tabs.EquipmentTab equipmentTab;
+		private megameklab.com.ui.Aero.tabs.BuildTab buildTab;
+	    private megameklab.com.ui.Aero.tabs.PreviewTab previewTab;
+		
+		public AeroPanel(Aero a) {
+			entity = a;
+			reloadTabs();
+		}
+		 
+		public Entity getEntity() {
+			return entity;
+		}
+		
+		public void reloadTabs() {
+			removeAll();
+
+			structureTab = new megameklab.com.ui.Aero.tabs.StructureTab((Aero) entity);
+			structureTab.setAsCustomization();
+			previewTab = new megameklab.com.ui.Aero.tabs.PreviewTab((Aero) entity);
+			equipmentTab = new megameklab.com.ui.Aero.tabs.EquipmentTab((Aero) entity);
+	        buildTab = new megameklab.com.ui.Aero.tabs.BuildTab((Aero) entity, equipmentTab);
+			structureTab.addRefreshedListener(this);
+			equipmentTab.addRefreshedListener(this);
+			buildTab.addRefreshedListener(this);
+
+			addTab("Structure/Armor", structureTab);
+			addTab("Equipment", equipmentTab);
+			addTab("Build", buildTab);
+	        addTab("Preview", previewTab);
+	        this.repaint();
+		}
+		
+		public void refreshAll() {
+			structureTab.refresh();
+			equipmentTab.refresh();
+			buildTab.refresh();
+			previewTab.refresh();
+			refreshSummary();
+		}
+
+		public void refreshArmor() {
+			refreshSummary();
+		}
+
+		public void refreshBuild() {
+			buildTab.refresh();
+			refreshSummary();
+		}
+
+		public void refreshEquipment() {
+			equipmentTab.refresh();
+			refreshSummary();
+		}
+
+		public void refreshStatus() {
+			refreshSummary();
+		}
+
+		public void refreshStructure() {
+			structureTab.refresh();
+			refreshSummary();
+		}
+
+		public void refreshWeapons() {
+			refreshSummary();
+		}
+
+		@Override
+		public void refreshHeader() {
+			
+		}
+
+        @Override
+        public void refreshPreview() {
+            previewTab.refresh();
+        }
+	}
+	
 	private class MekPanel extends EntityPanel {
 		
 		/**
@@ -414,7 +509,7 @@ public class MekLabPanel extends JPanel {
 		private megameklab.com.ui.Mek.tabs.StructureTab structureTab;
 		private megameklab.com.ui.Mek.tabs.EquipmentTab equipmentTab;
 		private megameklab.com.ui.Mek.tabs.BuildTab buildTab;
-	      private megameklab.com.ui.Mek.tabs.PreviewTab previewTab;
+	    private megameklab.com.ui.Mek.tabs.PreviewTab previewTab;
 		
 		public MekPanel(Mech m) {
 			entity = m;
