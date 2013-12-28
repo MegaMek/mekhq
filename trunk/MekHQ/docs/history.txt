@@ -73,7 +73,8 @@ v0.3.4 (SVN)
 + Bug: All Aero subclasses were enabling the customize in lab option
 + Bug [#432]: Units Histories cause a Display bug in TO&E
 + Bug [#434]: Balance Sheet link error
-+ RFE [#149]: Manual assignment of quality ratings
++ RFE [#149]: Manual assignment of quality ratings (Mechs)
++ RFE [#149]: Manual assignment of quality ratings (Parts)
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
