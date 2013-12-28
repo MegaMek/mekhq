@@ -6325,7 +6325,7 @@ public class Campaign implements Serializable {
                 //maybe use the money
                 if (campaignOptions.payForMaintain()) {
                     if (finances.debit(u.getMaintenanceCost(),
-                                       Transaction.C_MAINTAIN, "Maintenance for " + u.getHyperlinkedName(),
+                                       Transaction.C_MAINTAIN, "Maintenance for " + u.getName(),
                                        calendar.getTime())) {
                     } else {
                         paidMaintenance = false;

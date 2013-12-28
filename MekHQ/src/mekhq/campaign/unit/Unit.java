@@ -3152,6 +3152,14 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
         return (int)Math.round((1.0 * sumQuality)/nParts);
     }
     
+    public void setQuality(int q) {
+    	for (Part p : getParts()) {
+    		if (!(p instanceof MissingPart)) {
+    			p.setQuality(q);
+    		}
+    	}
+    }
+    
     public String getQualityName() {
         return Part.getQualityName(getQuality());
     }
