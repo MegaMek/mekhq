@@ -1113,6 +1113,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         quality -= 1;
     }
     
+    public void setQuality(int q) {
+    	quality = q;
+    }
+    
     public boolean needsMaintenance() {
         return true;
     }
