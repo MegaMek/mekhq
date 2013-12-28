@@ -121,7 +121,7 @@ public class Skill implements Serializable, MekHqXmlSerializable {
 			return type.getTarget() + level + bonus;
 		} else {
 			return type.getTarget() - level - bonus;
-		}	
+		}
 	}
 	
 	public void improve() {	
