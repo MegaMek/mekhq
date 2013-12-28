@@ -372,21 +372,31 @@ public class PartsStore implements Serializable {
 		//Ferro-Lamellor
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_FERRO_LAMELLOR, false));
 		parts.add(new Armor(0, EquipmentType.T_ARMOR_FERRO_LAMELLOR, amount, -1, false, true, c));
+		//Ferro-Aluminum
+		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_ALUM, false));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_ALUM, amount, -1, false, false, c));
+		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_ALUM, true));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_ALUM, amount, -1, false, true, c));
+		//Light/Heavy Ferro-Aluminum
+		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_LIGHT_ALUM, false));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_LIGHT_ALUM, amount, -1, false, false, c));
+		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_HEAVY_ALUM, false));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_HEAVY_ALUM, amount, -1, false, false, c));
 		//Primitive
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_PRIMITIVE, false));
 		parts.add(new Armor(0, EquipmentType.T_ARMOR_PRIMITIVE, amount, -1, false, false, c));
 		/*
 		 * These are all warship armors
+		*/
 		//Ferro-Carbide
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_FERRO_CARBIDE, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_FERRO_CARBIDE, amount, -1, false, false));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_FERRO_CARBIDE, amount, -1, false, false, c));
 		//Lemellor Ferro Carbide
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_LAMELLOR_FERRO_CARBIDE, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_LAMELLOR_FERRO_CARBIDE, amount, -1, false, false));
-		//Ferro Improved
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_LAMELLOR_FERRO_CARBIDE, amount, -1, false, false, c));
+		//Improved Ferro-Aluminum
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_FERRO_IMP, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_FERRO_IMP, amount, -1, false, false));
-		*/
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_FERRO_IMP, amount, -1, false, false, c));
 		parts.add(new ProtomekArmor(0, 100, -1, true, c));
 		for(int i=0; i < EquipmentType.T_ARMOR_BA_NUM; i++) {
 		    if(BaArmor.canBeIs(i)) {
