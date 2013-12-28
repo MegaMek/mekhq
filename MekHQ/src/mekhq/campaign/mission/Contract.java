@@ -28,6 +28,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import megamek.common.BattleArmor;
+import megamek.common.Infantry;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -385,9 +387,10 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		//calculate support amount
 		long maintCosts = 0;
 		for (Unit u : c.getUnits()) {
-            if (u.requiresMaintenance() && null != u.getTech()) {
-            	maintCosts += u.getWeeklyMaintenanceCost();
+            if (u.getEntity() instanceof Infantry && !(u.getEntity() instanceof BattleArmor)) {
+            	continue;
             }
+            maintCosts += u.getWeeklyMaintenanceCost();
         }
 		maintCosts *= 4;
 		supportAmount = (long)((straightSupport/100.0) * maintCosts * getLength());
