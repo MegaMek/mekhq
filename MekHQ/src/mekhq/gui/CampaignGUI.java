@@ -8300,6 +8300,47 @@ public class CampaignGUI extends JPanel {
                 refreshAcquireList();
                 refreshReport();
                 refreshCargo();
+            } else if (command.contains("SET_QUALITY")) {
+            	int q = -1;
+            	Object[] possibilities = {"F", "E", "D", "C", "B", "A"};
+            	String quality = (String)JOptionPane.showInputDialog(
+                        frame,
+                        "Choose the new quality level",
+                        "Set Quality",
+                        JOptionPane.PLAIN_MESSAGE,
+                        null,
+                        possibilities,
+                        "F");
+            	switch(quality) {
+                case "A":
+                    q = 0;
+                    break;
+                case "B":
+                    q = 1;
+                    break;
+                case "C":
+                    q = 2;
+                    break;
+                case "D":
+                    q = 3;
+                    break;
+                case "E":
+                    q = 4;
+                    break;
+                case "F":
+                    q = 5;
+                    break;
+                default:
+                    q = -1;
+                    break;
+                }
+            	if (q != -1) {
+	            	for (Part p : parts) {
+	            		if (p != null) {
+	            			p.setQuality(q);
+	            		}
+	            	}
+            	}
             } else if (command.contains("CHANGE_MODE")) {
                 String sel = command.split(":")[1];
                 int selected = Integer.parseInt(sel);
@@ -8455,6 +8496,12 @@ public class CampaignGUI extends JPanel {
                 // remove part
                 menuItem = new JMenuItem("Remove Part");
                 menuItem.setActionCommand("REMOVE");
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(getCampaign().isGM());
+                menu.add(menuItem);
+                // set part quality
+                menuItem = new JMenuItem("Set Quality...");
+                menuItem.setActionCommand("SET_QUALITY");
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(getCampaign().isGM());
                 menu.add(menuItem);
