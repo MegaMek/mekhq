@@ -75,6 +75,9 @@ v0.3.4 (SVN)
 + Bug [#434]: Balance Sheet link error
 + RFE [#149]: Manual assignment of quality ratings (Mechs)
 + RFE [#149]: Manual assignment of quality ratings (Parts)
++ Bug [#426]: Aerospace fighters showing "undamaged" after combat; ferro-aluminum armor missing (partial, armor only)
+    Additionally this immplements Improved Ferro-Aluminum, Ferro-Carbide, and Lamellor Ferro-Carbide. In order to implement
+    those a new MM.jar file was also required.
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
