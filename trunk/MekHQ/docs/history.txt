@@ -79,6 +79,9 @@ v0.3.4 (SVN)
     Additionally this immplements Improved Ferro-Aluminum, Ferro-Carbide, and Lamellor Ferro-Carbide. In order to implement
     those a new MM.jar file was also required.
 + Bug [#430]: Straight support calculation error
++ Bug [#438]: Unable to load .mul
+    This had actually been disabled on purpose pending a fix to an infinite loop bug in the code that is used to generate
+    proper crews for multi-crewed vehicles.
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

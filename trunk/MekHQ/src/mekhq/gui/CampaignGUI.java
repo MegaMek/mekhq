@@ -2222,7 +2222,7 @@ public class CampaignGUI extends JPanel {
                 miLoadForcesActionPerformed(evt);
             }
         });
-        miLoadForces.setEnabled(false);
+        //miLoadForces.setEnabled(false);
         menuImport.add(miLoadForces);
 
         menuFile.add(menuImport);
