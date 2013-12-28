@@ -31,6 +31,7 @@ import java.util.GregorianCalendar;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.unit.Unit;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -382,7 +383,14 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		}
 		
 		//calculate support amount
-		supportAmount = (long)((straightSupport/100.0) * c.getMaintenanceCosts() * getLength());
+		long maintCosts = 0;
+		for (Unit u : c.getUnits()) {
+            if (u.requiresMaintenance() && null != u.getTech()) {
+            	maintCosts += u.getWeeklyMaintenanceCost();
+            }
+        }
+		maintCosts *= 4;
+		supportAmount = (long)((straightSupport/100.0) * maintCosts * getLength());
 		
 		//calculate transportation costs
 		if(null != c.getPlanet(planetName)) {
