@@ -82,6 +82,8 @@ v0.3.4 (SVN)
 + Bug [#438]: Unable to load .mul
     This had actually been disabled on purpose pending a fix to an infinite loop bug in the code that is used to generate
     proper crews for multi-crewed vehicles.
++ Bug [#442]: GM Tools: Dice Roll gives nothing above 10
+    This also includes a new mekhq.Utilities method dice(num, faces) that will roll any number of any size dice.
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

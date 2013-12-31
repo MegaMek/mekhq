@@ -20,7 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-import megamek.common.Compute;
+import mekhq.Utilities;
 
 public class GMToolsDialog extends JDialog implements ActionListener {
 	private static final long serialVersionUID = 7724064095803583812L;
@@ -124,17 +124,7 @@ public class GMToolsDialog extends JDialog implements ActionListener {
 	}
 	
 	public void performDiceRoll() {
-		int value = 0;
-		int addValue = 0;
-		for (int i = 0; i < (Integer)numDice.getValue(); i++) {
-			addValue = Compute.randomInt((Integer)sizeDice.getValue());
-			// We need a 1 as a minimum
-			while (addValue == 0) {
-				addValue = Compute.randomInt((Integer)sizeDice.getValue());
-			}
-			value += addValue;
-		}
-		diceResults.setText(String.format("Result: %5d", value));
+		diceResults.setText(String.format("Result: %5d", Utilities.dice((Integer)numDice.getValue(), (Integer)sizeDice.getValue())));
 	}
 
 }
