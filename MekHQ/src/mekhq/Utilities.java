@@ -93,6 +93,20 @@ public class Utilities {
         return (rolls.elementAt(0) + rolls.elementAt(1));       
     }
     
+    /*
+     * Roll a certain number of dice with a certain number of faces
+     */
+    public static int dice(int num, int faces) {
+    	int result = 0;
+    	
+    	// Roll however many dice as necessary
+    	for (int i = 0; i < num; i++) {
+            result += Compute.randomInt(faces) + 1;
+        }
+    	
+    	return result;
+    }
+    
     public static ArrayList<AmmoType> getMunitionsFor(Entity entity, AmmoType cur_atype, int techLvl) {
         ArrayList<AmmoType> atypes = new ArrayList<AmmoType>();
         for(AmmoType atype : AmmoType.getMunitionsFor(cur_atype.getAmmoType())) {
