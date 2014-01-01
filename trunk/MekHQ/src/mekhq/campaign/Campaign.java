@@ -2191,6 +2191,10 @@ public class Campaign implements Serializable {
             sellAmmo((AmmoStorage) part, quantity);
             return;
         }
+        if (part instanceof Armor) {
+            sellArmor((Armor) part, quantity);
+            return;
+        }
         long cost = part.getActualValue() * quantity;
         String plural = "";
         if (quantity > 1) {
@@ -2207,14 +2211,26 @@ public class Campaign implements Serializable {
     public void sellAmmo(AmmoStorage ammo, int shots) {
         shots = Math.min(shots, ammo.getShots());
         boolean sellingAllAmmo = shots == ammo.getShots();
-        long cost = (long) (ammo.getActualValue() * ((double) shots / ammo
-                .getShots()));
+        long cost = (long) (ammo.getActualValue() * ((double) shots / ammo.getShots()));
         finances.credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + shots
                                                         + " " + ammo.getName(), calendar.getTime());
         if (sellingAllAmmo) {
             ammo.decrementQuantity();
         } else {
             ammo.changeShots(-1 * shots);
+        }
+    }
+
+    public void sellArmor(Armor armor, int points) {
+        points = Math.min(points, armor.getAmount());
+        boolean sellingAllArmor = points == armor.getAmount();
+        long cost = (long) (armor.getActualValue() * ((double) points / armor.getArmorPointsPerTon()));
+        finances.credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + points
+                                                        + " " + armor.getName(), calendar.getTime());
+        if (sellingAllArmor) {
+            armor.decrementQuantity();
+        } else {
+            armor.changeAmountAvailable(-1 * points);
         }
     }
 
