@@ -7255,8 +7255,16 @@ public class CampaignGUI extends JPanel {
                 refreshCargo();
             } else if (command.equalsIgnoreCase("EDGE")) {
                 String trigger = st.nextToken();
-                selectedPerson.changeEdgeTrigger(trigger);
-                getCampaign().personUpdated(selectedPerson);
+            	if (people.length > 1) {
+            		boolean status = Boolean.parseBoolean(st.nextToken());
+            		for (Person person : people) {
+            			person.setEdgeTrigger(trigger, status);
+                        getCampaign().personUpdated(person);
+            		}
+            	} else {
+            		selectedPerson.changeEdgeTrigger(trigger);
+                    getCampaign().personUpdated(selectedPerson);
+            	}
                 refreshPersonnelList();
                 refreshPersonnelView();
             } else if (command.equalsIgnoreCase("REMOVE")) {
@@ -7397,8 +7405,16 @@ public class CampaignGUI extends JPanel {
                 }
                 refreshReport();
             } else if (command.equalsIgnoreCase("DEPENDENT")) {
-                selectedPerson.setDependent(!selectedPerson.isDependent());
-                getCampaign().personUpdated(selectedPerson);
+            	if (people.length > 1) {
+            		boolean status = Boolean.parseBoolean(st.nextToken());
+            		for (Person person : people) {
+            			person.setDependent(status);
+                        getCampaign().personUpdated(person);
+            		}
+            	} else {
+            		selectedPerson.setDependent(!selectedPerson.isDependent());
+                    getCampaign().personUpdated(selectedPerson);
+            	}
             } else if (command.equalsIgnoreCase("CALLSIGN")) {
                 String s = (String) JOptionPane.showInputDialog(
                         frame,
@@ -7587,6 +7603,7 @@ public class CampaignGUI extends JPanel {
                 Person person = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
                 JMenuItem menuItem = null;
                 JMenu menu = null;
+                JMenu submenu = null;
                 JCheckBoxMenuItem cbMenuItem = null;
                 Person[] selected = getSelectedPeople();
                 // **lets fill the pop up menu**//
@@ -8036,37 +8053,27 @@ public class CampaignGUI extends JPanel {
                     if (getCampaign().getCampaignOptions().useEdge()) {
                         menu = new JMenu("Set Edge Triggers");
                         cbMenuItem = new JCheckBoxMenuItem("Head Hits");
-                        if (person.getOptions().booleanOption("edge_when_headhit")) {
-                            cbMenuItem.setSelected(true);
-                        }
+                        cbMenuItem.setSelected(person.getOptions().booleanOption("edge_when_headhit"));
                         cbMenuItem.setActionCommand("EDGE|edge_when_headhit");
                         cbMenuItem.addActionListener(this);
                         menu.add(cbMenuItem);
                         cbMenuItem = new JCheckBoxMenuItem("Through Armor Crits");
-                        if (person.getOptions().booleanOption("edge_when_tac")) {
-                            cbMenuItem.setSelected(true);
-                        }
+                        cbMenuItem.setSelected(person.getOptions().booleanOption("edge_when_tac"));
                         cbMenuItem.setActionCommand("EDGE|edge_when_tac");
                         cbMenuItem.addActionListener(this);
                         menu.add(cbMenuItem);
                         cbMenuItem = new JCheckBoxMenuItem("Fail KO check");
-                        if (person.getOptions().booleanOption("edge_when_ko")) {
-                            cbMenuItem.setSelected(true);
-                        }
+                        cbMenuItem.setSelected(person.getOptions().booleanOption("edge_when_ko"));
                         cbMenuItem.setActionCommand("EDGE|edge_when_ko");
                         cbMenuItem.addActionListener(this);
                         menu.add(cbMenuItem);
                         cbMenuItem = new JCheckBoxMenuItem("Ammo Explosion");
-                        if (person.getOptions().booleanOption("edge_when_explosion")) {
-                            cbMenuItem.setSelected(true);
-                        }
+                        cbMenuItem.setSelected(person.getOptions().booleanOption("edge_when_explosion"));
                         cbMenuItem.setActionCommand("EDGE|edge_when_explosion");
                         cbMenuItem.addActionListener(this);
                         menu.add(cbMenuItem);
                         cbMenuItem = new JCheckBoxMenuItem("MASC Failures");
-                        if (person.getOptions().booleanOption("edge_when_masc_fails")) {
-                            cbMenuItem.setSelected(true);
-                        }
+                        cbMenuItem.setSelected(person.getOptions().booleanOption("edge_when_masc_fails"));
                         cbMenuItem.setActionCommand("EDGE|edge_when_masc_fails");
                         cbMenuItem.addActionListener(this);
                         menu.add(cbMenuItem);
@@ -8083,6 +8090,67 @@ public class CampaignGUI extends JPanel {
                     cbMenuItem.setActionCommand("COMMANDER");
                     cbMenuItem.addActionListener(this);
                     menu.add(cbMenuItem);
+                    popup.add(menu);
+                } else if (areAllActive(selected)) {
+                	if (getCampaign().getCampaignOptions().useEdge()) {
+                        menu = new JMenu("Set Edge Triggers");
+                        submenu = new JMenu("On");
+                        menuItem = new JMenuItem("Head Hits");
+                        menuItem.setActionCommand("EDGE|edge_when_headhit|true");
+                        menuItem.addActionListener(this);
+                        submenu.add(menuItem);
+                        menuItem = new JMenuItem("Through Armor Crits");
+                        menuItem.setActionCommand("EDGE|edge_when_tac|true");
+                        menuItem.addActionListener(this);
+                        submenu.add(menuItem);
+                        menuItem = new JMenuItem("Fail KO check");
+                        menuItem.setActionCommand("EDGE|edge_when_ko|true");
+                        menuItem.addActionListener(this);
+                        submenu.add(menuItem);
+                        menuItem = new JMenuItem("Ammo Explosion");
+                        menuItem.setActionCommand("EDGE|edge_when_explosion|true");
+                        menuItem.addActionListener(this);
+                        submenu.add(menuItem);
+                        menuItem = new JMenuItem("MASC Failures");
+                        menuItem.setActionCommand("EDGE|edge_when_masc_fails|true");
+                        menuItem.addActionListener(this);
+                        submenu.add(menuItem);
+                        menu.add(submenu);
+                        submenu = new JMenu("Off");
+                        menuItem = new JMenuItem("Head Hits");
+                        menuItem.setActionCommand("EDGE|edge_when_headhit|false");
+                        menuItem.addActionListener(this);
+                        submenu.add(menuItem);
+                        menuItem = new JMenuItem("Through Armor Crits");
+                        menuItem.setActionCommand("EDGE|edge_when_tac|false");
+                        menuItem.addActionListener(this);
+                        submenu.add(menuItem);
+                        menuItem = new JMenuItem("Fail KO check");
+                        menuItem.setActionCommand("EDGE|edge_when_ko|false");
+                        menuItem.addActionListener(this);
+                        submenu.add(menuItem);
+                        menuItem = new JMenuItem("Ammo Explosion");
+                        menuItem.setActionCommand("EDGE|edge_when_explosion|false");
+                        menuItem.addActionListener(this);
+                        submenu.add(menuItem);
+                        menuItem = new JMenuItem("MASC Failures");
+                        menuItem.setActionCommand("EDGE|edge_when_masc_fails|false");
+                        menuItem.addActionListener(this);
+                        submenu.add(menuItem);
+                        menu.add(submenu);
+                        popup.add(menu);
+                    }
+                    menu = new JMenu("Special Flags...");
+                    submenu = new JMenu("Dependent");
+                    menuItem = new JMenuItem("Yes");
+                    menuItem.setActionCommand("DEPENDENT|true");
+                    menuItem.addActionListener(this);
+                    submenu.add(menuItem);
+                    menuItem = new JMenuItem("No");
+                    menuItem.setActionCommand("DEPENDENT|false");
+                    menuItem.addActionListener(this);
+                    submenu.add(menuItem);
+                    menu.add(submenu);
                     popup.add(menu);
                 }
                 if (oneSelected) {

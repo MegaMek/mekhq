@@ -1775,6 +1775,18 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
             }
         }
     }
+    
+    /*
+     * This will set a specific edge trigger, regardless of the current status
+     */
+    public void setEdgeTrigger(String name, boolean status) {
+        for (Enumeration<IOption> i = getOptions(PilotOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
+            IOption ability = i.nextElement();
+            if (ability.getName().equals(name)) {
+                ability.setValue(status);
+            }
+        }
+    }
 
     /**
      * This will flip the boolean status of the current edge trigger

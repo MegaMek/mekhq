@@ -86,6 +86,8 @@ v0.3.4 (SVN)
     This also includes a new mekhq.Utilities method dice(num, faces) that will roll any number of any size dice.
 + Bug [#427]: Maintenance Costs Not Showing Up
 + Bug [#422]: Retired Techs Still Perform Maintenance
++ RFE [#132]: Ability to mass modify edge triggers
+    Added this to dependent flag also
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
