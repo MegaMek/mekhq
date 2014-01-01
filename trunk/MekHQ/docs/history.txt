@@ -101,6 +101,8 @@ v0.3.4 (SVN)
     If you wish to join as reinforcements you will just export
     a mul file, join using the join button, and then load your
     mul as reinforcements.
++ Tweaked some of the XP values for the new SPAs so that they're either correct (for official ones)
+    or make sense and in line (for unofficial ones)
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
