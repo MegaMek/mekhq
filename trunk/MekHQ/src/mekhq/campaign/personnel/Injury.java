@@ -79,7 +79,7 @@ public class Injury {
 	}
 
 	public Injury(int time, String text, int loc, int type, int num, boolean perm, boolean workedOn) {
-		this(time, text, loc, type, num, workedOn, perm, false);
+		this(time, text, loc, type, num, perm, workedOn, false);
 	}
 	
 	public Injury(int time, String text, int loc, int type, int num, boolean perm, boolean workedOn, boolean extended) {

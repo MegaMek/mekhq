@@ -103,6 +103,7 @@ v0.3.4 (SVN)
     mul as reinforcements.
 + Tweaked some of the XP values for the new SPAs so that they're either correct (for official ones)
     or make sense and in line (for unofficial ones)
++ Bug: Advanced Medical Injuries workedOn and perm variables accidently swapped in 1 spot
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
