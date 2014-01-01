@@ -95,6 +95,12 @@ v0.3.4 (SVN)
 + Bug [#444]: Selling of parts bug
 + Bug: Selling N Parts doesn't refresh anything
 + RFE [#154]: Add better multiple player support for resolving scenarios with saved games
++ RFE: Join Game button in Briefing Room lets you join a game.
+    If the game is in the lounge, it adds you with your mechs.
+    If the game is in a different phase, it just connects you.
+    If you wish to join as reinforcements you will just export
+    a mul file, join using the join button, and then load your
+    mul as reinforcements.
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
