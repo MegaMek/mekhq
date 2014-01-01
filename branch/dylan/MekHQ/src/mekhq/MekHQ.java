@@ -366,6 +366,7 @@ public class MekHQ implements GameListener {
                 campaigngui.refreshReport();
                 campaigngui.changeMission();
                 campaigngui.refreshFinancialTransactions();
+                campaigngui.refreshOverview();
             }
 
         }// end try

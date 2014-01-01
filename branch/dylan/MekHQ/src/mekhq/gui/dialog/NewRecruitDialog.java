@@ -226,6 +226,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
         hqView.refreshDoctorsList();
         hqView.refreshReport();
         hqView.refreshFinancialTransactions();
+        hqView.refreshOverview();
     }
 
     private void randomName() {
