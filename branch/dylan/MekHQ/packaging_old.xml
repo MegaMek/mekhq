@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Author: Jay Lawson -->
+<!-- I am attempting to rewrite this build code more along the lines of packaging.xml in MM-->
+
+<project default="release" name="MekHQ" basedir=".">
+
+	<!-- Global properties for this build -->
+
+	<property name="version" value="0.1.21"/>
+	
+	<property name="srcdir" value="src" />
+	<property name="logdir" value="logs" />
+	<property name="builddir" value="classes" />
+	<property name="libdir" value="lib" />
+	<property name="datadir" value="data" />
+	<property name="apidocsdir" value="apidocs" />
+	<property name="docdir" value="docs" />
+	<property name="confdir" value="mmconf" />
+	<property name="svndir" value="svndev" />
+	
+	<!-- Version and packaging properties -->
+	<property name="project.name" value="mekhq" />
+		
+	<!-- same as builddir but under svn -->
+	<property name="svnbuilddir" value="${svndir}/${builddir}" />
+
+	<!-- svnroot used for svn authentification -->
+	<property name="svnroot" value="svn://svn.code.sf.net/p/mekhq/code/MekHQ" />
+
+	<property name="timestampfile" value="${logdir}/timestamp" />
+	<property name="TinyXMLsrc" value="TinyXML07-src.zip" />
+
+	<!-- Name of the target jarfile and the class containing the main-Method -->
+	<property name="jarfile" value="MekHQ.jar" />
+	<property name="jarmainclass" value="mekhq.MekHQ" />
+
+	<!-- This is the relative path to the 'data' directory -->
+	<property name="dataclasspath" value="." />
+
+	<!-- Build the list of the lib/*.jar files to be included in the "Class-Path" attribute of the jar's manifest dynamically.  -->
+	<!--
+	<pathconvert pathsep=" " property="jarclasspath">
+		<path>
+			<fileset dir="lib/">
+				<include name="*.jar" />
+			</fileset>
+			<fileset dir=".">
+				<include name="MegaMek.jar"/>
+				<include name="MegaMekLab.jar"/>
+			</fileset>
+		</path>
+		<mapper>
+			<chainedmapper>
+				<flattenmapper />
+				<globmapper from="*" to="lib/*" />
+			</chainedmapper>
+		</mapper>
+	</pathconvert>
+	-->
+
+	<target name="svndev-init">
+		<tstamp />
+		<delete dir="${svndir}" />
+		<property name="dist" value="${project.name}-${version}" />
+	</target>
+
+	<!-- following svndev-* tasks get, build & package the current version from svn -->
+	<target name="svndev-get" depends="svndev-init" description="get the latest source from SVN">
+		<exec executable="svn">
+			<arg line="export ${svnroot} ${svndir}" />
+		</exec>
+	</target>
+		
+	<target name="svndev-build" depends="svndev-get" description="compile project from SVN and generate JAR file" >
+		<mkdir dir="${svnbuilddir}" />
+		<!-- compile -->
+		<echo message="MekHQ" />
+		<javac debug="true" debuglevel="lines,source" target="1.5" source="1.5" destdir="${svnbuilddir}" srcdir="${svndir}/${srcdir}" memoryInitialSize="512m" memoryMaximumSize="512m" fork="true">
+			<classpath>
+				<pathelement location="${svndir}" />
+				<fileset dir="${svndir}/${libdir}" includes="*.jar" />
+				<fileset dir="${svndir}" includes="MegaMek.jar" />
+				<fileset dir="${svndir}" includes="MegaMekLab.jar" />
+			</classpath>			
+		</javac>
+
+		<!-- jar -->
+		<jar basedir="${svnbuilddir}" jarfile="${svndir}/${jarfile}" manifest="manifest.txt">
+			<fileset dir="${svndir}/${srcdir}" includes="**/*.properties"/>
+		</jar>
+
+		<!-- Ensure that the log directory exists. -->
+		<mkdir dir="${svndir}/${logdir}" />
+		<touch file="${svndir}/${timestampfile}" />	
+	</target>
+		
+	<target name="svndev-clean" description="remove the SVN build directory">
+		<delete dir="${svnbuilddir}" />
+	</target>
+	
+	<target name="bundle" description="Bundle the project built from SVN into a distribution">
+		<mkdir dir="${dist}" />
+		<copy todir="${dist}">
+			<fileset dir="${svndir}" >
+				<include name="${jarfile}" />
+				<include name="${libdir}/*.jar" />
+				<include name="${logdir}/" />
+				<include name="${datadir}/" />
+				<include name="${docdir}/" />
+				<include name="${confdir}/" />
+				<include name="campaigns/" />
+				<include name="campaigns/FoxsTeeth.cpnx" />
+				<include name="MegaMek.jar" />
+				<include name="MegaMekLab.jar" />
+				<include name="README.txt" />
+				<include name="SubmitBug.html" />
+				<include name="license.txt" />
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="zip" description="Create a zipfile of the distribution">
+		<zip zipfile="${basedir}/${dist}.zip" basedir="${dist}"  />
+	</target>
+	
+	<target name="clean">
+		<delete dir="${dist}" />
+	</target>
+		
+	<target name="package" depends="bundle, zip, clean" description="Package a  distribution of the project built from SVN"/>
+	
+	<target name="release" depends="svndev-build, package, svndev-clean" description="Build and package a release"/>
+	
+</project>

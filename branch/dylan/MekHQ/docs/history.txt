@@ -1,0 +1,1839 @@
+VERSION HISTORY
+----------------------------------
+v0.3.4 (SVN)
++ Bug: Moved Report Log not scrolling again (don't force set caret to 0 on refresh)
++ Bug: Personnel name not showing when GM->Remove is used
++ Bug [#403]:Unofficial Expanded Medical Bug
++ Refactor some Advanced Healing methods from Person to Injury where they belonged (as static methods)
++ Bug [#411] Hanger - sort by Status failure
++ use a proper rank object to record rank
++ new table for entering in rank information in campaign options with optional payment multipliers
++ changed structure of the rank tab in CampaignOptionsDialog
++ added campaign variable to personnel, removed it as a passed in variable from all personnel methods
++ added campaign options to adjust salary parameters
++ feature: set specific salary for a person
++ set up fake assets for loan collateral and income streams
++ clan phenotypes - you can choose the percentage of recruits for each type that should be trueborn in options
++ backwards compatability for clan phenotypes
++ unofficial option for tougher healing checks depending on the number of hits
++ Bug [#394]: Mothball Techs not removed from list of available techs
++ Bug [#402]: Rush Jobs and Tech Skill Level
++ Bug: gender variable set as static in Personnel, so all personnel same gender
++ Bug: background and phenotype not saved to xml
++ adjusted age randomizer to make clanners younger (trueborns only)
++ Bug [#414]: News.xml Issues
++ refactoring of packages in campaign - update your SVN
++ removed PersonnelMarketDialog.personnelTableModel and ServicedUnitTableModel - they use PersonnelTableModel and UnitTableModel, respectively
++ Minor Planetary Data Update
++ Added entries in News.xml for 3009-3014, 3048-3049, and 3058-3061
++ RFE [#130]: Limit to acquisition per character
++ RFE [#100]: GM Tab/Tools: "Dice" + Notification Scheduling
+  This is a very basic implementation for now. Only contains a dice roller.
+  Dialog is non-modal, so you can open it and continue to interact with the
+  main GUI.
++ Bug: No revision detection in Version.java meaning no revision check for new rank system
+  to be compatible with revision based releases
++ Bug: Personnel Market always empty after TableModel change
++ Bug [#412]: Support Ratings - Field Manual Mercs (rev) fixed.  Interstellar Ops Reputation coming soon.
++ Bug: acqusition limit check causes NPE with automatic success
++ Updated Unit Rating code to pick up the flagged commander (if set).  If no flagged commander is set, then will fall back to old method of sorting by rank and then experience.
++ Bug: Ultra-Green doesn't sort as less than Green
++ BattleArmorSuit, MissingBattleArmorSuit, BattleArmorEquipmentPart, and MissingBattleArmorEquipmentPart
++ Bug: value of armor and ammo changing when in salvage status
++ Converted "Taharqa" unit rating method to the "Interstellar Ops Reputation" unit rating method.  Still need to finish off the text breakdown and help text.
++ backwards compatatiblity for Battle Armor
++ Fixed "divide by zero" error in 'Interstellar Ops Reputation' rating method.
++ Added in the detailed breakdown and Help text for Interstellar Ops Reputation unit rating method.
++ new MM.jar
++ BattleArmorAmmoBin part
++ a few corrections to costs for BA parts
++ Updated MegaMek.jar (r9907)
++ Gender pronoun returning ?
++ Bug [#417]: Missing Backwards Compatibility for Ratings Changes
++ Bug [#419]: Transport Rating Not Included
++ Interstellar Ops Reputation was not re-initializing when rating methods were switched.
++ Bug [#417]: Missing Backwards Compatibility for Ratings Changes minor further change
++ Bug [#420]: IO Rating Issues
++ new MM.jar
++ some fixes to BA parts
++ Added View and Edit buttons to salvage dialog
++ Bug: Salvage View and Edit buttons not showing the proper entities
++ Bug: Personnel Market "Dylan's Method" not reporting on update
++ Pulled MegaMek and MegaMekLab versions into MekHQ's About Box
++ Started a new doc file containing a full MekHQ Tutorial (Tutorial is still a work in progress)
++ Bug: Callsign not showing
++ Bug: Prisoner/Bondsman not working correctly since new rank system introduced
++ New MM.jar
++ Compatibility with new MM.jar
++ New MM.jar - again (for XMLStreamParser fix)
++ New MML.jar
++ Compatibility with new MML.jar
++ Compatibility with MegaMek & new MegaMek.jar (10231)
++ Customization of Aeros & new MegaMekLab.jar (1274)
++ Bug: All Aero subclasses were enabling the customize in lab option
++ Bug [#432]: Units Histories cause a Display bug in TO&E
++ Bug [#434]: Balance Sheet link error
++ RFE [#149]: Manual assignment of quality ratings (Mechs)
++ RFE [#149]: Manual assignment of quality ratings (Parts)
++ Bug [#426]: Aerospace fighters showing "undamaged" after combat; ferro-aluminum armor missing (partial, armor only)
+    Additionally this immplements Improved Ferro-Aluminum, Ferro-Carbide, and Lamellor Ferro-Carbide. In order to implement
+    those a new MM.jar file was also required.
++ Bug [#430]: Straight support calculation error
++ Bug [#438]: Unable to load .mul
+    This had actually been disabled on purpose pending a fix to an infinite loop bug in the code that is used to generate
+    proper crews for multi-crewed vehicles.
++ Bug [#442]: GM Tools: Dice Roll gives nothing above 10
+    This also includes a new mekhq.Utilities method dice(num, faces) that will roll any number of any size dice.
++ Bug [#427]: Maintenance Costs Not Showing Up
++ Bug [#422]: Retired Techs Still Perform Maintenance
++ RFE [#132]: Ability to mass modify edge triggers
+    Added this to dependent flag also
++ RFE [#152]: Mass assign kills for vehicle crews
+    All selected people must either be crewing the same unit or be unassigned.
+    Additionally I also made it so the kill dialog now puts the unit name if
+    there is one, of Bare Hands if there isn't, instead of Bare Hands always.
+
+v0.3.3 (2013-09-20)
++ Bug: Refits always return an IMPOSSIBLE target roll
++ RFE: Allow ASF to be Refit (but not customized)
++ Bug: No way to remove individual camo
++ Bug: Individual camo always set on refit completion
++ Bug: Inactive Prisoners and Bondsmen included in count on summary
++ Mothballed units only cost 10% to maintain using unofficial maintenance costs
++ Bug: part quality not saved to campaign xml
++ Bug: Mass assign menus were incorrectly letting you assign people to roles they don't fit
++ Bug [#397]: Mass Assign Units Can Cause Unit To Show Too Many Assigned
++ html tags in report link to unit and personnel views, use unit.getHyperlinkedName(), person.getHyperlinkedName(), and person.getHyperlinkedFullTitle() in report strings
++ changed report to display only one day of activity
++ news reports (see data/universe/news.xml for details and example)
++ Implemented parts loot (Just a quick hack to make it work, full re-write to be like Units will be for Taharqa if he wants)
++ Bug [#398]: Assigning Tech to Large Craft Maintenance
++ Bug: assigning of techs to Small Craft maintenance and repair confused - should always use Aero tech
++ Bug [#396]: assign tech list oversized without scrolling
++ RFE: Personnel Market - This market should be used in place of Hire and Hire in Bulk
+  options and provides a more realistic atmosphere of transient personnel availability
++ Bug: Personnel Market shows rank instead of Person for Graphic, and vice versa for General
++ Bug: Personnel Market incorrect renderer
++ last maintenance report now kept for each unit, no more logging
++ Bug [#400]: personnel ages in the personnel market
++ refactored BasicInfo and Sorter classes from CampaignGUI into separate files
++ used separate PersonnelTableModel for PersonnelMarketDialog.java
++ refactored PersonnelTableModel to a separate class (experimental)
++ Bug: No maintenance costs when not using the new StratOps maintenance options
++ Major refactoring of CampaignGUI, phase one - all TableModels and initComponents refactored
++ Major refactoring of CampaignGUI, phase two - cleanup
++ backwards compatability - large vessels had enginepart in addition to spacecraft engine leading to inflated values
++ Major update to the Personnel Market (WIP)
+  There are now four methods of randomization to choose from.
+  Dylan's method and the Random (original implementation) method both generate daily, but don't "clear"
+  Dylan's method uses a weighted version of the Random method to frequently choose personnel for your most common unit type(s)
+  Random method is totally random, though it now has options on how personnel are removed based on roll on 2d6 (if it's less than that target)  
+  FM:Mercs Revised method is as close as I could code to what that book offers with a couple of TODO for roll modifiers
+  StratOps method follows the rules in StratOps based on whatever you set your Maint. Cycle as
+  This is still a WIP and there are currently no tooltips for the options.
++ Bug: Report pane not scrolling with reports
++ Updated MM and MML jar files
++ Updated UnitSelectorDialog to be compatible with new MM jar
++ Bug: Dylan's Method in Personnel Market incorrect percentage conversion
++ Bug [#401]: Personnel Market Sorts Incorrectly
++ Bug: parts in Loot not saved to XML
++ Bug: advanced search dialog shenanigans
++ Bug: Re-implement fix for UnitSelectorDialog from "+ Updated UnitSelectorDialog to be compatible with new MM jar"
++ RFE: Hyperlink Personnel Market refresh report
++ report text pane restructured into a vertical and detachable split pane
++ double-clicking on personnel and unit table expands and collapses the view
++ determine initial size based on users screen size
++ couple of grammatical corrections
++ Bug: partial repair penalty applied to unmaintained units
++ added Repair bay hyperlink to units damaged by maintenance
++ Added CampaignGUI.getTabIndexByName()
++ Bug: CampaignGUI.focusOnUnit() and CampaignGUI.focusOnPerson() using hard coded indexes (now uses CampaignGUI.getTabIndexByName())
++ Bug: Phantom Weapons on ASFs as a result of weapon groups not being filtered out in Unit.initializeParts()
++ Bug: Phantom Weapons due to EquipmentParts being skipped during campaign file loading
+   I've added a routine that should remove these phantom parts as well
++ Bug [#404]: Unable to assign Quirks to mechs
++ new MegaMek.jar
++ resolve scenario wizard now allows for viewing and editing of all units
+
+v0.3.2 (2013-09-13)
++ maintenance checks (WIP)
++ Bug: maintenance options not being saved
++ added optional logging of maintenance rolls
++ Bug: Non-active personnel showing in infirmary when they have injuries under advanced injuries rules.
++ Bug [#388]: Penalty For Clan Tech Still Applied w/ Clan Trained Techs
++ RFE 122: Personnel kill tracking
++ allow assignment of tech to more than one maintenance job
++ show unit status column on general view
++ assign tech for maintenance from unit context menu
++ Bug [#389]: Certain Parts on Clan Mechs Not Receiving Clan Penalty
++ Improved Cargo Handling & Added a Transport Overview
++ Bug: Prisoners & Bondsmen mixed when sorting by rank
++ Bug [#391]: Repair tasks no longer show if the replacement part is available or not
++ Bug [#392]: Scenario Force Icons do not size the same as the TO&E
++ Bug: GM Mode Complete Task for Ammo Acquisition fails and reports: You shouldn't be here (AmmoBin.find())
++ Bug [#386]: Missing help text for Finances tab
++ RFE [#108]: MM and MML histories & other docs
++ maintenance fixes for self-maintained vessels
++ added a Unit.isAvailable convenience function for units that are not deployed, are present, and not refitting and whatever else in the future would disallow making various types of changes
++ allow mothballing of units
++ graphical display option for personnel and unit table
++ pay individual unit maintenance costs when maintenance cycle is up instead of weekly all at once
++ used parts value options depend on quality rating
++ Bug: Customs files created when loading a campaign get saved under a "My Campaign" folder because campaign name isn't set yet
++ Bug: Customs disappearing from campaign saves
++ packaging_local.xml updated to keep in line with full packaging.xml functionality
++ docs folder cleaned up to prevent duplicates now that we import the megamek and megameklab docs
++ Bug: mekhq.png in data/images/misc wasn't being included in releases
++ Bug: new graphical hits images not included with either packaging file
++ Fixed megamek.4j.xml file to force inclusion of new xml save libs
++ new Report class - allows for flexible inclusion of various generated reports
++ moved overview items to a reports menu
++ more packaging fixes to pull files from other projects automatically
++ removed overview tab code from CampaignGUI
++ export personnel and unit tables as CSV
++ unofficial option to set minimum hits and randomize hits for wounded multi-vehicle crews and infantry
++ new feature: add potential loot (currently money and units) to scenario that can be added during scenario resolution
+
+v0.3.1 (2013-09-5)
++ Planetary Data Update 36
++ New MegaMekLab.jar
++ Bug 366: Broken MekLabPanel compile with latest MML trunk compiled into jar
++ Bug: Conventional fighter pilot addition code not correctly reassigning Vessel Pilots.
++ Bug: canPerformRole() missing check for conventional fighter pilots.
++ Bug: Conventional fighter pilot backwards compatibility check correction for 0.3.0 to 0.3.1
++ Bug: Campaign file upgrade code runs twice on old campaigns
++ Bug: More conventional pilot fixes.
++ Check if existing Aerospace Pilots with Conventional Sklls and adjust to conventional pilots.
++ Add "Conventional Pilots" to the GUI's Personnel tab sort by type dropdown
++ Bug 363: All "new" units end up with no camo and the blue default non-camo colorization when a campaign camo is set.
++ Updated MegaMek.jar with revision 9541
++ Updated getTechLevel() calls to include a year for compatibility with MegaMek.
++ Update MegaMekLab.jar
++ Fix deprecation warnings with new MegaMek.jar
++ New MegaMek.jar to fix Tanks.java NPE
++ Changed how the Individual Camo option is displayed.
++ Bug 369: Removing / Paying Off Loans
++ Added more bank names for the loan randomization
++ Removed arbitrary secondary role limitation - Many of my techs are also (albiet poor ones) MechWarriors.
++ Make Male/Female portrait folders so they can be embedded inside other folders.
+    Also allow folders that just end in Male or Female (ie ralgith_Female)
++ Added four Canon banks to the array for randomizing the bank name for Loans
++ Fixed bug with hangar popup menu not displaying Customization options (accidentally deleted the menu.add() call)
++ Added conventional pilots to getAbilitiesFor()
++ Bug: GM Menu letting you Add XP even when not in GM Mode
++ Bug: GM Menu missing heal item
++ Added Jayof9s' Advanced Healing System
++ Added random experience to new recruits
++ Added menu items to Import/Export Personnel
++ Bug: Missing critical modifier for non-MW/ASF
++ Bug: Duplicated injuries
++ Bug: Injury time resets
++ Bug: Should only be 1 head injury possible
++ Added an Edit Injuries GM Option to the right click menu. Disabled as the background code is a WIP.
++ Bug: Vessel Crew/Pilots/Gunners/Navigators can't be multi-selected and assigned
++ Completed the Edit Injuries
++ Update the packaging scripts and utils folder to include the l4j.ini files for MegaMek and MegaMekLab
++ Update the MegaMek.app plist to grab the new libs for MegaMek's XML saves
++ Add MekHQ icon in png format to data/images/misc folder for usage by UNIX/Linux dist.
++ Dylan's Random Xp now uses unofficial campaign option.
++ Bug: All personnel were showing 'Returned from combat with the following injuries', even when uninjured.
++ Bug: Concurrent Modification Error with injuries on advance day
++ Bug: Windows version won't work when using "Start Game" from inside MekHQ
++ Bug: ProtoMech and Battle Armor "Armor" fixes for missing "instance of ..." in a lot of places.
++ Bug: Import Personnel adds twice & NPE when importing Personnel
++ Bug: Ghost Patients (doctor ID not correctly set to NULL when healed using injury system)
++ Bug: Edit Injury dialog not sized correctly for the column widths
++ Bug: Random Xp Option not visible
++ Bug: Resolution IndexOutOfBoundsException error
++ Bug: Critical Healing success for Advanced Injuries incorrect
++ Bug: Missing healing messages
++ Verify entity externalId matches UUID when loading campaign
++ Bug 374: Duplicate ExternalIDs
++ Bug 372: Refits start before parts/refit kit arrives in trunk.
++ removed Java 7 code. Do not use Java 7 please!
++ allow user customizable waiting time in days between healing checks
++ Bug: Dropships, Jumpships, and Warships with consolidated ammo (ie. LongTom Ammo:125) not detecting max ammo correctly
++ Bug: Views (Most especially Repair Bay) not refreshing after undeploying units from a scenario.
++ Bug: Hangar Right Click->GM Mode->Undeploy not working
++ Bug 373: Warship (dropships? jumpships?) can have scheduled tasks worked on twice per day [#373]
++ Bug [#343]: MegaMek server cannot be restarted if it terminates prematurely (doesn't reach the victory phase)
++ Bug [#360]: Dragoon's Rating (both methods) doesn't take loans into account
++ Bug: Incorrect pronoun usage in injuries and reports
++ Bug [#120]: Load forces from MUL file doesn't load the pilots
++ Added a "random" crew generator that will create a crew with a specific skill target (For Bugs [#120] and [#233] - I'll fix 233 at a later time)
++ WIP [#193]: Financial issue - incorrect value on Jumpship sale
++ Feature: Prisoners and Bondsmen. You can now set this via the right click menu.
++ Bug: Prisoners and Bondsmen get paid.
++ Cargo Weight and Capacity on status bar
++ Bug [#375]: No Task XP From Procurement
++ Acquisitions Table improvements (Multi-select for GM Options & Items with 0 quantity no longer hang around)
++ RFE [#68]: Dependents (0-salary AsTechs)
++ RFE [#88]: Ability to assign an overall commander and abilities
++ RFE [#109]: Import/export parts
++ RFE [#77]: Add "Ammo Bin" category in Warehouse
++ RFE [#117]: Filter Parts by "In Transit"
++ Bug: Deploying a force, then deploying it's parent force, has the first force deployed twice.
++ Bug: Undeploy Unit doesn't correctly undeploy it's parent forces
++ RFE [#61]: Undeploy single units from TO&E
++ WIP RFE [#70]: Garrison & Factory Tags
++ Rounding for Cargo values!
++ WIP RFE [#70]: Garrison & Factory Tags, part 2
++ Bug: Commander flag incorrect code (Swapped "Better" CO)
++ RFE [#80]: Alternate Missile Tracking
++ Bug: Divide by zero in new ammo tracking code
++ Completed TODO for changing how onWarehouseTab() checks which tab it's on
++ NPE when attempting to resolve via MekHQ launching MegaMek due to new
+    "Prisoners and Bondsmen" code that should have been commented out.
++ Added "Undamaged" to Warehouse sorting
++ WIP RFE [#99]/[#63]: Overview Summary / Statistics page (So far only the basic layout and the Dragoons Rating section are finished)
++ Planetary Data Update 37
++ WIP RFE [#99]/[#63]: Overview Summary / Statistics page (Combat Personnel and Support Personnel overviews completed)
++ Bug: NPE when using a starting faction at a era where it has already died out (ie. Smoke Jaguars in 3067)
++ Condensed Overview personnel tabs into a single tab with a split pane.
++ Updated the data/mechfiles folder with the current (MM r9679) data in zipped format
++ Data [#2]: Sorensons Sabres Campaign Pack
++ Bug: URL Escape NPE for MercRosterAccess
++ Bug: Merc Roster Upload never completes
++ RFE: Customizations embedded in data/customs/<campaign name>/ folders for ease of sorting.
++ RFE: Percentage based maintenance costs
++ Bug: Support costs calculated off payroll, should be off maintenance
++ Bug: Edit Injury dialog doesn't refresh the Infirmary
++ Added a bit of logging for Refits when a part is null in the method to check if all parts have arrived
++ Bug: Cargo Tonnage/Capacity label causes NumberFormatException due to localization of numeric strings
++ Bug: Personnel Overview incorrectly showing MIA/KIA/Retired personnel in the active counts
++ Bug: Removing a person or changing their status does not display their name in the confirmation dialog
++ RFE: Right click unit in TO&E has option to go to unit in hangar and to go to pilot/commander in personnel
++ WIP RFE [#99]/[#63]: Overview Summary / Statistics page
+    (Hangar overview now has Mechs, ASF, Combat Vehicles, and Gun Emplacements. Other units later)
++ Bug: Cargo counts "In Transit" too
++ WIP RFE [#99]/[#63]: Overview Summary / Statistics page (Hangar Overview Finished)
++ Added unit name to refit confirmation dialog
++ RFE: Clan Trained Technician flag for captured clan techs to ignore the modifier for clan equipment
++ Bug: Commander, Dependent, and Clan Trained Technician flags not saving/loading in XML
++ Bug: Machine Gun Ammo reloads working incorrectly
++ Bug: NPE with new clan trained tech check
++ Bug: Bad hardcoded file separators with custom units created in the MekLab
++ Bug: Missing MASC Edge check
++ Bug [#378]: Thruster Repair (Missing Thruster Part)
++ Bug [383]: Weapons with incorrect multiple weights in Parts Store
++ Bug: NPE (Again) when trying to save to a campaign named folder if the folder doesn't exist
++ Bug [#384]: Gun Emplacements cannot be added to TO&E
++ Modified TO&E Menus to disable submenus with no items in them
++ unofficial option to destroy/damage parts by the margin of failure rather than by skill level of tech
++ Bug: NPE when resolving with a Gun Emplacement in your deployed forces
++ Bug: When using advanced medical option injured pilots not hightlighted in red on TO&E
++ Bug: salvage being added even if not in control of field when resolving through megamek
++ Rewrote file exists exception to use IOException instead of Java 7's FileAlreadyExistsException
+
+v0.3.0 (2013-04-25)
++ Bug 341: Conventional Pilots and Hire Full Complement
++ New acquisition procedure (see comments in ShoppingList for details)
++ Bug 342: NPE displaying Dragoon's Rating if unit has no commander
++ ShoppingListDialog
++ Bug: all acquisitions failing
++ better reporting in repair bay about acquisitions
++ added waiting times to shoppingList display
++ Bug 338: Dragoon's Rating error for tech support FMM:R method
++ Bug 334: Support hours for secondary personnel in dragoons rating
++ transit times for parts (highly customizable in campaign options)
++ Option to base mercenary contracts on value of force in TO&E (per StellarOps Beta)
++ Bug 260: BLC error (base on buy value no sell value)
++ Bug 350: Dragoon's Rating error FMM:R method for transportation
++ Data 1: Additional Force Icons
++ Dylan's Force Icons
++ Loans
++ disallow negative funds (take out loans instead) - still need to implement loan default
++ don't allow new day advancement until overdue loans are dealt with
++ finances.isInDebt change calculation to account for loans
++ loan payment and principal transaction codes for Transaction
++ LoanTable in finance tab
++ LoanTableMouseAdapter with Default, pay off, and remove (GM) options - need pay off collateral option
++ Bug: NPE in DragoonsRatingRevised
++ Bug 340: Dragoon's Rating error FMM:R method when in debt
++ Bug: overdue status not removed on loan payment
++ Bug 323/Patch 25: Individual camo not saving from MM/Patch for individual camo
++ Patch 26: GM Mode complete Task/Acquisition
++ Bug: Adjustment to Patch 26 code to support part transit times.
++ added context menu options Cancel Order and Deliver Part Now (GM) in warehouse
++ backwards compatability for conventional pilot types
++ put procurement list in warehouse tab instead of dialog
++ mouse adapter for procurement list table
++ restructured ShoppingList to add IAcquisitionWork instead of part
++ changed ShoppingListDialog to ProcurementTableModel and placed in CampaignGUI
++ put in can't afford it checks to ShoppingList.addShoppingItem and ShoppingList.newDay
++ Unit purchasing now used same method as parts acquisition
++ Unit procurement table in hangar tab
++ procure single and all item menu items for GM mode in ProcurementTableMouseAdapter
++ Bug: equipment parts not recognizing same status in warehouse
++ Bug: too much armor for custom refits
++ Bug: display off armor needed in refits incorrect
++ refit kits should take time too
++ refit kit fixes
++ change references to "shopping list" to "procurement list"
++ pay for recruitment option (2 x monthly salary)
++ option to disable StellarOps loan limits
++ recalculate loan limits based on rep modifier rather than dragoon rating
++ Bug: checking for insufficient funds when units and parts pay for options are false
++ Bug: wacky delivery times when acquisition roll set to auto success
++ Bug: NPE on unit purchases when they have no model name
++ financial report on finance tab
++ various Protomek parts
++ upload data to mercroster (wip)
++ protomek jump jet part
++ various fixes to protomech parts
++ removed outdated Part.getPartType
++ protomech gunnery skill and associated checks for protomech pilots
++ bug with ammo bin finding ammo
++ salvaged engine reduces proto to 0 MP
++ Fix for ammo counting on protos
++ adjustments for proto myomer booster and some WoR adjustments (jump jets and quad)
++ ammo fixes for protos
++ Ba Armor part
++ couple of proto fixes
++ New MegaMek.jar (9246)
++ PayCollateralDialog (WIP)
++ collect parts that should be the same when loading game for backwards compatability
++ Bug: warehouse parts go missing on save and re-load
++ Bug: no cap on clan price modifier max
+
+v0.2.0 (2013-03-16)
++ Bug 318: Dragoon's Rating error FMM:R method
++ Bug 332: Dragoons Rating error FMM:R tech support
++ Bug 331: Text bug
++ Bug 335: Mech needing repair not showing up in repair bay
++ Removed all the unnecessary code from mm-startup.sh, lab.sh, and hq.sh.
+
+v0.1.24 Release Candidate 3 (2013-03-12)
++ added version number to log file
++ confirmation dialog on deleting mission
++ Bug 317: New Force when canceled
++ confirmation dialog on deleting scenario
++ Bug 318: Dragoon's Rating error FMM:R method
++ Bug 320: Payment error for early failed contracts
++ Bug 319: Repair Bay ArrayIndexOutOfBoundsException
++ Planetary data update 35
++ better version tracking in campaign loading
++ escaping of some user data entry fields that were not being escaped 
++ Bug 324: Deployment delay is being saved
++ Bug 328: weapon specialization does not save
+
+v0.1.23 Release Candidate 2 (2013-03-03)  
++ updated code for changes to MegaMek entity.setC3Master
++ Bug 312: Multiple entries in the units.cache
++ Bug 309: MekLab Body part Issue
++ Bug 310: Contract Travel Time
++ Bug 308: Quirks not exported to MUL files
++ Bug 313: Gyro damage /= gyro destroyed
++ Updated MM.jar to r9180
++ Bug 311: Unable to remove Contracts/Missions
++ Fixed a few of raw type references,
+    but there are still over 100 more on JComboBox
+    and DefaultComboBoxModel that I don't know how to handle.
+
+v0.1.22 Release Candidate 1 (2013-02-17)
++ Bug: not able to save game when a refit with c3i is in progress
++ Bug 298: Missions disappear after edit, not able to save
++ Bug 303: Bulldog and Goblin Tanks prevent reload
++ Bug 154: Refit Kits - not clearing out
++ Bug 292: Missing Mech Bug (TO&E freezing up)
++ Bug 96:  No differentiation between salvaged and acquired head (partial: cockpits not pre-loaded)
++ Bug 293: Null Campaign
++ Bug 304: Problems setting planet in contracts/mission
++ Put personnel type (e.g. Driver, Crew) after unit name in personnel roster for beter sorting
++ Bug 305: Tracking Dead w/ Ejected Pilots
++ RFE 60: Save File Timestamp Change!
+
+v0.1.21 (2013-02-07)
++ Bug: infinite loop in MekGyro#updateConditionFromEntity
++ Added four shell files for Linux/UNIX users to start megamek easier.
+        hq.sh - starts MekHQ
+        lab.sh - starts MML
+        mm-server.sh - starts MegaMek with 1GB of RAM and uses the full script from the MegaMek package to use $HOME/.megamek
+        mm-startup.sh - starts MegaMek with 512MB of RAM and stays in the local MekHQ folder
++ Planetary Update 27, 28, and 29 
++ update to stay current with MML
++ Planetary Update 30
++ updates for infantry in MekLabPanel
++ Planetary Update 31
++ updated location of MechView in MM.jar
++ Planetary update 32 and 33
++ updated MM and MML jars
++ updated packaging.xml
++ added an unscrambleEquipmentNumbers routine to campaign loading to deal with changing equip numbers in mounted
++ Bug 291: KIA,MIA and retired support personnel still count towards support needs.
++ check for invalid force ids in loading (associated with Bug 292)
++ part of Bug 294: Contract Location - hitting enter multiple times
++ Bug 297: MekLab outer stats doesn't correctly handle prototype DHS
++ Bug 296: Targeting Computer's weight tracked incorrectly
++ Planetary update 34
++ Bug 289: NPE on invalid location of Artemis IV FCS
++ Bug 287: Campaigns not saving tank motive system and engine hits
++ Bug 285: File not loading; Error refers back to Log file. (xml character escaping for equipment names)
++ Bug: NPE for contract dates
++ Bug 295: Mech Salvage selection bug after battle
++ Bug 281: Error with tech limits
++ updated MegaMek.jar
++ updated MML.jar
++ new mekhq icon
++ updated packaging_utils for windows build
++ Bug 304: Problems setting planet in contracts/mission
+
+v0.1.20 (2012-10-12)
++ skip over entities in mul without externalIDs during scenario resolution (related to Bug 233)
++ Bug 275: Refit Description Bug
++ Bug 273: Customizing Infantry in MekHQ
++ Bug 272: Strange NPE on repair bay
++ new packaging.xml (WIP)
++ better windows executable packaging (just need better icons)
++ Bug 261: Name change: Mobile Field Base to Field Workshop
++ Bug 274: FMM:R DropShip tech support bug still not fixed
++ Bug 270: Dragoons error (both Taharqa and FMM:R methods)
++ Unit Loading Error Dialog to alert users to which entities MekHQ can't find in their files when loading
++ When save fails, existing save file is not overwritten by corrupted one
++ Bug 257: Reversing Weapons issue in MegaMekLab
++ Bug 258: Turrets of same weight being replaced
++ Planetary update 26
++ Bug 259: Doubling of IS/Clan ammo
++ error dialog when customized unit name is already in use
++ Bug 276: Secondary Role -> Doctor
++ SpacecraftEngine part
++ Bug: Overnight replacements get an Impossible repair roll on the replacement part
++ AeroLifeSupport part
++ non-part costs added for dropships/small craft
++ fixes to FireControlSystem costs for dropships/small craft
++ DropshipDockingCollar part
++ updated MM.jar
+
+v0.1.19 (2012-10-05)
++ new MML.jar (should fix bug #271)
++ Bug 269: missing file: non_combat_units_list.conf
++ Bug 262: Dragoon's Rating tech support error when using the FMM:R method
++ Bug 265: Missing final contract payment
++ Bug 266: Choose-Unit price Alpha sort
++ Planetary data update 25 
++ Conventional infantry customization (won't work until updated MML.jar is available)
++ updated MM and MML jars
+
+v0.1.18 (2012-09-29)
++ kill logs now editable
++ Bug: shorthanded mod for dropship/jumpship crews
++ Bug: dropship/jumpship repairs not being scheduled
++ Bug: incorrect price multiplier for jumpships, warships, and space stations
++ updated svn call in packaging.xml
++ new MegaMek.jar
+
+v0.1.17 (2012-09-28)
++ Bug 3529464: Divide by zero - Dragoon's Rating
++ Fixed NumberFormatException in AbstractDragoonsRating
++ Updated MegaMek.jar to r8823 for new Ultra AC options & unjamming bugfix
++ fixed error in FieldManualMercRevDragoonsRating - no BigDecimal.HUNDRED Bug 
++ Bug 3529484: Tanks tagged as custom do not save to campaign file properly
++ Non-canon costs for infantry and infantry parts (WIP)
++ Fixed problem with Dragoons Rating Transport score not being limited to a max of 25.
++ InfantryArmorPart and other infantry parts improvements
++ Bug: new parts purchased for used cost
++ Bug 3530312: miscalculation in parts repairs.
++ Bug: units limited by calendar year even when option was not checked
++ Bug 3531266
++ Planetary data update 17
++ Bug: engines purchased through parts store or repaired have no unit tonnage or value
++ Patch 3530318: patch for bug 3530316
++ Bug 3523821: Refit techs list window too long.
++ Bug 3531225: C3 crashing campaign
++ Bug 3530489: Salvage Option Wrong
++ Bug 3496668: Duplicate Tech assignment
++ better information about why a part cannot be scrapped
++ Fixed the code for the Tech Rating portion of the Dragoons Rating.
++ allow multiple discontiguous selections in TO&E
++ set up c3i networks in TO&E tab (fix for bug 3537061 C3 Networking)
++ Planetary data update 18 & 19
++ added equipment.txt and Vehicle BLK Files Explained.txt to the docs folder
++ Bug 3535050: Build Error on incorrect import
++ Code for building with -dev-rXXXX revision versions
++ Updated tileset files to keep inline with the MegaMek versions (fixes a display bug)
++ Bug: C3/C3i NPE for refits. New Entity needs Player and Game objects set.
++ Updated data to match MM for new tileset images
++ Another tileset image update
++ Vehicles.zip update for Ontos correction from MegaMek.
++ Bug: Refitting a unit clears its C3UUID
++ Updating MM.jar to revision 8913
++ Updating MM.jar to revision 8916 (For EntityWeightClass.getClassName(int) functionality to be restored so that MekHQ will compile)
++ Updating with new hex image data from MegaMek
++ Updating with new lunar images from MegaMek
++ Updating mechfiles data for the Thor (Summoner) image correction from MegaMek
++ New RAT data from MegaMek
++ Planetary data update 20
++ RAT and mechfiles update to stay current with MegaMek
++ Planetary data update 21
++ Bug 3545347: Units names were not being made xml safe on save.
++ Bug 3547739: megamek disconnect during deploy phase
++ Patch 3547373/Bug 3547371: C-Bill cost truncated by int limit
++ Updated MegaMek.jar to r8958
++ Update mechset.txt to correct Thor (Summoner) images not loading on Linux/Mac where filename case matters
++ Bug: Changes to MegaMek's Mounted class removed getShotsLeft() function and replaced it with getBaseShotsLeft() instead
++ Bug: MML out of date for getShotsLeft() changes, updated to r1044 (which is up to date for the changes)
++ Planetary data update 22
++ Planetary data update 23
++ updated MM.jar and fixed reference bugs
++ Bug: unit numbering and id lost when resolving scenarios by MUL
++ set up C3 networks in TO&E tab
++ Bug: secondary techs and doctors get no time
++ Planetary data update 24
++ Bug 3532049: Sell Single not working for Ammo
++ Bug 236: Spend XP on KIA personell
++ Bug 243: Personell Tab filtered for techs includes Vessel Crew
++ Bug 180: only allow post starleague units
++ Bug 239: Parts repair leads to part loose Clan-qualifier
++ Bug 251: No Front Rightt Leg.
++ Bug 253: MMHQ uses all weapons in stack for some refits/cusomisations
++ Bug 240: duplicate Repairs without sufficent stock cause impossible c
++ additional code for Bug 240: need to clear out reservation on task completion
++ Bug: fields in MissingPart not being loaded when loadFieldsFromXML overriden by inheriting class
++ Bug 244: Repair Bay Bug: Re-Installed Parts
++ Bug: tech being de-selected after repair
++ Bug 256: Exchange Rights
++ Bug: Fox's Teeth campaign had wrong lastScenarioId value
+
+v0.1.16 (2012-05-23)
++ removed PartsInventory, quantity is now tracked directly by part
++ include damage status in parts clones
++ repair damaged parts in warehouse (WIP)
++ finished repair warehouse parts feature
++ omnipod refitting
++ ChooseRefitDialog
++ show needed parts in MekLab
++ separate Part#issamePartTypeAndStatus int Part#isSamePartType and Part$isSameStatus
++ new infirmary layout
++ Bug: NPE when acquiring armor in the Repairs tab.
++ Bug: 3489734 - InSupply check being performed during salvage operations.
++ changes to make meklabpanel more generalizable
++ Bug 3495174: Map NPEs
++ Bug 3493304: Unable to resolve scenarios
++ Broke out the Dragoons rating code to better handle support of multiple calculation methods.
++    Took the original Dragoons rating code written by Taharqa and moved into the TaharqaDragoonsRating class.
++    Created the FieldManualMercRevDragoonsRating class to try to emulate the method described in FM: Mercenaries (rev).
++    Created a new Campaign Option, "Dragoons Rating Method" that allows the user to select which method for calculating the Dragoons Rating that they prefer.
++    Created the Dragoons Rating Dialog to display a breakdown of how the Dragoons Rating was calculated.  This is accessed by right-clicking the Dragoons
++      Rating Score in the main panel.
++ Bug 3507911: Salvage Tracking - applied patch 3509166
++ Planetary data & faction additions round 9
++ Fix of potential Divide By Zero errors.
++ Created a Quirks dialog for easier adding and deleting of quirks.  This change uses the QuirksPanel from megamek.
++ Planetary data round 10
++ Updated megamek to version 0.35.29
++ Updated Unit Files
++ Updated defaultQuirks.xml
++ Added a Select Bombs option for aerospace units.
++     This utilizes the BombChoicePanel from MegaMek to allow the user to choose which bombs to load on their fighters.
++     This information will save into the MUL file for a scenario.  However, currently it is not saving to the campaign save.
+*     Added the code needed for saving bombs loads to the campaign save and reading them back out again.
++ Planetary data & factions round 11
++ Bug 3516571 - Changed the bv and cost values of the ForceViewPanel to be long rather than integer, so they can handle 8-bit numbers.  Now they have an upper limit of (2^63)-1
++ Bug 3516569 - Changed the code so that the Battle Record always gets refreshed.
++ Fixed how Medical and HR Support percentages are calculated.
++ Bug 3518894 - Removed the 'initialized' variable since it wasn't fully implemented anyway.  I may revisit it at a later date.  Also, corrected the score multiplier to 5 (it had been multiplying by 2).
++ Update 11 of planetary/faction data - planets + faction changes from Wars of Reaving
++ Patch 3519596 (Fix for bug 3519594) - When you have a mech in a force without a pilot, it generates an NPE when attempting to view the force/parent force.
++ Patch 3519613 (Fix for bug 3518860) - Customized mechs lose ID
++ Bug 3516563 - Parts repair bugs.  Added code to make sure that the mode() value is cloned along with the rest of the Part being repaired.
++ Bug 3516563 - Parts repair bugs.  Modified the fix to better follow the original code style.
++ Fixed problems with Dragoons Rating calculations of Transport and number of units.
++ Update 13 of planetary data
++ Patch 3522780 (Fix for bug 3522145) - Unable to use Get MUL when units have C3/C3i
++ Update 14 of planetary data
++ Updated MegaMek to latest version of SVN as of May 5, 2012
++ Update 15 of planetary data
++ Update 16 of planetary data
++ Patch 3461478 - Added Insects as option for highest native-life
++ Patch 3528147 (Fix for bug 3528117) - Dragoon's Rating Dividing by 0 (SVN)
++ tank customization with refit kit and MekLab
++ updated MML.jar
++ Updated MegaMek.jar & data folder from current MegaMek SVN as of May 22, 2012
++ new MM.jar and a few changes to account for new method of checking quirks
+
+v0.1.15 (2012-02-11)
++ Bug 3486200: Previous version campaigns do not save...
++ updated princess_bot.properties
++ Bug: equality comparison of UUIDs for person and unit must use equals method not == or !=
++ Bug 3486199: GM mode remove person freezes personell tab
++ Bug 3486661: Armor replacement tasks not showing up
++ Bug: era mods option not saving with checkbox
++ Bug 3486666: Destroyed parts in warehouse
++ Patch 3486634: Test For No Armor Between Days
+
+v0.1.14 (2012-02-08)
++ don't include conventional infantry as salvage
++ random skills (more to come)
++ tweaking of age randomization by skill
++ use UUID to identify units
++ use UUID to identify personnel
++ assign UUIDs to pilots and units and fix all references when loading older campaigns
++ Bug 3472687: External ID Conflict when managing both players with HQ
++ updated MM.jar for string external ids
++ proper faction object, indexed by string
++ option to disallow the purchase of star league era mechs
++ factions loaded from xml
++ ability for multiple factions to control a planet
++ added remaining clan factions and some other minor powers
++ Bug 3480666: scenario data not getting saved
++ era mods option
++ inner sphere team working on clan-tech modifier
++ altNames field in factions for name changes (e.g. Diamond Shark/Sea Fox)
++ updated planets.xml to new string based faction codes
++ FRR faction change on 3/13/3034
++ Lyran Alliance faction change on 09/13/3057
++ Ghost Bear/Smoke Jag/Nova Cat invasion corridor
++ Operation Bulldog map changes
++ Bug: NPE when saving scenario date if pending
++ Bug: solo pilot units not getting gunnery assigned correctly
++ Bug: Armor skill level needed not reset when fixed
++ filter techs in repair bay by appropriate type and skill minimum required, sort by skill
++ more helpful unit table in repair bay and integrated mech view
++ default sorting of tables
++ UUID bugs in resolve scenario tracker
++ Bug: cant finish pending work if repair status switched
++ Bug: context menu does not choose right mech in serviced units table
++ dont prevent user from repairing/replacing on equipment on limb with bad hip/shoulder, but do nag them
++ support personnel XP accumulation options
++ Bug: subforce scenario id not being set on deployment
++ Bug: scenario forces counting double
++ Bug 3477353: Hull Breaches cause regular crits
++ personnel logs
++ manual editing of personnel logs
++ customizable multipliers for the value of used and damaged parts
++ base value of units on parts (work in progress)
++ moved planet and faction data to data/universe
++ editable unit history
++ change callsign context menu option
++ keep the focus on selected units and personnel in the view when respective lists are refreshed
++ ammo swap options should follow tech limits
++ Bug: salvaged units have no value in resolveScenarioWizard
++ Bug 3477265: Salvaging MASC leads to campaign corruption
++ finished random skills and special abilities (need to allow user customization)
++ random portrait selection 
++ NewRecruitDialog and HireBulkPersonnelDialog
++ warning dialog when game is not saved correctly
++ campaign option to generate portrait only for certain personnel types
++ Bug: tasksXP not being saved correctly
++ repairable parts in a destroyed location should be listed as salvage only regardless of unit status
++ random skill options in CampaignOptionsDialog
++ finished random skill options in CampaignOptionsDialog
++ Bug: can do task that is already being worked on
++ clear out game information from entity when resolving scenario (still needs work)
++ idle XP accumulation option
++ Bug 3484446: Green Repairs Become Impossible
++ Bug 3473292: Toughness doesn't save
++ new MM.jar
++ Bug 3472962: In the Hangar, BA do not show under the BA tab
++ Bug 3474830: Salvage show shorthanded when not
++ Bug 3477127: Weapons Missing from Parts List
++ Bug 3477779: Debt not carried over to new year
++ make text field of all spinners in CampaignOptionsDialog non-editable
++ re-attachable limbs/heads (yay!)
++ destroy detached limbs and their equipment when player does not control battlefield
++ roll for equipment destruction (d26 < 10) on all damaged equipment in scenario
++ Bug: blown off status not being saved
++ Bug 3473821: 0.1.13 Battle Armor loses all armor
++ Bug 3472965: Mass assign not working for BA
++ Bug 3473516: Force icons not resizing anymore - cropped
++ Bug 3482814: Missing carriage return on Recovered units
++ Bug 3485504: /n visible in mouseover of "Start Game" button
++ new MM.jar
++ remove units that are totally destroyed when loading campaign
+
+v0.1.13 (2012-01-11)
++ added campaign reference to all parts (should fix NPE refit bug)
++ bug: campaign reference not set for refit shoppingList on load
++ limit refit kits by tech limits
++ correct calculation of engine tonnage and costs
++ updated MM.jar
++ Bug 3466916: Damaged Mech does not appear in Repair Bay
++ mekhq-load.png
++ correct costs and tonnage for physical weapons, MASC, and targeting computers and EquipmentPart set-up to make further additions easier
++ Bug: negative engine costs
++ subfolder for equipment parts in preparation for subclassing of variable ton/cost equipment
++ MASC suptype for EquipmentPart
++ Bug: equipTonnage is double when loading XML 
++ Bug: need flag for MiscType when checking whether equipment type is MASC
++ Bug: NPE when loading refit and newArmorSupplies are null
++ don't add BA equipment and tank chassis modifications to parts store
++ Bug 3470231: Campaign refuses to advance day.
++ Bug: spare equipment parts all had zero tonnage
++ mission type field
++ crew assignments for large craft
++ Bug 3469928: Cannot repair damaged limbs after replacing
++ set missing status of critical slot and mounted to false for non-hittable items when replacing locations
++ set missing status of equipment parts to false when fixing and replacing
++ color understrength infantry units red in unit table
++ record date of scenario resolution
++ simplified gui code for tech task targets
++ large crafts fix themselves (sort of)
++ Bug 3470457: Negative time destroys Astech mins
++ Bug 3470662: Actuators listed in system components in warehouse
++ Bug 3469248: Mech sensors in warehouse - No Tonnage
++ Bug: aero sensors must be matched to unit tonnage since cost is variable by tonnage
++ Bug 3468357: Setting Edge to Multiple People
++ Bug 3468387: FRR Faction Typo
++ Bug 3468374: Green Techs roll like Astechs
++ MM listener starts resolution after victory screen not before
++ Bug: mission description getting cut off in missionviewpanel
++ updated MM.jar and MML.jar
++ Bug: small craft aren't repaired by own crew
++ set number of pilots on small craft and dropships to be 3
++ contributors doc
++ update MM.jar to 0.35.27
++ mekhq-splash.png
++ advanced search in unit selector
++ fluff images in unit selector
++ Bug: refits shown as costing nothing
+
+v0.1.12 (2011-12-22)
++ restrict parts store by tech limits
++ restrict acqusitions from repair bay by tech limits
++ fixed sorting issues on some tables (salary on personnel, cost and weight on parts store)
++ type name not being changed on ammo change, leading to a reload item for unit when loading game
++ text filter in parts store
++ no infantry weapons in parts store
++ Bug 3456424: Prices in repair bay
++ Bug: doctor with 25 patients cannot heal them
++ Bug: units that should not be repairable sometimes are immediately after scenario
++ personnel in destroyed vees should be wounded or dead
++ personnel filter for conventional infantry
++ allow editing of after action report and status for completed scenarios
++ ForceStub object to keep a record of forces used in completed scenarios
++ cleaned up imports
++ keep completed missions visible for historical record
++ get all personnel filtering correct
++ updated RATs
++ Bug: main gui refreshing before resolve wizard done
++ better stopping of game thread (didnt fix memory problems)
++ attempts to fix memory leak
++ new MM.jar (should deal with various LRM problems)
++ use a single dialog with CardLayout to resolve scenarios
++ max gunnery and artillery should be 7 for it to read in MULs correctly
++ Bug: units in subforces not removed when super force removed
++ Bug 3462195: Typo in Administration skill
++ Bug 3461993: Callsigns do not carry over
++ added version information to XML input/output
++ Bug: wrong parts being sold when warehouse list is sorted
++ Bug: personnel with admin skill are losing all skill
++ Bug 3457522: no BLC bug
++ added docs from MegaMek
+
+v0.1.11 (2011-12-09)
++ options to limit unit purchases by year, canonicity and type (Clan/IS)
++ changed layout of UnitSelectorDialog
++ "All" weight class option in UnitSelectorDialog
++ Bug: mmconf not being included with release
++ Bug: campaigns with personnel hired using the multiple hire option are not saveable
++ no refreshing hire dialog on multiple hires
++ Bug: memory problems in PortraitChoiceDialog with lots of images
++ Bug: person hired twice
++ updated force icons (thanks Urban Kufahl!)
++ no NPE when portrait or force image is missing - replace with default
++ Y/N dialog on force deletion
++ change MM options based on tech limits selected
++ multiple part selection
++ adjust parts value by clan modifier
++ limit parts in parts store by IS/Clan depending on options
++ Bug: armor being charged even if parts not paid for
++ Bug: gunnery and piloting not rounding correctly for multiple personnel units
++ new unit right-menu item to hire all missing personnel
++ Bug: not able to customize units in MM because artillery skill outside 0-8 range by default
++ Dragoons Rating (no support rating though)
++ approximation to support rating for Dragoons rating (waiting on StellarOps for final word)
++ set allowCanonOnly to false by default
++ Bug 3304647: Interstellar Map drop down remains open
++ some personnel pictures still not being properly scaled and sanity-checked
+
+v0.1.10 (2011-12-05)
++ beginnings of a proper splash and loading screen
++ added load campaign and quit options to splash screen
++ improvements to splash and load screen operations
++ save and loading XML is the default (no more binary saves!)
++ RFE 3304267: EXIT
++ improvements to layout of top and bottom panels
++ added missing data from MM data folders
++ beginning of MM game threading
++ moved directory items and mech tileset from MekHQView to MekHQApp
++ print record sheets for scenario
++ resolution of MM games from within MHQ
++ proper starting and stopping of MM host within MHQ
++ added images for record sheet printing
++ gridlayout for scenario buttons
++ grey out scenario buttons when no scenario selected, selected scenario is completed, or scenario has no units assigned
++ load/save MM game options in xml serialization
++ Kill object and kills record for personnel
++ beginning of kill assignment from scenario resolution
++ ResolveWizard for kill assignment
++ look and feel setting done in MekHQApp#initialize
++ replaced jdesktop.ResourceMap with ResourceBundle in CustomizeScenarioDialog as an example
+     this will eventually be done for all gui objects in anticipation of removing the SingleFrameApplication framework
++ customizable XP awards for kills
++ switched from ResourceMap to ResourceBundle and moved most dialogs to mekhq.gui
++ remainder of dialogs updated
++ removed swing-layout and swing-worker libs (yay! - only one more left)
++ consolidated all the *Info classes into a single BasicInfo class
++ show portraits of techs and doctors in repair bay and infirmary
++ replaced resourceMap with ResourceBundle in all panels and moved to mekhq.gui
++ converted MekHQView to CampaignGUI and removed FrameView
++ MekHQApp renamed MekHQ and no longer inherits from SingleFrameApplication
++ nag when quitting
++ created gui subfolders for dialogs and views
++ really crappy about box
++ updated MM.jar and MML.jar
++ new build.xml (this one works)
++ changed xml save suffix to cpnx (and updated FoxsTeeth to it)
++ added a default campaigns folder for saved campaigns
++ added PngEncoder library and source code for TinyXML
++ corrected mmconf files to default
++ trying out Nimbus look and feel
++ forgot to set default loading directory to campaigns in CampaignGUI
++ menu items to choose look and feel from available L&F
++ get rid of grid lines in Tables
++ beginning of a parts store dialog
++ gridlayout for mission buttons
++ better display of planetary neighbors in PlanetViewPanel
++ insets for view objects in Personnel, Unit, and Parts tab
++ Patch 3385171: fixes bug 3373903 (destroyed units not removed from TO&E), thank tathas!
++ added "Load Last Save" button to StartUpGUI
++ changed the layout of StartUpGUI so that the splash image is the background
++ use static string for campaign directory
++ mekhq.properties file (contains only L&F feel preferences for now, but expandable)
++ check campaigns subdirectories for last save
++ parts store dialog actually allows you to buy parts
++ more parts for the parts store
++ beginning of a chat client/server
++ beginning of MegaMekLab integration
++ a partially functional Refit object
++ Bug: phantom parts
++ improvements to refit calculation
++ refit tech assignment and rolls
++ improvements to refit/customization process
++ xml load/save for Refit object
++ armor refits processed properly
++ added system position to planet data
++ custom unit info is saved within xml so that cpnx are transportable without accompanying custom data
++ dont remove unit from lab when tech is missing on refit
++ add detail column to parts store
++ updateConditionFromPart method for MissingParts for refits
++ Bug: total armor amount for Armor part incorrect when salvaging
++ Bug: field refits showing up as Class D
++ Bug: alternate munition ammo type not properly loaded with xml
++ improvements to look of MekLabPanel
++ Bug: NPE when refitting
++ don't refit for a change in munition type
++ add in heat sink type changes and CASE changes
++ Bug: no refit kits for non-mech units
++ properly sourced refit kits
++ Bug: Center Torso not being replaced when internal structure changed
++ reserved status for refit kit parts (still need to include armor and ammo here)
++ tag unit as a custom unit menu option
++ proper reservation of armor for refitting
++ Bug 3403515: Negative Fix times
++ Bug 3430084: Artillery skill does not get saved in MUL file
++ personnel options affect corresponding megamek options
++ Bug 3413047: 0.1.9 Deplyed Units Issue
++ Bug: checked units not recovered in resolvemissingunitsdialog
++ OrgTreeModel: no more TO&E collapsing
++ Cockpit part type (made up values until next errata)
++ Bug 3402178: Mechs with destoyed cockpit still useable
++ Bug 3380632: Mechs with Destroyed Head never Usable
++ Bug 3430515: Cannot Load Campaign
++ Bug 3403476: Using Ampersand In Scenario/Mission Description Causes Issue
++ Bug 3401092: Loading a save with "MechWarrior" units crashes MekHQ
++ Bug 3398514: Jumpships inoperable
++ Bug 3371755: Medic Count
++ Bug 3369530: Infantry
++ Bug 3371759: Vehicle Crews
++ Bug 3380630: Warehouse Fields All Sort as strings
++ Bug 3373302: Able to salvage or repair components in a destroyed location
++ Bug 3401029: Non-Salvagable Torso
++ Bug 3376390: Cannot Scrap Arm
++ Bug: GM Mode not properly set on button when campaign loaded
++ Bug 3288072: Search query is case-sensitive
++ Bug 3440335: Contract Transportation Bug
++ Patch 3411830: Patch for 3288090 (Date Chooser), thanks derikpage!
++ Bug 3317572: Salvaged units bug
++ Bug 3388419: Destroyed Units Repairable
++ Bug 3323097: Clan tech price modifier bug
++ Bug 3371756: One-Shot Ammo
++ Patch 3411833: GM Edit & Delete Financial Transactions
++ Patch 3413431: Hire/Add Multiple Infantry (Feature Request 3391637)
++ increment display name for multiple units of the same type
++ added cockpits, more armor, and mek locations to the parts store
++ Drag-n-Drop functionality for OrgTree
++ don't allow customization that adds new equipment to missing locations
++ Bug: armor not set to actual amount when customization complete
++ various gui checks and notifications when unit is being customized or is in Lab
++ various fixes to new ammo in customizations
++ Bug: customization not handled right when armor type remains same but amount changes
++ updated MM.jar and MML.jar
++ Bug: ammo munitions getting switched in Refit#unscrambleEquipmentNumbers
++ Bug: refit armor amounts reverting to old unit values when refit is loaded from save
++ Bug: refitClass not being saved to XML
++ Bug: canceling at tech selection and model name does not stop refit
++ Bug: don't include techs for selection of refit who are already working on a refit
++ Bug: variable cost equipmentparts screwing up equipment cost calculation
++ aero and vehicle parts for parts store
++ new MM.jar
++ check for internal name and munition type when restoring type in AmmoBin (MML problem)
++ Bug: NPE on game resolution when no killer
++ Bug: slots in destroyed locations are set as repairable when loading even if they have been scrapped
+
+v0.1.9 (2011-07-17)
++ beginning of personnel switch (hold on to your hats!)
++ updated personnel views with new skills
++ updated PersonViewPanel with new skills
++ SkillType object
++ improvements to CustomizePersonDialog
++ more improvements to CustomizePersonDialog
++ re-added spending XP on skills and special abilities
++ re-added setting of edge triggers
++ Bug: MekEngine and MissingMekEngine xml loading
++ Bug: campaign not being set for units in xml loading
++ assignment of personnel to units (allowing for the assignment of pilots, drivers, gunners, and soldiers)
++ when buying units, don't include default pilot or soldiers (so BA and infantry is just the equipment)
++ reverse compatability in assigning pilots to units for XML loading
++ skill summary for personnel by primary type (using FM: Mercs Supplemental Update)
++ backwards compatability for reading in techs and doctor personnel
++ resetPilotandEntity on unit when loading in XML
++ update entity pilot when personnel characteristics are changed
++ Bug 3313715 and 3316912: Reloading game problem/destroyed parts in warehouse
++ infantry personnel type
++ change Force to unit-specific rather than person-specific (to accomodate multi-person crews)
++ corrected scenario Ids
++ Astech and medic personnel types (they don't do anything yet)
++ changes to resolveScenarioTracker to allow for more diverse units
++ fixed missing fields in Person for save/load XML
++ added Skill to XML serialization
++ assign casualties to infantry in ResolveScenarioTracker
++ assign casualties to vehicle crews in ResolveScenarioTracker
++ beginning of Astech Pool
++ adjust modifiers for overtime and shorthanded when carrying tasks over from day to day
++ removing and adding astechs changes astech pool time
++ astech pool menu items
++ report overtime in tech description
++ make sure shorthanded mod carries over on multiple day assignments
++ check tech type
++ removed outdated methods from SupportTeam
++ incorrect skill levels on Armor part
++ added tech and astech variables to XML serialization
++ only allow personnel type changing for new hires in CustomizePersonDialog
++ modifiers for rush jobs
++ release all techs from pool menu item
++ updated MM.jar
++ updated unit and image files to current MegaMek status
++ better checking in Person#isTech
++ remove personnel from unit when removed from game
++ removed repair system option from CampaignOptionDialog (outdated)
++ astech overtime
++ Bug: skill min not updating correctly when repairs fail
++ customizable XP cost for skills and abilities campaign options
++ changed default XP to be consistent with TW and SO defaults
++ adjustments to admin skill
++ added Admin personnel type
++ Skill costs added to XML serialization
++ ability costs moved from SkillCosts to SkillType
++ SkillCosts.java removed (costs now kept in SkillType)
++ jump over levels with XP costs of zero when improving skills
++ Bug 3317567: Inactive personnel show up in lists
++ Bug 3317565: Costs not paid
++ Bug 3317554: Salvage value not saved/loaded
++ default green, regular, veteran, and elite skill levels in SkillType
++ removed NameGen.java
++ changed personnel type to primaryRole and added secondaryRole variable
++ Person#canPerformRole
++ Personnel menu item to change primary and secondary role
++ Bug: the tech level of repaired parts does not reset to green
++ Add tech time for secondary role
++ cant be an astech and tech at the same time
++ Patch 3357529: Fix for 3352712: XML Escaping of Entities (Thanks, Josh Street!)
++ Bug 3352712: Program won't load saved xml
++ adjust salary for secondary role
++ report secondary role in GUI displays
++ restored infirmary functionality
++ shorthanded mods for doctors
++ reverse compatability for primary role of combat personnel when loading XML
++ menu item for medic pools
++ customize skill targets and levels in campaign options dialog
++ separate VEE_CREW role into ground vee drivers, naval vessel drivers, VTOL pilots, and gunners
++ improvements to CustomizePersonDialog
++ maintain selected skill levels between hires in CustomizePersonDialog
++ resized personnel view panel to account for longer skill names
++ load callsigns from XML
++ improvements to personnel table
++ better instructions in XP tab
++ only support roles can be secondary
++ use a tabbed pane in force view to display pilot and unit
++ stats bar on the bottom
++ better PopupValueChoiceDialog layout
++ cancel button for PopupValueChoiceDialog
++ add commander special abilities to unit pilot
++ set hits for pilot from personnel
++ remove unit and doctor assignments when personnel changed to non-active status
++ re-assign personnel to infantry and tank units when healed
++ Bug: infantry casualties not calculated correctly
++ Bug: temp medic number not showing
++ can't choose none as primary role and can always choose none as secondary role
++ customizable XP bonus for scenario completion
++ improvements to ResolveWizardPilotStatus to allow hit editing
++ not counting soldiers without anti-mech skills
++ list whether driver or gunner in unit assignment for vee crewmembers
++ toughness back in
++ don't allow deployment of undermanned vees
++ Bug: astechs being counted twice
++ Bug 3317564: Bug in jumpship recharge
++ updated MM.jar
++ updated Fox's Teeth campaign
++ need to reset skill types during XML load
+
+v0.1.8 (2011-06-13)
++ beginning of custom XP costs
++ custom XP costs
++ SkillCosts added to XML serialization
++ scenarioXP field in SkillCosts and option in CampaignOptionsDialog
++ apply scenarioXP when resolving scenario
++ BLC for lost units (duh)
++ better default theming of look and feel by system
++ Bug 3308725: All SPA's broken
++ new MM.jar
++ Bug 3309501: Campaign Loading
++ Bug 3309012: Command rights not updating
++ Bug 3309015: Pilots marked KIA show up MIA
++ Bug 3309014: Doctor always has 1 patient
++ Bug: structuralIntegrity has no default constructor
++ track name in PilotPerson not MM pilot (this should resolve save/load issues for pilots with special characters in their names)
++ avionics part
++ fcs part
++ engine repair/replacement for aeros and vees
++ motive system part
++ vee sensor part
++ vee stabilizer part
++ rotor part
++ some fixes for turrets
++ made rotor and turret parts a subclass of TankLocation part
++ fix weight and cost for turrets
++ don't allow scrapping of locations that still have stuff on them
++ Bug: no vee stabiliser in the body
++ turret lock "part"
++ vtol motive system repairs
++ functional and repairable conditions for aeros
++ aero sensors part
++ landing gear part
++ updated MM.jar
++ aero heat sink part
++ Bug 3314180: Campaign Options
++ Bug 3308346: Typo in mission interface
++ Bug 3309013: Contract start date not working (payment starts too soon)
++ by default, start contract on the estimated date of arrival
++ fixes for part XML save/load problems
+
+v0.1.7 (2011-05-26)
++ MekLab tab (no functionality yet, but there it is)
++ load a mech into the MekLab via the unit context menu (still doesn't do much)
++ A* pathfinding for finding jump paths
++ updated MegaMekLab.jar
++ use Graphics2D class to draw interstellar map so that coordinates are exact
++ dynamic faction changes to map
++ new planets database that takes account of faction changes using the PRSC time points
+     (2575,2750,3025,3030,3040,3052,3057,3062)
++ currentPlanet tracked in campaign and on map
++ alt-click on map to calculate jump path between clicked planet and currently selected planet
++ correction to A* pathfinding technique
++ alt+shift click to add a planet manually to the jump path
++ all jump paths calculated starting from current planetary location
++ new functoinality to mousePressed in InterstellarMapPanel: 
+		alt+click - jump path from current planet to clicked planet; shift+click - extend existing jump path to clicked planet
++ calculate jump path button for InterstellarMap
++ begin transit button for interstellar map (doesn't do anything yet)
++ change color of planet names when on jump path
++ dragging on the map doesn't select a planet
++ list of planets within 30 light years to PlanetViewPanel
++ landMass and satellite data and tags for planets
++ use line-wrapping text areas for planetary information instead of labels
++ use line-wrapping text areas for unit information instead of labels
++ some improvements to quirk reporting in UnitViewPanel
++ socio-industrial levels and HPG class
++ updated planet data so that faction as of 3025 in PRSC goes back to 2900
++ JumpPathViewPanel
++ JumpPath object
++ CurrentLocation object
++ radio buttons for status of missing pilots in retrieval wizard
++ ability to move force along jump path
++ made JumpPath and CurrentLocation serializable
++ jumpPath and CurrentLocation added to XML serialization
++ distinction between plotted paths and actual paths in map
++ some calculation errors in jump path display
++ when adding to the path by shift+click, planets were counted twice along path
++ center and zoom map initially on current location
++ move to planet automagically using GM mode
++ pay for transportation option
++ updated MM.jar
++ beginning of Contract.java
++ use concentric rings to indicate selected planet (white), current planet (orange), selected jump path (white), current jump path (yellow)
++ additions to NewContractDialog
++ MRBC fee
++ improvements to NewContractDialog layout
++ some accounting adjustments to contract (MRBC fee does not include signing bonus and signing bonus is part of advance)
++ getEsimatedTotalProfit in Contract.java
++ advance money and monthly payout transactions
++ employer text field in New Contract Dialog
++ ContractViewPanel
++ Battle Loss Compensation when resolving contract-based scenario
++ added Contract.java to XML serialization
++ custom ranks in Campaign Options
++ Salvage rights
++ added salvage fields in Contract to XML serialization
++ removed suggest.jar (added source code instead, thanks RakuDave!)
++ added planetary location fields to contracts and missions
++ Transport terms for contracts
++ contract start date (contracts are done!)
++ set the location of all dialogs so that they center on the main frame
++ removed NetBeans *.form files
++ matching on startWith rather than contains for JSuggestField
++ Bug 3306391: Resurection of pilots
++ Bug 3304919: Selling of  Parts error
++ Bug 3306402: Resolution wizard
++ separate Planets object that keeps a static hash of all planets so it isn't reloaded every time campaign is loaded
++ make Planets.java more like MechSummaryCache.java
++ remove MechSummaryCache loading from MekHQApp
++ DataLoadingDialog (not fully working)
++ Bug: unattached personnel overlapping with last force in ForceViewPanel
++ Bug 3306386: Salvage times for equipment
++ better tracking of quad mech parts
++ Structural Integrity part
++ Bug: busted actuators dont show up in repair bay for quad mechs
++ improvements to jump path user interaction
+
+v0.1.6 (2011-05-17)
++ beginning of Briefing Room tab
++ mission and scenario view panels
++ deploy forces and personnel to scenarios from TOE tab
++ color-coding of deployed forces and personnel in TOE
++ Bug: force not deleting once deployed
++ save and load scenarioId to XML in Force
++ scenario related buttons (not fully functional)
++ Clear Units from scenario button
++ Bug: can deploy a force even when already deployed
++ beginning of Resolve Scenario Wizard
++ removed unused deploy boolean in Unit.java
++ resolve missing pilots wizard
+
++ resolve casualties wizard
++ resolve salvage wizard
++ process resolved scenario
++ final check resolution wizard
++ allow for skipping of irrelevant wizards
++ separate after-action report from description
++ mission and scenario added to XML serialization
++ Bug: scenarios not loading through XML
++ various bugs with mission and scenario id loading
++ description fields in customizeMission and customizeScenario dialogs
++ context menu for scenario table
++ edit mission and complete mission buttons in Briefing Room
++ don't allow the completion of missions with pending scenarios
++ various improvements to the Briefing Room GUI
++ added time to jump point, gravity, atmospheric pressure, and recharge station tags (see El Dorado, for an example)
++ added menu scroller for all popup menus with lots of potential entries
++ updated MegaMek.jar (should resolve problem with Unit view for units with unassigned pilots
++ Bug: personnel reassigned to different force or unassigned do not have scenario id reset
++ deployed units should not show up in Repair Bay
++ removed Combat Loss menu option (handled from scenario resolution now)
++ Bug 3294979: Support personnel age
++ Bug: force id of new personnel set to overall force id
++ removed PersonnelWorkItem, implemented IWork and IMedicalWork interface to handle pilot healing
++ Bug 3299547: Problems w/ loading campagin files (removed dateFormat and simpleDateFormat from XML load and save)
++ star type, recharge time, life form, climate, temperature, and percent water added to Planet
++ beginning of BIG change to repair system - no more tasks, repairs are performed directly on parts
+   don't use this yet, salvage and replacement are not implemented
++ Mech repairs complete under new system (still need salvage and replacement)
++ mech salvage complete under new system 
++ tasktablemouseadapter 
++ MissingPart and MissingMekGyro (beginning of replacements under new system)
++ Mech replacements complete under new system
++ Bug: repair destroyed mech locations
++ added conditional checks for whether repairs, replacements, and salvages can be done
++ when techs are short on time, repairs are made the following day
++ initializeParts to XML loading
++ initializeParts should look for MissingParts
++ Bug: location repair mods are reversed
++ Bug: overtime not working right
++ dont allow salvaging or replacing of center torso
++ different time and difficulty for jump jets and heat sinks than other equipment parts
++ Bug: salvage times and difficulties not right
++ beginning of acquisition work
++ completed acqusition work
++ armor needs to be acquired
++ Bug 2854851: Part scrounging bug
++ Bug 2834251: time used for incomplete repair (armor)
++ new parts fully integrated into XML load and save
++ when armor replacement fails by elite tech, armor should be removed from spares and skill min reset to Green
++ beginning of ammo part replacement and reloading
++ ammo swapping
++ look for missing ammo bin in Unit#initializeParts
++ better reporting of ammo bin reloading
++ finished ammo work
++ removed all WorkItems, parts refactoring project complete
++ reorganized initializeParts for non-mech units
++ TankLocation part
++ adjust time for armor replacement by unit type
++ Tank MissingTurret part
++ VTOL MissingRotor part
++ Bug 3288578: Cannot add aero pilots to aerospace units
++ Bug 3298152: TO&E Tab Locks Up with Aerospace Force 0.1.5
++ Bug 3298314: Dropship added to unit cannot be deleted
++ Bug 3291774: Damaged Limbs
++ Bug: Unit#initializeParts choking on BattleArmor and Infantry
++ Bug: "Add XP" doesn't do anything for support personnel
++ Bug 3301119: Doctor is not a recognized Personnel Type
++ getCost for units follows StratOps, pg. 181 (1/2 for undamaged, 1/3 for damaged, 1/10 for destroyed)
++ some improvements to part costs (but it is still a mess)
++ separate unit tonnage from part tonnage (part tonnage still needs lots of work)
++ show parts needed in unit table
++ Bug: current description not showing when editing missions and scenarios
++ replaced Part#computeCost with getCurrentValue and getPurchasePrice, removed static cost variable from Part
++ removed salvage boolean from Part (it has no use) and removed all referencing methods
++ change getStatus() in Part to return Functional/Damaged/Destroyed
++ improvements to replacement part checking
++ report details in parts table
++ values for equipment parts (catching NPE errors as a result of null entities)
++ boolean variable identifying clan-based armor in Armor.java
++ tonnage for equipment parts (catching NPE errors as a result of null entities)
++ improvements to look of parts table
++ don't load a damaged replacement part if an undamaged one exists
++ SubmitBug.html
++ filter for parts table
++ very basic Jtextfield with auto-complete for planet searching
++ added temperature, surface water, and life forms to planet view panel
++ 30-light year radius bubble around selected planet when zoomed in
++ only show faction name of planet, when there are duplicates
++ put name of scenario in personnel deployment column rather than "Y/N"
++ Bug: ammo not being used up from supplies when loaded and wrong type being unloaded when swapping
++ improved some parts reporting and refreshing issues
++ Bug: problems with restoring some equipment parts
++ acuisition list not updating when parts removed
++ separate HeatSink part inheriting from EquipmentPart
++ separate JumpJet part inheriting from EquipmentPart
++ Bug: techs can still do repairs with 0 time left
++ Bug: can't salvage ammo bins
++ rounding of tonnage in parts table
++ Bug: unit ids not being set in Campaign#addUnit
++ Bug: get target number before reducing time in Campaign#fixParts
++ Bug: gyro not fixing the first time
++ Bug: salvage units disappear from unit list sometimes
++ Bug: non-hittable slots remaine critted when location is replaced
++ errors with XML loading of engines and Sensors
++ mul for scenario deployment named after scenario not campaign
++ Bug: sometimes new ammo and armor spare part created when existing one should be increased
++ color-coding of availability in work descriptions
++ scrap and canScrap methods in Part.java
++ Bug: completely salvaged mech showing up with new parts to be salvaged when game is reloaded
++ Bug: engine rating and type were reversed in constructor
++ Bug: XML not being saved as UTF-8
++ team name not reported correctly in Campaign#acquirePart
++ UTF-8 compliant female names
++ Bug: armor and ammo for free
++ Balance column for finance table
++ Bug: repairs being allowed on arms and legs with hip and shoulder damage
++ calculate distance and time to jump point in Planet.java
+
+v0.1.5 (2011-05-05)
++ refactored Hangar Panel into separate Hangar and Repair Bay panel
++ UnitTable and UnitTableModel in HangarPanel
++ sorting of UnitTable
++ Unit type filter for UnitTable
++ only units needing service should show up in the Repair Bay
++ unit view selector in UnitTable (General, Details, and Status)
++ Unit Viewer in Hangar
++ updated MegaMek.jar
++ improvements to UnitViewPanel
++ allow fluff images in UnitViewPanel
++ show unit image if no fluff image in UnitViewPanel
++ color-coding of UnitTable rows by condition
++ Bug: tasks not displaying when mul added after xml loaded
++ changed FoxsTeeth Unit fluff pictures to mini pics
++ tooltips for UnitTable
++ use JSplitPanes for personnel and unit tables and views (duh)
++ Patch 3294109: Doing anything with an empty personal list currently causes an array out of bounds exception. (Thanks Longinus00!)
++ bug: personnel and unit view scroll to the bottom when selected or if the split pane is resized
++ hierarchically-structured Force object
++ beginning of TO&E Panel (not yet functional)
++ use TreeModel to set up treeNodes for forces
++ context-menu for OrgTree
++ ability to add forces and personnel to orgTree
++ "remove force" menu item for orgTree context menu
++ "remove person from force" menu item for orgTree context menu
++ custom renderer for orgTree
++ define DirectoryItems (portraits, camos) once in MekHQView and pass them as needed into other components
++ added force icons and ability to set them
++ changes to PilotPerson#toString
++ save lastForceId in XML
++ saved forceId to XML
++ writeToXML function for Force (still need the function to reconstruct it)
++ context menu for unit table
++ keep personnel ids not personnel in Force.java
++ loading of force organization from XML
++ updated FoxsTeeth.xml with force organization
++ deployment and retrieval button belong in hangar
++ color coding for deployed units and a deployed (Y/N) column for personnelTable and unitTable
++ Bug: pilot external ids not being set when campaign reloaded from XML
++ rank name and condition color coding added to ForceRenderer for personnel
++ height issue of orgTree personnel nodes
++ force column in personnel table
++ sort personnel in orgTable by rank
++ Bug: unitId not set on personnel entered via MUL
++ ForceViewPanel for personnel on TO&E tab
++ ForceViewPanel (needs filling in)
++ improvements to ForceViewPanel
++ unit selected in unit context menu is the one highlighted not moused over
++ adjust contextmenu depending on single or multiple unit selection
++ person selected in person context menu is the one highlighted not moused over
++ adjust contextmenu depending on single or multiple person selection
++ Bug: top-level buttons and comboboxes not showing up above unit table
++ assign to force menu in personnel table
++ simplified code for assigning units
++ fixed refresh issues with ForceViewPanel
++ only allow unassigned pilots to be assigned in unit context menu
++ put "Repair" and "Salvage" menu items in a sub-menu called "Repair Status" in unit table context menu
++ use Quirks campaign option
++ beginning of parts table redesign
++ some basic code for InterstellarMap (not much yet, don't get excited)
++ Finances and Transaction object
++ finance campaign options
++ pay salaries and overhead expenses finance options
++ included a rank reference from campaign in Person.java and refactored Campaign#GetTitleFor(Person) into Person.java
++ adjust salaries by experience and officer status
++ financial balance sheet in Finance tab
++ added Finances to XML load and save 
++ pay for maintenance, sell units for money, and sell parts for money options added
++ Planet object
++ read in planet.xml data (from MekWars) for InterstellarMap
++ color coding of InterstellarMap by faction
++ mouseListener for InterStellarMap
++ mouseWheelListener for InterStellarMap
++ changed x,y variable in Planet to double
++ changed planets.xml map to one based off the PRSC data in 3062
++ color-coding of all factions on InterstellarMap
++ improvements to mouse interaction in InterstellarMap
++ highlight selected planet
++ keep selected planet in center when rescaling
++ context menu for InterstellarMap
++ improved zooming
++ top elements of main panel and main TabbedPane places in a split pane (so you can maximize whichever view you want)
++ "Select planet" context menu option (planets organized alphabetically, in submenus (A,B,C,etc)
++ improvements to zooming
++ improved planets.xml
++ PlanetViewPanel
++ changed color of Chaos March to a lighter gray
++ load planets.xml in Campaign.restore()
++ Bug: map context menu should be a result of popup trigger not mouse 3 button
++ Mission and Scenario objects
+
+v0.1.4 (2011-04-28)
++ Bug: personnel options not updating in CampaignOptionsDialog
++ improvements to NewPilotDialog.java
++ new MegaMek.jar
++ gender and birthdate choosers in HirePilotDialog
++ refactored NewPilotDialog.java to CustomizePilotDialog.java and use it for both new hires and editing
++ move the creation of new PilotPersons from CustomizePilotDialog to Campaign
++ converted NewTechTeamDialog to CustomizeTechTeamDialog
++ converted NewMedicalteamDialog to CustomizeMedicalTeamDialog
++ put refresh commands inside each Customize dialog
++ Bug: editing personnel does not update on other lists
++ Bug: context menu for personnel table picking wrong personnel when sorted
++ added birthdate and gender choosers to CustomizeTechDialog
++ Bug: problem with new personnel when personnel table columns are sorted
++ custom sorting comparators for personnel skills
++ replaced support skill column with overall skill summary
++ consolidated Person types in Person class
++ Bug: not able to hire all types of personnel
++ personnel filter
++ personnel rankings
++ rank system added to Campaign Options
++ added rank information to XML save and load
++ added ranks for five main factions and clans
++ assigned unit column in personnel tab
++ set preferred widths of personnel table column
++ view chooser in PersonnelTable
++ Personnel Viewer
++ replaced Personnel#GetDossier with a PersonnelViewPanel
++ added optional skills to PersonnelViewPanel
++ Fox's Teeth example campaign data
++ Bug: Personnel portrait not correct scale
++ vertical allignment of personnelviewpanel in scrollbar fixed
++ added fluff information view to PersonnelTable
++ better text wrapping in PersonnelViewTable
++ Bug: personnel portraits not being correctly loaded with XML
++ "Assign to Unit" menu in PersonnelTable context menu
++ status variable (active,retired,MIA,KIA) in Person and associated functionality in MekHQView
++ Add XP should not be a GM-mode action
++ GM Mode skill change menu items removed (Edit.. menu item can be used instead)
++ "Spend XP" menu in PersonnelTable context menu
++ Spend XP for Support staff too
++ "None" as an option in "Assign to Unit" menu
++ removed PersonnelViewDialog and Person#getDossier
++ added special abilities and implants to PersonViewPanel
++ separated edge from other special abilities in PersonnelViewPanel and added edge column to PersonnelTable
++ updated MegaMek.jar
++ added "use edge" campaign option
++ addded "Select Edge Trigger" menu option and "Set Edge" menu (GM mode) option to PersonnelTable context menu
++ custom renderer for PersonnelTable 
++ special ability, implants, and hits columns for PersonnelTable
++ tiger striping of PersonnelTable for readability
++ wounded personnel have a red background in PersonnelTable
++ get rid of annoying table borders in PersonnelTable
++ TextAreaDialog and "Change Biography" menu item in PersonnelTable context menu
++ Spend XP on special abilities
++ weapon specialist options in Spend XP > Special Abilities
++ context menu selecting wrong person on sorted rows
++ changes to packaging.xml and resource handling
++ consolidated CustomizeTechTeamDialog and CustomizeMedicalTeamDialog into CustomizeSupportTeamDialog
++ random name button in CustomizeSupportTeamDialog
++ added examples to packaging.xml build
++ reset game for entity in Campaign#restore()
+
+v0.1.3 (2011-04-22)
++ Bug 3288095: Tasks are not refreshing and dates do not advance
++ MegaMek Random Name Generator
++ Bug 3288083: GM Mode - Set XP spinner not working
++ Removed SSW library and all references to it (availability and tech codes should always be checked through MM)
++ forgot to recode availiability code X in Availability.java
++ Bug 3289622: Repair Crash
++ availability and tech ratings for all parts (specific equipment codes still need to be entered in MM)
++ tech ratings for all UnitWorkItems
++ tech rating modifier for repair, replacement, and salvage
++ moved random name generator from MekHQView.java to Campaign.java
++ Added random name generator properties to XML load/save
++ chooser for random name generator faction
++ Bug: name generator not being populated with XML load
++ new tab in Campaign Options for name generator
++ percent female slider for random name options
++ option (true by default) to assign random name generator based on faction selection
++ beginning of acquisition table
++ Acquisition table
++ Bug: NPE on MekGryo.canBeUsedBy check
++ Bug: selected task should remain current even when moving tabs
++ unofficial faction modifiers off by default
++ improvements to descriptions for replacement items and parts
++ renamed Personnel tab to Infirmary and refactored all "personnel" named variables in MekHQView to "patient"
++ personnelTable
++ added type and support skill columns to personnel table
++ only wounded personnel are in the infirmary
++ moved PatientMouseAdapter to PersonnelMouseAdapter
++ sortable columns in personnel table
+
++ gender variable in Person (still need to link it to random name generator)
++ birthday and age variables in Person
++ Bug: personnelTable not refreshing when new personnel are hired
++ Personnel Options tab 
++ Game options to use artillery skill, init bonus, tactics bonus, and toughness
++ NPE when cancelling loadXML
++ PersonnelList not refreshing when doctors hired
++ Doctors not able to be assigned
++ incorrect mods listed in Acquisition Info
++ Bug: personnelMouseAdapter referencing patientTable
+
+v0.1.2 (2011-04-15)
++ updated MegaMek.jar
++ pilot portraits
++ unit camo
++ CamoChoiceDialog
++ close button for PersonViewDialog
++ updated build.xml
++ PortraitChoiceDialog (not fully working)
++ updated nbproject properties
++ set default campaign options to vanilla StratOps
++ campaign options reset to private variables accessed by normal methods
++ Bug: campaign does not need to be passed into unit diagnostics because it is a variable in Unit.java
++ finances are disabled by default
++ Bug: finances disabled, replacement not possible due to lack of finances
++ refresh unit view when buying units
++ refresh respective views when hiring pilots and techs
++ removed "Store Time" option (no time machines!)
++ Techs can now begin a task on one day and finish it the next if they run out of time
++ Added one version of a random name generator
+	+ Name Gen class
+	+ Random names on "hire personnel" dialogs
+	+ First-pass resource files for first names, last names, and name patterns.
++ Added menu items and partial implementation of Save/Load to/from XML for campaign, in parallel to binary serialization.
+	+ Menu entries for save to/load from XML
+	+ Functions for saving Campaigns and most sub-objects to XML (Entity and Mounted currently outstanding)
+	+ Functions for loading Campaign and most sub-objects from XML (units, personnel, tasks, teams, parts, campaign options outstanding)
++ Added beginnings of a more flexible log framework handled through MekHQApp object.
++ Change "funds" var from int to long.  MAX_INT is only 4.3 billion or so, and there are DropShips that cost 1.6 billion...
++ Changed cost of parts from int to long, plus a couple of supporting functions that used it.
++ Changed instances of "<br>" to "<br/>" for XML parser compatibility on comments and text window.
++ Changed instances of "<p>" to "<p/>" for XML parser compatibility on comments and text window.
++ Added "reCalc" function to all Units, Parts, Persons, WorkItems, and Teams.
+	+ Moved all calculated values in constructors into reCalc and called in constructors.
+	+ Added "reCalc" to XML de-serialization to catch up on missing values.
++ XML Serialization/de-serialization completed. 
++ Altered NewTechTeamDialog so that it generates a new name once a tech is hired.
++ Put partial implementation of "getMonthlySalary()" on Person, as a step towards finances (using FM:Mercs(R) rules).
++ Added "Team Type" to SupportTeam for differentiation without class type comparison.
++ Re-factored MekGyro to more closely reflect actual calculations (based on gyro tonnage, not unit tonnage/walk MP).
++ Cleaned up numerous unnecessary imports.
++ Cleaned up some hanging references/unreferenced locals in code.
++ Bug 2908482: Unable to deploy any vehicles
++ Bug 3065623: Lock up when trying to do tasks
++ avoid concurrent looping problems in Campaign.RemoveAllTasksFor(Unit)
++ updated MegaMek.jar to 0.35.22
++ Bug 3262646: Report Pane doesn't auto scroll
++ Bug 3014569: Load Campaign Dialog Filter
++ updated mechfiles
++ Bug 3193405: Cannot Hire Pilots---Latest SVN
++ Bug: setCaretPosition for txtPaneReport not getting right length
++ Updating unit images to 0.35.22
++ Bug: Armor replacement on locations with no armor left 3 points unfixed
++ reversed ordering of report (new items are added to the top) to remove issue of inconsistent auto-scrolling
+
+v0.1.1 (2009-09-29)
++ declare pilots KIA and retired
++ Bug: canon only button not filtering properly
++ report notifications for recovered units and personnel
++ report notifications for new units and personnel
++ pilot advantages and implants in NewPilotDialog
++ RFE 2843210: Save campaign with campaign name
++ canon only button in UnitSelectorDialog
++ added unit picture to UnitSelectorDialog
++ Bug: entities not being restored on load game
++ UnitSelectorDialog (for hiring new units)
++ tooltip text and button labels for Deploy Units and Retrieve Units updated
++ load forces from MUL menu item (for loading initial forces including pilots)
++ RFE 2841678: Dialogue on unsuccessful deploy 
++ Clan/IS ammo limits
++ Bug: NPE when getTasksForUnit called and no units selected
++ Era
++ campaign faction option
++ campaign date option
++ campaign name option
++ Campaign Options Dialog
++ Main window title shows campaign name and date
++ GM Mode toggle button
++ Overtime toggle button
++ changed layout of master buttons panel
++ changed Personnel tab to GridBagLayout
++ changed hangar tab to GridBagLayout
++ changed layout of main panel to GridBagLayout
++ Bug 2834266: automatic recovery for wounded personnel
++ Bug: torso can be salvaged before arm
++ updated MegaMek.jar
++ Bug: mech CT cannot be scrapped
++ Ejected pilots read in
++ Only existing pilots are read from Load Unit dialog (use Hire Pilot to get new ones)
++ don't need R/L torso to salvage/replace R/L Leg
++ changed color and focus indicator for Info items
++ check for unit repairability and functionality on deployment and diagnosis
++ obtain replacement check
++ added detail line to TaskInfo and WorkItems
++ Bug: internal damage percentage not being set in MekLocationRepair
++ Scrap Component option enabled in Task context menu
++ improvements to Parts display
++ added restore methods for transient equipmentType field in EquipmentPart
++ campaign name
++ window name issues
++ improved task reporting
++ disallow salvaging of heat sinks integral to the engine
++ location salvage allowed only after all items salvaged or scapped; torso salvage only possible after limb salvage
++ Bug: engine salvage NPE
++ Elite failure of repair item does not automatically mutate to replacement item in case player still wants to use damaged part
++ Bug: salvaged locations not set to IArmorState.ARMOR_DESTROYED
++ smaller fonts on Info
++ scrapping component destroys part
++ refactored success and failure of tasks out of SupportTeam
++ Bug: removed comment out on parts check for target roll
++ Bug: parts re-assignment not resetting to null when no useable parts are available
++ Bug: destroying components on Elite team replacement failure
++ improvements to armor replacement and salvage
++ improved naming of various salvage, repair, and replacement items and parts
++ remove salvage work item from within repairItem#replace method
++ Bug: all ammo bins showing as needing to be replaced
++ when scrapping repairs, the component should be set to unrepairable status
++ helper functions in Unit for damaging, destroying, and repairing critical slots and associated uses
++ bug: duplicating salvage items on reload
++ added name and time to armor salvage
++ refactored actuator repairs and replacement into single repair and replace items with a type variable
++ more work on salvage/replacement compatability and diagnosis
++ salvage/repair switch in Unit context menu
++ isRepairable checks to Unit#runDiagnostic
++ updated MegaMek.jar
++ abstract salvage item
++ more parts
++ PartsTable
++ different color for replacement renderers without parts
++ elite tech failure on replacement destroys part
++ more parts and check for parts in ReplacementItem
++ Unit#canDeploy
++ start of Parts package
++ modular weapons quirk
++ fast reload quirk
++ difficult to maintain quirk mod
++ easy to maintain quirk mod
++ experimental component modifier
++ overtime work
++ Combat Loss menu item in Unit popup menu for deployed units
++ Deployed unit label text white
++ Bug 2830562: Arm Can Be Replaced, Even When Torso Is Missing
++ removed equipment destruction check from runDiagnostic (should be done from within MegaMek)
++ changed deployed unit background to dark gray
++ Bug: NPE on deploying units because of null tasks in Person
++ corrected initial date formatting (extra line)
++ WorkItem#sameAs method for determining whether a work item refers to the same component (and tons of overrides)
++ transfer skill min requirements from old tasks to new tasks when reloading units
++ reassign tasks when reloading units
++ refresh pilot when reloading units
++ load unit method now will reload entities for existing units rather than making duplicates (partial)
++ removed assignedTasks arrayList from SupportTeam (all Team assignment information is held by WorkItem)
++ added PilotPerson variable to unit
++ deployed units and personnel are not removed but rather set to a deployed status
++ set ExternalId of entities to be the same as unit id
++ updated MegaMek.jar
++ changed font size and enabled word wrapping on textTarget display
++ change "location" to "site"
++ extra time
++ rush jobs
++ location switcher added to Unit right-click menu
++ location mods
++ support team casualty mods
++ widened TaskTable
++ removed AmmoType variables from ReloadItem (because they are not serialized)
++ enabled loading of campaigns
++ enabled saving of campaigns
++ changed font and added wrapping to textTarget
++ removed unused imports
++ added some javadoc to Campaign.java
++ removed unused dialogs
++ wounded personnel will heal on their own in 15 cycles
++ make MekHQ compilable in Eclipse
++ native-looking menus for Mac OSX
++ Bug 2854866: Mechwarrior with 1 hit unable to be healed by medic team
++ double-click for view of pilot personnel
++ updated mechfiles
++ GM mode options
++ improved tooltips
++ README.txt
+
+v0.1.0 (2009-07-29)
++ Bug: some weapon repair/replacements not being diagnosed
++ no CASE repairs
++ Bug: double heat sinks not being picked up in diagnostic
++ uncrittable equipment should be skipped in diagnostic
++ updated Example.mul
++ Vee Sensor replacment item
++ Stabilizer replacement item (partial, no method in MM reset)
++ Stabilizer repair item (partial, no method in MM to rest)
++ TurreLock repair item (partial, no method in MM to reset)
++ refactored InternalRepair into MekInternalRepair and VeeInternalRepair
++ Rotor Replacement item
++ Rotor Repair item
++ Turret Replacement item
++ corrected labels
++ changed versioning
++ Bug: getting impossible rolls where they should be possible
++ populate a menu for swap ammo option in Task popup menu
++ scrap component option in Task popup menu
++ made corrections to RepairItem
++ swap ammo menu option in Unit popup menu
++ assign all tasks menu option in Unit popup menu
++ sell unit menu option in Unit popup menu
++ change pilot menu option in Unit popup menu
++ yellow color for units with tasks
++ team variable in WorkItem and associated methods
++ doctor assignment string to Person HTML report
++ red color for Personnel with unassigned tasks
++ fixed doctor/patient task assignment and updating
++ Bug: NPE on UpdateTargetText
++ target number label
++ added TextPane for reports
++ changed all icons to icons from the Open Clip Art Library
++ centralized impossible tasks checks in SupportTeam#getTargetFor
++ improvements to reporting on row labels
++ replaced DoctorList with DoctorTable
++ replaced PersonList with PersonTable
++ Renderer for TaskTable
++ abstract class ArrayTableModel
++ right-click menu for UnitTable
++ switched UnitList to UnitTable
++ MekTableModel and renderer
++ MekInfo
++ added work queue to SupportTeam.java to support user re-ordering of tasks
++ pass Team rather than TeamId into WorkItem
++ single selection of OrganizeTaskDialog table
++ fileFilters for saving and loading MULs
++ Start of OrganizeTasksDialog
++ switched to JDK6.0
++ Bug: TaskTable not being declared
++ Bug: front armor being added twice when rear armor doesn't exist
++ replaced TaskList with TaskTable
++ Calendar
++ Campaign#getTechTeams and remove medical teams from hangar team list
++ refactor SupportTeam into TechTeam and MedicalTeam
++ assignment and processing of HealPilot work items
++ HealPilot work item
++ refactor WorkItem into UnitWorkItem extending new abstract class WorkItem
++ label for ChoosePilotDialog
++ allow user to select a subset of units for deployment
++ allow pilot switching among units
++ hire new pilot dialog
++ list of personnel
++ SupportPerson class
++ PilotPerson class
++ Person class
++ Personnel tab
++ embedded main panel in tabbed pane
++ improve reporting of full ammo reloads
++ Show entity name in task report
++ Bug: NPE on single-shot ammo
++ time multipliers for reloading
++ View Unit button now working
++ tooltips on main window buttons
++ View Unit button
++ added log file
++ roll 3d6 taking two lowest on mismatched tech
++ dissallow doctors from making repairs
++ more ammo limitations
++ Include ReloadItems for all ammo bins because user may wish to swap ammo in full bins
++ Ammo Swapping
++ ReloadItem
++ AmmoBinReplacement item
++ failed Elite replacement checks reset level to Green
++ added impossibilty checks for tasks in destroyed locations
++ added check for impossible tasks
++ Replace button
++ messages about replacement/repair failure of Elite techs
++ Engine replacement item
++ Engine repair item
++ repair items failed by elite tech become replacement items
++ Heat sink replacement item
++ Heat sink repair item
++ Jump jet replacement item
++ Jump jet repair item
++ Life support repair item
++ Sensor replacement item
++ Actuator replacement items
++ Equipment replacement item
++ Equipment repair item
++ rear armor included in armor replacement diagnostic
++ Internal structure replacement items
++ Internal structure repair items
++ Actuator repair items
++ Gyro repair items
++ Life support repair items
++ Sensor repair items
++ added fix methods for GyroReplacement and GyroRepair
++ refactored Campaign#runDiagnostic into Unit#runDiagnostic
++ added Unit class as wrapper for Entity
++ added doc folder and version history
++ abstract classes RepairItem, Replacment Item, ReloadItem
++ Gyro repair and replacement
++ serialized classes
++ changed package structure
++ Fixed list selection indexing
++ mul example
++ new MegaMek.jar
++ added Game() to Entities to avoid NPEs
++ titles corrected
++ TinyXML.jar
++ lib folder
++ Initial SVN
