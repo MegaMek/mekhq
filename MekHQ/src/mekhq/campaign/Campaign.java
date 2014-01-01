@@ -6306,6 +6306,15 @@ public class Campaign implements Serializable {
         boolean maintained = null != tech
                              && tech.getMinutesLeft() > minutesUsed;
         boolean paidMaintenance = true;
+        //maybe use the money
+        if (campaignOptions.payForMaintain()) {
+            if (finances.debit(u.getMaintenanceCost(),
+                               Transaction.C_MAINTAIN, "Maintenance for " + u.getName(),
+                               calendar.getTime())) {
+            } else {
+                paidMaintenance = false;
+            }
+        }
         if (maintained) {
             // use the time
             tech.setMinutesLeft(tech.getMinutesLeft() - minutesUsed);
@@ -6322,15 +6331,6 @@ public class Campaign implements Serializable {
             if (null != tech) {
                 techName = tech.getFullTitle();
                 techNameLinked = tech.getHyperlinkedFullTitle();
-                //maybe use the money
-                if (campaignOptions.payForMaintain()) {
-                    if (finances.debit(u.getMaintenanceCost(),
-                                       Transaction.C_MAINTAIN, "Maintenance for " + u.getName(),
-                                       calendar.getTime())) {
-                    } else {
-                        paidMaintenance = false;
-                    }
-                }
             }
             // dont do actual damage until we clear the for loop to avoid
             // concurrent mod problems

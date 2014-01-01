@@ -84,6 +84,7 @@ v0.3.4 (SVN)
     proper crews for multi-crewed vehicles.
 + Bug [#442]: GM Tools: Dice Roll gives nothing above 10
     This also includes a new mekhq.Utilities method dice(num, faces) that will roll any number of any size dice.
++ Bug [#427]: Maintenance Costs Not Showing Up
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
