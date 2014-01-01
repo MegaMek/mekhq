@@ -248,10 +248,31 @@ public class MekHQ implements GameListener {
     	campaign = c;
     }
     
-    public void startHost(Scenario scenario, boolean loadSavegame, ArrayList<Unit> meks) {
+    public void joinGame(Scenario scenario, ArrayList<Unit> meks) {
+		String host = JOptionPane.showInputDialog("Host to connect server on?", "127.0.0.1");
+		int port = Integer.parseInt(JOptionPane.showInputDialog("Port to connect to server on?", "2346"));
 
     	try {
-            myServer = new Server("", 2346);
+    		client = new Client(campaign.getName(), "127.0.0.1", port);
+        } catch (Exception ex) {
+        	MekHQ.logMessage("Failed to connect to server properly");
+			MekHQ.logError(ex);
+            return;
+        }
+
+    	client.getGame().addGameListener(this);
+        currentScenario = scenario;
+        
+        //Start the game thread
+        gameThread = new GameThread(campaign.getName(), client, this, meks);
+        gameThread.start();
+    }
+    
+    public void startHost(Scenario scenario, boolean loadSavegame, ArrayList<Unit> meks) {
+		int port = Integer.parseInt(JOptionPane.showInputDialog("Port to start server on?", "2346"));
+
+    	try {
+            myServer = new Server("", port);
             if (loadSavegame) {
                 FileDialog f = new FileDialog(campaigngui.getFrame(), "Load Savegame");
                 f.setDirectory(System.getProperty("user.dir") + "/savegames");
@@ -266,8 +287,9 @@ public class MekHQ implements GameListener {
 
         myServer.getGame().addGameListener(this);
         currentScenario = scenario;
+        
         //Start the game thread
-        client = new Client(campaign.getName(), "127.0.0.1", 2346);
+        client = new Client(campaign.getName(), "127.0.0.1", port);
         gameThread = new GameThread(campaign.getName(), client, this, meks);
         gameThread.start();
     }

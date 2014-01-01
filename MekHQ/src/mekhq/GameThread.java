@@ -101,7 +101,6 @@ class GameThread extends Thread implements CloseClientListener {
                 }
 
                 client.sendPlayerInfo();
-
             }
             
             while(!stop) {
