@@ -8352,6 +8352,9 @@ public class CampaignGUI extends JPanel {
                     if (selectedPart instanceof AmmoStorage) {
                         n = ((AmmoStorage) selectedPart).getShots();
                     }
+                    if (selectedPart instanceof Armor) {
+                    	n = ((Armor) selectedPart).getAmount();
+                    }
                     PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
                             getFrame(), true, "Sell How Many " + selectedPart.getName() + "s?", 1, 1, n);
                     pvcd.setVisible(true);
@@ -8361,6 +8364,12 @@ public class CampaignGUI extends JPanel {
                     int q = pvcd.getValue();
                     getCampaign().sellPart(selectedPart, q);
                 }
+                refreshFinancialTransactions();
+                refreshPartsList();
+                refreshTaskList();
+                refreshAcquireList();
+                refreshReport();
+                refreshCargo();
             } else if (command.equalsIgnoreCase("CANCEL_ORDER")) {
                 double refund = getCampaign().getCampaignOptions().GetCanceledOrderReimbursement();
                 long refundAmount = 0;
@@ -8459,6 +8468,15 @@ public class CampaignGUI extends JPanel {
             maybeShowPopup(e);
         }
 
+        public boolean areAllPartsArmor(Part[] parts) {
+            for (Part p : parts) {
+                if (!(p instanceof Armor)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         public boolean areAllPartsAmmo(Part[] parts) {
             for (Part p : parts) {
                 if (!(p instanceof AmmoStorage)) {
@@ -8530,6 +8548,17 @@ public class CampaignGUI extends JPanel {
                             menuItem.addActionListener(this);
                             menu.add(menuItem);
                         }
+                    } else if (areAllPartsArmor(parts)) {
+                    	menuItem = new JMenuItem("Sell All Armor of This Type");
+                        menuItem.setActionCommand("SELL_ALL");
+                        menuItem.addActionListener(this);
+                        menu.add(menuItem);
+                        if (oneSelected && ((Armor) part).getAmount() > 1) {
+                            menuItem = new JMenuItem("Sell # Armor points of This Type...");
+                            menuItem.setActionCommand("SELL_N");
+                            menuItem.addActionListener(this);
+                            menu.add(menuItem);
+                        }
                     } else if (areAllPartsNotAmmo(parts)) {
                         menuItem = new JMenuItem("Sell Single Part of This Type");
                         menuItem.setActionCommand("SELL");
@@ -8546,7 +8575,7 @@ public class CampaignGUI extends JPanel {
                             menu.add(menuItem);
                         }
                     } else {
-                        //when both ammo and non-ammo only allow sell all
+                        //when armor, ammo, and non-ammo only allow sell all
                         menuItem = new JMenuItem("Sell All Parts of This Type");
                         menuItem.setActionCommand("SELL_ALL");
                         menuItem.addActionListener(this);
