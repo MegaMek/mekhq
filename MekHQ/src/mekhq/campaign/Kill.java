@@ -70,6 +70,10 @@ public class Kill implements Serializable {
 		return pilotId;
 	}
 	
+	public void setPilotId(UUID id) {
+		pilotId = id;
+	}
+	
 	public Date getDate() {
 		return date;
 	}
@@ -153,5 +157,10 @@ public class Kill implements Serializable {
 	public void fixIdReferences(Hashtable<Integer, UUID> pHash) {
     	pilotId = pHash.get(oldPilotId);
     }
+	
+	@Override
+	public Kill clone() {
+		return new Kill(getPilotId(), getWhatKilled(), getKilledByWhat(), getDate());
+	}
 	
 }
