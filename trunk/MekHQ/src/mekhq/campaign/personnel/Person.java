@@ -2450,8 +2450,16 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         setStatus(status);
         if (status != Person.S_ACTIVE) {
             setDoctorId(null, campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
+            // If we're assigned to a unit, remove us from it
             if (null != u) {
                 u.remove(this, true);
+            }
+            // If we're assigned as a tech for any unit, remove us from it/them
+            if (!techUnitIds.isEmpty()) {
+            	for (UUID tuuid : techUnitIds) {
+            		Unit t = campaign.getUnit(tuuid);
+            		t.remove(this, true);
+            	}
             }
         }
     }

@@ -4719,8 +4719,17 @@ public class Campaign implements Serializable {
         if (status != Person.S_ACTIVE) {
             person.setDoctorId(null, getCampaignOptions()
                     .getNaturalHealingWaitingPeriod());
+            // If we're assigned to a unit, remove us from it
             if (null != u) {
                 u.remove(person, true);
+            }
+            // If we're assigned as a tech for any unit, remove us from it/them
+            if (!person.getTechUnitIDs().isEmpty()) {
+            	ArrayList<UUID> techIDs = (ArrayList<UUID>) person.getTechUnitIDs().clone();
+            	for (UUID tuuid : techIDs) {
+            		Unit t = getUnit(tuuid);
+            		t.remove(person, true);
+            	}
             }
         }
     }
