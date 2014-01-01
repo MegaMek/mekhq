@@ -88,6 +88,10 @@ v0.3.4 (SVN)
 + Bug [#422]: Retired Techs Still Perform Maintenance
 + RFE [#132]: Ability to mass modify edge triggers
     Added this to dependent flag also
++ RFE [#152]: Mass assign kills for vehicle crews
+    All selected people must either be crewing the same unit or be unassigned.
+    Additionally I also made it so the kill dialog now puts the unit name if
+    there is one, of Bare Hands if there isn't, instead of Bare Hands always.
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

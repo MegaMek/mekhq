@@ -7366,10 +7366,28 @@ public class CampaignGUI extends JPanel {
                 }
                 refreshPersonnelList();
             } else if (command.equalsIgnoreCase("KILL")) {
-                KillDialog nkd = new KillDialog(getFrame(), true, new Kill(selectedPerson.getId(), "?", "Bare Hands", getCampaign().getDate()), selectedPerson.getName());
+            	KillDialog nkd;
+            	if (people.length > 1) {
+            		nkd = new KillDialog(getFrame(), true, new Kill(null, "?", getCampaign().getUnit(selectedPerson.getUnitId()) != null ?
+            				getCampaign().getUnit(selectedPerson.getUnitId()).getName() : "Bare Hands",
+            				getCampaign().getDate()), "Crew");
+            	} else {
+            		nkd = new KillDialog(getFrame(), true, new Kill(selectedPerson.getId(), "?",
+            				getCampaign().getUnit(selectedPerson.getUnitId()) != null ? getCampaign().getUnit(selectedPerson.getUnitId()).getName()
+            						: "Bare Hands", getCampaign().getDate()), selectedPerson.getName());
+            	}
                 nkd.setVisible(true);
                 if (!nkd.wasCancelled()) {
-                    getCampaign().addKill(nkd.getKill());
+                	Kill kill = nkd.getKill();
+                	if (people.length > 1) {
+	                	for (Person person : people) {
+	                		Kill k = kill.clone();
+	                		k.setPilotId(person.getId());
+	                		getCampaign().addKill(k);
+	                	}
+                	} else {
+                		getCampaign().addKill(kill);
+                	}
                 }
                 refreshPersonnelList();
             } else if (command.equalsIgnoreCase("KILL_LOG")) {
@@ -8183,12 +8201,14 @@ public class CampaignGUI extends JPanel {
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(true);
                 popup.add(menuItem);
-                if (oneSelected) {
+                if (oneSelected || allHaveSameUnit(selected)) {
                     menuItem = new JMenuItem("Assign Kill...");
                     menuItem.setActionCommand("KILL");
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
                     popup.add(menuItem);
+                }
+                if (oneSelected) {
                     menuItem = new JMenuItem("Edit Kill Log...");
                     menuItem.setActionCommand("KILL_LOG");
                     menuItem.addActionListener(this);
@@ -8266,6 +8286,17 @@ public class CampaignGUI extends JPanel {
                 popup.add(menu);
                 popup.show(e.getComponent(), e.getX(), e.getY());
             }
+        }
+        
+        private boolean allHaveSameUnit(Person[] people) {
+        	UUID unitId = people[0].getUnitId();
+        	for (Person person : people) {
+        		if ((unitId == null && person.getUnitId() == null) || person.getUnitId().equals(unitId)) {
+        			continue;
+        		}
+        		return false;
+            }
+            return true;
         }
     }
 
