@@ -94,6 +94,7 @@ v0.3.4 (SVN)
     there is one, of Bare Hands if there isn't, instead of Bare Hands always.
 + Bug [#444]: Selling of parts bug
 + Bug: Selling N Parts doesn't refresh anything
++ RFE [#154]: Add better multiple player support for resolving scenarios with saved games
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
