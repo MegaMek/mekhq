@@ -398,6 +398,7 @@ public class CampaignGUI extends JPanel {
     private JButton btnCompleteMission;
     private JButton btnDeleteMission;
     private JButton btnStartGame;
+    private JButton btnJoinGame;
     private JButton btnLoadGame;
     private JButton btnPrintRS;
     private JButton btnGetMul;
@@ -897,7 +898,7 @@ public class CampaignGUI extends JPanel {
 
         panScenario = new JPanel(new GridBagLayout());
 
-        panScenarioButtons = new JPanel(new GridLayout(2, 3));
+        panScenarioButtons = new JPanel(new GridLayout(3, 3));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -916,6 +917,16 @@ public class CampaignGUI extends JPanel {
         });
         btnStartGame.setEnabled(false);
         panScenarioButtons.add(btnStartGame);
+
+        btnJoinGame = new JButton(resourceMap.getString("btnJoinGame.text")); // NOI18N
+        btnJoinGame.setToolTipText(resourceMap.getString("btnJoinGame.toolTipText")); // NOI18N
+        btnJoinGame.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                joinScenario();
+            }
+        });
+        btnJoinGame.setEnabled(false);
+        panScenarioButtons.add(btnJoinGame);
 
         btnLoadGame = new JButton(resourceMap.getString("btnLoadGame.text")); // NOI18N
         btnLoadGame.setToolTipText(resourceMap.getString("btnLoadGame.toolTipText")); // NOI18N
@@ -5284,6 +5295,7 @@ public class CampaignGUI extends JPanel {
         if (row < 0) {
             scrollScenarioView.setViewportView(null);
             btnStartGame.setEnabled(false);
+            btnJoinGame.setEnabled(false);
             btnLoadGame.setEnabled(false);
             btnGetMul.setEnabled(false);
             btnClearAssignedUnits.setEnabled(false);
@@ -5302,6 +5314,7 @@ public class CampaignGUI extends JPanel {
         });
         boolean unitsAssigned = scenario.getForces(getCampaign()).getAllUnits().size() > 0;
         btnStartGame.setEnabled(scenario.isCurrent() && unitsAssigned);
+        btnJoinGame.setEnabled(scenario.isCurrent() && unitsAssigned);
         btnLoadGame.setEnabled(scenario.isCurrent() && unitsAssigned);
         btnGetMul.setEnabled(scenario.isCurrent() && unitsAssigned);
         btnClearAssignedUnits.setEnabled(scenario.isCurrent() && unitsAssigned);
@@ -6068,6 +6081,52 @@ public class CampaignGUI extends JPanel {
 
         if (chosen.size() > 0) {
             ((MekHQ) getApplication()).startHost(scenario, false, chosen);
+        }
+    }
+
+    protected void joinScenario() {
+        int row = scenarioTable.getSelectedRow();
+        if (row < 0) {
+            return;
+        }
+        Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
+
+        if (uids.size() == 0) {
+            return;
+        }
+
+        ArrayList<Unit> chosen = new ArrayList<Unit>();
+        //ArrayList<Unit> toDeploy = new ArrayList<Unit>();
+        StringBuffer undeployed = new StringBuffer();
+
+        for (UUID uid : uids) {
+            Unit u = getCampaign().getUnit(uid);
+            if (u.isUnmanned()) {
+                continue;
+            }
+            if (null != u.getEntity()) {
+                if (null == u.checkDeployment()) {
+                    chosen.add(u);
+                } else {
+                    undeployed.append("\n")
+                              .append(u.getName())
+                              .append(" (").append(u.checkDeployment())
+                              .append(")");
+                }
+            }
+        }
+
+        if (undeployed.length() > 0) {
+            JOptionPane.showMessageDialog(
+                    getFrame(),
+                    "The following units could not be deployed:"
+                    + undeployed.toString(),
+                    "Could not deploy some units", JOptionPane.WARNING_MESSAGE);
+        }
+
+        if (chosen.size() > 0) {
+            ((MekHQ) getApplication()).joinGame(scenario, chosen);
         }
     }
 

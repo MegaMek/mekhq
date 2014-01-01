@@ -77,6 +77,7 @@ public class ResolveScenarioTracker {
 	Hashtable<UUID, Crew> mia;
 	Hashtable<UUID, Person> newPilots;
 	ArrayList<Entity> potentialSalvage;
+	ArrayList<Entity> alliedUnits;
 	ArrayList<Unit> actualSalvage;
 	ArrayList<Unit> leftoverSalvage;
 	ArrayList<Unit> units;
@@ -97,6 +98,7 @@ public class ResolveScenarioTracker {
 		this.control = ctrl;
 		unitsStatus = new Hashtable<UUID, UnitStatus>();
 		potentialSalvage = new ArrayList<Entity>();
+		alliedUnits = new ArrayList<Entity>(); // TODO: Make some use of this?
 		actualSalvage = new ArrayList<Unit>();
 		leftoverSalvage = new ArrayList<Unit>();
 		pilots = new Hashtable<UUID, Crew>();
@@ -206,17 +208,19 @@ public class ResolveScenarioTracker {
 	public void processGame() {
 
 		int pid = client.getLocalPlayer().getId();
+		int team = client.getLocalPlayer().getTeam();
 		
 		for (Enumeration<Entity> iter = client.getGame().getEntities(); iter.hasMoreElements();) {
 			Entity e = iter.nextElement();
-			if(e.getOwnerId() == pid) {
+			if(e.getOwnerId() == pid || e.getOwner().getTeam() == team) {
 				if(e.canEscape() || control) {
 					if(!e.getExternalIdAsString().equals("-1")) {
 					    UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
 						if(null != status) {
 						    status.assignFoundEntity(e);
+						} else {
+							alliedUnits.add(e);
 						}
-					    //entities.put(UUID.fromString(e.getExternalIdAsString()), e);
 					}
 					if(null != e.getCrew()) {
 						if(!e.getCrew().getExternalIdAsString().equals("-1")) {
@@ -243,13 +247,14 @@ public class ResolveScenarioTracker {
 		//add retreated units
 		for (Enumeration<Entity> iter = client.getGame().getRetreatedEntities(); iter.hasMoreElements();) {
             Entity e = iter.nextElement();
-            if(e.getOwnerId() == pid) {
+            if(e.getOwnerId() == pid || e.getOwner().getTeam() == team) {
             	if(!e.getExternalIdAsString().equals("-1")) {
             	    UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
                     if(null != status) {
                         status.assignFoundEntity(e);
-                    }
-					//entities.put(UUID.fromString(e.getExternalIdAsString()), e);
+					} else {
+						alliedUnits.add(e);
+					}
 				}
 				if(null != e.getCrew()) {
 					if(!e.getCrew().getExternalIdAsString().equals("-1")) {
@@ -269,13 +274,14 @@ public class ResolveScenarioTracker {
         Enumeration<Entity> wrecks = client.getGame().getWreckedEntities();
         while (wrecks.hasMoreElements()) {
         	Entity e = wrecks.nextElement();
-        	if(e.getOwnerId() == pid) {
+        	if(e.getOwnerId() == pid || e.getOwner().getTeam() == team) {
         		if(!e.getExternalIdAsString().equals("-1") && control && e.isSalvage()) {
         		    UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
                     if(null != status) {
                         status.assignFoundEntity(e);
-                    }
-        		    //entities.put(UUID.fromString(e.getExternalIdAsString()), e);
+					} else {
+						alliedUnits.add(e);
+					}
 				}
 				if(null != e.getCrew()) {
 				    //get dead crew members even if you don't control the battlefield

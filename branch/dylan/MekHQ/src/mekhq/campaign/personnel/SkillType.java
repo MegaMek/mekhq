@@ -284,6 +284,7 @@ public class SkillType implements Serializable {
 		abilityCosts = new HashMap<String, Integer>();
 		abilityCosts.put("hot_dog", 4);
 		abilityCosts.put("jumping_jack", 12);
+		abilityCosts.put("melee_master", 12);
 		abilityCosts.put("multi_tasker", 4);
 		abilityCosts.put("oblique_attacker", 4);
 		abilityCosts.put("pain_resistance", 4);
@@ -297,6 +298,7 @@ public class SkillType implements Serializable {
 		abilityCosts.put("gunnery_missile", 4);
 		abilityCosts.put("ei_implant", 0);
 		abilityCosts.put("clan_pilot_training", 0);
+		abilityCosts.put("cluster_master", 0);
 	}
 	
 	public static ArrayList<String> getAbilitiesFor(int type) {

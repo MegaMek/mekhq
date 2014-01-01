@@ -248,7 +248,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
         JCheckBox chkTotaled;
         JButton btnViewUnit;
         JButton btnEditUnit;
-        j = 0;
         for(UUID id : tracker.getUnitsStatus().keySet()) {
             UnitStatus status = tracker.getUnitsStatus().get(id);
             ustatuses.add(status);
