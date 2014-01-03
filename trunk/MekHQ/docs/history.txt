@@ -105,6 +105,8 @@ v0.3.4 (SVN)
     or make sense and in line (for unofficial ones)
 + Bug: Advanced Medical Injuries workedOn and perm variables accidently swapped in 1 spot
 + Bug: Location repairs and other things messed up by changes to MegaMek for superheavies
++ Bug: Maintenance costs in financial report not calculated correctly
++ Bug [#446]: Maintenance being deducted daily and weekly
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

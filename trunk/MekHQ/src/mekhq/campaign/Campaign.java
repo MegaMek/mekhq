@@ -1734,8 +1734,9 @@ public class Campaign implements Serializable {
 		 * on individual units when they come up for their maintenance checks and apply a +1 penalty
 		 * if the cash is not there
 		 * Dylan - Except when we're not using the maint cycle options at all!
+		 * And now this is gone again because I've adjusted how doMaintenance(Unit) is handled.
 		 */
-        if (!getCampaignOptions().checkMaintenance()) {
+        /*if (!getCampaignOptions().checkMaintenance()) {
             if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
                 // maintenance costs
                 if (campaignOptions.payForMaintain()) {
@@ -1750,7 +1751,7 @@ public class Campaign implements Serializable {
                     }
                 }
             }
-        }
+        }*/
 
         if (calendar.get(Calendar.DAY_OF_MONTH) == 1) {
             // check for contract payments
@@ -1847,6 +1848,14 @@ public class Campaign implements Serializable {
             if (u.requiresMaintenance() && null != u.getTech()) {
                 costs += u.getMaintenanceCost();
             }
+        }
+        return costs;
+    }
+
+    public long getWeeklyMaintenanceCosts() {
+        long costs = 0;
+        for (Unit u : units) {
+            costs += u.getWeeklyMaintenanceCost();
         }
         return costs;
     }
@@ -5550,7 +5559,7 @@ public class Campaign implements Serializable {
         long overhead = 0;
         long contracts = 0;
         if (campaignOptions.payForMaintain()) {
-            maintenance = getMaintenanceCosts() * 4;
+            maintenance = getWeeklyMaintenanceCosts() * 4;
         }
         if (campaignOptions.payForSalaries()) {
             salaries = getPayRoll();
