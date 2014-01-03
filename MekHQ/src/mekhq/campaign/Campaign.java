@@ -6353,6 +6353,7 @@ public class Campaign implements Serializable {
                                    Transaction.C_MAINTAIN, "Maintenance for " + u.getName(),
                                    calendar.getTime())) {
                 } else {
+                	addReport("<font color='red'><b>You cannot afford to pay maintenance costs for "+u.getHyperlinkedName()+"!</b></font>");
                     paidMaintenance = false;
                 }
             }
@@ -6492,7 +6493,6 @@ public class Campaign implements Serializable {
 	                    }
 	                }
 	            }
-	            u.resetDaysSinceMaintenance();
 	            u.setLastMaintenanceReport(maintenanceReport);
 	            int quality = u.getQuality();
 	            String qualityString = "";
@@ -6528,6 +6528,7 @@ public class Campaign implements Serializable {
 	            addReport(techNameLinked + " performs maintenance on " + u.getHyperlinkedName()
 	                      + ". " + paidString + qualityString + ". " + damageString + " [<a href='MAINTENANCE|" + u.getId() + "'>Get details</a>]");
 	        }
+            u.resetDaysSinceMaintenance();
         }
     }
 }
