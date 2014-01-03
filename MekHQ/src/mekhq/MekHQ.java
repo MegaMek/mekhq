@@ -64,6 +64,7 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.StartUpGUI;
+import mekhq.gui.dialog.LaunchGameDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 
 /**
@@ -249,11 +250,11 @@ public class MekHQ implements GameListener {
     }
     
     public void joinGame(Scenario scenario, ArrayList<Unit> meks) {
-		String host = JOptionPane.showInputDialog("Host to connect server on?", "127.0.0.1");
-		int port = Integer.parseInt(JOptionPane.showInputDialog("Port to connect to server on?", "2346"));
+		LaunchGameDialog lgd = new LaunchGameDialog(campaigngui.getFrame(), false, campaign);
+		lgd.setVisible(true);
 
     	try {
-    		client = new Client(campaign.getName(), "127.0.0.1", port);
+    		client = new Client(lgd.playerName, lgd.serverAddr, lgd.port);
         } catch (Exception ex) {
         	MekHQ.logMessage("Failed to connect to server properly");
 			MekHQ.logError(ex);
@@ -264,15 +265,16 @@ public class MekHQ implements GameListener {
         currentScenario = scenario;
         
         //Start the game thread
-        gameThread = new GameThread(campaign.getName(), client, this, meks);
+        gameThread = new GameThread(lgd.playerName, client, this, meks);
         gameThread.start();
     }
     
     public void startHost(Scenario scenario, boolean loadSavegame, ArrayList<Unit> meks) {
-		int port = Integer.parseInt(JOptionPane.showInputDialog("Port to start server on?", "2346"));
+    	LaunchGameDialog lgd = new LaunchGameDialog(campaigngui.getFrame(), true, campaign);
+		lgd.setVisible(true);
 
     	try {
-            myServer = new Server("", port);
+            myServer = new Server("", lgd.port);
             if (loadSavegame) {
                 FileDialog f = new FileDialog(campaigngui.getFrame(), "Load Savegame");
                 f.setDirectory(System.getProperty("user.dir") + "/savegames");
@@ -289,8 +291,8 @@ public class MekHQ implements GameListener {
         currentScenario = scenario;
         
         //Start the game thread
-        client = new Client(campaign.getName(), "127.0.0.1", port);
-        gameThread = new GameThread(campaign.getName(), client, this, meks);
+        client = new Client(lgd.playerName, "127.0.0.1", lgd.port);
+        gameThread = new GameThread(lgd.playerName, client, this, meks);
         gameThread.start();
     }
 
