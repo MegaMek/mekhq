@@ -214,8 +214,13 @@ public class MissingEquipmentPart extends MissingPart {
 	                if ((slot == null) || (slot.getType() != CriticalSlot.TYPE_EQUIPMENT)) {
 	                    continue;
 	                }
-	                
-	                if (equipmentNum == slot.getIndex()) {
+	                Mounted equip = unit.getEntity().getEquipment(equipmentNum);
+	                Mounted m1 = slot.getMount();
+	                Mounted m2 = slot.getMount2();
+	                if (m1 == null && m2 == null) {
+	                	continue;
+	                }
+	                if ((equip.equals(m1)) || (equip.equals(m2))) {
 	                    if (unit.hasBadHipOrShoulder(loc)) {
 	                        return true;
 	                    }
@@ -293,6 +298,7 @@ public class MissingEquipmentPart extends MissingPart {
 			if(null != mounted) {
 				mounted.setHit(true);
 		        mounted.setDestroyed(true);
+		        mounted.setRepairable(false);
 		        unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, unit.getEntity().getEquipmentNum(mounted));	
 			}
 		}
