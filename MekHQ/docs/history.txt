@@ -107,6 +107,7 @@ v0.3.4 (SVN)
 + Bug: Location repairs and other things messed up by changes to MegaMek for superheavies
 + Bug: Maintenance costs in financial report not calculated correctly
 + Bug [#446]: Maintenance being deducted daily and weekly
++ Bug [#446]: Maintenance being deducted daily and weekly, part 2
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
