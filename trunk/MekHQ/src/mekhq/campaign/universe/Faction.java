@@ -355,7 +355,7 @@ public class Faction {
 					choosableFactionCodes = wn.getTextContent().split(",");
 				}
 			}
-		}	
+		}
 		MekHQ.logMessage("Loaded a total of " + factions.keySet().size() + " factions");
 	}
 

@@ -48,6 +48,7 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -4964,14 +4965,16 @@ public class Campaign implements Serializable {
     }
 
     public void setStartingPlanet() {
-        Planet startingPlanet = Planets.getInstance().getPlanets()
-                                       .get(getFaction().getStartingPlanet(getEra()));
+    	Hashtable<String, Planet> planetList = Planets.getInstance().getPlanets();
+        Planet startingPlanet = planetList.get(getFaction().getStartingPlanet(getEra()));
+        
         if (startingPlanet == null) {
-            location = new CurrentLocation(Planets.getInstance().getPlanets()
-                                                  .get("Terra"), 0);
-        } else {
-            location = new CurrentLocation(startingPlanet, 0);
+        	startingPlanet = planetList.get(JOptionPane.showInputDialog("This faction does not have a starting planet for this era. Please choose a planet."));
+        	while (startingPlanet == null) {
+        		startingPlanet = planetList.get(JOptionPane.showInputDialog("This planet you entered does not exist. Please choose a valid planet."));
+        	}
         }
+        location = new CurrentLocation(startingPlanet, 0);
     }
 
     public void addLogEntry(Person p, LogEntry entry) {

@@ -30,7 +30,7 @@ clan - include "true" if this is a clan faction. Defaults to false if missing.
 periphery - include "true" if this is a periphery faction. Defaults to false if missing.
  -->
 <factions>
-	<choosableFactionCodes>MERC,CC,DC,FS,FWL,LA,FC,ROS,CS,WOB,FRR,SIC,MOC,MH,OA,TC,CDS,CGB,CHH,CJF,CNC,CSJ,CSV,CSR,CW,CBS,CCC,CCO,CFM,CGS,CIH,CSA,TH,RWR</choosableFactionCodes>
+	<choosableFactionCodes>MERC,CC,DC,FS,FWL,LA,FC,ROS,CS,WOB,FRR,SIC,MOC,MH,OA,TC,CDS,CGB,CHH,CJF,CNC,CSJ,CSV,CSR,CW,CBS,CCC,CCO,CFM,CGS,CIH,CSA,TH,RWR,CIR,JF,PIR,NIOPS,CDP,HL,NC</choosableFactionCodes>
 	<!-- Major Inner Sphere Factions -->
 	<faction>
 		<shortname>ABN</shortname>
@@ -1361,13 +1361,22 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<clan>true</clan>
 	</faction>
 	<faction>
-		<shortname>RR</shortname>
-		<fullname>Republic Remnant</fullname>
-		<startingPlanet>, , , , , , , ,Callison</startingPlanet>
-		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>128,40,0</colorRGB>
-		<periphery>false</periphery>
-		<clan>false</clan>
-	</faction>
+        <shortname>RR</shortname>
+        <fullname>Republic Remnant</fullname>
+        <startingPlanet>, , , , , , , ,Callison</startingPlanet>
+        <eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>128,40,0</colorRGB>
+        <periphery>false</periphery>
+        <clan>false</clan>
+    </faction>
+    <faction>
+        <shortname>PIR</shortname>
+        <fullname>Pirate</fullname>
+        <eraMods>2,2,2,2,2,2,2,2,2</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <colorRGB>128,40,0</colorRGB>
+        <periphery>false</periphery>
+        <clan>false</clan>
+    </faction>
 </factions>

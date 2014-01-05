@@ -111,6 +111,11 @@ v0.3.4 (SVN)
 + Bug: No message when you cannot afford maintenance for a unit
 + New LaunchGameDialog for the Start Game and Join Game buttons replaces the multiple
     JOptionPane.showInputDialog() originally used for quickness
++ New SortedComboBoxModel for alphabetically sorted ComboBoxes
++ Bug [#448]: Cannot select most factions
+    I added several more of the major factions, and included a generic Pirate to match the generic Mercenary
++ Changed how null starting planets are handled, it now asks you what planet you'd like to start on
++ Factions choice on the Campaign Options is now alphabetized
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
