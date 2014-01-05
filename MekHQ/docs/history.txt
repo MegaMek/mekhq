@@ -118,6 +118,8 @@ v0.3.4 (SVN)
 + Factions choice on the Campaign Options is now alphabetized
 + Bug [#447]: Being in debt not working properly.  (Partial)
 + Planetary Data updates
++ Added Wolf and Blake Starterbook Campaigns
++ Added Fist and Falcon Starterbook Campaigns
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
