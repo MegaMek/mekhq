@@ -522,12 +522,13 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         return getTechSupportValue() + getMedicalSupportValue() + getAdminValue();
     }
 
-    /*
-    @Override
     public int getYearsInDebt() {
-        return getYearsInDebt(true);
+        int yearsInDebt = campaign.getFinances().getFullYearsInDebt(campaign.getCalendar());
+        yearsInDebt += campaign.getFinances().getPartialYearsInDebt(campaign.getCalendar());
+        return yearsInDebt;
     }
 
+    /*
     public int getYearsInDebt(boolean recalculate) {
         if (!recalculate) {
             return yearsInDebt;
@@ -572,7 +573,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     */
 
     public int getFinancialValue() {
-        int score = campaign.getFinances().getFullYearsInDebt(campaign.getCalendar()) * -10;
+        int score = getYearsInDebt() * -10;
         score -= 25 * campaign.getFinances().getLoanDefaults();
         score -= 10 * campaign.getFinances().getFailedCollateral();
 
@@ -615,7 +616,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         sb.append("    HR Support:           ").append(getAdminSupportPercentage().toPlainString()).append("%\n\n");
 
         sb.append("Financial:                      ").append(getFinancialValue()).append("\n");
-        sb.append("    Years in Debt:        ").append(campaign.getFinances().getFullYearsInDebt(campaign.getCalendar())).append("\n");
+        sb.append("    Years in Debt:        ").append(getYearsInDebt()).append("\n");
         sb.append("    Loan Defaults:        ").append(campaign.getFinances().getLoanDefaults()).append("\n");
         sb.append("    No Collateral Payment:").append(campaign.getFinances().getFailedCollateral()).append("\n\n");
 
