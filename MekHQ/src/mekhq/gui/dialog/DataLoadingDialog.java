@@ -187,6 +187,12 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             setProgress(4);
             if(newCampaign) {
             	setVisible(false);
+            	// show the date chooser
+                DateChooser dc = new DateChooser(frame, campaign.calendar);
+                // user can eiter choose a date or cancel by closing
+                if (dc.showDateChooser() == DateChooser.OK_OPTION) {
+                	campaign.calendar = dc.getDate();
+                }
             	CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(frame, true, campaign, app.getIconPackage().getCamos());
             	optionsDialog.setVisible(true);
         		if(optionsDialog.wasCancelled()) {
