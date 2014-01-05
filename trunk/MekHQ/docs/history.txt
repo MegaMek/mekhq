@@ -117,6 +117,7 @@ v0.3.4 (SVN)
 + Changed how null starting planets are handled, it now asks you what planet you'd like to start on
 + Factions choice on the Campaign Options is now alphabetized
 + Bug [#447]: Being in debt not working properly.  (Partial)
++ Planetary Data updates
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
