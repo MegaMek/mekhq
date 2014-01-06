@@ -217,7 +217,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox chkEquipContractSaleValue;
     private JCheckBox chkBLCSaleValue;
     private JSpinner spnOrderRefund;
-    private javax.swing.JCheckBox usePercentageMaintBox;
+    private JCheckBox usePercentageMaintBox;
+    private JCheckBox useInfantryDontCountBox;
 
     private javax.swing.JTable tableRanks;
     private RankTableModel ranksModel;
@@ -354,6 +355,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         payForRecruitmentBox.setSelected(options.payForRecruitment());
         useLoanLimitsBox.setSelected(options.useLoanLimits());
         usePercentageMaintBox.setSelected(options.usePercentageMaint());
+        useInfantryDontCountBox.setSelected(options.useInfantryDontCount());
 
         useDamageMargin.setSelected(options.isDestroyByMargin());
         useQualityMaintenance.setSelected(options.useQualityMaintenance());
@@ -1427,6 +1429,17 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panFinances.add(usePercentageMaintBox, gridBagConstraints);
+
+        // Unofficial infantry don't count for contract pay
+        useInfantryDontCountBox = new JCheckBox(resourceMap.getString("infantryDontCount.text")); // NOI18N
+        useInfantryDontCountBox.setToolTipText(resourceMap.getString("infantryDontCount.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 11;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panFinances.add(useInfantryDontCountBox, gridBagConstraints);
 
 
         clanPriceModifierLabel.setText(resourceMap.getString("clanPriceModifierLabel.text")); // NOI18N
@@ -2919,6 +2932,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setPayForRecruitment(payForRecruitmentBox.isSelected());
         options.setLoanLimits(useLoanLimitsBox.isSelected());
         options.setUsePercentageMaint(usePercentageMaintBox.isSelected());
+        options.setUseInfantryDontCount(useInfantryDontCountBox.isSelected());
         options.setSellUnits(sellUnitsBox.isSelected());
         options.setSellParts(sellPartsBox.isSelected());
 

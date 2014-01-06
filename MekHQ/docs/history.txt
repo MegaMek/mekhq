@@ -136,6 +136,7 @@ v0.3.4 (SVN)
     battle. I chose this route because otherwise it would not allow the next part. That next
     part is that enemy personnel are now loaded into MekHQ's end screen and you have 3 options
     with them: prisoner, bondsman, escaped.
++ RFE [#89]: Unofficial - Exclude Infantry from Contract Pay
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
