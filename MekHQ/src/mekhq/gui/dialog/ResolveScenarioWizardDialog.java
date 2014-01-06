@@ -38,6 +38,7 @@ import java.util.ResourceBundle;
 import java.util.UUID;
 
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -114,13 +115,17 @@ public class ResolveScenarioWizardDialog extends JDialog {
      * Pilot status panel components
      */
     private ArrayList<JCheckBox> miaBtns;
+    private ArrayList<JCheckBox> prisonerBtns;
+    private ArrayList<JCheckBox> bondsmanBtns;
+    private ArrayList<JCheckBox> escapeBtns;
     private ArrayList<JSlider> hitSliders;
     private ArrayList<PersonStatus> pstatuses;
     
     /*
      * Salvage panel components
      */
-    private ArrayList<javax.swing.JCheckBox> salvageBoxes;
+    private ArrayList<JCheckBox> salvageBoxes;
+    private ArrayList<JCheckBox> escapeBoxes;
     private ArrayList<Unit> salvageables;
 	Hashtable<UUID, UnitStatus> salvageStatus;
     private ArrayList<JButton> btnsSalvageViewUnit;
@@ -311,13 +316,26 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        gridBagConstraints.weightx = 1.0;
         pnlPilotStatus.add(new JLabel(resourceMap.getString("mia")), gridBagConstraints);
+        gridBagConstraints.gridx = 3;
+        pnlPilotStatus.add(new JLabel(resourceMap.getString("prisoner")), gridBagConstraints);
+        gridBagConstraints.gridx = 4;
+        pnlPilotStatus.add(new JLabel(resourceMap.getString("bondsman")), gridBagConstraints);
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.weightx = 1.0;
+        pnlPilotStatus.add(new JLabel(resourceMap.getString("escaped")), gridBagConstraints);
         miaBtns = new ArrayList<JCheckBox>();
+        prisonerBtns = new ArrayList<JCheckBox>();
+        bondsmanBtns = new ArrayList<JCheckBox>();
+        escapeBtns = new ArrayList<JCheckBox>();
         hitSliders = new ArrayList<JSlider>();
         pstatuses = new ArrayList<PersonStatus>();
         i = 2;
         JCheckBox miaCheck;
+        JCheckBox prisonerCheck;
+        JCheckBox bondsmanCheck;
+        JCheckBox escapeCheck;
+        ButtonGroup captured;
         JSlider hitSlider; 
         Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
         labelTable.put( new Integer( 0 ), new JLabel("0") );
@@ -359,8 +377,37 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.gridx = 1;
             pnlPilotStatus.add(hitSlider, gridBagConstraints);
             gridBagConstraints.gridx = 2;
-            gridBagConstraints.weightx = 1.0;
             pnlPilotStatus.add(miaCheck, gridBagConstraints);
+            prisonerCheck = new JCheckBox("");
+            prisonerBtns.add(prisonerCheck);
+            gridBagConstraints.gridx = 3;
+            if (!status.isCaptured())
+            	prisonerCheck.setEnabled(false);
+            pnlPilotStatus.add(prisonerCheck, gridBagConstraints);
+            bondsmanCheck = new JCheckBox("");
+            bondsmanBtns.add(bondsmanCheck);
+            gridBagConstraints.gridx = 4;
+            if (!status.isCaptured())
+            	bondsmanCheck.setEnabled(false);
+            else {
+            	if (tracker.getCampaign().getFaction().isClan()) {
+            		bondsmanCheck.setSelected(true);
+            	} else {
+            		prisonerCheck.setSelected(true);
+            	}
+            }
+            pnlPilotStatus.add(bondsmanCheck, gridBagConstraints);
+            escapeCheck = new JCheckBox("");
+            escapeBtns.add(escapeCheck);
+            gridBagConstraints.gridx = 5;
+            gridBagConstraints.weightx = 1.0;
+            if (!status.isCaptured())
+            	escapeCheck.setEnabled(false);
+            pnlPilotStatus.add(escapeCheck, gridBagConstraints);
+            captured = new ButtonGroup();
+            captured.add(prisonerCheck);
+            captured.add(bondsmanCheck);
+            captured.add(escapeCheck);
             i++;
         }    	
     	pnlMain.add(pnlPilotStatus, PILOTPANEL);
@@ -369,8 +416,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
     	 * Salvage panel
     	 */
     	pnlSalvage = new JPanel();
-        salvageBoxes = new ArrayList<JCheckBox>();
-        pnlSalvage.setLayout(new GridBagLayout()); 
+    	salvageBoxes = new ArrayList<JCheckBox>();
+    	escapeBoxes = new ArrayList<JCheckBox>();
+    	pnlSalvage.setLayout(new GridBagLayout()); 
         btnsSalvageViewUnit = new ArrayList<JButton>();
         btnsSalvageEditUnit = new ArrayList<JButton>();
         JPanel pnlSalvageValue = new JPanel(new GridBagLayout());
@@ -450,6 +498,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         i++;
         j = 0;
         JCheckBox box;
+        JCheckBox escaped;
         JButton btnSalvageViewUnit;
         JButton btnSalvageEditUnit;
         for(Entity en : tracker.getPotentialSalvage()) {
@@ -473,6 +522,16 @@ public class ResolveScenarioWizardDialog extends JDialog {
      			}
         	});
         	salvageBoxes.add(box);
+        	escaped = new JCheckBox("Escapes");
+        	escaped.setSelected(en.canEscape());
+        	escaped.setEnabled(en.canEscape());
+        	escaped.addItemListener(new ItemListener() {
+        		@Override
+        		public void itemStateChanged(ItemEvent evt) {
+     				checkSalvageRights();
+     			}
+        	});
+        	escapeBoxes.add(escaped);
             btnSalvageViewUnit = new JButton("View Unit");
             btnSalvageViewUnit.setEnabled(true);
             btnSalvageViewUnit.setActionCommand(u.getId().toString());
@@ -496,8 +555,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
             pnlSalvage.add(box, gridBagConstraints);
             gridBagConstraints.gridx = 1;
-            pnlSalvage.add(btnSalvageViewUnit, gridBagConstraints);
+            pnlSalvage.add(escaped, gridBagConstraints);
             gridBagConstraints.gridx = 2;
+            pnlSalvage.add(btnSalvageViewUnit, gridBagConstraints);
+            gridBagConstraints.gridx = 3;
             gridBagConstraints.weightx = 1.0;
             pnlSalvage.add(btnSalvageEditUnit, gridBagConstraints);
             i++;
@@ -1027,6 +1088,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
     		PersonStatus status = pstatuses.get(i);
     		status.setMissing(miaBtns.get(i).isSelected());
     		status.setHits(hitSliders.get(i).getValue());
+    		status.setPrisoner(prisonerBtns.get(i).isSelected());
+    		status.setBondsman(bondsmanBtns.get(i).isSelected());
+    		status.setRemove(escapeBtns.get(i).isSelected());
     	}
     	
     	//now salvage
@@ -1093,14 +1157,33 @@ public class ResolveScenarioWizardDialog extends JDialog {
     }
     
     private void checkSalvageRights() {
+    	// Perform a little magic to make sure we aren't trying to do both of these things
+    	for (JCheckBox escaped : escapeBoxes) {
+    		JCheckBox box = salvageBoxes.get(escapeBoxes.indexOf(escaped));
+			if (escaped.isSelected()) {
+				box.setSelected(false);
+				box.setEnabled(false);
+			} else if (box.isSelected()) {
+				escaped.setSelected(false);
+				escaped.setEnabled(false);
+			} else {
+				box.setEnabled(true);
+				escaped.setEnabled(true);
+			}
+    	}
     	if(!(tracker.getMission() instanceof Contract)) {
     		return;
     	}
     	salvageEmployer = ((Contract)tracker.getMission()).getSalvagedByEmployer();
     	salvageUnit = ((Contract)tracker.getMission()).getSalvagedByUnit();
     	for(int i = 0; i < salvageBoxes.size(); i++) {
-    		JCheckBox box = salvageBoxes.get(i);
-    		if(box.isSelected()) {
+    		// Skip the escaping units
+    		if (escapeBoxes.get(i).isSelected()) {
+    			continue;
+    		}
+    		
+    		// Set up the values
+    		if(salvageBoxes.get(i).isSelected()) {
     			salvageUnit += salvageables.get(i).getSellValue();
     		} else {
     			salvageEmployer += salvageables.get(i).getSellValue();

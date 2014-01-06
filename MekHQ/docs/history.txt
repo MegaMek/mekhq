@@ -128,6 +128,14 @@ v0.3.4 (SVN)
 + Broke out pieces of the HangarReport into methods for use in my dylan branch to eliminate duplicate code
 + Bug [#449]: Procurement List link error
 + Broke out pieces of the PersonnelReport same as the HangarReport
++ Bug: New LaunchGameDialog NPE
++ Bug [#233]: Campaign resolve NPE when you have extra units
+    This vastly changed the resolution process, especially for games played via MekHQ.
+    Now all entities on the field are places as potential salvage and there is a new checkbox
+    for having them escape (they won't count in terms of salvage value either way) from the
+    battle. I chose this route because otherwise it would not allow the next part. That next
+    part is that enemy personnel are now loaded into MekHQ's end screen and you have 3 options
+    with them: prisoner, bondsman, escaped.
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
