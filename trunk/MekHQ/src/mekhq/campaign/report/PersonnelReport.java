@@ -45,20 +45,26 @@ public class PersonnelReport extends Report {
     public String getTitle() {
         return "Personnel Report";
     }
-      
-    public JTextPane getReport() {
+    
+    public JTextPane getCombatPersonnelReport() {
     	// Load combat personnel
         JTextPane txtCombat = new JTextPane();
         txtCombat.setFont(new Font("Courier New", Font.PLAIN, 12));
         txtCombat.setText(getCampaign().getCombatPersonnelDetails());
-        
-        // Load support personnel
+        return txtCombat;
+    }
+    
+    public JTextPane getSupportPersonnelReport() {
+    	// Load support personnel
         JTextPane txtSupport = new JTextPane();
         txtSupport.setFont(new Font("Courier New", Font.PLAIN, 12));
         txtSupport.setText(getCampaign().getSupportPersonnelDetails());
-        
+        return txtSupport;
+    }
+      
+    public JTextPane getReport() {
         // SplitPane them
-        JSplitPane splitOverviewPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, txtCombat, txtSupport);
+        JSplitPane splitOverviewPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, getCombatPersonnelReport(), getSupportPersonnelReport());
 		splitOverviewPersonnel.setName("splitOverviewPersonnel");
 		splitOverviewPersonnel.setOneTouchExpandable(true);
 		splitOverviewPersonnel.setResizeWeight(0.5);
