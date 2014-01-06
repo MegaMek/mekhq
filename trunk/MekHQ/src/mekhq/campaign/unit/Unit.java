@@ -191,6 +191,9 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	public static final int STATE_LIGHT_DAMAGE = 1;
 	public static final int STATE_HEAVY_DAMAGE = 2;
 	public static final int STATE_CRIPPLED = 3;
+	
+	// To be used for transport and cargo reports
+	public static final int ETYPE_MOTHBALLED = -9876;
 
 	protected Entity entity;
 	private int site;

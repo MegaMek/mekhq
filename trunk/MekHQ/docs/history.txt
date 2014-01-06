@@ -120,6 +120,8 @@ v0.3.4 (SVN)
 + Planetary Data updates
 + Added Wolf and Blake Starterbook Campaigns
 + Added Fist and Falcon Starterbook Campaigns
++ Added new Cargo report to the reports menu
++ Bug [#406]: Transport Capacity Report still lists mothballed units
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

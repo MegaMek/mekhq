@@ -5850,6 +5850,12 @@ public class Campaign implements Serializable {
             if (!inTransit && !unit.isPresent()) {
                 continue;
             }
+        	if (unit.isMothballed()) {
+        		if (type == Unit.ETYPE_MOTHBALLED) {
+        			num++;
+        		}
+        		continue;
+        	}
             Entity en = unit.getEntity();
             if (en instanceof GunEmplacement || en instanceof FighterSquadron || en instanceof Jumpship) {
                 continue;
@@ -5900,7 +5906,12 @@ public class Campaign implements Serializable {
     }
 
     public double getCargoTonnage(boolean inTransit) {
+    	return getCargoTonnage(inTransit, false);
+    }
+
+    public double getCargoTonnage(boolean inTransit, boolean mothballed) {
         double cargoTonnage = 0;
+        double mothballedTonnage = 0;
         int mechs = getNumberOfUnitsByType(Entity.ETYPE_MECH);
         int ds = getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
         int sc = getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
@@ -5969,9 +5980,41 @@ public class Campaign implements Serializable {
                 protos--;
                 continue;
             }
-            cargoTonnage += unit.getEntity().getWeight();
+            if (unit.isMothballed()) {
+            	mothballedTonnage += en.getWeight();
+            } else {
+            	cargoTonnage += en.getWeight();
+            }
+        }
+        if (mothballed) {
+        	return mothballedTonnage;
         }
         return cargoTonnage;
+    }
+    
+    public String getCargoDetails() {
+    	StringBuffer sb = new StringBuffer("Cargo\n\n");
+    	double ccc = this.getTotalCombinedCargoCapacity();
+    	double gcc = this.getTotalCargoCapacity();
+    	double icc = this.getTotalInsulatedCargoCapacity();
+    	double lcc = this.getTotalLiquidCargoCapacity();
+    	double scc = this.getTotalLivestockCargoCapacity();
+    	double rcc = this.getTotalRefrigeratedCargoCapacity();
+    	double tonnage = this.getCargoTonnage(false);
+    	double mothballedTonnage = this.getCargoTonnage(false, true);
+    	double mothballedUnits = Math.max(getNumberOfUnitsByType(Unit.ETYPE_MOTHBALLED), 0);
+
+        sb.append(String.format("%-35s      %6.3f\n", "Total Capacity:", ccc));
+        sb.append(String.format("%-35s      %6.3f\n", "General Capacity:", gcc));
+        sb.append(String.format("%-35s      %6.3f\n", "Insulated Capacity:", icc));
+        sb.append(String.format("%-35s      %6.3f\n", "Liquid Capacity:", lcc));
+        sb.append(String.format("%-35s      %6.3f\n", "Livestock Capacity:", scc));
+        sb.append(String.format("%-35s      %6.3f\n", "Refrigerated Capacity:", rcc));
+        sb.append(String.format("%-35s      %6.3f\n", "Cargo Transported:", tonnage));
+        sb.append(String.format("%-35s      %4s (%1.0f)\n", "Mothballed Units as Cargo (Tons):", mothballedUnits, mothballedTonnage));
+        sb.append(String.format("%-35s      %6.3f\n", "Total Transported:", tonnage + mothballedTonnage));
+        
+        return new String(sb);
     }
 
     public int getOccupiedBays(long type) {
@@ -5981,6 +6024,9 @@ public class Campaign implements Serializable {
     public int getOccupiedBays(long type, boolean lv) {
         int num = 0;
         for (Unit unit : getUnits()) {
+        	if (unit.isMothballed()) {
+        		continue;
+        	}
             Entity en = unit.getEntity();
             if (en instanceof GunEmplacement || en instanceof Jumpship) {
                 continue;
@@ -6097,7 +6143,7 @@ public class Campaign implements Serializable {
         int noSC = Math.max(getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) - getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
         int noCF = Math.max(getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER) - getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
         int noASF = Math.max(getNumberOfUnitsByType(Entity.ETYPE_AERO) - getOccupiedBays(Entity.ETYPE_AERO), 0);
-        int nolv = Math.max(getNumberOfUnitsByType(Entity.ETYPE_TANK, true) - getOccupiedBays(Entity.ETYPE_TANK, true), 0);
+        int nolv = Math.max(getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) - getOccupiedBays(Entity.ETYPE_TANK, true), 0);
         int nohv = Math.max(getNumberOfUnitsByType(Entity.ETYPE_TANK) - getOccupiedBays(Entity.ETYPE_TANK), 0);
         int noinf = Math.max(getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) - getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
         int noBA = Math.max(getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) - getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
@@ -6106,6 +6152,7 @@ public class Campaign implements Serializable {
         int freeinf = Math.max(getTotalInfantryBays() - getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
         int freeba = Math.max(getTotalBattleArmorBays() - getOccupiedBays(Entity.ETYPE_TANK), 0);
         int freeSC = Math.max(getTotalSmallCraftBays() - getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
+        int mothballedAsCargo = Math.max(getNumberOfUnitsByType(Unit.ETYPE_MOTHBALLED), 0);
 
         String asfAppend = "";
         int newNoASF = Math.max(noASF - freeSC, 0);
@@ -6138,7 +6185,7 @@ public class Campaign implements Serializable {
 
         // Lets do Light Vehicles next.
         sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Light Vehicle Bays (Occupied):",
-                                getTotalLightVehicleBays(), getOccupiedBays(Entity.ETYPE_TANK), "Light Vehicles Not Transported:", nolv));
+                                getTotalLightVehicleBays(), getOccupiedBays(Entity.ETYPE_TANK, true), "Light Vehicles Not Transported:", nolv));
 
         // Lets do Heavy Vehicles next.
         sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Heavy Vehicle Bays (Occupied):",
@@ -6182,6 +6229,10 @@ public class Campaign implements Serializable {
 
         sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Docking Collars (Occupied):",
                                 getTotalDockingCollars(), getOccupiedBays(Entity.ETYPE_DROPSHIP), "Dropships Not Transported:", noDS));
+
+        sb.append("\n\n");
+
+        sb.append(String.format("%-35s      %4d\n", "Mothballed Units (see Cargo report)", mothballedAsCargo));
 
         return new String(sb);
     }

@@ -20,6 +20,7 @@
  */
 package mekhq.campaign.report;
 
+import java.awt.Dimension;
 import java.awt.Font;
 
 import javax.swing.JTextPane;
@@ -69,6 +70,7 @@ public class HangarReport extends Report {
       
     public JTextPane getReport() {
         JTextPane txtReport = new JTextPane();
+        txtReport.setMinimumSize(new Dimension(800, 500));
         txtReport.setFont(new Font("Courier New", Font.PLAIN, 12));
         
         DefaultMutableTreeNode top = new DefaultMutableTreeNode("Hangar");
