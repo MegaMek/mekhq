@@ -122,6 +122,8 @@ v0.3.4 (SVN)
 + Added Fist and Falcon Starterbook Campaigns
 + Added new Cargo report to the reports menu
 + Bug [#406]: Transport Capacity Report still lists mothballed units
++ Modified Cargo report to display overages
++ Removed unused refreshCargo() method from CampaignGUI and all references to it
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

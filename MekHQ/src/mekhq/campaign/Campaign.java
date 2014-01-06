@@ -6003,6 +6003,9 @@ public class Campaign implements Serializable {
     	double tonnage = this.getCargoTonnage(false);
     	double mothballedTonnage = this.getCargoTonnage(false, true);
     	double mothballedUnits = Math.max(getNumberOfUnitsByType(Unit.ETYPE_MOTHBALLED), 0);
+    	double combined = (tonnage + mothballedTonnage);
+    	double transported = combined > ccc ? ccc : combined;
+    	double overage = combined - transported;
 
         sb.append(String.format("%-35s      %6.3f\n", "Total Capacity:", ccc));
         sb.append(String.format("%-35s      %6.3f\n", "General Capacity:", gcc));
@@ -6012,7 +6015,8 @@ public class Campaign implements Serializable {
         sb.append(String.format("%-35s      %6.3f\n", "Refrigerated Capacity:", rcc));
         sb.append(String.format("%-35s      %6.3f\n", "Cargo Transported:", tonnage));
         sb.append(String.format("%-35s      %4s (%1.0f)\n", "Mothballed Units as Cargo (Tons):", mothballedUnits, mothballedTonnage));
-        sb.append(String.format("%-35s      %6.3f\n", "Total Transported:", tonnage + mothballedTonnage));
+        sb.append(String.format("%-35s      %6.3f/%1.3f\n", "Transported/Capacity:", transported, ccc));
+        sb.append(String.format("%-35s      %6.3f\n", "Overage Not Transported:", overage));
         
         return new String(sb);
     }
