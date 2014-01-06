@@ -58,8 +58,7 @@ import mekhq.campaign.unit.Unit;
  * @since 3/12/2012
  */
 public class HangarReport extends Report {
-  
-    
+
     public HangarReport(Campaign c) {
         super(c);
     }
@@ -67,13 +66,9 @@ public class HangarReport extends Report {
     public String getTitle() {
         return "Hangar Breakdown";
     }
-      
-    public JTextPane getReport() {
-        JTextPane txtReport = new JTextPane();
-        txtReport.setMinimumSize(new Dimension(800, 500));
-        txtReport.setFont(new Font("Courier New", Font.PLAIN, 12));
-        
-        DefaultMutableTreeNode top = new DefaultMutableTreeNode("Hangar");
+    
+    public JTree getHangarTree() {
+    	DefaultMutableTreeNode top = new DefaultMutableTreeNode("Hangar");
         JTree overviewHangarTree = new JTree(top);
  
         // BattleMechs
@@ -1202,7 +1197,11 @@ public class HangarReport extends Report {
             overviewHangarTree.expandPath(new TreePath(protos.getPath()));
         }*/
         
-        int countInTransit = 0;
+        return overviewHangarTree;
+    }
+    
+    public String getHangarTotals() {
+    	int countInTransit = 0;
         int countPresent = 0;
         int countDamaged = 0;
         int countDeployed = 0;
@@ -1220,14 +1219,22 @@ public class HangarReport extends Report {
             }
         }
         
-        txtReport.setAlignmentY(1.0f);
-
-        txtReport.setText("Total Units: "+getCampaign().getUnits().size()+
+        return "Total Units: "+getCampaign().getUnits().size()+
                 "\n  Present: "+countPresent+
                 "\n  In Transit: "+countInTransit+
                 "\n  Damaged: "+countDamaged+
-                "\n  Deployed: "+countDeployed + "\n\n\n");
-        txtReport.insertComponent(overviewHangarTree);
+                "\n  Deployed: "+countDeployed;
+    }
+
+    public JTextPane getReport() {
+        JTextPane txtReport = new JTextPane();
+        txtReport.setMinimumSize(new Dimension(800, 500));
+        txtReport.setFont(new Font("Courier New", Font.PLAIN, 12));
+        
+        txtReport.setAlignmentY(1.0f);
+
+        txtReport.setText(getHangarTotals() + "\n\n\n");
+        txtReport.insertComponent(getHangarTree());
       
         return txtReport;
     }
