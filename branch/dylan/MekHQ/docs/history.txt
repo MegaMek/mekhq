@@ -2,6 +2,10 @@ VERSION HISTORY
 ----------------------------------
 v0.3.4 (dylan)
 + Reintegrated Overview Tab
++ Cleanup from trunk removal of refreshCargo()
++ Use various Report objects instead of duplicating a bunch of code to create the overview report.
+    Removes all the duplicated code
++ Added new Cargo Overview tab
 
 v0.3.4 (SVN)
 + Bug: Moved Report Log not scrolling again (don't force set caret to 0 on refresh)
