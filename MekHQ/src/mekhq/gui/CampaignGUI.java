@@ -177,6 +177,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Rank;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
 import mekhq.campaign.report.RatingReport;
@@ -2471,6 +2472,14 @@ public class CampaignGUI extends JPanel {
             }
         });
         menuReports.add(miTransportReport);
+
+        JMenuItem miCargoReport = new JMenuItem(resourceMap.getString("miCargoReport.text")); // NOI18N
+        miCargoReport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showReport(new CargoReport(getCampaign()));
+            }
+        });
+        menuReports.add(miCargoReport);
 
         menuBar.add(menuReports);
 
