@@ -130,6 +130,7 @@ v0.3.4 (SVN)
 + Cleaned up the personnel report to make it nicer to look at
 + Broke out pieces of the HangarReport into methods for use in my dylan branch to eliminate duplicate code
 + Bug [#449]: Procurement List link error
++ Broke out pieces of the PersonnelReport same as the HangarReport
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
