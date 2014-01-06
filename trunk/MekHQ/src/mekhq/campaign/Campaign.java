@@ -1817,10 +1817,18 @@ public class Campaign implements Serializable {
         }
         return null;
     }
-
+    
     public long getPayRoll() {
+    	return getPayRoll(false);
+    }
+
+    public long getPayRoll(boolean noInfantry) {
         long salaries = 0;
         for (Person p : personnel) {
+        	// Optionized infantry (Unofficial)
+        	if (noInfantry && p.getPrimaryRole() == Person.T_INFANTRY)
+        		continue;
+        	
             if (p.isActive() && !p.isDependent()
                 && !(p.isPrisoner() || p.isBondsman())) {
                 salaries += p.getSalary();
@@ -5469,11 +5477,24 @@ public class Campaign implements Serializable {
      * @return
      */
     public long getForceValue() {
+    	return getForceValue(false);
+    }
+
+    /**
+     * Calculate the total value of units in the TO&E. This serves as the basis for contract payments in the StellarOps
+     * Beta.
+     *
+     * @return
+     */
+    public long getForceValue(boolean noInfantry) {
         long value = 0;
         for (UUID uuid : forces.getAllUnits()) {
             Unit u = getUnit(uuid);
             if (null == u) {
                 continue;
+            }
+            if (noInfantry && u.getEntity() instanceof Infantry && !(u.getEntity() instanceof BattleArmor)) {
+            	continue;
             }
             // lets exclude dropships and jumpships
             if (u.getEntity() instanceof Dropship
@@ -5492,9 +5513,10 @@ public class Campaign implements Serializable {
 
     public long getContractBase() {
         if (getCampaignOptions().useEquipmentContractBase()) {
-            return (long) ((getCampaignOptions().getEquipmentContractPercent() / 100.0) * getForceValue());
+            return (long) ((getCampaignOptions().getEquipmentContractPercent() / 100.0)
+            		* getForceValue(getCampaignOptions().useInfantryDontCount()));
         } else {
-            return getPayRoll();
+            return getPayRoll(getCampaignOptions().useInfantryDontCount());
         }
     }
 
