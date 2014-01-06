@@ -283,7 +283,23 @@ GM and Taijian Petrochemicals have vested interest in Acamar because they have h
 		<name>Accrington</name>
 		<xcood>-10.17</xcood>
 		<ycood>146.31</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2299-01-01</date>
+			<faction>FoS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -291,6 +307,10 @@ GM and Taijian Petrochemicals have vested interest in Acamar because they have h
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -771,17 +791,13 @@ Aitutaki’s early settlers made a unique distinction by creating two capital ci
 		<name>Al Na'ir</name>
 		<xcood>60.77</xcood>
 		<ycood>31.56</ycood>
-		<faction>TA</faction>
+		<faction>UND</faction>
 		<factionChange>
-			<date>2242-01-01</date>
-			<faction>IND</faction>
-		</factionChange>
-		<factionChange>
-			<date>2316-01-01</date>
+			<date>2450-01-01</date>	
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2790-01-01</date>
+			<date>2785-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -799,6 +815,10 @@ Aitutaki’s early settlers made a unique distinction by creating two capital ci
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3132-07-01</date>
+			<faction>DC</faction>
 		</factionChange>
 		<pressure>2</pressure>
 		<gravity>0.6</gravity>
@@ -1224,7 +1244,23 @@ Alcor was overlooked during the Jihad, the only known fighting that took place i
 		<name>Alexandria</name>
 		<xcood>-58.16</xcood>
 		<ycood>117.1</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2299-01-01</date>
+			<faction>FoS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -1232,6 +1268,10 @@ Alcor was overlooked during the Jihad, the only known fighting that took place i
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 		<spectralClass>M</spectralClass>
 		<subtype>4</subtype>
@@ -1269,15 +1309,11 @@ Alcor was overlooked during the Jihad, the only known fighting that took place i
 		<ycood>96.24</ycood>
 		<faction>UND</faction>
 		<factionChange>
-			<date>2172-08-01</date>
-			<faction>TA</faction>
+			<date>2450-08-01</date>
+			<faction>AB</faction>
 		</factionChange>
 		<factionChange>
-			<date>2242-01-01</date>
-			<faction>IND</faction>
-		</factionChange>
-		<factionChange>
-			<date>2319-01-01</date>
+			<date>2516-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -3233,7 +3269,19 @@ A few Stone Age tribes exist in the planet's deep deserts and jungles, far from 
 		<name>Apostica</name>
 		<xcood>-60.24</xcood>
 		<ycood>156.74</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-07-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -3245,6 +3293,10 @@ A few Stone Age tribes exist in the planet's deep deserts and jungles, far from 
 		<factionChange>
 			<date>3142-01-01</date>
 			<faction>ABN</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -3458,7 +3510,23 @@ Wolf Clan Sites 1-4</desc>
 		<name>Arcturus</name>
 		<xcood>-78.76</xcood>
 		<ycood>176.04</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2235-01-01</date>
+			<faction>TamP</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -3466,6 +3534,14 @@ Wolf Clan Sites 1-4</desc>
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3130-01-01</date>
+			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 		<spectralClass>K</spectralClass>
 		<subtype>2</subtype>
@@ -4459,7 +4535,11 @@ The primary industries on Augustine involve extracting raw minerals from the pla
 		<name>Auldhouse</name>
 		<xcood>-38.86</xcood>
 		<ycood>140.83</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2657-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -4467,6 +4547,10 @@ The primary industries on Augustine involve extracting raw minerals from the pla
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -4929,7 +5013,19 @@ During the Jihad, the World of Blake forces arrived via a pirate point that allo
 		<name>Ballynure</name>
 		<xcood>-82.93</xcood>
 		<ycood>248.54</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -4940,6 +5036,14 @@ During the Jihad, the World of Blake forces arrived via a pirate point that allo
 		</factionChange>
 		<factionChange>
 			<date>3067-01-01</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3130-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -5446,7 +5550,19 @@ Due to the lack of education and wealth, the population in the early 31st Centur
 		<name>Baxter</name>
 		<xcood>-31.56</xcood>
 		<ycood>113.71</ycood>
-		<faction>FoS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2299-01-01</date>
+			<faction>FoS</faction>
+		</factionChange>
 		<factionChange>
 			<date>2341-01-01</date>
 			<faction>LA</faction>
@@ -5462,6 +5578,14 @@ Due to the lack of education and wealth, the population in the early 31st Centur
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3132-07-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.79</gravity>
@@ -5829,7 +5953,11 @@ Belladonna's sky is dominated by six satellites, which due to the number of sate
 		<name>Benfled</name>
 		<xcood>-73.55</xcood>
 		<ycood>263.15</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2373-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -6071,7 +6199,11 @@ During the Word of Blake Jihad, Benjamin was right on the edge of the Word of Bl
 		<name>Bessarabia</name>
 		<xcood>-25.82</xcood>
 		<ycood>279.32</ycood>
-		<faction>LA</faction>
+		  <faction>UND</faction>
+		<factionChange>
+			<date>2673-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -6087,6 +6219,22 @@ During the Word of Blake Jihad, Benjamin was right on the edge of the Word of Bl
 		<factionChange>
 			<date>3059-03-08</date>
 			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3069-03-08</date>
+			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3130-01-01</date>
+			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -6318,7 +6466,11 @@ Betelgeuse has ample natural resources and a high level of industry, including B
 		<name>Biota</name>
 		<xcood>-45.12</xcood>
 		<ycood>274.1</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2580-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -6329,6 +6481,22 @@ Betelgeuse has ample natural resources and a high level of industry, including B
 		</factionChange>
 		<factionChange>
 			<date>3059-03-08</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3069-03-08</date>
+			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3130-01-01</date>
+			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -6654,12 +6822,33 @@ Bithinian Ballistics</desc>
 			<date>3130-01-01</date>
 			<faction>MH</faction>
 		</factionChange>
+		<desc>[3004] Even the tiny Lothian League has used Inner Sphere tactics against the much larger Circinius Federation. Both alliances claimed the colony world of Blantleff (which the Lothians had christened with the equally strange name of Dersidatz because each side wanted to breed a large native animal for meat.  In the eleven years from 2992 to 3003, small settlements of Circinians and Lothians tended their herds and lived in peaceful coexistence.  The prevailing attitude was the old Periphery philosophy that, out here, there's room enough for everybody.
+	
+This would soon change, however, for some Circinian bureaucrat who had never been to Blantleff decided one day that the planet must be either Circinian or Lothian, but that it ought to be the former.  There is some evidence that the Lothian settlers were unaware of the Circinian settlers' existence prior to the conflict, as there were only a few hundred of each, living hundreds of kilometers apart.
+	
+The only university-educated member of the Lothian colony, a man named Blatz, had read of the evasion tactics employed by the residents of Kentares IV to escape Jinjiro Kurita's massacre.  The objective for the Lothians, as for the Kentarans, was not only to survive the search-and-destroy missions. They must also stay in touch with offworld communication centers so that the homeworld would know what was happening to them.  They did so by re-tracking, that is, by following the troops that were hunting them down and keeping just out of sight behind them.
+	
+The Lothians on Dersidatz were nomads who new when to expect a Dropship to bring them supplies and to take their livestock offworld, and so would send out a signal beam at the appropriate time.  After the first raid by Circinian troops, the survivors sent out a distress call and shut off all power to their broadcasting equipment until the next Dropship was due.  In the meantime, they moved constantly in the same direction that the Circinian attackers had taken after destroying their base, and thereby managed to move always in the wake of the people searching for them.
+	
+When the Lothian ship arrived with help, the settler's distress signal led it to the Circinians' rear, which they had not bothered to secure.  After the Lothian forces won a decisive victory there, the Circinians, who were busy with difficulties elsewhere, did not attempt to re-colonize.</desc>
 	</planet>
 	<planet>
 		<name>Menkent</name>
 		<xcood>-38.86</xcood>
 		<ycood>20.86</ycood>
-		<faction>FoS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2299-01-01</date>
+			<faction>FoS</faction>
+		</factionChange>
 		<factionChange>
 			<date>2341-01-01</date>
 			<faction>LA</faction>
@@ -6675,6 +6864,14 @@ Bithinian Ballistics</desc>
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3132-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.83</gravity>
@@ -6816,9 +7013,9 @@ Since colonization, Blue Hole has exported water as a main industry due to its a
 		<landMass>Sabari</landMass>
 		<landMass>Sakété</landMass>
 		<socioIndustrial>B-C-B-C-C</socioIndustrial>
-		<desc>Bolan is a dry, mountainous world with just enough natural resources to support the planet's populace and a modest level of industrialization. Much of the industry was crippled during the 2nd Succession War when the Free Worlds League abandoned the planet and used nuclear weapons on the factories as they were departing. Industry on planet has been slowly recovering ever since. Unfortunately, many locations on planet, including the entire continent of Sabari, which was once the hub of trade and major military bases in the Star League era, are uninhabited and still scarred with radiation.
+		<desc>Bolan is a dry, mountainous world with just enough natural resources to support the planet's populace and a modest level of industrialization. Much of the industry was crippled during the 1st Succession War when the Free Worlds League abandoned the planet and used nuclear weapons on the factories as they were departing. Industry on planet has been slowly recovering ever since. Unfortunately, many locations on planet, including the entire continent of Sabari, which was once the hub of trade and major military bases in the Star League era, are uninhabited and still scarred with radiation.
 
-Bolan is the provincial capital for almost the entire Lyran boreder with the Free Worlds League. Located on the Sabari continent in the badlands known as the Sabari Wastes, the Melissa Steiner Martial Academy of Bolan began as a facility to train the militia on Bolan and was upgraded to an academy in 3055 and was renamed in honor of Archon Melissa Steiner after her death. Graduates wear a white-silk sash.
+Bolan is the provincial capital for almost the entire Lyran border with the Free Worlds League. Located on the Sabari continent in the badlands known as the Sabari Wastes, the Melissa Steiner Martial Academy of Bolan began as a facility to train the militia on Bolan and was upgraded to an academy in 3055 and was renamed in honor of Archon Melissa Steiner after her death. Graduates wear a white-silk sash.
 
 Bolan was primarily colonized by settlers from India, Pakistan and Afghanistan.</desc>
 	</planet>
@@ -6992,7 +7189,23 @@ Bermuda Combat Systems</desc>
 		<name>Borghese</name>
 		<xcood>-80.33</xcood>
 		<ycood>212.55</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2235-01-01</date>
+			<faction>TamP</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -7004,6 +7217,10 @@ Bermuda Combat Systems</desc>
 		<factionChange>
 			<date>3070-01-18</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -7208,7 +7425,19 @@ Brasha is home to the unique and elite Qum’ran Guard, which are comprised of m
 		<name>Breukelen</name>
 		<xcood>-88.93</xcood>
 		<ycood>142.66</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-07-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -7216,6 +7445,10 @@ Brasha is home to the unique and elite Qum’ran Guard, which are comprised of m
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -9053,7 +9286,18 @@ The majority of the population is located on the continent of Worrsetgard, which
 		<name>Carnwath</name>
 		<xcood>-63.64</xcood>
 		<ycood>83.2</ycood>
-		<faction>FoS</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2299-01-01</date>
+			<faction>FoS</faction>
+		</factionChange>
 		<factionChange>
 			<date>2341-01-01</date>
 			<faction>LA</faction>
@@ -9069,6 +9313,10 @@ The majority of the population is located on the continent of Worrsetgard, which
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3134-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 		<pressure>4</pressure>
 		<gravity>1.16</gravity>
@@ -9091,7 +9339,23 @@ Carnwath‘s capital city, Carnwath City, is located on the Wartholi continent, 
 		<name>Carse</name>
 		<xcood>-15.91</xcood>
 		<ycood>241.24</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2235-01-01</date>
+			<faction>TamP</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3034-03-13</date>
 			<faction>FRR</faction>
@@ -9103,6 +9367,10 @@ Carnwath‘s capital city, Carnwath City, is located on the Wartholi continent, 
 		<factionChange>
 			<date>3052-02-17</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>RD</faction>
 		</factionChange>
 		<nadirCharge>True</nadirCharge>
 		<zenithCharge>True</zenithCharge>
@@ -9165,7 +9433,19 @@ During the Jihad, Carsphairn was raided several times by Word of Blake forces as
 		<name>Carstairs</name>
 		<xcood>-77.72</xcood>
 		<ycood>140.57</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-07-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -9173,6 +9453,10 @@ During the Jihad, Carsphairn was raided several times by Word of Blake forces as
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -10020,7 +10304,7 @@ During the Succession Wars, the exports from Starpad to agriculturally poorer ne
 		<faction>UND</faction>
 		<factionChange>
 			<date>2573-01-01</date>
-			<faction>FC</faction>
+			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
@@ -10855,7 +11139,11 @@ This led to a very hostile environment by the mid 3020s with many residents just
 		<name>Colmar</name>
 		<xcood>-66.76</xcood>
 		<ycood>302.01</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2640-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -11245,7 +11533,11 @@ Hollis Incorporated</desc>
 		<name>Corridan IV</name>
 		<xcood>-38.34</xcood>
 		<ycood>122.58</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2640-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -11257,6 +11549,14 @@ Hollis Incorporated</desc>
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3132-07-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.92</gravity>
@@ -11512,7 +11812,23 @@ Coventry Metal Works, Refit Facility</desc>
 		<name>Crimond</name>
 		<xcood>-69.63</xcood>
 		<ycood>232.63</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2235-01-01</date>
+			<faction>TamP</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -11520,6 +11836,14 @@ Coventry Metal Works, Refit Facility</desc>
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3130-01-01</date>
+			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>8</subtype>
@@ -11808,7 +12132,23 @@ After suffering at the hands of the Combine for decades, the people of Csesztreg
 		<name>Cusset</name>
 		<xcood>-49.81</xcood>
 		<ycood>286.36</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2235-01-01</date>
+			<faction>TamP</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -11820,6 +12160,22 @@ After suffering at the hands of the Combine for decades, the people of Csesztreg
 		<factionChange>
 			<date>3059-03-08</date>
 			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3069-03-05</date>
+			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3130-01-01</date>
+			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -11919,7 +12275,15 @@ After suffering at the hands of the Combine for decades, the people of Csesztreg
 		<name>Dabih</name>
 		<xcood>60.51</xcood>
 		<ycood>84.76</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2450-01-01</date>	
+			<faction>AB</faction>
+		</factionChange>     
+		<factionChange>
+			<date>2516-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3075-01-01</date>
 			<faction>AB</faction>
@@ -11931,6 +12295,10 @@ After suffering at the hands of the Combine for decades, the people of Csesztreg
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3132-01-01</date>
+			<faction>DC</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.84</gravity>
@@ -12055,7 +12423,23 @@ The Jade Falcon, totem animal of the Clan with the same name, is from Dagda.</de
 		<name>Dalkeith</name>
 		<xcood>-26.34</xcood>
 		<ycood>156.74</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2235-01-01</date>
+			<faction>TamP</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -12063,6 +12447,10 @@ The Jade Falcon, totem animal of the Clan with the same name, is from Dagda.</de
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>RD</faction>
 		</factionChange>
 		<spectralClass>K</spectralClass>
 		<subtype>5</subtype>
@@ -12731,7 +13119,11 @@ After the Clan Invasion, Deia found itself along the front of a new dangerous bo
 		<name>Dell</name>
 		<xcood>-61.81</xcood>
 		<ycood>333.82</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2630-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -12743,6 +13135,10 @@ After the Clan Invasion, Deia found itself along the front of a new dangerous bo
 		<factionChange>
 			<date>3050-10-06</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CHH</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.98</gravity>
@@ -13733,7 +14129,11 @@ Protectorate Arms Conglomerate</desc>
 		<name>Domain</name>
 		<xcood>-33.12</xcood>
 		<ycood>250.37</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2637-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -13746,12 +14146,20 @@ Protectorate Arms Conglomerate</desc>
 			<date>3052-01-09</date>
 			<faction>CW</faction>
 		</factionChange>
+		<factionChange>
+			<date>3135-01-01</date>
+			<faction>CJF</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Dompaire</name>
 		<xcood>-75.37</xcood>
 		<ycood>302.79</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2680-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -14322,7 +14730,23 @@ The capital city of Dyev, Novaya Mensk, is located in the northern hemisphere, o
 		<name>Eaglesham</name>
 		<xcood>-33.64</xcood>
 		<ycood>135.88</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2299-01-01</date>
+			<faction>FoS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -14330,6 +14754,10 @@ The capital city of Dyev, Novaya Mensk, is located in the northern hemisphere, o
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>RD</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -14342,7 +14770,19 @@ The capital city of Dyev, Novaya Mensk, is located in the northern hemisphere, o
 		<name>Eaton</name>
 		<xcood>-81.63</xcood>
 		<ycood>113.71</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2468-07-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -14350,6 +14790,10 @@ The capital city of Dyev, Novaya Mensk, is located in the northern hemisphere, o
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -14394,7 +14838,19 @@ The capital city of Dyev, Novaya Mensk, is located in the northern hemisphere, o
 		<name>Edasich</name>
 		<xcood>-97.28</xcood>
 		<ycood>121.79</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2468-07-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -14402,6 +14858,10 @@ The capital city of Dyev, Novaya Mensk, is located in the northern hemisphere, o
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>6</subtype>
@@ -14788,7 +15248,7 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 		<name>Elissa</name>
 		<xcood>-39.38</xcood>
 		<ycood>487.44</ycood>
-		<faction>PIND</faction>
+		<faction>UND</faction>
 		<factionChange>
 			<date>2900-01-01</date>
 			<faction>PIND</faction>
@@ -14804,6 +15264,10 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 		<factionChange>
 			<date>3071-01-25</date>
 			<faction>CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3100-02-07</date>
+			<faction>TB</faction>
 		</factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>1</subtype>
@@ -15615,7 +16079,11 @@ Eutin has two moons, Eutin Minor and Eutin Prime. Despite being only marginally 
 		<name>Evciler</name>
 		<xcood>-95.97</xcood>
 		<ycood>359.9</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2650-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -15635,6 +16103,10 @@ Eutin has two moons, Eutin Minor and Eutin Prime. Despite being only marginally 
 		<factionChange>
 			<date>3072-02-24</date>
 			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3110-01-01</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -15864,7 +16336,23 @@ Olympus Construction Vehicles</desc>
 		<name>Fatima</name>
 		<xcood>-31.56</xcood>
 		<ycood>177.34</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange> 
+			<date>2235-01-01</date>
+			<faction>TamP</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -15872,6 +16360,14 @@ Olympus Construction Vehicles</desc>
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3130-01-01</date>
+			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -16541,6 +17037,10 @@ During the Capellan-Republic war, Foot Fall was the center of some of the fierce
 		<factionChange>
 			<date>3070-01-18</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>RD</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>6</subtype>
@@ -17439,7 +17939,11 @@ When Gallery was originally settled there were no native lifeforms so the origin
 		<name>Ganshoren</name>
 		<xcood>-43.81</xcood>
 		<ycood>159.61</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2456-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -17447,6 +17951,10 @@ When Gallery was originally settled there were no native lifeforms so the origin
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -17945,7 +18453,11 @@ The capital city, Hyacles, is located on the northern shores of Garamond, and is
 		<name>Glengarry</name>
 		<xcood>-77.46</xcood>
 		<ycood>77.72</ycood>
+		<faction>UND</faction>
+			<factionChange>
+			<date>2299-01-01</date>
 		<faction>FoS</faction>
+		</factionChange>
 		<factionChange>
 			<date>2341-01-01</date>
 			<faction>LA</faction>
@@ -17969,6 +18481,10 @@ The capital city, Hyacles, is located on the northern shores of Garamond, and is
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange> 
+			<date>3134-04-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.97</gravity>
@@ -18437,9 +18953,16 @@ Glenmora’s location on the Federated Suns and Draconis Combine border has made
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
+			<date>2777-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
 			<date>2785-11-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<desc>Gram was successfully conquered by the Draconis Combine in November of 2785 following a diversionary raid on the planet of Bone-Norman.
+		
+The gojo berries harvested on Gram earned a degree of fame and were noted not just for their sweetness but also for the potent alcoholic spirit that could be produced from the berries. The gojo harvest attracted traders each year, and in 3136 the harvest saw a Circle of Equals fought between Warrior-Merchant Najeh Hammond, a Clan Sea Fox ristar and Tiburon pilot, and a renegade Clan Jade Falcon MechWarrior employed by a pair of Draconis Combine with a ruthless reputation named the Yung Brothers. Hammond won, despite his Tiburon being heavily outweighed by his opponent's Ryoken II.</desc>
 	</planet>
 	<planet>
 		<name>Grand Base</name>
@@ -22491,17 +23014,21 @@ Itabaiana became the IS capital for the Diamond Sharks after they captured the p
 		<name>Izar</name>
 		<xcood>-60.51</xcood>
 		<ycood>98.32</ycood>
-		<faction>TA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
 		<factionChange>
 			<date>2242-01-01</date>
 			<faction>IND</faction>
 		</factionChange>
 		<factionChange>
-			<date>2316-01-01</date>
-			<faction>TH</faction>
+			<date>2299-01-01</date>
+			<faction>FoS</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2341-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -22515,6 +23042,10 @@ Itabaiana became the IS capital for the Diamond Sharks after they captured the p
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3132-07-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.84</gravity>
@@ -24095,7 +24626,23 @@ The Blakist Holy War destroyed much of Kawich‘s industry, but The Republic of 
 		<name>Kelenfold</name>
 		<xcood>-57.9</xcood>
 		<ycood>200.03</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2235-01-01</date>
+			<faction>TamP</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -24107,6 +24654,10 @@ The Blakist Holy War destroyed much of Kawich‘s industry, but The Republic of 
 		<factionChange>
 			<date>3070-01-18</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>2</subtype>
@@ -24935,7 +25486,19 @@ The planet has moderate natural resources and enough arable land to sustain itse
 		<name>Kirkcaldy</name>
 		<xcood>-97.28</xcood>
 		<ycood>128.31</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-07-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -24943,6 +25506,10 @@ The planet has moderate natural resources and enough arable land to sustain itse
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -25221,7 +25788,7 @@ Ko, a part of the so-called Lyons Thumb, was returned to Draconis Combine rule d
 		</factionChange>
 		<factionChange>
 			<date>2545-01-01</date>
-			<faction>UND</faction>
+			<faction>ABN</faction>
 		</factionChange>
 		<factionChange>
 			<date>2668-01-01</date>
@@ -25238,6 +25805,10 @@ Ko, a part of the so-called Lyons Thumb, was returned to Draconis Combine rule d
 		<factionChange>
 			<date>3051-12-15</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CHH</faction>
 		</factionChange>
 		<lifeForm>0</lifeForm>
 		<spectralClass>G</spectralClass>
@@ -25866,7 +26437,19 @@ Defiance Industries Manufacturing Annex</desc>
 		<name>La Blon</name>
 		<xcood>-32.08</xcood>
 		<ycood>73.55</ycood>
-		<faction>FoS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2299-01-01</date>
+			<faction>FoS</faction>
+		</factionChange>
 		<factionChange>
 			<date>2341-01-01</date>
 			<faction>LA</faction>
@@ -25882,6 +26465,14 @@ Defiance Industries Manufacturing Annex</desc>
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3132-07-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>1.04</gravity>
@@ -25909,7 +26500,23 @@ La Blon‘s capital, Amadeus, is located at the foot of the Carbondale Mountains
 		<name>La Grave</name>
 		<xcood>-51.64</xcood>
 		<ycood>249.32</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2235-01-01</date>
+			<faction>TamP</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -25925,6 +26532,10 @@ La Blon‘s capital, Amadeus, is located at the foot of the Carbondale Mountains
 		<factionChange>
 			<date>3069-10-04</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3135-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -26562,7 +27173,11 @@ Aside from the large island continent of Galapagos in the northern hemisphere of
 		<name>Leganes</name>
 		<xcood>-78.5</xcood>
 		<ycood>161.7</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange> <!-- Guess -->
+			<date>2605-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -26570,6 +27185,10 @@ Aside from the large island continent of Galapagos in the northern hemisphere of
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -28185,7 +28804,23 @@ Pinard Protectorates Unlimited</desc>
 		<name>Maestu</name>
 		<xcood>-35.73</xcood>
 		<ycood>289.23</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2235-01-01</date>
+			<faction>TamP</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -28197,6 +28832,10 @@ Pinard Protectorates Unlimited</desc>
 		<factionChange>
 			<date>3051-11-07</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -29026,7 +29665,15 @@ Waytani Incorporated</desc>
 		<name>Markab</name>
 		<xcood>98.58</xcood>
 		<ycood>23.47</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2450-01-01</date>	
+			<faction>AB</faction>
+		</factionChange>     
+		<factionChange>
+			<date>2516-01-01</date>
+			<faction>DC</faction>
+		</factionChange> 
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -29038,6 +29685,14 @@ Waytani Incorporated</desc>
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3132-07-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>DC</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.75</gravity>
@@ -29208,6 +29863,9 @@ Peloran Motors</desc>
 		<xcood>163.52</xcood>
 		<ycood>56.85</ycood>
 		<faction>DC</faction>
+		<desc>During the War of 3039 Matar was targeted for its strategic position.  From Matar the attackers could land on either Proserpina or Irurzun.  The 1st Kestrel Grenadiers and 1st Kathil Uhlans landed on the world in April, but a series of poor drops left the AFFS forces scattered across the Tri-City Region.  After 28 hours of hard fighting, the AFFS forces had claimed all their objectives, but a regiment of militia armor and a population loyal to the Draconis Combine resisted the invasion.  To make matters worse, Matar's citizens hunted the world's plentiful wildlife as a pastime so they were well armed.
+	
+In late September 3039 the 11th Ghost and 12th Ghost regiments arrived.  Close combat in the Tri-City region resulted in a great deal of collateral damage, resulting in the population taking up arms against the AFFS forces.  After two more months of hard fighting, the Tri-City region was effectively destroyed and the DCMS troops had successfully driven the AFFS off Matar.</desc>
 	</planet>
 	<planet>
 		<name>Matheran</name>
@@ -29624,7 +30282,7 @@ The planetary capital, Worthentown and primary seat of power are located on the 
 			<faction>IND</faction>
 		</factionChange>
 		<factionChange>
-			<date>2340-01-01</date>
+			<date>2288-01-01</date>
 			<faction>TamP</faction>
 		</factionChange>
 		<factionChange>
@@ -29638,6 +30296,14 @@ The planetary capital, Worthentown and primary seat of power are located on the 
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3130-01-01</date>
+			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>RD</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -31124,7 +31790,19 @@ Mizar has been a resort planet of some renown since before the time of the Star 
 		<name>Montmarault</name>
 		<xcood>-59.72</xcood>
 		<ycood>265.49</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -31993,7 +32671,19 @@ Neerabup is divided into provinces that are each ruled by a Publican. The Public
 		<name>Nekkar</name>
 		<xcood>-94.41</xcood>
 		<ycood>97.28</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -35041,7 +35731,23 @@ Etna Foundries</desc>
 		<name>Orkney</name>
 		<xcood>-49.03</xcood>
 		<ycood>237.07</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2235-01-01</date>
+			<faction>TamP</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -35057,6 +35763,10 @@ Etna Foundries</desc>
 		<factionChange>
 			<date>3069-10-04</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -35429,6 +36139,7 @@ Wunderland Enterprises</desc>
 			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
+		<desc>Life on Pain and The Rack, the two worlds ruled by Morrison's Extractors is cruel and difficult.  These worlds are even targeted by other pirate bands looking to make a name for themselves or simply to feed of the riches stolen by the Extractors.  The Extractors themselves have eased up on the few thousand free people who call Pain and The Rack home, realizing that they need their citizens to maintain what little civilization they have.  The most believable estimates can only narrow down the combined population of Pain and The Rack to between fifteen and twenty thousand, half of which are slaves.  By all accounts, the people who are best off are those who keep to themselves on Pain's far continent, Hades. </desc>
 	</planet>
 	<planet>
 		<name>Pajarito</name>
@@ -35598,7 +36309,19 @@ During the Fourth Succession War, Federated Suns forces landed and were immediat
 		<name>Pandora</name>
 		<xcood>-85.54</xcood>
 		<ycood>236.81</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-07-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -35609,6 +36332,14 @@ During the Fourth Succession War, Federated Suns forces landed and were immediat
 		</factionChange>
 		<factionChange>
 			<date>3067-01-01</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3130-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
 			<faction>CJF</faction>
 		</factionChange>
 		<pressure>3</pressure>
@@ -36634,7 +37365,11 @@ Wingman Enterprises</desc>
 		<name>Planting</name>
 		<xcood>-54.25</xcood>
 		<ycood>367.99</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>   
+		<factionChange>
+			<date>2650-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -36658,6 +37393,10 @@ Wingman Enterprises</desc>
 		<factionChange>
 			<date>3071-12-28</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -37077,7 +37816,7 @@ Port Moseby itself is an ordinary planet, comfortable for human life with no ext
 		<name>Porthos</name>
 		<xcood>91.02</xcood>
 		<ycood>480.13</ycood>
-		<faction>PIND</faction>
+		<faction>UND</faction>
 		<factionChange>
 			<date>2900-01-01</date>
 			<faction>PIND</faction>
@@ -37089,6 +37828,10 @@ Port Moseby itself is an ordinary planet, comfortable for human life with no ext
 		<factionChange>
 			<date>3049-09-05</date>
 			<faction>CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3100-02-07</date>
+			<faction>TB</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -38278,7 +39021,23 @@ Hope Industrial Works</desc>
 		<name>Rasalgethi</name>
 		<xcood>-42.25</xcood>
 		<ycood>214.12</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2235-01-01</date>
+			<faction>TamP</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -38294,6 +39053,10 @@ Hope Industrial Works</desc>
 		<factionChange>
 			<date>3069-10-04</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>RD</faction>
 		</factionChange>
 		<spectralClass>M</spectralClass>
 		<subtype>9</subtype>
@@ -38387,7 +39150,11 @@ Unfortunately, independence did not last long for the people of Rasalhague when 
 		<name>Rastaban</name>
 		<xcood>-33.9</xcood>
 		<ycood>265.23</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2550-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -38395,6 +39162,10 @@ Unfortunately, independence did not last long for the people of Rasalhague when 
 		<factionChange>
 			<date>3052-01-10</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3135-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -38807,7 +39578,11 @@ Quikscell Company</desc>
 		<name>Ridderkerk</name>
 		<xcood>-46.68</xcood>
 		<ycood>354.43</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2400-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -38823,6 +39598,10 @@ Quikscell Company</desc>
 		<factionChange>
 			<date>3071-08-26</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3130-01-01</date>
+			<faction>ABN</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -39417,7 +40196,11 @@ Interstellar Agriculture Concerns</desc>
 		<name>Romulus</name>
 		<xcood>-90.5</xcood>
 		<ycood>382.85</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>   
+		<factionChange>
+			<date>2436-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -39437,6 +40220,10 @@ Interstellar Agriculture Concerns</desc>
 		<factionChange>
 			<date>3072-01-05</date>
 			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3135-01-01</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -39870,6 +40657,10 @@ Under The Republic, Michaelson converted its helicopter designs to civilian use 
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3132-07-01</date>
+			<faction>CJF</faction>
+		</factionChange>
 		<pressure>3</pressure>
 		<gravity>1.04</gravity>
 		<zenithCharge>True</zenithCharge>
@@ -40298,7 +41089,23 @@ As of the 32nd century, this world is little more than an outpost, with no agric
 		<name>Sakhalin (LC)</name>
 		<xcood>-24.25</xcood>
 		<ycood>153.09</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange> 
+			<date>2299-01-01</date>
+			<faction>FoS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -40306,6 +41113,10 @@ As of the 32nd century, this world is little more than an outpost, with no agric
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>RD</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -40562,9 +41373,9 @@ As of the 32nd century, this world is little more than an outpost, with no agric
 		<name>Santander V</name>
 		<xcood>78.5</xcood>
 		<ycood>485.35</ycood>
-		<faction>PIND</faction>
+		<faction>UND</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2910-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -40578,6 +41389,10 @@ As of the 32nd century, this world is little more than an outpost, with no agric
 		<factionChange>
 			<date>3052-07-15</date>
 			<faction>CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3100-02-07</date>
+			<faction>TB</faction>
 		</factionChange>
 		<lifeForm>2</lifeForm>
 		<spectralClass>K</spectralClass>
@@ -41321,7 +42136,19 @@ The capital city, Gambootas, is home not only to the planet‘s sole interstella
 		<name>Seiduts</name>
 		<xcood>-82.67</xcood>
 		<ycood>364.86</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		 <factionChange>
+            <date>2172-08-01</date>
+            <faction>TA</faction>
+        </factionChange>
+        <factionChange>
+            <date>2242-01-01</date>
+  			 <faction>IND</faction>
+		</factionChange>   
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -41356,7 +42183,7 @@ The capital city, Gambootas, is home not only to the planet‘s sole interstella
 		</factionChange>
 		<factionChange>
 			<date>3080-08-15</date>
-			<faction>CW</faction>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -43734,7 +44561,15 @@ Tengo Aerospace</desc>
 		<name>Star's End</name>
 		<xcood>-83.98</xcood>
 		<ycood>436.06</ycood>
-		<faction>IND</faction>
+		<faction>UND</faction>
+		<factionChange>
+            <date>2172-08-01</date>
+            <faction>TA</faction>
+        </factionChange>
+        <factionChange>
+            <date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange> 
 		<factionChange>
 			<date>2334-01-01</date>
 			<faction>RWR</faction>
@@ -44382,7 +45217,11 @@ Tao ‘Mechworks</desc>
 		<name>Sudeten</name>
 		<xcood>-84.24</xcood>
 		<ycood>294.7</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2610-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -44435,7 +45274,23 @@ Tao ‘Mechworks</desc>
 		<name>Suk II</name>
 		<xcood>-29.47</xcood>
 		<ycood>258.45</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2235-01-01</date>
+			<faction>TamP</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -44447,6 +45302,10 @@ Tao ‘Mechworks</desc>
 		<factionChange>
 			<date>3052-02-10</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3135-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 		<gravity>0.93</gravity>
 		<zenithCharge>True</zenithCharge>
@@ -44581,13 +45440,37 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 		<name>Surcin</name>
 		<xcood>-92.06</xcood>
 		<ycood>196.64</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2235-01-01</date>
+			<faction>TamP</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
 			<date>3057-09-18</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3130-01-01</date>
+			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 	</planet>
@@ -44663,7 +45546,11 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 		<name>Svarstaad</name>
 		<xcood>-62.59</xcood>
 		<ycood>341.65</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2625-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -44675,6 +45562,10 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 		<factionChange>
 			<date>3050-09-05</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -44777,7 +45668,23 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 		<name>Symington</name>
 		<xcood>-38.86</xcood>
 		<ycood>149.18</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2299-01-01</date>
+			<faction>FoS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -44785,6 +45692,10 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -47038,7 +47949,23 @@ Timbuktu has been a staging ground used by the Lyran Commonwealth to coordinate 
 		<name>Tomans</name>
 		<xcood>-51.38</xcood>
 		<ycood>224.29</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2235-01-01</date>
+			<faction>TamP</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -47050,6 +47977,10 @@ Timbuktu has been a staging ground used by the Lyran Commonwealth to coordinate 
 		<factionChange>
 			<date>3070-01-18</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -47432,9 +48363,14 @@ Gutierrez Aerospace</desc>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
+			<date>2785-09-01</date>
+			<faction>LA,DC</faction>
+		</factionChange>
+		<factionChange>
 			<date>2785-11-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<desc>Trolloc Prime was successfully conquered by the Draconis Combine in November of 2785 following a diversionary raid on the planet of Bone-Norman.</desc>
 	</planet>
 	<planet>
 		<name>Trondheim</name>
@@ -47804,7 +48740,15 @@ Tsukude‘s capital, Ogawa City, is located on Ikadae, the largest of this world
 		<faction>UND</faction>
 		<factionChange>
 			<date>2418-01-01</date>
+			<faction>AB</faction>
+		</factionChange>
+		<factionChange>
+			<date>2516-01-01</date>
 			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2543-07-01</date>
+			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
 			<date>2865-01-01</date>
@@ -48229,7 +49173,19 @@ With no substantial industry or natural resources, the Blakists largely overlook
 		<name>Unukalhai</name>
 		<xcood>-46.68</xcood>
 		<ycood>70.42</ycood>
-		<faction>FoS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2299-01-01</date>
+			<faction>FoS</faction>
+		</factionChange>
 		<factionChange>
 			<date>2341-01-01</date>
 			<faction>LA</faction>
@@ -48245,6 +49201,14 @@ With no substantial industry or natural resources, the Blakists largely overlook
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3132-07-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>1.21</gravity>
@@ -48623,7 +49587,11 @@ In the centuries of the Succession Wars, Unukalhai was largely overlooked by inv
 		<name>Vantaa</name>
 		<xcood>-73.28</xcood>
 		<ycood>354.69</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2450-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -49347,7 +50315,11 @@ Tellis Electronics
 		<name>Vulcan</name>
 		<xcood>-67.29</xcood>
 		<ycood>323.39</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2620-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -51003,7 +51975,19 @@ Under The Republic of the Sphere, Yangtze has rebuilt the least-damaged dams and
 		<name>Yed Posterior</name>
 		<xcood>-44.6</xcood>
 		<ycood>120.23</ycood>
-		<faction>FoS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2320-01-01</date>
+			<faction>FoS</faction>
+		</factionChange>
 		<factionChange>
 			<date>2341-01-01</date>
 			<faction>LA</faction>
@@ -51019,6 +52003,14 @@ Under The Republic of the Sphere, Yangtze has rebuilt the least-damaged dams and
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3132-07-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>1.04</gravity>
@@ -51040,7 +52032,23 @@ As a border world, Yed Posterior saw its fair share of raids and invasions durin
 		<name>Yed Prior</name>
 		<xcood>-62.59</xcood>
 		<ycood>125.18</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2299-01-01</date>
+			<faction>FoS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -51048,6 +52056,10 @@ As a border world, Yed Posterior saw its fair share of raids and invasions durin
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 		<lifeForm>7</lifeForm>
 		<spectralClass>F</spectralClass>
@@ -51560,7 +52572,19 @@ Today, Gray Valley City remains the largest and most industrialized of Zebebelge
 		<name>Zebeneschamali</name>
 		<xcood>-78.5</xcood>
 		<ycood>91.02</ycood>
-		<faction>FoS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2299-01-01</date>
+			<faction>FoS</faction>
+		</factionChange>
 		<factionChange>
 			<date>2341-01-01</date>
 			<faction>LA</faction>
@@ -51576,6 +52600,10 @@ Today, Gray Valley City remains the largest and most industrialized of Zebebelge
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3132-07-01</date>
+			<faction>CJF</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.72</gravity>
@@ -51734,7 +52762,11 @@ Today, a trace of Zebeneschamali‘s founding decades can still be seen in the s
 		<name>Zoetermeer</name>
 		<xcood>-78.76</xcood>
 		<ycood>333.56</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2610-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -51758,6 +52790,10 @@ Today, a trace of Zebeneschamali‘s founding decades can still be seen in the s
 		<factionChange>
 			<date>3071-08-28</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3140-01-01</date>
+			<faction>CHH</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.98</gravity>
@@ -55830,4 +56866,136 @@ Alexandra is the 3rd planet in the Tanis system and is relatively temperate, tho
 			<faction>FR</faction>
 		</factionChange>
 	</planet>
+	<planet>
+		<name>Afleir</name>
+		<xcood>-51.28</xcood>
+		<ycood>-2.98</ycood>
+		<faction>TH</faction>
+		<factionChange>
+			<date>2785-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
+	</planet>
+	<planet>
+		<name>Pokhara</name>
+		<xcood>62.33</xcood>
+		<ycood>16.97</ycood>
+		<faction>TH</faction>
+		<factionChange>
+			<date>2784-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
+	</planet>
+	<planet>
+		<name>New Florence</name>
+		<xcood>90.56</xcood>
+		<ycood>-11.70</ycood>
+		<faction>TH</faction>
+		<factionChange>
+			<date>2785-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2822-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2864-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
+	</planet>
+	<planet>
+		<name>Bex</name>
+		<xcood>32.24</xcood>
+		<ycood>-46.39</ycood>
+		<faction>TH</faction>
+		<factionChange>
+			<date>2785-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
+	</planet>
+	<planet>
+		<name>New Dallas</name>
+		<xcood>-54.93</xcood>
+		<ycood>-25.62</ycood>
+		<faction>NONE</faction>
+		<factionChange>
+			<date>2354-01-01</date>
+			<faction>TH</faction>
+		</factionChange>
+		<factionChange>
+			<date>2766-12-27</date>
+			<faction>TH,RWR</faction>
+		</factionChange>
+		<factionChange>
+			<date>2766-01-31</date>
+			<faction>RWR</faction>
+		</factionChange>
+		<factionChange>
+			<date>2773-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2787-03-20</date>
+			<faction>IND,FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>2830-01-01</date>
+			<faction>ABN</faction>
+		</factionChange>
+		<pressure>4</pressure>
+		<gravity>0.86</gravity>
+		<lifeForm>2</lifeForm>
+		<climate>5</climate>
+		<percentWater>62</percentWater>
+		<temperature>47</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>VI</luminosity>
+		<sysPos>2</sysPos>
+		<hpg>A</hpg>
+		<zenithCharge>true</zenithCharge>
+		<nadirCharge>true</nadirCharge>
+		<satellite>Pecos</satellite>
+		<satellite>Franklin</satellite>
+		<landMass>Reunion</landMass>
+		<landMass>Ellum</landMass>
+		<landMass>Trinity (Caddo City)</landMass>
+		<socioIndustrial>A-B-A-B-A</socioIndustrial>
+		<desc>New Dallas was a planet within the Terran Hegemony, located near Borden and Marcus, and a part of the Tyrfing Province. New Dallas was colonised in 2354 by settlers from a region of the former United States named Texas. The colonization of New Dallas was the result of Director-General Michael Cameron restarting a general colonization drive within the boundaries of the Terran Hegemony. New Dallas was one of a number of worlds which had been ignored in the past, as it was only marginally habitable; one of the methods used by Cameron to break down nationalistic sentiment towards old countries on Terra was to encourage colonization on a regional basis, where inhabitants of particular regions of Terra could choose worlds that would be transformed into "paradises" through the efforts of the Hegemony. These worlds would then be settled by colonists from those regions, relocating the most nationalistically inclined to new worlds. New Dallas was one of these worlds.
+	
+Having established New Dallas the Hegemony government then worked to bind the population of the world to itself in a number of ways, one of which included favouring the planetary militia on New Dallas with preferred status for new technology, making them one of the first military units outside the Hegemony Armed Forces to receive the latest technology from the Hegemony development programmes. With regular access to cutting-edge designs, the militia elected to construct a large underground bunker where older BattleMechs could be stored; this was a common occurence during an era where 'Mechs were rare, expensive items.
+
+AMARIS CIVIL WAR
+
+During the reign of First Lord Richard Cameron the people of New Dallas and their Planetary Governor, a retired Star League Defense Force General named Titus Clay, were vocal opponents of the First Lord and what they saw as his spreading network of toadies. This skeptical attitude would nearly result in the undoing of Amaris' subsequent Operation APOTHESIS.
+
+When Cameron moved to station forces from the Rim Worlds Republic on New Dallas, both Governor Clay and the senior military officer on New Dallas, Major General Carlos Kataga, objected strenuously. They neither liked nor trusted the Republican forces, an attitude echoed by the people of New Dallas. Prior to the arrival of these new garrison forces, Governor Clay mobilised the New Dallas volunteer militia, which was already a strong planetary militia by any measure, and charged them with taking responsibility for both the three Castles Brian on New Dallas and a number of the local SLDF bases. General Kataga took this mobilization a step further by calling on the reservists living on New Dallas to voluntarily take on additional duties and responsibilities within the various SLDF bases. By far the greater part of the reservists did so; the measures were so successful that both Clay and Kataga reported to their respected superiors that there was no requirement for any additional forces to garrison New Dallas, based on the success of their mobilisation.
+
+Despite the protests from both Clay and Kataga, Rim Worlds forces began arriving, operating under the command of the Republican General Viktoria Benboudaoud. Benboudaoud presented both with orders signed by General Aleksandr Kerensky requiring the Rim Worlds forces to take over control of the three Castles Brian, orders that Clay and Kataga greeted with outright laughter. The two agreed only to hand over tiny corners of the most outlying bases for garrisoning by the Republican forces, and when Benboudaoud objected, Clay ordered for her to be removed from his office under armed escort. Clay and Kataga then revoked all landing clearances for Republican forces and detained Benboudaoud's DropShip. General Benboudaoud raised strenuous objections to General Patrick Scoffins, the senior Republican officer in the Terran Hegemony, as well as complaining directly to Stefan Amaris himself, but neither was prepared to push the issue at the time, leaving the Rim Worlds forces to take up their meagre facilities and make alternate plans for their ultimate conquest of New Dallas.
+
+In accordance with Amaris' plans to make the worlds of the Hegemony increasingly dependent on the Rim Worlds forces, independent terrorist attacks were sponsored on New Dallas in the name of various Periphery movements. However, rather than being able to respond to the crises and thereby gain greater influence on New Dallas, the Republican forces were blocked at every turn; whenever an incident occured, General Kataga responded by deploying companies of SLDF recruits to provide security as required, replacing their planned field exercises with actual field experience, dealing with exactly the kind of incidents they could expect to face in the Periphery.
+
+Amaris' agents on New Dallas triggered increasing numbers of terrorist incidents on New Dallas in the build up to the coup, but the Republicans failed to gain any traction; the Rim Worlds forces were limited to being able to deploy only onto training areas, and even when they used the training areas it was under a strict watch by local observer units. In contrast with the Republican efforts, the military and police forces on New Dallas experienced increasing levels of success against the terrorists; this culminated in two battalions of mercenaries under Republican employ being discovered as they attempted to infiltrate onto New Dallas shortly before the coup was launched. These mercenaries, intended to support the Republican forces when APOTHESIS began, instead found themselves under arrest for terrorism with their equipment confiscated; the New Dallas authorities came precipitously close to uncovering the true origin of the terrorist incidents, and it was only the timing of the launch of APOTHESIS on the 27th of December 2766 that prevented New Dallas from completely unravelling Amaris' plans.
+
+In contrast to the campaign suddenly waged on the majority of the other worlds within the Hegemony, Benboudaoud found that her forces had to fight a completely different campaign on New Dallas. The effective manner in which the local authorities had restricted Republican access to secure facilities and constrained terrorist activities prevented the Republicans from planting much by way of bombs and booby traps as their original plans had called for; the pre-emptive strike on the planetary HPG complex by Republican special forces was also rebuffed, forcing Benboudaoud to order military strikes against the New Dallas military and local infrastructure.
+
+The New Dallas militia blocked these Republican attacks, as well as Republican attempts to secure control of the local Space Defense System; when Benboudaoud was forced to call in support from the Republican WarShip flotilla responsible for securing the local jump points, the eight Republican WarShips found themselves facing an active SDS network under the control of General Kataga's forces. Dozens of drones engaged the Republican WarShips as General Kataga led his armed forces against Benboudaoud's forces on the ground, who were now heavily outnumbered by the SLDF and New Dallas troops. The New Dallas forces vanquished the Republicans on both the ground and in space over the course of the next six hours, leaving New Dallas under their control, at least temporarily.
+
+Governor Clay called a planetary state of emergency in anticipation of further Republican attacks; the Republicans still had control of both jump points, as well as the SDS drones which had been assigned to the control of the jump point stations. When the Republicans made a second attempt to capture New Dallas on the 7th of January 2767 they began with a heavy naval engagement, with a fleet of thirty Republican WarShips augmented by the captured SDS drones attacking the New Dallas SDS drones above New Dallas on the 14th of January. Republican Admiral Otto Idowu waited until his forces had destroyed the last of the SLDF SDS drones before broadcasting that the defenders of New Dallas had one day to surrender and submit to the rule of Emperor Stefan Amaris, a demand that Clay and Kataga responded to by ordering the local AeroSpace Fighter squadrons to engage and destroy the enemy forces. Despite being heavily outnumbered and outgunned the local squadrons managed to delay the Republican attack by several hours, but when the last of the squadrons had been destroyed Admiral Idowu ordered his WarShips to begin destroying the military bases on New Dallas using orbital bombardment.
+
+This orbital bombardment continued all the way up to the 31st of January, at which point additional Republican ground forces began landing, taking advantage of the destruction of New Dallas' organized military to secure the planet. This didn't stop resistance movements forming on New Dallas, however; the Republicans promptly arrested Governor Clay, staged a mock trial and executed him, acts which led to New Dallas becoming a hotbed of resistance against the new Amaris regime.
+
+DESTRUCTION
+
+The existence of the militia's boneyard bunker and it's location had been forgotten by the time the Star League fell, but the centuries of close association with the Hegemony had instilled a profound loyalty to the Hegemony in the population, which had fatal results. During the brutal First Succession War the population of New Dallas refused to join any of the Great Houses; having continued to receive the best military equipment right up until the fall of the Star League, the local militia on New Dallas put up a fierce resistance against those Houses who attempted to annex the world, and did so while fielding equipment matching that of the Star League Defense Force Royal Divisions.
+
+The Great Houses resorted to the use of nuclear weapons to destroy the New Dallas militia, weapons which had a devastating effect on the terraformed ecology of New Dallas, reversing the ancient terraforming efforts made by the Terran Hegemony and allowing the original hostile environment to reassert itself. This ecological reversion resulted in the citizens of New Dallas who had managed to survive the conflict on the planet leaving in large numbers, and by the time the Second Succession War began New Dallas was uninhabited once more.
+
+JIHAD
+
+New Dallas fell off maps of the Inner Sphere, one of many worlds to do so during the Succession Wars. It remained forgotten until Chandrasekhar Kurita obtained information through his intelligence networks which, when combined with information from the archaeological exploration company Interstellar Expeditions, revealed the Terran Hegemony's sharing of advanced technology with certain favoured planetary militias. Kurita hired the mercenary unit known as the Devil's Brigade, dispatching them in pursuit of the world of New Dallas and the advanced Star League technology believed to be there. The Devil's Brigade found no cutting-edge 'Mechs or weapons - everything the militia had, apparently fought on the front lines during the nuclear attacks, and was long since destroyed - and determined that New Dallas was a wasteland.
+
+However, the Devil's Brigade had one striking success: they found the ancient storage bunker put in place by the New Dallas militia, centuries before. Deep within the heart of the bunker lay a worthy treasure - a Terran Hegemony Memory Core. The memory core was a testament to the intelligence gathering performed by the Terran Hegemony; it contained the designs, blueprints and specifications not just for Terran Hegemony equipment, from the most ancient of BattleMechs to cutting-edge Royal designs, but also information on those BattleMechs designed and built by the other nations of the Inner Sphere and even the Periphery. The Devil's Brigade brought the memory core to Kurita, who used every means at his disposal to disseminate the information as widely and as quickly as possible. As a result, the same machines that fought on the surface of New Dallas would soon begin reappearing across the Inner Sphere - as well as machines that predated them by centuries. New Dallas and the legacy left by those who settled it would be responsible for the appearance of the technology known as RetroTech from factories across human space during the Word of Blake's Jihad in the mid-31st century.</desc>
+	</planet>	
 </planets>

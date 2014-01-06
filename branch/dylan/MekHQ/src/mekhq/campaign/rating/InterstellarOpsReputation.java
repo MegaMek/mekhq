@@ -720,7 +720,6 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
         return BigDecimal.ZERO;
     }
 
-    @Override
     public int getFinancialValue() {
         return campaign.getFinances().isInDebt() ? -10 : 0;
     }

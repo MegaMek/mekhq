@@ -191,6 +191,9 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	public static final int STATE_LIGHT_DAMAGE = 1;
 	public static final int STATE_HEAVY_DAMAGE = 2;
 	public static final int STATE_CRIPPLED = 3;
+	
+	// To be used for transport and cargo reports
+	public static final int ETYPE_MOTHBALLED = -9876;
 
 	protected Entity entity;
 	private int site;
@@ -537,13 +540,13 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	}
 	
 	public ArrayList<Part> getSalvageableParts() {
-		ArrayList<Part> brokenParts = new ArrayList<Part>();
+		ArrayList<Part> salvageParts = new ArrayList<Part>();
 		for(Part part: parts) {
 			if(part.isSalvaging()) {
-				brokenParts.add(part);
+				salvageParts.add(part);
 			}
 		}
-		return brokenParts;
+		return salvageParts;
 	}
 	
 	public ArrayList<IAcquisitionWork> getPartsNeeded() {
@@ -624,6 +627,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	 */
 	public int getCrits(Mounted m) {
 		// TODO: I should probably just add this method to Entity in MM
+		// For the above, Mounted would probably be even better than Entity
 		int hits = 0;
 		for (int loc = 0; loc < entity.locations(); loc++) {
 			for (int i = 0; i < entity.getNumberOfCriticals(loc); i++) {
@@ -633,9 +637,18 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 						|| (slot.getType() != CriticalSlot.TYPE_EQUIPMENT)) {
 					continue;
 				}
-				if (entity.getEquipmentNum(m) == slot.getIndex()
-						&& (slot.isHit() || slot.isDestroyed())) {
-					hits++;
+				Mounted m1 = slot.getMount();
+				Mounted m2 = slot.getMount2();
+				if (slot.getIndex() == -1) {
+					if ((m.equals(m1) || m.equals(m2))
+							&& (slot.isHit() || slot.isDestroyed())) {
+						hits++;
+					}
+				} else {
+					if (entity.getEquipmentNum(m) == slot.getIndex()
+							&& (slot.isHit() || slot.isDestroyed())) {
+						hits++;
+					}
 				}
 			}
 		}
@@ -748,13 +761,13 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 		return false;
 	}
 	
-	public void damageSystem(int type, int slot, int hits) {
+	public void damageSystem(int type, int equipmentNum, int hits) {
 		for (int loc = 0; loc < getEntity().locations(); loc++) {
-			damageSystem(type, slot, loc, hits);
+			damageSystem(type, equipmentNum, loc, hits);
 		}
 	}
 	
-	public void damageSystem(int type, int slot, int loc, int hits) {
+	public void damageSystem(int type, int equipmentNum, int loc, int hits) {
 		int nhits = 0;
 		for (int i = 0; i < getEntity().getNumberOfCriticals(loc); i++) {
 			CriticalSlot cs = getEntity().getCritical(loc, i);
@@ -762,7 +775,10 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 			if ((cs == null) || (cs.getType() != type)) {
 				continue;
 			}
-			if (cs.getIndex() == slot) {
+			Mounted mounted = getEntity().getEquipment(equipmentNum);
+            Mounted m1 = cs.getMount();
+            Mounted m2 = cs.getMount2();
+			if (cs.getIndex() == equipmentNum || (mounted != null && (mounted.equals(m1) || mounted.equals(m2)))) {
 				if(nhits < hits) {
 					cs.setHit(true);
 					cs.setDestroyed(true);
@@ -777,20 +793,23 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 		}
 	}
 		
-	public void destroySystem(int type, int slot) {
+	public void destroySystem(int type, int equipmentNum) {
 		for (int loc = 0; loc < getEntity().locations(); loc++) {
-			destroySystem(type, slot, loc);
+			destroySystem(type, equipmentNum, loc);
 		}
 	}
 
-	public void destroySystem(int type, int slot, int loc) {
+	public void destroySystem(int type, int equipmentNum, int loc) {
 		for (int i = 0; i < getEntity().getNumberOfCriticals(loc); i++) {
 			CriticalSlot cs = getEntity().getCritical(loc, i);
 			// ignore empty & system slots
 			if ((cs == null) || (cs.getType() != type)) {
 				continue;
 			}
-			if (cs.getIndex() == slot) {
+			Mounted mounted = getEntity().getEquipment(equipmentNum);
+            Mounted m1 = cs.getMount();
+            Mounted m2 = cs.getMount2();
+			if (cs.getIndex() == equipmentNum || (mounted != null && (mounted.equals(m1) || mounted.equals(m2)))) {
 				cs.setHit(true);
 				cs.setDestroyed(true);
 				cs.setRepairable(false);
@@ -798,15 +817,18 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 		}
 	}
 	
-	public void destroySystem(int type, int slot, int loc, int hits) {
-	    int nhits = 0;
+	public void destroySystem(int type, int equipmentNum, int loc, int hits) {
+		int nhits = 0;
         for (int i = 0; i < getEntity().getNumberOfCriticals(loc); i++) {
             CriticalSlot cs = getEntity().getCritical(loc, i);
             // ignore empty & system slots
             if ((cs == null) || (cs.getType() != type)) {
                 continue;
             }
-            if (cs.getIndex() == slot) {
+			Mounted mounted = getEntity().getEquipment(equipmentNum);
+            Mounted m1 = cs.getMount();
+            Mounted m2 = cs.getMount2();
+			if (cs.getIndex() == equipmentNum || (mounted != null && (mounted.equals(m1) || mounted.equals(m2)))) {
                 if(nhits < hits) {
                     cs.setHit(true);
                     cs.setDestroyed(true);
@@ -821,20 +843,23 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
         }
     }
 
-	public void repairSystem(int type, int slot) {
+	public void repairSystem(int type, int equipmentNum) {
 		for (int loc = 0; loc < getEntity().locations(); loc++) {
-			repairSystem(type, slot, loc);
+			repairSystem(type, equipmentNum, loc);
 		}
 	}
 	
-	public void repairSystem(int type, int slot, int loc) {
+	public void repairSystem(int type, int equipmentNum, int loc) {
 		for (int i = 0; i < getEntity().getNumberOfCriticals(loc); i++) {
 			CriticalSlot cs = getEntity().getCritical(loc, i);
 			// ignore empty & system slots
 			if ((cs == null) || (cs.getType() != type)) {
 				continue;
 			}
-			if (cs.getIndex() == slot) {
+			Mounted mounted = getEntity().getEquipment(equipmentNum);
+            Mounted m1 = cs.getMount();
+            Mounted m2 = cs.getMount2();
+			if (cs.getIndex() == equipmentNum || (mounted != null && (mounted.equals(m1) || mounted.equals(m2)))) {
 				cs.setHit(false);
 				cs.setMissing(false);
 				cs.setDestroyed(false);

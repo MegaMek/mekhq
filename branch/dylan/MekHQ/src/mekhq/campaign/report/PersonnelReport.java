@@ -20,8 +20,10 @@
  */
 package mekhq.campaign.report;
 
+import java.awt.Dimension;
 import java.awt.Font;
 
+import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
 
 import mekhq.campaign.Campaign;
@@ -45,9 +47,26 @@ public class PersonnelReport extends Report {
     }
       
     public JTextPane getReport() {
-        JTextPane txtReport = new JTextPane();
-        txtReport.setFont(new Font("Courier New", Font.PLAIN, 12));
-        txtReport.setText(getCampaign().getCombatPersonnelDetails() + "\n\n" + getCampaign().getSupportPersonnelDetails());
+    	// Load combat personnel
+        JTextPane txtCombat = new JTextPane();
+        txtCombat.setFont(new Font("Courier New", Font.PLAIN, 12));
+        txtCombat.setText(getCampaign().getCombatPersonnelDetails());
+        
+        // Load support personnel
+        JTextPane txtSupport = new JTextPane();
+        txtSupport.setFont(new Font("Courier New", Font.PLAIN, 12));
+        txtSupport.setText(getCampaign().getSupportPersonnelDetails());
+        
+        // SplitPane them
+        JSplitPane splitOverviewPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, txtCombat, txtSupport);
+		splitOverviewPersonnel.setName("splitOverviewPersonnel");
+		splitOverviewPersonnel.setOneTouchExpandable(true);
+		splitOverviewPersonnel.setResizeWeight(0.5);
+        
+		// Actual report pane
+		JTextPane txtReport = new JTextPane();
+        txtReport.setMinimumSize(new Dimension(800, 500));
+        txtReport.insertComponent(splitOverviewPersonnel);
         return txtReport;
     }
    

@@ -117,7 +117,10 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
 
     @Override
     public String getAcquisitionName() {
-        return getHyperlinkedName();
+    	// This cannot be hyperlinked name due to the fact that we have a null unit ID
+    	// Also, the field this goes into does not currently support html, and would need our listener attached
+    	//  - Dylan
+        return getName();
     }
 
     @Override

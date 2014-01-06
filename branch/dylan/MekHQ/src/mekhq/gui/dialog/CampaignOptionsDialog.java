@@ -29,6 +29,7 @@ import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.GregorianCalendar;
@@ -86,6 +87,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
+import mekhq.gui.model.SortedComboBoxModel;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -119,6 +121,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JSpinner spnUsedPartsValue[];
     private JSpinner spnDamagedPartsValue;
     private javax.swing.JComboBox comboFaction;
+    SortedComboBoxModel factionModel;
     private javax.swing.JComboBox comboFactionNames;
     private javax.swing.JComboBox comboRanks;
     private javax.swing.JSlider sldGender;
@@ -520,11 +523,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panGeneral.add(btnDate, gridBagConstraints);
 
-        DefaultComboBoxModel factionModel = new DefaultComboBoxModel();
+        factionModel = new SortedComboBoxModel();
         for (String sname : Faction.choosableFactionCodes) {
-            factionModel.addElement(Faction.getFaction(sname).getFullName(Era.E_JIHAD));
+            factionModel.addElement(Faction.getFaction(sname).getFullName(Era.getEra(date.get(Calendar.YEAR))));
         }
-        factionModel.setSelectedItem(campaign.getFaction().getFullName(Era.E_JIHAD));
+        factionModel.setSelectedItem(campaign.getFaction().getFullName(Era.getEra(date.get(Calendar.YEAR))));
         comboFaction.setModel(factionModel);
         comboFaction.setMinimumSize(new java.awt.Dimension(400, 30));
         comboFaction.setName("comboFaction"); // NOI18N
@@ -3100,6 +3103,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             date = dc.getDate();
             btnDate.setText(getDateAsString());
+            factionModel = new SortedComboBoxModel();
+            for (String sname : Faction.choosableFactionCodes) {
+                factionModel.addElement(Faction.getFaction(sname).getFullName(Era.getEra(date.get(Calendar.YEAR))));
+            }
+            factionModel.setSelectedItem(campaign.getFaction().getFullName(Era.getEra(date.get(Calendar.YEAR))));
+            comboFaction.setModel(factionModel);
         }
     }//GEN-LAST:event_btnDateActionPerformed
 

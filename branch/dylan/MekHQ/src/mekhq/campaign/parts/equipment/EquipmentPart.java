@@ -211,7 +211,7 @@ public class EquipmentPart extends Part {
 				mounted.setHit(false);
 				mounted.setMissing(false);
 		        mounted.setDestroyed(false);
-		        unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, unit.getEntity().getEquipmentNum(mounted));
+		        unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum);
 			}
 		}
 	}
@@ -229,7 +229,7 @@ public class EquipmentPart extends Part {
 				mounted.setHit(true);
 		        mounted.setDestroyed(true);
 		        mounted.setRepairable(false);
-		        unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, unit.getEntity().getEquipmentNum(mounted));	
+		        unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum, mounted.getLocation());	
 			}
 			Part spare = campaign.checkForExistingSparePart(this);
 			if(!salvage) {
@@ -337,12 +337,12 @@ public class EquipmentPart extends Part {
 					mounted.setDestroyed(true);
 					mounted.setHit(true);
 					mounted.setRepairable(true);
-			        unit.damageSystem(CriticalSlot.TYPE_EQUIPMENT, unit.getEntity().getEquipmentNum(mounted), hits);	
+			        unit.damageSystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum, hits);	
 				} else {
 					mounted.setHit(false);
 			        mounted.setDestroyed(false);
 			        mounted.setRepairable(true);
-			        unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, unit.getEntity().getEquipmentNum(mounted));
+			        unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum);
 				}
 			}
 		}
@@ -381,7 +381,9 @@ public class EquipmentPart extends Part {
 	
 	@Override
 	public boolean isMountedOnDestroyedLocation() {
-		if(null == unit) {
+		// This should do the exact same as the big loop commented out below - Dylan
+		return null != unit && unit.isLocationDestroyed(unit.getEntity().getEquipment(equipmentNum).getLocation());
+		/*if(null == unit) {
 			return false;
 		}
 		for(int loc = 0; loc < unit.getEntity().locations(); loc++) {
@@ -392,15 +394,18 @@ public class EquipmentPart extends Part {
                 if ((slot == null) || (slot.getType() != CriticalSlot.TYPE_EQUIPMENT)) {
                     continue;
                 }
-                
-                if (equipmentNum == slot.getIndex()) {
-                    if (unit.isLocationDestroyed(loc)) {
-                        return true;
-                    }
+                Mounted equip = unit.getEntity().getEquipment(equipmentNum);
+                Mounted m1 = slot.getMount();
+                Mounted m2 = slot.getMount2();
+                if (m1 == null && m2 == null) {
+                	continue;
+                }
+                if (slot.getIndex() == equipmentNum || (equip.equals(m1) || equip.equals(m2))) {
+                    return unit.isLocationDestroyed(loc);
                 }             
             }
         }     
-		return false;
+		return false;*/
 	}
 	
 	@Override
@@ -414,8 +419,13 @@ public class EquipmentPart extends Part {
 	                if ((slot == null) || (slot.getType() != CriticalSlot.TYPE_EQUIPMENT)) {
 	                    continue;
 	                }
-	                
-	                if (equipmentNum == slot.getIndex()) {
+	                Mounted equip = unit.getEntity().getEquipment(equipmentNum);
+	                Mounted m1 = slot.getMount();
+	                Mounted m2 = slot.getMount2();
+	                if (m1 == null && m2 == null) {
+	                	continue;
+	                }
+	                if ((equip.equals(m1)) || (equip.equals(m2))) {
 	                    if (unit.hasBadHipOrShoulder(loc)) {
 	                        return true;
 	                    }
