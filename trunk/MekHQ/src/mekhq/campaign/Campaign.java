@@ -607,7 +607,8 @@ public class Campaign implements Serializable {
         p.setId(id);
         personnel.add(p);
         personnelIds.put(id, p);
-        addReport(p.getHyperlinkedName() + " has been added to the personnel roster.");
+        String add = prisoner == true ? " as a prisoner" : bondsman == true ? " as a bondsman" : "";
+        addReport(p.getHyperlinkedName() + " has been added to the personnel roster"+add+".");
         if (p.getPrimaryRole() == Person.T_ASTECH) {
             astechPoolMinutes += 480;
             astechPoolOvertime += 240;
@@ -1903,6 +1904,10 @@ public class Campaign implements Serializable {
 
     public void removePerson(UUID id) {
         Person person = getPerson(id);
+        
+        if (person == null) {
+        	return;
+        }
 
         Unit u = getUnit(person.getUnitId());
         if (null != u) {

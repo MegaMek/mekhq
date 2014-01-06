@@ -49,11 +49,13 @@ import megamek.common.Mech;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
+import megamek.common.MechWarrior;
 import megamek.common.Mounted;
 import megamek.common.Tank;
 import megamek.common.XMLStreamParser;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
+import mekhq.Utilities;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
@@ -75,7 +77,7 @@ public class ResolveScenarioTracker {
 	Hashtable<UUID, UnitStatus> unitsStatus;
     Hashtable<UUID, Crew> pilots;
 	Hashtable<UUID, Crew> mia;
-	Hashtable<UUID, Person> newPilots;
+	ArrayList<Person> newPilots;
 	ArrayList<Entity> potentialSalvage;
 	ArrayList<Entity> alliedUnits;
 	ArrayList<Unit> actualSalvage;
@@ -84,6 +86,7 @@ public class ResolveScenarioTracker {
 	ArrayList<Loot> potentialLoot;
 	ArrayList<Loot> actualLoot;
 	Hashtable<UUID, PersonStatus> peopleStatus;
+	ArrayList<PersonStatus> newPeopleStatus;
 	Hashtable<String, String> killCredits;
 	Campaign campaign;
 	Scenario scenario;
@@ -103,11 +106,12 @@ public class ResolveScenarioTracker {
 		leftoverSalvage = new ArrayList<Unit>();
 		pilots = new Hashtable<UUID, Crew>();
 		mia = new Hashtable<UUID, Crew>();
-		newPilots = new Hashtable<UUID, Person>();
+		newPilots = new ArrayList<Person>();
 		units = new ArrayList<Unit>();
 		potentialLoot = scenario.getLoot();
 		actualLoot = new ArrayList<Loot>();
 		peopleStatus = new Hashtable<UUID, PersonStatus>();
+		newPeopleStatus = new ArrayList<PersonStatus>();
 		killCredits = new Hashtable<String, String>();
 		for(UUID uid : scenario.getForces(campaign).getAllUnits()) {
 			Unit u = campaign.getUnit(uid);
@@ -225,22 +229,20 @@ public class ResolveScenarioTracker {
 					if(null != e.getCrew()) {
 						if(!e.getCrew().getExternalIdAsString().equals("-1")) {
 							pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
-						/*} else {
-							for (Person p : Utilities.generateRandomCrewWithCombinedSkill(e, campaign)) {
-								campaign.makePrisoner(p);
-								MekHQ.logMessage("DEBUG: Adding "+p.getName()+" to the newPilots hash");
-								newPilots.put(p.getId(), p);
-							}*/
 						}
 					}
 				}
 			} else if(e.getOwner().isEnemyOf(client.getLocalPlayer())) {
-				if(!e.canEscape() && control) {
-					killCredits.put(e.getDisplayName(), "None");
+				if(control) {
+					// Kill credit automatically assigned only if they can't escape 
+					if (!e.canEscape()) {
+						killCredits.put(e.getDisplayName(), "None");
+					}
 					if(e instanceof Infantry && !(e instanceof BattleArmor)) {
 						continue;
 					}
 					potentialSalvage.add(e);
+					newPilots.addAll(Utilities.generateRandomCrewWithCombinedSkill(e, campaign));
 				}
 			}
 		}	
@@ -259,12 +261,6 @@ public class ResolveScenarioTracker {
 				if(null != e.getCrew()) {
 					if(!e.getCrew().getExternalIdAsString().equals("-1")) {
 						pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
-					/*} else {
-						for (Person p : Utilities.generateRandomCrewWithCombinedSkill(e, campaign)) {
-							campaign.makePrisoner(p);
-							MekHQ.logMessage("DEBUG: Adding "+p.getName()+" to the newPilots hash");
-							newPilots.put(p.getId(), p);
-						}*/
 					}
 				}
             }
@@ -288,12 +284,6 @@ public class ResolveScenarioTracker {
 					if(!e.getCrew().getExternalIdAsString().equals("-1")
 					        && (control || e.getCrew().isDead())) {
 						pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
-					/*} else {
-						for (Person p : Utilities.generateRandomCrewWithCombinedSkill(e, campaign)) {
-							campaign.makePrisoner(p);
-							MekHQ.logMessage("DEBUG: Adding "+p.getName()+" to the newPilots hash");
-							newPilots.put(p.getId(), p);
-						}*/
 					}
 				}
         	} else if(e.getOwner().isEnemyOf(client.getLocalPlayer())) {
@@ -309,6 +299,7 @@ public class ResolveScenarioTracker {
 						continue;
 					}
         			potentialSalvage.add(e);
+        			newPilots.addAll(Utilities.generateRandomCrewWithCombinedSkill(e, campaign));
         		}
         	}
         }
@@ -546,13 +537,29 @@ public class ResolveScenarioTracker {
 		}
 		
 		// And now we have prisoners...
-		for (UUID pid : newPilots.keySet()) {
-			Person p = newPilots.get(pid);
+		for (Person p : newPilots) {
+			// Can we have NULL pilots in this stupid list?
+			if (p == null) {
+				continue;
+			}
+			// Fix up the UUID as needed
+			UUID id = null;
+			if (p.getId() != null) {
+				id = p.getId();
+			}
+			if (id == null) {
+				id = UUID.randomUUID();
+			}
+			while (campaign.getPerson(id) != null) {
+				id = UUID.randomUUID();
+			}
+			p.setId(id);
+			
+			// Create a status for them
 			status = new PersonStatus(p.getName(), "None", p.getHits());
 			status.setHits(p.getHits());
 			status.setCaptured(true);
-			MekHQ.logMessage("DEBUG: Adding prisoner "+p.getName()+", with ID: "+p.getId().toString()+" to the peopleStatus hash");
-			peopleStatus.put(p.getId(), status);
+			peopleStatus.put(id, status);
 		}
 	}
 	
@@ -588,7 +595,6 @@ public class ResolveScenarioTracker {
                     if(null != status) {
                         status.assignFoundEntity(entity);
                     }
-					//entities.put(UUID.fromString(entity.getExternalIdAsString()), entity);
 				}
 			}
 
@@ -597,18 +603,7 @@ public class ResolveScenarioTracker {
 				if(!pilot.getExternalIdAsString().equals("-1")) {
 					pilots.put(UUID.fromString(pilot.getExternalIdAsString()), pilot);
 				} else { // We can currently only add crews if we have an entity associated with them.
-					/*for (Entity e : parser.getEntities()) {
-						if (!e.getCrew().equals(pilot)) {
-							MekHQ.logMessage("DEBUG: Pilots do no match");
-							continue;
-						}
-						for (Person p : Utilities.generateRandomCrewWithCombinedSkill(e, campaign)) {
-							campaign.makePrisoner(p);
-							MekHQ.logMessage("DEBUG: Adding "+p.getName()+" to the newPilots hash");
-							newPilots.put(p.getId(), p);
-						}
-						break;
-					}*/
+					//newPilots.addAll(Utilities.generateRandomCrewWithCombinedSkill(e, campaign));
 				}
 			}
 		}
@@ -659,6 +654,7 @@ public class ResolveScenarioTracker {
     					}
     				} else {		
     					potentialSalvage.add(entity);
+    					newPilots.addAll(Utilities.generateRandomCrewWithCombinedSkill(entity, campaign));
     				}
     			}
 			}   
@@ -674,7 +670,6 @@ public class ResolveScenarioTracker {
 			//Third, its possible to have duplicate pilots if a pilot ejected and then
 			//was killed later. We don't want the unhurt pilot to trump the hurt pilot, 
 			//so only replace if the hits are greater. 
-			//TODO: MIA pilots should get their hits recorded probably
 			//TODO: we need another way of handling this for multi-crewed units
 			for(Crew crew : parser.getPilots()) {
 			    if(!controlsField && crew.getHits() < 6) {
@@ -683,7 +678,21 @@ public class ResolveScenarioTracker {
 			        continue;
 			    }
 			    if(crew.getExternalIdAsString().equals("-1")) {
-			        continue; // TODO: use the generate random crew function here
+			    	MechWarrior mw = new MechWarrior(null);
+			    	mw.setCrew(crew);
+			    	boolean found = false;
+			    	for (Entity e : potentialSalvage) {
+			    		if (e.getCrew().getName().equals(crew.getName())) {
+			    			if (e.getCrew().getHits() > crew.getHits()) {
+			    				found = true;
+			    			}
+			    			break;
+			    		}
+			    	}
+			    	if (!found) {
+			    		newPilots.addAll(Utilities.generateRandomCrewWithCombinedSkill(mw, campaign));
+			    	}
+			        continue;
 			    }
 			    Crew existingPilot = pilots.get(UUID.fromString(crew.getExternalIdAsString()));
 			    if(null != existingPilot && existingPilot.getHits() > crew.getHits()) {
@@ -753,10 +762,21 @@ public class ResolveScenarioTracker {
 		//now lets update personnel
 		for(UUID pid : peopleStatus.keySet()) {
 			Person person = campaign.getPerson(pid);
+			if (person == null) {
+				for (Person p : newPilots) {
+					if (p != null && p.getId() == pid) {
+						person = p;
+						break;
+					}
+				}
+			}
 			PersonStatus status = peopleStatus.get(pid);
 			if(null == person || null == status) {
 				continue;
 			}
+			if (status.isPrisoner() || status.isBondsman()) {
+    			getCampaign().recruitPerson(person, status.isPrisoner(), status.isBondsman());
+    		}
 			person.setXp(person.getXp() + status.xp);
 			if(status.getHits() > person.getHits()) {
 			    person.setHits(status.getHits());
