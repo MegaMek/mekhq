@@ -36,6 +36,7 @@ import megamek.common.BattleArmor;
 import megamek.common.BattleArmorBay;
 import megamek.common.Bay;
 import megamek.common.CargoBay;
+import megamek.common.Compute;
 import megamek.common.ConvFighter;
 import megamek.common.Crew;
 import megamek.common.CriticalSlot;
@@ -2552,79 +2553,19 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     		pilot.setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getFinalSkillValue());
     	}
     	entity.setCrew(pilot);
-    }   
+    }
     
 
     public int getAeroCrewNeeds() {
-    	if(entity instanceof Dropship) {
-    		if(((Dropship)entity).isMilitary()) {
-    			return 4 + (int)Math.ceil(entity.getWeight()/5000.0);
-    		} else {
-    			return 3 + (int)Math.ceil(entity.getWeight()/5000.0);
-    		}
-    	}
-    	else if(entity instanceof SmallCraft) {
-    		return 3;
-    	}
-    	else if(entity instanceof Warship || entity instanceof SpaceStation) {
-			return 45 + (int)Math.ceil(entity.getWeight()/5000.0);
-    	}
-    	else if(entity instanceof Jumpship) {
-			return 6 + (int)Math.ceil(entity.getWeight()/20000.0);
-    	}
-    	return 0;
+    	return Compute.getAeroCrewNeeds(entity);
     }
     
 	public int getFullCrewSize() {
-		if(entity instanceof Tank) {
-			return (int)Math.ceil(entity.getWeight() / 15.0);
-		}
-		else if(entity instanceof BattleArmor) {
-		    int ntroopers = 0;
-		    for(int trooper = 1; trooper < entity.locations(); trooper++) {
-		        //less than zero means the suit is destroyed
-		        if(entity.getInternal(trooper) >= 0) {
-		            ntroopers++;
-		        }
-		    }
-		    return ntroopers;
-		}
-		else if(entity instanceof Infantry) {
-			return ((Infantry)entity).getSquadN() * ((Infantry)entity).getSquadSize();
-		}
-		else if(entity instanceof Jumpship || entity instanceof SmallCraft) {
-			return getAeroCrewNeeds() + getTotalGunnerNeeds();
-		}
-		else {
-			return 1;
-		}
+		return Compute.getFullCrewSize(entity);
 	}
 	
 	public int getTotalDriverNeeds() {
-		if(entity instanceof SpaceStation) {
-    		return 0;
-    	}
-    	if(entity instanceof SmallCraft || entity instanceof Jumpship) {
-    		//its not at all clear how many pilots dropships and jumpships 
-    		//should have, but the old BattleSpace book suggests they should
-    		//be able to get by with 2. For warships, lets go with 2 per shift 
-    		// so 6.
-    		if(entity instanceof Warship) {
-    			return 6;
-    		}
-    		if(entity instanceof SmallCraft) {
-    			return 3;
-    		}
-    		return 2;
-    	}
-    	if(entity instanceof Mech || entity instanceof Tank || entity instanceof Aero || entity instanceof Protomech) {
-    		//only one driver please
-    		return 1;
-    	}
-    	else if(entity instanceof Infantry) {
-    		return getFullCrewSize();
-    	}
-    	return 0;
+		return Compute.getTotalDriverNeeds(entity);
 	}
 	    
     public boolean canTakeMoreDrivers() {
@@ -2658,35 +2599,11 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     }
     
     public int getTotalGunnerNeeds() {
-    	if(entity instanceof SmallCraft || entity instanceof Jumpship) {
-    		int nStandardW = 0;
-    		int nCapitalW = 0;
-    		for(Mounted m : entity.getTotalWeaponList()) {
-    			EquipmentType type = m.getType();
-    			if(type instanceof BayWeapon) {
-    				continue;
-    			}
-    			if(type instanceof WeaponType) {
-    				if(((WeaponType)type).isCapital()) {
-    					nCapitalW++;
-    				} else {
-    					nStandardW++;
-    				}
-    			}
-    		}
-    		return nCapitalW + (int)Math.ceil(nStandardW/6.0);
-    	}
-    	else if(entity instanceof Tank) {
-    		return  (getFullCrewSize() - 1);
-    	}
-    	else if(entity instanceof Infantry) {
-    		return getFullCrewSize();
-    	}
-    	return 0;
+    	return Compute.getTotalGunnerNeeds(entity);
     }
     
     public boolean usesSoloPilot() {
-    	return getFullCrewSize() == 1;
+    	return Compute.getFullCrewSize(entity) == 1;
     }
     
     public boolean usesSoldiers() {
