@@ -137,6 +137,7 @@ v0.3.4 (SVN)
     part is that enemy personnel are now loaded into MekHQ's end screen and you have 3 options
     with them: prisoner, bondsman, escaped.
 + RFE [#89]: Unofficial - Exclude Infantry from Contract Pay
++ new MM.jar (revision 10304) and updates to Unit.java for it
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
