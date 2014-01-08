@@ -3937,6 +3937,7 @@ public class CampaignGUI extends JPanel {
         scrollOverviewCombatPersonnel.setViewportView(new PersonnelReport(getCampaign()).getCombatPersonnelReport());
         scrollOverviewSupportPersonnel.setViewportView(new PersonnelReport(getCampaign()).getSupportPersonnelReport());
         scrollOverviewTransport.setViewportView(new TransportReport(getCampaign()).getReport());
+        scrollOverviewCargo.setViewportView(new CargoReport(getCampaign()).getReport());
         HangarReport hr = new HangarReport(getCampaign());
         overviewHangarArea.setText(hr.getHangarTotals());
         scrollOverviewHangar.setViewportView(hr.getHangarTree());
