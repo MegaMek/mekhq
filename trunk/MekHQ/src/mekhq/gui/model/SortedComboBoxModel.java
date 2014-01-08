@@ -54,7 +54,7 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
 
 		for (E item : items)
 		{
-            addElement( item );
+            addElement(item);
         }
 	}
 
@@ -69,7 +69,6 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
 	/*
 	 *  Create a model with data and use the specified Comparator
 	 */
-
 	public SortedComboBoxModel(Vector<E> items, Comparator comparator)
 	{
 		this.comparator = comparator;
@@ -93,7 +92,6 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
 		int size = getSize();
 
 		//  Determine where to insert element to keep model in sorted order
-
 		for (index = 0; index < size; index++)
 		{
 			if (comparator != null)
@@ -105,8 +103,7 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
 			}
 			else
 			{
-				Comparable c = (Comparable)getElementAt( index );
-
+				Comparable c = (Comparable)getElementAt(index);
 				if (c.compareTo(element) > 0)
 					break;
 			}
@@ -115,7 +112,6 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
 		super.insertElementAt(element, index);
 
 		//  Select an element when it is added to the beginning of the model
-
 		if (index == 0 && element != null)
 		{
 			setSelectedItem( element );

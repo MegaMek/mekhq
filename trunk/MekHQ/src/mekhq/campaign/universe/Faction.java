@@ -196,6 +196,21 @@ public class Faction {
 		return factions.get(sname);
 	}
 	
+	public static Faction getFactionFromFullName(String fname, int year) {
+		return getFactionFromFullNameAndEra(fname, Era.getEra(year));
+	}
+	
+	public static Faction getFactionFromFullNameAndEra(String fname, int era) {
+		Faction faction = null;
+		for (Faction f : factions.values()) {
+			if (f.getFullName(era).equals(fname)) {
+				faction = f;
+				break;
+			}
+		}
+		return faction;
+	}
+	
     public static String getFactionCode(int faction) {
         switch(faction) {
             case F_MERC:
