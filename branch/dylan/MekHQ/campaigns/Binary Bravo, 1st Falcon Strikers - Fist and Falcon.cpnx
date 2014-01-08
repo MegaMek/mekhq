@@ -2,7 +2,7 @@
 <campaign version="0.3.4-dev">
 	<info>
 		<name>Binary Bravo,1st Falcon Strikers, Delta Galaxy</name>
-		<faction>CJF</faction>
+		<faction>FRR</faction>
 		<ranks>
 			<rankSystem>7</rankSystem>
 			<rank>
@@ -73,7 +73,7 @@
 		<camoFileName>CJF - 1st Falcon Striker Cluster.jpg</camoFileName>
 		<colorIndex>0</colorIndex>
 		<lastTeamId>0</lastTeamId>
-		<lastPartId>562</lastPartId>
+		<lastPartId>565</lastPartId>
 		<lastForceId>3</lastForceId>
 		<lastMissionId>1</lastMissionId>
 		<lastScenarioId>1</lastScenarioId>
@@ -90,7 +90,7 @@
 		<clanPriceModifier>1.0</clanPriceModifier>
 		<useFactionForNames>true</useFactionForNames>
 		<repairSystem>0</repairSystem>
-		<useUnitRating>true</useUnitRating>
+		<useUnitRating>false</useUnitRating>
 		<unitRatingMethod>Interstellar Ops</unitRatingMethod>
 		<useEraMods>false</useEraMods>
 		<useTactics>true</useTactics>
@@ -408,12 +408,12 @@ large pulse laser, but his accuracy suffers when he switches to the paired ER me
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Leadership</type>
+				<type>Negotiation</type>
 				<level>2</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Negotiation</type>
+				<type>Leadership</type>
 				<level>2</level>
 				<bonus>0</bonus>
 			</skill>
@@ -423,12 +423,12 @@ large pulse laser, but his accuracy suffers when he switches to the paired ER me
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Small Arms</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Small Arms</type>
+				<type>Gunnery/Mech</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
@@ -486,13 +486,13 @@ Hayes, who uses similar tactics with his lighter (and even faster) Incubus. Haye
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Negotiation</type>
-				<level>4</level>
+				<type>Leadership</type>
+				<level>2</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Leadership</type>
-				<level>2</level>
+				<type>Negotiation</type>
+				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
@@ -501,13 +501,13 @@ Hayes, who uses similar tactics with his lighter (and even faster) Incubus. Haye
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Small Arms</type>
-				<level>3</level>
+				<type>Gunnery/Mech</type>
+				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
-				<level>4</level>
+				<type>Small Arms</type>
+				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
@@ -560,13 +560,13 @@ ER PPCs. Through diligent effort he has managed to overcome the worst of the hea
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Leadership</type>
-				<level>1</level>
+				<type>Negotiation</type>
+				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Negotiation</type>
-				<level>3</level>
+				<type>Leadership</type>
+				<level>1</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
@@ -575,14 +575,14 @@ ER PPCs. Through diligent effort he has managed to overcome the worst of the hea
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Small Arms</type>
-				<level>2</level>
-				<bonus>0</bonus>
-			</skill>
-			<skill>
 				<type>Gunnery/Mech</type>
 				<level>4</level>
 				<bonus>1</bonus>
+			</skill>
+			<skill>
+				<type>Small Arms</type>
+				<level>2</level>
+				<bonus>0</bonus>
 			</skill>
 			<skill>
 				<type>Piloting/Mech</type>
@@ -634,13 +634,13 @@ despises the light, fixed-configuration second-line ’Mech and its entirely-mis
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Leadership</type>
-				<level>1</level>
+				<type>Negotiation</type>
+				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Negotiation</type>
-				<level>3</level>
+				<type>Leadership</type>
+				<level>1</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
@@ -649,14 +649,14 @@ despises the light, fixed-configuration second-line ’Mech and its entirely-mis
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
-				<level>3</level>
-				<bonus>1</bonus>
-			</skill>
-			<skill>
 				<type>Small Arms</type>
 				<level>3</level>
 				<bonus>0</bonus>
+			</skill>
+			<skill>
+				<type>Gunnery/Mech</type>
+				<level>3</level>
+				<bonus>1</bonus>
 			</skill>
 			<skill>
 				<type>Piloting/Mech</type>
@@ -707,13 +707,13 @@ freeborn warrior with an OmniMech in her control. She eschews the other configur
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Leadership</type>
-				<level>1</level>
+				<type>Negotiation</type>
+				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Negotiation</type>
-				<level>4</level>
+				<type>Leadership</type>
+				<level>1</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
@@ -722,13 +722,13 @@ freeborn warrior with an OmniMech in her control. She eschews the other configur
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
-				<level>4</level>
+				<type>Small Arms</type>
+				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Small Arms</type>
-				<level>3</level>
+				<type>Gunnery/Mech</type>
+				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
@@ -812,13 +812,13 @@ The Kodiak Nicola pilots was taken as isorla from Clan Wolf in a Trial of Posses
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Administration</type>
-				<level>3</level>
+				<type>Medtech</type>
+				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Medtech</type>
-				<level>4</level>
+				<type>Administration</type>
+				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
@@ -967,12 +967,12 @@ of his defeat by such an “old man,” Callen used a decrepit secondline Comman
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Leadership</type>
+				<type>Administration</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Administration</type>
+				<type>Leadership</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
@@ -982,12 +982,86 @@ of his defeat by such an “old man,” Callen used a decrepit secondline Comman
 				<bonus>0</bonus>
 			</skill>
 			<skill>
+				<type>Small Arms</type>
+				<level>5</level>
+				<bonus>0</bonus>
+			</skill>
+			<skill>
 				<type>Gunnery/Mech</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
+				<type>Piloting/Mech</type>
+				<level>5</level>
+				<bonus>0</bonus>
+			</skill>
+		</person>
+		<person id="76a13d8f-bb29-470d-9077-8c4cb0ae5dcd" type="mekhq.campaign.personnel.Person">
+			<name>Michaela</name>
+			<callsign></callsign>
+			<primaryRole>1</primaryRole>
+			<secondaryRole>0</secondaryRole>
+			<commander>false</commander>
+			<dependent>false</dependent>
+			<clan>true</clan>
+			<phenotype>1</phenotype>
+			<biography>Binary Bravo is MechWarrior Michaela’s first posting. She successfully won her Trial of Position in mid-3069 and barely reached the Inner Sphere in time to be assigned to the First Falcon Striker Cluster. Her youth and inexperience placed her in the newly-formed Binary, but Star Captain Ingried was immediately impressed with her skills and is pleased to have her. Her Star Commander is not so enamored, but no one can deny that Michaela is a prodigy on the battlefield. Her talent for ’Mech piloting has already marked her as a likely ristar in the Clan.
+
+Were it not for her partner’s initiation of a melee in her Trial of Position, most of her Starmates agree she would have achieved at least Star Commander’s rank, if not Star Captain. The fact that her Trial opponents were freed from zellbrigen made it impossible for her to defeat more than one of them before her ’Mech was
+disabled, but her one victory was enough to secure her place in the warrior caste. Her first act after her Trial of Position was to challenge her partner in the Trial to a Trial of Grievance for his actions in the battle. She won the challenge, crippling the other
+warrior and forcing his dismissal into the scientist caste. She has not told this story to her Starmates, but the Jade Falcon rumor mill has no doubt informed them. Michaela is not a woman to cross.
+
+Her short time in the Inner Sphere has already given Michaela something most Clan warriors lack: a sense of vanity. Like most Clansmen she hadn’t given a great deal of thought to her physical beauty as a child and adolescent, but she is uncommonly beautiful
+by Inner Sphere standards and has been noticed by many younger Inner Sphere-born youths. At first she dismissed the attention, but lately has come to embrace it. Her Starmates mock her for the attention she gives to her appearance, but she ignores them. She enjoys the attention of those her Clan has conquered, and the realization that her looks can give her some measure of control over the opposite sex has offered her one more weapon to add to her arsenal.
+
+Her Cougar is configured in the Alpha configuration, which is a support ’Mech built around two large long-range missile launchers. This means she is often assigned near MechWarrior Quintero, who also prefers missiles on his OmniMech, but the two warriors do not cooperate. They are both far too ambitious
+for that. Michaela has been practicing steadily in the simulator to improve her long-range gunnery with her missiles, in anticipation of facing heavier Lyran ‘Mechs that far outmass her Cougar.</biography>
+			<idleMonths>-1</idleMonths>
+			<id>76a13d8f-bb29-470d-9077-8c4cb0ae5dcd</id>
+			<portraitCategory>Pursing Peregrines/</portraitCategory>
+			<portraitFile>Michaela.jpg</portraitFile>
+			<xp>0</xp>
+			<daysToWaitForHealing>15</daysToWaitForHealing>
+			<gender>1</gender>
+			<rank>1</rank>
+			<nTasks>0</nTasks>
+			<unitId>0b3e0149-472f-4bff-ac01-7da2648af1e5</unitId>
+			<salary>-1</salary>
+			<status>0</status>
+			<prisonerstatus>0</prisonerstatus>
+			<hits>0</hits>
+			<toughness>0</toughness>
+			<minutesLeft>0</minutesLeft>
+			<overtimeLeft>0</overtimeLeft>
+			<birthday>3052-04-11 12:00:00</birthday>
+			<skill>
+				<type>Medtech</type>
+				<level>5</level>
+				<bonus>0</bonus>
+			</skill>
+			<skill>
+				<type>Negotiation</type>
+				<level>4</level>
+				<bonus>0</bonus>
+			</skill>
+			<skill>
+				<type>Leadership</type>
+				<level>1</level>
+				<bonus>0</bonus>
+			</skill>
+			<skill>
+				<type>Tactics</type>
+				<level>2</level>
+				<bonus>0</bonus>
+			</skill>
+			<skill>
 				<type>Small Arms</type>
+				<level>3</level>
+				<bonus>0</bonus>
+			</skill>
+			<skill>
+				<type>Gunnery/Mech</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
@@ -1042,77 +1116,8 @@ into making a mistake. These tactics work well for him in the open field, where 
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Leadership</type>
-				<level>1</level>
-				<bonus>0</bonus>
-			</skill>
-			<skill>
 				<type>Negotiation</type>
 				<level>3</level>
-				<bonus>0</bonus>
-			</skill>
-			<skill>
-				<type>Tactics</type>
-				<level>2</level>
-				<bonus>0</bonus>
-			</skill>
-			<skill>
-				<type>Gunnery/Mech</type>
-				<level>3</level>
-				<bonus>1</bonus>
-			</skill>
-			<skill>
-				<type>Small Arms</type>
-				<level>4</level>
-				<bonus>1</bonus>
-			</skill>
-			<skill>
-				<type>Piloting/Mech</type>
-				<level>3</level>
-				<bonus>1</bonus>
-			</skill>
-		</person>
-		<person id="76a13d8f-bb29-470d-9077-8c4cb0ae5dcd" type="mekhq.campaign.personnel.Person">
-			<name>Michaela</name>
-			<callsign></callsign>
-			<primaryRole>1</primaryRole>
-			<secondaryRole>0</secondaryRole>
-			<commander>false</commander>
-			<dependent>false</dependent>
-			<clan>true</clan>
-			<phenotype>1</phenotype>
-			<biography>Binary Bravo is MechWarrior Michaela’s first posting. She successfully won her Trial of Position in mid-3069 and barely reached the Inner Sphere in time to be assigned to the First Falcon Striker Cluster. Her youth and inexperience placed her in the newly-formed Binary, but Star Captain Ingried was immediately impressed with her skills and is pleased to have her. Her Star Commander is not so enamored, but no one can deny that Michaela is a prodigy on the battlefield. Her talent for ’Mech piloting has already marked her as a likely ristar in the Clan.
-
-Were it not for her partner’s initiation of a melee in her Trial of Position, most of her Starmates agree she would have achieved at least Star Commander’s rank, if not Star Captain. The fact that her Trial opponents were freed from zellbrigen made it impossible for her to defeat more than one of them before her ’Mech was
-disabled, but her one victory was enough to secure her place in the warrior caste. Her first act after her Trial of Position was to challenge her partner in the Trial to a Trial of Grievance for his actions in the battle. She won the challenge, crippling the other
-warrior and forcing his dismissal into the scientist caste. She has not told this story to her Starmates, but the Jade Falcon rumor mill has no doubt informed them. Michaela is not a woman to cross.
-
-Her short time in the Inner Sphere has already given Michaela something most Clan warriors lack: a sense of vanity. Like most Clansmen she hadn’t given a great deal of thought to her physical beauty as a child and adolescent, but she is uncommonly beautiful
-by Inner Sphere standards and has been noticed by many younger Inner Sphere-born youths. At first she dismissed the attention, but lately has come to embrace it. Her Starmates mock her for the attention she gives to her appearance, but she ignores them. She enjoys the attention of those her Clan has conquered, and the realization that her looks can give her some measure of control over the opposite sex has offered her one more weapon to add to her arsenal.
-
-Her Cougar is configured in the Alpha configuration, which is a support ’Mech built around two large long-range missile launchers. This means she is often assigned near MechWarrior Quintero, who also prefers missiles on his OmniMech, but the two warriors do not cooperate. They are both far too ambitious
-for that. Michaela has been practicing steadily in the simulator to improve her long-range gunnery with her missiles, in anticipation of facing heavier Lyran ‘Mechs that far outmass her Cougar.</biography>
-			<idleMonths>-1</idleMonths>
-			<id>76a13d8f-bb29-470d-9077-8c4cb0ae5dcd</id>
-			<portraitCategory>Pursing Peregrines/</portraitCategory>
-			<portraitFile>Michaela.jpg</portraitFile>
-			<xp>0</xp>
-			<daysToWaitForHealing>15</daysToWaitForHealing>
-			<gender>1</gender>
-			<rank>1</rank>
-			<nTasks>0</nTasks>
-			<unitId>0b3e0149-472f-4bff-ac01-7da2648af1e5</unitId>
-			<salary>-1</salary>
-			<status>0</status>
-			<prisonerstatus>0</prisonerstatus>
-			<hits>0</hits>
-			<toughness>0</toughness>
-			<minutesLeft>0</minutesLeft>
-			<overtimeLeft>0</overtimeLeft>
-			<birthday>3052-04-11 12:00:00</birthday>
-			<skill>
-				<type>Medtech</type>
-				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
@@ -1121,29 +1126,24 @@ for that. Michaela has been practicing steadily in the simulator to improve her 
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Negotiation</type>
-				<level>4</level>
-				<bonus>0</bonus>
-			</skill>
-			<skill>
 				<type>Tactics</type>
 				<level>2</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
-				<level>5</level>
-				<bonus>0</bonus>
+				<type>Small Arms</type>
+				<level>4</level>
+				<bonus>1</bonus>
 			</skill>
 			<skill>
-				<type>Small Arms</type>
+				<type>Gunnery/Mech</type>
 				<level>3</level>
-				<bonus>0</bonus>
+				<bonus>1</bonus>
 			</skill>
 			<skill>
 				<type>Piloting/Mech</type>
-				<level>5</level>
-				<bonus>0</bonus>
+				<level>3</level>
+				<bonus>1</bonus>
 			</skill>
 		</person>
 	</personnel>
@@ -1556,28 +1556,36 @@ Conversion by Hammer</desc>
 			<eliteLvl>5</eliteLvl>
 			<costs>8,4,4,4,4,4,4,4,4,4,4</costs>
 		</skillType>
-		<ability-tactical_genius>12</ability-tactical_genius>
 		<ability-gunnery_laser>4</ability-gunnery_laser>
-		<ability-ei_implant>0</ability-ei_implant>
+		<ability-tactical_genius>12</ability-tactical_genius>
 		<ability-gunnery_ballistic>4</ability-gunnery_ballistic>
-		<ability-pain_resistance>4</ability-pain_resistance>
+		<ability-ei_implant>0</ability-ei_implant>
 		<ability-sniper>12</ability-sniper>
-		<ability-maneuvering_ace>8</ability-maneuvering_ace>
-		<ability-gunnery_missile>4</ability-gunnery_missile>
 		<ability-aptitude_gunnery>40</ability-aptitude_gunnery>
 		<ability-specialist>4</ability-specialist>
 		<ability-jumping_jack>12</ability-jumping_jack>
+		<ability-allweather>8</ability-allweather>
 		<ability-iron_man>8</ability-iron_man>
 		<ability-melee_specialist>8</ability-melee_specialist>
+		<ability-weathered>8</ability-weathered>
+		<ability-blind_fighter>8</ability-blind_fighter>
+		<ability-sensor_geek>8</ability-sensor_geek>
+		<ability-clan_pilot_training>0</ability-clan_pilot_training>
+		<ability-oblique_attacker>4</ability-oblique_attacker>
+		<ability-jumping_jill>8</ability-jumping_jill>
+		<ability-some_like_it_hot>8</ability-some_like_it_hot>
+		<ability-dodge_maneuver>8</ability-dodge_maneuver>
+		<ability-hopping_jack>8</ability-hopping_jack>
+		<ability-pain_resistance>4</ability-pain_resistance>
+		<ability-maneuvering_ace>8</ability-maneuvering_ace>
+		<ability-cluster_hitter>8</ability-cluster_hitter>
+		<ability-gunnery_missile>4</ability-gunnery_missile>
 		<ability-melee_master>12</ability-melee_master>
 		<ability-hot_dog>4</ability-hot_dog>
 		<ability-cluster_master>0</ability-cluster_master>
 		<ability-multi_tasker>4</ability-multi_tasker>
-		<ability-clan_pilot_training>0</ability-clan_pilot_training>
-		<ability-oblique_attacker>4</ability-oblique_attacker>
 		<ability-weapon_specialist>1</ability-weapon_specialist>
-		<ability-jumping_jill>8</ability-jumping_jill>
-		<ability-dodge_maneuver>8</ability-dodge_maneuver>
+		<ability-sandblaster>8</ability-sandblaster>
 	</skillTypes>
 	<randomSkillPreferences>
 		<overallRecruitBonus>0</overallRecruitBonus>
@@ -1595,6 +1603,81 @@ Conversion by Hammer</desc>
 		<secondSkillBonus>-4</secondSkillBonus>
 	</randomSkillPreferences>
 	<parts>
+		<part id="565" type="mekhq.campaign.parts.equipment.EquipmentPart">
+			<id>565</id>
+			<name>ER Medium Laser</name>
+			<unitTonnage>45</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>10a48169-4ce8-48a9-abae-9dc65c6b095c</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>10</equipmentNum>
+			<typeName>CLERMediumLaser</typeName>
+			<equipTonnage>1.0</equipTonnage>
+		</part>
+		<part id="564" type="mekhq.campaign.parts.equipment.EquipmentPart">
+			<id>564</id>
+			<name>ER Medium Laser</name>
+			<unitTonnage>100</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>672e726e-2c55-4773-9017-85527cf9a679</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>11</equipmentNum>
+			<typeName>CLERMediumLaser</typeName>
+			<equipTonnage>1.0</equipTonnage>
+		</part>
+		<part id="563" type="mekhq.campaign.parts.equipment.HeatSink">
+			<id>563</id>
+			<name>Double Heat Sink</name>
+			<unitTonnage>70</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>51097474-8627-4694-a6a3-a26ac7004a99</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>21</equipmentNum>
+			<typeName>CLDoubleHeatSink</typeName>
+			<equipTonnage>1.0</equipTonnage>
+		</part>
 		<part id="562" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>562</id>
 			<name>Heavy Large Laser</name>
@@ -1616,7 +1699,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>6</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>CLHeavyLargeLaser</typeName>
 			<equipTonnage>4.0</equipTonnage>
 		</part>
@@ -1641,7 +1724,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>1</equipmentNum>
 			<typeName>CLDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -1666,7 +1749,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>13</equipmentNum>
+			<equipmentNum>0</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -1691,7 +1774,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>10</equipmentNum>
+			<equipmentNum>1</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -1716,7 +1799,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>7</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -1741,7 +1824,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>6</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>CLSRM6</typeName>
 			<equipTonnage>1.5</equipTonnage>
 		</part>
@@ -1766,7 +1849,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>15</equipmentNum>
+			<equipmentNum>0</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -1791,7 +1874,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>10</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>CLERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -1816,7 +1899,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>9</equipmentNum>
+			<equipmentNum>1</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -1841,7 +1924,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>7</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>CLATM6</typeName>
 			<equipTonnage>3.5</equipTonnage>
 		</part>
@@ -1866,7 +1949,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>12</equipmentNum>
+			<equipmentNum>1</equipmentNum>
 			<typeName>CLDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -1891,7 +1974,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>7</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>Clan Ammo LRM-20 (Clan) Artemis-capable</typeName>
 			<munition>8192</munition>
 			<shotsNeeded>0</shotsNeeded>
@@ -1919,7 +2002,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>6</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>CLERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -1944,7 +2027,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>13</equipmentNum>
+			<equipmentNum>1</equipmentNum>
 			<typeName>CLDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -1969,7 +2052,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>12</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>CLDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -1994,7 +2077,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>11</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>CLERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2019,7 +2102,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>10</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>CLERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2044,7 +2127,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>14</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>CLERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2069,7 +2152,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>CLERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2094,7 +2177,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>17</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>CLERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2119,7 +2202,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>16</equipmentNum>
+			<equipmentNum>0</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2144,7 +2227,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>13</equipmentNum>
+			<equipmentNum>1</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2169,7 +2252,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>11</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2194,7 +2277,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>21</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>CLDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2219,7 +2302,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>20</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>CLDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2244,7 +2327,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>17</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>CLDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2269,7 +2352,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>16</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>CLDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2294,7 +2377,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>8</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>CLMG</typeName>
 			<equipTonnage>0.25</equipTonnage>
 		</part>
@@ -2319,7 +2402,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>6</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>CLERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2344,7 +2427,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
+			<equipmentNum>6</equipmentNum>
 			<typeName>CLHeavyLargeLaser</typeName>
 			<equipTonnage>4.0</equipTonnage>
 		</part>
@@ -2369,7 +2452,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>1</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>CLDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2394,7 +2477,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>CLDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2419,7 +2502,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>0</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2444,7 +2527,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>1</equipmentNum>
+			<equipmentNum>7</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2469,7 +2552,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
+			<equipmentNum>10</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2494,7 +2577,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>6</equipmentNum>
 			<typeName>CLSRM6</typeName>
 			<equipTonnage>1.5</equipTonnage>
 		</part>
@@ -2519,7 +2602,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>13</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2544,7 +2627,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>0</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2569,7 +2652,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>8</equipmentNum>
 			<typeName>CLERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2594,7 +2677,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>1</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2619,7 +2702,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>7</equipmentNum>
 			<typeName>CLATM6</typeName>
 			<equipTonnage>3.5</equipTonnage>
 		</part>
@@ -2644,7 +2727,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
+			<equipmentNum>9</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2669,7 +2752,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>15</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2772,7 +2855,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>1</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>CLDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2825,7 +2908,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>Clan Ammo LRM-20 (Clan) Artemis-capable</typeName>
 			<munition>8192</munition>
 			<shotsNeeded>0</shotsNeeded>
@@ -2853,7 +2936,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
+			<equipmentNum>6</equipmentNum>
 			<typeName>CLERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2878,7 +2961,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>7</equipmentNum>
 			<typeName>Clan Ammo LRM-20 (Clan) Artemis-capable</typeName>
 			<munition>8192</munition>
 			<shotsNeeded>0</shotsNeeded>
@@ -2906,7 +2989,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>1</equipmentNum>
+			<equipmentNum>12</equipmentNum>
 			<typeName>CLDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2931,7 +3014,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
+			<equipmentNum>13</equipmentNum>
 			<typeName>CLDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2956,7 +3039,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>CLERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2981,7 +3064,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>6</equipmentNum>
 			<typeName>CLERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -3006,7 +3089,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>8</equipmentNum>
 			<typeName>CLERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -3031,7 +3114,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>6</equipmentNum>
+			<equipmentNum>9</equipmentNum>
 			<typeName>CLERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -3056,7 +3139,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>8</equipmentNum>
+			<equipmentNum>10</equipmentNum>
 			<typeName>CLERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -3081,7 +3164,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>CLERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -3106,7 +3189,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>14</equipmentNum>
 			<typeName>CLERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -3181,7 +3264,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>CLERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -3206,7 +3289,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>0</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -3231,7 +3314,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>1</equipmentNum>
+			<equipmentNum>11</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -3256,7 +3339,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
+			<equipmentNum>13</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -3306,7 +3389,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>16</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -3331,7 +3414,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
+			<equipmentNum>8</equipmentNum>
 			<typeName>CLDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -3356,7 +3439,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>9</equipmentNum>
 			<typeName>CLDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -3381,7 +3464,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>10</equipmentNum>
 			<typeName>CLDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -3406,7 +3489,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>11</equipmentNum>
 			<typeName>CLDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -3431,7 +3514,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>CLMG</typeName>
 			<equipTonnage>0.25</equipTonnage>
 		</part>
@@ -3456,7 +3539,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>6</equipmentNum>
 			<typeName>CLERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -4954,7 +5037,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>12</equipmentNum>
 			<typeName>CLDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -6005,31 +6088,6 @@ Conversion by Hammer</desc>
 			<shotsNeeded>0</shotsNeeded>
 			<checkedToday>false</checkedToday>
 			<oneShot>false</oneShot>
-		</part>
-		<part id="373" type="mekhq.campaign.parts.equipment.EquipmentPart">
-			<id>373</id>
-			<name>ER Medium Laser</name>
-			<unitTonnage>45</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>10a48169-4ce8-48a9-abae-9dc65c6b095c</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>8</equipmentNum>
-			<typeName>CLERMediumLaser</typeName>
-			<equipTonnage>1.0</equipTonnage>
 		</part>
 		<part id="363" type="mekhq.campaign.parts.Armor">
 			<id>363</id>
@@ -8337,31 +8395,6 @@ Conversion by Hammer</desc>
 			<equipmentNum>15</equipmentNum>
 			<typeName>CLStreakSRM6</typeName>
 			<equipTonnage>3.0</equipTonnage>
-		</part>
-		<part id="262" type="mekhq.campaign.parts.equipment.EquipmentPart">
-			<id>262</id>
-			<name>ER Medium Laser</name>
-			<unitTonnage>100</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>672e726e-2c55-4773-9017-85527cf9a679</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>9</equipmentNum>
-			<typeName>CLERMediumLaser</typeName>
-			<equipTonnage>1.0</equipTonnage>
 		</part>
 		<part id="258" type="mekhq.campaign.parts.Armor">
 			<id>258</id>
@@ -11532,7 +11565,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>17</equipmentNum>
 			<typeName>CLERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -12538,7 +12571,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>7</equipmentNum>
 			<typeName>CLMG</typeName>
 			<equipTonnage>0.25</equipTonnage>
 		</part>
@@ -12563,7 +12596,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>7</equipmentNum>
+			<equipmentNum>8</equipmentNum>
 			<typeName>CLMG</typeName>
 			<equipTonnage>0.25</equipTonnage>
 		</part>
@@ -13599,31 +13632,6 @@ Conversion by Hammer</desc>
 			<typeName>CLERLargeLaser</typeName>
 			<equipTonnage>4.0</equipTonnage>
 		</part>
-		<part id="29" type="mekhq.campaign.parts.equipment.HeatSink">
-			<id>29</id>
-			<name>Double Heat Sink</name>
-			<unitTonnage>70</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>51097474-8627-4694-a6a3-a26ac7004a99</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>8</equipmentNum>
-			<typeName>CLDoubleHeatSink</typeName>
-			<equipTonnage>1.0</equipTonnage>
-		</part>
 		<part id="27" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>27</id>
 			<name>Double Heat Sink</name>
@@ -13645,7 +13653,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>9</equipmentNum>
+			<equipmentNum>14</equipmentNum>
 			<typeName>CLDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -13720,7 +13728,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>10</equipmentNum>
+			<equipmentNum>15</equipmentNum>
 			<typeName>CLDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -13745,7 +13753,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>11</equipmentNum>
+			<equipmentNum>16</equipmentNum>
 			<typeName>CLDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -13770,7 +13778,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>14</equipmentNum>
+			<equipmentNum>17</equipmentNum>
 			<typeName>CLDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -13795,7 +13803,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>15</equipmentNum>
+			<equipmentNum>20</equipmentNum>
 			<typeName>CLDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>

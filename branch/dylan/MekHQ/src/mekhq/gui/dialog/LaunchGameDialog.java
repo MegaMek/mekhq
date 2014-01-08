@@ -129,7 +129,9 @@ public class LaunchGameDialog extends JDialog implements ActionListener {
 		if (!"cancel".equals(e.getActionCommand())) { //$NON-NLS-1$
             try {
                 playerName = yourNameF.getText();
-                serverAddr = serverAddrF.getText();
+                if (!server) {
+                	serverAddr = serverAddrF.getText();
+                }
                 port = Integer.decode(portF.getText().trim()).intValue();
             } catch (NumberFormatException ex) {
                 System.err.println(ex.getMessage());

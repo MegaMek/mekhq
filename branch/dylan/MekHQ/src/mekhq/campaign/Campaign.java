@@ -608,7 +608,8 @@ public class Campaign implements Serializable {
         p.setId(id);
         personnel.add(p);
         personnelIds.put(id, p);
-        addReport(p.getHyperlinkedName() + " has been added to the personnel roster.");
+        String add = prisoner == true ? " as a prisoner" : bondsman == true ? " as a bondsman" : "";
+        addReport(p.getHyperlinkedName() + " has been added to the personnel roster"+add+".");
         if (p.getPrimaryRole() == Person.T_ASTECH) {
             astechPoolMinutes += 480;
             astechPoolOvertime += 240;
@@ -1858,10 +1859,18 @@ public class Campaign implements Serializable {
         }
         return null;
     }
-
+    
     public long getPayRoll() {
+    	return getPayRoll(false);
+    }
+
+    public long getPayRoll(boolean noInfantry) {
         long salaries = 0;
         for (Person p : personnel) {
+        	// Optionized infantry (Unofficial)
+        	if (noInfantry && p.getPrimaryRole() == Person.T_INFANTRY)
+        		continue;
+        	
             if (p.isActive() && !p.isDependent()
                 && !(p.isPrisoner() || p.isBondsman())) {
                 salaries += p.getSalary();
@@ -1945,6 +1954,10 @@ public class Campaign implements Serializable {
 
     public void removePerson(UUID id) {
         Person person = getPerson(id);
+        
+        if (person == null) {
+        	return;
+        }
 
         Unit u = getUnit(person.getUnitId());
         if (null != u) {
@@ -5506,11 +5519,24 @@ public class Campaign implements Serializable {
      * @return
      */
     public long getForceValue() {
+    	return getForceValue(false);
+    }
+
+    /**
+     * Calculate the total value of units in the TO&E. This serves as the basis for contract payments in the StellarOps
+     * Beta.
+     *
+     * @return
+     */
+    public long getForceValue(boolean noInfantry) {
         long value = 0;
         for (UUID uuid : forces.getAllUnits()) {
             Unit u = getUnit(uuid);
             if (null == u) {
                 continue;
+            }
+            if (noInfantry && u.getEntity() instanceof Infantry && !(u.getEntity() instanceof BattleArmor)) {
+            	continue;
             }
             // lets exclude dropships and jumpships
             if (u.getEntity() instanceof Dropship
@@ -5529,9 +5555,10 @@ public class Campaign implements Serializable {
 
     public long getContractBase() {
         if (getCampaignOptions().useEquipmentContractBase()) {
-            return (long) ((getCampaignOptions().getEquipmentContractPercent() / 100.0) * getForceValue());
+            return (long) ((getCampaignOptions().getEquipmentContractPercent() / 100.0)
+            		* getForceValue(getCampaignOptions().useInfantryDontCount()));
         } else {
-            return getPayRoll();
+            return getPayRoll(getCampaignOptions().useInfantryDontCount());
         }
     }
 

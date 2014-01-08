@@ -366,6 +366,7 @@ public class Utilities {
     			p = c.newPerson(Person.T_GVEE_DRIVER);
     			p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(), false, 0);
     		}
+			p.setHits(e.getCrew().getHits());
 			drivers.add(p);
 		}
 		
@@ -475,6 +476,27 @@ public class Utilities {
     	newCrew.addAll(gunners);
     	newCrew.addAll(vesselCrew);
     	newCrew.add(navigator);
+		
+		// We need to be able to handle incoming captured personnel
+		int casualties = 0;
+		if(null != e && e instanceof Infantry) {
+			e.applyDamage();
+			casualties = newCrew.size() - ((Infantry)e).getShootingStrength();
+			for (Person p : newCrew) {
+				for (int i = 0; i < casualties; i++) {
+					if(Compute.d6(2) >= 7) {
+						int hits = c.getCampaignOptions().getMinimumHitsForVees();
+					    if (c.getCampaignOptions().useAdvancedMedical() || c.getCampaignOptions().useRandomHitsForVees()) {
+					        int range = 6 - hits;
+	                        hits = hits + Compute.randomInt(range);
+	                    }
+	                    p.setHits(hits);
+					} else {
+						p.setHits(6);
+					}
+				}
+			}
+		}
 		
 		return newCrew;
 	}

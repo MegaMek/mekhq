@@ -118,6 +118,7 @@ public class CampaignOptions implements Serializable {
     private double damagedPartsValue;
     private double canceledOrderReimbursement;
     private boolean usePercentageMaint; // Unofficial
+    private boolean infantryDontCount; // Unofficial
     private double clanPriceModifier;
 
     //contract related
@@ -215,6 +216,7 @@ public class CampaignOptions implements Serializable {
         allowCanonOnly = false;
         useAmmoByType = false;
         usePercentageMaint = false;
+        infantryDontCount = false;
         techLevel = TECH_EXPERIMENTAL;
         scenarioXP = 1;
         killsForXP = 0;
@@ -753,6 +755,14 @@ public class CampaignOptions implements Serializable {
 
     public void setUsePercentageMaint(boolean b) {
         usePercentageMaint = b;
+    }
+    
+    public boolean useInfantryDontCount() {
+    	return infantryDontCount;
+    }
+    
+    public void setUseInfantryDontCount(boolean b) {
+    	infantryDontCount = b;
     }
 
     public int getTechLevel() {
