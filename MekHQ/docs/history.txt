@@ -139,6 +139,7 @@ v0.3.4 (SVN)
 + RFE [#89]: Unofficial - Exclude Infantry from Contract Pay
 + new MM.jar (revision 10304) and updates to Unit.java for it
 + Bug [#452]: Can't Change Faction
++ Bug: NPE in Utilities.findCommander due to attempting to access a Person object without checking if it is null first
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
