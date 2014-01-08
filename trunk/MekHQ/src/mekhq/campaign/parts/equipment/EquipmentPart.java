@@ -29,6 +29,7 @@ import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.TechConstants;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.MissingPart;
@@ -382,7 +383,12 @@ public class EquipmentPart extends Part {
 	@Override
 	public boolean isMountedOnDestroyedLocation() {
 		// This should do the exact same as the big loop commented out below - Dylan
-		return null != unit && unit.isLocationDestroyed(unit.getEntity().getEquipment(equipmentNum).getLocation());
+		try {
+			return unit != null && unit.getEntity() != null && unit.getEntity().getEquipment(equipmentNum) != null && unit.isLocationDestroyed(unit.getEntity().getEquipment(equipmentNum).getLocation());
+		} catch (Exception e) {
+			MekHQ.logError(e);
+		}
+		return false;
 		/*if(null == unit) {
 			return false;
 		}
