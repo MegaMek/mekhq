@@ -264,7 +264,7 @@ public class Utilities {
     		}
     	}
     	for(Person p : gunners) {
-    		if((entity instanceof Tank || entity instanceof Infantry) && p != null && p.getHits() > 0) { 
+    		if(p == null || ((entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0)) { 
     			continue;
     		}
     		if(p.getRankOrder() > bestRank) {
@@ -273,7 +273,7 @@ public class Utilities {
     		}
     	}
     	for(Person p : drivers) {
-    		if((entity instanceof Tank || entity instanceof Infantry) && p != null && p.getHits() > 0) { 
+    		if(p == null || ((entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0)) { 
     			continue;
     		}
     		if(p.getRankOrder() > bestRank) {
