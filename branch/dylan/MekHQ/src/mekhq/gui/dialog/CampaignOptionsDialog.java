@@ -51,7 +51,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSlider;
 import javax.swing.JSpinner;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -63,6 +65,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
@@ -112,63 +115,62 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private Hashtable<String, JSpinner> hashEliteSkill;
     private boolean cancelled;
 
-
-    private javax.swing.JButton btnCamo;
-    private javax.swing.JButton btnCancel;
-    private javax.swing.JButton btnDate;
-    private javax.swing.JButton btnOkay;
+    private JButton btnCamo;
+    private JButton btnCancel;
+    private JButton btnDate;
+    private JButton btnOkay;
     private JSpinner spnClanPriceModifier;
     private JSpinner spnUsedPartsValue[];
     private JSpinner spnDamagedPartsValue;
-    private javax.swing.JComboBox comboFaction;
+    private JComboBox comboFaction;
     SortedComboBoxModel factionModel;
-    private javax.swing.JComboBox comboFactionNames;
-    private javax.swing.JComboBox comboRanks;
-    private javax.swing.JSlider sldGender;
-    private javax.swing.JLabel lblCamo;
-    private javax.swing.JLabel lblDate;
-    private javax.swing.JLabel lblFaction;
-    private javax.swing.JLabel lblFactionNames;
-    private javax.swing.JLabel lblRank;
-    private javax.swing.JLabel lblGender;
-    private javax.swing.JLabel lblName;
-    private javax.swing.JPanel panGeneral;
-    private javax.swing.JPanel panRepair;
-    private javax.swing.JPanel panTech;
-    private javax.swing.JPanel panPersonnel;
-    private javax.swing.JPanel panFinances;
-    private javax.swing.JPanel panMercenary;
-    private javax.swing.JPanel panNameGen;
-    private javax.swing.JPanel panXP;
-    private javax.swing.JPanel panRank;
-    private javax.swing.JPanel panSkill;
-    private javax.swing.JPanel panRandomSkill;
-    private javax.swing.JTabbedPane tabOptions;
-    private javax.swing.JTextField txtName;
-    private javax.swing.JCheckBox useEraModsCheckBox;
-    private javax.swing.JCheckBox useUnitRatingCheckBox;
-    private javax.swing.JComboBox unitRatingMethodCombo;
-    private javax.swing.JCheckBox useFactionForNamesBox;
-    private javax.swing.JCheckBox useTacticsBox;
-    private javax.swing.JCheckBox useInitBonusBox;
-    private javax.swing.JCheckBox useToughnessBox;
-    private javax.swing.JCheckBox useArtilleryBox;
-    private javax.swing.JCheckBox useAbilitiesBox;
-    private javax.swing.JCheckBox useQuirksBox;
-    private javax.swing.JCheckBox useEdgeBox;
-    private javax.swing.JCheckBox useImplantsBox;
-    private javax.swing.JCheckBox useAdvancedMedicalBox;
-    private javax.swing.JCheckBox useDylansRandomXpBox;
-    private javax.swing.JCheckBox payForPartsBox;
-    private javax.swing.JCheckBox payForUnitsBox;
-    private javax.swing.JCheckBox payForSalariesBox;
-    private javax.swing.JCheckBox payForOverheadBox;
-    private javax.swing.JCheckBox payForMaintainBox;
-    private javax.swing.JCheckBox payForTransportBox;
-    private javax.swing.JCheckBox payForRecruitmentBox;
-    private javax.swing.JCheckBox useLoanLimitsBox;
-    private javax.swing.JCheckBox sellUnitsBox;
-    private javax.swing.JCheckBox sellPartsBox;
+    private JComboBox comboFactionNames;
+    private JComboBox comboRanks;
+    private JSlider sldGender;
+    private JLabel lblCamo;
+    private JLabel lblDate;
+    private JLabel lblFaction;
+    private JLabel lblFactionNames;
+    private JLabel lblRank;
+    private JLabel lblGender;
+    private JLabel lblName;
+    private JPanel panGeneral;
+    private JPanel panRepair;
+    private JPanel panTech;
+    private JPanel panPersonnel;
+    private JPanel panFinances;
+    private JPanel panMercenary;
+    private JPanel panNameGen;
+    private JPanel panXP;
+    private JPanel panRank;
+    private JPanel panSkill;
+    private JPanel panRandomSkill;
+    private JTabbedPane tabOptions;
+    private JTextField txtName;
+    private JCheckBox useEraModsCheckBox;
+    private JCheckBox useUnitRatingCheckBox;
+    private JComboBox unitRatingMethodCombo;
+    private JCheckBox useFactionForNamesBox;
+    private JCheckBox useTacticsBox;
+    private JCheckBox useInitBonusBox;
+    private JCheckBox useToughnessBox;
+    private JCheckBox useArtilleryBox;
+    private JCheckBox useAbilitiesBox;
+    private JCheckBox useQuirksBox;
+    private JCheckBox useEdgeBox;
+    private JCheckBox useImplantsBox;
+    private JCheckBox useAdvancedMedicalBox;
+    private JCheckBox useDylansRandomXpBox;
+    private JCheckBox payForPartsBox;
+    private JCheckBox payForUnitsBox;
+    private JCheckBox payForSalariesBox;
+    private JCheckBox payForOverheadBox;
+    private JCheckBox payForMaintainBox;
+    private JCheckBox payForTransportBox;
+    private JCheckBox payForRecruitmentBox;
+    private JCheckBox useLoanLimitsBox;
+    private JCheckBox sellUnitsBox;
+    private JCheckBox sellPartsBox;
 
     private JTextField[] txtSalaryBase;
     private JSpinner[] spnSalaryXp;
@@ -201,14 +203,14 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JLabel personnelMarketDylansWeightLabel;
     // End Personnel Market
 
-    private javax.swing.JCheckBox useDamageMargin;
+    private JCheckBox useDamageMargin;
     private JSpinner spnDamageMargin;
 
-    private javax.swing.JCheckBox checkMaintenance;
-    private javax.swing.JCheckBox logMaintenance;
+    private JCheckBox checkMaintenance;
+    private JCheckBox logMaintenance;
     private JSpinner spnMaintenanceDays;
     private JSpinner spnMaintenanceBonus;
-    private javax.swing.JCheckBox useQualityMaintenance;
+    private JCheckBox useQualityMaintenance;
 
 
     private JRadioButton btnContractEquipment;
@@ -220,18 +222,18 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox usePercentageMaintBox;
     private JCheckBox useInfantryDontCountBox;
 
-    private javax.swing.JTable tableRanks;
+    private JTable tableRanks;
     private RankTableModel ranksModel;
-    private javax.swing.JScrollPane scrRanks;
+    private JScrollPane scrRanks;
     private JButton btnAddRank;
     private JButton btnDeleteRank;
     String[] rankColNames = {"Rank", "Officer", "Pay Multiplier"};
 
-    private javax.swing.JTextArea txtInstructionsXP;
-    private javax.swing.JScrollPane scrXP;
-    private javax.swing.JTable tableXP;
-    private javax.swing.JScrollPane scrAbilityXP;
-    private javax.swing.JPanel panAbilityXP;
+    private JTextArea txtInstructionsXP;
+    private JScrollPane scrXP;
+    private JTable tableXP;
+    private JScrollPane scrAbilityXP;
+    private JPanel panAbilityXP;
     private JLabel lblScenarioXP;
     private JSpinner spnScenarioXP;
     private JLabel lblKillXP;
@@ -266,14 +268,14 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JSpinner spnAcquireMinimum;
     private JComboBox choiceAcquireMinimumUnit;
 
-    private javax.swing.JCheckBox limitByYearBox;
-    private javax.swing.JCheckBox allowClanPurchasesBox;
-    private javax.swing.JCheckBox allowISPurchasesBox;
-    private javax.swing.JCheckBox allowCanonOnlyBox;
-    private javax.swing.JCheckBox useAmmoByTypeBox;
-    //private javax.swing.JCheckBox disallowSLUnitsBox;
-    private javax.swing.JLabel lblTechLevel;
-    private javax.swing.JComboBox choiceTechLevel;
+    private JCheckBox limitByYearBox;
+    private JCheckBox allowClanPurchasesBox;
+    private JCheckBox allowISPurchasesBox;
+    private JCheckBox allowCanonOnlyBox;
+    private JCheckBox useAmmoByTypeBox;
+    //private JCheckBox disallowSLUnitsBox;
+    private JLabel lblTechLevel;
+    private JComboBox choiceTechLevel;
 
     private JLabel lblOverallRecruitBonus;
     private JSpinner spnOverallRecruitBonus;
@@ -301,7 +303,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JSpinner spnProbPhenoBA;
     private JSpinner spnProbPhenoVee;
 
-    private javax.swing.JPanel panRandomPortrait;
+    private JPanel panRandomPortrait;
     private JCheckBox[] chkUsePortrait;
 
     /**
@@ -382,76 +384,76 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        tabOptions = new javax.swing.JTabbedPane();
-        panGeneral = new javax.swing.JPanel();
-        txtName = new javax.swing.JTextField();
-        lblName = new javax.swing.JLabel();
-        lblFaction = new javax.swing.JLabel();
-        lblFactionNames = new javax.swing.JLabel();
-        lblRank = new javax.swing.JLabel();
-        lblGender = new javax.swing.JLabel();
-        lblDate = new javax.swing.JLabel();
-        btnDate = new javax.swing.JButton();
-        comboFaction = new javax.swing.JComboBox();
-        comboFactionNames = new javax.swing.JComboBox();
-        comboRanks = new javax.swing.JComboBox();
-        sldGender = new javax.swing.JSlider(SwingConstants.HORIZONTAL);
-        btnCamo = new javax.swing.JButton();
-        lblCamo = new javax.swing.JLabel();
-        panRepair = new javax.swing.JPanel();
-        panPersonnel = new javax.swing.JPanel();
-        panFinances = new javax.swing.JPanel();
-        panMercenary = new javax.swing.JPanel();
-        panNameGen = new javax.swing.JPanel();
-        panRank = new javax.swing.JPanel();
-        panXP = new javax.swing.JPanel();
-        panSkill = new javax.swing.JPanel();
-        panAbilityXP = new javax.swing.JPanel();
-        panTech = new javax.swing.JPanel();
-        panRandomSkill = new javax.swing.JPanel();
-        panRandomPortrait = new javax.swing.JPanel();
-        useEraModsCheckBox = new javax.swing.JCheckBox();
-        useUnitRatingCheckBox = new javax.swing.JCheckBox();
-        unitRatingMethodCombo = new javax.swing.JComboBox(UnitRatingMethod.getUnitRatingMethodNames());
-        javax.swing.JLabel clanPriceModifierLabel = new javax.swing.JLabel();
-        javax.swing.JLabel usedPartsValueLabel = new javax.swing.JLabel();
-        javax.swing.JLabel damagedPartsValueLabel = new javax.swing.JLabel();
+        tabOptions = new JTabbedPane();
+        panGeneral = new JPanel();
+        txtName = new JTextField();
+        lblName = new JLabel();
+        lblFaction = new JLabel();
+        lblFactionNames = new JLabel();
+        lblRank = new JLabel();
+        lblGender = new JLabel();
+        lblDate = new JLabel();
+        btnDate = new JButton();
+        comboFaction = new JComboBox();
+        comboFactionNames = new JComboBox();
+        comboRanks = new JComboBox();
+        sldGender = new JSlider(SwingConstants.HORIZONTAL);
+        btnCamo = new JButton();
+        lblCamo = new JLabel();
+        panRepair = new JPanel();
+        panPersonnel = new JPanel();
+        panFinances = new JPanel();
+        panMercenary = new JPanel();
+        panNameGen = new JPanel();
+        panRank = new JPanel();
+        panXP = new JPanel();
+        panSkill = new JPanel();
+        panAbilityXP = new JPanel();
+        panTech = new JPanel();
+        panRandomSkill = new JPanel();
+        panRandomPortrait = new JPanel();
+        useEraModsCheckBox = new JCheckBox();
+        useUnitRatingCheckBox = new JCheckBox();
+        unitRatingMethodCombo = new JComboBox(UnitRatingMethod.getUnitRatingMethodNames());
+        javax.swing.JLabel clanPriceModifierLabel = new JLabel();
+        javax.swing.JLabel usedPartsValueLabel = new JLabel();
+        javax.swing.JLabel damagedPartsValueLabel = new JLabel();
         DecimalFormat numberFormat = (DecimalFormat) DecimalFormat.getInstance();
         numberFormat.setMaximumFractionDigits(2);
         DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols();
         decimalFormatSymbols.setGroupingSeparator(' ');
         decimalFormatSymbols.setDecimalSeparator('.');
         numberFormat.setDecimalFormatSymbols(decimalFormatSymbols);
-        useFactionForNamesBox = new javax.swing.JCheckBox();
-        useTacticsBox = new javax.swing.JCheckBox();
-        useInitBonusBox = new javax.swing.JCheckBox();
-        useToughnessBox = new javax.swing.JCheckBox();
-        useArtilleryBox = new javax.swing.JCheckBox();
-        useAbilitiesBox = new javax.swing.JCheckBox();
-        useEdgeBox = new javax.swing.JCheckBox();
-        useImplantsBox = new javax.swing.JCheckBox();
-        useAdvancedMedicalBox = new javax.swing.JCheckBox();
-        useDylansRandomXpBox = new javax.swing.JCheckBox();
-        payForPartsBox = new javax.swing.JCheckBox();
-        payForUnitsBox = new javax.swing.JCheckBox();
-        payForSalariesBox = new javax.swing.JCheckBox();
-        payForRecruitmentBox = new javax.swing.JCheckBox();
-        useLoanLimitsBox = new javax.swing.JCheckBox();
-        payForOverheadBox = new javax.swing.JCheckBox();
-        payForMaintainBox = new javax.swing.JCheckBox();
-        payForTransportBox = new javax.swing.JCheckBox();
-        sellUnitsBox = new javax.swing.JCheckBox();
-        sellPartsBox = new javax.swing.JCheckBox();
-        useQuirksBox = new javax.swing.JCheckBox();
-        limitByYearBox = new javax.swing.JCheckBox();
-        allowClanPurchasesBox = new javax.swing.JCheckBox();
-        allowISPurchasesBox = new javax.swing.JCheckBox();
-        allowCanonOnlyBox = new javax.swing.JCheckBox();
-        useAmmoByTypeBox = new javax.swing.JCheckBox();
-        choiceTechLevel = new javax.swing.JComboBox();
-        btnOkay = new javax.swing.JButton();
-        btnCancel = new javax.swing.JButton();
-        scrRanks = new javax.swing.JScrollPane();
+        useFactionForNamesBox = new JCheckBox();
+        useTacticsBox = new JCheckBox();
+        useInitBonusBox = new JCheckBox();
+        useToughnessBox = new JCheckBox();
+        useArtilleryBox = new JCheckBox();
+        useAbilitiesBox = new JCheckBox();
+        useEdgeBox = new JCheckBox();
+        useImplantsBox = new JCheckBox();
+        useAdvancedMedicalBox = new JCheckBox();
+        useDylansRandomXpBox = new JCheckBox();
+        payForPartsBox = new JCheckBox();
+        payForUnitsBox = new JCheckBox();
+        payForSalariesBox = new JCheckBox();
+        payForRecruitmentBox = new JCheckBox();
+        useLoanLimitsBox = new JCheckBox();
+        payForOverheadBox = new JCheckBox();
+        payForMaintainBox = new JCheckBox();
+        payForTransportBox = new JCheckBox();
+        sellUnitsBox = new JCheckBox();
+        sellPartsBox = new JCheckBox();
+        useQuirksBox = new JCheckBox();
+        limitByYearBox = new JCheckBox();
+        allowClanPurchasesBox = new JCheckBox();
+        allowISPurchasesBox = new JCheckBox();
+        allowCanonOnlyBox = new JCheckBox();
+        useAmmoByTypeBox = new JCheckBox();
+        choiceTechLevel = new JComboBox();
+        btnOkay = new JButton();
+        btnCancel = new JButton();
+        scrRanks = new JScrollPane();
 
         useDamageMargin = new JCheckBox();
         useQualityMaintenance = new JCheckBox();
@@ -1796,7 +1798,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panXP.add(spnTargetIdleXP, gridBagConstraints);
 
-        txtInstructionsXP = new javax.swing.JTextArea();
+        txtInstructionsXP = new JTextArea();
         txtInstructionsXP.setText(resourceMap.getString("txtInstructionsXP.text"));
         txtInstructionsXP.setName("txtInstructions");
         txtInstructionsXP.setEditable(false);
@@ -2347,7 +2349,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         tcm.getColumn(2).setPreferredWidth(100);
         tcm.getColumn(2).setCellEditor(new SpinnerEditor());
         tableRanks.getSelectionModel().addListSelectionListener(
-                new javax.swing.event.ListSelectionListener() {
+        		new ListSelectionListener() {
                     public void valueChanged(
                             javax.swing.event.ListSelectionEvent evt) {
                         tableRanksValueChanged(evt);
@@ -2370,7 +2372,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         scrRanks.setPreferredSize(new Dimension(500, 500));
         scrRanks.setMaximumSize(new Dimension(500, 500));
 
-        JTextArea txtInstructionsRanks = new javax.swing.JTextArea();
+        JTextArea txtInstructionsRanks = new JTextArea();
         txtInstructionsRanks.setText(resourceMap.getString("txtInstructionsRanks.text"));
         txtInstructionsRanks.setEditable(false);
         txtInstructionsRanks.setLineWrap(true);
@@ -2776,7 +2778,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     }
 
     private void switchFaction() {
-        String factionCode = Faction.getFaction(Faction.choosableFactionCodes[comboFaction.getSelectedIndex()])
+        String factionCode = Faction.getFactionFromFullNameAndEra(String.valueOf(comboFaction.getSelectedItem()), Era.getEra(date.get(Calendar.YEAR)))
                                     .getNameGenerator();
         boolean found = false;
         for (Iterator<String> i = campaign.getRNG().getFactions(); i.hasNext(); ) {
@@ -2844,7 +2846,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             this.setVisible(false);
         }
         campaign.calendar = date;
-        campaign.setFactionCode(Faction.choosableFactionCodes[comboFaction.getSelectedIndex()]);
+        campaign.setFactionCode(Faction.getFactionFromFullNameAndEra
+        		(String.valueOf(comboFaction.getSelectedItem()), Era.getEra(date.get(Calendar.YEAR))).getShortName());
         if (null != comboFactionNames.getSelectedItem()) {
             campaign.getRNG().setChosenFaction((String) comboFactionNames.getSelectedItem());
         }
