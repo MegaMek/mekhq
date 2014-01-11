@@ -9477,13 +9477,16 @@ public class CampaignGUI extends JPanel {
                 }
             } else if (command.equalsIgnoreCase("EDIT_DAMAGE")) {
                 if (null != selectedUnit) {
-                    MechEditorDialog med = new MechEditorDialog(frame, selectedUnit.getEntity());
+                	Entity entity = selectedUnit.getEntity();
+                    MechEditorDialog med = new MechEditorDialog(frame, entity);
                     med.setVisible(true);
                     selectedUnit.runDiagnostic();
-                    refreshUnitList();
                     refreshServicedUnitList();
-                    refreshOrganization();
+                    refreshUnitList();
                     refreshTaskList();
+                    refreshUnitView();
+                    refreshAcquireList();
+                    refreshOrganization();
                 }
             }
         }
