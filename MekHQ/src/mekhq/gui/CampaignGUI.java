@@ -3945,7 +3945,6 @@ public class CampaignGUI extends JPanel {
 
             // Read a Vector from the file.
             try {
-
                 parser.parse(listStream);
                 listStream.close();
             } catch (ParseException excep) {
