@@ -142,6 +142,7 @@ v0.3.4 (SVN)
 + Bug: NPE in Utilities.findCommander due to attempting to access a Person object without checking if it is null first
 + Bug [#454]: NPE: mekhq.campaign.parts.equipment.EquipmentPart.isMountedOnDestroyedLocation(EquipmentPart.java:385)
 + Bug: NPE in Utilities.findCommander due to attempting to access a Person object without checking if it is null first, redux
++ new MM.jar (revision 10341) and updates for compatibility with it
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

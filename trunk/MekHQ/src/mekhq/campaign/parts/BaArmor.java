@@ -80,34 +80,9 @@ public class BaArmor extends Part implements IAcquisitionWork {
         this.location = loc;
         this.type = type;
         this.clan = clan;
-        switch(type) {
-        case EquipmentType.T_ARMOR_BA_STANDARD_PROTOTYPE:
-            this.name = "BA Armor (Prototype)";
-            break;
-        case EquipmentType.T_ARMOR_BA_STANDARD_ADVANCED:
-            this.name = "BA Armor (Advanced)";
-            break;
-        case EquipmentType.T_ARMOR_BA_STEALTH:
-            this.name = "BA Stealth Armor";
-            break;
-        case EquipmentType.T_ARMOR_BA_STEALTH_BASIC:
-            this.name = "BA Stealth Armor (Basic)";
-            break;
-        case EquipmentType.T_ARMOR_BA_STEALTH_IMP:
-            this.name = "BA Stealth Armor (Improved)";
-            break;
-        case EquipmentType.T_ARMOR_BA_STEALTH_PROTOTYPE:
-            this.name = "BA Stealth Armor (Prototype)";
-            break;
-        case EquipmentType.T_ARMOR_BA_FIRE_RESIST:
-            this.name = "BA Fire Resitant Armor";
-            break;
-        case EquipmentType.T_ARMOR_BA_MIMETIC:
-            this.name = "BA Mimetic Armor";
-            break;
-        case EquipmentType.T_ARMOR_BA_STANDARD:
-        default:
-            this.name = "BA Armor";  
+        this.name = "Armor";
+        if(type > -1) {
+        	this.name += " (" + EquipmentType.armorNames[type] + ")";
         }
     }
     
