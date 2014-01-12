@@ -32,6 +32,7 @@ import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import megamek.common.MiscType;
 import megamek.common.Protomech;
+import megamek.common.verifier.TestBattleArmor;
 import megamek.common.verifier.TestEntity;
 import megamek.common.weapons.BayWeapon;
 import megamek.common.weapons.InfantryAttack;
@@ -398,7 +399,7 @@ public class PartsStore implements Serializable {
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_FERRO_IMP, false));
 		parts.add(new Armor(0, EquipmentType.T_ARMOR_FERRO_IMP, amount, -1, false, false, c));
 		parts.add(new ProtomekArmor(0, 100, -1, true, c));
-		for(int i=0; i < EquipmentType.T_ARMOR_BA_NUM; i++) {
+		for(int i=0; i < TestBattleArmor.BAArmor.getNumBAArmors(); i++) {
 		    if(BaArmor.canBeIs(i)) {
 		        parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(i, false)), i, -1, false, c));
 		    }
