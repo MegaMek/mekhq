@@ -280,6 +280,14 @@ public class Campaign implements Serializable {
         news = new News(calendar.get(Calendar.YEAR));
         personnelMarket = new PersonnelMarket();
     }
+    
+    public Game getGame() {
+    	return game;
+    }
+    
+    public Player getPlayer() {
+    	return player;
+    }
 
     public String getName() {
         return name;
