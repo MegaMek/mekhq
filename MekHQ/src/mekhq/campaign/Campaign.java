@@ -5971,6 +5971,10 @@ public class Campaign implements Serializable {
                 continue;
             }
             Entity en = unit.getEntity();
+            if (unit.isMothballed()) {
+            	mothballedTonnage += en.getWeight();
+            	continue;
+            }
             if (en instanceof GunEmplacement || en instanceof FighterSquadron || en instanceof Jumpship) {
                 continue;
             }
@@ -6015,11 +6019,7 @@ public class Campaign implements Serializable {
                 protos--;
                 continue;
             }
-            if (unit.isMothballed()) {
-            	mothballedTonnage += en.getWeight();
-            } else {
-            	cargoTonnage += en.getWeight();
-            }
+            cargoTonnage += en.getWeight();
         }
         if (mothballed) {
         	return mothballedTonnage;
