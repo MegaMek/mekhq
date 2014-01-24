@@ -5,7 +5,7 @@
   Developers:
      Sebastian Brocks <beerockxs@users.sourceforge.net>
   	 Frederic Morel <natitf@users.sourceforge.net>
-  	 Dylan Myers
+  	 Dylan Myers <ralgith-erian@users.sourceforge.net>
   	 Deric Page
   	 Robin Toll <fastsammy@users.sourceforge.net>
 
@@ -20,6 +20,9 @@
   	 Longinus00
   	 Josh Street
   	 Neyah Peterson
+  	 
+  Starterbook Campaign Files:
+     Dave Nawton <hammer-gs@users.sourceforge.net>
   
   Inner Sphere Map Data
     Alex Yokel
