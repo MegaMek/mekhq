@@ -148,6 +148,7 @@ v0.3.4 (SVN)
 + Bug: Still resolution issues related to prisoners
     new MM.jar (revision 10365) and updates for compatibility with it needed to correct this
 + Bug [#455]: Cargo report not showing tonnage of mothballed units
++ Bug: Escaped units counting for the employer salvage value
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
