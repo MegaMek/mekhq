@@ -1098,7 +1098,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     		JCheckBox box = salvageBoxes.get(i);
     		if(box.isSelected()) {
     			tracker.salvageUnit(i);
-    		} else {
+    		} else if (!escapeBoxes.get(i).isSelected()) { // Only salvage if they don't escape
     			tracker.dontSalvageUnit(i);
     		}
     	}
