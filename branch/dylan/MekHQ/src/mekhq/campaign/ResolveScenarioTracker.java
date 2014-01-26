@@ -678,18 +678,22 @@ public class ResolveScenarioTracker {
 			        continue;
 			    }
 			    if(crew.getExternalIdAsString().equals("-1")) {
-			    	MechWarrior mw = new MechWarrior(null);
-			    	mw.setCrew(crew);
+			    	MechWarrior mw = new MechWarrior(crew, campaign.getPlayer(), campaign.getGame());
 			    	boolean found = false;
 			    	for (Entity e : potentialSalvage) {
 			    		if (e.getCrew().getName().equals(crew.getName())) {
-			    			if (e.getCrew().getHits() > crew.getHits()) {
+			    			// TODO: Disable this if check, this could mean that hits are not accurate on prisoners.
+			    			// This is to prevent duplicates below. Dammit all.
+			    			//if (e.getCrew().getHits() > crew.getHits()) {
 			    				found = true;
-			    			}
+			    			//}
 			    			break;
 			    		}
 			    	}
 			    	if (!found) {
+			    		// TODO: Even in this state we could end up duplicating people because
+			    		// we've still already added the crew from the actual entity. Dammit all. 
+			    		// EDIT: I've decided to prevent duplication, but this is still a mess.
 			    		newPilots.addAll(Utilities.generateRandomCrewWithCombinedSkill(mw, campaign));
 			    	}
 			        continue;

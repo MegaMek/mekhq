@@ -281,6 +281,14 @@ public class Campaign implements Serializable {
         news = new News(calendar.get(Calendar.YEAR));
         personnelMarket = new PersonnelMarket();
     }
+    
+    public Game getGame() {
+    	return game;
+    }
+    
+    public Player getPlayer() {
+    	return player;
+    }
 
     public String getName() {
         return name;
@@ -6005,6 +6013,10 @@ public class Campaign implements Serializable {
                 continue;
             }
             Entity en = unit.getEntity();
+            if (unit.isMothballed()) {
+            	mothballedTonnage += en.getWeight();
+            	continue;
+            }
             if (en instanceof GunEmplacement || en instanceof FighterSquadron || en instanceof Jumpship) {
                 continue;
             }
@@ -6049,11 +6061,7 @@ public class Campaign implements Serializable {
                 protos--;
                 continue;
             }
-            if (unit.isMothballed()) {
-            	mothballedTonnage += en.getWeight();
-            } else {
-            	cargoTonnage += en.getWeight();
-            }
+            cargoTonnage += en.getWeight();
         }
         if (mothballed) {
         	return mothballedTonnage;

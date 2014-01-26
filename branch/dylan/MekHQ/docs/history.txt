@@ -153,6 +153,10 @@ v0.3.4 (SVN)
 + new MM.jar (revision 10341) and updates for compatibility with it
 + Bug: Edit Damage on units was not working correctly due to changes for superheavies
     new MM.jar (revision 10346) and updates for compatibility with it needed to correct this
++ Bug: Still resolution issues related to prisoners
+    new MM.jar (revision 10365) and updates for compatibility with it needed to correct this
++ Bug [#455]: Cargo report not showing tonnage of mothballed units
++ Bug: Escaped units counting for the employer salvage value
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
