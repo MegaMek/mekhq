@@ -298,7 +298,6 @@ public class SkillType implements Serializable {
 		abilityCosts.put("gunnery_missile", 4);
 		abilityCosts.put("ei_implant", 0);
 		abilityCosts.put("clan_pilot_training", 0);
-		abilityCosts.put("cluster_master", 0);
 	}
 	
 	public static ArrayList<String> getAbilitiesFor(int type) {
