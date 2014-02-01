@@ -107,7 +107,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private String camoFileName;
     private int colorIndex;
     private DirectoryItems camos;
-    private Hashtable<String, JTextField> hashAbilityCosts;
     private Hashtable<String, JSpinner> hashSkillTargets;
     private Hashtable<String, JSpinner> hashGreenSkill;
     private Hashtable<String, JSpinner> hashRegSkill;
@@ -232,8 +231,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JTextArea txtInstructionsXP;
     private JScrollPane scrXP;
     private JTable tableXP;
-    private JScrollPane scrAbilityXP;
-    private JPanel panAbilityXP;
     private JLabel lblScenarioXP;
     private JSpinner spnScenarioXP;
     private JLabel lblKillXP;
@@ -322,7 +319,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         this.camoFileName = campaign.getCamoFileName();
         this.colorIndex = campaign.getColorIndex();
         this.camos = camos;
-        hashAbilityCosts = new Hashtable<String, JTextField>();
         hashSkillTargets = new Hashtable<String, JSpinner>();
         hashGreenSkill = new Hashtable<String, JSpinner>();
         hashRegSkill = new Hashtable<String, JSpinner>();
@@ -408,7 +404,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panRank = new JPanel();
         panXP = new JPanel();
         panSkill = new JPanel();
-        panAbilityXP = new JPanel();
         panTech = new JPanel();
         panRandomSkill = new JPanel();
         panRandomPortrait = new JPanel();
@@ -1844,64 +1839,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panXP.add(scrXP, gridBagConstraints);
 
-        panAbilityXP.setName("panAbilityXP"); // NOI18N
-        panAbilityXP.setLayout(new java.awt.GridBagLayout());
-        //arggh.. cant access pilot options statically?
-        PilotOptions pilotOptions = new PilotOptions();
-        pilotOptions.initialize();
-        JLabel lblOption;
-        JTextField txtCost;
-        int k = 0;
-        for (Enumeration<IOptionGroup> i = pilotOptions.getGroups(); i.hasMoreElements(); ) {
-            IOptionGroup group = i.nextElement();
-            if (group.getKey().equalsIgnoreCase(PilotOptions.MD_ADVANTAGES)) {
-                continue;
-            }
-            if (group.getKey().equalsIgnoreCase(PilotOptions.EDGE_ADVANTAGES)) {
-                continue;
-            }
-            for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements(); ) {
-                IOption option = j.nextElement();
-                lblOption = new JLabel(option.getDisplayableName());
-                lblOption.setToolTipText(option.getDescription());
-                gridBagConstraints = new java.awt.GridBagConstraints();
-                gridBagConstraints.gridx = 0;
-                gridBagConstraints.gridy = k;
-                gridBagConstraints.weightx = 1.0;
-                gridBagConstraints.weighty = 0.0;
-                gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-                gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-                panAbilityXP.add(lblOption, gridBagConstraints);
-                txtCost = new JTextField();
-                txtCost.setText(Integer.toString(SkillType.getAbilityCost(option.getName())));
-                hashAbilityCosts.put(option.getName(), txtCost);
-                gridBagConstraints = new java.awt.GridBagConstraints();
-                gridBagConstraints.gridx = 1;
-                gridBagConstraints.gridy = k++;
-                gridBagConstraints.weightx = 0.0;
-                gridBagConstraints.weighty = 0.0;
-                gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-                gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-                panAbilityXP.add(txtCost, gridBagConstraints);
-            }
-        }
-        scrAbilityXP = new JScrollPane(panAbilityXP);
-        scrAbilityXP.setMinimumSize(new Dimension(300, 140));
-        scrAbilityXP.setPreferredSize(new Dimension(300, 140));
-        scrAbilityXP.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resourceMap.getString("scrAbilityXP.title")),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        scrAbilityXP.setOpaque(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = 7;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        panXP.add(scrAbilityXP, gridBagConstraints);
-
         tabOptions.addTab(resourceMap.getString("panXP.TabConstraints.tabTitle"), panXP); // NOI18N
 
         panSkill.setName("panSkill"); // NOI18N
@@ -3069,14 +3006,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                 } catch (NumberFormatException e) {
                     MekHQ.logMessage("unreadable value in skill cost table for " + SkillType.skillList[i]);
                 }
-            }
-        }
-        for (String optionName : hashAbilityCosts.keySet()) {
-            try {
-                int cost = Integer.parseInt(hashAbilityCosts.get(optionName).getText());
-                SkillType.setAbilityCost(optionName, cost);
-            } catch (NumberFormatException e) {
-                MekHQ.logMessage("unreadable value in ability cost table for " + optionName);
             }
         }
         //campaign.getSkillCosts().setScenarioXP((Integer)spnScenarioXP.getModel().getValue());
