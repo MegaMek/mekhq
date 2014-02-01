@@ -1678,16 +1678,25 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         return new Vector<IOption>().elements();
     }
 
-    public ArrayList<String> getAvailableOptions() {
-        ArrayList<String> available = new ArrayList<String>();
-        for (String name : SkillType.getAbilitiesFor(getPrimaryRole())) {
-            IOption option = getOptions().getOption(name);
-            if (null == option || option.booleanValue()) {
-                continue;
+    public ArrayList<SpecialAbility> getEligibleSPAs(boolean generation) {
+        ArrayList<SpecialAbility> eligible = new ArrayList<SpecialAbility>();
+        for (Enumeration<IOption> i = getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements(); ) {
+            IOption ability = i.nextElement();
+            if (!ability.booleanValue()) {
+                SpecialAbility spa = SpecialAbility.getAbility(ability.getName());
+                if(null == spa) {
+                    continue;
+                }
+                if(!spa.isEligible(this)) {
+                    continue;
+                }
+                if(generation & spa.getWeight() <= 0) {
+                    continue;
+                }
+                eligible.add(spa);
             }
-            available.add(option.getName());
         }
-        return available;
+        return eligible;
     }
 
     public int countOptions() {
@@ -1842,10 +1851,22 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
 
     public void acquireAbility(String type, String name, Object value) {
+        //we might also need to remove some prior abilities
+        SpecialAbility spa = SpecialAbility.getAbility(name);
+        Vector<String> toRemove = new Vector<String>();
+        if(null != spa) {
+            toRemove = spa.getRemovedAbilities();
+        }
         for (Enumeration<IOption> i = getOptions(type); i.hasMoreElements(); ) {
             IOption ability = i.nextElement();
             if (ability.getName().equals(name)) {
                 ability.setValue(value);
+            } else {
+                for(String remove : toRemove) {
+                    if (ability.getName().equals(remove)) {
+                        ability.setValue(ability.getDefault());
+                    }
+                }
             }
         }
     }

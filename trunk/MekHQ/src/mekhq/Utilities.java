@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
+import java.util.StringTokenizer;
 import java.util.Vector;
 
 import javax.swing.JTable;
@@ -769,69 +770,6 @@ public class Utilities {
 		return name;
 	}
 	
-	public static String chooseWeaponSpecialization(int type, boolean isClan, int techLvl, int year) {
-		ArrayList<String> candidates = new ArrayList<String>();
-		for (Enumeration<EquipmentType> e = EquipmentType.getAllTypes(); e.hasMoreElements();) {
-            EquipmentType et = e.nextElement();
-            if(!(et instanceof WeaponType)) {
-            	continue;
-            }
-            if(et instanceof InfantryWeapon 
-            		|| et instanceof BayWeapon
-					|| et instanceof InfantryAttack) {
-            	continue;
-            }
-            WeaponType wt = (WeaponType)et;
-            if(wt.isCapital() 
-            		|| wt.isSubCapital() 
-            		|| wt.hasFlag(WeaponType.F_INFANTRY)
-            		|| wt.hasFlag(WeaponType.F_ONESHOT)
-            		|| wt.hasFlag(WeaponType.F_PROTOTYPE)) {
-            	continue;
-            }
-            if(!((wt.hasFlag(WeaponType.F_MECH_WEAPON) && type == Person.T_MECHWARRIOR) 
-            		|| (wt.hasFlag(WeaponType.F_AERO_WEAPON) && type != Person.T_AERO_PILOT)
-            		|| (wt.hasFlag(WeaponType.F_TANK_WEAPON) && !(type == Person.T_VEE_GUNNER 
-                    		|| type == Person.T_NVEE_DRIVER 
-                    		|| type == Person.T_GVEE_DRIVER 
-                    		|| type == Person.T_VTOL_PILOT))
-                    || (wt.hasFlag(WeaponType.F_BA_WEAPON) && type != Person.T_BA)
-                    || (wt.hasFlag(WeaponType.F_PROTO_WEAPON) && type != Person.T_PROTO_PILOT))) {
-            	continue;
-            }
-            if(wt.getAtClass() == WeaponType.CLASS_NONE ||
-            		wt.getAtClass() == WeaponType.CLASS_POINT_DEFENSE ||
-            		wt.getAtClass() >= WeaponType.CLASS_CAPITAL_LASER) {
-            	continue;
-            }
-            if(TechConstants.isClan(wt.getTechLevel(year)) != isClan) {
-            	continue;
-            }
-            int lvl = wt.getTechLevel(year);
-            if(lvl < 0) {
-            	continue;
-            }
-            if(techLvl < Utilities.getSimpleTechLevel(lvl)) {
-            	continue;
-            }          
-            if(techLvl == TechConstants.T_IS_UNOFFICIAL) {
-            	continue;
-            }
-            int ntimes = 10;
-            if(techLvl >= TechConstants.T_IS_ADVANCED) {
-            	ntimes = 1;
-            }
-            while(ntimes > 0) {
-            	candidates.add(et.getName());
-            	ntimes--;
-            }
-		}
-		if(candidates.isEmpty()) {
-			return "??";
-		}
-		return candidates.get(Compute.randomInt(candidates.size()));
-	}
-	
 	public static String printIntegerArray(int[] array) {
 		String values = "";
 		for(int i = 0; i < array.length; i++) {
@@ -1087,4 +1025,25 @@ public class Utilities {
 
 	    }catch(IOException e){ System.out.println(e); }
 	}
+	
+	public static Vector<String> splitString(String str, String sep) {
+        StringTokenizer st = new StringTokenizer(str, sep);
+        Vector<String> output = new Vector<String>();
+        while(st.hasMoreTokens()) {
+            output.add(st.nextToken());
+        }
+        return output;
+    }
+    
+    public static String combineString(Vector<String> vec, String sep) {
+        String output = "";
+        Enumeration<String> eVec = vec.elements();
+        while(eVec.hasMoreElements()) {
+            output += eVec.nextElement();
+            if(eVec.hasMoreElements()) {
+                output += sep;
+            }
+        }
+        return output;
+    }
 }

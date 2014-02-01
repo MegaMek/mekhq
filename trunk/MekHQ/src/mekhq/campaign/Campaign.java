@@ -137,6 +137,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingFactory;
 import mekhq.campaign.unit.Unit;
@@ -268,6 +269,7 @@ public class Campaign implements Serializable {
         location = new CurrentLocation(Planets.getInstance().getPlanets()
                                               .get("Outreach"), 0);
         SkillType.initializeTypes();
+        SpecialAbility.initializeSPA();
         astechPool = 0;
         medicPool = 0;
         resetAstechMinutes();
@@ -2416,7 +2418,6 @@ public class Campaign implements Serializable {
                 type.writeToXml(pw1, 2);
             }
         }
-        SkillType.writeAbilityCostsToXML(pw1, 2);
         pw1.println("\t</skillTypes>");
         rskillPrefs.writeToXml(pw1, 1);
         // parts is the biggest so it goes last
@@ -3133,7 +3134,6 @@ public class Campaign implements Serializable {
             }
 
             if (wn2.getNodeName().startsWith("ability-")) {
-                SkillType.readAbilityCostFromXML(wn2);
                 continue;
             } else if (!wn2.getNodeName().equalsIgnoreCase("skillType")) {
                 // Error condition of sorts!
@@ -3950,21 +3950,21 @@ public class Campaign implements Serializable {
         if (getCampaignOptions().useAbilities()) {
             int nabil = Utilities.rollSpecialAbilities(rskillPrefs
                                                                .getSpecialAbilBonus(expLvl));
-            ArrayList<String> abilityList = person.getAvailableOptions();
-            while (nabil > 0 && abilityList.size() > 0) {
-                // create a weighted list
+            while (nabil > 0) {
+                ArrayList<SpecialAbility> abilityList = person.getEligibleSPAs(true);
+                if(abilityList.isEmpty()) {
+                    nabil = 0;
+                    continue;
+                }
+                    
+                // create a weighted list based on XP
                 ArrayList<String> weightedList = new ArrayList<String>();
-                for (String s : abilityList) {
-                    int cost = SkillType.getAbilityCost(s);
-                    if (cost < 1) {
-                        cost = 100;
-                    }
-                    int weight = Math.max(1, 100 / cost);
+                for (SpecialAbility spa : abilityList) {
+                    int weight = spa.getWeight();
                     while (weight > 0) {
-                        weightedList.add(s);
+                        weightedList.add(spa.getName());
                         weight--;
                     }
-
                 }
                 String name = weightedList.get(Compute.randomInt(weightedList
                                                                          .size()));
@@ -3985,34 +3985,13 @@ public class Campaign implements Serializable {
                                           special);
                 } else if (name.equals("weapon_specialist")) {
                     person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
-                                          Utilities.chooseWeaponSpecialization(type,
+                                          SpecialAbility.chooseWeaponSpecialization(type,
                                                                                getFaction().isClan(), getCampaignOptions()
                                                   .getTechLevel(),
                                                                                getCalendar().get(GregorianCalendar.YEAR)));
                 } else {
                     person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
                                           true);
-                }
-                abilityList.remove(name);
-                if (name.equals("specialist")) {
-                    abilityList.remove("weapon_specialist");
-                    abilityList.remove("gunnery_laser");
-                    abilityList.remove("gunnery_missile");
-                    abilityList.remove("gunnery_ballistic");
-
-                }
-                if (name.equals("weapon_specialist")) {
-                    abilityList.remove("specialist");
-                    abilityList.remove("gunnery_laser");
-                    abilityList.remove("gunnery_missile");
-                    abilityList.remove("gunnery_ballistic");
-                }
-                if (name.contains("gunnery_")) {
-                    abilityList.remove("weapon_specialist");
-                    abilityList.remove("specialist");
-                    abilityList.remove("gunnery_laser");
-                    abilityList.remove("gunnery_missile");
-                    abilityList.remove("gunnery_ballistic");
                 }
                 nabil--;
             }

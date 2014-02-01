@@ -177,6 +177,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Rank;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
@@ -8016,7 +8017,14 @@ public class CampaignGUI extends JPanel {
                         for (Enumeration<IOption> i = person.getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements(); ) {
                             IOption ability = i.nextElement();
                             if (!ability.booleanValue()) {
-                                cost = SkillType.getAbilityCost(ability.getName());
+                                SpecialAbility spa = SpecialAbility.getAbility(ability.getName());
+                                if(null == spa) {
+                                    continue;
+                                }
+                                if(!spa.isEligible(person)) {
+                                    continue;
+                                }
+                                cost = spa.getCost();
                                 costDesc = " (" + cost + "XP)";
                                 if (cost < 0) {
                                     costDesc = " (Not Possible)";
