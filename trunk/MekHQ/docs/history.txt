@@ -150,6 +150,7 @@ v0.3.4 (SVN)
 + Bug [#455]: Cargo report not showing tonnage of mothballed units
 + Bug: Escaped units counting for the employer salvage value
 + Bug: 0 cost for cluster master
++ Bug: Injury.generateHealingTime() was being called in some places with the arguments out of order, leading to incorrect times.
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
