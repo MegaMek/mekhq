@@ -1696,14 +1696,24 @@ public class Campaign implements Serializable {
         // concurrent mod problems
         ArrayList<Integer> assignedPartIds = new ArrayList<Integer>();
         ArrayList<Integer> arrivedPartIds = new ArrayList<Integer>();
+        boolean engineerAssigned = false;
         for (Part part : getParts()) {
-        	Unit u = part.getUnit();
-            if (null != part.getUnit()
-                && (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship)) {
-                part.setTeamId(u.getEngineer().getId());
-            }
             if (part.getAssignedTeamId() != null) {
                 assignedPartIds.add(part.getId());
+            }
+            /*
+             * If small craft, dropship, or jumpship and the engineer has time left
+             * Autoassign him to the first part we find. This allows manual
+             * Prioritization to take place.
+             */
+        	Unit u = part.getUnit();
+            if (!engineerAssigned && null != u
+            		&& u.getEngineer().getMinutesLeft() > 0
+            		&& (u.getEntity() instanceof SmallCraft
+            				|| u.getEntity() instanceof Jumpship)) {
+        	    part.setTeamId(u.getEngineer().getId());
+                assignedPartIds.add(part.getId());
+                engineerAssigned = true;
             }
             if (part.checkArrival()) {
                 arrivedPartIds.add(part.getId());
