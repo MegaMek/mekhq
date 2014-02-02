@@ -1697,6 +1697,11 @@ public class Campaign implements Serializable {
         ArrayList<Integer> assignedPartIds = new ArrayList<Integer>();
         ArrayList<Integer> arrivedPartIds = new ArrayList<Integer>();
         for (Part part : getParts()) {
+        	Unit u = part.getUnit();
+            if (null != part.getUnit()
+                && (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship)) {
+                part.setTeamId(u.getEngineer().getId());
+            }
             if (part.getAssignedTeamId() != null) {
                 assignedPartIds.add(part.getId());
             }
@@ -1714,11 +1719,6 @@ public class Campaign implements Serializable {
             Part part = getPart(pid);
             if (null != part) {
                 Person tech = getPerson(part.getAssignedTeamId());
-                if (null != part.getUnit()
-                    && (part.getUnit().getEntity() instanceof SmallCraft || part
-                        .getUnit().getEntity() instanceof Jumpship)) {
-                    tech = part.getUnit().getEngineer();
-                }
                 if (null != tech) {
                     fixPart(part, tech);
                 }
