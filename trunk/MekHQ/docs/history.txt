@@ -156,6 +156,9 @@ v0.3.4 (SVN)
     While this wasn't actually a bug as written, I found that the code for automatically assigning techs for small craft, dropships,
     and jumpships was in the wrong place. Now that it's moved, the Ships' crews will automatically be assigned to their repairs and
     complete them. No longer will you need to manually start the repairs.
++ Feature: Adjusted the campaign.newDay() repair code again from bug #464 in order to allow manual prioritization of the repairs
+    When you first resolve you can manually start a repair. That repair will be prioritized as first. Each time a component completes,
+    you can manually start another to have it be the next, or let the rest be handled by the auto-system
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
