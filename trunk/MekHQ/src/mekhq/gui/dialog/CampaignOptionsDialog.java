@@ -30,7 +30,6 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
@@ -74,9 +73,6 @@ import javax.swing.table.TableColumnModel;
 
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Player;
-import megamek.common.options.IOption;
-import megamek.common.options.IOptionGroup;
-import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;

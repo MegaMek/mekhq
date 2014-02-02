@@ -23,10 +23,7 @@ package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Map;
 
 import megamek.common.Aero;
 import megamek.common.BattleArmor;

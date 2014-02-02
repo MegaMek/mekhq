@@ -151,7 +151,11 @@ v0.3.4 (SVN)
 + Bug: Escaped units counting for the employer salvage value
 + Bug: 0 cost for cluster master
 + Bug: Injury.generateHealingTime() was being called in some places with the arguments out of order, leading to incorrect times.
-+ Special Ability object and affiliated files - this alows for specifying a variety of restrictions on special abilities for pilots
++ Special Ability object and affiliated files - this allows for specifying a variety of restrictions on special abilities for pilots
++ Bug [#464]: Repiar: Small Craft
+    While this wasn't actually a bug as written, I found that the code for automatically assigning techs for small craft, dropships,
+    and jumpships was in the wrong place. Now that it's moved, the Ships' crews will automatically be assigned to their repairs and
+    complete them. No longer will you need to manually start the repairs.
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
