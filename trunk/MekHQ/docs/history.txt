@@ -160,6 +160,7 @@ v0.3.4 (SVN)
     When you first resolve you can manually start a repair. That repair will be prioritized as first. Each time a component completes,
     you can manually start another to have it be the next, or let the rest be handled by the auto-system
 + Updated MegaMek.jar and MegaMekLab.jar and the mechfiles zip files
++ Bug [#465]: Salary: Set salary no reversible
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

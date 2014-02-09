@@ -1317,6 +1317,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public void setSalary(int s) {
         salary = s;
     }
+    
+    public int getRawSalary() {
+    	return salary;
+    }
 
     public int getSalary() {
 
