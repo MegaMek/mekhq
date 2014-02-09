@@ -7488,7 +7488,7 @@ public class CampaignGUI extends JPanel {
                 refreshPatientList();
                 refreshPersonnelList();
             } else if (command.equalsIgnoreCase("SALARY")) {
-                PopupValueChoiceDialog pcvd = new PopupValueChoiceDialog(frame, true, "Change Salary", selectedPerson.getSalary(), 0, 100000);
+                PopupValueChoiceDialog pcvd = new PopupValueChoiceDialog(frame, true, "Change Salary (-1 to remove custom salary)", selectedPerson.getSalary(), -1, 100000);
                 pcvd.setVisible(true);
                 int salary = pcvd.getValue();
                 if (salary < 0) {
