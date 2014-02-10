@@ -23,10 +23,7 @@ package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Map;
 
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
@@ -102,10 +99,7 @@ public class SkillType implements Serializable {
 						                      S_TACTICS,S_STRATEGY,
 						                      S_NEG,S_LEADER,S_SCROUNGE};
 	
-    private static Hashtable<String, SkillType> lookupHash;
-    private static Map<String, Integer> abilityCosts;
-	private static int defaultAbilityCost = 8;
-	
+    private static Hashtable<String, SkillType> lookupHash;	
 
     public static final int EXP_ULTRA_GREEN = 0;
     public static final int EXP_GREEN = 1;
@@ -281,6 +275,7 @@ public class SkillType implements Serializable {
 		lookupHash.put(S_NEG, createNegotiation());
 		lookupHash.put(S_SCROUNGE, createScrounge());
 
+		/*
 		abilityCosts = new HashMap<String, Integer>();
 		abilityCosts.put("hot_dog", 4);
 		abilityCosts.put("jumping_jack", 12);
@@ -298,88 +293,7 @@ public class SkillType implements Serializable {
 		abilityCosts.put("gunnery_missile", 4);
 		abilityCosts.put("ei_implant", 0);
 		abilityCosts.put("clan_pilot_training", 0);
-		abilityCosts.put("cluster_master", 0);
-	}
-	
-	public static ArrayList<String> getAbilitiesFor(int type) {
-		ArrayList<String> abils = new ArrayList<String>();
-		switch(type) {
-		case Person.T_MECHWARRIOR:
-			abils.add("dodge_maneuver");
-			abils.add("hot_dog");
-			abils.add("jumping_jack");
-			abils.add("maneuvering_ace");
-			abils.add("melee_specialist");
-			abils.add("multi_tasker");
-			abils.add("pain_resistance");
-			abils.add("sniper");
-			abils.add("tactical_genius");
-			abils.add("specialist");
-			abils.add("weapon_specialist");
-			abils.add("aptitude_gunnery");
-			abils.add("gunnery_laser");
-			abils.add("gunnery_missile");
-			abils.add("gunnery_ballistic");
-			abils.add("iron_man");
-			break;
-		case Person.T_PROTO_PILOT:
-			abils.add("dodge_maneuver");
-			abils.add("jumping_jack");
-			abils.add("melee_specialist");
-			abils.add("multi_tasker");
-			abils.add("pain_resistance");
-			abils.add("sniper");
-			abils.add("tactical_genius");
-			abils.add("specialist");
-			abils.add("weapon_specialist");
-			abils.add("aptitude_gunnery");
-			abils.add("gunnery_laser");
-			abils.add("gunnery_missile");
-			abils.add("gunnery_ballistic");
-			break;
-		case Person.T_AERO_PILOT:
-		case Person.T_CONV_PILOT:
-			abils.add("maneuvering_ace");
-			abils.add("pain_resistance");
-			abils.add("sniper");
-			abils.add("tactical_genius");
-			abils.add("specialist");
-			abils.add("weapon_specialist");
-			abils.add("aptitude_gunnery");
-			abils.add("gunnery_laser");
-			abils.add("gunnery_missile");
-			abils.add("gunnery_ballistic");
-			break;
-		case Person.T_BA:
-			abils.add("sniper");
-			abils.add("tactical_genius");
-			abils.add("specialist");
-			abils.add("weapon_specialist");
-			abils.add("aptitude_gunnery");
-			abils.add("gunnery_laser");
-			abils.add("gunnery_missile");
-			abils.add("gunnery_ballistic");
-			break;
-		case Person.T_VEE_GUNNER:
-			abils.add("maneuvering_ace");
-			abils.add("multi_tasker");
-			abils.add("sniper");
-			abils.add("tactical_genius");
-			abils.add("specialist");
-			abils.add("weapon_specialist");
-			abils.add("aptitude_gunnery");
-			abils.add("gunnery_laser");
-			abils.add("gunnery_missile");
-			abils.add("gunnery_ballistic");
-			break;
-		case Person.T_GVEE_DRIVER:
-		case Person.T_NVEE_DRIVER:
-		case Person.T_VTOL_PILOT:
-			abils.add("maneuvering_ace");
-			abils.add("tactical_genius");
-			break;
-		}
-		return abils;
+		*/
 	}
 	
 	public static SkillType getType(String t) {
@@ -459,19 +373,7 @@ public class SkillType implements Serializable {
         }
 		return S_GUN_MECH;
 	}
-	
-	public static int getAbilityCost(String ability) {
-		if(null == abilityCosts.get(ability)) {
-			return defaultAbilityCost;
-		} else {
-			return abilityCosts.get(ability);
-		}
-	}
-	
-	public static void setAbilityCost(String name, int cost) {
-		abilityCosts.put(name, cost);
-	}
-	
+
 	public static String[][] getSkillCostsArray() {
 		String[][] array = new String[skillList.length][11];
 		int i = 0;
@@ -520,15 +422,6 @@ public class SkillType implements Serializable {
 				+printCosts()
 				+"</costs>");
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</skillType>");	
-	}
-	
-	public static void writeAbilityCostsToXML(PrintWriter pw1, int indent) {
-		for(String optionName : abilityCosts.keySet()) {
-			pw1.println(MekHqXmlUtil.indentStr(indent)
-					+"<ability-" + optionName + ">"
-					+abilityCosts.get(optionName)
-					+"</ability-" + optionName + ">");
-		}
 	}
 	
 	public static void generateInstanceFromXML(Node wn, Version version) {
@@ -580,12 +473,6 @@ public class SkillType implements Serializable {
 		    }
 		}
 		lookupHash.put(retVal.name, retVal);
-	}
-	
-	public static void readAbilityCostFromXML(Node wn) {
-		if (wn.getNodeName().startsWith("ability-")) {
-			abilityCosts.put(wn.getNodeName().split("-")[1], Integer.parseInt(wn.getTextContent()));
-		}
 	}
 	
 	private String printCosts() {

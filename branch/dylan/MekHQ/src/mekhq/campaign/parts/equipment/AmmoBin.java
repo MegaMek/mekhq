@@ -699,12 +699,12 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 	
 	public Part getNewPart() {
-		return new AmmoStorage(1,type,((AmmoType)type).getShots(),campaign);
+		return new AmmoStorage(1,type,shotsNeeded,campaign);
 	}
 	
 	@Override
     public IAcquisitionWork getAcquisitionWork() {
-        return new AmmoStorage(1,type,((AmmoType)type).getShots(),campaign);
+        return new AmmoStorage(1,type,shotsNeeded,campaign);
     }
 	
 	@Override

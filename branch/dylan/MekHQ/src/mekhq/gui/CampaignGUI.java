@@ -126,10 +126,12 @@ import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
 import megamek.common.Crew;
+import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import megamek.common.GunEmplacement;
 import megamek.common.Infantry;
+import megamek.common.Jumpship;
 import megamek.common.Mech;
 import megamek.common.MechSummaryCache;
 import megamek.common.MechView;
@@ -181,6 +183,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Rank;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingFactory;
 import mekhq.campaign.report.CargoReport;
@@ -3774,7 +3777,17 @@ public class CampaignGUI extends JPanel {
     }
 
     public void refitUnit(Refit r, boolean selectModelName) {
-        if (getCampaign().getTechs().size() > 0) {
+    	if (r.getOriginalEntity() instanceof Dropship || r.getOriginalEntity() instanceof Jumpship) {
+    		Person engineer = r.getOriginalUnit().getEngineer();
+    		if (engineer == null) {
+    			JOptionPane.showMessageDialog(frame,
+                        "You cannot refit a ship that does not have an engineer. Assign a qualified vessel crew to this unit.",
+                        "No Engineer",
+                        JOptionPane.WARNING_MESSAGE);
+    			return;
+    		}
+    		r.setTeamId(engineer.getId());
+    	} else if (getCampaign().getTechs().size() > 0) {
             String name;
             HashMap<String, Person> techHash = new HashMap<String, Person>();
             for (Person tech : getCampaign().getTechs()) {
@@ -7839,7 +7852,7 @@ public class CampaignGUI extends JPanel {
                 refreshPersonnelList();
                 refreshOverview();
             } else if (command.equalsIgnoreCase("SALARY")) {
-                PopupValueChoiceDialog pcvd = new PopupValueChoiceDialog(frame, true, "Change Salary", selectedPerson.getSalary(), 0, 100000);
+                PopupValueChoiceDialog pcvd = new PopupValueChoiceDialog(frame, true, "Change Salary (-1 to remove custom salary)", selectedPerson.getSalary(), -1, 100000);
                 pcvd.setVisible(true);
                 int salary = pcvd.getValue();
                 if (salary < 0) {
@@ -8368,7 +8381,14 @@ public class CampaignGUI extends JPanel {
                         for (Enumeration<IOption> i = person.getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements(); ) {
                             IOption ability = i.nextElement();
                             if (!ability.booleanValue()) {
-                                cost = SkillType.getAbilityCost(ability.getName());
+                                SpecialAbility spa = SpecialAbility.getAbility(ability.getName());
+                                if(null == spa) {
+                                    continue;
+                                }
+                                if(!spa.isEligible(person)) {
+                                    continue;
+                                }
+                                cost = spa.getCost();
                                 costDesc = " (" + cost + "XP)";
                                 if (cost < 0) {
                                     costDesc = " (Not Possible)";

@@ -587,7 +587,7 @@ public class Injury {
 	
 	public static int generateHealingTime(Campaign c, int type, int hits, Person p) {
 		int rand = Compute.randomInt(100);
-		int mod = 0;
+		int mod = 100;
 		int time;
 		if (rand < 5) {
 			if (Compute.d6() < 4) {
@@ -600,7 +600,7 @@ public class Injury {
 		case INJ_CUT:
 		case INJ_BRUISE:
 		case INJ_LACERATION:
-			time = Compute.d6()+5;
+			time = Compute.d6();
 			break;
 		case INJ_SPRAIN:
 			time = 12;
@@ -651,12 +651,7 @@ public class Injury {
 			System.err.println("ERROR: Default CASE reached in (Advanced Medical Section) Person.generateHealingTime()");
 			return Compute.d6()+5;
 		}
-		if (mod < 0) {
-			time += Math.floor((time * mod / 100));
-		}
-		if (mod > 0) {
-			time += Math.ceil((time * mod / 100));
-		}
+		time = Math.round(time * mod / 100);
 		time = Math.round(time * p.getAbilityTimeModifier() / 100);
 		return time;
 	}
