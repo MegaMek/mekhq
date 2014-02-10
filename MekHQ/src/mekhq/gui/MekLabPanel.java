@@ -39,6 +39,7 @@ import javax.swing.JTabbedPane;
 
 import megamek.common.Aero;
 import megamek.common.AmmoType;
+import megamek.common.BattleArmor;
 import megamek.common.Engine;
 import megamek.common.Entity;
 import megamek.common.Infantry;
@@ -52,6 +53,7 @@ import megamek.common.WeaponType;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.verifier.EntityVerifier;
 import megamek.common.verifier.TestAero;
+import megamek.common.verifier.TestBattleArmor;
 import megamek.common.verifier.TestEntity;
 import megamek.common.verifier.TestInfantry;
 import megamek.common.verifier.TestMech;
@@ -193,13 +195,16 @@ public class MekLabPanel extends JPanel {
 		refit = new Refit(unit, entity, true); 
 		testEntity = null;
 		if(entity instanceof Aero) {
-			testEntity = new TestAero((Aero)entity, entityVerifier.mechOption, null);
+			testEntity = new TestAero((Aero)entity, entityVerifier.aeroOption, null);
 		}
 		else if(entity instanceof Mech) {
 			testEntity = new TestMech((Mech)entity, entityVerifier.mechOption, null);
 		}
 		else if(entity instanceof Tank) {
 			testEntity = new TestTank((Tank)entity, entityVerifier.tankOption, null);
+		}
+		else if(entity instanceof BattleArmor) {
+			testEntity = new TestBattleArmor((BattleArmor)entity, entityVerifier.baOption, null);
 		}
 		else if(entity instanceof Infantry) {
 			testEntity = new TestInfantry((Infantry)entity, entityVerifier.tankOption, null);
@@ -394,6 +399,9 @@ public class MekLabPanel extends JPanel {
 		}
 		else if(en instanceof Tank) {
 			return new TankPanel((Tank)en);
+		}
+		else if(en instanceof BattleArmor) {
+			return new BattleArmorPanel((BattleArmor)en);
 		}
 		else if(en instanceof Infantry) {
 			return new InfantryPanel((Infantry)en);
@@ -658,14 +666,93 @@ public class MekLabPanel extends JPanel {
 
 		@Override
 		public void refreshHeader() {
-			// TODO Auto-generated method stub
-			
 		}
 
         @Override
         public void refreshPreview() {
-            // TODO Auto-generated method stub
-            
+        }
+	}
+	
+	private class BattleArmorPanel extends EntityPanel {
+		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 6894731868670529166L;
+	
+		private BattleArmor entity;
+		private megameklab.com.ui.BattleArmor.tabs.StructureTab structureTab;
+		private megameklab.com.ui.BattleArmor.tabs.EquipmentTab equipmentTab;
+	    private megameklab.com.ui.BattleArmor.tabs.BuildTab buildTab;
+
+		
+		public BattleArmorPanel(BattleArmor ba) {
+			entity = ba;
+			reloadTabs();
+		}
+		 
+		public Entity getEntity() {
+			return entity;
+		}
+		
+		public void reloadTabs() {
+			removeAll();
+			    
+			structureTab = new megameklab.com.ui.BattleArmor.tabs.StructureTab(entity);
+	        structureTab.setAsCustomization();
+			equipmentTab = new megameklab.com.ui.BattleArmor.tabs.EquipmentTab(entity);
+			buildTab = new megameklab.com.ui.BattleArmor.tabs.BuildTab(entity);
+	        structureTab.addRefreshedListener(this);
+			equipmentTab.addRefreshedListener(this);
+			buildTab.addRefreshedListener(this);
+
+			addTab("Structure", structureTab);
+	        addTab("Equipment", equipmentTab);
+	        addTab("Assign Criticals", buildTab);
+	        this.repaint();
+		}
+		
+		public void refreshAll() {
+			structureTab.refresh();
+			equipmentTab.refresh();
+			buildTab.refresh();
+			refreshSummary();
+		}
+
+		public void refreshArmor() {
+			refreshSummary();
+		}
+
+		public void refreshBuild() {
+			buildTab.refresh();
+			refreshSummary();
+		}
+
+		public void refreshEquipment() {
+			equipmentTab.refresh();
+			refreshSummary();
+		}
+
+		public void refreshStatus() {
+			refreshSummary();
+		}
+
+		public void refreshStructure() {
+			structureTab.refresh();
+			refreshSummary();
+		}
+
+		public void refreshWeapons() {
+			refreshSummary();
+		}
+
+		@Override
+		public void refreshHeader() {
+		}
+
+        @Override
+        public void refreshPreview() {
+        	structureTab.refresh();
         }
 	}
 	
@@ -736,8 +823,6 @@ public class MekLabPanel extends JPanel {
 
 		@Override
 		public void refreshHeader() {
-			// TODO Auto-generated method stub
-			
 		}
 
         @Override
