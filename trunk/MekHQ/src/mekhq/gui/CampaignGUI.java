@@ -9706,7 +9706,7 @@ public class CampaignGUI extends JPanel {
                 if (oneSelected && (unit.getEntity() instanceof Mech
                                     || unit.getEntity() instanceof Tank
                                     || unit.getEntity() instanceof Aero
-                                    || (unit.getEntity() instanceof Infantry && !(unit.getEntity() instanceof BattleArmor)))) {
+                                    || (unit.getEntity() instanceof Infantry))) {
                     menu = new JMenu("Customize");
                     menuItem = new JMenuItem("Choose Refit Kit...");
                     menuItem.setActionCommand("REFIT_KIT");
@@ -9715,7 +9715,7 @@ public class CampaignGUI extends JPanel {
                                         && (unit.getEntity() instanceof megamek.common.Mech
                                             || unit.getEntity() instanceof megamek.common.Tank
                                             || unit.getEntity() instanceof megamek.common.Aero
-                                            || (unit.getEntity() instanceof Infantry && !(unit.getEntity() instanceof BattleArmor))));
+                                            || (unit.getEntity() instanceof Infantry)));
                     menu.add(menuItem);
                     menuItem = new JMenuItem("Customize in Mek Lab...");
                     menuItem.setActionCommand("CUSTOMIZE");
@@ -9724,7 +9724,7 @@ public class CampaignGUI extends JPanel {
                                         && (unit.getEntity() instanceof megamek.common.Mech
                                             || unit.getEntity() instanceof megamek.common.Tank
                                             || (unit.getEntity() instanceof megamek.common.Aero && unit.getEntity().getClass() == Aero.class)
-                                            || (unit.getEntity() instanceof Infantry && !(unit.getEntity() instanceof BattleArmor))));
+                                            || (unit.getEntity() instanceof Infantry)));
                     menu.add(menuItem);
                     if (unit.isRefitting()) {
                         menuItem = new JMenuItem("Cancel Customization");

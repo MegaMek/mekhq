@@ -166,6 +166,7 @@ v0.3.4 (SVN)
 + Bug [#456]: Dropship refit Tech not in list
 + Bug [#459]: Trouble with pilots transfering from .mul files
 + Bug: More infinite loop troubles with auto-matic prisoners
++ Updated MM.jar (r10529) and MML.jar (r1356 built with MM.jar r10529) and enabled BattleArmor customization
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
