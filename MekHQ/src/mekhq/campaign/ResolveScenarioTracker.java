@@ -657,7 +657,7 @@ public class ResolveScenarioTracker {
     					newPilots.addAll(Utilities.generateRandomCrewWithCombinedSkill(entity, campaign));
     				}
     			}
-			}   
+			}
 			
 			//look for pilots. There are a couple of things to keep in mind here.
 			//First, we should be able to safely add all pilots without checking for 
