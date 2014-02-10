@@ -162,6 +162,7 @@ v0.3.4 (SVN)
 + Updated MegaMek.jar and MegaMekLab.jar and the mechfiles zip files
 + Bug [#465]: Salary: Set salary no reversible
 + Bug [#461]: Using Heavy Vehicle Bays for Light Vehicles
++ Bug [#450]: Parts in Use font error (warehouse portion)
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

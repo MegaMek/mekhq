@@ -308,6 +308,33 @@ public class Utilities {
     	}
     	return Math.max(target, 0);
     }
+    
+    /*
+     * If an infantry platoon or vehicle crew took damage, perform the personnel injuries
+     */
+    public static ArrayList<Person> doCrewInjuries(Entity e, Campaign c, ArrayList<Person> newCrew) {
+    	int casualties = 0;
+		if(null != e && e instanceof Infantry) {
+			e.applyDamage();
+			casualties = newCrew.size() - ((Infantry)e).getShootingStrength();
+			for (Person p : newCrew) {
+				for (int i = 0; i < casualties; i++) {
+					if(Compute.d6(2) >= 7) {
+						int hits = c.getCampaignOptions().getMinimumHitsForVees();
+					    if (c.getCampaignOptions().useAdvancedMedical() || c.getCampaignOptions().useRandomHitsForVees()) {
+					        int range = 6 - hits;
+	                        hits = hits + Compute.randomInt(range);
+	                    }
+	                    p.setHits(hits);
+					} else {
+						p.setHits(6);
+					}
+				}
+			}
+		}
+		
+		return newCrew;
+    }
 	
     // TODO: There is a lot of code duplication between these 2 methods.
     // Time to split out the duplicated code and have both of these methods reference it.
@@ -468,31 +495,21 @@ public class Utilities {
     	findCommander(e, vesselCrew, gunners, drivers, navigator).setName(commanderName);
     	
     	// Add everyone to the crew
-    	newCrew.addAll(drivers);
-    	newCrew.addAll(gunners);
-    	newCrew.addAll(vesselCrew);
-    	newCrew.add(navigator);
+    	if (!drivers.isEmpty()) {
+    		newCrew.addAll(drivers);
+    	}
+    	if (!gunners.isEmpty()) {
+    		newCrew.addAll(gunners);
+    	}
+    	if (!vesselCrew.isEmpty()) {
+    		newCrew.addAll(vesselCrew);
+    	}
+    	if (navigator != null) {
+    		newCrew.add(navigator);
+    	}
 		
 		// We need to be able to handle incoming captured personnel
-		int casualties = 0;
-		if(null != e && e instanceof Infantry) {
-			e.applyDamage();
-			casualties = newCrew.size() - ((Infantry)e).getShootingStrength();
-			for (Person p : newCrew) {
-				for (int i = 0; i < casualties; i++) {
-					if(Compute.d6(2) >= 7) {
-						int hits = c.getCampaignOptions().getMinimumHitsForVees();
-					    if (c.getCampaignOptions().useAdvancedMedical() || c.getCampaignOptions().useRandomHitsForVees()) {
-					        int range = 6 - hits;
-	                        hits = hits + Compute.randomInt(range);
-	                    }
-	                    p.setHits(hits);
-					} else {
-						p.setHits(6);
-					}
-				}
-			}
-		}
+		newCrew = doCrewInjuries(e, c, newCrew);
 		
 		return newCrew;
 	}
