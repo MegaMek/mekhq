@@ -363,31 +363,33 @@ public class Utilities {
 			Person p = null;
 			if(unit.getEntity() instanceof Mech) {
     			p = c.newPerson(Person.T_MECHWARRIOR);
-    			p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(), false, 0);
-    			p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget() - oldCrew.getGunnery(), false, 0);
+    			p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(), 0);
+    			p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget() - oldCrew.getGunnery(), 0);
     		}
     		else if(unit.getEntity() instanceof Aero) {
     			p = c.newPerson(Person.T_AERO_PILOT);
-    			p.addSkill(SkillType.S_PILOT_AERO, SkillType.getType(SkillType.S_PILOT_AERO).getTarget() - oldCrew.getPiloting(), false, 0);
-    			p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget() - oldCrew.getGunnery(), false, 0);
+    			p.addSkill(SkillType.S_PILOT_AERO, SkillType.getType(SkillType.S_PILOT_AERO).getTarget() - oldCrew.getPiloting(), 0);
+    			p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget() - oldCrew.getGunnery(), 0);
     		}
     		else if(unit.getEntity() instanceof ConvFighter) {
     			p = c.newPerson(Person.T_CONV_PILOT);
-    			p.addSkill(SkillType.S_PILOT_JET, SkillType.getType(SkillType.S_PILOT_JET).getTarget() - oldCrew.getPiloting(), false, 0);
-    			p.addSkill(SkillType.S_GUN_JET, SkillType.getType(SkillType.S_GUN_JET).getTarget() - oldCrew.getPiloting(), false, 0);
+    			p.addSkill(SkillType.S_PILOT_JET, SkillType.getType(SkillType.S_PILOT_JET).getTarget() - oldCrew.getPiloting(), 0);
+    			p.addSkill(SkillType.S_GUN_JET, SkillType.getType(SkillType.S_GUN_JET).getTarget() - oldCrew.getPiloting(), 0);
     		}
     		else if(unit.getEntity() instanceof Protomech) {
     			p = c.newPerson(Person.T_PROTO_PILOT);
-    			//p.addSkill(SkillType.S_PILOT_PROTO, SkillType.getType(SkillType.S_PILOT_PROTO).getTarget() - oldCrew.getPiloting(), false, 0);
-    			p.addSkill(SkillType.S_GUN_PROTO, SkillType.getType(SkillType.S_GUN_PROTO).getTarget() - oldCrew.getGunnery(), false, 0);
+    			//p.addSkill(SkillType.S_PILOT_PROTO, SkillType.getType(SkillType.S_PILOT_PROTO).getTarget() - oldCrew.getPiloting(), 0);
+    			p.addSkill(SkillType.S_GUN_PROTO, SkillType.getType(SkillType.S_GUN_PROTO).getTarget() - oldCrew.getGunnery(), 0);
     		}
     		else if(unit.getEntity() instanceof VTOL) {
     			p = c.newPerson(Person.T_VTOL_PILOT);
-    			p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(), false, 0);
+    			p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(), 0);
+    			p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
     		}
     		else if(unit.getEntity() instanceof Tank) {
     			p = c.newPerson(Person.T_GVEE_DRIVER);
-    			p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(), false, 0);
+    			p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(), 0);
+    			p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
     		}
 			p.setHits(e.getCrew().getHits());
 			drivers.add(p);
@@ -397,18 +399,26 @@ public class Utilities {
 	    		Person p = null;
 	    		if(unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
 	    			p = c.newPerson(Person.T_SPACE_PILOT);
-	    			p.addSkill(SkillType.S_PILOT_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_PILOT_SPACE).getTarget() - oldCrew.getPiloting() - 1), false, 0);
+	    			p.addSkill(SkillType.S_PILOT_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_PILOT_SPACE).getTarget() - oldCrew.getPiloting()), 0);
 	    			totalPiloting += p.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue();
 	    		}
 	    		else if(unit.getEntity() instanceof BattleArmor) {
 	    			p = c.newPerson(Person.T_BA);
-	    			p.addSkill(SkillType.S_GUN_BA, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_BA).getTarget() - oldCrew.getGunnery() - 1), false, 0);
+	    			p.addSkill(SkillType.S_GUN_BA, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_BA).getTarget() - oldCrew.getGunnery()), 0);
 	    			totalGunnery += p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue();
 	    		}
 	    		else if(unit.getEntity() instanceof Infantry) {
 	    			p = c.newPerson(Person.T_INFANTRY);
-	    			p.addSkill(SkillType.S_SMALL_ARMS, randomSkillFromTarget(SkillType.getType(SkillType.S_SMALL_ARMS).getTarget() - oldCrew.getGunnery() - 1), false, 0);
+	    			p.addSkill(SkillType.S_SMALL_ARMS, randomSkillFromTarget(SkillType.getType(SkillType.S_SMALL_ARMS).getTarget() - oldCrew.getGunnery()), 0);
 	    			totalGunnery += p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue();
+	    		}
+	    		else if(unit.getEntity() instanceof VTOL) {
+	    			p = c.newPerson(Person.T_VTOL_PILOT);
+	    			p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(), 0);
+	    		}
+	    		else if(unit.getEntity() instanceof Tank) {
+	    			p = c.newPerson(Person.T_GVEE_DRIVER);
+	    			p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(), 0);
 	    		}
 	    		drivers.add(p);
 	    	}
@@ -418,28 +428,28 @@ public class Utilities {
 				averageGunnery = (int)Math.round(((double)totalGunnery)/drivers.size());
 				averagePiloting = (int)Math.round(((double)totalPiloting)/drivers.size());
 				if (unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
-					while (averagePiloting != oldCrew.getPiloting() - 1) {
+					while (averagePiloting != oldCrew.getPiloting()) {
 						totalPiloting = 0;
 						for (Person p : drivers) {
-							p.addSkill(SkillType.S_PILOT_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_PILOT_SPACE).getTarget() - oldCrew.getPiloting() - 1), false, 0);
+							p.addSkill(SkillType.S_PILOT_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_PILOT_SPACE).getTarget() - oldCrew.getPiloting()), 0);
 							totalPiloting += p.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue();
 						}
 						averagePiloting = (int)Math.round(((double)totalPiloting)/drivers.size());
 					}
 				} else if (unit.getEntity() instanceof BattleArmor) {
-					while (averageGunnery != oldCrew.getGunnery() - 1) {
+					while (averageGunnery != oldCrew.getGunnery()) {
 						totalGunnery = 0;
 						for (Person p : drivers) {
-							p.addSkill(SkillType.S_GUN_BA, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_BA).getTarget() - oldCrew.getGunnery() - 1), false, 0);
+							p.addSkill(SkillType.S_GUN_BA, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_BA).getTarget() - oldCrew.getGunnery()), 0);
 							totalGunnery += p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue();
 						}
 						averageGunnery = (int)Math.round(((double)totalGunnery)/drivers.size());
 					}
 				} else if (unit.getEntity() instanceof Infantry) {
-					while (averageGunnery != oldCrew.getGunnery() - 1) {
+					while (averageGunnery != oldCrew.getGunnery()) {
 						totalGunnery = 0;
 						for (Person p : drivers) {
-							p.addSkill(SkillType.S_SMALL_ARMS, randomSkillFromTarget(SkillType.getType(SkillType.S_SMALL_ARMS).getTarget() - oldCrew.getGunnery() - 1), false, 0);
+							p.addSkill(SkillType.S_SMALL_ARMS, randomSkillFromTarget(SkillType.getType(SkillType.S_SMALL_ARMS).getTarget() - oldCrew.getGunnery()), 0);
 							totalGunnery += p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue();
 						}
 						averageGunnery = (int)Math.round(((double)totalGunnery)/drivers.size());
@@ -452,11 +462,11 @@ public class Utilities {
 	    		Person p = null;
 	    		if (unit.getEntity() instanceof Tank) {
 	    			p = c.newPerson(Person.T_VEE_GUNNER);
-	    			p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery() - 1), false, 0);
+	    			p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery()), 0);
 	    			totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
 	    		} else if (unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
 	    			p = c.newPerson(Person.T_SPACE_GUNNER);
-	    			p.addSkill(SkillType.S_GUN_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_SPACE).getTarget() - oldCrew.getGunnery() - 1), false, 0);
+	    			p.addSkill(SkillType.S_GUN_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_SPACE).getTarget() - oldCrew.getGunnery()), 0);
 	    			totalGunnery += p.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue();
 	    		}
 	    		gunners.add(p);
@@ -466,19 +476,19 @@ public class Utilities {
 	    	if (gunners.size() != 0) {
 	    		averageGunnery = (int)Math.round(((double)totalGunnery)/gunners.size());
 	    		if (unit.getEntity() instanceof Tank) {
-					while (averageGunnery != oldCrew.getGunnery() - 1) {
+					while (averageGunnery != oldCrew.getGunnery()) {
 						totalGunnery = 0;
 						for (Person p : gunners) {
-							p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery() - 1), false, 0);
+							p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery()), 0);
 							totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
 						}
 						averageGunnery = (int)Math.round(((double)totalGunnery)/gunners.size());
 					}
 	    		} else if (unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
-					while (averageGunnery != oldCrew.getGunnery() - 1) {
+					while (averageGunnery != oldCrew.getGunnery()) {
 						totalGunnery = 0;
 						for (Person p : gunners) {
-							p.addSkill(SkillType.S_GUN_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_SPACE).getTarget() - oldCrew.getGunnery() - 1), false, 0);
+							p.addSkill(SkillType.S_GUN_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_SPACE).getTarget() - oldCrew.getGunnery()), 0);
 							totalGunnery += p.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue();
 						}
 						averageGunnery = (int)Math.round(((double)totalGunnery)/gunners.size());
@@ -542,31 +552,33 @@ public class Utilities {
 			Person p = null;
 			if(unit.getEntity() instanceof Mech) {
     			p = c.newPerson(Person.T_MECHWARRIOR);
-    			p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting() - 1, false, 0);
-    			p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget() - oldCrew.getGunnery() - 1, false, 0);
+    			p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(), 0);
+    			p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget() - oldCrew.getGunnery(), 0);
     		}
     		else if(unit.getEntity() instanceof Aero) {
     			p = c.newPerson(Person.T_AERO_PILOT);
-    			p.addSkill(SkillType.S_PILOT_AERO, SkillType.getType(SkillType.S_PILOT_AERO).getTarget() - oldCrew.getPiloting() - 1, false, 0);
-    			p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget() - oldCrew.getGunnery() - 1, false, 0);
+    			p.addSkill(SkillType.S_PILOT_AERO, SkillType.getType(SkillType.S_PILOT_AERO).getTarget() - oldCrew.getPiloting(), 0);
+    			p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget() - oldCrew.getGunnery(), 0);
     		}
     		else if(unit.getEntity() instanceof ConvFighter) {
     			p = c.newPerson(Person.T_CONV_PILOT);
-    			p.addSkill(SkillType.S_PILOT_JET, SkillType.getType(SkillType.S_PILOT_JET).getTarget() - oldCrew.getPiloting() - 1, false, 0);
-    			p.addSkill(SkillType.S_GUN_JET, SkillType.getType(SkillType.S_GUN_JET).getTarget() - oldCrew.getPiloting() - 1, false, 0);
+    			p.addSkill(SkillType.S_PILOT_JET, SkillType.getType(SkillType.S_PILOT_JET).getTarget() - oldCrew.getPiloting(), 0);
+    			p.addSkill(SkillType.S_GUN_JET, SkillType.getType(SkillType.S_GUN_JET).getTarget() - oldCrew.getPiloting(), 0);
     		}
     		else if(unit.getEntity() instanceof Protomech) {
     			p = c.newPerson(Person.T_PROTO_PILOT);
-    			//p.addSkill(SkillType.S_PILOT_PROTO, SkillType.getType(SkillType.S_PILOT_PROTO).getTarget() - oldCrew.getPiloting(), false, 0);
-    			p.addSkill(SkillType.S_GUN_PROTO, SkillType.getType(SkillType.S_GUN_PROTO).getTarget() - oldCrew.getGunnery() - 1, false, 0);
+    			//p.addSkill(SkillType.S_PILOT_PROTO, SkillType.getType(SkillType.S_PILOT_PROTO).getTarget() - oldCrew.getPiloting(), 0);
+    			p.addSkill(SkillType.S_GUN_PROTO, SkillType.getType(SkillType.S_GUN_PROTO).getTarget() - oldCrew.getGunnery(), 0);
     		}
     		else if(unit.getEntity() instanceof VTOL) {
     			p = c.newPerson(Person.T_VTOL_PILOT);
-    			p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting() - 1, false, 0);
+    			p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(), 0);
+    			p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
     		}
     		else if(unit.getEntity() instanceof Tank) {
     			p = c.newPerson(Person.T_GVEE_DRIVER);
-    			p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting() - 1, false, 0);
+    			p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(), 0);
+    			p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
     		}
 			drivers.add(p);
 		} else {
@@ -575,18 +587,28 @@ public class Utilities {
 	    		Person p = null;
 	    		if(unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
 	    			p = c.newPerson(Person.T_SPACE_PILOT);
-	    			p.addSkill(SkillType.S_PILOT_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_PILOT_SPACE).getTarget() - oldCrew.getPiloting() - 1), false, 0);
+	    			p.addSkill(SkillType.S_PILOT_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_PILOT_SPACE).getTarget() - oldCrew.getPiloting()), 0);
 	    			totalPiloting += p.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue();
 	    		}
 	    		else if(unit.getEntity() instanceof BattleArmor) {
 	    			p = c.newPerson(Person.T_BA);
-	    			p.addSkill(SkillType.S_GUN_BA, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_BA).getTarget() - oldCrew.getGunnery() - 1), false, 0);
+	    			p.addSkill(SkillType.S_GUN_BA, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_BA).getTarget() - oldCrew.getGunnery()), 0);
 	    			totalGunnery += p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue();
 	    		}
 	    		else if(unit.getEntity() instanceof Infantry) {
 	    			p = c.newPerson(Person.T_INFANTRY);
-	    			p.addSkill(SkillType.S_SMALL_ARMS, randomSkillFromTarget(SkillType.getType(SkillType.S_SMALL_ARMS).getTarget() - oldCrew.getGunnery() - 1), false, 0);
+	    			p.addSkill(SkillType.S_SMALL_ARMS, randomSkillFromTarget(SkillType.getType(SkillType.S_SMALL_ARMS).getTarget() - oldCrew.getGunnery()), 0);
 	    			totalGunnery += p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue();
+	    		}
+	    		else if(unit.getEntity() instanceof VTOL) {
+	    			p = c.newPerson(Person.T_VTOL_PILOT);
+	    			p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(), 0);
+	    			p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
+	    		}
+	    		else if(unit.getEntity() instanceof Tank) {
+	    			p = c.newPerson(Person.T_GVEE_DRIVER);
+	    			p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(), 0);
+	    			p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
 	    		}
 	    		drivers.add(p);
 	    	}
@@ -596,28 +618,28 @@ public class Utilities {
 				averageGunnery = (int)Math.round(((double)totalGunnery)/drivers.size());
 				averagePiloting = (int)Math.round(((double)totalPiloting)/drivers.size());
 				if (unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
-					while (averagePiloting != oldCrew.getPiloting() - 1) {
+					while (averagePiloting != oldCrew.getPiloting()) {
 						totalPiloting = 0;
 						for (Person p : drivers) {
-							p.addSkill(SkillType.S_PILOT_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_PILOT_SPACE).getTarget() - oldCrew.getPiloting() - 1), false, 0);
+							p.addSkill(SkillType.S_PILOT_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_PILOT_SPACE).getTarget() - oldCrew.getPiloting()), 0);
 							totalPiloting += p.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue();
 						}
 						averagePiloting = (int)Math.round(((double)totalPiloting)/drivers.size());
 					}
 				} else if (unit.getEntity() instanceof BattleArmor) {
-					while (averageGunnery != oldCrew.getGunnery() - 1) {
+					while (averageGunnery != oldCrew.getGunnery()) {
 						totalGunnery = 0;
 						for (Person p : drivers) {
-							p.addSkill(SkillType.S_GUN_BA, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_BA).getTarget() - oldCrew.getGunnery() - 1), false, 0);
+							p.addSkill(SkillType.S_GUN_BA, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_BA).getTarget() - oldCrew.getGunnery()), 0);
 							totalGunnery += p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue();
 						}
 						averageGunnery = (int)Math.round(((double)totalGunnery)/drivers.size());
 					}
 				} else if (unit.getEntity() instanceof Infantry) {
-					while (averageGunnery != oldCrew.getGunnery() - 1) {
+					while (averageGunnery != oldCrew.getGunnery()) {
 						totalGunnery = 0;
 						for (Person p : drivers) {
-							p.addSkill(SkillType.S_SMALL_ARMS, randomSkillFromTarget(SkillType.getType(SkillType.S_SMALL_ARMS).getTarget() - oldCrew.getGunnery() - 1), false, 0);
+							p.addSkill(SkillType.S_SMALL_ARMS, randomSkillFromTarget(SkillType.getType(SkillType.S_SMALL_ARMS).getTarget() - oldCrew.getGunnery()), 0);
 							totalGunnery += p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue();
 						}
 						averageGunnery = (int)Math.round(((double)totalGunnery)/drivers.size());
@@ -630,11 +652,11 @@ public class Utilities {
 	    		Person p = null;
 	    		if (unit.getEntity() instanceof Tank) {
 	    			p = c.newPerson(Person.T_VEE_GUNNER);
-	    			p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery() - 1), false, 0);
+	    			p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery()), 0);
 	    			totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
 	    		} else if (unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
 	    			p = c.newPerson(Person.T_SPACE_GUNNER);
-	    			p.addSkill(SkillType.S_GUN_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_SPACE).getTarget() - oldCrew.getGunnery() - 1), false, 0);
+	    			p.addSkill(SkillType.S_GUN_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_SPACE).getTarget() - oldCrew.getGunnery()), 0);
 	    			totalGunnery += p.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue();
 	    		}
 	    		gunners.add(p);
@@ -644,19 +666,19 @@ public class Utilities {
 	    	if (gunners.size() != 0) {
 	    		averageGunnery = (int)Math.round(((double)totalGunnery)/gunners.size());
 	    		if (unit.getEntity() instanceof Tank) {
-					while (averageGunnery != oldCrew.getGunnery() - 1) {
+					while (averageGunnery != oldCrew.getGunnery()) {
 						totalGunnery = 0;
 						for (Person p : gunners) {
-							p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery() - 1), false, 0);
+							p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery()), 0);
 							totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
 						}
 						averageGunnery = (int)Math.round(((double)totalGunnery)/gunners.size());
 					}
 	    		} else if (unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
-					while (averageGunnery != oldCrew.getGunnery() - 1) {
+					while (averageGunnery != oldCrew.getGunnery()) {
 						totalGunnery = 0;
 						for (Person p : gunners) {
-							p.addSkill(SkillType.S_GUN_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_SPACE).getTarget() - oldCrew.getGunnery() - 1), false, 0);
+							p.addSkill(SkillType.S_GUN_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_SPACE).getTarget() - oldCrew.getGunnery()), 0);
 							totalGunnery += p.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue();
 						}
 						averageGunnery = (int)Math.round(((double)totalGunnery)/gunners.size());
