@@ -7,6 +7,7 @@ v0.3.4 (dylan)
     Removes all the duplicated code
 + Added new Cargo Overview tab
 + Bug: Missing refresh for Cargo Overview
++ Bug [#450]: Parts in Use font error
 
 v0.3.4 (SVN)
 + Bug: Moved Report Log not scrolling again (don't force set caret to 0 on refresh)
