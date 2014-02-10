@@ -161,6 +161,7 @@ v0.3.4 (SVN)
     you can manually start another to have it be the next, or let the rest be handled by the auto-system
 + Updated MegaMek.jar and MegaMekLab.jar and the mechfiles zip files
 + Bug [#465]: Salary: Set salary no reversible
++ Bug [#461]: Using Heavy Vehicle Bays for Light Vehicles
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

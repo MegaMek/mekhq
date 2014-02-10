@@ -4180,95 +4180,50 @@ public class Campaign implements Serializable {
      * are just going to calculate average costs per unit and then make some guesses about total dropship collar needs.
      * <p/>
      * Hopefully, StellarOps will clarify all of this.
+     * Cleaned this up some, to take advantage of my new methods, but it needs a lot more work - Dylan
      */
     public long calculateCostPerJump(boolean excludeOwnTransports) {
         // first we need to get the total number of units by type
-        int nMech = 0;
-        int nVee = 0;
-        int nAero = 0;
-        int nBA = 0;
+        int nMech = getNumberOfUnitsByType(Entity.ETYPE_MECH);
+        int nLVee = getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true);
+        int nHVee = getNumberOfUnitsByType(Entity.ETYPE_TANK);
+        int nAero = getNumberOfUnitsByType(Entity.ETYPE_AERO);
+        int nSC = getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
+        int nCF = getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER);
+        int nBA = getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR);
         int nMechInf = 0;
         int nMotorInf = 0;
         int nFootInf = 0;
+        int nProto = getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH);
+        int nDropship = getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
+        int nCollars = getTotalDockingCollars();
 
         double cargoSpace = 0.0;
 
-        int nDropship = 0;
-        int nCollars = 0;
+        
+        int noMech = Math.max(nMech - getOccupiedBays(Entity.ETYPE_MECH), 0);
+        int noDS = Math.max(nDropship - getOccupiedBays(Entity.ETYPE_DROPSHIP), 0);
+        int noSC = Math.max(nSC - getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
+        int noCF = Math.max(nCF - getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
+        int noASF = Math.max(nAero - getOccupiedBays(Entity.ETYPE_AERO), 0);
+        int nolv = Math.max(nLVee - getOccupiedBays(Entity.ETYPE_TANK, true), 0);
+        int nohv = Math.max(nHVee - getOccupiedBays(Entity.ETYPE_TANK), 0);
+        int noinf = Math.max(getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) - getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
+        int noBA = Math.max(nBA - getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
+        int noProto = Math.max(nProto - getOccupiedBays(Entity.ETYPE_PROTOMECH), 0);
+        int freehv = Math.max(getTotalHeavyVehicleBays() - getOccupiedBays(Entity.ETYPE_TANK), 0);
+        int freeinf = Math.max(getTotalInfantryBays() - getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
+        int freeba = Math.max(getTotalBattleArmorBays() - getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
+        int freeSC = Math.max(getTotalSmallCraftBays() - getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
+        int mothballedAsCargo = Math.max(getNumberOfUnitsByType(Unit.ETYPE_MOTHBALLED), 0);
 
-        for (Unit u : getUnits()) {
-            Entity en = u.getEntity();
-            if (en instanceof Dropship && excludeOwnTransports) {
-                nDropship++;
-                // decrement total needs by what this dropship can offer
-                for (Bay bay : en.getTransportBays()) {
-                    if (bay instanceof MechBay) {
-                        nMech -= bay.getCapacity();
-                    } else if (bay instanceof LightVehicleBay) {
-                        nVee -= bay.getCapacity();
-                    } else if (bay instanceof HeavyVehicleBay) {
-                        nVee -= bay.getCapacity();
-                    } else if (bay instanceof ASFBay
-                               || bay instanceof SmallCraftBay) {
-                        nAero -= bay.getCapacity();
-                    } else if (bay instanceof BattleArmorBay) {
-                        nBA -= bay.getCapacity() * 4;
-                    } else if (bay instanceof InfantryBay) {
-                        nMechInf -= bay.getCapacity() * 28;
-                    } else if (bay instanceof CargoBay) {
-                        cargoSpace += bay.getCapacity();
-                    }
-                }
-            } else if (en instanceof Jumpship && excludeOwnTransports) {
-                nCollars += ((Jumpship) en).getDocks();
-            } else if (en instanceof Mech) {
-                nMech++;
-            } else if (en instanceof Tank) {
-                nVee++;
-            } else if (en instanceof Aero && !(en instanceof Dropship)
-                       && !(en instanceof Jumpship)) {
-                nAero++;
-            } else if (en instanceof BattleArmor) {
-                nBA += 4;
-            } else if (en instanceof Infantry) {
-                if (en.getMovementMode() == EntityMovementMode.INF_LEG
-                    || en.getMovementMode() == EntityMovementMode.INF_LEG) {
-                    nFootInf += ((Infantry) en).getSquadN()
-                                * ((Infantry) en).getSquadSize();
-                } else if (en.getMovementMode() == EntityMovementMode.INF_MOTORIZED) {
-                    nMotorInf += ((Infantry) en).getSquadN()
-                                 * ((Infantry) en).getSquadSize();
-                } else {
-                    nMechInf += ((Infantry) en).getSquadN()
-                                * ((Infantry) en).getSquadSize();
-                }
-            }
-            // if we havent got you yet then you fly free (yay!)
-        }
-
-        if (nMech < 0) {
-            nMech = 0;
-        }
-        if (nVee < 0) {
-            nVee = 0;
-        }
-        if (nAero < 0) {
-            nAero = 0;
-        }
-        if (nBA < 0) {
-            nBA = 0;
-        }
-        // now lets resort the infantry a bit
-        if (nMechInf < 0) {
-            nMotorInf += nMechInf;
-            nMechInf = 0;
-        }
-        if (nMotorInf < 0) {
-            nFootInf += nMotorInf;
-        }
-        if (nFootInf < 0) {
-            nFootInf = 0;
-        }
+        int newNoASF = Math.max(noASF - freeSC, 0);
+        int placedASF = Math.max(noASF - newNoASF, 0);
+        freeSC -= placedASF;
+        
+        int newNolv = Math.max(nolv - freehv, 0);
+        int placedlv = Math.max(nolv - newNolv, 0);
+        freehv -= placedlv;
 
         // Ok, now the costs per unit - this is the dropship fee. I am loosely
         // basing this on Field Manual Mercs, although I think the costs are
@@ -4276,7 +4231,7 @@ public class Campaign implements Serializable {
         long dropshipCost = 0;
         dropshipCost += nMech * 10000;
         dropshipCost += nAero * 15000;
-        dropshipCost += nVee * 3000;
+        dropshipCost += (nLVee+nHVee) * 3000;
         dropshipCost += nBA * 250;
         dropshipCost += nMechInf * 100;
         dropshipCost += nMotorInf * 50;
@@ -4293,7 +4248,7 @@ public class Campaign implements Serializable {
         collarsNeeded += (int) Math
                 .ceil(Math.max(0, nAero - collarsNeeded * 2) / 6.0);
         // for vees, assume a Triumph
-        collarsNeeded += (int) Math.ceil(nVee / 53.0);
+        collarsNeeded += (int) Math.ceil((nLVee+nHVee) / 53.0);
         // for now I am going to let infantry and BA tag along because of cargo
         // space rules
 
@@ -5954,7 +5909,9 @@ public class Campaign implements Serializable {
             cargoTonnage += (part.getQuantity() * part.getTonnage());
         }
 
-        // place units in bays, with remainder going to cargo.
+        // place units in bays
+        // FIXME: This has been temporarily disabled. It really needs dropship assignments done to fix it correctly.
+        // Remaining units go into cargo
         for (Unit unit : getUnits()) {
             if (!inTransit && !unit.isPresent()) {
                 continue;
@@ -5967,48 +5924,7 @@ public class Campaign implements Serializable {
             if (en instanceof GunEmplacement || en instanceof FighterSquadron || en instanceof Jumpship) {
                 continue;
             }
-            if (mechs > 0 && en instanceof Mech) {
-                mechs--;
-                continue;
-            }
-            if (ds > 0 && en instanceof Dropship) {
-                ds--;
-                continue;
-            }
-            if (sc > 0 && en instanceof SmallCraft && !(en instanceof Dropship)) {
-                sc--;
-                continue;
-            }
-            if (cf > 0 && en instanceof ConvFighter) {
-                cf--;
-                continue;
-            }
-            if (asf > 0 && en instanceof Aero
-                && !(en instanceof SmallCraft || en instanceof ConvFighter)) {
-                asf--;
-                continue;
-            }
-            if (inf > 0 && en instanceof Infantry && !(en instanceof BattleArmor)) {
-                inf--;
-                continue;
-            }
-            if (ba > 0 && en instanceof BattleArmor) {
-                ba--;
-                continue;
-            }
-            if (lv > 0 && en instanceof Tank && !(en instanceof GunEmplacement) && en.getWeight() <= 50) {
-                lv--;
-                continue;
-            }
-            if (hv > 0 && en instanceof Tank && !(en instanceof GunEmplacement) && en.getWeight() > 50) {
-                hv--;
-                continue;
-            }
-            if (protos > 0 && en instanceof Protomech) {
-                protos--;
-                continue;
-            }
-            cargoTonnage += en.getWeight();
+            // cargoTonnage += en.getWeight();
         }
         if (mothballed) {
         	return mothballedTonnage;
@@ -6177,8 +6093,8 @@ public class Campaign implements Serializable {
         int noBA = Math.max(getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) - getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
         int noProto = Math.max(getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH) - getOccupiedBays(Entity.ETYPE_PROTOMECH), 0);
         int freehv = Math.max(getTotalHeavyVehicleBays() - getOccupiedBays(Entity.ETYPE_TANK), 0);
-        int freeinf = Math.max(getTotalInfantryBays() - getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
-        int freeba = Math.max(getTotalBattleArmorBays() - getOccupiedBays(Entity.ETYPE_TANK), 0);
+        int freeinf = Math.max(getTotalInfantryBays() - getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
+        int freeba = Math.max(getTotalBattleArmorBays() - getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
         int freeSC = Math.max(getTotalSmallCraftBays() - getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
         int mothballedAsCargo = Math.max(getNumberOfUnitsByType(Unit.ETYPE_MOTHBALLED), 0);
 
@@ -6187,10 +6103,15 @@ public class Campaign implements Serializable {
         int placedASF = Math.max(noASF - newNoASF, 0);
         if (noASF > 0 && freeSC > 0) {
             asfAppend = " [" + placedASF + " ASF will be placed in Small Craft bays]";
+            freeSC -= placedASF;
         }
-
+        
+        String lvAppend = "";
+        int newNolv = Math.max(nolv - freehv, 0);
+        int placedlv = Math.max(nolv - newNolv, 0);
         if (nolv > 0 && freehv > 0) {
-
+        	lvAppend = " [" + placedlv + " Light Vehicles will be placed in Heavy Vehicle bays]";
+        	freehv -= placedlv;
         }
 
         if (noBA > 0 && freeinf > 0) {
@@ -6212,12 +6133,18 @@ public class Campaign implements Serializable {
                                 getTotalASFBays(), getOccupiedBays(Entity.ETYPE_AERO), "ASF Not Transported:", noASF, asfAppend));
 
         // Lets do Light Vehicles next.
-        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Light Vehicle Bays (Occupied):",
-                                getTotalLightVehicleBays(), getOccupiedBays(Entity.ETYPE_TANK, true), "Light Vehicles Not Transported:", nolv));
+        sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d%s\n", "Light Vehicle Bays (Occupied):",
+                                getTotalLightVehicleBays(), getOccupiedBays(Entity.ETYPE_TANK, true), "Light Vehicles Not Transported:", nolv, lvAppend));
 
         // Lets do Heavy Vehicles next.
         sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d\n", "Heavy Vehicle Bays (Occupied):",
                                 getTotalHeavyVehicleBays(), getOccupiedBays(Entity.ETYPE_TANK), "Heavy Vehicles Not Transported:", nohv));
+
+        if (noASF > 0 && freeSC > 0) {
+            // Lets do ASF in Free Small Craft Bays next.
+            sb.append(String.format("%-35s   %4d (%4d)      %-35s     %4d\n", "   Light Vehicles in Heavy Vehicle Bays (Occupied):",
+            					getTotalHeavyVehicleBays(), getOccupiedBays(Entity.ETYPE_TANK) + placedlv, "Light Vehicles Not Transported:", newNolv));
+        }
 
         if (nolv > 0 && freehv > 0) {
 
