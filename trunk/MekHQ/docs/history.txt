@@ -163,6 +163,7 @@ v0.3.4 (SVN)
 + Bug [#465]: Salary: Set salary no reversible
 + Bug [#461]: Using Heavy Vehicle Bays for Light Vehicles
 + Bug [#450]: Parts in Use font error (warehouse portion)
++ Bug [#456]: Dropship refit Tech not in list
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

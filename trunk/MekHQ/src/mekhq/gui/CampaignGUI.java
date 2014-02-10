@@ -122,10 +122,12 @@ import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
 import megamek.common.Crew;
+import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import megamek.common.GunEmplacement;
 import megamek.common.Infantry;
+import megamek.common.Jumpship;
 import megamek.common.Mech;
 import megamek.common.MechSummaryCache;
 import megamek.common.MechView;
@@ -3639,7 +3641,17 @@ public class CampaignGUI extends JPanel {
     }
 
     public void refitUnit(Refit r, boolean selectModelName) {
-        if (getCampaign().getTechs().size() > 0) {
+    	if (r.getOriginalEntity() instanceof Dropship || r.getOriginalEntity() instanceof Jumpship) {
+    		Person engineer = r.getOriginalUnit().getEngineer();
+    		if (engineer == null) {
+    			JOptionPane.showMessageDialog(frame,
+                        "You cannot refit a ship that does not have an engineer. Assign a qualified vessel crew to this unit.",
+                        "No Engineer",
+                        JOptionPane.WARNING_MESSAGE);
+    			return;
+    		}
+    		r.setTeamId(engineer.getId());
+    	} else if (getCampaign().getTechs().size() > 0) {
             String name;
             HashMap<String, Person> techHash = new HashMap<String, Person>();
             for (Person tech : getCampaign().getTechs()) {

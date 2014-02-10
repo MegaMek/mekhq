@@ -327,7 +327,6 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 						newPartList.add(mPart);
 					} else {
 						MekHQ.logError("null missing part for " + part.getName() + " during refit calculations");
-
 					}
 				}
 			}		
