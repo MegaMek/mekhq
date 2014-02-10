@@ -53,12 +53,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import megamek.client.RandomNameGenerator;
-import megamek.common.ASFBay;
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
-import megamek.common.BattleArmorBay;
-import megamek.common.Bay;
-import megamek.common.CargoBay;
 import megamek.common.Compute;
 import megamek.common.ConvFighter;
 import megamek.common.Coords;
@@ -69,13 +65,9 @@ import megamek.common.EntityMovementMode;
 import megamek.common.FighterSquadron;
 import megamek.common.Game;
 import megamek.common.GunEmplacement;
-import megamek.common.HeavyVehicleBay;
 import megamek.common.Infantry;
-import megamek.common.InfantryBay;
 import megamek.common.Jumpship;
-import megamek.common.LightVehicleBay;
 import megamek.common.Mech;
-import megamek.common.MechBay;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
@@ -84,7 +76,6 @@ import megamek.common.Mounted;
 import megamek.common.Player;
 import megamek.common.Protomech;
 import megamek.common.SmallCraft;
-import megamek.common.SmallCraftBay;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.VTOL;
@@ -1383,6 +1374,7 @@ public class Campaign implements Serializable {
         }
         String report = tech.getHyperlinkedFullTitle() + " works on " + r.getPartName();
         int minutes = r.getTimeLeft();
+        // FIXME: Overtime?
         if (minutes > tech.getMinutesLeft()) {
             r.addTimeSpent(tech.getMinutesLeft());
             tech.setMinutesLeft(0);
@@ -1479,7 +1471,7 @@ public class Campaign implements Serializable {
                 if (isOvertimeAllowed()) {
                     minutesUsed += tech.getOvertimeLeft();
                     partWork.setWorkedOvertime(true);
-                    usedOvertime = false;
+                    usedOvertime = true;
                 }
                 partWork.addTimeSpent(minutesUsed);
                 tech.setMinutesLeft(0);
@@ -1702,14 +1694,21 @@ public class Campaign implements Serializable {
                 assignedPartIds.add(part.getId());
             }
             /*
-             * If small craft, dropship, or jumpship and the engineer has time left
+             * If dropship or jumpship and the engineer has time left
              * Autoassign him to the first part we find. This allows manual
              * Prioritization to take place.
              */
         	Unit u = part.getUnit();
+        	// Loop through all the parts on this unit to see
+        	// if the engineer is already assigned
+        	for (Part uPart : u.getParts()) {
+        		if (uPart.getAssignedTeamId().equals(u.getEngineer().getId())) {
+        			engineerAssigned = true;
+        		}
+        	}
             if (!engineerAssigned && null != u
             		&& u.getEngineer().getMinutesLeft() > 0
-            		&& (u.getEntity() instanceof SmallCraft
+            		&& (u.getEntity() instanceof Dropship
             				|| u.getEntity() instanceof Jumpship)) {
         	    part.setTeamId(u.getEngineer().getId());
                 assignedPartIds.add(part.getId());
@@ -1751,29 +1750,6 @@ public class Campaign implements Serializable {
             // clear the ledger
             finances.newFiscalYear(calendar.getTime());
         }
-		/*
-		 * Now that we have maintenance checks in for real, we are going to pay maintenance
-		 * on individual units when they come up for their maintenance checks and apply a +1 penalty
-		 * if the cash is not there
-		 * Dylan - Except when we're not using the maint cycle options at all!
-		 * And now this is gone again because I've adjusted how doMaintenance(Unit) is handled.
-		 */
-        /*if (!getCampaignOptions().checkMaintenance()) {
-            if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
-                // maintenance costs
-                if (campaignOptions.payForMaintain()) {
-                    if (finances.debit(getMaintenanceCosts(),
-                                       Transaction.C_MAINTAIN, "Weekly Maintenance",
-                                       calendar.getTime())) {
-                        addReport("Your account has been debited for "
-                                  + formatter.format(getMaintenanceCosts())
-                                  + " C-bills in maintenance costs");
-                    } else {
-                        addReport("<font color='red'><b>You cannot afford to pay maintenance costs!</b></font>");
-                    }
-                }
-            }
-        }*/
 
         if (calendar.get(Calendar.DAY_OF_MONTH) == 1) {
             // check for contract payments
