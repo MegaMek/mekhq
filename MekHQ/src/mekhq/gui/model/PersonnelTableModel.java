@@ -22,6 +22,7 @@ import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.Rank;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
@@ -267,7 +268,7 @@ import mekhq.gui.BasicInfo;
                 p = getPerson(row);
             }
             if(col == COL_RANK) {
-                return p.getRank().getName();
+                return "<html><div id=\""+p.getId()+"\">"+p.getRank().getName()+Rank.getLevelName(p.getRankLevel(), p.getRank().getLevels() == 0)+"</div></html>";
             }
             if(col == COL_NAME) {
                 return p.getName();

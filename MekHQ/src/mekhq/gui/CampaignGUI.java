@@ -249,6 +249,7 @@ import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.LevelSorter;
 import mekhq.gui.sorter.RankSorter;
 import mekhq.gui.sorter.TargetSorter;
+import mekhq.gui.sorter.TechSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
 import mekhq.gui.sorter.WeightClassSorter;
@@ -6979,8 +6980,9 @@ public class CampaignGUI extends JPanel {
             }
             if (command.contains("RANK")) {
                 int rank = Integer.parseInt(st.nextToken());
+                int level = Integer.parseInt(st.nextToken());
                 for (Person person : people) {
-                    getCampaign().changeRank(person, rank, true);
+                    getCampaign().changeRank(person, rank, level, true);
                 }
                 refreshServicedUnitList();
                 refreshUnitList();
@@ -7610,10 +7612,12 @@ public class CampaignGUI extends JPanel {
         }
 
         private boolean areAllEligible(Person[] people) {
+        	int profession = people[0].getProfession();
             for (Person person : people) {
-                if (person.isPrisoner() || person.isBondsman()) {
+                if (person.isPrisoner() || person.isBondsman() || person.getProfession() != profession) {
                     return false;
                 }
+                profession = person.getProfession();
             }
             return true;
         }
@@ -7647,15 +7651,30 @@ public class CampaignGUI extends JPanel {
                 if (areAllEligible(selected)) {
                     menu = new JMenu("Change Rank");
                     int rankOrder = 0;
-                    for (Rank rank : getCampaign().getRanks().getAllRanks()) {
-                        cbMenuItem = new JCheckBoxMenuItem(rank.getName());
-                        cbMenuItem.setActionCommand("RANK|" + rankOrder);
-                        if (person.getRankOrder() == rankOrder) {
-                            cbMenuItem.setSelected(true);
-                        }
-                        cbMenuItem.addActionListener(this);
-                        cbMenuItem.setEnabled(true);
-                        menu.add(cbMenuItem);
+                    for (Rank rank : getCampaign().getRanks().getAllRankProfessions().get(person.getProfession()).getAllRanksForProfession()) {
+                    	if (rank.getLevels() > 0) {
+                    		JMenu subMenu = new JMenu(rank.getName());
+                    		for (int level = 0; level < rank.getLevels(); level++) {
+                    			cbMenuItem = new JCheckBoxMenuItem(rank.getName()+Rank.getLevelName(level));
+    	                        cbMenuItem.setActionCommand("RANK|" + rankOrder + "|" + level);
+    	                        if (person.getRankOrder() == rankOrder && person.getRankLevel() == level) {
+    	                            cbMenuItem.setSelected(true);
+    	                        }
+    	                        cbMenuItem.addActionListener(this);
+    	                        cbMenuItem.setEnabled(true);
+    	                        subMenu.add(cbMenuItem);
+                    		}
+                    		menu.add(subMenu);
+                    	} else {
+	                        cbMenuItem = new JCheckBoxMenuItem(rank.getName());
+	                        cbMenuItem.setActionCommand("RANK|" + rankOrder+"|0");
+	                        if (person.getRankOrder() == rankOrder) {
+	                            cbMenuItem.setSelected(true);
+	                        }
+	                        cbMenuItem.addActionListener(this);
+	                        cbMenuItem.setEnabled(true);
+	                        menu.add(cbMenuItem);
+                    	}
                         rankOrder++;
                     }
                     if (menu.getItemCount() > 20) {
