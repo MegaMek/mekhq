@@ -3631,7 +3631,7 @@ public class Campaign implements Serializable {
                         || (version.getRevision() != -1 && version.getRevision() < 1645)) {
                         rankSystem = Integer.parseInt(wn.getTextContent().trim());
                     } else {
-                        retVal.ranks = Ranks.generateInstanceFromXML(wn);
+                        retVal.ranks = Ranks.generateInstanceFromXML(wn, version);
                     }
                 } else if (xn.equalsIgnoreCase("gmMode")) {
                     if (wn.getTextContent().trim().equals("true")) {
@@ -4712,16 +4712,21 @@ public class Campaign implements Serializable {
     }
 
     public void changeRank(Person person, int rank, boolean report) {
+    	changeRank(person, rank, 0, report);
+    }
+    
+    public void changeRank(Person person, int rank, int level, boolean report) {
         if (report) {
-            if (rank > person.getRankOrder()) {
+            if (rank > person.getRankOrder() || (rank == person.getRankOrder() && level > person.getRankLevel())) {
                 person.addLogEntry(getDate(), "Promoted to "
-                                              + getRanks().getRank(rank).getName());
-            } else if (rank < person.getRankOrder()) {
+                                              + getRanks().getRank(rank, person.getProfession()).getName());
+            } else if (rank < person.getRankOrder() || (rank == person.getRankOrder() && level < person.getRankLevel())) {
                 person.addLogEntry(getDate(), "Demoted to "
-                                              + getRanks().getRank(rank).getName());
+                                              + getRanks().getRank(rank, person.getProfession()).getName());
             }
         }
         person.setRank(rank);
+        person.setRankLevel(level);
         personUpdated(person);
     }
 

@@ -46,6 +46,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.sorter.RankSorter;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
@@ -212,12 +213,17 @@ public abstract class AbstractUnitRating implements IUnitRating {
                     }
 
                     // Compare rank.
-                    int p1Rank = p1.getRankOrder();
+                    /*int p1Rank = p1.getRankOrder();
                     int p2Rank = p2.getRankOrder();
                     if (p1Rank > p2Rank) {
                         return -1;
                     } else if (p1Rank < p2Rank) {
                         return 1;
+                    }*/
+                    // Smarter to use out existing sorter!
+                    int rankVal = (new RankSorter(campaign)).compare(p1.getFullTitle(true), p2.getFullTitle(true));
+                    if (rankVal != 0) {
+                    	return rankVal;
                     }
 
                     // Compare expreience.
