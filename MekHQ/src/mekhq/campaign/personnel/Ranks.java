@@ -261,7 +261,7 @@ public class Ranks {
         }
         
         if ((version.getMajorVersion() < 1 && version.getMinorVersion() < 4 && version.getSnapshot() < 4)
-        			|| version.getRevision() < 1760) {
+        			|| (version.getRevision() != -1 && version.getRevision() < 1761)) {
         	if (retVal.rankSystem > RS_FS)
         		retVal.rankSystem += 2;
         	if (retVal.rankSystem > RS_CC)
