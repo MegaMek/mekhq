@@ -175,6 +175,8 @@ v0.3.4 (SVN)
     Due to corrections the ranks in player campaigns could now be off. Please sanity check your ranks against your
     previous version of MekHQ!
 + Bug [#469]: Zombie Clinic (Doctors not refreshing in infirmary tab after resolving combat)
++ Bug: Incorrect column type for RankTableModel (should be Boolean, not JCheckBox)
++ Split RankTableModel out into it's own .java file in the mekhq.gui.model package where it belongs
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

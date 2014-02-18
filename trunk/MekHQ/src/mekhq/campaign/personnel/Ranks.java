@@ -30,7 +30,7 @@ import javax.swing.JTable;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
-import mekhq.gui.dialog.CampaignOptionsDialog.RankTableModel;
+import mekhq.gui.model.RankTableModel;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
