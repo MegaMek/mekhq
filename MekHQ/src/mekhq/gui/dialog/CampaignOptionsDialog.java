@@ -67,7 +67,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -88,6 +87,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
+import mekhq.gui.model.RankTableModel;
 import mekhq.gui.model.SortedComboBoxModel;
 
 /**
@@ -3305,35 +3305,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
                 return this;
             }
-        }
-    }
-
-    public class RankTableModel extends DefaultTableModel {
-        private static final long serialVersionUID = 534443424190075264L;
-
-        public final static int COL_NAME = 0;
-        public final static int COL_OFFICER = 1;
-        public final static int COL_PAYMULT = 2;
-        public final static int COL_LEVELS = 3;
-
-        public RankTableModel(Object[][] ranksArray, String[] rankColNames) {
-            super(ranksArray, rankColNames);
-        }
-
-        @Override
-        public Class<?> getColumnClass(int c) {
-        	switch (c) {
-        		case COL_NAME:
-        			return String.class;
-        		case COL_OFFICER:
-        			return JCheckBox.class;
-        		case COL_PAYMULT:
-        			return Double.class;
-        		case COL_LEVELS:
-        			return Integer.class;
-        		default:
-        			return getValueAt(0, c).getClass();
-        	}
         }
     }
 

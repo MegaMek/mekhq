@@ -27,7 +27,7 @@ import java.util.Vector;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.gui.dialog.CampaignOptionsDialog.RankTableModel;
+import mekhq.gui.model.RankTableModel;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
