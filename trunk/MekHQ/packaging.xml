@@ -50,7 +50,6 @@
     <property name="svnmmldocs" value="svn://svn.code.sf.net/p/megameklab/code/trunk/docs" />
     <property name="svnrsheets" value="svn://svn.code.sf.net/p/megameklab/code/trunk/data/images/recordsheets" />
     <property name="svnmmlpng" value="svn://svn.code.sf.net/p/megameklab/code/trunk/data/images/misc/megameklab.png" />
-    <property name="svnmmlproperties" value="svn://svn.code.sf.net/p/megameklab/code/trunk/mmconf/megameklab.properties" />
 
 
     <property name="timestampfile" value="${logdir}/timestamp" />
@@ -172,9 +171,6 @@
                 <include name="mekhq.properties" />
             </fileset>
         </copy>
-    	<exec executable="svn">
-            <arg line="export ${svnmmlproperties} ${svndir}/${confdir}/megameklab.properties" />
-    	</exec>
         <delete dir="${svndir}/${confdir}-OLD" />
     </target>
     
