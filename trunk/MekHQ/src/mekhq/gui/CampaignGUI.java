@@ -302,7 +302,8 @@ public class CampaignGUI extends JPanel {
     public static final int PG_RETIRE = 14;
     public static final int PG_MIA = 15;
     public static final int PG_KIA = 16;
-    public static final int PG_NUM = 17;
+    public static final int PG_PRISONER = 17;
+    public static final int PG_NUM = 18;
 
     //parts filter groups
     private static final int SG_ALL = 0;
@@ -3432,6 +3433,8 @@ public class CampaignGUI extends JPanel {
                 return "Personnel MIA";
             case PG_KIA:
                 return "Rolls of Honor (KIA)";
+            case PG_PRISONER:
+                return "Prisoners/Bondsmen";
             default:
                 return "?";
         }
@@ -5147,7 +5150,9 @@ public class CampaignGUI extends JPanel {
                     (nGroup == PG_VESSEL && (type == Person.T_SPACE_PILOT || type == Person.T_SPACE_CREW || type == Person.T_SPACE_GUNNER || type == Person.T_NAVIGATOR)) ||
                     (nGroup == PG_TECH && type >= Person.T_MECH_TECH && type < Person.T_DOCTOR) ||
                     (nGroup == PG_DOC && ((type == Person.T_DOCTOR) || (type == Person.T_MEDIC))) ||
-                    (nGroup == PG_ADMIN && type > Person.T_MEDIC)
+                    (nGroup == PG_ADMIN && type > Person.T_MEDIC) ||
+                    (nGroup == PG_PRISONER && 
+                        (person.isPrisoner() ||  person.isBondsman()))
                         ) {
                     return person.isActive();
                 } else if (nGroup == PG_RETIRE) {
