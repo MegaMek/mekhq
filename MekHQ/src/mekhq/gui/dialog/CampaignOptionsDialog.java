@@ -2856,6 +2856,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         }
         campaign.getRNG().setPerentFemale(sldGender.getValue());
         campaign.getRanks().setRanksFromTableMap(rankTableMap);
+        campaign.setRankSystem(comboRanks.getSelectedIndex());
         campaign.setCamoCategory(camoCategory);
         campaign.setCamoFileName(camoFileName);
         campaign.setColorIndex(colorIndex);
