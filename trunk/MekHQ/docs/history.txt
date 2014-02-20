@@ -177,7 +177,9 @@ v0.3.4 (SVN)
 + Bug [#469]: Zombie Clinic (Doctors not refreshing in infirmary tab after resolving combat)
 + Bug: Incorrect column type for RankTableModel (should be Boolean, not JCheckBox)
 + Split RankTableModel out into it's own .java file in the mekhq.gui.model package where it belongs
-+ Bug: No way to sort for Prisoners and Bondsmen on the personnel table 
++ Bug: No way to sort for Prisoners and Bondsmen on the personnel table
++ Bug [#472]: Rank Drop Down in Campaign Options isn't sticky
++ Bug: Hiring Personnel and Hiring Personnel Bulk throw IndexOutOfBounds exceptions
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
