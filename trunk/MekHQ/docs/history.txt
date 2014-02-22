@@ -169,6 +169,7 @@ v0.3.4 (SVN)
 + Updated MM.jar (r10529) and MML.jar (r1356 built with MM.jar r10529) and enabled BattleArmor customization
 + Bug [#421]: Experience being assigned to reserves who did not arrive
 + Updated MM.jar (10539) - new code needed for bug 421
++ Bug [#469]: Zombie Clinic (Doctors not refreshing in infirmary tab after resolving combat)
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
