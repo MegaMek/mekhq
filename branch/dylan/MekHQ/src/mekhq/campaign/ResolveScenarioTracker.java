@@ -530,8 +530,14 @@ public class ResolveScenarioTracker {
 	                    }
 	                    status.setHits(hits);
 					}
-				}		
-				status.setXP(campaign.getCampaignOptions().getScenarioXP());
+				}
+				/**
+				 * If the entity cannot be found, or it was deployed at least once during the scenario
+				 * Then the pilot gets XP
+				 */
+				if (en == null || !en.wasNeverDeployed()) {
+					status.setXP(campaign.getCampaignOptions().getScenarioXP());
+				}
 				peopleStatus.put(p.getId(), status);
 			}
 		}
