@@ -4004,9 +4004,6 @@ public class Campaign implements Serializable {
 
     public void setRankSystem(int system) {
         getRanks().setRankSystem(system);
-        for (Person p : getPersonnel()) {
-            p.setRank(0);
-        }
     }
 
     public ArrayList<Force> getAllForces() {

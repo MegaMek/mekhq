@@ -168,6 +168,27 @@ public class Ranks {
 		return rank;
 	}
 	
+	public ArrayList<Rank> getRanks(int profession) {
+		ArrayList<Rank> ranks = new ArrayList<Rank>();
+		if(profession >= rankProfessions.size()) {
+		    // build off MW table instead...
+		    profession = RankProfession.RPROF_MW;
+		}
+		RankProfession prof = rankProfessions.get(profession);
+		if (prof.getRanksArray().length == 0) {
+			prof = rankProfessions.get(RankProfession.RPROF_MW);
+		}
+		ArrayList<Rank> pRankList = prof.getAllRanksForProfession();
+		for (int r = 0;r < pRankList.size(); r++) {
+			Rank rank = pRankList.get(r);
+			if (rank.getName().equals("-")) {
+				rank = getRank(r, RankProfession.RPROF_MW);
+			}
+			ranks.add(rank);
+		}
+		return ranks;
+	}
+	
 	public int getOfficerCut() {
 	    return rankProfessions.get(0).getOfficerCut();
 	}
