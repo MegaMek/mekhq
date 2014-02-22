@@ -100,11 +100,6 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         gridBagConstraints.weightx = 1.0;
         choiceType.setSelectedIndex(0);
-        choiceType.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                personnelTypeChanged();
-            }
-        });
         getContentPane().add(choiceType, gridBagConstraints);
         
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -114,8 +109,12 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(lblRank, gridBagConstraints);
         
+        DefaultComboBoxModel rankModel = new DefaultComboBoxModel();
+        for(Rank rank : campaign.getRanks().getAllRanks()) {
+        	rankModel.addElement(rank.getName());
+        }
+        choiceRanks.setModel(rankModel);
         choiceRanks.setName("choiceRanks"); // NOI18N
-        personnelTypeChanged();
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -194,13 +193,4 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
         hqView.refreshFinancialTransactions();
     }
     
-    // Reset the rank combo
-    public void personnelTypeChanged() {
-    	DefaultComboBoxModel rankModel = new DefaultComboBoxModel();
-        for(Rank rank : campaign.getRanks().getRanks(Person.getProfessionFromPrimaryRole(choiceType.getSelectedIndex()))) {
-        	rankModel.addElement(rank.getName());
-        }
-        choiceRanks.setModel(rankModel);
-        choiceRanks.setSelectedIndex(0);
-    }
 }

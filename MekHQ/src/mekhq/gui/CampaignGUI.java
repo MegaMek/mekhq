@@ -302,8 +302,7 @@ public class CampaignGUI extends JPanel {
     public static final int PG_RETIRE = 14;
     public static final int PG_MIA = 15;
     public static final int PG_KIA = 16;
-    public static final int PG_PRISONER = 17;
-    public static final int PG_NUM = 18;
+    public static final int PG_NUM = 17;
 
     //parts filter groups
     private static final int SG_ALL = 0;
@@ -3433,8 +3432,6 @@ public class CampaignGUI extends JPanel {
                 return "Personnel MIA";
             case PG_KIA:
                 return "Rolls of Honor (KIA)";
-            case PG_PRISONER:
-                return "Prisoners/Bondsmen";
             default:
                 return "?";
         }
@@ -4497,7 +4494,6 @@ public class CampaignGUI extends JPanel {
         refreshUnitList();
         filterPersonnel();
         refreshPersonnelList();
-        refreshDoctorsList();
         refreshPatientList();
         refreshReport();
         changeMission();
@@ -4939,9 +4935,6 @@ public class CampaignGUI extends JPanel {
         ArrayList<Person> assigned = new ArrayList<Person>();
         ArrayList<Person> unassigned = new ArrayList<Person>();
         for (Person patient : getCampaign().getPatients()) {
-        	if (!getCampaign().getPerson(patient.getDoctorId()).isActive()) {
-        		patient.setDoctorId(null, getCampaign().getCampaignOptions().getNaturalHealingWaitingPeriod());
-        	}
             if (null == patient.getDoctorId()) {
                 unassigned.add(patient);
             } else if (null != doctor && patient.getDoctorId().equals(doctor.getId())) {
@@ -5150,9 +5143,7 @@ public class CampaignGUI extends JPanel {
                     (nGroup == PG_VESSEL && (type == Person.T_SPACE_PILOT || type == Person.T_SPACE_CREW || type == Person.T_SPACE_GUNNER || type == Person.T_NAVIGATOR)) ||
                     (nGroup == PG_TECH && type >= Person.T_MECH_TECH && type < Person.T_DOCTOR) ||
                     (nGroup == PG_DOC && ((type == Person.T_DOCTOR) || (type == Person.T_MEDIC))) ||
-                    (nGroup == PG_ADMIN && type > Person.T_MEDIC) ||
-                    (nGroup == PG_PRISONER && 
-                        (person.isPrisoner() ||  person.isBondsman()))
+                    (nGroup == PG_ADMIN && type > Person.T_MEDIC)
                         ) {
                     return person.isActive();
                 } else if (nGroup == PG_RETIRE) {
@@ -6989,9 +6980,8 @@ public class CampaignGUI extends JPanel {
             }
             if (command.contains("RANK")) {
                 int rank = Integer.parseInt(st.nextToken());
-                int level = Integer.parseInt(st.nextToken());
                 for (Person person : people) {
-                    getCampaign().changeRank(person, rank, level, true);
+                    getCampaign().changeRank(person, rank, true);
                 }
                 refreshServicedUnitList();
                 refreshUnitList();
@@ -7621,12 +7611,10 @@ public class CampaignGUI extends JPanel {
         }
 
         private boolean areAllEligible(Person[] people) {
-        	int profession = people[0].getProfession();
             for (Person person : people) {
-                if (person.isPrisoner() || person.isBondsman() || person.getProfession() != profession) {
+                if (person.isPrisoner() || person.isBondsman()) {
                     return false;
                 }
-                profession = person.getProfession();
             }
             return true;
         }
@@ -7660,30 +7648,15 @@ public class CampaignGUI extends JPanel {
                 if (areAllEligible(selected)) {
                     menu = new JMenu("Change Rank");
                     int rankOrder = 0;
-                    for (Rank rank : getCampaign().getRanks().getAllRankProfessions().get(person.getProfession()).getAllRanksForProfession()) {
-                    	if (rank.getLevels() > 0) {
-                    		JMenu subMenu = new JMenu(rank.getName());
-                    		for (int level = 0; level < rank.getLevels(); level++) {
-                    			cbMenuItem = new JCheckBoxMenuItem(rank.getName()+Rank.getLevelName(level));
-    	                        cbMenuItem.setActionCommand("RANK|" + rankOrder + "|" + level);
-    	                        if (person.getRankOrder() == rankOrder && person.getRankLevel() == level) {
-    	                            cbMenuItem.setSelected(true);
-    	                        }
-    	                        cbMenuItem.addActionListener(this);
-    	                        cbMenuItem.setEnabled(true);
-    	                        subMenu.add(cbMenuItem);
-                    		}
-                    		menu.add(subMenu);
-                    	} else {
-	                        cbMenuItem = new JCheckBoxMenuItem(rank.getName());
-	                        cbMenuItem.setActionCommand("RANK|" + rankOrder+"|0");
-	                        if (person.getRankOrder() == rankOrder) {
-	                            cbMenuItem.setSelected(true);
-	                        }
-	                        cbMenuItem.addActionListener(this);
-	                        cbMenuItem.setEnabled(true);
-	                        menu.add(cbMenuItem);
-                    	}
+                    for (Rank rank : getCampaign().getRanks().getAllRanks()) {
+                        cbMenuItem = new JCheckBoxMenuItem(rank.getName());
+                        cbMenuItem.setActionCommand("RANK|" + rankOrder);
+                        if (person.getRankOrder() == rankOrder) {
+                            cbMenuItem.setSelected(true);
+                        }
+                        cbMenuItem.addActionListener(this);
+                        cbMenuItem.setEnabled(true);
+                        menu.add(cbMenuItem);
                         rankOrder++;
                     }
                     if (menu.getItemCount() > 20) {

@@ -40,38 +40,20 @@ public class Rank implements MekHqXmlSerializable {
     private String rankName;
     private boolean officer;
     private double payMultiplier;
-    private int levels;
-    
-    // A couple of arrays for use in the getLevelName() method
-    private static int[]    numbers = { 1000,  900,  500,  400,  100,   90,  
-        50,   40,   10,    9,    5,    4,    1 };
-    private static String[] letters = { "M",  "CM",  "D",  "CD", "C",  "XC",
-      "L",  "XL",  "X",  "IX", "V",  "IV", "I" };
-    
-    public Rank() {
-    	this("Unknown", false, 1.0);
-    }
     
     public Rank(String name, boolean b, double mult) {
-    	this(name, b, mult, 0);
-    }
-    
-    public Rank(String name, boolean b, double mult, int lev) {
         rankName = name;
         officer = b;
         payMultiplier = mult;
-        levels = lev;
     }
     
-    public int getLevels() {
-		return levels;
-	}
-
-	public void setLevels(int levels) {
-		this.levels = levels;
-	}
-
-	public String getName() {
+    public Rank() {
+        rankName = "Unknown";
+        officer = false;
+        payMultiplier = 1.0;
+    }
+    
+    public String getName() {
         return rankName;
     }
     
@@ -106,10 +88,6 @@ public class Rank implements MekHqXmlSerializable {
                 +"<payMultiplier>"
                 +payMultiplier
                 +"</payMultiplier>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<levels>"
-                +levels
-                +"</levels>");
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</rank>");
     }
     
@@ -131,8 +109,6 @@ public class Rank implements MekHqXmlSerializable {
                     retVal.officer = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("payMultiplier")) {
                     retVal.payMultiplier = Double.parseDouble(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("levels")) {
-                    retVal.levels = Integer.parseInt(wn2.getTextContent());
                 }
             }
         } catch (Exception ex) {
@@ -145,56 +121,4 @@ public class Rank implements MekHqXmlSerializable {
         return retVal;
     }
     
-    // TODO: Optionize this to allow user to choose roman or arabic numerals
-    public static String getLevelName(int level) {
-    	return getLevelName(level, false);
-    }
-    
-    public static String getLevelName(int level, boolean checkZero) {
-    	// If we're 0, then we just return an empty string
-    	if (checkZero && level == 0) {
-    		return "";
-    	}
-    	
-    	// Roman numeral, prepended with a space for display purposes
-    	String roman = " ";
-        int num = level+1;
-
-        for (int i = 0; i < numbers.length; i++) {
-			while (num >= numbers[i]) {
-				roman += letters[i];
-				num -= numbers[i];
-			}
-        }
-        
-        return roman;
-    }
-    
-    // TODO: Optionize this to allow user to choose roman or arabic numerals
-    public static int getLevelFromName(String name) {
-    	// If we're 0, then we just return an empty string
-    	if (name.equals("")) {
-    		return 0;
-    	}
-    	
-    	// Roman numeral, prepended with a space for display purposes
-    	int arabic = 0;
-        String roman = name;
-
-        for (int i = 0; i < roman.length(); i++) {
-        	int num = letters.toString().indexOf(roman.charAt(i));
-        	if (i < roman.length()) {
-        		int temp = letters.toString().indexOf(roman.charAt(i+1));
-        		// If this is a larger number, then we need to combine them
-        		if (temp > num) {
-        			num = temp - num;
-        			i++;
-        		}
-        	}
-        	
-        	arabic += num;
-        }
-        
-        return arabic-1;
-    }
 }

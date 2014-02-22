@@ -3631,7 +3631,7 @@ public class Campaign implements Serializable {
                         || (version.getRevision() != -1 && version.getRevision() < 1645)) {
                         rankSystem = Integer.parseInt(wn.getTextContent().trim());
                     } else {
-                        retVal.ranks = Ranks.generateInstanceFromXML(wn, version);
+                        retVal.ranks = Ranks.generateInstanceFromXML(wn);
                     }
                 } else if (xn.equalsIgnoreCase("gmMode")) {
                     if (wn.getTextContent().trim().equals("true")) {
@@ -4004,6 +4004,9 @@ public class Campaign implements Serializable {
 
     public void setRankSystem(int system) {
         getRanks().setRankSystem(system);
+        for (Person p : getPersonnel()) {
+            p.setRank(0);
+        }
     }
 
     public ArrayList<Force> getAllForces() {
@@ -4709,21 +4712,16 @@ public class Campaign implements Serializable {
     }
 
     public void changeRank(Person person, int rank, boolean report) {
-    	changeRank(person, rank, 0, report);
-    }
-    
-    public void changeRank(Person person, int rank, int level, boolean report) {
         if (report) {
-            if (rank > person.getRankOrder() || (rank == person.getRankOrder() && level > person.getRankLevel())) {
+            if (rank > person.getRankOrder()) {
                 person.addLogEntry(getDate(), "Promoted to "
-                                              + getRanks().getRank(rank, person.getProfession()).getName());
-            } else if (rank < person.getRankOrder() || (rank == person.getRankOrder() && level < person.getRankLevel())) {
+                                              + getRanks().getRank(rank).getName());
+            } else if (rank < person.getRankOrder()) {
                 person.addLogEntry(getDate(), "Demoted to "
-                                              + getRanks().getRank(rank, person.getProfession()).getName());
+                                              + getRanks().getRank(rank).getName());
             }
         }
         person.setRank(rank);
-        person.setRankLevel(level);
         personUpdated(person);
     }
 
