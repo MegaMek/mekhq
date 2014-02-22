@@ -110,8 +110,13 @@ public class NewRecruitDialog extends javax.swing.JDialog {
         panSidebar.setName("panButtons"); // NOI18N
         panSidebar.setLayout(new java.awt.GridLayout(6,1));
         
+        DefaultComboBoxModel ranksModel = new DefaultComboBoxModel();
+        for(Rank rank : campaign.getRanks().getAllRanks()) {
+        	ranksModel.addElement(rank.getName());
+        }
+        choiceRanks.setModel(ranksModel);
         choiceRanks.setName("choiceRanks"); // NOI18N
-        refreshRanksCombo();
+        choiceRanks.setSelectedIndex(0);
         choiceRanks.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
             	changeRank();
@@ -208,7 +213,6 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     private void hire() {
     	if(campaign.recruitPerson(person)) {
         	person = campaign.newPerson(person.getPrimaryRole());
-        	refreshRanksCombo();
         	campaign.changeRank(person, choiceRanks.getSelectedIndex(), false);
     	}
         refreshView();
@@ -253,13 +257,11 @@ public class NewRecruitDialog extends javax.swing.JDialog {
 		if(gender != person.getGender()) {
 			randomPortrait();
 		}
-		refreshRanksCombo();
     	refreshView();
     }
     
     private void regenerate() {
     	person = campaign.newPerson(person.getPrimaryRole());
-    	refreshRanksCombo();
         refreshView();
     }
     
@@ -267,13 +269,6 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     	campaign.changeRank(person, choiceRanks.getSelectedIndex(), false);
     	refreshView();
     }
-    
-    private void refreshRanksCombo() {
-    	DefaultComboBoxModel ranksModel = new DefaultComboBoxModel();
-        for(Rank rank : campaign.getRanks().getRanks(person.getProfession())) {
-        	ranksModel.addElement(rank.getName());
-        }
-        choiceRanks.setModel(ranksModel);
-        choiceRanks.setSelectedIndex(0);
-    }
+   
+
 }

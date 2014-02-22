@@ -23,14 +23,11 @@ package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
-
-import javax.swing.JTable;
+import java.util.Vector;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.Version;
-import mekhq.gui.model.RankTableModel;
+import mekhq.gui.dialog.CampaignOptionsDialog.RankTableModel;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -44,36 +41,34 @@ import org.w3c.dom.NodeList;
  */
 public class Ranks {
 	
-	// Rank Faction Codes
-	// TODO: Major periphery realms?
-	public static final int RS_SL		= 0;
-	public static final int RS_FS		= 1;
-	public static final int RS_FC		= 2;
-	public static final int RS_LC		= 3;
-	public static final int RS_LA		= 4;
-	public static final int RS_FWL		= 5;
-	public static final int RS_CC		= 6;
-	public static final int RS_CCWH		= 7;
-	public static final int RS_DC		= 8;
-	public static final int RS_CL		= 9;
-	public static final int RS_COM		= 10;
-	public static final int RS_WOB		= 11;
-	public static final int RS_CUSTOM	= 12;
-	public static final int RS_NUM		= 13;
-	
-	// Prisoners and Bondsmen, for sorting
+	//pre-fab rank systems
+	public static final int RS_SL =  0;
+	public static final int RS_FS =  1;
+	public static final int RS_LA =  2;
+	public static final int RS_FWL = 3;
+	public static final int RS_CC =  4;
+	public static final int RS_DC =  5;
+	public static final int RS_CL =  6;
+	public static final int RS_CUSTOM = 7;
+	public static final int RS_NUM = 8;
+	private static final String[][] rankSystems = {
+		{"None","Recruit","Private","Corporal","Sergeant","Master Sergeant","Warrant Officer","Lieutenant","Captain","Major","Colonel","Lt. General","Major General","General","Commanding General"},
+		{"None","Recruit","Private","Private, FC","Corporal","Sergeant","Sergeant-Major","Command Sergeant-Major","Cadet","Subaltern","Leftenant","Captain","Major","Leftenant Colonel","Colonel","Leftenant General","Major General","General","Marshal","Field Marshal","Marshal of the Armies"},
+		{"None","Recruit","Private","Private, FC","Corporal","Senior Corporal","Sergeant","Staff Sergeant","Sergeant Major","Staff Sergeant Major","Senior Sergeant Major","Warrant Officer","Warrant Officer, FC","Senior Warrant Officer","Chief Warrant Officer","Cadet","Leutnant","First Leutnant","Hauptmann","Kommandant","Hauptmann-Kommandant","Leutnant-Colonel","Colonel","Leutnant-General","Hauptmann-General","Kommandant-General","General","General of the Armies","Archon"},
+		{"None","Recruit","Private","Private, FC","Corporal","Sergeant","Staff Sergeant","Master Sergeant","Sergeant Major","Lieutenant","Captain","Force Commander","Lieutenant Colonel","Colonel","General","Marshal","Captain-General"},
+		{"None","Shia-ben-bing","San-ben-bing","Si-ben-bing","Yi-si-ben-bing","Sao-wei","Sang-wei","Sao-shao","Zhong-shao","Sang-shao","Jiang-jun","Sang-jiang-jun"},
+		{"None","Hojuhei","Heishi","Gunjin","Go-cho","Gunsho","Shujin","Kashira","Sho-ko","Chu-i","Tai-i","Sho-sa","Chu-sa","Tai-sa","Sho-sho","Tai-sho","Tai-shu","Gunji-no-Kanrei"},
+		{"None","Point","Point Commander","Star Commander","Star Captain","Star Colonel","Galaxy Commander","Khan","ilKhan"}
+	};
+	private static final int[] officerCut = {7,8,11,9,5,9,3};
 	public static final int RANK_BONDSMAN = -1;
 	public static final int RANK_PRISONER = -2;
 	
 	private int rankSystem;
-	private ArrayList<RankProfession> rankProfessions;
+	private ArrayList<Rank> ranks;
 	
-	public static String[] getRankSystem(int profession, int system) {
-		// Default to MechWarrior if there is no system built for this
-		if (RankProfession.getRankProfessionsForSystem(system)[profession].length == 0) {
-			return RankProfession.getRankProfessionsForSystem(system)[RankProfession.RPROF_MW];
-		}
-		return RankProfession.getRankProfessionsForSystem(system)[profession];
+	public static String[] getRankSystem(int system) {
+		return rankSystems[system];
 	}
 	
 	public static String getRankSystemName(int system) {
@@ -84,26 +79,16 @@ public class Ranks {
 			return "Star League";
 		case RS_FS:
 			return "Federated Suns";
-		case RS_FC:
-			return "Federated Commonwealth";
-		case RS_LC:
-			return "Lyran Commonwealth";
 		case RS_LA:
 			return "Lyran Alliance";
 		case RS_FWL:
 			return "Free Worlds League";
 		case RS_CC:
 			return "Capellan Confederation";
-		case RS_CCWH:
-			return "Capellan Confederation Warrior House";
 		case RS_DC:
 			return "Draconis Combine";
 		case RS_CL:
 			return "Clan";
-		case RS_COM:
-			return "Comstar";
-		case RS_WOB:
-			return "Word of Blake";
 		default:
 			return "?";
 		}
@@ -118,91 +103,65 @@ public class Ranks {
 		useRankSystem(rankSystem);
 	}
 	
-	public ArrayList<RankProfession> getAllRankProfessions() {
-		return rankProfessions;
-	}
-	
-	public void useRankSystem(int system) {
-		rankProfessions = new ArrayList<RankProfession>();
-		if(system >= RankProfession.getRankSystems().length) {
-			rankProfessions.add(new RankProfession());
-			return;
-		}
-		for (int i = 0; i < RankProfession.getRankProfessionsForSystem(system).length; i++) {
-			rankProfessions.add(new RankProfession(system, i));
-		}
-	}
-	
-	public void setCustomRanks(ArrayList<ArrayList> customRanks, int offCut) {
-	    rankProfessions = new ArrayList<RankProfession>();
-	    for (int i = 0; i < RankProfession.RPROF_NUM; i++) {
-	    	RankProfession profession = new RankProfession();
-	    	profession.setProfession(rankSystem, i);
-	    	if (!customRanks.get(i).isEmpty() && customRanks.get(i).get(0) instanceof Rank) {
-	    		profession.setCustomRanks(customRanks.get(i));
-	    	} else {
-	    		profession.setCustomRanks(customRanks.get(i), offCut);
-	    	}
-	    	rankProfessions.add(profession);
-	    }
-		rankSystem = RS_CUSTOM;
-	}
-	
-	public Rank getRank(int rankNum, int profession) {
-		if(profession >= rankProfessions.size()) {
-		    // build off MW table instead...
-		    profession = RankProfession.RPROF_MW;
-		}
-		if (rankNum == RANK_BONDSMAN) { // Bondsman
-			return new Rank("Bondsman", false, 0.0);
-		}
-		if (rankNum == RANK_PRISONER) { // Prisoners
-            return new Rank("Prisoner", false, 0.0);
-		}
-		Rank rank = rankProfessions.get(profession).getRank(rankNum);
-		if (rank.getName().equals("-")) {
-			rank = getRank(rankNum, RankProfession.RPROF_MW);
-		} else if (rank.getName().equals("")) {
-			rank = getRank(rankNum-1, profession);
-		}
-		return rank;
-	}
-	
-	public ArrayList<Rank> getRanks(int profession) {
-		ArrayList<Rank> ranks = new ArrayList<Rank>();
-		if(profession >= rankProfessions.size()) {
-		    // build off MW table instead...
-		    profession = RankProfession.RPROF_MW;
-		}
-		RankProfession prof = rankProfessions.get(profession);
-		if (prof.getRanksArray().length == 0) {
-			prof = rankProfessions.get(RankProfession.RPROF_MW);
-		}
-		ArrayList<Rank> pRankList = prof.getAllRanksForProfession();
-		for (int r = 0;r < pRankList.size(); r++) {
-			Rank rank = pRankList.get(r);
-			if (rank.getName().equals("-")) {
-				rank = getRank(r, RankProfession.RPROF_MW);
-			}
-			ranks.add(rank);
-		}
+	public ArrayList<Rank> getAllRanks() {
 		return ranks;
 	}
 	
-	public int getOfficerCut() {
-	    return rankProfessions.get(0).getOfficerCut();
+	public void useRankSystem(int system) {
+		ranks = new ArrayList<Rank>();
+		if(system >= rankSystems.length) {
+			ranks.add(new Rank("Unknown", false, 1.0));
+			return;
+		}
+		for (int i = 0; i < rankSystems[system].length; i++) {
+			ranks.add(new Rank(rankSystems[system][i], officerCut[system] <= i,  1.0));
+		}
 	}
 	
-	// Get rank order from a known profession
-	public int getRankOrder(String rank, int profession) {
+	public void setCustomRanks(ArrayList<String> customRanks, int offCut) {
+	    ranks = new ArrayList<Rank>();
+        for (int i = 0; i < customRanks.size(); i++) {
+            ranks.add(new Rank(customRanks.get(i), offCut <= i,  1.0));
+        }
+		rankSystem = RS_CUSTOM;
+	}
+	
+	public Rank getRank(int r) {
+		if(r >= ranks.size()) {
+		    //assign the highest rank
+		    r = ranks.size() - 1;
+		}
+		if (r == RANK_BONDSMAN) { // Bondsman
+			return new Rank("Bondsman", false, 0.0);
+		}
+		if (r == RANK_PRISONER) { // Prisoners
+            return new Rank("Prisoner", false, 0.0);
+		}
+		return ranks.get(r);
+	}
+	
+	public int getOfficerCut() {
+	    for(int i = 0; i < ranks.size(); i++) {
+            if(ranks.get(i).isOfficer()) {
+                return i;
+            }
+        }
+        return ranks.size() - 1;
+	}
+	
+	public int getRankOrder(String rank) {
 		if (rank.equals("Prisoner")) {
 			return -2;
 		}
 		if (rank.equals("Bondsman")) {
 			return -1;
 		}
-		
-		return rankProfessions.get(profession).getRankOrder(rank);
+		for(int i = 0; i < ranks.size(); i++) {
+		    if(ranks.get(i).getName().equals(rank)) {
+		        return i;
+		    }
+		}
+		return 0;
 	}
 	
 	public int getRankSystem() {
@@ -216,29 +175,27 @@ public class Ranks {
 		}	
 	}
 	
-	public String getRankNameList(int profession) {
-		return rankProfessions.get(profession).getRankNameList();
+	public String getRankNameList() {
+		String rankNames = "";
+		int i = 0;
+		for(Rank rank : getAllRanks()) {
+			rankNames += rank.getName();
+			i++;
+			if(i < getAllRanks().size()) {
+				rankNames += ",";
+			}
+		}
+		return rankNames;
 	}
 	
 	//Keep this for reverse compatability in loading campaigns
 	public void setRanksFromList(String names, int officerCut) {
 		ArrayList<String> rankNames = new ArrayList<String>();
-		ArrayList<String> emptyRankNames = new ArrayList<String>(); // Hack for the profession ranks
 		String[] rnames = names.split(",");
 		for(String rname : rnames) {
 			rankNames.add(rname);
 		}
-		
-		rankProfessions = new ArrayList<RankProfession>();
-		for (int i = 0; i < RankProfession.RPROF_NUM; i++) {
-			RankProfession p = new RankProfession();
-			p.setProfession(rankSystem, i);
-			if (i == RankProfession.RPROF_MW) {
-				p.setCustomRanks(rankNames, officerCut);
-			} else {
-				p.setCustomRanks(emptyRankNames, officerCut);
-			}
-		}
+		setCustomRanks(rankNames, officerCut);
 	}
 	
 	
@@ -248,17 +205,17 @@ public class Ranks {
                 +"<rankSystem>"
                 +rankSystem
                 +"</rankSystem>");
-        for(RankProfession p : rankProfessions) {
-            p.writeToXml(pw1, indent+1, rankSystem == RS_CUSTOM);
+        for(Rank r : ranks) {
+            r.writeToXml(pw1, indent+1);
         }
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</ranks>");
     }
 	
-	public static Ranks generateInstanceFromXML(Node wn, Version version) {
+	public static Ranks generateInstanceFromXML(Node wn) {
         Ranks retVal = new Ranks();
-        retVal.rankProfessions = new ArrayList<RankProfession>();
-        retVal.rankSystem = RS_SL;
+        
         ArrayList<Rank> ranks = new ArrayList<Rank>();
+        int rankSystem = RS_SL;
         
         try {  
             NodeList nl = wn.getChildNodes();
@@ -267,12 +224,10 @@ public class Ranks {
                 Node wn2 = nl.item(x);
                 
                 if (wn2.getNodeName().equalsIgnoreCase("rankSystem")) {
-                	retVal.rankSystem = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("rankProfessions")) {
-                	retVal.rankProfessions.add(RankProfession.generateInstanceFromXML(wn2));
+                    rankSystem = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
-                	ranks.add(Rank.generateInstanceFromXML(wn2));
-                }
+                    ranks.add(Rank.generateInstanceFromXML(wn2));
+                } 
             }
         } catch (Exception ex) {
             // Errrr, apparently either the class name was invalid...
@@ -281,55 +236,32 @@ public class Ranks {
             MekHQ.logError(ex);
         }
         
-        if ((version.getMajorVersion() < 1 && version.getMinorVersion() < 4 && version.getSnapshot() < 4)
-        			|| (version.getRevision() != -1 && version.getRevision() < 1761)) {
-        	if (retVal.rankSystem > RS_FS)
-        		retVal.rankSystem += 2;
-        	if (retVal.rankSystem > RS_CC)
-        		retVal.rankSystem += 1;
-        	if (retVal.rankSystem > RS_CL)
-        		retVal.rankSystem += 2;
-        }
-        
-        if (retVal.rankSystem == RS_CUSTOM && !ranks.isEmpty()) {
-        	int offCut = 0;
-        	for (int c = 0; c < ranks.size(); c++) {
-        		if (ranks.get(c).isOfficer()) {
-        			offCut = c;
-        			break;
-        		}
-        	}
-        	ArrayList customRanks = new ArrayList<ArrayList>();
-        	for (int i = 0; i < RankProfession.RPROF_NUM; i++) {
-        		if (i == RankProfession.RPROF_MW) {
-        			customRanks.add(ranks);
-        		} else {
-        			customRanks.add(new ArrayList<Rank>());
-        		}
-        	}
-        	retVal.setCustomRanks(customRanks, offCut);
-        }
-        
-        // Empty rank system protection...
-        if (retVal.rankProfessions.isEmpty()) {
-        	retVal.useRankSystem(retVal.rankSystem);
-        }
+        retVal.rankSystem = rankSystem;
+        retVal.ranks = ranks;
         
         return retVal;
     }
 	
-	public Object[][] getRanksArray(int profession) {
-        return rankProfessions.get(profession).getRanksArray();
+	public Object[][] getRanksArray() {
+        Object[][] array = new Object[ranks.size()][3];
+        int i = 0;
+        for(Rank rank : ranks) {
+            array[i][0] = rank.getName();
+            array[i][1] = rank.isOfficer();
+            array[i][2] = rank.getPayMultiplier();
+            i++;
+        }
+        return array;
     }
 	
-	public void setRanksFromTableMap(HashMap<Integer,JTable> rankTableMap) {
-        rankProfessions = new ArrayList<RankProfession>();
-	    for(int i = 0; i < RankProfession.RPROF_NUM; i++) {
-	    	RankTableModel model = (RankTableModel) rankTableMap.get(i).getModel();
-	        RankProfession p = new RankProfession();
-	        p.setRanksFromModel(model);
-	        p.setProfession(rankSystem, i);
-	        rankProfessions.add(p);
+	public void setRanksFromModel(RankTableModel model) {
+        ranks = new ArrayList<Rank>();
+	    Vector<Vector> vectors = model.getDataVector();
+	    for(Vector<Object> row : vectors) {
+	        String name = (String)row.get(0);
+	        Boolean officer = (Boolean)row.get(1);
+            double payMult = (Double)row.get(2);
+	        ranks.add(new Rank(name, officer, payMult));
 	    }
 	}
 	

@@ -32,7 +32,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.EventObject;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.ResourceBundle;
@@ -67,6 +66,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -81,13 +81,11 @@ import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.RankProfession;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
-import mekhq.gui.model.RankTableModel;
 import mekhq.gui.model.SortedComboBoxModel;
 
 /**
@@ -219,15 +217,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox usePercentageMaintBox;
     private JCheckBox useInfantryDontCountBox;
 
-    private JTabbedPane tabRanks;
     private JTable tableRanks;
     private RankTableModel ranksModel;
     private JScrollPane scrRanks;
     private JButton btnAddRank;
     private JButton btnDeleteRank;
-    private HashMap<Integer,JTable> rankTableMap;
-    private HashMap<Integer,JButton> rankTableButtonMap;
-    String[] rankColNames = {"Rank", "Officer", "Pay Multiplier", "Levels"};
+    String[] rankColNames = {"Rank", "Officer", "Pay Multiplier"};
 
     private JTextArea txtInstructionsXP;
     private JScrollPane scrXP;
@@ -449,9 +444,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         choiceTechLevel = new JComboBox();
         btnOkay = new JButton();
         btnCancel = new JButton();
-        rankTableMap = new HashMap<Integer,JTable>();
-        rankTableButtonMap  = new HashMap<Integer,JButton>();
-        tabRanks = new JTabbedPane();
+        scrRanks = new JScrollPane();
 
         useDamageMargin = new JCheckBox();
         useQualityMaintenance = new JCheckBox();
@@ -2247,113 +2240,91 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panRank.add(comboRanks, gridBagConstraints);
-        
-        for (int p = 0; p < RankProfession.RPROF_NUM; p++) {
-        	JPanel panRankTwo = new JPanel();
-        	panRankTwo.setName(campaign.getRanks().getAllRankProfessions().get(p).getRankProfessionName()); // NOI18N
-            panRankTwo.setLayout(new java.awt.GridBagLayout());
-            ranksModel = new RankTableModel(campaign.getRanks().getRanksArray(p), rankColNames);
-	        tableRanks = new JTable(ranksModel);
-	        scrRanks = new JScrollPane();
-	        JTextArea txtInstructionsRanks = new JTextArea();
-	        gridBagConstraints = new java.awt.GridBagConstraints();
-	        
-	        btnAddRank = new JButton("Add Rank");
-	        btnAddRank.setActionCommand(""+p);
-	        gridBagConstraints.gridx = 0;
-	        gridBagConstraints.gridy = 0;
-	        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-	        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-	        panRankTwo.add(btnAddRank, gridBagConstraints);
-	        btnAddRank.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	                addRank(evt);
-	            }
-	        });
-	
-	        btnDeleteRank = new JButton("Remove Rank");
-	        btnDeleteRank.setActionCommand(""+p);
-	        gridBagConstraints.gridx = 1;
-	        gridBagConstraints.gridy = 0;
-	        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-	        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-	        panRankTwo.add(btnDeleteRank, gridBagConstraints);
-	        btnDeleteRank.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	                removeRank(evt);
-	            }
-	        });
-	        btnDeleteRank.setEnabled(false);
-	        rankTableButtonMap.put(p, btnDeleteRank);
 
-	        tableRanks.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-	        tableRanks.setRowSelectionAllowed(false);
-	        tableRanks.setColumnSelectionAllowed(false);
-	        tableRanks.setCellSelectionEnabled(true);
-	        tableRanks.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-	        tableRanks.setIntercellSpacing(new Dimension(0, 0));
-	        tableRanks.setShowGrid(false);
-	        TableColumnModel tcm = tableRanks.getColumnModel();
-	        tcm.getColumn(0).setPreferredWidth(300);
-	        tcm.getColumn(1).setPreferredWidth(100);
-	        tcm.getColumn(2).setPreferredWidth(50);
-	        tcm.getColumn(2).setCellEditor(new SpinnerEditor());
-	        tcm.getColumn(3).setPreferredWidth(50);
-	        tableRanks.getSelectionModel().addListSelectionListener(
-	        		new ListSelectionListener() {
-	                    public void valueChanged(
-	                            javax.swing.event.ListSelectionEvent evt) {
-	                    	tableRanksValueChanged(evt);
-	                    }
-	                });
-	        scrRanks.setViewportView(tableRanks);
-	        rankTableMap.put(p, tableRanks);
-	
-	        gridBagConstraints.gridx = 0;
-	        gridBagConstraints.gridy = 1;
-	        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
-	        gridBagConstraints.weightx = 0.0;
-	        gridBagConstraints.weighty = 1.0;
-	        gridBagConstraints.gridwidth = 2;
-	        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-	        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-	        panRankTwo.add(scrRanks, gridBagConstraints);
-	
-	        scrRanks.setMinimumSize(new Dimension(500, 500));
-	        scrRanks.setPreferredSize(new Dimension(500, 500));
-	        scrRanks.setMaximumSize(new Dimension(500, 500));
-	
-	        txtInstructionsRanks.setText(resourceMap.getString("txtInstructionsRanks.text"));
-	        txtInstructionsRanks.setEditable(false);
-	        txtInstructionsRanks.setLineWrap(true);
-	        txtInstructionsRanks.setWrapStyleWord(true);
-	        txtInstructionsRanks.setBorder(BorderFactory.createCompoundBorder(
-	                BorderFactory.createTitledBorder(resourceMap.getString("txtInstructionsRanks.title")),
-	                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-	        txtInstructionsRanks.setOpaque(false);
-	        txtInstructionsRanks.setMinimumSize(new Dimension(550, 120));
-	        gridBagConstraints = new java.awt.GridBagConstraints();
-	        gridBagConstraints.gridx = 4;
-	        gridBagConstraints.gridy = 0;
-	        gridBagConstraints.gridheight = 2;
-	        gridBagConstraints.weightx = 1.0;
-	        gridBagConstraints.weighty = 1.0;
-	        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-	        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-	        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-	        panRankTwo.add(txtInstructionsRanks, gridBagConstraints);
-	        
-	        tabRanks.addTab(RankProfession.getRankProfessionName(p), panRankTwo);
-        }
-        
+        btnAddRank = new JButton("Add Rank");
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panRank.add(btnAddRank, gridBagConstraints);
+        btnAddRank.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addRank();
+            }
+        });
+
+
+        btnDeleteRank = new JButton("Remove Rank");
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panRank.add(btnDeleteRank, gridBagConstraints);
+        btnDeleteRank.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                removeRank();
+            }
+        });
+        btnDeleteRank.setEnabled(false);
+
+        ranksModel = new RankTableModel(campaign.getRanks().getRanksArray(), rankColNames);
+        tableRanks = new JTable(ranksModel);
+        tableRanks.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tableRanks.setRowSelectionAllowed(false);
+        tableRanks.setColumnSelectionAllowed(false);
+        tableRanks.setCellSelectionEnabled(true);
+        tableRanks.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        tableRanks.setIntercellSpacing(new Dimension(0, 0));
+        tableRanks.setShowGrid(false);
+        TableColumnModel tcm = tableRanks.getColumnModel();
+        tcm.getColumn(0).setPreferredWidth(300);
+        tcm.getColumn(1).setPreferredWidth(100);
+        tcm.getColumn(2).setPreferredWidth(100);
+        tcm.getColumn(2).setCellEditor(new SpinnerEditor());
+        tableRanks.getSelectionModel().addListSelectionListener(
+        		new ListSelectionListener() {
+                    public void valueChanged(
+                            javax.swing.event.ListSelectionEvent evt) {
+                        tableRanksValueChanged(evt);
+                    }
+                });
+        scrRanks.setViewportView(tableRanks);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.gridwidth = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panRank.add(scrRanks, gridBagConstraints);
+
+        scrRanks.setMinimumSize(new Dimension(500, 500));
+        scrRanks.setPreferredSize(new Dimension(500, 500));
+        scrRanks.setMaximumSize(new Dimension(500, 500));
+
+        JTextArea txtInstructionsRanks = new JTextArea();
+        txtInstructionsRanks.setText(resourceMap.getString("txtInstructionsRanks.text"));
+        txtInstructionsRanks.setEditable(false);
+        txtInstructionsRanks.setLineWrap(true);
+        txtInstructionsRanks.setWrapStyleWord(true);
+        txtInstructionsRanks.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder(resourceMap.getString("txtInstructionsRanks.title")),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        txtInstructionsRanks.setOpaque(false);
+        txtInstructionsRanks.setMinimumSize(new Dimension(550, 120));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        panRank.add(tabRanks, gridBagConstraints);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panRank.add(txtInstructionsRanks, gridBagConstraints);
 
         tabOptions.addTab(resourceMap.getString("panRank.TabConstraints.tabTitle"), panRank); // NOI18N
 
@@ -2757,32 +2728,15 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     private void fillRankInfo() {
         Ranks ranks = new Ranks(comboRanks.getSelectedIndex());
-        
-        for (int p = 0; p < RankProfession.RPROF_NUM; p++) {
-        	ranksModel = (RankTableModel) rankTableMap.get(new Integer(p)).getModel();
-        	ranksModel.setDataVector(ranks.getRanksArray(p), rankColNames);
-        }
+        ranksModel.setDataVector(ranks.getRanksArray(), rankColNames);
     }
 
     private void tableRanksValueChanged(javax.swing.event.ListSelectionEvent evt) {
-    	int index = -1;
-    	for (int i : rankTableMap.keySet()) {
-    		tableRanks = rankTableMap.get(i);
-    		if (tableRanks.getSelectionModel().equals((ListSelectionModel)evt.getSource())) {
-    			index = i;
-    			break;
-    		}
-    	}
-    	if (index == -1) {
-    		return;
-    	}
         int row = tableRanks.getSelectedRow();
-        rankTableButtonMap.get(index).setEnabled(row != -1);
+        btnDeleteRank.setEnabled(row != -1);
     }
 
-    private void addRank(ActionEvent evt) {
-    	tableRanks = rankTableMap.get(Integer.parseInt(evt.getActionCommand()));
-    	ranksModel = (RankTableModel)tableRanks.getModel();
+    private void addRank() {
         Object[] rank = {"Unknown", false, 1.0};
         int row = tableRanks.getSelectedRow();
         if (row == -1) {
@@ -2798,9 +2752,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         }
     }
 
-    private void removeRank(ActionEvent evt) {
-    	tableRanks = rankTableMap.get(Integer.parseInt(evt.getActionCommand()));
-    	ranksModel = (RankTableModel)tableRanks.getModel();
+    private void removeRank() {
         int row = tableRanks.getSelectedRow();
         if (row > -1) {
             ranksModel.removeRow(row);
@@ -2822,28 +2774,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     }
 
     private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkayActionPerformed
-    	// Perform a couple verifications before we continue...
-    	int mwRanksSize = rankTableMap.get(0).getModel().getRowCount();
-    	for (int i : rankTableMap.keySet()) {
-    		if (i == 0) {
-	        	for (int row = 0; row < rankTableMap.get(0).getModel().getRowCount(); row++) {
-	        		if (rankTableMap.get(0).getModel().getValueAt(row, 0).toString().equals("-")) {
-	        			JOptionPane.showMessageDialog(frame,
-	        				    "The MechWarrior table cannot have a hyphen for the rank name.",
-	        				    "Rank Tables Error",
-	        				    JOptionPane.ERROR_MESSAGE);
-	        			return;
-	        		}
-	        	}
-    		}
-    		if (rankTableMap.get(i).getModel().getRowCount() > 0 && rankTableMap.get(i).getModel().getRowCount() != mwRanksSize) {
-    			JOptionPane.showMessageDialog(frame,
-    				    "All profession rank tables must be either empty, or the same size as the MechWarrior table.",
-    				    "Rank Tables Error",
-    				    JOptionPane.ERROR_MESSAGE);
-    			return;
-    		}
-    	}
         if (txtName.getText().length() > 0) {
             campaign.setName(txtName.getText());
             this.setVisible(false);
@@ -2855,8 +2785,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             campaign.getRNG().setChosenFaction((String) comboFactionNames.getSelectedItem());
         }
         campaign.getRNG().setPerentFemale(sldGender.getValue());
-        campaign.getRanks().setRanksFromTableMap(rankTableMap);
-        campaign.setRankSystem(comboRanks.getSelectedIndex());
+        campaign.getRanks().setRanksFromModel(ranksModel);
         campaign.setCamoCategory(camoCategory);
         campaign.setCamoFileName(camoFileName);
         campaign.setColorIndex(colorIndex);
@@ -3306,6 +3235,23 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
                 return this;
             }
+        }
+    }
+
+    public class RankTableModel extends DefaultTableModel {
+        private static final long serialVersionUID = 534443424190075264L;
+
+        public final static int COL_NAME = 0;
+        public final static int COL_OFFICER = 1;
+        public final static int COL_PAYMULT = 2;
+
+        public RankTableModel(Object[][] ranksArray, String[] rankColNames) {
+            super(ranksArray, rankColNames);
+        }
+
+        @Override
+        public Class<?> getColumnClass(int c) {
+            return getValueAt(0, c).getClass();
         }
     }
 

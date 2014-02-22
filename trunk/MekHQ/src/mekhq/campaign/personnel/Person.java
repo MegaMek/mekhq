@@ -190,7 +190,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     //need to pass in the rank system
     private int rankOrder;
-    private int rankLevel;
 
     //stuff to track for support teams
     protected int minutesLeft;
@@ -234,7 +233,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         gender = G_MALE;
         birthday = new GregorianCalendar(3042, Calendar.JANUARY, 1);
         rankOrder = 0;
-        rankLevel = 0;
         status = S_ACTIVE;
         hits = 0;
         skills = new Hashtable<String, Skill>();
@@ -888,13 +886,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     + gender
                     + "</gender>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                + "<rank>"
-                + rankOrder
-                + "</rank>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                + "<rankLevel>"
-                + rankLevel
-                + "</rankLevel>");
+                    + "<rank>"
+                    + rankOrder
+                    + "</rank>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<nTasks>"
                     + nTasks
@@ -1069,8 +1063,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     retVal.gender = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
                     retVal.rankOrder = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("rankLevel")) {
-                    retVal.rankLevel = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("doctorId")) {
                     if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
                         retVal.oldDoctorId = Integer.parseInt(wn2.getTextContent());
@@ -1368,27 +1360,16 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         //TODO: Add era mod to salary calc..
     }
 
-    public int getRankLevel() {
-    	// If our level is somehow above the max level of this rank, drop to the max level
-    	if (Math.max(0, getRank().getLevels()-1) < rankLevel)
-    		rankLevel = Math.max(0, getRank().getLevels()-1);
-        return rankLevel;
-    }
-
-    public void setRankLevel(int level) {
-        this.rankLevel = level;
-    }
-
     public int getRankOrder() {
         return rankOrder;
     }
 
-    public void setRank(int r) {
-        this.rankOrder = r;
+    public Rank getRank() {
+        return campaign.getRanks().getRank(rankOrder);
     }
 
-    public Rank getRank() {
-        return campaign.getRanks().getRank(rankOrder, getProfession());
+    public void setRank(int r) {
+        this.rankOrder = r;
     }
 
     public String getSkillSummary() {
@@ -1562,18 +1543,14 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
      * @return
      */
     public String getFullDesc() {
-        String toReturn = "<html><font size='2'><b>" + getFullTitle(true) + "</b><br/>";
+        String toReturn = "<html><font size='2'><b>" + getFullTitle() + "</b><br/>";
         toReturn += getSkillSummary() + " " + getRoleDesc();
         toReturn += "</font></html>";
         return toReturn;
     }
 
     public String getFullTitle() {
-    	return getFullTitle(false);
-    }
-    
-    public String getFullTitle(boolean html) {
-        String rank = getRank().getName()+Rank.getLevelName(getRankLevel(), getRank().getLevels() == 0);
+        String rank = getRank().getName();
         if (rank.equalsIgnoreCase("None")) {
             if (isPrisoner()) {
                 return "Prisoner " + getName();
@@ -1583,17 +1560,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
             }
             return getName();
         }
-        if (html)
-        	rank = makeHTMLRankDiv();
         return rank + " " + getName();
-    }
-    
-    public String makeHTMLRank() {
-    	return "<html>"+makeHTMLRankDiv()+"</html>";
-    }
-    
-    public String makeHTMLRankDiv() {
-    	return "<div id=\""+getId()+"\">"+getRank().getName()+Rank.getLevelName(getRankLevel(), getRank().getLevels() == 0)+"</div>";
     }
 
     public String getHyperlinkedFullTitle() {
@@ -2897,47 +2864,5 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public void addInjury(Injury i) {
         injuries.add(i);
-    }
-    
-    public int getProfession() {
-    	return getProfessionFromPrimaryRole(primaryRole);
-    }
-    
-    public static int getProfessionFromPrimaryRole(int role) {
-    	switch (role) {
-			case T_MECHWARRIOR:
-		    case T_PROTO_PILOT:
-		    case T_DOCTOR:
-		    case T_MEDIC:
-        		return RankProfession.RPROF_MW;
-			case T_AERO_PILOT:
-        		return RankProfession.RPROF_ASF;
-		    case T_GVEE_DRIVER:
-		    case T_NVEE_DRIVER:
-		    case T_VTOL_PILOT:
-		    case T_VEE_GUNNER:
-        		return RankProfession.RPROF_VEE;
-		    case T_BA:
-		    case T_INFANTRY:
-        		return RankProfession.RPROF_INF;
-		    case T_CONV_PILOT:
-		    case T_SPACE_PILOT:
-		    case T_SPACE_CREW:
-		    case T_SPACE_GUNNER:
-		    case T_NAVIGATOR:
-        		return RankProfession.RPROF_NAVAL;
-		    case T_MECH_TECH:
-		    case T_MECHANIC:
-		    case T_AERO_TECH:
-		    case T_BA_TECH:
-		    case T_ASTECH:
-		    case T_ADMIN_COM:
-		    case T_ADMIN_LOG:
-		    case T_ADMIN_TRA:
-		    case T_ADMIN_HR:
-        		return RankProfession.RPROF_TECH;
-        	default:
-        		return RankProfession.RPROF_MW;
-    	}
     }
 }

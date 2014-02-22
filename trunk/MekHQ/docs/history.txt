@@ -169,18 +169,6 @@ v0.3.4 (SVN)
 + Updated MM.jar (r10529) and MML.jar (r1356 built with MM.jar r10529) and enabled BattleArmor customization
 + Bug [#421]: Experience being assigned to reserves who did not arrive
 + Updated MM.jar (10539) - new code needed for bug 421
-+ RFE [#118]: Sub Rank Fields & Ranks by Profession
-    A very complex addition. Please see the instructions for customizing ranks in the Campaign Options - Rank System
-+ Bug/Data: Corrected and Added to the included rank systems in MekHQ
-    Due to corrections the ranks in player campaigns could now be off. Please sanity check your ranks against your
-    previous version of MekHQ!
-+ Bug [#469]: Zombie Clinic (Doctors not refreshing in infirmary tab after resolving combat)
-+ Bug: Incorrect column type for RankTableModel (should be Boolean, not JCheckBox)
-+ Split RankTableModel out into it's own .java file in the mekhq.gui.model package where it belongs
-+ Bug: No way to sort for Prisoners and Bondsmen on the personnel table
-+ Bug [#472]: Rank Drop Down in Campaign Options isn't sticky
-+ Bug: Hiring Personnel and Hiring Personnel Bulk throw IndexOutOfBounds exceptions
-+ Bug: Hiring Personnel (Take 2) and other Rank Bugs
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
