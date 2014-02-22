@@ -180,6 +180,7 @@ v0.3.4 (SVN)
 + Bug: No way to sort for Prisoners and Bondsmen on the personnel table
 + Bug [#472]: Rank Drop Down in Campaign Options isn't sticky
 + Bug: Hiring Personnel and Hiring Personnel Bulk throw IndexOutOfBounds exceptions
++ Bug: Hiring Personnel (Take 2) and other Rank Bugs
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

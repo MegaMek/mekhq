@@ -1573,7 +1573,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
     
     public String getFullTitle(boolean html) {
-        String htmlRank = "<div id=\""+getId()+"\">"+getRank().getName()+Rank.getLevelName(getRankLevel(), getRank().getLevels() == 0)+"</div>";
         String rank = getRank().getName()+Rank.getLevelName(getRankLevel(), getRank().getLevels() == 0);
         if (rank.equalsIgnoreCase("None")) {
             if (isPrisoner()) {
@@ -1585,8 +1584,16 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
             return getName();
         }
         if (html)
-        	rank = htmlRank;
+        	rank = makeHTMLRankDiv();
         return rank + " " + getName();
+    }
+    
+    public String makeHTMLRank() {
+    	return "<html>"+makeHTMLRankDiv()+"</html>";
+    }
+    
+    public String makeHTMLRankDiv() {
+    	return "<div id=\""+getId()+"\">"+getRank().getName()+Rank.getLevelName(getRankLevel(), getRank().getLevels() == 0)+"</div>";
     }
 
     public String getHyperlinkedFullTitle() {

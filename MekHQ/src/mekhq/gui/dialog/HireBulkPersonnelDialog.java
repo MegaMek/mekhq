@@ -197,9 +197,7 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
     // Reset the rank combo
     public void personnelTypeChanged() {
     	DefaultComboBoxModel rankModel = new DefaultComboBoxModel();
-        for(Rank rank : campaign.getRanks().getAllRankProfessions().
-        		get(Person.getProfessionFromPrimaryRole(choiceType.getSelectedIndex())).
-        			getAllRanksForProfession()) {
+        for(Rank rank : campaign.getRanks().getRanks(Person.getProfessionFromPrimaryRole(choiceType.getSelectedIndex()))) {
         	rankModel.addElement(rank.getName());
         }
         choiceRanks.setModel(rankModel);

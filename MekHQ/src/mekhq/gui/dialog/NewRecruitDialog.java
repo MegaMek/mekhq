@@ -112,7 +112,6 @@ public class NewRecruitDialog extends javax.swing.JDialog {
         
         choiceRanks.setName("choiceRanks"); // NOI18N
         refreshRanksCombo();
-        choiceRanks.setSelectedIndex(0);
         choiceRanks.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
             	changeRank();
@@ -271,7 +270,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     
     private void refreshRanksCombo() {
     	DefaultComboBoxModel ranksModel = new DefaultComboBoxModel();
-        for(Rank rank : campaign.getRanks().getAllRankProfessions().get(person.getProfession()).getAllRanksForProfession()) {
+        for(Rank rank : campaign.getRanks().getRanks(person.getProfession())) {
         	ranksModel.addElement(rank.getName());
         }
         choiceRanks.setModel(ranksModel);

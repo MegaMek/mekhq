@@ -221,7 +221,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
                         return 1;
                     }*/
                     // Smarter to use out existing sorter!
-                    int rankVal = (new RankSorter(campaign)).compare(p1.getFullTitle(true), p2.getFullTitle(true));
+                    int rankVal = (new RankSorter(campaign)).compare(p1.makeHTMLRank(), p2.makeHTMLRank());
                     if (rankVal != 0) {
                     	return rankVal;
                     }
