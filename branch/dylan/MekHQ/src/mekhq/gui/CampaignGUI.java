@@ -255,6 +255,7 @@ import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.LevelSorter;
 import mekhq.gui.sorter.RankSorter;
 import mekhq.gui.sorter.TargetSorter;
+import mekhq.gui.sorter.TechSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
 import mekhq.gui.sorter.WeightClassSorter;
@@ -4791,6 +4792,7 @@ public class CampaignGUI extends JPanel {
         refreshUnitList();
         filterPersonnel();
         refreshPersonnelList();
+        refreshDoctorsList();
         refreshPatientList();
         refreshReport();
         changeMission();
@@ -5234,6 +5236,9 @@ public class CampaignGUI extends JPanel {
         ArrayList<Person> assigned = new ArrayList<Person>();
         ArrayList<Person> unassigned = new ArrayList<Person>();
         for (Person patient : getCampaign().getPatients()) {
+        	if (!getCampaign().getPerson(patient.getDoctorId()).isActive()) {
+        		patient.setDoctorId(null, getCampaign().getCampaignOptions().getNaturalHealingWaitingPeriod());
+        	}
             if (null == patient.getDoctorId()) {
                 unassigned.add(patient);
             } else if (null != doctor && patient.getDoctorId().equals(doctor.getId())) {

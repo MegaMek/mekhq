@@ -1,4 +1,4 @@
-package mekhq.gui;
+package mekhq.gui.sorter;
 
 import java.util.Comparator;
 
