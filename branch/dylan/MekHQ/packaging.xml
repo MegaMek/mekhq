@@ -138,6 +138,7 @@
             <fileset dir="${svndir}/${datadir}-OLD" >
                 <include name="universe/" />
                 <include name="fonts/" />
+                <include name="spa" />
                 <include name="images/force/" />
                 <include name="images/portraits/FoxsTeeth/" />
                 <include name="images/fluff/mech/*.png" />
