@@ -31169,7 +31169,7 @@ Menkib has 25 hour days and orbits its sun every 37 standard days.</desc>
 		</factionChange>
 		 <factionChange>
             <date>3035-11-16</date>
-            <faction>,LA</faction>
+            <faction>FWL,LA</faction>
         </factionChange>
         <factionChange>
             <date>3035-11-19</date>
