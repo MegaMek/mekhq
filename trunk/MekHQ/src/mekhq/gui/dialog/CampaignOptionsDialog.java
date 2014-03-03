@@ -66,7 +66,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -86,6 +85,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
+import mekhq.gui.model.RankTableModel;
 import mekhq.gui.model.SortedComboBoxModel;
 
 /**
@@ -222,7 +222,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JScrollPane scrRanks;
     private JButton btnAddRank;
     private JButton btnDeleteRank;
-    String[] rankColNames = {"Rank", "Officer", "Pay Multiplier"};
+    String[] rankColNames = {"MW Rank", "ASF Rank", "Vee Crew Rank", "Naval Rank", "Infantry Rank", "Tech Rank", "Officer", "Pay Multiplier"};
 
     private JTextArea txtInstructionsXP;
     private JScrollPane scrXP;
@@ -2267,7 +2267,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         });
         btnDeleteRank.setEnabled(false);
 
-        ranksModel = new RankTableModel(campaign.getRanks().getRanksArray(), rankColNames);
+        ranksModel = new RankTableModel(campaign.getRanks().getRanksForModel(), rankColNames);
         tableRanks = new JTable(ranksModel);
         tableRanks.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableRanks.setRowSelectionAllowed(false);
@@ -2277,10 +2277,15 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         tableRanks.setIntercellSpacing(new Dimension(0, 0));
         tableRanks.setShowGrid(false);
         TableColumnModel tcm = tableRanks.getColumnModel();
-        tcm.getColumn(0).setPreferredWidth(300);
-        tcm.getColumn(1).setPreferredWidth(100);
-        tcm.getColumn(2).setPreferredWidth(100);
-        tcm.getColumn(2).setCellEditor(new SpinnerEditor());
+        tcm.getColumn(RankTableModel.COL_NAME_MW).setPreferredWidth(300);
+        tcm.getColumn(RankTableModel.COL_NAME_ASF).setPreferredWidth(300);
+        tcm.getColumn(RankTableModel.COL_NAME_VEE).setPreferredWidth(300);
+        tcm.getColumn(RankTableModel.COL_NAME_NAVAL).setPreferredWidth(300);
+        tcm.getColumn(RankTableModel.COL_NAME_INF).setPreferredWidth(300);
+        tcm.getColumn(RankTableModel.COL_NAME_TECH).setPreferredWidth(300);
+        tcm.getColumn(RankTableModel.COL_OFFICER).setPreferredWidth(100);
+        tcm.getColumn(RankTableModel.COL_PAYMULT).setPreferredWidth(100);
+        tcm.getColumn(RankTableModel.COL_PAYMULT).setCellEditor(new SpinnerEditor());
         tableRanks.getSelectionModel().addListSelectionListener(
         		new ListSelectionListener() {
                     public void valueChanged(
@@ -2728,7 +2733,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     private void fillRankInfo() {
         Ranks ranks = new Ranks(comboRanks.getSelectedIndex());
-        ranksModel.setDataVector(ranks.getRanksArray(), rankColNames);
+        ranksModel.setDataVector(ranks.getRanksForModel(), rankColNames);
     }
 
     private void tableRanksValueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -2756,6 +2761,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         int row = tableRanks.getSelectedRow();
         if (row > -1) {
             ranksModel.removeRow(row);
+        }
+        if (tableRanks.getRowCount() == 0) {
+        	return;
         }
         if (tableRanks.getRowCount() > row) {
             tableRanks.setRowSelectionInterval(row, row);
@@ -2786,6 +2794,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         }
         campaign.getRNG().setPerentFemale(sldGender.getValue());
         campaign.getRanks().setRanksFromModel(ranksModel);
+        campaign.setRankSystem(comboRanks.getSelectedIndex());
         campaign.setCamoCategory(camoCategory);
         campaign.setCamoFileName(camoFileName);
         campaign.setColorIndex(colorIndex);
@@ -3235,23 +3244,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
                 return this;
             }
-        }
-    }
-
-    public class RankTableModel extends DefaultTableModel {
-        private static final long serialVersionUID = 534443424190075264L;
-
-        public final static int COL_NAME = 0;
-        public final static int COL_OFFICER = 1;
-        public final static int COL_PAYMULT = 2;
-
-        public RankTableModel(Object[][] ranksArray, String[] rankColNames) {
-            super(ranksArray, rankColNames);
-        }
-
-        @Override
-        public Class<?> getColumnClass(int c) {
-            return getValueAt(0, c).getClass();
         }
     }
 

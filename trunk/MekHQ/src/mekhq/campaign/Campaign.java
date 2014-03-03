@@ -620,7 +620,7 @@ public class Campaign implements Serializable {
         }
         String rankEntry = "";
         if (p.getRankOrder() > 0) {
-            rankEntry = " as a " + p.getRank().getName();
+            rankEntry = " as a " + p.getRank().getName(p.getProfession());
         }
         if (prisoner) {
             p.setPrisoner();
@@ -658,7 +658,7 @@ public class Campaign implements Serializable {
         }
         String rankEntry = "";
         if (p.getRankOrder() > 0) {
-            rankEntry = " as a " + p.getRank().getName();
+            rankEntry = " as a " + p.getRank().getName(p.getProfession());
         }
         p.addLogEntry(getDate(), "Joined " + getName() + rankEntry);
     }
@@ -4715,10 +4715,10 @@ public class Campaign implements Serializable {
         if (report) {
             if (rank > person.getRankOrder()) {
                 person.addLogEntry(getDate(), "Promoted to "
-                                              + getRanks().getRank(rank).getName());
+                                              + getRanks().getRank(rank).getName(person.getProfession()));
             } else if (rank < person.getRankOrder()) {
                 person.addLogEntry(getDate(), "Demoted to "
-                                              + getRanks().getRank(rank).getName());
+                                              + getRanks().getRank(rank).getName(person.getProfession()));
             }
         }
         person.setRank(rank);

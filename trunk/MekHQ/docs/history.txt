@@ -170,6 +170,16 @@ v0.3.4 (SVN)
 + Bug [#421]: Experience being assigned to reserves who did not arrive
 + Updated MM.jar (10539) - new code needed for bug 421
 + Bug [#469]: Zombie Clinic (Doctors not refreshing in infirmary tab after resolving combat)
++ Bug: SPA folder not brought back in by the packaging script
++ Bug: ranksTable Exception when removing a rank leaves no ranks in the table
++ New error dialog for bad faction codes
++ RFE [#118]: Sub Rank Fields & Ranks by Profession - pt1
+    A very complex addition. Please see the instructions for customizing ranks in the Campaign Options - Rank System
++ Bug/Data: Corrected and Added to the included rank systems in MekHQ
+-    Due to corrections the ranks in player campaigns could now be off. Please sanity check your ranks against your
+-    previous version of MekHQ!
++ Split RankTableModel out into it's own .java file in the mekhq.gui.model package where it belongs
++ Bug [#472]: Rank Drop Down in Campaign Options isn't sticky
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
