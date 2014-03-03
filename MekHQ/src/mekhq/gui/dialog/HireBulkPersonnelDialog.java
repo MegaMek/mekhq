@@ -111,7 +111,7 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
         
         DefaultComboBoxModel rankModel = new DefaultComboBoxModel();
         for(Rank rank : campaign.getRanks().getAllRanks()) {
-        	rankModel.addElement(rank.getName());
+        	rankModel.addElement(rank.getName(choiceType.getSelectedIndex()));
         }
         choiceRanks.setModel(rankModel);
         choiceRanks.setName("choiceRanks"); // NOI18N

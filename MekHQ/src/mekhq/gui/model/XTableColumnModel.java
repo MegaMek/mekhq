@@ -1,4 +1,4 @@
-package mekhq.gui;
+package mekhq.gui.model;
 
 import java.util.Enumeration;
 import java.util.Vector;

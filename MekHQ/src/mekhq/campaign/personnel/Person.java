@@ -1367,6 +1367,30 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public Rank getRank() {
         return campaign.getRanks().getRank(rankOrder);
     }
+    
+    public String getRankName() {
+    	int profession = getProfession();
+    	
+    	// If we're using an "empty" profession, default to MechWarrior
+    	if (campaign.getRanks().isEmptyProfession(profession)) {
+    		profession = campaign.getRanks().getAlternateProfession(profession);
+    	}
+    	
+    	// If we're set to a rank that no longer exists, demote ourself
+    	while (getRank().getName(profession).equals("-")) {
+    		setRank(--rankOrder);
+    	}
+    	
+    	// We've hit a rank that defaults back to the MechWarrior table, so grab the equivalent name from there
+    	if (getRank().getName(profession).equals("--")) {
+    		return getRank().getName(campaign.getRanks().getAlternateProfession(profession));
+    	} else if (getRank().getName(profession).startsWith("--")) {
+    		return getRank().getName(campaign.getRanks().getAlternateProfession(getRank().getName(profession)));
+    	}
+    	
+    	// We have our name, return it
+    	return getRank().getName(profession);
+    }
 
     public void setRank(int r) {
         this.rankOrder = r;
@@ -1543,14 +1567,18 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
      * @return
      */
     public String getFullDesc() {
-        String toReturn = "<html><font size='2'><b>" + getFullTitle() + "</b><br/>";
+        String toReturn = "<html><font size='2'><b>" + getFullTitle(true) + "</b><br/>";
         toReturn += getSkillSummary() + " " + getRoleDesc();
         toReturn += "</font></html>";
         return toReturn;
     }
 
     public String getFullTitle() {
-        String rank = getRank().getName();
+    	return getFullTitle(false);
+    }
+    
+    public String getFullTitle(boolean html) {
+        String rank = getRankName();
         if (rank.equalsIgnoreCase("None")) {
             if (isPrisoner()) {
                 return "Prisoner " + getName();
@@ -1560,7 +1588,17 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
             }
             return getName();
         }
+        if (html)
+        	rank = makeHTMLRankDiv();
         return rank + " " + getName();
+    }
+    
+    public String makeHTMLRank() {
+    	return "<html>"+makeHTMLRankDiv()+"</html>";
+    }
+    
+    public String makeHTMLRankDiv() {
+    	return "<div id=\""+getId()+"\">"+getRankName()+"</div>";
     }
 
     public String getHyperlinkedFullTitle() {
@@ -2865,4 +2903,46 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public void addInjury(Injury i) {
         injuries.add(i);
     }
+    
+    public int getProfession() {
+		return getProfessionFromPrimaryRole(primaryRole);
+	}
+    	    
+    public static int getProfessionFromPrimaryRole(int role) {
+    	switch (role) {
+			case T_MECHWARRIOR:
+		    case T_PROTO_PILOT:
+		    case T_DOCTOR:
+		    case T_MEDIC:
+        		return Ranks.RPROF_MW;
+			case T_AERO_PILOT:
+        		return Ranks.RPROF_ASF;
+		    case T_GVEE_DRIVER:
+		    case T_NVEE_DRIVER:
+		    case T_VTOL_PILOT:
+		    case T_VEE_GUNNER:
+       		return Ranks.RPROF_VEE;
+		    case T_BA:
+		    case T_INFANTRY:
+        		return Ranks.RPROF_INF;
+		    case T_CONV_PILOT:
+		    case T_SPACE_PILOT:
+		    case T_SPACE_CREW:
+		    case T_SPACE_GUNNER:
+		    case T_NAVIGATOR:
+        		return Ranks.RPROF_NAVAL;
+		    case T_MECH_TECH:
+		    case T_MECHANIC:
+		    case T_AERO_TECH:
+		    case T_BA_TECH:
+		    case T_ASTECH:
+		    case T_ADMIN_COM:
+		    case T_ADMIN_LOG:
+		    case T_ADMIN_TRA:
+		    case T_ADMIN_HR:
+        		return Ranks.RPROF_TECH;
+        	default:
+        		return Ranks.RPROF_MW;
+		}
+	}
 }

@@ -244,6 +244,7 @@ import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.model.TaskTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.model.UnitTableModel;
+import mekhq.gui.model.XTableColumnModel;
 import mekhq.gui.sorter.BonusSorter;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.LevelSorter;
@@ -4936,7 +4937,7 @@ public class CampaignGUI extends JPanel {
         ArrayList<Person> assigned = new ArrayList<Person>();
         ArrayList<Person> unassigned = new ArrayList<Person>();
         for (Person patient : getCampaign().getPatients()) {
-        	if (!getCampaign().getPerson(patient.getDoctorId()).isActive()) {
+        	if (getCampaign().getPerson(patient.getDoctorId()) != null && !getCampaign().getPerson(patient.getDoctorId()).isActive()) {
         		patient.setDoctorId(null, getCampaign().getCampaignOptions().getNaturalHealingWaitingPeriod());
         	}
             if (null == patient.getDoctorId()) {
@@ -7615,8 +7616,9 @@ public class CampaignGUI extends JPanel {
         }
 
         private boolean areAllEligible(Person[] people) {
+        	int profession = people[0].getProfession();
             for (Person person : people) {
-                if (person.isPrisoner() || person.isBondsman()) {
+                if (person.isPrisoner() || person.isBondsman() || person.getProfession() != profession) {
                     return false;
                 }
             }
@@ -7653,7 +7655,7 @@ public class CampaignGUI extends JPanel {
                     menu = new JMenu("Change Rank");
                     int rankOrder = 0;
                     for (Rank rank : getCampaign().getRanks().getAllRanks()) {
-                        cbMenuItem = new JCheckBoxMenuItem(rank.getName());
+                        cbMenuItem = new JCheckBoxMenuItem(rank.getName(person.getProfession()));
                         cbMenuItem.setActionCommand("RANK|" + rankOrder);
                         if (person.getRankOrder() == rankOrder) {
                             cbMenuItem.setSelected(true);

@@ -267,7 +267,7 @@ import mekhq.gui.BasicInfo;
                 p = getPerson(row);
             }
             if(col == COL_RANK) {
-                return p.getRank().getName();
+                return p.makeHTMLRank();
             }
             if(col == COL_NAME) {
                 return p.getName();

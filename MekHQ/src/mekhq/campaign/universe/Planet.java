@@ -31,9 +31,10 @@ import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+import javax.swing.JOptionPane;
+
 import megamek.common.EquipmentType;
 import megamek.common.PlanetaryConditions;
-import mekhq.MekHQ;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
@@ -682,7 +683,14 @@ public class Planet implements Serializable {
 			} else if (wn2.getNodeName().equalsIgnoreCase("ycood")) {
 				retVal.y = Double.parseDouble(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("faction")) {
-				retVal.factionCodes = processFactionCodes(wn2.getTextContent());
+				try {
+					retVal.factionCodes = processFactionCodes(wn2.getTextContent());
+				} catch (NoSuchFieldException e) {
+					JOptionPane.showMessageDialog(null,
+						    "Invalid faction code detected for planet "+retVal.getName(),
+						    "Invalid Faction Code",
+						    JOptionPane.ERROR_MESSAGE);
+				}
 			} else if (wn2.getNodeName().equalsIgnoreCase("pressure")) {
 				retVal.pressure = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("gravity")) {
@@ -755,7 +763,14 @@ public class Planet implements Serializable {
 					SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 					date = df.parse(wn.getTextContent().trim());
 				} else if (xn.equalsIgnoreCase("faction")) {
-					factions = processFactionCodes(wn.getTextContent().trim());
+					try {
+						factions = processFactionCodes(wn.getTextContent().trim());
+					} catch (NoSuchFieldException e) {
+						JOptionPane.showMessageDialog(null,
+							    "Invalid faction code detected for planet "+retVal.getName(),
+							    "Invalid Faction Code",
+							    JOptionPane.ERROR_MESSAGE);
+					}
 				}
 			}
 		}
@@ -777,13 +792,12 @@ public class Planet implements Serializable {
 		return false;
 	}
 	
-	private static ArrayList<String> processFactionCodes(String codeList) {
+	private static ArrayList<String> processFactionCodes(String codeList) throws NoSuchFieldException {
 		ArrayList<String> factions = new ArrayList<String>();
 		String[] codes = codeList.split(",");
 		for(String code : codes) {
-			//code = code.trim();
 			if(null == Faction.getFaction(code)) {
-				MekHQ.logMessage("Unknown faction code: " + code);
+				throw new NoSuchFieldException();
 			}
 			factions.add(code);
 		}
