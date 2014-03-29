@@ -28,12 +28,12 @@ import megamek.common.FighterSquadron;
 import megamek.common.IArmorState;
 import megamek.common.ILocationExposureStatus;
 import megamek.common.Jumpship;
+import megamek.common.MULParser;
 import megamek.common.Mech;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.Tank;
 import megamek.common.WeaponType;
-import megamek.common.XMLStreamParser;
 import megamek.common.util.StringUtil;
 
 import org.w3c.dom.NamedNodeMap;
@@ -802,7 +802,8 @@ public class MekHqXmlUtil {
 
 		Entity retVal = null;
 
-		XMLStreamParser prs = new XMLStreamParser(new ByteArrayInputStream(
+		MULParser prs = new MULParser();
+		prs.parse(new ByteArrayInputStream(
 				xml.getBytes("UTF-8")));
 		Vector<Entity> ents = prs.getEntities();
 

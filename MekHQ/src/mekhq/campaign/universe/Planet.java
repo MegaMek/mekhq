@@ -28,11 +28,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeMap;
 
 import javax.swing.JOptionPane;
 
+import megamek.common.Compute;
 import megamek.common.EquipmentType;
 import megamek.common.PlanetaryConditions;
 
@@ -62,6 +64,14 @@ public class Planet implements Serializable {
 	private static final int SPECTRAL_G = 4;
 	private static final int SPECTRAL_K = 5;
 	private static final int SPECTRAL_M = 6;
+	
+	private static final int TYPE_EMPTY			= 0;
+	private static final int TYPE_ASTEROID		= 1;
+	private static final int TYPE_DWARF			= 2;
+	private static final int TYPE_TERRESTRIAL	= 3;
+	private static final int TYPE_GIANT 		= 4;
+	private static final int TYPE_GAS_GIANT		= 5;
+	private static final int TYPE_ICE_GIANT		= 6;
 	
 	private static final String LUM_0   = "0";
 	private static final String LUM_IA  = "Ia";
@@ -802,5 +812,142 @@ public class Planet implements Serializable {
 			factions.add(code);
 		}
 		return factions;
+	}
+	
+	public static int generateStarType() {
+		switch (Compute.d6(2)) {
+			case 2:
+				return SPECTRAL_F;
+			case 3:
+				return SPECTRAL_M;
+			case 4:
+				return SPECTRAL_G;
+			case 5:
+				return SPECTRAL_K;
+			case 6:
+			case 7:
+			case 8:
+			case 9:
+			case 10:
+			case 11:
+				return SPECTRAL_M;
+			case 12:
+				switch (Compute.d6(2)) {
+					case 2:
+					case 3:
+						return SPECTRAL_B;
+					case 4:
+					case 5:
+					case 6:
+					case 7:
+					case 8:
+					case 9:
+					case 10:
+						return SPECTRAL_A;
+					case 11:
+						return SPECTRAL_B;
+					case 12:
+						return SPECTRAL_F;
+					default:
+						return SPECTRAL_A;
+				}
+			default:
+				return SPECTRAL_M;
+		}
+	}
+	
+	public static int generateSubtype() {
+		switch (Compute.d6()) {
+			case 1:
+				return 1;
+			case 2:
+				return 2;
+			case 3:
+				return 4;
+			case 4:
+				return 6;
+			case 5:
+				return 8;
+			case 6:
+				return 0;
+			default:
+				return 1;
+		}
+	}
+	
+	public static int calculateNumberOfSlots() {
+		return Compute.d6(2) + 3;
+	}
+	
+	public static HashMap<String, Integer> generateSlotType(boolean outOfZone) {
+		HashMap<String, Integer> map = new HashMap<String, Integer>();
+		int roll = Compute.d6(2);
+		if (outOfZone)
+			roll += 2;
+		
+		switch (roll) {
+			case 2:
+			case 3:
+				map.put("type", TYPE_EMPTY);
+				map.put("base_dm", 0);
+				map.put("dm_mod", 0);
+				map.put("density", 0);
+				map.put("day_length", 0);
+				break;
+			case 4:
+				map.put("type", TYPE_ASTEROID);
+				map.put("base_dm", 0);
+				map.put("dm_mod", 0);
+				map.put("density", 0);
+				map.put("day_length", 0);
+				break;
+			case 5:
+				map.put("type", TYPE_DWARF);
+				map.put("base_dm", 400);
+				map.put("dm_mod", (100 * Compute.d6(3)));
+				map.put("density", Compute.d6());
+				map.put("day_length", (Compute.d6(3) + 12));
+				break;
+			case 6:
+			case 7:
+				map.put("type", TYPE_TERRESTRIAL);
+				map.put("base_dm", 2500);
+				map.put("dm_mod", (1000 * Compute.d6(2)));
+				map.put("density", (int)Math.pow(2.5 + Compute.d6(), 0.75));
+				map.put("day_length", (Compute.d6(3) + 12));
+				break;
+			case 8:
+				map.put("type", TYPE_GIANT);
+				map.put("base_dm", 12500);
+				map.put("dm_mod", (1000 * Compute.d6(2)));
+				map.put("density", Compute.d6()+2);
+				map.put("day_length", (Compute.d6(4)));
+				break;
+			case 9:
+			case 10:
+				map.put("type", TYPE_GAS_GIANT);
+				map.put("base_dm", 50000);
+				map.put("dm_mod", (10000 * Compute.d6(2)));
+				map.put("density", (int) (Compute.d6(2) / 10 + 0.5));
+				map.put("day_length", (Compute.d6(4)));
+				break;
+			case 11:
+			case 12:
+				map.put("type", TYPE_ICE_GIANT);
+				map.put("base_dm", 25000);
+				map.put("dm_mod", (5000 * Compute.d6()));
+				map.put("density", (int) (Compute.d6(2) / 10 + 1));
+				map.put("day_length", (Compute.d6(4)));
+				break;
+			default:
+				map.put("type", TYPE_EMPTY);
+				map.put("base_dm", 0);
+				map.put("dm_mod", 0);
+				map.put("density", 0);
+				map.put("day_length", 0);
+				break;
+		}
+		
+		return map;
 	}
 }

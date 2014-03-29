@@ -21,8 +21,6 @@
 
 package mekhq.campaign;
 
-import gd.xml.ParseException;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -45,6 +43,7 @@ import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.IArmorState;
 import megamek.common.Infantry;
+import megamek.common.MULParser;
 import megamek.common.Mech;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
@@ -52,7 +51,6 @@ import megamek.common.MechSummaryCache;
 import megamek.common.MechWarrior;
 import megamek.common.Mounted;
 import megamek.common.Tank;
-import megamek.common.XMLStreamParser;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -575,7 +573,7 @@ public class ResolveScenarioTracker {
 			// I need to get the parser myself, because I want to pull both
 			// entities and pilots from it
 			// Create an empty parser.
-			XMLStreamParser parser = new XMLStreamParser();
+			MULParser parser = new MULParser();
 
 			// Open up the file.
 			InputStream listStream = new FileInputStream(unitFile);
@@ -583,7 +581,7 @@ public class ResolveScenarioTracker {
 			try {
 				parser.parse(listStream);
 				listStream.close();
-			} catch (ParseException excep) {
+			} catch (Exception excep) {
 				excep.printStackTrace(System.err);
 				// throw new IOException("Unable to read from: " +
 				// unitFile.getName());
@@ -620,7 +618,7 @@ public class ResolveScenarioTracker {
 			// I need to get the parser myself, because I want to pull both
 			// entities and pilots from it
 			// Create an empty parser.
-			XMLStreamParser parser = new XMLStreamParser();
+			MULParser parser = new MULParser();
 
 			// Open up the file.
 			InputStream listStream = new FileInputStream(salvageFile);
@@ -628,7 +626,7 @@ public class ResolveScenarioTracker {
 			try {
 				parser.parse(listStream);
 				listStream.close();
-			} catch (ParseException excep) {
+			} catch (Exception excep) {
 				excep.printStackTrace(System.err);
 				// throw new IOException("Unable to read from: " +
 				// unitFile.getName());

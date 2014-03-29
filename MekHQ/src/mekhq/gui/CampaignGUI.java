@@ -20,8 +20,6 @@
  */
 package mekhq.gui;
 
-import gd.xml.ParseException;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -128,6 +126,7 @@ import megamek.common.EntityListFile;
 import megamek.common.GunEmplacement;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
+import megamek.common.MULParser;
 import megamek.common.Mech;
 import megamek.common.MechSummaryCache;
 import megamek.common.MechView;
@@ -138,7 +137,6 @@ import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.UnitType;
 import megamek.common.WeaponType;
-import megamek.common.XMLStreamParser;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.IOption;
@@ -3953,7 +3951,7 @@ public class CampaignGUI extends JPanel {
             // I need to get the parser myself, because I want to pull both
             // entities and pilots from it
             // Create an empty parser.
-            XMLStreamParser parser = new XMLStreamParser();
+        	MULParser parser = new MULParser();
 
             // Open up the file.
             InputStream listStream = new FileInputStream(unitFile);
@@ -3962,7 +3960,7 @@ public class CampaignGUI extends JPanel {
             try {
                 parser.parse(listStream);
                 listStream.close();
-            } catch (ParseException excep) {
+            } catch (Exception excep) {
                 excep.printStackTrace(System.err);
                 // throw new IOException("Unable to read from: " +
                 // unitFile.getName());
