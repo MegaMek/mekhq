@@ -180,6 +180,13 @@ v0.3.4 (SVN)
 -    previous version of MekHQ!
 + Split RankTableModel out into it's own .java file in the mekhq.gui.model package where it belongs
 + Bug [#472]: Rank Drop Down in Campaign Options isn't sticky
++ Updated MegaMek.jar to 0.37.9 (0.38.0 RC1)
++ Updated MegaMekLab.jar to 0.1.26
++ Replaced all calls to XMLStreamParser with calls to the new MULParser
++ RFE: Planet Editor & Randomizer (pt. 1: start of basic framework)
+    This will eventually allow passing of an option to the MekHQ.jar file in order to edit the official
+    planets.xml file, and also an in game editor from the maps tab to allow for campaign level editing
+    of the controlling factions and such as well.
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
