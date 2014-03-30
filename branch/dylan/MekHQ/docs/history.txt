@@ -179,6 +179,27 @@ v0.3.4 (SVN)
 + Bug [#421]: Experience being assigned to reserves who did not arrive
 + Updated MM.jar (10539) - new code needed for bug 421
 + Bug [#469]: Zombie Clinic (Doctors not refreshing in infirmary tab after resolving combat)
++ Bug: SPA folder not brought back in by the packaging script
++ Bug: ranksTable Exception when removing a rank leaves no ranks in the table
++ New error dialog for bad faction codes
++ RFE [#118]: Sub Rank Fields & Ranks by Profession - pt1
+    A very complex addition. Please see the instructions for customizing ranks in the Campaign Options - Rank System
++ Bug/Data: Corrected and Added to the included rank systems in MekHQ
+-    Due to corrections the ranks in player campaigns could now be off. Please sanity check your ranks against your
+-    previous version of MekHQ!
++ Split RankTableModel out into it's own .java file in the mekhq.gui.model package where it belongs
++ Bug [#472]: Rank Drop Down in Campaign Options isn't sticky
++ Updated MegaMek.jar to 0.37.9 (0.38.0 RC1)
++ Updated MegaMekLab.jar to 0.1.26
++ Replaced all calls to XMLStreamParser with calls to the new MULParser
++ RFE: Planet Editor & Randomizer (pt. 1: start of basic framework)
+    This will eventually allow passing of an option to the MekHQ.jar file in order to edit the official
+    planets.xml file, and also an in game editor from the maps tab to allow for campaign level editing
+    of the controlling factions and such as well.
++ RFE [#118]: Sub Rank Fields & Ranks by Profession - pt2
+    Completed the rank system overhaul. The rank levels (For Comstar/WoB to get Precentor IV and such)
+    will be implemented separately once I decide how I want to add them.
++ Bug: NPE in CampaignGUI.refreshPatients() if patient is null and/or doctor ID is null
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

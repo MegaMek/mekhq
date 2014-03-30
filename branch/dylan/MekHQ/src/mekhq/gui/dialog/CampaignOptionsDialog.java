@@ -66,10 +66,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Player;
@@ -86,6 +84,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
+import mekhq.gui.model.RankTableModel;
 import mekhq.gui.model.SortedComboBoxModel;
 
 /**
@@ -222,7 +221,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JScrollPane scrRanks;
     private JButton btnAddRank;
     private JButton btnDeleteRank;
-    String[] rankColNames = {"Rank", "Officer", "Pay Multiplier"};
+    String[] rankColNames = { "Rate", "MW Rank", "ASF Rank", "Vee Crew Rank", "Naval Rank", "Infantry Rank", "Tech Rank", "Officer", "Pay Multiplier"};
 
     private JTextArea txtInstructionsXP;
     private JScrollPane scrXP;
@@ -2241,7 +2240,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panRank.add(comboRanks, gridBagConstraints);
 
-        btnAddRank = new JButton("Add Rank");
+        /*btnAddRank = new JButton("Add Rank");
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
@@ -2265,9 +2264,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                 removeRank();
             }
         });
-        btnDeleteRank.setEnabled(false);
+        btnDeleteRank.setEnabled(false);*/
 
-        ranksModel = new RankTableModel(campaign.getRanks().getRanksArray(), rankColNames);
+        ranksModel = new RankTableModel(campaign.getRanks().getRanksForModel(), rankColNames);
         tableRanks = new JTable(ranksModel);
         tableRanks.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableRanks.setRowSelectionAllowed(false);
@@ -2276,11 +2275,15 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         tableRanks.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         tableRanks.setIntercellSpacing(new Dimension(0, 0));
         tableRanks.setShowGrid(false);
-        TableColumnModel tcm = tableRanks.getColumnModel();
-        tcm.getColumn(0).setPreferredWidth(300);
-        tcm.getColumn(1).setPreferredWidth(100);
-        tcm.getColumn(2).setPreferredWidth(100);
-        tcm.getColumn(2).setCellEditor(new SpinnerEditor());
+        TableColumn column = null;
+        for (int i = 0; i < RankTableModel.COL_NUM; i++) {
+            column = tableRanks.getColumnModel().getColumn(i);
+            column.setPreferredWidth(ranksModel.getColumnWidth(i));
+            column.setCellRenderer(ranksModel.getRenderer());
+            if (i == RankTableModel.COL_PAYMULT) {
+            	column.setCellEditor(new SpinnerEditor());
+            }
+        }
         tableRanks.getSelectionModel().addListSelectionListener(
         		new ListSelectionListener() {
                     public void valueChanged(
@@ -2293,17 +2296,19 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
-        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.gridwidth = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        scrRanks.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrRanks.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         panRank.add(scrRanks, gridBagConstraints);
 
-        scrRanks.setMinimumSize(new Dimension(500, 500));
-        scrRanks.setPreferredSize(new Dimension(500, 500));
-        scrRanks.setMaximumSize(new Dimension(500, 500));
+        scrRanks.setMinimumSize(new Dimension(1000, 500));
+        /*scrRanks.setPreferredSize(new Dimension(500, 500));
+        scrRanks.setMaximumSize(new Dimension(500, 500));*/
 
         JTextArea txtInstructionsRanks = new JTextArea();
         txtInstructionsRanks.setText(resourceMap.getString("txtInstructionsRanks.text"));
@@ -2314,14 +2319,14 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                 BorderFactory.createTitledBorder(resourceMap.getString("txtInstructionsRanks.title")),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         txtInstructionsRanks.setOpaque(false);
-        txtInstructionsRanks.setMinimumSize(new Dimension(550, 120));
+        txtInstructionsRanks.setMinimumSize(new Dimension(250, 120));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panRank.add(txtInstructionsRanks, gridBagConstraints);
@@ -2728,7 +2733,16 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     private void fillRankInfo() {
         Ranks ranks = new Ranks(comboRanks.getSelectedIndex());
-        ranksModel.setDataVector(ranks.getRanksArray(), rankColNames);
+        ranksModel.setDataVector(ranks.getRanksForModel(), rankColNames);
+        TableColumn column = null;
+        for (int i = 0; i < RankTableModel.COL_NUM; i++) {
+            column = tableRanks.getColumnModel().getColumn(i);
+            column.setPreferredWidth(ranksModel.getColumnWidth(i));
+            column.setCellRenderer(ranksModel.getRenderer());
+            if (i == RankTableModel.COL_PAYMULT) {
+            	column.setCellEditor(new SpinnerEditor());
+            }
+        }
     }
 
     private void tableRanksValueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -2756,6 +2770,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         int row = tableRanks.getSelectedRow();
         if (row > -1) {
             ranksModel.removeRow(row);
+        }
+        if (tableRanks.getRowCount() == 0) {
+        	return;
         }
         if (tableRanks.getRowCount() > row) {
             tableRanks.setRowSelectionInterval(row, row);
@@ -2786,6 +2803,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         }
         campaign.getRNG().setPerentFemale(sldGender.getValue());
         campaign.getRanks().setRanksFromModel(ranksModel);
+        campaign.setRankSystem(comboRanks.getSelectedIndex());
         campaign.setCamoCategory(camoCategory);
         campaign.setCamoFileName(camoFileName);
         campaign.setColorIndex(colorIndex);
@@ -3090,7 +3108,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         // Try to get the camo file.
         try {
-
             // Translate the root camo directory name.
             if (Player.ROOT_CAMO.equals(camoCategory)) {
                 camoCategory = ""; //$NON-NLS-1$
@@ -3098,7 +3115,19 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             Image camo = (Image) camos.getItem(camoCategory, camoFileName);
             btnCamo.setIcon(new ImageIcon(camo));
         } catch (Exception err) {
-            err.printStackTrace();
+            //err.printStackTrace();
+        	JOptionPane.showMessageDialog(
+        			this,
+        			"Cannot find your camo file.\n"
+        			+ "Setting to default color.\n"
+        			+ "You should browse to the correct camo file,\n"
+        			+ "or if it isn't available copy it into MekHQ's"
+        			+ "data/images/camo folder.",
+        			"Missing Camo File",
+        			JOptionPane.WARNING_MESSAGE);
+        	camoCategory = Player.NO_CAMO;
+        	colorIndex = 0;
+        	setCamoIcon();
         }
     }
 
@@ -3235,23 +3264,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
                 return this;
             }
-        }
-    }
-
-    public class RankTableModel extends DefaultTableModel {
-        private static final long serialVersionUID = 534443424190075264L;
-
-        public final static int COL_NAME = 0;
-        public final static int COL_OFFICER = 1;
-        public final static int COL_PAYMULT = 2;
-
-        public RankTableModel(Object[][] ranksArray, String[] rankColNames) {
-            super(ranksArray, rankColNames);
-        }
-
-        @Override
-        public Class<?> getColumnClass(int c) {
-            return getValueAt(0, c).getClass();
         }
     }
 

@@ -22,6 +22,8 @@
 package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
@@ -37,24 +39,37 @@ import org.w3c.dom.NodeList;
 
 public class Rank implements MekHqXmlSerializable {
         
-    private String rankName;
+    private ArrayList<String> rankNames;
     private boolean officer;
     private double payMultiplier;
     
-    public Rank(String name, boolean b, double mult) {
-        rankName = name;
+    public Rank() {
+        this(new ArrayList<String>(), false, 1.0);
+    }
+    
+    public Rank(String[] names) {
+        this(names, false, 1.0);
+    }
+    
+    public Rank(ArrayList<String> names) {
+        this(names, false, 1.0);
+    }
+    
+    public Rank(String[] name, boolean b, double mult) {
+        this(new ArrayList<String>(Arrays.asList(name)), b, mult);
+    }
+    
+    public Rank(ArrayList<String> names, boolean b, double mult) {
+    	rankNames = names;
         officer = b;
         payMultiplier = mult;
     }
     
-    public Rank() {
-        rankName = "Unknown";
-        officer = false;
-        payMultiplier = 1.0;
-    }
-    
-    public String getName() {
-        return rankName;
+    public String getName(int profession) {
+    	if (profession >= rankNames.size()) {
+    		return "Profession Out of Bounds";
+    	}
+    	return rankNames.get(profession);
     }
     
     public boolean isOfficer() {
@@ -77,9 +92,9 @@ public class Rank implements MekHqXmlSerializable {
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<rank>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<rankName>"
-                +MekHqXmlUtil.escape(rankName)
-                +"</rankName>");
+                +"<rankNames>"
+                +MekHqXmlUtil.escape(getRankNamesAsString())
+                +"</rankNames>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<officer>"
                 +officer
@@ -88,7 +103,17 @@ public class Rank implements MekHqXmlSerializable {
                 +"<payMultiplier>"
                 +payMultiplier
                 +"</payMultiplier>");
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</rank>");
+        pw1.print(MekHqXmlUtil.indentStr(indent) + "</rank>");
+    }
+    
+    public String getRankNamesAsString() {
+    	String names = "";
+    	String sep = "";
+    	for (String name : rankNames) {
+    		names += sep+name;
+    		sep = ",";
+    	}
+    	return names;
     }
     
     public static Rank generateInstanceFromXML(Node wn) {
@@ -104,7 +129,10 @@ public class Rank implements MekHqXmlSerializable {
                 Node wn2 = nl.item(x);
                 
                 if (wn2.getNodeName().equalsIgnoreCase("rankName")) {
-                    retVal.rankName = wn2.getTextContent();
+                	String[] rNames = { wn2.getTextContent(), "--MW", "--MW", "--MW", "--MW", "--MW" };
+                    retVal.rankNames = new ArrayList<String>(Arrays.asList(rNames));
+                } else if (wn2.getNodeName().equalsIgnoreCase("rankNames")) {
+                    retVal.rankNames = new ArrayList<String>(Arrays.asList(wn2.getTextContent().split(",")));
                 } else if (wn2.getNodeName().equalsIgnoreCase("officer")) {
                     retVal.officer = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("payMultiplier")) {

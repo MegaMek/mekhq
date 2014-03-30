@@ -17,6 +17,7 @@ import megamek.common.UnitType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Rank;
+import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -122,7 +123,8 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             for(Rank rank : campaign.getRanks().getAllRanks()) {
                 preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".ranks (number, rankname) VALUES (?, ?)");
                 preparedStatement.setInt(1, i);
-                preparedStatement.setString(2, truncateString(rank.getName(), 45));
+                // TODO: This currently only exports MechWarrior Ranks. MercRoster software needs adjusted before this can be.
+                preparedStatement.setString(2, truncateString(rank.getName(Ranks.RPROF_MW), 45));
                 preparedStatement.executeUpdate();
                 i++;
                 progressTicker++;
@@ -447,7 +449,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             }
             try {
                 preparedStatement = connect.prepareStatement("UPDATE " + table + ".crew SET rank=?, lname=?, fname=?, callsign=?, status=?, parent=?, crewnumber=?, joiningdate=?, notes=?, bday=? WHERE uuid=?"); 
-                preparedStatement.setInt(1, p.getRankOrder());
+                preparedStatement.setInt(1, p.getRankNumeric());
                 preparedStatement.setString(2, truncateString(parseLastName(p.getName()),30));
                 preparedStatement.setString(3, truncateString(parseFirstName(p.getName()), 30));
                 preparedStatement.setString(4, truncateString(p.getCallsign(), 30));
@@ -463,7 +465,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 if(preparedStatement.executeUpdate() < 1) {
                     //no prior record so insert
                     preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".crew (rank, lname, fname, callsign, status, parent, crewnumber, joiningdate, notes, bday, uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                    preparedStatement.setInt(1, p.getRankOrder());
+                    preparedStatement.setInt(1, p.getRankNumeric());
                     preparedStatement.setString(2, truncateString(parseLastName(p.getName()),30));
                     preparedStatement.setString(3, truncateString(parseFirstName(p.getName()), 30));
                     preparedStatement.setString(4, truncateString(p.getCallsign(), 30));

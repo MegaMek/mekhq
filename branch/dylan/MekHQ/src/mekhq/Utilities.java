@@ -254,33 +254,33 @@ public class Utilities {
     	int bestRank = -1;
     	Person commander = null;
     	for(Person p : vesselCrew) {
-    		if(null != p && p.getRankOrder() > bestRank) {
+    		if(null != p && p.getRankNumeric() > bestRank) {
     			commander = p;
-    			bestRank = p.getRankOrder();
+    			bestRank = p.getRankNumeric();
     		}
     	}
     	for(Person p : gunners) {
     		if(p == null || ((entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0)) { 
     			continue;
     		}
-    		if(p.getRankOrder() > bestRank) {
+    		if(p.getRankNumeric() > bestRank) {
     			commander = p;
-    			bestRank = p.getRankOrder();
+    			bestRank = p.getRankNumeric();
     		}
     	}
     	for(Person p : drivers) {
     		if(p == null || ((entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0)) { 
     			continue;
     		}
-    		if(p.getRankOrder() > bestRank) {
+    		if(p.getRankNumeric() > bestRank) {
     			commander = p;
-    			bestRank = p.getRankOrder();
+    			bestRank = p.getRankNumeric();
     		}
     	}
     	if(navigator != null) {
-    		if(null != navigator && navigator.getRankOrder() > bestRank) {
+    		if(null != navigator && navigator.getRankNumeric() > bestRank) {
     			commander = navigator;
-    			bestRank = navigator.getRankOrder();
+    			bestRank = navigator.getRankNumeric();
     		}
     	}
     	return commander;

@@ -20,8 +20,6 @@
  */
 package mekhq.gui;
 
-import gd.xml.ParseException;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -132,6 +130,7 @@ import megamek.common.EntityListFile;
 import megamek.common.GunEmplacement;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
+import megamek.common.MULParser;
 import megamek.common.Mech;
 import megamek.common.MechSummaryCache;
 import megamek.common.MechView;
@@ -142,7 +141,6 @@ import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.UnitType;
 import megamek.common.WeaponType;
-import megamek.common.XMLStreamParser;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.IOption;
@@ -250,6 +248,7 @@ import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.model.TaskTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.model.UnitTableModel;
+import mekhq.gui.model.XTableColumnModel;
 import mekhq.gui.sorter.BonusSorter;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.LevelSorter;
@@ -4247,7 +4246,7 @@ public class CampaignGUI extends JPanel {
             // I need to get the parser myself, because I want to pull both
             // entities and pilots from it
             // Create an empty parser.
-            XMLStreamParser parser = new XMLStreamParser();
+        	MULParser parser = new MULParser();
 
             // Open up the file.
             InputStream listStream = new FileInputStream(unitFile);
@@ -4256,7 +4255,7 @@ public class CampaignGUI extends JPanel {
             try {
                 parser.parse(listStream);
                 listStream.close();
-            } catch (ParseException excep) {
+            } catch (Exception excep) {
                 excep.printStackTrace(System.err);
                 // throw new IOException("Unable to read from: " +
                 // unitFile.getName());
@@ -5236,12 +5235,16 @@ public class CampaignGUI extends JPanel {
         ArrayList<Person> assigned = new ArrayList<Person>();
         ArrayList<Person> unassigned = new ArrayList<Person>();
         for (Person patient : getCampaign().getPatients()) {
-        	if (!getCampaign().getPerson(patient.getDoctorId()).isActive()) {
+        	// Knock out inactive doctors
+        	if (patient != null
+        			&& patient.getDoctorId() != null
+        			&& getCampaign().getPerson(patient.getDoctorId()) != null
+        			&& getCampaign().getPerson(patient.getDoctorId()).isInActive()) {
         		patient.setDoctorId(null, getCampaign().getCampaignOptions().getNaturalHealingWaitingPeriod());
         	}
-            if (null == patient.getDoctorId()) {
+            if (patient.getDoctorId() == null) {
                 unassigned.add(patient);
-            } else if (null != doctor && patient.getDoctorId().equals(doctor.getId())) {
+            } else if (doctor != null && patient.getDoctorId().equals(doctor.getId())) {
                 assigned.add(patient);
             }
         }
@@ -7967,8 +7970,9 @@ public class CampaignGUI extends JPanel {
         }
 
         private boolean areAllEligible(Person[] people) {
+        	int profession = people[0].getProfession();
             for (Person person : people) {
-                if (person.isPrisoner() || person.isBondsman()) {
+                if (person.isPrisoner() || person.isBondsman() || person.getProfession() != profession) {
                     return false;
                 }
             }
@@ -8005,9 +8009,9 @@ public class CampaignGUI extends JPanel {
                     menu = new JMenu("Change Rank");
                     int rankOrder = 0;
                     for (Rank rank : getCampaign().getRanks().getAllRanks()) {
-                        cbMenuItem = new JCheckBoxMenuItem(rank.getName());
+                        cbMenuItem = new JCheckBoxMenuItem(rank.getName(person.getProfession()));
                         cbMenuItem.setActionCommand("RANK|" + rankOrder);
-                        if (person.getRankOrder() == rankOrder) {
+                        if (person.getRankNumeric() == rankOrder) {
                             cbMenuItem.setSelected(true);
                         }
                         cbMenuItem.addActionListener(this);

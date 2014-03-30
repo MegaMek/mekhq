@@ -111,7 +111,7 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
         
         DefaultComboBoxModel rankModel = new DefaultComboBoxModel();
         for(Rank rank : campaign.getRanks().getAllRanks()) {
-        	rankModel.addElement(rank.getName());
+        	rankModel.addElement(rank.getName(choiceType.getSelectedIndex()));
         }
         choiceRanks.setModel(rankModel);
         choiceRanks.setName("choiceRanks"); // NOI18N
@@ -178,7 +178,7 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
     	int number = (Integer)spnNumber.getModel().getValue();
     	while(number > 0) {
     		Person p = campaign.newPerson(choiceType.getSelectedIndex() + 1);
-    		p.setRank(choiceRanks.getSelectedIndex());
+    		p.setRankNumeric(choiceRanks.getSelectedIndex());
     		if(!campaign.recruitPerson(p)) {
     		    number = 0;
     		} else {

@@ -188,8 +188,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     protected String portraitCategory;
     protected String portraitFile;
 
-    //need to pass in the rank system
-    private int rankOrder;
+    // Our rank
+    private int rank;
+    // If this Person uses a custom rank system (-1 for no)
+    private int rankSystem = -1;
 
     //stuff to track for support teams
     protected int minutesLeft;
@@ -232,7 +234,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         acquisitions = 0;
         gender = G_MALE;
         birthday = new GregorianCalendar(3042, Calendar.JANUARY, 1);
-        rankOrder = 0;
+        rank = 0;
         status = S_ACTIVE;
         hits = 0;
         skills = new Hashtable<String, Skill>();
@@ -815,6 +817,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         return getStatus() == S_ACTIVE;
     }
 
+    public boolean isInActive() {
+        return getStatus() != S_ACTIVE;
+    }
+
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\""
                     + id.toString()
@@ -887,7 +893,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     + "</gender>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<rank>"
-                    + rankOrder
+                    + rank
                     + "</rank>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<nTasks>"
@@ -1062,7 +1068,18 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                 } else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
                     retVal.gender = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
-                    retVal.rankOrder = Integer.parseInt(wn2.getTextContent());
+                	if ((version.getMajorVersion() < 1 && (version.getMinorVersion() < 3
+                			|| (version.getMinorVersion() == 3 && version.getSnapshot() < 5)))
+                			|| (version.getRevision() != -1 && version.getRevision() < 1782)) {
+                		RankTranslator rt = new RankTranslator(c);
+                		try {
+							retVal.rank = rt.getNewRank(c.getRanks().getRankSystem(), Integer.parseInt(wn2.getTextContent()));
+						} catch (ArrayIndexOutOfBoundsException e) {
+							c.showMessage = true;
+						}
+                	} else {
+                		retVal.rank = Integer.parseInt(wn2.getTextContent());
+                	}
                 } else if (wn2.getNodeName().equalsIgnoreCase("doctorId")) {
                     if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
                         retVal.oldDoctorId = Integer.parseInt(wn2.getTextContent());
@@ -1303,11 +1320,11 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         }
         
         // Prisoner and Bondsman updating
-        if (retVal.prisonerStatus != PRISONER_NOT && retVal.rankOrder == 0) {
+        if (retVal.prisonerStatus != PRISONER_NOT && retVal.rank == 0) {
         	if (retVal.prisonerStatus == PRISONER_BONDSMAN) {
-        		retVal.setRank(Ranks.RANK_BONDSMAN);
+        		retVal.setRankNumeric(Ranks.RANK_BONDSMAN);
         	} else {
-        		retVal.setRank(Ranks.RANK_PRISONER);
+        		retVal.setRankNumeric(Ranks.RANK_PRISONER);
         	}
         }
 
@@ -1360,16 +1377,57 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         //TODO: Add era mod to salary calc..
     }
 
-    public int getRankOrder() {
-        return rankOrder;
+    public int getRankNumeric() {
+        return rank;
+    }
+
+    public void setRankNumeric(int r) {
+        this.rank = r;
+    }
+    
+    public int getRankSystem() {
+    	if (rankSystem == -1) {
+    		return campaign.getRanks().getRankSystem();
+    	}
+    	return rankSystem;
+    }
+    
+    public void setRankSystem(int system) {
+    	rankSystem = system;
+    	if (system == campaign.getRanks().getRankSystem()) {
+    		rankSystem = -1;
+    	}
     }
 
     public Rank getRank() {
-        return campaign.getRanks().getRank(rankOrder);
+    	if (rankSystem != -1) {
+    		return Ranks.getRanksFromSystem(rankSystem).getRank(rank);
+    	}
+        return campaign.getRanks().getRank(rank);
     }
-
-    public void setRank(int r) {
-        this.rankOrder = r;
+    
+    public String getRankName() {
+    	int profession = getProfession();
+    	
+    	// If we're using an "empty" profession, default to MechWarrior
+    	if (campaign.getRanks().isEmptyProfession(profession)) {
+    		profession = campaign.getRanks().getAlternateProfession(profession);
+    	}
+    	
+    	// If we're set to a rank that no longer exists, demote ourself
+    	while (getRank().getName(profession).equals("-")) {
+    		setRankNumeric(--rank);
+    	}
+    	
+    	// We've hit a rank that defaults back to the MechWarrior table, so grab the equivalent name from there
+    	if (getRank().getName(profession).equals("--")) {
+    		return getRank().getName(campaign.getRanks().getAlternateProfession(profession));
+    	} else if (getRank().getName(profession).startsWith("--")) {
+    		return getRank().getName(campaign.getRanks().getAlternateProfession(getRank().getName(profession)));
+    	}
+    	
+    	// We have our name, return it
+    	return getRank().getName(profession);
     }
 
     public String getSkillSummary() {
@@ -1543,14 +1601,18 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
      * @return
      */
     public String getFullDesc() {
-        String toReturn = "<html><font size='2'><b>" + getFullTitle() + "</b><br/>";
+        String toReturn = "<html><font size='2'><b>" + getFullTitle(true) + "</b><br/>";
         toReturn += getSkillSummary() + " " + getRoleDesc();
         toReturn += "</font></html>";
         return toReturn;
     }
 
     public String getFullTitle() {
-        String rank = getRank().getName();
+    	return getFullTitle(false);
+    }
+    
+    public String getFullTitle(boolean html) {
+        String rank = getRankName();
         if (rank.equalsIgnoreCase("None")) {
             if (isPrisoner()) {
                 return "Prisoner " + getName();
@@ -1560,7 +1622,17 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
             }
             return getName();
         }
+        if (html)
+        	rank = makeHTMLRankDiv();
         return rank + " " + getName();
+    }
+    
+    public String makeHTMLRank() {
+    	return "<html>"+makeHTMLRankDiv()+"</html>";
+    }
+    
+    public String makeHTMLRankDiv() {
+    	return "<div id=\""+getId()+"\">"+getRankName()+"</div>";
     }
 
     public String getHyperlinkedFullTitle() {
@@ -2865,4 +2937,46 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public void addInjury(Injury i) {
         injuries.add(i);
     }
+    
+    public int getProfession() {
+		return getProfessionFromPrimaryRole(primaryRole);
+	}
+    	    
+    public static int getProfessionFromPrimaryRole(int role) {
+    	switch (role) {
+			case T_MECHWARRIOR:
+		    case T_PROTO_PILOT:
+		    case T_DOCTOR:
+		    case T_MEDIC:
+        		return Ranks.RPROF_MW;
+			case T_AERO_PILOT:
+        		return Ranks.RPROF_ASF;
+		    case T_GVEE_DRIVER:
+		    case T_NVEE_DRIVER:
+		    case T_VTOL_PILOT:
+		    case T_VEE_GUNNER:
+       		return Ranks.RPROF_VEE;
+		    case T_BA:
+		    case T_INFANTRY:
+        		return Ranks.RPROF_INF;
+		    case T_CONV_PILOT:
+		    case T_SPACE_PILOT:
+		    case T_SPACE_CREW:
+		    case T_SPACE_GUNNER:
+		    case T_NAVIGATOR:
+        		return Ranks.RPROF_NAVAL;
+		    case T_MECH_TECH:
+		    case T_MECHANIC:
+		    case T_AERO_TECH:
+		    case T_BA_TECH:
+		    case T_ASTECH:
+		    case T_ADMIN_COM:
+		    case T_ADMIN_LOG:
+		    case T_ADMIN_TRA:
+		    case T_ADMIN_HR:
+        		return Ranks.RPROF_TECH;
+        	default:
+        		return Ranks.RPROF_MW;
+		}
+	}
 }
