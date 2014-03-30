@@ -817,6 +817,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         return getStatus() == S_ACTIVE;
     }
 
+    public boolean isInActive() {
+        return getStatus() != S_ACTIVE;
+    }
+
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\""
                     + id.toString()

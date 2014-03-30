@@ -4935,12 +4935,16 @@ public class CampaignGUI extends JPanel {
         ArrayList<Person> assigned = new ArrayList<Person>();
         ArrayList<Person> unassigned = new ArrayList<Person>();
         for (Person patient : getCampaign().getPatients()) {
-        	if (getCampaign().getPerson(patient.getDoctorId()) != null && !getCampaign().getPerson(patient.getDoctorId()).isActive()) {
+        	// Knock out inactive doctors
+        	if (patient != null
+        			&& patient.getDoctorId() != null
+        			&& getCampaign().getPerson(patient.getDoctorId()) != null
+        			&& getCampaign().getPerson(patient.getDoctorId()).isInActive()) {
         		patient.setDoctorId(null, getCampaign().getCampaignOptions().getNaturalHealingWaitingPeriod());
         	}
-            if (null == patient.getDoctorId()) {
+            if (patient.getDoctorId() == null) {
                 unassigned.add(patient);
-            } else if (null != doctor && patient.getDoctorId().equals(doctor.getId())) {
+            } else if (doctor != null && patient.getDoctorId().equals(doctor.getId())) {
                 assigned.add(patient);
             }
         }
