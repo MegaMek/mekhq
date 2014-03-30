@@ -128,7 +128,10 @@ public class Rank implements MekHqXmlSerializable {
             for (int x=0; x<nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
                 
-                if (wn2.getNodeName().equalsIgnoreCase("rankNames")) {
+                if (wn2.getNodeName().equalsIgnoreCase("rankName")) {
+                	String[] rNames = { wn2.getTextContent(), "--MW", "--MW", "--MW", "--MW", "--MW" };
+                    retVal.rankNames = new ArrayList<String>(Arrays.asList(rNames));
+                } else if (wn2.getNodeName().equalsIgnoreCase("rankNames")) {
                     retVal.rankNames = new ArrayList<String>(Arrays.asList(wn2.getTextContent().split(",")));
                 } else if (wn2.getNodeName().equalsIgnoreCase("officer")) {
                     retVal.officer = Boolean.parseBoolean(wn2.getTextContent());

@@ -802,9 +802,7 @@ public class MekHqXmlUtil {
 
 		Entity retVal = null;
 
-		MULParser prs = new MULParser();
-		prs.parse(new ByteArrayInputStream(
-				xml.getBytes("UTF-8")));
+		MULParser prs = new MULParser(new ByteArrayInputStream(xml.getBytes("UTF-8")));
 		Vector<Entity> ents = prs.getEntities();
 
 		if (ents.size() > 1)

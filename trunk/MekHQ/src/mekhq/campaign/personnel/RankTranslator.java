@@ -26,20 +26,57 @@ public class RankTranslator {
 	
 	private Campaign campaign;
 	
-	RankTranslator(Campaign c) {
+	public RankTranslator(Campaign c) {
 		campaign = c;
 	}
 	
-	public int getNewRank(int oldSystem, int oldRank) {
-		Ranks ranks = campaign.getRanks();
-		String rankName = oldRankSystems[oldSystem][oldRank];
-		for (int rankNum = Ranks.RE_MIN; rankNum < Ranks.RC_NUM; rankNum++) {
-			if (ranks.getRank(rankNum).getName(Ranks.RPROF_MW).equals(rankName)) {
-				return rankNum;
+	public int getNewRank(int oldSystem, int oldRank) throws ArrayIndexOutOfBoundsException {
+		Ranks ranks = Ranks.getRanksFromSystem(RankTranslator.translateRankSystem(oldSystem, campaign.getFactionCode()));
+		String rankName;
+		
+		// Try and acquire the rank name...
+		try {
+			rankName = oldRankSystems[oldSystem][oldRank];
+			
+			for (int rankNum = Ranks.RE_MIN; rankNum < Ranks.RC_NUM; rankNum++) {
+				if (ranks.getRank(rankNum).getName(Ranks.RPROF_MW).equals(rankName)) {
+					return rankNum;
+				}
 			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+			throw e;
 		}
 		
 		// If we didn't find anything to translate to, then we can kick them as Rank "None"
 		return 0;
+	}
+	
+	public static int translateRankSystem(int old, String faction) {
+		switch(old) {
+			case RT_SL: return Ranks.RS_SL;
+			case RT_FS: return Ranks.RS_FS;
+			case RT_LA: return Ranks.RS_LA;
+			case RT_FWL: return Ranks.RS_FWL;
+			case RT_CC: return Ranks.RS_CC;
+			case RT_DC: return Ranks.RS_DC;
+			case RT_CL: return Ranks.RS_CL;
+			case RT_CUSTOM:
+				switch (faction) {
+					case "WOB": return Ranks.RS_WOB;
+					case "FC": return Ranks.RS_FC;
+					case "CS": return Ranks.RS_COM;
+					case "CDS":
+					case "CGB":
+					case "CHH":
+					case "CJF":
+					case "CNC":
+					case "CSJ":
+					case "CSV":
+					case "CW":
+						return Ranks.RS_CL;
+				}
+				return Ranks.RS_CUSTOM;
+			default: return Ranks.RS_SL;
+		}
 	}
 }

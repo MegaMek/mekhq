@@ -449,7 +449,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             }
             try {
                 preparedStatement = connect.prepareStatement("UPDATE " + table + ".crew SET rank=?, lname=?, fname=?, callsign=?, status=?, parent=?, crewnumber=?, joiningdate=?, notes=?, bday=? WHERE uuid=?"); 
-                preparedStatement.setInt(1, p.getRankOrder());
+                preparedStatement.setInt(1, p.getRankNumeric());
                 preparedStatement.setString(2, truncateString(parseLastName(p.getName()),30));
                 preparedStatement.setString(3, truncateString(parseFirstName(p.getName()), 30));
                 preparedStatement.setString(4, truncateString(p.getCallsign(), 30));
@@ -465,7 +465,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 if(preparedStatement.executeUpdate() < 1) {
                     //no prior record so insert
                     preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".crew (rank, lname, fname, callsign, status, parent, crewnumber, joiningdate, notes, bday, uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                    preparedStatement.setInt(1, p.getRankOrder());
+                    preparedStatement.setInt(1, p.getRankNumeric());
                     preparedStatement.setString(2, truncateString(parseLastName(p.getName()),30));
                     preparedStatement.setString(3, truncateString(parseFirstName(p.getName()), 30));
                     preparedStatement.setString(4, truncateString(p.getCallsign(), 30));

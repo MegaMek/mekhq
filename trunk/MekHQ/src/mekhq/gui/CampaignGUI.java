@@ -7655,7 +7655,7 @@ public class CampaignGUI extends JPanel {
                     for (Rank rank : getCampaign().getRanks().getAllRanks()) {
                         cbMenuItem = new JCheckBoxMenuItem(rank.getName(person.getProfession()));
                         cbMenuItem.setActionCommand("RANK|" + rankOrder);
-                        if (person.getRankOrder() == rankOrder) {
+                        if (person.getRankNumeric() == rankOrder) {
                             cbMenuItem.setSelected(true);
                         }
                         cbMenuItem.addActionListener(this);

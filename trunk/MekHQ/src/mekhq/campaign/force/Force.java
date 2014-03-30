@@ -466,7 +466,7 @@ public class Force implements Serializable {
 		}
 		Collections.sort(units, new Comparator<Unit>(){		 
             public int compare(final Unit u1, final Unit u2) {
-               return ((Comparable<Integer>)u2.getCommander().getRankOrder()).compareTo(u1.getCommander().getRankOrder());
+               return ((Comparable<Integer>)u2.getCommander().getRankNumeric()).compareTo(u1.getCommander().getRankNumeric());
             }
         });
 		children.addAll(units);

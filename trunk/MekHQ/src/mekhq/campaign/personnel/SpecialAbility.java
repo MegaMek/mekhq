@@ -164,7 +164,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
                     if(!skill.isEmpty()) {
                         retVal.prereqSkills.add(skill);
                     }
-                } 
+                }
             }       
         } catch (Exception ex) {
             // Errrr, apparently either the class name was invalid...

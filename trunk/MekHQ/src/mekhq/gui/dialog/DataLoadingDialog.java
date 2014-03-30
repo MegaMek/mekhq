@@ -144,8 +144,13 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             setProgress(3);
             boolean newCampaign = false;
             if(null == fileCampaign) {
-            	newCampaign = true;
-            	campaign = new Campaign();
+            	try {
+					newCampaign = true;
+					campaign = new Campaign();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
             } else {
             	MekHQ.logMessage("Loading campaign file from XML...");
 

@@ -42,7 +42,7 @@ import mekhq.campaign.personnel.Ranks;
 	        		// the rank orders match, try comparing the levels
 	            	return ((Comparable<Integer>)p0.getRankLevel()).compareTo(p1.getRankLevel());
 	        	}*/
-	            return ((Comparable<Integer>)p0.getRankOrder()).compareTo(p1.getRankOrder());
+	            return ((Comparable<Integer>)p0.getRankNumeric()).compareTo(p1.getRankNumeric());
         	} catch (Exception e) {
         		MekHQ.logError("[DEBUG] RankSorter Exception, s0: "+s0+", s1: "+s1);
         		e.printStackTrace();
