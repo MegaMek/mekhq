@@ -191,6 +191,7 @@ v0.3.4 (SVN)
     Completed the rank system overhaul. The rank levels (For Comstar/WoB to get Precentor IV and such)
     will be implemented separately once I decide how I want to add them.
 + Bug: NPE in CampaignGUI.refreshPatients() if patient is null and/or doctor ID is null
++ New MegaMek.jar r10732 & new MegaMekLab.jar 1406
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
