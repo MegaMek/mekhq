@@ -178,7 +178,7 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
     	int number = (Integer)spnNumber.getModel().getValue();
     	while(number > 0) {
     		Person p = campaign.newPerson(choiceType.getSelectedIndex() + 1);
-    		p.setRank(choiceRanks.getSelectedIndex());
+    		p.setRankNumeric(choiceRanks.getSelectedIndex());
     		if(!campaign.recruitPerson(p)) {
     		    number = 0;
     		} else {

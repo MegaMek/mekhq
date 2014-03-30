@@ -718,7 +718,6 @@ import mekhq.gui.BasicInfo;
                         c.setBackground(new Color(220, 220, 220));
                     } else {
                         c.setBackground(Color.WHITE);
-                        
                     }
                 }
                 return c;

@@ -2325,9 +2325,9 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	Person commander = null;
     	for(UUID id : vesselCrew) {
     		Person p = campaign.getPerson(id);
-    		if(null != p && p.getRankOrder() > bestRank) {
+    		if(null != p && p.getRankNumeric() > bestRank) {
     			commander = p;
-    			bestRank = p.getRankOrder();
+    			bestRank = p.getRankNumeric();
     		}
     	}
     	for(UUID pid : gunners) {
@@ -2335,9 +2335,9 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     		if((entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0) { 
     			continue;
     		}
-    		if(p.getRankOrder() > bestRank) {
+    		if(p.getRankNumeric() > bestRank) {
     			commander = p;
-    			bestRank = p.getRankOrder();
+    			bestRank = p.getRankNumeric();
     		}
     	}
     	for(UUID pid : drivers) {
@@ -2345,16 +2345,16 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     		if((entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0) { 
     			continue;
     		}
-    		if(p.getRankOrder() > bestRank) {
+    		if(p.getRankNumeric() > bestRank) {
     			commander = p;
-    			bestRank = p.getRankOrder();
+    			bestRank = p.getRankNumeric();
     		}
     	}
     	if(navigator != null) {
     		Person p = campaign.getPerson(navigator);
-    		if(null != p && p.getRankOrder() > bestRank) {
+    		if(null != p && p.getRankNumeric() > bestRank) {
     			commander = p;
-    			bestRank = p.getRankOrder();
+    			bestRank = p.getRankNumeric();
     		}
     	}
     	return commander;
@@ -2517,9 +2517,9 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
         			sumBonus += p.getSkill(SkillType.S_TECH_VESSEL).getBonus();
         			nCrew++;
         		}
-        		if(p.getRankOrder() > bestRank) {
+        		if(p.getRankNumeric() > bestRank) {
         		    engineerName = p.getName();
-        		    bestRank = p.getRankOrder();
+        		    bestRank = p.getRankNumeric();
         		}
         	}
         	if(nCrew > 0) {
@@ -2529,7 +2529,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
         		engineer.setId(commander.getId());
         		engineer.setPrimaryRole(Person.T_SPACE_CREW);
         		if(bestRank > -1) {
-        		    engineer.setRank(bestRank);
+        		    engineer.setRankNumeric(bestRank);
         		}
                 engineer.addSkill(SkillType.S_TECH_VESSEL, sumSkill/nCrew, sumBonus/nCrew);
         	} else {

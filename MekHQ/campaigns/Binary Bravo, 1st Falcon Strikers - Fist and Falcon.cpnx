@@ -2,9 +2,9 @@
 <campaign version="0.3.4-dev">
 	<info>
 		<name>Binary Bravo,1st Falcon Strikers, Delta Galaxy</name>
-		<faction>FRR</faction>
+		<faction>CJF</faction>
 		<ranks>
-			<rankSystem>7</rankSystem>
+			<rankSystem>6</rankSystem>
 			<rank>
 				<rankName>None</rankName>
 				<officer>true</officer>

@@ -212,8 +212,8 @@ public abstract class AbstractUnitRating implements IUnitRating {
                     }
 
                     // Compare rank.
-                    int p1Rank = p1.getRankOrder();
-                    int p2Rank = p2.getRankOrder();
+                    int p1Rank = p1.getRankNumeric();
+                    int p2Rank = p2.getRankNumeric();
                     if (p1Rank > p2Rank) {
                         return -1;
                     } else if (p1Rank < p2Rank) {

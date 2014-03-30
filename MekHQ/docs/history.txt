@@ -187,6 +187,9 @@ v0.3.4 (SVN)
     This will eventually allow passing of an option to the MekHQ.jar file in order to edit the official
     planets.xml file, and also an in game editor from the maps tab to allow for campaign level editing
     of the controlling factions and such as well.
++ RFE [#118]: Sub Rank Fields & Ranks by Profession - pt2
+    Completed the rank system overhaul. The rank levels (For Comstar/WoB to get Precentor IV and such)
+    will be implemented separately once I decide how I want to add them.
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

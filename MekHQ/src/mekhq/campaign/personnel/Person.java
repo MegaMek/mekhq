@@ -188,8 +188,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     protected String portraitCategory;
     protected String portraitFile;
 
-    //need to pass in the rank system
-    private int rankOrder;
+    // Our rank
+    private int rank;
+    // If this Person uses a custom rank system (-1 for no)
+    private int rankSystem = -1;
 
     //stuff to track for support teams
     protected int minutesLeft;
@@ -232,7 +234,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         acquisitions = 0;
         gender = G_MALE;
         birthday = new GregorianCalendar(3042, Calendar.JANUARY, 1);
-        rankOrder = 0;
+        rank = 0;
         status = S_ACTIVE;
         hits = 0;
         skills = new Hashtable<String, Skill>();
@@ -887,7 +889,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     + "</gender>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<rank>"
-                    + rankOrder
+                    + rank
                     + "</rank>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<nTasks>"
@@ -1062,7 +1064,18 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                 } else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
                     retVal.gender = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
-                    retVal.rankOrder = Integer.parseInt(wn2.getTextContent());
+                	if ((version.getMajorVersion() < 1 && (version.getMinorVersion() < 3
+                			|| (version.getMinorVersion() == 3 && version.getSnapshot() < 5)))
+                			|| (version.getRevision() != -1 && version.getRevision() < 1782)) {
+                		RankTranslator rt = new RankTranslator(c);
+                		try {
+							retVal.rank = rt.getNewRank(c.getRanks().getRankSystem(), Integer.parseInt(wn2.getTextContent()));
+						} catch (ArrayIndexOutOfBoundsException e) {
+							c.showMessage = true;
+						}
+                	} else {
+                		retVal.rank = Integer.parseInt(wn2.getTextContent());
+                	}
                 } else if (wn2.getNodeName().equalsIgnoreCase("doctorId")) {
                     if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
                         retVal.oldDoctorId = Integer.parseInt(wn2.getTextContent());
@@ -1303,11 +1316,11 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         }
         
         // Prisoner and Bondsman updating
-        if (retVal.prisonerStatus != PRISONER_NOT && retVal.rankOrder == 0) {
+        if (retVal.prisonerStatus != PRISONER_NOT && retVal.rank == 0) {
         	if (retVal.prisonerStatus == PRISONER_BONDSMAN) {
-        		retVal.setRank(Ranks.RANK_BONDSMAN);
+        		retVal.setRankNumeric(Ranks.RANK_BONDSMAN);
         	} else {
-        		retVal.setRank(Ranks.RANK_PRISONER);
+        		retVal.setRankNumeric(Ranks.RANK_PRISONER);
         	}
         }
 
@@ -1360,12 +1373,33 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         //TODO: Add era mod to salary calc..
     }
 
-    public int getRankOrder() {
-        return rankOrder;
+    public int getRankNumeric() {
+        return rank;
+    }
+
+    public void setRankNumeric(int r) {
+        this.rank = r;
+    }
+    
+    public int getRankSystem() {
+    	if (rankSystem == -1) {
+    		return campaign.getRanks().getRankSystem();
+    	}
+    	return rankSystem;
+    }
+    
+    public void setRankSystem(int system) {
+    	rankSystem = system;
+    	if (system == campaign.getRanks().getRankSystem()) {
+    		rankSystem = -1;
+    	}
     }
 
     public Rank getRank() {
-        return campaign.getRanks().getRank(rankOrder);
+    	if (rankSystem != -1) {
+    		return Ranks.getRanksFromSystem(rankSystem).getRank(rank);
+    	}
+        return campaign.getRanks().getRank(rank);
     }
     
     public String getRankName() {
@@ -1378,7 +1412,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	
     	// If we're set to a rank that no longer exists, demote ourself
     	while (getRank().getName(profession).equals("-")) {
-    		setRank(--rankOrder);
+    		setRankNumeric(--rank);
     	}
     	
     	// We've hit a rank that defaults back to the MechWarrior table, so grab the equivalent name from there
@@ -1390,10 +1424,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	
     	// We have our name, return it
     	return getRank().getName(profession);
-    }
-
-    public void setRank(int r) {
-        this.rankOrder = r;
     }
 
     public String getSkillSummary() {

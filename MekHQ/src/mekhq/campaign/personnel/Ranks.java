@@ -21,14 +21,22 @@
 
 package mekhq.campaign.personnel;
 
+import java.io.FileInputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Vector;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import mekhq.Version;
 import mekhq.gui.model.RankTableModel;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -74,7 +82,7 @@ public class Ranks {
 	public static final int RO_MAX	= 50;
 	public static final int RO_NUM	= 51; // Number that comes after RO_MAX
 	// Total
-	public static final int RC_NUM	= 51; // Same as RO_MAX
+	public static final int RC_NUM	= 51; // Same as RO_MAX+1
 	
 	// Rank Profession Codes
 	public static final int RPROF_MW	= 0;
@@ -85,110 +93,7 @@ public class Ranks {
 	public static final int RPROF_TECH	= 5;
 	public static final int RPROF_NUM	= 6;
 	
-	/*
-	 * Stock Ranks by Profession & Faction
-	 * Each profession must have either a 0 length entry for a faction, or the same length as the same faction under MW
-	 * Hyphen entries ("-") are allowed, and will be filled in with the same position from the MW table
-	 * Empty string (as in "") entries are also allowed, and will be skipped
-	 */
-	private static final String[][][] rankSystems = {
-		{ /* SLDF */
-			/* MW    */ {"None","Recruit","Private","Corporal","Sergeant","Master Sergeant","Lieutenant JG","Lieutenant SG","Captain","Major","Colonel","Lt. General","Major General","General","Commanding General"},
-			/* ASF   */ {},
-			/* VEE   */ {},
-			/* NAVAL */ {"None","Spaceman Recruit","Spaceman","Petty Officer","Chief PO","Master Chief PO","Warrant Officer","Lieutenant","Commander","Captain","Commodore","Rear Admiral","Vice Admiral","Admiral","Commanding Admiral"},
-			/* INF   */ {},
-			/* TECH  */ {}
-		},
-		{ /* AFFS */
-			/* MW    */ {"None","Recruit","Private","Corporal","Sergeant","Sergeant-Major","Subaltern","Leftenant","Captain","Major","Leftenant Colonel","Colonel","Leftenant General","Major General","General","Marshal","Field Marshal","Marshal of the Armies","Prince"},
-			/* ASF   */ {},
-			/* VEE   */ {},
-			/* NAVAL */ {"None","Recruit","Private","Corporal","Sergeant","Sergeant-Major","Subaltern","Leftenant","Captain","Major","Light Commodore","Commodore","Rear Admiral","Vice Admiral","Admiral","Fleet Admiral","-","-","-"},
-			/* INF   */ {},
-			/* TECH  */ {}
-		},
-		{ /* AFFC */
-			/* MW    */ {"None","Recruit","Private","Private, FC","Corporal","Sergeant","Sergeant-Major","Command Sergeant-Major","Cadet","Subaltern","Leftenant","Captain","Major","Leftenant Colonel","Colonel","Leftenant General","Major General","General","Marshal","Field Marshal","Marshal of the Armies","Prince"},
-			/* ASF   */ {},
-			/* VEE   */ {},
-			/* NAVAL */ {"None","Recruit","Private","Private, FC","Corporal","Sergeant","Sergeant-Major","Command Sergeant-Major","Cadet","Subaltern","Leftenant","Captain","Major","Light Commodore","Commodore","Rear Admiral","Vice Admiral","Admiral","Fleet Admiral","-","-","-"},
-			/* INF   */ {},
-			/* TECH  */ {}
-		},
-		{ /* LCAF */
-			/* MW    */ {"None","Private","Private, FC","Corporal","Senior Corporal","Sergeant","Staff Sergeant","Sergeant Major","Staff Sergeant Major","Senior Sergeant Major","Warrant Officer","Warrant Officer, FC","Senior Warrant Officer","Chief Warrant Officer","Leutnant","First Leutnant","Hauptmann","Kommandant","Hauptmann-Kommandant","Leutnant-Colonel","Colonel","Leutnant-General","Hauptmann-General","Kommandant-General","General","General of the Armies","Archon"},
-			/* ASF   */ {},
-			/* VEE   */ {},
-			/* NAVAL */ {"None","Private","Private, FC","Corporal","Senior Corporal","Sergeant","Staff Sergeant","Sergeant Major","Staff Sergeant Major","Senior Sergeant Major","Warrant Officer","Warrant Officer, FC","Senior Warrant Officer","Chief Warrant Officer","Leutnant","First Leutnant","Hauptmann","Kommandant","Hauptmann-Kommandant","Leutnant-Kaptain","Kaptain","Leutnant-Kommodore","Kommodore","Hauptmann-Kommodore","Admiral","Fleet Admiral","-"},
-			/* INF   */ {},
-			/* TECH  */ {}
-		},
-		{ /* LAAF */
-			/* MW    */ {"None","Recruit","Private","Private, FC","Corporal","Senior Corporal","Sergeant","Staff Sergeant","Sergeant Major","Staff Sergeant Major","Senior Sergeant Major","Cadet","Leutnant","First Leutnant","Hauptmann","Kommandant","Hauptmann-Kommandant","Leutnant-Colonel","Colonel","Leutnant-General","Hauptmann-General","Kommandant-General","General","General of the Armies","Archon"},
-			/* ASF   */ {},
-			/* VEE   */ {},
-			/* NAVAL */ {"None","Recruit","Private","Private, FC","Corporal","Senior Corporal","Sergeant","Staff Sergeant","Sergeant Major","Staff Sergeant Major","Senior Sergeant Major","Cadet","Leutnant","First Leutnant","Hauptmann","Kommandant","Hauptmann-Kommandant","Leutnant-Kaptain","Kaptain","Leutnant-Kommodore","Kommodore","Hauptmann-Kommodore","Admiral","Fleet Admiral","-"},
-			/* INF   */ {},
-			/* TECH  */ {}
-		},
-		{ /* FWLM */
-			/* MW    */ {"None","Recruit","Private","Private, FC","Corporal","Sergeant","Staff Sergeant","Master Sergeant","Sergeant Major","Lieutenant JG","Lieutenant SG","Captain","Force Commander","Lieutenant Colonel","Colonel","General","Marshal","Captain-General"},
-			/* ASF   */ {},
-			/* VEE   */ {},
-			/* NAVAL */ {"None","Spaceman Recruit","Spaceman","Able Spaceman","Petty Officer 2nd","Petty Officer 1st","Chief Petty Officer","Senior Chief PO","Master Chief PO", "Ensign","Lieutenant","Lt. Commander","Commander","Captain","Commodore","Vice Admiral","Admiral","Fleet Admiral","-"},
-			/* INF   */ {},
-			/* TECH  */ {}
-		},
-		{ /* CCAF */
-			/* MW    */ {"None","Shia-ben-bing","San-ben-bing","Si-ben-bing","Yi-si-ben-bing","Sao-wei","Sang-wei","Sao-shao","Zhong-shao","Sang-shao","Jiang-jun","Sang-jiang-jun","Chancellor"},
-			/* ASF   */ {},
-			/* VEE   */ {},
-			/* NAVAL */ {"None","Shia-ben-bing","San-ben-bing","Si-ben-bing","Yi-si-ben-bing","Kong-sao-wei","Kong-sang-wei","Kong-sao-shao","Kong-zhong-shao","Kong-sang-shao","Kong-jiang-jun","","-"},
-			/* INF   */ {},
-			/* TECH  */ {}
-		},
-		{ /* CCWH */
-			/* MW    */ {"None","Zhang-si","Ban-zhang","Pai-zhang","Lien-zhang","Ying-zhang","Shiao-zhang","Gao-shiao-zhang"},
-			/* ASF   */ {},
-			/* VEE   */ {},
-			/* NAVAL */ {},
-			/* INF   */ {},
-			/* TECH  */ {}
-		},
-		{ /* DCMS */
-			/* MW    */ {"None","Hojuhei","Heishi","Gunjin","Go-cho","Gunsho","Shujin","Kashira","Sho-ko","Chu-i","Tai-i","Sho-sa","Chu-sa","Tai-sa","Sho-sho","Tai-sho","Tai-shu","Gunji-no-Kanrei","Coordinator"},
-			/* ASF   */ {},
-			/* VEE   */ {},
-			/* NAVAL */ {"None","Hojuhei","Heishi","Gunjin","Go-cho","Gunsho","Shujin","Kashira","Sho-ko","Sho-i","Chu-i","Dai-i","Sho-sa","Captain","Cho-sho","Tai-sho","Tai-shu","-","-"},
-			/* INF   */ {},
-			/* TECH  */ {}
-		},
-		{ /* CLAN */
-			/* MW    */ {"None","Point","Point Commander","Star Commander","Nova Commander","Star Captain","Nova Captain","Star Colonel","Galaxy Commander","saKhan","Khan","ilKhan"},
-			/* ASF   */ {},
-			/* VEE   */ {},
-			/* NAVAL */ {"None","Point","Point Commander","Star Commander","Nova Commander","Star Captain","Nova Captain","Star Commodore","Star Admiral","saKhan","Khan","ilKhan"},
-			/* INF   */ {},
-			/* TECH  */ {}
-		},
-		{ /* ComStar */
-			/* MW    */ {"None","Acolyte","Adept","Demi-Precentor","Precentor","Precentor Martial","Primus"},
-			/* ASF   */ {},
-			/* VEE   */ {},
-			/* NAVAL */ {},
-			/* INF   */ {},
-			/* TECH  */ {}
-		},
-		{ /* WoB */
-			/* MW    */ {"None","Acolyte","Adept","Demi-Precentor","Precentor","Precentor Martial"},
-			/* ASF   */ {},
-			/* VEE   */ {},
-			/* NAVAL */ {},
-			/* INF   */ {},
-			/* TECH  */ {}
-		}
-	};
+	private static Hashtable<Integer, Ranks> rankSystems;
 	private static final int[] officerCut = {/*SLDF*/7,/*AFFS*/6,/*AFFC*/8,/*LCAF*/14,/*LAAF*/11,/*FWLM*/9,/*CCAF*/5,/*CCWH*/2,/*DCMD*/9,/*Clan*/3,/*COM*/2,/*WOB*/2};
 	public static final int RANK_BONDSMAN = -1;
 	public static final int RANK_PRISONER = -2;
@@ -196,8 +101,73 @@ public class Ranks {
 	private int rankSystem;
 	private ArrayList<Rank> ranks;
 	
-	public static String[][] getRankSystem(int system) {
-		return rankSystems[system];
+	public Ranks() {
+		this(RS_SL);
+	}
+	
+	public Ranks(int system) {
+		rankSystem = system;
+		useRankSystem(rankSystem);
+	}
+    
+    public static void initializeRankSystems() {
+        rankSystems = new Hashtable<Integer, Ranks>();
+        MekHQ.logMessage("Starting load of Rank Systems from XML...");
+        // Initialize variables.
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        Document xmlDoc = null;
+    
+        
+        try {
+            FileInputStream fis = new FileInputStream("data/universe/ranks.xml");
+            // Using factory get an instance of document builder
+            DocumentBuilder db = dbf.newDocumentBuilder();
+    
+            // Parse using builder to get DOM representation of the XML file
+            xmlDoc = db.parse(fis);
+        } catch (Exception ex) {
+            MekHQ.logError(ex);
+        }
+    
+        Element ranksEle = xmlDoc.getDocumentElement();
+        NodeList nl = ranksEle.getChildNodes();
+    
+        // Get rid of empty text nodes and adjacent text nodes...
+        // Stupid weird parsing of XML.  At least this cleans it up.
+        ranksEle.normalize(); 
+    
+        // Okay, lets iterate through the children, eh?
+        for (int x = 0; x < nl.getLength(); x++) {
+            Node wn = nl.item(x);
+            Ranks value;
+            
+            if (wn.getParentNode() != ranksEle)
+                continue;
+    
+            int xc = wn.getNodeType();
+    
+            if (xc == Node.ELEMENT_NODE) {
+                // This is what we really care about.
+                // All the meat of our document is in this node type, at this
+                // level.
+                // Okay, so what element is it?
+                String xn = wn.getNodeName();
+    
+                if (xn.equalsIgnoreCase("rankSystem")) {
+                    value = generateInstanceFromXML(wn, null);
+                    rankSystems.put(value.getRankSystem(), value);
+                }
+            }
+        }   
+        MekHQ.logMessage("Done loading Rank Systems");
+    }
+	
+	public static Ranks getRanksFromSystem(int system) {
+		return rankSystems.get(system);
+	}
+	
+	public int getRankSystem() {
+		return rankSystem;
 	}
 	
 	public static String getRankSystemName(int system) {
@@ -231,15 +201,6 @@ public class Ranks {
 		default:
 			return "?";
 		}
-	}
-	
-	public Ranks() {
-		this(RS_SL);
-	}
-	
-	public Ranks(int system) {
-		rankSystem = system;
-		useRankSystem(rankSystem);
 	}
     
     public boolean isEmptyProfession(int profession) {
@@ -298,14 +259,18 @@ public class Ranks {
 	}
 	
 	public void useRankSystem(int system) {
-		ranks = new ArrayList<Rank>();
-		if(system >= rankSystems.length) {
-			ranks.add(new Rank());
+		// If we've got an invalid rank system, default to Star League
+		if(system >= rankSystems.size()) {
+			if (rankSystems.isEmpty()) {
+				ranks = new ArrayList<Rank>();
+			} else {
+				ranks = rankSystems.get(RS_SL).getAllRanks();
+			}
+			rankSystem = RS_SL;
 			return;
 		}
-		for (int i = 0; i < rankSystems[system].length; i++) {
-			ranks.add(new Rank(rankSystems[system][i], officerCut[system] <= i,  1.0));
-		}
+		ranks = rankSystems.get(system).getAllRanks();
+		rankSystem = system;
 	}
 	
 	public void setCustomRanks(ArrayList<ArrayList<String>> customRanks, int offCut) {
@@ -354,10 +319,6 @@ public class Ranks {
 		    }
 		}
 		return 0;
-	}
-	
-	public int getRankSystem() {
-		return rankSystem;
 	}
 	
 	public void setRankSystem(int system) {
@@ -423,22 +384,29 @@ public class Ranks {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</rankSystem>");
     }
 	
-	public static Ranks generateInstanceFromXML(Node wn) {
-        Ranks retVal = new Ranks();
+	public static Ranks generateInstanceFromXML(Node wn, Version version) {
+		Ranks retVal = new Ranks();
         
         // Dump the ranks ArrayList so we can re-use it.
-        retVal.ranks.clear();
-        
-        try {  
+        retVal.ranks = new ArrayList<Rank>();
+
+        try {
             NodeList nl = wn.getChildNodes();
             
             for (int x=0; x<nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
                 
-                if (wn2.getNodeName().equalsIgnoreCase("system")) {
+                if (wn2.getNodeName().equalsIgnoreCase("system") || wn2.getNodeName().equalsIgnoreCase("rankSystem")) {
                 	retVal.rankSystem = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
-                	retVal.ranks.add(Rank.generateInstanceFromXML(wn2));
+                	// If this is an older version from before the full blown rank system with professions
+                	if (retVal.rankSystem != RS_CUSTOM && version != null && ((version.getMajorVersion() == 0 && version.getMinorVersion() < 4 && version.getSnapshot() < 5)
+                			|| (version.getRevision() != -1 && version.getRevision() < 1782))) {
+                		// Use the default ranks for this system
+                		return Ranks.getRanksFromSystem(retVal.rankSystem);
+                	} else if (version == null || retVal.rankSystem == RS_CUSTOM) {
+                		retVal.ranks.add(Rank.generateInstanceFromXML(wn2));
+                	}
                 } 
             }
         } catch (Exception ex) {
@@ -455,6 +423,13 @@ public class Ranks {
         Object[][] array = new Object[ranks.size()][RankTableModel.COL_NUM];
         int i = 0;
         for(Rank rank : ranks) {
+        	String rating = "E"+i;
+        	if (i > RWO_MAX) {
+        		rating = "O"+(i-RWO_MAX);
+        	} else if (i > RE_MAX) {
+        		rating = "WO"+(i-RE_MAX);
+        	}
+        	array[i][RankTableModel.COL_NAME_RATE]	= rating;
             array[i][RankTableModel.COL_NAME_MW]	= rank.getName(RPROF_MW);
             array[i][RankTableModel.COL_NAME_ASF]	= rank.getName(RPROF_ASF);
             array[i][RankTableModel.COL_NAME_VEE]	= rank.getName(RPROF_VEE);
