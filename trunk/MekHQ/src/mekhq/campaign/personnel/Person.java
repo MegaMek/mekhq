@@ -1068,9 +1068,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                 } else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
                     retVal.gender = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
-                	if ((version.getMajorVersion() < 1 && (version.getMinorVersion() < 3
-                			|| (version.getMinorVersion() == 3 && version.getSnapshot() < 5)))
-                			|| (version.getRevision() != -1 && version.getRevision() < 1782)) {
+                	if (Version.versionCompare(version, "0.3.4-r1782")) {
                 		RankTranslator rt = new RankTranslator(c);
                 		try {
 							retVal.rank = rt.getNewRank(c.getRanks().getRankSystem(), Integer.parseInt(wn2.getTextContent()));
