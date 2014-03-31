@@ -68,4 +68,75 @@ public class Version {
     public int getMajorVersion() {
         return major;
     }
+    
+    /**
+     * Compare Versions
+     * 
+     * @param checkVersion  The version we want to see if is less than this version
+     * 
+     * Use this method to determine if the version string passed is less than
+     * this version object.
+     */
+    public boolean versionCompare(String checkVersion) {
+    	return versionCompare(new Version(checkVersion));
+    }
+    
+    /**
+     * Compare Versions
+     * 
+     * @param checkVersion  The version we want to see if is less than this version
+     */
+    public boolean versionCompare(Version checkVersion) {
+    	// Pass to the static method for the final computation
+    	return Version.versionCompare(checkVersion, this);
+    }
+    
+    /**
+     * Compare Versions
+     * 
+     * @param checkVersion  The version we want to see if is less than the other
+     * @param staticVersion The static version that we're comparing against
+     */
+    public static boolean versionCompare(String checkVersion, String staticVersion) {
+    	return versionCompare(new Version(checkVersion), new Version(staticVersion));
+    }
+    
+    /**
+     * Compare Versions
+     * 
+     * @param checkVersion  The version we want to see if is less than the other
+     * @param staticVersion The static version that we're comparing against
+     */
+    public static boolean versionCompare(Version checkVersion, String staticVersion) {
+    	return versionCompare(checkVersion, new Version(staticVersion));
+    }
+    
+    /**
+     * Compare Versions
+     * 
+     * @param checkVersion  The version we want to see if is less than the other
+     * @param staticVersion The static version that we're comparing against
+     */
+    public static boolean versionCompare(String checkVersion, Version staticVersion) {
+    	return versionCompare(new Version(checkVersion), staticVersion);
+    }
+    
+    /**
+     * Compare Versions
+     * 
+     * @param checkVersion  The version we want to see if is less than the other
+     * @param staticVersion The static version that we're comparing against
+     */
+    public static boolean versionCompare(Version checkVersion, Version staticVersion) {
+    	// Major version is less
+    	if (checkVersion.getMajorVersion() < staticVersion.getMajorVersion())
+    		return true;
+    	else if (checkVersion.getMajorVersion() == staticVersion.getMajorVersion() && checkVersion.getMinorVersion() < staticVersion.getMinorVersion())
+    		return true;
+    	else if (checkVersion.getMajorVersion() == staticVersion.getMajorVersion() && checkVersion.getMinorVersion() == staticVersion.getMinorVersion() && checkVersion.getSnapshot() < staticVersion.getSnapshot())
+    		return true;
+    	else if (checkVersion.getRevision() != -1 && staticVersion.getRevision() != -1 && checkVersion.getRevision() < staticVersion.getRevision())
+    		return true;
+    	return false;
+    }
 }
