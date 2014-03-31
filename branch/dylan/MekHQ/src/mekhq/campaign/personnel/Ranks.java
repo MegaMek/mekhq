@@ -400,8 +400,9 @@ public class Ranks {
                 	retVal.rankSystem = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
                 	// If this is an older version from before the full blown rank system with professions
-                	if (retVal.rankSystem != RS_CUSTOM && version != null && ((version.getMajorVersion() == 0 && version.getMinorVersion() < 4 && version.getSnapshot() < 5)
-                			|| (version.getRevision() != -1 && version.getRevision() < 1782))) {
+                	if (retVal.rankSystem != RS_CUSTOM && version != null && Version.versionCompare(version, "0.3.4-r1782")) {
+                		// Translate the rank system
+                		retVal.rankSystem = Ranks.translateFactions[retVal.rankSystem];
                 		// Use the default ranks for this system
                 		return Ranks.getRanksFromSystem(retVal.rankSystem);
                 	} else if (version == null || retVal.rankSystem == RS_CUSTOM) {

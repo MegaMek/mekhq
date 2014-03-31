@@ -2762,9 +2762,7 @@ public class Campaign implements Serializable {
         
         // If the version is earlier than 0.3.4 r1782, then we need to translate
         // the rank system.
-        if ((version.getMajorVersion() < 1 && version.getMinorVersion() < 4
-        		&& version.getSnapshot() < 5)
-        		|| (version.getRevision() != -1 && version.getRevision() < 1782)) {
+        if (Version.versionCompare(version, "0.3.4-r1782")) {
         	retVal.setRankSystem(RankTranslator.translateRankSystem(retVal.getRanks().getRankSystem(), retVal.getFactionCode()));
         	if (retVal.getRanks() == null) {
         		
