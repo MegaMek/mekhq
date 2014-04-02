@@ -46,7 +46,7 @@ public class StartUpGUI extends javax.swing.JPanel {
                 return name.toLowerCase().endsWith(".cpnx") || name.toLowerCase().endsWith(".xml");
             }
         });
-        initComponents();      
+        initComponents();
     }
 
     /** This method is called from within the constructor to

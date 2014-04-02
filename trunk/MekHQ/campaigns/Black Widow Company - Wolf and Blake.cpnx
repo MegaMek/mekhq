@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<campaign version="0.3.4-dev">
+<campaign version="0.3.4-dev-r1700">
 	<info>
 		<name>Black Widow Company</name>
 		<faction>MERC</faction>
 		<ranks>
-			<rankSystem>0</rankSystem>
+			<rankSystem>7</rankSystem>
 			<rank>
 				<rankName>Trooper</rankName>
 				<officer>false</officer>

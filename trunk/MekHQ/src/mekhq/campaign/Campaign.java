@@ -238,8 +238,6 @@ public class Campaign implements Serializable {
     private ShoppingList shoppingList;
 
     private PersonnelMarket personnelMarket;
-    
-    public Boolean showMessage = false;
 
     public Campaign() {
         game = new Game();
@@ -2721,7 +2719,7 @@ public class Campaign implements Serializable {
         // If the version is earlier than 0.3.4 r1782, then we need to translate
         // the rank system.
         if (Version.versionCompare(version, "0.3.4-r1782")) {
-        	retVal.setRankSystem(RankTranslator.translateRankSystem(retVal.getRanks().getRankSystem(), retVal.getFactionCode()));
+        	retVal.setRankSystem(RankTranslator.translateRankSystem(retVal.getRanks().getOldRankSystem(), retVal.getFactionCode()));
         	if (retVal.getRanks() == null) {
         		
         	}
@@ -3100,7 +3098,6 @@ public class Campaign implements Serializable {
         NodeList wList = wn.getChildNodes();
 
         // Okay, lets iterate through the children, eh?
-        retVal.showMessage = false;
         for (int x = 0; x < wList.getLength(); x++) {
             Node wn2 = wList.item(x);
 
@@ -3123,10 +3120,6 @@ public class Campaign implements Serializable {
             if (p != null) {
                 retVal.addPersonWithoutId(p);
             }
-        }
-        
-        if (retVal.showMessage) {
-        	JOptionPane.showMessageDialog(null, "You have used a custom rank set in your campaign.\nYou must re-create that set in this version.", "ERROR: Custom Ranks", JOptionPane.ERROR_MESSAGE);
         }
 
         MekHQ.logMessage("Load Personnel Nodes Complete!", 4);

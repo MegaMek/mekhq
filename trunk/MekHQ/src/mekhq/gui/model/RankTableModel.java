@@ -26,6 +26,11 @@ public class RankTableModel extends DefaultTableModel {
     public RankTableModel(Object[][] ranksArray, String[] rankColNames) {
         super(ranksArray, rankColNames);
     }
+    
+    @Override
+    public boolean isCellEditable(int row, int column) {
+    	return !(column == COL_NAME_RATE || column == COL_OFFICER);
+    }
 
     @Override
     public Class<?> getColumnClass(int c) {
