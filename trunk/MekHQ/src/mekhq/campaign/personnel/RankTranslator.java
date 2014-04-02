@@ -79,6 +79,11 @@ public class RankTranslator {
 					case "CSV":
 					case "CW":
 						return Ranks.RS_CL;
+					case "OA": return Ranks.RS_OA;
+					case "MH": return Ranks.RS_MH;
+					case "TC": return Ranks.RS_TC;
+					case "MOC": return Ranks.RS_MOC;
+					case "FRR": return Ranks.RS_FRR;
 				}
 				return Ranks.RS_CUSTOM;
 			default: return Ranks.RS_SL;
