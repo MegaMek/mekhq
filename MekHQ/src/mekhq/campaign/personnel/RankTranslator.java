@@ -14,7 +14,12 @@ public class RankTranslator {
 	public static final int RT_CUSTOM = 7;
 	public static final int RT_NUM = 8;
 	
-	private static final String[][] oldRankSystems = {
+	public static final String[] oldRankNames = {
+		"Star League", "Federated Sun", "Lyran Alliance", "Free Worlds League",
+		"Capellan Confederation", "Draconis Combine", "Clan", "Custom"
+	};
+	
+	public static final String[][] oldRankSystems = {
 		{"None","Recruit","Private","Corporal","Sergeant","Master Sergeant","Warrant Officer","Lieutenant","Captain","Major","Colonel","Lt. General","Major General","General","Commanding General"},
 		{"None","Recruit","Private","Private, FC","Corporal","Sergeant","Sergeant-Major","Command Sergeant-Major","Cadet","Subaltern","Leftenant","Captain","Major","Leftenant Colonel","Colonel","Leftenant General","Major General","General","Marshal","Field Marshal","Marshal of the Armies"},
 		{"None","Recruit","Private","Private, FC","Corporal","Senior Corporal","Sergeant","Staff Sergeant","Sergeant Major","Staff Sergeant Major","Senior Sergeant Major","Warrant Officer","Warrant Officer, FC","Senior Warrant Officer","Chief Warrant Officer","Cadet","Leutnant","First Leutnant","Hauptmann","Kommandant","Hauptmann-Kommandant","Leutnant-Colonel","Colonel","Leutnant-General","Hauptmann-General","Kommandant-General","General","General of the Armies","Archon"},

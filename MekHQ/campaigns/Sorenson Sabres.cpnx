@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<campaign version="0.3.1-dev">
+<campaign version="0.3.1-dev-r1700">
 	<info>
 		<name>Sorenson Sabres</name>
 		<faction>DC</faction>
-		<ranks>5</ranks>
+		<ranks>
+			<rankSystem>5</rankSystem>
+		</ranks>
 		<nameGen>DC</nameGen>
 		<percentFemale>50</percentFemale>
 		<overtime>false</overtime>

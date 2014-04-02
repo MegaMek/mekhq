@@ -36,6 +36,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.ResourceBundle;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
@@ -86,6 +87,7 @@ import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.model.RankTableModel;
 import mekhq.gui.model.SortedComboBoxModel;
+import mekhq.gui.utilities.TableCellListener;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -2228,9 +2230,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         comboRanks.setModel(rankModel);
         comboRanks.setSelectedIndex(campaign.getRanks().getRankSystem());
         comboRanks.setName("comboRanks"); // NOI18N
+        comboRanks.setActionCommand("fillRanks");
         comboRanks.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                fillRankInfo();
+            	if (evt.getActionCommand().equals("fillRanks"))
+            		fillRankInfo();
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -2291,6 +2295,21 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                         tableRanksValueChanged(evt);
                     }
                 });
+        AbstractAction rankCellAction = new AbstractAction() {
+			private static final long serialVersionUID = -7586376360964669234L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				TableCellListener tcl = (TableCellListener)e.getSource();
+				if (!(tcl.getOldValue().equals(tcl.getNewValue()))) {
+					comboRanks.setActionCommand("noFillRanks");
+					comboRanks.setSelectedIndex(Ranks.RS_CUSTOM);
+					comboRanks.setActionCommand("fillRanks");
+				}
+			}
+        	
+        };
+        TableCellListener rankCellListener = new TableCellListener(tableRanks, rankCellAction);
         scrRanks.setViewportView(tableRanks);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -2747,7 +2766,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     private void tableRanksValueChanged(javax.swing.event.ListSelectionEvent evt) {
         int row = tableRanks.getSelectedRow();
-        btnDeleteRank.setEnabled(row != -1);
+        //btnDeleteRank.setEnabled(row != -1);
     }
 
     private void addRank() {
@@ -2802,8 +2821,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             campaign.getRNG().setChosenFaction((String) comboFactionNames.getSelectedItem());
         }
         campaign.getRNG().setPerentFemale(sldGender.getValue());
-        campaign.getRanks().setRanksFromModel(ranksModel);
-        campaign.setRankSystem(comboRanks.getSelectedIndex());
+        if (comboRanks.getSelectedIndex() == Ranks.RS_CUSTOM)
+        {
+	        campaign.getRanks().setRanksFromModel(ranksModel);
+	        campaign.setRankSystem(Ranks.RS_CUSTOM);
+        }
         campaign.setCamoCategory(camoCategory);
         campaign.setCamoFileName(camoFileName);
         campaign.setColorIndex(colorIndex);

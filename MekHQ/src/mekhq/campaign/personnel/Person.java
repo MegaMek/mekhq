@@ -1071,9 +1071,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                 	if (Version.versionCompare(version, "0.3.4-r1782")) {
                 		RankTranslator rt = new RankTranslator(c);
                 		try {
-							retVal.rank = rt.getNewRank(c.getRanks().getRankSystem(), Integer.parseInt(wn2.getTextContent()));
+							retVal.rank = rt.getNewRank(c.getRanks().getOldRankSystem(), Integer.parseInt(wn2.getTextContent()));
 						} catch (ArrayIndexOutOfBoundsException e) {
-							c.showMessage = true;
+							// Do nothing
 						}
                 	} else {
                 		retVal.rank = Integer.parseInt(wn2.getTextContent());

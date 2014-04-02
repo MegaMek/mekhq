@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<campaign version="0.3.4-dev">
+<campaign version="0.3.4-dev-r1700">
 	<info>
 		<name>The Kewran Wolfhounds, C Company, 3rd Battalion, 25th Arcturan Guards RCT</name>
 		<faction>LA</faction>
 		<ranks>
-			<rankSystem>0</rankSystem>
+			<rankSystem>2</rankSystem>
 			<rank>
 				<rankName>None</rankName>
 				<officer>false</officer>
@@ -2011,6 +2011,7 @@ Conversion by Hammer</desc>
 			<unitTonnage>50</unitTonnage>
 			<hits>0</hits>
 			<difficulty>0</difficulty>
+
 			<time>0</time>
 			<timeSpent>0</timeSpent>
 			<mode>0</mode>
@@ -2266,6 +2267,7 @@ Conversion by Hammer</desc>
 			<difficulty>0</difficulty>
 			<time>0</time>
 			<timeSpent>0</timeSpent>
+
 			<mode>0</mode>
 			<skillMin>1</skillMin>
 			<unitId>e916d765-b5b7-424f-a6c3-e6f1c3f4f145</unitId>
@@ -4064,6 +4066,7 @@ Conversion by Hammer</desc>
 			<workingOvertime>false</workingOvertime>
 			<shorthandedMod>0</shorthandedMod>
 			<refitId>null</refitId>
+
 			<daysToArrival>0</daysToArrival>
 			<brandNew>false</brandNew>
 			<quantity>1</quantity>
@@ -8855,6 +8858,7 @@ Conversion by Hammer</desc>
 			<refitId>null</refitId>
 			<daysToArrival>0</daysToArrival>
 			<brandNew>false</brandNew>
+
 			<quantity>1</quantity>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
@@ -9392,6 +9396,7 @@ Conversion by Hammer</desc>
 			<timeSpent>0</timeSpent>
 			<mode>0</mode>
 			<skillMin>1</skillMin>
+
 			<unitId>7d7ed6fc-dbe0-4c7f-ae29-4fc357cac9ca</unitId>
 			<salvaging>false</salvaging>
 			<workingOvertime>false</workingOvertime>
@@ -13359,6 +13364,7 @@ Conversion by Hammer</desc>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
 			<type>10</type>
+
 			<location>4</location>
 		</part>
 		<part id="152" type="mekhq.campaign.parts.MekActuator">
