@@ -196,6 +196,7 @@ v0.3.4 (SVN)
 + Implemented new Version.versionCompare() method, with several overloads including both static and non-static versions
 + Bug: New rank system was still writing out ranks for the stock systems. As these systems are no longer editable, we don't need to do this
 + Bug: When editing ranks, it should automatically change the ranks dropdown to Custom and the canon ranks should not be editable
++ Data: Added more canon rank systems (Several periphery realms and the FRR)
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

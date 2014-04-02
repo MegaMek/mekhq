@@ -66,7 +66,12 @@ public class Ranks {
 	public static final int RS_COM		= 10;
 	public static final int RS_WOB		= 11;
 	public static final int RS_CUSTOM	= 12;
-	public static final int RS_NUM		= 13;
+	public static final int RS_MOC		= 13;
+	public static final int RS_TC		= 14;
+	public static final int RS_MH		= 15;
+	public static final int RS_OA		= 16;
+	public static final int RS_FRR		= 17;
+	public static final int RS_NUM		= 18;
 	
 	public static final int[] translateFactions = { /* 0 */ 0, /* 1 */ 1, /* 2 */ 4, /* 3 */ 5, /* 4 */ 6, /* 5 */ 8, /* 6 */ 9, /* 7 */ 12 };
 	
@@ -205,6 +210,16 @@ public class Ranks {
 			return "Comstar";
 		case RS_WOB:
 			return "Word of Blake";
+		case RS_MOC:
+			return "Magistry of Canopus";
+		case RS_MH:
+			return "Marian Hegemony";
+		case RS_TC:
+			return "Taurian Concordat";
+		case RS_OA:
+			return "Outworld's Alliance";
+		case RS_FRR:
+			return "Free Rasalhague Republic";
 		default:
 			return "?";
 		}
