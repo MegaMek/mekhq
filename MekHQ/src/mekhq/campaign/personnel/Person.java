@@ -190,8 +190,23 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     // Our rank
     private int rank;
+    private int rankLevel = 0;
     // If this Person uses a custom rank system (-1 for no)
     private int rankSystem = -1;
+    private Ranks ranks;
+    
+    // Manei Domini "Classes"
+    public static final int MD_NONE			= 0;
+    public static final int MD_GHOST		= 1;
+    public static final int MD_WRAITH		= 2;
+    public static final int MD_BANSHEE		= 3;
+    public static final int MD_ZOMBIE		= 4;
+    public static final int MD_PHANTOM		= 5;
+    public static final int MD_SPECTER		= 6;
+    public static final int MD_POLTERGEIST	= 7;
+    public static final int MD_NUM			= 8;
+    private int maneiDominiClass = MD_NONE;
+    private int maneiDominiRank = Rank.MD_RANK_NONE;
 
     //stuff to track for support teams
     protected int minutesLeft;
@@ -235,6 +250,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         gender = G_MALE;
         birthday = new GregorianCalendar(3042, Calendar.JANUARY, 1);
         rank = 0;
+        rankLevel = 0;
         status = S_ACTIVE;
         hits = 0;
         skills = new Hashtable<String, Skill>();
@@ -896,6 +912,22 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     + rank
                     + "</rank>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+	                + "<rankLevel>"
+	                + rankLevel
+	                + "</rankLevel>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+	                + "<rankSystem>"
+	                + rankSystem
+	                + "</rankSystem>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+	                + "<maneiDominiRank>"
+	                + maneiDominiRank
+	                + "</maneiDominiRank>");
+    pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+	                + "<maneiDominiClass>"
+	                + maneiDominiClass
+	                + "</maneiDominiClass>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<nTasks>"
                     + nTasks
                     + "</nTasks>");
@@ -1078,6 +1110,14 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                 	} else {
                 		retVal.rank = Integer.parseInt(wn2.getTextContent());
                 	}
+                } else if (wn2.getNodeName().equalsIgnoreCase("rankLevel")) {
+                	retVal.rankLevel = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("rankSystem")) {
+                	retVal.setRankSystem(Integer.parseInt(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("maneiDominiRank")) {
+                	retVal.maneiDominiRank = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("maneiDominiClass")) {
+                	retVal.maneiDominiClass = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("doctorId")) {
                     if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
                         retVal.oldDoctorId = Integer.parseInt(wn2.getTextContent());
@@ -1380,7 +1420,21 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
 
     public void setRankNumeric(int r) {
-        this.rank = r;
+        rank = r;
+        rankLevel = 0; // Always reset to 0 so that a call to setRankLevel() isn't mandatory.
+    }
+
+    public int getRankLevel() {
+    	// If we're somehow about the max level for this rank, drop to that level
+    	if (rankLevel > getRank().getRankLevels(getProfession())) {
+    		rankLevel = getRank().getRankLevels(getProfession());
+    	}
+    	
+        return rankLevel;
+    }
+
+    public void setRankLevel(int level) {
+        rankLevel = level;
     }
     
     public int getRankSystem() {
@@ -1395,6 +1449,24 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	if (system == campaign.getRanks().getRankSystem()) {
     		rankSystem = -1;
     	}
+    	
+    	// Set the ranks too
+    	if (rankSystem == -1) {
+    		ranks = null;
+    	} else {
+        	ranks = new Ranks(rankSystem);
+    	}
+    }
+    
+    public Ranks getRanks() {
+    	if (rankSystem != -1) {
+    		// Null protection
+    		if (ranks == null) {
+    			ranks = new Ranks(rankSystem);
+    		}
+    		return ranks;
+    	}
+    	return campaign.getRanks();
     }
 
     public Rank getRank() {
@@ -1405,10 +1477,11 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
     
     public String getRankName() {
+    	String rankName;
     	int profession = getProfession();
     	
     	// If we're using an "empty" profession, default to MechWarrior
-    	if (campaign.getRanks().isEmptyProfession(profession)) {
+    	if (getRanks().isEmptyProfession(profession)) {
     		profession = campaign.getRanks().getAlternateProfession(profession);
     	}
     	
@@ -1417,18 +1490,69 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     		setRankNumeric(--rank);
     	}
     	
-    	// We've hit a rank that defaults back to the MechWarrior table, so grab the equivalent name from there
-    	if (getRank().getName(profession).equals("--")) {
-    		return getRank().getName(campaign.getRanks().getAlternateProfession(profession));
-    	} else if (getRank().getName(profession).startsWith("--")) {
-    		return getRank().getName(campaign.getRanks().getAlternateProfession(getRank().getName(profession)));
+    	// re-route through any profession redirections
+    	while (getRank().getName(profession).startsWith("--") && profession != Ranks.RPROF_MW) {
+	    	// We've hit a rank that defaults to the MechWarrior table, so grab the equivalent name from there
+	    	if (getRank().getName(profession).equals("--")) {
+	    		profession = getRanks().getAlternateProfession(profession);
+	    	} else if (getRank().getName(profession).startsWith("--")) {
+	    		profession = getRanks().getAlternateProfession(getRank().getName(profession));
+	    	}
+    	}
+    	
+    	rankName = getRank().getName(profession);
+    	
+    	// If we have a rankLevel, add it
+    	if (rankLevel > 0) {
+    		if (getRank().getRankLevels(profession) > 0)
+    			rankName += Utilities.getRomanNumeralsFromArabicNumber(rankLevel, true);
+    		else // Oops! Our rankLevel didn't get correctly cleared, they's remedy that.
+    			rankLevel = 0;
     	}
     	
     	// We have our name, return it
-    	return getRank().getName(profession);
+    	return rankName;
     }
 
-    public String getSkillSummary() {
+    public int getManeiDominiClass() {
+		return maneiDominiClass;
+	}
+
+	public void setManeiDominiClass(int maneiDominiClass) {
+		this.maneiDominiClass = maneiDominiClass;
+	}
+
+    public int getManeiDominiRank() {
+		return maneiDominiRank;
+	}
+
+	public void setManeiDominiRank(int maneiDominiRank) {
+		this.maneiDominiRank = maneiDominiRank;
+	}
+	
+	public String getManeiDominiClassNames() {
+		return getManeiDominiClassNames(maneiDominiClass, getRanks().getRankSystem());
+	}
+	
+	public static String getManeiDominiClassNames(int maneiDominiClass, int rankSystem) {
+		// Only WoB
+		if (rankSystem != Ranks.RS_WOB)
+			return "";
+		
+		switch (maneiDominiClass) {
+			case MD_NONE: return "";
+			case MD_GHOST: return "Ghost";
+			case MD_WRAITH: return "Wraith";
+			case MD_BANSHEE: return "Banshee";
+			case MD_ZOMBIE: return "Zombie";
+			case MD_PHANTOM: return "Phantom";
+			case MD_SPECTER: return "Specter";
+			case MD_POLTERGEIST: return "Poltergeist";
+			default: return "";
+		}
+	}
+
+	public String getSkillSummary() {
         return SkillType.getExperienceLevelName(getExperienceLevel(false));
     }
 
@@ -1611,6 +1735,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     
     public String getFullTitle(boolean html) {
         String rank = getRankName();
+        
+        // Do prisoner checks
         if (rank.equalsIgnoreCase("None")) {
             if (isPrisoner()) {
                 return "Prisoner " + getName();
@@ -1620,8 +1746,24 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
             }
             return getName();
         }
+        
+        // Manei Domini Additions
+        if (getRanks().getRankSystem() != Ranks.RS_WOB) {
+        	// Oops, clear our MD variables
+        	maneiDominiClass = MD_NONE;
+        	maneiDominiRank = Rank.MD_RANK_NONE;
+        }
+        if (maneiDominiClass != MD_NONE) {
+        	rank = this.getManeiDominiClassNames() + " " + rank;
+        }
+        if (maneiDominiRank != Rank.MD_RANK_NONE) {
+        	rank += " " + Rank.getManeiDominiRankName(maneiDominiRank);
+        }
+        
+        // If we need it in html for any reason, make it so.
         if (html)
         	rank = makeHTMLRankDiv();
+        
         return rank + " " + getName();
     }
     

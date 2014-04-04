@@ -175,6 +175,7 @@ import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Rank;
+import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
@@ -6985,11 +6986,53 @@ public class CampaignGUI extends JPanel {
             for (int i = 0; i < rows.length; i++) {
                 people[i] = personModel.getPerson(personnelTable.convertRowIndexToModel(rows[i]));
             }
-            if (command.contains("RANK")) {
+            if (command.startsWith("RANKSYSTEM")) {
+            	int system = Integer.parseInt(st.nextToken());
+            	for (Person person : people) {
+            		person.setRankSystem(system);
+            	}
+                refreshServicedUnitList();
+                refreshUnitList();
+                refreshPatientList();
+                refreshPersonnelList();
+                refreshTechsList();
+                refreshDoctorsList();
+                refreshOrganization();
+            } else if (command.startsWith("RANK")) {
                 int rank = Integer.parseInt(st.nextToken());
-                for (Person person : people) {
-                    getCampaign().changeRank(person, rank, true);
+                int level = 0;
+                // Check to see if we added a rank level...
+                if (st.hasMoreTokens()) {
+                	level = Integer.parseInt(st.nextToken());
                 }
+                
+                for (Person person : people) {
+                    getCampaign().changeRank(person, rank, level, true);
+                }
+                refreshServicedUnitList();
+                refreshUnitList();
+                refreshPatientList();
+                refreshPersonnelList();
+                refreshTechsList();
+                refreshDoctorsList();
+                refreshOrganization();
+            } else if (command.startsWith("MD_RANK")) {
+            	int md_rank = Integer.parseInt(st.nextToken());
+            	for (Person person : people) {
+            		person.setManeiDominiRank(md_rank);
+            	}
+                refreshServicedUnitList();
+                refreshUnitList();
+                refreshPatientList();
+                refreshPersonnelList();
+                refreshTechsList();
+                refreshDoctorsList();
+                refreshOrganization();
+            } else if (command.startsWith("MD_CLASS")) {
+            	int md_class = Integer.parseInt(st.nextToken());
+            	for (Person person : people) {
+            		person.setManeiDominiClass(md_class);
+            	}
                 refreshServicedUnitList();
                 refreshUnitList();
                 refreshPatientList();
@@ -7624,7 +7667,21 @@ public class CampaignGUI extends JPanel {
                     return false;
                 }
             }
+        	int system = people[0].getRankSystem();
+            for (Person person : people) {
+                if (person.getRankSystem() != system) {
+                    return false;
+                }
+            }
             return true;
+        }
+        
+        private boolean areAllWoB(Person[] people) {
+        	for (Person p : people) {
+        		if (p.getRanks().getRankSystem() != Ranks.RS_WOB)
+        			return false;
+        	}
+        	return true;
         }
 
         private Person[] getSelectedPeople() {
@@ -7655,23 +7712,103 @@ public class CampaignGUI extends JPanel {
                 // **lets fill the pop up menu**//
                 if (areAllEligible(selected)) {
                     menu = new JMenu("Change Rank");
-                    int rankOrder = 0;
-                    for (Rank rank : getCampaign().getRanks().getAllRanks()) {
-                        cbMenuItem = new JCheckBoxMenuItem(rank.getName(person.getProfession()));
-                        cbMenuItem.setActionCommand("RANK|" + rankOrder);
-                        if (person.getRankNumeric() == rankOrder) {
-                            cbMenuItem.setSelected(true);
-                        }
-                        cbMenuItem.addActionListener(this);
-                        cbMenuItem.setEnabled(true);
-                        menu.add(cbMenuItem);
-                        rankOrder++;
+                    Ranks ranks = person.getRanks() == null ? getCampaign().getRanks() : person.getRanks();
+                    for (int rankOrder = 0; rankOrder < Ranks.RC_NUM; rankOrder++) {
+                    	Rank rank = ranks.getAllRanks().get(rankOrder);
+                        int profession = person.getProfession();
+                        
+                    	if (rank.getName(profession).equals("-")) {
+                    		continue;
+                    	}
+                    	
+                    	// re-route through any profession redirections
+                    	while (rank.getName(profession).startsWith("--") && profession != Ranks.RPROF_MW) {
+	                    	if (rank.getName(profession).equals("--")) {
+	                    		profession = getCampaign().getRanks().getAlternateProfession(profession);
+	                    	} else if (rank.getName(profession).startsWith("--")) {
+	                    		profession = getCampaign().getRanks().getAlternateProfession(rank.getName(profession));
+	                    	}
+                    	}
+                    	
+                    	if (rank.getRankLevels(profession) > 0) {
+                    		submenu = new JMenu(rank.getName(profession));
+                    		for (int level = 0; level <= rank.getRankLevels(profession); level++) {
+                    			cbMenuItem = new JCheckBoxMenuItem(rank.getName(profession)+Utilities.getRomanNumeralsFromArabicNumber(level, true));
+    	                        cbMenuItem.setActionCommand("RANK|" + rankOrder + "|" + level);
+    	                        if (person.getRankNumeric() == rankOrder && person.getRankLevel() == level) {
+    	                            cbMenuItem.setSelected(true);
+    	                        }
+    	                        cbMenuItem.addActionListener(this);
+    	                        cbMenuItem.setEnabled(true);
+    	                        submenu.add(cbMenuItem);
+                    		}
+                    		menu.add(submenu);
+                    	} else {
+	                        cbMenuItem = new JCheckBoxMenuItem(rank.getName(profession));
+	                        cbMenuItem.setActionCommand("RANK|" + rankOrder);
+	                        if (person.getRankNumeric() == rankOrder) {
+	                            cbMenuItem.setSelected(true);
+	                        }
+	                        cbMenuItem.addActionListener(this);
+	                        cbMenuItem.setEnabled(true);
+	                        menu.add(cbMenuItem);
+                    	}
                     }
                     if (menu.getItemCount() > 20) {
                         MenuScroller.setScrollerFor(menu, 20);
                     }
                     popup.add(menu);
                 }
+                menu = new JMenu("Change Rank System");
+                // First allow them to revert to the campaign system
+                cbMenuItem = new JCheckBoxMenuItem("Use Campaign Rank System");
+                cbMenuItem.setActionCommand("RANKSYSTEM|" + "-1");
+                cbMenuItem.addActionListener(this);
+                cbMenuItem.setEnabled(true);
+                menu.add(cbMenuItem);
+                for (int system = 0; system < Ranks.RS_NUM; system++) {
+                	if (system == Ranks.RS_CUSTOM) {
+                		continue;
+                	}
+                	cbMenuItem = new JCheckBoxMenuItem(Ranks.getRankSystemName(system));
+                    cbMenuItem.setActionCommand("RANKSYSTEM|" + system);
+                    cbMenuItem.addActionListener(this);
+                    cbMenuItem.setEnabled(true);
+                    if (system == person.getRanks().getRankSystem()) {
+                    	cbMenuItem.setSelected(true);
+                    }
+                    menu.add(cbMenuItem);
+                }
+                if (areAllWoB(selected)) {
+                	// MD Ranks
+                	menu = new JMenu("Change Manei Domini Rank");
+                	for (int i = Rank.MD_RANK_NONE; i < Rank.MD_RANK_NUM; i++) {
+                		cbMenuItem = new JCheckBoxMenuItem(Rank.getManeiDominiRankName(i));
+                        cbMenuItem.setActionCommand("MD_RANK|" + i);
+                        cbMenuItem.addActionListener(this);
+                        cbMenuItem.setEnabled(true);
+                        if (i == person.getManeiDominiRank()) {
+                        	cbMenuItem.setSelected(true);
+                        }
+                        menu.add(cbMenuItem);
+                	}
+                	popup.add(menu);
+                	
+                	// MD Classes
+                	menu = new JMenu("Change Manei Domini Class");
+                	for (int i = Person.MD_NONE; i < Person.MD_NUM; i++) {
+                		cbMenuItem = new JCheckBoxMenuItem(Person.getManeiDominiClassNames(i, Ranks.RS_WOB));
+                        cbMenuItem.setActionCommand("MD_CLASS|" + i);
+                        cbMenuItem.addActionListener(this);
+                        cbMenuItem.setEnabled(true);
+                        if (i == person.getManeiDominiClass()) {
+                        	cbMenuItem.setSelected(true);
+                        }
+                        menu.add(cbMenuItem);
+                	}
+                	popup.add(menu);
+                }
+                popup.add(menu);
                 menu = new JMenu("Change Status");
                 for (int s = 0; s < Person.S_NUM; s++) {
                     cbMenuItem = new JCheckBoxMenuItem(Person.getStatusName(s));
