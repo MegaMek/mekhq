@@ -42,14 +42,14 @@
     <property name="svnbuilddir" value="${svndir}/${builddir}" />
 
     <!-- svnroot used for svn authentification -->
-    <property name="svnroot" value="svn://svn.code.sf.net/p/mekhq/code/trunk/MekHQ" />
-    <property name="svndata" value="svn://svn.code.sf.net/p/megamek/code/trunk/megamek/data" />
-    <property name="svnconf" value="svn://svn.code.sf.net/p/megamek/code/trunk/megamek/mmconf" />
-    <property name="svnlibs" value="svn://svn.code.sf.net/p/megamek/code/trunk/megamek/lib" />
-    <property name="svnmmdocs" value="svn://svn.code.sf.net/p/megamek/code/trunk/megamek/docs" />
-    <property name="svnmmldocs" value="svn://svn.code.sf.net/p/megameklab/code/trunk/docs" />
-    <property name="svnrsheets" value="svn://svn.code.sf.net/p/megameklab/code/trunk/data/images/recordsheets" />
-    <property name="svnmmlpng" value="svn://svn.code.sf.net/p/megameklab/code/trunk/data/images/misc/megameklab.png" />
+    <property name="svnroot" value="https://svn.code.sf.net/p/mekhq/code/trunk/MekHQ" />
+    <property name="svndata" value="https://svn.code.sf.net/p/megamek/code/trunk/megamek/data" />
+    <property name="svnconf" value="https://svn.code.sf.net/p/megamek/code/trunk/megamek/mmconf" />
+    <property name="svnlibs" value="https://svn.code.sf.net/p/megamek/code/trunk/megamek/lib" />
+    <property name="svnmmdocs" value="https://svn.code.sf.net/p/megamek/code/trunk/megamek/docs" />
+    <property name="svnmmldocs" value="https://svn.code.sf.net/p/megameklab/code/trunk/docs" />
+    <property name="svnrsheets" value="https://svn.code.sf.net/p/megameklab/code/trunk/data/images/recordsheets" />
+    <property name="svnmmlpng" value="https://svn.code.sf.net/p/megameklab/code/trunk/data/images/misc/megameklab.png" />
 
 
     <property name="timestampfile" value="${logdir}/timestamp" />
@@ -138,7 +138,7 @@
             <fileset dir="${svndir}/${datadir}-OLD" >
                 <include name="universe/" />
                 <include name="fonts/" />
-                <include name="spa" />
+                <include name="spa/" />
                 <include name="images/force/" />
                 <include name="images/portraits/FoxsTeeth/" />
                 <include name="images/fluff/mech/*.png" />
