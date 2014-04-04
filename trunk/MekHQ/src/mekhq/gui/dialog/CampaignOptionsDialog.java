@@ -35,6 +35,7 @@ import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -82,9 +83,11 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
+import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.model.RankTableModel;
 import mekhq.gui.model.SortedComboBoxModel;
 import mekhq.gui.utilities.TableCellListener;
@@ -299,6 +302,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     private JPanel panRandomPortrait;
     private JCheckBox[] chkUsePortrait;
+    
+    private JPanel panSpecialAbilities;
 
     /**
      * Creates new form CampaignOptionsDialog
@@ -1599,6 +1604,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         tabOptions.addTab(resourceMap.getString("panMercenary.TabConstraints.tabTitle"), panMercenary); // NOI18N
 
+        Set<String> spaNames = SpecialAbility.getAllSpecialAbilities().keySet();
+        
         panXP.setName("panXP"); // NOI18N
         panXP.setLayout(new java.awt.GridBagLayout());
 
@@ -1922,6 +1929,23 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         tabOptions.addTab(resourceMap.getString("panSkill.TabConstraints.tabTitle"), scrSkill); // NOI18N
 
+        panSpecialAbilities = new JPanel(new GridBagLayout());
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx =1.0;
+        gridBagConstraints.weighty =1.0;
+
+        for(String name : spaNames) {
+            panSpecialAbilities.add(new SpecialAbilityPanel(SpecialAbility.getAbility(name)), gridBagConstraints);
+            gridBagConstraints.gridy++;
+        }      
+        
+        tabOptions.addTab("Special Abilities", new JScrollPane(panSpecialAbilities)); // NOI18N
+        
 
         panRandomSkill.setName("panRandomSkill"); // NOI18N
         panRandomSkill.setLayout(new java.awt.GridBagLayout());

@@ -2417,6 +2417,11 @@ public class Campaign implements Serializable {
             }
         }
         pw1.println("\t</skillTypes>");
+        pw1.println("\t<specialAbilities>");
+        for(String key : SpecialAbility.getAllSpecialAbilities().keySet()) {
+            SpecialAbility.getAbility(key).writeToXml(pw1, 2);
+        }
+        pw1.println("\t</specialAbilities>");
         rskillPrefs.writeToXml(pw1, 1);
         // parts is the biggest so it goes last
         writeArrayAndHashToXml(pw1, 1, "parts", parts, partIds); // Parts
@@ -2686,6 +2691,8 @@ public class Campaign implements Serializable {
                             wn, retVal);
                 } else if (xn.equalsIgnoreCase("skillTypes")) {
                     processSkillTypeNodes(retVal, wn, version);
+                } else if (xn.equalsIgnoreCase("specialAbilities")) {
+                    processSpecialAbilityNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("gameOptions")) {
                     processGameOptionNodes(retVal, wn);
                 } else if (xn.equalsIgnoreCase("kills")) {
@@ -3156,6 +3163,39 @@ public class Campaign implements Serializable {
 
         MekHQ.logMessage("Load Skill Type Nodes Complete!", 4);
     }
+    
+    private static void processSpecialAbilityNodes(Campaign retVal, Node wn,
+            Version version) {
+        MekHQ.logMessage("Loading Special Ability Nodes from XML...", 4);
+        
+        PilotOptions options = new PilotOptions();
+        SpecialAbility.clearSPA();
+        
+        NodeList wList = wn.getChildNodes();
+                
+        // Okay, lets iterate through the children, eh?
+        for (int x = 0; x < wList.getLength(); x++) {
+            Node wn2 = wList.item(x);
+        
+            // If it's not an element node, we ignore it.
+            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+        
+            if (!wn2.getNodeName().equalsIgnoreCase("ability")) {
+                // Error condition of sorts!
+                // Errr, what should we do here?
+                MekHQ.logMessage("Unknown node type not loaded in Special Ability nodes: "
+                        + wn2.getNodeName());
+        
+                continue;
+            }
+        
+            SpecialAbility.generateInstanceFromXML(wn2, options);
+        }
+        
+        MekHQ.logMessage("Load Special Ability Nodes Complete!", 4);
+}
 
     private static void processKillNodes(Campaign retVal, Node wn,
                                          Version version) {
