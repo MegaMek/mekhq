@@ -79,6 +79,12 @@ import mekhq.campaign.unit.Unit;
  */
 public class Utilities {
 	private static final int MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24;
+	
+	// A couple of arrays for use in the getLevelName() method
+    private static int[]    arabicNumbers = { 1000,  900,  500,  400,  100,   90,  
+        50,   40,   10,    9,    5,    4,    1 };
+    private static String[] romanNumerals = { "M",  "CM",  "D",  "CD", "C",  "XC",
+      "L",  "XL",  "X",  "IX", "V",  "IV", "I" };
 
     public static int roll3d6() {      
         Vector<Integer> rolls = new Vector<Integer>();
@@ -1084,5 +1090,53 @@ public class Utilities {
             }
         }
         return output;
+    }
+    
+    public static String getRomanNumeralsFromArabicNumber(int level, boolean checkZero) {
+    	// If we're 0, then we just return an empty string
+    	if (checkZero && level == 0) {
+    		return "";
+    	}
+    	
+    	// Roman numeral, prepended with a space for display purposes
+    	String roman = " ";
+        int num = level+1;
+
+        for (int i = 0; i < arabicNumbers.length; i++) {
+			while (num > arabicNumbers[i]) {
+				roman += romanNumerals[i];
+				num -= arabicNumbers[i];
+			}
+        }
+        
+        return roman;
+    }
+    
+    // TODO: Optionize this to allow user to choose roman or arabic numerals
+    public static int getArabicNumberFromRomanNumerals(String name) {
+    	// If we're 0, then we just return an empty string
+    	if (name.equals("")) {
+    		return 0;
+    	}
+    	
+    	// Roman numeral, prepended with a space for display purposes
+    	int arabic = 0;
+        String roman = name;
+
+        for (int i = 0; i < roman.length(); i++) {
+        	int num = romanNumerals.toString().indexOf(roman.charAt(i));
+        	if (i < roman.length()) {
+        		int temp = romanNumerals.toString().indexOf(roman.charAt(i+1));
+        		// If this is a larger number, then we need to combine them
+        		if (temp > num) {
+        			num = temp - num;
+        			i++;
+        		}
+        	}
+        	
+        	arabic += num;
+        }
+        
+        return arabic-1;
     }
 }

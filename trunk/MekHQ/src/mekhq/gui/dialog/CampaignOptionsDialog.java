@@ -2824,8 +2824,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         if (comboRanks.getSelectedIndex() == Ranks.RS_CUSTOM)
         {
 	        campaign.getRanks().setRanksFromModel(ranksModel);
-	        campaign.setRankSystem(Ranks.RS_CUSTOM);
         }
+        campaign.setRankSystem(comboRanks.getSelectedIndex());
         campaign.setCamoCategory(camoCategory);
         campaign.setCamoFileName(camoFileName);
         campaign.setColorIndex(colorIndex);

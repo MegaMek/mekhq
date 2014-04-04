@@ -2614,7 +2614,7 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E3 -->
 		<rank>
-			<rankNames>Acolyte,-,-,-,-,-</rankNames>
+			<rankNames>Acolyte:25,-,-,-,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E4 -->
@@ -2759,12 +2759,12 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O2 -->
 		<rank>
-			<rankNames>Adept,-,-,-,-,-</rankNames>
+			<rankNames>Adept:25,-,-,-,-,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O3 -->
 		<rank>
-			<rankNames>Demi-Precentor,-,-,-,-,-</rankNames>
+			<rankNames>Demi-Precentor:25,-,-,-,-,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O4 -->
@@ -2779,7 +2779,7 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O6 -->
 		<rank>
-			<rankNames>Precentor,-,-,-,-,-</rankNames>
+			<rankNames>Precentor:25,-,-,-,-,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O7 -->
@@ -2873,7 +2873,7 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E3 -->
 		<rank>
-			<rankNames>Acolyte,-,-,-,-,-</rankNames>
+			<rankNames>Acolyte:25,-,-,-,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E4 -->
@@ -3018,12 +3018,12 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O2 -->
 		<rank>
-			<rankNames>Adept,-,-,-,-,-</rankNames>
+			<rankNames>Adept:25,-,-,-,-,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O3 -->
 		<rank>
-			<rankNames>Demi-Precentor,-,-,-,-,-</rankNames>
+			<rankNames>-,-,-,-,-,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O4 -->
@@ -3038,7 +3038,7 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O6 -->
 		<rank>
-			<rankNames>Precentor,-,-,-,-,-</rankNames>
+			<rankNames>Precentor:25,-,-,-,-,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O7 -->

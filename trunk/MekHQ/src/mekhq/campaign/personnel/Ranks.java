@@ -182,6 +182,10 @@ public class Ranks {
 		return oldRankSystem;
 	}
 	
+	public void setOldRankSystem(int old) {
+		oldRankSystem = old;
+	}
+	
 	public static String getRankSystemName(int system) {
 		switch(system) {
 		case RS_CUSTOM:
@@ -280,7 +284,7 @@ public class Ranks {
 		return ranks;
 	}
 	
-	public void useRankSystem(int system) {
+	private void useRankSystem(int system) {
 		// If we've got an invalid rank system, default to Star League
 		if(system >= rankSystems.size()) {
 			if (rankSystems.isEmpty()) {
@@ -330,10 +334,10 @@ public class Ranks {
 	
 	public int getRankOrder(String rank, int profession) {
 		if (rank.equals("Prisoner")) {
-			return -2;
+			return RANK_PRISONER;
 		}
 		if (rank.equals("Bondsman")) {
-			return -1;
+			return RANK_BONDSMAN;
 		}
 		for(int i = 0; i < ranks.size(); i++) {
 		    if(ranks.get(i).getName(profession).equals(rank)) {
@@ -493,12 +497,12 @@ public class Ranks {
         		rating = "WO"+(i-RE_MAX);
         	}
         	array[i][RankTableModel.COL_NAME_RATE]	= rating;
-            array[i][RankTableModel.COL_NAME_MW]	= rank.getName(RPROF_MW);
-            array[i][RankTableModel.COL_NAME_ASF]	= rank.getName(RPROF_ASF);
-            array[i][RankTableModel.COL_NAME_VEE]	= rank.getName(RPROF_VEE);
-            array[i][RankTableModel.COL_NAME_NAVAL]	= rank.getName(RPROF_NAVAL);
-            array[i][RankTableModel.COL_NAME_INF]	= rank.getName(RPROF_INF);
-            array[i][RankTableModel.COL_NAME_TECH]	= rank.getName(RPROF_TECH);
+            array[i][RankTableModel.COL_NAME_MW]	= rank.getNameWithLevels(RPROF_MW);
+            array[i][RankTableModel.COL_NAME_ASF]	= rank.getNameWithLevels(RPROF_ASF);
+            array[i][RankTableModel.COL_NAME_VEE]	= rank.getNameWithLevels(RPROF_VEE);
+            array[i][RankTableModel.COL_NAME_NAVAL]	= rank.getNameWithLevels(RPROF_NAVAL);
+            array[i][RankTableModel.COL_NAME_INF]	= rank.getNameWithLevels(RPROF_INF);
+            array[i][RankTableModel.COL_NAME_TECH]	= rank.getNameWithLevels(RPROF_TECH);
             array[i][RankTableModel.COL_OFFICER] = rank.isOfficer();
             array[i][RankTableModel.COL_PAYMULT] = rank.getPayMultiplier();
             i++;
