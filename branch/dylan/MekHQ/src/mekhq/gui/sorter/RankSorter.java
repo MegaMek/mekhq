@@ -38,10 +38,14 @@ import mekhq.campaign.personnel.Ranks;
 	        	matcher = pattern.matcher(s1);
 	        	matcher.find();
 	        	Person p1 = campaign.getPerson(UUID.fromString(matcher.group(1)));
-	        	/*if (p0.getRankOrder() == p1.getRankOrder()) {
-	        		// the rank orders match, try comparing the levels
+	        	// the rank orders match, try comparing the levels
+	        	if (p0.getRankNumeric() == p1.getRankNumeric()) {
+	        		// the levels match too, try comparing MD rank
+	        		if (p0.getRankLevel() == p1.getRankLevel()) {
+	        			return ((Comparable<Integer>)p0.getManeiDominiRank()).compareTo(p1.getManeiDominiRank());
+	        		}
 	            	return ((Comparable<Integer>)p0.getRankLevel()).compareTo(p1.getRankLevel());
-	        	}*/
+	        	}
 	            return ((Comparable<Integer>)p0.getRankNumeric()).compareTo(p1.getRankNumeric());
         	} catch (Exception e) {
         		MekHQ.logError("[DEBUG] RankSorter Exception, s0: "+s0+", s1: "+s1);

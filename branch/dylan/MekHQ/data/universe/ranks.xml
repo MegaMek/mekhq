@@ -2614,7 +2614,7 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E3 -->
 		<rank>
-			<rankNames>Acolyte,-,-,-,-,-</rankNames>
+			<rankNames>Acolyte:25,-,-,-,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E4 -->
@@ -2759,12 +2759,12 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O2 -->
 		<rank>
-			<rankNames>Adept,-,-,-,-,-</rankNames>
+			<rankNames>Adept:25,-,-,-,-,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O3 -->
 		<rank>
-			<rankNames>Demi-Precentor,-,-,-,-,-</rankNames>
+			<rankNames>Demi-Precentor:25,-,-,-,-,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O4 -->
@@ -2779,7 +2779,7 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O6 -->
 		<rank>
-			<rankNames>Precentor,-,-,-,-,-</rankNames>
+			<rankNames>Precentor:25,-,-,-,-,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O7 -->
@@ -2873,7 +2873,7 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E3 -->
 		<rank>
-			<rankNames>Acolyte,-,-,-,-,-</rankNames>
+			<rankNames>Acolyte:25,-,-,-,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E4 -->
@@ -3018,12 +3018,12 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O2 -->
 		<rank>
-			<rankNames>Adept,-,-,-,-,-</rankNames>
+			<rankNames>Adept:25,-,-,-,-,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O3 -->
 		<rank>
-			<rankNames>Demi-Precentor,-,-,-,-,-</rankNames>
+			<rankNames>-,-,-,-,-,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O4 -->
@@ -3038,7 +3038,7 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O6 -->
 		<rank>
-			<rankNames>Precentor,-,-,-,-,-</rankNames>
+			<rankNames>Precentor:25,-,-,-,-,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O7 -->
@@ -3099,6 +3099,1560 @@
 		</rank> <!-- O18 -->
 		<rank>
 			<rankNames>Conclave Member,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O19 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O20 -->
+	</rankSystem>
+	<rankSystem>
+		<!-- Custom -->
+		<system>12</system>
+		<rank>
+			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E0 "None" -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E1 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E2 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E3 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E4 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E5 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E6 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E7 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E8 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E9 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E10 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E11 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E12 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E13 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E14 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E15 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E16 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E17 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E18 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E19 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E20 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO1 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO2 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO3 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO4 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO5 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO6 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO7 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO8 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO9 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO10 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O1 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O2 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O3 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O4 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O5 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O6 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O7 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O8 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O9 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O10 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O11 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O12 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O13 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O14 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O15 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O16 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O17 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O18 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O19 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O20 -->
+	</rankSystem>
+	<rankSystem>
+		<!-- Magistry of Canopus -->
+		<system>13</system>
+		<rank>
+			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E0 "None" -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E1 -->
+		<rank>
+			<rankNames>Volunteer,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E2 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E3 -->
+		<rank>
+			<rankNames>First Ranker,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E4 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E5 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E6 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E7 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E8 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E9 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E10 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E11 -->
+		<rank>
+			<rankNames>Lance Corporal,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E12 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E13 -->
+		<rank>
+			<rankNames>Star Corporal,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E14 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E15 -->
+		<rank>
+			<rankNames>Command Sergeant,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E16 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E17 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E18 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E19 -->
+		<rank>
+			<rankNames>Banner Sergeant,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E20 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO1 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO2 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO3 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO4 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO5 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO6 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO7 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO8 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO9 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO10 -->
+		<rank>
+			<rankNames>,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O1 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O2 -->
+		<rank>
+			<rankNames>Ensign,-,-,Comcapt,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O3 -->
+		<rank>
+			<rankNames>Commander,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O4 -->
+		<rank>
+			<rankNames>Major,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O5 -->
+		<rank>
+			<rankNames>-,-,-,Rearad,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O6 -->
+		<rank>
+			<rankNames>Force Major,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O7 -->
+		<rank>
+			<rankNames>Colonel,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O8 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O9 -->
+		<rank>
+			<rankNames>-,-,-,Admiral,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O10 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O11 -->
+		<rank>
+			<rankNames>General,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O12 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O13 -->
+		<rank>
+			<rankNames>Senior General,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O14 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O15 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O16 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O17 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O18 -->
+		<rank>
+			<rankNames>Magestrix,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O19 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O20 -->
+	</rankSystem>
+	<rankSystem>
+		<!-- Taurian Concordat -->
+		<system>14</system>
+		<rank>
+			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E0 "None" -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E1 -->
+		<rank>
+			<rankNames>Recruit,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E2 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E3 -->
+		<rank>
+			<rankNames>Corporal,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E4 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E5 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E6 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E7 -->
+		<rank>
+			<rankNames>Section Leader,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E8 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E9 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E10 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E11 -->
+		<rank>
+			<rankNames>Force Sergeant,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E12 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E13 -->
+		<rank>
+			<rankNames>Lance Sergeant,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E14 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E15 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E16 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E17 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E18 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E19 -->
+		<rank>
+			<rankNames>Battalion Chief Sergeant,-,-,Air Chief,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E20 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO1 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO2 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO3 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO4 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO5 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO6 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO7 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO8 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO9 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO10 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O1 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O2 -->
+		<rank>
+			<rankNames>Cornet,-,-,Ensign,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O3 -->
+		<rank>
+			<rankNames>Subaltern,-,-,Air Master JG,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O4 -->
+		<rank>
+			<rankNames>Brigadier,-,-,Air Master SG,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O5 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O6 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O7 -->
+		<rank>
+			<rankNames>Colonel,-,-,Space Master,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O8 -->
+		<rank>
+			<rankNames>Comptroller,-,-,Commodore,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O9 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O10 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O11 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O12 -->
+		<rank>
+			<rankNames>Marshal,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O13 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O14 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O15 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O16 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O17 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O18 -->
+		<rank>
+			<rankNames>Protector,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O19 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O20 -->
+	</rankSystem>
+	<rankSystem>
+		<!-- Marian Hegemony -->
+		<system>15</system>
+		<rank>
+			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E0 "None" -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E1 -->
+		<rank>
+			<rankNames>Miles,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E2 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E3 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E4 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E5 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E6 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E7 -->
+		<rank>
+			<rankNames>Miles probatus,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E8 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E9 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E10 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E11 -->
+		<rank>
+			<rankNames>Miles gregarius,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E12 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E13 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E14 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E15 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E16 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E17 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E18 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E19 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E20 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO1 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO2 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO3 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO4 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO5 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO6 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO7 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO8 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO9 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO10 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O1 -->
+		<rank>
+			<rankNames>Legionnaire,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O2 -->
+		<rank>
+			<rankNames>Centurion,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O3 -->
+		<rank>
+			<rankNames>Principes,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O4 -->
+		<rank>
+			<rankNames>Legatus,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O5 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O6 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O7 -->
+		<rank>
+			<rankNames>Prefect,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O8 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O9 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O10 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O11 -->
+		<rank>
+			<rankNames>General,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O12 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O13 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O14 -->
+		<rank>
+			<rankNames>Imperator,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O15 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O16 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O17 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O18 -->
+		<rank>
+			<rankNames>Ceasar,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O19 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O20 -->
+	</rankSystem>
+	<rankSystem>
+		<!-- Outworld's Alliance -->
+		<system>16</system>
+		<rank>
+			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E0 "None" -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E1 -->
+		<rank>
+			<rankNames>Defender,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E2 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E3 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E4 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E5 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E6 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E7 -->
+		<rank>
+			<rankNames>Protector,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E8 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E9 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E10 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E11 -->
+		<rank>
+			<rankNames>Guardian,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E12 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E13 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E14 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E15 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E16 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E17 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E18 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E19 -->
+		<rank>
+			<rankNames>Preceptor,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E20 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO1 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO2 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO3 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO4 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO5 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO6 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO7 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO8 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO9 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO10 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O1 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O2 -->
+		<rank>
+			<rankNames>Supervisor,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O3 -->
+		<rank>
+			<rankNames>Section Leader,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O4 -->
+		<rank>
+			<rankNames>Director,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O5 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O6 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O7 -->
+		<rank>
+			<rankNames>Chairman,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O8 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O9 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O10 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O11 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O12 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O13 -->
+		<rank>
+			<rankNames>Senior Chairman,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O14 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O15 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O16 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O17 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O18 -->
+		<rank>
+			<rankNames>President,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O19 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O20 -->
+	</rankSystem>
+	<rankSystem>
+		<!-- Free Rasalhague Republic -->
+		<system>17</system>
+		<rank>
+			<rankNames>None,--NAVAL,--MW,--MW,--MW,--MW</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E0 "None" -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E1 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E2 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E3 -->
+		<rank>
+			<rankNames>Menig,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E4 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E5 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E6 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E7 -->
+		<rank>
+			<rankNames>Kavellrist,Korpral,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E8 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E9 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E10 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E11 -->
+		<rank>
+			<rankNames>Sergeant,--MW,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E12 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E13 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E14 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E15 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E16 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E17 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E18 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E19 -->
+		<rank>
+			<rankNames>Fanjunkare,--MW,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- E20 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO1 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO2 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO3 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO4 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO5 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO6 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO7 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO8 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO9 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>false</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- WO10 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O1 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O2 -->
+		<rank>
+			<rankNames>Löjtnant,--MW,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O3 -->
+		<rank>
+			<rankNames>Kapten,--MW,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O4 -->
+		<rank>
+			<rankNames>Major,--MW,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O5 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O6 -->
+		<rank>
+			<rankNames>Överste-Löjtnant,--MW,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O7 -->
+		<rank>
+			<rankNames>Överste,--MW,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O8 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O9 -->
+		<rank>
+			<rankNames>Generalmajor,--MW,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O10 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O11 -->
+		<rank>
+			<rankNames>General,--MW,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O12 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O13 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O14 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O15 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O16 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O17 -->
+		<rank>
+			<rankNames>-,-,-,-,-,-</rankNames>
+			<officer>true</officer>
+			<payMultiplier>1.0</payMultiplier>
+		</rank> <!-- O18 -->
+		<rank>
+			<rankNames>Överbefälhavare (Elected Prince),--MW,-,-,-,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O19 -->

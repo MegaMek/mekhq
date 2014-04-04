@@ -24,9 +24,11 @@ package mekhq.campaign.personnel;
 import java.io.FileInputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -64,7 +66,12 @@ public class Ranks {
 	public static final int RS_COM		= 10;
 	public static final int RS_WOB		= 11;
 	public static final int RS_CUSTOM	= 12;
-	public static final int RS_NUM		= 13;
+	public static final int RS_MOC		= 13;
+	public static final int RS_TC		= 14;
+	public static final int RS_MH		= 15;
+	public static final int RS_OA		= 16;
+	public static final int RS_FRR		= 17;
+	public static final int RS_NUM		= 18;
 	
 	public static final int[] translateFactions = { /* 0 */ 0, /* 1 */ 1, /* 2 */ 4, /* 3 */ 5, /* 4 */ 6, /* 5 */ 8, /* 6 */ 9, /* 7 */ 12 };
 	
@@ -99,6 +106,7 @@ public class Ranks {
 	public static final int RANK_PRISONER = -2;
 	
 	private int rankSystem;
+	private int oldRankSystem = -1;
 	private ArrayList<Rank> ranks;
 	
 	public Ranks() {
@@ -170,6 +178,14 @@ public class Ranks {
 		return rankSystem;
 	}
 	
+	public int getOldRankSystem() {
+		return oldRankSystem;
+	}
+	
+	public void setOldRankSystem(int old) {
+		oldRankSystem = old;
+	}
+	
 	public static String getRankSystemName(int system) {
 		switch(system) {
 		case RS_CUSTOM:
@@ -198,6 +214,16 @@ public class Ranks {
 			return "Comstar";
 		case RS_WOB:
 			return "Word of Blake";
+		case RS_MOC:
+			return "Magistry of Canopus";
+		case RS_MH:
+			return "Marian Hegemony";
+		case RS_TC:
+			return "Taurian Concordat";
+		case RS_OA:
+			return "Outworld's Alliance";
+		case RS_FRR:
+			return "Free Rasalhague Republic";
 		default:
 			return "?";
 		}
@@ -258,7 +284,7 @@ public class Ranks {
 		return ranks;
 	}
 	
-	public void useRankSystem(int system) {
+	private void useRankSystem(int system) {
 		// If we've got an invalid rank system, default to Star League
 		if(system >= rankSystems.size()) {
 			if (rankSystems.isEmpty()) {
@@ -308,10 +334,10 @@ public class Ranks {
 	
 	public int getRankOrder(String rank, int profession) {
 		if (rank.equals("Prisoner")) {
-			return -2;
+			return RANK_PRISONER;
 		}
 		if (rank.equals("Bondsman")) {
-			return -1;
+			return RANK_BONDSMAN;
 		}
 		for(int i = 0; i < ranks.size(); i++) {
 		    if(ranks.get(i).getName(profession).equals(rank)) {
@@ -370,22 +396,30 @@ public class Ranks {
 	}
 	
 	public void writeToXml(PrintWriter pw1, int indent) {
+		writeToXml(pw1, indent, false);
+	}
+	
+	public void writeToXml(PrintWriter pw1, int indent, boolean saveAll) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<rankSystem>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)+"<!-- "+getRankSystemName(rankSystem)+" -->");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<system>"
                 +rankSystem
                 +"</system>");
-        for(int i = 0; i < ranks.size(); i++) {
-        	Rank r = ranks.get(i);
-            r.writeToXml(pw1, indent+1);
-            pw1.println(getRankPostTag(i));
+        // Only write out the ranks if we're using a custom system
+        if (rankSystem == RS_CUSTOM || saveAll) {
+	        for(int i = 0; i < ranks.size(); i++) {
+	        	Rank r = ranks.get(i);
+	            r.writeToXml(pw1, indent+1);
+	            pw1.println(getRankPostTag(i));
+	        }
         }
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</rankSystem>");
     }
 	
 	public static Ranks generateInstanceFromXML(Node wn, Version version) {
 		Ranks retVal = new Ranks();
+		boolean showMessage = false;
         
         // Dump the ranks ArrayList so we can re-use it.
         retVal.ranks = new ArrayList<Rank>();
@@ -398,17 +432,49 @@ public class Ranks {
                 
                 if (wn2.getNodeName().equalsIgnoreCase("system") || wn2.getNodeName().equalsIgnoreCase("rankSystem")) {
                 	retVal.rankSystem = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
-                	// If this is an older version from before the full blown rank system with professions
-                	if (retVal.rankSystem != RS_CUSTOM && version != null && Version.versionCompare(version, "0.3.4-r1782")) {
+                	
+                	// If this is an older version from before the full blown rank system with
+                	// professions, we need to translate it to match the new constants
+                	if (version != null && Version.versionCompare(version, "0.3.4-r1782")) {
                 		// Translate the rank system
+                		if (retVal.rankSystem == RankTranslator.RT_SL) {
+                			String change = (String) JOptionPane.showInputDialog(
+                					null,
+                					"Due to an error in previous versions of MekHQ this value may not be correct."
+                					+ "\nPlease select the correct rank system and click OK.",
+                					"Select Correct Rank System",
+                					JOptionPane.QUESTION_MESSAGE,
+                					null,
+                					RankTranslator.oldRankNames,
+                					RankTranslator.oldRankNames[0]);
+                			retVal.rankSystem = Arrays.asList(RankTranslator.oldRankNames).indexOf(change);
+                		}
+                		retVal.oldRankSystem = retVal.rankSystem;
                 		retVal.rankSystem = Ranks.translateFactions[retVal.rankSystem];
-                		// Use the default ranks for this system
-                		return Ranks.getRanksFromSystem(retVal.rankSystem);
-                	} else if (version == null || retVal.rankSystem == RS_CUSTOM) {
+                	}
+                } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
+                	// If we're parsing from the XML or using custom ranks, then parse the rank sub-nodes
+                	if (retVal.oldRankSystem == RankTranslator.RT_CUSTOM) {
+            			showMessage = true;
+                	}
+                	if (version == null || retVal.rankSystem == RS_CUSTOM) {
                 		retVal.ranks.add(Rank.generateInstanceFromXML(wn2));
+                	} else {
+                		// Otherwise... use the default ranks for this system
+                		int temp = retVal.oldRankSystem;
+                		retVal = Ranks.getRanksFromSystem(retVal.rankSystem);
+                		retVal.oldRankSystem = temp;
+                		return retVal;
                 	}
                 } 
+            }
+            if (showMessage) {
+            	JOptionPane.showConfirmDialog(
+            			null,
+            			"You have used a custom rank set in your campaign."
+            			+ "\nYou must recreate that system for this version.",
+            			"Custom Ranks",
+            			JOptionPane.OK_OPTION);
             }
         } catch (Exception ex) {
             // Errrr, apparently either the class name was invalid...
@@ -431,12 +497,12 @@ public class Ranks {
         		rating = "WO"+(i-RE_MAX);
         	}
         	array[i][RankTableModel.COL_NAME_RATE]	= rating;
-            array[i][RankTableModel.COL_NAME_MW]	= rank.getName(RPROF_MW);
-            array[i][RankTableModel.COL_NAME_ASF]	= rank.getName(RPROF_ASF);
-            array[i][RankTableModel.COL_NAME_VEE]	= rank.getName(RPROF_VEE);
-            array[i][RankTableModel.COL_NAME_NAVAL]	= rank.getName(RPROF_NAVAL);
-            array[i][RankTableModel.COL_NAME_INF]	= rank.getName(RPROF_INF);
-            array[i][RankTableModel.COL_NAME_TECH]	= rank.getName(RPROF_TECH);
+            array[i][RankTableModel.COL_NAME_MW]	= rank.getNameWithLevels(RPROF_MW);
+            array[i][RankTableModel.COL_NAME_ASF]	= rank.getNameWithLevels(RPROF_ASF);
+            array[i][RankTableModel.COL_NAME_VEE]	= rank.getNameWithLevels(RPROF_VEE);
+            array[i][RankTableModel.COL_NAME_NAVAL]	= rank.getNameWithLevels(RPROF_NAVAL);
+            array[i][RankTableModel.COL_NAME_INF]	= rank.getNameWithLevels(RPROF_INF);
+            array[i][RankTableModel.COL_NAME_TECH]	= rank.getNameWithLevels(RPROF_TECH);
             array[i][RankTableModel.COL_OFFICER] = rank.isOfficer();
             array[i][RankTableModel.COL_PAYMULT] = rank.getPayMultiplier();
             i++;

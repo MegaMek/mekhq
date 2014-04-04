@@ -168,7 +168,7 @@ public class MekHQ implements GameListener {
         System.setProperty("com.apple.mrj.application.apple.menu.about.name","MekHQ");  
         //redirect output to log file
         redirectOutput();
-        MekHQ.getInstance().startup();      
+        MekHQ.getInstance().startup();
     }
     
     protected static Properties setDefaultPreferences() {

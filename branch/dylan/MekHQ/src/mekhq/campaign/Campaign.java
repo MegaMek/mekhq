@@ -239,8 +239,6 @@ public class Campaign implements Serializable {
     private ShoppingList shoppingList;
 
     private PersonnelMarket personnelMarket;
-    
-    public Boolean showMessage = false;
 
     public Campaign() {
         game = new Game();
@@ -2763,7 +2761,7 @@ public class Campaign implements Serializable {
         // If the version is earlier than 0.3.4 r1782, then we need to translate
         // the rank system.
         if (Version.versionCompare(version, "0.3.4-r1782")) {
-        	retVal.setRankSystem(RankTranslator.translateRankSystem(retVal.getRanks().getRankSystem(), retVal.getFactionCode()));
+        	retVal.setRankSystem(RankTranslator.translateRankSystem(retVal.getRanks().getOldRankSystem(), retVal.getFactionCode()));
         	if (retVal.getRanks() == null) {
         		
         	}
@@ -3142,7 +3140,6 @@ public class Campaign implements Serializable {
         NodeList wList = wn.getChildNodes();
 
         // Okay, lets iterate through the children, eh?
-        retVal.showMessage = false;
         for (int x = 0; x < wList.getLength(); x++) {
             Node wn2 = wList.item(x);
 
@@ -3165,10 +3162,6 @@ public class Campaign implements Serializable {
             if (p != null) {
                 retVal.addPersonWithoutId(p);
             }
-        }
-        
-        if (retVal.showMessage) {
-        	JOptionPane.showMessageDialog(null, "You have used a custom rank set in your campaign.\nYou must re-create that set in this version.", "ERROR: Custom Ranks", JOptionPane.ERROR_MESSAGE);
         }
 
         MekHQ.logMessage("Load Personnel Nodes Complete!", 4);
@@ -3674,8 +3667,7 @@ public class Campaign implements Serializable {
                     if (version.getMajorVersion() == 0
                         && version.getMinorVersion() < 2
                         && version.getSnapshot() < 14) {
-                        retVal.factionCode = Faction.getFactionCode(Integer
-                                                                            .parseInt(wn.getTextContent()));
+                        retVal.factionCode = Faction.getFactionCode(Integer.parseInt(wn.getTextContent()));
                     } else {
                         retVal.factionCode = wn.getTextContent();
                     }
@@ -3684,14 +3676,10 @@ public class Campaign implements Serializable {
                 } else if (xn.equalsIgnoreCase("rankNames")) {
                     rankNames = wn.getTextContent().trim();
                 } else if (xn.equalsIgnoreCase("ranks")) {
-                    if (version.getMinorVersion() < 3 || (version.getMinorVersion() == 3 && version.getSnapshot() < 4)
-                        || (version.getRevision() != -1 && version.getRevision() < 1645)) {
+                    if (Version.versionCompare(version, "0.3.4-r1645")) {
                         rankSystem = Integer.parseInt(wn.getTextContent().trim());
                     } else {
                         retVal.ranks = Ranks.generateInstanceFromXML(wn, version);
-                        if (retVal.ranks.getRankSystem() == 0) {
-                        	
-                        }
                     }
                 } else if (xn.equalsIgnoreCase("gmMode")) {
                     if (wn.getTextContent().trim().equals("true")) {
@@ -3744,11 +3732,12 @@ public class Campaign implements Serializable {
             }
         }
         if (null != rankNames) {
-            //backwards compatability
+            //backwards compatibility
             retVal.ranks.setRanksFromList(rankNames, officerCut);
         }
         if (rankSystem != -1) {
-            retVal.ranks.useRankSystem(rankSystem);
+            retVal.ranks = new Ranks(rankSystem);
+            retVal.ranks.setOldRankSystem(rankSystem);
         }
     }
 
@@ -4769,16 +4758,23 @@ public class Campaign implements Serializable {
     }
 
     public void changeRank(Person person, int rank, boolean report) {
+    	changeRank(person, rank, 0, report);
+    }
+
+    public void changeRank(Person person, int rank, int rankLevel, boolean report) {
         if (report) {
-            if (rank > person.getRankNumeric()) {
+            if (rank > person.getRankNumeric() || (rank == person.getRankNumeric() && rankLevel > person.getRankLevel())) {
                 person.addLogEntry(getDate(), "Promoted to "
-                                              + getRanks().getRank(rank).getName(person.getProfession()));
-            } else if (rank < person.getRankNumeric()) {
+                                              + getRanks().getRank(rank).getName(person.getProfession())
+                                              + (rankLevel > 0 ? Utilities.getRomanNumeralsFromArabicNumber(rankLevel, true) : ""));
+            } else if (rank < person.getRankNumeric() || (rank == person.getRankNumeric() && rankLevel < person.getRankLevel())) {
                 person.addLogEntry(getDate(), "Demoted to "
-                                              + getRanks().getRank(rank).getName(person.getProfession()));
+                                              + getRanks().getRank(rank).getName(person.getProfession())
+                                              + (rankLevel > 0 ? Utilities.getRomanNumeralsFromArabicNumber(rankLevel, true) : ""));
             }
         }
         person.setRankNumeric(rank);
+        person.setRankLevel(rankLevel);
         personUpdated(person);
     }
 

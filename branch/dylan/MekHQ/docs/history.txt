@@ -203,6 +203,13 @@ v0.3.4 (SVN)
 + New MegaMek.jar r10732 & new MegaMekLab.jar 1406
 + Bug: New rank system not translating due to static defines used as constants changing order
 + Implemented new Version.versionCompare() method, with several overloads including both static and non-static versions
++ Bug: New rank system was still writing out ranks for the stock systems. As these systems are no longer editable, we don't need to do this
++ Bug: When editing ranks, it should automatically change the ranks dropdown to Custom and the canon ranks should not be editable
++ Data: Added more canon rank systems (Several periphery realms and the FRR)
++ RFE: Added rank levels
++ RFE: Added the ability for a person to have a personal rank system
++ RFE: Manei Domini classes
++ Refactored the included campaigns & saved the Fox's Teeth from the current version since it was very out of date
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
