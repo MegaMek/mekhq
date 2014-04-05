@@ -437,7 +437,7 @@ public class Ranks {
                 	// professions, we need to translate it to match the new constants
                 	if (version != null && Version.versionCompare(version, "0.3.4-r1782")) {
                 		// Translate the rank system
-                		if (version != null & retVal.rankSystem == RankTranslator.RT_SL) {
+                		if (retVal.rankSystem == RankTranslator.RT_SL) {
                 			String change = (String) JOptionPane.showInputDialog(
                 					null,
                 					"Due to an error in previous versions of MekHQ this value may not be correct."
@@ -451,6 +451,8 @@ public class Ranks {
                 		}
                 		retVal.oldRankSystem = retVal.rankSystem;
                 		retVal.rankSystem = Ranks.translateFactions[retVal.rankSystem];
+                	} else if (version != null) {
+                		retVal = Ranks.getRanksFromSystem(retVal.rankSystem);
                 	}
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
                 	// If we're parsing from the XML or using custom ranks, then parse the rank sub-nodes

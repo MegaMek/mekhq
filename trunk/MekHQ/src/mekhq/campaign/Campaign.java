@@ -2325,17 +2325,10 @@ public class Campaign implements Serializable {
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "name", name);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "faction", factionCode);
-        //MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "ranks", ranks.getRankSystem());
-		/*
-		 * TODO: reimplement saving ranks to XML
-		if (ranks.getRankSystem() == Ranks.RS_CUSTOM) {
-			MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "officerCut",
-					ranks.getOfficerCut());
-			MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "rankNames",
-					ranks.getRankNameList());
-		}
-		*/
-        ranks.writeToXml(pw1, 2);
+        
+        // Ranks
+        ranks.writeToXml(pw1, 3);
+        
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "nameGen",
                                        rng.getChosenFaction());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "percentFemale",
@@ -2672,9 +2665,10 @@ public class Campaign implements Serializable {
                 } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
                     retVal.rskillPrefs = RandomSkillPreferences
                             .generateRandomSkillPreferencesFromXml(wn);
-                } else if (xn.equalsIgnoreCase("info")) {
+                } /* We don't need this since info is processed above in the first iteration...
+                else if (xn.equalsIgnoreCase("info")) {
                     processInfoNode(retVal, wn, version);
-                } else if (xn.equalsIgnoreCase("parts")) {
+                }*/ else if (xn.equalsIgnoreCase("parts")) {
                     processPartNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("personnel")) {
                     processPersonnelNodes(retVal, wn, version);
@@ -3673,7 +3667,7 @@ public class Campaign implements Serializable {
                     officerCut = Integer.parseInt(wn.getTextContent().trim());
                 } else if (xn.equalsIgnoreCase("rankNames")) {
                     rankNames = wn.getTextContent().trim();
-                } else if (xn.equalsIgnoreCase("ranks")) {
+                } else if (xn.equalsIgnoreCase("ranks") || xn.equalsIgnoreCase("rankSystem")) {
                     if (Version.versionCompare(version, "0.3.4-r1645")) {
                         rankSystem = Integer.parseInt(wn.getTextContent().trim());
                     } else {

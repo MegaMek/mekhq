@@ -204,6 +204,10 @@ v0.3.4 (SVN)
 + Bug [#482]: Crash in loading salvage mul file with Tank pilots
 + New MegaMek.jar 0.37.10-dev-r10759 & new MegaMekLab.jar 0.1.27-dev-r1408 (Both updated for bug below)
 + Bug: All units receiving an "empty" (default Blue) individual camo - This was due to a bug in MegaMek actually
++ Bug: Rank type choice not loading correctly from the campaign file
++ Bug: Dialog for choosing proper rank system is displaying twice
+    This was due to processInfoNode() being called twice when loading the campaign file;
+    which is not necessary. This was probably an oversight. The second loading is now commented out.
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
