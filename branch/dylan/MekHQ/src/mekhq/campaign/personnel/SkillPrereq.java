@@ -22,6 +22,7 @@
 package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 import org.w3c.dom.Node;
@@ -29,6 +30,7 @@ import org.w3c.dom.NodeList;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
 
 /**
  * This object tracks a specific skill prerequisite for a special ability. This object can list more 
@@ -74,9 +76,44 @@ public class SkillPrereq implements MekHqXmlSerializable {
     }
 
     @Override
+    public String toString() {
+        String toReturn = "";
+        Enumeration<String> enumKeys = skillset.keys();
+        while(enumKeys.hasMoreElements()) {
+            String key = enumKeys.nextElement();
+            SkillType.getType(key).getName();
+            int lvl = skillset.get(key);
+            String skillLvl = "";
+            if(lvl >= SkillType.EXP_GREEN) {
+                skillLvl = SkillType.getExperienceLevelName(lvl) + " ";
+            }
+            toReturn += skillLvl + SkillType.getType(key).getName();
+            if(enumKeys.hasMoreElements()) {
+                toReturn += "<br>OR ";
+            }
+        }
+        return "{" + toReturn + "}";
+    }
+    
+    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        // TODO Auto-generated method stub
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "<skillPrereq>");
+        for(String key : skillset.keySet()) {
+            int lvl = skillset.get(key);
+            if(lvl <= 0) {
+                pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                        +"<displayName>"
+                        +key
+                        +"</displayName>");
+            } else {
+                pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                        +"<displayName>"
+                        +key + "::" + SkillType.getExperienceLevelName(lvl)
+                        +"</displayName>");
+            }
+        }
         
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "</skillPrereq>");
     }
     
     public static SkillPrereq generateInstanceFromXML(Node wn) {

@@ -2367,17 +2367,10 @@ public class Campaign implements Serializable {
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "name", name);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "faction", factionCode);
-        //MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "ranks", ranks.getRankSystem());
-		/*
-		 * TODO: reimplement saving ranks to XML
-		if (ranks.getRankSystem() == Ranks.RS_CUSTOM) {
-			MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "officerCut",
-					ranks.getOfficerCut());
-			MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "rankNames",
-					ranks.getRankNameList());
-		}
-		*/
-        ranks.writeToXml(pw1, 2);
+        
+        // Ranks
+        ranks.writeToXml(pw1, 3);
+        
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "nameGen",
                                        rng.getChosenFaction());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "percentFemale",
@@ -2459,6 +2452,11 @@ public class Campaign implements Serializable {
             }
         }
         pw1.println("\t</skillTypes>");
+        pw1.println("\t<specialAbilities>");
+        for(String key : SpecialAbility.getAllSpecialAbilities().keySet()) {
+            SpecialAbility.getAbility(key).writeToXml(pw1, 2);
+        }
+        pw1.println("\t</specialAbilities>");
         rskillPrefs.writeToXml(pw1, 1);
         // parts is the biggest so it goes last
         writeArrayAndHashToXml(pw1, 1, "parts", parts, partIds); // Parts
@@ -2709,9 +2707,10 @@ public class Campaign implements Serializable {
                 } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
                     retVal.rskillPrefs = RandomSkillPreferences
                             .generateRandomSkillPreferencesFromXml(wn);
-                } else if (xn.equalsIgnoreCase("info")) {
+                } /* We don't need this since info is processed above in the first iteration...
+                else if (xn.equalsIgnoreCase("info")) {
                     processInfoNode(retVal, wn, version);
-                } else if (xn.equalsIgnoreCase("parts")) {
+                }*/ else if (xn.equalsIgnoreCase("parts")) {
                     processPartNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("personnel")) {
                     processPersonnelNodes(retVal, wn, version);
@@ -2728,6 +2727,8 @@ public class Campaign implements Serializable {
                             wn, retVal);
                 } else if (xn.equalsIgnoreCase("skillTypes")) {
                     processSkillTypeNodes(retVal, wn, version);
+                } else if (xn.equalsIgnoreCase("specialAbilities")) {
+                    processSpecialAbilityNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("gameOptions")) {
                     processGameOptionNodes(retVal, wn);
                 } else if (xn.equalsIgnoreCase("kills")) {
@@ -3198,6 +3199,39 @@ public class Campaign implements Serializable {
 
         MekHQ.logMessage("Load Skill Type Nodes Complete!", 4);
     }
+    
+    private static void processSpecialAbilityNodes(Campaign retVal, Node wn,
+            Version version) {
+        MekHQ.logMessage("Loading Special Ability Nodes from XML...", 4);
+        
+        PilotOptions options = new PilotOptions();
+        SpecialAbility.clearSPA();
+        
+        NodeList wList = wn.getChildNodes();
+                
+        // Okay, lets iterate through the children, eh?
+        for (int x = 0; x < wList.getLength(); x++) {
+            Node wn2 = wList.item(x);
+        
+            // If it's not an element node, we ignore it.
+            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+        
+            if (!wn2.getNodeName().equalsIgnoreCase("ability")) {
+                // Error condition of sorts!
+                // Errr, what should we do here?
+                MekHQ.logMessage("Unknown node type not loaded in Special Ability nodes: "
+                        + wn2.getNodeName());
+        
+                continue;
+            }
+        
+            SpecialAbility.generateInstanceFromXML(wn2, options);
+        }
+        
+        MekHQ.logMessage("Load Special Ability Nodes Complete!", 4);
+}
 
     private static void processKillNodes(Campaign retVal, Node wn,
                                          Version version) {
@@ -3675,7 +3709,7 @@ public class Campaign implements Serializable {
                     officerCut = Integer.parseInt(wn.getTextContent().trim());
                 } else if (xn.equalsIgnoreCase("rankNames")) {
                     rankNames = wn.getTextContent().trim();
-                } else if (xn.equalsIgnoreCase("ranks")) {
+                } else if (xn.equalsIgnoreCase("ranks") || xn.equalsIgnoreCase("rankSystem")) {
                     if (Version.versionCompare(version, "0.3.4-r1645")) {
                         rankSystem = Integer.parseInt(wn.getTextContent().trim());
                     } else {

@@ -35,12 +35,17 @@ import megamek.common.Compute;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import megamek.common.WeaponType;
+import megamek.common.options.IOption;
+import megamek.common.options.PilotOptions;
 import megamek.common.weapons.BayWeapon;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
+import mekhq.campaign.universe.Era;
+import mekhq.campaign.universe.Planet;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -62,7 +67,10 @@ public class SpecialAbility implements MekHqXmlSerializable {
 
     private static Hashtable<String, SpecialAbility> specialAbilities;
     
+    private String displayName;
     private String lookupName;
+    private String desc;
+    
     private int xpCost;
     
     //this determines how much weight to give this SPA when creating new personnel
@@ -86,6 +94,8 @@ public class SpecialAbility implements MekHqXmlSerializable {
     
     SpecialAbility(String name) {
         lookupName = name;
+        displayName = "";
+        desc = "";
         prereqAbilities = new Vector<String>();
         invalidAbilities = new Vector<String>();
         removeAbilities = new Vector<String>();
@@ -115,6 +125,14 @@ public class SpecialAbility implements MekHqXmlSerializable {
         return true;
     }
     
+    public String getDisplayName() {
+        return displayName;
+    }
+    
+    public String getDescription() {
+        return desc;
+    }
+    
     public String getName() {
         return lookupName;
     }
@@ -133,12 +151,48 @@ public class SpecialAbility implements MekHqXmlSerializable {
     
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "<ability>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<displayName>"
+                +MekHqXmlUtil.escape(displayName)
+                +"</displayName>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<lookupName>"
+                +lookupName
+                +"</lookupName>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<desc>"
+                +MekHqXmlUtil.escape(desc)
+                +"</desc>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<xpCost>"
+                +xpCost
+                +"</xpCost>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<weight>"
+                +weight
+                +"</weight>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<prereqAbilities>"
+                +Utilities.combineString(prereqAbilities, "::")
+                +"</prereqAbilities>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<invalidAbilities>"
+                +Utilities.combineString(invalidAbilities, "::")
+                +"</invalidAbilities>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<removeAbilities>"
+                +Utilities.combineString(removeAbilities, "::")
+                +"</removeAbilities>");
+        for(SkillPrereq skillpre : prereqSkills) {
+            skillpre.writeToXml(pw1, indent+1);
+        }
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "</ability>");   
         
     }
     
     
-    public static void generateInstanceFromXML(Node wn) {
+    public static void generateInstanceFromXML(Node wn, PilotOptions options) {
         SpecialAbility retVal = null;
         
         try {       
@@ -147,7 +201,13 @@ public class SpecialAbility implements MekHqXmlSerializable {
                 
             for (int x=0; x<nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
-                if (wn2.getNodeName().equalsIgnoreCase("lookupName")) {
+                if (wn2.getNodeName().equalsIgnoreCase("displayName")) {
+                    retVal.displayName = wn2.getTextContent();
+                } 
+                else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
+                    retVal.desc = wn2.getTextContent();
+                } 
+                else if (wn2.getNodeName().equalsIgnoreCase("lookupName")) {
                     retVal.lookupName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("xpCost")) {
                     retVal.xpCost = Integer.parseInt(wn2.getTextContent());        
@@ -172,19 +232,32 @@ public class SpecialAbility implements MekHqXmlSerializable {
             // Doh!
             MekHQ.logError(ex);
         }
+        
+        if(retVal.displayName.isEmpty()) { 
+            IOption option = options.getOption(retVal.lookupName);
+            if(null != option) {
+                retVal.displayName = option.getDisplayableName();
+            }
+        }
+        if(retVal.desc.isEmpty()) { 
+            IOption option = options.getOption(retVal.lookupName);
+            if(null != option) {
+                retVal.desc = option.getDescription();
+            }
+        }
+        
         specialAbilities.put(retVal.lookupName, retVal);
     }
     
     public static void initializeSPA() {
         specialAbilities = new Hashtable<String, SpecialAbility>();
-        MekHQ.logMessage("Starting load of special abilities from XML...");
-        // Initialize variables.
+        
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         Document xmlDoc = null;
     
         
         try {
-            FileInputStream fis = new FileInputStream("data/spa/default.xml");
+            FileInputStream fis = new FileInputStream("data/universe/defaultspa.xml");
             // Using factory get an instance of document builder
             DocumentBuilder db = dbf.newDocumentBuilder();
     
@@ -201,6 +274,8 @@ public class SpecialAbility implements MekHqXmlSerializable {
         // Stupid weird parsing of XML.  At least this cleans it up.
         spaEle.normalize(); 
     
+        PilotOptions options = new PilotOptions();
+        
         // Okay, lets iterate through the children, eh?
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn = nl.item(x);
@@ -218,15 +293,19 @@ public class SpecialAbility implements MekHqXmlSerializable {
                 String xn = wn.getNodeName();
     
                 if (xn.equalsIgnoreCase("ability")) {
-                    generateInstanceFromXML(wn);                  
+                    SpecialAbility.generateInstanceFromXML(wn, options);
                 }
             }
         }   
-        MekHQ.logMessage("Done loading SPAs");
+        
     }
     
     public static SpecialAbility getAbility(String name) {
         return specialAbilities.get(name);
+    }
+    
+    public static Hashtable<String, SpecialAbility> getAllSpecialAbilities() {
+        return specialAbilities;
     }
     
     public static String chooseWeaponSpecialization(int type, boolean isClan, int techLvl, int year) {
@@ -290,6 +369,46 @@ public class SpecialAbility implements MekHqXmlSerializable {
             return "??";
         }
         return candidates.get(Compute.randomInt(candidates.size()));
+    }
+    
+    public String getPrereqDesc() {
+        String toReturn = "";
+        for(String prereq : prereqAbilities) {
+            toReturn += getDisplayName(prereq) + "<br>";
+        }
+        for(SkillPrereq skPr : prereqSkills) {
+            toReturn += skPr.toString() + "<br>";
+        }        
+        return toReturn;
+    }
+    
+    public String getInvalidDesc() {
+        String toReturn = "";
+        for(String invalid : invalidAbilities) {
+            toReturn += getDisplayName(invalid) + "<br>";
+        }        
+        return toReturn;
+    }
+    
+    public String getRemovedDesc() {
+        String toReturn = "";
+        for(String remove : removeAbilities) {
+            toReturn += getDisplayName(remove) + "<br>";
+        }        
+        return toReturn;
+    }
+    
+    public static String getDisplayName(String name) {
+        PilotOptions options = new PilotOptions();
+        IOption option = options.getOption(name);
+        if(null != option) {
+            return option.getDisplayableName();
+        }
+        return "??";
+    }
+    
+    public static void clearSPA() {
+        specialAbilities.clear();
     }
     
     //TODO: also put some static methods here that return the available options for a given SPA, so

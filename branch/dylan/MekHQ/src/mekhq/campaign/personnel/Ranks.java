@@ -451,6 +451,8 @@ public class Ranks {
                 		}
                 		retVal.oldRankSystem = retVal.rankSystem;
                 		retVal.rankSystem = Ranks.translateFactions[retVal.rankSystem];
+                	} else if (version != null) {
+                		retVal = Ranks.getRanksFromSystem(retVal.rankSystem);
                 	}
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
                 	// If we're parsing from the XML or using custom ranks, then parse the rank sub-nodes
@@ -474,7 +476,7 @@ public class Ranks {
             			"You have used a custom rank set in your campaign."
             			+ "\nYou must recreate that system for this version.",
             			"Custom Ranks",
-            			JOptionPane.OK_OPTION);
+            			JOptionPane.OK_CANCEL_OPTION);
             }
         } catch (Exception ex) {
             // Errrr, apparently either the class name was invalid...
