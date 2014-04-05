@@ -201,6 +201,9 @@ v0.3.4 (SVN)
 + RFE: Added the ability for a person to have a personal rank system
 + RFE: Manei Domini classes
 + Refactored the included campaigns & saved the Fox's Teeth from the current version since it was very out of date
++ Bug [#482]: Crash in loading salvage mul file with Tank pilots
++ New MegaMek.jar 0.37.10-dev-r10759 & new MegaMekLab.jar 0.1.27-dev-r1408 (Both updated for bug below)
++ Bug: All units receiving an "empty" (default Blue) individual camo - This was due to a bug in MegaMek actually
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
