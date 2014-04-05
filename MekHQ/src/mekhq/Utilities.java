@@ -266,19 +266,13 @@ public class Utilities {
     		}
     	}
     	for(Person p : gunners) {
-    		if(p == null || ((entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0)) { 
-    			continue;
-    		}
     		if(p.getRankNumeric() > bestRank) {
     			commander = p;
     			bestRank = p.getRankNumeric();
     		}
     	}
     	for(Person p : drivers) {
-    		if(p == null || ((entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0)) { 
-    			continue;
-    		}
-    		if(p.getRankNumeric() > bestRank) {
+    		if(null != p && p.getRankNumeric() > bestRank) {
     			commander = p;
     			bestRank = p.getRankNumeric();
     		}

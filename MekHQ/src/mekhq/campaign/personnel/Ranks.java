@@ -437,7 +437,7 @@ public class Ranks {
                 	// professions, we need to translate it to match the new constants
                 	if (version != null && Version.versionCompare(version, "0.3.4-r1782")) {
                 		// Translate the rank system
-                		if (retVal.rankSystem == RankTranslator.RT_SL) {
+                		if (version != null & retVal.rankSystem == RankTranslator.RT_SL) {
                 			String change = (String) JOptionPane.showInputDialog(
                 					null,
                 					"Due to an error in previous versions of MekHQ this value may not be correct."
@@ -474,7 +474,7 @@ public class Ranks {
             			"You have used a custom rank set in your campaign."
             			+ "\nYou must recreate that system for this version.",
             			"Custom Ranks",
-            			JOptionPane.OK_OPTION);
+            			JOptionPane.OK_CANCEL_OPTION);
             }
         } catch (Exception ex) {
             // Errrr, apparently either the class name was invalid...
