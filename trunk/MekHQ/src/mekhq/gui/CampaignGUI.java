@@ -7717,16 +7717,21 @@ public class CampaignGUI extends JPanel {
                     	Rank rank = ranks.getAllRanks().get(rankOrder);
                         int profession = person.getProfession();
                         
+                        // Empty professions need swapped before the continuation
+                        while (ranks.isEmptyProfession(profession) && profession != Ranks.RPROF_MW) {
+                        	profession = ranks.getAlternateProfession(profession);
+                        }
+                        
                     	if (rank.getName(profession).equals("-")) {
                     		continue;
                     	}
                     	
-                    	// re-route through any profession redirections
+                    	// re-route through any profession redirections, starting with the empty profession check
                     	while (rank.getName(profession).startsWith("--") && profession != Ranks.RPROF_MW) {
 	                    	if (rank.getName(profession).equals("--")) {
-	                    		profession = getCampaign().getRanks().getAlternateProfession(profession);
+	                    		profession = ranks.getAlternateProfession(profession);
 	                    	} else if (rank.getName(profession).startsWith("--")) {
-	                    		profession = getCampaign().getRanks().getAlternateProfession(rank.getName(profession));
+	                    		profession = ranks.getAlternateProfession(rank.getName(profession));
 	                    	}
                     	}
                     	
