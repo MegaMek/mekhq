@@ -44,8 +44,6 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
-import mekhq.campaign.universe.Era;
-import mekhq.campaign.universe.Planet;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

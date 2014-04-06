@@ -68,7 +68,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         Mockito.when(mockDoctor.isDeployed()).thenReturn(false);
         Mockito.when(mockDoctor.getSkill(Mockito.eq(SkillType.S_DOCTOR))).thenReturn(mockDoctorSkillRegular);
         Mockito.when(mockDoctor.hasSkill(Mockito.eq(SkillType.S_DOCTOR))).thenReturn(true);
-        Mockito.when(mockDoctor.getRankOrder()).thenReturn(5);
+        Mockito.when(mockDoctor.getRankNumeric()).thenReturn(5);
 
         // Set up the tech.
         Mockito.when(mockMechTechSkillVeteran.getExperienceLevel()).thenReturn(SkillType.EXP_VETERAN);
@@ -79,7 +79,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         Mockito.when(mockTech.isDeployed()).thenReturn(false);
         Mockito.when(mockTech.getSkill(Mockito.eq(SkillType.S_TECH_MECH))).thenReturn(mockMechTechSkillVeteran);
         Mockito.when(mockTech.hasSkill(Mockito.eq(SkillType.S_TECH_MECH))).thenReturn(true);
-        Mockito.when(mockTech.getRankOrder()).thenReturn(4);
+        Mockito.when(mockTech.getRankNumeric()).thenReturn(4);
 
         Mockito.when(mockMedicSkill.getExperienceLevel()).thenReturn(SkillType.EXP_REGULAR);
         Mockito.when(mockAstechSkill.getExperienceLevel()).thenReturn(SkillType.EXP_REGULAR);
@@ -197,11 +197,11 @@ public class FieldManualMercRevDragoonsRatingTest {
 
         // Test a campaign where the commander is not flagged, but there is a clear highest ranking officer.
         testRating = Mockito.spy(new FieldManualMercRevDragoonsRating(mockCampaign));
-        Mockito.when(expectedCommander.getRankOrder()).thenReturn(10);
+        Mockito.when(expectedCommander.getRankNumeric()).thenReturn(10);
         Person leftennant = Mockito.mock(Person.class);
-        Mockito.when(leftennant.getRankOrder()).thenReturn(5);
+        Mockito.when(leftennant.getRankNumeric()).thenReturn(5);
         Person leftennant2 = Mockito.mock(Person.class);
-        Mockito.when(leftennant2.getRankOrder()).thenReturn(5);
+        Mockito.when(leftennant2.getRankNumeric()).thenReturn(5);
         List<Person> commandList = new ArrayList<Person>(3);
         commandList.add(leftennant);
         commandList.add(expectedCommander);
