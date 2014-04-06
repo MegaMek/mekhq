@@ -210,6 +210,8 @@ v0.3.4 (SVN)
     which is not necessary. This was probably an oversight. The second loading is now commented out
 + Bug: Most professions could not change their rank due to a missing ranks.isEmptyProfession() check
 + Bug: Hire personnel & Bulk Hire had rank issues
++ Bug: Star League Lts. not translating correctly because there is no "Lieutenant" now, but rather Lieutenant JG and Lieutenant SG.
+    I've made it so all Lieutenant translate to Lieutenant JG, and people can promote to SG as they desire
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
