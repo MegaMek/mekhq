@@ -18,6 +18,7 @@ import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Rank;
+import mekhq.campaign.personnel.Ranks;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.view.PersonViewPanel;
 
@@ -209,7 +210,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     	if(campaign.recruitPerson(person)) {
         	person = campaign.newPerson(person.getPrimaryRole());
         	refreshRanksCombo();
-        	campaign.changeRank(person, choiceRanks.getSelectedIndex(), false);
+        	campaign.changeRank(person, campaign.getRanks().getRankNumericFromNameAndProfession(person.getProfession(), (String)choiceRanks.getSelectedItem()), false);
     	}
         refreshView();
         refreshHqView();
@@ -265,14 +266,34 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
     
     private void changeRank() {
-    	campaign.changeRank(person, choiceRanks.getSelectedIndex(), false);
+    	campaign.changeRank(person, campaign.getRanks().getRankNumericFromNameAndProfession(person.getProfession(), (String)choiceRanks.getSelectedItem()), false);
     	refreshView();
     }
    
     private void refreshRanksCombo() {
     	DefaultComboBoxModel ranksModel = new DefaultComboBoxModel();
+    	
+    	// Determine correct profession to pass into the loop
+    	int profession = person.getProfession();
+    	while (campaign.getRanks().isEmptyProfession(profession) && profession != Ranks.RPROF_MW) {
+    		profession = campaign.getRanks().getAlternateProfession(profession);
+    	}
+    	
         for(Rank rank : campaign.getRanks().getAllRanks()) {
-        	ranksModel.addElement(rank.getName(person.getProfession()));
+        	int p = profession;
+        	// Grab rank from correct profession as needed
+        	while (rank.getName(p).startsWith("--") && p != Ranks.RPROF_MW) {
+            	if (rank.getName(p).equals("--")) {
+            		p = campaign.getRanks().getAlternateProfession(p);
+            	} else if (rank.getName(p).startsWith("--")) {
+            		p = campaign.getRanks().getAlternateProfession(rank.getName(p));
+            	}
+        	}
+        	if (rank.getName(p).equals("-")) {
+        		continue;
+        	}
+        	
+        	ranksModel.addElement(rank.getName(p));
         }
         choiceRanks.setModel(ranksModel);
         choiceRanks.setSelectedIndex(0);

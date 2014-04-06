@@ -20,6 +20,7 @@ import javax.swing.SpinnerNumberModel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Rank;
+import mekhq.campaign.personnel.Ranks;
 import mekhq.gui.CampaignGUI;
 
 
@@ -100,6 +101,12 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         gridBagConstraints.weightx = 1.0;
         choiceType.setSelectedIndex(0);
+        choiceType.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	// If we change the type, we need to setup the ranks for that type
+            	refreshRanksCombo();
+            }
+        });
         getContentPane().add(choiceType, gridBagConstraints);
         
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -110,11 +117,9 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
         getContentPane().add(lblRank, gridBagConstraints);
         
         DefaultComboBoxModel rankModel = new DefaultComboBoxModel();
-        for(Rank rank : campaign.getRanks().getAllRanks()) {
-        	rankModel.addElement(rank.getName(choiceType.getSelectedIndex()));
-        }
         choiceRanks.setModel(rankModel);
         choiceRanks.setName("choiceRanks"); // NOI18N
+        refreshRanksCombo();
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -122,7 +127,6 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         gridBagConstraints.weightx = 1.0;
-        choiceRanks.setSelectedIndex(0);
         getContentPane().add(choiceRanks, gridBagConstraints);
         
         spnNumber = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
@@ -178,7 +182,7 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
     	int number = (Integer)spnNumber.getModel().getValue();
     	while(number > 0) {
     		Person p = campaign.newPerson(choiceType.getSelectedIndex() + 1);
-    		p.setRankNumeric(choiceRanks.getSelectedIndex());
+    		p.setRankNumeric(campaign.getRanks().getRankNumericFromNameAndProfession(p.getProfession(), (String)choiceRanks.getSelectedItem()));
     		if(!campaign.recruitPerson(p)) {
     		    number = 0;
     		} else {
@@ -193,5 +197,33 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
         hqView.refreshFinancialTransactions();
         hqView.refreshOverview();
     }
-    
+   
+    private void refreshRanksCombo() {
+    	DefaultComboBoxModel ranksModel = new DefaultComboBoxModel();
+    	
+    	// Determine correct profession to pass into the loop
+    	int profession = Person.getProfessionFromPrimaryRole((choiceType.getSelectedIndex() + 1));
+    	while (campaign.getRanks().isEmptyProfession(profession) && profession != Ranks.RPROF_MW) {
+    		profession = campaign.getRanks().getAlternateProfession(profession);
+    	}
+    	
+        for(Rank rank : campaign.getRanks().getAllRanks()) {
+        	int p = profession;
+        	// Grab rank from correct profession as needed
+        	while (rank.getName(p).startsWith("--") && p != Ranks.RPROF_MW) {
+            	if (rank.getName(p).equals("--")) {
+            		p = campaign.getRanks().getAlternateProfession(p);
+            	} else if (rank.getName(p).startsWith("--")) {
+            		p = campaign.getRanks().getAlternateProfession(rank.getName(p));
+            	}
+        	}
+        	if (rank.getName(p).equals("-")) {
+        		continue;
+        	}
+        	
+        	ranksModel.addElement(rank.getName(p));
+        }
+        choiceRanks.setModel(ranksModel);
+        choiceRanks.setSelectedIndex(0);
+    }
 }

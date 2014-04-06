@@ -216,7 +216,9 @@ v0.3.4 (SVN)
 + Bug: Rank type choice not loading correctly from the campaign file
 + Bug: Dialog for choosing proper rank system is displaying twice
     This was due to processInfoNode() being called twice when loading the campaign file;
-    which is not necessary. This was probably an oversight. The second loading is now commented out.
+    which is not necessary. This was probably an oversight. The second loading is now commented out
++ Bug: Most professions could not change their rank due to a missing ranks.isEmptyProfession() check
++ Bug: Hire personnel & Bulk Hire had rank issues
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
