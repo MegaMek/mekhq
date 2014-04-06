@@ -2845,11 +2845,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             campaign.getRNG().setChosenFaction((String) comboFactionNames.getSelectedItem());
         }
         campaign.getRNG().setPerentFemale(sldGender.getValue());
+        campaign.setRankSystem(comboRanks.getSelectedIndex());
         if (comboRanks.getSelectedIndex() == Ranks.RS_CUSTOM)
         {
 	        campaign.getRanks().setRanksFromModel(ranksModel);
         }
-        campaign.setRankSystem(comboRanks.getSelectedIndex());
         campaign.setCamoCategory(camoCategory);
         campaign.setCamoFileName(camoFileName);
         campaign.setColorIndex(colorIndex);
