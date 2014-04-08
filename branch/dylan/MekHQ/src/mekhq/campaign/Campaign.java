@@ -1754,7 +1754,7 @@ public class Campaign implements Serializable {
 		        		if (uPart == null || uPart.getAssignedTeamId() == null) {
 		        			continue;
 		        		}
-		        		if (uPart.getAssignedTeamId().equals(u.getEngineer().getId())) {
+		        		if (u.getEngineer() != null && uPart.getAssignedTeamId().equals(u.getEngineer().getId())) {
 		        			engineerAssigned = true;
 		        		}
 		        	}

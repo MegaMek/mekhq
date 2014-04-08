@@ -2552,6 +2552,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public void clearInjuries() {
         injuries.clear();
+        
+        // Clear the doctor if there is one
+        doctorId = null;
     }
 
     public void removeInjury(Injury i) {
