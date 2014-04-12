@@ -3,10 +3,10 @@
 	<info>
 		<name>Fox&apos;s Teeth</name>
 		<faction>FS</faction>
-		<rankSystem>
-			<!-- Federated Suns -->
-			<system>1</system>
-		</rankSystem>
+			<rankSystem>
+				<!-- Federated Suns -->
+				<system>1</system>
+			</rankSystem>
 		<nameGen>FS</nameGen>
 		<percentFemale>50</percentFemale>
 		<overtime>false</overtime>
@@ -19,7 +19,7 @@
 		<camoFileName>Wood1.jpg</camoFileName>
 		<colorIndex>0</colorIndex>
 		<lastTeamId>0</lastTeamId>
-		<lastPartId>680</lastPartId>
+		<lastPartId>767</lastPartId>
 		<lastForceId>4</lastForceId>
 		<lastMissionId>1</lastMissionId>
 		<lastScenarioId>1</lastScenarioId>
@@ -181,6 +181,111 @@
 			<reportLine><![CDATA[<p/><b>Thursday, March 23 3048</b>]]></reportLine>
 			<reportLine><![CDATA[<p/><b>Wednesday, March 22 3048</b>]]></reportLine>
 			<reportLine><![CDATA[<a href='PERSONNEL_MARKET'>Personnel market updated</a>]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> fixed.</b></font>]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> fixed.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> fixed.</b></font>]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[AC/10 Ammo Bin scrapped.]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> fixed.</b></font>]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> fixed.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> fixed.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> fixed.</b></font>]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> fixed.</b></font>]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> fixed.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> fixed.</b></font>]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> fixed.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> fixed.</b></font>]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> fixed.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> fixed.</b></font>]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> fixed.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> fixed.</b></font>]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> fixed.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> fixed.</b></font>]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> fixed.</b></font>]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> fixed.</b></font>]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> fixed.</b></font>]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> replaced.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> fixed.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> fixed.</b></font>]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[<font color='green'><b> part found</b>.</font> It will be delivered in 0 days.]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> fixed.</b></font>]]></reportLine>
+			<reportLine><![CDATA[ <font color='green'><b> fixed.</b></font>]]></reportLine>
 		</currentReport>
 	</info>
 	<campaignOptions>
@@ -284,19 +389,7 @@
 	</campaignOptions>
 	<units>
 		<unit id="8e0e6d85-dcbc-495f-8e21-19023e0861b9" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Dervish" model="DV-6M" type="Biped" commander="false" externalId="8e0e6d85-dcbc-495f-8e21-19023e0861b9" camoCategory="" camoFileName="">
-				<location index="2"> Right Torso
-					<slot index="3" type="System" isHit="true" isRepairable="false" isDestroyed="true"/>
-				</location>
-				<location index="3"> Left Torso
-					<slot index="3" type="System" isHit="true" isRepairable="false" isDestroyed="true"/>
-				</location>
-				<location index="4"> Right Arm
-					<slot index="6" type="System" isHit="true" isRepairable="false" isDestroyed="true"/>
-				</location>
-				<location index="5"> Left Arm
-					<slot index="6" type="System" isHit="true" isRepairable="false" isDestroyed="true"/>
-				</location>
+			<entity chassis="Dervish" model="DV-6M" type="Biped" commander="false" externalId="8e0e6d85-dcbc-495f-8e21-19023e0861b9">
 			</entity>
 			<driverId>3c3abbc1-def4-438b-8c49-c5c92163e22c</driverId>
 			<gunnerId>3c3abbc1-def4-438b-8c49-c5c92163e22c</gunnerId>
@@ -313,10 +406,7 @@
 			<history></history>
 		</unit>
 		<unit id="7072ada6-60ce-485c-b049-fbdee97e1222" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Hornet" model="HNT-151" type="Biped" commander="false" externalId="7072ada6-60ce-485c-b049-fbdee97e1222" camoCategory="" camoFileName="">
-				<location index="3"> Left Torso
-					<slot index="4" type="System" isHit="true" isRepairable="false" isDestroyed="true"/>
-				</location>
+			<entity chassis="Hornet" model="HNT-151" type="Biped" commander="false" externalId="7072ada6-60ce-485c-b049-fbdee97e1222">
 				<location index="4"> Right Arm
 					<slot index="4" type="Empty"/>
 				</location>
@@ -339,16 +429,7 @@
 			<history></history>
 		</unit>
 		<unit id="bf179ea4-c9da-49d5-bac1-a2d92f3fefb7" type="mekhq.campaign.unit.Unit">
-			<entity chassis="JagerMech" model="JM6-S" type="Biped" commander="false" externalId="bf179ea4-c9da-49d5-bac1-a2d92f3fefb7" camoCategory="" camoFileName="">
-				<location index="1"> Center Torso
-					<slot index="11" type="System" isHit="true" isRepairable="false" isDestroyed="true"/>
-				</location>
-				<location index="2"> Right Torso
-					<slot index="2" type="System" isHit="true" isRepairable="false" isDestroyed="true"/>
-				</location>
-				<location index="3"> Left Torso
-					<slot index="2" type="System" isHit="true" isRepairable="false" isDestroyed="true"/>
-				</location>
+			<entity chassis="JagerMech" model="JM6-S" type="Biped" commander="false" externalId="bf179ea4-c9da-49d5-bac1-a2d92f3fefb7">
 			</entity>
 			<driverId>02f95f7a-acab-4b79-b0df-ec05175211a1</driverId>
 			<gunnerId>02f95f7a-acab-4b79-b0df-ec05175211a1</gunnerId>
@@ -365,12 +446,7 @@
 			<history></history>
 		</unit>
 		<unit id="08da54d6-08f6-4d0c-82a2-01b8c07e35df" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Cataphract" model="CTF-2X George" type="Biped" commander="false" externalId="08da54d6-08f6-4d0c-82a2-01b8c07e35df" camoCategory="" camoFileName="">
-				<location index="3"> Left Torso
-					<slot index="8" type="System" isHit="true" isRepairable="false" isDestroyed="true"/>
-					<slot index="9" type="System" isHit="true" isRepairable="false" isDestroyed="true"/>
-					<slot index="10" type="System" isHit="true" isRepairable="false" isDestroyed="true"/>
-				</location>
+			<entity chassis="Cataphract" model="CTF-2X George" type="Biped" commander="false" externalId="08da54d6-08f6-4d0c-82a2-01b8c07e35df">
 			</entity>
 			<driverId>1692715d-0916-4605-bcb9-fd964fd8e3e7</driverId>
 			<gunnerId>1692715d-0916-4605-bcb9-fd964fd8e3e7</gunnerId>
@@ -387,7 +463,7 @@
 			<history></history>
 		</unit>
 		<unit id="fbd0331c-bc85-425d-b3da-aefa70859b5e" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Black Knight" model="BL-6-KNT Ian" type="Biped" commander="false" externalId="fbd0331c-bc85-425d-b3da-aefa70859b5e" camoCategory="" camoFileName="">
+			<entity chassis="Black Knight" model="BL-6-KNT Ian" type="Biped" commander="false" externalId="fbd0331c-bc85-425d-b3da-aefa70859b5e">
 			</entity>
 			<driverId>1795712b-6a31-4e4a-9f08-c3ffb5d0b97e</driverId>
 			<gunnerId>1795712b-6a31-4e4a-9f08-c3ffb5d0b97e</gunnerId>
@@ -404,13 +480,7 @@
 			<history></history>
 		</unit>
 		<unit id="51ec55e7-15f0-43f7-975d-e9e8168b2b4a" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Commando" model="COM-2D" type="Biped" commander="false" externalId="51ec55e7-15f0-43f7-975d-e9e8168b2b4a" camoCategory="" camoFileName="">
-				<location index="2"> Right Torso
-					<slot index="3" type="System" isHit="true" isRepairable="false" isDestroyed="true"/>
-				</location>
-				<location index="3"> Left Torso
-					<slot index="3" type="System" isHit="true" isRepairable="false" isDestroyed="true"/>
-				</location>
+			<entity chassis="Commando" model="COM-2D" type="Biped" commander="false" externalId="51ec55e7-15f0-43f7-975d-e9e8168b2b4a">
 			</entity>
 			<driverId>42b118e5-acc2-4660-94ac-90bc4554c0fa</driverId>
 			<gunnerId>42b118e5-acc2-4660-94ac-90bc4554c0fa</gunnerId>
@@ -427,11 +497,7 @@
 			<history></history>
 		</unit>
 		<unit id="5622b5dc-e67a-46be-9529-3474e6d7de46" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Enforcer" model="ENF-4R Daniel" type="Biped" commander="false" externalId="5622b5dc-e67a-46be-9529-3474e6d7de46" camoCategory="" camoFileName="">
-				<location index="2"> Right Torso
-					<slot index="2" type="System" isHit="true" isRepairable="false" isDestroyed="true"/>
-					<slot index="3" type="System" isHit="true" isRepairable="false" isDestroyed="true"/>
-				</location>
+			<entity chassis="Enforcer" model="ENF-4R Daniel" type="Biped" commander="false" externalId="5622b5dc-e67a-46be-9529-3474e6d7de46">
 			</entity>
 			<driverId>83f2abe1-cb32-49e3-9757-7624e10658c3</driverId>
 			<gunnerId>83f2abe1-cb32-49e3-9757-7624e10658c3</gunnerId>
@@ -448,13 +514,7 @@
 			<history></history>
 		</unit>
 		<unit id="ef7b511a-548b-466b-ae57-aec804832e7f" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Javelin" model="JVN-10N" type="Biped" commander="false" externalId="ef7b511a-548b-466b-ae57-aec804832e7f" camoCategory="" camoFileName="">
-				<location index="2"> Right Torso
-					<slot index="5" type="System" isHit="true" isRepairable="false" isDestroyed="true"/>
-				</location>
-				<location index="3"> Left Torso
-					<slot index="4" type="System" isHit="true" isRepairable="false" isDestroyed="true"/>
-				</location>
+			<entity chassis="Javelin" model="JVN-10N" type="Biped" commander="false" externalId="ef7b511a-548b-466b-ae57-aec804832e7f">
 			</entity>
 			<driverId>78cdfffc-3d90-4b08-ab69-0179b9e93468</driverId>
 			<gunnerId>78cdfffc-3d90-4b08-ab69-0179b9e93468</gunnerId>
@@ -471,15 +531,7 @@
 			<history></history>
 		</unit>
 		<unit id="35d8a1cf-fed5-4e5e-9e46-f65cc82d8a92" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Centurion" model="CN9-A" type="Biped" commander="false" externalId="35d8a1cf-fed5-4e5e-9e46-f65cc82d8a92" camoCategory="" camoFileName="">
-				<location index="2"> Right Torso
-					<slot index="2" type="System" isHit="true" isRepairable="false" isDestroyed="true"/>
-					<slot index="3" type="System" isHit="true" isRepairable="false" isDestroyed="true"/>
-				</location>
-				<location index="3"> Left Torso
-					<slot index="4" type="System" isHit="true" isRepairable="false" isDestroyed="true"/>
-					<slot index="5" type="System" isHit="true" isRepairable="false" isDestroyed="true"/>
-				</location>
+			<entity chassis="Centurion" model="CN9-A" type="Biped" commander="false" externalId="35d8a1cf-fed5-4e5e-9e46-f65cc82d8a92">
 			</entity>
 			<driverId>e278fdd1-d5ef-4e57-bd76-d92928bb4394</driverId>
 			<gunnerId>e278fdd1-d5ef-4e57-bd76-d92928bb4394</gunnerId>
@@ -496,13 +548,7 @@
 			<history></history>
 		</unit>
 		<unit id="56ef5856-abb6-4a2d-9e4c-d1461b9b9dce" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Assassin" model="ASN-21" type="Biped" commander="false" externalId="56ef5856-abb6-4a2d-9e4c-d1461b9b9dce" camoCategory="" camoFileName="">
-				<location index="2"> Right Torso
-					<slot index="5" type="System" isHit="true" isRepairable="false" isDestroyed="true"/>
-				</location>
-				<location index="3"> Left Torso
-					<slot index="5" type="System" isHit="true" isRepairable="false" isDestroyed="true"/>
-				</location>
+			<entity chassis="Assassin" model="ASN-21" type="Biped" commander="false" externalId="56ef5856-abb6-4a2d-9e4c-d1461b9b9dce">
 			</entity>
 			<driverId>2f9c153a-467b-4898-bd47-d5cba4c3e532</driverId>
 			<gunnerId>2f9c153a-467b-4898-bd47-d5cba4c3e532</gunnerId>
@@ -519,11 +565,7 @@
 			<history></history>
 		</unit>
 		<unit id="f8cf9760-9998-4219-baca-416347c6e049" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Hatchetman" model="HCT-3F Austin" type="Biped" commander="false" externalId="f8cf9760-9998-4219-baca-416347c6e049" camoCategory="" camoFileName="">
-				<location index="1"> Center Torso
-					<slot index="11" type="System" isHit="true" isRepairable="false" isDestroyed="true"/>
-					<slot index="12" type="System" isHit="true" isRepairable="false" isDestroyed="true"/>
-				</location>
+			<entity chassis="Hatchetman" model="HCT-3F Austin" type="Biped" commander="false" externalId="f8cf9760-9998-4219-baca-416347c6e049">
 			</entity>
 			<driverId>b06e5c92-e603-4769-b82a-00c3c58db696</driverId>
 			<gunnerId>b06e5c92-e603-4769-b82a-00c3c58db696</gunnerId>
@@ -540,7 +582,7 @@
 			<history></history>
 		</unit>
 		<unit id="322364d4-da1e-4405-9a66-87ad8e4b8e51" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Wolfhound" model="WLF-1" type="Biped" commander="false" externalId="322364d4-da1e-4405-9a66-87ad8e4b8e51" camoCategory="" camoFileName="">
+			<entity chassis="Wolfhound" model="WLF-1" type="Biped" commander="false" externalId="322364d4-da1e-4405-9a66-87ad8e4b8e51">
 			</entity>
 			<driverId>8b4e7d03-4673-4011-8e1b-3ce2d82c6f50</driverId>
 			<gunnerId>8b4e7d03-4673-4011-8e1b-3ce2d82c6f50</gunnerId>
@@ -1586,6 +1628,254 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<costs>8,4,4,4,4,4,4,4,4,4,4</costs>
 		</skillType>
 	</skillTypes>
+	<specialAbilities>
+		<ability>
+			<displayName>Gunnery Specialization (aToW)</displayName>
+			<lookupName>specialist</lookupName>
+			<desc>A pilot who specializes in a type of weapon receives a -1 to-hit modifier when using weapons of that type and a
+ +1 to-hit modifier when using other types of weapons.</desc>
+			<xpCost>6</xpCost>
+			<weight>4</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities>weapon_specialist</invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
+			<displayName>Hot Dog (aToW)</displayName>
+			<lookupName>hot_dog</lookupName>
+			<desc>Reduce heat-related target rolls (e.g ammo, damage, shutdown) by 1.</desc>
+			<xpCost>2</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
+			<displayName>Sandblaster (AToW)</displayName>
+			<lookupName>sandblaster</lookupName>
+			<desc>A pilot with this ability gets a +4, +3, or +2 to the cluster table
+at short, medium, or long/extended range, respectively, but only with a specialized weapon.</desc>
+			<xpCost>6</xpCost>
+			<weight>3</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities>cluster_hitter::cluster_master</invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
+			<displayName>Some Like It Hot (Unofficial)</displayName>
+			<lookupName>some_like_it_hot</lookupName>
+			<desc>A pilot with this ability does not suffer the initial -1 to hit due to heat.</desc>
+			<xpCost>6</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
+			<displayName>Melee Specialist (aToW)</displayName>
+			<lookupName>melee_specialist</lookupName>
+			<desc>Enables the unit to do 1 additional point of damage with physical attacks and applies a -1 to-hit modifier to physical attacks.
+Note: This ability is only used for BattleMechs.</desc>
+			<xpCost>4</xpCost>
+			<weight>3</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
+			<displayName>Weathered (Unofficial)</displayName>
+			<lookupName>weathered</lookupName>
+			<desc>A pilot with this ability does not suffer the initial -1 to hit due to weather conditions.</desc>
+			<xpCost>6</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
+			<displayName>Cluster Master (AToW)</displayName>
+			<lookupName>cluster_master</lookupName>
+			<desc>A pilot with this ability gets a +2 to the cluster hit table</desc>
+			<xpCost>6</xpCost>
+			<weight>6</weight>
+			<prereqAbilities>cluster_hitter</prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities>cluster_hitter</removeAbilities>
+		</ability>
+		<ability>
+			<displayName>Maneuvering Ace (aToW)</displayName>
+			<lookupName>maneuvering_ace</lookupName>
+			<desc>Enables the unit to move laterally like a Quad.
+Quads can move laterally for 1 less MP.
+Aerospace units can perform maneuvers for 1 less thrust point.
+Units also receive a -1 BTH to rolls against skidding, sideslipping, and going out of control.</desc>
+			<xpCost>4</xpCost>
+			<weight>3</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
+			<displayName>Multi-Tasker (aToW)</displayName>
+			<lookupName>multi_tasker</lookupName>
+			<desc>Secondary target modifiers are reduced by one.</desc>
+			<xpCost>6</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
+			<displayName>Oblique Attacker (aToW)</displayName>
+			<lookupName>oblique_attacker</lookupName>
+			<desc>The penalty for indirect fire is reduced by one.</desc>
+			<xpCost>6</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
+			<displayName>Natural Aptitude, Gunnery (aToW)</displayName>
+			<lookupName>aptitude_gunnery</lookupName>
+			<desc>Roll 3d6 and take the best two for gunnery checks</desc>
+			<xpCost>40</xpCost>
+			<weight>0</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
+			<displayName>Hopping Jack (Unofficial)</displayName>
+			<lookupName>hopping_jack</lookupName>
+			<desc>Unit only suffers a +2 to-hit penalty for jumping, rather than a +3 to-hit penalty.</desc>
+			<xpCost>6</xpCost>
+			<weight>3</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities>jumping_jack</invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
+			<displayName>All Weather (Unofficial)</displayName>
+			<lookupName>allweather</lookupName>
+			<desc>A pilot with this ability does not suffer the PSR penalties due to weather.</desc>
+			<xpCost>2</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
+			<displayName>Tactical Genius (aToW)</displayName>
+			<lookupName>tactical_genius</lookupName>
+			<desc>A pilot who has a Tactical Genius may reroll their initiative once per turn.
+ The second roll must be accepted.
+Note: Only one Tactical Genius may be utilized per team.</desc>
+			<xpCost>8</xpCost>
+			<weight>1</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
+			<displayName>Jumping Jack (aToW)</displayName>
+			<lookupName>jumping_jack</lookupName>
+			<desc>Unit only suffers a +1 to-hit penalty for jumping, rather than a +3 to-hit penalty.</desc>
+			<xpCost>6</xpCost>
+			<weight>6</weight>
+			<prereqAbilities>hopping_jack</prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities>hopping_jack</removeAbilities>
+		</ability>
+		<ability>
+			<displayName>Pain Resistance (MaxTech)</displayName>
+			<lookupName>pain_resistance</lookupName>
+			<desc>When making consciousness rolls,
+1 is added to all rolls.
+Also,
+damage received from ammo explosions is reduced to 1.
+Note: This ability is only used for BattleMechs.</desc>
+			<xpCost>4</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
+			<displayName>Sniper (aToW)</displayName>
+			<lookupName>sniper</lookupName>
+			<desc>Range penalties are halved.</desc>
+			<xpCost>12</xpCost>
+			<weight>1</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
+			<displayName>Dodge (MaxTech)</displayName>
+			<lookupName>dodge_maneuver</lookupName>
+			<desc>Enables the unit to make a dodge maneuver instead of a physical attack.
+This maneuver adds +2 to the BTH to physical attacks against the unit.
+NOTE: The dodge maneuver is declared during the weapons phase.
+Note: This ability is only used for BattleMechs.</desc>
+			<xpCost>2</xpCost>
+			<weight>1</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
+			<displayName>Blind Fighter (Unofficial)</displayName>
+			<lookupName>blind_fighter</lookupName>
+			<desc>A pilot with this ability does not suffer the initial -1 to hit due to darkness.</desc>
+			<xpCost>6</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
+			<displayName>Cluster Hitter (AToW)</displayName>
+			<lookupName>cluster_hitter</lookupName>
+			<desc>A pilot with this ability gets a +1 to the cluster hit table </desc>
+			<xpCost>6</xpCost>
+			<weight>3</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities>cluster_master</invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
+			<displayName>Weapon Specialist (aToW)</displayName>
+			<lookupName>weapon_specialist</lookupName>
+			<desc>A pilot who specializes in a particular weapon receives a -2 to hit modifier on all attacks with that weapon.</desc>
+			<xpCost>12</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities>specialist</invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
+			<displayName>Melee Master (aToW)</displayName>
+			<lookupName>melee_master</lookupName>
+			<desc>Enables the unit to do one additional kick, punch, or club attack on the same opponent.</desc>
+			<xpCost>4</xpCost>
+			<weight>6</weight>
+			<prereqAbilities>melee_specialist</prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
+			<displayName>Sensor Geek (Unofficial)</displayName>
+			<lookupName>sensor_geek</lookupName>
+			<desc>A pilot with this ability gets a -2 bonus on sensor checks.
+ Note that this is really only a bonus, if inclusive sensor ranges are in use.</desc>
+			<xpCost>3</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+	</specialAbilities>
 	<randomSkillPreferences>
 		<overallRecruitBonus>0</overallRecruitBonus>
 		<recruitBonuses>0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0</recruitBonuses>
@@ -1602,6 +1892,931 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 		<secondSkillBonus>-4</secondSkillBonus>
 	</randomSkillPreferences>
 	<parts>
+		<part id="765" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>765</id>
+			<name>AC/10 Ammo Bin</name>
+			<unitTonnage>50</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>35d8a1cf-fed5-4e5e-9e46-f65cc82d8a92</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>9</equipmentNum>
+			<typeName>IS Ammo AC/10</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="764" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>764</id>
+			<name>LRM 10 Ammo Bin</name>
+			<unitTonnage>50</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>35d8a1cf-fed5-4e5e-9e46-f65cc82d8a92</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>6</equipmentNum>
+			<typeName>IS Ammo LRM-10</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="759" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>759</id>
+			<name>AC/10 Ammo Bin</name>
+			<unitTonnage>50</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>35d8a1cf-fed5-4e5e-9e46-f65cc82d8a92</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>8</equipmentNum>
+			<typeName>IS Ammo AC/10</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="758" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>758</id>
+			<name>LRM 10 Ammo Bin</name>
+			<unitTonnage>50</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>35d8a1cf-fed5-4e5e-9e46-f65cc82d8a92</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>5</equipmentNum>
+			<typeName>IS Ammo LRM-10</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="754" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>754</id>
+			<name>SRM 6 Ammo Bin</name>
+			<unitTonnage>30</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>ef7b511a-548b-466b-ae57-aec804832e7f</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>12</equipmentNum>
+			<typeName>IS Ammo SRM-6</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="751" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>751</id>
+			<name>SRM 6 Ammo Bin</name>
+			<unitTonnage>30</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>ef7b511a-548b-466b-ae57-aec804832e7f</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>8</equipmentNum>
+			<typeName>IS Ammo SRM-6</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="748" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>748</id>
+			<name>AC/5 Ammo Bin</name>
+			<unitTonnage>65</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>bf179ea4-c9da-49d5-bac1-a2d92f3fefb7</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>9</equipmentNum>
+			<typeName>IS Ammo AC/5</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="744" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>744</id>
+			<name>AC/2 Ammo Bin</name>
+			<unitTonnage>65</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>bf179ea4-c9da-49d5-bac1-a2d92f3fefb7</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>10</equipmentNum>
+			<typeName>IS Ammo AC/2</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="743" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>743</id>
+			<name>AC/5 Ammo Bin</name>
+			<unitTonnage>65</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>bf179ea4-c9da-49d5-bac1-a2d92f3fefb7</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>7</equipmentNum>
+			<typeName>IS Ammo AC/5</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="738" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>738</id>
+			<name>LRM 10 Ammo Bin</name>
+			<unitTonnage>55</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>8e0e6d85-dcbc-495f-8e21-19023e0861b9</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>15</equipmentNum>
+			<typeName>IS Ammo LRM-10</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="737" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>737</id>
+			<name>SRM 2 Ammo Bin</name>
+			<unitTonnage>55</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>8e0e6d85-dcbc-495f-8e21-19023e0861b9</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>11</equipmentNum>
+			<typeName>IS Ammo SRM-2</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="732" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>732</id>
+			<name>LRM 10 Ammo Bin</name>
+			<unitTonnage>55</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>8e0e6d85-dcbc-495f-8e21-19023e0861b9</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>13</equipmentNum>
+			<typeName>IS Ammo LRM-10</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="731" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>731</id>
+			<name>SRM 2 Ammo Bin</name>
+			<unitTonnage>55</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>8e0e6d85-dcbc-495f-8e21-19023e0861b9</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>8</equipmentNum>
+			<typeName>IS Ammo SRM-2</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="726" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>726</id>
+			<name>LB 10-X AC Ammo Bin</name>
+			<unitTonnage>45</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>15</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>f8cf9760-9998-4219-baca-416347c6e049</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>16</equipmentNum>
+			<typeName>IS LB 10-X AC Ammo</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="725" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>725</id>
+			<name>LB 10-X Cluster Ammo Bin</name>
+			<unitTonnage>45</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>15</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>f8cf9760-9998-4219-baca-416347c6e049</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>15</equipmentNum>
+			<typeName>IS LB 10-X Cluster Ammo</typeName>
+			<munition>1</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="720" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>720</id>
+			<name>LRM 5 Ammo Bin</name>
+			<unitTonnage>40</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>15</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>56ef5856-abb6-4a2d-9e4c-d1461b9b9dce</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>12</equipmentNum>
+			<typeName>IS Ammo LRM-5</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="719" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>719</id>
+			<name>SRM 2 Ammo Bin</name>
+			<unitTonnage>40</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>15</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>56ef5856-abb6-4a2d-9e4c-d1461b9b9dce</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>7</equipmentNum>
+			<typeName>IS Ammo SRM-2</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="715" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>715</id>
+			<name>Gauss Ammo Bin</name>
+			<unitTonnage>50</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>15</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>5622b5dc-e67a-46be-9529-3474e6d7de46</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>13</equipmentNum>
+			<typeName>IS Gauss Ammo</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="712" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>712</id>
+			<name>Gauss Ammo Bin</name>
+			<unitTonnage>50</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>15</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>5622b5dc-e67a-46be-9529-3474e6d7de46</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>14</equipmentNum>
+			<typeName>IS Gauss Ammo</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="708" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>708</id>
+			<name>SRM 4 Ammo Bin</name>
+			<unitTonnage>25</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>15</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>51ec55e7-15f0-43f7-975d-e9e8168b2b4a</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>9</equipmentNum>
+			<typeName>IS Ammo SRM-4</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="707" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>707</id>
+			<name>SRM 6 Ammo Bin</name>
+			<unitTonnage>25</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>15</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>51ec55e7-15f0-43f7-975d-e9e8168b2b4a</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>6</equipmentNum>
+			<typeName>IS Ammo SRM-6</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="704" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>704</id>
+			<name>AC/10 Ammo Bin</name>
+			<unitTonnage>70</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>15</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>08da54d6-08f6-4d0c-82a2-01b8c07e35df</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>9</equipmentNum>
+			<typeName>IS Ammo AC/10</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="696" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>696</id>
+			<name>SRM 4 Ammo Bin</name>
+			<unitTonnage>70</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>15</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>08da54d6-08f6-4d0c-82a2-01b8c07e35df</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>8</equipmentNum>
+			<typeName>IS Ammo SRM-4</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="695" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>695</id>
+			<name>AC/10 Ammo Bin</name>
+			<unitTonnage>70</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>15</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>08da54d6-08f6-4d0c-82a2-01b8c07e35df</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>10</equipmentNum>
+			<typeName>IS Ammo AC/10</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="691" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>691</id>
+			<name>LRM 5 Ammo Bin</name>
+			<unitTonnage>20</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>15</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>7072ada6-60ce-485c-b049-fbdee97e1222</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>11</equipmentNum>
+			<typeName>IS Ammo LRM-5</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="689" type="mekhq.campaign.parts.equipment.EquipmentPart">
+			<id>689</id>
+			<name>Hatchet</name>
+			<unitTonnage>45</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>f8cf9760-9998-4219-baca-416347c6e049</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>9</equipmentNum>
+			<typeName>Hatchet</typeName>
+			<equipTonnage>3.0</equipTonnage>
+		</part>
+		<part id="688" type="mekhq.campaign.parts.equipment.JumpJet">
+			<id>688</id>
+			<name>Jump Jet</name>
+			<unitTonnage>40</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>56ef5856-abb6-4a2d-9e4c-d1461b9b9dce</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>3</equipmentNum>
+			<typeName>Jump Jet</typeName>
+			<equipTonnage>0.5</equipTonnage>
+		</part>
+		<part id="687" type="mekhq.campaign.parts.equipment.JumpJet">
+			<id>687</id>
+			<name>Jump Jet</name>
+			<unitTonnage>40</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>56ef5856-abb6-4a2d-9e4c-d1461b9b9dce</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>4</equipmentNum>
+			<typeName>Jump Jet</typeName>
+			<equipTonnage>0.5</equipTonnage>
+		</part>
+		<part id="686" type="mekhq.campaign.parts.equipment.HeatSink">
+			<id>686</id>
+			<name>Heat Sink</name>
+			<unitTonnage>50</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>35d8a1cf-fed5-4e5e-9e46-f65cc82d8a92</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>3</equipmentNum>
+			<typeName>Heat Sink</typeName>
+			<equipTonnage>1.0</equipTonnage>
+		</part>
+		<part id="685" type="mekhq.campaign.parts.equipment.JumpJet">
+			<id>685</id>
+			<name>Jump Jet</name>
+			<unitTonnage>30</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>ef7b511a-548b-466b-ae57-aec804832e7f</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>2</equipmentNum>
+			<typeName>Jump Jet</typeName>
+			<equipTonnage>0.5</equipTonnage>
+		</part>
+		<part id="684" type="mekhq.campaign.parts.equipment.JumpJet">
+			<id>684</id>
+			<name>Jump Jet</name>
+			<unitTonnage>30</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>ef7b511a-548b-466b-ae57-aec804832e7f</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>3</equipmentNum>
+			<typeName>Jump Jet</typeName>
+			<equipTonnage>0.5</equipTonnage>
+		</part>
+		<part id="683" type="mekhq.campaign.parts.equipment.HeatSink">
+			<id>683</id>
+			<name>Heat Sink</name>
+			<unitTonnage>25</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>51ec55e7-15f0-43f7-975d-e9e8168b2b4a</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>4</equipmentNum>
+			<typeName>Heat Sink</typeName>
+			<equipTonnage>1.0</equipTonnage>
+		</part>
+		<part id="682" type="mekhq.campaign.parts.equipment.JumpJet">
+			<id>682</id>
+			<name>Jump Jet</name>
+			<unitTonnage>20</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>7072ada6-60ce-485c-b049-fbdee97e1222</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>2</equipmentNum>
+			<typeName>Jump Jet</typeName>
+			<equipTonnage>0.5</equipTonnage>
+		</part>
+		<part id="681" type="mekhq.campaign.parts.equipment.JumpJet">
+			<id>681</id>
+			<name>Jump Jet</name>
+			<unitTonnage>55</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>8e0e6d85-dcbc-495f-8e21-19023e0861b9</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>2</equipmentNum>
+			<typeName>Jump Jet</typeName>
+			<equipTonnage>0.5</equipTonnage>
+		</part>
 		<part id="680" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>680</id>
 			<name>Large Laser</name>
@@ -1648,7 +2863,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -1673,65 +2888,9 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
-		</part>
-		<part id="677" type="mekhq.campaign.parts.equipment.MissingAmmoBin">
-			<id>677</id>
-			<name>LB 10-X Cluster Ammo Bin</name>
-			<unitTonnage>45</unitTonnage>
-			<hits>0</hits>
-			<difficulty>-2</difficulty>
-			<time>120</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>f8cf9760-9998-4219-baca-416347c6e049</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<equipmentNum>15</equipmentNum>
-			<typeName>IS LB 10-X Cluster Ammo</typeName>
-			<daysToWait>0</daysToWait>
-			<oneShot>false</oneShot>
-		</part>
-		<part id="676" type="mekhq.campaign.parts.equipment.MissingAmmoBin">
-			<id>676</id>
-			<name>LB 10-X AC Ammo Bin</name>
-			<unitTonnage>45</unitTonnage>
-			<hits>0</hits>
-			<difficulty>-2</difficulty>
-			<time>120</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>f8cf9760-9998-4219-baca-416347c6e049</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<equipmentNum>16</equipmentNum>
-			<typeName>IS LB 10-X AC Ammo</typeName>
-			<daysToWait>0</daysToWait>
-			<oneShot>false</oneShot>
 		</part>
 		<part id="675" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>675</id>
@@ -1754,7 +2913,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>13</equipmentNum>
+			<equipmentNum>10</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -1779,7 +2938,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>12</equipmentNum>
+			<equipmentNum>11</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -1804,7 +2963,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -1829,7 +2988,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -1854,7 +3013,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -1879,121 +3038,9 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
-		</part>
-		<part id="669" type="mekhq.campaign.parts.equipment.MissingAmmoBin">
-			<id>669</id>
-			<name>LRM 10 Ammo Bin</name>
-			<unitTonnage>50</unitTonnage>
-			<hits>0</hits>
-			<difficulty>-2</difficulty>
-			<time>120</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>35d8a1cf-fed5-4e5e-9e46-f65cc82d8a92</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<equipmentNum>6</equipmentNum>
-			<typeName>IS Ammo LRM-10</typeName>
-			<daysToWait>0</daysToWait>
-			<oneShot>false</oneShot>
-		</part>
-		<part id="668" type="mekhq.campaign.parts.equipment.MissingAmmoBin">
-			<id>668</id>
-			<name>LRM 10 Ammo Bin</name>
-			<unitTonnage>50</unitTonnage>
-			<hits>0</hits>
-			<difficulty>-2</difficulty>
-			<time>120</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>35d8a1cf-fed5-4e5e-9e46-f65cc82d8a92</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<equipmentNum>5</equipmentNum>
-			<typeName>IS Ammo LRM-10</typeName>
-			<daysToWait>0</daysToWait>
-			<oneShot>false</oneShot>
-		</part>
-		<part id="667" type="mekhq.campaign.parts.equipment.MissingAmmoBin">
-			<id>667</id>
-			<name>AC/10 Ammo Bin</name>
-			<unitTonnage>50</unitTonnage>
-			<hits>0</hits>
-			<difficulty>-2</difficulty>
-			<time>120</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>35d8a1cf-fed5-4e5e-9e46-f65cc82d8a92</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<equipmentNum>9</equipmentNum>
-			<typeName>IS Ammo AC/10</typeName>
-			<daysToWait>0</daysToWait>
-			<oneShot>false</oneShot>
-		</part>
-		<part id="666" type="mekhq.campaign.parts.equipment.MissingAmmoBin">
-			<id>666</id>
-			<name>AC/10 Ammo Bin</name>
-			<unitTonnage>50</unitTonnage>
-			<hits>0</hits>
-			<difficulty>-2</difficulty>
-			<time>120</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>35d8a1cf-fed5-4e5e-9e46-f65cc82d8a92</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<equipmentNum>8</equipmentNum>
-			<typeName>IS Ammo AC/10</typeName>
-			<daysToWait>0</daysToWait>
-			<oneShot>false</oneShot>
 		</part>
 		<part id="665" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>665</id>
@@ -2070,62 +3117,6 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<typeName>Autocannon/10</typeName>
 			<equipTonnage>12.0</equipTonnage>
 		</part>
-		<part id="660" type="mekhq.campaign.parts.equipment.MissingAmmoBin">
-			<id>660</id>
-			<name>SRM 2 Ammo Bin</name>
-			<unitTonnage>40</unitTonnage>
-			<hits>0</hits>
-			<difficulty>-2</difficulty>
-			<time>120</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>56ef5856-abb6-4a2d-9e4c-d1461b9b9dce</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<equipmentNum>7</equipmentNum>
-			<typeName>IS Ammo SRM-2</typeName>
-			<daysToWait>0</daysToWait>
-			<oneShot>false</oneShot>
-		</part>
-		<part id="659" type="mekhq.campaign.parts.equipment.MissingAmmoBin">
-			<id>659</id>
-			<name>LRM 5 Ammo Bin</name>
-			<unitTonnage>40</unitTonnage>
-			<hits>0</hits>
-			<difficulty>-2</difficulty>
-			<time>120</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>56ef5856-abb6-4a2d-9e4c-d1461b9b9dce</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<equipmentNum>12</equipmentNum>
-			<typeName>IS Ammo LRM-5</typeName>
-			<daysToWait>0</daysToWait>
-			<oneShot>false</oneShot>
-		</part>
 		<part id="658" type="mekhq.campaign.parts.equipment.JumpJet">
 			<id>658</id>
 			<name>Jump Jet</name>
@@ -2147,7 +3138,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>13</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2172,7 +3163,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>10</equipmentNum>
+			<equipmentNum>8</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2251,62 +3242,6 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<typeName>Medium Laser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
-		<part id="653" type="mekhq.campaign.parts.equipment.MissingAmmoBin">
-			<id>653</id>
-			<name>SRM 6 Ammo Bin</name>
-			<unitTonnage>30</unitTonnage>
-			<hits>0</hits>
-			<difficulty>-2</difficulty>
-			<time>120</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>ef7b511a-548b-466b-ae57-aec804832e7f</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<equipmentNum>12</equipmentNum>
-			<typeName>IS Ammo SRM-6</typeName>
-			<daysToWait>0</daysToWait>
-			<oneShot>false</oneShot>
-		</part>
-		<part id="652" type="mekhq.campaign.parts.equipment.MissingAmmoBin">
-			<id>652</id>
-			<name>SRM 6 Ammo Bin</name>
-			<unitTonnage>30</unitTonnage>
-			<hits>0</hits>
-			<difficulty>-2</difficulty>
-			<time>120</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>ef7b511a-548b-466b-ae57-aec804832e7f</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<equipmentNum>8</equipmentNum>
-			<typeName>IS Ammo SRM-6</typeName>
-			<daysToWait>0</daysToWait>
-			<oneShot>false</oneShot>
-		</part>
 		<part id="651" type="mekhq.campaign.parts.equipment.JumpJet">
 			<id>651</id>
 			<name>Jump Jet</name>
@@ -2328,7 +3263,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>14</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2353,7 +3288,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>13</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2378,7 +3313,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>10</equipmentNum>
+			<equipmentNum>6</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2403,7 +3338,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>13</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2428,65 +3363,9 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>14</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
-		</part>
-		<part id="646" type="mekhq.campaign.parts.equipment.MissingAmmoBin">
-			<id>646</id>
-			<name>Gauss Ammo Bin</name>
-			<unitTonnage>50</unitTonnage>
-			<hits>0</hits>
-			<difficulty>-2</difficulty>
-			<time>120</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>5622b5dc-e67a-46be-9529-3474e6d7de46</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<equipmentNum>14</equipmentNum>
-			<typeName>IS Gauss Ammo</typeName>
-			<daysToWait>0</daysToWait>
-			<oneShot>false</oneShot>
-		</part>
-		<part id="645" type="mekhq.campaign.parts.equipment.MissingAmmoBin">
-			<id>645</id>
-			<name>Gauss Ammo Bin</name>
-			<unitTonnage>50</unitTonnage>
-			<hits>0</hits>
-			<difficulty>-2</difficulty>
-			<time>120</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>5622b5dc-e67a-46be-9529-3474e6d7de46</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<equipmentNum>13</equipmentNum>
-			<typeName>IS Gauss Ammo</typeName>
-			<daysToWait>0</daysToWait>
-			<oneShot>false</oneShot>
 		</part>
 		<part id="644" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>644</id>
@@ -2509,7 +3388,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>12</equipmentNum>
+			<equipmentNum>9</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2534,7 +3413,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2559,7 +3438,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2584,7 +3463,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2609,65 +3488,9 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
-		</part>
-		<part id="639" type="mekhq.campaign.parts.equipment.MissingAmmoBin">
-			<id>639</id>
-			<name>SRM 6 Ammo Bin</name>
-			<unitTonnage>25</unitTonnage>
-			<hits>0</hits>
-			<difficulty>-2</difficulty>
-			<time>120</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>51ec55e7-15f0-43f7-975d-e9e8168b2b4a</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<equipmentNum>6</equipmentNum>
-			<typeName>IS Ammo SRM-6</typeName>
-			<daysToWait>0</daysToWait>
-			<oneShot>false</oneShot>
-		</part>
-		<part id="638" type="mekhq.campaign.parts.equipment.MissingAmmoBin">
-			<id>638</id>
-			<name>SRM 4 Ammo Bin</name>
-			<unitTonnage>25</unitTonnage>
-			<hits>0</hits>
-			<difficulty>-2</difficulty>
-			<time>120</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>51ec55e7-15f0-43f7-975d-e9e8168b2b4a</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<equipmentNum>9</equipmentNum>
-			<typeName>IS Ammo SRM-4</typeName>
-			<daysToWait>0</daysToWait>
-			<oneShot>false</oneShot>
 		</part>
 		<part id="637" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>637</id>
@@ -2690,7 +3513,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>8</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2790,7 +3613,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>11</equipmentNum>
+			<equipmentNum>7</equipmentNum>
 			<typeName>ISDoubleHeatSinkPrototype</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2840,7 +3663,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>7</equipmentNum>
+			<equipmentNum>11</equipmentNum>
 			<typeName>ISDoubleHeatSinkPrototype</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2868,90 +3691,6 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<equipmentNum>3</equipmentNum>
 			<typeName>Hatchet</typeName>
 			<equipTonnage>5.0</equipTonnage>
-		</part>
-		<part id="628" type="mekhq.campaign.parts.equipment.MissingAmmoBin">
-			<id>628</id>
-			<name>AC/10 Ammo Bin</name>
-			<unitTonnage>70</unitTonnage>
-			<hits>0</hits>
-			<difficulty>-2</difficulty>
-			<time>120</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>08da54d6-08f6-4d0c-82a2-01b8c07e35df</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<equipmentNum>9</equipmentNum>
-			<typeName>IS Ammo AC/10</typeName>
-			<daysToWait>0</daysToWait>
-			<oneShot>false</oneShot>
-		</part>
-		<part id="627" type="mekhq.campaign.parts.equipment.MissingAmmoBin">
-			<id>627</id>
-			<name>AC/10 Ammo Bin</name>
-			<unitTonnage>70</unitTonnage>
-			<hits>0</hits>
-			<difficulty>-2</difficulty>
-			<time>120</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>08da54d6-08f6-4d0c-82a2-01b8c07e35df</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<equipmentNum>8</equipmentNum>
-			<typeName>IS Ammo AC/10</typeName>
-			<daysToWait>0</daysToWait>
-			<oneShot>false</oneShot>
-		</part>
-		<part id="626" type="mekhq.campaign.parts.equipment.MissingAmmoBin">
-			<id>626</id>
-			<name>SRM 4 Ammo Bin</name>
-			<unitTonnage>70</unitTonnage>
-			<hits>0</hits>
-			<difficulty>-2</difficulty>
-			<time>120</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>08da54d6-08f6-4d0c-82a2-01b8c07e35df</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<equipmentNum>10</equipmentNum>
-			<typeName>IS Ammo SRM-4</typeName>
-			<daysToWait>0</daysToWait>
-			<oneShot>false</oneShot>
 		</part>
 		<part id="625" type="mekhq.campaign.parts.MekActuator">
 			<id>625</id>
@@ -3023,7 +3762,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>6</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>ISDoubleHeatSinkPrototype</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -3073,7 +3812,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>6</equipmentNum>
 			<typeName>ISDoubleHeatSinkPrototype</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -3102,90 +3841,6 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<typeName>SRM 4</typeName>
 			<equipTonnage>2.0</equipTonnage>
 		</part>
-		<part id="619" type="mekhq.campaign.parts.equipment.MissingAmmoBin">
-			<id>619</id>
-			<name>AC/5 Ammo Bin</name>
-			<unitTonnage>65</unitTonnage>
-			<hits>0</hits>
-			<difficulty>-2</difficulty>
-			<time>120</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>bf179ea4-c9da-49d5-bac1-a2d92f3fefb7</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<equipmentNum>9</equipmentNum>
-			<typeName>IS Ammo AC/5</typeName>
-			<daysToWait>0</daysToWait>
-			<oneShot>false</oneShot>
-		</part>
-		<part id="618" type="mekhq.campaign.parts.equipment.MissingAmmoBin">
-			<id>618</id>
-			<name>AC/5 Ammo Bin</name>
-			<unitTonnage>65</unitTonnage>
-			<hits>0</hits>
-			<difficulty>-2</difficulty>
-			<time>120</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>bf179ea4-c9da-49d5-bac1-a2d92f3fefb7</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<equipmentNum>7</equipmentNum>
-			<typeName>IS Ammo AC/5</typeName>
-			<daysToWait>0</daysToWait>
-			<oneShot>false</oneShot>
-		</part>
-		<part id="617" type="mekhq.campaign.parts.equipment.MissingAmmoBin">
-			<id>617</id>
-			<name>AC/2 Ammo Bin</name>
-			<unitTonnage>65</unitTonnage>
-			<hits>0</hits>
-			<difficulty>-2</difficulty>
-			<time>120</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>bf179ea4-c9da-49d5-bac1-a2d92f3fefb7</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<equipmentNum>10</equipmentNum>
-			<typeName>IS Ammo AC/2</typeName>
-			<daysToWait>0</daysToWait>
-			<oneShot>false</oneShot>
-		</part>
 		<part id="616" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>616</id>
 			<name>AC/2</name>
@@ -3207,7 +3862,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>Autocannon/2</typeName>
 			<equipTonnage>6.0</equipTonnage>
 		</part>
@@ -3232,7 +3887,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>Autocannon/5</typeName>
 			<equipTonnage>8.0</equipTonnage>
 		</part>
@@ -3257,37 +3912,9 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>Autocannon/5</typeName>
 			<equipTonnage>8.0</equipTonnage>
-		</part>
-		<part id="613" type="mekhq.campaign.parts.equipment.MissingAmmoBin">
-			<id>613</id>
-			<name>LRM 5 Ammo Bin</name>
-			<unitTonnage>20</unitTonnage>
-			<hits>0</hits>
-			<difficulty>-2</difficulty>
-			<time>120</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>7072ada6-60ce-485c-b049-fbdee97e1222</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<equipmentNum>11</equipmentNum>
-			<typeName>IS Ammo LRM-5</typeName>
-			<daysToWait>0</daysToWait>
-			<oneShot>false</oneShot>
 		</part>
 		<part id="612" type="mekhq.campaign.parts.equipment.JumpJet">
 			<id>612</id>
@@ -3310,7 +3937,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>16</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -3335,7 +3962,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -3360,7 +3987,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -3385,121 +4012,9 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>16</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
-		</part>
-		<part id="608" type="mekhq.campaign.parts.equipment.MissingAmmoBin">
-			<id>608</id>
-			<name>SRM 2 Ammo Bin</name>
-			<unitTonnage>55</unitTonnage>
-			<hits>0</hits>
-			<difficulty>-2</difficulty>
-			<time>120</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>8e0e6d85-dcbc-495f-8e21-19023e0861b9</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<equipmentNum>11</equipmentNum>
-			<typeName>IS Ammo SRM-2</typeName>
-			<daysToWait>0</daysToWait>
-			<oneShot>false</oneShot>
-		</part>
-		<part id="607" type="mekhq.campaign.parts.equipment.MissingAmmoBin">
-			<id>607</id>
-			<name>SRM 2 Ammo Bin</name>
-			<unitTonnage>55</unitTonnage>
-			<hits>0</hits>
-			<difficulty>-2</difficulty>
-			<time>120</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>8e0e6d85-dcbc-495f-8e21-19023e0861b9</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<equipmentNum>8</equipmentNum>
-			<typeName>IS Ammo SRM-2</typeName>
-			<daysToWait>0</daysToWait>
-			<oneShot>false</oneShot>
-		</part>
-		<part id="606" type="mekhq.campaign.parts.equipment.MissingAmmoBin">
-			<id>606</id>
-			<name>LRM 10 Ammo Bin</name>
-			<unitTonnage>55</unitTonnage>
-			<hits>0</hits>
-			<difficulty>-2</difficulty>
-			<time>120</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>8e0e6d85-dcbc-495f-8e21-19023e0861b9</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<equipmentNum>15</equipmentNum>
-			<typeName>IS Ammo LRM-10</typeName>
-			<daysToWait>0</daysToWait>
-			<oneShot>false</oneShot>
-		</part>
-		<part id="605" type="mekhq.campaign.parts.equipment.MissingAmmoBin">
-			<id>605</id>
-			<name>LRM 10 Ammo Bin</name>
-			<unitTonnage>55</unitTonnage>
-			<hits>0</hits>
-			<difficulty>-2</difficulty>
-			<time>120</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>8e0e6d85-dcbc-495f-8e21-19023e0861b9</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<equipmentNum>13</equipmentNum>
-			<typeName>IS Ammo LRM-10</typeName>
-			<daysToWait>0</daysToWait>
-			<oneShot>false</oneShot>
 		</part>
 		<part id="604" type="mekhq.campaign.parts.equipment.JumpJet">
 			<id>604</id>
@@ -3522,7 +4037,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>16</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -3547,7 +4062,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>10</equipmentNum>
+			<equipmentNum>7</equipmentNum>
 			<typeName>SRM 2</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -3572,7 +4087,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -3597,7 +4112,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -3622,7 +4137,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>16</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -4523,7 +5038,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>Autocannon/2</typeName>
 			<equipTonnage>6.0</equipTonnage>
 		</part>
@@ -5058,81 +5573,6 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<engineRating>300</engineRating>
 			<engineFlags>0</engineFlags>
 			<forHover>false</forHover>
-		</part>
-		<part id="529" type="mekhq.campaign.parts.equipment.HeatSink">
-			<id>529</id>
-			<name>Double Heat Sink</name>
-			<unitTonnage>75</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>fbd0331c-bc85-425d-b3da-aefa70859b5e</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>6</equipmentNum>
-			<typeName>ISDoubleHeatSink</typeName>
-			<equipTonnage>1.0</equipTonnage>
-		</part>
-		<part id="526" type="mekhq.campaign.parts.equipment.HeatSink">
-			<id>526</id>
-			<name>Double Heat Sink</name>
-			<unitTonnage>75</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>fbd0331c-bc85-425d-b3da-aefa70859b5e</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>7</equipmentNum>
-			<typeName>ISDoubleHeatSink</typeName>
-			<equipTonnage>1.0</equipTonnage>
-		</part>
-		<part id="525" type="mekhq.campaign.parts.equipment.HeatSink">
-			<id>525</id>
-			<name>Double Heat Sink</name>
-			<unitTonnage>75</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>fbd0331c-bc85-425d-b3da-aefa70859b5e</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>10</equipmentNum>
-			<typeName>ISDoubleHeatSink</typeName>
-			<equipTonnage>1.0</equipTonnage>
 		</part>
 		<part id="520" type="mekhq.campaign.parts.Armor">
 			<id>520</id>
@@ -6039,56 +6479,6 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<engineRating>280</engineRating>
 			<engineFlags>0</engineFlags>
 			<forHover>false</forHover>
-		</part>
-		<part id="479" type="mekhq.campaign.parts.equipment.HeatSink">
-			<id>479</id>
-			<name>Double Heat Sink</name>
-			<unitTonnage>70</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>08da54d6-08f6-4d0c-82a2-01b8c07e35df</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>6</equipmentNum>
-			<typeName>ISDoubleHeatSink</typeName>
-			<equipTonnage>1.0</equipTonnage>
-		</part>
-		<part id="477" type="mekhq.campaign.parts.equipment.HeatSink">
-			<id>477</id>
-			<name>Double Heat Sink</name>
-			<unitTonnage>70</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>08da54d6-08f6-4d0c-82a2-01b8c07e35df</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>7</equipmentNum>
-			<typeName>ISDoubleHeatSink</typeName>
-			<equipTonnage>1.0</equipTonnage>
 		</part>
 		<part id="472" type="mekhq.campaign.parts.Armor">
 			<id>472</id>
@@ -7041,7 +7431,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>10</equipmentNum>
+			<equipmentNum>12</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -7066,34 +7456,9 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>11</equipmentNum>
+			<equipmentNum>13</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
-		</part>
-		<part id="430" type="mekhq.campaign.parts.equipment.EquipmentPart">
-			<id>430</id>
-			<name>Hatchet</name>
-			<unitTonnage>45</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>f8cf9760-9998-4219-baca-416347c6e049</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>9</equipmentNum>
-			<typeName>Hatchet</typeName>
-			<equipTonnage>3.0</equipTonnage>
 		</part>
 		<part id="422" type="mekhq.campaign.parts.Armor">
 			<id>422</id>
@@ -7998,7 +8363,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>9</equipmentNum>
+			<equipmentNum>10</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -8023,7 +8388,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>10</equipmentNum>
+			<equipmentNum>12</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -8932,31 +9297,6 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<engineRating>200</engineRating>
 			<engineFlags>0</engineFlags>
 			<forHover>false</forHover>
-		</part>
-		<part id="334" type="mekhq.campaign.parts.equipment.HeatSink">
-			<id>334</id>
-			<name>Heat Sink</name>
-			<unitTonnage>50</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>35d8a1cf-fed5-4e5e-9e46-f65cc82d8a92</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
-			<typeName>Heat Sink</typeName>
-			<equipTonnage>1.0</equipTonnage>
 		</part>
 		<part id="332" type="mekhq.campaign.parts.Armor">
 			<id>332</id>
@@ -9911,34 +10251,9 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>7</equipmentNum>
+			<equipmentNum>10</equipmentNum>
 			<typeName>SRM 2</typeName>
 			<equipTonnage>1.0</equipTonnage>
-		</part>
-		<part id="285" type="mekhq.campaign.parts.equipment.JumpJet">
-			<id>285</id>
-			<name>Jump Jet</name>
-			<unitTonnage>55</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>8e0e6d85-dcbc-495f-8e21-19023e0861b9</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
-			<typeName>Jump Jet</typeName>
-			<equipTonnage>0.5</equipTonnage>
 		</part>
 		<part id="284" type="mekhq.campaign.parts.Armor">
 			<id>284</id>
@@ -11750,7 +12065,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>6</equipmentNum>
+			<equipmentNum>9</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -11800,59 +12115,9 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>9</equipmentNum>
+			<equipmentNum>10</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
-		</part>
-		<part id="198" type="mekhq.campaign.parts.equipment.JumpJet">
-			<id>198</id>
-			<name>Jump Jet</name>
-			<unitTonnage>30</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>ef7b511a-548b-466b-ae57-aec804832e7f</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
-			<typeName>Jump Jet</typeName>
-			<equipTonnage>0.5</equipTonnage>
-		</part>
-		<part id="197" type="mekhq.campaign.parts.equipment.JumpJet">
-			<id>197</id>
-			<name>Jump Jet</name>
-			<unitTonnage>30</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>ef7b511a-548b-466b-ae57-aec804832e7f</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
-			<typeName>Jump Jet</typeName>
-			<equipTonnage>0.5</equipTonnage>
 		</part>
 		<part id="196" type="mekhq.campaign.parts.Armor">
 			<id>196</id>
@@ -13691,56 +13956,6 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<typeName>LRM 5</typeName>
 			<equipTonnage>2.0</equipTonnage>
 		</part>
-		<part id="116" type="mekhq.campaign.parts.equipment.JumpJet">
-			<id>116</id>
-			<name>Jump Jet</name>
-			<unitTonnage>40</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>56ef5856-abb6-4a2d-9e4c-d1461b9b9dce</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
-			<typeName>Jump Jet</typeName>
-			<equipTonnage>0.5</equipTonnage>
-		</part>
-		<part id="113" type="mekhq.campaign.parts.equipment.JumpJet">
-			<id>113</id>
-			<name>Jump Jet</name>
-			<unitTonnage>40</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>56ef5856-abb6-4a2d-9e4c-d1461b9b9dce</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
-			<typeName>Jump Jet</typeName>
-			<equipTonnage>0.5</equipTonnage>
-		</part>
 		<part id="112" type="mekhq.campaign.parts.equipment.JumpJet">
 			<id>112</id>
 			<name>Jump Jet</name>
@@ -13762,7 +13977,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>10</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -13787,7 +14002,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>8</equipmentNum>
+			<equipmentNum>13</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -14800,31 +15015,6 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
-		<part id="64" type="mekhq.campaign.parts.equipment.JumpJet">
-			<id>64</id>
-			<name>Jump Jet</name>
-			<unitTonnage>20</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>7072ada6-60ce-485c-b049-fbdee97e1222</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
-			<typeName>Jump Jet</typeName>
-			<equipTonnage>0.5</equipTonnage>
-		</part>
 		<part id="63" type="mekhq.campaign.parts.Armor">
 			<id>63</id>
 			<name>Armor (Standard)</name>
@@ -15780,31 +15970,6 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<typeName>SRM 6</typeName>
 			<equipTonnage>3.0</equipTonnage>
 		</part>
-		<part id="23" type="mekhq.campaign.parts.equipment.HeatSink">
-			<id>23</id>
-			<name>Heat Sink</name>
-			<unitTonnage>25</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>51ec55e7-15f0-43f7-975d-e9e8168b2b4a</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
-			<typeName>Heat Sink</typeName>
-			<equipTonnage>1.0</equipTonnage>
-		</part>
 		<part id="22" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>22</id>
 			<name>Heat Sink</name>
@@ -15826,7 +15991,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>8</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -16546,6 +16711,10 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 		</gameoption>
 		<gameoption>
 			<name>allow_advanced_ammo</name>
+			<value>false</value>
+		</gameoption>
+		<gameoption>
+			<name>allow_experimental_ammo</name>
 			<value>false</value>
 		</gameoption>
 		<gameoption>
