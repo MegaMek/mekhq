@@ -215,6 +215,8 @@ v0.3.4 (SVN)
 + Bug: Customizing ranks is broken
 + Bug [#484]: GM Mode fails to remove Doctor entry
 + Bug [#483]: Astech Bug causing Advance Day to fail
++ Updated MegaMek.jar 0.37.10-dev-r10785
++ Bug [#486]: Ammo Bins destroyed after every battle
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
