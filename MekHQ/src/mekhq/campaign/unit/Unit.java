@@ -3188,7 +3188,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
             int nbLimbsWithInternalDamage = 0;
             int nbTorsoWithInternalDamage = 0;
             boolean hasDestroyedTorso = false;
-            int nbWeaponsUnusable = 0;
+            int nbWeaponsUnusable = (en.isMilitary() ? 0 : -1);
             int nbCrits = 0;
             int nbLimbsWithArmorDamage = 0;
 
@@ -3253,7 +3253,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
         } else if (en instanceof Tank) {
             Tank tank = (Tank) en;
 
-            int nbWeaponsDestroyed = 0;
+            int nbWeaponsDestroyed = (en.isMilitary() ? 0 : -1);
             int nbLimbsWithArmorDamage = 0;
             int nbLimbsWithInternalDamage = 0;
             int nbLimbsWithAllArmorDestroyed = 0;
