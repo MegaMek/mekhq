@@ -219,6 +219,7 @@ v0.3.4 (SVN)
 + Bug [#486]: Ammo Bins destroyed after every battle
 + Bug: Hiring new personnel or promoting personnel could show - for their rank
 + Bug: Custom rank systems not working correctly on reload
++ Bug [#467]: Structural Integrity showing in Warehouse
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
