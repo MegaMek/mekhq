@@ -218,6 +218,7 @@ v0.3.4 (SVN)
 + Updated MegaMek.jar 0.37.10-dev-r10785
 + Bug [#486]: Ammo Bins destroyed after every battle
 + Bug: Hiring new personnel or promoting personnel could show - for their rank
++ Bug: Custom rank systems not working correctly on reload
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

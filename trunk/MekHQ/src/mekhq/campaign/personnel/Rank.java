@@ -133,6 +133,19 @@ public class Rank implements MekHqXmlSerializable {
     public int getRankLevels(int profession) {
     	return rankLevels.get(profession);
     }
+    
+    public String getRankNamesAsString() {
+    	String names = "";
+    	String sep = "";
+    	for (String name : rankNames) {
+    		names += sep+name;
+    		if (rankLevels.size() > 0 && rankLevels.get(rankNames.indexOf(name)) > 0) {
+    			names += rankLevels.get(rankNames.indexOf(name)).toString();
+    		}
+    		sep = ",";
+    	}
+    	return names;
+    }
 
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<rank>");
@@ -149,19 +162,6 @@ public class Rank implements MekHqXmlSerializable {
                 +payMultiplier
                 +"</payMultiplier>");
         pw1.print(MekHqXmlUtil.indentStr(indent) + "</rank>");
-    }
-    
-    public String getRankNamesAsString() {
-    	String names = "";
-    	String sep = "";
-    	for (String name : rankNames) {
-    		names += sep+name;
-    		if (rankLevels.size() > 0 && rankLevels.get(rankNames.indexOf(name)) > 0) {
-    			names += rankLevels.get(rankNames.indexOf(name)).toString();
-    		}
-    		sep = ",";
-    	}
-    	return names;
     }
     
     public static Rank generateInstanceFromXML(Node wn) {

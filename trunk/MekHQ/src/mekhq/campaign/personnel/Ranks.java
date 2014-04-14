@@ -478,7 +478,7 @@ public class Ranks {
                 		}
                 		retVal.oldRankSystem = retVal.rankSystem;
                 		retVal.rankSystem = Ranks.translateFactions[retVal.rankSystem];
-                	} else if (version != null) {
+                	} else if (version != null && retVal.rankSystem != RS_CUSTOM) {
                 		retVal = Ranks.getRanksFromSystem(retVal.rankSystem);
                 	}
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
