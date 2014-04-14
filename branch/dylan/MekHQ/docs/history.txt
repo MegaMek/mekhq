@@ -124,6 +124,8 @@ v0.3.4 (SVN)
 + Bug [#448]: Cannot select most factions
     I added several more of the major factions, and included a generic Pirate to match the generic Mercenary
 + Changed how null starting planets are handled, it now asks you what planet you'd like to start on
++ Bug [#377]: Factions that do not exist during an era have no starting planet
+    With the above change, I now consider this fixed
 + Factions choice on the Campaign Options is now alphabetized
 + Bug [#447]: Being in debt not working properly.  (Partial)
 + Planetary Data updates
@@ -224,6 +226,12 @@ v0.3.4 (SVN)
 + Bug: Customizing ranks is broken
 + Bug [#484]: GM Mode fails to remove Doctor entry
 + Bug [#483]: Astech Bug causing Advance Day to fail
++ Updated MegaMek.jar 0.37.10-dev-r10785
++ Bug [#486]: Ammo Bins destroyed after every battle
++ Bug: Hiring new personnel or promoting personnel could show - for their rank
++ Bug: Custom rank systems not working correctly on reload
++ Bug [#467]: Structural Integrity showing in Warehouse
++ Bug [#130]: Daedalus with damaged leg remain crippled after repair
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

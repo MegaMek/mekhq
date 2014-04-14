@@ -623,7 +623,7 @@ public class Campaign implements Serializable {
         }
         String rankEntry = "";
         if (p.getRankNumeric() > 0) {
-            rankEntry = " as a " + p.getRank().getName(p.getProfession());
+            rankEntry = " as a " + p.getRankName();
         }
         if (prisoner) {
             p.setPrisoner();
@@ -661,7 +661,7 @@ public class Campaign implements Serializable {
         }
         String rankEntry = "";
         if (p.getRankNumeric() > 0) {
-            rankEntry = " as a " + p.getRank().getName(p.getProfession());
+            rankEntry = " as a " + p.getRankName();
         }
         p.addLogEntry(getDate(), "Joined " + getName() + rankEntry);
     }
@@ -4796,20 +4796,17 @@ public class Campaign implements Serializable {
     }
 
     public void changeRank(Person person, int rank, int rankLevel, boolean report) {
-        if (report) {
-            if (rank > person.getRankNumeric() || (rank == person.getRankNumeric() && rankLevel > person.getRankLevel())) {
-                person.addLogEntry(getDate(), "Promoted to "
-                                              + getRanks().getRank(rank).getName(person.getProfession())
-                                              + (rankLevel > 0 ? Utilities.getRomanNumeralsFromArabicNumber(rankLevel, true) : ""));
-            } else if (rank < person.getRankNumeric() || (rank == person.getRankNumeric() && rankLevel < person.getRankLevel())) {
-                person.addLogEntry(getDate(), "Demoted to "
-                                              + getRanks().getRank(rank).getName(person.getProfession())
-                                              + (rankLevel > 0 ? Utilities.getRomanNumeralsFromArabicNumber(rankLevel, true) : ""));
-            }
-        }
+    	int oldRank = person.getRankNumeric();
         person.setRankNumeric(rank);
         person.setRankLevel(rankLevel);
         personUpdated(person);
+        if (report) {
+            if (rank > oldRank || (rank == oldRank && rankLevel > person.getRankLevel())) {
+                person.addLogEntry(getDate(), "Promoted to " + person.getRankName());
+            } else if (rank < oldRank || (rank == oldRank && rankLevel < person.getRankLevel())) {
+                person.addLogEntry(getDate(), "Demoted to " + person.getRankName());
+            }
+        }
     }
 
     public GameOptions getGameOptions() {

@@ -907,6 +907,12 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				oldUnit.campaign.removePart(part);
 				continue;
 			}
+			// SI Should never be "kept" for the Warehouse
+			else if(part instanceof StructuralIntegrity) {
+				part.setUnit(null);
+				oldUnit.campaign.removePart(part);
+				continue;
+			}
 			else if(part instanceof Armor) {
 				Armor a = (Armor)part;
 				if(!sameArmorType) {
