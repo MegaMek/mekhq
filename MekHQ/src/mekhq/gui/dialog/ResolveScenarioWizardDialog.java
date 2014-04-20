@@ -523,8 +523,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         	});
         	salvageBoxes.add(box);
         	escaped = new JCheckBox("Escapes");
-        	escaped.setSelected(en.canEscape());
-        	escaped.setEnabled(en.canEscape());
+        	escaped.setSelected(!(en.isDestroyed() || en.isDoomed() || en.isCrippled() || en.isShutDown()) && en.canEscape());
+        	escaped.setEnabled(!(en.isDestroyed() || en.isDoomed()));
         	escaped.addItemListener(new ItemListener() {
         		@Override
         		public void itemStateChanged(ItemEvent evt) {
