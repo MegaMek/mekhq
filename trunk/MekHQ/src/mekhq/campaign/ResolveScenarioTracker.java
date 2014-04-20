@@ -1140,13 +1140,16 @@ public class ResolveScenarioTracker {
         public String getDesc() {
             int damage = Unit.getDamageState(getEntity());  
             String color = "black";
-            if(damage == Unit.STATE_LIGHT_DAMAGE) {
+            if(damage == Entity.DMG_LIGHT) {
                 color = "green";
             }
-            if(damage == Unit.STATE_HEAVY_DAMAGE) {
-                color = "green";
+            if(damage == Entity.DMG_MODERATE) {
+                color = "yellow";
             }
-            if(damage == Unit.STATE_CRIPPLED) {
+            if(damage == Entity.DMG_HEAVY) {
+                color = "orange";
+            }
+            if(damage == Entity.DMG_CRIPPLED) {
                 color = "red";
             }
             String s = "<html><b>" + getName() + "</b><br><font color='" + color + "'>"+ Unit.getDamageStateName(damage)+ "</font></html>";
