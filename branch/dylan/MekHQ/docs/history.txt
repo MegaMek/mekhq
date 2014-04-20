@@ -232,6 +232,10 @@ v0.3.4 (SVN)
 + Bug: Custom rank systems not working correctly on reload
 + Bug [#467]: Structural Integrity showing in Warehouse
 + Bug [#130]: Daedalus with damaged leg remain crippled after repair
++ Bug [#471]: Captured Mechwarriors, Escaped Salvages??
++ Bug [#426]: Aerospace fighters showing "undamaged" after combat; ferro-aluminum armor missing
+    To fix this bug I dumped the MekHQ versions of undamaged, light damage, heavy damage, and crippled
+    and instead pulled them in from Entity & it's subclasses to let them handle all the work
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

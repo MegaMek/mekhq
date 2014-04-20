@@ -26,7 +26,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.UUID;
 
 import megamek.common.ASFBay;
@@ -186,11 +185,6 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	public static final int SITE_FACILITY = 3;
 	public static final int SITE_FACTORY = 4;
 	public static final int SITE_N = 5;
-
-	public static final int STATE_UNDAMAGED = 0;
-	public static final int STATE_LIGHT_DAMAGE = 1;
-	public static final int STATE_HEAVY_DAMAGE = 2;
-	public static final int STATE_CRIPPLED = 3;
 	
 	// To be used for transport and cargo reports
 	public static final int ETYPE_MOTHBALLED = -9876;
@@ -282,13 +276,15 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	
 	public static String getDamageStateName(int i) {
 		switch(i) {
-		case STATE_UNDAMAGED:
+		case Entity.DMG_NONE:
 			return "Undamaged";
-		case STATE_LIGHT_DAMAGE:
+		case Entity.DMG_LIGHT:
 			return "Light Damage";
-		case STATE_HEAVY_DAMAGE:
+		case Entity.DMG_MODERATE:
+			return "Moderate Damage";
+		case Entity.DMG_HEAVY:
 			return "Heavy Damage";
-		case STATE_CRIPPLED:
+		case Entity.DMG_CRIPPLED:
 			return "Crippled";
 		default:
 			return "Unknown";
@@ -870,7 +866,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	}
 
 	public boolean isDamaged() {
-		return getDamageState() != Unit.STATE_UNDAMAGED;
+		return getDamageState() != Entity.DMG_NONE;
 	}
 
 	public String getHeatSinkTypeString(int year) {
@@ -3178,8 +3174,9 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     }
     
     public static int getDamageState(Entity en) {
+    	return en.getDamageLevel();
 
-        if (en instanceof Mech) {
+        /*if (en instanceof Mech) {
             Mech mech = (Mech) en;
 
             int nbEngineCrits = 0;
@@ -3311,7 +3308,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
             }
         } else {
             return Unit.STATE_UNDAMAGED;
-        }
+        }*/
     }
     
     public void resetParts() {
