@@ -229,6 +229,8 @@ v0.3.4 (SVN)
     and instead pulled them in from Entity & it's subclasses to let them handle all the work
 + added GUI editing to CampaignOptionsDialog for Special Ability formats
 + tooltips for special ability stuff
++ ability to import/export campaign options (but not ranks)
++ cleaned up some GUI formatting in CampaignOptionsDialog
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
