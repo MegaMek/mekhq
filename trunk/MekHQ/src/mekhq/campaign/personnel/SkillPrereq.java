@@ -60,6 +60,12 @@ public class SkillPrereq implements MekHqXmlSerializable {
         skillset = new Hashtable<String, Integer>();
     }
     
+    public SkillPrereq clone() {
+    	SkillPrereq clone = new SkillPrereq();
+    	clone.skillset = (Hashtable<String, Integer>)this.skillset.clone();
+    	return clone;
+    }
+    
     public boolean isEmpty() {
         return skillset.isEmpty();
     }
@@ -74,7 +80,18 @@ public class SkillPrereq implements MekHqXmlSerializable {
         }
         return false;
     }
+    
+    public int getSkillLevel(String skillName) {
+    	if(null != skillset.get(skillName)) {
+    		return skillset.get(skillName);
+    	}
+    	return -1;
+    }
 
+    public void addPrereq(String type, int lvl) {
+    	skillset.put(type, lvl);
+    }
+    
     @Override
     public String toString() {
         String toReturn = "";

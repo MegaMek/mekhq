@@ -86,11 +86,11 @@ public class SpecialAbility implements MekHqXmlSerializable {
     private Vector<String> removeAbilities;
 
     
-    SpecialAbility() {
+    public SpecialAbility() {
         this("unknown");
     }
     
-    SpecialAbility(String name) {
+    public SpecialAbility(String name) {
         lookupName = name;
         displayName = "";
         desc = "";
@@ -98,8 +98,33 @@ public class SpecialAbility implements MekHqXmlSerializable {
         invalidAbilities = new Vector<String>();
         removeAbilities = new Vector<String>();
         prereqSkills = new Vector<SkillPrereq>();
-        xpCost = 0;
+        xpCost = 1;
         weight = 1;
+    }
+    
+    public SpecialAbility(String name, String display, String description) {
+        lookupName = name;
+        displayName = display;
+        desc = description;
+        prereqAbilities = new Vector<String>();
+        invalidAbilities = new Vector<String>();
+        removeAbilities = new Vector<String>();
+        prereqSkills = new Vector<SkillPrereq>();
+        xpCost = 1;
+        weight = 1;
+    }
+    
+    public SpecialAbility clone() {
+    	SpecialAbility clone = new SpecialAbility(lookupName);
+    	clone.displayName = this.displayName;
+    	clone.desc = this.desc;
+    	clone.xpCost = this.xpCost;
+    	clone.weight = this.weight;
+    	clone.prereqAbilities = (Vector<String>)this.prereqAbilities.clone();
+    	clone.invalidAbilities = (Vector<String>)this.invalidAbilities.clone();
+    	clone.removeAbilities = (Vector<String>)this.removeAbilities.clone();
+    	clone.prereqSkills = (Vector<SkillPrereq>)this.prereqSkills.clone();
+    	return clone;
     }
     
     public boolean isEligible(Person p) {
@@ -139,12 +164,48 @@ public class SpecialAbility implements MekHqXmlSerializable {
         return xpCost;
     }
     
+    public void setCost(int cost) {
+    	xpCost = cost;
+    }
+    
     public int getWeight() {
         return weight;
     }
     
+    public Vector<SkillPrereq> getPrereqSkills() {
+        return prereqSkills;
+    }
+    
+    public void setPrereqSkills(Vector<SkillPrereq> prereq) {
+    	prereqSkills = prereq;
+    }
+    
+    public Vector<String> getPrereqAbilities() {
+        return prereqAbilities;
+    }
+    
+    public void setPrereqAbilities(Vector<String> prereq) {
+    	prereqAbilities = prereq;
+    }
+    
+    public Vector<String> getInvalidAbilities() {
+        return invalidAbilities;
+    }
+    
+    public void setInvalidAbilities(Vector<String> invalid) {
+    	invalidAbilities = invalid;
+    }
+    
     public Vector<String> getRemovedAbilities() {
         return removeAbilities;
+    }
+    
+    public void setRemovedAbilities(Vector<String> remove) {
+    	removeAbilities = remove;
+    }
+    
+    public void clearPrereqSkills() {
+        prereqSkills = new Vector<SkillPrereq>();
     }
     
     @Override
@@ -306,6 +367,10 @@ public class SpecialAbility implements MekHqXmlSerializable {
         return specialAbilities;
     }
     
+    public static void replaceSpecialAbilities(Hashtable<String, SpecialAbility> spas) {
+    	specialAbilities = spas;
+    }
+    
     public static String chooseWeaponSpecialization(int type, boolean isClan, int techLvl, int year) {
         ArrayList<String> candidates = new ArrayList<String>();
         for (Enumeration<EquipmentType> e = EquipmentType.getAllTypes(); e.hasMoreElements();) {
@@ -369,14 +434,28 @@ public class SpecialAbility implements MekHqXmlSerializable {
         return candidates.get(Compute.randomInt(candidates.size()));
     }
     
-    public String getPrereqDesc() {
+    public String getAllPrereqDesc() {
         String toReturn = "";
         for(String prereq : prereqAbilities) {
             toReturn += getDisplayName(prereq) + "<br>";
         }
         for(SkillPrereq skPr : prereqSkills) {
             toReturn += skPr.toString() + "<br>";
-        }        
+        }     
+        if(toReturn.isEmpty()) {
+        	toReturn = "None";
+        }
+        return toReturn;
+    }
+    
+    public String getPrereqAbilDesc() {
+        String toReturn = "";
+        for(String prereq : prereqAbilities) {
+            toReturn += getDisplayName(prereq) + "<br>";
+        }     
+        if(toReturn.isEmpty()) {
+        	toReturn = "None";
+        }
         return toReturn;
     }
     
@@ -385,6 +464,9 @@ public class SpecialAbility implements MekHqXmlSerializable {
         for(String invalid : invalidAbilities) {
             toReturn += getDisplayName(invalid) + "<br>";
         }        
+        if(toReturn.isEmpty()) {
+        	toReturn = "None";
+        }
         return toReturn;
     }
     
@@ -393,6 +475,9 @@ public class SpecialAbility implements MekHqXmlSerializable {
         for(String remove : removeAbilities) {
             toReturn += getDisplayName(remove) + "<br>";
         }        
+        if(toReturn.isEmpty()) {
+        	toReturn = "None";
+        }
         return toReturn;
     }
     
