@@ -2310,6 +2310,11 @@ public class Campaign implements Serializable {
         return campaignOptions;
     }
 
+    public void setCampaignOptions(CampaignOptions options) {
+    	campaignOptions = options;
+    }
+
+    
     public void writeToXml(PrintWriter pw1) {
         // File header
         pw1.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
@@ -4955,6 +4960,10 @@ public class Campaign implements Serializable {
 
     public RandomSkillPreferences getRandomSkillPreferences() {
         return rskillPrefs;
+    }
+    
+    public void setRandomSkillPreferences(RandomSkillPreferences prefs) {
+        rskillPrefs = prefs;
     }
 
     public void setStartingPlanet() {

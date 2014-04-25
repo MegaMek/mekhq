@@ -1975,7 +1975,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             gridBagConstraints.gridy++;
         }      
         
-        tabOptions.addTab("Special Abilities", new JScrollPane(panSpecialAbilities)); // NOI18N
+        JScrollPane scrSPA = new JScrollPane(panSpecialAbilities);
+        scrSPA.setPreferredSize(new java.awt.Dimension(500, 400));
+
+        
+        tabOptions.addTab("Special Abilities", scrSPA); // NOI18N
         
 
         panRandomSkill.setName("panRandomSkill"); // NOI18N
@@ -2274,7 +2278,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         lblRank.setName("lblRank"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panRank.add(lblRank, gridBagConstraints);
 
@@ -2294,7 +2298,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panRank.add(comboRanks, gridBagConstraints);
@@ -2369,20 +2373,20 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         scrRanks.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrRanks.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         panRank.add(scrRanks, gridBagConstraints);
 
-        scrRanks.setMinimumSize(new Dimension(1000, 500));
-        /*scrRanks.setPreferredSize(new Dimension(500, 500));
-        scrRanks.setMaximumSize(new Dimension(500, 500));*/
+        //scrRanks.setMinimumSize(new Dimension(500, 500));
+        //scrRanks.setPreferredSize(new Dimension(500, 500));
+        //scrRanks.setMaximumSize(new Dimension(500, 500));
 
         JTextArea txtInstructionsRanks = new JTextArea();
         txtInstructionsRanks.setText(resourceMap.getString("txtInstructionsRanks.text"));
@@ -2395,14 +2399,15 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         txtInstructionsRanks.setOpaque(false);
         txtInstructionsRanks.setMinimumSize(new Dimension(250, 120));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        //txtInstructionsRanks.setMinimumSize(new Dimension(400, 400));
         panRank.add(txtInstructionsRanks, gridBagConstraints);
 
         tabOptions.addTab(resourceMap.getString("panRank.TabConstraints.tabTitle"), panRank); // NOI18N
