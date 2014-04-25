@@ -30,12 +30,14 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.Vector;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -73,6 +75,9 @@ import javax.swing.table.TableColumn;
 
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Player;
+import megamek.common.options.IOption;
+import megamek.common.options.IOptionGroup;
+import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -305,6 +310,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     
     private JPanel panSpecialAbilities;
 
+    Hashtable<String, SpecialAbility> tempSPA;
+    private JButton btnAddSPA;
+    
     /**
      * Creates new form CampaignOptionsDialog
      */
@@ -774,14 +782,14 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubAcquire.add(pnlWaitingPeriod, gridBagConstraints);
 
-        DefaultComboBoxModel acquireSkillModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> acquireSkillModel = new DefaultComboBoxModel<String>();
         acquireSkillModel.addElement(CampaignOptions.S_TECH);
         acquireSkillModel.addElement(SkillType.S_ADMIN);
         acquireSkillModel.addElement(SkillType.S_SCROUNGE);
         acquireSkillModel.addElement(SkillType.S_NEG);
         acquireSkillModel.addElement(CampaignOptions.S_AUTO);
         acquireSkillModel.setSelectedItem(options.getAcquisitionSkill());
-        choiceAcquireSkill = new JComboBox(acquireSkillModel);
+        choiceAcquireSkill = new JComboBox<String>(acquireSkillModel);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -1605,6 +1613,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         tabOptions.addTab(resourceMap.getString("panMercenary.TabConstraints.tabTitle"), panMercenary); // NOI18N
 
         Set<String> spaNames = SpecialAbility.getAllSpecialAbilities().keySet();
+        //We need to create a temporary hash of special abilities that we can modify without 
+        //changing the underlying one in case the user cancels the changes
+        tempSPA = new Hashtable<String, SpecialAbility>();
+        for(String name : spaNames) {
+        	tempSPA.put(name, SpecialAbility.getAbility(name).clone());
+        }
         
         panXP.setName("panXP"); // NOI18N
         panXP.setLayout(new java.awt.GridBagLayout());
@@ -1931,16 +1945,33 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         panSpecialAbilities = new JPanel(new GridBagLayout());
         
+        btnAddSPA = new JButton("Add Another Special Ability");
+        btnAddSPA.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddSPA();
+            }
+        });
+        
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx =1.0;
+        gridBagConstraints.weighty =0.0;
+        panSpecialAbilities.add(btnAddSPA, gridBagConstraints);
+        btnAddSPA.setEnabled(!getUnusedSPA().isEmpty());
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx =1.0;
         gridBagConstraints.weighty =1.0;
 
         for(String name : spaNames) {
-            panSpecialAbilities.add(new SpecialAbilityPanel(SpecialAbility.getAbility(name)), gridBagConstraints);
+            panSpecialAbilities.add(new SpecialAbilityPanel(tempSPA.get(name), this), gridBagConstraints);
             gridBagConstraints.gridy++;
         }      
         
@@ -3044,6 +3075,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setSalaryAntiMekMultiplier((Double) spnSalaryAntiMek.getModel().getValue());
         //end salary
 
+        //start SPA
+        SpecialAbility.replaceSpecialAbilities(tempSPA);
+        //end SPA
+        
         // Start Personnel Market
         options.setPersonnelMarketDylansWeight((Double) personnelMarketDylansWeight.getValue());
         options.setPersonnelMarketRandomEliteRemoval(Integer.parseInt(personnelMarketRandomEliteRemoval.getText()));
@@ -3101,6 +3136,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     public boolean wasCancelled() {
         return cancelled;
     }
+    
+    public Hashtable<String, SpecialAbility> getCurrentSPA() {
+    	return tempSPA;
+    }
 
     private void btnDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDateActionPerformed
         // show the date chooser
@@ -3129,6 +3168,109 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         setCamoIcon();
     }//GEN-LAST:event_btnCamoActionPerformed
 
+    
+    private Vector<String> getUnusedSPA() {
+    	Vector<String> unused = new Vector<String>();
+    	PilotOptions poptions = new PilotOptions();
+    	for (Enumeration<IOptionGroup> i = poptions.getGroups(); i.hasMoreElements();) {
+    		IOptionGroup group = i.nextElement();
+
+    		if (!group.getKey().equalsIgnoreCase(PilotOptions.LVL3_ADVANTAGES)) {
+    			continue;
+    		}
+    	           
+    		for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
+    			IOption option = j.nextElement();
+    			if(null == tempSPA.get(option.getName())) {
+    				unused.add(option.getName());
+    			}
+    		}
+    	}
+    	return unused;
+    }
+    
+    private void btnAddSPA() {
+    	
+    	SelectUnusedAbilityDialog suad = new SelectUnusedAbilityDialog(this.frame, getUnusedSPA(), getCurrentSPA());
+    	suad.setVisible(true);
+    	
+    	panSpecialAbilities.removeAll();
+        
+        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx =1.0;
+        gridBagConstraints.weighty =0.0;
+        panSpecialAbilities.add(btnAddSPA, gridBagConstraints);
+        btnAddSPA.setEnabled(!getUnusedSPA().isEmpty());
+
+        
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx =1.0;
+        gridBagConstraints.weighty =1.0;
+
+        for(String title : tempSPA.keySet()) {
+            panSpecialAbilities.add(new SpecialAbilityPanel(tempSPA.get(title), this), gridBagConstraints);
+            gridBagConstraints.gridy++;
+        }      
+        panSpecialAbilities.revalidate();
+        panSpecialAbilities.repaint();
+    	
+    }
+    
+    public void btnRemoveSPA(String name) {
+        tempSPA.remove(name);
+        
+        //we also need to cycle through the existing SPAs and remove this one from
+        //any prereqs
+        for(String key: tempSPA.keySet()) {
+        	SpecialAbility otherAbil = tempSPA.get(key);
+    		Vector<String> prereq = otherAbil.getPrereqAbilities();
+    		Vector<String> invalid = otherAbil.getInvalidAbilities();
+    		Vector<String> remove = otherAbil.getRemovedAbilities();
+        	if(prereq.remove(name)) {
+        		otherAbil.setPrereqAbilities(prereq);
+        	}
+        	if(invalid.remove(name)) {
+        		otherAbil.setInvalidAbilities(invalid);
+        	}
+        	if(remove.remove(name)) {
+        		otherAbil.setRemovedAbilities(remove);
+        	}
+        }
+        
+        panSpecialAbilities.removeAll();
+        
+        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx =1.0;
+        gridBagConstraints.weighty =0.0;
+        panSpecialAbilities.add(btnAddSPA, gridBagConstraints);
+        btnAddSPA.setEnabled(true);
+        
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx =1.0;
+        gridBagConstraints.weighty =1.0;
+
+        for(String title : tempSPA.keySet()) {
+            panSpecialAbilities.add(new SpecialAbilityPanel(tempSPA.get(title), this), gridBagConstraints);
+            gridBagConstraints.gridy++;
+        }      
+        panSpecialAbilities.revalidate();
+        panSpecialAbilities.repaint();
+    }
+    
     public String getDateAsString() {
         return dateFormat.format(date.getTime());
     }
