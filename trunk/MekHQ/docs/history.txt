@@ -228,6 +228,7 @@ v0.3.4 (SVN)
     To fix this bug I dumped the MekHQ versions of undamaged, light damage, heavy damage, and crippled
     and instead pulled them in from Entity & it's subclasses to let them handle all the work
 + added GUI editing to CampaignOptionsDialog for Special Ability formats
++ tooltips for special ability stuff
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
