@@ -3,6 +3,7 @@ package mekhq.gui;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -59,6 +60,8 @@ public class SpecialAbilityPanel extends JPanel {
         
         private void initComponents() {
             
+            ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.SpecialAbilityPanel");
+
             GridBagConstraints c = new GridBagConstraints();
           
             JTextArea txtDesc = new JTextArea(abil.getDescription());
@@ -102,7 +105,9 @@ public class SpecialAbilityPanel extends JPanel {
             c.gridx = 1;
             c.gridy = 2;
             c.weighty = 0.0;
-            add(new JLabel("<html><b>Prerequisites</b></html>"), c);
+            JLabel lblPrereq = new JLabel("<html><b>Prerequisites</b></html>");
+            lblPrereq.setToolTipText(resourceMap.getString("lblPrereq.toolTipText"));
+            add(lblPrereq, c);
             c.gridx = 1;
             c.gridy = 3;
             c.weighty = 1.0;
@@ -111,7 +116,9 @@ public class SpecialAbilityPanel extends JPanel {
             c.gridx = 2;
             c.gridy = 2;
             c.weighty = 0.0;
-            add(new JLabel("<html><b>Incompatible</b></html>"), c);
+            JLabel lblIncompatible = new JLabel("<html><b>Incompatible</b></html>");
+            lblIncompatible.setToolTipText(resourceMap.getString("lblIncompatible.toolTipText"));
+            add(lblIncompatible, c);
             c.gridx = 2;
             c.gridy = 3;
             c.weighty = 1.0;
@@ -120,7 +127,9 @@ public class SpecialAbilityPanel extends JPanel {
             c.gridx = 3;
             c.gridy = 2;
             c.weighty = 0.0;
-            add(new JLabel("<html><b>Removes</b></html>"), c);
+            JLabel lblRemove = new JLabel("<html><b>Removes</b></html>");
+            lblRemove.setToolTipText(resourceMap.getString("lblRemove.toolTipText"));
+            add(lblRemove, c);
             c.gridx = 3;
             c.gridy = 3;
             c.weighty = 1.0;
