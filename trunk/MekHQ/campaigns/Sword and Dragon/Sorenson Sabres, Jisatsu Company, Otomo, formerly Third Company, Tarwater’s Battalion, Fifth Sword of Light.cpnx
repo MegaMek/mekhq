@@ -168,7 +168,7 @@
 			<history></history>
 		</unit>
 		<unit id="153d2e91-5fa3-4903-9010-a4d9ddccfc31" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Jenner" model="JR7-K Grace" type="Biped" commander="false" externalId="153d2e91-5fa3-4903-9010-a4d9ddccfc31">
+			<entity chassis="Jenner" model="JR7-K (Grace)" type="Biped" commander="false" externalId="153d2e91-5fa3-4903-9010-a4d9ddccfc31">
 			</entity>
 			<driverId>2c2a9623-d19e-465b-afdf-ac16b6dc5c2e</driverId>
 			<gunnerId>2c2a9623-d19e-465b-afdf-ac16b6dc5c2e</gunnerId>
@@ -185,7 +185,7 @@
 			<history></history>
 		</unit>
 		<unit id="029aa656-ef80-483c-899a-aa792e4ea069" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Hunchback" model="HBK-4G Shakir" type="Biped" commander="false" externalId="029aa656-ef80-483c-899a-aa792e4ea069">
+			<entity chassis="Hunchback" model="HBK-4G (Shakir)" type="Biped" commander="false" externalId="029aa656-ef80-483c-899a-aa792e4ea069">
 			</entity>
 			<driverId>65cffdcd-c356-4cea-bb7e-2257c1ab795c</driverId>
 			<gunnerId>65cffdcd-c356-4cea-bb7e-2257c1ab795c</gunnerId>
@@ -236,7 +236,7 @@
 			<history></history>
 		</unit>
 		<unit id="eec47cc4-f449-4ef4-9b3d-806fbc3ba994" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Hatamoto-Chi" model="HTM-27T Daniel" type="Biped" commander="false" externalId="eec47cc4-f449-4ef4-9b3d-806fbc3ba994">
+			<entity chassis="Hatamoto-Chi" model="HTM-27T (Daniel)" type="Biped" commander="false" externalId="eec47cc4-f449-4ef4-9b3d-806fbc3ba994">
 			</entity>
 			<driverId>6303f987-c746-4e51-b8d9-733fffe361af</driverId>
 			<gunnerId>6303f987-c746-4e51-b8d9-733fffe361af</gunnerId>
@@ -253,7 +253,7 @@
 			<history></history>
 		</unit>
 		<unit id="570e8139-d9b0-4344-9d36-d588a49cc06a" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Grand Dragon" model="DRG-1G Emory" type="Biped" commander="false" externalId="570e8139-d9b0-4344-9d36-d588a49cc06a">
+			<entity chassis="Grand Dragon" model="DRG-1G (Emory)" type="Biped" commander="false" externalId="570e8139-d9b0-4344-9d36-d588a49cc06a">
 			</entity>
 			<driverId>1078aaa7-c4d7-4d7c-9a95-2d55f0c25fbe</driverId>
 			<gunnerId>1078aaa7-c4d7-4d7c-9a95-2d55f0c25fbe</gunnerId>
