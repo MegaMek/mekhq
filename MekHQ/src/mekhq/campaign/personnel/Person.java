@@ -1723,9 +1723,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
      * @return
      */
     public String getFullDesc() {
-        String toReturn = "<html><font size='2'><b>" + getFullTitle(true) + "</b><br/>";
+        String toReturn = "<b>" + getFullTitle(true) + "</b><br/>";
         toReturn += getSkillSummary() + " " + getRoleDesc();
-        toReturn += "</font></html>";
         return toReturn;
     }
 
@@ -1761,8 +1760,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         }
         
         // If we need it in html for any reason, make it so.
-        if (html)
-        	rank = makeHTMLRankDiv();
+        //Taharqa: This is messing up the font display for personnel so I am commenting it out. I don't believe it
+        //is functional anyway
+        //if (html)
+        //	rank = makeHTMLRankDiv();
         
         return rank + " " + getName();
     }

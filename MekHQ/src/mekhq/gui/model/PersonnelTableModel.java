@@ -642,12 +642,12 @@ import mekhq.gui.BasicInfo;
                 Component c = this;
                 int actualCol = table.convertColumnIndexToModel(column);
                 int actualRow = table.convertRowIndexToModel(row);
-                setText(getValueAt(actualRow, actualCol).toString(), "black");
                 Person p = getPerson(actualRow);
                 String color = "black";
                 if(isSelected) {
                     color = "white";
                 }
+                setText(getValueAt(actualRow, actualCol).toString(), color);
                 if (actualCol == COL_RANK) {
                     setPortrait(p);
                     setText(p.getFullDesc(), color);
@@ -658,12 +658,12 @@ import mekhq.gui.BasicInfo;
                         u = getCampaign().getUnit(p.getTechUnitIDs().get(0));
                     }
                     if(null != u) {
-                        String desc = "<html><b>" + u.getName() + "</b><br>";
+                        String desc = "<b>" + u.getName() + "</b><br>";
                         desc += u.getEntity().getWeightClassName();
                         if(!(u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship)) {
                             desc += " " + UnitType.getTypeDisplayableName(UnitType.determineUnitTypeCode(u.getEntity()));
                         }
-                        desc += "<br>" + u.getStatus() + "</html>";
+                        desc += "<br>" + u.getStatus() + "";
                         setText(desc, color);
                         Image mekImage = getImageFor(u);
                         if(null != mekImage) {
