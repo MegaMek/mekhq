@@ -1,156 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<campaign version="0.3.4-dev-r1700">
+<campaign version="0.3.4-dev">
 	<info>
 		<name>The Kewran Wolfhounds, C Company, 3rd Battalion, 25th Arcturan Guards RCT</name>
 		<faction>LA</faction>
-		<ranks>
-			<rankSystem>2</rankSystem>
-			<rank>
-				<rankName>None</rankName>
-				<officer>false</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Recruit</rankName>
-				<officer>false</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Private</rankName>
-				<officer>false</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Private, FC</rankName>
-				<officer>false</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Corporal</rankName>
-				<officer>false</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Senior Corporal</rankName>
-				<officer>false</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Sergeant</rankName>
-				<officer>false</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Staff Sergeant</rankName>
-				<officer>false</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Sergeant Major</rankName>
-				<officer>false</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Staff Sergeant Major</rankName>
-				<officer>false</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Senior Sergeant Major</rankName>
-				<officer>false</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Warrant Officer</rankName>
-				<officer>true</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Warrant Officer, FC</rankName>
-				<officer>true</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Senior Warrant Officer</rankName>
-				<officer>true</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Chief Warrant Officer</rankName>
-				<officer>true</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Cadet</rankName>
-				<officer>true</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Leutnant</rankName>
-				<officer>true</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>First Leutnant</rankName>
-				<officer>true</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Hauptmann</rankName>
-				<officer>true</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Kommandant</rankName>
-				<officer>true</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Hauptmann-Kommandant</rankName>
-				<officer>true</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Leutnant-Colonel</rankName>
-				<officer>true</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Colonel</rankName>
-				<officer>true</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Leutnant-General</rankName>
-				<officer>true</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Hauptmann-General</rankName>
-				<officer>true</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Kommandant-General</rankName>
-				<officer>true</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>General</rankName>
-				<officer>true</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>General of the Armies</rankName>
-				<officer>true</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Archon</rankName>
-				<officer>true</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-		</ranks>
+			<rankSystem>
+				<!-- Lyran Alliance -->
+				<system>4</system>
+			</rankSystem>
 		<nameGen>LA</nameGen>
 		<percentFemale>50</percentFemale>
 		<overtime>false</overtime>
@@ -159,11 +15,11 @@
 		<astechPoolMinutes>0</astechPoolMinutes>
 		<astechPoolOvertime>0</astechPoolOvertime>
 		<medicPool>0</medicPool>
-		<camoCategory>LCAF/</camoCategory>
-		<camoFileName>[is]-[lcaf]-arcturan-stripe.gif</camoFileName>
+		<camoCategory>Steiner/Arcturan Guards/</camoCategory>
+		<camoFileName>25th Arcturan Guard.jpg</camoFileName>
 		<colorIndex>0</colorIndex>
 		<lastTeamId>0</lastTeamId>
-		<lastPartId>648</lastPartId>
+		<lastPartId>652</lastPartId>
 		<lastForceId>4</lastForceId>
 		<lastMissionId>1</lastMissionId>
 		<lastScenarioId>1</lastScenarioId>
@@ -450,23 +306,6 @@
 			<mothballed>false</mothballed>
 			<history></history>
 		</unit>
-		<unit id="f5a9556a-5be8-45fc-86be-45b86fae701f" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Wolfhound" model="WLF-2" type="Biped" commander="false" externalId="f5a9556a-5be8-45fc-86be-45b86fae701f">
-			</entity>
-			<driverId>da439749-f3bd-4f65-ad9d-3f270d6f8dbc</driverId>
-			<gunnerId>da439749-f3bd-4f65-ad9d-3f270d6f8dbc</gunnerId>
-			<salvaged>false</salvaged>
-			<site>2</site>
-			<forceId>4</forceId>
-			<scenarioId>-1</scenarioId>
-			<daysToArrival>0</daysToArrival>
-			<daysSinceMaintenance>0</daysSinceMaintenance>
-			<daysActivelyMaintained>0</daysActivelyMaintained>
-			<astechDaysMaintained>0</astechDaysMaintained>
-			<mothballTime>0</mothballTime>
-			<mothballed>false</mothballed>
-			<history></history>
-		</unit>
 		<unit id="5ff50c94-8f0f-4c20-8a00-ffad59f3ffb6" type="mekhq.campaign.unit.Unit">
 			<entity chassis="Starslayer" model="STY-3C" type="Biped" commander="false" externalId="5ff50c94-8f0f-4c20-8a00-ffad59f3ffb6">
 			</entity>
@@ -476,6 +315,23 @@
 			<site>2</site>
 			<forceId>4</forceId>
 			<scenarioId>1</scenarioId>
+			<daysToArrival>0</daysToArrival>
+			<daysSinceMaintenance>0</daysSinceMaintenance>
+			<daysActivelyMaintained>0</daysActivelyMaintained>
+			<astechDaysMaintained>0</astechDaysMaintained>
+			<mothballTime>0</mothballTime>
+			<mothballed>false</mothballed>
+			<history></history>
+		</unit>
+		<unit id="f5a9556a-5be8-45fc-86be-45b86fae701f" type="mekhq.campaign.unit.Unit">
+			<entity chassis="Wolfhound" model="WLF-2" type="Biped" commander="false" externalId="f5a9556a-5be8-45fc-86be-45b86fae701f">
+			</entity>
+			<driverId>da439749-f3bd-4f65-ad9d-3f270d6f8dbc</driverId>
+			<gunnerId>da439749-f3bd-4f65-ad9d-3f270d6f8dbc</gunnerId>
+			<salvaged>false</salvaged>
+			<site>2</site>
+			<forceId>4</forceId>
+			<scenarioId>-1</scenarioId>
 			<daysToArrival>0</daysToArrival>
 			<daysSinceMaintenance>0</daysSinceMaintenance>
 			<daysActivelyMaintained>0</daysActivelyMaintained>
@@ -513,7 +369,11 @@ The Atlas is a familiar ’Mech in the Lyran Armed Forces. One of the many Battl
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>0</gender>
-			<rank>6</rank>
+			<rank>12</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<unitId>e916d765-b5b7-424f-a6c3-e6f1c3f4f145</unitId>
 			<salary>-1</salary>
@@ -603,7 +463,11 @@ manufactured on Pandora before the Falcons took the world, and it was refitted t
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>0</gender>
-			<rank>18</rank>
+			<rank>34</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<unitId>c9071d05-377b-48ba-ac86-ef08374d4716</unitId>
 			<salary>-1</salary>
@@ -655,12 +519,12 @@ manufactured on Pandora before the Falcons took the world, and it was refitted t
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Medtech</type>
+				<type>Administration</type>
 				<level>2</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Administration</type>
+				<type>Medtech</type>
 				<level>2</level>
 				<bonus>0</bonus>
 			</skill>
@@ -696,7 +560,11 @@ corps quite happy, but also increases the average engagement time. While her lan
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>1</gender>
-			<rank>6</rank>
+			<rank>12</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<unitId>f96775d9-4ae3-4428-854c-6f92f826814b</unitId>
 			<salary>-1</salary>
@@ -780,7 +648,11 @@ Quibble’s sleep was interrupted by nightmares of burning ’Mechs, jammed cann
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>0</gender>
-			<rank>6</rank>
+			<rank>12</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<unitId>30619ef0-64f2-42db-b7ec-3055da88f393</unitId>
 			<salary>-1</salary>
@@ -807,9 +679,9 @@ Quibble’s sleep was interrupted by nightmares of burning ’Mechs, jammed cann
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Tech/Mechanic</type>
-				<level>1</level>
-				<bonus>-1</bonus>
+				<type>Gunnery/Mech</type>
+				<level>4</level>
+				<bonus>0</bonus>
 			</skill>
 			<skill>
 				<type>Small Arms</type>
@@ -817,9 +689,9 @@ Quibble’s sleep was interrupted by nightmares of burning ’Mechs, jammed cann
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
-				<level>4</level>
-				<bonus>0</bonus>
+				<type>Tech/Mechanic</type>
+				<level>1</level>
+				<bonus>-1</bonus>
 			</skill>
 			<skill>
 				<type>Piloting/Mech</type>
@@ -857,7 +729,11 @@ entered the LAAF</biography>
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>0</gender>
-			<rank>16</rank>
+			<rank>32</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<unitId>7d7ed6fc-dbe0-4c7f-ae29-4fc357cac9ca</unitId>
 			<salary>-1</salary>
@@ -904,12 +780,12 @@ entered the LAAF</biography>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Administration</type>
+				<type>Medtech</type>
 				<level>1</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Medtech</type>
+				<type>Administration</type>
 				<level>1</level>
 				<bonus>0</bonus>
 			</skill>
@@ -947,7 +823,11 @@ potential.</biography>
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>1</gender>
-			<rank>6</rank>
+			<rank>12</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<unitId>6cad1e5c-86f7-45d8-b705-d89bac8813fa</unitId>
 			<salary>-1</salary>
@@ -979,23 +859,23 @@ potential.</biography>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Small Arms</type>
-				<level>3</level>
-				<bonus>0</bonus>
-			</skill>
-			<skill>
 				<type>Gunnery/Mech</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Piloting/Mech</type>
-				<level>4</level>
+				<type>Small Arms</type>
+				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
 				<type>Tech/Mech</type>
 				<level>0</level>
+				<bonus>0</bonus>
+			</skill>
+			<skill>
+				<type>Piloting/Mech</type>
+				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<advantages>gunnery_ballistic</advantages>
@@ -1027,7 +907,11 @@ his graduation class to have some say in his posting, but did little to instill 
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>0</gender>
-			<rank>6</rank>
+			<rank>12</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<unitId>5ff50c94-8f0f-4c20-8a00-ffad59f3ffb6</unitId>
 			<salary>-1</salary>
@@ -1044,12 +928,12 @@ his graduation class to have some say in his posting, but did little to instill 
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Administration</type>
+				<type>Negotiation</type>
 				<level>1</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Negotiation</type>
+				<type>Administration</type>
 				<level>1</level>
 				<bonus>0</bonus>
 			</skill>
@@ -1059,24 +943,24 @@ his graduation class to have some say in his posting, but did little to instill 
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Small Arms</type>
-				<level>2</level>
-				<bonus>0</bonus>
-			</skill>
-			<skill>
 				<type>Gunnery/Mech</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Piloting/Mech</type>
-				<level>3</level>
+				<type>Small Arms</type>
+				<level>2</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
 				<type>Tech/Mech</type>
 				<level>1</level>
 				<bonus>-1</bonus>
+			</skill>
+			<skill>
+				<type>Piloting/Mech</type>
+				<level>3</level>
+				<bonus>0</bonus>
 			</skill>
 		</person>
 		<person id="d67d405f-b67c-4ebf-a3e5-0bf22001b97d" type="mekhq.campaign.personnel.Person">
@@ -1109,7 +993,11 @@ the Zeus, Banshee, and Atlas. To be stuck in a fifty-ton primitive support ’Me
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>0</gender>
-			<rank>6</rank>
+			<rank>12</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<unitId>8874defd-485a-445f-8ff0-aa3d22c454db</unitId>
 			<salary>-1</salary>
@@ -1126,12 +1014,12 @@ the Zeus, Banshee, and Atlas. To be stuck in a fifty-ton primitive support ’Me
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Administration</type>
+				<type>Negotiation</type>
 				<level>1</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Negotiation</type>
+				<type>Administration</type>
 				<level>1</level>
 				<bonus>0</bonus>
 			</skill>
@@ -1141,12 +1029,12 @@ the Zeus, Banshee, and Atlas. To be stuck in a fifty-ton primitive support ’Me
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Small Arms</type>
+				<type>Gunnery/Mech</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Small Arms</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
@@ -1180,7 +1068,11 @@ as a waste of her time and the Alliance’s time. Her friendship with Tricia Can
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>1</gender>
-			<rank>6</rank>
+			<rank>12</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<unitId>69b910f6-ef6c-42ec-b5f4-6529351a11ff</unitId>
 			<salary>-1</salary>
@@ -1237,79 +1129,6 @@ as a waste of her time and the Alliance’s time. Her friendship with Tricia Can
 				<bonus>0</bonus>
 			</skill>
 		</person>
-		<person id="da439749-f3bd-4f65-ad9d-3f270d6f8dbc" type="mekhq.campaign.personnel.Person">
-			<name>Kristoff Semmes</name>
-			<callsign></callsign>
-			<primaryRole>1</primaryRole>
-			<secondaryRole>0</secondaryRole>
-			<commander>false</commander>
-			<dependent>false</dependent>
-			<clan>false</clan>
-			<phenotype>0</phenotype>
-			<biography>Kristoff Semmes is insane. He is a functioning sociopath, and were the LAAF in any less dire straits he would have certainly been ejected from the MechWarrior corps. He was arrested several
-times during his childhood on Kelenfold, and again twice more during his time at the Coventry Military Academy, for attacking his fellow students over imagined slights. Semmes is functional in that he recognizes the constraints of society, but he is incapable of applying them to himself. So far as Semmes is concerned, no one else in the universe is real—he suffers from a complete lack of empathy. This attitude is a nightmare in a civilian, but something
-drill instructors train for—although not to the extreme Semmes exhibits—in boot camp. Were he able to function in society, Semmes might have become a near-perfect soldier.
-
-Of course, with the Word of Blake’s Jihad raging around them and the Jade Falcons probing deeply into the Alliance’s interior, the LAAF is prepared to look the other way unless Semmes really steps over the line. His skill in the Starslayer he pilots, as well as his recognition of his lance as the only way for him to survive in combat, makes him a valuable lancemate. Both Hauptmann Guillaume and the battalion’s kommandant are uneasy placing Semmes under so junior—and innocent—an officer as Reginald Hoffmann, but so far Semmes has accepted the young officer’s authority. In fact, Semmes seems to be going out of his way to actually try and form bonds with his lancemates in Striker Lance. The Wolfhounds’ medical staff is convinced Semmes is up to no good ends with this practice, seeing as they believe he is physically incapable of forming real friendships. One unit
-psychologist summed up the group’s beliefs: “Maybe he thinks the others are his pets.”
-
-Semmes’ Starslayer was a reserve ’Mech requisitioned from a militia on Australia and shipped to the Arcturan Guards. It was assigned to Semmes on the theory that it was a powerful enough ’Mech to let him be effective in a lance but not strong enough
-that he could get away from his lancemates if he “snapped.” Hauptmann Guillaume has given Leutnant Hoffmann strict— and secret—orders to deal with Semmes at the first sign of trouble, but thus far the man has been a model MechWarrior. In simulations he’s been seen covering his lancemates and exposing
-himself to fire to protect them—behavior the psychologists said he was patently incapable of.</biography>
-			<idleMonths>-1</idleMonths>
-			<id>da439749-f3bd-4f65-ad9d-3f270d6f8dbc</id>
-			<portraitCategory>Kewran Wolfhounds/</portraitCategory>
-			<portraitFile>Kristoff Semmes.jpg</portraitFile>
-			<xp>0</xp>
-			<daysToWaitForHealing>15</daysToWaitForHealing>
-			<gender>0</gender>
-			<rank>6</rank>
-			<nTasks>0</nTasks>
-			<unitId>f5a9556a-5be8-45fc-86be-45b86fae701f</unitId>
-			<salary>-1</salary>
-			<status>0</status>
-			<prisonerstatus>0</prisonerstatus>
-			<hits>0</hits>
-			<toughness>0</toughness>
-			<minutesLeft>0</minutesLeft>
-			<overtimeLeft>0</overtimeLeft>
-			<birthday>3050-04-10 12:00:00</birthday>
-			<skill>
-				<type>Medtech</type>
-				<level>3</level>
-				<bonus>1</bonus>
-			</skill>
-			<skill>
-				<type>Administration</type>
-				<level>1</level>
-				<bonus>0</bonus>
-			</skill>
-			<skill>
-				<type>Negotiation</type>
-				<level>3</level>
-				<bonus>0</bonus>
-			</skill>
-			<skill>
-				<type>Tactics</type>
-				<level>1</level>
-				<bonus>0</bonus>
-			</skill>
-			<skill>
-				<type>Small Arms</type>
-				<level>3</level>
-				<bonus>0</bonus>
-			</skill>
-			<skill>
-				<type>Gunnery/Mech</type>
-				<level>3</level>
-				<bonus>0</bonus>
-			</skill>
-			<skill>
-				<type>Piloting/Mech</type>
-				<level>3</level>
-				<bonus>0</bonus>
-			</skill>
-		</person>
 		<person id="812d9034-103f-44a9-9e75-a4c620ebc9d2" type="mekhq.campaign.personnel.Person">
 			<name>Hans Ostgaard</name>
 			<callsign></callsign>
@@ -1338,7 +1157,11 @@ in the right direction.</biography>
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>0</gender>
-			<rank>6</rank>
+			<rank>12</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<unitId>73902adb-f690-4086-9780-c189c89ebd94</unitId>
 			<salary>-1</salary>
@@ -1360,12 +1183,12 @@ in the right direction.</biography>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Administration</type>
+				<type>Negotiation</type>
 				<level>1</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Negotiation</type>
+				<type>Administration</type>
 				<level>1</level>
 				<bonus>0</bonus>
 			</skill>
@@ -1375,13 +1198,90 @@ in the right direction.</biography>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
+				<type>Gunnery/Mech</type>
+				<level>4</level>
+				<bonus>0</bonus>
+			</skill>
+			<skill>
 				<type>Small Arms</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
+				<type>Piloting/Mech</type>
+				<level>3</level>
+				<bonus>0</bonus>
+			</skill>
+		</person>
+		<person id="da439749-f3bd-4f65-ad9d-3f270d6f8dbc" type="mekhq.campaign.personnel.Person">
+			<name>Kristoff Semmes</name>
+			<callsign></callsign>
+			<primaryRole>1</primaryRole>
+			<secondaryRole>0</secondaryRole>
+			<commander>false</commander>
+			<dependent>false</dependent>
+			<clan>false</clan>
+			<phenotype>0</phenotype>
+			<biography>Kristoff Semmes is insane. He is a functioning sociopath, and were the LAAF in any less dire straits he would have certainly been ejected from the MechWarrior corps. He was arrested several
+times during his childhood on Kelenfold, and again twice more during his time at the Coventry Military Academy, for attacking his fellow students over imagined slights. Semmes is functional in that he recognizes the constraints of society, but he is incapable of applying them to himself. So far as Semmes is concerned, no one else in the universe is real—he suffers from a complete lack of empathy. This attitude is a nightmare in a civilian, but something
+drill instructors train for—although not to the extreme Semmes exhibits—in boot camp. Were he able to function in society, Semmes might have become a near-perfect soldier.
+
+Of course, with the Word of Blake’s Jihad raging around them and the Jade Falcons probing deeply into the Alliance’s interior, the LAAF is prepared to look the other way unless Semmes really steps over the line. His skill in the Starslayer he pilots, as well as his recognition of his lance as the only way for him to survive in combat, makes him a valuable lancemate. Both Hauptmann Guillaume and the battalion’s kommandant are uneasy placing Semmes under so junior—and innocent—an officer as Reginald Hoffmann, but so far Semmes has accepted the young officer’s authority. In fact, Semmes seems to be going out of his way to actually try and form bonds with his lancemates in Striker Lance. The Wolfhounds’ medical staff is convinced Semmes is up to no good ends with this practice, seeing as they believe he is physically incapable of forming real friendships. One unit
+psychologist summed up the group’s beliefs: “Maybe he thinks the others are his pets.”
+
+Semmes’ Starslayer was a reserve ’Mech requisitioned from a militia on Australia and shipped to the Arcturan Guards. It was assigned to Semmes on the theory that it was a powerful enough ’Mech to let him be effective in a lance but not strong enough
+that he could get away from his lancemates if he “snapped.” Hauptmann Guillaume has given Leutnant Hoffmann strict— and secret—orders to deal with Semmes at the first sign of trouble, but thus far the man has been a model MechWarrior. In simulations he’s been seen covering his lancemates and exposing
+himself to fire to protect them—behavior the psychologists said he was patently incapable of.</biography>
+			<idleMonths>-1</idleMonths>
+			<id>da439749-f3bd-4f65-ad9d-3f270d6f8dbc</id>
+			<portraitCategory>Kewran Wolfhounds/</portraitCategory>
+			<portraitFile>Kristoff Semmes.jpg</portraitFile>
+			<xp>0</xp>
+			<daysToWaitForHealing>15</daysToWaitForHealing>
+			<gender>0</gender>
+			<rank>12</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
+			<nTasks>0</nTasks>
+			<unitId>f5a9556a-5be8-45fc-86be-45b86fae701f</unitId>
+			<salary>-1</salary>
+			<status>0</status>
+			<prisonerstatus>0</prisonerstatus>
+			<hits>0</hits>
+			<toughness>0</toughness>
+			<minutesLeft>0</minutesLeft>
+			<overtimeLeft>0</overtimeLeft>
+			<birthday>3050-04-10 12:00:00</birthday>
+			<skill>
+				<type>Medtech</type>
+				<level>3</level>
+				<bonus>1</bonus>
+			</skill>
+			<skill>
+				<type>Negotiation</type>
+				<level>3</level>
+				<bonus>0</bonus>
+			</skill>
+			<skill>
+				<type>Administration</type>
+				<level>1</level>
+				<bonus>0</bonus>
+			</skill>
+			<skill>
+				<type>Tactics</type>
+				<level>1</level>
+				<bonus>0</bonus>
+			</skill>
+			<skill>
 				<type>Gunnery/Mech</type>
-				<level>4</level>
+				<level>3</level>
+				<bonus>0</bonus>
+			</skill>
+			<skill>
+				<type>Small Arms</type>
+				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
@@ -1412,7 +1312,11 @@ the Kewran Wolfhounds but they bear that strain willingly; a Mad Cat Mk II is to
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>1</gender>
-			<rank>17</rank>
+			<rank>33</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<unitId>c0a5a68a-3223-43d5-bd5e-fda292a4e848</unitId>
 			<salary>-1</salary>
@@ -1459,12 +1363,12 @@ the Kewran Wolfhounds but they bear that strain willingly; a Mad Cat Mk II is to
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Medtech</type>
+				<type>Administration</type>
 				<level>2</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Administration</type>
+				<type>Medtech</type>
 				<level>2</level>
 				<bonus>0</bonus>
 			</skill>
@@ -1891,29 +1795,405 @@ Conversion by Hammer</desc>
 			<eliteLvl>5</eliteLvl>
 			<costs>8,4,4,4,4,4,4,4,4,4,4</costs>
 		</skillType>
-		<ability-tactical_genius>12</ability-tactical_genius>
-		<ability-gunnery_laser>4</ability-gunnery_laser>
-		<ability-ei_implant>0</ability-ei_implant>
-		<ability-gunnery_ballistic>4</ability-gunnery_ballistic>
-		<ability-pain_resistance>4</ability-pain_resistance>
-		<ability-sniper>12</ability-sniper>
-		<ability-maneuvering_ace>8</ability-maneuvering_ace>
-		<ability-gunnery_missile>4</ability-gunnery_missile>
-		<ability-aptitude_gunnery>40</ability-aptitude_gunnery>
-		<ability-specialist>4</ability-specialist>
-		<ability-jumping_jack>12</ability-jumping_jack>
-		<ability-iron_man>8</ability-iron_man>
-		<ability-melee_specialist>8</ability-melee_specialist>
-		<ability-melee_master>12</ability-melee_master>
-		<ability-hot_dog>4</ability-hot_dog>
-		<ability-cluster_master>0</ability-cluster_master>
-		<ability-multi_tasker>4</ability-multi_tasker>
-		<ability-clan_pilot_training>0</ability-clan_pilot_training>
-		<ability-oblique_attacker>4</ability-oblique_attacker>
-		<ability-weapon_specialist>1</ability-weapon_specialist>
-		<ability-jumping_jill>8</ability-jumping_jill>
-		<ability-dodge_maneuver>8</ability-dodge_maneuver>
 	</skillTypes>
+	<specialAbilities>
+		<ability>
+			<displayName>Gunnery Specialization (aToW)</displayName>
+			<lookupName>specialist</lookupName>
+			<desc>A pilot who specializes in a type of weapon receives a -1 to-hit modifier when using weapons of that type and a
+ +1 to-hit modifier when using other types of weapons.</desc>
+			<xpCost>6</xpCost>
+			<weight>4</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities>weapon_specialist</invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Gunnery/Battlesuit::Regular</displayName>
+				<displayName>Gunnery/Aircraft::Regular</displayName>
+				<displayName>Gunnery/Spacecraft::Regular</displayName>
+				<displayName>Gunnery/Aerospace::Regular</displayName>
+				<displayName>Gunnery/Vehicle::Regular</displayName>
+				<displayName>Gunnery/Mech::Regular</displayName>
+				<displayName>Gunnery/Protomech::Regular</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Hot Dog (aToW)</displayName>
+			<lookupName>hot_dog</lookupName>
+			<desc>Reduce heat-related target rolls (e.g ammo, damage, shutdown) by 1.</desc>
+			<xpCost>2</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Piloting/Aerospace::Regular</displayName>
+				<displayName>Piloting/Aircraft::Regular</displayName>
+				<displayName>Piloting/Mech::Regular</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Sandblaster (AToW)</displayName>
+			<lookupName>sandblaster</lookupName>
+			<desc>A pilot with this ability gets a +4, +3, or +2 to the cluster table
+at short, medium, or long/extended range, respectively, but only with a specialized weapon.</desc>
+			<xpCost>6</xpCost>
+			<weight>3</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities>cluster_hitter::cluster_master</invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Gunnery/Battlesuit::Regular</displayName>
+				<displayName>Gunnery/Aircraft::Regular</displayName>
+				<displayName>Gunnery/Spacecraft::Regular</displayName>
+				<displayName>Gunnery/Aerospace::Regular</displayName>
+				<displayName>Gunnery/Vehicle::Regular</displayName>
+				<displayName>Gunnery/Mech::Regular</displayName>
+				<displayName>Gunnery/Protomech::Regular</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Some Like It Hot (Unofficial)</displayName>
+			<lookupName>some_like_it_hot</lookupName>
+			<desc>A pilot with this ability does not suffer the initial -1 to hit due to heat.</desc>
+			<xpCost>6</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Gunnery/Aircraft::Regular</displayName>
+				<displayName>Gunnery/Aerospace::Regular</displayName>
+				<displayName>Gunnery/Mech::Regular</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Melee Specialist (aToW)</displayName>
+			<lookupName>melee_specialist</lookupName>
+			<desc>Enables the unit to do 1 additional point of damage with physical attacks and applies a -1 to-hit modifier to physical attacks.
+Note: This ability is only used for BattleMechs.</desc>
+			<xpCost>4</xpCost>
+			<weight>3</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Piloting/Mech::Regular</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Weathered (Unofficial)</displayName>
+			<lookupName>weathered</lookupName>
+			<desc>A pilot with this ability does not suffer the initial -1 to hit due to weather conditions.</desc>
+			<xpCost>6</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Gunnery/Battlesuit::Regular</displayName>
+				<displayName>Gunnery/Aircraft::Regular</displayName>
+				<displayName>Gunnery/Spacecraft::Regular</displayName>
+				<displayName>Gunnery/Aerospace::Regular</displayName>
+				<displayName>Gunnery/Vehicle::Regular</displayName>
+				<displayName>Gunnery/Mech::Regular</displayName>
+				<displayName>Gunnery/Protomech::Regular</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Cluster Master (AToW)</displayName>
+			<lookupName>cluster_master</lookupName>
+			<desc>A pilot with this ability gets a +2 to the cluster hit table</desc>
+			<xpCost>6</xpCost>
+			<weight>6</weight>
+			<prereqAbilities>cluster_hitter</prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities>cluster_hitter</removeAbilities>
+			<skillPrereq>
+				<displayName>Gunnery/Battlesuit::Veteran</displayName>
+				<displayName>Gunnery/Aircraft::Veteran</displayName>
+				<displayName>Gunnery/Spacecraft::Veteran</displayName>
+				<displayName>Gunnery/Aerospace::Veteran</displayName>
+				<displayName>Gunnery/Vehicle::Veteran</displayName>
+				<displayName>Gunnery/Mech::Veteran</displayName>
+				<displayName>Gunnery/Protomech::Veteran</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Multi-Tasker (aToW)</displayName>
+			<lookupName>multi_tasker</lookupName>
+			<desc>Secondary target modifiers are reduced by one.</desc>
+			<xpCost>6</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Gunnery/Battlesuit::Regular</displayName>
+				<displayName>Gunnery/Aircraft::Regular</displayName>
+				<displayName>Gunnery/Spacecraft::Regular</displayName>
+				<displayName>Gunnery/Aerospace::Regular</displayName>
+				<displayName>Gunnery/Vehicle::Regular</displayName>
+				<displayName>Gunnery/Mech::Regular</displayName>
+				<displayName>Gunnery/Protomech::Regular</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Maneuvering Ace (aToW)</displayName>
+			<lookupName>maneuvering_ace</lookupName>
+			<desc>Enables the unit to move laterally like a Quad.
+Quads can move laterally for 1 less MP.
+Aerospace units can perform maneuvers for 1 less thrust point.
+Units also receive a -1 BTH to rolls against skidding, sideslipping, and going out of control.</desc>
+			<xpCost>4</xpCost>
+			<weight>3</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Piloting/Aerospace::Veteran</displayName>
+				<displayName>Piloting/Naval::Veteran</displayName>
+				<displayName>Piloting/Ground Vehicle::Veteran</displayName>
+				<displayName>Piloting/VTOL::Veteran</displayName>
+				<displayName>Piloting/Aircraft::Veteran</displayName>
+				<displayName>Piloting/Mech::Veteran</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Oblique Attacker (aToW)</displayName>
+			<lookupName>oblique_attacker</lookupName>
+			<desc>The penalty for indirect fire is reduced by one.</desc>
+			<xpCost>6</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Gunnery/Battlesuit::Regular</displayName>
+				<displayName>Gunnery/Aircraft::Regular</displayName>
+				<displayName>Gunnery/Aerospace::Regular</displayName>
+				<displayName>Gunnery/Vehicle::Regular</displayName>
+				<displayName>Gunnery/Mech::Regular</displayName>
+				<displayName>Gunnery/Protomech::Regular</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Natural Aptitude, Gunnery (aToW)</displayName>
+			<lookupName>aptitude_gunnery</lookupName>
+			<desc>Roll 3d6 and take the best two for gunnery checks</desc>
+			<xpCost>40</xpCost>
+			<weight>0</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Gunnery/Battlesuit</displayName>
+				<displayName>Gunnery/Aircraft</displayName>
+				<displayName>Gunnery/Spacecraft</displayName>
+				<displayName>Gunnery/Aerospace</displayName>
+				<displayName>Gunnery/Vehicle</displayName>
+				<displayName>Gunnery/Mech</displayName>
+				<displayName>Gunnery/Protomech</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Hopping Jack (Unofficial)</displayName>
+			<lookupName>hopping_jack</lookupName>
+			<desc>Unit only suffers a +2 to-hit penalty for jumping, rather than a +3 to-hit penalty.</desc>
+			<xpCost>6</xpCost>
+			<weight>3</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities>jumping_jack</invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Piloting/Mech::Veteran</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>All Weather (Unofficial)</displayName>
+			<lookupName>allweather</lookupName>
+			<desc>A pilot with this ability does not suffer the PSR penalties due to weather.</desc>
+			<xpCost>2</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Piloting/Aerospace::Regular</displayName>
+				<displayName>Piloting/Naval::Regular</displayName>
+				<displayName>Piloting/Ground Vehicle::Regular</displayName>
+				<displayName>Piloting/VTOL::Regular</displayName>
+				<displayName>Piloting/Aircraft::Regular</displayName>
+				<displayName>Piloting/Mech::Regular</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Tactical Genius (aToW)</displayName>
+			<lookupName>tactical_genius</lookupName>
+			<desc>A pilot who has a Tactical Genius may reroll their initiative once per turn.
+ The second roll must be accepted.
+Note: Only one Tactical Genius may be utilized per team.</desc>
+			<xpCost>8</xpCost>
+			<weight>1</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Tactics::Green</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Jumping Jack (aToW)</displayName>
+			<lookupName>jumping_jack</lookupName>
+			<desc>Unit only suffers a +1 to-hit penalty for jumping, rather than a +3 to-hit penalty.</desc>
+			<xpCost>6</xpCost>
+			<weight>6</weight>
+			<prereqAbilities>hopping_jack</prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities>hopping_jack</removeAbilities>
+			<skillPrereq>
+				<displayName>Piloting/Mech::Veteran</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Pain Resistance (MaxTech)</displayName>
+			<lookupName>pain_resistance</lookupName>
+			<desc>When making consciousness rolls,
+1 is added to all rolls.
+Also,
+damage received from ammo explosions is reduced to 1.
+Note: This ability is only used for BattleMechs.</desc>
+			<xpCost>4</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
+			<displayName>Sniper (aToW)</displayName>
+			<lookupName>sniper</lookupName>
+			<desc>Range penalties are halved.</desc>
+			<xpCost>12</xpCost>
+			<weight>1</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Gunnery/Battlesuit::Veteran</displayName>
+				<displayName>Gunnery/Aircraft::Veteran</displayName>
+				<displayName>Gunnery/Spacecraft::Veteran</displayName>
+				<displayName>Gunnery/Aerospace::Veteran</displayName>
+				<displayName>Gunnery/Vehicle::Veteran</displayName>
+				<displayName>Gunnery/Mech::Veteran</displayName>
+				<displayName>Gunnery/Protomech::Veteran</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Dodge (MaxTech)</displayName>
+			<lookupName>dodge_maneuver</lookupName>
+			<desc>Enables the unit to make a dodge maneuver instead of a physical attack.
+This maneuver adds +2 to the BTH to physical attacks against the unit.
+NOTE: The dodge maneuver is declared during the weapons phase.
+Note: This ability is only used for BattleMechs.</desc>
+			<xpCost>2</xpCost>
+			<weight>1</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Piloting/Mech::Regular</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Blind Fighter (Unofficial)</displayName>
+			<lookupName>blind_fighter</lookupName>
+			<desc>A pilot with this ability does not suffer the initial -1 to hit due to darkness.</desc>
+			<xpCost>6</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Gunnery/Battlesuit::Regular</displayName>
+				<displayName>Gunnery/Aircraft::Regular</displayName>
+				<displayName>Gunnery/Aerospace::Regular</displayName>
+				<displayName>Gunnery/Vehicle::Regular</displayName>
+				<displayName>Gunnery/Mech::Regular</displayName>
+				<displayName>Gunnery/Protomech::Regular</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Cluster Hitter (AToW)</displayName>
+			<lookupName>cluster_hitter</lookupName>
+			<desc>A pilot with this ability gets a +1 to the cluster hit table </desc>
+			<xpCost>6</xpCost>
+			<weight>3</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities>cluster_master</invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Gunnery/Battlesuit::Regular</displayName>
+				<displayName>Gunnery/Aircraft::Regular</displayName>
+				<displayName>Gunnery/Spacecraft::Regular</displayName>
+				<displayName>Gunnery/Aerospace::Regular</displayName>
+				<displayName>Gunnery/Vehicle::Regular</displayName>
+				<displayName>Gunnery/Mech::Regular</displayName>
+				<displayName>Gunnery/Protomech::Regular</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Weapon Specialist (aToW)</displayName>
+			<lookupName>weapon_specialist</lookupName>
+			<desc>A pilot who specializes in a particular weapon receives a -2 to hit modifier on all attacks with that weapon.</desc>
+			<xpCost>12</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities>specialist</invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Gunnery/Battlesuit::Regular</displayName>
+				<displayName>Gunnery/Aircraft::Regular</displayName>
+				<displayName>Gunnery/Spacecraft::Regular</displayName>
+				<displayName>Gunnery/Aerospace::Regular</displayName>
+				<displayName>Gunnery/Vehicle::Regular</displayName>
+				<displayName>Gunnery/Mech::Regular</displayName>
+				<displayName>Gunnery/Protomech::Regular</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Melee Master (aToW)</displayName>
+			<lookupName>melee_master</lookupName>
+			<desc>Enables the unit to do one additional kick, punch, or club attack on the same opponent.</desc>
+			<xpCost>4</xpCost>
+			<weight>6</weight>
+			<prereqAbilities>melee_specialist</prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Piloting/Mech::Veteran</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Sensor Geek (Unofficial)</displayName>
+			<lookupName>sensor_geek</lookupName>
+			<desc>A pilot with this ability gets a -2 bonus on sensor checks.
+ Note that this is really only a bonus, if inclusive sensor ranges are in use.</desc>
+			<xpCost>3</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Piloting/Aerospace::Green</displayName>
+				<displayName>Piloting/Naval::Green</displayName>
+				<displayName>Piloting/Ground Vehicle::Green</displayName>
+				<displayName>Gunnery/Battlesuit::Green</displayName>
+				<displayName>Piloting/VTOL::Green</displayName>
+				<displayName>Piloting/Aircraft::Green</displayName>
+				<displayName>Piloting/Mech::Green</displayName>
+			</skillPrereq>
+		</ability>
+	</specialAbilities>
 	<randomSkillPreferences>
 		<overallRecruitBonus>0</overallRecruitBonus>
 		<recruitBonuses>0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0</recruitBonuses>
@@ -1930,6 +2210,106 @@ Conversion by Hammer</desc>
 		<secondSkillBonus>-4</secondSkillBonus>
 	</randomSkillPreferences>
 	<parts>
+		<part id="652" type="mekhq.campaign.parts.equipment.HeatSink">
+			<id>652</id>
+			<name>Double Heat Sink</name>
+			<unitTonnage>70</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>73902adb-f690-4086-9780-c189c89ebd94</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>13</equipmentNum>
+			<typeName>ISDoubleHeatSink</typeName>
+			<equipTonnage>1.0</equipTonnage>
+		</part>
+		<part id="651" type="mekhq.campaign.parts.equipment.EquipmentPart">
+			<id>651</id>
+			<name>Rotary AC/5</name>
+			<unitTonnage>60</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>30619ef0-64f2-42db-b7ec-3055da88f393</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>8</equipmentNum>
+			<typeName>ISRotaryAC5</typeName>
+			<equipTonnage>10.0</equipTonnage>
+		</part>
+		<part id="650" type="mekhq.campaign.parts.equipment.EquipmentPart">
+			<id>650</id>
+			<name>ER Small Laser</name>
+			<unitTonnage>25</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>69b910f6-ef6c-42ec-b5f4-6529351a11ff</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>9</equipmentNum>
+			<typeName>ISERSmallLaser</typeName>
+			<equipTonnage>0.5</equipTonnage>
+		</part>
+		<part id="649" type="mekhq.campaign.parts.equipment.EquipmentPart">
+			<id>649</id>
+			<name>ER Medium Laser</name>
+			<unitTonnage>25</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>69b910f6-ef6c-42ec-b5f4-6529351a11ff</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>8</equipmentNum>
+			<typeName>ISERMediumLaser</typeName>
+			<equipTonnage>1.0</equipTonnage>
+		</part>
 		<part id="648" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>648</id>
 			<name>Medium Laser</name>
@@ -1951,7 +2331,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>8</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>Medium Laser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -1976,7 +2356,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>ISDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2001,7 +2381,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>14</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2011,7 +2391,6 @@ Conversion by Hammer</desc>
 			<unitTonnage>50</unitTonnage>
 			<hits>0</hits>
 			<difficulty>0</difficulty>
-
 			<time>0</time>
 			<timeSpent>0</timeSpent>
 			<mode>0</mode>
@@ -2027,7 +2406,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>13</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>Large Laser</typeName>
 			<equipTonnage>5.0</equipTonnage>
 		</part>
@@ -2052,7 +2431,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>12</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2077,7 +2456,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>16</equipmentNum>
+			<equipmentNum>1</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2102,7 +2481,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>13</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>ISDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2127,7 +2506,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>12</equipmentNum>
+			<equipmentNum>7</equipmentNum>
 			<typeName>ISDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2152,7 +2531,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>IS LB 20-X Cluster Ammo</typeName>
 			<munition>1</munition>
 			<shotsNeeded>0</shotsNeeded>
@@ -2180,7 +2559,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>12</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2205,7 +2584,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>6</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>SRM 2</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2230,7 +2609,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>12</equipmentNum>
+			<equipmentNum>8</equipmentNum>
 			<typeName>ISERLargeLaser</typeName>
 			<equipTonnage>5.0</equipTonnage>
 		</part>
@@ -2255,7 +2634,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>11</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2267,7 +2646,6 @@ Conversion by Hammer</desc>
 			<difficulty>0</difficulty>
 			<time>0</time>
 			<timeSpent>0</timeSpent>
-
 			<mode>0</mode>
 			<skillMin>1</skillMin>
 			<unitId>e916d765-b5b7-424f-a6c3-e6f1c3f4f145</unitId>
@@ -2281,7 +2659,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>10</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2306,7 +2684,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>7</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2331,7 +2709,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>18</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>2.0</equipTonnage>
 		</part>
@@ -2356,7 +2734,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>6</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>ISLBXAC10</typeName>
 			<equipTonnage>11.0</equipTonnage>
 		</part>
@@ -2381,7 +2759,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>6</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>IS Ultra AC/20 Ammo</typeName>
 			<munition>0</munition>
 			<shotsNeeded>0</shotsNeeded>
@@ -2409,7 +2787,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>IS Ultra AC/20 Ammo</typeName>
 			<munition>0</munition>
 			<shotsNeeded>0</shotsNeeded>
@@ -2437,7 +2815,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>12</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>CLERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2462,7 +2840,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>13</equipmentNum>
+			<equipmentNum>1</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2487,7 +2865,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>11</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2512,7 +2890,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>11</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2537,7 +2915,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
+			<equipmentNum>13</equipmentNum>
 			<typeName>Large Laser</typeName>
 			<equipTonnage>5.0</equipTonnage>
 		</part>
@@ -2562,7 +2940,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>12</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2587,7 +2965,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>6</equipmentNum>
 			<typeName>Medium Laser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2612,7 +2990,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>ISDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2662,7 +3040,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>1</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2687,7 +3065,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>8</equipmentNum>
 			<typeName>ISDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2712,7 +3090,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>7</equipmentNum>
+			<equipmentNum>10</equipmentNum>
 			<typeName>ISDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2762,7 +3140,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>16</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2787,7 +3165,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>IS LB 20-X Cluster Ammo</typeName>
 			<munition>1</munition>
 			<shotsNeeded>0</shotsNeeded>
@@ -2871,7 +3249,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2896,7 +3274,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>6</equipmentNum>
 			<typeName>SRM 2</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2921,7 +3299,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>12</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -3021,7 +3399,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>8</equipmentNum>
+			<equipmentNum>12</equipmentNum>
 			<typeName>ISERLargeLaser</typeName>
 			<equipTonnage>5.0</equipTonnage>
 		</part>
@@ -3046,7 +3424,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -3071,7 +3449,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>6</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -3121,7 +3499,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>7</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -3146,7 +3524,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>10</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -3171,7 +3549,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>2.0</equipTonnage>
 		</part>
@@ -3196,7 +3574,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>6</equipmentNum>
 			<typeName>ISLBXAC10</typeName>
 			<equipTonnage>11.0</equipTonnage>
 		</part>
@@ -3221,7 +3599,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>18</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>2.0</equipTonnage>
 		</part>
@@ -3246,7 +3624,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>IS Ultra AC/20 Ammo</typeName>
 			<munition>0</munition>
 			<shotsNeeded>0</shotsNeeded>
@@ -3274,7 +3652,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>6</equipmentNum>
 			<typeName>IS Ultra AC/20 Ammo</typeName>
 			<munition>0</munition>
 			<shotsNeeded>0</shotsNeeded>
@@ -3327,7 +3705,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>CLERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -3527,7 +3905,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>1</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -3552,7 +3930,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -3627,7 +4005,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>11</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -3652,7 +4030,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>13</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -4066,7 +4444,6 @@ Conversion by Hammer</desc>
 			<workingOvertime>false</workingOvertime>
 			<shorthandedMod>0</shorthandedMod>
 			<refitId>null</refitId>
-
 			<daysToArrival>0</daysToArrival>
 			<brandNew>false</brandNew>
 			<quantity>1</quantity>
@@ -4916,7 +5293,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>6</equipmentNum>
+			<equipmentNum>7</equipmentNum>
 			<typeName>Medium Laser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -4941,7 +5318,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>7</equipmentNum>
+			<equipmentNum>8</equipmentNum>
 			<typeName>Medium Laser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -5923,56 +6300,6 @@ Conversion by Hammer</desc>
 			<quality>3</quality>
 			<equipmentNum>12</equipmentNum>
 			<typeName>ISDoubleHeatSink</typeName>
-			<equipTonnage>1.0</equipTonnage>
-		</part>
-		<part id="479" type="mekhq.campaign.parts.equipment.EquipmentPart">
-			<id>479</id>
-			<name>ER Small Laser</name>
-			<unitTonnage>25</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>69b910f6-ef6c-42ec-b5f4-6529351a11ff</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>9</equipmentNum>
-			<typeName>ISERSmallLaser</typeName>
-			<equipTonnage>0.5</equipTonnage>
-		</part>
-		<part id="478" type="mekhq.campaign.parts.equipment.EquipmentPart">
-			<id>478</id>
-			<name>ER Medium Laser</name>
-			<unitTonnage>25</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>69b910f6-ef6c-42ec-b5f4-6529351a11ff</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>8</equipmentNum>
-			<typeName>ISERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
 		<part id="470" type="mekhq.campaign.parts.Armor">
@@ -7054,7 +7381,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>11</equipmentNum>
+			<equipmentNum>14</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -8858,7 +9185,6 @@ Conversion by Hammer</desc>
 			<refitId>null</refitId>
 			<daysToArrival>0</daysToArrival>
 			<brandNew>false</brandNew>
-
 			<quantity>1</quantity>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
@@ -9396,7 +9722,6 @@ Conversion by Hammer</desc>
 			<timeSpent>0</timeSpent>
 			<mode>0</mode>
 			<skillMin>1</skillMin>
-
 			<unitId>7d7ed6fc-dbe0-4c7f-ae29-4fc357cac9ca</unitId>
 			<salvaging>false</salvaging>
 			<workingOvertime>false</workingOvertime>
@@ -10254,31 +10579,6 @@ Conversion by Hammer</desc>
 			<equipmentNum>6</equipmentNum>
 			<typeName>ISERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
-		</part>
-		<part id="291" type="mekhq.campaign.parts.equipment.EquipmentPart">
-			<id>291</id>
-			<name>Rotary AC/5</name>
-			<unitTonnage>60</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>30619ef0-64f2-42db-b7ec-3055da88f393</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>8</equipmentNum>
-			<typeName>ISRotaryAC5</typeName>
-			<equipTonnage>10.0</equipTonnage>
 		</part>
 		<part id="290" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>290</id>
@@ -11309,31 +11609,6 @@ Conversion by Hammer</desc>
 			<typeName>Large Laser</typeName>
 			<equipTonnage>5.0</equipTonnage>
 		</part>
-		<part id="241" type="mekhq.campaign.parts.equipment.HeatSink">
-			<id>241</id>
-			<name>Double Heat Sink</name>
-			<unitTonnage>70</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>73902adb-f690-4086-9780-c189c89ebd94</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>8</equipmentNum>
-			<typeName>ISDoubleHeatSink</typeName>
-			<equipTonnage>1.0</equipTonnage>
-		</part>
 		<part id="238" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>238</id>
 			<name>Double Heat Sink</name>
@@ -11355,7 +11630,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>10</equipmentNum>
+			<equipmentNum>11</equipmentNum>
 			<typeName>ISDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -11430,7 +11705,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>11</equipmentNum>
+			<equipmentNum>12</equipmentNum>
 			<typeName>ISDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -13364,7 +13639,6 @@ Conversion by Hammer</desc>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
 			<type>10</type>
-
 			<location>4</location>
 		</part>
 		<part id="152" type="mekhq.campaign.parts.MekActuator">
@@ -13841,7 +14115,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>6</equipmentNum>
+			<equipmentNum>11</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -15016,7 +15290,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>11</equipmentNum>
 			<typeName>CLERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -15041,7 +15315,7 @@ Conversion by Hammer</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>11</equipmentNum>
+			<equipmentNum>12</equipmentNum>
 			<typeName>CLERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -16985,10 +17259,6 @@ Conversion by Hammer</desc>
 			<value>false</value>
 		</gameoption>
 		<gameoption>
-			<name>show_dmg_level</name>
-			<value>false</value>
-		</gameoption>
-		<gameoption>
 			<name>year</name>
 			<value>3071</value>
 		</gameoption>
@@ -17059,6 +17329,10 @@ Conversion by Hammer</desc>
 		<gameoption>
 			<name>allow_advanced_ammo</name>
 			<value>true</value>
+		</gameoption>
+		<gameoption>
+			<name>allow_experimental_ammo</name>
+			<value>false</value>
 		</gameoption>
 		<gameoption>
 			<name>is_eq_limits</name>
@@ -17149,6 +17423,10 @@ Conversion by Hammer</desc>
 			<value>false</value>
 		</gameoption>
 		<gameoption>
+			<name>tacops_tank_crews</name>
+			<value>false</value>
+		</gameoption>
+		<gameoption>
 			<name>stratops_quirks</name>
 			<value>false</value>
 		</gameoption>
@@ -17182,10 +17460,6 @@ Conversion by Hammer</desc>
 		</gameoption>
 		<gameoption>
 			<name>no_ignite_clear</name>
-			<value>false</value>
-		</gameoption>
-		<gameoption>
-			<name>a4homing_target_area</name>
 			<value>false</value>
 		</gameoption>
 		<gameoption>
@@ -17429,6 +17703,14 @@ Conversion by Hammer</desc>
 			<value>false</value>
 		</gameoption>
 		<gameoption>
+			<name>num_hexes_predesignate</name>
+			<value>5</value>
+		</gameoption>
+		<gameoption>
+			<name>map_area_predesignate</name>
+			<value>1088</value>
+		</gameoption>
+		<gameoption>
 			<name>max_external_heat</name>
 			<value>15</value>
 		</gameoption>
@@ -17503,6 +17785,14 @@ Conversion by Hammer</desc>
 		<gameoption>
 			<name>tacops_careful_stand</name>
 			<value>false</value>
+		</gameoption>
+		<gameoption>
+			<name>mek_lance_movement</name>
+			<value>false</value>
+		</gameoption>
+		<gameoption>
+			<name>mek_lance_movement_number</name>
+			<value>4</value>
 		</gameoption>
 		<gameoption>
 			<name>no_immobile_vehicles</name>
@@ -17760,6 +18050,10 @@ Conversion by Hammer</desc>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>0</gender>
 			<rank>0</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<salary>-1</salary>
 			<status>0</status>

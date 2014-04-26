@@ -234,6 +234,7 @@ v0.3.4 (SVN)
 + updated MM.jar and MML.jar
 + Bug: individual camos being saved when they shouldn't be
 + Bug: correct font and color coding not showing up for personnel VisualRenderer
++ updated camos and packaged campaigns point to correct camo
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
