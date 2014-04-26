@@ -1,5 +1,7 @@
 VERSION HISTORY
 ----------------------------------
+v0.3.5 (SVN)
+
 v0.3.4 (2014-04-26)
 + Bug: Moved Report Log not scrolling again (don't force set caret to 0 on refresh)
 + Bug: Personnel name not showing when GM->Remove is used
