@@ -231,6 +231,7 @@ v0.3.4 (SVN)
 + tooltips for special ability stuff
 + ability to import/export campaign options (but not ranks)
 + cleaned up some GUI formatting in CampaignOptionsDialog
++ updated MM.jar and MML.jar
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
