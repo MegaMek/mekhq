@@ -132,7 +132,7 @@
 	</campaignOptions>
 	<units>
 		<unit id="c1b16001-6600-46c9-9c35-97c965a3a107" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Malak" model="C-MK-O Mi" type="Biped" commander="false" externalId="c1b16001-6600-46c9-9c35-97c965a3a107" c3UUID="15498450-6969-4f52-aba7-84c03ace7435">
+			<entity chassis="Malak" model="C-MK-O (Mi)" type="Biped" commander="false" externalId="c1b16001-6600-46c9-9c35-97c965a3a107" c3UUID="15498450-6969-4f52-aba7-84c03ace7435">
 				<c3iset>
 					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435"/>
 					<c3i_link link="dfb5fd09-fa7f-4901-a12e-c2bc5d9e81a3"/>
@@ -182,7 +182,7 @@
 			<history></history>
 		</unit>
 		<unit id="00e0b81d-e8fe-4d85-8686-4f6b853bff29" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Grigori" model="C-GRG-O Rufus" type="Biped" commander="false" externalId="00e0b81d-e8fe-4d85-8686-4f6b853bff29" c3UUID="dfb5fd09-fa7f-4901-a12e-c2bc5d9e81a3">
+			<entity chassis="Grigori" model="C-GRG-O (Rufus)" type="Biped" commander="false" externalId="00e0b81d-e8fe-4d85-8686-4f6b853bff29" c3UUID="dfb5fd09-fa7f-4901-a12e-c2bc5d9e81a3">
 				<c3iset>
 					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435"/>
 					<c3i_link link="dfb5fd09-fa7f-4901-a12e-c2bc5d9e81a3"/>
@@ -232,7 +232,7 @@
 			<history></history>
 		</unit>
 		<unit id="f9936e32-1953-4888-beb3-ee243fad60c3" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Deva" model="C-DVA-O Achilleus" type="Biped" commander="false" externalId="f9936e32-1953-4888-beb3-ee243fad60c3" c3UUID="6df625a9-5be3-48b5-bc5f-c632558e6513">
+			<entity chassis="Deva" model="C-DVA-O (Achilleus)" type="Biped" commander="false" externalId="f9936e32-1953-4888-beb3-ee243fad60c3" c3UUID="6df625a9-5be3-48b5-bc5f-c632558e6513">
 				<c3iset>
 					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435"/>
 					<c3i_link link="dfb5fd09-fa7f-4901-a12e-c2bc5d9e81a3"/>
@@ -282,7 +282,7 @@
 			<history></history>
 		</unit>
 		<unit id="52249633-3534-4be5-a983-55e18d74655c" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Seraph" model="C-SRP-O Havalah" type="Biped" commander="false" externalId="52249633-3534-4be5-a983-55e18d74655c" c3UUID="a8cab9a9-4cda-4c97-aa92-6604591ef9d9">
+			<entity chassis="Seraph" model="C-SRP-O (Havalah)" type="Biped" commander="false" externalId="52249633-3534-4be5-a983-55e18d74655c" c3UUID="a8cab9a9-4cda-4c97-aa92-6604591ef9d9">
 				<c3iset>
 					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435"/>
 					<c3i_link link="dfb5fd09-fa7f-4901-a12e-c2bc5d9e81a3"/>
@@ -332,7 +332,7 @@
 			<history></history>
 		</unit>
 		<unit id="86e8442a-bc36-438a-87b3-df8a41e1a6e9" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Preta" model="C-PRT-O Kendali" type="Biped" commander="false" externalId="86e8442a-bc36-438a-87b3-df8a41e1a6e9" c3UUID="5fd55c97-5efc-43ae-a949-22321cf58c22">
+			<entity chassis="Preta" model="C-PRT-O (Kendali)" type="Biped" commander="false" externalId="86e8442a-bc36-438a-87b3-df8a41e1a6e9" c3UUID="5fd55c97-5efc-43ae-a949-22321cf58c22">
 				<c3iset>
 					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435"/>
 					<c3i_link link="dfb5fd09-fa7f-4901-a12e-c2bc5d9e81a3"/>

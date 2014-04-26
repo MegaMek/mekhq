@@ -446,7 +446,7 @@
 			<history></history>
 		</unit>
 		<unit id="08da54d6-08f6-4d0c-82a2-01b8c07e35df" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Cataphract" model="CTF-2X George" type="Biped" commander="false" externalId="08da54d6-08f6-4d0c-82a2-01b8c07e35df">
+			<entity chassis="Cataphract" model="CTF-2X (George)" type="Biped" commander="false" externalId="08da54d6-08f6-4d0c-82a2-01b8c07e35df">
 			</entity>
 			<driverId>1692715d-0916-4605-bcb9-fd964fd8e3e7</driverId>
 			<gunnerId>1692715d-0916-4605-bcb9-fd964fd8e3e7</gunnerId>
@@ -463,7 +463,7 @@
 			<history></history>
 		</unit>
 		<unit id="fbd0331c-bc85-425d-b3da-aefa70859b5e" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Black Knight" model="BL-6-KNT Ian" type="Biped" commander="false" externalId="fbd0331c-bc85-425d-b3da-aefa70859b5e">
+			<entity chassis="Black Knight" model="BL-6-KNT (Ian)" type="Biped" commander="false" externalId="fbd0331c-bc85-425d-b3da-aefa70859b5e">
 			</entity>
 			<driverId>1795712b-6a31-4e4a-9f08-c3ffb5d0b97e</driverId>
 			<gunnerId>1795712b-6a31-4e4a-9f08-c3ffb5d0b97e</gunnerId>
@@ -497,7 +497,7 @@
 			<history></history>
 		</unit>
 		<unit id="5622b5dc-e67a-46be-9529-3474e6d7de46" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Enforcer" model="ENF-4R Daniel" type="Biped" commander="false" externalId="5622b5dc-e67a-46be-9529-3474e6d7de46">
+			<entity chassis="Enforcer" model="ENF-4R (Daniel)" type="Biped" commander="false" externalId="5622b5dc-e67a-46be-9529-3474e6d7de46">
 			</entity>
 			<driverId>83f2abe1-cb32-49e3-9757-7624e10658c3</driverId>
 			<gunnerId>83f2abe1-cb32-49e3-9757-7624e10658c3</gunnerId>
@@ -565,7 +565,7 @@
 			<history></history>
 		</unit>
 		<unit id="f8cf9760-9998-4219-baca-416347c6e049" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Hatchetman" model="HCT-3F Austin" type="Biped" commander="false" externalId="f8cf9760-9998-4219-baca-416347c6e049">
+			<entity chassis="Hatchetman" model="HCT-3F (Austin)" type="Biped" commander="false" externalId="f8cf9760-9998-4219-baca-416347c6e049">
 			</entity>
 			<driverId>b06e5c92-e603-4769-b82a-00c3c58db696</driverId>
 			<gunnerId>b06e5c92-e603-4769-b82a-00c3c58db696</gunnerId>

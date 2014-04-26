@@ -149,7 +149,7 @@
 			<history></history>
 		</unit>
 		<unit id="bd2ec814-dcf7-4401-8b78-7eeb90fd648b" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Zeus X" model="ZEU-9WD (Stacy)" type="Biped" commander="false" externalId="bd2ec814-dcf7-4401-8b78-7eeb90fd648b">
+			<entity chassis="Zeus-X" model="ZEU-9WD (Stacy)" type="Biped" commander="false" externalId="bd2ec814-dcf7-4401-8b78-7eeb90fd648b">
 			</entity>
 			<driverId>27c90d97-63c3-48a6-81fa-b7fe219d83a1</driverId>
 			<gunnerId>27c90d97-63c3-48a6-81fa-b7fe219d83a1</gunnerId>
@@ -183,7 +183,7 @@
 			<history></history>
 		</unit>
 		<unit id="ef33e6a4-66e7-41e4-92a1-32f4984dd1be" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Griffin" model="GRF-6S Francine II" type="Biped" commander="false" externalId="ef33e6a4-66e7-41e4-92a1-32f4984dd1be">
+			<entity chassis="Griffin" model="GRF-6S (Francine II)" type="Biped" commander="false" externalId="ef33e6a4-66e7-41e4-92a1-32f4984dd1be">
 			</entity>
 			<driverId>fbc73bbd-7d10-464f-a073-408da3bddbcc</driverId>
 			<gunnerId>fbc73bbd-7d10-464f-a073-408da3bddbcc</gunnerId>
@@ -251,7 +251,7 @@
 			<history></history>
 		</unit>
 		<unit id="23b4db00-fe8d-480a-9e00-572bbce19ae2" type="mekhq.campaign.unit.Unit">
-			<entity chassis="BattleMaster" model="BLR-4S Calvin II" type="Biped" commander="false" externalId="23b4db00-fe8d-480a-9e00-572bbce19ae2">
+			<entity chassis="BattleMaster" model="BLR-4S (Calvin II)" type="Biped" commander="false" externalId="23b4db00-fe8d-480a-9e00-572bbce19ae2">
 			</entity>
 			<driverId>235df119-e815-41ca-879a-495409b6b493</driverId>
 			<gunnerId>235df119-e815-41ca-879a-495409b6b493</gunnerId>
