@@ -237,6 +237,7 @@ v0.3.4 (SVN)
 + updated camos and packaged campaigns point to correct camo
 + updated mechfiles in data files
 + corrected all campaigns to have right chassis names
++ Bug: when type restore fails for EquipmentPart and MissingEquipmentPart, campaigns wont load
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

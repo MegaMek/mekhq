@@ -3559,6 +3559,12 @@ public class Campaign implements Serializable {
                 // repaired parts were not getting experience properly reset
                 p.setSkillMin(SkillType.EXP_GREEN);
             }
+            
+            //if for some reason we couldn't find a type for equipment part, then remove it
+            if((p instanceof EquipmentPart && null == ((EquipmentPart)p).getType())
+            		|| (p instanceof MissingEquipmentPart && null == ((MissingEquipmentPart)p).getType())) {
+            	p = null;
+            }
 
             if (p != null) {
                 p.setCampaign(retVal);
