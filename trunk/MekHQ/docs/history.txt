@@ -232,6 +232,8 @@ v0.3.4 (SVN)
 + ability to import/export campaign options (but not ranks)
 + cleaned up some GUI formatting in CampaignOptionsDialog
 + updated MM.jar and MML.jar
++ Bug: individual camos being saved when they shouldn't be
++ Bug: correct font and color coding not showing up for personnel VisualRenderer
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll
