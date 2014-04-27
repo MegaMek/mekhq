@@ -4284,6 +4284,7 @@ public class CampaignGUI extends JPanel {
             fos = new FileOutputStream(file);
             pw = new PrintWriter(new OutputStreamWriter(fos, "UTF-8"));
 
+            ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ");
             // File header
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             pw.println("<options version=\""
