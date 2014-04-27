@@ -97,7 +97,7 @@ public class BaArmor extends Part implements IAcquisitionWork {
         return EquipmentType.getBaArmorWeightPerPoint(type, clan) * getActualAmount();
     }
     
-    private int getPointCost() {
+    public int getPointCost() {
         switch(type) {
         case EquipmentType.T_ARMOR_BA_STANDARD_ADVANCED:
             return 12500;
