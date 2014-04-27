@@ -127,11 +127,12 @@ public class MissingBattleArmorSuit extends MissingPart {
             if(part instanceof MissingBattleArmorEquipmentPart && ((MissingBattleArmorEquipmentPart)part).getTrooper() == trooper) {
                 Part newEquip = ((MissingBattleArmorEquipmentPart)part).getNewPart();
                 extraCost += newEquip.getStickerPrice();
-                extraTonnage += newEquip.getStickerPrice();
+                extraTonnage += newEquip.getTonnage();
             }
-            if(part instanceof BaArmor) {
-                extraCost += part.getStickerPrice();
-                extraTonnage += part.getStickerPrice();
+            if(part instanceof BaArmor && ((BaArmor)part).getLocation() == trooper) {
+            	
+                extraCost += ((BaArmor)part).getAmountNeeded() * ((BaArmor)part).getPointCost();
+                extraTonnage += ((BaArmor)part).getTonnageNeeded();
             }
         }
         suit.setExtraCost(extraCost);
