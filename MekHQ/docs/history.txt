@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.5 (SVN)
+v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
 + Bug [#490]: Error Exporting Campaign Options
 + Bug [#492]: Repair mode resetting after every repair attempt.
