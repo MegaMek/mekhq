@@ -5,6 +5,8 @@ v0.3.5 (SVN)
 + Bug [#490]: Error Exporting Campaign Options
 + Bug [#492]: Repair mode resetting after every repair attempt.
 + Bug [#462]: BA Repairs
++ new MM.jar
++ better instructions for how to fix unit names in loading error dialog
 
 v0.3.4 (2014-04-26)
 + Bug: Moved Report Log not scrolling again (don't force set caret to 0 on refresh)
