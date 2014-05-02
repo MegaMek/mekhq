@@ -47,6 +47,7 @@ import megamek.common.EntityWeightClass;
 import megamek.common.EquipmentType;
 import megamek.common.HeavyVehicleBay;
 import megamek.common.ILocationExposureStatus;
+import megamek.common.IPlayer;
 import megamek.common.Infantry;
 import megamek.common.InfantryBay;
 import megamek.common.InsulatedCargoBay;
@@ -2925,8 +2926,12 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     }
      
     public boolean isEntityCamo() {
-        if ((null != entity) && (null != entity.getCamoCategory())
-                && (!Player.NO_CAMO.equals(entity.getCamoFileName()))) {
+        if ((null != entity) && (null != entity.getCamoCategory() 
+        		&& entity.getCamoCategory() != IPlayer.NO_CAMO
+        		&& !entity.getCamoCategory().isEmpty())
+        		&& (null != entity.getCamoFileName())
+                && (!Player.NO_CAMO.equals(entity.getCamoFileName()))
+                && !entity.getCamoFileName().isEmpty()) {
             return true;
         }
         

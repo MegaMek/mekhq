@@ -15,8 +15,8 @@
 		<astechPoolMinutes>0</astechPoolMinutes>
 		<astechPoolOvertime>0</astechPoolOvertime>
 		<medicPool>0</medicPool>
-		<camoCategory></camoCategory>
-		<camoFileName>Wood1.jpg</camoFileName>
+		<camoCategory>Davion/Crucis Lancers/</camoCategory>
+		<camoFileName>7th Crucis Lancers RCT.jpg</camoFileName>
 		<colorIndex>0</colorIndex>
 		<lastTeamId>0</lastTeamId>
 		<lastPartId>767</lastPartId>
@@ -446,7 +446,7 @@
 			<history></history>
 		</unit>
 		<unit id="08da54d6-08f6-4d0c-82a2-01b8c07e35df" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Cataphract" model="CTF-2X George" type="Biped" commander="false" externalId="08da54d6-08f6-4d0c-82a2-01b8c07e35df">
+			<entity chassis="Cataphract" model="CTF-2X (George)" type="Biped" commander="false" externalId="08da54d6-08f6-4d0c-82a2-01b8c07e35df">
 			</entity>
 			<driverId>1692715d-0916-4605-bcb9-fd964fd8e3e7</driverId>
 			<gunnerId>1692715d-0916-4605-bcb9-fd964fd8e3e7</gunnerId>
@@ -463,7 +463,7 @@
 			<history></history>
 		</unit>
 		<unit id="fbd0331c-bc85-425d-b3da-aefa70859b5e" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Black Knight" model="BL-6-KNT Ian" type="Biped" commander="false" externalId="fbd0331c-bc85-425d-b3da-aefa70859b5e">
+			<entity chassis="Black Knight" model="BL-6-KNT (Ian)" type="Biped" commander="false" externalId="fbd0331c-bc85-425d-b3da-aefa70859b5e">
 			</entity>
 			<driverId>1795712b-6a31-4e4a-9f08-c3ffb5d0b97e</driverId>
 			<gunnerId>1795712b-6a31-4e4a-9f08-c3ffb5d0b97e</gunnerId>
@@ -497,7 +497,7 @@
 			<history></history>
 		</unit>
 		<unit id="5622b5dc-e67a-46be-9529-3474e6d7de46" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Enforcer" model="ENF-4R Daniel" type="Biped" commander="false" externalId="5622b5dc-e67a-46be-9529-3474e6d7de46">
+			<entity chassis="Enforcer" model="ENF-4R (Daniel)" type="Biped" commander="false" externalId="5622b5dc-e67a-46be-9529-3474e6d7de46">
 			</entity>
 			<driverId>83f2abe1-cb32-49e3-9757-7624e10658c3</driverId>
 			<gunnerId>83f2abe1-cb32-49e3-9757-7624e10658c3</gunnerId>
@@ -530,23 +530,6 @@
 			<mothballed>false</mothballed>
 			<history></history>
 		</unit>
-		<unit id="35d8a1cf-fed5-4e5e-9e46-f65cc82d8a92" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Centurion" model="CN9-A" type="Biped" commander="false" externalId="35d8a1cf-fed5-4e5e-9e46-f65cc82d8a92">
-			</entity>
-			<driverId>e278fdd1-d5ef-4e57-bd76-d92928bb4394</driverId>
-			<gunnerId>e278fdd1-d5ef-4e57-bd76-d92928bb4394</gunnerId>
-			<salvaged>false</salvaged>
-			<site>2</site>
-			<forceId>3</forceId>
-			<scenarioId>1</scenarioId>
-			<daysToArrival>0</daysToArrival>
-			<daysSinceMaintenance>0</daysSinceMaintenance>
-			<daysActivelyMaintained>0</daysActivelyMaintained>
-			<astechDaysMaintained>0</astechDaysMaintained>
-			<mothballTime>0</mothballTime>
-			<mothballed>false</mothballed>
-			<history></history>
-		</unit>
 		<unit id="56ef5856-abb6-4a2d-9e4c-d1461b9b9dce" type="mekhq.campaign.unit.Unit">
 			<entity chassis="Assassin" model="ASN-21" type="Biped" commander="false" externalId="56ef5856-abb6-4a2d-9e4c-d1461b9b9dce">
 			</entity>
@@ -564,8 +547,25 @@
 			<mothballed>false</mothballed>
 			<history></history>
 		</unit>
+		<unit id="35d8a1cf-fed5-4e5e-9e46-f65cc82d8a92" type="mekhq.campaign.unit.Unit">
+			<entity chassis="Centurion" model="CN9-A" type="Biped" commander="false" externalId="35d8a1cf-fed5-4e5e-9e46-f65cc82d8a92">
+			</entity>
+			<driverId>e278fdd1-d5ef-4e57-bd76-d92928bb4394</driverId>
+			<gunnerId>e278fdd1-d5ef-4e57-bd76-d92928bb4394</gunnerId>
+			<salvaged>false</salvaged>
+			<site>2</site>
+			<forceId>3</forceId>
+			<scenarioId>1</scenarioId>
+			<daysToArrival>0</daysToArrival>
+			<daysSinceMaintenance>0</daysSinceMaintenance>
+			<daysActivelyMaintained>0</daysActivelyMaintained>
+			<astechDaysMaintained>0</astechDaysMaintained>
+			<mothballTime>0</mothballTime>
+			<mothballed>false</mothballed>
+			<history></history>
+		</unit>
 		<unit id="f8cf9760-9998-4219-baca-416347c6e049" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Hatchetman" model="HCT-3F Austin" type="Biped" commander="false" externalId="f8cf9760-9998-4219-baca-416347c6e049">
+			<entity chassis="Hatchetman" model="HCT-3F (Austin)" type="Biped" commander="false" externalId="f8cf9760-9998-4219-baca-416347c6e049">
 			</entity>
 			<driverId>b06e5c92-e603-4769-b82a-00c3c58db696</driverId>
 			<gunnerId>b06e5c92-e603-4769-b82a-00c3c58db696</gunnerId>
@@ -958,8 +958,8 @@ A confirmed atheist, Hill has been engaged with Dekker in an extended debate abo
 				<bonus>0</bonus>
 			</skill>
 		</person>
-		<person id="1795712b-6a31-4e4a-9f08-c3ffb5d0b97e" type="mekhq.campaign.personnel.Person">
-			<name>Ian McKinnon</name>
+		<person id="2f9c153a-467b-4898-bd47-d5cba4c3e532" type="mekhq.campaign.personnel.Person">
+			<name>Mateo Alvarez</name>
 			<callsign></callsign>
 			<primaryRole>1</primaryRole>
 			<secondaryRole>0</secondaryRole>
@@ -967,25 +967,23 @@ A confirmed atheist, Hill has been engaged with Dekker in an extended debate abo
 			<dependent>false</dependent>
 			<clan>false</clan>
 			<phenotype>0</phenotype>
-			<biography>Taking command following his father’s death, Ian soon gained a well-deserved reputation as a daring, almost reckless leader. With a flair for independent operations, Ian’s superiors have long- since resigned themselves to his habit of interpreting orders somewhat loosely. A master of unconventional tactics—using Henrik Dekker to launch psychological attacks, for example—Ian has outthought and outfought the best the Draconis Combine and Capellan Confederation have to offer.
+			<biography>Before the Battle of Butte Haven, Alvarez was an excellent recon pilot, but that was before Kate Nomura accused him of cowardice. Ian McKinnon threw out the charge, but Alvarez’s reputation had been tarnished. He started taking greater and greater risks in an attempt to prove his courage, but it would be long years before he could redeem himself in Nomura’s eyes. Caught in the path of a counterattack by the Third Benjamin Regulars during the War of ‘39, Nomura’s recon lance was forced to scatter. When she ejected from her crippled Griffin, Alvarez braved fire from a whole company to rescue her.
 
-The rigors of military life kept Ian in good physical condition, but also added a few lines and wrinkles and gray hairs. More wearing was Ian’s battle to keep his younger brother Mark out of trouble (a task for which Hanse “The Fox” Davion’s patronage proved useful). Since Mark’s death in 3034, Ian has likewise attempted to look after Mark’s outspoken son, David McKinnon.
-
-Ian retired in 3051, accepting a battalion command in the Kestrel Militia.</biography>
+Admitting she had been wrong about Alvarez, Nomura resigned her commission. His honor now restored, Alvarez was overjoyed to swap his heavily damaged Wasp (and its troublesome cooling system) for an old (but serviceable) Assassin.</biography>
 			<idleMonths>-1</idleMonths>
-			<id>1795712b-6a31-4e4a-9f08-c3ffb5d0b97e</id>
+			<id>2f9c153a-467b-4898-bd47-d5cba4c3e532</id>
 			<portraitCategory>FoxsTeeth/</portraitCategory>
-			<portraitFile>McKinnon.png</portraitFile>
+			<portraitFile>Alvarez.png</portraitFile>
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>0</gender>
-			<rank>34</rank>
+			<rank>12</rank>
 			<rankLevel>0</rankLevel>
 			<rankSystem>-1</rankSystem>
 			<maneiDominiRank>-1</maneiDominiRank>
 			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
-			<unitId>fbd0331c-bc85-425d-b3da-aefa70859b5e</unitId>
+			<unitId>56ef5856-abb6-4a2d-9e4c-d1461b9b9dce</unitId>
 			<salary>-1</salary>
 			<status>0</status>
 			<prisonerstatus>0</prisonerstatus>
@@ -993,7 +991,7 @@ Ian retired in 3051, accepting a battalion command in the Kestrel Militia.</biog
 			<toughness>0</toughness>
 			<minutesLeft>0</minutesLeft>
 			<overtimeLeft>0</overtimeLeft>
-			<birthday>2994-04-04 12:00:00</birthday>
+			<birthday>2999-08-18 12:00:00</birthday>
 			<skill>
 				<type>Tactics</type>
 				<level>0</level>
@@ -1060,8 +1058,8 @@ Henrik Dekker’s late night debates with Hill have become the stuff of legends 
 				<bonus>0</bonus>
 			</skill>
 		</person>
-		<person id="2f9c153a-467b-4898-bd47-d5cba4c3e532" type="mekhq.campaign.personnel.Person">
-			<name>Mateo Alvarez</name>
+		<person id="1795712b-6a31-4e4a-9f08-c3ffb5d0b97e" type="mekhq.campaign.personnel.Person">
+			<name>Ian McKinnon</name>
 			<callsign></callsign>
 			<primaryRole>1</primaryRole>
 			<secondaryRole>0</secondaryRole>
@@ -1069,23 +1067,25 @@ Henrik Dekker’s late night debates with Hill have become the stuff of legends 
 			<dependent>false</dependent>
 			<clan>false</clan>
 			<phenotype>0</phenotype>
-			<biography>Before the Battle of Butte Haven, Alvarez was an excellent recon pilot, but that was before Kate Nomura accused him of cowardice. Ian McKinnon threw out the charge, but Alvarez’s reputation had been tarnished. He started taking greater and greater risks in an attempt to prove his courage, but it would be long years before he could redeem himself in Nomura’s eyes. Caught in the path of a counterattack by the Third Benjamin Regulars during the War of ‘39, Nomura’s recon lance was forced to scatter. When she ejected from her crippled Griffin, Alvarez braved fire from a whole company to rescue her.
+			<biography>Taking command following his father’s death, Ian soon gained a well-deserved reputation as a daring, almost reckless leader. With a flair for independent operations, Ian’s superiors have long- since resigned themselves to his habit of interpreting orders somewhat loosely. A master of unconventional tactics—using Henrik Dekker to launch psychological attacks, for example—Ian has outthought and outfought the best the Draconis Combine and Capellan Confederation have to offer.
 
-Admitting she had been wrong about Alvarez, Nomura resigned her commission. His honor now restored, Alvarez was overjoyed to swap his heavily damaged Wasp (and its troublesome cooling system) for an old (but serviceable) Assassin.</biography>
+The rigors of military life kept Ian in good physical condition, but also added a few lines and wrinkles and gray hairs. More wearing was Ian’s battle to keep his younger brother Mark out of trouble (a task for which Hanse “The Fox” Davion’s patronage proved useful). Since Mark’s death in 3034, Ian has likewise attempted to look after Mark’s outspoken son, David McKinnon.
+
+Ian retired in 3051, accepting a battalion command in the Kestrel Militia.</biography>
 			<idleMonths>-1</idleMonths>
-			<id>2f9c153a-467b-4898-bd47-d5cba4c3e532</id>
+			<id>1795712b-6a31-4e4a-9f08-c3ffb5d0b97e</id>
 			<portraitCategory>FoxsTeeth/</portraitCategory>
-			<portraitFile>Alvarez.png</portraitFile>
+			<portraitFile>McKinnon.png</portraitFile>
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>0</gender>
-			<rank>12</rank>
+			<rank>34</rank>
 			<rankLevel>0</rankLevel>
 			<rankSystem>-1</rankSystem>
 			<maneiDominiRank>-1</maneiDominiRank>
 			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
-			<unitId>56ef5856-abb6-4a2d-9e4c-d1461b9b9dce</unitId>
+			<unitId>fbd0331c-bc85-425d-b3da-aefa70859b5e</unitId>
 			<salary>-1</salary>
 			<status>0</status>
 			<prisonerstatus>0</prisonerstatus>
@@ -1093,7 +1093,7 @@ Admitting she had been wrong about Alvarez, Nomura resigned her commission. His 
 			<toughness>0</toughness>
 			<minutesLeft>0</minutesLeft>
 			<overtimeLeft>0</overtimeLeft>
-			<birthday>2999-08-18 12:00:00</birthday>
+			<birthday>2994-04-04 12:00:00</birthday>
 			<skill>
 				<type>Tactics</type>
 				<level>0</level>
@@ -1703,6 +1703,16 @@ Note: This ability is only used for BattleMechs.</desc>
 			<removeAbilities>cluster_hitter</removeAbilities>
 		</ability>
 		<ability>
+			<displayName>Multi-Tasker (aToW)</displayName>
+			<lookupName>multi_tasker</lookupName>
+			<desc>Secondary target modifiers are reduced by one.</desc>
+			<xpCost>6</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
 			<displayName>Maneuvering Ace (aToW)</displayName>
 			<lookupName>maneuvering_ace</lookupName>
 			<desc>Enables the unit to move laterally like a Quad.
@@ -1711,16 +1721,6 @@ Aerospace units can perform maneuvers for 1 less thrust point.
 Units also receive a -1 BTH to rolls against skidding, sideslipping, and going out of control.</desc>
 			<xpCost>4</xpCost>
 			<weight>3</weight>
-			<prereqAbilities></prereqAbilities>
-			<invalidAbilities></invalidAbilities>
-			<removeAbilities></removeAbilities>
-		</ability>
-		<ability>
-			<displayName>Multi-Tasker (aToW)</displayName>
-			<lookupName>multi_tasker</lookupName>
-			<desc>Secondary target modifiers are reduced by one.</desc>
-			<xpCost>6</xpCost>
-			<weight>2</weight>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
@@ -1898,63 +1898,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<unitTonnage>50</unitTonnage>
 			<hits>0</hits>
 			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>35d8a1cf-fed5-4e5e-9e46-f65cc82d8a92</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>9</equipmentNum>
-			<typeName>IS Ammo AC/10</typeName>
-			<munition>0</munition>
-			<shotsNeeded>0</shotsNeeded>
-			<checkedToday>false</checkedToday>
-			<oneShot>false</oneShot>
-		</part>
-		<part id="764" type="mekhq.campaign.parts.equipment.AmmoBin">
-			<id>764</id>
-			<name>LRM 10 Ammo Bin</name>
-			<unitTonnage>50</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>35d8a1cf-fed5-4e5e-9e46-f65cc82d8a92</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>6</equipmentNum>
-			<typeName>IS Ammo LRM-10</typeName>
-			<munition>0</munition>
-			<shotsNeeded>0</shotsNeeded>
-			<checkedToday>false</checkedToday>
-			<oneShot>false</oneShot>
-		</part>
-		<part id="759" type="mekhq.campaign.parts.equipment.AmmoBin">
-			<id>759</id>
-			<name>AC/10 Ammo Bin</name>
-			<unitTonnage>50</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
+			<time>15</time>
 			<timeSpent>0</timeSpent>
 			<mode>0</mode>
 			<skillMin>1</skillMin>
@@ -1976,13 +1920,13 @@ Note: This ability is only used for BattleMechs.</desc>
 			<checkedToday>false</checkedToday>
 			<oneShot>false</oneShot>
 		</part>
-		<part id="758" type="mekhq.campaign.parts.equipment.AmmoBin">
-			<id>758</id>
+		<part id="764" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>764</id>
 			<name>LRM 10 Ammo Bin</name>
 			<unitTonnage>50</unitTonnage>
 			<hits>0</hits>
 			<difficulty>0</difficulty>
-			<time>0</time>
+			<time>15</time>
 			<timeSpent>0</timeSpent>
 			<mode>0</mode>
 			<skillMin>1</skillMin>
@@ -2004,17 +1948,17 @@ Note: This ability is only used for BattleMechs.</desc>
 			<checkedToday>false</checkedToday>
 			<oneShot>false</oneShot>
 		</part>
-		<part id="754" type="mekhq.campaign.parts.equipment.AmmoBin">
-			<id>754</id>
-			<name>SRM 6 Ammo Bin</name>
-			<unitTonnage>30</unitTonnage>
+		<part id="759" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>759</id>
+			<name>AC/10 Ammo Bin</name>
+			<unitTonnage>50</unitTonnage>
 			<hits>0</hits>
 			<difficulty>0</difficulty>
-			<time>0</time>
+			<time>15</time>
 			<timeSpent>0</timeSpent>
 			<mode>0</mode>
 			<skillMin>1</skillMin>
-			<unitId>ef7b511a-548b-466b-ae57-aec804832e7f</unitId>
+			<unitId>35d8a1cf-fed5-4e5e-9e46-f65cc82d8a92</unitId>
 			<salvaging>false</salvaging>
 			<workingOvertime>false</workingOvertime>
 			<shorthandedMod>0</shorthandedMod>
@@ -2025,20 +1969,48 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>12</equipmentNum>
-			<typeName>IS Ammo SRM-6</typeName>
+			<equipmentNum>9</equipmentNum>
+			<typeName>IS Ammo AC/10</typeName>
 			<munition>0</munition>
 			<shotsNeeded>0</shotsNeeded>
 			<checkedToday>false</checkedToday>
 			<oneShot>false</oneShot>
 		</part>
-		<part id="751" type="mekhq.campaign.parts.equipment.AmmoBin">
-			<id>751</id>
+		<part id="758" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>758</id>
+			<name>LRM 10 Ammo Bin</name>
+			<unitTonnage>50</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>15</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>35d8a1cf-fed5-4e5e-9e46-f65cc82d8a92</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>6</equipmentNum>
+			<typeName>IS Ammo LRM-10</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="754" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>754</id>
 			<name>SRM 6 Ammo Bin</name>
 			<unitTonnage>30</unitTonnage>
 			<hits>0</hits>
 			<difficulty>0</difficulty>
-			<time>0</time>
+			<time>15</time>
 			<timeSpent>0</timeSpent>
 			<mode>0</mode>
 			<skillMin>1</skillMin>
@@ -2060,13 +2032,41 @@ Note: This ability is only used for BattleMechs.</desc>
 			<checkedToday>false</checkedToday>
 			<oneShot>false</oneShot>
 		</part>
+		<part id="751" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>751</id>
+			<name>SRM 6 Ammo Bin</name>
+			<unitTonnage>30</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>15</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>ef7b511a-548b-466b-ae57-aec804832e7f</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>12</equipmentNum>
+			<typeName>IS Ammo SRM-6</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
 		<part id="748" type="mekhq.campaign.parts.equipment.AmmoBin">
 			<id>748</id>
 			<name>AC/5 Ammo Bin</name>
 			<unitTonnage>65</unitTonnage>
 			<hits>0</hits>
 			<difficulty>0</difficulty>
-			<time>0</time>
+			<time>15</time>
 			<timeSpent>0</timeSpent>
 			<mode>0</mode>
 			<skillMin>1</skillMin>
@@ -2081,7 +2081,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>9</equipmentNum>
+			<equipmentNum>7</equipmentNum>
 			<typeName>IS Ammo AC/5</typeName>
 			<munition>0</munition>
 			<shotsNeeded>0</shotsNeeded>
@@ -2094,7 +2094,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<unitTonnage>65</unitTonnage>
 			<hits>0</hits>
 			<difficulty>0</difficulty>
-			<time>0</time>
+			<time>15</time>
 			<timeSpent>0</timeSpent>
 			<mode>0</mode>
 			<skillMin>1</skillMin>
@@ -2122,7 +2122,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<unitTonnage>65</unitTonnage>
 			<hits>0</hits>
 			<difficulty>0</difficulty>
-			<time>0</time>
+			<time>15</time>
 			<timeSpent>0</timeSpent>
 			<mode>0</mode>
 			<skillMin>1</skillMin>
@@ -2137,7 +2137,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>7</equipmentNum>
+			<equipmentNum>9</equipmentNum>
 			<typeName>IS Ammo AC/5</typeName>
 			<munition>0</munition>
 			<shotsNeeded>0</shotsNeeded>
@@ -2150,63 +2150,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<unitTonnage>55</unitTonnage>
 			<hits>0</hits>
 			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>8e0e6d85-dcbc-495f-8e21-19023e0861b9</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>15</equipmentNum>
-			<typeName>IS Ammo LRM-10</typeName>
-			<munition>0</munition>
-			<shotsNeeded>0</shotsNeeded>
-			<checkedToday>false</checkedToday>
-			<oneShot>false</oneShot>
-		</part>
-		<part id="737" type="mekhq.campaign.parts.equipment.AmmoBin">
-			<id>737</id>
-			<name>SRM 2 Ammo Bin</name>
-			<unitTonnage>55</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>8e0e6d85-dcbc-495f-8e21-19023e0861b9</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>11</equipmentNum>
-			<typeName>IS Ammo SRM-2</typeName>
-			<munition>0</munition>
-			<shotsNeeded>0</shotsNeeded>
-			<checkedToday>false</checkedToday>
-			<oneShot>false</oneShot>
-		</part>
-		<part id="732" type="mekhq.campaign.parts.equipment.AmmoBin">
-			<id>732</id>
-			<name>LRM 10 Ammo Bin</name>
-			<unitTonnage>55</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
+			<time>15</time>
 			<timeSpent>0</timeSpent>
 			<mode>0</mode>
 			<skillMin>1</skillMin>
@@ -2228,13 +2172,13 @@ Note: This ability is only used for BattleMechs.</desc>
 			<checkedToday>false</checkedToday>
 			<oneShot>false</oneShot>
 		</part>
-		<part id="731" type="mekhq.campaign.parts.equipment.AmmoBin">
-			<id>731</id>
+		<part id="737" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>737</id>
 			<name>SRM 2 Ammo Bin</name>
 			<unitTonnage>55</unitTonnage>
 			<hits>0</hits>
 			<difficulty>0</difficulty>
-			<time>0</time>
+			<time>15</time>
 			<timeSpent>0</timeSpent>
 			<mode>0</mode>
 			<skillMin>1</skillMin>
@@ -2250,6 +2194,62 @@ Note: This ability is only used for BattleMechs.</desc>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
 			<equipmentNum>8</equipmentNum>
+			<typeName>IS Ammo SRM-2</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="732" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>732</id>
+			<name>LRM 10 Ammo Bin</name>
+			<unitTonnage>55</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>15</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>8e0e6d85-dcbc-495f-8e21-19023e0861b9</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>15</equipmentNum>
+			<typeName>IS Ammo LRM-10</typeName>
+			<munition>0</munition>
+			<shotsNeeded>0</shotsNeeded>
+			<checkedToday>false</checkedToday>
+			<oneShot>false</oneShot>
+		</part>
+		<part id="731" type="mekhq.campaign.parts.equipment.AmmoBin">
+			<id>731</id>
+			<name>SRM 2 Ammo Bin</name>
+			<unitTonnage>55</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>15</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>8e0e6d85-dcbc-495f-8e21-19023e0861b9</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>11</equipmentNum>
 			<typeName>IS Ammo SRM-2</typeName>
 			<munition>0</munition>
 			<shotsNeeded>0</shotsNeeded>
@@ -16703,7 +16703,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		</gameoption>
 		<gameoption>
 			<name>allow_advanced_units</name>
-			<value>false</value>
+			<value>true</value>
 		</gameoption>
 		<gameoption>
 			<name>allow_illegal_units</name>
@@ -16711,7 +16711,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		</gameoption>
 		<gameoption>
 			<name>allow_advanced_ammo</name>
-			<value>false</value>
+			<value>true</value>
 		</gameoption>
 		<gameoption>
 			<name>allow_experimental_ammo</name>
@@ -17371,7 +17371,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		</gameoption>
 		<gameoption>
 			<name>pilot_advantages</name>
-			<value>false</value>
+			<value>true</value>
 		</gameoption>
 		<gameoption>
 			<name>edge</name>

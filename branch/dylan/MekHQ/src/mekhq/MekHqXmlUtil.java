@@ -27,6 +27,7 @@ import megamek.common.Entity;
 import megamek.common.FighterSquadron;
 import megamek.common.IArmorState;
 import megamek.common.ILocationExposureStatus;
+import megamek.common.IPlayer;
 import megamek.common.Jumpship;
 import megamek.common.MULParser;
 import megamek.common.Mech;
@@ -149,12 +150,16 @@ public class MekHqXmlUtil {
 			retVal += tgtEnt.getC3UUIDAsString();
 		}
 
-         if (null != tgtEnt.getCamoCategory()) {
+         if (null != tgtEnt.getCamoCategory() 
+        		 && tgtEnt.getCamoCategory() != IPlayer.NO_CAMO
+        		 && !tgtEnt.getCamoCategory().isEmpty()) {
              retVal += "\" camoCategory=\"";
              retVal += tgtEnt.getCamoCategory();
          }
 
-         if (null != tgtEnt.getCamoFileName()) {
+         if (null != tgtEnt.getCamoFileName()
+        		 && tgtEnt.getCamoFileName() != IPlayer.NO_CAMO
+        		 && !tgtEnt.getCamoFileName().isEmpty()) {
              retVal += "\" camoFileName=\"";
              retVal += tgtEnt.getCamoFileName();
          }

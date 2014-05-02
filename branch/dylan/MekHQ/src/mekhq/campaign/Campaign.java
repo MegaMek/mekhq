@@ -2352,6 +2352,11 @@ public class Campaign implements Serializable {
         return campaignOptions;
     }
 
+    public void setCampaignOptions(CampaignOptions options) {
+    	campaignOptions = options;
+    }
+
+    
     public void writeToXml(PrintWriter pw1) {
         // File header
         pw1.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
@@ -3595,6 +3600,12 @@ public class Campaign implements Serializable {
                 && !p.isSalvaging()) {
                 // repaired parts were not getting experience properly reset
                 p.setSkillMin(SkillType.EXP_GREEN);
+            }
+            
+            //if for some reason we couldn't find a type for equipment part, then remove it
+            if((p instanceof EquipmentPart && null == ((EquipmentPart)p).getType())
+            		|| (p instanceof MissingEquipmentPart && null == ((MissingEquipmentPart)p).getType())) {
+            	p = null;
             }
 
             if (p != null) {
@@ -4997,6 +5008,10 @@ public class Campaign implements Serializable {
 
     public RandomSkillPreferences getRandomSkillPreferences() {
         return rskillPrefs;
+    }
+    
+    public void setRandomSkillPreferences(RandomSkillPreferences prefs) {
+        rskillPrefs = prefs;
     }
 
     public void setStartingPlanet() {

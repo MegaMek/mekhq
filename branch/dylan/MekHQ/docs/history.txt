@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.4 (dylan)
+v0.3.4-dylan (2014-04-26)
 + Reintegrated Overview Tab
 + Cleanup from trunk removal of refreshCargo()
 + Use various Report objects instead of duplicating a bunch of code to create the overview report.
@@ -9,7 +9,7 @@ v0.3.4 (dylan)
 + Bug: Missing refresh for Cargo Overview
 + Bug [#450]: Parts in Use font error
 
-v0.3.4 (SVN)
+v0.3.4 (2014-04-26)
 + Bug: Moved Report Log not scrolling again (don't force set caret to 0 on refresh)
 + Bug: Personnel name not showing when GM->Remove is used
 + Bug [#403]:Unofficial Expanded Medical Bug
@@ -236,6 +236,17 @@ v0.3.4 (SVN)
 + Bug [#426]: Aerospace fighters showing "undamaged" after combat; ferro-aluminum armor missing
     To fix this bug I dumped the MekHQ versions of undamaged, light damage, heavy damage, and crippled
     and instead pulled them in from Entity & it's subclasses to let them handle all the work
++ added GUI editing to CampaignOptionsDialog for Special Ability formats
++ tooltips for special ability stuff
++ ability to import/export campaign options (but not ranks)
++ cleaned up some GUI formatting in CampaignOptionsDialog
++ updated MM.jar and MML.jar
++ Bug: individual camos being saved when they shouldn't be
++ Bug: correct font and color coding not showing up for personnel VisualRenderer
++ updated camos and packaged campaigns point to correct camo
++ updated mechfiles in data files
++ corrected all campaigns to have right chassis names
++ Bug: when type restore fails for EquipmentPart and MissingEquipmentPart, campaigns wont load
 
 v0.3.3 (2013-09-20)
 + Bug: Refits always return an IMPOSSIBLE target roll

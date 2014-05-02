@@ -151,9 +151,11 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.Kill;
 import mekhq.campaign.LogEntry;
+import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Transaction;
@@ -2326,6 +2328,14 @@ public class CampaignGUI extends JPanel {
         });
         menuExport.add(miExportParts);
         */
+        
+        JMenuItem miExportOptions = new JMenuItem(resourceMap.getString("miExportOptions.text")); // NOI18N
+        miExportOptions.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miExportOptionsActionPerformed(evt);
+            }
+        });
+        menuExport.add(miExportOptions);
 
         JMenuItem miExportPersonCSV = new JMenuItem(resourceMap.getString("miExportPersonCSV.text")); // NOI18N
         miExportPersonCSV.addActionListener(new java.awt.event.ActionListener() {
@@ -2345,6 +2355,14 @@ public class CampaignGUI extends JPanel {
         });
         menuExport.add(miExportUnitCSV);
 
+        JMenuItem miImportOptions = new JMenuItem(resourceMap.getString("miImportOptions.text")); // NOI18N
+        miImportOptions.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miImportOptionsActionPerformed(evt);
+            }
+        });
+        menuImport.add(miImportOptions);
+        
         JMenuItem miImportPerson = new JMenuItem(resourceMap.getString("miImportPerson.text")); // NOI18N
         miImportPerson.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -3722,6 +3740,24 @@ public class CampaignGUI extends JPanel {
         }
     }// GEN-LAST:event_miExportPersonActionPerformed
 
+    private void miExportOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miExportPersonActionPerformed
+        try {
+            saveOptionsFile();
+        } catch (IOException ex) {
+            Logger.getLogger(CampaignGUI.class.getName()).log(Level.SEVERE, null,
+                                                              ex);
+        }
+    }// GEN-LAST:event_miExportPersonActionPerformed
+
+    private void miImportOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miExportPersonActionPerformed
+        try {
+            loadOptionsFile();
+        } catch (IOException ex) {
+            Logger.getLogger(CampaignGUI.class.getName()).log(Level.SEVERE, null,
+                                                              ex);
+        }
+    }// GEN-LAST:event_miExportPersonActionPerformed
+
 
     private void miImportPartsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miImportPersonActionPerformed
         try {
@@ -4492,6 +4528,108 @@ public class CampaignGUI extends JPanel {
             }
         }
     }
+    
+    private void saveOptionsFile() throws IOException {
+        JFileChooser saveOptions = new JFileChooser(".");
+        saveOptions.setDialogTitle("Save Campaign Options");
+        saveOptions.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File dir) {
+                if (dir.isDirectory()) {
+                    return true;
+                }
+                return dir.getName().endsWith(".xml");
+            }
+
+            @Override
+            public String getDescription() {
+                return "Campaign options file";
+            }
+        });
+        saveOptions.setSelectedFile(new File("campaignOptions.xml")); //$NON-NLS-1$
+        int returnVal = saveOptions.showSaveDialog(mainPanel);
+
+        if ((returnVal != JFileChooser.APPROVE_OPTION)
+            || (saveOptions.getSelectedFile() == null)) {
+            // I want a file, y'know!
+            return;
+        }
+
+        File file = saveOptions.getSelectedFile();
+        if (file == null) {
+            // I want a file, y'know!
+            return;
+        }
+        String path = file.getPath();
+        if (!path.endsWith(".xml")) {
+            path += ".xml";
+            file = new File(path);
+        }
+
+        //check for existing file and make a back-up if found
+        String path2 = path + "_backup";
+        File backupFile = new File(path2);
+        if (file.exists()) {
+            Utilities.copyfile(file, backupFile);
+        }
+
+        // Then save it out to that file.
+        FileOutputStream fos = null;
+        PrintWriter pw = null;
+
+        try {
+            fos = new FileOutputStream(file);
+            pw = new PrintWriter(new OutputStreamWriter(fos, "UTF-8"));
+
+            // File header
+            pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            pw.println("<options version=\""
+                       + resourceMap.getString("Application.version")
+                       + "\">");
+            // Start the XML root.
+            getCampaign().getCampaignOptions().writeToXml(pw, 1);
+            pw.println("\t<skillTypes>");
+            for (String name : SkillType.skillList) {
+                SkillType type = SkillType.getType(name);
+                if (null != type) {
+                    type.writeToXml(pw, 2);
+                }
+            }
+            pw.println("\t</skillTypes>");
+            pw.println("\t<specialAbilities>");
+            for(String key : SpecialAbility.getAllSpecialAbilities().keySet()) {
+                SpecialAbility.getAbility(key).writeToXml(pw, 2);
+            }
+            pw.println("\t</specialAbilities>");
+            getCampaign().getRandomSkillPreferences().writeToXml(pw, 1);
+            pw.println("</options>");
+            // Okay, we're done.
+            // Close everything out and be done with it.
+            pw.flush();
+            pw.close();
+            fos.close();
+            //delete the backup file because we didn't need it
+            if (backupFile.exists()) {
+                backupFile.delete();
+            }
+            MekHQ.logMessage("Campaign Options saved saved to " + file);
+        } catch (Exception ex) {
+            MekHQ.logError(ex);
+            JOptionPane.showMessageDialog(getFrame(),
+                                          "Oh no! The program was unable to correctly export your campaign options. We know this\n" +
+                                          "is annoying and apologize. Please help us out and submit a bug with the\n" +
+                                          "mekhqlog.txt file from this game so we can prevent this from happening in\n" +
+                                          "the future.",
+                                          "Could not export campaign options",
+                                          JOptionPane.ERROR_MESSAGE);
+            //restore the backup file
+            file.delete();
+            if (backupFile.exists()) {
+                Utilities.copyfile(backupFile, file);
+                backupFile.delete();
+            }
+        }
+    }
 
     protected void loadPartsFile() throws IOException {
         JFileChooser loadList = new JFileChooser(".");
@@ -4580,6 +4718,153 @@ public class CampaignGUI extends JPanel {
         refreshPartsList();
         refreshReport();
         refreshFinancialTransactions();
+    }
+    
+    protected void loadOptionsFile() throws IOException {
+        JFileChooser loadList = new JFileChooser(".");
+        loadList.setDialogTitle("Load Campaign Options");
+
+        loadList.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File dir) {
+                if (dir.isDirectory()) {
+                    return true;
+                }
+                return dir.getName().endsWith(".xml");
+            }
+
+            @Override
+            public String getDescription() {
+                return "Campaign options file";
+            }
+        });
+
+        int returnVal = loadList.showOpenDialog(mainPanel);
+
+        if ((returnVal != JFileChooser.APPROVE_OPTION)
+            || (loadList.getSelectedFile() == null)) {
+            // I want a file, y'know!
+            return;
+        }
+
+        File optionsFile = loadList.getSelectedFile();
+
+        if (optionsFile != null) {
+            // Open up the file.
+            InputStream fis = new FileInputStream(optionsFile);
+
+            MekHQ.logMessage("Starting load of options file from XML...");
+            // Initialize variables.
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            Document xmlDoc = null;
+
+            try {
+                // Using factory get an instance of document builder
+                DocumentBuilder db = dbf.newDocumentBuilder();
+
+                // Parse using builder to get DOM representation of the XML file
+                xmlDoc = db.parse(fis);
+            } catch (Exception ex) {
+                MekHQ.logError(ex);
+            }
+
+            Element partsEle = xmlDoc.getDocumentElement();
+            NodeList nl = partsEle.getChildNodes();
+
+            // Get rid of empty text nodes and adjacent text nodes...
+            // Stupid weird parsing of XML.  At least this cleans it up.
+            partsEle.normalize();
+
+            Version version = new Version(partsEle.getAttribute("version"));
+
+            CampaignOptions options = null;
+            RandomSkillPreferences rsp = null;
+            
+            //we need to iterate through three times, the first time to collect
+            //any custom units that might not be written yet
+            for (int x = 0; x < nl.getLength(); x++) {
+                Node wn = nl.item(x);
+
+                // If it's not an element node, we ignore it.
+                if (wn.getNodeType() != Node.ELEMENT_NODE) {
+                    continue;
+                }
+
+                String xn = wn.getNodeName();
+
+                if (xn.equalsIgnoreCase("campaignOptions")) {
+                    options = CampaignOptions.generateCampaignOptionsFromXml(wn);
+                } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
+                    rsp = RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn);
+                } else if (xn.equalsIgnoreCase("skillTypes")) {
+                	NodeList wList = wn.getChildNodes();
+
+                    // Okay, lets iterate through the children, eh?
+                    for (int x2 = 0; x2 < wList.getLength(); x2++) {
+                        Node wn2 = wList.item(x2);
+
+                        // If it's not an element node, we ignore it.
+                        if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (wn2.getNodeName().startsWith("ability-")) {
+                            continue;
+                        } else if (!wn2.getNodeName().equalsIgnoreCase("skillType")) {
+                            // Error condition of sorts!
+                            // Errr, what should we do here?
+                            MekHQ.logMessage("Unknown node type not loaded in Skill Type nodes: "
+                                             + wn2.getNodeName());
+
+                            continue;
+                        }
+                        SkillType.generateInstanceFromXML(wn2, version);
+                    }
+                } else if (xn.equalsIgnoreCase("specialAbilities")) {
+                	PilotOptions poptions = new PilotOptions();
+                    SpecialAbility.clearSPA();
+                    
+                    NodeList wList = wn.getChildNodes();
+                            
+                    // Okay, lets iterate through the children, eh?
+                    for (int x2 = 0; x2 < wList.getLength(); x2++) {
+                        Node wn2 = wList.item(x2);
+                    
+                        // If it's not an element node, we ignore it.
+                        if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+                    
+                        if (!wn2.getNodeName().equalsIgnoreCase("ability")) {
+                            // Error condition of sorts!
+                            // Errr, what should we do here?
+                            MekHQ.logMessage("Unknown node type not loaded in Special Ability nodes: "
+                                    + wn2.getNodeName());
+                    
+                            continue;
+                        }
+                    
+                        SpecialAbility.generateInstanceFromXML(wn2, poptions);
+                    }
+                }
+                
+            }
+            
+            if(null != options) {
+            	this.getCampaign().setCampaignOptions(options);
+            }
+            if(null != rsp) {
+            	this.getCampaign().setRandomSkillPreferences(rsp);
+            }
+            
+            MekHQ.logMessage("Finished load of campaign options file");
+        }
+
+        refreshCalendar();
+        getCampaign().reloadNews();
+        changePersonnelView();
+        refreshPersonnelList();
+        panMap.repaint();
     }
 
     private void savePartsFile() throws IOException {

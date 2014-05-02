@@ -1,56 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<campaign version="0.3.4-dev-r1700">
+<campaign version="0.3.4-dev">
 	<info>
 		<name>Opacus Venatori</name>
 		<faction>WOB</faction>
-		<ranks>
-			<rankSystem>7</rankSystem>
-			<rank>
-				<rankName>Adept (Non-MD)</rankName>
-				<officer>false</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Adept-Alpha</rankName>
-				<officer>false</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Adept-Beta</rankName>
-				<officer>false</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Adept-Omega</rankName>
-				<officer>false</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Adept-Tau</rankName>
-				<officer>false</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Demi-Precentor (Non-MD)</rankName>
-				<officer>true</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Demi-Precentor-Delta</rankName>
-				<officer>true</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Precentor-Sigma</rankName>
-				<officer>true</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-			<rank>
-				<rankName>Precentor-Omicron</rankName>
-				<officer>true</officer>
-				<payMultiplier>1.0</payMultiplier>
-			</rank>
-		</ranks>
+			<rankSystem>
+				<!-- Word of Blake -->
+				<system>11</system>
+			</rankSystem>
 		<nameGen>General</nameGen>
 		<percentFemale>50</percentFemale>
 		<overtime>false</overtime>
@@ -59,8 +15,8 @@
 		<astechPoolMinutes>0</astechPoolMinutes>
 		<astechPoolOvertime>0</astechPoolOvertime>
 		<medicPool>0</medicPool>
-		<camoCategory>WOB Comstar SLDF/</camoCategory>
-		<camoFileName>WOB Opacus Venatori.JPG</camoFileName>
+		<camoCategory>Word of Blake/Shadow Divisions/</camoCategory>
+		<camoFileName>52nd  Shadow Division.jpg</camoFileName>
 		<colorIndex>0</colorIndex>
 		<lastTeamId>0</lastTeamId>
 		<lastPartId>611</lastPartId>
@@ -176,7 +132,7 @@
 	</campaignOptions>
 	<units>
 		<unit id="c1b16001-6600-46c9-9c35-97c965a3a107" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Malak" model="C-MK-O Mi" type="Biped" commander="false" externalId="c1b16001-6600-46c9-9c35-97c965a3a107" c3UUID="15498450-6969-4f52-aba7-84c03ace7435">
+			<entity chassis="Malak" model="C-MK-O (Mi)" type="Biped" commander="false" externalId="c1b16001-6600-46c9-9c35-97c965a3a107" c3UUID="15498450-6969-4f52-aba7-84c03ace7435">
 				<c3iset>
 					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435"/>
 					<c3i_link link="dfb5fd09-fa7f-4901-a12e-c2bc5d9e81a3"/>
@@ -226,7 +182,7 @@
 			<history></history>
 		</unit>
 		<unit id="00e0b81d-e8fe-4d85-8686-4f6b853bff29" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Grigori" model="C-GRG-O Rufus" type="Biped" commander="false" externalId="00e0b81d-e8fe-4d85-8686-4f6b853bff29" c3UUID="dfb5fd09-fa7f-4901-a12e-c2bc5d9e81a3">
+			<entity chassis="Grigori" model="C-GRG-O (Rufus)" type="Biped" commander="false" externalId="00e0b81d-e8fe-4d85-8686-4f6b853bff29" c3UUID="dfb5fd09-fa7f-4901-a12e-c2bc5d9e81a3">
 				<c3iset>
 					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435"/>
 					<c3i_link link="dfb5fd09-fa7f-4901-a12e-c2bc5d9e81a3"/>
@@ -276,7 +232,7 @@
 			<history></history>
 		</unit>
 		<unit id="f9936e32-1953-4888-beb3-ee243fad60c3" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Deva" model="C-DVA-O Achilleus" type="Biped" commander="false" externalId="f9936e32-1953-4888-beb3-ee243fad60c3" c3UUID="6df625a9-5be3-48b5-bc5f-c632558e6513">
+			<entity chassis="Deva" model="C-DVA-O (Achilleus)" type="Biped" commander="false" externalId="f9936e32-1953-4888-beb3-ee243fad60c3" c3UUID="6df625a9-5be3-48b5-bc5f-c632558e6513">
 				<c3iset>
 					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435"/>
 					<c3i_link link="dfb5fd09-fa7f-4901-a12e-c2bc5d9e81a3"/>
@@ -326,7 +282,7 @@
 			<history></history>
 		</unit>
 		<unit id="52249633-3534-4be5-a983-55e18d74655c" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Seraph" model="C-SRP-O Havalah" type="Biped" commander="false" externalId="52249633-3534-4be5-a983-55e18d74655c" c3UUID="a8cab9a9-4cda-4c97-aa92-6604591ef9d9">
+			<entity chassis="Seraph" model="C-SRP-O (Havalah)" type="Biped" commander="false" externalId="52249633-3534-4be5-a983-55e18d74655c" c3UUID="a8cab9a9-4cda-4c97-aa92-6604591ef9d9">
 				<c3iset>
 					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435"/>
 					<c3i_link link="dfb5fd09-fa7f-4901-a12e-c2bc5d9e81a3"/>
@@ -376,7 +332,7 @@
 			<history></history>
 		</unit>
 		<unit id="86e8442a-bc36-438a-87b3-df8a41e1a6e9" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Preta" model="C-PRT-O Kendali" type="Biped" commander="false" externalId="86e8442a-bc36-438a-87b3-df8a41e1a6e9" c3UUID="5fd55c97-5efc-43ae-a949-22321cf58c22">
+			<entity chassis="Preta" model="C-PRT-O (Kendali)" type="Biped" commander="false" externalId="86e8442a-bc36-438a-87b3-df8a41e1a6e9" c3UUID="5fd55c97-5efc-43ae-a949-22321cf58c22">
 				<c3iset>
 					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435"/>
 					<c3i_link link="dfb5fd09-fa7f-4901-a12e-c2bc5d9e81a3"/>
@@ -505,7 +461,11 @@ Impressed by his singular focus, photographic memory and ferocious fighting skil
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>0</gender>
-			<rank>3</rank>
+			<rank>0</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<unitId>f9936e32-1953-4888-beb3-ee243fad60c3</unitId>
 			<salary>-1</salary>
@@ -517,13 +477,13 @@ Impressed by his singular focus, photographic memory and ferocious fighting skil
 			<overtimeLeft>0</overtimeLeft>
 			<birthday>3037-01-30 12:00:00</birthday>
 			<skill>
-				<type>Gunnery/Mech</type>
-				<level>3</level>
+				<type>Small Arms</type>
+				<level>2</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Small Arms</type>
-				<level>2</level>
+				<type>Gunnery/Mech</type>
+				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
@@ -556,7 +516,11 @@ Precentor Berith’s greatest strength is in his diplomatic skills. Though he ad
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>0</gender>
-			<rank>8</rank>
+			<rank>0</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<unitId>349b1678-2125-4dcb-adff-83deeed05cc8</unitId>
 			<salary>-1</salary>
@@ -605,7 +569,11 @@ rather than his skills.</biography>
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>0</gender>
-			<rank>2</rank>
+			<rank>0</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<unitId>00e0b81d-e8fe-4d85-8686-4f6b853bff29</unitId>
 			<salary>-1</salary>
@@ -652,6 +620,10 @@ with a prosthetic, she was unable to re-enter active duty for over a year due to
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>1</gender>
 			<rank>0</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<unitId>29c37941-0aa5-40e3-817b-6575944e8459</unitId>
 			<salary>-1</salary>
@@ -697,6 +669,10 @@ makes up for as the unit’s communications specialist. She is constantly trying
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>1</gender>
 			<rank>0</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<unitId>3a0c56b6-a97e-4cbf-8c03-e2b99668e205</unitId>
 			<salary>-1</salary>
@@ -739,7 +715,11 @@ Precentor Marita shoulders the blame for the Legion’s  destruction and the esc
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>1</gender>
-			<rank>5</rank>
+			<rank>0</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<unitId>77047b79-b2a9-4a2c-a7df-34b44c8938a1</unitId>
 			<salary>-1</salary>
@@ -786,6 +766,10 @@ is beside the point.</biography>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>0</gender>
 			<rank>0</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<unitId>248f5ac6-ecbe-434a-bf6b-8d3ad9133f5c</unitId>
 			<salary>-1</salary>
@@ -829,6 +813,10 @@ Diagnosed with a rare spinal disease in 3071, Rodriguez has resigned herself to 
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>1</gender>
 			<rank>0</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<unitId>f6790aa4-c393-4af6-bdeb-2185c4b5711f</unitId>
 			<salary>-1</salary>
@@ -850,33 +838,36 @@ Diagnosed with a rare spinal disease in 3071, Rodriguez has resigned herself to 
 				<bonus>0</bonus>
 			</skill>
 		</person>
-		<person id="4002e95b-a3a6-4ab6-b3bd-5659acbe8c6e" type="mekhq.campaign.personnel.Person">
-			<name>Bryn Rivenschild</name>
-			<callsign>Omicron Rho IX</callsign>
+		<person id="1133a093-b3cc-45f7-8ef0-83e6976fef41" type="mekhq.campaign.personnel.Person">
+			<name>Kandali Morris</name>
+			<callsign>Zombie</callsign>
 			<primaryRole>1</primaryRole>
 			<secondaryRole>0</secondaryRole>
 			<commander>false</commander>
 			<dependent>false</dependent>
 			<clan>false</clan>
 			<phenotype>0</phenotype>
-			<biography>Bryn Rivenschild entered ComStar service after his application to the famed Highlanders was rejected. Happily, he aced the initial tests and was trained with the Com Guards as an infantry soldier. On the day of his first posting, he also received his first tattoo—an
-elaborate Celtic design that was also part of his family’s crest.
+			<biography>One of the few remaining pure-blooded Zulu warrior-citizens of Africa, Kendali Morris was considered one of the Light of Mankind’s deadliest operatives until a fateful explosion on Muphrid cost her nearly half of her face and jaw. At that time, she was offered and accepted severe augmentation, and joined the ranks of the Manei Domini.
 
-Horrified with the secularized changes occurring within the Order, he and the entire ComStar garrison overwhelmed and seized control of the local HPG on Saiph. In a short shadow war, the garrison maintained control of the station against two Com- Star-aligned ROM teams until help arrived.
+Her LoM service record is heavily shrouded in sealed operations occurring deep in the Free Rasalhague Republic and the Dominion. Excelling in solo or dual-team missions, one of her key contributions can be seen in the recent development of the heavy gyroscopic system now in use with the Protectorate.
 
-Adept Rivenschild was one of the first LoM members selected for the Venatori. Utilizing his computer skills to great effect, he was invaluable to the Hunter’s missions in eliminating Wolfnet across the Chaos March. Known for stealing nine BattleMechs, due to his own custom code-cracking programs, Rivenschild was often loaned out to assist other LoM operations against corporate entities.
+Known for her keen eyesight—rivaling many augmented Manei Domini inductees—and her berserker fury in her Preta, Precentor Morris recently underwent further augmentation to her jaw and teeth. Two one-inch steel incisors were implanted with a unique venom-delivery system, coupled with a myomer-enhanced jaw that exerts enough pressure to crack large bones in half. Coupled with her myomer-enhanced legs, Morris is a deadly in-fighter.
 
-For every successful operation, Rivenschild adds to his Celtic knot; nearly eighty percent of his body is now covered with the continuous tattoo.</biography>
+Morris is legendary among her native Zulu as the only female warrior to capture and kill one of the genetically enhanced liions of the Serengeti. According to the tribal tales, she stalked the predator for three days before ambushing and wrestling it to the ground, tearing its throat out. When queried about the incident, Morris refuses comment; the myth may indeed have some truth to it, as Morris is rarely without a bone bracelet strung with liion claws.</biography>
 			<idleMonths>-1</idleMonths>
-			<id>4002e95b-a3a6-4ab6-b3bd-5659acbe8c6e</id>
+			<id>1133a093-b3cc-45f7-8ef0-83e6976fef41</id>
 			<portraitCategory>Opacus Venatori/</portraitCategory>
-			<portraitFile>Bryn_Rivenschild.jpg</portraitFile>
+			<portraitFile>Kendali_Morris.jpg</portraitFile>
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
-			<gender>0</gender>
+			<gender>1</gender>
 			<rank>0</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
-			<unitId>d257aeeb-e278-4e31-9980-9f054c513e91</unitId>
+			<unitId>86e8442a-bc36-438a-87b3-df8a41e1a6e9</unitId>
 			<salary>-1</salary>
 			<status>0</status>
 			<prisonerstatus>0</prisonerstatus>
@@ -884,10 +875,10 @@ For every successful operation, Rivenschild adds to his Celtic knot; nearly eigh
 			<toughness>0</toughness>
 			<minutesLeft>0</minutesLeft>
 			<overtimeLeft>0</overtimeLeft>
-			<birthday>3028-12-16 12:00:00</birthday>
+			<birthday>3045-04-08 12:00:00</birthday>
 			<skill>
 				<type>Gunnery/Mech</type>
-				<level>5</level>
+				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
@@ -895,6 +886,7 @@ For every successful operation, Rivenschild adds to his Celtic knot; nearly eigh
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
+			<implants>bvdni::pain_shunt::pl_masc::boost_comm_implant</implants>
 		</person>
 		<person id="95b2a383-8ffe-4184-9289-2e38a2fbacb3" type="mekhq.campaign.personnel.Person">
 			<name>Mi Tomitaki</name>
@@ -922,7 +914,11 @@ more internal work done; her survival of a ten-story fall during an Opacus missi
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>1</gender>
-			<rank>4</rank>
+			<rank>0</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<unitId>c1b16001-6600-46c9-9c35-97c965a3a107</unitId>
 			<salary>-1</salary>
@@ -945,32 +941,37 @@ more internal work done; her survival of a ten-story fall during an Opacus missi
 			</skill>
 			<implants>vdni::dermal_armor</implants>
 		</person>
-		<person id="1133a093-b3cc-45f7-8ef0-83e6976fef41" type="mekhq.campaign.personnel.Person">
-			<name>Kandali Morris</name>
-			<callsign>Zombie</callsign>
+		<person id="4002e95b-a3a6-4ab6-b3bd-5659acbe8c6e" type="mekhq.campaign.personnel.Person">
+			<name>Bryn Rivenschild</name>
+			<callsign>Omicron Rho IX</callsign>
 			<primaryRole>1</primaryRole>
 			<secondaryRole>0</secondaryRole>
 			<commander>false</commander>
 			<dependent>false</dependent>
 			<clan>false</clan>
 			<phenotype>0</phenotype>
-			<biography>One of the few remaining pure-blooded Zulu warrior-citizens of Africa, Kendali Morris was considered one of the Light of Mankind’s deadliest operatives until a fateful explosion on Muphrid cost her nearly half of her face and jaw. At that time, she was offered and accepted severe augmentation, and joined the ranks of the Manei Domini.
+			<biography>Bryn Rivenschild entered ComStar service after his application to the famed Highlanders was rejected. Happily, he aced the initial tests and was trained with the Com Guards as an infantry soldier. On the day of his first posting, he also received his first tattoo—an
+elaborate Celtic design that was also part of his family’s crest.
 
-Her LoM service record is heavily shrouded in sealed operations occurring deep in the Free Rasalhague Republic and the Dominion. Excelling in solo or dual-team missions, one of her key contributions can be seen in the recent development of the heavy gyroscopic system now in use with the Protectorate.
+Horrified with the secularized changes occurring within the Order, he and the entire ComStar garrison overwhelmed and seized control of the local HPG on Saiph. In a short shadow war, the garrison maintained control of the station against two Com- Star-aligned ROM teams until help arrived.
 
-Known for her keen eyesight—rivaling many augmented Manei Domini inductees—and her berserker fury in her Preta, Precentor Morris recently underwent further augmentation to her jaw and teeth. Two one-inch steel incisors were implanted with a unique venom-delivery system, coupled with a myomer-enhanced jaw that exerts enough pressure to crack large bones in half. Coupled with her myomer-enhanced legs, Morris is a deadly in-fighter.
+Adept Rivenschild was one of the first LoM members selected for the Venatori. Utilizing his computer skills to great effect, he was invaluable to the Hunter’s missions in eliminating Wolfnet across the Chaos March. Known for stealing nine BattleMechs, due to his own custom code-cracking programs, Rivenschild was often loaned out to assist other LoM operations against corporate entities.
 
-Morris is legendary among her native Zulu as the only female warrior to capture and kill one of the genetically enhanced liions of the Serengeti. According to the tribal tales, she stalked the predator for three days before ambushing and wrestling it to the ground, tearing its throat out. When queried about the incident, Morris refuses comment; the myth may indeed have some truth to it, as Morris is rarely without a bone bracelet strung with liion claws.</biography>
+For every successful operation, Rivenschild adds to his Celtic knot; nearly eighty percent of his body is now covered with the continuous tattoo.</biography>
 			<idleMonths>-1</idleMonths>
-			<id>1133a093-b3cc-45f7-8ef0-83e6976fef41</id>
+			<id>4002e95b-a3a6-4ab6-b3bd-5659acbe8c6e</id>
 			<portraitCategory>Opacus Venatori/</portraitCategory>
-			<portraitFile>Kendali_Morris.jpg</portraitFile>
+			<portraitFile>Bryn_Rivenschild.jpg</portraitFile>
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
-			<gender>1</gender>
-			<rank>6</rank>
+			<gender>0</gender>
+			<rank>0</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
-			<unitId>86e8442a-bc36-438a-87b3-df8a41e1a6e9</unitId>
+			<unitId>d257aeeb-e278-4e31-9980-9f054c513e91</unitId>
 			<salary>-1</salary>
 			<status>0</status>
 			<prisonerstatus>0</prisonerstatus>
@@ -978,10 +979,10 @@ Morris is legendary among her native Zulu as the only female warrior to capture 
 			<toughness>0</toughness>
 			<minutesLeft>0</minutesLeft>
 			<overtimeLeft>0</overtimeLeft>
-			<birthday>3045-04-08 12:00:00</birthday>
+			<birthday>3028-12-16 12:00:00</birthday>
 			<skill>
 				<type>Gunnery/Mech</type>
-				<level>4</level>
+				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
@@ -989,7 +990,6 @@ Morris is legendary among her native Zulu as the only female warrior to capture 
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
-			<implants>bvdni::pain_shunt::pl_masc::boost_comm_implant</implants>
 		</person>
 		<person id="4c9f3722-7bc1-4ef0-964c-b05c91f882ea" type="mekhq.campaign.personnel.Person">
 			<name>Havalah Cazer</name>
@@ -1016,7 +1016,11 @@ It is likely that Adept Cazer may be a future choice for Ascension.</biography>
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>1</gender>
-			<rank>2</rank>
+			<rank>0</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<unitId>52249633-3534-4be5-a983-55e18d74655c</unitId>
 			<salary>-1</salary>
@@ -1146,7 +1150,6 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 						<unit id="3a0c56b6-a97e-4cbf-8c03-e2b99668e205"/>
 					</units>
 				</force>
-
 			</subforces>
 		</force>
 	</forces>
@@ -1483,30 +1486,405 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 			<eliteLvl>5</eliteLvl>
 			<costs>8,4,4,4,4,4,4,4,4,4,4</costs>
 		</skillType>
-		<ability-tactical_genius>12</ability-tactical_genius>
-		<ability-gunnery_laser>4</ability-gunnery_laser>
-		<ability-hopping_jack>8</ability-hopping_jack>
-		<ability-ei_implant>0</ability-ei_implant>
-		<ability-gunnery_ballistic>4</ability-gunnery_ballistic>
-		<ability-pain_resistance>4</ability-pain_resistance>
-		<ability-sniper>12</ability-sniper>
-		<ability-maneuvering_ace>8</ability-maneuvering_ace>
-		<ability-gunnery_missile>4</ability-gunnery_missile>
-		<ability-aptitude_gunnery>40</ability-aptitude_gunnery>
-		<ability-specialist>4</ability-specialist>
-		<ability-jumping_jack>12</ability-jumping_jack>
-		<ability-iron_man>8</ability-iron_man>
-		<ability-melee_specialist>8</ability-melee_specialist>
-		<ability-melee_master>12</ability-melee_master>
-		<ability-hot_dog>4</ability-hot_dog>
-		<ability-cluster_master>0</ability-cluster_master>
-		<ability-multi_tasker>4</ability-multi_tasker>
-		<ability-clan_pilot_training>0</ability-clan_pilot_training>
-		<ability-oblique_attacker>4</ability-oblique_attacker>
-		<ability-weapon_specialist>1</ability-weapon_specialist>
-		<ability-jumping_jill>8</ability-jumping_jill>
-		<ability-dodge_maneuver>8</ability-dodge_maneuver>
 	</skillTypes>
+	<specialAbilities>
+		<ability>
+			<displayName>Gunnery Specialization (aToW)</displayName>
+			<lookupName>specialist</lookupName>
+			<desc>A pilot who specializes in a type of weapon receives a -1 to-hit modifier when using weapons of that type and a
+ +1 to-hit modifier when using other types of weapons.</desc>
+			<xpCost>6</xpCost>
+			<weight>4</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities>weapon_specialist</invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Gunnery/Battlesuit::Regular</displayName>
+				<displayName>Gunnery/Aircraft::Regular</displayName>
+				<displayName>Gunnery/Spacecraft::Regular</displayName>
+				<displayName>Gunnery/Aerospace::Regular</displayName>
+				<displayName>Gunnery/Vehicle::Regular</displayName>
+				<displayName>Gunnery/Mech::Regular</displayName>
+				<displayName>Gunnery/Protomech::Regular</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Hot Dog (aToW)</displayName>
+			<lookupName>hot_dog</lookupName>
+			<desc>Reduce heat-related target rolls (e.g ammo, damage, shutdown) by 1.</desc>
+			<xpCost>2</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Piloting/Aerospace::Regular</displayName>
+				<displayName>Piloting/Aircraft::Regular</displayName>
+				<displayName>Piloting/Mech::Regular</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Sandblaster (AToW)</displayName>
+			<lookupName>sandblaster</lookupName>
+			<desc>A pilot with this ability gets a +4, +3, or +2 to the cluster table
+at short, medium, or long/extended range, respectively, but only with a specialized weapon.</desc>
+			<xpCost>6</xpCost>
+			<weight>3</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities>cluster_hitter::cluster_master</invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Gunnery/Battlesuit::Regular</displayName>
+				<displayName>Gunnery/Aircraft::Regular</displayName>
+				<displayName>Gunnery/Spacecraft::Regular</displayName>
+				<displayName>Gunnery/Aerospace::Regular</displayName>
+				<displayName>Gunnery/Vehicle::Regular</displayName>
+				<displayName>Gunnery/Mech::Regular</displayName>
+				<displayName>Gunnery/Protomech::Regular</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Some Like It Hot (Unofficial)</displayName>
+			<lookupName>some_like_it_hot</lookupName>
+			<desc>A pilot with this ability does not suffer the initial -1 to hit due to heat.</desc>
+			<xpCost>6</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Gunnery/Aircraft::Regular</displayName>
+				<displayName>Gunnery/Aerospace::Regular</displayName>
+				<displayName>Gunnery/Mech::Regular</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Melee Specialist (aToW)</displayName>
+			<lookupName>melee_specialist</lookupName>
+			<desc>Enables the unit to do 1 additional point of damage with physical attacks and applies a -1 to-hit modifier to physical attacks.
+Note: This ability is only used for BattleMechs.</desc>
+			<xpCost>4</xpCost>
+			<weight>3</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Piloting/Mech::Regular</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Weathered (Unofficial)</displayName>
+			<lookupName>weathered</lookupName>
+			<desc>A pilot with this ability does not suffer the initial -1 to hit due to weather conditions.</desc>
+			<xpCost>6</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Gunnery/Battlesuit::Regular</displayName>
+				<displayName>Gunnery/Aircraft::Regular</displayName>
+				<displayName>Gunnery/Spacecraft::Regular</displayName>
+				<displayName>Gunnery/Aerospace::Regular</displayName>
+				<displayName>Gunnery/Vehicle::Regular</displayName>
+				<displayName>Gunnery/Mech::Regular</displayName>
+				<displayName>Gunnery/Protomech::Regular</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Cluster Master (AToW)</displayName>
+			<lookupName>cluster_master</lookupName>
+			<desc>A pilot with this ability gets a +2 to the cluster hit table</desc>
+			<xpCost>6</xpCost>
+			<weight>6</weight>
+			<prereqAbilities>cluster_hitter</prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities>cluster_hitter</removeAbilities>
+			<skillPrereq>
+				<displayName>Gunnery/Battlesuit::Veteran</displayName>
+				<displayName>Gunnery/Aircraft::Veteran</displayName>
+				<displayName>Gunnery/Spacecraft::Veteran</displayName>
+				<displayName>Gunnery/Aerospace::Veteran</displayName>
+				<displayName>Gunnery/Vehicle::Veteran</displayName>
+				<displayName>Gunnery/Mech::Veteran</displayName>
+				<displayName>Gunnery/Protomech::Veteran</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Multi-Tasker (aToW)</displayName>
+			<lookupName>multi_tasker</lookupName>
+			<desc>Secondary target modifiers are reduced by one.</desc>
+			<xpCost>6</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Gunnery/Battlesuit::Regular</displayName>
+				<displayName>Gunnery/Aircraft::Regular</displayName>
+				<displayName>Gunnery/Spacecraft::Regular</displayName>
+				<displayName>Gunnery/Aerospace::Regular</displayName>
+				<displayName>Gunnery/Vehicle::Regular</displayName>
+				<displayName>Gunnery/Mech::Regular</displayName>
+				<displayName>Gunnery/Protomech::Regular</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Maneuvering Ace (aToW)</displayName>
+			<lookupName>maneuvering_ace</lookupName>
+			<desc>Enables the unit to move laterally like a Quad.
+Quads can move laterally for 1 less MP.
+Aerospace units can perform maneuvers for 1 less thrust point.
+Units also receive a -1 BTH to rolls against skidding, sideslipping, and going out of control.</desc>
+			<xpCost>4</xpCost>
+			<weight>3</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Piloting/Aerospace::Veteran</displayName>
+				<displayName>Piloting/Naval::Veteran</displayName>
+				<displayName>Piloting/Ground Vehicle::Veteran</displayName>
+				<displayName>Piloting/VTOL::Veteran</displayName>
+				<displayName>Piloting/Aircraft::Veteran</displayName>
+				<displayName>Piloting/Mech::Veteran</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Oblique Attacker (aToW)</displayName>
+			<lookupName>oblique_attacker</lookupName>
+			<desc>The penalty for indirect fire is reduced by one.</desc>
+			<xpCost>6</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Gunnery/Battlesuit::Regular</displayName>
+				<displayName>Gunnery/Aircraft::Regular</displayName>
+				<displayName>Gunnery/Aerospace::Regular</displayName>
+				<displayName>Gunnery/Vehicle::Regular</displayName>
+				<displayName>Gunnery/Mech::Regular</displayName>
+				<displayName>Gunnery/Protomech::Regular</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Natural Aptitude, Gunnery (aToW)</displayName>
+			<lookupName>aptitude_gunnery</lookupName>
+			<desc>Roll 3d6 and take the best two for gunnery checks</desc>
+			<xpCost>40</xpCost>
+			<weight>0</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Gunnery/Battlesuit</displayName>
+				<displayName>Gunnery/Aircraft</displayName>
+				<displayName>Gunnery/Spacecraft</displayName>
+				<displayName>Gunnery/Aerospace</displayName>
+				<displayName>Gunnery/Vehicle</displayName>
+				<displayName>Gunnery/Mech</displayName>
+				<displayName>Gunnery/Protomech</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Hopping Jack (Unofficial)</displayName>
+			<lookupName>hopping_jack</lookupName>
+			<desc>Unit only suffers a +2 to-hit penalty for jumping, rather than a +3 to-hit penalty.</desc>
+			<xpCost>6</xpCost>
+			<weight>3</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities>jumping_jack</invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Piloting/Mech::Veteran</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>All Weather (Unofficial)</displayName>
+			<lookupName>allweather</lookupName>
+			<desc>A pilot with this ability does not suffer the PSR penalties due to weather.</desc>
+			<xpCost>2</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Piloting/Aerospace::Regular</displayName>
+				<displayName>Piloting/Naval::Regular</displayName>
+				<displayName>Piloting/Ground Vehicle::Regular</displayName>
+				<displayName>Piloting/VTOL::Regular</displayName>
+				<displayName>Piloting/Aircraft::Regular</displayName>
+				<displayName>Piloting/Mech::Regular</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Tactical Genius (aToW)</displayName>
+			<lookupName>tactical_genius</lookupName>
+			<desc>A pilot who has a Tactical Genius may reroll their initiative once per turn.
+ The second roll must be accepted.
+Note: Only one Tactical Genius may be utilized per team.</desc>
+			<xpCost>8</xpCost>
+			<weight>1</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Tactics::Green</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Jumping Jack (aToW)</displayName>
+			<lookupName>jumping_jack</lookupName>
+			<desc>Unit only suffers a +1 to-hit penalty for jumping, rather than a +3 to-hit penalty.</desc>
+			<xpCost>6</xpCost>
+			<weight>6</weight>
+			<prereqAbilities>hopping_jack</prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities>hopping_jack</removeAbilities>
+			<skillPrereq>
+				<displayName>Piloting/Mech::Veteran</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Pain Resistance (MaxTech)</displayName>
+			<lookupName>pain_resistance</lookupName>
+			<desc>When making consciousness rolls,
+1 is added to all rolls.
+Also,
+damage received from ammo explosions is reduced to 1.
+Note: This ability is only used for BattleMechs.</desc>
+			<xpCost>4</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
+			<displayName>Sniper (aToW)</displayName>
+			<lookupName>sniper</lookupName>
+			<desc>Range penalties are halved.</desc>
+			<xpCost>12</xpCost>
+			<weight>1</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Gunnery/Battlesuit::Veteran</displayName>
+				<displayName>Gunnery/Aircraft::Veteran</displayName>
+				<displayName>Gunnery/Spacecraft::Veteran</displayName>
+				<displayName>Gunnery/Aerospace::Veteran</displayName>
+				<displayName>Gunnery/Vehicle::Veteran</displayName>
+				<displayName>Gunnery/Mech::Veteran</displayName>
+				<displayName>Gunnery/Protomech::Veteran</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Dodge (MaxTech)</displayName>
+			<lookupName>dodge_maneuver</lookupName>
+			<desc>Enables the unit to make a dodge maneuver instead of a physical attack.
+This maneuver adds +2 to the BTH to physical attacks against the unit.
+NOTE: The dodge maneuver is declared during the weapons phase.
+Note: This ability is only used for BattleMechs.</desc>
+			<xpCost>2</xpCost>
+			<weight>1</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Piloting/Mech::Regular</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Blind Fighter (Unofficial)</displayName>
+			<lookupName>blind_fighter</lookupName>
+			<desc>A pilot with this ability does not suffer the initial -1 to hit due to darkness.</desc>
+			<xpCost>6</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Gunnery/Battlesuit::Regular</displayName>
+				<displayName>Gunnery/Aircraft::Regular</displayName>
+				<displayName>Gunnery/Aerospace::Regular</displayName>
+				<displayName>Gunnery/Vehicle::Regular</displayName>
+				<displayName>Gunnery/Mech::Regular</displayName>
+				<displayName>Gunnery/Protomech::Regular</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Cluster Hitter (AToW)</displayName>
+			<lookupName>cluster_hitter</lookupName>
+			<desc>A pilot with this ability gets a +1 to the cluster hit table </desc>
+			<xpCost>6</xpCost>
+			<weight>3</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities>cluster_master</invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Gunnery/Battlesuit::Regular</displayName>
+				<displayName>Gunnery/Aircraft::Regular</displayName>
+				<displayName>Gunnery/Spacecraft::Regular</displayName>
+				<displayName>Gunnery/Aerospace::Regular</displayName>
+				<displayName>Gunnery/Vehicle::Regular</displayName>
+				<displayName>Gunnery/Mech::Regular</displayName>
+				<displayName>Gunnery/Protomech::Regular</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Weapon Specialist (aToW)</displayName>
+			<lookupName>weapon_specialist</lookupName>
+			<desc>A pilot who specializes in a particular weapon receives a -2 to hit modifier on all attacks with that weapon.</desc>
+			<xpCost>12</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities>specialist</invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Gunnery/Battlesuit::Regular</displayName>
+				<displayName>Gunnery/Aircraft::Regular</displayName>
+				<displayName>Gunnery/Spacecraft::Regular</displayName>
+				<displayName>Gunnery/Aerospace::Regular</displayName>
+				<displayName>Gunnery/Vehicle::Regular</displayName>
+				<displayName>Gunnery/Mech::Regular</displayName>
+				<displayName>Gunnery/Protomech::Regular</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Melee Master (aToW)</displayName>
+			<lookupName>melee_master</lookupName>
+			<desc>Enables the unit to do one additional kick, punch, or club attack on the same opponent.</desc>
+			<xpCost>4</xpCost>
+			<weight>6</weight>
+			<prereqAbilities>melee_specialist</prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Piloting/Mech::Veteran</displayName>
+			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Sensor Geek (Unofficial)</displayName>
+			<lookupName>sensor_geek</lookupName>
+			<desc>A pilot with this ability gets a -2 bonus on sensor checks.
+ Note that this is really only a bonus, if inclusive sensor ranges are in use.</desc>
+			<xpCost>3</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+			<skillPrereq>
+				<displayName>Piloting/Aerospace::Green</displayName>
+				<displayName>Piloting/Naval::Green</displayName>
+				<displayName>Piloting/Ground Vehicle::Green</displayName>
+				<displayName>Gunnery/Battlesuit::Green</displayName>
+				<displayName>Piloting/VTOL::Green</displayName>
+				<displayName>Piloting/Aircraft::Green</displayName>
+				<displayName>Piloting/Mech::Green</displayName>
+			</skillPrereq>
+		</ability>
+	</specialAbilities>
 	<randomSkillPreferences>
 		<overallRecruitBonus>0</overallRecruitBonus>
 		<recruitBonuses>0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0</recruitBonuses>
@@ -1820,7 +2198,7 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
 			<equipmentNum>3</equipmentNum>
-			<typeName>ISLargeVSP</typeName>
+			<typeName>ISLargeVSPLaser</typeName>
 			<equipTonnage>9.0</equipTonnage>
 		</part>
 		<part id="599" type="mekhq.campaign.parts.equipment.EquipmentPart">
@@ -2445,7 +2823,7 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
 			<equipmentNum>3</equipmentNum>
-			<typeName>ISLargeVSP</typeName>
+			<typeName>ISLargeVSPLaser</typeName>
 			<equipTonnage>9.0</equipTonnage>
 		</part>
 		<part id="574" type="mekhq.campaign.parts.equipment.EquipmentPart">
@@ -2545,7 +2923,7 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
 			<equipmentNum>5</equipmentNum>
-			<typeName>ISLargeVSP</typeName>
+			<typeName>ISLargeVSPLaser</typeName>
 			<equipTonnage>9.0</equipTonnage>
 		</part>
 		<part id="570" type="mekhq.campaign.parts.equipment.HeatSink">
@@ -2870,7 +3248,7 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
 			<equipmentNum>2</equipmentNum>
-			<typeName>ISMediumVSP</typeName>
+			<typeName>ISMediumVSPLaser</typeName>
 			<equipTonnage>4.0</equipTonnage>
 		</part>
 		<part id="557" type="mekhq.campaign.parts.equipment.EquipmentPart">
@@ -2895,7 +3273,7 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
 			<equipmentNum>3</equipmentNum>
-			<typeName>ISMediumVSP</typeName>
+			<typeName>ISMediumVSPLaser</typeName>
 			<equipTonnage>4.0</equipTonnage>
 		</part>
 		<part id="556" type="mekhq.campaign.parts.MekActuator">
@@ -9334,7 +9712,6 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 			<unitTonnage>100</unitTonnage>
 			<hits>0</hits>
 			<difficulty>-1</difficulty>
-
 			<time>90</time>
 			<timeSpent>0</timeSpent>
 			<mode>0</mode>
@@ -10398,7 +10775,6 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 			<forQuad>false</forQuad>
 			<sensors>false</sensors>
 			<lifeSupport>false</lifeSupport>
-
 			<breached>false</breached>
 		</part>
 		<part id="234" type="mekhq.campaign.parts.MekActuator">
@@ -10732,7 +11108,7 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
 			<equipmentNum>16</equipmentNum>
-			<typeName>ISMediumVSP</typeName>
+			<typeName>ISMediumVSPLaser</typeName>
 			<equipTonnage>4.0</equipTonnage>
 		</part>
 		<part id="220" type="mekhq.campaign.parts.equipment.AmmoBin">
@@ -11721,7 +12097,6 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 			<quality>3</quality>
 			<type>8</type>
 			<location>5</location>
-
 		</part>
 		<part id="180" type="mekhq.campaign.parts.MekActuator">
 			<id>180</id>
@@ -11886,7 +12261,7 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
 			<equipmentNum>20</equipmentNum>
-			<typeName>ISMediumVSP</typeName>
+			<typeName>ISMediumVSPLaser</typeName>
 			<equipTonnage>4.0</equipTonnage>
 		</part>
 		<part id="173" type="mekhq.campaign.parts.equipment.EquipmentPart">
@@ -14084,7 +14459,7 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
 			<equipmentNum>13</equipmentNum>
-			<typeName>ISSmallVSP</typeName>
+			<typeName>ISSmallVSPLaser</typeName>
 			<equipTonnage>2.0</equipTonnage>
 		</part>
 		<part id="80" type="mekhq.campaign.parts.equipment.EquipmentPart">
@@ -15166,7 +15541,7 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
 			<equipmentNum>16</equipmentNum>
-			<typeName>ISMediumVSP</typeName>
+			<typeName>ISMediumVSPLaser</typeName>
 			<equipTonnage>4.0</equipTonnage>
 		</part>
 		<part id="33" type="mekhq.campaign.parts.equipment.EquipmentPart">
@@ -15991,10 +16366,6 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 			<value>false</value>
 		</gameoption>
 		<gameoption>
-			<name>show_dmg_level</name>
-			<value>false</value>
-		</gameoption>
-		<gameoption>
 			<name>year</name>
 			<value>3071</value>
 		</gameoption>
@@ -16065,6 +16436,10 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 		<gameoption>
 			<name>allow_advanced_ammo</name>
 			<value>true</value>
+		</gameoption>
+		<gameoption>
+			<name>allow_experimental_ammo</name>
+			<value>false</value>
 		</gameoption>
 		<gameoption>
 			<name>is_eq_limits</name>
@@ -16155,6 +16530,10 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 			<value>false</value>
 		</gameoption>
 		<gameoption>
+			<name>tacops_tank_crews</name>
+			<value>false</value>
+		</gameoption>
+		<gameoption>
 			<name>stratops_quirks</name>
 			<value>true</value>
 		</gameoption>
@@ -16188,10 +16567,6 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 		</gameoption>
 		<gameoption>
 			<name>no_ignite_clear</name>
-			<value>false</value>
-		</gameoption>
-		<gameoption>
-			<name>a4homing_target_area</name>
 			<value>false</value>
 		</gameoption>
 		<gameoption>
@@ -16435,6 +16810,14 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 			<value>false</value>
 		</gameoption>
 		<gameoption>
+			<name>num_hexes_predesignate</name>
+			<value>5</value>
+		</gameoption>
+		<gameoption>
+			<name>map_area_predesignate</name>
+			<value>1088</value>
+		</gameoption>
+		<gameoption>
 			<name>max_external_heat</name>
 			<value>15</value>
 		</gameoption>
@@ -16509,6 +16892,14 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 		<gameoption>
 			<name>tacops_careful_stand</name>
 			<value>false</value>
+		</gameoption>
+		<gameoption>
+			<name>mek_lance_movement</name>
+			<value>false</value>
+		</gameoption>
+		<gameoption>
+			<name>mek_lance_movement_number</name>
+			<value>4</value>
 		</gameoption>
 		<gameoption>
 			<name>no_immobile_vehicles</name>
@@ -16766,6 +17157,10 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>1</gender>
 			<rank>0</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<salary>-1</salary>
 			<status>0</status>
