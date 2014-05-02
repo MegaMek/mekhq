@@ -1,5 +1,20 @@
 VERSION HISTORY
 ----------------------------------
+v0.3.6-dylan (SVN)
+
+v0.3.6 (SVN)
+
+v0.3.5-dylan (2014-04-28)
+-- No Changes--
+
+v0.3.5 (2014-04-28)
++ new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
++ Bug [#490]: Error Exporting Campaign Options
++ Bug [#492]: Repair mode resetting after every repair attempt.
++ Bug [#462]: BA Repairs
++ new MM.jar
++ better instructions for how to fix unit names in loading error dialog
+
 v0.3.4-dylan (2014-04-26)
 + Reintegrated Overview Tab
 + Cleanup from trunk removal of refreshCargo()

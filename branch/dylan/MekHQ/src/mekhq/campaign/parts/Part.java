@@ -879,6 +879,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		hits = 0;
 		skillMin = SkillType.EXP_GREEN;
 		shorthandedMod = 0;
+		mode = Modes.MODE_NORMAL;
 	}
 	
 	@Override
@@ -913,7 +914,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
 	public void setSalvaging(boolean b) {
 		this.salvaging = b;
-		this.mode = Modes.MODE_NORMAL;
 	}
 	
 	public String checkScrappable() {
