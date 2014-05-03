@@ -25,19 +25,14 @@ import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.GridLayout;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import megamek.common.options.IOption;
-import megamek.common.options.IOptionGroup;
-import megamek.common.options.PilotOptions;
 import mekhq.campaign.personnel.SpecialAbility;
 
 
