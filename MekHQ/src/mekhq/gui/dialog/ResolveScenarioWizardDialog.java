@@ -513,7 +513,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         	salvageStatus.put(u.getId(), tracker.new UnitStatus(u.getName(), u.getEntity().getChassis(), u.getEntity().getModel()));
         	UnitStatus status = salvageStatus.get(u.getId());
         	status.assignFoundEntity(en);
-        	box = new JCheckBox(en.getDisplayName() + " (" + formatter.format(u.getSellValue()) + " C-Bills)");
+        	String txtBoxString = status.getDesc().replace(en.getDisplayName(), en.getDisplayName() + " (" + formatter.format(u.getSellValue()) + " C-Bills)");
+        	box = new JCheckBox(txtBoxString);
         	box.setSelected(false);
         	box.addItemListener(new ItemListener() {
         		@Override
