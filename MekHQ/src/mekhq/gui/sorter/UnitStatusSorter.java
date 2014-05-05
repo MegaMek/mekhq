@@ -74,17 +74,23 @@ import java.util.Comparator;
             if(s1.contains("Heavy")) {
                 l1 = 10;
             }
-            if(s0.contains("Light")) {
+            if(s0.contains("Moderate")) {
                 l0 = 11;
             }
-            if(s1.contains("Light")) {
+            if(s1.contains("Moderate")) {
                 l1 = 11;
             }
-            if(s0.contains("Undamaged")) {
+            if(s0.contains("Light")) {
                 l0 = 12;
             }
-            if(s1.contains("Undamaged")) {
+            if(s1.contains("Light")) {
                 l1 = 12;
+            }
+            if(s0.contains("Undamaged")) {
+                l0 = 13;
+            }
+            if(s1.contains("Undamaged")) {
+                l1 = 13;
             }
             return ((Comparable<Integer>)l0).compareTo(l1);
         }

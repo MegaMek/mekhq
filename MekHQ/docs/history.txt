@@ -3,6 +3,7 @@ VERSION HISTORY
 v0.3.6 (SVN)
 + Bug [#496]: NPE in mission resolution dialogue
 + Add status to unit name label on salvage screen to match the player's own recovered units screen
++ Bug [#498]: Repair Bay sort order: Status
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
