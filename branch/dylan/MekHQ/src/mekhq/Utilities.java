@@ -335,6 +335,14 @@ public class Utilities {
 		
 		return newCrew;
     }
+    
+    public static boolean isDeadCrew(Entity e) {
+		if (Compute.getFullCrewSize(e) == 0 || e.getCrew().isDead()) {
+			return true;
+		}
+		
+		return false;
+    }
 	
     // TODO: There is a lot of code duplication between these 2 methods.
     // Time to split out the duplicated code and have both of these methods reference it.
@@ -357,6 +365,11 @@ public class Utilities {
 		gunners.clear();
 		vesselCrew.clear();
 		navigator = null;
+		
+		// If the entire crew is dead, we don't want to generate them.
+		if (isDeadCrew(e)) {
+			return newCrew;
+		}
 		
 		// Generate solo crews
 		if (unit.usesSoloPilot()) {
@@ -546,6 +559,11 @@ public class Utilities {
 		gunners.clear();
 		vesselCrew.clear();
 		navigator = null;
+		
+		// If the entire crew is dead, we don't want to generate them.
+		if (isDeadCrew(unit.getEntity())) {
+			return;
+		}
 		
 		// Generate solo crews
 		if (unit.usesSoloPilot()) {
