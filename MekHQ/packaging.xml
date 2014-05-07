@@ -126,13 +126,19 @@
         <exec executable="svn">
             <arg line="--force export ${svnlibs} ${svndir}/${libdir}" />
         </exec>
+    	<!-- Move MekHQ's history.txt out of the way... -->
+        <move file="${svndir}/${docdir}/history.txt" tofile="${svndir}/${docdir}/history-mhq.txt"/>
         <!-- now add in doc files -->
         <exec executable="svn">
-            <arg line="export ${svnmmdocs} ${svndir}/${docdir}/docs-megamek" />
+            <arg line="export ${svnmmdocs} ${svndir}/${docdir}" />
         </exec>
+    	<move file="${svndir}/${docdir}/history.txt" tofile="${svndir}/${docdir}/history-mm.txt"/>
         <exec executable="svn">
-            <arg line="export ${svnmmldocs} ${svndir}/${docdir}/docs-megameklab" />
+            <arg line="export ${svnmmldocs} ${svndir}/${docdir}" />
         </exec>
+        <move file="${svndir}/${docdir}/history.txt" tofile="${svndir}/${docdir}/history-mml.txt"/>
+        <!-- Move MekHQ's history.txt back... -->
+        <move file="${svndir}/${docdir}/history-mhq.txt" tofile="${svndir}/${docdir}/history.txt"/>
         <!-- ok now move some stuff back into data that needs to be there-->
         <copy todir="${svndir}/${datadir}">
             <fileset dir="${svndir}/${datadir}-OLD" >
@@ -200,6 +206,7 @@
             
         <target name="svndev-clean" description="remove the SVN build directory">
             <delete dir="${svnbuilddir}" />
+            <delete dir="${svndir}" />
         </target>
     
     <target name="mac-bundle" description="Bundle the project built from SVN into an Mac OSX distribution">

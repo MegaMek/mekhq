@@ -123,15 +123,21 @@
             <fileset dir="${mmdir}/${libdir}">
             </fileset>
         </copy>
+        <!-- Move MekHQ's history.txt out of the way... -->
+        <move file="${localdir}/${docdir}/history.txt" tofile="${localdir}/${docdir}/history-mhq.txt"/>
         <!-- now add in doc files -->
         <copy todir="${localdir}/${docdir}/docs-megamek">
             <fileset dir="${mmdir}/${docdir}">
             </fileset>
         </copy>
+        <move file="${localdir}/${docdir}/history.txt" tofile="${localdir}/${docdir}/history-mm.txt"/>
         <copy todir="${localdir}/${docdir}/docs-megameklab">
             <fileset dir="${mmldir}/${docdir}">
             </fileset>
         </copy>
+        <move file="${localdir}/${docdir}/history.txt" tofile="${localdir}/${docdir}/history-mml.txt"/>
+        <!-- Move MekHQ's history.txt back... -->
+        <move file="${localdir}/${docdir}/history-mhq.txt" tofile="${localdir}/${docdir}/history.txt"/>
         <!-- ok now move some stuff back into data that needs to be there-->
         <copy todir="${localdir}/${datadir}">
             <fileset dir="${localdir}/${datadir}-OLD" >
@@ -158,7 +164,7 @@
             <fileset dir="${mmldir}/${datadir}/images/misc" >
             </fileset>
         </copy>
-        <delete dir="${svndir}/${datadir}-OLD" />
+        <delete dir="${localdir}/${datadir}-OLD" />
         <!--now we need to replace our mmconf with the latest from the MM svn
             but first we need to back it up because we will need to keep a few 
             things-->
@@ -204,7 +210,8 @@
 		</target>
 			
 		<target name="localdev-clean" description="remove the local build directory">
-			<delete dir="${localbuilddir}" />
+            <delete dir="${localbuilddir}" />
+            <delete dir="${localdir}" />
 		</target>
 	
 	<target name="mac-bundle" description="Bundle the project built from local source into an Mac OSX distribution">
