@@ -3023,9 +3023,9 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O3 -->
 		<rank>
-			<rankNames>-,-,-,-,-,-</rankNames>
-			<officer>true</officer>
-			<payMultiplier>1.0</payMultiplier>
+			<rankNames>Demi-Precentor:25,-,-,-,-,-</rankNames>
+            <officer>true</officer>
+            <payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O4 -->
 		<rank>
 			<rankNames>-,-,-,-,-,-</rankNames>
