@@ -8,6 +8,9 @@ v0.3.6 (SVN)
     Now history.txt for each of those is renamed, instead of all docs for them being
     placed in subfolders of the docs folder
 + Bug: WoB ranks missing demi-precentor
++ Patch [#33], Feature Request [#164], Feature Request [#162] (partial): Drop zero minute techs.  Implemented patch to
+    satisfy Feature Request 164 with some refactoring and unit testing.  Also added code to allow the inclusion of a
+    specific Tech's ID to place at the front of the returned list (partially satisfying Feature Request 162).
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4

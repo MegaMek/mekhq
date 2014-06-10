@@ -53,7 +53,6 @@ import mekhq.campaign.unit.Unit;
 public class InterstellarOpsReputation extends AbstractUnitRating {
 
     private int nonAdminPersonnelCount = 0;
-    private int nonTransportPersonnelCount = 0;
 
     // Tech Support & Admins.
     private int mechTechTeamsNeeded = 0;
@@ -65,13 +64,12 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
     private int adminsNeeded = 0;
 
     private int totalTechTeams = 0;
-    private int astechTeams = 0;
     private int mechTechTeams = 0;
     private int fighterTechTeams = 0;
     private int veeTechTeams = 0;
     private int baTechTeams = 0;
     private int generalTechTeams = 0; // ToDo: Should Protomech & Infantry techs be counted as separate skills?
-    private List<String> craftWithoutCrew = new ArrayList<String>();
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection") private List<String> craftWithoutCrew = new ArrayList<>();
 
     public InterstellarOpsReputation(Campaign campaign) {
         super(campaign);
@@ -141,7 +139,7 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
         // Reset counts.
         totalSkillLevels = BigDecimal.ZERO;
 
-        List<Unit> unitList = new ArrayList<Unit>(campaign.getUnits());
+        List<Unit> unitList = new ArrayList<>(campaign.getUnits());
         for (Unit u : unitList) {
             if (u.isMothballed()) {
                 continue;
@@ -369,14 +367,8 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
 
     private void updatePersonnelCounts() {
         nonAdminPersonnelCount = 0;
-        nonTransportPersonnelCount = 0;
-        List<Person> personnelList = new ArrayList<Person>(campaign.getPersonnel());
+        List<Person> personnelList = new ArrayList<>(campaign.getPersonnel());
         for (Person p : personnelList) {
-            Unit unit = campaign.getUnit(p.getUnitId());
-            if ((unit == null) || !((unit.getEntity() instanceof Dropship) || unit.getEntity() instanceof Jumpship)) {
-                nonTransportPersonnelCount++;
-            }
-
             if (p.isAdmin()) {
                 continue;
             }
@@ -605,7 +597,7 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
     private int calcTechSupportValue() {
         int totalValue = 0;
         totalTechTeams = 0;
-        astechTeams = 0;
+        int astechTeams;
         mechTechTeams = 0;
         fighterTechTeams = 0;
         veeTechTeams = 0;
@@ -689,7 +681,7 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
     }
 
     private int calcLargeCraftSupportValue() {
-        List<String> craftWithoutCrew = new ArrayList<String>();
+        List<String> craftWithoutCrew = new ArrayList<>();
         for (Unit u : campaign.getUnits()) {
             if (!(u.getEntity() instanceof Dropship) && !(u.getEntity() instanceof Jumpship)) {
                 continue;
