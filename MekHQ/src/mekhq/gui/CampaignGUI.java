@@ -5196,8 +5196,8 @@ public class CampaignGUI extends JPanel {
 
     public void refreshTechsList() {
         int selected = techTable.getSelectedRow();
-        techsModel.setData(getCampaign().getTechs());
-        if ((selected > -1) && (selected < getCampaign().getTechs().size())) {
+        techsModel.setData(getCampaign().getTechs(true, null));
+        if ((selected > -1) && (selected < getCampaign().getTechs(true, null).size())) {
             techTable.setRowSelectionInterval(selected, selected);
         }
         String astechString = "<html><b>Astech Pool Minutes:</> " + getCampaign().getAstechPoolMinutes();
