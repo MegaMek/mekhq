@@ -66,20 +66,20 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
     @Override
     protected void initValues() {
-        if (initialized) {
+        if (isInitialized()) {
             return;
         }
 
         super.initValues();
-        for (UUID uid : campaign.getForces().getAllUnits()) {
-            Unit u = campaign.getUnit(uid);
+        for (UUID uid : getCampaign().getForces().getAllUnits()) {
+            Unit u = getCampaign().getUnit(uid);
             if (null == u) {
                 continue;
             }
 
             Person p = u.getCommander();
             if (null != p) {
-                commanderList.add(p);
+                getCommanderList().add(p);
             }
 
             if (!u.isRepairable()) {
@@ -87,7 +87,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             }
 
             BigDecimal value = getUnitValue(u);
-            numberUnits = numberUnits.add(value);
+            setNumberUnits(getNumberUnits().add(value));
 
             updateAdvanceTechCount(u, value);
 
@@ -110,7 +110,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     protected void updateAvailableSupport() {
-        for (Person p : campaign.getPersonnel()) {
+        for (Person p : getCampaign().getPersonnel()) {
             if (!p.isActive()) {
                 continue;
             }
@@ -127,30 +127,30 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     private void updateJumpships(Entity en) {
         if (en instanceof Warship) {
             if (en.getDocks() > 0) {
-                warhipWithDocsOwner = true;
+                setWarhipWithDocsOwner(true);
             } else {
-                warshipOwner = true;
+                setWarshipOwner(true);
             }
         } else if (en instanceof Jumpship) {
-            jumpshipOwner = true;
+            setJumpshipOwner(true);
         }
     }
 
     private void updateUnitCounts(Entity en) {
         if (en instanceof Mech) {
-            mechCount++;
+            setMechCount(getMechCount() + 1);
         } else if (en instanceof Tank) {
-            lightVeeCount++;
+            setLightVeeCount(getLightVeeCount() + 1);
         } else if ((en instanceof Aero) && !(en instanceof Dropship) && !(en instanceof Jumpship)) {
-            fighterCount++;
+            setFighterCount(getFighterCount() + 1);
         } else if (en instanceof BattleArmor) {
-            battleArmorCount += ((Infantry) en).getSquadSize();
-            numberBaSquads++;
+            setBattleArmorCount(getBattleArmorCount() + ((Infantry) en).getSquadSize());
+            setNumberBaSquads(getNumberBaSquads() + 1);
         } else if (en instanceof Infantry) {
-            infantryCount += ((Infantry) en).getSquadN() * ((Infantry) en).getSquadSize();
-            numberInfSquads++;
+            setInfantryCount(getInfantryCount() + ((Infantry) en).getSquadN() * ((Infantry) en).getSquadSize());
+            setNumberInfSquads(getNumberInfSquads() + 1);
         } else {
-            numberOther++;
+            setNumberOther(getNumberOther() + 1);
         }
     }
 
@@ -192,7 +192,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             return;
         }
 
-        if (campaign.getCampaignOptions().useQuirks()) {
+        if (getCampaign().getCampaignOptions().useQuirks()) {
             if (en.hasQuirk("easy_maintain")) {
                 hoursNeeded -= hoursNeeded * 0.2;
             } else if (en.hasQuirk("difficult_maintain")) {
@@ -228,7 +228,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             }
         }
 
-        if (campaign.getCampaignOptions().useQuirks()) {
+        if (getCampaign().getCampaignOptions().useQuirks()) {
             if (en.hasQuirk("easy_maintain")) {
                 hours -= hours * 0.2;
             } else if (en.hasQuirk("difficult_maintain")) {
@@ -254,9 +254,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     //   3 + (4/5) = 3 + 0.8 = 3.8 = 4 hours.
     //   total = 16 hours.
     private void calcMedicalSupportHoursNeeded() {
-        int numSquads = new BigDecimal(campaign.getPersonnel().size())
+        int numSquads = new BigDecimal(getCampaign().getPersonnel().size())
                 .divide(new BigDecimal(7), 0, RoundingMode.DOWN).intValue();
-        int leftOver = campaign.getPersonnel().size() - (numSquads * 7);
+        int leftOver = getCampaign().getPersonnel().size() - (numSquads * 7);
 
         medSupportNeeded = (numSquads * 4) +
                            (3 + (new BigDecimal(leftOver).divide(new BigDecimal(5), 0, RoundingMode.HALF_EVEN).intValue()));
@@ -268,7 +268,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
     private void calcAdminSupportHoursNeeded() {
         int personnelCount = 0;
-        for (Person p : campaign.getPersonnel()) {
+        for (Person p : getCampaign().getPersonnel()) {
             if ((p.getPrimaryRole() == Person.T_ADMIN_TRA) ||
                 (p.getPrimaryRole() == Person.T_ADMIN_COM) ||
                 (p.getPrimaryRole() == Person.T_ADMIN_LOG) ||
@@ -363,7 +363,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         }
 
         //Add to the running total.
-        totalSkillLevels = totalSkillLevels.add(value.multiply(combatSkillAverage));
+        setTotalSkillLevels(getTotalSkillLevels().add(value.multiply(combatSkillAverage)));
     }
 
     @Override
@@ -432,12 +432,12 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     public int getMedicalSupportAvailable() {
-        int medicPoolMinutes = campaign.getNumberMedics() * 20;
+        int medicPoolMinutes = getCampaign().getNumberMedics() * 20;
         return medSupportAvailable + medicPoolMinutes;
     }
 
     public int getTechSupportAvailable() {
-        int astechPoolMinutes = campaign.getNumberAstechs() * 20;
+        int astechPoolMinutes = getCampaign().getNumberAstechs() * 20;
         return techSupportAvailable + astechPoolMinutes;
     }
 
@@ -523,8 +523,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     public int getYearsInDebt() {
-        int yearsInDebt = campaign.getFinances().getFullYearsInDebt(campaign.getCalendar());
-        yearsInDebt += campaign.getFinances().getPartialYearsInDebt(campaign.getCalendar());
+        int yearsInDebt = getCampaign().getFinances().getFullYearsInDebt(getCampaign().getCalendar());
+        yearsInDebt += getCampaign().getFinances().getPartialYearsInDebt(getCampaign().getCalendar());
         return yearsInDebt;
     }
 
@@ -574,8 +574,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
     public int getFinancialValue() {
         int score = getYearsInDebt() * -10;
-        score -= 25 * campaign.getFinances().getLoanDefaults();
-        score -= 10 * campaign.getFinances().getFailedCollateral();
+        score -= 25 * getCampaign().getFinances().getLoanDefaults();
+        score -= 10 * getCampaign().getFinances().getFailedCollateral();
 
         return score;
     }
@@ -600,15 +600,15 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
         sb.append("Transportation:                 ").append(getTransportValue()).append("\n");
         sb.append("    Dropship Capacity:    ").append(getTransportPercent().toPlainString()).append("\n");
-        sb.append("    Jumpship?             ").append(jumpshipOwner ? "Yes" : "No").append("\n");
-        sb.append("    Warship w/out Dock?   ").append(warshipOwner ? "Yes" : "No").append("\n");
-        sb.append("    Warship w/ Dock?      ").append(warhipWithDocsOwner ? "Yes" : "No").append("\n\n");
+        sb.append("    Jumpship?             ").append(isJumpshipOwner() ? "Yes" : "No").append("\n");
+        sb.append("    Warship w/out Dock?   ").append(isWarshipOwner() ? "Yes" : "No").append("\n");
+        sb.append("    Warship w/ Dock?      ").append(isWarhipWithDocsOwner() ? "Yes" : "No").append("\n\n");
 
         sb.append("Technology:                     ").append(getTechValue()).append("\n");
-        sb.append("    # Clan Units:         ").append(countClan).append("\n");
-        sb.append("    # IS2 Units:          ").append(countIS2).append("\n");
+        sb.append("    # Clan Units:         ").append(getCountClan()).append("\n");
+        sb.append("    # IS2 Units:          ").append(getCountIS2()).append("\n");
         sb.append("    Total # Units:        ")
-          .append(fighterCount + numberBaSquads + mechCount + lightVeeCount + numberOther).append("\n\n");
+          .append(getFighterCount() + getNumberBaSquads() + getMechCount() + getLightVeeCount() + getNumberOther()).append("\n\n");
 
         sb.append("Support:                        ").append(getSupportValue()).append("\n");
         sb.append("    Tech Support:         ").append(getTechSupportPercentage().toPlainString()).append("%\n");
@@ -617,8 +617,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
         sb.append("Financial:                      ").append(getFinancialValue()).append("\n");
         sb.append("    Years in Debt:        ").append(getYearsInDebt()).append("\n");
-        sb.append("    Loan Defaults:        ").append(campaign.getFinances().getLoanDefaults()).append("\n");
-        sb.append("    No Collateral Payment:").append(campaign.getFinances().getFailedCollateral()).append("\n\n");
+        sb.append("    Loan Defaults:        ").append(getCampaign().getFinances().getLoanDefaults()).append("\n");
+        sb.append("    No Collateral Payment:").append(getCampaign().getFinances().getFailedCollateral()).append("\n\n");
 
         return new String(sb);
     }
@@ -636,25 +636,25 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     public BigDecimal getTransportPercent() {
         // todo Superheavys.
         //Find out how short of transport bays we are.
-        int numberWithoutTransport = Math.max((mechCount - mechBayCount), 0);
-        numberWithoutTransport += Math.max(protoCount - protoBayCount, 0);
-        numberWithoutTransport += Math.max((lightVeeCount - lightVeeBayCount), 0);
-        numberWithoutTransport += Math.max(heavyVeeCount - heavyVeeBayCount, 0);
-        numberWithoutTransport += Math.max((fighterCount - fighterCount), 0);
-        numberWithoutTransport += Math.max((numberBaSquads - baBayCount), 0);
-        numberWithoutTransport += Math.max((numberInfSquads - infantryBayCount), 0);
+        int numberWithoutTransport = Math.max((getMechCount() - getMechBayCount()), 0);
+        numberWithoutTransport += Math.max(getProtoCount() - getProtoBayCount(), 0);
+        numberWithoutTransport += Math.max((getLightVeeCount() - getLightVeeBayCount()), 0);
+        numberWithoutTransport += Math.max(getHeavyVeeCount() - getHeavyVeeBayCount(), 0);
+        numberWithoutTransport += Math.max((getFighterCount() - getFighterCount()), 0);
+        numberWithoutTransport += Math.max((getNumberBaSquads() - getBaBayCount()), 0);
+        numberWithoutTransport += Math.max((getNumberInfSquads() - getInfantryBayCount()), 0);
         BigDecimal transportNeeded = new BigDecimal(numberWithoutTransport);
 
         //Find the percentage of units that are transported.
-        BigDecimal totalUnits = new BigDecimal(mechCount + lightVeeCount + heavyVeeCount + fighterCount +
-                                               numberBaSquads + numberInfSquads);
+        BigDecimal totalUnits = new BigDecimal(getMechCount() + getLightVeeCount() + getHeavyVeeCount() + getFighterCount() +
+                                               getNumberBaSquads() + getNumberInfSquads());
         if (totalUnits.compareTo(BigDecimal.ZERO) == 0) {
             return BigDecimal.ZERO;
         }
         BigDecimal percentUntransported = transportNeeded.divide(totalUnits, PRECISION, HALF_EVEN);
-        transportPercent = BigDecimal.ONE.subtract(percentUntransported).multiply(HUNDRED).setScale(0, HALF_EVEN);
+        setTransportPercent(BigDecimal.ONE.subtract(percentUntransported).multiply(HUNDRED).setScale(0, HALF_EVEN));
 
-        return transportPercent;
+        return super.getTransportPercent();
     }
 
     @Override
