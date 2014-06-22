@@ -76,7 +76,7 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
     }
 
     public int getDropshipCount() {
-        return dropshipCount;
+        return super.getDropshipCount();
     }
 
     protected int getNonAdminPersonnelCount() {
@@ -88,27 +88,27 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
     }
 
     protected int getMechCount() {
-        return mechCount;
+        return super.getMechCount();
     }
 
     protected int getProtoCount() {
-        return protoCount;
+        return super.getProtoCount();
     }
 
     protected int getVeeCount() {
-        return lightVeeCount;
+        return getLightVeeCount();
     }
 
     protected int getBattleArmorCount() {
-        return battleArmorCount;
+        return super.getBattleArmorCount();
     }
 
     protected int getInfantryCount() {
-        return infantryCount;
+        return super.getInfantryCount();
     }
 
     protected int getFighterCount() {
-        return fighterCount;
+        return super.getFighterCount();
     }
 
     protected int getMechTechTeamsNeeded() {
@@ -137,9 +137,9 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
 
     private void updateUnitCounts() {
         // Reset counts.
-        totalSkillLevels = BigDecimal.ZERO;
+        setTotalSkillLevels(BigDecimal.ZERO);
 
-        List<Unit> unitList = new ArrayList<>(campaign.getUnits());
+        List<Unit> unitList = new ArrayList<>(getCampaign().getUnits());
         for (Unit u : unitList) {
             if (u.isMothballed()) {
                 continue;
@@ -147,48 +147,48 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
 
             Person p = u.getCommander();
             if (p != null) {
-                commanderList.add(p);
+                getCommanderList().add(p);
             }
 
             Entity entity = u.getEntity();
             if (entity instanceof Mech) {
-                mechCount++;
+                setMechCount(super.getMechCount() + 1);
                 updateTotalSkill(u.getCrew(), UnitType.MEK);
             } else if (entity instanceof Dropship) {
                 // Tech needs are handled by the crew directly.
-                dropshipCount++;
+                setDropshipCount(super.getDropshipCount() + 1);
                 updateTotalSkill(u.getCrew(), UnitType.DROPSHIP);
                 updateBayCount((Dropship) entity);
             } else if (entity instanceof Warship) {
                 // Tech needs are handled by the crew directly.
-                warshipCount++;
+                setWarshipCount(getWarshipCount() + 1);
                 updateTotalSkill(u.getCrew(), UnitType.WARSHIP);
                 updateBayCount((Warship) entity);
                 updateDockingCollarCount((Warship) entity);
             } else if (entity instanceof Jumpship) {
                 // Tech needs are handled by the crew directly.
-                jumpshipCount++;
+                setJumpshipCount(getJumpshipCount() + 1);
                 updateBayCount((Jumpship) entity);
                 updateDockingCollarCount((Jumpship) entity);
             } else if (entity instanceof Aero) {
-                fighterCount++;
+                setFighterCount(super.getFighterCount() + 1);
                 if (entity instanceof ConvFighter) {
                     updateTotalSkill(u.getCrew(), UnitType.CONV_FIGHTER);
                 } else {
                     updateTotalSkill(u.getCrew(), UnitType.AERO);
                 }
             } else if (entity instanceof Protomech) {
-                protoCount++;
+                setProtoCount(super.getProtoCount() + 1);
                 updateTotalSkill(u.getCrew(), UnitType.PROTOMEK);
             } else if (entity instanceof LargeSupportTank) {
                 // Tech needs are handled by the crew directly.
-                superHeavyVeeCount++;
+                setSuperHeavyVeeCount(getSuperHeavyVeeCount() + 1);
                 updateTotalSkill(u.getCrew(), UnitType.TANK);
             } else if (entity instanceof Tank) {
                 if (entity.getWeight() <= 50f) {
-                    lightVeeCount++;
+                    setLightVeeCount(getLightVeeCount() + 1);
                 } else {
-                    heavyVeeCount++;
+                    setHeavyVeeCount(getHeavyVeeCount() + 1);
                 }
                 if (entity instanceof VTOL) {
                     updateTotalSkill(u.getCrew(), UnitType.VTOL);
@@ -197,11 +197,11 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
                 }
             } else if (entity instanceof BattleArmor) {
                 int personnel = ((BattleArmor) entity).getSquadN() * ((BattleArmor) entity).getSquadSize();
-                battleArmorCount += personnel;
+                setBattleArmorCount(super.getBattleArmorCount() + personnel);
                 updateTotalSkill(u.getCrew(), UnitType.BATTLE_ARMOR);
             } else if (entity instanceof Infantry) {
                 int personnel = ((Infantry) entity).getSquadN() * ((Infantry) entity).getSquadSize();
-                infantryCount += personnel;
+                setInfantryCount(super.getInfantryCount() + personnel);
                 updateTotalSkill(u.getCrew(), UnitType.INFANTRY);
             }
         }
@@ -322,7 +322,7 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
             skillLevel = skillLevel.add(averageGunnery).add(BigDecimal.ONE);
         }
 
-        totalSkillLevels = totalSkillLevels.add(skillLevel);
+        setTotalSkillLevels(getTotalSkillLevels().add(skillLevel));
     }
 
     @Override
@@ -349,36 +349,36 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
             return BigDecimal.ZERO;
         }
 
-        return totalSkillLevels.divide(new BigDecimal(totalCombatUnits), 2, BigDecimal.ROUND_HALF_UP);
+        return getTotalSkillLevels().divide(new BigDecimal(totalCombatUnits), 2, BigDecimal.ROUND_HALF_UP);
     }
 
     private void calcNeededTechs() {
-        mechTechTeamsNeeded = mechCount;
-        fighterTechTeamsNeeded = fighterCount;
-        protoTechTeamsNeeded = new BigDecimal(protoCount).divide(new BigDecimal(5), 0, RoundingMode.HALF_UP).intValue();
-        veeTechTeamsNeeded = lightVeeCount;
-        battleArmorTechTeamsNeeded = new BigDecimal(battleArmorCount)
+        setMechTechTeamsNeeded(super.getMechCount());
+        setFighterTechTeamsNeeded(super.getFighterCount());
+        setProtoTechTeamsNeeded(new BigDecimal(super.getProtoCount()).divide(new BigDecimal(5), 0, RoundingMode.HALF_UP).intValue());
+        setVeeTechTeamsNeeded(getLightVeeCount());
+        setBattleArmorTechTeamsNeeded(new BigDecimal(super.getBattleArmorCount())
                 .divide(new BigDecimal(5), 0, RoundingMode.HALF_UP)
-                .intValue();
-        infantryTechTeamsNeeded = new BigDecimal(infantryCount)
+                .intValue());
+        setInfantryTechTeamsNeeded(new BigDecimal(super.getInfantryCount())
                 .divide(new BigDecimal(84), 0, RoundingMode.HALF_UP)
-                .intValue();
+                .intValue());
     }
 
     private void updatePersonnelCounts() {
-        nonAdminPersonnelCount = 0;
-        List<Person> personnelList = new ArrayList<>(campaign.getPersonnel());
+        setNonAdminPersonnelCount(0);
+        List<Person> personnelList = new ArrayList<>(getCampaign().getPersonnel());
         for (Person p : personnelList) {
             if (p.isAdmin()) {
                 continue;
             }
-            nonAdminPersonnelCount++;
+            setNonAdminPersonnelCount(getNonAdminPersonnelCount() + 1);
         }
-        nonAdminPersonnelCount += campaign.getAstechPool();
+        setNonAdminPersonnelCount(getNonAdminPersonnelCount() + getCampaign().getAstechPool());
     }
 
     private void calcNeededAdmins() {
-        adminsNeeded = new BigDecimal(nonAdminPersonnelCount).divide(BigDecimal.TEN, 0, RoundingMode.UP).intValue();
+        setAdminsNeeded(new BigDecimal(getNonAdminPersonnelCount()).divide(BigDecimal.TEN, 0, RoundingMode.UP).intValue());
     }
 
     // todo Combat Personnel (up to 1/4 total) may be assigned double-duty and count as 1/3 of a tech.
@@ -389,15 +389,15 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
     protected void initValues() {
         super.initValues();
 
-        mechCount = 0;
-        protoCount = 0;
-        lightVeeCount = 0;
-        battleArmorCount = 0;
-        infantryCount = 0;
-        fighterCount = 0;
-        dropshipCount = 0;
-        jumpshipCount = 0;
-        dockingCollarCount = 0;
+        setMechCount(0);
+        setProtoCount(0);
+        setLightVeeCount(0);
+        setBattleArmorCount(0);
+        setInfantryCount(0);
+        setFighterCount(0);
+        setDropshipCount(0);
+        setJumpshipCount(0);
+        setDockingCollarCount(0);
 
         updateUnitCounts();
         calcNeededTechs();
@@ -527,46 +527,46 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
         // Find out how short of transport bays we are.
         boolean doubleCapacity = true;
         boolean fullCapacity = true;
-        if (mechBayCount < mechCount) {
+        if (getMechBayCount() < super.getMechCount()) {
             fullCapacity = false;
             doubleCapacity = false;
-        } else if (mechBayCount < mechCount * 2) {
+        } else if (getMechBayCount() < super.getMechCount() * 2) {
             doubleCapacity = false;
         }
-        if (protoBayCount < protoCount) {
+        if (getProtoBayCount() < super.getProtoCount()) {
             fullCapacity = false;
             doubleCapacity = false;
-        } else if (protoBayCount < protoCount * 2) {
+        } else if (getProtoBayCount() < super.getProtoCount() * 2) {
             doubleCapacity = false;
         }
-        if (lightVeeBayCount < lightVeeCount) {
+        if (getLightVeeBayCount() < getLightVeeCount()) {
             fullCapacity = false;
             doubleCapacity = false;
-        } else if (lightVeeBayCount < lightVeeCount * 2) {
+        } else if (getLightVeeBayCount() < getLightVeeCount() * 2) {
             doubleCapacity = false;
         }
-        if (heavyVeeBayCount < heavyVeeCount) {
+        if (getHeavyVeeBayCount() < getHeavyVeeCount()) {
             fullCapacity = false;
             doubleCapacity = false;
-        } else if (heavyVeeBayCount < heavyVeeCount * 2) {
+        } else if (getHeavyVeeBayCount() < getHeavyVeeCount() * 2) {
             doubleCapacity = false;
         }
-        if (fighterBayCount < fighterCount) {
+        if (getFighterBayCount() < super.getFighterCount()) {
             fullCapacity = false;
             doubleCapacity = false;
-        } else if (fighterBayCount < fighterCount * 2) {
+        } else if (getFighterBayCount() < super.getFighterCount() * 2) {
             doubleCapacity = false;
         }
-        if ((baBayCount) < battleArmorCount / 5) {
+        if ((getBaBayCount()) < super.getBattleArmorCount() / 5) {
             fullCapacity = false;
             doubleCapacity = false;
-        } else if ((baBayCount * 2) < 2 * battleArmorCount / 5) {
+        } else if ((getBaBayCount() * 2) < 2 * super.getBattleArmorCount() / 5) {
             doubleCapacity = false;
         }
-        if (infantryBayCount < infantryCount / 28) {
+        if (getInfantryBayCount() < super.getInfantryCount() / 28) {
             fullCapacity = false;
             doubleCapacity = false;
-        } else if (infantryBayCount < infantryCount / 14) {
+        } else if (getInfantryBayCount() < super.getInfantryCount() / 14) {
             doubleCapacity = false;
         }
 
@@ -575,7 +575,7 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
             totalValue += 10;
         } else if (fullCapacity) {
             totalValue += 5;
-        } else if (dropshipCount < 1) {
+        } else if (super.getDropshipCount() < 1) {
             totalValue -= 10;
         } else {
             totalValue -= 5;
@@ -584,88 +584,88 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
         // ToDo Calculate transport needs and capacity for support personnel.
         // According to InterStellar Ops Beta, this will require tracking bay personnel & passenger quarters.
 
-        if ((jumpshipCount + warshipCount) > 0) {
+        if ((getJumpshipCount() + getWarshipCount()) > 0) {
             totalValue += 10;
         }
-        if (dockingCollarCount >= dropshipCount) {
+        if (getDockingCollarCount() >= super.getDropshipCount()) {
             totalValue += 5;
         }
 
         return totalValue;
     }
 
-    private int calcTechSupportValue() {
+    protected int calcTechSupportValue() {
         int totalValue = 0;
-        totalTechTeams = 0;
+        setTotalTechTeams(0);
         int astechTeams;
-        mechTechTeams = 0;
-        fighterTechTeams = 0;
-        veeTechTeams = 0;
-        baTechTeams = 0;
-        generalTechTeams = 0;
+        setMechTechTeams(0);
+        setFighterTechTeams(0);
+        setVeeTechTeams(0);
+        setBaTechTeams(0);
+        setGeneralTechTeams(0);
 
         // How many astech teams do we have?
-        astechTeams = campaign.getNumberAstechs() / 6;
+        astechTeams = getCampaign().getNumberAstechs() / 6;
 
-        for (Person tech : campaign.getTechs()) {
+        for (Person tech : getCampaign().getTechs()) {
             // If we're out of astech teams, the rest of the techs are unsupporeted and don't count.
             if (astechTeams <= 0) {
                 break;
             }
 
             if (tech.getSkill(SkillType.S_TECH_MECH) != null) {
-                mechTechTeams++;
+                setMechTechTeams(getMechTechTeams() + 1);
                 astechTeams--;
             } else if (tech.getSkill(SkillType.S_TECH_AERO) != null) {
-                fighterTechTeams++;
+                setFighterTechTeams(getFighterTechTeams() + 1);
                 astechTeams--;
             } else if (tech.getSkill(SkillType.S_TECH_MECHANIC) != null) {
-                veeTechTeams++;
+                setVeeTechTeams(getVeeTechTeams() + 1);
                 astechTeams--;
             } else if (tech.getSkill(SkillType.S_TECH_BA) != null) {
-                baTechTeams++;
+                setBaTechTeams(getBaTechTeams() + 1);
                 astechTeams--;
             } else {
-                generalTechTeams++;
+                setGeneralTechTeams(getGeneralTechTeams() + 1);
                 astechTeams--;
             }
         }
 
         boolean techShortage = false;
-        if (mechTechTeamsNeeded > mechTechTeams) {
+        if (getMechTechTeamsNeeded() > getMechTechTeams()) {
             techShortage = true;
         }
-        if (fighterTechTeamsNeeded > fighterTechTeams) {
+        if (getFighterTechTeamsNeeded() > getFighterTechTeams()) {
             techShortage = true;
         }
-        if (veeTechTeamsNeeded > veeTechTeams) {
+        if (getVeeTechTeamsNeeded() > getVeeTechTeams()) {
             techShortage = true;
         }
-        if (battleArmorTechTeamsNeeded > baTechTeams) {
+        if (getBattleArmorTechTeamsNeeded() > getBaTechTeams()) {
             techShortage = true;
         }
-        if ((protoTechTeamsNeeded + infantryTechTeamsNeeded) > generalTechTeams) {
+        if ((getProtoTechTeamsNeeded() + getInfantryTechTeamsNeeded()) > getGeneralTechTeams()) {
             techShortage = true;
         }
 
-        totalTechTeams = mechTechTeams + fighterTechTeams + veeTechTeams + baTechTeams + generalTechTeams;
-        int totalTechTeamsNeeded = mechTechTeamsNeeded + fighterTechTeamsNeeded + veeTechTeamsNeeded +
-                                   battleArmorTechTeamsNeeded + protoTechTeamsNeeded + infantryTechTeamsNeeded;
-        supportPercent = BigDecimal.ZERO;
-        if (totalTechTeams != 0) {
-            supportPercent = new BigDecimal(totalTechTeams)
+        setTotalTechTeams(getMechTechTeams() + getFighterTechTeams() + getVeeTechTeams() + getBaTechTeams() + getGeneralTechTeams());
+        int totalTechTeamsNeeded = getMechTechTeamsNeeded() + getFighterTechTeamsNeeded() + getVeeTechTeamsNeeded() +
+                                   getBattleArmorTechTeamsNeeded() + getProtoTechTeamsNeeded() + getInfantryTechTeamsNeeded();
+        setSupportPercent(BigDecimal.ZERO);
+        if (totalTechTeamsNeeded != 0) {
+            setSupportPercent(new BigDecimal(getTotalTechTeams())
                     .divide(new BigDecimal(totalTechTeamsNeeded), 5, BigDecimal.ROUND_HALF_UP)
-                    .multiply(HUNDRED);
+                    .multiply(HUNDRED));
         }
 
         if (techShortage) {
             totalValue -= 5;
         } else {
-            if (supportPercent.compareTo(new BigDecimal(200)) > 0) {
+            if (getSupportPercent().compareTo(new BigDecimal(200)) > 0) {
                 totalValue += 15;
-            } else if (supportPercent.compareTo(new BigDecimal(175)) > 0) {
+            } else if (getSupportPercent().compareTo(new BigDecimal(175)) > 0) {
                 totalValue += 10;
-            } else if (supportPercent.compareTo(new BigDecimal(149)) > 0) {
+            } else if (getSupportPercent().compareTo(new BigDecimal(149)) > 0) {
                 totalValue += 5;
             }
         }
@@ -674,7 +674,7 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
     }
 
     private int calcAdminSupportValue() {
-        if (adminsNeeded > campaign.getAdmins().size()) {
+        if (getAdminsNeeded() > getCampaign().getAdmins().size()) {
             return -5;
         }
         return 0;
@@ -682,7 +682,7 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
 
     private int calcLargeCraftSupportValue() {
         List<String> craftWithoutCrew = new ArrayList<>();
-        for (Unit u : campaign.getUnits()) {
+        for (Unit u : getCampaign().getUnits()) {
             if (!(u.getEntity() instanceof Dropship) && !(u.getEntity() instanceof Jumpship)) {
                 continue;
             }
@@ -713,7 +713,7 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
     }
 
     public int getFinancialValue() {
-        return campaign.getFinances().isInDebt() ? -10 : 0;
+        return getCampaign().getFinances().isInDebt() ? -10 : 0;
     }
 
     // ToDo: MekHQ doesn't currently support recording crimes.
@@ -754,50 +754,50 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
         sb.append("    Contract Breaches:    ").append(getBreachCount()).append("\n\n");
 
         sb.append("Transportation:                 ").append(getTransportValue()).append("\n");
-        sb.append("    Mech Bays:            ").append(getMechCount()).append(" needed /").append(mechBayCount)
+        sb.append("    Mech Bays:            ").append(getMechCount()).append(" needed /").append(getMechBayCount())
           .append(" available\n");
-        sb.append("    Fighter Bays:         ").append(getFighterCount()).append(" needed /").append(fighterBayCount)
+        sb.append("    Fighter Bays:         ").append(getFighterCount()).append(" needed /").append(getFighterBayCount())
           .append(" available\n");
-        sb.append("    Protomech Bays:       ").append(getProtoCount()).append(" needed /").append(protoBayCount)
+        sb.append("    Protomech Bays:       ").append(getProtoCount()).append(" needed /").append(getProtoBayCount())
           .append(" available\n");
-        sb.append("    Light Vehicle Bays:   ").append(lightVeeCount).append(" needed /").append(lightVeeBayCount)
+        sb.append("    Light Vehicle Bays:   ").append(getLightVeeCount()).append(" needed /").append(getLightVeeBayCount())
           .append(" available\n");
-        sb.append("    Heavy Vehicle Bays:   ").append(heavyVeeCount).append(" needed /").append(heavyVeeBayCount)
+        sb.append("    Heavy Vehicle Bays:   ").append(getHeavyVeeCount()).append(" needed /").append(getHeavyVeeBayCount())
           .append(" available\n");
-        sb.append("    BA Bays:              ").append(getBattleArmorCount() / 5).append(" needed /").append(baBayCount)
+        sb.append("    BA Bays:              ").append(getBattleArmorCount() / 5).append(" needed /").append(getBaBayCount())
           .append(" available\n");
         sb.append("    Infantry Bays:        ").append(getInfantryCount() / 28).append(" needed /").append
-                (infantryBayCount)
+                (getInfantryBayCount())
           .append(" available\n");
-        sb.append("    Docking Collars:      ").append(dropshipCount).append(" needed /").append(dockingCollarCount)
+        sb.append("    Docking Collars:      ").append(super.getDropshipCount()).append(" needed /").append(getDockingCollarCount())
           .append(" available\n");
-        sb.append("    Jump-Capable Ships?   ").append(jumpshipCount + warshipCount > 0 ? "Yes\n" : "No\n");
+        sb.append("    Jump-Capable Ships?   ").append(getJumpshipCount() + getWarshipCount() > 0 ? "Yes\n" : "No\n");
         sb.append("\n");
 
         sb.append("Support:                        ").append(getSupportValue()).append("\n");
         sb.append("    Tech Support:\n");
-        sb.append("        Astech Teams:     ").append(totalTechTeams).append("\n");
-        sb.append("        Mech Techs:       ").append(mechTechTeamsNeeded).append(" needed /").append(mechTechTeams)
+        sb.append("        Astech Teams:     ").append(getTotalTechTeams()).append("\n");
+        sb.append("        Mech Techs:       ").append(getMechTechTeamsNeeded()).append(" needed /").append(getMechTechTeams())
           .append(" available\n");
-        sb.append("        Fighter Techs:    ").append(fighterTechTeamsNeeded).append(" needed /")
-          .append(fighterTechTeams).append(" available\n");
-        sb.append("        Tank Techs:       ").append(veeTechTeamsNeeded).append(" needed /").append(veeTechTeams)
+        sb.append("        Fighter Techs:    ").append(getFighterTechTeamsNeeded()).append(" needed /")
+          .append(getFighterTechTeams()).append(" available\n");
+        sb.append("        Tank Techs:       ").append(getVeeTechTeamsNeeded()).append(" needed /").append(getVeeTechTeams())
           .append(" available\n");
-        sb.append("        BA Techs:         ").append(battleArmorTechTeamsNeeded).append(" needed /")
-          .append(baTechTeams).append(" available\n");
-        sb.append("        Inf/Proto Techs:  ").append(infantryTechTeamsNeeded + protoTechTeamsNeeded)
-          .append(" needed /").append(generalTechTeams).append(" available\n");
+        sb.append("        BA Techs:         ").append(getBattleArmorTechTeamsNeeded()).append(" needed /")
+          .append(getBaTechTeams()).append(" available\n");
+        sb.append("        Inf/Proto Techs:  ").append(getInfantryTechTeamsNeeded() + getProtoTechTeamsNeeded())
+          .append(" needed /").append(getGeneralTechTeams()).append(" available\n");
         sb.append("            NOTE:  MHQ Does not currently support Infantry and Protomech specific techs.\n");
-        sb.append("    Admin Support:        ").append(adminsNeeded).append(" needed /")
-          .append(campaign.getAdmins().size()).append(" available\n");
+        sb.append("    Admin Support:        ").append(getAdminsNeeded()).append(" needed /")
+          .append(getCampaign().getAdmins().size()).append(" available\n");
         sb.append("    Large Craft Support:\n");
-        for (String s : craftWithoutCrew) {
+        for (String s : getCraftWithoutCrew()) {
             sb.append("        ").append(s).append(" short crew.\n");
         }
         sb.append("\n");
 
         sb.append("Financial:                      ").append(getFinancialValue()).append("\n");
-        sb.append("    In Debt?              ").append(campaign.getFinances().isInDebt() ? "Yes\n" : "No\n");
+        sb.append("    In Debt?              ").append(getCampaign().getFinances().isInDebt() ? "Yes\n" : "No\n");
 
         sb.append("Criminal Activity:              0 (MHQ does not currently track criminal activity.)\n");
 
@@ -819,5 +819,94 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
                "+ Support: MHQ Does not currently support Infantry and Protomech specific techs." +
                "+ Criminal Activity: MHQ does not currently track criminal activity." +
                "+ Inactivity: MHQ does not track end dates for missions/contracts.";
+    }
+
+    protected void setNonAdminPersonnelCount(int nonAdminPersonnelCount) {
+        this.nonAdminPersonnelCount = nonAdminPersonnelCount;
+    }
+
+    protected void setMechTechTeamsNeeded(int mechTechTeamsNeeded) {
+        this.mechTechTeamsNeeded = mechTechTeamsNeeded;
+    }
+
+    protected void setProtoTechTeamsNeeded(int protoTechTeamsNeeded) {
+        this.protoTechTeamsNeeded = protoTechTeamsNeeded;
+    }
+
+    protected void setVeeTechTeamsNeeded(int veeTechTeamsNeeded) {
+        this.veeTechTeamsNeeded = veeTechTeamsNeeded;
+    }
+
+    protected void setBattleArmorTechTeamsNeeded(int battleArmorTechTeamsNeeded) {
+        this.battleArmorTechTeamsNeeded = battleArmorTechTeamsNeeded;
+    }
+
+    protected void setInfantryTechTeamsNeeded(int infantryTechTeamsNeeded) {
+        this.infantryTechTeamsNeeded = infantryTechTeamsNeeded;
+    }
+
+    protected void setFighterTechTeamsNeeded(int fighterTechTeamsNeeded) {
+        this.fighterTechTeamsNeeded = fighterTechTeamsNeeded;
+    }
+
+    protected void setAdminsNeeded(int adminsNeeded) {
+        this.adminsNeeded = adminsNeeded;
+    }
+
+    protected int getTotalTechTeams() {
+        return totalTechTeams;
+    }
+
+    protected void setTotalTechTeams(int totalTechTeams) {
+        this.totalTechTeams = totalTechTeams;
+    }
+
+    protected int getMechTechTeams() {
+        return mechTechTeams;
+    }
+
+    protected void setMechTechTeams(int mechTechTeams) {
+        this.mechTechTeams = mechTechTeams;
+    }
+
+    protected int getFighterTechTeams() {
+        return fighterTechTeams;
+    }
+
+    protected void setFighterTechTeams(int fighterTechTeams) {
+        this.fighterTechTeams = fighterTechTeams;
+    }
+
+    protected int getVeeTechTeams() {
+        return veeTechTeams;
+    }
+
+    protected void setVeeTechTeams(int veeTechTeams) {
+        this.veeTechTeams = veeTechTeams;
+    }
+
+    protected int getBaTechTeams() {
+        return baTechTeams;
+    }
+
+    protected void setBaTechTeams(int baTechTeams) {
+        this.baTechTeams = baTechTeams;
+    }
+
+    protected int getGeneralTechTeams() {
+        return generalTechTeams;
+    }
+
+    protected void setGeneralTechTeams(int generalTechTeams) {
+        this.generalTechTeams = generalTechTeams;
+    }
+
+    protected List<String> getCraftWithoutCrew() {
+        return craftWithoutCrew;
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    protected void setCraftWithoutCrew(List<String> craftWithoutCrew) {
+        this.craftWithoutCrew = craftWithoutCrew;
     }
 }

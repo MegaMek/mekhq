@@ -21,7 +21,6 @@
 package mekhq.campaign.rating;
 
 import asserts.BigDecimalAssert;
-import junit.framework.TestCase;
 import megamek.common.ASFBay;
 import megamek.common.Aero;
 import megamek.common.Bay;
@@ -41,6 +40,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,9 +66,9 @@ public class InterstellarOpsReputationTest {
     // Test for is based off example of Arnold's force in Interstellar Ops Beta.
 
     Campaign mockCampaign = Mockito.mock(Campaign.class);
-    ArrayList<Unit> unitList = new ArrayList<Unit>();
-    ArrayList<Person> personnelList = new ArrayList<Person>();
-    ArrayList<Mission> missionList = new ArrayList<Mission>();
+    ArrayList<Unit> unitList = new ArrayList<>();
+    ArrayList<Person> personnelList = new ArrayList<>();
+    ArrayList<Mission> missionList = new ArrayList<>();
 
     // Mothballed units.
     Unit mockMechMothballed = Mockito.mock(Unit.class);
@@ -155,7 +155,7 @@ public class InterstellarOpsReputationTest {
     Skill mockInfantryGunnery = Mockito.mock(Skill.class);
     Infantry mockLaserPlatoon = Mockito.mock(Infantry.class);
     Unit mockLaserPlatoonUnit = Mockito.mock(Unit.class);
-    Collection<Person> infantryPersonnel = new HashSet<Person>(28);
+    Collection<Person> infantryPersonnel = new HashSet<>(28);
 
     // Fighters
     Skill mockAeroGunnery = Mockito.mock(Skill.class);
@@ -174,14 +174,14 @@ public class InterstellarOpsReputationTest {
     Skill mockDropPilot = Mockito.mock(Skill.class);
     Dropship mockSeeker = Mockito.mock(Dropship.class);
     Unit mockSeekerUnit = Mockito.mock(Unit.class);
-    Collection<Person> seekerCrew = new HashSet<Person>(20);
+    Collection<Person> seekerCrew = new HashSet<>(20);
 
     // Jumpships
     Skill mockJumpGunnery = Mockito.mock(Skill.class);
     Skill mockJumpPilot = Mockito.mock(Skill.class);
     Jumpship mockInvader = Mockito.mock(Jumpship.class);
     Unit mockInvaderUnit = Mockito.mock(Unit.class);
-    Collection<Person> invaderCrew = new HashSet<Person>(24);
+    Collection<Person> invaderCrew = new HashSet<>(24);
 
     // Techs
     Skill mockMechTechSkillRegular = Mockito.mock(Skill.class);
@@ -189,7 +189,7 @@ public class InterstellarOpsReputationTest {
     Skill mockFighterTechSkill = Mockito.mock(Skill.class);
     Skill mockFighterTechSkillElite = Mockito.mock(Skill.class);
     Skill mockVeeTechSkill = Mockito.mock(Skill.class);
-    Collection<Person> regularAdmins = new HashSet<Person>(10);
+    Collection<Person> regularAdmins = new HashSet<>(10);
 
     // Finances
     Finances mockFinances = Mockito.mock(Finances.class);
@@ -200,13 +200,13 @@ public class InterstellarOpsReputationTest {
     public void setUp() {
         int astechs = 0;
         mockCampaign = Mockito.mock(Campaign.class);
-        unitList = new ArrayList<Unit>();
-        personnelList = new ArrayList<Person>();
-        missionList = new ArrayList<Mission>();
-        infantryPersonnel = new HashSet<Person>(28);
-        seekerCrew = new HashSet<Person>(20);
-        invaderCrew = new HashSet<Person>(24);
-        regularAdmins = new HashSet<Person>(10);
+        unitList = new ArrayList<>();
+        personnelList = new ArrayList<>();
+        missionList = new ArrayList<>();
+        infantryPersonnel = new HashSet<>(28);
+        seekerCrew = new HashSet<>(20);
+        invaderCrew = new HashSet<>(24);
+        regularAdmins = new HashSet<>(10);
         spyReputation = Mockito.spy(new InterstellarOpsReputation(mockCampaign));
 
         Mockito.when(mockMechMothballed.isMothballed()).thenReturn(true);
@@ -242,7 +242,7 @@ public class InterstellarOpsReputationTest {
         Mockito.when(mockThunderbolt1Pilot.getSkill(SkillType.S_PILOT_MECH)).thenReturn(mockMechPilot);
         personnelList.add(mockThunderbolt1Pilot);
         mockThunderboltUnit1.addPilotOrSoldier(mockThunderbolt1Pilot);
-        ArrayList<Person> crew = new ArrayList<Person>(1);
+        ArrayList<Person> crew = new ArrayList<>(1);
         crew.add(mockThunderbolt1Pilot);
         Mockito.when(mockThunderboltUnit1.getCrew()).thenReturn(crew);
         Mockito.when(mockThunderbolt1Tech.isAdmin()).thenReturn(false);
@@ -258,7 +258,7 @@ public class InterstellarOpsReputationTest {
         Mockito.when(mockThunderbolt2Pilot.getSkill(SkillType.S_PILOT_MECH)).thenReturn(mockMechPilot);
         personnelList.add(mockThunderbolt2Pilot);
         mockThunderboltUnit2.addPilotOrSoldier(mockThunderbolt2Pilot);
-        crew = new ArrayList<Person>(1);
+        crew = new ArrayList<>(1);
         crew.add(mockThunderbolt2Pilot);
         Mockito.when(mockThunderboltUnit2.getCrew()).thenReturn(crew);
         Mockito.when(mockThunderbolt2Tech.isAdmin()).thenReturn(false);
@@ -274,7 +274,7 @@ public class InterstellarOpsReputationTest {
         Mockito.when(mockGrasshopper1Pilot.getSkill(SkillType.S_PILOT_MECH)).thenReturn(mockMechPilot);
         personnelList.add(mockGrasshopper1Pilot);
         mockGrasshopperUnit1.addPilotOrSoldier(mockGrasshopper1Pilot);
-        crew = new ArrayList<Person>(1);
+        crew = new ArrayList<>(1);
         crew.add(mockGrasshopper1Pilot);
         Mockito.when(mockGrasshopperUnit1.getCrew()).thenReturn(crew);
         Mockito.when(mockGrasshopper1Tech.isAdmin()).thenReturn(false);
@@ -294,7 +294,7 @@ public class InterstellarOpsReputationTest {
         Mockito.when(mockGrasshopper2Pilot.getSkill(SkillType.S_NEG)).thenReturn(mockNegotiation);
         personnelList.add(mockGrasshopper2Pilot);
         mockGrasshopperUnit2.addPilotOrSoldier(mockGrasshopper2Pilot);
-        crew = new ArrayList<Person>(1);
+        crew = new ArrayList<>(1);
         crew.add(mockGrasshopper2Pilot);
         Mockito.when(mockGrasshopperUnit2.getCrew()).thenReturn(crew);
         Mockito.when(mockGrasshopper2Tech.isAdmin()).thenReturn(false);
@@ -327,7 +327,7 @@ public class InterstellarOpsReputationTest {
         mockBulldogUnit1.addPilotOrSoldier(mockBulldog1Gunner1);
         mockBulldogUnit1.addPilotOrSoldier(mockBulldog1Gunner2);
         mockBulldogUnit1.addPilotOrSoldier(mockBulldog1Gunner3);
-        crew = new ArrayList<Person>(4);
+        crew = new ArrayList<>(4);
         crew.add(mockBulldog1Driver);
         crew.add(mockBulldog1Gunner1);
         crew.add(mockBulldog1Gunner2);
@@ -358,7 +358,7 @@ public class InterstellarOpsReputationTest {
         mockBulldogUnit2.addPilotOrSoldier(mockBulldog2Gunner1);
         mockBulldogUnit2.addPilotOrSoldier(mockBulldog2Gunner2);
         mockBulldogUnit2.addPilotOrSoldier(mockBulldog2Gunner3);
-        crew = new ArrayList<Person>(4);
+        crew = new ArrayList<>(4);
         crew.add(mockBulldog2Driver);
         crew.add(mockBulldog2Gunner1);
         crew.add(mockBulldog2Gunner2);
@@ -389,7 +389,7 @@ public class InterstellarOpsReputationTest {
         mockBulldogUnit3.addPilotOrSoldier(mockBulldog3Gunner1);
         mockBulldogUnit3.addPilotOrSoldier(mockBulldog3Gunner2);
         mockBulldogUnit3.addPilotOrSoldier(mockBulldog3Gunner3);
-        crew = new ArrayList<Person>(4);
+        crew = new ArrayList<>(4);
         crew.add(mockBulldog3Driver);
         crew.add(mockBulldog3Gunner1);
         crew.add(mockBulldog3Gunner2);
@@ -420,7 +420,7 @@ public class InterstellarOpsReputationTest {
         mockBulldogUnit4.addPilotOrSoldier(mockBulldog4Gunner1);
         mockBulldogUnit4.addPilotOrSoldier(mockBulldog4Gunner2);
         mockBulldogUnit4.addPilotOrSoldier(mockBulldog4Gunner3);
-        crew = new ArrayList<Person>(4);
+        crew = new ArrayList<>(4);
         crew.add(mockBulldog4Driver);
         crew.add(mockBulldog4Gunner1);
         crew.add(mockBulldog4Gunner2);
@@ -443,7 +443,7 @@ public class InterstellarOpsReputationTest {
         personnelList.add(mockPackrat1Tech);
         mockPackratUnit1.addPilotOrSoldier(mockPackrat1Driver);
         mockPackratUnit1.addPilotOrSoldier(mockPackrat1Gunner);
-        crew = new ArrayList<Person>(2);
+        crew = new ArrayList<>(2);
         crew.add(mockPackrat1Driver);
         crew.add(mockPackrat1Gunner);
         Mockito.when(mockPackratUnit1.getCrew()).thenReturn(crew);
@@ -464,7 +464,7 @@ public class InterstellarOpsReputationTest {
         personnelList.add(mockPackrat2Tech);
         mockPackratUnit2.addPilotOrSoldier(mockPackrat2Driver);
         mockPackratUnit2.addPilotOrSoldier(mockPackrat2Gunner);
-        crew = new ArrayList<Person>(2);
+        crew = new ArrayList<>(2);
         crew.add(mockPackrat2Driver);
         crew.add(mockPackrat2Gunner);
         Mockito.when(mockPackratUnit2.getCrew()).thenReturn(crew);
@@ -485,7 +485,7 @@ public class InterstellarOpsReputationTest {
         personnelList.add(mockPackrat3Tech);
         mockPackratUnit3.addPilotOrSoldier(mockPackrat3Driver);
         mockPackratUnit3.addPilotOrSoldier(mockPackrat3Gunner);
-        crew = new ArrayList<Person>(2);
+        crew = new ArrayList<>(2);
         crew.add(mockPackrat3Driver);
         crew.add(mockPackrat3Gunner);
         Mockito.when(mockPackratUnit3.getCrew()).thenReturn(crew);
@@ -506,7 +506,7 @@ public class InterstellarOpsReputationTest {
         personnelList.add(mockPackrat4Tech);
         mockPackratUnit4.addPilotOrSoldier(mockPackrat4Driver);
         mockPackratUnit4.addPilotOrSoldier(mockPackrat4Gunner);
-        crew = new ArrayList<Person>(2);
+        crew = new ArrayList<>(2);
         crew.add(mockPackrat4Driver);
         crew.add(mockPackrat4Gunner);
         Mockito.when(mockPackratUnit4.getCrew()).thenReturn(crew);
@@ -515,7 +515,7 @@ public class InterstellarOpsReputationTest {
         Mockito.when(mockLaserPlatoon.getSquadSize()).thenReturn(7);
         Mockito.when(mockLaserPlatoon.getSquadN()).thenReturn(4);
         Mockito.when(mockLaserPlatoonUnit.getEntity()).thenReturn(mockLaserPlatoon);
-        crew = new ArrayList<Person>(28);
+        crew = new ArrayList<>(28);
         for (int i = 0; i < 28; i++) {
             Person mockInfantry = Mockito.mock(Person.class);
             Mockito.when(mockInfantry.isAdmin()).thenReturn(false);
@@ -533,7 +533,7 @@ public class InterstellarOpsReputationTest {
         Mockito.when(mockCorsair1Pilot.getSkill(SkillType.S_PILOT_AERO)).thenReturn(mockAeroPilot);
         personnelList.add(mockCorsair1Pilot);
         mockCorsairUnit1.addPilotOrSoldier(mockCorsair1Pilot);
-        crew = new ArrayList<Person>(1);
+        crew = new ArrayList<>(1);
         crew.add(mockCorsair1Pilot);
         Mockito.when(mockCorsairUnit1.getCrew()).thenReturn(crew);
         Mockito.when(getMockCorsair1Tech.isAdmin()).thenReturn(false);
@@ -549,7 +549,7 @@ public class InterstellarOpsReputationTest {
         Mockito.when(mockCorsair2Pilot.getSkill(SkillType.S_PILOT_AERO)).thenReturn(mockAeroPilot);
         personnelList.add(mockCorsair2Pilot);
         mockCorsairUnit2.addPilotOrSoldier(mockCorsair2Pilot);
-        crew = new ArrayList<Person>(1);
+        crew = new ArrayList<>(1);
         crew.add(mockCorsair2Pilot);
         Mockito.when(mockCorsairUnit2.getCrew()).thenReturn(crew);
         Mockito.when(getMockCorsair2Tech.isAdmin()).thenReturn(false);
@@ -561,7 +561,7 @@ public class InterstellarOpsReputationTest {
 
         Mockito.when(mockSeekerUnit.getEntity()).thenReturn(mockSeeker);
         Bay transportBay;
-        Vector<Bay> bayList = new Vector<Bay>();
+        Vector<Bay> bayList = new Vector<>();
         for (int i = 0; i < 4; i++) {
             transportBay = new MechBay(100.0, 1, i);
             bayList.add(transportBay);
@@ -579,7 +579,7 @@ public class InterstellarOpsReputationTest {
             bayList.add(transportBay);
         }
         Mockito.when(mockSeeker.getTransportBays()).thenReturn(bayList);
-        crew = new ArrayList<Person>(20);
+        crew = new ArrayList<>(20);
         for (int i = 0; i < 20; i++) {
             Person mockCrew = Mockito.mock(Person.class);
             Mockito.when(mockCrew.isAdmin()).thenReturn(false);
@@ -599,14 +599,14 @@ public class InterstellarOpsReputationTest {
 
         Mockito.when(mockInvaderUnit.getEntity()).thenReturn(mockInvader);
         DockingCollar collar;
-        Vector<DockingCollar> collarList = new Vector<DockingCollar>(4);
+        Vector<DockingCollar> collarList = new Vector<>(4);
         for (int i = 0; i < 4; i++) {
             collar = Mockito.mock(DockingCollar.class);
             collarList.add(collar);
         }
         Mockito.when(mockInvader.getTransportBays()).thenReturn(new Vector<Bay>(0));
         Mockito.when(mockInvader.getDockingCollars()).thenReturn(collarList);
-        crew = new ArrayList<Person>(24);
+        crew = new ArrayList<>(24);
         for (int i = 0; i < 24; i++) {
             Person mockCrew = Mockito.mock(Person.class);
             Mockito.when(mockCrew.isAdmin()).thenReturn(false);
@@ -672,69 +672,69 @@ public class InterstellarOpsReputationTest {
         BigDecimal expectedTotalSkill = new BigDecimal("143.80");
         BigDecimal expectedAverageSkill = new BigDecimal("8.99");
         spyReputation.initValues();
-        TestCase.assertEquals(4, spyReputation.getMechCount());
-        TestCase.assertEquals(2, spyReputation.getFighterCount());
-        TestCase.assertEquals(0, spyReputation.getProtoCount());
-        TestCase.assertEquals(8, spyReputation.getVeeCount());
-        TestCase.assertEquals(0, spyReputation.getBattleArmorCount());
-        TestCase.assertEquals(28, spyReputation.getInfantryCount());
-        TestCase.assertEquals(200, spyReputation.getNonAdminPersonnelCount());
-        TestCase.assertEquals(1, spyReputation.getDropshipCount());
+        Assert.assertEquals(4, spyReputation.getMechCount());
+        Assert.assertEquals(2, spyReputation.getFighterCount());
+        Assert.assertEquals(0, spyReputation.getProtoCount());
+        Assert.assertEquals(8, spyReputation.getVeeCount());
+        Assert.assertEquals(0, spyReputation.getBattleArmorCount());
+        Assert.assertEquals(28, spyReputation.getInfantryCount());
+        Assert.assertEquals(200, spyReputation.getNonAdminPersonnelCount());
+        Assert.assertEquals(1, spyReputation.getDropshipCount());
         BigDecimalAssert.assertEquals(expectedTotalSkill, spyReputation.getTotalSkillLevels(), 2);
-        TestCase.assertEquals(4, spyReputation.getMechTechTeamsNeeded());
-        TestCase.assertEquals(0, spyReputation.getProtoTechTeamsNeeded());
-        TestCase.assertEquals(2, spyReputation.getFighterTechTeamsNeeded());
-        TestCase.assertEquals(8, spyReputation.getVeeTechTeamsNeeded());
-        TestCase.assertEquals(0, spyReputation.getBattleArmorTechTeamsNeeded());
-        TestCase.assertEquals(0, spyReputation.getInfantryTechTeamsNeeded());
-        TestCase.assertEquals(20, spyReputation.getAdminsNeeded());
-        TestCase.assertEquals(expectedAverageSkill, spyReputation.calcAverageExperience());
-        TestCase.assertEquals(5, spyReputation.getExperienceValue());
+        Assert.assertEquals(4, spyReputation.getMechTechTeamsNeeded());
+        Assert.assertEquals(0, spyReputation.getProtoTechTeamsNeeded());
+        Assert.assertEquals(2, spyReputation.getFighterTechTeamsNeeded());
+        Assert.assertEquals(8, spyReputation.getVeeTechTeamsNeeded());
+        Assert.assertEquals(0, spyReputation.getBattleArmorTechTeamsNeeded());
+        Assert.assertEquals(0, spyReputation.getInfantryTechTeamsNeeded());
+        Assert.assertEquals(20, spyReputation.getAdminsNeeded());
+        Assert.assertEquals(expectedAverageSkill, spyReputation.calcAverageExperience());
+        Assert.assertEquals(5, spyReputation.getExperienceValue());
 
         // Add a couple of mothballed units.
         unitList.add(mockMechMothballed);
         unitList.add(mockTankMothballed);
         unitList.add(mockAeroMothballed);
-        TestCase.assertEquals(4, spyReputation.getMechCount());
-        TestCase.assertEquals(2, spyReputation.getFighterCount());
-        TestCase.assertEquals(0, spyReputation.getProtoCount());
-        TestCase.assertEquals(8, spyReputation.getVeeCount());
-        TestCase.assertEquals(0, spyReputation.getBattleArmorCount());
-        TestCase.assertEquals(28, spyReputation.getInfantryCount());
-        TestCase.assertEquals(200, spyReputation.getNonAdminPersonnelCount());
-        TestCase.assertEquals(1, spyReputation.getDropshipCount());
+        Assert.assertEquals(4, spyReputation.getMechCount());
+        Assert.assertEquals(2, spyReputation.getFighterCount());
+        Assert.assertEquals(0, spyReputation.getProtoCount());
+        Assert.assertEquals(8, spyReputation.getVeeCount());
+        Assert.assertEquals(0, spyReputation.getBattleArmorCount());
+        Assert.assertEquals(28, spyReputation.getInfantryCount());
+        Assert.assertEquals(200, spyReputation.getNonAdminPersonnelCount());
+        Assert.assertEquals(1, spyReputation.getDropshipCount());
         BigDecimalAssert.assertEquals(expectedTotalSkill, spyReputation.getTotalSkillLevels(), 2);
-        TestCase.assertEquals(4, spyReputation.getMechTechTeamsNeeded());
-        TestCase.assertEquals(0, spyReputation.getProtoTechTeamsNeeded());
-        TestCase.assertEquals(2, spyReputation.getFighterTechTeamsNeeded());
-        TestCase.assertEquals(8, spyReputation.getVeeTechTeamsNeeded());
-        TestCase.assertEquals(0, spyReputation.getBattleArmorTechTeamsNeeded());
-        TestCase.assertEquals(0, spyReputation.getInfantryTechTeamsNeeded());
-        TestCase.assertEquals(20, spyReputation.getAdminsNeeded());
-        TestCase.assertEquals(expectedAverageSkill, spyReputation.calcAverageExperience());
-        TestCase.assertEquals(5, spyReputation.getExperienceValue());
+        Assert.assertEquals(4, spyReputation.getMechTechTeamsNeeded());
+        Assert.assertEquals(0, spyReputation.getProtoTechTeamsNeeded());
+        Assert.assertEquals(2, spyReputation.getFighterTechTeamsNeeded());
+        Assert.assertEquals(8, spyReputation.getVeeTechTeamsNeeded());
+        Assert.assertEquals(0, spyReputation.getBattleArmorTechTeamsNeeded());
+        Assert.assertEquals(0, spyReputation.getInfantryTechTeamsNeeded());
+        Assert.assertEquals(20, spyReputation.getAdminsNeeded());
+        Assert.assertEquals(expectedAverageSkill, spyReputation.calcAverageExperience());
+        Assert.assertEquals(5, spyReputation.getExperienceValue());
 
         // Test a brand new campaign.
         buildFreshCampaign();
         spyReputation.initValues();
-        TestCase.assertEquals(0, spyReputation.getMechCount());
-        TestCase.assertEquals(0, spyReputation.getFighterCount());
-        TestCase.assertEquals(0, spyReputation.getProtoCount());
-        TestCase.assertEquals(0, spyReputation.getVeeCount());
-        TestCase.assertEquals(0, spyReputation.getBattleArmorCount());
-        TestCase.assertEquals(0, spyReputation.getInfantryCount());
-        TestCase.assertEquals(0, spyReputation.getNonAdminPersonnelCount());
-        TestCase.assertEquals(0, spyReputation.getDropshipCount());
+        Assert.assertEquals(0, spyReputation.getMechCount());
+        Assert.assertEquals(0, spyReputation.getFighterCount());
+        Assert.assertEquals(0, spyReputation.getProtoCount());
+        Assert.assertEquals(0, spyReputation.getVeeCount());
+        Assert.assertEquals(0, spyReputation.getBattleArmorCount());
+        Assert.assertEquals(0, spyReputation.getInfantryCount());
+        Assert.assertEquals(0, spyReputation.getNonAdminPersonnelCount());
+        Assert.assertEquals(0, spyReputation.getDropshipCount());
         BigDecimalAssert.assertEquals(BigDecimal.ZERO, spyReputation.getTotalSkillLevels(), 2);
-        TestCase.assertEquals(0, spyReputation.getMechTechTeamsNeeded());
-        TestCase.assertEquals(0, spyReputation.getProtoTechTeamsNeeded());
-        TestCase.assertEquals(0, spyReputation.getFighterTechTeamsNeeded());
-        TestCase.assertEquals(0, spyReputation.getVeeTechTeamsNeeded());
-        TestCase.assertEquals(0, spyReputation.getBattleArmorTechTeamsNeeded());
-        TestCase.assertEquals(0, spyReputation.getInfantryTechTeamsNeeded());
-        TestCase.assertEquals(0, spyReputation.getAdminsNeeded());
-        TestCase.assertEquals(BigDecimal.ZERO, spyReputation.calcAverageExperience());
-        TestCase.assertEquals(0, spyReputation.getExperienceValue());
+        Assert.assertEquals(0, spyReputation.getMechTechTeamsNeeded());
+        Assert.assertEquals(0, spyReputation.getProtoTechTeamsNeeded());
+        Assert.assertEquals(0, spyReputation.getFighterTechTeamsNeeded());
+        Assert.assertEquals(0, spyReputation.getVeeTechTeamsNeeded());
+        Assert.assertEquals(0, spyReputation.getBattleArmorTechTeamsNeeded());
+        Assert.assertEquals(0, spyReputation.getInfantryTechTeamsNeeded());
+        Assert.assertEquals(0, spyReputation.getAdminsNeeded());
+        Assert.assertEquals(BigDecimal.ZERO, spyReputation.calcAverageExperience());
+        Assert.assertEquals(0, spyReputation.getExperienceValue());
     }
 
     private void buildFreshCampaign() {
@@ -751,19 +751,19 @@ public class InterstellarOpsReputationTest {
     @Test
     public void testGetCommanderValue() {
         spyReputation.initValues();
-        TestCase.assertEquals(13, spyReputation.getCommanderValue());
+        Assert.assertEquals(13, spyReputation.getCommanderValue());
 
         // Test a brand new campaign.
         buildFreshCampaign();
         spyReputation.initValues();
-        TestCase.assertEquals(0, spyReputation.getCommanderValue());
+        Assert.assertEquals(0, spyReputation.getCommanderValue());
     }
 
     @Test
     public void testGetCombatRecordValue() {
         // New company with no record.
         spyReputation.initValues();
-        TestCase.assertEquals(0, spyReputation.getCombatRecordValue());
+        Assert.assertEquals(0, spyReputation.getCombatRecordValue());
 
         // Add a few missions.
         Mission winOne = Mockito.mock(Mission.class);
@@ -786,74 +786,74 @@ public class InterstellarOpsReputationTest {
         Mockito.when(active.isActive()).thenReturn(true);
         Mockito.when(active.getStatus()).thenReturn(Mission.S_ACTIVE);
         missionList.add(active);
-        TestCase.assertEquals(5, spyReputation.getCombatRecordValue());
+        Assert.assertEquals(5, spyReputation.getCombatRecordValue());
     }
 
     @Test
     public void testGetTransportValue() {
         spyReputation.initValues();
-        TestCase.assertEquals(20, spyReputation.getTransportValue());
+        Assert.assertEquals(20, spyReputation.getTransportValue());
 
         // Test a brand new campaign.
         buildFreshCampaign();
         spyReputation.initValues();
-        TestCase.assertEquals(0, spyReputation.getTransportValue());
+        Assert.assertEquals(0, spyReputation.getTransportValue());
     }
 
     @Test
     public void testGetSupportValue() {
         spyReputation.initValues();
-        TestCase.assertEquals(-5, spyReputation.getSupportValue());
+        Assert.assertEquals(-5, spyReputation.getSupportValue());
 
         // Test a brand new campaign.
         buildFreshCampaign();
         spyReputation.initValues();
-        TestCase.assertEquals(0, spyReputation.getSupportValue());
+        Assert.assertEquals(0, spyReputation.getSupportValue());
     }
 
     @Test
     public void testGetFinancialValue() {
         spyReputation.initValues();
-        TestCase.assertEquals(0, spyReputation.getFinancialValue());
+        Assert.assertEquals(0, spyReputation.getFinancialValue());
 
         // Test a brand new campaign.
         buildFreshCampaign();
         spyReputation.initValues();
-        TestCase.assertEquals(0, spyReputation.getFinancialValue());
+        Assert.assertEquals(0, spyReputation.getFinancialValue());
     }
 
     @Test
     public void testCalculateUnitRatingScore() {
         spyReputation.initValues();
-        TestCase.assertEquals(38, spyReputation.calculateUnitRatingScore());
+        Assert.assertEquals(38, spyReputation.calculateUnitRatingScore());
 
         // Test a brand new campaign.
         buildFreshCampaign();
         spyReputation.initValues();
-        TestCase.assertEquals(0, spyReputation.calculateUnitRatingScore());
+        Assert.assertEquals(0, spyReputation.calculateUnitRatingScore());
     }
 
     @Test
     public void testGetReputationModifier() {
         spyReputation.initValues();
-        TestCase.assertEquals(3, spyReputation.getModifier());
+        Assert.assertEquals(3, spyReputation.getModifier());
 
         // Test a brand new campaign.
         buildFreshCampaign();
         spyReputation.initValues();
-        TestCase.assertEquals(0, spyReputation.getModifier());
+        Assert.assertEquals(0, spyReputation.getModifier());
     }
 
     @Test
     public void testGetAverageExperience() {
         spyReputation.initValues();
-        TestCase.assertEquals(SkillType.getExperienceLevelName(SkillType.EXP_REGULAR),
+        Assert.assertEquals(SkillType.getExperienceLevelName(SkillType.EXP_REGULAR),
                               spyReputation.getAverageExperience());
 
         // Test a brand new campaign.
         buildFreshCampaign();
         spyReputation.initValues();
-        TestCase.assertEquals(SkillType.getExperienceLevelName(-1),
+        Assert.assertEquals(SkillType.getExperienceLevelName(-1),
                               spyReputation.getAverageExperience());
     }
 
@@ -905,7 +905,7 @@ public class InterstellarOpsReputationTest {
                 "Criminal Activity:              0 (MHQ does not currently track criminal activity.)\n" +
                 "Inativity Modifier:             0 (MHQ does not track end dates for missions/contracts.)";
         spyReputation.initValues();
-        TestCase.assertEquals(expectedDetails, spyReputation.getDetails());
+        Assert.assertEquals(expectedDetails, spyReputation.getDetails());
 
         // Test a brand new campaign.
         expectedDetails =
@@ -955,6 +955,53 @@ public class InterstellarOpsReputationTest {
                 "Inativity Modifier:             0 (MHQ does not track end dates for missions/contracts.)";
         buildFreshCampaign();
         spyReputation.initValues();
-        TestCase.assertEquals(expectedDetails, spyReputation.getDetails());
+        Assert.assertEquals(expectedDetails, spyReputation.getDetails());
+    }
+
+    @Test
+    public void testCalcTechSupportValue() {
+        Assert.assertEquals(0, spyReputation.calcTechSupportValue());
+
+        // Test having techs and astechs without having any combat units.
+        Mockito.doReturn(12).when(mockCampaign).getNumberAstechs();
+        Mockito.doReturn(mockCampaign).when(spyReputation).getCampaign();
+        ArrayList<Person> techs = new ArrayList<>(2);
+        techs.add(mockThunderbolt1Tech);
+        techs.add(mockThunderbolt2Tech);
+        Mockito.doReturn(techs).when(mockCampaign).getTechs();
+        Mockito.doReturn(0).when(spyReputation).getMechTechTeamsNeeded();
+        Mockito.doReturn(0).when(spyReputation).getVeeTechTeamsNeeded();
+        Mockito.doReturn(0).when(spyReputation).getFighterTechTeamsNeeded();
+        Mockito.doReturn(0).when(spyReputation).getBattleArmorTechTeamsNeeded();
+        Mockito.doReturn(0).when(spyReputation).getProtoTechTeamsNeeded();
+        Mockito.doReturn(0).when(spyReputation).getInfantryTechTeamsNeeded();
+        Assert.assertEquals(0, spyReputation.calcTechSupportValue());
+
+        // Test having techs without having any astechs.
+        Mockito.doReturn(0).when(mockCampaign).getNumberAstechs();
+        Mockito.doReturn(mockCampaign).when(spyReputation).getCampaign();
+        techs = new ArrayList<>(2);
+        techs.add(mockThunderbolt1Tech);
+        techs.add(mockThunderbolt2Tech);
+        Mockito.doReturn(techs).when(mockCampaign).getTechs();
+        Mockito.doReturn(2).when(spyReputation).getMechTechTeamsNeeded();
+        Mockito.doReturn(0).when(spyReputation).getVeeTechTeamsNeeded();
+        Mockito.doReturn(0).when(spyReputation).getFighterTechTeamsNeeded();
+        Mockito.doReturn(0).when(spyReputation).getBattleArmorTechTeamsNeeded();
+        Mockito.doReturn(0).when(spyReputation).getProtoTechTeamsNeeded();
+        Mockito.doReturn(0).when(spyReputation).getInfantryTechTeamsNeeded();
+        Assert.assertEquals(-5, spyReputation.calcTechSupportValue());
+
+        // Test having astechs without having any techs.
+        Mockito.doReturn(12).when(mockCampaign).getNumberAstechs();
+        Mockito.doReturn(mockCampaign).when(spyReputation).getCampaign();
+        Mockito.doReturn(new ArrayList<>(0)).when(mockCampaign).getTechs();
+        Mockito.doReturn(2).when(spyReputation).getMechTechTeamsNeeded();
+        Mockito.doReturn(0).when(spyReputation).getVeeTechTeamsNeeded();
+        Mockito.doReturn(0).when(spyReputation).getFighterTechTeamsNeeded();
+        Mockito.doReturn(0).when(spyReputation).getBattleArmorTechTeamsNeeded();
+        Mockito.doReturn(0).when(spyReputation).getProtoTechTeamsNeeded();
+        Mockito.doReturn(0).when(spyReputation).getInfantryTechTeamsNeeded();
+        Assert.assertEquals(-5, spyReputation.calcTechSupportValue());
     }
 }
