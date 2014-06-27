@@ -12,6 +12,8 @@ v0.3.6 (SVN)
     satisfy Feature Request 164 with some refactoring and unit testing.  Also added code to allow the inclusion of a
     specific Tech's ID to place at the front of the returned list (partially satisfying Feature Request 162).
 + Bug {#518]: IntOps: Tech/Astech divide by zero
++ Bug: Infinite Loop from Bugfix for [#518]
++ Bug [515]: Tech Import bug (cosmetic only I think)
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4

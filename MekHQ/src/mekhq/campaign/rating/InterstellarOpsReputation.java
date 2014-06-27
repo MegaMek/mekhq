@@ -307,6 +307,7 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
         }
         BigDecimal averageGunnery = new BigDecimal(totalGunnery)
                 .divide(new BigDecimal(crew.size()), 3, RoundingMode.HALF_UP);
+        Thread.dumpStack();
         BigDecimal averagePilot;
         if (UnitType.BATTLE_ARMOR == unitType || UnitType.INFANTRY == unitType) {
             averagePilot = new BigDecimal(totalPilot).divide(new BigDecimal(crew.size()), 3, RoundingMode.HALF_UP);
@@ -322,7 +323,7 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
             skillLevel = skillLevel.add(averageGunnery).add(BigDecimal.ONE);
         }
 
-        setTotalSkillLevels(getTotalSkillLevels().add(skillLevel));
+        setTotalSkillLevels(getTotalSkillLevels(false).add(skillLevel));
     }
 
     @Override

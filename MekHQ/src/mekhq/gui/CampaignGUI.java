@@ -4111,6 +4111,10 @@ public class CampaignGUI extends JPanel {
                 if (p != null) {
                     getCampaign().addPersonWithoutId(p, true);
                 }
+                
+                // Clear some values we no longer should have set in case this has transferred campaigns or things in the campaign have changed...
+                p.setUnitId(null);
+                p.clearTechUnitIDs();
             }
             MekHQ.logMessage("Finished load of personnel file");
         }
