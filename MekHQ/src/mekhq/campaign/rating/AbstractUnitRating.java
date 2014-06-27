@@ -586,12 +586,10 @@ public abstract class AbstractUnitRating implements IUnitRating {
         this.mechCount = mechCount;
     }
 
-    @SuppressWarnings("UnusedDeclaration")
     protected int getSuperHeavyMechCount() {
         return superHeavyMechCount;
     }
 
-    @SuppressWarnings("UnusedDeclaration")
     protected void setSuperHeavyMechCount(int superHeavyMechCount) {
         this.superHeavyMechCount = superHeavyMechCount;
     }
@@ -724,12 +722,10 @@ public abstract class AbstractUnitRating implements IUnitRating {
         this.mechBayCount = mechBayCount;
     }
 
-    @SuppressWarnings("UnusedDeclaration")
     protected int getSuperHeavyMechBayCount() {
         return superHeavyMechBayCount;
     }
 
-    @SuppressWarnings("UnusedDeclaration")
     protected void setSuperHeavyMechBayCount(int superHeavyMechBayCount) {
         this.superHeavyMechBayCount = superHeavyMechBayCount;
     }
@@ -738,7 +734,6 @@ public abstract class AbstractUnitRating implements IUnitRating {
         return protoBayCount;
     }
 
-    @SuppressWarnings("UnusedDeclaration")
     protected void setProtoBayCount(int protoBayCount) {
         this.protoBayCount = protoBayCount;
     }
