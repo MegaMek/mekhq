@@ -69,7 +69,7 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
     private int veeTechTeams = 0;
     private int baTechTeams = 0;
     private int generalTechTeams = 0; // ToDo: Should Protomech & Infantry techs be counted as separate skills?
-    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection") private List<String> craftWithoutCrew = new ArrayList<>();
+    private List<String> craftWithoutCrew = new ArrayList<>();
 
     public InterstellarOpsReputation(Campaign campaign) {
         super(campaign);
@@ -905,7 +905,6 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
         return craftWithoutCrew;
     }
 
-    @SuppressWarnings("UnusedDeclaration")
     protected void setCraftWithoutCrew(List<String> craftWithoutCrew) {
         this.craftWithoutCrew = craftWithoutCrew;
     }
