@@ -449,7 +449,19 @@ public abstract class AbstractUnitRating implements IUnitRating {
      * @return
      */
     protected BigDecimal getTotalSkillLevels() {
-        initValues();
+    	return getTotalSkillLevels(true);
+    }
+    
+    /**
+     * Returns the sum of all experience rating for all combat units.
+     *
+     * @param canInit Whether or not this method may initialize the values
+     * @return
+     */
+    protected BigDecimal getTotalSkillLevels(boolean canInit) {
+    	if (canInit && !isInitialized()) {
+    		initValues();
+    	}
         return totalSkillLevels;
     }
 

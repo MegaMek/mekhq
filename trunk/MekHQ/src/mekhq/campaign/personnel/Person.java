@@ -2193,6 +2193,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public void addTechUnitID(UUID i) {
         techUnitIds.add(i);
     }
+    
+    public void clearTechUnitIDs() {
+    	techUnitIds.clear();
+    }
 
     public ArrayList<UUID> getTechUnitIDs() {
         return techUnitIds;
