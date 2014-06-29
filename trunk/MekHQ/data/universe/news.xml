@@ -222,6 +222,106 @@ During the speech, Captain-General Janos Marik called for death to all traitors 
 		<location>Regulus</location>
 	</newsItem>
 	<newsItem>
+		<headline>New Wessex Suffers Collateral Damage During Lyran Raid</headline>
+		<date>3020-09-20</date>
+		<desc><![CDATA[New Wessex is the latest casualty of the war between the Draconis Combine and the Lyran Commonwealth. During an orbital battle earlier this year the LCS St. Brendan entered the atmosphere and suffered a catastrophic engine containment failure. The resulting explosion rained tons of radioactive debris across Jaricosa. Reports are still coming in and medical professionals and scientists are preparing for an increase in cancer and other radiation exposure symptoms of incalcuable levels.]]></desc>
+		<date>3020-10-10</date>
+		<service>INN</service>
+		<location>New Wessex</location>
+	</newsItem>
+	<newsItem>
+		<headline>Truth Massacre</headline>
+		<date>3020-09-22</date>
+		<desc><![CDATA[Capellan Confederation media reports that mercenaries have attacked Truth and butchered the population. Initial estimates indicate that as many as 50,000 people were killed, some dragged from their homes and executed, others fired upon by the mercenary battlemechs as they fled. So far there has been no official response from the Capellan government. ComStar has dennounced the mercenaries and branded them rogue.]]></desc>
+		<service>INN</service>
+		<location>Truth</location>
+	</newsItem>
+	<newsItem>
+		<headline>Lyran Alliance Founds New War College</headline>
+		<date>3020-10-15</date>
+		<desc><![CDATA[The Lyran Alliance welcomes the first class to be enrolled in the War College of Buena on Fort Buena. The grueling schedule includes not only combat skills as well as academic studies but also technical and logistics managment courses. The intent is to produce officers who are knowledgeable in all aspects of warfare. Only time will tell if these students will live up to the high expectations of the LAAF commanders.]]></desc>
+		<service>TBC</service>
+		<location>Tharkad</location>
+	</newsItem>
+	
+	<newsItem>
+		<headline>New Member of the Royal Family!</headline>
+		<date>3030-05-01</date>
+		<desc><![CDATA[The Federated Commonwealth has a new member of the royal family. On 12 April 3030 Archon-Designate Melissa Steiner-Davion and First Prince Hanse Davion welcomed Victor Steiner-Davion to the world. The new Prince has a long road ahead of him to see the continuation of the Federated Commonwealth into the next generation. All of us here at the TBC wish the Prince a long and joyous life and congratulate the the royal family on its new member. ]]></desc>
+		<service>TBC</service>
+		<location>Tharkad</location>
+	</newsItem>
+	<newsItem>
+		<headline>A New Successor State is Born</headline>
+		<date>3034-04-01</date>
+		<desc><![CDATA[Gunji-no-Kanrei Theodore Kurita formally acknowledged the creation of the Free Rasalhague Republic earlier this year. The proclaimed Prince of the Free Rasalhague Republic, Haakon Magnusson has now created a realm for himself from both Draconis Combine as well as Federated Commonwealth worlds in the former Rasalhague Military District. Only time will tell how this new power will be treated in the large political world that is the Inner Sphere. Good luck Prince Magnusson, you are going to need it. ]]></desc>
+		<service>INN</service>
+		<location>Rasalhague</location>
+	</newsItem>
+	<newsItem>
+		<headline>First-Prince to Coordinator, "We have waited long enough for justice!"</headline>
+		<date>3039-04-15</date>
+		<desc><![CDATA[First-Prince Hanse Davion announced today that the Federated Commonwealth will no longer sit by while its citizens are brutalized by Kuritan thugs. In response to several incidents of former Federated worlds being dealth with harshly by armed Kuritan officials and military personnel the First-Prince declared a war of liberation on those worlds. During his speech this morning from New Avalon he announced that "Steps must be taken to deal with the Kuritan tyranny." Officials who spoke with the TBC on the condition of anonymity this afternoon indicated that several elite units are mobilizing and will be ready to attack the Draconis Combine as early as the next few weeks.]]></desc>
+		<service>TBC</service>
+		<location>Tharkad</location>
+	</newsItem>
+	<newsItem>
+		<headline>Fifth Succession War?</headline>
+		<date>3039-05-01</date>
+		<desc><![CDATA[Reports of attacks against the Combine worlds of Alrakis and Alnasi have been filtering through official and unoffical channels. This follows a declaration of liberation by First-Prince Hanse Davion last month. These events have stunned many who predicted that the Steiner-Davion marriage was going to usher in a new era of peace after the attempts to conquer the Capellan Confederation. Analysts are struggling to piece these new reorts together and anticipate the DCMS response.]]></desc>
+		<service>INN</service>
+		<location>Outreach</location>
+	</newsItem>
+	<newsItem>
+		<headline>Solaris Tension Rises as War Approaches</headline>
+		<date>3039-05-07</date>
+		<desc><![CDATA[Authorities have reported increasing numbers of incidents involving Draconis and Federated citizens and stable affiliated mechwarriors as things heat up throughtout the Inner Sphere. Several mechwarriors have been arrested and at least four civilian deaths have been reported. Stable owners have been warned that any incident will be met with harsh punishment and that any mechwarriors identified inciting violence outside of the arena will be treated accordingly. As a result of the increasing tension on the Commonwealth/Combine border, arena attendance has been higher than normal and betting has seen a large increasein volume. Officials went on record to say "No matter the situation out there on those worlds Solaris will always be a place where people can come and get away from all of the politics, and maybe make a profit from it in the process."]]></desc>
+		<service>S7NN</service>
+		<location>Solaris VII</location>
+	</newsItem>
+	<newsItem>
+		<headline>Riding A Pale Horse</headline>
+		<date>3039-05-11</date>
+		<desc><![CDATA[The Gray Death Legion achieved fame with its exploits on Helm and its subsequent accomplishments in the Fourth Succession War. The War of 3039 has seen this elite mercenary unit in action once more. Our correspondent, Nathalie Myers, accompanied them to Altais and brings this report. 
+				<p>Myers: I’m here on the outskirts of New Ross with Legion officer Davis McCall. Major McCall, can you tell me what happened here?
+				<p>McCall: It were a reet mess, lassie. It all gaed ta bugry when t’ beacon fritzed and me and the lads and lasses were chucked all o’er the toon. We wuz skittering all o’er the toon like Caledonian flitter.
+				<p>Myers: So it was a confused landing?
+				<p>McCall: Aye, more chappit tatties than rummledethump. Wee Andy’s haed his heed knocked off in’t first seconds but ah winnae let summet like dat gae me doon and wasnae disjaskit. Ah cracked the Sassenach that battered wee Andy and gae him a kickin’ before gannin’ back tae the sodger lads, rallyin’ them for a counterattack. 
+				<p>Myers: You weren’t going to stay on the defensive?
+				<p>McCall: Ahm nae bampot, lassie. I ken the need tae kick ‘em Snakes in t’ bollocks—pardon my French—while they’re nae ready. Those bogles were gae’n themsels organized so yis had tae act.
+				<p>Myers: Did it work?
+				<p>McCall: Well, lassie, there ye hae a gid question. Ah dinnae ‘spect ‘em tae bugger off but they’re hard scunners and gae as gid as they got.
+				<p>Myers: What was your thought when you realized that? Were you afraid for your life?
+				<p>McCall: I’d be touched if ah wasnae worried, but I’m nae eejit. We werenae feenisht yet, particular if wis helt till Gray show’d up.
+				<p>Myers: You expected Colonel Carlyle to rescue you?
+				<p>McCall: Nae, lassie, but he hae a knack o’turnin’ up when he’s needed, ye ken?
+				<p>[Colonel Carlyle arrives and whispers briefly to McCall]
+				<p>McCall: Sure Gray, no problem. I’ll be right over once I’m finished here.]]></desc>
+		<service>Donegal Broadcasting Corporation</service>
+		<location>Altais</location>
+	</newsItem>
+	<newsItem>
+		<headline>AFFS Battalion Commander Flees Battle, Steals Jumpship</headline>
+		<date>3039-08-23</date>
+		<desc><![CDATA[The defenders of Halstead Station are a little shorthanded lately as reports of an AFFS officer leaving his post along with his entire battalion including dropships and a jumpship have been coming through unofficial channels. AFFS leaders have so far declined to comment on this report and have denied any morale issues within their officer corps. Several veteran units were stationed on the planet and it is not known at this time who the officer was or their unit affiliation.]]></desc>
+		<service>INN</service>
+		<location>Halstead Station</location>
+	</newsItem>
+	<newsItem>
+		<headline>Davion Commander Mutiny's, Flees Federated Space </headline>
+		<date>3039-08-25</date>
+		<desc><![CDATA[Glory to the Dragon! Davion forces flee from Halstead Station in the face of superior mechwarriors of the Sword of Light regiments taking with them several dropships as well as a jumpship. The commander chose to abandon his post without honor when he was informed of the elite regiments arriving on planet. He was said to have addressed his troops from low orbit on his intent to join a Periphery bandit clan. This latest incident shows just how much Federated officers fear the Combine military and can clearly see that they stand no chance against the will of the Coordinator.]]></desc>
+		<service>Voice of the Dragon</service>
+		<location>Halstead Station</location>
+	</newsItem>
+	<newsItem>
+		<headline>Galedon V in Flames</headline>
+		<date>3044-08-01</date>
+		<desc><![CDATA[The planets in the Galedon system are reporting uprisings against the Draconis garrison forces amid reports of war-crimes. Reports are spotty and local media outlets have been supressed by DC troops. Both sides are reportedly looking for mercenaries units.]]></desc>
+		<service>INN</service>
+		<location>Outreach</location>
+	</newsItem>
+	<newsItem>
 		<headline>Axman Unveiled</headline>
 		<date>3048-02-10</date>
 		<desc><![CDATA[Today the Federated Commonwealth unveiled a brand new design, developed by Team Banzai and the NAIS, the new <i>Axman</i> is the follow up to the iconic <i>Hatchetman</i> BattleMech. The new <i>Axman</i> weighs significantly more than its predecessor but is otherwise very similar. Both 'Mechs wield massive hatchets and are armed with large-bore auto-cannons for destroying other 'Mechs and both designs have a top speed of nearly 65 km/h and jump jets. The biggest difference between the <i>Axman</i> and the <i>Hatchetman</i>, other than their size, is the inclusion of rediscovered Lostech on the <i>Axman</i>.]]></desc>

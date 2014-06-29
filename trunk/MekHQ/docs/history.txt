@@ -14,6 +14,7 @@ v0.3.6 (SVN)
 + Bug {#518]: IntOps: Tech/Astech divide by zero
 + Bug: Infinite Loop from Bugfix for [#518]
 + Bug [515]: Tech Import bug (cosmetic only I think)
++ Update to News.xml
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
