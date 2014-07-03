@@ -222,6 +222,54 @@ During the speech, Captain-General Janos Marik called for death to all traitors 
 		<location>Regulus</location>
 	</newsItem>
 	<newsItem>
+		<headline>Marik Civil War Updates</headline>
+		<date>3014-12-03</date>
+		<desc><![CDATA[The Civil War between brothers continues to rage in the Free Worlds League. Insider reports indicate that forces loyal to Anton Marik, the rebelling brother to Captain-General Janos Marik, have secured some key victories in their fight to overthrow the leader of the League, including the capture of the 'Mech factories on Irian and Emris IV, as well as additional military manufacturing on Bernardo and Asuncion. However, Anton's forces have suffered several setbacks and reversals that could put an end to this war soon. However, so far the biggest setbacks have been political and not on the battlefield. While many regions of the Free Worlds League have declared their neutrality in the conflict and have reserved their forces for the defense of their holdings from Liao and Steiner, the Captain-General has secured support of both Sirian and Regulus, two of the most powerful regions of the League. With the new forces they can provide to the Captain-General, even the elite Wolf's Dragoons may not be enough to keep Anton's Rebellion alive.]]></desc>
+		<service>INN</service>
+		<location>New Home</location>
+	</newsItem>
+	<newsItem>
+		<headline>Anton Marik Colludes With Confederation</headline>
+		<date>3015-01-23</date>
+		<desc><![CDATA[Rumors abound that Anton Marik, rebel brother of Captain-General Janos Marik, has been colluding and working closely with the Capellan Confederation before and during his on-going revolt. While no hard evidence exists, rumors continue to surface, and the fact that the Wolf's Dragoons left the service of Liao early and without any complaints of contract breaking, suggest that the contract was instead passed to Anton Marik by agreement. How can a man that claims to be fighting for the benefit of the Free Worlds League collude with our enemy?]]></desc>
+		<service>GB</service>
+		<location>Atreus</location>
+	</newsItem>
+	<newsItem>
+		<headline>Anton Marik Killed</headline>
+		<date>3015-04-04</date>
+		<desc><![CDATA[The Civil War between Captain Janos Marik and his brother Anton has ended today. Reports are still coming in from New Delos, however, all reports indicate that some major disagreement between Colonel Jamie Wolf and Anton Marik resulted in the deaths of more than two-dozen Dragoons dependents. After which, Colonel Wolf unleashed the full fury of the Dragoons against Anton Marik and his forces on New Delos.
+
+Reports indicate that Anton Marik's palatial fortress and headquarters at Cienfuegos was completely leveled by the enrgaged Dragoons and the “Ducal Guards” and the 18th Marik Militia defending him were reportedly hunted down and destroyed to the last man.
+
+With their leader lost, the already flagging rebel forces are quickly falling to loyalist forces and for the first time in months, the Free Worlds League may be nearing peace.]]></desc>
+		<service>GB</service>
+		<location>Atreus</location>
+	</newsItem>
+	<newsItem>
+		<headline>Wolfs Dragoons New Employer</headline>
+		<date>3015-05-10</date>
+		<desc><![CDATA[In an odd twist of fate, after months of bitter fighting for his brother, Wolf's Dragoons have signed a contract with Captain-General Janos Marik's Free Worlds League. While we do not have word on where they will be deployed, it is likely safe to assume the Captain-General will be deploying them against the Lyran Commonwealth in retribution for attacks against the League while the nation was embroiled in a Civil War. Reports indicate that Captain-General Janos Marik personally reached out to the Dragoons to request their services.]]></desc>
+		<service>INN</service>
+		<location>Galatea</location>
+	</newsItem>
+	<newsItem>
+		<headline>Kell Hounds Disband</headline>
+		<date>3015-07-13</date>
+		<desc><![CDATA[The Kell Hounds are known throughout the Lyran Commonwealth as an elite mercenary regiment, led by the legendary brothers Morgan and Patrick Kell. However, today that has changed. Reports indicate that nearly two-thirds of the Hounds have disbanded and are seeking work with other commands, apparently at the request of Colonel Morgan Kell, who has himself gone into exile. There is no explanation from the Hounds and Colonel Patrick Kell declined to comment when TBC asked what caused the collapse of the Kell Hounds.]]></desc>
+		<service>TBC</service>
+		<location>Tharkad</location>
+	</newsItem>
+	<newsItem>
+		<headline>New Delos Treason Trials End</headline>
+		<date>3015-10-20</date>
+		<desc><![CDATA[The so-called “New Delos Treason Trials” have finally ended, closing the curtain on a dark period in the long history of the Free Worlds League. The trials were ruthless for those that supported the rebel Anton Marik and fought against Captain-General Janos Marik. The majority of Anton's top supporters and senior officials were found guilty and executed, while lesser supporters were exiled to prison planets or sent to hard labor for their treason. Even the nobles of the League were not spared, even the Captain-General Janos Marik's second son, Gerald Marik, was executed for his part in Anton's Revolt.
+
+Beyond the bloody results of the treason trials, the Free Worlds League remains a nation divided. The rebels are gone but distrust remains between loyalists and those that remained neutral after invoking the Home Defense Act and the FWL Parliament remains splits politically, with many members at odds with each other or the Captain-General.]]></desc>
+		<service>INN</service>
+		<location>New Home</location>
+	</newsItem>
+	<newsItem>
 		<headline>New Wessex Suffers Collateral Damage During Lyran Raid</headline>
 		<date>3020-09-20</date>
 		<desc><![CDATA[New Wessex is the latest casualty of the war between the Draconis Combine and the Lyran Commonwealth. During an orbital battle earlier this year the LCS St. Brendan entered the atmosphere and suffered a catastrophic engine containment failure. The resulting explosion rained tons of radioactive debris across Jaricosa. Reports are still coming in and medical professionals and scientists are preparing for an increase in cancer and other radiation exposure symptoms of incalcuable levels.]]></desc>
