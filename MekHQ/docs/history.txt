@@ -19,6 +19,7 @@ v0.3.6 (SVN)
 + Re-work if statements and otherwise make Utilities.getAllVariants() more readable
 + Bug: Salvaged units were not being initialized and diagnosed for non-contract missions
 + Bug [516]: Scrapping breached location does not remove breach
++ Bug [507]: Special characters causing problems in xml files
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
