@@ -600,6 +600,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				
 				 if (wn2.getNodeName().equalsIgnoreCase("id")) {
 					retVal.id = Integer.parseInt(wn2.getTextContent());
+					
+					if (retVal.getId() == 770) {
+						int dnej = retVal.getId();
+					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("name")) {
 					retVal.name = wn2.getTextContent();
 				} else if (wn2.getNodeName().equalsIgnoreCase("unitTonnage")) {
