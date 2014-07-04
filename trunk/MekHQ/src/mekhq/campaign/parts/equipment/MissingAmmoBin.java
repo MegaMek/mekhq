@@ -53,6 +53,21 @@ public class MissingAmmoBin extends MissingEquipmentPart {
         	this.name += " Bin";
         }
     }
+
+	@Override 
+	public void fix() {
+		Part replacement = findReplacement(false);
+		if(null != replacement) {
+			Part actualReplacement = replacement.clone();
+			unit.addPart(actualReplacement);
+			campaign.addPart(actualReplacement, 0);
+			replacement.decrementQuantity();
+			((EquipmentPart)actualReplacement).setEquipmentNum(equipmentNum);
+			remove(false);
+			//assign the replacement part to the unit
+			actualReplacement.updateConditionFromPart();
+		}
+	}
 	
 	@Override
 	public boolean isAcceptableReplacement(Part part, boolean refit) {

@@ -1823,6 +1823,8 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
             		aeroThrustersRight = ((Thrusters) part);
             	}
             }
+
+    		part.updateConditionFromPart();
     	}
     	//now check to see what is null
     	for(int i = 0; i<locations.length; i++) {
