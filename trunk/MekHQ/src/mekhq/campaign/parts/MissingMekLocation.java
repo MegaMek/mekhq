@@ -309,7 +309,8 @@ public class MissingMekLocation extends MissingPart {
 	    }*/
 	    boolean lifeSupport = (loc == Mech.LOC_HEAD);
 	    boolean sensors = (loc == Mech.LOC_HEAD);
-		return new MekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad, sensors, lifeSupport, campaign);
+	    Part nPart = new MekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad, sensors, lifeSupport, campaign);
+		return nPart;
 	}
 	
 	@Override
