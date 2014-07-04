@@ -8316,8 +8316,6 @@ public class CampaignGUI extends JPanel {
                                 cbMenuItem.addActionListener(this);
                                 soldierMenu.add(cbMenuItem);
                             }
-                            menu.setEnabled(!person.isDeployed());
-                            popup.add(menu);
                         } else if (areAllBattleArmor(selected)) {
                             if (!(unit.getEntity() instanceof BattleArmor)) {
                                 continue;
@@ -8329,8 +8327,6 @@ public class CampaignGUI extends JPanel {
                                 cbMenuItem.addActionListener(this);
                                 soldierMenu.add(cbMenuItem);
                             }
-                            menu.setEnabled(!person.isDeployed());
-                            popup.add(menu);
                         } else if (areAllVeeGunners(selected)) {
                             if (!(unit.getEntity() instanceof Tank)) {
                                 continue;
@@ -8387,51 +8383,51 @@ public class CampaignGUI extends JPanel {
                                 navMenu.add(cbMenuItem);
                             }
                         }
-                        if (soldierMenu.getItemCount() > 0) {
-                            menu.add(soldierMenu);
-                            if (soldierMenu.getItemCount() > 20) {
-                                MenuScroller.setScrollerFor(soldierMenu, 20);
-                            }
-                        }
-                        if (pilotMenu.getItemCount() > 0) {
-                            menu.add(pilotMenu);
-                            if (pilotMenu.getItemCount() > 20) {
-                                MenuScroller.setScrollerFor(pilotMenu, 20);
-                            }
-                        }
-                        if (driverMenu.getItemCount() > 0) {
-                            menu.add(driverMenu);
-                            if (driverMenu.getItemCount() > 20) {
-                                MenuScroller.setScrollerFor(driverMenu, 20);
-                            }
-                        }
-                        if (crewMenu.getItemCount() > 0) {
-                            menu.add(crewMenu);
-                            if (crewMenu.getItemCount() > 20) {
-                                MenuScroller.setScrollerFor(crewMenu, 20);
-                            }
-                        }
-                        if (navMenu.getItemCount() > 0) {
-                            menu.add(navMenu);
-                            if (navMenu.getItemCount() > 20) {
-                                MenuScroller.setScrollerFor(navMenu, 20);
-                            }
-                        }
-                        if (gunnerMenu.getItemCount() > 0) {
-                            menu.add(gunnerMenu);
-                            if (gunnerMenu.getItemCount() > 20) {
-                                MenuScroller.setScrollerFor(gunnerMenu, 20);
-                            }
-                        }
-                        if (soldierMenu.getItemCount() > 0) {
-                            menu.add(soldierMenu);
-                            if (soldierMenu.getItemCount() > 20) {
-                                MenuScroller.setScrollerFor(soldierMenu, 20);
-                            }
-                        }
-                        menu.setEnabled(!person.isDeployed());
-                        popup.add(menu);
                     }
+                    if (soldierMenu.getItemCount() > 0) {
+                        menu.add(soldierMenu);
+                        if (soldierMenu.getItemCount() > 20) {
+                            MenuScroller.setScrollerFor(soldierMenu, 20);
+                        }
+                    }
+                    if (pilotMenu.getItemCount() > 0) {
+                        menu.add(pilotMenu);
+                        if (pilotMenu.getItemCount() > 20) {
+                            MenuScroller.setScrollerFor(pilotMenu, 20);
+                        }
+                    }
+                    if (driverMenu.getItemCount() > 0) {
+                        menu.add(driverMenu);
+                        if (driverMenu.getItemCount() > 20) {
+                            MenuScroller.setScrollerFor(driverMenu, 20);
+                        }
+                    }
+                    if (crewMenu.getItemCount() > 0) {
+                        menu.add(crewMenu);
+                        if (crewMenu.getItemCount() > 20) {
+                            MenuScroller.setScrollerFor(crewMenu, 20);
+                        }
+                    }
+                    if (navMenu.getItemCount() > 0) {
+                        menu.add(navMenu);
+                        if (navMenu.getItemCount() > 20) {
+                            MenuScroller.setScrollerFor(navMenu, 20);
+                        }
+                    }
+                    if (gunnerMenu.getItemCount() > 0) {
+                        menu.add(gunnerMenu);
+                        if (gunnerMenu.getItemCount() > 20) {
+                            MenuScroller.setScrollerFor(gunnerMenu, 20);
+                        }
+                    }
+                    if (soldierMenu.getItemCount() > 0) {
+                        menu.add(soldierMenu);
+                        if (soldierMenu.getItemCount() > 20) {
+                            MenuScroller.setScrollerFor(soldierMenu, 20);
+                        }
+                    }
+                    menu.setEnabled(!person.isDeployed());
+                    popup.add(menu);
                 }
                 if (oneSelected && person.isActive()) {
                     menu = new JMenu("Spend XP");

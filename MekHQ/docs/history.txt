@@ -21,6 +21,7 @@ v0.3.6 (SVN)
 + Bug [516]: Scrapping breached location does not remove breach
 + Bug [507]: Special characters causing problems in xml files
 + Bug [511]: Ammo Reload Tasks Disappearing
++ Bug [514]: List of available vehicles for assignment error
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
