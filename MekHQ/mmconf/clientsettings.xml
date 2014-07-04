@@ -1,21 +1,21 @@
 <?xml version="1.0"?>
 <MegaMekSettings>
 	<store name="ClientSettings">
-		<preference name="LastPlayerCamoName" value="Wood1.jpg"/>
-		<preference name="LastPlayerCategory" value=""/>
-		<preference name="LastPlayerColor" value="0"/>
+		<preference name="LastPlayerCamoName" value="7th Crucis Lancers RCT.jpg"/>
+		<preference name="LastPlayerCategory" value="Davion/Crucis Lancers/"/>
 		<preference name="megamek.megamek.goalplayers" value="2"/>
+		<preference name="LastPlayerColor" value="0"/>
 		<preference name="LastPlayerName" value="bob"/>
 		<preference name="megamek.megamek.metaservername" value="http://www.damour.info/cgi-bin/james/metaserver"/>
 	</store>
 	<store name="megamek.client.ui.AWT.GUIPreferences">
 	</store>
 	<store name="megamek.client.ui.swing.GUIPreferences">
-		<preference name="WindowSizeHeight" value="1030"/>
 		<preference name="MechSelectorWeightClass" value="4"/>
+		<preference name="WindowSizeHeight" value="1033"/>
 		<preference name="WindowPosY" value="25"/>
 		<preference name="WindowPosX" value="0"/>
-		<preference name="WindowSizeWidth" value="1920"/>
 		<preference name="MechSelectorRuleType" value="2"/>
+		<preference name="WindowSizeWidth" value="1928"/>
 	</store>
 </MegaMekSettings>
