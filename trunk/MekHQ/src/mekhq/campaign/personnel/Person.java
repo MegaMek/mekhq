@@ -889,11 +889,11 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     + "</id>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<portraitCategory>"
-                    + portraitCategory
+                    + MekHqXmlUtil.escape(portraitCategory)
                     + "</portraitCategory>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<portraitFile>"
-                    + portraitFile
+                    + MekHqXmlUtil.escape(portraitFile)
                     + "</portraitFile>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<xp>"
