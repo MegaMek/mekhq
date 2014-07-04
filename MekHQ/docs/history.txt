@@ -16,6 +16,7 @@ v0.3.6 (SVN)
 + Bug [515]: Tech Import bug (cosmetic only I think)
 + Update to News.xml
 + New MegaMek.jar 0.38.0 & MegaMekLab.jar 0.1.29
++ Re-work if statements and otherwise make Utilities.getAllVariants() more readable
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
