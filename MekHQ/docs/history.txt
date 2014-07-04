@@ -17,6 +17,8 @@ v0.3.6 (SVN)
 + Update to News.xml
 + New MegaMek.jar 0.38.0 & MegaMekLab.jar 0.1.29
 + Re-work if statements and otherwise make Utilities.getAllVariants() more readable
++ Bug: Salvaged units were not being initialized and diagnosed for non-contract missions
++ Bug [516]: Scrapping breached location does not remove breach
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4

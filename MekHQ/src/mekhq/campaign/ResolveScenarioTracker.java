@@ -867,10 +867,10 @@ public class ResolveScenarioTracker {
 		    checkForEquipmentStatus(salvageUnit.getEntity(), control);
 			campaign.clearGameData(salvageUnit.getEntity());
 			campaign.addUnit(salvageUnit.getEntity(), false, 0);
-			//if this is a contract, add to th salvaged value
+			salvageUnit.initializeParts(false);
+			salvageUnit.runDiagnostic();
+			//if this is a contract, add to the salvaged value
 			if(getMission() instanceof Contract) {
-				salvageUnit.initializeParts(false);
-				salvageUnit.runDiagnostic();
 				((Contract)getMission()).addSalvageByUnit(salvageUnit.getSellValue());
 			}
 		}
