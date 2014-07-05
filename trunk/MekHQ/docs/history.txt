@@ -23,6 +23,7 @@ v0.3.6 (SVN)
 + Bug [511]: Ammo Reload Tasks Disappearing
 + Bug [514]: List of available vehicles for assignment error
 + Bug [512]: Error on loading save with ASF bombs loaded in mekhq
++ Bug [491]: Doctor Queue never clears Permanent Injuries
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
