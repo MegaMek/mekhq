@@ -34,6 +34,7 @@ v0.3.6 (SVN)
 + Data: Updated all campaigns to be fully compatible with 0.3.6
 + Bug: By person rank system option not showing up on the menu for campaigns with WoB as the default system
 + Feature: Added in Comstar/WoB Branch Designations (WIP)
++ Data: Updated the WoB campaign file with more information
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
