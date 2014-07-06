@@ -36,6 +36,7 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
 import megamek.client.Client;
+import megamek.common.Aero;
 import megamek.common.BattleArmor;
 import megamek.common.Compute;
 import megamek.common.Crew;
@@ -844,6 +845,10 @@ public class ResolveScenarioTracker {
 			    checkForEquipmentStatus(en, control);
 				long currentValue = unit.getValueOfAllMissingParts();
 				campaign.clearGameData(en);
+				// FIXME: Need to implement a "fuel" part just like the "armor" part
+				if (en instanceof Aero) {
+					((Aero)en).setFuelTonnage(((Aero)ustatus.getBaseEntity()).getFuelTonnage());
+				}
 				unit.setEntity(en);
 				unit.runDiagnostic();
 				unit.resetPilotAndEntity();
@@ -864,6 +869,11 @@ public class ResolveScenarioTracker {
 		
 		//now lets take care of salvage
 		for(Unit salvageUnit : actualSalvage) {
+			UnitStatus salstatus = new UnitStatus(salvageUnit.getName(), salvageUnit.getEntity().getChassis(), salvageUnit.getEntity().getModel());
+			// FIXME: Need to implement a "fuel" part just like the "armor" part
+			if (salvageUnit.getEntity() instanceof Aero) {
+				((Aero)salvageUnit.getEntity()).setFuelTonnage(((Aero)salstatus.getBaseEntity()).getFuelTonnage());
+			}
 		    checkForEquipmentStatus(salvageUnit.getEntity(), control);
 			campaign.clearGameData(salvageUnit.getEntity());
 			campaign.addUnit(salvageUnit.getEntity(), false, 0);
@@ -1087,6 +1097,7 @@ public class ResolveScenarioTracker {
         private String model;
         private boolean totalLoss;
         private Entity entity;
+        private Entity baseEntity;
         private boolean remove;
         
         public UnitStatus(String name, String c, String m) {
@@ -1103,6 +1114,7 @@ public class ResolveScenarioTracker {
             } else {
                 try {
                     entity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+                    baseEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
                 } catch (EntityLoadingException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -1129,7 +1141,15 @@ public class ResolveScenarioTracker {
             entity = e;
         }
         
-        public boolean isTotalLoss() {
+        public Entity getBaseEntity() {
+			return baseEntity;
+		}
+
+		public void setBaseEntity(Entity baseEntity) {
+			this.baseEntity = baseEntity;
+		}
+
+		public boolean isTotalLoss() {
             return totalLoss;
         }
         
