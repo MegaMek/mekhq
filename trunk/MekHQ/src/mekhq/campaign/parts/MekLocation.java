@@ -446,7 +446,6 @@ public class MekLocation extends Part {
 			} 
 		}
 		if(blownOff) {
-			remove(true);
 			if(loc == Mech.LOC_HEAD) {
 				this.time = 200;
 				this.difficulty = 2;
