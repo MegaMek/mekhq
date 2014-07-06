@@ -2565,6 +2565,17 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	public int getTotalDriverNeeds() {
 		return Compute.getTotalDriverNeeds(entity);
 	}
+	
+	public int getTotalCrewNeeds() {
+		int nav = 0;
+    	if(entity instanceof SmallCraft || entity instanceof Jumpship) {
+    		if(entity instanceof Jumpship && !(entity instanceof SpaceStation)) {
+    			nav = 1;
+    		}
+    		return getAeroCrewNeeds() - getTotalDriverNeeds() - nav;
+    	}
+		return 0;
+	}
 	    
     public boolean canTakeMoreDrivers() {
     	int nDrivers = drivers.size();
