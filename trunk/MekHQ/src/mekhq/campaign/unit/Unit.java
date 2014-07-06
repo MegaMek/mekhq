@@ -2759,13 +2759,14 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     
     public void setMothballed(boolean b) {
         this.mothballed = b;
+        // Tech gets removed either way bug [#488]
+        if(null != tech) {
+            remove(getTech(), true);
+        }
         if(mothballed) {
             //remove any other personnel
             for(Person p : getCrew()) {
                 remove(p, true);
-            }
-            if(null != tech) {
-                remove(getTech(), true);
             }
             resetPilotAndEntity();
         } else {
