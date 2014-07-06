@@ -711,12 +711,9 @@ public class Utilities {
 	    	}
 		}
     	
-    	while(unit.canTakeMoreVesselCrew()) {
+    	while(vesselCrew.size() < unit.getTotalCrewNeeds()) {
     		Person p = c.newPerson(Person.T_SPACE_CREW);
-			if (!c.recruitPerson(p)) {
-				return;
-			}
-    		vesselCrew.add(p);
+			vesselCrew.add(p);
     	}
     	
     	if(unit.canTakeNavigator()) {
