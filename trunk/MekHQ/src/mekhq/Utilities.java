@@ -516,7 +516,7 @@ public class Utilities {
 	    	}
 		}
     	
-    	while(unit.canTakeMoreVesselCrew()) {
+    	while(vesselCrew.size() < unit.getTotalCrewNeeds()) {
     		Person p = c.newPerson(Person.T_SPACE_CREW);
 			vesselCrew.add(p);
     	}
