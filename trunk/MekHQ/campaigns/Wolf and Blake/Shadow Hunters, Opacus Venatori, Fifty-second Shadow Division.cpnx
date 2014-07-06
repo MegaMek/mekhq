@@ -10,7 +10,7 @@
 		<nameGen>General</nameGen>
 		<percentFemale>50</percentFemale>
 		<overtime>false</overtime>
-		<gmMode>false</gmMode>
+		<gmMode>true</gmMode>
 		<astechPool>0</astechPool>
 		<astechPoolMinutes>0</astechPoolMinutes>
 		<astechPoolOvertime>0</astechPoolOvertime>
@@ -132,7 +132,7 @@
 	</campaignOptions>
 	<units>
 		<unit id="c1b16001-6600-46c9-9c35-97c965a3a107" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Malak" model="C-MK-O (Mi)" type="Biped" commander="false" externalId="c1b16001-6600-46c9-9c35-97c965a3a107" c3UUID="15498450-6969-4f52-aba7-84c03ace7435">
+			<entity chassis="Malak" model="C-MK-O (Mi)" type="Biped" commander="false" externalId="c1b16001-6600-46c9-9c35-97c965a3a107" c3UUID="15498450-6969-4f52-aba7-84c03ace7435" camoCategory="Word of Blake/Special Forces/" camoFileName="Opacus.jpg">
 				<c3iset>
 					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435"/>
 					<c3i_link link="dfb5fd09-fa7f-4901-a12e-c2bc5d9e81a3"/>
@@ -157,7 +157,7 @@
 			<history></history>
 		</unit>
 		<unit id="77047b79-b2a9-4a2c-a7df-34b44c8938a1" type="mekhq.campaign.unit.Unit">
-			<entity chassis="King Crab" model="KGC-008" type="Biped" commander="false" externalId="77047b79-b2a9-4a2c-a7df-34b44c8938a1" quirks="command_mech" c3UUID="f8ac6bd1-a2ab-40cf-868e-c6d167fe92ab">
+			<entity chassis="King Crab" model="KGC-008" type="Biped" commander="false" externalId="77047b79-b2a9-4a2c-a7df-34b44c8938a1" quirks="command_mech" c3UUID="f8ac6bd1-a2ab-40cf-868e-c6d167fe92ab" camoCategory="Word of Blake/Special Forces/" camoFileName="Venatori.jpg">
 				<c3iset>
 					<c3i_link link="f8ac6bd1-a2ab-40cf-868e-c6d167fe92ab"/>
 					<c3i_link link="ef543e6e-43cf-4ac7-8dba-4ffb577499e1"/>
@@ -182,7 +182,7 @@
 			<history></history>
 		</unit>
 		<unit id="00e0b81d-e8fe-4d85-8686-4f6b853bff29" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Grigori" model="C-GRG-O (Rufus)" type="Biped" commander="false" externalId="00e0b81d-e8fe-4d85-8686-4f6b853bff29" c3UUID="dfb5fd09-fa7f-4901-a12e-c2bc5d9e81a3">
+			<entity chassis="Grigori" model="C-GRG-O (Rufus)" type="Biped" commander="false" externalId="00e0b81d-e8fe-4d85-8686-4f6b853bff29" c3UUID="dfb5fd09-fa7f-4901-a12e-c2bc5d9e81a3" camoCategory="Word of Blake/Special Forces/" camoFileName="Opacus.jpg">
 				<c3iset>
 					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435"/>
 					<c3i_link link="dfb5fd09-fa7f-4901-a12e-c2bc5d9e81a3"/>
@@ -207,7 +207,7 @@
 			<history></history>
 		</unit>
 		<unit id="d257aeeb-e278-4e31-9980-9f054c513e91" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Lightray" model="LGH-6W" type="Biped" commander="false" externalId="d257aeeb-e278-4e31-9980-9f054c513e91" c3UUID="ef543e6e-43cf-4ac7-8dba-4ffb577499e1">
+			<entity chassis="Lightray" model="LGH-6W" type="Biped" commander="false" externalId="d257aeeb-e278-4e31-9980-9f054c513e91" c3UUID="ef543e6e-43cf-4ac7-8dba-4ffb577499e1" camoCategory="Word of Blake/Special Forces/" camoFileName="Venatori.jpg">
 				<c3iset>
 					<c3i_link link="f8ac6bd1-a2ab-40cf-868e-c6d167fe92ab"/>
 					<c3i_link link="ef543e6e-43cf-4ac7-8dba-4ffb577499e1"/>
@@ -232,7 +232,7 @@
 			<history></history>
 		</unit>
 		<unit id="f9936e32-1953-4888-beb3-ee243fad60c3" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Deva" model="C-DVA-O (Achilleus)" type="Biped" commander="false" externalId="f9936e32-1953-4888-beb3-ee243fad60c3" c3UUID="6df625a9-5be3-48b5-bc5f-c632558e6513">
+			<entity chassis="Deva" model="C-DVA-O (Achilleus)" type="Biped" commander="false" externalId="f9936e32-1953-4888-beb3-ee243fad60c3" c3UUID="6df625a9-5be3-48b5-bc5f-c632558e6513" camoCategory="Word of Blake/Special Forces/" camoFileName="Opacus.jpg">
 				<c3iset>
 					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435"/>
 					<c3i_link link="dfb5fd09-fa7f-4901-a12e-c2bc5d9e81a3"/>
@@ -257,7 +257,7 @@
 			<history></history>
 		</unit>
 		<unit id="3a0c56b6-a97e-4cbf-8c03-e2b99668e205" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Raijin II" model="RJN-200-A" type="Biped" commander="false" externalId="3a0c56b6-a97e-4cbf-8c03-e2b99668e205" c3UUID="9d441863-e2b0-46b4-9b29-4dc9e50b2bd0">
+			<entity chassis="Raijin II" model="RJN-200-A" type="Biped" commander="false" externalId="3a0c56b6-a97e-4cbf-8c03-e2b99668e205" c3UUID="9d441863-e2b0-46b4-9b29-4dc9e50b2bd0" camoCategory="Word of Blake/Special Forces/" camoFileName="Venatori.jpg">
 				<c3iset>
 					<c3i_link link="f8ac6bd1-a2ab-40cf-868e-c6d167fe92ab"/>
 					<c3i_link link="ef543e6e-43cf-4ac7-8dba-4ffb577499e1"/>
@@ -282,7 +282,7 @@
 			<history></history>
 		</unit>
 		<unit id="52249633-3534-4be5-a983-55e18d74655c" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Seraph" model="C-SRP-O (Havalah)" type="Biped" commander="false" externalId="52249633-3534-4be5-a983-55e18d74655c" c3UUID="a8cab9a9-4cda-4c97-aa92-6604591ef9d9">
+			<entity chassis="Seraph" model="C-SRP-O (Havalah)" type="Biped" commander="false" externalId="52249633-3534-4be5-a983-55e18d74655c" c3UUID="a8cab9a9-4cda-4c97-aa92-6604591ef9d9" camoCategory="Word of Blake/Special Forces/" camoFileName="Opacus.jpg">
 				<c3iset>
 					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435"/>
 					<c3i_link link="dfb5fd09-fa7f-4901-a12e-c2bc5d9e81a3"/>
@@ -307,7 +307,7 @@
 			<history></history>
 		</unit>
 		<unit id="f6790aa4-c393-4af6-bdeb-2185c4b5711f" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Gurkha" model="GUR-2G" type="Biped" commander="false" externalId="f6790aa4-c393-4af6-bdeb-2185c4b5711f" c3UUID="e2c1e75a-03c7-4892-9da3-6604eba213f0">
+			<entity chassis="Gurkha" model="GUR-2G" type="Biped" commander="false" externalId="f6790aa4-c393-4af6-bdeb-2185c4b5711f" c3UUID="e2c1e75a-03c7-4892-9da3-6604eba213f0" camoCategory="Word of Blake/Special Forces/" camoFileName="Venatori.jpg">
 				<c3iset>
 					<c3i_link link="f8ac6bd1-a2ab-40cf-868e-c6d167fe92ab"/>
 					<c3i_link link="ef543e6e-43cf-4ac7-8dba-4ffb577499e1"/>
@@ -332,7 +332,7 @@
 			<history></history>
 		</unit>
 		<unit id="86e8442a-bc36-438a-87b3-df8a41e1a6e9" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Preta" model="C-PRT-O (Kendali)" type="Biped" commander="false" externalId="86e8442a-bc36-438a-87b3-df8a41e1a6e9" c3UUID="5fd55c97-5efc-43ae-a949-22321cf58c22">
+			<entity chassis="Preta" model="C-PRT-O (Kendali)" type="Biped" commander="false" externalId="86e8442a-bc36-438a-87b3-df8a41e1a6e9" c3UUID="5fd55c97-5efc-43ae-a949-22321cf58c22" camoCategory="Word of Blake/Special Forces/" camoFileName="Opacus.jpg">
 				<c3iset>
 					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435"/>
 					<c3i_link link="dfb5fd09-fa7f-4901-a12e-c2bc5d9e81a3"/>
@@ -357,7 +357,7 @@
 			<history></history>
 		</unit>
 		<unit id="29c37941-0aa5-40e3-817b-6575944e8459" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Buccaneer" model="BCN-5W" type="Biped" commander="false" externalId="29c37941-0aa5-40e3-817b-6575944e8459" c3UUID="a323a277-8f14-4152-aca9-0e169c814e60">
+			<entity chassis="Buccaneer" model="BCN-5W" type="Biped" commander="false" externalId="29c37941-0aa5-40e3-817b-6575944e8459" c3UUID="a323a277-8f14-4152-aca9-0e169c814e60" camoCategory="Word of Blake/Special Forces/" camoFileName="Venatori.jpg">
 				<c3iset>
 					<c3i_link link="f8ac6bd1-a2ab-40cf-868e-c6d167fe92ab"/>
 					<c3i_link link="ef543e6e-43cf-4ac7-8dba-4ffb577499e1"/>
@@ -382,7 +382,7 @@
 			<history></history>
 		</unit>
 		<unit id="349b1678-2125-4dcb-adff-83deeed05cc8" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Archangel" model="C-ANG-O (Berith)" type="Biped" commander="false" externalId="349b1678-2125-4dcb-adff-83deeed05cc8" c3UUID="ef561cea-94b5-44a5-8e6d-e9fa1ed6a1c7">
+			<entity chassis="Archangel" model="C-ANG-O (Berith)" type="Biped" commander="false" externalId="349b1678-2125-4dcb-adff-83deeed05cc8" c3UUID="ef561cea-94b5-44a5-8e6d-e9fa1ed6a1c7" camoCategory="Word of Blake/Special Forces/" camoFileName="Opacus.jpg">
 				<c3iset>
 					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435"/>
 					<c3i_link link="dfb5fd09-fa7f-4901-a12e-c2bc5d9e81a3"/>
@@ -407,7 +407,7 @@
 			<history></history>
 		</unit>
 		<unit id="248f5ac6-ecbe-434a-bf6b-8d3ad9133f5c" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Mercury" model="MCY-102" type="Biped" commander="false" externalId="248f5ac6-ecbe-434a-bf6b-8d3ad9133f5c" c3UUID="60cd78c7-4c02-46f7-9564-5201731e7cab">
+			<entity chassis="Mercury" model="MCY-102" type="Biped" commander="false" externalId="248f5ac6-ecbe-434a-bf6b-8d3ad9133f5c" c3UUID="60cd78c7-4c02-46f7-9564-5201731e7cab" camoCategory="Word of Blake/Special Forces/" camoFileName="Venatori.jpg">
 				<c3iset>
 					<c3i_link link="f8ac6bd1-a2ab-40cf-868e-c6d167fe92ab"/>
 					<c3i_link link="ef543e6e-43cf-4ac7-8dba-4ffb577499e1"/>
@@ -477,13 +477,13 @@ Impressed by his singular focus, photographic memory and ferocious fighting skil
 			<overtimeLeft>0</overtimeLeft>
 			<birthday>3037-01-30 12:00:00</birthday>
 			<skill>
-				<type>Gunnery/Mech</type>
-				<level>3</level>
+				<type>Small Arms</type>
+				<level>2</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Small Arms</type>
-				<level>2</level>
+				<type>Gunnery/Mech</type>
+				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
@@ -637,9 +637,9 @@ with a prosthetic, she was unable to re-enter active duty for over a year due to
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>1</gender>
-			<rank>0</rank>
-			<rankLevel>0</rankLevel>
-			<rankSystem>-1</rankSystem>
+			<rank>33</rank>
+			<rankLevel>10</rankLevel>
+			<rankSystem>10</rankSystem>
 			<maneiDominiRank>-1</maneiDominiRank>
 			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
@@ -662,6 +662,12 @@ with a prosthetic, she was unable to re-enter active duty for over a year due to
 				<level>7</level>
 				<bonus>0</bonus>
 			</skill>
+			<personnelLog>
+				<logEntry>
+					<date>3073-01-24 12:00:00</date>
+					<desc>Promoted to Adept Epsilon X</desc>
+				</logEntry>
+			</personnelLog>
 		</person>
 		<person id="34affb3a-6a1b-4788-81d9-b1e7efbb4def" type="mekhq.campaign.personnel.Person">
 			<name>Jacqueline Norman</name>
@@ -686,9 +692,9 @@ makes up for as the unit’s communications specialist. She is constantly trying
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>1</gender>
-			<rank>0</rank>
-			<rankLevel>0</rankLevel>
-			<rankSystem>-1</rankSystem>
+			<rank>33</rank>
+			<rankLevel>2</rankLevel>
+			<rankSystem>10</rankSystem>
 			<maneiDominiRank>-1</maneiDominiRank>
 			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
@@ -711,6 +717,12 @@ makes up for as the unit’s communications specialist. She is constantly trying
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
+			<personnelLog>
+				<logEntry>
+					<date>3073-01-24 12:00:00</date>
+					<desc>Promoted to Adept Epsilon II</desc>
+				</logEntry>
+			</personnelLog>
 		</person>
 		<person id="75057ad3-1c20-4258-8515-01c825f6502b" type="mekhq.campaign.personnel.Person">
 			<name>Kari Marita</name>
@@ -733,9 +745,9 @@ Precentor Marita shoulders the blame for the Legion’s  destruction and the esc
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>1</gender>
-			<rank>0</rank>
-			<rankLevel>0</rankLevel>
-			<rankSystem>-1</rankSystem>
+			<rank>34</rank>
+			<rankLevel>2</rankLevel>
+			<rankSystem>10</rankSystem>
 			<maneiDominiRank>-1</maneiDominiRank>
 			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
@@ -758,6 +770,12 @@ Precentor Marita shoulders the blame for the Legion’s  destruction and the esc
 				<level>6</level>
 				<bonus>0</bonus>
 			</skill>
+			<personnelLog>
+				<logEntry>
+					<date>3073-01-24 12:00:00</date>
+					<desc>Promoted to Demi-Precentor Epsilon II</desc>
+				</logEntry>
+			</personnelLog>
 		</person>
 		<person id="3cf3806f-eb04-4fc1-8290-3dfaafd97098" type="mekhq.campaign.personnel.Person">
 			<name>Cassius Montague</name>
@@ -783,9 +801,9 @@ is beside the point.</biography>
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>0</gender>
-			<rank>0</rank>
-			<rankLevel>0</rankLevel>
-			<rankSystem>-1</rankSystem>
+			<rank>33</rank>
+			<rankLevel>18</rankLevel>
+			<rankSystem>10</rankSystem>
 			<maneiDominiRank>-1</maneiDominiRank>
 			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
@@ -808,6 +826,12 @@ is beside the point.</biography>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
+			<personnelLog>
+				<logEntry>
+					<date>3073-01-24 12:00:00</date>
+					<desc>Promoted to Adept Epsilon XVIII</desc>
+				</logEntry>
+			</personnelLog>
 		</person>
 		<person id="8bbc8205-4809-4649-9ef9-779909f9b32d" type="mekhq.campaign.personnel.Person">
 			<name>Elizabeth Rodriguez</name>
@@ -830,9 +854,9 @@ Diagnosed with a rare spinal disease in 3071, Rodriguez has resigned herself to 
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>1</gender>
-			<rank>0</rank>
-			<rankLevel>0</rankLevel>
-			<rankSystem>-1</rankSystem>
+			<rank>33</rank>
+			<rankLevel>2</rankLevel>
+			<rankSystem>10</rankSystem>
 			<maneiDominiRank>-1</maneiDominiRank>
 			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
@@ -855,38 +879,43 @@ Diagnosed with a rare spinal disease in 3071, Rodriguez has resigned herself to 
 				<level>6</level>
 				<bonus>0</bonus>
 			</skill>
+			<personnelLog>
+				<logEntry>
+					<date>3073-01-24 12:00:00</date>
+					<desc>Promoted to Adept Epsilon II</desc>
+				</logEntry>
+			</personnelLog>
 		</person>
-		<person id="4002e95b-a3a6-4ab6-b3bd-5659acbe8c6e" type="mekhq.campaign.personnel.Person">
-			<name>Bryn Rivenschild</name>
-			<callsign>Omicron Rho IX</callsign>
+		<person id="1133a093-b3cc-45f7-8ef0-83e6976fef41" type="mekhq.campaign.personnel.Person">
+			<name>Kandali Morris</name>
+			<callsign>Zombie</callsign>
 			<primaryRole>1</primaryRole>
 			<secondaryRole>0</secondaryRole>
 			<commander>false</commander>
 			<dependent>false</dependent>
 			<clan>false</clan>
 			<phenotype>0</phenotype>
-			<biography>Bryn Rivenschild entered ComStar service after his application to the famed Highlanders was rejected. Happily, he aced the initial tests and was trained with the Com Guards as an infantry soldier. On the day of his first posting, he also received his first tattoo—an
-elaborate Celtic design that was also part of his family’s crest.
+			<biography>One of the few remaining pure-blooded Zulu warrior-citizens of Africa, Kendali Morris was considered one of the Light of Mankind’s deadliest operatives until a fateful explosion on Muphrid cost her nearly half of her face and jaw. At that time, she was offered and accepted severe augmentation, and joined the ranks of the Manei Domini.
 
-Horrified with the secularized changes occurring within the Order, he and the entire ComStar garrison overwhelmed and seized control of the local HPG on Saiph. In a short shadow war, the garrison maintained control of the station against two Com- Star-aligned ROM teams until help arrived.
+Her LoM service record is heavily shrouded in sealed operations occurring deep in the Free Rasalhague Republic and the Dominion. Excelling in solo or dual-team missions, one of her key contributions can be seen in the recent development of the heavy gyroscopic system now in use with the Protectorate.
 
-Adept Rivenschild was one of the first LoM members selected for the Venatori. Utilizing his computer skills to great effect, he was invaluable to the Hunter’s missions in eliminating Wolfnet across the Chaos March. Known for stealing nine BattleMechs, due to his own custom code-cracking programs, Rivenschild was often loaned out to assist other LoM operations against corporate entities.
+Known for her keen eyesight—rivaling many augmented Manei Domini inductees—and her berserker fury in her Preta, Precentor Morris recently underwent further augmentation to her jaw and teeth. Two one-inch steel incisors were implanted with a unique venom-delivery system, coupled with a myomer-enhanced jaw that exerts enough pressure to crack large bones in half. Coupled with her myomer-enhanced legs, Morris is a deadly in-fighter.
 
-For every successful operation, Rivenschild adds to his Celtic knot; nearly eighty percent of his body is now covered with the continuous tattoo.</biography>
+Morris is legendary among her native Zulu as the only female warrior to capture and kill one of the genetically enhanced liions of the Serengeti. According to the tribal tales, she stalked the predator for three days before ambushing and wrestling it to the ground, tearing its throat out. When queried about the incident, Morris refuses comment; the myth may indeed have some truth to it, as Morris is rarely without a bone bracelet strung with liion claws.</biography>
 			<idleMonths>-1</idleMonths>
-			<id>4002e95b-a3a6-4ab6-b3bd-5659acbe8c6e</id>
+			<id>1133a093-b3cc-45f7-8ef0-83e6976fef41</id>
 			<portraitCategory>Opacus Venatori/</portraitCategory>
-			<portraitFile>Bryn_Rivenschild.jpg</portraitFile>
+			<portraitFile>Kendali_Morris.jpg</portraitFile>
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
-			<gender>0</gender>
-			<rank>0</rank>
+			<gender>1</gender>
+			<rank>34</rank>
 			<rankLevel>0</rankLevel>
 			<rankSystem>-1</rankSystem>
-			<maneiDominiRank>-1</maneiDominiRank>
-			<maneiDominiClass>0</maneiDominiClass>
+			<maneiDominiRank>4</maneiDominiRank>
+			<maneiDominiClass>4</maneiDominiClass>
 			<nTasks>0</nTasks>
-			<unitId>d257aeeb-e278-4e31-9980-9f054c513e91</unitId>
+			<unitId>86e8442a-bc36-438a-87b3-df8a41e1a6e9</unitId>
 			<salary>-1</salary>
 			<status>0</status>
 			<prisonerstatus>0</prisonerstatus>
@@ -894,10 +923,10 @@ For every successful operation, Rivenschild adds to his Celtic knot; nearly eigh
 			<toughness>0</toughness>
 			<minutesLeft>0</minutesLeft>
 			<overtimeLeft>0</overtimeLeft>
-			<birthday>3028-12-16 12:00:00</birthday>
+			<birthday>3045-04-08 12:00:00</birthday>
 			<skill>
 				<type>Gunnery/Mech</type>
-				<level>5</level>
+				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
@@ -905,6 +934,13 @@ For every successful operation, Rivenschild adds to his Celtic knot; nearly eigh
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
+			<implants>bvdni::pain_shunt::pl_masc::boost_comm_implant</implants>
+			<personnelLog>
+				<logEntry>
+					<date>3073-01-24 12:00:00</date>
+					<desc>Promoted to Demi-Precentor</desc>
+				</logEntry>
+			</personnelLog>
 		</person>
 		<person id="95b2a383-8ffe-4184-9289-2e38a2fbacb3" type="mekhq.campaign.personnel.Person">
 			<name>Mi Tomitaki</name>
@@ -965,36 +1001,37 @@ more internal work done; her survival of a ten-story fall during an Opacus missi
 				</logEntry>
 			</personnelLog>
 		</person>
-		<person id="1133a093-b3cc-45f7-8ef0-83e6976fef41" type="mekhq.campaign.personnel.Person">
-			<name>Kandali Morris</name>
-			<callsign>Zombie</callsign>
+		<person id="4002e95b-a3a6-4ab6-b3bd-5659acbe8c6e" type="mekhq.campaign.personnel.Person">
+			<name>Bryn Rivenschild</name>
+			<callsign>Omicron Rho IX</callsign>
 			<primaryRole>1</primaryRole>
 			<secondaryRole>0</secondaryRole>
 			<commander>false</commander>
 			<dependent>false</dependent>
 			<clan>false</clan>
 			<phenotype>0</phenotype>
-			<biography>One of the few remaining pure-blooded Zulu warrior-citizens of Africa, Kendali Morris was considered one of the Light of Mankind’s deadliest operatives until a fateful explosion on Muphrid cost her nearly half of her face and jaw. At that time, she was offered and accepted severe augmentation, and joined the ranks of the Manei Domini.
+			<biography>Bryn Rivenschild entered ComStar service after his application to the famed Highlanders was rejected. Happily, he aced the initial tests and was trained with the Com Guards as an infantry soldier. On the day of his first posting, he also received his first tattoo—an
+elaborate Celtic design that was also part of his family’s crest.
 
-Her LoM service record is heavily shrouded in sealed operations occurring deep in the Free Rasalhague Republic and the Dominion. Excelling in solo or dual-team missions, one of her key contributions can be seen in the recent development of the heavy gyroscopic system now in use with the Protectorate.
+Horrified with the secularized changes occurring within the Order, he and the entire ComStar garrison overwhelmed and seized control of the local HPG on Saiph. In a short shadow war, the garrison maintained control of the station against two Com- Star-aligned ROM teams until help arrived.
 
-Known for her keen eyesight—rivaling many augmented Manei Domini inductees—and her berserker fury in her Preta, Precentor Morris recently underwent further augmentation to her jaw and teeth. Two one-inch steel incisors were implanted with a unique venom-delivery system, coupled with a myomer-enhanced jaw that exerts enough pressure to crack large bones in half. Coupled with her myomer-enhanced legs, Morris is a deadly in-fighter.
+Adept Rivenschild was one of the first LoM members selected for the Venatori. Utilizing his computer skills to great effect, he was invaluable to the Hunter’s missions in eliminating Wolfnet across the Chaos March. Known for stealing nine BattleMechs, due to his own custom code-cracking programs, Rivenschild was often loaned out to assist other LoM operations against corporate entities.
 
-Morris is legendary among her native Zulu as the only female warrior to capture and kill one of the genetically enhanced liions of the Serengeti. According to the tribal tales, she stalked the predator for three days before ambushing and wrestling it to the ground, tearing its throat out. When queried about the incident, Morris refuses comment; the myth may indeed have some truth to it, as Morris is rarely without a bone bracelet strung with liion claws.</biography>
+For every successful operation, Rivenschild adds to his Celtic knot; nearly eighty percent of his body is now covered with the continuous tattoo.</biography>
 			<idleMonths>-1</idleMonths>
-			<id>1133a093-b3cc-45f7-8ef0-83e6976fef41</id>
+			<id>4002e95b-a3a6-4ab6-b3bd-5659acbe8c6e</id>
 			<portraitCategory>Opacus Venatori/</portraitCategory>
-			<portraitFile>Kendali_Morris.jpg</portraitFile>
+			<portraitFile>Bryn_Rivenschild.jpg</portraitFile>
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
-			<gender>1</gender>
-			<rank>34</rank>
-			<rankLevel>0</rankLevel>
-			<rankSystem>-1</rankSystem>
-			<maneiDominiRank>4</maneiDominiRank>
-			<maneiDominiClass>4</maneiDominiClass>
+			<gender>0</gender>
+			<rank>33</rank>
+			<rankLevel>9</rankLevel>
+			<rankSystem>10</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
-			<unitId>86e8442a-bc36-438a-87b3-df8a41e1a6e9</unitId>
+			<unitId>d257aeeb-e278-4e31-9980-9f054c513e91</unitId>
 			<salary>-1</salary>
 			<status>0</status>
 			<prisonerstatus>0</prisonerstatus>
@@ -1002,10 +1039,10 @@ Morris is legendary among her native Zulu as the only female warrior to capture 
 			<toughness>0</toughness>
 			<minutesLeft>0</minutesLeft>
 			<overtimeLeft>0</overtimeLeft>
-			<birthday>3045-04-08 12:00:00</birthday>
+			<birthday>3028-12-16 12:00:00</birthday>
 			<skill>
 				<type>Gunnery/Mech</type>
-				<level>4</level>
+				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
@@ -1013,11 +1050,10 @@ Morris is legendary among her native Zulu as the only female warrior to capture 
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
-			<implants>bvdni::pain_shunt::pl_masc::boost_comm_implant</implants>
 			<personnelLog>
 				<logEntry>
 					<date>3073-01-24 12:00:00</date>
-					<desc>Promoted to Demi-Precentor</desc>
+					<desc>Promoted to Adept Epsilon IX</desc>
 				</logEntry>
 			</personnelLog>
 		</person>
@@ -1598,6 +1634,16 @@ Note: This ability is only used for BattleMechs.</desc>
 			<removeAbilities>cluster_hitter</removeAbilities>
 		</ability>
 		<ability>
+			<displayName>Multi-Tasker (aToW)</displayName>
+			<lookupName>multi_tasker</lookupName>
+			<desc>Secondary target modifiers are reduced by one.</desc>
+			<xpCost>6</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
 			<displayName>Maneuvering Ace (aToW)</displayName>
 			<lookupName>maneuvering_ace</lookupName>
 			<desc>Enables the unit to move laterally like a Quad.
@@ -1606,16 +1652,6 @@ Aerospace units can perform maneuvers for 1 less thrust point.
 Units also receive a -1 BTH to rolls against skidding, sideslipping, and going out of control.</desc>
 			<xpCost>4</xpCost>
 			<weight>3</weight>
-			<prereqAbilities></prereqAbilities>
-			<invalidAbilities></invalidAbilities>
-			<removeAbilities></removeAbilities>
-		</ability>
-		<ability>
-			<displayName>Multi-Tasker (aToW)</displayName>
-			<lookupName>multi_tasker</lookupName>
-			<desc>Secondary target modifiers are reduced by one.</desc>
-			<xpCost>6</xpCost>
-			<weight>2</weight>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
@@ -1651,6 +1687,16 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<removeAbilities></removeAbilities>
 		</ability>
 		<ability>
+			<displayName>All Weather (Unofficial)</displayName>
+			<lookupName>allweather</lookupName>
+			<desc>A pilot with this ability does not suffer the PSR penalties due to weather.</desc>
+			<xpCost>2</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
 			<displayName>Tactical Genius (aToW)</displayName>
 			<lookupName>tactical_genius</lookupName>
 			<desc>A pilot who has a Tactical Genius may reroll their initiative once per turn.
@@ -1658,16 +1704,6 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 Note: Only one Tactical Genius may be utilized per team.</desc>
 			<xpCost>8</xpCost>
 			<weight>1</weight>
-			<prereqAbilities></prereqAbilities>
-			<invalidAbilities></invalidAbilities>
-			<removeAbilities></removeAbilities>
-		</ability>
-		<ability>
-			<displayName>All Weather (Unofficial)</displayName>
-			<lookupName>allweather</lookupName>
-			<desc>A pilot with this ability does not suffer the PSR penalties due to weather.</desc>
-			<xpCost>2</xpCost>
-			<weight>2</weight>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
