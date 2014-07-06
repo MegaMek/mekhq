@@ -31,6 +31,7 @@ v0.3.6 (SVN)
 + Bug: Various issues with loans, including names and reference numbers not being correct when values are changed on the dialog
 + Bug [380]: Aerospace Fuel Refueling
 + Bug [488]: Activation of mothballed unit...
++ Data: Updated all campaigns to be fully compatible with 0.3.6
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4

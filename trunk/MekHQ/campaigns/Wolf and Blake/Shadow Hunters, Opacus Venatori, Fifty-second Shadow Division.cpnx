@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<campaign version="0.3.4-dev">
+<campaign version="0.3.6-dev">
 	<info>
 		<name>Opacus Venatori</name>
 		<faction>WOB</faction>
@@ -461,11 +461,11 @@ Impressed by his singular focus, photographic memory and ferocious fighting skil
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>0</gender>
-			<rank>0</rank>
+			<rank>33</rank>
 			<rankLevel>0</rankLevel>
 			<rankSystem>-1</rankSystem>
-			<maneiDominiRank>-1</maneiDominiRank>
-			<maneiDominiClass>0</maneiDominiClass>
+			<maneiDominiRank>2</maneiDominiRank>
+			<maneiDominiClass>7</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<unitId>f9936e32-1953-4888-beb3-ee243fad60c3</unitId>
 			<salary>-1</salary>
@@ -477,13 +477,13 @@ Impressed by his singular focus, photographic memory and ferocious fighting skil
 			<overtimeLeft>0</overtimeLeft>
 			<birthday>3037-01-30 12:00:00</birthday>
 			<skill>
-				<type>Small Arms</type>
-				<level>2</level>
+				<type>Gunnery/Mech</type>
+				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
-				<level>3</level>
+				<type>Small Arms</type>
+				<level>2</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
@@ -492,6 +492,12 @@ Impressed by his singular focus, photographic memory and ferocious fighting skil
 				<bonus>0</bonus>
 			</skill>
 			<implants>bvdni::pain_shunt::mm_eye_im</implants>
+			<personnelLog>
+				<logEntry>
+					<date>3073-01-24 12:00:00</date>
+					<desc>Promoted to Adept</desc>
+				</logEntry>
+			</personnelLog>
 		</person>
 		<person id="468e1216-b649-440b-89e9-8f7a0b758648" type="mekhq.campaign.personnel.Person">
 			<name>Berith</name>
@@ -516,11 +522,11 @@ Precentor Berith’s greatest strength is in his diplomatic skills. Though he ad
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>0</gender>
-			<rank>0</rank>
+			<rank>37</rank>
 			<rankLevel>0</rankLevel>
 			<rankSystem>-1</rankSystem>
-			<maneiDominiRank>-1</maneiDominiRank>
-			<maneiDominiClass>0</maneiDominiClass>
+			<maneiDominiRank>6</maneiDominiRank>
+			<maneiDominiClass>6</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<unitId>349b1678-2125-4dcb-adff-83deeed05cc8</unitId>
 			<salary>-1</salary>
@@ -542,6 +548,12 @@ Precentor Berith’s greatest strength is in his diplomatic skills. Though he ad
 				<bonus>0</bonus>
 			</skill>
 			<implants>bvdni::pain_shunt::mm_eye_im::boost_comm_implant</implants>
+			<personnelLog>
+				<logEntry>
+					<date>3073-01-24 12:00:00</date>
+					<desc>Promoted to Precentor</desc>
+				</logEntry>
+			</personnelLog>
 		</person>
 		<person id="5afd413b-0776-4f93-8c44-e382b956fe37" type="mekhq.campaign.personnel.Person">
 			<name>Rufus Black Bear</name>
@@ -569,11 +581,11 @@ rather than his skills.</biography>
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>0</gender>
-			<rank>0</rank>
+			<rank>33</rank>
 			<rankLevel>0</rankLevel>
 			<rankSystem>-1</rankSystem>
-			<maneiDominiRank>-1</maneiDominiRank>
-			<maneiDominiClass>0</maneiDominiClass>
+			<maneiDominiRank>1</maneiDominiRank>
+			<maneiDominiClass>1</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<unitId>00e0b81d-e8fe-4d85-8686-4f6b853bff29</unitId>
 			<salary>-1</salary>
@@ -595,6 +607,12 @@ rather than his skills.</biography>
 				<bonus>0</bonus>
 			</skill>
 			<implants>vdni::cyber_eye_im::dermal_armor</implants>
+			<personnelLog>
+				<logEntry>
+					<date>3073-01-24 12:00:00</date>
+					<desc>Promoted to Adept</desc>
+				</logEntry>
+			</personnelLog>
 		</person>
 		<person id="d636251e-4e78-441c-8f7c-ff151de2ab18" type="mekhq.campaign.personnel.Person">
 			<name>Portia Thomas</name>
@@ -838,109 +856,6 @@ Diagnosed with a rare spinal disease in 3071, Rodriguez has resigned herself to 
 				<bonus>0</bonus>
 			</skill>
 		</person>
-		<person id="1133a093-b3cc-45f7-8ef0-83e6976fef41" type="mekhq.campaign.personnel.Person">
-			<name>Kandali Morris</name>
-			<callsign>Zombie</callsign>
-			<primaryRole>1</primaryRole>
-			<secondaryRole>0</secondaryRole>
-			<commander>false</commander>
-			<dependent>false</dependent>
-			<clan>false</clan>
-			<phenotype>0</phenotype>
-			<biography>One of the few remaining pure-blooded Zulu warrior-citizens of Africa, Kendali Morris was considered one of the Light of Mankind’s deadliest operatives until a fateful explosion on Muphrid cost her nearly half of her face and jaw. At that time, she was offered and accepted severe augmentation, and joined the ranks of the Manei Domini.
-
-Her LoM service record is heavily shrouded in sealed operations occurring deep in the Free Rasalhague Republic and the Dominion. Excelling in solo or dual-team missions, one of her key contributions can be seen in the recent development of the heavy gyroscopic system now in use with the Protectorate.
-
-Known for her keen eyesight—rivaling many augmented Manei Domini inductees—and her berserker fury in her Preta, Precentor Morris recently underwent further augmentation to her jaw and teeth. Two one-inch steel incisors were implanted with a unique venom-delivery system, coupled with a myomer-enhanced jaw that exerts enough pressure to crack large bones in half. Coupled with her myomer-enhanced legs, Morris is a deadly in-fighter.
-
-Morris is legendary among her native Zulu as the only female warrior to capture and kill one of the genetically enhanced liions of the Serengeti. According to the tribal tales, she stalked the predator for three days before ambushing and wrestling it to the ground, tearing its throat out. When queried about the incident, Morris refuses comment; the myth may indeed have some truth to it, as Morris is rarely without a bone bracelet strung with liion claws.</biography>
-			<idleMonths>-1</idleMonths>
-			<id>1133a093-b3cc-45f7-8ef0-83e6976fef41</id>
-			<portraitCategory>Opacus Venatori/</portraitCategory>
-			<portraitFile>Kendali_Morris.jpg</portraitFile>
-			<xp>0</xp>
-			<daysToWaitForHealing>15</daysToWaitForHealing>
-			<gender>1</gender>
-			<rank>0</rank>
-			<rankLevel>0</rankLevel>
-			<rankSystem>-1</rankSystem>
-			<maneiDominiRank>-1</maneiDominiRank>
-			<maneiDominiClass>0</maneiDominiClass>
-			<nTasks>0</nTasks>
-			<unitId>86e8442a-bc36-438a-87b3-df8a41e1a6e9</unitId>
-			<salary>-1</salary>
-			<status>0</status>
-			<prisonerstatus>0</prisonerstatus>
-			<hits>0</hits>
-			<toughness>0</toughness>
-			<minutesLeft>0</minutesLeft>
-			<overtimeLeft>0</overtimeLeft>
-			<birthday>3045-04-08 12:00:00</birthday>
-			<skill>
-				<type>Gunnery/Mech</type>
-				<level>4</level>
-				<bonus>0</bonus>
-			</skill>
-			<skill>
-				<type>Piloting/Mech</type>
-				<level>5</level>
-				<bonus>0</bonus>
-			</skill>
-			<implants>bvdni::pain_shunt::pl_masc::boost_comm_implant</implants>
-		</person>
-		<person id="95b2a383-8ffe-4184-9289-2e38a2fbacb3" type="mekhq.campaign.personnel.Person">
-			<name>Mi Tomitaki</name>
-			<callsign>Phantom</callsign>
-			<primaryRole>1</primaryRole>
-			<secondaryRole>0</secondaryRole>
-			<commander>false</commander>
-			<dependent>false</dependent>
-			<clan>false</clan>
-			<phenotype>0</phenotype>
-			<biography>Orphaned during the Ronin War of 3034, Tomitaki grew up in a ComStar-sponsored orphanage until her sixteenth birthday. On that day, she formally joined the Order and served first in Rho/ Gamma before passing the tests to enter the Com Guards.
-
-One of the few survivors from the 138th Division—decimated by the Clan Wolf counterattack at Skupo—her path to eventual command seemed assured. Those dreams were shattered when Tomitaki suffered acute Post-Traumatic Stress Disorder and was“rehabilitated” on Terra.
-
-Liberated along with other “detainees” from the psychiatric ward during Operation Odysseus, Tomitaki led a volunteer unit into the fray in the urban jungles of Lower Geneva. Impressed with her fanatical zeal and utter hatred for the heretical ComStar, ROM re-inducted Tomitaki into the Word of Blake Militia.
-
-Tomitaki was elevated into the Light of Mankind after salvaging an operation gone sour. Though the mission on Procyon is still highly classified, her devotion to the Word’s objectives and outstanding performance was obvious by the immediate fasttracking of her career.
-
-A ROM operative who voluntarily underwent augmentation, she was also one of the first Manei Domini in the Shadows. The only obvious mark of her induction into that terrifying order is her multi-model cybernetic eye. She is rumored to have much
-more internal work done; her survival of a ten-story fall during an Opacus mission on Thorin lends much truth to those stories.</biography>
-			<idleMonths>-1</idleMonths>
-			<id>95b2a383-8ffe-4184-9289-2e38a2fbacb3</id>
-			<portraitCategory>Opacus Venatori/</portraitCategory>
-			<portraitFile>Mi_Tomitaki.jpg</portraitFile>
-			<xp>0</xp>
-			<daysToWaitForHealing>15</daysToWaitForHealing>
-			<gender>1</gender>
-			<rank>0</rank>
-			<rankLevel>0</rankLevel>
-			<rankSystem>-1</rankSystem>
-			<maneiDominiRank>-1</maneiDominiRank>
-			<maneiDominiClass>0</maneiDominiClass>
-			<nTasks>0</nTasks>
-			<unitId>c1b16001-6600-46c9-9c35-97c965a3a107</unitId>
-			<salary>-1</salary>
-			<status>0</status>
-			<prisonerstatus>0</prisonerstatus>
-			<hits>0</hits>
-			<toughness>0</toughness>
-			<minutesLeft>0</minutesLeft>
-			<overtimeLeft>0</overtimeLeft>
-			<birthday>3026-01-17 12:00:00</birthday>
-			<skill>
-				<type>Gunnery/Mech</type>
-				<level>4</level>
-				<bonus>0</bonus>
-			</skill>
-			<skill>
-				<type>Piloting/Mech</type>
-				<level>6</level>
-				<bonus>0</bonus>
-			</skill>
-			<implants>vdni::dermal_armor</implants>
-		</person>
 		<person id="4002e95b-a3a6-4ab6-b3bd-5659acbe8c6e" type="mekhq.campaign.personnel.Person">
 			<name>Bryn Rivenschild</name>
 			<callsign>Omicron Rho IX</callsign>
@@ -991,6 +906,121 @@ For every successful operation, Rivenschild adds to his Celtic knot; nearly eigh
 				<bonus>0</bonus>
 			</skill>
 		</person>
+		<person id="95b2a383-8ffe-4184-9289-2e38a2fbacb3" type="mekhq.campaign.personnel.Person">
+			<name>Mi Tomitaki</name>
+			<callsign>Phantom</callsign>
+			<primaryRole>1</primaryRole>
+			<secondaryRole>0</secondaryRole>
+			<commander>false</commander>
+			<dependent>false</dependent>
+			<clan>false</clan>
+			<phenotype>0</phenotype>
+			<biography>Orphaned during the Ronin War of 3034, Tomitaki grew up in a ComStar-sponsored orphanage until her sixteenth birthday. On that day, she formally joined the Order and served first in Rho/ Gamma before passing the tests to enter the Com Guards.
+
+One of the few survivors from the 138th Division—decimated by the Clan Wolf counterattack at Skupo—her path to eventual command seemed assured. Those dreams were shattered when Tomitaki suffered acute Post-Traumatic Stress Disorder and was“rehabilitated” on Terra.
+
+Liberated along with other “detainees” from the psychiatric ward during Operation Odysseus, Tomitaki led a volunteer unit into the fray in the urban jungles of Lower Geneva. Impressed with her fanatical zeal and utter hatred for the heretical ComStar, ROM re-inducted Tomitaki into the Word of Blake Militia.
+
+Tomitaki was elevated into the Light of Mankind after salvaging an operation gone sour. Though the mission on Procyon is still highly classified, her devotion to the Word’s objectives and outstanding performance was obvious by the immediate fasttracking of her career.
+
+A ROM operative who voluntarily underwent augmentation, she was also one of the first Manei Domini in the Shadows. The only obvious mark of her induction into that terrifying order is her multi-model cybernetic eye. She is rumored to have much
+more internal work done; her survival of a ten-story fall during an Opacus mission on Thorin lends much truth to those stories.</biography>
+			<idleMonths>-1</idleMonths>
+			<id>95b2a383-8ffe-4184-9289-2e38a2fbacb3</id>
+			<portraitCategory>Opacus Venatori/</portraitCategory>
+			<portraitFile>Mi_Tomitaki.jpg</portraitFile>
+			<xp>0</xp>
+			<daysToWaitForHealing>15</daysToWaitForHealing>
+			<gender>1</gender>
+			<rank>33</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>3</maneiDominiRank>
+			<maneiDominiClass>5</maneiDominiClass>
+			<nTasks>0</nTasks>
+			<unitId>c1b16001-6600-46c9-9c35-97c965a3a107</unitId>
+			<salary>-1</salary>
+			<status>0</status>
+			<prisonerstatus>0</prisonerstatus>
+			<hits>0</hits>
+			<toughness>0</toughness>
+			<minutesLeft>0</minutesLeft>
+			<overtimeLeft>0</overtimeLeft>
+			<birthday>3026-01-17 12:00:00</birthday>
+			<skill>
+				<type>Gunnery/Mech</type>
+				<level>4</level>
+				<bonus>0</bonus>
+			</skill>
+			<skill>
+				<type>Piloting/Mech</type>
+				<level>6</level>
+				<bonus>0</bonus>
+			</skill>
+			<implants>vdni::dermal_armor</implants>
+			<personnelLog>
+				<logEntry>
+					<date>3073-01-24 12:00:00</date>
+					<desc>Promoted to Adept</desc>
+				</logEntry>
+			</personnelLog>
+		</person>
+		<person id="1133a093-b3cc-45f7-8ef0-83e6976fef41" type="mekhq.campaign.personnel.Person">
+			<name>Kandali Morris</name>
+			<callsign>Zombie</callsign>
+			<primaryRole>1</primaryRole>
+			<secondaryRole>0</secondaryRole>
+			<commander>false</commander>
+			<dependent>false</dependent>
+			<clan>false</clan>
+			<phenotype>0</phenotype>
+			<biography>One of the few remaining pure-blooded Zulu warrior-citizens of Africa, Kendali Morris was considered one of the Light of Mankind’s deadliest operatives until a fateful explosion on Muphrid cost her nearly half of her face and jaw. At that time, she was offered and accepted severe augmentation, and joined the ranks of the Manei Domini.
+
+Her LoM service record is heavily shrouded in sealed operations occurring deep in the Free Rasalhague Republic and the Dominion. Excelling in solo or dual-team missions, one of her key contributions can be seen in the recent development of the heavy gyroscopic system now in use with the Protectorate.
+
+Known for her keen eyesight—rivaling many augmented Manei Domini inductees—and her berserker fury in her Preta, Precentor Morris recently underwent further augmentation to her jaw and teeth. Two one-inch steel incisors were implanted with a unique venom-delivery system, coupled with a myomer-enhanced jaw that exerts enough pressure to crack large bones in half. Coupled with her myomer-enhanced legs, Morris is a deadly in-fighter.
+
+Morris is legendary among her native Zulu as the only female warrior to capture and kill one of the genetically enhanced liions of the Serengeti. According to the tribal tales, she stalked the predator for three days before ambushing and wrestling it to the ground, tearing its throat out. When queried about the incident, Morris refuses comment; the myth may indeed have some truth to it, as Morris is rarely without a bone bracelet strung with liion claws.</biography>
+			<idleMonths>-1</idleMonths>
+			<id>1133a093-b3cc-45f7-8ef0-83e6976fef41</id>
+			<portraitCategory>Opacus Venatori/</portraitCategory>
+			<portraitFile>Kendali_Morris.jpg</portraitFile>
+			<xp>0</xp>
+			<daysToWaitForHealing>15</daysToWaitForHealing>
+			<gender>1</gender>
+			<rank>34</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>4</maneiDominiRank>
+			<maneiDominiClass>4</maneiDominiClass>
+			<nTasks>0</nTasks>
+			<unitId>86e8442a-bc36-438a-87b3-df8a41e1a6e9</unitId>
+			<salary>-1</salary>
+			<status>0</status>
+			<prisonerstatus>0</prisonerstatus>
+			<hits>0</hits>
+			<toughness>0</toughness>
+			<minutesLeft>0</minutesLeft>
+			<overtimeLeft>0</overtimeLeft>
+			<birthday>3045-04-08 12:00:00</birthday>
+			<skill>
+				<type>Gunnery/Mech</type>
+				<level>4</level>
+				<bonus>0</bonus>
+			</skill>
+			<skill>
+				<type>Piloting/Mech</type>
+				<level>5</level>
+				<bonus>0</bonus>
+			</skill>
+			<implants>bvdni::pain_shunt::pl_masc::boost_comm_implant</implants>
+			<personnelLog>
+				<logEntry>
+					<date>3073-01-24 12:00:00</date>
+					<desc>Promoted to Demi-Precentor</desc>
+				</logEntry>
+			</personnelLog>
+		</person>
 		<person id="4c9f3722-7bc1-4ef0-964c-b05c91f882ea" type="mekhq.campaign.personnel.Person">
 			<name>Havalah Cazer</name>
 			<callsign>Wraith</callsign>
@@ -1016,11 +1046,11 @@ It is likely that Adept Cazer may be a future choice for Ascension.</biography>
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
 			<gender>1</gender>
-			<rank>0</rank>
+			<rank>33</rank>
 			<rankLevel>0</rankLevel>
 			<rankSystem>-1</rankSystem>
-			<maneiDominiRank>-1</maneiDominiRank>
-			<maneiDominiClass>0</maneiDominiClass>
+			<maneiDominiRank>1</maneiDominiRank>
+			<maneiDominiClass>2</maneiDominiClass>
 			<nTasks>0</nTasks>
 			<unitId>52249633-3534-4be5-a983-55e18d74655c</unitId>
 			<salary>-1</salary>
@@ -1042,6 +1072,12 @@ It is likely that Adept Cazer may be a future choice for Ascension.</biography>
 				<bonus>0</bonus>
 			</skill>
 			<implants>cyber_eye_im</implants>
+			<personnelLog>
+				<logEntry>
+					<date>3073-01-24 12:00:00</date>
+					<desc>Promoted to Adept</desc>
+				</logEntry>
+			</personnelLog>
 		</person>
 	</personnel>
 	<missions>
@@ -1498,15 +1534,6 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities>weapon_specialist</invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Regular</displayName>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Spacecraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Vehicle::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-				<displayName>Gunnery/Protomech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Hot Dog (aToW)</displayName>
@@ -1517,11 +1544,6 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Aerospace::Regular</displayName>
-				<displayName>Piloting/Aircraft::Regular</displayName>
-				<displayName>Piloting/Mech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Sandblaster (AToW)</displayName>
@@ -1533,15 +1555,6 @@ at short, medium, or long/extended range, respectively, but only with a speciali
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities>cluster_hitter::cluster_master</invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Regular</displayName>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Spacecraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Vehicle::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-				<displayName>Gunnery/Protomech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Some Like It Hot (Unofficial)</displayName>
@@ -1552,11 +1565,6 @@ at short, medium, or long/extended range, respectively, but only with a speciali
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Melee Specialist (aToW)</displayName>
@@ -1568,9 +1576,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Mech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Weathered (Unofficial)</displayName>
@@ -1581,15 +1586,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Regular</displayName>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Spacecraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Vehicle::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-				<displayName>Gunnery/Protomech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Cluster Master (AToW)</displayName>
@@ -1600,34 +1596,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities>cluster_hitter</prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities>cluster_hitter</removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Veteran</displayName>
-				<displayName>Gunnery/Aircraft::Veteran</displayName>
-				<displayName>Gunnery/Spacecraft::Veteran</displayName>
-				<displayName>Gunnery/Aerospace::Veteran</displayName>
-				<displayName>Gunnery/Vehicle::Veteran</displayName>
-				<displayName>Gunnery/Mech::Veteran</displayName>
-				<displayName>Gunnery/Protomech::Veteran</displayName>
-			</skillPrereq>
-		</ability>
-		<ability>
-			<displayName>Multi-Tasker (aToW)</displayName>
-			<lookupName>multi_tasker</lookupName>
-			<desc>Secondary target modifiers are reduced by one.</desc>
-			<xpCost>6</xpCost>
-			<weight>2</weight>
-			<prereqAbilities></prereqAbilities>
-			<invalidAbilities></invalidAbilities>
-			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Regular</displayName>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Spacecraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Vehicle::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-				<displayName>Gunnery/Protomech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Maneuvering Ace (aToW)</displayName>
@@ -1641,14 +1609,16 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Aerospace::Veteran</displayName>
-				<displayName>Piloting/Naval::Veteran</displayName>
-				<displayName>Piloting/Ground Vehicle::Veteran</displayName>
-				<displayName>Piloting/VTOL::Veteran</displayName>
-				<displayName>Piloting/Aircraft::Veteran</displayName>
-				<displayName>Piloting/Mech::Veteran</displayName>
-			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Multi-Tasker (aToW)</displayName>
+			<lookupName>multi_tasker</lookupName>
+			<desc>Secondary target modifiers are reduced by one.</desc>
+			<xpCost>6</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
 		</ability>
 		<ability>
 			<displayName>Oblique Attacker (aToW)</displayName>
@@ -1659,14 +1629,6 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Regular</displayName>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Vehicle::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-				<displayName>Gunnery/Protomech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Natural Aptitude, Gunnery (aToW)</displayName>
@@ -1677,15 +1639,6 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit</displayName>
-				<displayName>Gunnery/Aircraft</displayName>
-				<displayName>Gunnery/Spacecraft</displayName>
-				<displayName>Gunnery/Aerospace</displayName>
-				<displayName>Gunnery/Vehicle</displayName>
-				<displayName>Gunnery/Mech</displayName>
-				<displayName>Gunnery/Protomech</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Hopping Jack (Unofficial)</displayName>
@@ -1696,27 +1649,6 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities>jumping_jack</invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Mech::Veteran</displayName>
-			</skillPrereq>
-		</ability>
-		<ability>
-			<displayName>All Weather (Unofficial)</displayName>
-			<lookupName>allweather</lookupName>
-			<desc>A pilot with this ability does not suffer the PSR penalties due to weather.</desc>
-			<xpCost>2</xpCost>
-			<weight>2</weight>
-			<prereqAbilities></prereqAbilities>
-			<invalidAbilities></invalidAbilities>
-			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Aerospace::Regular</displayName>
-				<displayName>Piloting/Naval::Regular</displayName>
-				<displayName>Piloting/Ground Vehicle::Regular</displayName>
-				<displayName>Piloting/VTOL::Regular</displayName>
-				<displayName>Piloting/Aircraft::Regular</displayName>
-				<displayName>Piloting/Mech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Tactical Genius (aToW)</displayName>
@@ -1729,9 +1661,16 @@ Note: Only one Tactical Genius may be utilized per team.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Tactics::Green</displayName>
-			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>All Weather (Unofficial)</displayName>
+			<lookupName>allweather</lookupName>
+			<desc>A pilot with this ability does not suffer the PSR penalties due to weather.</desc>
+			<xpCost>2</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
 		</ability>
 		<ability>
 			<displayName>Jumping Jack (aToW)</displayName>
@@ -1742,9 +1681,6 @@ Note: Only one Tactical Genius may be utilized per team.</desc>
 			<prereqAbilities>hopping_jack</prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities>hopping_jack</removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Mech::Veteran</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Pain Resistance (MaxTech)</displayName>
@@ -1769,15 +1705,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Veteran</displayName>
-				<displayName>Gunnery/Aircraft::Veteran</displayName>
-				<displayName>Gunnery/Spacecraft::Veteran</displayName>
-				<displayName>Gunnery/Aerospace::Veteran</displayName>
-				<displayName>Gunnery/Vehicle::Veteran</displayName>
-				<displayName>Gunnery/Mech::Veteran</displayName>
-				<displayName>Gunnery/Protomech::Veteran</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Dodge (MaxTech)</displayName>
@@ -1791,9 +1718,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Mech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Blind Fighter (Unofficial)</displayName>
@@ -1804,14 +1728,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Regular</displayName>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Vehicle::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-				<displayName>Gunnery/Protomech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Cluster Hitter (AToW)</displayName>
@@ -1822,15 +1738,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities>cluster_master</invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Regular</displayName>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Spacecraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Vehicle::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-				<displayName>Gunnery/Protomech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Weapon Specialist (aToW)</displayName>
@@ -1841,15 +1748,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities>specialist</invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Regular</displayName>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Spacecraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Vehicle::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-				<displayName>Gunnery/Protomech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Melee Master (aToW)</displayName>
@@ -1860,9 +1758,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities>melee_specialist</prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Mech::Veteran</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Sensor Geek (Unofficial)</displayName>
@@ -1874,15 +1769,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Aerospace::Green</displayName>
-				<displayName>Piloting/Naval::Green</displayName>
-				<displayName>Piloting/Ground Vehicle::Green</displayName>
-				<displayName>Gunnery/Battlesuit::Green</displayName>
-				<displayName>Piloting/VTOL::Green</displayName>
-				<displayName>Piloting/Aircraft::Green</displayName>
-				<displayName>Piloting/Mech::Green</displayName>
-			</skillPrereq>
 		</ability>
 	</specialAbilities>
 	<randomSkillPreferences>
@@ -16611,6 +16497,10 @@ Note: This ability is only used for BattleMechs.</desc>
 		</gameoption>
 		<gameoption>
 			<name>geometric_mean_bv</name>
+			<value>false</value>
+		</gameoption>
+		<gameoption>
+			<name>reduced_overheat_modifier_bv</name>
 			<value>false</value>
 		</gameoption>
 		<gameoption>
