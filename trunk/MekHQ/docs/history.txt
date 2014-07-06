@@ -25,6 +25,7 @@ v0.3.6 (SVN)
 + Bug [512]: Error on loading save with ASF bombs loaded in mekhq
 + Bug [491]: Doctor Queue never clears Permanent Injuries
 + Bug [505]: Resolution with a captured JS/DS/WS/SC eats memory and never completes
++ Bug [489]: Typo - in News Item
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
