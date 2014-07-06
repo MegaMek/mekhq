@@ -8074,6 +8074,7 @@ public class CampaignGUI extends JPanel {
                     }
                     menu.add(cbMenuItem);
                 }
+            	popup.add(menu);
                 if (areAllWoB(selected)) {
                 	// MD Ranks
                 	menu = new JMenu("Change Manei Domini Rank");
