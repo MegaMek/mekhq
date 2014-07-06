@@ -190,7 +190,7 @@ public class Turret extends TankLocation {
 	public String checkFixable() {
 		if(isSalvaging()) {
 			//check for armor
-	        if(unit.getEntity().getArmor(loc, false) != IArmorState.ARMOR_DESTROYED) {
+	        if(unit.getEntity().getArmorForReal(loc, false) > 0) {
 	        	return "must salvage armor in this location first";
 	        }
 	        //you can only salvage a location that has nothing left on it

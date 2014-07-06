@@ -27,6 +27,7 @@ v0.3.6 (SVN)
 + Bug [505]: Resolution with a captured JS/DS/WS/SC eats memory and never completes
 + Bug [489]: Typo - in News Item
 + Bug [390]: Replacing Torso Impossible w/ Blown Off Limb
++ Bug [416]: Unsalvageable rotor on a Warrior VTOL (Also affected tank turrets)
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
