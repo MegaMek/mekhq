@@ -34,9 +34,10 @@
       	at http://iscs.teamspam.net/
       	
       Force Images
+        Dylan Myers <ralgith-erian@users.sourceforge.net>
         Peter Farland <pfarland@live.com>
         CarnageINC
-        Dylan Myers <ralgith-erian@users.sourceforge.net>
+        krazzyharry
   	  
   And Of Course...
      FASA, WizKids, FanPro and Catalyst Game Labs for creating and publishing the original game of 
