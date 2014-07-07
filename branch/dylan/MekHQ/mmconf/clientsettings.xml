@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <MegaMekSettings>
 	<store name="ClientSettings">
-		<preference name="LastPlayerCamoName" value="Wood1.jpg"/>
-		<preference name="LastPlayerCategory" value=""/>
+		<preference name="LastPlayerCamoName" value="7th Crucis Lancers RCT.jpg"/>
+		<preference name="LastPlayerCategory" value="Davion/Crucis Lancers/"/>
 		<preference name="LastPlayerColor" value="0"/>
 		<preference name="megamek.megamek.goalplayers" value="2"/>
 		<preference name="LastPlayerName" value="bob"/>
@@ -11,8 +11,9 @@
 	<store name="megamek.client.ui.AWT.GUIPreferences">
 	</store>
 	<store name="megamek.client.ui.swing.GUIPreferences">
+		<preference name="MechSelectorUnitType" value="12"/>
 		<preference name="WindowSizeHeight" value="1030"/>
-		<preference name="MechSelectorWeightClass" value="4"/>
+		<preference name="MechSelectorWeightClass" value="9"/>
 		<preference name="WindowPosY" value="25"/>
 		<preference name="WindowPosX" value="0"/>
 		<preference name="WindowSizeWidth" value="1920"/>

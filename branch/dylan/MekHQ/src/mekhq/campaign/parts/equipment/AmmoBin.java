@@ -246,7 +246,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 			} else if (wn2.getNodeName().equalsIgnoreCase("munition")) {
 				munition = Long.parseLong(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("shotsNeeded")) {
-				shotsNeeded = Integer.parseInt(wn2.getTextContent());
+				String tmp = wn2.getTextContent();
+				shotsNeeded = Integer.parseInt(tmp);
 			} else if (wn2.getNodeName().equalsIgnoreCase("checkedToday")) {
 				if(wn2.getTextContent().equalsIgnoreCase("true")) {
 					checkedToday = true;

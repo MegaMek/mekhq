@@ -1823,6 +1823,8 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
             		aeroThrustersRight = ((Thrusters) part);
             	}
             }
+
+    		part.updateConditionFromPart();
     	}
     	//now check to see what is null
     	for(int i = 0; i<locations.length; i++) {
@@ -2563,6 +2565,17 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	public int getTotalDriverNeeds() {
 		return Compute.getTotalDriverNeeds(entity);
 	}
+	
+	public int getTotalCrewNeeds() {
+		int nav = 0;
+    	if(entity instanceof SmallCraft || entity instanceof Jumpship) {
+    		if(entity instanceof Jumpship && !(entity instanceof SpaceStation)) {
+    			nav = 1;
+    		}
+    		return getAeroCrewNeeds() - getTotalDriverNeeds() - nav;
+    	}
+		return 0;
+	}
 	    
     public boolean canTakeMoreDrivers() {
     	int nDrivers = drivers.size();
@@ -2746,13 +2759,14 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     
     public void setMothballed(boolean b) {
         this.mothballed = b;
+        // Tech gets removed either way bug [#488]
+        if(null != tech) {
+            remove(getTech(), true);
+        }
         if(mothballed) {
             //remove any other personnel
             for(Person p : getCrew()) {
                 remove(p, true);
-            }
-            if(null != tech) {
-                remove(getTech(), true);
             }
             resetPilotAndEntity();
         } else {

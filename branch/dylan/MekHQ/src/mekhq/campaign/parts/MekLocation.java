@@ -405,9 +405,11 @@ public class MekLocation extends Part {
 	@Override
 	public void remove(boolean salvage) {
 		blownOff = false;
+		breached = false;
 		if(null != unit) {
 			unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
 			unit.getEntity().setLocationBlownOff(loc, false);
+			unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL, true);
 			Part spare = campaign.checkForExistingSparePart(this);
 			if(!salvage) {
 				campaign.removePart(this);
@@ -452,7 +454,6 @@ public class MekLocation extends Part {
 				this.difficulty = 1;
 			}
 		} else if(breached) {
-			breached = true;
 			this.time = 60;
 			this.difficulty = 0;
 		} else if (percent < 0.25) {

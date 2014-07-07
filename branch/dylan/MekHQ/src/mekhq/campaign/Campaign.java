@@ -976,14 +976,41 @@ public class Campaign implements Serializable {
         return toReturn;
     }
 
-    public ArrayList<Person> getTechs() {
-        ArrayList<Person> techs = new ArrayList<Person>();
+    /**
+     * Returns a list of active technicians.
+     *
+     * @param noZeroMinute If TRUE, then techs with no time remaining will be excluded from the list.
+     * @param firstTechId  The ID of the tech that should appear first in the list (assuming active and satisfies the
+     *                     noZeroMinute argument)
+     * @return The list of active {@link Person}s who qualify as technicians ({@link Person#isTech()}).
+     */
+    public ArrayList<Person> getTechs(boolean noZeroMinute, UUID firstTechId) {
+        ArrayList<Person> techs = new ArrayList<>();
+
+        // Get the first tech.
+        Person firstTech = getPerson(firstTechId);
+        if ((firstTech != null) && firstTech.isTech() && firstTech.isActive() &&
+            (!noZeroMinute || firstTech.getMinutesLeft() > 0)) {
+            techs.add(firstTech);
+        }
+
         for (Person p : getPersonnel()) {
-            if (p.isTech() && p.isActive()) {
+            if (p.isTech() && p.isActive() && (!p.equals(firstTech)) && (!noZeroMinute || (p.getMinutesLeft() > 0))) {
                 techs.add(p);
             }
         }
         return techs;
+    }
+
+    public ArrayList<Person> getTechs(boolean noZeroMinute) {
+        return getTechs(noZeroMinute, null);
+    }
+
+    /**
+     * @return The list of all active {@link Person}s who qualify as technicians ({@link Person#isTech()}));
+     */
+    public ArrayList<Person> getTechs() {
+        return getTechs(false, null);
     }
 
     public List<Person> getAdmins() {

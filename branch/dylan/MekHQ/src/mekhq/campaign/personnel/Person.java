@@ -889,11 +889,11 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     + "</id>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<portraitCategory>"
-                    + portraitCategory
+                    + MekHqXmlUtil.escape(portraitCategory)
                     + "</portraitCategory>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<portraitFile>"
-                    + portraitFile
+                    + MekHqXmlUtil.escape(portraitFile)
                     + "</portraitFile>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<xp>"
@@ -1501,6 +1501,11 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	}
     	
     	rankName = getRank().getName(profession);
+        
+    	// TODO: Add an override system for this...
+        if (getRanks().getRankSystem() == Ranks.RS_COM || (getRanks().getRankSystem() == Ranks.RS_WOB && getManeiDominiRank() == Rank.MD_RANK_NONE)) {
+        	rankName += getComstarBranchDesignation();
+        }
     	
     	// If we have a rankLevel, add it
     	if (rankLevel > 0) {
@@ -1753,7 +1758,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         	maneiDominiRank = Rank.MD_RANK_NONE;
         }
         if (maneiDominiClass != MD_NONE) {
-        	rank = this.getManeiDominiClassNames() + " " + rank;
+        	rank = getManeiDominiClassNames() + " " + rank;
         }
         if (maneiDominiRank != Rank.MD_RANK_NONE) {
         	rank += " " + Rank.getManeiDominiRankName(maneiDominiRank);
@@ -1778,6 +1783,47 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public String getHyperlinkedFullTitle() {
         return "<a href='PERSON:" + getId() + "'>" + getFullTitle() + "</a>";
+    }
+    
+    public String getComstarBranchDesignation() {
+    	if (isTechPrimary()) {
+    		return " Zeta";
+    	}
+    	if (isAdminPrimary()) {
+    		return " Chi";
+    	}
+    	switch (getPrimaryRole()) {
+    	case T_MECHWARRIOR: return " Epsilon";
+    	case T_AERO_PILOT: return " Pi";
+    	case T_BA:
+    	case T_INFANTRY:
+    		return " Iota";
+    	case T_SPACE_CREW:
+    	case T_SPACE_GUNNER:
+    	case T_SPACE_PILOT:
+    	case T_NAVIGATOR:
+    		Unit u = campaign.getUnit(getUnitId());
+    		if (u != null) {
+    			Entity en = u.getEntity();
+    			if (en instanceof Dropship) {
+    				return " Xi";
+    			}
+    			if (en instanceof Jumpship) {
+    				return " Theta";
+    			}
+    		}
+    		return " ";
+    	case T_DOCTOR:
+    	case T_MEDIC:
+    		return " Kappa";
+    	case T_GVEE_DRIVER:
+    	case T_NVEE_DRIVER:
+    	case T_VTOL_PILOT:
+    	case T_VEE_GUNNER:
+    	case T_CONV_PILOT:
+    		return " Lambda";
+    	default: return "";
+    	}
     }
 
     @Override
@@ -1866,7 +1912,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     @Override
     public boolean needsFixing() {
-        return (hits > 0 || injuries.size() > 0) && status != S_KIA && status == S_ACTIVE;
+        return (hits > 0 || needsAMFixing()) && status != S_KIA && status == S_ACTIVE;
     }
 
     @Override
@@ -2192,6 +2238,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public void addTechUnitID(UUID i) {
         techUnitIds.add(i);
+    }
+    
+    public void clearTechUnitIDs() {
+    	techUnitIds.clear();
     }
 
     public ArrayList<UUID> getTechUnitIDs() {

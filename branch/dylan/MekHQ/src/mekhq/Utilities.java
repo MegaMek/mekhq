@@ -216,20 +216,26 @@ public class Utilities {
 	public static ArrayList<String> getAllVariants(Entity en, int year, CampaignOptions options) {
 		ArrayList<String> variants = new ArrayList<String>();
 		for(MechSummary summary : MechSummaryCache.getInstance().getAllMechs()) {
+			// If this isn't the same chassis, is our current unit, or is a different weight we continue
+			if(!en.getChassis().equalsIgnoreCase(summary.getChassis())
+					|| en.getModel().equalsIgnoreCase(summary.getModel())
+					|| summary.getTons() != en.getWeight()) {
+				continue;
+			}
+			// If we only allow canon units and this isn't canon we continue
 			if(!summary.isCanon() && options.allowCanonOnly()) {
 				continue;
 			}
+			// If we're limiting by year and aren't to this unit's year yet we continue
 			if(options.limitByYear() && summary.getYear() > year) {
 				continue;
 			}
+			// If the tech level doesn't meet the game's tech level we continue
 			if(options.getTechLevel() < Utilities.getSimpleTechLevel(summary.getType())) {
 				continue;
 			}
-			if(en.getChassis().equalsIgnoreCase(summary.getChassis())
-					&& !en.getModel().equalsIgnoreCase(summary.getModel())
-					&& summary.getTons() == en.getWeight()) {
-				variants.add(summary.getModel());
-			}
+			// Otherwise, we can offer it for selection
+			variants.add(summary.getModel());
 		}
 		return variants;
 	}
@@ -510,7 +516,7 @@ public class Utilities {
 	    	}
 		}
     	
-    	while(unit.canTakeMoreVesselCrew()) {
+    	while(vesselCrew.size() < unit.getTotalCrewNeeds()) {
     		Person p = c.newPerson(Person.T_SPACE_CREW);
 			vesselCrew.add(p);
     	}
@@ -705,12 +711,9 @@ public class Utilities {
 	    	}
 		}
     	
-    	while(unit.canTakeMoreVesselCrew()) {
+    	while(vesselCrew.size() < unit.getTotalCrewNeeds()) {
     		Person p = c.newPerson(Person.T_SPACE_CREW);
-			if (!c.recruitPerson(p)) {
-				return;
-			}
-    		vesselCrew.add(p);
+			vesselCrew.add(p);
     	}
     	
     	if(unit.canTakeNavigator()) {

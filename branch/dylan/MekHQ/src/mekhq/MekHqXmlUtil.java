@@ -267,8 +267,9 @@ public class MekHqXmlUtil {
                 retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<bombs>\n";
                 for (int type = 0; type < BombType.B_NUM; type++) {
                     if (bombChoices[type] > 0) {
+                    	String typeName = BombType.getBombInternalName(type);
                         retVal += MekHqXmlUtil.indentStr(indentLvl+2) + "<bomb type=\"";
-                        retVal += String.valueOf(type);
+                        retVal += typeName;
                         retVal += "\" load=\"";
                         retVal += String.valueOf(bombChoices[type]);
                         retVal += "\"/>\n";
