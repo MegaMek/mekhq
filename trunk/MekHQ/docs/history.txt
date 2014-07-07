@@ -37,6 +37,8 @@ v0.3.6 (SVN)
 + Data: Updated the WoB campaign file with more information
 + Fix infinite loop in AbstractUnitRating that prevents launching MHQ when loading a campaign file.
 + Data: New VTOL force images - Thanks pfarland, keep 'em coming
++ Data: New Force images from CarnageINC on the MegaMek forums
++ Updated the mekhq-contributors.txt file
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
