@@ -43,6 +43,7 @@ v0.3.6 (SVN)
 + Data: More Force images
 + Data: krazzyharry Force images & Clan Wolverine image
 + Fix folder name for the Miscellaneous force images
++ Bug: packaging_local.xml looking in wrong place for history files of MM and MML
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4

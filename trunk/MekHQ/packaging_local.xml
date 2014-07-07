@@ -126,12 +126,12 @@
         <!-- Move MekHQ's history.txt out of the way... -->
         <move file="${localdir}/${docdir}/history.txt" tofile="${localdir}/${docdir}/history-mhq.txt"/>
         <!-- now add in doc files -->
-        <copy todir="${localdir}/${docdir}/docs-megamek">
+        <copy todir="${localdir}/${docdir}">
             <fileset dir="${mmdir}/${docdir}">
             </fileset>
         </copy>
         <move file="${localdir}/${docdir}/history.txt" tofile="${localdir}/${docdir}/history-mm.txt"/>
-        <copy todir="${localdir}/${docdir}/docs-megameklab">
+        <copy todir="${localdir}/${docdir}">
             <fileset dir="${mmldir}/${docdir}">
             </fileset>
         </copy>
