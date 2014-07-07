@@ -128,7 +128,6 @@ public abstract class AbstractUnitRating implements IUnitRating {
     public void reInitialize() {
         setInitialized(false);
         initValues();
-        setInitialized(true);
     }
 
     public String getAverageExperience() {
@@ -451,7 +450,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     protected BigDecimal getTotalSkillLevels() {
     	return getTotalSkillLevels(true);
     }
-    
+
     /**
      * Returns the sum of all experience rating for all combat units.
      *
@@ -471,9 +470,6 @@ public abstract class AbstractUnitRating implements IUnitRating {
      * @return
      */
     protected BigDecimal getNumberUnits() {
-        if (numberUnits.compareTo(BigDecimal.ZERO) <= 0) {
-            reInitialize();
-        }
         return numberUnits;
     }
 
@@ -517,6 +513,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setSupportPercent(BigDecimal.ZERO);
         setTransportPercent(BigDecimal.ZERO);
         setHighTechPercent(BigDecimal.ZERO);
+        setInitialized(true);
     }
 
     protected void updateBayCount(Dropship ds) {

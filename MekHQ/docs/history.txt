@@ -35,6 +35,7 @@ v0.3.6 (SVN)
 + Bug: By person rank system option not showing up on the menu for campaigns with WoB as the default system
 + Feature: Added in Comstar/WoB Branch Designations (WIP)
 + Data: Updated the WoB campaign file with more information
++ Fix infinite loop in AbstractUnitRating that prevents launching MHQ when loading a campaign file.
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
