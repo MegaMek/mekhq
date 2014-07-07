@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<campaign version="0.3.4-dev">
+<campaign version="0.3.6-dev">
 	<info>
 		<name>The Kewran Wolfhounds, C Company, 3rd Battalion, 25th Arcturan Guards RCT</name>
 		<faction>LA</faction>
@@ -1406,7 +1406,7 @@ Hoffmann, 14 May 3071</desc>
 	</missions>
 	<forces>
 		<force id="0" type="mekhq.campaign.force.Force">
-			<name>My Campaign</name>
+			<name>The Kewran Wolfhounds</name>
 			<desc>This is C Company, 3rd Battalion as set up at the start of the campaign for the Starter Book: Fist and Falcon.
 
 Anyone that wants to use these will need to add the additional support personal and define the rules as they want them.
@@ -1416,7 +1416,7 @@ In addition this starter book included Character sheets so those have been added
 Enjoy.
 
 Conversion by Hammer</desc>
-			<iconCategory>-- General --</iconCategory>
+			<iconCategory>Units/</iconCategory>
 			<iconFileName>Arturanguards25th.jpg</iconFileName>
 			<scenarioId>-1</scenarioId>
 			<subforces>
@@ -1807,15 +1807,6 @@ Conversion by Hammer</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities>weapon_specialist</invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Regular</displayName>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Spacecraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Vehicle::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-				<displayName>Gunnery/Protomech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Hot Dog (aToW)</displayName>
@@ -1826,11 +1817,6 @@ Conversion by Hammer</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Aerospace::Regular</displayName>
-				<displayName>Piloting/Aircraft::Regular</displayName>
-				<displayName>Piloting/Mech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Sandblaster (AToW)</displayName>
@@ -1842,15 +1828,6 @@ at short, medium, or long/extended range, respectively, but only with a speciali
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities>cluster_hitter::cluster_master</invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Regular</displayName>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Spacecraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Vehicle::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-				<displayName>Gunnery/Protomech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Some Like It Hot (Unofficial)</displayName>
@@ -1861,11 +1838,6 @@ at short, medium, or long/extended range, respectively, but only with a speciali
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Melee Specialist (aToW)</displayName>
@@ -1877,9 +1849,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Mech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Weathered (Unofficial)</displayName>
@@ -1890,15 +1859,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Regular</displayName>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Spacecraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Vehicle::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-				<displayName>Gunnery/Protomech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Cluster Master (AToW)</displayName>
@@ -1909,15 +1869,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities>cluster_hitter</prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities>cluster_hitter</removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Veteran</displayName>
-				<displayName>Gunnery/Aircraft::Veteran</displayName>
-				<displayName>Gunnery/Spacecraft::Veteran</displayName>
-				<displayName>Gunnery/Aerospace::Veteran</displayName>
-				<displayName>Gunnery/Vehicle::Veteran</displayName>
-				<displayName>Gunnery/Mech::Veteran</displayName>
-				<displayName>Gunnery/Protomech::Veteran</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Multi-Tasker (aToW)</displayName>
@@ -1928,15 +1879,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Regular</displayName>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Spacecraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Vehicle::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-				<displayName>Gunnery/Protomech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Maneuvering Ace (aToW)</displayName>
@@ -1950,14 +1892,6 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Aerospace::Veteran</displayName>
-				<displayName>Piloting/Naval::Veteran</displayName>
-				<displayName>Piloting/Ground Vehicle::Veteran</displayName>
-				<displayName>Piloting/VTOL::Veteran</displayName>
-				<displayName>Piloting/Aircraft::Veteran</displayName>
-				<displayName>Piloting/Mech::Veteran</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Oblique Attacker (aToW)</displayName>
@@ -1968,14 +1902,6 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Regular</displayName>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Vehicle::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-				<displayName>Gunnery/Protomech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Natural Aptitude, Gunnery (aToW)</displayName>
@@ -1986,15 +1912,6 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit</displayName>
-				<displayName>Gunnery/Aircraft</displayName>
-				<displayName>Gunnery/Spacecraft</displayName>
-				<displayName>Gunnery/Aerospace</displayName>
-				<displayName>Gunnery/Vehicle</displayName>
-				<displayName>Gunnery/Mech</displayName>
-				<displayName>Gunnery/Protomech</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Hopping Jack (Unofficial)</displayName>
@@ -2005,9 +1922,6 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities>jumping_jack</invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Mech::Veteran</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>All Weather (Unofficial)</displayName>
@@ -2018,14 +1932,6 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Aerospace::Regular</displayName>
-				<displayName>Piloting/Naval::Regular</displayName>
-				<displayName>Piloting/Ground Vehicle::Regular</displayName>
-				<displayName>Piloting/VTOL::Regular</displayName>
-				<displayName>Piloting/Aircraft::Regular</displayName>
-				<displayName>Piloting/Mech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Tactical Genius (aToW)</displayName>
@@ -2038,9 +1944,6 @@ Note: Only one Tactical Genius may be utilized per team.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Tactics::Green</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Jumping Jack (aToW)</displayName>
@@ -2051,9 +1954,6 @@ Note: Only one Tactical Genius may be utilized per team.</desc>
 			<prereqAbilities>hopping_jack</prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities>hopping_jack</removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Mech::Veteran</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Pain Resistance (MaxTech)</displayName>
@@ -2078,15 +1978,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Veteran</displayName>
-				<displayName>Gunnery/Aircraft::Veteran</displayName>
-				<displayName>Gunnery/Spacecraft::Veteran</displayName>
-				<displayName>Gunnery/Aerospace::Veteran</displayName>
-				<displayName>Gunnery/Vehicle::Veteran</displayName>
-				<displayName>Gunnery/Mech::Veteran</displayName>
-				<displayName>Gunnery/Protomech::Veteran</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Dodge (MaxTech)</displayName>
@@ -2100,9 +1991,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Mech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Blind Fighter (Unofficial)</displayName>
@@ -2113,14 +2001,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Regular</displayName>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Vehicle::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-				<displayName>Gunnery/Protomech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Cluster Hitter (AToW)</displayName>
@@ -2131,15 +2011,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities>cluster_master</invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Regular</displayName>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Spacecraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Vehicle::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-				<displayName>Gunnery/Protomech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Weapon Specialist (aToW)</displayName>
@@ -2150,15 +2021,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities>specialist</invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Regular</displayName>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Spacecraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Vehicle::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-				<displayName>Gunnery/Protomech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Melee Master (aToW)</displayName>
@@ -2169,9 +2031,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities>melee_specialist</prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Mech::Veteran</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Sensor Geek (Unofficial)</displayName>
@@ -2183,15 +2042,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Aerospace::Green</displayName>
-				<displayName>Piloting/Naval::Green</displayName>
-				<displayName>Piloting/Ground Vehicle::Green</displayName>
-				<displayName>Gunnery/Battlesuit::Green</displayName>
-				<displayName>Piloting/VTOL::Green</displayName>
-				<displayName>Piloting/Aircraft::Green</displayName>
-				<displayName>Piloting/Mech::Green</displayName>
-			</skillPrereq>
 		</ability>
 	</specialAbilities>
 	<randomSkillPreferences>
@@ -2231,7 +2081,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>13</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>ISDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2256,7 +2106,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>8</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>ISRotaryAC5</typeName>
 			<equipTonnage>10.0</equipTonnage>
 		</part>
@@ -2281,7 +2131,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>9</equipmentNum>
+			<equipmentNum>6</equipmentNum>
 			<typeName>ISERSmallLaser</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2306,7 +2156,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>8</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>ISERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2481,7 +2331,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>7</equipmentNum>
 			<typeName>ISDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2506,7 +2356,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>7</equipmentNum>
+			<equipmentNum>8</equipmentNum>
 			<typeName>ISDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -3065,7 +2915,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>8</equipmentNum>
+			<equipmentNum>10</equipmentNum>
 			<typeName>ISDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -3090,7 +2940,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>10</equipmentNum>
+			<equipmentNum>11</equipmentNum>
 			<typeName>ISDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -3780,7 +3630,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>8</equipmentNum>
 			<typeName>ISRotaryAC5</typeName>
 			<equipTonnage>10.0</equipTonnage>
 		</part>
@@ -3955,7 +3805,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>6</equipmentNum>
+			<equipmentNum>9</equipmentNum>
 			<typeName>ISERSmallLaser</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -3980,7 +3830,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>8</equipmentNum>
 			<typeName>ISERMediumLaser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -11630,7 +11480,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>11</equipmentNum>
+			<equipmentNum>12</equipmentNum>
 			<typeName>ISDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -11705,7 +11555,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>12</equipmentNum>
+			<equipmentNum>13</equipmentNum>
 			<typeName>ISDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>

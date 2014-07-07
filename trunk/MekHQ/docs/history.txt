@@ -39,6 +39,7 @@ v0.3.6 (SVN)
 + Data: New VTOL force images - Thanks pfarland, keep 'em coming
 + Data: New Force images from CarnageINC on the MegaMek forums
 + Updated the mekhq-contributors.txt file
++ Fixed Campaign files again since some force files got moved
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4

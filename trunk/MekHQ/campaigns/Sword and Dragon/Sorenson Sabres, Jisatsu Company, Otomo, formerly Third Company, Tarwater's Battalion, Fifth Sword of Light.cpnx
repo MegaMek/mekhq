@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<campaign version="0.3.4-dev">
+<campaign version="0.3.6-dev">
 	<info>
 		<name>Sorenson Sabres</name>
 		<faction>DC</faction>
@@ -19,7 +19,7 @@
 		<camoFileName>5th Sword of Light.jpg</camoFileName>
 		<colorIndex>0</colorIndex>
 		<lastTeamId>0</lastTeamId>
-		<lastPartId>716</lastPartId>
+		<lastPartId>724</lastPartId>
 		<lastForceId>4</lastForceId>
 		<lastMissionId>1</lastMissionId>
 		<lastScenarioId>1</lastScenarioId>
@@ -764,6 +764,54 @@ Known for his practical jokes and boisterous laugh, Martin seems to also be the 
 				<bonus>0</bonus>
 			</skill>
 		</person>
+		<person id="65cffdcd-c356-4cea-bb7e-2257c1ab795c" type="mekhq.campaign.personnel.Person">
+			<name>Shakir Jerrar</name>
+			<callsign></callsign>
+			<primaryRole>1</primaryRole>
+			<secondaryRole>0</secondaryRole>
+			<commander>false</commander>
+			<dependent>false</dependent>
+			<clan>false</clan>
+			<phenotype>0</phenotype>
+			<biography>Orphaned by a border raid on Donenac, Jerrar was adopted by the Fusilli family on Irurzun. During a brief stint with the First Proserpina Hussars, Jerrar’s outspoken criticism of the unit’s upper echelon got him a ticket straight to the Legions of Vega.
+However, impressed by the man’s single-minded drive to succeed and his utter devotion to the Combine state, the ISF reassigned and trained him as a metsuke agent. 
+
+His first assignment was to determine the loyalties of the Rasalhagian native Sorenson and, by extension, the Sabres as a whole. Jerrar immediately fit in, seeing after only a short while that the man had indeed changed in many ways—he wasn’t the rebellious ideologue the ISF had initially thought. The two became good friends, though Jerrar never let out the secret out of his ISF connections. 
+
+When the unit returned from the ’49 border campaign, Jerrar was reassigned to a Draconis Elite Strike Team. He maintained contact with Sorenson up until his friend’s death and is rumored to be the key reason why the Sabres were assigned to the Otomo. In 3068 he was tapped by Kanrei Minamoto for the Directorship of the ISF after Ninyu Indrahar was killed on Benjamin.</biography>
+			<idleMonths>-1</idleMonths>
+			<id>65cffdcd-c356-4cea-bb7e-2257c1ab795c</id>
+			<portraitCategory>Sorenson Sabres/</portraitCategory>
+			<portraitFile>Shakir.JPG</portraitFile>
+			<xp>0</xp>
+			<daysToWaitForHealing>15</daysToWaitForHealing>
+			<gender>0</gender>
+			<rank>16</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
+			<nTasks>0</nTasks>
+			<unitId>029aa656-ef80-483c-899a-aa792e4ea069</unitId>
+			<salary>-1</salary>
+			<status>0</status>
+			<prisonerstatus>0</prisonerstatus>
+			<hits>0</hits>
+			<toughness>0</toughness>
+			<minutesLeft>0</minutesLeft>
+			<overtimeLeft>0</overtimeLeft>
+			<birthday>3011-11-04 12:00:00</birthday>
+			<skill>
+				<type>Gunnery/Mech</type>
+				<level>4</level>
+				<bonus>0</bonus>
+			</skill>
+			<skill>
+				<type>Piloting/Mech</type>
+				<level>5</level>
+				<bonus>0</bonus>
+			</skill>
+		</person>
 		<person id="5651f33f-a584-4b73-879d-c4f60315d6f9" type="mekhq.campaign.personnel.Person">
 			<name>Jasmine Rubach</name>
 			<callsign></callsign>
@@ -820,54 +868,6 @@ With the exception of the Tai-i, the veterans of the unit who knew her parents a
 					<desc>Assigned to Hermes II HER-4K &quot;Hermes III&quot;</desc>
 				</logEntry>
 			</personnelLog>
-		</person>
-		<person id="65cffdcd-c356-4cea-bb7e-2257c1ab795c" type="mekhq.campaign.personnel.Person">
-			<name>Shakir Jerrar</name>
-			<callsign></callsign>
-			<primaryRole>1</primaryRole>
-			<secondaryRole>0</secondaryRole>
-			<commander>false</commander>
-			<dependent>false</dependent>
-			<clan>false</clan>
-			<phenotype>0</phenotype>
-			<biography>Orphaned by a border raid on Donenac, Jerrar was adopted by the Fusilli family on Irurzun. During a brief stint with the First Proserpina Hussars, Jerrar’s outspoken criticism of the unit’s upper echelon got him a ticket straight to the Legions of Vega.
-However, impressed by the man’s single-minded drive to succeed and his utter devotion to the Combine state, the ISF reassigned and trained him as a metsuke agent. 
-
-His first assignment was to determine the loyalties of the Rasalhagian native Sorenson and, by extension, the Sabres as a whole. Jerrar immediately fit in, seeing after only a short while that the man had indeed changed in many ways—he wasn’t the rebellious ideologue the ISF had initially thought. The two became good friends, though Jerrar never let out the secret out of his ISF connections. 
-
-When the unit returned from the ’49 border campaign, Jerrar was reassigned to a Draconis Elite Strike Team. He maintained contact with Sorenson up until his friend’s death and is rumored to be the key reason why the Sabres were assigned to the Otomo. In 3068 he was tapped by Kanrei Minamoto for the Directorship of the ISF after Ninyu Indrahar was killed on Benjamin.</biography>
-			<idleMonths>-1</idleMonths>
-			<id>65cffdcd-c356-4cea-bb7e-2257c1ab795c</id>
-			<portraitCategory>Sorenson Sabres/</portraitCategory>
-			<portraitFile>Shakir.JPG</portraitFile>
-			<xp>0</xp>
-			<daysToWaitForHealing>15</daysToWaitForHealing>
-			<gender>0</gender>
-			<rank>16</rank>
-			<rankLevel>0</rankLevel>
-			<rankSystem>-1</rankSystem>
-			<maneiDominiRank>-1</maneiDominiRank>
-			<maneiDominiClass>0</maneiDominiClass>
-			<nTasks>0</nTasks>
-			<unitId>029aa656-ef80-483c-899a-aa792e4ea069</unitId>
-			<salary>-1</salary>
-			<status>0</status>
-			<prisonerstatus>0</prisonerstatus>
-			<hits>0</hits>
-			<toughness>0</toughness>
-			<minutesLeft>0</minutesLeft>
-			<overtimeLeft>0</overtimeLeft>
-			<birthday>3011-11-04 12:00:00</birthday>
-			<skill>
-				<type>Gunnery/Mech</type>
-				<level>4</level>
-				<bonus>0</bonus>
-			</skill>
-			<skill>
-				<type>Piloting/Mech</type>
-				<level>5</level>
-				<bonus>0</bonus>
-			</skill>
 		</person>
 		<person id="a61397b8-8ec1-4e1b-9558-f23281139634" type="mekhq.campaign.personnel.Person">
 			<name>Alberta Benton</name>
@@ -956,8 +956,8 @@ wishes to hit it. The Fox is known for his cunning—and using out of- the-way w
 		<force id="0" type="mekhq.campaign.force.Force">
 			<name>Sorenson Sabers</name>
 			<desc></desc>
-			<iconCategory>-- General --</iconCategory>
-			<iconFileName>SorensonSabres.JPG</iconFileName>
+			<iconCategory>Units/</iconCategory>
+			<iconFileName>SorensonSabres.jpg</iconFileName>
 			<scenarioId>-1</scenarioId>
 			<subforces>
 				<force id="2" type="mekhq.campaign.force.Force">
@@ -1347,15 +1347,6 @@ wishes to hit it. The Fox is known for his cunning—and using out of- the-way w
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities>weapon_specialist</invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Regular</displayName>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Spacecraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Vehicle::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-				<displayName>Gunnery/Protomech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Hot Dog (aToW)</displayName>
@@ -1366,11 +1357,6 @@ wishes to hit it. The Fox is known for his cunning—and using out of- the-way w
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Aerospace::Regular</displayName>
-				<displayName>Piloting/Aircraft::Regular</displayName>
-				<displayName>Piloting/Mech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Sandblaster (AToW)</displayName>
@@ -1382,15 +1368,6 @@ at short, medium, or long/extended range, respectively, but only with a speciali
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities>cluster_hitter::cluster_master</invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Regular</displayName>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Spacecraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Vehicle::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-				<displayName>Gunnery/Protomech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Some Like It Hot (Unofficial)</displayName>
@@ -1401,11 +1378,6 @@ at short, medium, or long/extended range, respectively, but only with a speciali
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Melee Specialist (aToW)</displayName>
@@ -1417,9 +1389,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Mech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Weathered (Unofficial)</displayName>
@@ -1430,15 +1399,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Regular</displayName>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Spacecraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Vehicle::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-				<displayName>Gunnery/Protomech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Cluster Master (AToW)</displayName>
@@ -1449,34 +1409,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities>cluster_hitter</prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities>cluster_hitter</removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Veteran</displayName>
-				<displayName>Gunnery/Aircraft::Veteran</displayName>
-				<displayName>Gunnery/Spacecraft::Veteran</displayName>
-				<displayName>Gunnery/Aerospace::Veteran</displayName>
-				<displayName>Gunnery/Vehicle::Veteran</displayName>
-				<displayName>Gunnery/Mech::Veteran</displayName>
-				<displayName>Gunnery/Protomech::Veteran</displayName>
-			</skillPrereq>
-		</ability>
-		<ability>
-			<displayName>Multi-Tasker (aToW)</displayName>
-			<lookupName>multi_tasker</lookupName>
-			<desc>Secondary target modifiers are reduced by one.</desc>
-			<xpCost>6</xpCost>
-			<weight>2</weight>
-			<prereqAbilities></prereqAbilities>
-			<invalidAbilities></invalidAbilities>
-			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Regular</displayName>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Spacecraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Vehicle::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-				<displayName>Gunnery/Protomech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Maneuvering Ace (aToW)</displayName>
@@ -1490,14 +1422,16 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Aerospace::Veteran</displayName>
-				<displayName>Piloting/Naval::Veteran</displayName>
-				<displayName>Piloting/Ground Vehicle::Veteran</displayName>
-				<displayName>Piloting/VTOL::Veteran</displayName>
-				<displayName>Piloting/Aircraft::Veteran</displayName>
-				<displayName>Piloting/Mech::Veteran</displayName>
-			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>Multi-Tasker (aToW)</displayName>
+			<lookupName>multi_tasker</lookupName>
+			<desc>Secondary target modifiers are reduced by one.</desc>
+			<xpCost>6</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
 		</ability>
 		<ability>
 			<displayName>Oblique Attacker (aToW)</displayName>
@@ -1508,14 +1442,6 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Regular</displayName>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Vehicle::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-				<displayName>Gunnery/Protomech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Natural Aptitude, Gunnery (aToW)</displayName>
@@ -1526,15 +1452,6 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit</displayName>
-				<displayName>Gunnery/Aircraft</displayName>
-				<displayName>Gunnery/Spacecraft</displayName>
-				<displayName>Gunnery/Aerospace</displayName>
-				<displayName>Gunnery/Vehicle</displayName>
-				<displayName>Gunnery/Mech</displayName>
-				<displayName>Gunnery/Protomech</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Hopping Jack (Unofficial)</displayName>
@@ -1545,27 +1462,6 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities>jumping_jack</invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Mech::Veteran</displayName>
-			</skillPrereq>
-		</ability>
-		<ability>
-			<displayName>All Weather (Unofficial)</displayName>
-			<lookupName>allweather</lookupName>
-			<desc>A pilot with this ability does not suffer the PSR penalties due to weather.</desc>
-			<xpCost>2</xpCost>
-			<weight>2</weight>
-			<prereqAbilities></prereqAbilities>
-			<invalidAbilities></invalidAbilities>
-			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Aerospace::Regular</displayName>
-				<displayName>Piloting/Naval::Regular</displayName>
-				<displayName>Piloting/Ground Vehicle::Regular</displayName>
-				<displayName>Piloting/VTOL::Regular</displayName>
-				<displayName>Piloting/Aircraft::Regular</displayName>
-				<displayName>Piloting/Mech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Tactical Genius (aToW)</displayName>
@@ -1578,9 +1474,16 @@ Note: Only one Tactical Genius may be utilized per team.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Tactics::Green</displayName>
-			</skillPrereq>
+		</ability>
+		<ability>
+			<displayName>All Weather (Unofficial)</displayName>
+			<lookupName>allweather</lookupName>
+			<desc>A pilot with this ability does not suffer the PSR penalties due to weather.</desc>
+			<xpCost>2</xpCost>
+			<weight>2</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
 		</ability>
 		<ability>
 			<displayName>Jumping Jack (aToW)</displayName>
@@ -1591,9 +1494,6 @@ Note: Only one Tactical Genius may be utilized per team.</desc>
 			<prereqAbilities>hopping_jack</prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities>hopping_jack</removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Mech::Veteran</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Pain Resistance (MaxTech)</displayName>
@@ -1618,15 +1518,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Veteran</displayName>
-				<displayName>Gunnery/Aircraft::Veteran</displayName>
-				<displayName>Gunnery/Spacecraft::Veteran</displayName>
-				<displayName>Gunnery/Aerospace::Veteran</displayName>
-				<displayName>Gunnery/Vehicle::Veteran</displayName>
-				<displayName>Gunnery/Mech::Veteran</displayName>
-				<displayName>Gunnery/Protomech::Veteran</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Dodge (MaxTech)</displayName>
@@ -1640,9 +1531,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Mech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Blind Fighter (Unofficial)</displayName>
@@ -1653,14 +1541,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Regular</displayName>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Vehicle::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-				<displayName>Gunnery/Protomech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Cluster Hitter (AToW)</displayName>
@@ -1671,15 +1551,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities>cluster_master</invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Regular</displayName>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Spacecraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Vehicle::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-				<displayName>Gunnery/Protomech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Weapon Specialist (aToW)</displayName>
@@ -1690,15 +1561,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities>specialist</invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Gunnery/Battlesuit::Regular</displayName>
-				<displayName>Gunnery/Aircraft::Regular</displayName>
-				<displayName>Gunnery/Spacecraft::Regular</displayName>
-				<displayName>Gunnery/Aerospace::Regular</displayName>
-				<displayName>Gunnery/Vehicle::Regular</displayName>
-				<displayName>Gunnery/Mech::Regular</displayName>
-				<displayName>Gunnery/Protomech::Regular</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Melee Master (aToW)</displayName>
@@ -1709,9 +1571,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities>melee_specialist</prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Mech::Veteran</displayName>
-			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Sensor Geek (Unofficial)</displayName>
@@ -1723,15 +1582,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
-			<skillPrereq>
-				<displayName>Piloting/Aerospace::Green</displayName>
-				<displayName>Piloting/Naval::Green</displayName>
-				<displayName>Piloting/Ground Vehicle::Green</displayName>
-				<displayName>Gunnery/Battlesuit::Green</displayName>
-				<displayName>Piloting/VTOL::Green</displayName>
-				<displayName>Piloting/Aircraft::Green</displayName>
-				<displayName>Piloting/Mech::Green</displayName>
-			</skillPrereq>
 		</ability>
 	</specialAbilities>
 	<randomSkillPreferences>
@@ -1750,6 +1600,206 @@ Note: This ability is only used for BattleMechs.</desc>
 		<secondSkillBonus>-4</secondSkillBonus>
 	</randomSkillPreferences>
 	<parts>
+		<part id="724" type="mekhq.campaign.parts.equipment.HeatSink">
+			<id>724</id>
+			<name>Heat Sink</name>
+			<unitTonnage>80</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>fdceebee-6bb0-4d85-ad41-9a1a541c0142</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>22</equipmentNum>
+			<typeName>Heat Sink</typeName>
+			<equipTonnage>1.0</equipTonnage>
+		</part>
+		<part id="723" type="mekhq.campaign.parts.equipment.HeatSink">
+			<id>723</id>
+			<name>Heat Sink</name>
+			<unitTonnage>80</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>fdceebee-6bb0-4d85-ad41-9a1a541c0142</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>21</equipmentNum>
+			<typeName>Heat Sink</typeName>
+			<equipTonnage>1.0</equipTonnage>
+		</part>
+		<part id="722" type="mekhq.campaign.parts.equipment.EquipmentPart">
+			<id>722</id>
+			<name>Medium Laser</name>
+			<unitTonnage>80</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>fdceebee-6bb0-4d85-ad41-9a1a541c0142</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>20</equipmentNum>
+			<typeName>Medium Laser</typeName>
+			<equipTonnage>1.0</equipTonnage>
+		</part>
+		<part id="721" type="mekhq.campaign.parts.equipment.EquipmentPart">
+			<id>721</id>
+			<name>SRM 4</name>
+			<unitTonnage>80</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>eec47cc4-f449-4ef4-9b3d-806fbc3ba994</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>9</equipmentNum>
+			<typeName>SRM 4</typeName>
+			<equipTonnage>2.0</equipTonnage>
+		</part>
+		<part id="720" type="mekhq.campaign.parts.equipment.EquipmentPart">
+			<id>720</id>
+			<name>LRM 5</name>
+			<unitTonnage>85</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>2f77dc5d-04fb-45ba-9943-8c4f505a3bb0</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>7</equipmentNum>
+			<typeName>LRM 5</typeName>
+			<equipTonnage>2.0</equipTonnage>
+		</part>
+		<part id="719" type="mekhq.campaign.parts.equipment.HeatSink">
+			<id>719</id>
+			<name>Heat Sink</name>
+			<unitTonnage>50</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>029aa656-ef80-483c-899a-aa792e4ea069</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>11</equipmentNum>
+			<typeName>Heat Sink</typeName>
+			<equipTonnage>1.0</equipTonnage>
+		</part>
+		<part id="718" type="mekhq.campaign.parts.equipment.JumpJet">
+			<id>718</id>
+			<name>Jump Jet</name>
+			<unitTonnage>35</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>153d2e91-5fa3-4903-9010-a4d9ddccfc31</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>12</equipmentNum>
+			<typeName>Jump Jet</typeName>
+			<equipTonnage>0.5</equipTonnage>
+		</part>
+		<part id="717" type="mekhq.campaign.parts.equipment.JumpJet">
+			<id>717</id>
+			<name>Jump Jet</name>
+			<unitTonnage>30</unitTonnage>
+			<hits>0</hits>
+			<difficulty>0</difficulty>
+			<time>0</time>
+			<timeSpent>0</timeSpent>
+			<mode>0</mode>
+			<skillMin>1</skillMin>
+			<unitId>518b69c6-f3ba-47ee-a9f1-56900b528441</unitId>
+			<salvaging>false</salvaging>
+			<workingOvertime>false</workingOvertime>
+			<shorthandedMod>0</shorthandedMod>
+			<refitId>null</refitId>
+			<daysToArrival>0</daysToArrival>
+			<brandNew>false</brandNew>
+			<quantity>1</quantity>
+			<daysToWait>0</daysToWait>
+			<replacementId>-1</replacementId>
+			<quality>3</quality>
+			<equipmentNum>9</equipmentNum>
+			<typeName>Jump Jet</typeName>
+			<equipTonnage>0.5</equipTonnage>
+		</part>
 		<part id="716" type="mekhq.campaign.parts.equipment.AmmoBin">
 			<id>716</id>
 			<name>AC/5 Ammo Bin</name>
@@ -1902,7 +1952,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>22</equipmentNum>
+			<equipmentNum>6</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -1927,7 +1977,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>21</equipmentNum>
+			<equipmentNum>7</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -1952,7 +2002,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>20</equipmentNum>
+			<equipmentNum>8</equipmentNum>
 			<typeName>Medium Laser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -1977,7 +2027,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>18</equipmentNum>
+			<equipmentNum>9</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2002,7 +2052,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2027,7 +2077,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2052,7 +2102,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2077,7 +2127,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2102,7 +2152,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>6</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>Medium Laser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2152,7 +2202,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>6</equipmentNum>
 			<typeName>Medium Laser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2177,7 +2227,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2202,7 +2252,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2227,7 +2277,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2252,7 +2302,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2277,7 +2327,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>Large Laser</typeName>
 			<equipTonnage>5.0</equipTonnage>
 		</part>
@@ -2302,7 +2352,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>Large Laser</typeName>
 			<equipTonnage>5.0</equipTonnage>
 		</part>
@@ -2327,7 +2377,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>10</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>ISDoubleHeatSinkPrototype</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2377,7 +2427,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>10</equipmentNum>
 			<typeName>ISDoubleHeatSinkPrototype</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2452,7 +2502,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>10</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>IS Ammo SRM-4</typeName>
 			<munition>0</munition>
 			<shotsNeeded>0</shotsNeeded>
@@ -2480,7 +2530,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>9</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>SRM 4</typeName>
 			<equipTonnage>2.0</equipTonnage>
 		</part>
@@ -2505,7 +2555,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>ISLBXAC10Prototype</typeName>
 			<equipTonnage>11.0</equipTonnage>
 		</part>
@@ -2530,7 +2580,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>ISLBXAC10Prototype</typeName>
 			<equipTonnage>11.0</equipTonnage>
 		</part>
@@ -2555,7 +2605,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>9</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>IS Ammo LRM-20</typeName>
 			<munition>0</munition>
 			<shotsNeeded>0</shotsNeeded>
@@ -2583,7 +2633,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>8</equipmentNum>
+			<equipmentNum>6</equipmentNum>
 			<typeName>IS Ammo LRM-20</typeName>
 			<munition>0</munition>
 			<shotsNeeded>0</shotsNeeded>
@@ -2611,7 +2661,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>7</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>LRM 5</typeName>
 			<equipTonnage>2.0</equipTonnage>
 		</part>
@@ -2636,7 +2686,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>LRM 20</typeName>
 			<equipTonnage>10.0</equipTonnage>
 		</part>
@@ -2661,7 +2711,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>LRM 20</typeName>
 			<equipTonnage>10.0</equipTonnage>
 		</part>
@@ -2686,7 +2736,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>16</equipmentNum>
+			<equipmentNum>6</equipmentNum>
 			<typeName>Medium Laser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2711,7 +2761,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2736,7 +2786,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2761,7 +2811,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2786,7 +2836,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2811,7 +2861,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>11</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2836,7 +2886,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>7</equipmentNum>
+			<equipmentNum>6</equipmentNum>
 			<typeName>ISMediumPulseLaserPrototype</typeName>
 			<equipTonnage>2.0</equipTonnage>
 		</part>
@@ -2861,7 +2911,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2911,7 +2961,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2936,7 +2986,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>12</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -2961,7 +3011,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>Medium Laser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -2986,7 +3036,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>Medium Laser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -3036,7 +3086,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -3061,7 +3111,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -3086,7 +3136,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -3111,7 +3161,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -3136,7 +3186,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>9</equipmentNum>
+			<equipmentNum>4</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -3161,7 +3211,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>8</equipmentNum>
+			<equipmentNum>5</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -3186,7 +3236,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>7</equipmentNum>
+			<equipmentNum>6</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -3211,7 +3261,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
+			<equipmentNum>2</equipmentNum>
 			<typeName>Machine Gun</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -3236,7 +3286,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
+			<equipmentNum>3</equipmentNum>
 			<typeName>Machine Gun</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -5172,56 +5222,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<typeName>ISDoubleHeatSink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
-		<part id="552" type="mekhq.campaign.parts.equipment.HeatSink">
-			<id>552</id>
-			<name>Double Heat Sink</name>
-			<unitTonnage>60</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>570e8139-d9b0-4344-9d36-d588a49cc06a</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
-			<typeName>ISDoubleHeatSink</typeName>
-			<equipTonnage>1.0</equipTonnage>
-		</part>
-		<part id="551" type="mekhq.campaign.parts.equipment.HeatSink">
-			<id>551</id>
-			<name>Double Heat Sink</name>
-			<unitTonnage>60</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>570e8139-d9b0-4344-9d36-d588a49cc06a</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>3</equipmentNum>
-			<typeName>ISDoubleHeatSink</typeName>
-			<equipTonnage>1.0</equipTonnage>
-		</part>
 		<part id="550" type="mekhq.campaign.parts.MekActuator">
 			<id>550</id>
 			<name>Foot Actuator</name>
@@ -5555,31 +5555,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<equipmentNum>13</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
-		</part>
-		<part id="535" type="mekhq.campaign.parts.equipment.JumpJet">
-			<id>535</id>
-			<name>Jump Jet</name>
-			<unitTonnage>35</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>153d2e91-5fa3-4903-9010-a4d9ddccfc31</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
-			<typeName>Jump Jet</typeName>
-			<equipTonnage>0.5</equipTonnage>
 		</part>
 		<part id="534" type="mekhq.campaign.parts.equipment.JumpJet">
 			<id>534</id>
@@ -6845,34 +6820,9 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>6</equipmentNum>
+			<equipmentNum>7</equipmentNum>
 			<typeName>ISMediumPulseLaserPrototype</typeName>
 			<equipTonnage>2.0</equipTonnage>
-		</part>
-		<part id="479" type="mekhq.campaign.parts.equipment.HeatSink">
-			<id>479</id>
-			<name>Heat Sink</name>
-			<unitTonnage>50</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>029aa656-ef80-483c-899a-aa792e4ea069</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>2</equipmentNum>
-			<typeName>Heat Sink</typeName>
-			<equipTonnage>1.0</equipTonnage>
 		</part>
 		<part id="478" type="mekhq.campaign.parts.Armor">
 			<id>478</id>
@@ -8970,37 +8920,12 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>10</equipmentNum>
 			<typeName>IS Ammo SRM-4</typeName>
 			<munition>0</munition>
 			<shotsNeeded>0</shotsNeeded>
 			<checkedToday>false</checkedToday>
 			<oneShot>false</oneShot>
-		</part>
-		<part id="392" type="mekhq.campaign.parts.equipment.EquipmentPart">
-			<id>392</id>
-			<name>SRM 4</name>
-			<unitTonnage>80</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>eec47cc4-f449-4ef4-9b3d-806fbc3ba994</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
-			<typeName>SRM 4</typeName>
-			<equipTonnage>2.0</equipTonnage>
 		</part>
 		<part id="389" type="mekhq.campaign.parts.Armor">
 			<id>389</id>
@@ -9961,7 +9886,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>8</equipmentNum>
 			<typeName>IS Ammo LRM-20</typeName>
 			<munition>0</munition>
 			<shotsNeeded>0</shotsNeeded>
@@ -9989,37 +9914,12 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>6</equipmentNum>
+			<equipmentNum>9</equipmentNum>
 			<typeName>IS Ammo LRM-20</typeName>
 			<munition>0</munition>
 			<shotsNeeded>0</shotsNeeded>
 			<checkedToday>false</checkedToday>
 			<oneShot>false</oneShot>
-		</part>
-		<part id="349" type="mekhq.campaign.parts.equipment.EquipmentPart">
-			<id>349</id>
-			<name>LRM 5</name>
-			<unitTonnage>85</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>2f77dc5d-04fb-45ba-9943-8c4f505a3bb0</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
-			<typeName>LRM 5</typeName>
-			<equipTonnage>2.0</equipTonnage>
 		</part>
 		<part id="346" type="mekhq.campaign.parts.Armor">
 			<id>346</id>
@@ -10996,33 +10896,8 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>6</equipmentNum>
+			<equipmentNum>10</equipmentNum>
 			<typeName>Heat Sink</typeName>
-			<equipTonnage>1.0</equipTonnage>
-		</part>
-		<part id="308" type="mekhq.campaign.parts.equipment.EquipmentPart">
-			<id>308</id>
-			<name>Medium Laser</name>
-			<unitTonnage>80</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>fdceebee-6bb0-4d85-ad41-9a1a541c0142</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>8</equipmentNum>
-			<typeName>Medium Laser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
 		<part id="307" type="mekhq.campaign.parts.equipment.EquipmentPart">
@@ -11071,7 +10946,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>7</equipmentNum>
+			<equipmentNum>12</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -11131,31 +11006,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<checkedToday>false</checkedToday>
 			<oneShot>false</oneShot>
 		</part>
-		<part id="300" type="mekhq.campaign.parts.equipment.HeatSink">
-			<id>300</id>
-			<name>Heat Sink</name>
-			<unitTonnage>80</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>fdceebee-6bb0-4d85-ad41-9a1a541c0142</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>9</equipmentNum>
-			<typeName>Heat Sink</typeName>
-			<equipTonnage>1.0</equipTonnage>
-		</part>
 		<part id="299" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>299</id>
 			<name>Medium Laser</name>
@@ -11181,31 +11031,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<typeName>Medium Laser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
-		<part id="298" type="mekhq.campaign.parts.equipment.HeatSink">
-			<id>298</id>
-			<name>Heat Sink</name>
-			<unitTonnage>80</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>fdceebee-6bb0-4d85-ad41-9a1a541c0142</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>10</equipmentNum>
-			<typeName>Heat Sink</typeName>
-			<equipTonnage>1.0</equipTonnage>
-		</part>
 		<part id="297" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>297</id>
 			<name>Heat Sink</name>
@@ -11227,7 +11052,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>12</equipmentNum>
+			<equipmentNum>13</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -11277,7 +11102,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>13</equipmentNum>
+			<equipmentNum>17</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -11302,7 +11127,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>17</equipmentNum>
+			<equipmentNum>18</equipmentNum>
 			<typeName>Heat Sink</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -14598,7 +14423,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>6</equipmentNum>
+			<equipmentNum>7</equipmentNum>
 			<typeName>Medium Laser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -14623,7 +14448,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>7</equipmentNum>
+			<equipmentNum>16</equipmentNum>
 			<typeName>Medium Laser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
@@ -15658,31 +15483,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<typeName>Medium Laser</typeName>
 			<equipTonnage>1.0</equipTonnage>
 		</part>
-		<part id="67" type="mekhq.campaign.parts.equipment.JumpJet">
-			<id>67</id>
-			<name>Jump Jet</name>
-			<unitTonnage>30</unitTonnage>
-			<hits>0</hits>
-			<difficulty>0</difficulty>
-			<time>0</time>
-			<timeSpent>0</timeSpent>
-			<mode>0</mode>
-			<skillMin>1</skillMin>
-			<unitId>518b69c6-f3ba-47ee-a9f1-56900b528441</unitId>
-			<salvaging>false</salvaging>
-			<workingOvertime>false</workingOvertime>
-			<shorthandedMod>0</shorthandedMod>
-			<refitId>null</refitId>
-			<daysToArrival>0</daysToArrival>
-			<brandNew>false</brandNew>
-			<quantity>1</quantity>
-			<daysToWait>0</daysToWait>
-			<replacementId>-1</replacementId>
-			<quality>3</quality>
-			<equipmentNum>4</equipmentNum>
-			<typeName>Jump Jet</typeName>
-			<equipTonnage>0.5</equipTonnage>
-		</part>
 		<part id="66" type="mekhq.campaign.parts.equipment.JumpJet">
 			<id>66</id>
 			<name>Jump Jet</name>
@@ -15704,7 +15504,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>5</equipmentNum>
+			<equipmentNum>7</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -15729,7 +15529,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<daysToWait>0</daysToWait>
 			<replacementId>-1</replacementId>
 			<quality>3</quality>
-			<equipmentNum>6</equipmentNum>
+			<equipmentNum>8</equipmentNum>
 			<typeName>Jump Jet</typeName>
 			<equipTonnage>0.5</equipTonnage>
 		</part>
@@ -17185,12 +16985,12 @@ Note: This ability is only used for BattleMechs.</desc>
 			<overtimeLeft>0</overtimeLeft>
 			<birthday>3019-03-05 12:00:00</birthday>
 			<skill>
-				<type>Small Arms</type>
+				<type>Gunnery/Vehicle</type>
 				<level>2</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Vehicle</type>
+				<type>Small Arms</type>
 				<level>2</level>
 				<bonus>0</bonus>
 			</skill>
