@@ -1212,7 +1212,7 @@ Founder, I hate this duty.
 	</missions>
 	<forces>
 		<force id="0" type="mekhq.campaign.force.Force">
-			<name>My Campaign</name>
+			<name>Binary Bravo</name>
 			<desc>This is Binary Bravo, 1st Falcon Strikers as set up at the start of the campaign for the Starter Book: Fist and Falcon.
 
 Anyone that wants to use these will need to add the additional support personal and define the rules as they want them.
@@ -1222,7 +1222,7 @@ In addition this starter book included Character sheets so those have been added
 Enjoy.
 
 Conversion by Hammer</desc>
-			<iconCategory>-- General --</iconCategory>
+			<iconCategory>Units/</iconCategory>
 			<iconFileName>JadeFalconDelta.gif</iconFileName>
 			<scenarioId>-1</scenarioId>
 			<subforces>
@@ -14951,10 +14951,6 @@ Note: This ability is only used for BattleMechs.</desc>
 		</gameoption>
 		<gameoption>
 			<name>geometric_mean_bv</name>
-			<value>false</value>
-		</gameoption>
-		<gameoption>
-			<name>reduced_overheat_modifier_bv</name>
 			<value>false</value>
 		</gameoption>
 		<gameoption>

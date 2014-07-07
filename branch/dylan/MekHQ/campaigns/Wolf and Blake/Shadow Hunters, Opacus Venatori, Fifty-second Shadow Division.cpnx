@@ -477,13 +477,13 @@ Impressed by his singular focus, photographic memory and ferocious fighting skil
 			<overtimeLeft>0</overtimeLeft>
 			<birthday>3037-01-30 12:00:00</birthday>
 			<skill>
-				<type>Small Arms</type>
-				<level>2</level>
+				<type>Gunnery/Mech</type>
+				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
-				<level>3</level>
+				<type>Small Arms</type>
+				<level>2</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
@@ -886,36 +886,37 @@ Diagnosed with a rare spinal disease in 3071, Rodriguez has resigned herself to 
 				</logEntry>
 			</personnelLog>
 		</person>
-		<person id="1133a093-b3cc-45f7-8ef0-83e6976fef41" type="mekhq.campaign.personnel.Person">
-			<name>Kandali Morris</name>
-			<callsign>Zombie</callsign>
+		<person id="4002e95b-a3a6-4ab6-b3bd-5659acbe8c6e" type="mekhq.campaign.personnel.Person">
+			<name>Bryn Rivenschild</name>
+			<callsign>Omicron Rho IX</callsign>
 			<primaryRole>1</primaryRole>
 			<secondaryRole>0</secondaryRole>
 			<commander>false</commander>
 			<dependent>false</dependent>
 			<clan>false</clan>
 			<phenotype>0</phenotype>
-			<biography>One of the few remaining pure-blooded Zulu warrior-citizens of Africa, Kendali Morris was considered one of the Light of Mankind’s deadliest operatives until a fateful explosion on Muphrid cost her nearly half of her face and jaw. At that time, she was offered and accepted severe augmentation, and joined the ranks of the Manei Domini.
+			<biography>Bryn Rivenschild entered ComStar service after his application to the famed Highlanders was rejected. Happily, he aced the initial tests and was trained with the Com Guards as an infantry soldier. On the day of his first posting, he also received his first tattoo—an
+elaborate Celtic design that was also part of his family’s crest.
 
-Her LoM service record is heavily shrouded in sealed operations occurring deep in the Free Rasalhague Republic and the Dominion. Excelling in solo or dual-team missions, one of her key contributions can be seen in the recent development of the heavy gyroscopic system now in use with the Protectorate.
+Horrified with the secularized changes occurring within the Order, he and the entire ComStar garrison overwhelmed and seized control of the local HPG on Saiph. In a short shadow war, the garrison maintained control of the station against two Com- Star-aligned ROM teams until help arrived.
 
-Known for her keen eyesight—rivaling many augmented Manei Domini inductees—and her berserker fury in her Preta, Precentor Morris recently underwent further augmentation to her jaw and teeth. Two one-inch steel incisors were implanted with a unique venom-delivery system, coupled with a myomer-enhanced jaw that exerts enough pressure to crack large bones in half. Coupled with her myomer-enhanced legs, Morris is a deadly in-fighter.
+Adept Rivenschild was one of the first LoM members selected for the Venatori. Utilizing his computer skills to great effect, he was invaluable to the Hunter’s missions in eliminating Wolfnet across the Chaos March. Known for stealing nine BattleMechs, due to his own custom code-cracking programs, Rivenschild was often loaned out to assist other LoM operations against corporate entities.
 
-Morris is legendary among her native Zulu as the only female warrior to capture and kill one of the genetically enhanced liions of the Serengeti. According to the tribal tales, she stalked the predator for three days before ambushing and wrestling it to the ground, tearing its throat out. When queried about the incident, Morris refuses comment; the myth may indeed have some truth to it, as Morris is rarely without a bone bracelet strung with liion claws.</biography>
+For every successful operation, Rivenschild adds to his Celtic knot; nearly eighty percent of his body is now covered with the continuous tattoo.</biography>
 			<idleMonths>-1</idleMonths>
-			<id>1133a093-b3cc-45f7-8ef0-83e6976fef41</id>
+			<id>4002e95b-a3a6-4ab6-b3bd-5659acbe8c6e</id>
 			<portraitCategory>Opacus Venatori/</portraitCategory>
-			<portraitFile>Kendali_Morris.jpg</portraitFile>
+			<portraitFile>Bryn_Rivenschild.jpg</portraitFile>
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
-			<gender>1</gender>
-			<rank>34</rank>
-			<rankLevel>0</rankLevel>
-			<rankSystem>-1</rankSystem>
-			<maneiDominiRank>4</maneiDominiRank>
-			<maneiDominiClass>4</maneiDominiClass>
+			<gender>0</gender>
+			<rank>33</rank>
+			<rankLevel>9</rankLevel>
+			<rankSystem>10</rankSystem>
+			<maneiDominiRank>-1</maneiDominiRank>
+			<maneiDominiClass>0</maneiDominiClass>
 			<nTasks>0</nTasks>
-			<unitId>86e8442a-bc36-438a-87b3-df8a41e1a6e9</unitId>
+			<unitId>d257aeeb-e278-4e31-9980-9f054c513e91</unitId>
 			<salary>-1</salary>
 			<status>0</status>
 			<prisonerstatus>0</prisonerstatus>
@@ -923,10 +924,10 @@ Morris is legendary among her native Zulu as the only female warrior to capture 
 			<toughness>0</toughness>
 			<minutesLeft>0</minutesLeft>
 			<overtimeLeft>0</overtimeLeft>
-			<birthday>3045-04-08 12:00:00</birthday>
+			<birthday>3028-12-16 12:00:00</birthday>
 			<skill>
 				<type>Gunnery/Mech</type>
-				<level>4</level>
+				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
@@ -934,11 +935,10 @@ Morris is legendary among her native Zulu as the only female warrior to capture 
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
-			<implants>bvdni::pain_shunt::pl_masc::boost_comm_implant</implants>
 			<personnelLog>
 				<logEntry>
 					<date>3073-01-24 12:00:00</date>
-					<desc>Promoted to Demi-Precentor</desc>
+					<desc>Promoted to Adept Epsilon IX</desc>
 				</logEntry>
 			</personnelLog>
 		</person>
@@ -1001,37 +1001,36 @@ more internal work done; her survival of a ten-story fall during an Opacus missi
 				</logEntry>
 			</personnelLog>
 		</person>
-		<person id="4002e95b-a3a6-4ab6-b3bd-5659acbe8c6e" type="mekhq.campaign.personnel.Person">
-			<name>Bryn Rivenschild</name>
-			<callsign>Omicron Rho IX</callsign>
+		<person id="1133a093-b3cc-45f7-8ef0-83e6976fef41" type="mekhq.campaign.personnel.Person">
+			<name>Kandali Morris</name>
+			<callsign>Zombie</callsign>
 			<primaryRole>1</primaryRole>
 			<secondaryRole>0</secondaryRole>
 			<commander>false</commander>
 			<dependent>false</dependent>
 			<clan>false</clan>
 			<phenotype>0</phenotype>
-			<biography>Bryn Rivenschild entered ComStar service after his application to the famed Highlanders was rejected. Happily, he aced the initial tests and was trained with the Com Guards as an infantry soldier. On the day of his first posting, he also received his first tattoo—an
-elaborate Celtic design that was also part of his family’s crest.
+			<biography>One of the few remaining pure-blooded Zulu warrior-citizens of Africa, Kendali Morris was considered one of the Light of Mankind’s deadliest operatives until a fateful explosion on Muphrid cost her nearly half of her face and jaw. At that time, she was offered and accepted severe augmentation, and joined the ranks of the Manei Domini.
 
-Horrified with the secularized changes occurring within the Order, he and the entire ComStar garrison overwhelmed and seized control of the local HPG on Saiph. In a short shadow war, the garrison maintained control of the station against two Com- Star-aligned ROM teams until help arrived.
+Her LoM service record is heavily shrouded in sealed operations occurring deep in the Free Rasalhague Republic and the Dominion. Excelling in solo or dual-team missions, one of her key contributions can be seen in the recent development of the heavy gyroscopic system now in use with the Protectorate.
 
-Adept Rivenschild was one of the first LoM members selected for the Venatori. Utilizing his computer skills to great effect, he was invaluable to the Hunter’s missions in eliminating Wolfnet across the Chaos March. Known for stealing nine BattleMechs, due to his own custom code-cracking programs, Rivenschild was often loaned out to assist other LoM operations against corporate entities.
+Known for her keen eyesight—rivaling many augmented Manei Domini inductees—and her berserker fury in her Preta, Precentor Morris recently underwent further augmentation to her jaw and teeth. Two one-inch steel incisors were implanted with a unique venom-delivery system, coupled with a myomer-enhanced jaw that exerts enough pressure to crack large bones in half. Coupled with her myomer-enhanced legs, Morris is a deadly in-fighter.
 
-For every successful operation, Rivenschild adds to his Celtic knot; nearly eighty percent of his body is now covered with the continuous tattoo.</biography>
+Morris is legendary among her native Zulu as the only female warrior to capture and kill one of the genetically enhanced liions of the Serengeti. According to the tribal tales, she stalked the predator for three days before ambushing and wrestling it to the ground, tearing its throat out. When queried about the incident, Morris refuses comment; the myth may indeed have some truth to it, as Morris is rarely without a bone bracelet strung with liion claws.</biography>
 			<idleMonths>-1</idleMonths>
-			<id>4002e95b-a3a6-4ab6-b3bd-5659acbe8c6e</id>
+			<id>1133a093-b3cc-45f7-8ef0-83e6976fef41</id>
 			<portraitCategory>Opacus Venatori/</portraitCategory>
-			<portraitFile>Bryn_Rivenschild.jpg</portraitFile>
+			<portraitFile>Kendali_Morris.jpg</portraitFile>
 			<xp>0</xp>
 			<daysToWaitForHealing>15</daysToWaitForHealing>
-			<gender>0</gender>
-			<rank>33</rank>
-			<rankLevel>9</rankLevel>
-			<rankSystem>10</rankSystem>
-			<maneiDominiRank>-1</maneiDominiRank>
-			<maneiDominiClass>0</maneiDominiClass>
+			<gender>1</gender>
+			<rank>34</rank>
+			<rankLevel>0</rankLevel>
+			<rankSystem>-1</rankSystem>
+			<maneiDominiRank>4</maneiDominiRank>
+			<maneiDominiClass>4</maneiDominiClass>
 			<nTasks>0</nTasks>
-			<unitId>d257aeeb-e278-4e31-9980-9f054c513e91</unitId>
+			<unitId>86e8442a-bc36-438a-87b3-df8a41e1a6e9</unitId>
 			<salary>-1</salary>
 			<status>0</status>
 			<prisonerstatus>0</prisonerstatus>
@@ -1039,10 +1038,10 @@ For every successful operation, Rivenschild adds to his Celtic knot; nearly eigh
 			<toughness>0</toughness>
 			<minutesLeft>0</minutesLeft>
 			<overtimeLeft>0</overtimeLeft>
-			<birthday>3028-12-16 12:00:00</birthday>
+			<birthday>3045-04-08 12:00:00</birthday>
 			<skill>
 				<type>Gunnery/Mech</type>
-				<level>5</level>
+				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
@@ -1050,10 +1049,11 @@ For every successful operation, Rivenschild adds to his Celtic knot; nearly eigh
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
+			<implants>bvdni::pain_shunt::pl_masc::boost_comm_implant</implants>
 			<personnelLog>
 				<logEntry>
 					<date>3073-01-24 12:00:00</date>
-					<desc>Promoted to Adept Epsilon IX</desc>
+					<desc>Promoted to Demi-Precentor</desc>
 				</logEntry>
 			</personnelLog>
 		</person>
@@ -1177,7 +1177,7 @@ Thanks to a ROM agent within the unit, their arrival is anticipated.
 	</missions>
 	<forces>
 		<force id="0" type="mekhq.campaign.force.Force">
-			<name>My Campaign</name>
+			<name>Opacus Venatori</name>
 			<desc>This is the Opacus Venatori as per the start of the campaign in the Starter Book: Wolf vs. Blake by Catalyst Game Labs.
 
 All mechs and personal are set up exactly like the book.  Anyone that wants to use these will need to add the additional support personal and equipment and will need to define what MHQ and MM rules they want to use with the Campaign.
@@ -1188,7 +1188,7 @@ Enjoy.
 Conversion by Hammer
 
 Thanks to pfarland for the Camo for the Opacus Venatori</desc>
-			<iconCategory>-- General --</iconCategory>
+			<iconCategory>Units/</iconCategory>
 			<iconFileName>Opacus_Venatori.jpg</iconFileName>
 			<scenarioId>-1</scenarioId>
 			<subforces>
@@ -1634,16 +1634,6 @@ Note: This ability is only used for BattleMechs.</desc>
 			<removeAbilities>cluster_hitter</removeAbilities>
 		</ability>
 		<ability>
-			<displayName>Multi-Tasker (aToW)</displayName>
-			<lookupName>multi_tasker</lookupName>
-			<desc>Secondary target modifiers are reduced by one.</desc>
-			<xpCost>6</xpCost>
-			<weight>2</weight>
-			<prereqAbilities></prereqAbilities>
-			<invalidAbilities></invalidAbilities>
-			<removeAbilities></removeAbilities>
-		</ability>
-		<ability>
 			<displayName>Maneuvering Ace (aToW)</displayName>
 			<lookupName>maneuvering_ace</lookupName>
 			<desc>Enables the unit to move laterally like a Quad.
@@ -1652,6 +1642,16 @@ Aerospace units can perform maneuvers for 1 less thrust point.
 Units also receive a -1 BTH to rolls against skidding, sideslipping, and going out of control.</desc>
 			<xpCost>4</xpCost>
 			<weight>3</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
+			<displayName>Multi-Tasker (aToW)</displayName>
+			<lookupName>multi_tasker</lookupName>
+			<desc>Secondary target modifiers are reduced by one.</desc>
+			<xpCost>6</xpCost>
+			<weight>2</weight>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
@@ -1687,16 +1687,6 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<removeAbilities></removeAbilities>
 		</ability>
 		<ability>
-			<displayName>All Weather (Unofficial)</displayName>
-			<lookupName>allweather</lookupName>
-			<desc>A pilot with this ability does not suffer the PSR penalties due to weather.</desc>
-			<xpCost>2</xpCost>
-			<weight>2</weight>
-			<prereqAbilities></prereqAbilities>
-			<invalidAbilities></invalidAbilities>
-			<removeAbilities></removeAbilities>
-		</ability>
-		<ability>
 			<displayName>Tactical Genius (aToW)</displayName>
 			<lookupName>tactical_genius</lookupName>
 			<desc>A pilot who has a Tactical Genius may reroll their initiative once per turn.
@@ -1704,6 +1694,16 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 Note: Only one Tactical Genius may be utilized per team.</desc>
 			<xpCost>8</xpCost>
 			<weight>1</weight>
+			<prereqAbilities></prereqAbilities>
+			<invalidAbilities></invalidAbilities>
+			<removeAbilities></removeAbilities>
+		</ability>
+		<ability>
+			<displayName>All Weather (Unofficial)</displayName>
+			<lookupName>allweather</lookupName>
+			<desc>A pilot with this ability does not suffer the PSR penalties due to weather.</desc>
+			<xpCost>2</xpCost>
+			<weight>2</weight>
 			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
@@ -16533,10 +16533,6 @@ Note: This ability is only used for BattleMechs.</desc>
 		</gameoption>
 		<gameoption>
 			<name>geometric_mean_bv</name>
-			<value>false</value>
-		</gameoption>
-		<gameoption>
-			<name>reduced_overheat_modifier_bv</name>
 			<value>false</value>
 		</gameoption>
 		<gameoption>
