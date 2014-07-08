@@ -43,6 +43,11 @@ v0.3.6 (SVN)
 + Updated the mekhq-contributors.txt file
 + Fixed Campaign files again since some force files got moved
 + Data: More Force images
++ Data: krazzyharry Force images & Clan Wolverine image
++ Fix folder name for the Miscellaneous force images
++ Bug: packaging_local.xml looking in wrong place for history files of MM and MML
++ Bug [524]: Version.java not intelligent in splitting the version "extras" out
++ Data: Force icons for xenoplanetary, Scuba Infantry, and Space Marines
 
 v0.3.5-dylan (2014-04-28)
 -- No Changes--
