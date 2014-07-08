@@ -42,6 +42,7 @@ import megamek.common.MechSummaryCache;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planets;
 
@@ -113,6 +114,11 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             setProgress(0);
             try {
             	Faction.generateFactions();
+            } catch (Exception ex) {
+    			ex.printStackTrace();
+            }
+            try {
+            	Bloodname.loadBloodnameData();
             } catch (Exception ex) {
     			ex.printStackTrace();
             }

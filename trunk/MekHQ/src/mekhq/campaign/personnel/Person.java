@@ -3144,6 +3144,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		    case T_MEDIC:
         		return Ranks.RPROF_MW;
 			case T_AERO_PILOT:
+		    case T_CONV_PILOT:
         		return Ranks.RPROF_ASF;
 		    case T_GVEE_DRIVER:
 		    case T_NVEE_DRIVER:
@@ -3153,7 +3154,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		    case T_BA:
 		    case T_INFANTRY:
         		return Ranks.RPROF_INF;
-		    case T_CONV_PILOT:
 		    case T_SPACE_PILOT:
 		    case T_SPACE_CREW:
 		    case T_SPACE_GUNNER:

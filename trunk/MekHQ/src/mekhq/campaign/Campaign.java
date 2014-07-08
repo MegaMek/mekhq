@@ -123,6 +123,7 @@ import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.MASC;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingMASC;
+import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.RankTranslator;
@@ -4074,7 +4075,122 @@ public class Campaign implements Serializable {
         if (getCampaignOptions().usePortraitForType(type)) {
             assignRandomPortraitFor(person);
         }
+        //check for Bloodname
+        checkBloodnameAdd(person, type);
         return person;
+    }
+    
+    public void checkBloodnameAdd(Person person, int type) {
+    	checkBloodnameAdd(person, type, false);
+    }
+    
+    public void checkBloodnameAdd(Person person, int type, boolean ignoreDice) {
+    	// Person already has a bloodname?
+    	if (person.getName().contains(" ")) {
+    		String nn = person.getName();
+    		String[] temp = nn.split("\\s+", 2);
+    		int result = JOptionPane.showConfirmDialog(
+					null,
+					temp[0] + " already has the bloodname " + temp[1] +
+					"\nDo you wish to remove that bloodname and generate a new one?",
+					"Already Has Bloodname",
+					JOptionPane.YES_NO_OPTION,
+					JOptionPane.QUESTION_MESSAGE
+					);
+    		if (result == JOptionPane.NO_OPTION) {
+    			return;
+    		}
+    		
+    		person.setName(temp[0]);
+    	}
+    	
+    	// Go ahead and generate a new bloodname
+    	if (person.isClanner() && person.getPhenotype() != Person.PHENOTYPE_NONE) { 
+    		int bloodnameTarget = 6;
+    		switch (person.getPhenotype()) {
+    		case Person.PHENOTYPE_MW:
+    			bloodnameTarget += person.hasSkill(SkillType.S_GUN_MECH)?
+    				person.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue():13;
+    			bloodnameTarget += person.hasSkill(SkillType.S_PILOT_MECH)?
+    				person.getSkill(SkillType.S_PILOT_MECH).getFinalSkillValue():13;
+    			break;
+    		case Person.PHENOTYPE_AERO:
+    			if (type == Person.T_PROTO_PILOT) {
+    				bloodnameTarget += 2 * (person.hasSkill(SkillType.S_GUN_PROTO)?
+    					person.getSkill(SkillType.S_GUN_PROTO).getFinalSkillValue():13);
+
+    			} else {
+    				bloodnameTarget += person.hasSkill(SkillType.S_GUN_AERO)?
+    					person.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue():13;
+    				bloodnameTarget += person.hasSkill(SkillType.S_PILOT_AERO)?
+    					person.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue():13;
+    			}
+    			break;
+    		case Person.PHENOTYPE_BA:
+    			bloodnameTarget += person.hasSkill(SkillType.S_GUN_BA)?
+    				person.getSkill(SkillType.S_GUN_BA).getFinalSkillValue():13;
+    			bloodnameTarget += person.hasSkill(SkillType.S_ANTI_MECH)?
+    				person.getSkill(SkillType.S_ANTI_MECH).getFinalSkillValue():13;
+    			break;
+    		case Person.PHENOTYPE_VEE:
+    			bloodnameTarget += person.hasSkill(SkillType.S_GUN_VEE)?
+    				person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue():13;
+    			if (type == Person.T_VTOL_PILOT) {
+        			bloodnameTarget += person.hasSkill(SkillType.S_PILOT_VTOL)?
+        				person.getSkill(SkillType.S_PILOT_VTOL).getFinalSkillValue():13;        				
+    			} else if (type == Person.T_NVEE_DRIVER) {
+        			bloodnameTarget += person.hasSkill(SkillType.S_PILOT_NVEE)?
+        				person.getSkill(SkillType.S_PILOT_NVEE).getFinalSkillValue():13;        				
+    			} else {
+        			bloodnameTarget += person.hasSkill(SkillType.S_PILOT_GVEE)?
+        				person.getSkill(SkillType.S_PILOT_GVEE).getFinalSkillValue():13;        				
+    			}
+    			break;
+    		}
+    		//Higher rated units are more likely to have Bloodnamed
+    		if (campaignOptions.useDragoonRating()) {
+    			IUnitRating rating = UnitRatingFactory.getUnitRating(this);
+    			rating.reInitialize();
+    			bloodnameTarget += IUnitRating.DRAGOON_C - (campaignOptions.getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.FLD_MAN_MERCS_REV)?
+    					rating.getUnitRatingAsInteger():rating.getModifier());
+    		}
+    		//Reavings diminish the number of available Bloodrights in later eras
+			int year = getCalendar().get(Calendar.YEAR);
+			if (year <= 2950) bloodnameTarget--;
+			if (year > 3055) bloodnameTarget++;
+			if (year > 3065) bloodnameTarget++;
+			if (year > 3080) bloodnameTarget++;
+	   		if (Compute.d6(2) >= bloodnameTarget || ignoreDice) {
+    			/* The Bloodname generator has slight differences in categories
+    			 * that do not map easily onto Person constants
+    			 */
+    			int phenotype = Bloodname.P_GENERAL;
+    			switch (type) {
+    			case Person.T_MECHWARRIOR:
+    				phenotype = Bloodname.P_MECHWARRIOR;
+    				break;
+    			case Person.T_BA:
+    				phenotype = Bloodname.P_ELEMENTAL;
+    				break;
+    			case Person.T_AERO_PILOT:
+    			case Person.T_CONV_PILOT:
+    				phenotype = Bloodname.P_AEROSPACE;
+    				break;
+    			case Person.T_SPACE_CREW:
+    			case Person.T_NAVIGATOR:
+    			case Person.T_SPACE_GUNNER:
+    			case Person.T_SPACE_PILOT:
+    				phenotype = Bloodname.P_NAVAL;
+    				break;
+    			case Person.T_PROTO_PILOT:
+    				phenotype = Bloodname.P_PROTOMECH;
+    				break;
+    			}
+    			person.setName(person.getName() + " "
+    				+ Bloodname.randomBloodname(factionCode, phenotype,
+    						calendar.get(Calendar.YEAR)).getName());
+    		}
+        }
     }
 
     public Ranks getRanks() {
@@ -4327,7 +4443,6 @@ public class Campaign implements Serializable {
         Unit u = getUnit(p.getUnitId());
         if (null != u) {
             u.resetPilotAndEntity();
-
         }
     }
 
