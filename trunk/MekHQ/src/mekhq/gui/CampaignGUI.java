@@ -54,6 +54,7 @@ import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.ResourceBundle;
@@ -156,6 +157,9 @@ import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Lance;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
@@ -200,6 +204,8 @@ import mekhq.gui.dialog.CampaignOptionsDialog;
 import mekhq.gui.dialog.ChooseMulFilesDialog;
 import mekhq.gui.dialog.ChooseRefitDialog;
 import mekhq.gui.dialog.CompleteMissionDialog;
+import mekhq.gui.dialog.ContractMarketDialog;
+import mekhq.gui.dialog.CustomizeAtBContractDialog;
 import mekhq.gui.dialog.CustomizeMissionDialog;
 import mekhq.gui.dialog.CustomizePersonDialog;
 import mekhq.gui.dialog.CustomizeScenarioDialog;
@@ -231,7 +237,9 @@ import mekhq.gui.dialog.QuirksDialog;
 import mekhq.gui.dialog.RefitNameDialog;
 import mekhq.gui.dialog.ReportDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
+import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.TextAreaDialog;
+import mekhq.gui.dialog.UnitMarketDialog;
 import mekhq.gui.dialog.UnitSelectorDialog;
 import mekhq.gui.model.AcquisitionTableModel;
 import mekhq.gui.model.DocTableModel;
@@ -256,6 +264,8 @@ import mekhq.gui.sorter.TechSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
 import mekhq.gui.sorter.WeightClassSorter;
+import mekhq.gui.view.AtBContractViewPanel;
+import mekhq.gui.view.AtBScenarioViewPanel;
 import mekhq.gui.view.ContractViewPanel;
 import mekhq.gui.view.ForceViewPanel;
 import mekhq.gui.view.JumpPathViewPanel;
@@ -363,6 +373,9 @@ public class CampaignGUI extends JPanel {
     private JMenu menuThemes;
     private JMenuItem miDetachLog;
     private JMenuItem miAttachLog;
+    private JMenuItem miContractMarket;
+    private JMenuItem miUnitMarket;
+    private JMenuItem miRetirementDefectionDialog;
 
     /*For the TO&E tab*/
     private JPanel panOrganization;
@@ -373,6 +386,8 @@ public class CampaignGUI extends JPanel {
     /*For the briefing room tab*/
     private JPanel panBriefing;
     private JPanel panScenario;
+    private LanceAssignmentView panLanceAssignment;
+    private JSplitPane splitScenario;
     private JSplitPane splitBrief;
     private JSplitPane splitMission;
     private JTable scenarioTable;
@@ -442,6 +457,7 @@ public class CampaignGUI extends JPanel {
     private JTable acquisitionTable;
     private JTable techTable;
     private JButton btnDoTask;
+    private JButton btnUseBonusPart;
     private JToggleButton btnShowAllTechs;
     private JScrollPane scrTextTarget;
     private JScrollPane scrollPartsTable;
@@ -553,6 +569,24 @@ public class CampaignGUI extends JPanel {
         this.revalidate();
         this.repaint();
     }
+    
+    public void showRetirementDefectionDialog() {
+    	/* if there are unresolved personnel, show the results view;
+    	 * otherwise, present the retirement view to give the player
+    	 * a chance to follow a custom schedule
+    	 */
+    	RetirementDefectionDialog rdd =
+    			new RetirementDefectionDialog(this, null,
+    					getCampaign().getRetirementDefectionTracker().getRetirees().size() == 0);
+    	rdd.setVisible(true);
+    	if (!rdd.wasAborted()) {
+    		getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
+    	}
+        refreshReport();
+        refreshFunds();
+        refreshFinancialTransactions();
+        refreshRating();
+   }
 
     public void showGMToolsDialog() {
         gmTools.setVisible(true);
@@ -560,6 +594,9 @@ public class CampaignGUI extends JPanel {
     
     public void randomizeAllBloodnames() {
         for (Person p : getCampaign().getPersonnel()) {
+        	if (!p.isClanner()) {
+        		continue;
+        	}
         	getCampaign().checkBloodnameAdd(p, p.getPrimaryRole());
             getCampaign().personUpdated(p);
         }
@@ -850,7 +887,7 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         panBriefing.add(scrollMissionView, gridBagConstraints);
-
+        
         scenarioModel = new ScenarioTableModel(getCampaign());
         scenarioTable = new JTable(scenarioModel);
         scenarioTable.setShowGrid(false);
@@ -966,7 +1003,18 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.weighty = 1.0;
         panScenario.add(scrollScenarioView, gridBagConstraints);
 
-        splitBrief = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT, splitMission, panScenario);
+        /* ATB */
+        panLanceAssignment = new LanceAssignmentView(getCampaign());
+        JScrollPane paneLanceDeployment = new JScrollPane(panLanceAssignment);
+        paneLanceDeployment.setMinimumSize(new java.awt.Dimension(200, 300));
+        paneLanceDeployment.setPreferredSize(new java.awt.Dimension(200, 300));
+        paneLanceDeployment.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+        splitScenario = new javax.swing.JSplitPane(javax.swing.JSplitPane.VERTICAL_SPLIT, panScenario, paneLanceDeployment);
+        splitScenario.setOneTouchExpandable(true);
+        splitScenario.setResizeWeight(1.0);
+        
+        
+        splitBrief = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT, splitMission, splitScenario);
         splitBrief.setOneTouchExpandable(true);
         splitBrief.setResizeWeight(0.5);
         splitBrief.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
@@ -1827,7 +1875,19 @@ public class CampaignGUI extends JPanel {
         JScrollPane scrollTaskTable = new JScrollPane(taskTable);
         scrollTaskTable.setMinimumSize(new java.awt.Dimension(200, 200));
         scrollTaskTable.setPreferredSize(new java.awt.Dimension(300, 300));
-
+        
+        btnUseBonusPart = new JButton();
+        btnUseBonusPart.setVisible(false);
+        btnUseBonusPart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                useBonusPart();
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        panTasks.add(btnUseBonusPart, gridBagConstraints);
 
         acquireModel = new AcquisitionTableModel();
         acquisitionTable = new JTable(acquireModel);
@@ -2333,6 +2393,25 @@ public class CampaignGUI extends JPanel {
         });
         menuMarket.add(miPersonnelMarket);
 
+        // Contract Market
+        miContractMarket = new JMenuItem("Contract Market");
+        miContractMarket.addActionListener(new java.awt.event.ActionListener() {
+        	public void actionPerformed(java.awt.event.ActionEvent evt) {
+        		showContractMarket();
+        	}
+        });
+        menuMarket.add(miContractMarket);
+        miContractMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+
+        miUnitMarket = new JMenuItem("Unit Market");
+        miUnitMarket.addActionListener(new java.awt.event.ActionListener() {
+        	public void actionPerformed(java.awt.event.ActionEvent evt) {
+        		showUnitMarket();
+        	}
+        });
+        menuMarket.add(miUnitMarket);
+        miUnitMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+
         JMenuItem miPurchaseUnit = new JMenuItem(resourceMap.getString("miPurchaseUnit.text")); // NOI18N
         miPurchaseUnit.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -2746,15 +2825,24 @@ public class CampaignGUI extends JPanel {
     }
 
     private void editMission() {
-        Mission mission = getCampaign().getMission(selectedMission);
-        if (null != mission) {
-            CustomizeMissionDialog cmd = new CustomizeMissionDialog(getFrame(), true, mission, getCampaign());
-            cmd.setVisible(true);
-            if (cmd.getMissionId() != -1) {
-                selectedMission = cmd.getMissionId();
-            }
-            refreshMissions();
-        }
+    	Mission mission = getCampaign().getMission(selectedMission);
+    	if (null != mission) {
+    		if (getCampaign().getCampaignOptions().getUseAtB() && mission instanceof AtBContract) {
+    			CustomizeAtBContractDialog cmd = new CustomizeAtBContractDialog(getFrame(),
+    					true, (AtBContract)mission, getCampaign(), getIconPackage().getCamos());
+    			cmd.setVisible(true);
+    			if (cmd.getMissionId() != -1) {
+    				selectedMission = cmd.getMissionId();
+    			}
+    		} else {
+    			CustomizeMissionDialog cmd = new CustomizeMissionDialog(getFrame(), true, mission, getCampaign());
+    			cmd.setVisible(true);
+    			if (cmd.getMissionId() != -1) {
+    				selectedMission = cmd.getMissionId();
+    			}
+    		}
+    		refreshMissions();
+    	}
 
     }
 
@@ -2804,20 +2892,73 @@ public class CampaignGUI extends JPanel {
                                               "Pending Scenarios",
                                               JOptionPane.WARNING_MESSAGE);
             } else {
-                CompleteMissionDialog cmd = new CompleteMissionDialog(getFrame(), true, mission);
-                cmd.setVisible(true);
-                if (cmd.getStatus() > Mission.S_ACTIVE) {
-                    getCampaign().completeMission(mission.getId(), cmd.getStatus());
-                }
-                if (!mission.isActive()) {
-                    if (getCampaign().getSortedMissions().size() > 0) {
-                        selectedMission = getCampaign().getSortedMissions().get(0).getId();
-                    } else {
-                        selectedMission = -1;
-                    }
-                    refreshMissions();
-                }
+            	CompleteMissionDialog cmd = new CompleteMissionDialog(getFrame(), true, mission);
+            	cmd.setVisible(true);
+            	if (cmd.getStatus() >= 0) {
+            		mission.setStatus(cmd.getStatus());
+
+            		if (getCampaign().getCampaignOptions().getUseAtB() &&
+            				mission instanceof AtBContract) {
+            			if (getCampaign().contractExtended((AtBContract)mission)) {
+            				mission.setStatus(Mission.S_ACTIVE);
+            			} else {
+	            			if (getCampaign().getCampaignOptions().doRetirementRolls()) {
+	            				RetirementDefectionDialog rdd = new RetirementDefectionDialog(this,
+	            						(AtBContract)mission, true);
+	            				rdd.setVisible(true);
+	            				if (rdd.wasAborted()) {
+	            					/* Once the retirement rolls have been made, the outstanding payouts
+	            					 * can be resolved without reference to the contract and the dialog
+	            					 * can be accessed through the menu.
+	            					 */
+	            					if (!getCampaign().getRetirementDefectionTracker().isOutstanding(mission.getId())) {
+	            						mission.setStatus(Mission.S_ACTIVE);
+	            					}
+	            				} else {
+	            					if (null != getCampaign().getRetirementDefectionTracker().getRetirees((AtBContract)mission) &&
+	            							getCampaign().getFinances().getBalance() >= rdd.totalPayout()) {
+            							Person[] bestAdmins = new Person[4];
+            							for (Person p : getCampaign().getAdmins()) {
+            								int i = p.getPrimaryRole() - Person.T_ADMIN_COM;
+            								if (i < 0 || i > 3) {
+            									i = p.getSecondaryRole() - Person.T_ADMIN_COM;
+            								}
+            								if (null == bestAdmins[i] ||
+            										(null != p.getSkill(SkillType.S_ADMIN) &&
+            										p.getSkill(SkillType.S_ADMIN).getLevel() >
+            										bestAdmins[i].getSkill(SkillType.S_ADMIN).getLevel())) {
+            									bestAdmins[i] = p;
+            								}
+            							}
+            							for (Person p : bestAdmins) {
+            								if (null != p) {
+            									p.setXp(p.getXp() + 1);
+            					                getCampaign().addReport(p.getHyperlinkedName() + " has gained 1 XP.");
+            								}
+            							}
+	            					}
+	            					if (!getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments())) {
+	            						mission.setStatus(Mission.S_ACTIVE);
+	            					}
+	            				}
+	            			}
+            			}
+            		}
+            	}
+            	if (!mission.isActive()) {
+            		if (getCampaign().getCampaignOptions().getUseAtB() &&
+            				mission instanceof AtBContract) {
+            			getCampaign().checkForFollowup((AtBContract)mission);
+            		}
+            		if (getCampaign().getSortedMissions().size() > 0) {
+            			selectedMission = getCampaign().getSortedMissions().get(0).getId();
+            		} else {
+            			selectedMission = -1;
+            		}
+            		refreshMissions();
+            	}
             }
+
         }
         refreshReport();
         refreshFunds();
@@ -2825,15 +2966,15 @@ public class CampaignGUI extends JPanel {
         refreshRating();
     }
 
-    private void deleteMission() {
-        Mission mission = getCampaign().getMission(selectedMission);
-        MekHQ.logMessage("Attempting to Delete Mission, Mission ID: " + mission.getId());
-        if (0 != JOptionPane.showConfirmDialog(null,
-                                               "Are you sure you want to delete this mission?"
-                , "Delete mission?",
-                                               JOptionPane.YES_NO_OPTION)) {
-            return;
-        }
+	private void deleteMission() {
+    	Mission mission = getCampaign().getMission(selectedMission);
+    	MekHQ.logMessage("Attempting to Delete Mission, Mission ID: " + mission.getId());
+    	if (0 != JOptionPane.showConfirmDialog(null,
+    			"Are you sure you want to delete this mission?"
+    			, "Delete mission?",
+    			JOptionPane.YES_NO_OPTION)) {
+    		return;
+    	}
         getCampaign().removeMission(mission.getId());
         if (getCampaign().getSortedMissions().size() > 0) {
             selectedMission = getCampaign().getSortedMissions().get(0).getId();
@@ -3031,6 +3172,59 @@ public class CampaignGUI extends JPanel {
         }
 
     }// GEN-LAST:event_btnDoTaskActionPerformed
+    
+    private void useBonusPart() {
+        int selectedRow = -1;
+        int partId = -1;
+        if (acquireSelected()) {
+            selectedRow = acquisitionTable.getSelectedRow();
+            IAcquisitionWork acquisition = getSelectedAcquisition();
+            if (null == acquisition) {
+                return;
+            }
+    		String report = acquisition.find(0);
+    		if (report.endsWith("0 days.")) {    			
+	        	AtBContract contract = getCampaign().getAttachedAtBContract(getSelectedAcquisition().getUnit());
+	        	if (null == contract) {
+	        		for (Mission m : getCampaign().getMissions()) {
+	        			if (m.isActive() && m instanceof AtBContract &&
+	        					((AtBContract)m).getNumBonusParts() > 0) {
+	        				contract = (AtBContract)m;
+	        				break;
+	        			}
+	        		}
+	        	}
+	        	if (null == contract) {
+	        		MekHQ.logError("AtB: used bonus part but no contract has bonus parts available.");
+	        	} else {
+	        		contract.useBonusPart();
+	        	}
+    		}
+        }
+
+        refreshServicedUnitList();
+        refreshUnitList();
+        refreshPersonnelList();
+        refreshTaskList();
+        refreshAcquireList();
+        refreshTechsList();
+        refreshPartsList();
+        refreshReport();
+        refreshFunds();
+        refreshFinancialTransactions();
+
+        if (selectedRow != -1) {
+            if (acquireSelected()) {
+                if (acquisitionTable.getRowCount() > 0) {
+                    if (acquisitionTable.getRowCount() == selectedRow) {
+                        acquisitionTable.setRowSelectionInterval(selectedRow - 1, selectedRow - 1);
+                    } else {
+                        acquisitionTable.setRowSelectionInterval(selectedRow, selectedRow);
+                    }
+                }
+            }
+        }
+    }
 
     private Person getSelectedTech() {
         JTable table = techTable;
@@ -3249,10 +3443,49 @@ public class CampaignGUI extends JPanel {
             refreshReport();
             return;
         }
+        if (getCampaign().getRetirementDefectionTracker().getRetirees().size() > 0) {
+        	Object[] options = {"Show Retirement Dialog", "Cancel"};
+            if (JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(frame,
+                                          "You have former personnel that have not received their final payout.\nYou must deal with these payments before advancing the day.\nHere are some options:\n  - Sell off equipment to generate funds.\n  - Pay one or more personnel in equipment.\n  - Just cheat and use GM mode to edit the settlement.",
+                                          "Unresolved Final Payments",
+                                          JOptionPane.OK_CANCEL_OPTION,
+                                          JOptionPane.WARNING_MESSAGE,
+                                          null,
+                                          options,
+                                          options[0])) {
+            	showRetirementDefectionDialog();
+            }
+            return;
+        }
+        if (getCampaign().getCampaignOptions().getUseAtB() &&
+        		Utilities.getDaysBetween(getCampaign().getRetirementDefectionTracker().getLastRetirementRoll().getTime(),
+        		getCampaign().getDate()) == 365) {
+        	Object[] options = {"Show Retirement Dialog", "Not Now"};
+            if (JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(frame,
+                                          "It has been a year since the last retirement/defection roll, and it is time to do another.",
+                                          "Retirement/Defection roll required",
+                                          JOptionPane.OK_CANCEL_OPTION,
+                                          JOptionPane.WARNING_MESSAGE,
+                                          null,
+                                          options,
+                                          options[0])) {
+            	showRetirementDefectionDialog();
+            }
+        }
         if (nagShortMaintenance()) {
             return;
         }
+        if (getCampaign().getCampaignOptions().getUseAtB()) {
+	        if (nagShortDeployments()) {
+	        	return;
+	        }
+	        if (nagOutstandingScenarios()) {
+	        	return;
+	        }
+        }
         getCampaign().newDay();
+        refreshScenarioList();
+        refreshMissions();
         refreshServicedUnitList();
         refreshUnitList();
         refreshPersonnelList();
@@ -3309,6 +3542,45 @@ public class CampaignGUI extends JPanel {
         return false;
     }
 
+    private boolean nagShortDeployments() {
+    	if (getCampaign().getCalendar().get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+    		return false;
+    	}
+    	for (Mission m : getCampaign().getMissions()) {
+    		if (!m.isActive() || !(m instanceof AtBContract) ||
+    				!getCampaign().getLocation().isOnPlanet()) {
+    			continue;
+    		}
+    		if (getCampaign().getDeploymentDeficit((AtBContract)m) > 0) {
+    			return 0 != JOptionPane.showConfirmDialog(null,
+    					"You have not met the deployment levels required by contract. Do your really wish to advance the day?",
+    					"Unmet deployment requirements",
+    					JOptionPane.YES_NO_OPTION);
+    		}
+    	}
+    	return false;
+    }
+    
+    private boolean nagOutstandingScenarios() {
+    	for (Mission m : getCampaign().getMissions()) {
+    		if (!m.isActive() || !(m instanceof AtBContract)) {
+    			continue;
+    		}
+    		for (Scenario s : m.getScenarios()) {
+    			if (!s.isCurrent() || !(s instanceof AtBScenario)) {
+    				continue;
+    			}
+    			if (getCampaign().getDate().equals(s.getDate())) {
+    				return 0 != JOptionPane.showConfirmDialog(null,
+    						"You have a pending battle. Failure to deploy will result in a defeat and a minor contract breach. Do your really wish to advance the day?",
+    						"Pending battle",
+    						JOptionPane.YES_NO_OPTION);
+    			}
+    		}
+    	}
+    	return false;
+    }
+
     private void assignDoctor() {
         Person doctor = getSelectedDoctor();
         for (Person p : getSelectedUnassignedPatients()) {
@@ -3357,7 +3629,21 @@ public class CampaignGUI extends JPanel {
         hbpd.setVisible(true);
     }
 
-    private void menuSaveXmlActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuSaveActionPerformed
+    public void showContractMarket() {
+        ContractMarketDialog cmd = new ContractMarketDialog(getFrame(), this,
+                                                              getCampaign());
+        cmd.setVisible(true);
+		refreshMissions();
+		refreshFinancialTransactions();
+}
+
+    public void showUnitMarket() {
+        UnitMarketDialog umd = new UnitMarketDialog(getFrame(), this,
+                                                              getCampaign());
+        umd.setVisible(true);
+    }
+
+   private void menuSaveXmlActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuSaveActionPerformed
         MekHQ.logMessage("Saving campaign...");
         // Choose a file...
         File file = selectSaveCampaignFile();
@@ -3598,9 +3884,21 @@ public class CampaignGUI extends JPanel {
     }// GEN-LAST:event_btnGMModeActionPerformed
 
     private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuOptionsActionPerformed
+    	boolean atb = getCampaign().getCampaignOptions().getUseAtB();
         CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), true,
                                                               getCampaign(), getIconPackage().getCamos());
         cod.setVisible(true);
+        if (atb != getCampaign().getCampaignOptions().getUseAtB()) {
+        	if (getCampaign().getCampaignOptions().getUseAtB()) {
+        		getCampaign().initAtB();
+        		refreshLanceAssignments();
+        	}
+        	splitScenario.getBottomComponent().setVisible(getCampaign().getCampaignOptions().getUseAtB());
+        	splitScenario.resetToPreferredSizes();
+        	miContractMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+        	miUnitMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+        	miRetirementDefectionDialog.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+        }
         refreshCalendar();
         getCampaign().reloadNews();
         changePersonnelView();
@@ -3911,7 +4209,12 @@ public class CampaignGUI extends JPanel {
             return;
         }
         Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
-        scrollScenarioView.setViewportView(new ScenarioViewPanel(scenario, getCampaign(), getIconPackage()));
+        if (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario)) {
+        	scrollScenarioView.setViewportView(new AtBScenarioViewPanel((AtBScenario)scenario,
+        			getCampaign(), getIconPackage(), frame));
+        } else {
+        	scrollScenarioView.setViewportView(new ScenarioViewPanel(scenario, getCampaign(), getIconPackage()));
+        }
         //This odd code is to make sure that the scrollbar stays at the top
         //I can't just call it here, because it ends up getting reset somewhere later
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -3920,12 +4223,16 @@ public class CampaignGUI extends JPanel {
             }
         });
         boolean unitsAssigned = scenario.getForces(getCampaign()).getAllUnits().size() > 0;
-        btnStartGame.setEnabled(scenario.isCurrent() && unitsAssigned);
-        btnJoinGame.setEnabled(scenario.isCurrent() && unitsAssigned);
-        btnLoadGame.setEnabled(scenario.isCurrent() && unitsAssigned);
+        boolean canStartGame = scenario.isCurrent() && unitsAssigned;
+        if (getCampaign().getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario) {
+        	canStartGame = canStartGame && getCampaign().getDate().equals(scenario.getDate());
+        }
+        btnStartGame.setEnabled(canStartGame);
+        btnJoinGame.setEnabled(canStartGame);
+        btnLoadGame.setEnabled(canStartGame);
         btnGetMul.setEnabled(scenario.isCurrent() && unitsAssigned);
         btnClearAssignedUnits.setEnabled(scenario.isCurrent() && unitsAssigned);
-        btnResolveScenario.setEnabled(scenario.isCurrent() && unitsAssigned);
+        btnResolveScenario.setEnabled(canStartGame);
         btnPrintRS.setEnabled(scenario.isCurrent() && unitsAssigned);
 
     }
@@ -3964,6 +4271,10 @@ public class CampaignGUI extends JPanel {
                 }
             });
         }
+    }
+    
+    public void refreshLanceAssignments() {
+    	panLanceAssignment.refresh();
     }
 
     public void refreshPlanetView() {
@@ -4821,6 +5132,16 @@ public class CampaignGUI extends JPanel {
         //tracker.postProcessEntities(control);
         ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(getFrame(), true, tracker);
         resolveDialog.setVisible(true);
+    	if (getCampaign().getCampaignOptions().getUseAtB() &&
+    			getCampaign().getMission(scenario.getMissionId()) instanceof AtBContract &&
+    			getCampaign().getRetirementDefectionTracker().getRetirees().size() > 0) {
+    		RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGUI(),
+    				(AtBContract)getCampaign().getMission(scenario.getMissionId()), false);
+    		rdd.setVisible(true);
+    		if (!rdd.wasAborted()) {
+    			getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
+    		}
+    	}
 
         refreshScenarioList();
         refreshOrganization();
@@ -4932,19 +5253,54 @@ public class CampaignGUI extends JPanel {
                     + undeployed.toString(),
                     "Could not deploy some units", JOptionPane.WARNING_MESSAGE);
         }
+        
+        if (getCampaign().getCampaignOptions().getUseAtB() &&
+        		scenario instanceof AtBScenario) {
+        	((AtBScenario)scenario).refresh(getCampaign());
+
+            /* For standard battles, any deployed unit not part of the
+             * lance assigned to the battle is assumed to be reinforcements.
+             */
+        	if (null != ((AtBScenario)scenario).getLance(getCampaign())) {
+        		int assignedForceId = ((AtBScenario)scenario).getLance(getCampaign()).getForceId();
+        		for (Force f : scenario.getForces(getCampaign()).getSubForces()) {
+        			if (f.getId() != assignedForceId) {
+        				Vector<UUID> units = f.getAllUnits();
+        				int slowest = 12;
+        				for (UUID id : units) {
+        					if (chosen.contains(getCampaign().getUnit(id))) {
+        						slowest = Math.min(slowest, getCampaign().getUnit(id).getEntity().getWalkMP());
+        					} 
+        				}
+        				int deployRound = 12 - slowest;
+        				Person commander = getCampaign().getPerson(Lance.findCommander(f.getId(), getCampaign()));
+        				if (null != commander && null != commander.getSkill(SkillType.S_STRATEGY)) {
+        					deployRound -= commander.getSkill(SkillType.S_STRATEGY).getLevel();
+        				}
+        				deployRound = Math.max(deployRound, 0);
+
+        				for (UUID id : units) {
+        					if (chosen.contains(getCampaign().getUnit(id))) {
+        						getCampaign().getUnit(id).getEntity().setDeployRound(deployRound);
+        					} 
+        				}        			
+        			}
+        		}
+        	}
+        }
 
         if (chosen.size() > 0) {
-            ((MekHQ) getApplication()).startHost(scenario, false, chosen);
+        	((MekHQ) getApplication()).startHost(scenario, false, chosen);
         }
     }
 
     protected void joinScenario() {
-        int row = scenarioTable.getSelectedRow();
-        if (row < 0) {
-            return;
-        }
-        Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
-        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
+    	int row = scenarioTable.getSelectedRow();
+    	if (row < 0) {
+    		return;
+    	}
+    	Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+    	Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
 
         if (uids.size() == 0) {
             return;
@@ -5126,7 +5482,10 @@ public class CampaignGUI extends JPanel {
             Mission m = getCampaign().getSortedMissions().get(idx);
             if (null != m) {
                 selectedMission = m.getId();
-                if (m instanceof Contract) {
+                if (getCampaign().getCampaignOptions().getUseAtB() &&
+                		m instanceof AtBContract) {
+                    scrollMissionView.setViewportView(new AtBContractViewPanel((AtBContract) m, getCampaign()));
+                } else if (m instanceof Contract) {
                     scrollMissionView.setViewportView(new ContractViewPanel((Contract) m));
                 } else {
                     scrollMissionView.setViewportView(new MissionViewPanel(m));
@@ -5218,6 +5577,9 @@ public class CampaignGUI extends JPanel {
         }
         changeMission();
         refreshRating();
+        if (getCampaign().getCampaignOptions().getUseAtB()) {
+        	refreshLanceAssignments();
+        }
     }
 
     public void refreshLab() {
@@ -5335,6 +5697,9 @@ public class CampaignGUI extends JPanel {
                 orgTree.updateUI();
                 orgTree.setSelectionPath(null);
                 refreshForceView();
+                if (getCampaign().getCampaignOptions().getUseAtB()) {
+                	refreshLanceAssignments();
+                }
             }
         });
         refreshRating();
@@ -5460,6 +5825,23 @@ public class CampaignGUI extends JPanel {
             btn.setEnabled(false);
             text.setText("");
             lbl.setText("-");
+        }
+        if (getCampaign().getCampaignOptions().getUseAtB()) {
+        	int numBonusParts = 0;
+        	if (acquireSelected() && null != getSelectedAcquisition()) {
+	        	AtBContract contract = getCampaign().getAttachedAtBContract(getSelectedAcquisition().getUnit());
+	        	if (null == contract) {                		
+	        		numBonusParts = getCampaign().totalBonusParts();
+	        	} else {
+	        		numBonusParts = contract.getNumBonusParts();
+	        	}
+        	}
+        	if (numBonusParts > 0) {
+        		btnUseBonusPart.setText("Use Bonus Part (" + numBonusParts + ")");
+        		btnUseBonusPart.setVisible(true);
+        	} else {
+        		btnUseBonusPart.setVisible(false);
+        	}
         }
     }
 
@@ -7115,6 +7497,11 @@ public class CampaignGUI extends JPanel {
                             missionMenu = new JMenu(m.getName());
                             for (Scenario s : m.getScenarios()) {
                                 if (s.isCurrent()) {
+                                	if (getCampaign().getCampaignOptions().getUseAtB() &&
+                                			s instanceof AtBScenario && 
+                                			!((AtBScenario)s).canDeployForces(forces, getCampaign())) {
+                                		continue;
+                                	}
                                     menuItem = new JMenuItem(s.getName());
                                     menuItem.setActionCommand("DEPLOY_FORCE|FORCE|" + s.getId() + "|" + forceIds);
                                     menuItem.addActionListener(this);
@@ -7256,6 +7643,11 @@ public class CampaignGUI extends JPanel {
                             missionMenu = new JMenu(m.getName());
                             for (Scenario s : m.getScenarios()) {
                                 if (s.isCurrent()) {
+                                	if (getCampaign().getCampaignOptions().getUseAtB() &&
+                                			s instanceof AtBScenario && 
+                                			!((AtBScenario)s).canDeployUnits(units, getCampaign())) {
+                                		continue;
+                                	}
                                     menuItem = new JMenuItem(s.getName());
                                     menuItem.setActionCommand("DEPLOY_UNIT|UNIT|" + s.getId() + "|" + unitIds);
                                     menuItem.addActionListener(this);
@@ -7574,10 +7966,27 @@ public class CampaignGUI extends JPanel {
             } else if (command.contains("IMPROVE")) {
                 String type = st.nextToken();
                 int cost = Integer.parseInt(st.nextToken());
+                int oldExpLevel = selectedPerson.getExperienceLevel(false);
                 selectedPerson.improveSkill(type);
                 getCampaign().personUpdated(selectedPerson);
                 selectedPerson.setXp(selectedPerson.getXp() - cost);
                 getCampaign().addReport(selectedPerson.getHyperlinkedName() + " improved " + type + "!");
+                if (getCampaign().getCampaignOptions().getUseAtB()) {
+                	if (selectedPerson.getPrimaryRole() > Person.T_NONE &&
+                			selectedPerson.getPrimaryRole() <= Person.T_CONV_PILOT &&
+                			selectedPerson.getExperienceLevel(false) > oldExpLevel &&
+                			oldExpLevel >= SkillType.EXP_REGULAR) {
+                		String spa = getCampaign().rollSPA(selectedPerson.getPrimaryRole(), selectedPerson);
+                		if (null == spa) {
+                			if (getCampaign().getCampaignOptions().useEdge()) {
+                				selectedPerson.acquireAbility(PilotOptions.EDGE_ADVANTAGES, "edge", selectedPerson.getEdge() + 1);
+                    			getCampaign().addReport(selectedPerson.getHyperlinkedName() + " gained edge point!");
+                			}
+                		} else {
+                			getCampaign().addReport(selectedPerson.getHyperlinkedName() + " gained " + SpecialAbility.getDisplayName(spa) + "!");
+                		}
+                	}
+                }
                 refreshServicedUnitList();
                 refreshUnitList();
                 refreshPersonnelList();
@@ -7685,6 +8094,28 @@ public class CampaignGUI extends JPanel {
                         getCampaign().removePerson(person.getId());
                     }
                 }
+                refreshServicedUnitList();
+                refreshUnitList();
+                refreshPatientList();
+                refreshPersonnelList();
+                refreshTechsList();
+                refreshDoctorsList();
+                refreshOrganization();
+                refreshReport();
+            } else if (command.equalsIgnoreCase("SACK")) {
+                for (Person person : people) {
+                	getCampaign().getRetirementDefectionTracker().removeFromCampaign(person,
+                			false, getCampaign().getCampaignOptions().getUseShareSystem()?person.getNumShares():0,
+                					null);
+                }
+                RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGUI(),
+                		null, false);
+                rdd.setVisible(true);
+                if (rdd.wasAborted() || !getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments())) {
+                	for (Person person : people) {
+                		getCampaign().getRetirementDefectionTracker().removePayout(person);
+                	}
+                } 
                 refreshServicedUnitList();
                 refreshUnitList();
                 refreshPatientList();
@@ -7886,6 +8317,9 @@ public class CampaignGUI extends JPanel {
                 refreshPersonnelList();
             } else if (command.equalsIgnoreCase("BLOODNAME")) {
             	for (Person p : people) {
+            		if (!p.isClanner()) {
+            			continue;
+            		}
             		getCampaign().checkBloodnameAdd(p, p.getPrimaryRole(), true);
             	}
                 getCampaign().personUpdated(selectedPerson);
@@ -8757,6 +9191,13 @@ public class CampaignGUI extends JPanel {
                         miExportPersonActionPerformed(evt);
                     }
                 });
+                if (getCampaign().getCampaignOptions().getUseAtB() &&
+                		areAllActive(selected)) {
+                	menuItem = new JMenuItem("Sack...");
+                	menuItem.setActionCommand("SACK");
+                	menuItem.addActionListener(this);
+                	menu.add(menuItem);
+                }
                 menuItem.setEnabled(true);
                 popup.add(menuItem);
                 menu = new JMenu("GM Mode");

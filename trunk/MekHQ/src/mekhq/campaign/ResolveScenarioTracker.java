@@ -56,6 +56,8 @@ import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Mission;
@@ -87,6 +89,11 @@ public class ResolveScenarioTracker {
 	Hashtable<UUID, PersonStatus> peopleStatus;
 	ArrayList<PersonStatus> newPeopleStatus;
 	Hashtable<String, String> killCredits;
+	
+	/* AtB */
+	int contractBreaches = 0;
+	int bonusRolls = 0;
+	
 	Campaign campaign;
 	Scenario scenario;
 	JFileChooser unitList;
@@ -444,6 +451,15 @@ public class ResolveScenarioTracker {
 		
 		//lets cycle through units and get their crew
 		PersonStatus status;
+		java.util.HashSet<Integer> pickedUpPilots = new java.util.HashSet<Integer>();
+		
+		for(Unit u : units) {
+			for (int mwid : u.getEntity().getPickedUpMechWarriors()) {
+				megamek.common.MechWarrior mw = (megamek.common.MechWarrior)client.getGame().getEntity(mwid);
+				pickedUpPilots.add(mw.getOriginalRideId());
+			}
+		}
+
 		for(Unit u : units) {
 			//shuffling the crew ensures that casualties are randomly assigned in multi-crew units
 			ArrayList<Person> crew = shuffleCrew(u.getActiveCrew());
@@ -471,6 +487,9 @@ public class ResolveScenarioTracker {
 						status.setMissing(true);
 					} else {
 						status.setHits(pilot.getHits());
+					}
+					if (pickedUpPilots.contains(u.getEntity().getId())) {
+						status.setPickedUp(true);
 					}
 				} else {
 					//we have a multi-crewed vee
@@ -722,6 +741,10 @@ public class ResolveScenarioTracker {
 		return false;
 	}
 	
+	public ArrayList<Entity> getAlliedUnits() {
+		return alliedUnits;
+	}
+	
 	public ArrayList<Entity> getPotentialSalvage() {
 		return potentialSalvage;
 	}
@@ -738,8 +761,20 @@ public class ResolveScenarioTracker {
 		leftoverSalvage.add(new Unit(potentialSalvage.get(i), campaign));	
 	}
 	
+	public void setContractBreaches(int i) {
+		contractBreaches = i;
+	}
+	
+	public void setBonusRolls(int i) {
+		bonusRolls = i;
+	}
+	
 	public Campaign getCampaign() {
 		return campaign;
+	}
+	
+	public Scenario getScenario() {
+		return scenario;
 	}
 	
 	public Mission getMission() {
@@ -785,6 +820,17 @@ public class ResolveScenarioTracker {
 			}
 			if (status.isPrisoner() || status.isBondsman()) {
     			getCampaign().recruitPerson(person, status.isPrisoner(), status.isBondsman());
+    			if (getCampaign().getCampaignOptions().getUseAtB() &&
+    					getCampaign().getCampaignOptions().getUseAtBCapture() &&
+ 						m instanceof AtBContract &&
+ 	   					status.isPrisoner()) {
+    				getCampaign().getFinances().credit(50000, Transaction.C_MISC,
+    						"Bonus for prisoner capture", getCampaign().getDate());
+   					if (Compute.d6(2) >= 10 + ((AtBContract)m).getEnemySkill() - AtBContract.getUnitRatingMod(getCampaign())) {
+   						getCampaign().addReport("You have convinced "
+   								+ person.getHyperlinkedName() + " to defect.");
+   					}
+    			}
     		}
 			person.setXp(person.getXp() + status.xp);
 			if(status.getHits() > person.getHits()) {
@@ -799,6 +845,12 @@ public class ResolveScenarioTracker {
 			}
 			if(status.isDead()) {
 				campaign.changeStatus(person, Person.S_KIA);
+				if (campaign.getCampaignOptions().getUseAtB() &&
+						m instanceof AtBContract) {
+					campaign.getRetirementDefectionTracker().removeFromCampaign(person,
+							true, campaign.getCampaignOptions().getUseShareSystem()?person.getNumShares():0,
+									(AtBContract)m);
+				}
 			}
 			if (campaign.getCampaignOptions().useAdvancedMedical()) {
 				person.diagnose(status.getHits());
@@ -901,6 +953,16 @@ public class ResolveScenarioTracker {
 			}
 		}
 		
+		if (campaign.getCampaignOptions().getUseAtB() && getMission() instanceof AtBContract) {
+			int dragoonRating = AtBContract.getUnitRatingMod(campaign);
+			for (Unit unit : units) {
+				unit.setSite(((AtBContract)getMission()).getRepairLocation(dragoonRating));
+			}
+			for (Unit unit : actualSalvage) {
+				unit.setSite(((AtBContract)getMission()).getRepairLocation(dragoonRating));
+			}
+		}
+		
 		for(Loot loot : actualLoot) {
 		    loot.get(campaign, scenario);
 		}
@@ -912,6 +974,9 @@ public class ResolveScenarioTracker {
 		campaign.reloadGameEntities();
 		campaign.refreshNetworks();
 		scenario.setDate(campaign.getCalendar().getTime());
+		if (campaign.getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario) {
+			((AtBScenario)scenario).doPostResolution(campaign, contractBreaches, bonusRolls);
+		}
 		client = null;
 	}
 	
@@ -991,6 +1056,7 @@ public class ResolveScenarioTracker {
 		private boolean prisoner;
 		private boolean bondsman;
 		private boolean remove;
+		private boolean pickedUp;
 		
 		public PersonStatus(String n, String u, int h) {
 			name = n;
@@ -1003,6 +1069,7 @@ public class ResolveScenarioTracker {
 			prisoner = false;
 			bondsman = false;
 			remove = false;
+			pickedUp = false;
 		}
 		
 		public boolean toRemove() {
@@ -1063,6 +1130,14 @@ public class ResolveScenarioTracker {
 		
 		public void setMissing(boolean b) {
 			missing = b;
+		}
+		
+		public boolean wasPickedUp() {
+			return pickedUp;
+		}
+		
+		public void setPickedUp(boolean set) {
+			pickedUp = set;
 		}
 		
 		public int getXP() {

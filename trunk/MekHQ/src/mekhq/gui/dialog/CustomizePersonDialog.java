@@ -6,10 +6,13 @@
 
 package mekhq.gui.dialog;
 
+import java.awt.Component;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.text.SimpleDateFormat;
@@ -22,9 +25,11 @@ import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
@@ -41,6 +46,7 @@ import megamek.common.options.PilotOptions;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.unit.Unit;
 
 /**
  *
@@ -90,6 +96,13 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private JCheckBox chkClan;
     private JComboBox choicePheno;
     
+    /* Against the Bot */
+    private JComboBox<String> choiceUnitWeight;
+    private JComboBox<String> choiceUnitTech;
+    private JLabel lblShares;
+    private JCheckBox chkFounder;
+    private JComboBox<Unit> choiceOriginalUnit;
+    
     private Campaign campaign;
     
     /** Creates new form CustomizePilotDialog */
@@ -109,7 +122,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     	initComponents();
     }
 
-    private void initComponents() {
+    @SuppressWarnings("serial")
+	private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
         panDemog = new javax.swing.JPanel();
@@ -328,6 +342,115 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             panDemog.add(textToughness, gridBagConstraints);
         }
         
+        JLabel lblUnit = new JLabel();
+        lblUnit.setText("Original unit:"); // NOI18N
+        lblUnit.setName("lblUnit"); // NOI18N
+        
+        choiceUnitWeight = new JComboBox<String>();
+        choiceUnitWeight.addItem("None");
+        choiceUnitWeight.addItem("Light");
+        choiceUnitWeight.addItem("Medium");
+        choiceUnitWeight.addItem("Heavy");
+        choiceUnitWeight.addItem("Assault");
+        choiceUnitWeight.setSelectedIndex(person.getOriginalUnitWeight());
+
+        choiceUnitTech = new JComboBox<String>();
+        choiceUnitTech.addItem("IS1");
+        choiceUnitTech.addItem("IS2");
+        choiceUnitTech.addItem("Clan");
+        choiceUnitTech.setSelectedIndex(person.getOriginalUnitTech());
+        
+        lblShares = new JLabel();
+        lblShares.setText(person.getNumShares() + " shares");
+        
+        chkFounder = new JCheckBox("Founding member");
+        chkFounder.setSelected(person.isFounder());
+        
+        choiceOriginalUnit = new JComboBox<Unit>();
+        choiceOriginalUnit.setRenderer(new DefaultListCellRenderer() {
+			@Override
+        	public Component getListCellRendererComponent(JList<?> list,
+        			Object value, int index, boolean isSelected,
+        			boolean cellHasFocus) {
+        		if (null == value) {
+        			setText("None");
+         		} else {
+        			setText(((Unit)value).getName());
+        		}
+        		return this;
+        	}
+        });
+    	choiceOriginalUnit.addItem(null);       
+        for (Unit unit : campaign.getUnits()) {
+        	choiceOriginalUnit.addItem(unit);
+        }
+        if (null == person.getOriginalUnitId()) {
+        	choiceOriginalUnit.setSelectedItem(null);
+        } else {
+        	choiceOriginalUnit.setSelectedItem(campaign.getUnit(person.getOriginalUnitId()));
+        }
+        choiceOriginalUnit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent ev) {
+				if (null == choiceOriginalUnit.getSelectedItem()) {
+					choiceUnitWeight.setSelectedIndex(0);
+					choiceUnitTech.setSelectedIndex(0);
+				} else {
+					Unit unit = (Unit)choiceOriginalUnit.getSelectedItem();
+					choiceUnitWeight.setSelectedIndex(unit.getEntity().getWeightClass());
+					if (unit.getEntity().isClan()) {
+						choiceUnitTech.setSelectedIndex(2);
+					} else if (unit.getEntity().getTechLevel() > megamek.common.TechConstants.T_INTRO_BOXSET) {
+						choiceUnitTech.setSelectedIndex(1);						
+					} else {
+						choiceUnitTech.setSelectedIndex(0);	
+					}
+				}
+			}
+        });
+        
+        if (campaign.getCampaignOptions().getUseAtB()) {
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 7;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+	        panDemog.add(lblUnit, gridBagConstraints);
+	        
+	        gridBagConstraints.gridx = 1;
+	        gridBagConstraints.gridy = 7;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+	        panDemog.add(choiceUnitWeight, gridBagConstraints);
+
+	        gridBagConstraints.gridx = 2;
+	        gridBagConstraints.gridy = 7;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+	        panDemog.add(choiceUnitTech, gridBagConstraints);
+
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 8;
+	        gridBagConstraints.gridwidth = 3;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+	        panDemog.add(choiceOriginalUnit, gridBagConstraints);
+	        
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 9;
+	        gridBagConstraints.gridwidth = 2;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+	        panDemog.add(chkFounder, gridBagConstraints);
+	        
+	        if (campaign.getCampaignOptions().getUseShareSystem()) {
+	        	gridBagConstraints.gridx = 2;
+	        	gridBagConstraints.gridy = 9;
+	        	gridBagConstraints.gridwidth = 1;
+	        	gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+	        	panDemog.add(lblShares, gridBagConstraints);
+	        }
+        }
+
+         
+        
         scrBio.setName("scrBio"); // NOI18N
 
         txtBio.setName("txtBio"); // NOI18N
@@ -339,7 +462,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 10;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 1.0;
@@ -439,6 +562,13 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         } catch(NumberFormatException e) {
         	//dont do anything
         }
+        if (null == choiceOriginalUnit.getSelectedItem()) {
+        	person.setOriginalUnitWeight(choiceUnitWeight.getSelectedIndex());
+        	person.setOriginalUnitTech(choiceUnitTech.getSelectedIndex());
+        } else {
+        	person.setOriginalUnitId(((Unit)choiceOriginalUnit.getSelectedItem()).getId());
+        }
+        person.setFounder(chkFounder.isSelected());
         setSkills();
         setOptions();       
         setVisible(false);

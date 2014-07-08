@@ -183,6 +183,45 @@ public class CampaignOptions implements Serializable {
 
     //random portraits related
     private boolean[] usePortraitForType;
+    
+    //Against the Bot related
+    private boolean useAtB;
+    private boolean useAero;
+    private boolean useVehicles;
+    private boolean clanVehicles;
+    private boolean useDropShips;
+    private int skillLevel;
+    private boolean doubleVehicles;
+    private boolean adjustPlayerVehicles;
+    private boolean regionalMechVariations;
+    private boolean aeroRecruitsHaveUnits;
+    private boolean useShareSystem;
+    private boolean retirementRolls;
+    private boolean customRetirementMods;
+    private boolean trackOriginalUnit;
+    private boolean mercSizeLimited;
+    private String[] rats = {"FM Updates", "Xotl", "Total Warfare"};
+    private String[] ratsNoEra = {"Xotl", "Total Warfare"};
+    private int searchRadius;
+    private double intensity;
+    private boolean variableContractLength;
+    private boolean instantUnitMarketDelivery;
+    private boolean useWeatherConditions;
+    private boolean useLightConditions;
+    private boolean usePlanetaryConditions;
+    private boolean useLeadership;
+    private boolean useStrategy;
+    private int baseStrategyDeployment;
+    private int additionalStrategyDeployment;
+    private boolean adjustPaymentForStrategy;
+    private boolean restrictPartsByMission;
+    private boolean limitLanceWeight;
+    private boolean limitLanceNumUnits;
+    private int lanceStructure;
+    private boolean useAtBCapture;
+    private boolean contractMarketReportRefresh;
+    private boolean unitMarketReportRefresh;
+    
 
     public CampaignOptions() {
         clanPriceModifier = 1.0;
@@ -319,7 +358,41 @@ public class CampaignOptions implements Serializable {
         probPhenoVee = 0;
         tougherHealing = false;
 
-    }
+        useAtB = false;
+    	useAero = false;
+    	useVehicles = true;
+    	clanVehicles = false;
+    	doubleVehicles = true;
+        adjustPlayerVehicles = false;
+    	useDropShips = false;
+    	skillLevel = 2;
+        aeroRecruitsHaveUnits = false;
+        useShareSystem = false;
+        retirementRolls = true;
+        customRetirementMods = false;
+        trackOriginalUnit = false;
+        mercSizeLimited = false;
+    	regionalMechVariations = false;
+    	searchRadius = 800;
+    	intensity = 1.0;
+    	variableContractLength = false;
+        instantUnitMarketDelivery = false;
+        useWeatherConditions = true;
+    	useLightConditions = true;
+    	usePlanetaryConditions = true;
+    	useLeadership = true;
+    	useStrategy = true;
+    	baseStrategyDeployment = 3;
+    	additionalStrategyDeployment = 1;
+    	adjustPaymentForStrategy = false;
+    	restrictPartsByMission = true;
+    	limitLanceWeight = true;
+    	limitLanceNumUnits = true;
+    	lanceStructure = 4;
+    	useAtBCapture = false;
+        contractMarketReportRefresh = true;
+        unitMarketReportRefresh = true;
+   }
 
     public UnitRatingMethod getUnitRatingMethod() {
         return unitRatingMethod;
@@ -1120,7 +1193,299 @@ public class CampaignOptions implements Serializable {
         tougherHealing = b;
     }
 
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public boolean isUseTactics() {
+		return useTactics;
+	}
+
+	public void setUseTactics(boolean useTactics) {
+		this.useTactics = useTactics;
+	}
+	
+	public boolean getUseAtB() {
+		return useAtB;
+	}
+	
+	public void setUseAtB(boolean useAtB) {
+		this.useAtB = useAtB;
+	}
+
+	public boolean getUseAero() {
+		return useAero;
+	}
+
+	public void setUseAero(boolean useAero) {
+		this.useAero = useAero;
+	}
+
+	public boolean getUseVehicles() {
+		return useVehicles;
+	}
+
+	public void setUseVehicles(boolean useVehicles) {
+		this.useVehicles = useVehicles;
+	}
+	
+	public boolean getClanVehicles() {
+		return clanVehicles;
+	}
+	
+	public void setClanVehicles(boolean clanVehicles) {
+		this.clanVehicles = clanVehicles;
+	}
+
+	public boolean getDoubleVehicles() {
+		return doubleVehicles;
+	}
+
+	public void setDoubleVehicles(boolean doubleVehicles) {
+		this.doubleVehicles = doubleVehicles;
+	}
+	
+	public boolean getAdjustPlayerVehicles() {
+		return adjustPlayerVehicles;
+	}
+	
+	public void setAdjustPlayerVehicles(boolean adjust) {
+		adjustPlayerVehicles = adjust;
+	}
+
+	public boolean getUseDropShips() {
+		return useDropShips;
+	}
+
+	public void setUseDropShips(boolean useDropShips) {
+		this.useDropShips = useDropShips;
+	}
+	
+	public int getSkillLevel() {
+		return skillLevel;
+	}
+	
+	public void setSkillLevel(int level) {
+		skillLevel = level;
+	}
+	
+	public boolean getAeroRecruitsHaveUnits() {
+		return aeroRecruitsHaveUnits;
+	}
+	
+	public void setAeroRecruitsHaveUnits(boolean haveUnits) {
+		aeroRecruitsHaveUnits = haveUnits;
+	}
+
+	public boolean getUseShareSystem() {
+		return useShareSystem;
+	}
+	
+	public boolean doRetirementRolls() {
+		return retirementRolls;
+	}
+	
+	public void setRetirementRolls(boolean roll) {
+		retirementRolls = roll;
+	}
+	
+	public boolean getCustomRetirementMods() {
+		return customRetirementMods;
+	}
+	
+	public void setCustomRetirementMods(boolean mods) {
+		customRetirementMods = mods;
+	}
+	
+	public boolean getTrackOriginalUnit() {
+		return trackOriginalUnit;
+	}
+	
+	public void setTrackOriginalUnit(boolean track) {
+		trackOriginalUnit = track;
+	}
+	
+	public boolean isMercSizeLimited() {
+		return mercSizeLimited;
+	}
+	
+	public void setMercSizeLimited(boolean limit) {
+		mercSizeLimited = limit;
+	}
+	
+	public void setUseShareSystem(boolean shares) {
+		useShareSystem = shares;
+	}
+
+	public boolean getRegionalMechVariations() {
+		return regionalMechVariations;
+	}
+
+	public void setRegionalMechVariations(boolean regionalMechVariations) {
+		this.regionalMechVariations = regionalMechVariations;
+	}
+
+	public String[] getRATs() {
+		return rats;
+	}
+	
+	public void setRATs (String[] rats) {
+		this.rats = rats;
+	}
+	
+	public String[] getRATsNoEra() {
+		return ratsNoEra;
+	}
+
+	public int getSearchRadius() {
+		return searchRadius;
+	}
+	
+	public void setSearchRadius(int radius) {
+		searchRadius = radius;
+	}
+	
+	public boolean getInstantUnitMarketDelivery() {
+		return instantUnitMarketDelivery;
+	}
+	
+	public void setInstantUnitMarketDelivery(boolean instant) {
+		instantUnitMarketDelivery = instant;
+	}
+
+	public double getIntensity() {
+		return intensity;
+	}
+
+	public void setIntensity(double intensity) {
+		this.intensity = intensity;
+	}
+	
+	public boolean getVariableContractLength() {
+		return variableContractLength;
+	}
+	
+	public void setVariableContractLength(boolean variable) {
+		variableContractLength = variable;
+	}
+
+	public boolean getUseWeatherConditions() {
+		return useWeatherConditions;
+	}
+
+	public void setUseWeatherConditions(boolean useWeatherConditions) {
+		this.useWeatherConditions = useWeatherConditions;
+	}
+
+	public boolean getUseLightConditions() {
+		return useLightConditions;
+	}
+
+	public void setUseLightConditions(boolean useLightConditions) {
+		this.useLightConditions = useLightConditions;
+	}
+	
+	public boolean getUsePlanetaryConditions() {
+		return usePlanetaryConditions;
+	}
+	
+	public void setUsePlanetaryConditions(boolean usePlanetaryConditions) {
+		this.usePlanetaryConditions = usePlanetaryConditions;
+	}
+
+	public boolean getUseLeadership() {
+		return useLeadership;
+	}
+
+	public void setUseLeadership(boolean useLeadership) {
+		this.useLeadership = useLeadership;
+	}
+
+	public boolean getUseStrategy() {
+		return useStrategy;
+	}
+
+	public void setUseStrategy(boolean useStrategy) {
+		this.useStrategy = useStrategy;
+	}
+
+	public int getBaseStrategyDeployment() {
+		return baseStrategyDeployment;
+	}
+
+	public void setBaseStrategyDeployment(int baseStrategyDeployment) {
+		this.baseStrategyDeployment = baseStrategyDeployment;
+	}
+
+	public int getAdditionalStrategyDeployment() {
+		return additionalStrategyDeployment;
+	}
+
+	public void setAdditionalStrategyDeployment(int additionalStrategyDeployment) {
+		this.additionalStrategyDeployment = additionalStrategyDeployment;
+	}
+
+	public boolean getAdjustPaymentForStrategy() {
+		return adjustPaymentForStrategy;
+	}
+
+	public void setAdjustPaymentForStrategy(boolean adjustPaymentForStrategy) {
+		this.adjustPaymentForStrategy = adjustPaymentForStrategy;
+	}
+	
+	public boolean getRestrictPartsByMission() {
+		return restrictPartsByMission;
+	}
+
+	public void setRestrictPartsByMission(boolean restrictPartsByMission) {
+		this.restrictPartsByMission = restrictPartsByMission;
+	}
+	
+	public boolean getLimitLanceWeight() {
+		return limitLanceWeight;
+	}
+	
+	public void setLimitLanceWeight(boolean limit) {
+		limitLanceWeight = limit;
+	}
+	
+	public boolean getLimitLanceNumUnits() {
+		return limitLanceNumUnits;
+	}
+	
+	public void setLimitLanceNumUnits(boolean limit) {
+		limitLanceNumUnits = limit;
+	}
+	
+	public int getLanceStructure() {
+		return lanceStructure;
+	}
+	
+	public void setLanceStructure(int struct) {
+		lanceStructure = struct;
+	}
+	
+	public boolean getUseAtBCapture() {
+		return useAtBCapture;
+	}
+	
+	public void setUseAtBCapture(boolean set) {
+		useAtBCapture = set;
+	}
+
+	public boolean getContractMarketReportRefresh() {
+		return contractMarketReportRefresh;
+	}
+	
+	public void setContractMarketReportRefresh(boolean refresh) {
+		contractMarketReportRefresh = refresh;
+	}
+	
+	public boolean getUnitMarketReportRefresh() {
+		return unitMarketReportRefresh;
+	}
+	
+	public void setUnitMarketReportRefresh(boolean refresh) {
+		unitMarketReportRefresh = refresh;
+	}
+	
+	public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanPriceModifier", clanPriceModifier); //private double
         // clanPriceModifier;
@@ -1223,6 +1588,40 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "probPhenoBA", probPhenoBA);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "probPhenoVee", probPhenoVee);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "tougherHealing", tougherHealing);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAtB", useAtB);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAero", useAero);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useVehicles", useVehicles);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanVehicles", clanVehicles);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "doubleVehicles", doubleVehicles);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "adjustPlayerVehicles", adjustPlayerVehicles);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useDropShips", useDropShips);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "skillLevel", skillLevel);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "aeroRecruitsHaveUnits", aeroRecruitsHaveUnits);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useShareSystem", useShareSystem);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "retirementRolls", retirementRolls);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "customRetirementMods", customRetirementMods);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "mercSizeLimited", mercSizeLimited);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trackOriginalUnit", trackOriginalUnit);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "regionalMechVariations", regionalMechVariations);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "searchRadius", searchRadius);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "intensity", intensity);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "variableContractLength", variableContractLength);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "instantUnitMarketDelivery", instantUnitMarketDelivery);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useWeatherConditions", useWeatherConditions);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useLightConditions", useLightConditions);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePlanetaryConditions", usePlanetaryConditions);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useLeadership", useLeadership);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useStrategy", useStrategy);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "baseStrategyDeployment", baseStrategyDeployment);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "additionalStrategyDeployment", additionalStrategyDeployment);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "adjustPaymentForStrategy", adjustPaymentForStrategy);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "restrictPartsByMission", restrictPartsByMission);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "limitLanceWeight", limitLanceWeight);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "limitLanceNumUnits", limitLanceNumUnits);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lanceStructure", lanceStructure);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAtBCapture", useAtBCapture);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "contractMarketReportRefresh", contractMarketReportRefresh);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitMarketReportRefresh", unitMarketReportRefresh);
 
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<salaryTypeBase>"
@@ -1237,6 +1636,28 @@ public class CampaignOptions implements Serializable {
                     + "<usePortraitForType>"
                     + Utilities.printBooleanArray(usePortraitForType)
                     + "</usePortraitForType>");
+        String csv = "";
+        for (int i = 0; i < rats.length; i++) {
+        	csv += rats[i];
+        	if (i < rats.length - 1) {
+        		csv += ",";
+        	}
+        }
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                + "<rats>"
+                + MekHqXmlUtil.escape(csv)
+                + "</rats>");
+        csv = "";
+        for (int i = 0; i < ratsNoEra.length; i++) {
+        	csv += ratsNoEra[i];
+        	if (i < ratsNoEra.length - 1) {
+        		csv += ",";
+        	}
+        }
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                + "<ratsNoEra>"
+                + MekHqXmlUtil.escape(csv)
+                + "</ratsNoEra>");
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</campaignOptions>");
     }
 
@@ -1620,6 +2041,78 @@ public class CampaignOptions implements Serializable {
                 retVal.probPhenoVee = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("tougherHealing")) {
                 retVal.tougherHealing = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useAtB")) {
+                retVal.useAtB = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useAero")) {
+                retVal.useAero = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useVehicles")) {
+                retVal.useVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("clanVehicles")) {
+                retVal.clanVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("doubleVehicles")) {
+                retVal.doubleVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("adjustPlayerVehicles")) {
+                retVal.adjustPlayerVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useDropShips")) {
+                retVal.useDropShips = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("skillLevel")) {
+                retVal.skillLevel = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("aeroRecruitsHaveUnits")) {
+                retVal.aeroRecruitsHaveUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useShareSystem")) {
+                retVal.useShareSystem = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("retirementRolls")) {
+                retVal.retirementRolls = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("customRetirementMods")) {
+                retVal.customRetirementMods = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("trackOriginalUnit")) {
+                retVal.trackOriginalUnit = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("mercSizeLimited")) {
+                retVal.mercSizeLimited = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("regionalMechVariations")) {
+                retVal.regionalMechVariations = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("searchRadius")) {
+                retVal.searchRadius = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("intensity")) {
+                retVal.intensity = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("variableContractLength")) {
+                retVal.variableContractLength = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("instantUnitMarketDelivery")) {
+                retVal.instantUnitMarketDelivery = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useWeatherConditions")) {
+                retVal.useWeatherConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useLightConditions")) {
+                retVal.useLightConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("usePlanetaryConditions")) {
+                retVal.usePlanetaryConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useLeadership")) {
+                retVal.useLeadership = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useStrategy")) {
+                retVal.useStrategy = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("baseStrategyDeployment")) {
+                retVal.baseStrategyDeployment = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("additionalStrategyDeployment")) {
+                retVal.additionalStrategyDeployment = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("adjustPaymentForStrategy")) {
+                retVal.adjustPaymentForStrategy = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("restrictPartsByMission")) {
+                retVal.restrictPartsByMission = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("limitLanceWeight")) {
+                retVal.limitLanceWeight = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("limitLanceNumUnits")) {
+                retVal.limitLanceNumUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("lanceStructure")) {
+                retVal.lanceStructure = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useAtBCapture")) {
+                retVal.useAtBCapture = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("contractMarketReportRefresh")) {
+                retVal.contractMarketReportRefresh = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketReportRefresh")) {
+                retVal.unitMarketReportRefresh = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("rats")) {
+            	retVal.rats = MekHqXmlUtil.unEscape(wn2.getTextContent().trim()).split(",");
+            } else if (wn2.getNodeName().equalsIgnoreCase("ratsNoEra")) {
+            	retVal.ratsNoEra = MekHqXmlUtil.unEscape(wn2.getTextContent().trim()).split(",");
             }
         }
 

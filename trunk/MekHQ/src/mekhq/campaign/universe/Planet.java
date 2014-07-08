@@ -369,6 +369,10 @@ public class Planet implements Serializable {
 		return gravity;
 	}
 	
+	public int getPressure() {
+		return pressure;
+	}
+	
 	public String getPressureName() {
 		return PlanetaryConditions.getAtmosphereDisplayableName(pressure);
 	}

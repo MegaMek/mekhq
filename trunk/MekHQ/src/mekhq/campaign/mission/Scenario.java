@@ -22,6 +22,7 @@ package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -256,6 +257,11 @@ public class Scenario implements Serializable {
 	}
 	
 	public void writeToXml(PrintWriter pw1, int indent) {
+		writeToXmlBegin(pw1, indent);
+		writeToXmlEnd(pw1, indent);
+	}
+	
+	protected void writeToXmlBegin(PrintWriter pw1, int indent) {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<scenario id=\""
 				+id
@@ -298,8 +304,14 @@ public class Scenario implements Serializable {
 					+df.format(date)
 					+"</date>");
 		}
-		pw1.println(MekHqXmlUtil.indentStr(indent) + "</scenario>");
-		
+	}
+	
+	protected void writeToXmlEnd(PrintWriter pw1, int indent) {
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "</scenario>");		
+	}
+	
+	protected void loadFieldsFromXmlNode(Node wn) throws ParseException {
+		//do nothing
 	}
 	
 	public static Scenario generateInstanceFromXML(Node wn, Campaign c, Version version) {
@@ -312,6 +324,7 @@ public class Scenario implements Serializable {
 		try {
 			// Instantiate the correct child class, and call its parsing function.
 			retVal = (Scenario) Class.forName(className).newInstance();
+			retVal.loadFieldsFromXmlNode(wn);
 			
 			// Okay, now load Part-specific fields!
 			NodeList nl = wn.getChildNodes();

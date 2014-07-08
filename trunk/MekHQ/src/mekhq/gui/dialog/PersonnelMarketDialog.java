@@ -11,11 +11,13 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.UUID;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
@@ -25,10 +27,16 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import megamek.client.ui.swing.MechViewPanel;
+import megamek.common.Compute;
+import megamek.common.Entity;
 import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.PersonnelMarket;
+import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.model.XTableColumnModel;
@@ -51,22 +59,30 @@ public class PersonnelMarketDialog extends JDialog {
     boolean addToCampaign;
     Person selectedPerson = null;
     private DirectoryItems portraits;
+    private long unitCost = 0;
 
     private JButton btnAdd;
     private javax.swing.JButton btnHire;
     private javax.swing.JButton btnClose;
     private javax.swing.JComboBox comboPersonType;
     private javax.swing.JLabel lblPersonChoice;
+    private javax.swing.JRadioButton radioNormalRoll;
+    private javax.swing.JRadioButton radioPaidRecruitment;
+    private javax.swing.JComboBox<String> comboRecruitType;
+    private javax.swing.JRadioButton radioShipSearch;
+    private javax.swing.JComboBox<String> comboShipType;
+    private javax.swing.JLabel lblShipSearch;
     private javax.swing.JPanel panelOKBtns;
     private javax.swing.JPanel panelMain;
     private javax.swing.JPanel panelFilterBtns;
     private javax.swing.JTable tablePersonnel;
+    private javax.swing.JLabel lblUnitCost;
     private javax.swing.JScrollPane scrollTablePersonnel;
     private javax.swing.JScrollPane scrollPersonnelView;
     private TableRowSorter<PersonnelTableModel> sorter;
     ArrayList <RowSorter.SortKey> sortKeys;
     private javax.swing.JSplitPane splitMain;
-
+    
     /** Creates new form UnitSelectorDialog */
     public PersonnelMarketDialog(Frame frame, CampaignGUI view, Campaign c, DirectoryItems portraits) {
         super(frame, true);
@@ -90,6 +106,12 @@ public class PersonnelMarketDialog extends JDialog {
         panelMain = new javax.swing.JPanel();
         panelFilterBtns = new javax.swing.JPanel();
         comboPersonType = new javax.swing.JComboBox();
+        radioNormalRoll = new javax.swing.JRadioButton();
+        radioPaidRecruitment = new javax.swing.JRadioButton();
+        comboRecruitType = new javax.swing.JComboBox<String>();
+        radioShipSearch = new javax.swing.JRadioButton();
+        comboShipType = new javax.swing.JComboBox<String>();
+        lblUnitCost = new javax.swing.JLabel();
         panelOKBtns = new javax.swing.JPanel();
         btnHire = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
@@ -103,6 +125,8 @@ public class PersonnelMarketDialog extends JDialog {
         setName("Form"); // NOI18N
         getContentPane().setLayout(new BorderLayout());
 
+        panelFilterBtns.setLayout(new java.awt.GridBagLayout());
+        
         lblPersonChoice.setText("Personnel Type:"); // NOI18N
         lblPersonChoice.setName("lblPersonChoice"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -110,7 +134,7 @@ public class PersonnelMarketDialog extends JDialog {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panelFilterBtns.add(lblPersonChoice, gridBagConstraints);
 
         DefaultComboBoxModel personTypeModel = new DefaultComboBoxModel();
@@ -133,6 +157,70 @@ public class PersonnelMarketDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panelFilterBtns.add(comboPersonType, gridBagConstraints);
 
+        if (campaign.getCampaignOptions().getUseAtB()) {
+        	boolean activeContract = false;
+        	for (Mission m : campaign.getMissions()) {
+        		if (m.isActive() && m instanceof mekhq.campaign.mission.Contract &&
+        				((mekhq.campaign.mission.Contract)m).getStartDate().before(campaign.getDate())) {
+        			activeContract = true;
+        			break;
+        		}
+        	}
+        	if (!activeContract) {
+        		radioNormalRoll.setText("Make normal roll next week");
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = 1;
+                gridBagConstraints.gridwidth = 2;
+                gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+                panelFilterBtns.add(radioNormalRoll, gridBagConstraints);
+                
+        		radioPaidRecruitment.setText("Make paid recruitment roll next week (100,000 C-bills)");
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = 2;
+                gridBagConstraints.gridwidth = 2;
+                gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+                panelFilterBtns.add(radioPaidRecruitment, gridBagConstraints);
+                
+                for (int i = 1; i < Person.T_NUM; i++) {
+                	comboRecruitType.addItem(Person.getRoleDesc(i, campaign.getFaction().isClan()));
+                }
+                gridBagConstraints.gridx = 2;
+                gridBagConstraints.gridy = 2;
+                gridBagConstraints.gridwidth = 1;
+                gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+                panelFilterBtns.add(comboRecruitType, gridBagConstraints);
+
+        		radioShipSearch.setText("Search for a ship next week (100,000 C-bills)");
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = 3;
+                gridBagConstraints.gridwidth = 2;
+                gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+                panelFilterBtns.add(radioShipSearch, gridBagConstraints);
+
+                comboShipType.addItem("DropShip");
+                comboShipType.addItem("JumpShip");
+                gridBagConstraints.gridx = 2;
+                gridBagConstraints.gridy = 3;
+                gridBagConstraints.gridwidth = 1;
+                gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+                panelFilterBtns.add(comboShipType, gridBagConstraints);
+                
+                javax.swing.ButtonGroup group = new javax.swing.ButtonGroup();
+                group.add(radioNormalRoll);
+                group.add(radioPaidRecruitment);
+                group.add(radioShipSearch);
+                
+                if (personnelMarket.getPaidRecruitment()) {
+                	radioPaidRecruitment.setSelected(true);
+                	comboRecruitType.setSelectedIndex(personnelMarket.getPaidRecruitType() - 1);
+                } else if (personnelMarket.getShipSearch()) {
+                	radioShipSearch.setSelected(true);
+                	comboShipType.setSelectedIndex((personnelMarket.getPaidRecruitType() == Person.T_NAVIGATOR)?1:0);
+                } else {
+                	radioNormalRoll.setSelected(true);
+                }
+        	}
+        }
         
         scrollTablePersonnel.setMinimumSize(new java.awt.Dimension(500, 400));
         scrollTablePersonnel.setName("srcTablePersonnel"); // NOI18N
@@ -217,38 +305,95 @@ public class PersonnelMarketDialog extends JDialog {
         });
         panelOKBtns.add(btnClose, new java.awt.GridBagConstraints());
 
-        getContentPane().add(panelOKBtns, BorderLayout.PAGE_END);
+        javax.swing.JPanel panel = new javax.swing.JPanel();
+        panel.setLayout(new java.awt.GridLayout(1, 3));
+        panel.add(lblUnitCost);
+        panel.add(panelOKBtns);
+        panel.add(new javax.swing.JPanel());
+                
+        getContentPane().add(panel, BorderLayout.PAGE_END);
 
         pack();
     }
-
+    
 	public Person getPerson() {
 	    return selectedPerson;
 	}
 	
 	private void hirePerson(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
 	    if(null != selectedPerson) {
-	        if(campaign.recruitPerson(selectedPerson)) {
-	    		personnelMarket.removePerson(selectedPerson);
-	    		personnelModel.setData(personnelMarket.getPersonnel());
+	    	if (campaign.getFunds() < unitCost + 
+	    			(campaign.getCampaignOptions().payForRecruitment()?
+	    					selectedPerson.getSalary() * 2:0)) {
+				 campaign.addReport("<font color='red'><b>Insufficient funds. Transaction cancelled</b>.</font>");
+	    	} else {
+	    		/* Adding person to campaign changes pid; grab the old one to
+	    		 * use as a key to any attached entity
+	    		 */
+	    		UUID pid = selectedPerson.getId();
+	    		if(campaign.recruitPerson(selectedPerson)) {
+	    			Entity en = personnelMarket.getAttachedEntity(pid);
+	    			if (null != en) {
+	    				addUnit(en);
+	    				personnelMarket.removeAttachedEntity(pid);
+	    			}
+	    			personnelMarket.removePerson(selectedPerson);
+	    			personnelModel.setData(personnelMarket.getPersonnel());
+	    		}
 	    	}
 	    	refreshHqView();
 	    	refreshPersonView();
 	    }
 	}//GEN-LAST:event_btnHireActionPerformed
-	
+
 	private void addPerson() {
+		Entity en = personnelMarket.getAttachedEntity(selectedPerson);
 	    if(null != selectedPerson) {
 	    	campaign.addPersonWithoutId(selectedPerson, true);
 	    	personnelMarket.removePerson(selectedPerson);
     		personnelModel.setData(personnelMarket.getPersonnel());
+			addUnit(en);
 	    	refreshHqView();
 	    	refreshPersonView();
 	    }
 	}
 
+	private void addUnit(Entity en) {
+		if ((null == en)  || 
+				!campaign.getFinances().debit(unitCost, Transaction.C_UNIT,
+				"Purchased " + en.getShortName(),
+				campaign.getCalendar().getTime())) {
+			return;
+		}
+		campaign.addUnit(en, false, 0);
+		Unit unit = null;
+		for (Unit u : campaign.getUnits()) {
+			if (u.getEntity() == en) {
+				unit = u;
+				break;
+			}
+		}
+		if (unit.usesSoloPilot()) {
+			unit.addPilotOrSoldier(selectedPerson);
+			selectedPerson.setOriginalUnit(unit);
+		} else if (unit.usesSoldiers()) {
+			unit.addPilotOrSoldier(selectedPerson);
+		} else if (selectedPerson.canDrive(en)) {
+			unit.addDriver(selectedPerson);
+		} else if (selectedPerson.canGun(en)) {
+			unit.addGunner(selectedPerson);
+		} else if (selectedPerson.getPrimaryRole() == Person.T_NAVIGATOR) {
+			unit.setNavigator(selectedPerson);
+		} else {
+			unit.addVesselCrew(selectedPerson);
+		}
+		
+		campaign.hirePersonnelFor(unit.getId());
+	}
+	
     private void refreshHqView() {
         hqView.refreshPersonnelList();
+        hqView.refreshUnitList();
         hqView.refreshPatientList();
         hqView.refreshTechsList();
         hqView.refreshDoctorsList();
@@ -258,6 +403,15 @@ public class PersonnelMarketDialog extends JDialog {
 	
 	private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
 	    selectedPerson = null;
+    	personnelMarket.setPaidRecruitment(radioPaidRecruitment.isSelected());
+    	personnelMarket.setShipSearch(radioShipSearch.isSelected());
+    	if (radioPaidRecruitment.isSelected()) {
+    		personnelMarket.setPaidRecruitType(comboRecruitType.getSelectedIndex() + 1);
+    	}
+    	if (radioShipSearch.isSelected()) {
+    		personnelMarket.setPaidRecruitType(comboShipType.getSelectedItem().
+    				equals("DropShip")?Person.T_SPACE_PILOT:Person.T_NAVIGATOR);
+    	}
 	    setVisible(false);
 	}//GEN-LAST:event_btnCloseActionPerformed
 	
@@ -313,16 +467,51 @@ public class PersonnelMarketDialog extends JDialog {
             return;
         }
         selectedPerson = personnelModel.getPerson(tablePersonnel.convertRowIndexToModel(view));
+    	Entity en =  personnelMarket.getAttachedEntity(selectedPerson);
+    	if (null == en) {
+    		unitCost = 0;
+    	} else {
+    		if (en instanceof megamek.common.Dropship ||
+    				en instanceof megamek.common.Jumpship) {
+    			unitCost = (long)Math.ceil(en.getCost(false));
+    		} else if (!campaign.getCampaignOptions().getUseShareSystem() &&
+    				(en instanceof megamek.common.Mech ||
+    						en instanceof megamek.common.Tank ||
+    						en instanceof megamek.common.Aero)) {
+    			unitCost = (long)Math.ceil(en.getCost(false) / 2);
+    		} else {
+    			unitCost = 0;
+    		}
+    	}
         refreshPersonView();
     }
 
      void refreshPersonView() {
     	 int row = tablePersonnel.getSelectedRow();
+    	 if (unitCost > 0) {
+    		 lblUnitCost.setText("Unit cost: " + new java.text.DecimalFormat().format(unitCost));
+    	 } else {
+    		 lblUnitCost.setText("");
+    	 }
          if(row < 0) {
              scrollPersonnelView.setViewportView(null);
              return;
          }
-    	 scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, campaign, portraits));
+         Entity en = personnelMarket.getAttachedEntity(selectedPerson);
+         if (null != en) {
+             JTabbedPane tabUnit = new JTabbedPane();
+             String name = "Commander";
+             if (Compute.getFullCrewSize(en) == 1) {
+            	 name = "Pilot";
+             }
+             tabUnit.add(name, new PersonViewPanel(selectedPerson, campaign, portraits));
+             MechViewPanel mvp = new MechViewPanel();
+             mvp.setMech(en);
+             tabUnit.add("Unit", mvp);
+             scrollPersonnelView.setViewportView(tabUnit);        	 
+         } else {
+        	 scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, campaign, portraits));
+         }
  		//This odd code is to make sure that the scrollbar stays at the top
  		//I cant just call it here, because it ends up getting reset somewhere later
  		javax.swing.SwingUtilities.invokeLater(new Runnable() {

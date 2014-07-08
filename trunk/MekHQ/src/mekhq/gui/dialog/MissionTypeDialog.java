@@ -73,6 +73,7 @@ public class MissionTypeDialog extends javax.swing.JDialog {
     
     private void newMission() {
     	CustomizeMissionDialog cmd = new CustomizeMissionDialog(frame, true, null, campaign);
+    	new CustomizeMissionDialog(frame, true, null, campaign);
 		cmd.setVisible(true);
 		this.setVisible(false);
 		if(cmd.getMissionId() != -1) {
@@ -82,7 +83,9 @@ public class MissionTypeDialog extends javax.swing.JDialog {
     }
     
     private void newContract() {
-    	NewContractDialog ncd = new NewContractDialog(frame, true, campaign);
+    	NewContractDialog ncd = campaign.getCampaignOptions().getUseAtB()?
+    			new NewAtBContractDialog(frame, true, campaign):
+    			new NewContractDialog(frame, true, campaign);
 		ncd.setVisible(true);
 		this.setVisible(false);
 		if(ncd.getContractId() != -1) {
