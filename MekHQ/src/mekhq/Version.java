@@ -43,12 +43,25 @@ public class Version {
             major = Integer.parseInt(temp[0]);
             minor = Integer.parseInt(temp[1]);
             String snap = temp[2].replace("-dev", "");
+            
+            // Check for other information embedded in the snapshot & handle it
             if (snap.indexOf("-") > 0) {
+            	// Create a new temporary array split by the hyphen
                 temp = snap.split("\\-");
+                // The snapshot is the first element of the new array
                 snap = temp[0];
-                String rev = temp[1].replace("r", "");
-                revision = Integer.parseInt(rev);
+                
+                // Loop over other elements searching for usable parameters
+                for (int i = 1; i < temp.length; i++) {
+                	// For now the only usable parameter is the revision
+                	if (temp[i].matches("r[0-9]+")) {
+                		String rev = temp[i].replace("r", "");
+                        revision = Integer.parseInt(rev);
+                	}
+                }
             }
+            
+            // Finally, file the snapshot
             snapshot = Integer.parseInt(snap);
         }
     }
