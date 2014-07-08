@@ -193,6 +193,7 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.Modes;
 import mekhq.gui.dialog.AddFundsDialog;
+import mekhq.gui.dialog.BloodnameDialog;
 import mekhq.gui.dialog.BombsDialog;
 import mekhq.gui.dialog.CamoChoiceDialog;
 import mekhq.gui.dialog.CampaignOptionsDialog;
@@ -517,6 +518,7 @@ public class CampaignGUI extends JPanel {
 
     private DailyReportLogDialog logDialog;
     private GMToolsDialog gmTools;
+    private BloodnameDialog bloodnameDialog;
 
     public CampaignGUI(MekHQ app) {
         this.app = app;
@@ -555,7 +557,26 @@ public class CampaignGUI extends JPanel {
     public void showGMToolsDialog() {
         gmTools.setVisible(true);
     }
+    
+    public void randomizeAllBloodnames() {
+        for (Person p : getCampaign().getPersonnel()) {
+        	getCampaign().checkBloodnameAdd(p, p.getPrimaryRole());
+            getCampaign().personUpdated(p);
+        }
+        refreshPatientList();
+        refreshDoctorsList();
+        refreshServicedUnitList();
+        refreshUnitList();
+        refreshPersonnelList();
+        refreshOrganization();
+    }
 
+    public void showBloodnameDialog() {
+    	bloodnameDialog.setFaction(getCampaign().getFactionCode());
+    	bloodnameDialog.setYear(getCampaign().getCalendar().get(java.util.Calendar.YEAR));
+    	bloodnameDialog.setVisible(true);
+    }
+    
     private void initComponents() {
 
         resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI");
@@ -747,7 +768,7 @@ public class CampaignGUI extends JPanel {
         panBriefing.add(new JLabel(resourceMap.getString("lblMission.text")), gridBagConstraints);
 
         choiceMission = new JComboBox();
-        choiceMission.addActionListener(new java.awt.event.ActionListener() {
+        choiceMission.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 changeMission();
             }
@@ -774,7 +795,7 @@ public class CampaignGUI extends JPanel {
 
         btnAddMission = new JButton(resourceMap.getString("btnAddMission.text")); // NOI18N
         btnAddMission.setToolTipText(resourceMap.getString("btnAddMission.toolTipText")); // NOI18N
-        btnAddMission.addActionListener(new java.awt.event.ActionListener() {
+        btnAddMission.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addMission();
             }
@@ -783,7 +804,7 @@ public class CampaignGUI extends JPanel {
 
         btnAddScenario = new JButton(resourceMap.getString("btnAddScenario.text")); // NOI18N
         btnAddScenario.setToolTipText(resourceMap.getString("btnAddScenario.toolTipText")); // NOI18N
-        btnAddScenario.addActionListener(new java.awt.event.ActionListener() {
+        btnAddScenario.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addScenario();
             }
@@ -792,7 +813,7 @@ public class CampaignGUI extends JPanel {
 
         btnEditMission = new JButton(resourceMap.getString("btnEditMission.text")); // NOI18N
         btnEditMission.setToolTipText(resourceMap.getString("btnEditMission.toolTipText")); // NOI18N
-        btnEditMission.addActionListener(new java.awt.event.ActionListener() {
+        btnEditMission.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 editMission();
             }
@@ -801,7 +822,7 @@ public class CampaignGUI extends JPanel {
 
         btnCompleteMission = new JButton(resourceMap.getString("btnCompleteMission.text")); // NOI18N
         btnCompleteMission.setToolTipText(resourceMap.getString("btnCompleteMission.toolTipText")); // NOI18N
-        btnCompleteMission.addActionListener(new java.awt.event.ActionListener() {
+        btnCompleteMission.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 completeMission();
             }
@@ -811,7 +832,7 @@ public class CampaignGUI extends JPanel {
         btnDeleteMission = new JButton(resourceMap.getString("btnDeleteMission.text")); // NOI18N
         btnDeleteMission.setToolTipText(resourceMap.getString("btnDeleteMission.toolTipText")); // NOI18N
         btnDeleteMission.setName("btnDeleteMission"); // NOI18N
-        btnDeleteMission.addActionListener(new java.awt.event.ActionListener() {
+        btnDeleteMission.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 deleteMission();
             }
@@ -864,7 +885,7 @@ public class CampaignGUI extends JPanel {
 
         btnStartGame = new JButton(resourceMap.getString("btnStartGame.text")); // NOI18N
         btnStartGame.setToolTipText(resourceMap.getString("btnStartGame.toolTipText")); // NOI18N
-        btnStartGame.addActionListener(new java.awt.event.ActionListener() {
+        btnStartGame.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 startScenario();
             }
@@ -874,7 +895,7 @@ public class CampaignGUI extends JPanel {
 
         btnJoinGame = new JButton(resourceMap.getString("btnJoinGame.text")); // NOI18N
         btnJoinGame.setToolTipText(resourceMap.getString("btnJoinGame.toolTipText")); // NOI18N
-        btnJoinGame.addActionListener(new java.awt.event.ActionListener() {
+        btnJoinGame.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 joinScenario();
             }
@@ -884,7 +905,7 @@ public class CampaignGUI extends JPanel {
 
         btnLoadGame = new JButton(resourceMap.getString("btnLoadGame.text")); // NOI18N
         btnLoadGame.setToolTipText(resourceMap.getString("btnLoadGame.toolTipText")); // NOI18N
-        btnLoadGame.addActionListener(new java.awt.event.ActionListener() {
+        btnLoadGame.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 loadScenario();
             }
@@ -894,7 +915,7 @@ public class CampaignGUI extends JPanel {
 
         btnPrintRS = new JButton(resourceMap.getString("btnPrintRS.text")); // NOI18N
         btnPrintRS.setToolTipText(resourceMap.getString("btnPrintRS.toolTipText")); // NOI18N
-        btnPrintRS.addActionListener(new java.awt.event.ActionListener() {
+        btnPrintRS.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 printRecordSheets();
             }
@@ -905,7 +926,7 @@ public class CampaignGUI extends JPanel {
         btnGetMul = new JButton(resourceMap.getString("btnGetMul.text")); // NOI18N
         btnGetMul.setToolTipText(resourceMap.getString("btnGetMul.toolTipText")); // NOI18N
         btnGetMul.setName("btnGetMul"); // NOI18N
-        btnGetMul.addActionListener(new java.awt.event.ActionListener() {
+        btnGetMul.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 deployListFile();
             }
@@ -915,7 +936,7 @@ public class CampaignGUI extends JPanel {
 
         btnResolveScenario = new JButton(resourceMap.getString("btnResolveScenario.text")); // NOI18N
         btnResolveScenario.setToolTipText(resourceMap.getString("btnResolveScenario.toolTipText")); // NOI18N
-        btnResolveScenario.addActionListener(new java.awt.event.ActionListener() {
+        btnResolveScenario.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 resolveScenario();
             }
@@ -925,7 +946,7 @@ public class CampaignGUI extends JPanel {
 
         btnClearAssignedUnits = new JButton(resourceMap.getString("btnClearAssignedUnits.text")); // NOI18N
         btnClearAssignedUnits.setToolTipText(resourceMap.getString("btnClearAssignedUnits.toolTipText")); // NOI18N
-        btnClearAssignedUnits.addActionListener(new java.awt.event.ActionListener() {
+        btnClearAssignedUnits.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 clearAssignedUnits();
             }
@@ -972,7 +993,7 @@ public class CampaignGUI extends JPanel {
         panMapView.add(new JLabel(resourceMap.getString("lblFindPlanet.text")), gridBagConstraints);
 
         suggestPlanet = new JSuggestField(getFrame(), getCampaign().getPlanetNames());
-        suggestPlanet.addActionListener(new java.awt.event.ActionListener() {
+        suggestPlanet.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 Planet p = getCampaign().getPlanet(suggestPlanet.getText());
                 if (null != p) {
@@ -992,7 +1013,7 @@ public class CampaignGUI extends JPanel {
 
         JButton btnCalculateJumpPath = new JButton(resourceMap.getString("btnCalculateJumpPath.text")); // NOI18N
         btnCalculateJumpPath.setToolTipText(resourceMap.getString("btnCalculateJumpPath.toolTipText")); // NOI18N
-        btnCalculateJumpPath.addActionListener(new java.awt.event.ActionListener() {
+        btnCalculateJumpPath.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 calculateJumpPath();
             }
@@ -1008,7 +1029,7 @@ public class CampaignGUI extends JPanel {
 
         JButton btnBeginTransit = new JButton(resourceMap.getString("btnBeginTransit.text")); // NOI18N
         btnBeginTransit.setToolTipText(resourceMap.getString("btnBeginTransit.toolTipText")); // NOI18N
-        btnBeginTransit.addActionListener(new java.awt.event.ActionListener() {
+        btnBeginTransit.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 beginTransit();
             }
@@ -1100,7 +1121,7 @@ public class CampaignGUI extends JPanel {
         }
         choicePersonView = new JComboBox(personViewModel);
         choicePersonView.setSelectedIndex(0);
-        choicePersonView.addActionListener(new java.awt.event.ActionListener() {
+        choicePersonView.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 changePersonnelView();
             }
@@ -1197,7 +1218,7 @@ public class CampaignGUI extends JPanel {
         }
         choiceUnit = new JComboBox(unitGroupModel);
         choiceUnit.setSelectedIndex(0);
-        choiceUnit.addActionListener(new java.awt.event.ActionListener() {
+        choiceUnit.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 filterUnits();
             }
@@ -1224,7 +1245,7 @@ public class CampaignGUI extends JPanel {
         }
         choiceUnitView = new JComboBox(unitViewModel);
         choiceUnitView.setSelectedIndex(0);
-        choiceUnitView.addActionListener(new java.awt.event.ActionListener() {
+        choiceUnitView.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 changeUnitView();
             }
@@ -1378,7 +1399,7 @@ public class CampaignGUI extends JPanel {
         }
         choiceParts = new JComboBox(partsGroupModel);
         choiceParts.setSelectedIndex(0);
-        choiceParts.addActionListener(new java.awt.event.ActionListener() {
+        choiceParts.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 filterParts();
             }
@@ -1407,7 +1428,7 @@ public class CampaignGUI extends JPanel {
         }
         choicePartsView = new JComboBox(partsGroupViewModel);
         choicePartsView.setSelectedIndex(0);
-        choicePartsView.addActionListener(new java.awt.event.ActionListener() {
+        choicePartsView.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 filterParts();
             }
@@ -1529,7 +1550,7 @@ public class CampaignGUI extends JPanel {
         btnDoTaskWarehouse.setToolTipText(resourceMap.getString("btnDoTask.toolTipText")); // NOI18N
         btnDoTaskWarehouse.setEnabled(false);
         btnDoTaskWarehouse.setName("btnDoTask"); // NOI18N
-        btnDoTaskWarehouse.addActionListener(new java.awt.event.ActionListener() {
+        btnDoTaskWarehouse.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 doTask();
             }
@@ -1576,7 +1597,7 @@ public class CampaignGUI extends JPanel {
 
         btnShowAllTechsWarehouse = new JToggleButton(resourceMap.getString("btnShowAllTechs.text"));
         btnShowAllTechsWarehouse.setToolTipText(resourceMap.getString("btnShowAllTechs.toolTipText")); // NOI18N
-        btnShowAllTechsWarehouse.addActionListener(new java.awt.event.ActionListener() {
+        btnShowAllTechsWarehouse.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 filterTechs(true);
             }
@@ -1737,7 +1758,7 @@ public class CampaignGUI extends JPanel {
         btnDoTask = new JButton(resourceMap.getString("btnDoTask.text")); // NOI18N
         btnDoTask.setToolTipText(resourceMap.getString("btnDoTask.toolTipText")); // NOI18N
         btnDoTask.setEnabled(false);
-        btnDoTask.addActionListener(new java.awt.event.ActionListener() {
+        btnDoTask.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 doTask();
             }
@@ -1846,7 +1867,7 @@ public class CampaignGUI extends JPanel {
         btnShowAllTechs = new JToggleButton(resourceMap.getString("btnShowAllTechs.text")); // NOI18N
         btnShowAllTechs.setToolTipText(resourceMap.getString("btnShowAllTechs.toolTipText")); // NOI18N
         btnShowAllTechs.setName("btnShowAllTechs"); // NOI18N
-        btnShowAllTechs.addActionListener(new java.awt.event.ActionListener() {
+        btnShowAllTechs.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 filterTechs(false);
             }
@@ -1942,7 +1963,7 @@ public class CampaignGUI extends JPanel {
         btnAssignDoc = new JButton(resourceMap.getString("btnAssignDoc.text")); // NOI18N
         btnAssignDoc.setToolTipText(resourceMap.getString("btnAssignDoc.toolTipText")); // NOI18N
         btnAssignDoc.setEnabled(false);
-        btnAssignDoc.addActionListener(new java.awt.event.ActionListener() {
+        btnAssignDoc.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 assignDoctor();
             }
@@ -1955,7 +1976,7 @@ public class CampaignGUI extends JPanel {
 
         btnUnassignDoc = new JButton(resourceMap.getString("btnUnassignDoc.text")); // NOI18N
         btnUnassignDoc.setEnabled(false);
-        btnUnassignDoc.addActionListener(new java.awt.event.ActionListener() {
+        btnUnassignDoc.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 unassignDoctor();
             }
@@ -2099,7 +2120,7 @@ public class CampaignGUI extends JPanel {
 
         JPanel pnlFinanceBtns = new JPanel(new GridLayout(2, 2));
         btnAddFunds = new JButton("Add Funds (GM)");
-        btnAddFunds.addActionListener(new java.awt.event.ActionListener() {
+        btnAddFunds.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addFundsActionPerformed(evt);
             }
@@ -2107,7 +2128,7 @@ public class CampaignGUI extends JPanel {
         btnAddFunds.setEnabled(getCampaign().isGM());
         pnlFinanceBtns.add(btnAddFunds);
         JButton btnGetLoan = new JButton("Get Loan");
-        btnGetLoan.addActionListener(new java.awt.event.ActionListener() {
+        btnGetLoan.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 showNewLoanDialog();
             }
@@ -2115,7 +2136,7 @@ public class CampaignGUI extends JPanel {
         pnlFinanceBtns.add(btnGetLoan);
 
         btnManageAssets = new JButton("Manage Assets (GM)");
-        btnManageAssets.addActionListener(new java.awt.event.ActionListener() {
+        btnManageAssets.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 manageAssets();
             }
@@ -2158,7 +2179,7 @@ public class CampaignGUI extends JPanel {
         JMenu menuFile = new JMenu(resourceMap.getString("fileMenu.text")); // NOI18N
 
         JMenuItem menuLoad = new JMenuItem(resourceMap.getString("menuLoad.text")); // NOI18N
-        menuLoad.addActionListener(new java.awt.event.ActionListener() {
+        menuLoad.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuLoadXmlActionPerformed(evt);
             }
@@ -2166,7 +2187,7 @@ public class CampaignGUI extends JPanel {
         menuFile.add(menuLoad);
 
         JMenuItem menuSave = new JMenuItem(resourceMap.getString("menuSave.text")); // NOI18N
-        menuSave.addActionListener(new java.awt.event.ActionListener() {
+        menuSave.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuSaveXmlActionPerformed(evt);
             }
@@ -2183,7 +2204,7 @@ public class CampaignGUI extends JPanel {
          * and be clearly labeled as such
          * 
         miExportPerson.setText(resourceMap.getString("miExportPerson.text")); // NOI18N
-        miExportPerson.addActionListener(new java.awt.event.ActionListener() {
+        miExportPerson.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 miExportPersonActionPerformed(evt);
             }
@@ -2191,7 +2212,7 @@ public class CampaignGUI extends JPanel {
         menuExport.add(miExportPerson);
         
         miExportParts.setText(resourceMap.getString("miExportParts.text")); // NOI18N
-        miExportParts.addActionListener(new java.awt.event.ActionListener() {
+        miExportParts.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 miExportPartsActionPerformed(evt);
             }
@@ -2200,7 +2221,7 @@ public class CampaignGUI extends JPanel {
         */
         
         JMenuItem miExportOptions = new JMenuItem(resourceMap.getString("miExportOptions.text")); // NOI18N
-        miExportOptions.addActionListener(new java.awt.event.ActionListener() {
+        miExportOptions.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 miExportOptionsActionPerformed(evt);
             }
@@ -2208,7 +2229,7 @@ public class CampaignGUI extends JPanel {
         menuExport.add(miExportOptions);
 
         JMenuItem miExportPersonCSV = new JMenuItem(resourceMap.getString("miExportPersonCSV.text")); // NOI18N
-        miExportPersonCSV.addActionListener(new java.awt.event.ActionListener() {
+        miExportPersonCSV.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 exportTable(personnelTable, getCampaign().getName()
                                             + getCampaign().getShortDateAsString() + "_ExportedPersonnel" + ".csv");
@@ -2217,7 +2238,7 @@ public class CampaignGUI extends JPanel {
         menuExport.add(miExportPersonCSV);
 
         JMenuItem miExportUnitCSV = new JMenuItem(resourceMap.getString("miExportUnitCSV.text")); // NOI18N
-        miExportUnitCSV.addActionListener(new java.awt.event.ActionListener() {
+        miExportUnitCSV.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 exportTable(unitTable, getCampaign().getName()
                                        + getCampaign().getShortDateAsString() + "_ExportedUnit" + ".csv");
@@ -2226,7 +2247,7 @@ public class CampaignGUI extends JPanel {
         menuExport.add(miExportUnitCSV);
 
         JMenuItem miImportOptions = new JMenuItem(resourceMap.getString("miImportOptions.text")); // NOI18N
-        miImportOptions.addActionListener(new java.awt.event.ActionListener() {
+        miImportOptions.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 miImportOptionsActionPerformed(evt);
             }
@@ -2234,7 +2255,7 @@ public class CampaignGUI extends JPanel {
         menuImport.add(miImportOptions);
         
         JMenuItem miImportPerson = new JMenuItem(resourceMap.getString("miImportPerson.text")); // NOI18N
-        miImportPerson.addActionListener(new java.awt.event.ActionListener() {
+        miImportPerson.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 miImportPersonActionPerformed(evt);
             }
@@ -2242,7 +2263,7 @@ public class CampaignGUI extends JPanel {
         menuImport.add(miImportPerson);
 
         JMenuItem miImportParts = new JMenuItem(resourceMap.getString("miImportParts.text")); // NOI18N
-        miImportParts.addActionListener(new java.awt.event.ActionListener() {
+        miImportParts.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 miImportPartsActionPerformed(evt);
             }
@@ -2250,7 +2271,7 @@ public class CampaignGUI extends JPanel {
         menuImport.add(miImportParts);
 
         JMenuItem miLoadForces = new JMenuItem(resourceMap.getString("miLoadForces.text")); // NOI18N
-        miLoadForces.addActionListener(new java.awt.event.ActionListener() {
+        miLoadForces.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 miLoadForcesActionPerformed(evt);
             }
@@ -2263,7 +2284,7 @@ public class CampaignGUI extends JPanel {
 
 
         JMenuItem miMercRoster = new JMenuItem(resourceMap.getString("miMercRoster.text")); // NOI18N
-        miMercRoster.addActionListener(new java.awt.event.ActionListener() {
+        miMercRoster.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 showMercRosterDialog();
             }
@@ -2271,7 +2292,7 @@ public class CampaignGUI extends JPanel {
         menuFile.add(miMercRoster);
 
         JMenuItem menuOptions = new JMenuItem(resourceMap.getString("menuOptions.text")); // NOI18N
-        menuOptions.addActionListener(new java.awt.event.ActionListener() {
+        menuOptions.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuOptionsActionPerformed(evt);
             }
@@ -2279,7 +2300,7 @@ public class CampaignGUI extends JPanel {
         menuFile.add(menuOptions);
 
         JMenuItem menuOptionsMM = new JMenuItem(resourceMap.getString("menuOptionsMM.text")); // NOI18N
-        menuOptionsMM.addActionListener(new java.awt.event.ActionListener() {
+        menuOptionsMM.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuOptionsMMActionPerformed(evt);
             }
@@ -2292,7 +2313,7 @@ public class CampaignGUI extends JPanel {
         menuFile.add(menuThemes);
 
         JMenuItem menuExitItem = new JMenuItem("Exit");
-        menuExitItem.addActionListener(new java.awt.event.ActionListener() {
+        menuExitItem.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 getApplication().exit();
             }
@@ -2305,7 +2326,7 @@ public class CampaignGUI extends JPanel {
 
         // Personnel Market
         JMenuItem miPersonnelMarket = new JMenuItem("Personnel Market");
-        miPersonnelMarket.addActionListener(new java.awt.event.ActionListener() {
+        miPersonnelMarket.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 hirePersonMarket();
             }
@@ -2313,7 +2334,7 @@ public class CampaignGUI extends JPanel {
         menuMarket.add(miPersonnelMarket);
 
         JMenuItem miPurchaseUnit = new JMenuItem(resourceMap.getString("miPurchaseUnit.text")); // NOI18N
-        miPurchaseUnit.addActionListener(new java.awt.event.ActionListener() {
+        miPurchaseUnit.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 miPurchaseUnitActionPerformed(evt);
             }
@@ -2321,14 +2342,14 @@ public class CampaignGUI extends JPanel {
         menuMarket.add(miPurchaseUnit);
 
         JMenuItem miBuyParts = new JMenuItem(resourceMap.getString("miBuyParts.text")); // NOI18N
-        miBuyParts.addActionListener(new java.awt.event.ActionListener() {
+        miBuyParts.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buyParts();
             }
         });
         menuMarket.add(miBuyParts);
         JMenuItem miHireBulk = new JMenuItem("Hire Personnel in Bulk");
-        miHireBulk.addActionListener(new java.awt.event.ActionListener() {
+        miHireBulk.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 hireBulkPersonnel();
             }
@@ -2341,7 +2362,7 @@ public class CampaignGUI extends JPanel {
         for (int i = Person.T_MECHWARRIOR; i < Person.T_NUM; i++) {
             miHire = new JMenuItem(Person.getRoleDesc(i, getCampaign().getFaction().isClan())); // NOI18N
             miHire.setActionCommand(Integer.toString(i));
-            miHire.addActionListener(new java.awt.event.ActionListener() {
+            miHire.addActionListener(new ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     hirePerson(evt);
                 }
@@ -2353,7 +2374,7 @@ public class CampaignGUI extends JPanel {
         JMenu menuAstechPool = new JMenu("Astech Pool");
 
         JMenuItem miHireAstechs = new JMenuItem("Hire Astechs");
-        miHireAstechs.addActionListener(new java.awt.event.ActionListener() {
+        miHireAstechs.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Hire How Many Astechs?", 1, 0, 100);
                 pvcd.setVisible(true);
@@ -2368,7 +2389,7 @@ public class CampaignGUI extends JPanel {
         menuAstechPool.add(miHireAstechs);
 
         JMenuItem miFireAstechs = new JMenuItem("Release Astechs");
-        miFireAstechs.addActionListener(new java.awt.event.ActionListener() {
+        miFireAstechs.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Release How Many Astechs?", 1, 0, getCampaign().getAstechPool());
                 pvcd.setVisible(true);
@@ -2383,7 +2404,7 @@ public class CampaignGUI extends JPanel {
         menuAstechPool.add(miFireAstechs);
 
         JMenuItem miFullStrengthAstechs = new JMenuItem("Bring All Tech Teams to Full Strength");
-        miFullStrengthAstechs.addActionListener(new java.awt.event.ActionListener() {
+        miFullStrengthAstechs.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 int need = (getCampaign().getTechs().size() * 6) - getCampaign().getNumberAstechs();
                 if (need > 0) {
@@ -2396,7 +2417,7 @@ public class CampaignGUI extends JPanel {
         menuAstechPool.add(miFullStrengthAstechs);
 
         JMenuItem miFireAllAstechs = new JMenuItem("Release All Astechs from Pool");
-        miFireAllAstechs.addActionListener(new java.awt.event.ActionListener() {
+        miFireAllAstechs.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 getCampaign().decreaseAstechPool(getCampaign().getAstechPool());
                 refreshTechsList();
@@ -2408,7 +2429,7 @@ public class CampaignGUI extends JPanel {
 
         JMenu menuMedicPool = new JMenu("Medic Pool");
         JMenuItem miHireMedics = new JMenuItem("Hire Medics");
-        miHireMedics.addActionListener(new java.awt.event.ActionListener() {
+        miHireMedics.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Hire How Many Medics?", 1, 0, 100);
                 pvcd.setVisible(true);
@@ -2423,7 +2444,7 @@ public class CampaignGUI extends JPanel {
         menuMedicPool.add(miHireMedics);
 
         JMenuItem miFireMedics = new JMenuItem("Release Medics");
-        miFireMedics.addActionListener(new java.awt.event.ActionListener() {
+        miFireMedics.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Release How Many Medics?", 1, 0, getCampaign().getMedicPool());
                 pvcd.setVisible(true);
@@ -2437,7 +2458,7 @@ public class CampaignGUI extends JPanel {
         });
         menuMedicPool.add(miFireMedics);
         JMenuItem miFullStrengthMedics = new JMenuItem("Bring All Medical Teams to Full Strength");
-        miFullStrengthMedics.addActionListener(new java.awt.event.ActionListener() {
+        miFullStrengthMedics.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 int need = (getCampaign().getDoctors().size() * 4) - getCampaign().getNumberMedics();
                 if (need > 0) {
@@ -2449,7 +2470,7 @@ public class CampaignGUI extends JPanel {
         });
         menuMedicPool.add(miFullStrengthMedics);
         JMenuItem miFireAllMedics = new JMenuItem("Release All Medics from Pool");
-        miFireAllMedics.addActionListener(new java.awt.event.ActionListener() {
+        miFireAllMedics.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 getCampaign().decreaseMedicPool(getCampaign().getMedicPool());
                 refreshDoctorsList();
@@ -2463,7 +2484,7 @@ public class CampaignGUI extends JPanel {
         JMenu menuReports = new JMenu(resourceMap.getString("menuReports.text")); // NOI18N
 
         JMenuItem miDragoonsRating = new JMenuItem(resourceMap.getString("miDragoonsRating.text")); // NOI18N
-        miDragoonsRating.addActionListener(new java.awt.event.ActionListener() {
+        miDragoonsRating.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 showReport(new RatingReport(getCampaign()));
             }
@@ -2471,7 +2492,7 @@ public class CampaignGUI extends JPanel {
         menuReports.add(miDragoonsRating);
 
         JMenuItem miPersonnelReport = new JMenuItem(resourceMap.getString("miPersonnelReport.text")); // NOI18N
-        miPersonnelReport.addActionListener(new java.awt.event.ActionListener() {
+        miPersonnelReport.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 showReport(new PersonnelReport(getCampaign()));
             }
@@ -2479,7 +2500,7 @@ public class CampaignGUI extends JPanel {
         menuReports.add(miPersonnelReport);
 
         JMenuItem miHangarBreakdown = new JMenuItem(resourceMap.getString("miHangarBreakdown.text")); // NOI18N
-        miHangarBreakdown.addActionListener(new java.awt.event.ActionListener() {
+        miHangarBreakdown.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 showReport(new HangarReport(getCampaign()));
             }
@@ -2487,7 +2508,7 @@ public class CampaignGUI extends JPanel {
         menuReports.add(miHangarBreakdown);
 
         JMenuItem miTransportReport = new JMenuItem(resourceMap.getString("miTransportReport.text")); // NOI18N
-        miTransportReport.addActionListener(new java.awt.event.ActionListener() {
+        miTransportReport.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 showReport(new TransportReport(getCampaign()));
             }
@@ -2495,7 +2516,7 @@ public class CampaignGUI extends JPanel {
         menuReports.add(miTransportReport);
 
         JMenuItem miCargoReport = new JMenuItem(resourceMap.getString("miCargoReport.text")); // NOI18N
-        miCargoReport.addActionListener(new java.awt.event.ActionListener() {
+        miCargoReport.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 showReport(new CargoReport(getCampaign()));
             }
@@ -2507,7 +2528,7 @@ public class CampaignGUI extends JPanel {
         JMenu menuCommunity = new JMenu(resourceMap.getString("menuCommunity.text")); // NOI18N
 
         JMenuItem miChat = new JMenuItem(resourceMap.getString("miChat.text")); // NOI18N
-        miChat.addActionListener(new java.awt.event.ActionListener() {
+        miChat.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 miChatActionPerformed(evt);
             }
@@ -2518,7 +2539,7 @@ public class CampaignGUI extends JPanel {
 
         JMenu menuView = new JMenu("View"); // NOI18N
         miDetachLog = new JMenuItem("Detach Daily Report Log"); // NOI18N
-        miDetachLog.addActionListener(new java.awt.event.ActionListener() {
+        miDetachLog.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 showDailyReportDialog();
             }
@@ -2527,13 +2548,26 @@ public class CampaignGUI extends JPanel {
 
         miAttachLog = new JMenuItem("Attach Daily Report Log"); // NOI18N
         miAttachLog.setEnabled(false);
-        miAttachLog.addActionListener(new java.awt.event.ActionListener() {
+        miAttachLog.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 hideDailyReportDialog();
             }
         });
         menuView.add(miAttachLog);
 
+        JMenuItem miBloodnameDialog = new JMenuItem("Show Bloodname Dialog...");
+        miBloodnameDialog.setEnabled(true);
+        miBloodnameDialog.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                showBloodnameDialog();
+            }
+        });
+        menuView.add(miBloodnameDialog);
+        
+        menuBar.add(menuView);
+        
+        JMenu menuManage = new JMenu("Manage Campaign");
+        menuManage.setName("manageMenu");
         JMenuItem miGMToolsDialog = new JMenuItem("Show GM Tools Dialog");
         miGMToolsDialog.setEnabled(true);
         miGMToolsDialog.addActionListener(new ActionListener() {
@@ -2541,15 +2575,24 @@ public class CampaignGUI extends JPanel {
                 showGMToolsDialog();
             }
         });
-        menuView.add(miGMToolsDialog);
-
-        menuBar.add(menuView);
+        menuManage.add(miGMToolsDialog);
+        JMenuItem miBloodnames = new JMenuItem("Randomize Bloodnames All Personnel");
+        miBloodnames.setEnabled(true);
+        miBloodnames.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+            	randomizeAllBloodnames();
+            }
+        });
+        menuManage.add(miBloodnames);
+        
+        menuBar.add(menuManage);
+        
 
         JMenu menuHelp = new JMenu(resourceMap.getString("helpMenu.text")); // NOI18N
         menuHelp.setName("helpMenu"); // NOI18N
         JMenuItem menuAboutItem = new JMenuItem("aboutMenuItem"); // NOI18N
         menuAboutItem.setText("About");
-        menuAboutItem.addActionListener(new java.awt.event.ActionListener() {
+        menuAboutItem.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 showAboutBox();
             }
@@ -2565,6 +2608,7 @@ public class CampaignGUI extends JPanel {
         panLog.setMinimumSize(new java.awt.Dimension(150, 100));
         logDialog = new DailyReportLogDialog(getFrame(), this, reportHLL);
         gmTools = new GMToolsDialog(getFrame());
+        bloodnameDialog = new BloodnameDialog(getFrame());
 
         mainPanel = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT, tabMain, panLog);
         mainPanel.setOneTouchExpandable(true);
@@ -2607,7 +2651,7 @@ public class CampaignGUI extends JPanel {
         btnGMMode = new JToggleButton(resourceMap.getString("btnGMMode.text")); // NOI18N
         btnGMMode.setToolTipText(resourceMap.getString("btnGMMode.toolTipText")); // NOI18N
         btnGMMode.setSelected(getCampaign().isGM());
-        btnGMMode.addActionListener(new java.awt.event.ActionListener() {
+        btnGMMode.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnGMModeActionPerformed(evt);
             }
@@ -2628,7 +2672,7 @@ public class CampaignGUI extends JPanel {
 
         btnOvertime = new JToggleButton(resourceMap.getString("btnOvertime.text")); // NOI18N
         btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText")); // NOI18N
-        btnOvertime.addActionListener(new java.awt.event.ActionListener() {
+        btnOvertime.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOvertimeActionPerformed(evt);
             }
@@ -2648,7 +2692,7 @@ public class CampaignGUI extends JPanel {
 
         btnAdvanceDay = new JButton(resourceMap.getString("btnAdvanceDay.text")); // NOI18N
         btnAdvanceDay.setToolTipText(resourceMap.getString("btnAdvanceDay.toolTipText")); // NOI18N
-        btnAdvanceDay.addActionListener(new java.awt.event.ActionListener() {
+        btnAdvanceDay.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 advanceDay();
             }
@@ -2743,7 +2787,7 @@ public class CampaignGUI extends JPanel {
             }
             menuThemes.add(miPlaf);
             miPlaf.setActionCommand(plaf.getClassName());
-            miPlaf.addActionListener(new java.awt.event.ActionListener() {
+            miPlaf.addActionListener(new ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     changeTheme(evt);
                 }
@@ -7840,6 +7884,17 @@ public class CampaignGUI extends JPanel {
                 epid.setVisible(true);
                 refreshPatientList();
                 refreshPersonnelList();
+            } else if (command.equalsIgnoreCase("BLOODNAME")) {
+            	for (Person p : people) {
+            		getCampaign().checkBloodnameAdd(p, p.getPrimaryRole(), true);
+            	}
+                getCampaign().personUpdated(selectedPerson);
+                refreshPatientList();
+                refreshDoctorsList();
+                refreshServicedUnitList();
+                refreshUnitList();
+                refreshPersonnelList();
+                refreshOrganization();
             } else if (command.equalsIgnoreCase("SALARY")) {
                 PopupValueChoiceDialog pcvd = new PopupValueChoiceDialog(frame, true, "Change Salary (-1 to remove custom salary)", selectedPerson.getSalary(), -1, 100000);
                 pcvd.setVisible(true);
@@ -7948,6 +8003,15 @@ public class CampaignGUI extends JPanel {
                 }
             }
             return true;
+        }
+        
+        private boolean areAllClanEligible(Person[] people) {
+        	for (Person p : people) {
+        		if (!p.isClanner()) {
+        			return false;
+        		}
+        	}
+        	return areAllEligible(people);
         }
 
         private boolean areAllEligible(Person[] people) {
@@ -8170,6 +8234,14 @@ public class CampaignGUI extends JPanel {
                     MenuScroller.setScrollerFor(menu, 20);
                 }
                 popup.add(menu);
+                // Bloodnames
+                if (areAllClanEligible(selected)) {
+                	menuItem = new JMenuItem("Give Random Bloodname");
+                    menuItem.setActionCommand("BLOODNAME");
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(areAllActive(selected));
+                    popup.add(menuItem);
+                }
                 // change salary
                 if (getCampaign().getCampaignOptions().payForSalaries()) {
                     menuItem = new JMenuItem("Set Salary...");
@@ -8680,7 +8752,7 @@ public class CampaignGUI extends JPanel {
                     popup.add(menuItem);
                 }
                 menuItem = new JMenuItem("Export Personnel");
-                menuItem.addActionListener(new java.awt.event.ActionListener() {
+                menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
                         miExportPersonActionPerformed(evt);
                     }
@@ -9062,7 +9134,7 @@ public class CampaignGUI extends JPanel {
                     popup.add(menuItem);
                 }
                 menuItem = new JMenuItem("Export Parts");
-                menuItem.addActionListener(new java.awt.event.ActionListener() {
+                menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
                         miExportPartsActionPerformed(evt);
                     }
@@ -10141,10 +10213,7 @@ public class CampaignGUI extends JPanel {
                     popup.add(menuItem);
                 }
                 // Customize
-                if (oneSelected && (unit.getEntity() instanceof Mech
-                                    || unit.getEntity() instanceof Tank
-                                    || unit.getEntity() instanceof Aero
-                                    || (unit.getEntity() instanceof Infantry))) {
+                if (oneSelected) {
                     menu = new JMenu("Customize");
                     menuItem = new JMenuItem("Choose Refit Kit...");
                     menuItem.setActionCommand("REFIT_KIT");
