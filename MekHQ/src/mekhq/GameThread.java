@@ -25,14 +25,14 @@ import mekhq.campaign.unit.Unit;
 class GameThread extends Thread implements CloseClientListener {
 
     // VARIABLES
-    private String myname;
-    private Client client;
-    private ClientGUI swingGui;
-    private MekHQ app;
+    protected String myname;
+    protected Client client;
+    protected ClientGUI swingGui;
+    protected MekHQ app;
 
-    private ArrayList<Unit> mechs = new ArrayList<Unit>();
+    protected ArrayList<Unit> mechs = new ArrayList<Unit>();
 
-    private volatile boolean stop = false;
+    protected volatile boolean stop = false;
     
     // CONSTRUCTOR
     public GameThread(String name, Client c, MekHQ app, ArrayList<Unit> mechs) {

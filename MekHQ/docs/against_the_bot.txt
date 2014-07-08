@@ -1,0 +1,122 @@
+Against the Bot for MekHq
+
+This document was written to assist testing of a patch for MekHq that implements the Against the Bot rules. It assumes some familiarity with the Against the Bot rules.
+
+Against the Bot is a set of solo campaign rules for use with MekHq, developed with input from the BattleTech forum community and maintained by Makinus. See http://bg.battletech.com/forums/index.php/topic,23390.0.html.
+
+Contents:
+1. Design philosophy
+2. Quick start guide
+3. List of features that were omitted, added, or changed
+4. Implementation details
+
+1. Design philosophy
+Against the Bot (AtB) can be used directly as written, but in practice most players use their own variation on the rules. Because of this, I have tried as much as possible to make the AtB additions to MekHq assist with the rules rather than enforcing them. Consequently I have been very sparing with requiring GM mode, and nearly everything done by the AtB code can be changed by the player.
+
+2. Quick start guide
+
+2.1 Starting an AtB campaign
+Any new campaign or existing campaign can be played using the AtB rules by going to the Against the Bot tab in the campaign options and clicking the checkbox at the top of the window. If the purpose of any of the options is not obvious through the label or the tip that appears when hovering over it, more explanation will be found below. It can be safely left at the default value for the time being.
+
+2.1.1 Converting an existing campaign
+When the AtB rules are enabled, MekHQ will fill in whatever default values are necessary for the system to function, but the player should adjust these. Any active contract will need to be edited to verify employer and mission type, and to set the enemy faction, skill levels, and equipment ratings. Completed contracts will only need to have the employer set correctly, and only if you want it to count toward a possible retainer contract. Mechwarriors (and ASF pilots, if you use the "treat ASF pilots as MWs option) will need to be edited to make sure that MekHQ has correctly guessed whether that pilot had a unit when he or she arrived. This is found on the GM Mode>Edit... menu on the Personnel tab. The default is to assume the oldest date in any of the personnel logs is the founding date of the unit, and anyone hired on that date is a founder (important if using the shares system). A Mechwarrior is assumed to have brought his or her own 'Mech if assigned to a non-Assault unit on the hire date (or any weight class if a founder).
+
+2.1.2 Starting a new AtB campaign
+I did not write any unit creation code. MekHQ will keep track of the original unit of any Mechwarrior hired through the Personnel Market, but those hired through the Hire menu who start with a 'Mech will need to be edited as above. Alternatively, you can wait until after creating the unit to enable the AtB rules and MekHQ will fill those values in as it converts the campaign to use the AtB rules (or disable then reenable AtB).
+
+2.2 Recruits
+The Personnel Market now includes Against the Bot as an option, but the AtB rules can be used with any of the market types. If playing with AtB rules, any infantry recruit represents a platoon/point/BA squad and MechWarriors and ProtoMech pilots (and optionally ASF pilots) have a chance of already having a unit. If using the employer/employee system, half the cost of the unit will need to be paid to hire the person.
+
+The Personnel Market is also used when not in contract for paid recruitment rolls and Dropship/Jumpship searches. The search will be made according to whatever values are set when advancing from Sunday to Monday.
+
+2.3 Contracts
+The Contract Market is generated on the first of each month, and contracts remain until the end of the month. It can be accessed through a link in the report window on the first of the month or through the Market menu at any time. If using the shares system, the share percentage needs to be set before accepting the contract.
+
+If you want to use a particular camo or bot name for your enemies or allies, you can do that by editing the mission in the Briefing Room tab.
+
+2.4 Unit Market
+The unit market is generated on the first of the month and remains available until the end of the month.  It can be accessed through a link in the report window on the first of the month or through the Market menu at any time.
+
+2.5 Scenarios
+
+2.5.1 Lance assignments
+The bottom right side of the Briefing Room tab shows the active contracts and how many lances are required to be deployed to each, and in which roles. Under that is a table of lances (extracted from the TO&E) which is used to assign lances to one of the four mission roles (fight, scout, defend, training). These values can be changed at any time as long as they are correct when advancing the day from Sunday to Monday. If all deployment requirements are not met you will get a warning that proceeding will result in one or more contract breaches.
+
+2.5.2 Battles
+Scenarios are generated automatically when advancing the day from Sunday to Monday based on the lance assignments. Unlike those create by the Add Scenario button, they have a set date and can only be played on that date. All enemy and allied forces will be generated using the RAT preference order indicated on the AtB tab in the campaign options. MekHQ will also generate map settings, starting locations, and battle conditions and these, along with the ally and enemy forces will be transferred to MegaMek. The player can customize bot settings by right-clicking on a force in the scenario view. Following the battle, MekHQ will track contract breaches for attached allies that were lost, calculate final payout for any personnel that were killed, and keep a running total of the contract score.
+
+2.5.3 Special missions/big battles
+Battles that result from contract special events can take place at any time during the month. The day of the month is generated randomly and the battle appears on the scenario list at the beginning of the week in which it occurs, along with standard battles. Unlike standard battles, which are generated for a specific lance, special missions and big battles require the player to select forces to deploy to the scenario before it can be played.
+
+2.6 Retirement/Defection rolls
+By default, MekHQ will require retirement/defection rolls at the end of a contract. Players wishing to follow a custom schedule instead can disable this and invoke the retirement/defection dialog at the appropriate time from the View menu. There is also an option to allow the player to add custom modifications to the target number, but note that in MekHQ I followed the convention of modifying the target rather than the roll, and the target number is what is required to retain the person (4 or less to retire becomes 5+ to retain), and positive modifiers make retirement more likely and negative numbers increase the chance of retention. Once the "Roll" button is clicked, the results become set and final payouts must be settled before advancing the day, as with overdue loan payments. If the dialog is canceled (such as to take out a loan or look at some details elsewhere in MekHQ), the dialog can be invoked again from the View menu and it will bring up the payment resolution view. There is also an option in GM mode to allow the player to edit the final payout terms.
+
+AtB 2.29 states that a retirement/defection roll must be made if a year passes without one (such as on a long contract). Requiring the roll suddenly and immediately, and probably unexpectedly, on the anniversary of the previous roll would likely be frustrating, so instead MekHQ will inform the player that it has been a year, but it is up to the player to take the step of making the roll at his or her earliest convenience.
+
+The retirement/defection dialog is also used for personnel who are sacked or killed in battle.
+
+When assigning units to dead or departing personnel, the required unit is presented as a class. Light-Assault units are class 1-4 if IS1; one higher if IS2 or Clan; and one lower if inoperable (an inoperable IS1 light 'Mech cannot be used as part of a final payout).
+
+The rules do not say what to do if there is no unit of the correct class. My solution is to allow lesser units to be given and to increase the payout amount by 3M C-bills per level of difference. Better units can be given, but there is no benefit to doing so. Units can also be given to other departing/deceased personnel to offset part or all of the payout amount, but any excess is lost. It is not possible to pay more than one unit per person simply to keep the interface manageable.
+
+2.7 Repair
+The repair location is set on all units (including salvage) recovered from a scenario, but nothing prevents a player from changing it. Part availability is also restricted by contract (unless disabled in the campaign options). If a unit is part of a lance that is assigned a deployment role, attempts to find parts for that unit will use the assigned contract for parts availability level. All other units, and any parts obtained through the Purchase Parts menu will use the most favorable contract if there is more than one active.
+
+If bonus parts are awarded through contract special events or rescuing civilian units, then a "Use Bonus Part" button will appear above the Acquisitions table on the Repair Bay tab and on the Purchase Parts dialog. When using a bonus part the acquisition roll is ignored and the part is delivered immediately. The number of bonus parts remaining is given in parentheses. Any bonus parts that are not used by the end of the contract are lost.
+
+3. Feature list
+3.1 Not implemented
+MekHQ does not (yet) implement the following parts of the AtB rules:
+* Unit creation
+* Pirate rules
+* Noble rules
+* "Other" factions (partial: independent planets and mercenary subcontracts are implemented, but corporations/regional governments/private citizens are not)
+* Special event related to Lostech units
+* Defections from 'Mech reassignments
+* The enemy capture rules are partially implemented from v2.18. If the option is enabled, MekHQ will determine which enemy personnel have been captured and which escape, but does not make defection rolls.
+
+3.2 Additional features
+* Skill level setting affects difficulty of enemy forces
+* Intensity setting allows adjustment of battle frequency
+* Localized campaigns, set within a certain radius (actually a by-product of the contract generation system)
+* Vehicles for Clan OpFors. If this option is enabled, the chance of any given Star being vehicles is 2-4 on 2d6 for a unit with a rating of F, with a +1 to the roll for every step the rating is above F, and -2 to the roll for Hell's Horses and Stone Lion. Because there are two vehicles in a Point, the number of vehicles is not doubled for Clan opponents.
+* All AtB rules that use the Dragoon Rating will use the IOps Beta reputation score if that is what the user selects. Every 10 points of reputation corresponds to one step of dragoon rating, so <10 is F, 10-19 is D, 20-29 is C, 30-39 is B, 40-49 is A, and 50+ is A*. If the user chooses not to use a rating system, the unit will be treated as if it has a C rating.
+
+3.3 Playing non-mercenary units
+The AtB rules are built around mercenary units, with optional rules for pirates and minor nobles. AtB campaigns in MekHQ can also play units from other factions, treating them effectively as permanent retainer contracts (including the bonus to each contract clause) that always have access to a hiring hall (per IOps Beta). This will suffice for most Inner Sphere factions.
+
+ComStar/Word of Blake units should set the unit organization in the campaign options to Level II, which increases the limit on lance size and weight by 50%. To run a ComStar campaign properly would required rules for covert missions, but ComStar is still a usable faction under the existing rules. It works best if played after the ComGuard was officially made public in 3030 and before they were disbanded in 3081. Opponents will include pirates, bandit kingdoms, rebels, independent worlds, Clans (after Tukayyid) and Word of Blake (after the loss of Terra). ComStar will also occasionally appear as an employer for mercernaries.
+
+Clan units should set the unit organization to Star, which not only increases the limits by 25%, but counts points rather than individual units. Players can also form novas (either standard 'Mechs and Battlearmor or vehicle+conventional infantry novas fielded by Hell's Horses) without crossing the limits.
+
+3.4 Features changed from the official AtB ruleset
+I tried to avoid making any outright changes (as opposed to alternatives) from the AtB rules, but there were two situations where I thought there was a compelling reason to do so.
+
+*Contract generation: the AtB rules have charts for employers and enemies for eras from 3025 to 3067. To make the rules work properly with MekHQ it was necessary to expand on that. Instead of using static charts, the AtB contract generator in MekHQ uses the faction and planet data already in MekHQ to determine employer and enemy factions on the fly, based on the current campaign date. See below for details on how it works. Once MekHQ was compiling the data, it was only one more step to select an appropriate system for the antagonists and contract type. The inclusion of the Deep Periphery and Clan space made it necessary to limit the range of the search; a Smoke Jaguar unit based on Huntress should not get a mission against the Draconis Combine, and the Hanseatic League is not likely to hire a merc unit based in Taurian space. Making the search radius variable gives another configuration option.
+
+*Parts availability was a nightmare to code consistently with the AtB chart, due to the wide variety of the way parts are handled in MekHQ (which is itself based on the way parts are handled in MegaMek). The problem was not just the amount of work involved, but the high probability of a large number of coding errors along the way that would be very tedious to track down. Instead I used the availability codes from the Technical Manual, which are already coded into MegaMek, with ammunition one level easier. The values are fairly close, though not identical. The alternative is to disable restricted parts availability in the campaign options and track it manually.
+
+4. Implementation details
+4.1 Contract generation
+Instead of employer and enemy charts in the Against the Bot rules, MekHQ effectively generates charts based on which factions control which systems at the time the contract is generated.
+
+The employer charts is the simplest one, and comes very close to the AtB table. The chance of a given faction offering a contract is proporional to the number of systems it controls: if faction A has 20 worlds and faction B has 10, faction A is twice as likely to offer a contract.
+
+The enemy is a bit more complicated. While going through the planet list to count how many systems are controlled by each faction, MekHQ also tracks how many planets within a certain number of jumps are controlled by potentially hostile factions. Once the employer is chosen, then the enemy is chosen from all the factions with systems within a certain distance of the employer, with the chance of any given one chosen being proportional to the number of planets within range. Through experimentation I have settled on a range of one jump (30 ly) for Inner Sphere factions, two jumps for Near Periphery, and seven jumps for Deep Periphery. This does not get as close to the AtB charts as the employer generation, but it comes reasonably close.
+
+The selection of an enemy actually has one more step. The data/universe/factionhints.xml file contains a list of wars, alliances, and Clan rivalries that are used to weight the possibilities differently. This data is also used to determine whether an employer is at war and it is necessary to check for contract extension due to emergency clause activation.
+
+Once the employer and enemy are selected, the location is selected from the planets controlled by the defender (employer in garrison-type contracts, enemy in assault or raid-type) within two jumps (seven jumps for Deep Periphery) of the attacker. Contracts against rebels can take place on any world controlled by the attacker, and pirate hunting contracts generally take place near a border with any rival.
+
+4.2 Random Assignment Tables (RATs)
+4.2.1 The method
+MekHQ+AtB is capable of selecting an appropriate table based on a set of criteria. The AtB tab on the Campaign Options dialog gives the player a chance to designate which sources to check in which order. When a random unit is needed, either for a scenario or for the unit or personnel market, MekHQ checks each source in turn until an acceptable table is found, using the following criteria:
+1. Is the campaign date equal to or later than the date on the source?
+2. Does this source have tables for the selected faction?
+3. Does this source contain tables for the type of unit sought?
+When all these conditions are met, the selected RAT will be used to select the unit. If not, the first step is to check alternate factions (such as CC for St Ives), then any appropriate generic factions (periphery, Clan, general). If an appropriate table is not found, then next step is to look for tables from an earlier era within the same source, then finally to move to the next source.
+
+If after all these steps an acceptable table is not found, it is most likely because the campaign is set before 3025 or MekHQ is trying to determine pre-3050 aerospace fighters. The fallback behavior is to roll any aerospace fighters on the War of '39 tables (randomly selecting one of the five successor states for other factions), then other units on Xotl 3028, and if there is still not match use the Total Warfare tables. If there is still no match, log an error and proceed without the unit. The only reason I can see it getting there is if for some reason it is trying to find a ProtoMech for a non-Clan faction, but I don't see a path to that possibility.
+
+4.2.2 Using custom RATs
+Because MekHQ+AtB selects tables based on certain criteria, you will need to provide details about any additional RATs you intend to use. This can be done by editing the data/universe/ratinfo.xml file and adding information about your custom RAT.

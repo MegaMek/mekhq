@@ -231,6 +231,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     /**
      * * End Advanced Medical ***
      */
+    
+    /* Against the Bot */
+    private boolean founder; // +1 share if using shares system
+    private int originalUnitWeight; // uses EntityWeightClass; 0 (Extra-Light) for no original unit
+    private int originalUnitTech; // 0 = IS1, 1 = IS2, 2 = Clan
+    private UUID originalUnitId;
 
     //lets just go ahead and pass in the campaign - to hell with OOP
     private Campaign campaign;
@@ -1028,7 +1034,19 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
             }
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</injuries>");
         }
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+        		+ "<founder>"
+        		+ founder
+        		+ "</founder>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+        		+ "<originalUnitWeight>"
+        		+ originalUnitWeight
+        		+ "</originalUnitWeight>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+        		+ "<originalUnitTech>"
+        		+ originalUnitTech
+        		+ "</originalUnitTech>");
+       pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
     }
 
     public static Person generateInstanceFromXML(Node wn, Campaign c, Version version) {
@@ -1231,6 +1249,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                         }
                         retVal.injuries.add(Injury.generateInstanceFromXML(wn3));
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase("founder")) {
+                    retVal.founder = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitWeight")) {
+                    retVal.originalUnitWeight = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitTech")) {
+                    retVal.originalUnitTech = Integer.parseInt(wn2.getTextContent());
                 }
             }
 
@@ -3173,4 +3197,78 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         		return Ranks.RPROF_MW;
 		}
 	}
+    
+    /* For use by Against the Bot retirement/defection rolls */
+    
+    public boolean isFounder() {
+    	return founder;
+    }
+    
+    public void setFounder(boolean founder) {
+    	this.founder = founder;
+    }
+    
+    public int getOriginalUnitWeight() {
+    	return originalUnitWeight;
+    }
+    
+    public void setOriginalUnitWeight(int weight) {
+    	originalUnitWeight = weight;
+    }
+    
+    public int getOriginalUnitTech() {
+    	return originalUnitTech;
+    }
+    
+    public void setOriginalUnitTech(int tech) {
+    	originalUnitTech = tech;
+    }
+    
+    public UUID getOriginalUnitId() {
+    	return originalUnitId;
+    }
+    
+    public void setOriginalUnitId(UUID id) {
+    	originalUnitId = id;
+    }
+    
+    public void setOriginalUnit(Unit unit) {
+    	originalUnitId = unit.getId();
+    	originalUnitTech = 0;
+    	if (unit.getEntity().isClan()) {
+    		originalUnitTech += 2;
+    	} else if (unit.getEntity().getTechLevel() > megamek.common.TechConstants.T_INTRO_BOXSET) {
+			originalUnitTech++;
+    	}
+    	originalUnitWeight = unit.getEntity().getWeightClass();        
+    }
+    
+    public int getNumShares() {
+    	int shares = 1;
+    	if (founder) {
+    		shares++;
+    	}
+    	shares += Math.max(-1, getExperienceLevel(false) - 2);
+    	
+    	if (getRank().isOfficer()) {
+            Ranks ranks = getRanks() == null ? campaign.getRanks() : getRanks();
+            int rankOrder = ranks.getOfficerCut();
+            while (rankOrder <= rank && rankOrder < Ranks.RC_NUM) {
+            	Rank rank = ranks.getAllRanks().get(rankOrder);
+            	if (!rank.getName(getProfession()).equals("-")) {
+            		shares++;;
+            	}
+            	rankOrder++;
+        	}
+    	}
+    	if (originalUnitWeight >= 1) {
+    		shares++;
+    	}
+    	if (originalUnitWeight >= 3) {
+    		shares++;
+    	}
+    	shares += originalUnitTech;
+    	
+    	return shares;
+    }
 }

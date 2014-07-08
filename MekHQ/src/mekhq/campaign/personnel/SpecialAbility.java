@@ -172,6 +172,10 @@ public class SpecialAbility implements MekHqXmlSerializable {
         return weight;
     }
     
+    public void setWeight(int weight) {
+    	this.weight = weight;
+    }
+    
     public Vector<SkillPrereq> getPrereqSkills() {
         return prereqSkills;
     }

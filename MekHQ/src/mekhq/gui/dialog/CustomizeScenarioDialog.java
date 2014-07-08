@@ -46,6 +46,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.AtBScenario;
 import mekhq.gui.model.LootTableModel;
 
 /**
@@ -176,7 +177,8 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
 	        gridBagConstraints.gridx = 1;
 	        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
 	        panMain.add(choiceStatus, gridBagConstraints);
-	        
+        }
+        if (!scenario.isCurrent() || (campaign.getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario)) {
 	        btnDate = new javax.swing.JButton();
 	        btnDate.setText(dateFormatter.format(date));
 	        btnDate.addActionListener(new java.awt.event.ActionListener() {
@@ -194,7 +196,8 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
 	        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
 	        panMain.add(btnDate, gridBagConstraints);
 
-        } else {          
+        } 
+        if (scenario.isCurrent()) {
             initLootPanel();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy++;
@@ -424,4 +427,5 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
             }
         }
     }
+    
 }

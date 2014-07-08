@@ -63,8 +63,6 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 	public final static int COM_LIAISON    = 2;
 	public final static int COM_INDEP      = 3;
 	public final static int COM_NUM        = 4;
-   
-	
 	
 	private Date startDate;
 	private Date endDate;
@@ -305,28 +303,56 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		return advanceAmount;
 	}
 	
+	protected void setAdvanceAmount(long amount) {
+		advanceAmount = amount;
+	}
+	
 	public long getFeeAmount() {
 		return feeAmount;
+	}
+	
+	protected void setFeeAmount(long amount) {
+		feeAmount = amount;
 	}
 
 	public long getBaseAmount() {
 		return baseAmount;
 	}
 	
+	protected void setBaseAmount(long amount) {
+		baseAmount = amount;
+	}
+	
 	public long getOverheadAmount() {
 		return overheadAmount;
 	}
 	
+	protected void setOverheadAmount(long amount) {
+		overheadAmount = amount;
+	}
+	
 	public long getSupportAmount() {
 		return supportAmount;
+	}
+	
+	protected void setSupportAmount(long amount) {
+		supportAmount = amount;
 	}
 
 	public long getTransportAmount() {
 		return transportAmount;
 	}
 	
+	protected void setTransportAmount(long amount) {
+		transportAmount = amount;
+	}
+	
 	public long getSigningBonusAmount() {
 		return signingAmount;
+	}
+	
+	protected void setSigningBonusAmount (long amount) {
+		signingAmount = amount;
 	}
 	
 	public long getMonthlyPayOut() {
@@ -434,8 +460,8 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		endDate = cal.getTime();
 	}
 	
-	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);
+	protected void writeToXmlBegin(PrintWriter pw1, int indent) {
+		super.writeToXmlBegin(pw1, indent);
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<nMonths>"
@@ -533,7 +559,6 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 				+"<salvagedByEmployer>"
 				+salvagedByEmployer
 				+"</salvagedByEmployer>");
-		writeToXmlEnd(pw1, indent);
 	}
 	
 	public void loadFieldsFromXmlNode(Node wn) throws ParseException {

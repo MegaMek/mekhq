@@ -99,9 +99,14 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Lance;
+import mekhq.campaign.market.ContractMarket;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
+import mekhq.campaign.market.UnitMarket;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
@@ -128,6 +133,7 @@ import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.RankTranslator;
 import mekhq.campaign.personnel.Ranks;
+import mekhq.campaign.personnel.RetirementDefectionTracker;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
@@ -140,6 +146,7 @@ import mekhq.campaign.universe.News;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planets;
+import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IPartWork;
@@ -205,6 +212,7 @@ public class Campaign implements Serializable {
 
     // hierarchically structured Force object to define TO&E
     private Force forces;
+    private Hashtable<Integer, Lance> lances; //AtB
 
     // calendar stuff
     public GregorianCalendar calendar;
@@ -212,6 +220,7 @@ public class Campaign implements Serializable {
     private SimpleDateFormat shortDateFormat;
 
     private String factionCode;
+    private String retainerEmployerCode; //AtB
     private Ranks ranks;
 
     private ArrayList<String> currentReport;
@@ -239,6 +248,9 @@ public class Campaign implements Serializable {
     private ShoppingList shoppingList;
 
     private PersonnelMarket personnelMarket;
+    private ContractMarket contractMarket; //AtB
+    private UnitMarket unitMarket; //AtB
+    private RetirementDefectionTracker retirementDefectionTracker; // AtB
 
     public Campaign() {
         game = new Game();
@@ -254,11 +266,13 @@ public class Campaign implements Serializable {
         overtime = false;
         gmMode = false;
         factionCode = "MERC";
+        retainerEmployerCode = null;
         Ranks.initializeRankSystems();
         ranks = Ranks.getRanksFromSystem(Ranks.RS_SL);
         forces = new Force(name);
         forceIds.put(new Integer(lastForceId), forces);
         lastForceId++;
+        lances = new Hashtable<Integer, Lance>();
         finances = new Finances();
         location = new CurrentLocation(Planets.getInstance().getPlanets()
                                               .get("Outreach"), 0);
@@ -275,6 +289,9 @@ public class Campaign implements Serializable {
         shoppingList = new ShoppingList();
         news = new News(calendar.get(Calendar.YEAR));
         personnelMarket = new PersonnelMarket();
+        contractMarket = new ContractMarket();
+        unitMarket = new UnitMarket();
+        retirementDefectionTracker = new RetirementDefectionTracker();
     }
     
     public Game getGame() {
@@ -333,6 +350,18 @@ public class Campaign implements Serializable {
     public Force getForces() {
         return forces;
     }
+    
+    public Hashtable<Integer, Lance> getLances() {
+    	return lances;
+    }
+    
+    public ArrayList<Lance> getLanceList() {
+    	ArrayList<Lance> retVal = new ArrayList<Lance>();
+    	for (Lance l : lances.values()) {
+    		retVal.add(l);
+    	}
+    	return retVal;
+    }
 
     public ShoppingList getShoppingList() {
         return shoppingList;
@@ -344,6 +373,72 @@ public class Campaign implements Serializable {
 
     public void generateNewPersonnelMarket() {
         personnelMarket.generatePersonnelForDay(this);
+    }
+    
+    public ContractMarket getContractMarket() {
+    	return contractMarket;
+    }
+    
+    public void generateNewContractMarket() {
+    	contractMarket.generateContractOffers(this);
+    }
+    
+    public UnitMarket getUnitMarket() {
+    	return unitMarket;
+    }
+    
+    public void generateNewUnitMarket() {
+    	unitMarket.generateUnitOffers(this);
+    }
+    
+    public RetirementDefectionTracker getRetirementDefectionTracker() {
+    	return retirementDefectionTracker;
+    }
+    
+    public boolean applyRetirement(long totalPayout, HashMap<UUID, UUID> unitAssignments) {
+		if (null != getRetirementDefectionTracker().getRetirees()) {
+			if (getFinances().debit(totalPayout,
+					Transaction.C_SALARY, "Final Payout", getDate())) {
+				for (UUID pid : getRetirementDefectionTracker().getRetirees()) {
+					if (getPerson(pid).isActive()) {
+						changeStatus(getPerson(pid), Person.S_RETIRED);
+						addReport(getPerson(pid).getName() + " has retired.");
+					}
+					if (Person.T_NONE != getRetirementDefectionTracker().getPayout(pid).getRecruitType()) {
+						getPersonnelMarket().addPerson(newPerson(getRetirementDefectionTracker().getPayout(pid).getRecruitType()));
+					}
+					if (getRetirementDefectionTracker().getPayout(pid).hasHeir()) {
+						Person p = newPerson(getPerson(pid).getPrimaryRole());
+						p.setOriginalUnitWeight(getPerson(pid).getOriginalUnitWeight());
+						p.setOriginalUnitTech(getPerson(pid).getOriginalUnitTech());
+						p.setOriginalUnitId(getPerson(pid).getOriginalUnitId());
+						if (unitAssignments.containsKey(pid)) {
+							getPersonnelMarket().addPerson(p, getUnit(unitAssignments.get(pid)).getEntity());
+						} else {
+							getPersonnelMarket().addPerson(p);
+						}
+					}
+					int dependents = getRetirementDefectionTracker().getPayout(pid).getDependents();
+			    	while(dependents > 0 ) {
+			    		Person p = newPerson(Person.T_ASTECH);
+			    		p.setDependent(true);
+			    		if (recruitPerson(p)) {
+			    			dependents--;
+			    		} else {
+			    			dependents = 0;
+			    		}
+			    	}
+					if (unitAssignments.containsKey(pid)) {
+						removeUnit(unitAssignments.get(pid));
+					}
+				}
+				getRetirementDefectionTracker().resolveAllContracts();
+				return true;
+			} else {
+				addReport("<font color='red'>You cannot afford to make the final payments.</font>");
+			}
+		}    	
+		return false;
     }
 
     public News getNews() {
@@ -364,6 +459,11 @@ public class Campaign implements Serializable {
         forceIds.put(new Integer(id), force);
         lastForceId = id;
 
+        if (campaignOptions.getUseAtB() && force.getUnits().size() > 0) {
+        	if (null == lances.get(id)) {
+        		lances.put(id, new Lance(force.getId(), this));
+        	}
+        }
     }
 
     public void moveForce(Force force, Force superForce) {
@@ -417,7 +517,30 @@ public class Campaign implements Serializable {
             force.addUnit(u.getId());
             u.setScenarioId(force.getScenarioId());
         }
+        
+        if (campaignOptions.getUseAtB()) {
+        	if (null != prevForce && prevForce.getUnits().size() == 0) {
+        		lances.remove(prevForce.getId());
+        	}
+        	if (null == lances.get(id)) {
+        		lances.put(id, new Lance(force.getId(), this));
+        	}
+        }
     }
+    
+    /** Adds force and all its subforces to the AtB lance table
+     */
+    
+    private void addAllLances(Force force) {
+		if (force.getUnits().size() > 0) {
+			lances.put(force.getId(), new Lance(force.getId(), this));
+		}
+		for (Force f : force.getSubForces()) {
+			addAllLances(f);
+		}    	
+    }
+    
+    
 
     /**
      * Add a mission to the campaign
@@ -1595,6 +1718,24 @@ public class Campaign implements Serializable {
         news.loadNewsFor(calendar.get(Calendar.YEAR));
 
     }
+    
+    public int getDeploymentDeficit(AtBContract contract) {
+    	int total = -contract.getRequiredLances();
+    	int role = -Math.max(1, contract.getRequiredLances() / 2);
+    	for (Lance l : lances.values()) {
+    		if (l.getMissionId() == contract.getId() && l.getRole() != Lance.ROLE_UNASSIGNED) {
+    			total++;
+    			if (l.getRole() == contract.getRequiredLanceType()) {
+    				role++;
+    			}
+    		}
+    	}
+    	
+    	if (total >= 0 && role >= 0) {
+    		return 0;
+    	}
+    	return Math.max(total, role);
+    }
 
     public void newDay() {
         calendar.add(Calendar.DAY_OF_MONTH, 1);
@@ -1614,6 +1755,200 @@ public class Campaign implements Serializable {
 
         // Manage the personnel market
         personnelMarket.generatePersonnelForDay(this);
+
+        if (campaignOptions.getUseAtB()) {
+        	contractMarket.generateContractOffers(this);
+        	unitMarket.generateUnitOffers(this);
+        	
+        	//Add or remove dependents
+            if (calendar.get(Calendar.DAY_OF_YEAR) == 1) {
+            	int numPersonnel = 0;
+            	ArrayList<Person> dependents = new ArrayList<Person>();
+            	for (Person p : personnel) {
+            		if (p.isActive()) {
+            			numPersonnel++;
+            			if (p.isDependent()) {
+            				dependents.add(p);
+            			}
+            		}
+            	}
+            	int roll = Compute.d6(2) + AtBContract.getUnitRatingMod(this) - 2;
+            	if (roll < 2) roll = 2;
+            	if (roll > 12) roll = 12;
+            	int change = numPersonnel * (roll - 5) / 100;
+            	while (change < 0 && dependents.size() > 0) {
+            		removePerson(dependents.get(Compute.randomInt(dependents.size())).getId());
+            		change++;
+            	}
+            	while (change > 0 && recruitPerson(newPerson(Person.T_ASTECH))) {
+            		change--;
+            	}
+            }
+        	
+        	for (Mission m : missions) {
+        		if (!m.isActive() || !(m instanceof AtBContract) ||
+						getDate().before(((Contract)m).getStartDate())) {
+        			continue;
+        		}
+        		/* Situations like a delayed start or running out of funds during transit
+        		 * can delay arrival until after the contract start. In that case, shift the
+        		 * starting and ending dates before making any battle rolls. We check that the
+        		 * unit is actually on route to the planet in case the user is using a custom system
+        		 * for transport or splitting the unit, etc.
+        		 */
+        		if (!getLocation().isOnPlanet() &&
+        				getLocation().getJumpPath().getLastPlanet().getName().equals(m.getPlanetName())) {
+        			/*transitTime is measured in days; round up to the next
+        			 * whole day, then convert to milliseconds */
+        			GregorianCalendar cal = (GregorianCalendar)calendar.clone();
+        			cal.add(Calendar.DATE, (int)Math.ceil(getLocation().getTransitTime()));
+        			((AtBContract)m).getStartDate().setTime(cal.getTimeInMillis());
+        			cal.add(Calendar.MONTH, ((AtBContract)m).getLength());
+        			((AtBContract)m).getEndingDate().setTime(cal.getTimeInMillis());
+        			addReport("The start and end dates of " + m.getName() +
+        					" have been shifted to reflect the current ETA.");
+        			continue;
+           		}
+            	if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
+            		int deficit = getDeploymentDeficit((AtBContract)m);
+            		if (deficit > 0) {
+            			((AtBContract)m).addPlayerMinorBreaches(deficit);
+            			addReport("Failure to meet " + m.getName() +
+            					" requirements resulted in " + deficit +
+            					((deficit==1)?" minor contract breach":" minor contract breaches"));
+            		}
+            	}
+        		
+        		for (Scenario s : m.getScenarios()) {
+        			if (!s.isCurrent() || !(s instanceof AtBScenario)) {
+        				continue;
+        			}
+        			if (s.getDate().before(calendar.getTime())) {
+        				s.setStatus(Scenario.S_DEFEAT);
+        				((AtBContract)m).addPlayerMinorBreach();
+        				addReport("Failure to deploy for " + s.getName() +
+        						" resulted in defeat and a minor contract breach.");
+        			}
+        		}
+        	}
+
+        	/* Iterate through the list of lances and make a battle roll for each,
+        	 * then sort them by date before adding them to the campaign.
+        	 * Contracts with enemy morale level of invincible have a base attack
+        	 * (defender) battle each week. If there is a base attack (attacker)
+        	 * battle, that is the only one for the week on that contract.
+        	 */
+        	if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
+        		ArrayList<AtBScenario> sList = new ArrayList<AtBScenario>();
+        		AtBScenario baseAttack = null;
+        		
+        		for (Lance l : lances.values()) {
+        			if (null == l.getContract(this) || !l.getContract(this).isActive() ||
+        					getDate().before(l.getContract(this).getStartDate())) {
+        				continue;
+        			}
+        			if (l.getRole() == Lance.ROLE_TRAINING) {
+        				awardTrainingXP(l);
+        			}
+        			if (l.getContract(this).getMoraleLevel() <= AtBContract.MORALE_VERYLOW ||
+        					l.getContract(this).enemyIsRouted(getDate())) {
+        				continue;
+        			}
+        			AtBScenario scenario = l.checkForBattle(this);
+        			if (null != scenario) {
+            			scenario.setMissionId(l.getContract(this).getId());
+        				if (scenario.getBattleType() == AtBScenario.BASEATTACK && scenario.isAttacker()) {
+        					baseAttack = scenario;
+        					break;
+        				}
+        				sList.add(scenario);
+        			}
+        		}
+
+        		/* If there is a base attack (attacker), all other battles on
+        		 * that contract are cleared.
+        		 */
+        		if (null != baseAttack) {
+        			ArrayList<Scenario> sameContract = new ArrayList<Scenario>();
+        			for (AtBScenario s : sList) {
+        				if (s != baseAttack && s.getId() == baseAttack.getId()) {
+        					sameContract.add(s);
+        				}
+        			}
+        			sList.removeAll(sameContract);
+        		}
+        		
+        		/* Make sure invincible morale has base attack */
+        		for (Mission m : missions) {
+        			if (m.isActive() && m instanceof AtBContract &&
+        					((AtBContract)m).getMoraleLevel() == AtBContract.MORALE_INVINCIBLE) {
+    					boolean hasBaseAttack = false;
+        				for (AtBScenario s : sList) {
+        					if (s.getMissionId() == m.getId() &&
+        							s.getBattleType() == AtBScenario.BASEATTACK &&
+        							!s.isAttacker()) {
+        						hasBaseAttack = true;
+        						break;
+        					}
+        				}
+        				if (!hasBaseAttack) {
+        					ArrayList<Lance> lList = new ArrayList<Lance>();
+	        				for (Lance l : lances.values()) {
+	        					if (l.getMissionId() == m.getId()) {
+	        						lList.add(l);
+	        					}
+	        				}
+	        				if (lList.size() > 0) {
+	        					Lance lance = lList.get(Compute.randomInt(lList.size()));
+	        					AtBScenario scenario = new AtBScenario(this, lance,
+	        							AtBScenario.BASEATTACK, false,
+	        							Lance.getBattleDate(calendar));
+	        					for (int i = 0; i < sList.size(); i++) {
+	        						if (sList.get(i).getLanceForceId() ==
+	        								lance.getForceId()) {
+	        							sList.set(i, scenario);
+	        							break;
+	        						}
+	        					}
+	        					if (!sList.contains(scenario)) {
+	        						sList.add(scenario);
+	        					}
+	        				} else {
+	        					//What to do if there are no lances assigned to this contract?
+	        				}
+        				}
+        			}
+        		}
+        		
+        		/* Sort by date and add to the campaign */
+        		Collections.sort(sList, new Comparator<AtBScenario>() {
+					public int compare(AtBScenario s1, AtBScenario s2) {
+						return s1.getDate().compareTo(s2.getDate());
+					}
+        		});
+        		for (AtBScenario s : sList) {
+        			addScenario(s, missionIds.get(s.getMissionId()));
+        			s.setForces(this);
+        			if (null != lances.get(s.getLanceForceId())) {
+        				forceIds.get(s.getLanceForceId()).setScenarioId(s.getId());
+        				s.addForces(s.getLanceForceId());
+        				for (UUID uid : forceIds.get(s.getLanceForceId()).getAllUnits()) {
+        					Unit u = getUnit(uid);
+        					if (null != u) {
+        						u.setScenarioId(s.getId());
+        					}
+        				}
+        			}
+        		}
+        	}
+        	
+        	for (Mission m : missions) {
+        		if (m.isActive() && m instanceof AtBContract &&
+        				!((AtBContract)m).getStartDate().after(getDate())) {
+        			((AtBContract)m).checkEvents(this);
+        		}
+        	}
+        }
 
         for (Person p : getPersonnel()) {
             if (!p.isActive()) {
@@ -1801,6 +2136,19 @@ public class Campaign implements Serializable {
                           + formatter.format(contract.getMonthlyPayOut())
                           + " C-bills for the monthly payout from contract "
                           + contract.getName());
+
+            	if (campaignOptions.getUseAtB() && campaignOptions.getUseShareSystem() && contract instanceof AtBContract) {
+            		long shares = contract.getMonthlyPayOut() * ((AtBContract)contract).getSharesPct() / 100;
+            		if (finances.debit(shares, Transaction.C_SALARY, "Shares payments for " + contract.getName(),
+            				calendar.getTime())) {
+            			addReport(formatter.format(shares) + " C-bills have been distributed as shares.");
+            		} else {
+            			/* This should not happen, as the shares payment is less than the contract payment that
+            			 * has just been made. 
+            			 */
+            			addReport("<font color='red'><b>You cannot afford to pay shares!</b></font> Lucky for you that personnel morale is not yet implemented.");
+            		}
+            	}
             }
             // Payday!
             if (campaignOptions.payForSalaries()) {
@@ -1823,6 +2171,24 @@ public class Campaign implements Serializable {
                 } else {
                     addReport("<font color='red'><b>You cannot afford to pay overhead costs!</b></font> Lucky for you that this does not appear to have any effect.");
                 }
+            }
+            if (campaignOptions.getUseAtB()) {
+            	
+            	RandomFactionGenerator.getInstance().updateTables(calendar.getTime(),
+            			location.getCurrentPlanet(), campaignOptions);
+                IUnitRating rating = UnitRatingFactory.getUnitRating(this);
+                rating.reInitialize();
+
+                for (Mission m : missions) {
+            		if (m.isActive() && m instanceof AtBContract &&
+            				!((AtBContract)m).getStartDate().after(getDate())) {
+            			((AtBContract)m).checkMorale(calendar, AtBContract.getUnitRatingMod(this));
+            			addReport("Enemy morale is now " +
+            					((AtBContract)m).getMoraleLevelName() + " on contract " +
+            					m.getName());
+            		}
+            	}
+            	//generate market
             }
         }
         // check for anything else in finances
@@ -1972,6 +2338,24 @@ public class Campaign implements Serializable {
             astechPoolOvertime = Math.max(0, astechPoolOvertime - 120);
         }
     }
+    
+    private void awardTrainingXP(Lance l) {
+		for (UUID trainerId : forceIds.get(l.getForceId()).getAllUnits()) {
+			if (getUnit(trainerId).getCommander().getRank().isOfficer() &&
+					getUnit(trainerId).getEntity().getCrew().getGunnery() +
+					getUnit(trainerId).getEntity().getCrew().getPiloting() <= 6) {
+				for (UUID traineeId : forceIds.get(l.getForceId()).getAllUnits()) {
+					for (Person p : getUnit(traineeId).getCrew()) {
+						if (p.getExperienceLevel(false) < SkillType.EXP_REGULAR) {
+							p.setXp(p.getXp() + 1);
+			                addReport(p.getHyperlinkedName() + " has gained 1 XP from training.");
+						}
+					}
+				}
+				break;
+			}
+		}
+    }
 
     public void removeAllPatientsFor(Person doctor) {
         for (Person p : personnel) {
@@ -2049,6 +2433,11 @@ public class Campaign implements Serializable {
             Scenario s = getScenario(force.getScenarioId());
             s.removeForce(fid);
         }
+        
+        if (campaignOptions.getUseAtB()) {
+        	lances.remove(fid);
+        }
+        
         if (null != force.getParentForce()) {
             force.getParentForce().removeSubForce(fid);
         }
@@ -2079,6 +2468,10 @@ public class Campaign implements Serializable {
             }
             u.getEntity().setC3MasterIsUUIDAsString(null);
             u.getEntity().setC3Master(null, true);
+            
+            if (campaignOptions.getUseAtB() && force.getUnits().size() == 0) {
+            	lances.remove(force.getId());
+            }
         }
     }
 
@@ -2122,6 +2515,11 @@ public class Campaign implements Serializable {
         }
 
         shoppingList.restore();
+        
+		if (getCampaignOptions().getUseAtB()) {
+			RandomFactionGenerator.getInstance().updateTables(getDate(),
+					location.getCurrentPlanet(), getCampaignOptions());
+		}
     }
 
     public boolean isOvertimeAllowed() {
@@ -2156,6 +2554,14 @@ public class Campaign implements Serializable {
         return factionCode;
     }
 
+    public String getRetainerEmployerCode() {
+    	return retainerEmployerCode;
+    }
+    
+    public void setRetainerEmployerCode(String code) {
+    	retainerEmployerCode = code;
+    }
+    
     public void addReport(String r) {
         currentReport.add(r);
     }
@@ -2456,6 +2862,20 @@ public class Campaign implements Serializable {
 
         // Personnel Market
         personnelMarket.writeToXml(pw1, 1);
+        
+        // Against the Bot
+        if (getCampaignOptions().getUseAtB()) {
+            contractMarket.writeToXml(pw1, 1);
+            unitMarket.writeToXml(pw1, 1);
+            if (lances.size() > 0)   {
+            	pw1.println("\t<lances>");
+            	for (Lance l : lances.values()) {
+            		l.writeToXml(pw1, 2);
+            	}
+            	pw1.println("\t</lances>");
+            }
+            retirementDefectionTracker.writeToXml(pw1, 1);
+        }
 
         writeCustoms(pw1);
         // Okay, we're done.
@@ -2674,6 +3094,8 @@ public class Campaign implements Serializable {
         }
 
         boolean foundPersonnelMarket = false;
+        boolean foundContractMarket = false;
+        boolean foundUnitMarket = false;
 
         // Okay, lets iterate through the children, eh?
         for (int x = 0; x < nl.getLength(); x++) {
@@ -2731,6 +3153,18 @@ public class Campaign implements Serializable {
                     retVal.personnelMarket = PersonnelMarket.generateInstanceFromXML(
                             wn, retVal, version);
                     foundPersonnelMarket = true;
+                } else if (xn.equalsIgnoreCase("contractMarket")) {
+                    retVal.contractMarket = ContractMarket.generateInstanceFromXML(
+                            wn, retVal, version);
+                    foundContractMarket = true;
+                } else if (xn.equalsIgnoreCase("unitMarket")) {
+                    retVal.unitMarket = UnitMarket.generateInstanceFromXML(
+                            wn, retVal, version);
+                    foundUnitMarket = true;
+                } else if (xn.equalsIgnoreCase("lances")) {
+                	processLanceNodes(retVal, wn);
+                } else if (xn.equalsIgnoreCase("retirementDefectionTracker")) {
+                	retVal.retirementDefectionTracker = RetirementDefectionTracker.generateInstanceFromXML(wn, retVal);
                 }
 
             } else {
@@ -2745,6 +3179,16 @@ public class Campaign implements Serializable {
         if (!foundPersonnelMarket) {
             retVal.personnelMarket = new PersonnelMarket(retVal);
         }
+        if (!foundContractMarket) {
+            retVal.contractMarket = new ContractMarket();
+        }
+        if (!foundUnitMarket) {
+            retVal.unitMarket = new UnitMarket();
+        }
+        if (null == retVal.retirementDefectionTracker) {
+        	retVal.retirementDefectionTracker = new RetirementDefectionTracker();
+        }
+        
 
         // Okay, after we've gone through all the nodes and constructed the
         // Campaign object...
@@ -3121,7 +3565,7 @@ public class Campaign implements Serializable {
                 MekHQ.logMessage("More than one type-level force found", 5);
             }
         }
-
+        
         MekHQ.logMessage("Load of Force Organization complete!");
     }
 
@@ -3772,6 +4216,35 @@ public class Campaign implements Serializable {
         }
     }
 
+    private static void processLanceNodes(Campaign retVal, Node wn) {
+        NodeList wList = wn.getChildNodes();
+
+        // Okay, lets iterate through the children, eh?
+        for (int x = 0; x < wList.getLength(); x++) {
+            Node wn2 = wList.item(x);
+
+            // If it's not an element node, we ignore it.
+            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (!wn2.getNodeName().equalsIgnoreCase("lance")) {
+                // Error condition of sorts!
+                // Errr, what should we do here?
+                MekHQ.logMessage("Unknown node type not loaded in Lance nodes: "
+                                 + wn2.getNodeName());
+
+                continue;
+            }
+
+            Lance l = Lance.generateInstanceFromXML(wn2);
+
+            if (l != null) {
+            	retVal.lances.put(l.getForceId(), l);
+            }
+        }
+    }
+
     public ArrayList<Planet> getPlanets() {
         ArrayList<Planet> plnts = new ArrayList<Planet>();
         for (String key : Planets.getInstance().getPlanets().keySet()) {
@@ -4026,49 +4499,7 @@ public class Campaign implements Serializable {
         if (getCampaignOptions().useAbilities()) {
             int nabil = Utilities.rollSpecialAbilities(rskillPrefs
                                                                .getSpecialAbilBonus(expLvl));
-            while (nabil > 0) {
-                ArrayList<SpecialAbility> abilityList = person.getEligibleSPAs(true);
-                if(abilityList.isEmpty()) {
-                    nabil = 0;
-                    continue;
-                }
-                    
-                // create a weighted list based on XP
-                ArrayList<String> weightedList = new ArrayList<String>();
-                for (SpecialAbility spa : abilityList) {
-                    int weight = spa.getWeight();
-                    while (weight > 0) {
-                        weightedList.add(spa.getName());
-                        weight--;
-                    }
-                }
-                String name = weightedList.get(Compute.randomInt(weightedList
-                                                                         .size()));
-                if (name.equals("specialist")) {
-                    String special = Crew.SPECIAL_NONE;
-                    switch (Compute.randomInt(2)) {
-                        case 0:
-                            special = Crew.SPECIAL_LASER;
-                            break;
-                        case 1:
-                            special = Crew.SPECIAL_BALLISTIC;
-                            break;
-                        case 2:
-                            special = Crew.SPECIAL_MISSILE;
-                            break;
-                    }
-                    person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
-                                          special);
-                } else if (name.equals("weapon_specialist")) {
-                    person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
-                                          SpecialAbility.chooseWeaponSpecialization(type,
-                                                                               getFaction().isClan(), getCampaignOptions()
-                                                  .getTechLevel(),
-                                                                               getCalendar().get(GregorianCalendar.YEAR)));
-                } else {
-                    person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
-                                          true);
-                }
+            while (nabil > 0 && null != rollSPA(type, person)) {
                 nabil--;
             }
         }
@@ -4076,7 +4507,10 @@ public class Campaign implements Serializable {
             assignRandomPortraitFor(person);
         }
         //check for Bloodname
-        checkBloodnameAdd(person, type);
+        if (person.isClanner()) {
+        	checkBloodnameAdd(person, type);
+        }
+        
         return person;
     }
     
@@ -4193,6 +4627,51 @@ public class Campaign implements Serializable {
         }
     }
 
+	public String rollSPA(int type, Person person) {
+		ArrayList<SpecialAbility> abilityList = person.getEligibleSPAs(true);
+		if(abilityList.isEmpty()) {
+                    return null;
+		}
+		    
+		// create a weighted list based on XP
+		ArrayList<String> weightedList = new ArrayList<String>();
+		for (SpecialAbility spa : abilityList) {
+		    int weight = spa.getWeight();
+		    while (weight > 0) {
+		        weightedList.add(spa.getName());
+		        weight--;
+		    }
+		}
+		String name = weightedList.get(Compute.randomInt(weightedList
+		                                                         .size()));
+		if (name.equals("specialist")) {
+		    String special = Crew.SPECIAL_NONE;
+		    switch (Compute.randomInt(2)) {
+		        case 0:
+		            special = Crew.SPECIAL_LASER;
+		            break;
+		        case 1:
+		            special = Crew.SPECIAL_BALLISTIC;
+		            break;
+		        case 2:
+		            special = Crew.SPECIAL_MISSILE;
+		            break;
+		    }
+		    person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
+		                          special);
+		} else if (name.equals("weapon_specialist")) {
+		    person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
+		                          SpecialAbility.chooseWeaponSpecialization(type,
+		                                                               getFaction().isClan(), getCampaignOptions()
+		                                  .getTechLevel(),
+		                                                               getCalendar().get(GregorianCalendar.YEAR)));
+		} else {
+		    person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
+		                          true);
+		}
+		return name;
+	}
+
     public Ranks getRanks() {
         return ranks;
     }
@@ -4285,8 +4764,8 @@ public class Campaign implements Serializable {
         while (!found && jumps < 10000) {
             jumps++;
             int currentG = scoreG.get(current) + 1;
-            ArrayList<String> neighborKeys = getAllReachablePlanetsFrom(Planets
-                                                                                .getInstance().getPlanets().get(current));
+            ArrayList<String> neighborKeys = Planets.getNearbyPlanets(Planets
+            		.getInstance().getPlanets().get(current), 30);
             for (String neighborKey : neighborKeys) {
                 if (closed.contains(neighborKey)) {
                     continue;
@@ -4341,14 +4820,7 @@ public class Campaign implements Serializable {
     }
 
     public ArrayList<String> getAllReachablePlanetsFrom(Planet planet) {
-        ArrayList<String> neighbors = new ArrayList<String>();
-        for (String key : Planets.getInstance().getPlanets().keySet()) {
-            Planet p = Planets.getInstance().getPlanets().get(key);
-            if (planet.getDistanceTo(p) <= 30.0) {
-                neighbors.add(key);
-            }
-        }
-        return neighbors;
+        return Planets.getNearbyPlanets(planet, 30);
     }
 
     /**
@@ -4674,11 +5146,72 @@ public class Campaign implements Serializable {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                                   "You cannot acquire parts of this tech level");
         }
+        if (getCampaignOptions().getUseAtB() &&
+        		getCampaignOptions().getRestrictPartsByMission() &&
+        		acquisition instanceof Part) {
+            int partAvailability = ((Part)acquisition).getAvailability(getEra());
+            if (acquisition instanceof EquipmentPart &&
+            		((EquipmentPart)acquisition).getType() instanceof megamek.common.AmmoType) {
+            	partAvailability--;
+            }
+        	if (partAvailability >
+        			findAtBPartsAvailabilityLevel(acquisition)) {
+                return new TargetRoll(TargetRoll.IMPOSSIBLE,
+                        "This part is not currently available to your unit.");       		
+        	}
+         }
         TargetRoll target = new TargetRoll(skill.getFinalSkillValue(),
                                            SkillType.getExperienceLevelName(skill.getExperienceLevel()));// person.getTarget(Modes.MODE_NORMAL);
         target.append(acquisition.getAllAcquisitionMods());
         return target;
     }
+    
+    public AtBContract getAttachedAtBContract(Unit unit) {
+		if (null != unit &&
+				null != lances.get(unit.getForceId())) {
+			return lances.get(unit.getForceId()).getContract(this);
+		}
+		return null;
+    }
+    
+    /**
+     * AtB: count all available bonus parts
+     * @return the total <code>int</code> number of bonus parts for all active contracts
+     */
+    public int totalBonusParts() {
+    	int retVal = 0;
+    	for (Mission m : missions) {
+    		if (m.isActive() && m instanceof AtBContract) {
+    			retVal += ((AtBContract)m).getNumBonusParts();
+    		}
+    	}
+    	return retVal;
+    }
+
+	private int findAtBPartsAvailabilityLevel(IAcquisitionWork acquisition) {
+		AtBContract contract = getAttachedAtBContract(acquisition.getUnit());
+		/* If the unit is not assigned to a contract, use the least restrictive active contract */
+		for (Mission m : missions) {
+			if (m.isActive() && m instanceof AtBContract) {
+				if (null == contract || ((AtBContract)m).getPartsAvailabilityLevel() > contract.getPartsAvailabilityLevel()) {
+					contract = (AtBContract)m;
+				}
+			}
+		}
+		if (null != contract) {
+			return contract.getPartsAvailabilityLevel();
+		}
+		/* If contract is still null, the unit is not in a contract.*/
+		int adminMod = SkillType.EXP_ULTRA_GREEN;
+		for (Person p :getAdmins()) {
+			if ((p.getPrimaryRole() == Person.T_ADMIN_LOG ||
+					p.getSecondaryRole() == Person.T_ADMIN_LOG) &&
+					p.getSkill(SkillType.S_ADMIN).getExperienceLevel() > adminMod) {
+				adminMod = p.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+			}
+		}
+		return AtBContract.getUnitRatingMod(this) + adminMod - SkillType.EXP_REGULAR;
+	}
 
     public void resetAstechMinutes() {
         astechPoolMinutes = 480 * getNumberPrimaryAstechs() + 240
@@ -5424,6 +5957,45 @@ public class Campaign implements Serializable {
             }
         }
     }
+    
+    public boolean contractExtended (AtBContract contract) {
+    	if (contract.getMissionType() != AtBContract.MT_PIRATEHUNTING &&
+    			contract.getMissionType() != AtBContract.MT_RIOTDUTY) {
+    		String warName = RandomFactionGenerator.getInstance().getCurrentWar(contract.getEmployerCode(),
+    				contract.getEnemyCode(), getDate());
+    		if (null != warName) {
+    			int extension = 0;
+    			int roll = Compute.d6();
+    			if (roll == 1) {
+    				extension = Math.max(1, contract.getLength() / 2);
+    			}
+    			if (roll == 2) {
+    				extension = 1;
+    			}
+    			if (extension > 0) {
+    				AtBContract contractExtension =
+    						AtBContract.getContractExtension(contract,
+    								extension, this);
+    				addMission(contractExtension);
+    				addReport("Due to the " + warName +
+    						" crisis your employer has invoked the emergency clause and extended the contract " +
+    						extension + ((extension == 1)?" month":" months"));
+    			}
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+    
+    public void checkForFollowup(AtBContract contract) {
+    	if ((contract.getMissionType() == AtBContract.MT_DIVERSIONARYRAID ||
+    			contract.getMissionType() == AtBContract.MT_RECONRAID ||
+    			contract.getMissionType() == AtBContract.MT_RIOTDUTY) &&
+    			Compute.d6() == 6) {
+    		getContractMarket().addFollowup(this, contract);
+    		addReport("Your employer has offered a follow-up contract (available on the <a href=\"CONTRACT_MARKET\">contract market</a>).");
+    	}
+    }
 
     public void completeMission(int id, int status) {
         Mission mission = getMission(id);
@@ -5450,9 +6022,8 @@ public class Campaign implements Serializable {
                           + contract.getName());
             }
         }
-
     }
-
+    
     public int calculatePartTransitTime(int mos) {
         int nDice = getCampaignOptions().getNDiceTransitTime();
         int time = getCampaignOptions().getConstantTransitTime();
@@ -6724,5 +7295,74 @@ public class Campaign implements Serializable {
 	        }
             u.resetDaysSinceMaintenance();
         }
+    }
+    
+    public void initAtB() {
+    	retirementDefectionTracker.setLastRetirementRoll(calendar);
+    	for (int i = 0; i < missions.size(); i++) {
+    		if (missions.get(i) instanceof Contract &&
+    				!(missions.get(i) instanceof AtBContract)) {
+    			missions.set(i, new AtBContract((Contract)missions.get(i), this));
+    			missionIds.put(missions.get(i).getId(), missions.get(i));
+    		}
+    	}
+    	/* Go through all the personnel records and assume the earliest date
+    	 * is the date the unit was founded.
+    	 */
+    	Date founding = null;
+    	for (Person p : personnel) {
+    		for (LogEntry e : p.getPersonnelLog()) {
+    			if (null == founding || e.getDate().before(founding)) {
+    				founding = e.getDate();
+    			}
+    		}
+    	}
+    	/* Go through the personnel records again and assume that any
+    	 * person who joined the unit on the founding date is one of the
+    	 * founding members. Also assume that MWs assigned to a non-Assault
+    	 * 'Mech on the date they joined came with that 'Mech (which is a less
+    	 * certain assumption)
+    	 */
+    	for (Person p : personnel) {
+    		Date join = null;
+    		for (LogEntry e : p.getPersonnelLog()) {
+    			if (e.getDesc().startsWith("Joined ")) {
+    				join = e.getDate();
+    				break;
+    			}
+    		}
+    		if (join.equals(founding)) {
+    			p.setFounder(true);
+    		}
+    		if (p.getPrimaryRole() == Person.T_MECHWARRIOR ||
+    				(p.getPrimaryRole() == Person.T_AERO_PILOT &&
+    				getCampaignOptions().getAeroRecruitsHaveUnits()) ||
+    				p.getPrimaryRole() == Person.T_PROTO_PILOT) {
+    			for (LogEntry e : p.getPersonnelLog()) {
+    				if (e.getDate().equals(join) && e.getDesc().startsWith("Assigned to ")) {
+    					String mech = e.getDesc().substring(12);
+    					MechSummary ms = MechSummaryCache.getInstance().getMech(mech);
+    					if (null != ms && (p.isFounder() ||
+    							ms.getWeightClass() < megamek.common.EntityWeightClass.WEIGHT_ASSAULT)) {
+    						p.setOriginalUnitWeight(ms.getWeightClass());
+    						if (ms.isClan()) {
+    							p.setOriginalUnitTech(2);
+    						} else if (ms.getYear() > 3050) {
+    							/* We're only guessing anyway, so we use this hack to avoid
+    							 * actually loading the entity to check for IS2
+    							 */
+    							p.setOriginalUnitTech(1);
+    						}
+    						if (null != p.getUnitId() &&
+    								null != unitIds.get(p.getUnitId()) &&
+    								ms.getName().equals(unitIds.get(p.getUnitId()).getEntity().getShortNameRaw())) {
+    							p.setOriginalUnitId(p.getUnitId());
+    						}
+    					}
+    				}
+    			}
+    		}
+    	}
+    	addAllLances(this.forces);
     }
 }
