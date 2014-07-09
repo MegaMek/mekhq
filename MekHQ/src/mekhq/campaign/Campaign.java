@@ -721,9 +721,9 @@ public class Campaign implements Serializable {
         // Only pay if option set and this isn't a prisoner or bondsman
         if (getCampaignOptions().payForRecruitment() && !(prisoner || bondsman)) {
             if (!getFinances().debit(2 * p.getSalary(), Transaction.C_SALARY,
-                                     "recruitment of " + p.getName(), getCalendar().getTime())) {
+                                     "recruitment of " + p.getFullName(), getCalendar().getTime())) {
                 addReport("<font color='red'><b>Insufficient funds to recruit "
-                          + p.getName() + "</b></font>");
+                          + p.getFullName() + "</b></font>");
                 return false;
             }
         }
@@ -1341,7 +1341,7 @@ public class Campaign implements Serializable {
     public TargetRoll getTargetFor(IMedicalWork medWork, Person doctor) {
         Skill skill = doctor.getSkill(SkillType.S_DOCTOR);
         if (null == skill) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE, doctor.getName()
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, doctor.getFullName()
                                                          + " isn't a doctor, he just plays one on TV.");
         }
         if (medWork.getAssignedTeamId() != null
@@ -1357,7 +1357,7 @@ public class Campaign implements Serializable {
                                   medWork.getPatientName() + " does not require healing.");
         }
         if (getPatientsFor(doctor) > 25) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE, doctor.getName()
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, doctor.getFullName()
                                                          + " already has 25 patients.");
         }
         TargetRoll target = new TargetRoll(skill.getFinalSkillValue(),
@@ -4520,12 +4520,10 @@ public class Campaign implements Serializable {
     
     public void checkBloodnameAdd(Person person, int type, boolean ignoreDice) {
     	// Person already has a bloodname?
-    	if (person.getName().contains(" ")) {
-    		String nn = person.getName();
-    		String[] temp = nn.split("\\s+", 2);
+    	if (person.getBloodname().length() > 0) {
     		int result = JOptionPane.showConfirmDialog(
 					null,
-					temp[0] + " already has the bloodname " + temp[1] +
+					person.getName() + " already has the bloodname " + person.getBloodname() +
 					"\nDo you wish to remove that bloodname and generate a new one?",
 					"Already Has Bloodname",
 					JOptionPane.YES_NO_OPTION,
@@ -4534,9 +4532,7 @@ public class Campaign implements Serializable {
     		if (result == JOptionPane.NO_OPTION) {
     			return;
     		}
-    		
-    		person.setName(temp[0]);
-    	}
+       	}
     	
     	// Go ahead and generate a new bloodname
     	if (person.isClanner() && person.getPhenotype() != Person.PHENOTYPE_NONE) { 
@@ -4594,7 +4590,10 @@ public class Campaign implements Serializable {
 			if (year > 3055) bloodnameTarget++;
 			if (year > 3065) bloodnameTarget++;
 			if (year > 3080) bloodnameTarget++;
-	   		if (Compute.d6(2) >= bloodnameTarget || ignoreDice) {
+			//Officers have better chance; no penalty for non-officer
+			bloodnameTarget += Math.min(0, ranks.getOfficerCut() - person.getRankNumeric());
+
+			if (Compute.d6(2) >= bloodnameTarget || ignoreDice) {
     			/* The Bloodname generator has slight differences in categories
     			 * that do not map easily onto Person constants
     			 */
@@ -4620,8 +4619,7 @@ public class Campaign implements Serializable {
     				phenotype = Bloodname.P_PROTOMECH;
     				break;
     			}
-    			person.setName(person.getName() + " "
-    				+ Bloodname.randomBloodname(factionCode, phenotype,
+    			person.setBloodname(Bloodname.randomBloodname(factionCode, phenotype,
     						calendar.get(Calendar.YEAR)).getName());
     		}
         }

@@ -4037,7 +4037,7 @@ public class CampaignGUI extends JPanel {
                 if (getCampaign().isWorkingOnRefit(tech)) {
                     continue;
                 }
-                name = tech.getName() + ", " + tech.getPrimaryRoleDesc() + " (" + getCampaign().getTargetFor(r, tech).getValueAsString() + "+)";
+                name = tech.getFullName() + ", " + tech.getPrimaryRoleDesc() + " (" + getCampaign().getTargetFor(r, tech).getValueAsString() + "+)";
                 techHash.put(name, tech);
             }
             String[] techNames = new String[techHash.keySet().size()];
@@ -4130,7 +4130,7 @@ public class CampaignGUI extends JPanel {
         HashMap<String, Person> techHash = new HashMap<String, Person>();
         for (Person tech : getCampaign().getTechs()) {
             if (tech.canTech(u.getEntity()) && !tech.isMothballing()) {
-                name = tech.getName() + ", " + SkillType.getExperienceLevelName(tech.getSkillForWorkingOn(u).getExperienceLevel()) + " (" + (480 - tech.getMaintenanceTimeUsing()) + "min)";
+                name = tech.getFullName() + ", " + SkillType.getExperienceLevelName(tech.getSkillForWorkingOn(u).getExperienceLevel()) + " (" + (480 - tech.getMaintenanceTimeUsing()) + "min)";
                 techHash.put(name, tech);
             }
         }
@@ -4459,8 +4459,8 @@ public class CampaignGUI extends JPanel {
                 }
 
                 Person p = Person.generateInstanceFromXML(wn2, getCampaign(), version);
-                if (getCampaign().getPerson(p.getId()) != null && getCampaign().getPerson(p.getId()).getName().equals(p.getName())) {
-                    MekHQ.logMessage("ERROR: Cannot load person who exists, ignoring. (Name: " + p.getName() + ")");
+                if (getCampaign().getPerson(p.getId()) != null && getCampaign().getPerson(p.getId()).getFullName().equals(p.getFullName())) {
+                    MekHQ.logMessage("ERROR: Cannot load person who exists, ignoring. (Name: " + p.getFullName() + ")");
                     p = null;
                 }
                 if (p != null) {
@@ -6877,7 +6877,7 @@ public class CampaignGUI extends JPanel {
                 menu = new JMenu("Assign all tasks");
                 i = 0;
                 for (Person tech : getCampaign().getTechs()) {
-                    menuItem = new JMenuItem(tech.getName());
+                    menuItem = new JMenuItem(tech.getFullName());
                     menuItem.setActionCommand("ASSIGN_TECH:" + i);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(tech.getMinutesLeft() > 0);
@@ -8209,7 +8209,7 @@ public class CampaignGUI extends JPanel {
             	} else {
             		nkd = new KillDialog(getFrame(), true, new Kill(selectedPerson.getId(), "?",
             				getCampaign().getUnit(selectedPerson.getUnitId()) != null ? getCampaign().getUnit(selectedPerson.getUnitId()).getName()
-            						: "Bare Hands", getCampaign().getDate()), selectedPerson.getName());
+            						: "Bare Hands", getCampaign().getDate()), selectedPerson.getFullName());
             	}
                 nkd.setVisible(true);
                 if (!nkd.wasCancelled()) {
