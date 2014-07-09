@@ -7972,6 +7972,15 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshPersonnelList();
                 refreshOrganization();
+            } else if (command.contains("REMOVE_SPOUSE")) {
+            	selectedPerson.getSpouse().setSpouseID(null);
+            	selectedPerson.setSpouseID(null);
+                refreshPersonnelList();
+            } else if (command.contains("SPOUSE")) {
+            	Person spouse = getCampaign().getPerson(UUID.fromString(st.nextToken()));
+            	spouse.setSpouseID(selectedPerson.getId());
+            	selectedPerson.setSpouseID(spouse.getId());
+                refreshPersonnelList();
             } else if (command.contains("IMPROVE")) {
                 String type = st.nextToken();
                 int cost = Integer.parseInt(st.nextToken());
@@ -8946,6 +8955,28 @@ public class CampaignGUI extends JPanel {
                     popup.add(menu);
                 }
                 if (oneSelected && person.isActive()) {
+                	if (person.getAge(getCampaign().getCalendar()) > 13
+                			&& person.getSpouseID() == null) {
+                		menu = new JMenu("Choose Spouse (Mate)");
+                		for (Person ps : getCampaign().getPersonnel()) {
+                			if (!person.equals(ps)
+                					&& person.getGender() != ps.getGender()
+                					&& ps.getAge(getCampaign().getCalendar()) > 13
+                					&& ps.getSpouseID() == null) {
+                				menuItem = new JMenuItem(ps.getFullName());
+                				menuItem.setActionCommand("SPOUSE|"+ps.getId().toString());
+                				menuItem.addActionListener(this);
+                				menu.add(menuItem);
+                			}
+                		}
+                		popup.add(menu);
+                	}
+                	if (person.getSpouseID() != null) {
+                		menuItem = new JMenuItem("Remove Spouse");
+                		menuItem.setActionCommand("REMOVE_SPOUSE");
+                		menuItem.addActionListener(this);
+                		popup.add(menuItem);
+                	}
                     menu = new JMenu("Spend XP");
                     JMenu currentMenu = new JMenu("Current Skills");
                     JMenu newMenu = new JMenu("New Skills");

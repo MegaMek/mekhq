@@ -1950,10 +1950,31 @@ public class Campaign implements Serializable {
         	}
         }
 
+        ArrayList<Person> babies = new ArrayList<Person>();
         for (Person p : getPersonnel()) {
             if (!p.isActive()) {
                 continue;
             }
+            
+            // Procreation
+            if (p.isFemale()) {
+            	if (p.isPregnant()) {
+            		if (getCalendar().compareTo((p.getDueDate())) == 0) {
+            			babies.add(p.birth());
+            		}
+            	} else {
+            		if (p.getSpouseID() != null) {
+            			Person spouse = getPerson(p.getSpouseID());
+            			if (spouse.isActive() && !spouse.isDeployed() && !p.isDeployed()) {
+            				// Age limitations...
+            				if (p.getAge(calendar) > 13 && p.getAge(calendar) < 51 && spouse.getAge(calendar) > 13) {
+            					p.procreate();
+            				}
+            			}
+            		}
+            	}
+            }
+            
             p.resetMinutesLeft();
             // Reset acquisitions made to 0
             p.setAcquisition(0);
@@ -2019,6 +2040,9 @@ public class Campaign implements Serializable {
                 }
             }
 
+        }
+        for (Person baby : babies) {
+        	addPersonWithoutId(baby, false);
         }
         resetAstechMinutes();
 
@@ -4326,10 +4350,11 @@ public class Campaign implements Serializable {
         GregorianCalendar birthdate = (GregorianCalendar) getCalendar().clone();
         birthdate.set(Calendar.YEAR, birthdate.get(Calendar.YEAR) - Utilities.getAgeByExpLevel(expLvl, person.isClanner() && person.getPhenotype() != Person.PHENOTYPE_NONE));
         // choose a random day and month
-        int randomDay = Compute.randomInt(365) + 1;
+        int nDays = 365;
         if (birthdate.isLeapYear(birthdate.get(Calendar.YEAR))) {
-            randomDay = Compute.randomInt(366) + 1;
+        	nDays = 366;
         }
+        int randomDay = Compute.randomInt(nDays) + 1;
         birthdate.set(Calendar.DAY_OF_YEAR, randomDay);
         person.setBirthday(birthdate);
         // set default skills

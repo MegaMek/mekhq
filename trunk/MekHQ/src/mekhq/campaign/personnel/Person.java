@@ -134,9 +134,14 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public static final int PHENOTYPE_VEE = 4;
     public static final int PHENOTYPE_NUM = 5;
 
-
     protected UUID id;
     protected int oldId;
+    
+    // Lineage & Procreation
+    protected UUID fatherID;
+    protected UUID motherID;
+    protected UUID spouse;
+    protected GregorianCalendar dueDate;
 
     private String name;
     private String callsign;
@@ -248,6 +253,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
 
     public Person(String name, Campaign c) {
+    	this(name, c, null, null);
+    }
+
+    public Person(String name, Campaign c, UUID mother, UUID father) {
         this.name = name;
         callsign = "";
         portraitCategory = Crew.ROOT_PORTRAIT;
@@ -283,6 +292,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         phenotype = PHENOTYPE_NONE;
         clan = campaign.getFaction().isClan();
         bloodname = "";
+        motherID = mother;
+        fatherID = father;
     }
 
     public int getPhenotype() {
@@ -445,6 +456,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
             default:
                 return "?";
         }
+    }
+    
+    public String pregnancyStatus() {
+    	return isPregnant() ? " (Pregnant)" : "";
     }
 
     public String getStatusName() {
@@ -792,7 +807,148 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         return id;
     }
 
-    public int getXp() {
+    public UUID getFatherID() {
+		return fatherID;
+	}
+
+	public void setFatherID(UUID fatherID) {
+		this.fatherID = fatherID;
+	}
+	
+	public Person getFather() {
+		return campaign.getPerson(fatherID);
+	}
+
+	public UUID getMotherID() {
+		return motherID;
+	}
+
+	public void setMotherID(UUID motherID) {
+		this.motherID = motherID;
+	}
+	
+	public Person getMother() {
+		return campaign.getPerson(motherID);
+	}
+
+	public UUID getSpouseID() {
+		return spouse;
+	}
+
+	public void setSpouseID(UUID spouse) {
+		this.spouse = spouse;
+	}
+	
+	public Person getSpouse() {
+		return campaign.getPerson(spouse);
+	}
+
+	public GregorianCalendar getDueDate() {
+		return dueDate;
+	}
+
+	public void setDueDate(GregorianCalendar dueDate) {
+		this.dueDate = dueDate;
+	}
+	
+	public boolean isPregnant() {
+		return dueDate != null;
+	}
+	
+	public Person birth() {
+		Person baby = campaign.newPerson(T_NONE);
+		baby.setMotherID(getId());
+		baby.setFatherID(getSpouseID());
+		String surname = "";
+		if (getName().contains(" ")) {
+			surname = getName().split(" ", 2)[1];
+		} else if (baby.getFather().getName().contains(" ")) {
+			surname = baby.getFather().getName().split(" ", 2)[1];
+		}
+		baby.setName(baby.getName().split(" ", 2)[0] + " " + surname);
+		baby.setBirthday((GregorianCalendar) campaign.getCalendar().clone());
+		UUID id = UUID.randomUUID();
+		while (null != campaign.getPerson(id)) {
+			id = UUID.randomUUID();
+		}
+		baby.setId(id);
+		campaign.addReport(getName() + " has given birth to " + baby.getName() + ", a baby " + (baby.getGender() == G_MALE ? "boy!" : "girl!"));
+		setDueDate(null);
+		return baby;
+	}
+	
+	public void procreate() {
+		// 0.5% chance that this procreation attempt will create a child
+		if (Compute.randomInt(1000) < 5) {
+			GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
+			tCal.add(GregorianCalendar.DAY_OF_YEAR, 40*7);
+			setDueDate(tCal);
+			campaign.addReport(getFullName()+" has conceived");
+		}
+	}
+	
+	public boolean safeSpouse(Person p) {
+		if (p.equals(this)) {
+			return false;
+		}
+		// Our parents
+		Person f1 = getFather();
+		Person m1 = getMother();
+		
+		// Check back 5 generations on our side
+		for (int i = 0; i < 5; i++) {
+			// If both parents are null, we're done
+			if (f1.equals(null) && m1.equals(null))
+				break;
+			
+			// Their parents
+			Person f2 = p.getFather();
+			Person m2 = p.getMother();
+			
+			// Check back 5 generations on their side
+			for (int j = 0; j < 5; j++) {
+				// If both parents are null, break to outer loop
+				if (f2.equals(null) && m2.equals(null))
+					break;
+				
+				// If the father matches an ancestor...
+				if (!f1.equals(null) && f1.equals(f2)) {
+					return false;
+				}
+				
+				// If the mother matches an ancestor...
+				if (!m1.equals(null) && m1.equals(m2)) {
+					return false;
+				}
+				
+				// Iterate another generation
+				f2 = f2.getFather();
+				m2 = m2.getMother();
+			}
+			
+			// Iterate another generation
+			f2 = f2.getFather();
+			m2 = m2.getMother();
+		}
+		
+		// No matches made, we're safe
+		return true;
+	}
+	
+	public boolean isFemale() {
+		return gender == G_FEMALE;
+	}
+	
+	public boolean isMale() {
+		return gender == G_MALE;
+	}
+	
+	// Currently this isn't used
+	public boolean isNeuter() {
+		return !isMale() && !isFemale();
+	}
+
+	public int getXp() {
         return xp;
     }
 
@@ -915,6 +1071,23 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     + this.id.toString()
                     + "</id>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+	                + "<motherid>"
+	                + this.motherID.toString()
+	                + "</motherid>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+	                + "<fatherid>"
+	                + this.fatherID.toString()
+	                + "</fatherid>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+	                + "<spouse>"
+	                + this.spouse.toString()
+	                + "</spouse>");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                    + "<dueDate>"
+                    + df.format(dueDate.getTime())
+                    + "</dueDate>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<portraitCategory>"
                     + MekHqXmlUtil.escape(portraitCategory)
                     + "</portraitCategory>");
@@ -950,7 +1123,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	                + "<maneiDominiRank>"
 	                + maneiDominiRank
 	                + "</maneiDominiRank>");
-    pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
 	                + "<maneiDominiClass>"
 	                + maneiDominiClass
 	                + "</maneiDominiClass>");
@@ -998,7 +1171,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     + "<overtimeLeft>"
                     + overtimeLeft
                     + "</overtimeLeft>");
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<birthday>"
                     + df.format(birthday.getTime())
@@ -1126,6 +1298,16 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     } else {
                         retVal.id = UUID.fromString(wn2.getTextContent());
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase("motherid")) {
+                    retVal.motherID = UUID.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("fatherID")) {
+                    retVal.fatherID = UUID.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("spouse")) {
+                    retVal.spouse = UUID.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("duedate")) {
+                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                    retVal.dueDate = (GregorianCalendar) GregorianCalendar.getInstance();
+                    retVal.dueDate.setTime(df.parse(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
                     retVal.teamId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
