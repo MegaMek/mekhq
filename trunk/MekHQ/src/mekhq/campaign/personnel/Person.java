@@ -168,6 +168,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     //phenotype and background
     private int phenotype;
     private boolean clan;
+    private String bloodname;
 
     //assignments
     private UUID unitId;
@@ -281,6 +282,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         salary = -1;
         phenotype = PHENOTYPE_NONE;
         clan = campaign.getFaction().isClan();
+        bloodname = "";
     }
 
     public int getPhenotype() {
@@ -305,6 +307,14 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         } else {
             return "Inner Sphere";
         }
+    }
+    
+    public String getBloodname() {
+    	return bloodname;
+    }
+    
+    public void setBloodname(String bn) {
+    	bloodname = bn;
     }
 
     public boolean isCommander() {
@@ -496,17 +506,24 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public String getPrisonerStatusName() {
         return getPrisonerStatusName(prisonerStatus);
     }
-
+    
     public String getName() {
-        return name;
+    	return name;
     }
 
     public void setName(String n) {
         this.name = n;
     }
 
-    public String getHyperlinkedName() {
-        return "<a href='PERSON:" + getId() + "'>" + getName() + "</a>";
+    public String getFullName() {
+    	if (bloodname.length() > 0) {
+    		return name + " " + bloodname;
+    	}
+        return name;
+    }
+
+   public String getHyperlinkedName() {
+        return "<a href='PERSON:" + getId() + "'>" + getFullName() + "</a>";
     }
 
     public String getCallsign() {
@@ -878,9 +895,13 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     + clan
                     + "</clan>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<phenotype>"
-                    + phenotype
-                    + "</phenotype>");
+                + "<phenotype>"
+                + phenotype
+                + "</phenotype>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+        		+ "<bloodname>"
+        		+ bloodname
+        		+ "</bloodname>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<biography>"
                     + MekHqXmlUtil.escape(biography)
@@ -1087,6 +1108,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     retVal.clan = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotype")) {
                     retVal.phenotype = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("bloodname")) {
+                    retVal.bloodname = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("biography")) {
                     retVal.biography = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("primaryRole")) {
@@ -1586,7 +1609,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
 
     public String toString() {
-        return getName();
+        return getFullName();
     }
 
     public int getExperienceLevel(boolean secondary) {
@@ -1767,12 +1790,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         // Do prisoner checks
         if (rank.equalsIgnoreCase("None")) {
             if (isPrisoner()) {
-                return "Prisoner " + getName();
+                return "Prisoner " + getFullName();
             }
             if (isBondsman()) {
-                return "Bondsman " + getName();
+                return "Bondsman " + getFullName();
             }
-            return getName();
+            return getFullName();
         }
         
         // Manei Domini Additions
@@ -1794,7 +1817,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         //if (html)
         //	rank = makeHTMLRankDiv();
         
-        return rank + " " + getName();
+        return rank + " " + getFullName();
     }
     
     public String makeHTMLRank() {
@@ -1877,7 +1900,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     @Override
     public String getPatientName() {
-        return getName();
+        return getFullName();
     }
 
     public boolean hasSkill(String skillName) {
@@ -2450,7 +2473,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
 
     public String getDocDesc() {
-        String toReturn = "<html><font size='2'><b>" + getName() + "</b><br/>";
+        String toReturn = "<html><font size='2'><b>" + getFullName() + "</b><br/>";
         Skill skill = getSkill(SkillType.S_DOCTOR);
         if (null != skill) {
             toReturn += SkillType.getExperienceLevelName(skill.getExperienceLevel()) + " " + SkillType.S_DOCTOR;
@@ -2487,7 +2510,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
 
     public String getTechDesc(boolean overtimeAllowed) {
-        String toReturn = "<html><font size='2'><b>" + getName() + "</b><br/>";
+        String toReturn = "<html><font size='2'><b>" + getFullName() + "</b><br/>";
         Skill mechSkill = getSkill(SkillType.S_TECH_MECH);
         Skill mechanicSkill = getSkill(SkillType.S_TECH_MECHANIC);
         Skill baSkill = getSkill(SkillType.S_TECH_BA);

@@ -53,6 +53,7 @@ v0.3.6 (SVN)
 + Data: 200 more VTOL force icons from pfarland
 + Removed unnecessary code from AtBGameThread.java
 + Bug [#525]: Ammo swaps do not save
++ Patch [36]: Bloodnames, 2nd Patch
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
