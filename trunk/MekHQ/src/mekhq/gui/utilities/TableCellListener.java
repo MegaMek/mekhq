@@ -1,13 +1,3 @@
-package mekhq.gui.utilities;
-
-import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import javax.swing.Action;
-import javax.swing.JTable;
-import javax.swing.SwingUtilities;
-
 /**
  *  This class listens for changes made to the data in the table via the
  *  TableCellEditor. When editing is started, the value of the cell is saved
@@ -20,7 +10,19 @@ import javax.swing.SwingUtilities;
  *  
  *  @see <a href="http://tips4java.wordpress.com/2009/06/07/table-cell-listener/">http://tips4java.wordpress.com/2009/06/07/table-cell-listener/</a>
  *  @see <a href="http://www.camick.com/java/source/TableCellListener.java">http://www.camick.com/java/source/TableCellListener.java</a>
+ *  
  */
+
+package mekhq.gui.utilities;
+
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
+import javax.swing.Action;
+import javax.swing.JTable;
+import javax.swing.SwingUtilities;
+
 public class TableCellListener implements PropertyChangeListener, Runnable
 {
   private JTable table;
