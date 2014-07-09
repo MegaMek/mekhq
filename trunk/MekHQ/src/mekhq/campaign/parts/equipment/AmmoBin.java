@@ -246,8 +246,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 			} else if (wn2.getNodeName().equalsIgnoreCase("munition")) {
 				munition = Long.parseLong(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("shotsNeeded")) {
-				String tmp = wn2.getTextContent();
-				shotsNeeded = Integer.parseInt(tmp);
+				shotsNeeded = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("checkedToday")) {
 				if(wn2.getTextContent().equalsIgnoreCase("true")) {
 					checkedToday = true;
@@ -425,6 +424,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 				mounted.setHit(false);
 		        mounted.setDestroyed(false);
 		        mounted.setRepairable(true);
+		        mounted.changeAmmoType((AmmoType) type);
 		        unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum);
 				mounted.setShotsLeft(getFullShots() - shotsNeeded);
 			}
