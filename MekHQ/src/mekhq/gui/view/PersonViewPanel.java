@@ -8,6 +8,7 @@ package mekhq.gui.view;
 
 import java.awt.Color;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.text.SimpleDateFormat;
@@ -17,6 +18,7 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import megamek.common.Crew;
@@ -83,25 +85,25 @@ public class PersonViewPanel extends javax.swing.JPanel {
 	private void initComponents() {
 		java.awt.GridBagConstraints gridBagConstraints;
 
-		lblPortrait = new javax.swing.JLabel();
-		pnlStats = new javax.swing.JPanel();
-		txtDesc = new javax.swing.JTextArea();
-		pnlKills = new javax.swing.JPanel();
-		pnlLog = new javax.swing.JPanel();
-		pnlInjuries = new javax.swing.JPanel();
+		lblPortrait = new JLabel();
+		pnlStats = new JPanel();
+		txtDesc = new JTextArea();
+		pnlKills = new JPanel();
+		pnlLog = new JPanel();
+		pnlInjuries = new JPanel();
 
-		setLayout(new java.awt.GridBagLayout());
+		setLayout(new GridBagLayout());
 
 		setBackground(Color.WHITE);
 				
 		lblPortrait.setName("lblPortait"); // NOI18N
 		lblPortrait.setBackground(Color.WHITE);
 		setPortrait();
-		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		gridBagConstraints.fill = GridBagConstraints.NONE;
+		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 		gridBagConstraints.insets = new Insets(10,10,0,0);
 		add(lblPortrait, gridBagConstraints);
 	
@@ -109,13 +111,13 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		pnlStats.setBorder(BorderFactory.createTitledBorder(person.getFullTitle()));
 		pnlStats.setBackground(Color.WHITE);
 		fillStats();
-		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
+		gridBagConstraints.insets = new Insets(5, 5, 5, 20);
+		gridBagConstraints.fill = GridBagConstraints.BOTH;
+		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;	
 		add(pnlStats, gridBagConstraints);
 		
 		int gridy = 1;
@@ -124,13 +126,13 @@ public class PersonViewPanel extends javax.swing.JPanel {
 			pnlInjuries.setBorder(BorderFactory.createTitledBorder("Injury Report"));
 			pnlInjuries.setBackground(Color.WHITE);
 			fillInjuries();
-			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = gridy;
 			gridBagConstraints.gridwidth = 2;
-			gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
+			gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+			gridBagConstraints.fill = GridBagConstraints.BOTH;
+			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;	
 			add(pnlInjuries, gridBagConstraints);
 			gridy++;
 		}
@@ -144,13 +146,13 @@ public class PersonViewPanel extends javax.swing.JPanel {
 			txtDesc.setBorder(BorderFactory.createCompoundBorder(
 					BorderFactory.createTitledBorder("Description"),
 					BorderFactory.createEmptyBorder(5,5,5,5)));
-			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = gridy;
 			gridBagConstraints.gridwidth = 2;
-			gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints.insets = new Insets(5, 5, 5, 20);
+			gridBagConstraints.fill = GridBagConstraints.BOTH;
+			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 			add(txtDesc, gridBagConstraints);
 			gridy++;
 		}
@@ -160,13 +162,13 @@ public class PersonViewPanel extends javax.swing.JPanel {
 			pnlLog.setBorder(BorderFactory.createTitledBorder("Personnel Log"));
 			pnlLog.setBackground(Color.WHITE);
 			fillLog();
-			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = gridy;
 			gridBagConstraints.gridwidth = 2;
-			gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
+			gridBagConstraints.insets = new Insets(5, 5, 5, 20);
+			gridBagConstraints.fill = GridBagConstraints.BOTH;
+			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;	
 			add(pnlLog, gridBagConstraints);
 			gridy++;
 		}
@@ -178,14 +180,14 @@ public class PersonViewPanel extends javax.swing.JPanel {
 			pnlKills.setBorder(BorderFactory.createCompoundBorder(
 					BorderFactory.createTitledBorder("Kill Record"),
 	                BorderFactory.createEmptyBorder(5,5,5,5)));
-			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints = new GridBagConstraints();
 			pnlKills.setBackground(Color.WHITE);
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = gridy;
 			gridBagConstraints.gridwidth = 2;
-			gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints.insets = new Insets(5, 5, 5, 20);
+			gridBagConstraints.fill = GridBagConstraints.BOTH;
+			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 			add(pnlKills, gridBagConstraints);
 			gridy++;
 		}
@@ -193,14 +195,14 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		//just to flush something to the bottom of the page
 		JTextArea txtFiller = new JTextArea("");
 		txtFiller.setEditable(false);
-		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = gridy;
 		gridBagConstraints.gridwidth = 2;
 		gridBagConstraints.weighty = 1.0;
-		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		gridBagConstraints.insets = new Insets(5, 5, 5, 20);
+		gridBagConstraints.fill = GridBagConstraints.BOTH;
+		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 		add(txtFiller, gridBagConstraints);
 
 	}
@@ -248,40 +250,40 @@ public class PersonViewPanel extends javax.swing.JPanel {
     	
     	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel");
     	
-    	lblType = new javax.swing.JLabel();
-    	lblCall1 = new javax.swing.JLabel();
-		lblCall2 = new javax.swing.JLabel();
-		lblAge1 = new javax.swing.JLabel();
-		lblAge2 = new javax.swing.JLabel();
-		lblGender1 = new javax.swing.JLabel();
-		lblGender2 = new javax.swing.JLabel();
-		lblStatus1 = new javax.swing.JLabel();
-		lblStatus2 = new javax.swing.JLabel();
-		lblTough1 = new javax.swing.JLabel();
-		lblTough2 = new javax.swing.JLabel();
-		lblEdge1 = new javax.swing.JLabel();
-		lblEdge2 = new javax.swing.JLabel();
-		lblAbility1 = new javax.swing.JLabel();
-		lblAbility2 = new javax.swing.JLabel();
-		lblImplants1 = new javax.swing.JLabel();
-		lblImplants2 = new javax.swing.JLabel();
-		lblAdvancedMedical1 = new javax.swing.JLabel();
-		lblAdvancedMedical2 = new javax.swing.JLabel();
+    	lblType = new JLabel();
+    	lblCall1 = new JLabel();
+		lblCall2 = new JLabel();
+		lblAge1 = new JLabel();
+		lblAge2 = new JLabel();
+		lblGender1 = new JLabel();
+		lblGender2 = new JLabel();
+		lblStatus1 = new JLabel();
+		lblStatus2 = new JLabel();
+		lblTough1 = new JLabel();
+		lblTough2 = new JLabel();
+		lblEdge1 = new JLabel();
+		lblEdge2 = new JLabel();
+		lblAbility1 = new JLabel();
+		lblAbility2 = new JLabel();
+		lblImplants1 = new JLabel();
+		lblImplants2 = new JLabel();
+		lblAdvancedMedical1 = new JLabel();
+		lblAdvancedMedical2 = new JLabel();
     	
     	java.awt.GridBagConstraints gridBagConstraints;
-		pnlStats.setLayout(new java.awt.GridBagLayout());
+		pnlStats.setLayout(new GridBagLayout());
 		
 		lblType.setName("lblType"); // NOI18N
 		lblType.setText("<html><i>" + person.getRoleDesc() + "</i></html>");
-		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.gridwidth = 4;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 0.0;
-		gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		gridBagConstraints.insets = new Insets(0, 0, 5, 0);
+		gridBagConstraints.fill = GridBagConstraints.NONE;
+		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblType, gridBagConstraints);
 		
 		int firsty = 0;
@@ -290,86 +292,86 @@ public class PersonViewPanel extends javax.swing.JPanel {
 			firsty++;
 			lblCall1.setName("lblCall1"); // NOI18N
 			lblCall1.setText(resourceMap.getString("lblCall1.text"));
-			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = firsty;
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints.fill = GridBagConstraints.NONE;
+			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 			pnlStats.add(lblCall1, gridBagConstraints);
 			
 			lblCall2.setName("lblCall2"); // NOI18N
 			lblCall2.setText(person.getCallsign());
-			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 1;
 			gridBagConstraints.gridy = firsty;
 			gridBagConstraints.weightx = 0.5;
-			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+			gridBagConstraints.fill = GridBagConstraints.NONE;
+			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 			pnlStats.add(lblCall2, gridBagConstraints);
 		}
 			
 		firsty++;
 		lblAge1.setName("lblAge1"); // NOI18N
 		lblAge1.setText(resourceMap.getString("lblAge1.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = firsty;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		gridBagConstraints.fill = GridBagConstraints.NONE;
+		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblAge1, gridBagConstraints);
 		
 		lblAge2.setName("lblAge2"); // NOI18N
 		lblAge2.setText(Integer.toString(person.getAge(campaign.getCalendar())));
-		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = firsty;
 		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+		gridBagConstraints.fill = GridBagConstraints.NONE;
+		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblAge2, gridBagConstraints);
 		
 		firsty++;
 		lblGender1.setName("lblGender1"); // NOI18N
 		lblGender1.setText(resourceMap.getString("lblGender1.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = firsty;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		gridBagConstraints.fill = GridBagConstraints.NONE;
+		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblGender1, gridBagConstraints);
 		
 		lblGender2.setName("lblGender2"); // NOI18N
 		lblGender2.setText(person.getGenderName());
-		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = firsty;
 		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+		gridBagConstraints.fill = GridBagConstraints.NONE;
+		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblGender2, gridBagConstraints);
 		
 		firsty++;
 		lblStatus1.setName("lblStatus1"); // NOI18N
 		lblStatus1.setText(resourceMap.getString("lblStatus1.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = firsty;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		gridBagConstraints.fill = GridBagConstraints.NONE;
+		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblStatus1, gridBagConstraints);
 		
 		lblStatus2.setName("lblStatus2"); // NOI18N
-		lblStatus2.setText(person.getStatusName());
-		gridBagConstraints = new java.awt.GridBagConstraints();
+		lblStatus2.setText(person.getStatusName() + person.pregnancyStatus());
+		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = firsty;
 		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+		gridBagConstraints.fill = GridBagConstraints.NONE;
+		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblStatus2, gridBagConstraints);
 		
 		int secondy = 0;
@@ -381,19 +383,19 @@ public class PersonViewPanel extends javax.swing.JPanel {
 				secondy++;
 				lblName = new JLabel("<html><b>" + SkillType.getSkillList()[i] + ":</b></html>");
 				lblValue = new JLabel(person.getSkill(SkillType.getSkillList()[i]).toString());
-				gridBagConstraints = new java.awt.GridBagConstraints();
+				gridBagConstraints = new GridBagConstraints();
 				gridBagConstraints.gridx = 2;
 				gridBagConstraints.gridy = secondy;
-				gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+				gridBagConstraints.fill = GridBagConstraints.NONE;
+				gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 				pnlStats.add(lblName, gridBagConstraints);
-				gridBagConstraints = new java.awt.GridBagConstraints();
+				gridBagConstraints = new GridBagConstraints();
 				gridBagConstraints.gridx = 3;
 				gridBagConstraints.gridy = secondy;
 				gridBagConstraints.weightx = 0.5;
-				gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-				gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+				gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+				gridBagConstraints.fill = GridBagConstraints.NONE;
+				gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 				pnlStats.add(lblValue, gridBagConstraints);
 			}
 		}
@@ -402,45 +404,45 @@ public class PersonViewPanel extends javax.swing.JPanel {
 			secondy++;
 			lblTough1.setName("lblTough1"); // NOI18N
 			lblTough1.setText(resourceMap.getString("lblTough1.text"));
-			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 2;
 			gridBagConstraints.gridy = secondy;
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints.fill = GridBagConstraints.NONE;
+			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 			pnlStats.add(lblTough1, gridBagConstraints);
 				
 			lblTough2.setName("lblTough2"); // NOI18N
 			lblTough2.setText("+" + Integer.toString(person.getToughness()));
-			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 3;
 			gridBagConstraints.gridy = secondy;
 			gridBagConstraints.weightx = 0.5;
-			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+			gridBagConstraints.fill = GridBagConstraints.NONE;
+			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 			pnlStats.add(lblTough2, gridBagConstraints);
 		}		
 		if(campaign.getCampaignOptions().useEdge()) {
 			secondy++;
 			lblEdge1.setName("lblEdge1"); // NOI18N
 			lblEdge1.setText(resourceMap.getString("lblEdge1.text"));
-			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 2;
 			gridBagConstraints.gridy = secondy;
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints.fill = GridBagConstraints.NONE;
+			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 			pnlStats.add(lblEdge1, gridBagConstraints);
 				
 			lblEdge2.setName("lblEdge2"); // NOI18N
 			lblEdge2.setText(Integer.toString(person.getEdge()));
 			lblEdge2.setToolTipText(person.getEdgeTooltip());
-			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 3;
 			gridBagConstraints.gridy = secondy;
 			gridBagConstraints.weightx = 0.5;
-			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+			gridBagConstraints.fill = GridBagConstraints.NONE;
+			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 			pnlStats.add(lblEdge2, gridBagConstraints);
 		}
 			
@@ -453,23 +455,23 @@ public class PersonViewPanel extends javax.swing.JPanel {
 			secondy++;
 			lblAbility1.setName("lblAbility1"); // NOI18N
 			lblAbility1.setText(resourceMap.getString("lblAbility1.text"));
-			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = secondy;
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints.fill = GridBagConstraints.NONE;
+			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 			pnlStats.add(lblAbility1, gridBagConstraints);
 				
 			lblAbility2.setName("lblAbility2"); // NOI18N
 			lblAbility2.setText(person.getAbilityList(PilotOptions.LVL3_ADVANTAGES));
-			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 1;
 			gridBagConstraints.gridy = secondy;
 			gridBagConstraints.gridwidth = 3;
 			gridBagConstraints.weightx = 1.0;
-			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+			gridBagConstraints.fill = GridBagConstraints.NONE;
+			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 			pnlStats.add(lblAbility2, gridBagConstraints);
 		}
 			
@@ -477,23 +479,23 @@ public class PersonViewPanel extends javax.swing.JPanel {
 			secondy++;
 			lblImplants1.setName("lblImplants1"); // NOI18N
 			lblImplants1.setText(resourceMap.getString("lblImplants1.text"));
-			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = secondy;
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints.fill = GridBagConstraints.NONE;
+			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 			pnlStats.add(lblImplants1, gridBagConstraints);
 				
 			lblImplants2.setName("lblImplants2"); // NOI18N
 			lblImplants2.setText(person.getAbilityList(PilotOptions.MD_ADVANTAGES));
-			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 1;
 			gridBagConstraints.gridy = secondy;
 			gridBagConstraints.gridwidth = 3;
 			gridBagConstraints.weightx = 1.0;
-			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+			gridBagConstraints.fill = GridBagConstraints.NONE;
+			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 			pnlStats.add(lblImplants2, gridBagConstraints);
 		}
 		
@@ -501,23 +503,23 @@ public class PersonViewPanel extends javax.swing.JPanel {
 			secondy++;
 			lblAdvancedMedical1.setName("lblAdvancedMedical1"); // NOI18N
 			lblAdvancedMedical1.setText(resourceMap.getString("lblAdvancedMedical1.text"));
-			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = secondy;
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints.fill = GridBagConstraints.NONE;
+			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 			pnlStats.add(lblAdvancedMedical1, gridBagConstraints);
 				
 			lblAdvancedMedical2.setName("lblAdvancedMedical2"); // NOI18N
 			lblAdvancedMedical2.setText(person.getEffects());
-			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 1;
 			gridBagConstraints.gridy = secondy;
 			gridBagConstraints.gridwidth = 3;
 			gridBagConstraints.weightx = 1.0;
-			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+			gridBagConstraints.fill = GridBagConstraints.NONE;
+			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 			pnlStats.add(lblAdvancedMedical2, gridBagConstraints);
 		}
     }
@@ -525,7 +527,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
     private void fillLog() {
     	SimpleDateFormat shortDateFormat = new SimpleDateFormat("MM/dd/yyyy");
     	GridBagConstraints gridBagConstraints;
-		pnlLog.setLayout(new java.awt.GridBagLayout());
+		pnlLog.setLayout(new GridBagLayout());
     	JLabel lblDate;
     	JTextArea txtLog;
     	int row = 0;
@@ -536,24 +538,24 @@ public class PersonViewPanel extends javax.swing.JPanel {
     		txtLog.setEditable(false);
     		txtLog.setLineWrap(true);
     		txtLog.setWrapStyleWord(true);
-    		gridBagConstraints = new java.awt.GridBagConstraints();
+    		gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = row;
 			gridBagConstraints.weightx = 0.0;
-			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+			gridBagConstraints.fill = GridBagConstraints.NONE;
+			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 			pnlLog.add(lblDate, gridBagConstraints);
-			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 1;
 			gridBagConstraints.gridy = row;
 			gridBagConstraints.weightx = 1.0;
 			if(row == (logs.size()-1)) {
 				gridBagConstraints.weighty = 1.0;
 			}
-			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+			gridBagConstraints.fill = GridBagConstraints.BOTH;
+			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 			pnlLog.add(txtLog, gridBagConstraints);
 			row++;
     	}
@@ -561,20 +563,20 @@ public class PersonViewPanel extends javax.swing.JPanel {
     
     private void fillInjuries() {
     	GridBagConstraints gridBagConstraints;
-		pnlInjuries.setLayout(new java.awt.GridBagLayout());
+		pnlInjuries.setLayout(new GridBagLayout());
     	JLabel lblInjury;
     	JTextArea txtInjury;
     	int row = 0;
     	ArrayList<Injury> injuries = person.getInjuries();
     	for(Injury injury : injuries) {
     		lblInjury = new JLabel(injury.getFluff());
-    		gridBagConstraints = new java.awt.GridBagConstraints();
+    		gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = row;
 			gridBagConstraints.weightx = 0.0;
-			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+			gridBagConstraints.fill = GridBagConstraints.NONE;
+			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 			pnlInjuries.add(lblInjury, gridBagConstraints);
 			
 			String text = (injury.getPermanent() && injury.getTime() < 1) ? " permanent injury" : injury.getTime()+" days";
@@ -582,16 +584,16 @@ public class PersonViewPanel extends javax.swing.JPanel {
     		txtInjury.setEditable(false);
     		txtInjury.setLineWrap(true);
     		txtInjury.setWrapStyleWord(true);
-    		gridBagConstraints = new java.awt.GridBagConstraints();
+    		gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 1;
 			gridBagConstraints.gridy = row;
 			gridBagConstraints.weightx = 1.0;
 			if(row == (injuries.size()-1)) {
 				gridBagConstraints.weighty = 1.0;
 			}
-			gridBagConstraints.insets = new java.awt.Insets(0, 20, 0, 0);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints.insets = new Insets(0, 20, 0, 0);
+			gridBagConstraints.fill = GridBagConstraints.BOTH;
+			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 			pnlInjuries.add(txtInjury, gridBagConstraints);
 			row++;
     	}
@@ -601,18 +603,18 @@ public class PersonViewPanel extends javax.swing.JPanel {
     	ArrayList<Kill> kills = campaign.getKillsFor(person.getId());
     	SimpleDateFormat shortDateFormat = new SimpleDateFormat("MM/dd/yyyy");
     	GridBagConstraints gridBagConstraints;
-		pnlKills.setLayout(new java.awt.GridBagLayout());
+		pnlKills.setLayout(new GridBagLayout());
     	JLabel lblDate;
     	JTextArea txtKill;
     	JLabel lblRecord = new JLabel("Kills: " + kills.size());
-    	gridBagConstraints = new java.awt.GridBagConstraints();
+    	gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.gridwidth = 2;
-		gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+		gridBagConstraints.fill = GridBagConstraints.NONE;
+		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 		pnlKills.add(lblRecord, gridBagConstraints);
     	int row = 1;
 		for(Kill k : kills) {
@@ -621,24 +623,24 @@ public class PersonViewPanel extends javax.swing.JPanel {
     		txtKill.setEditable(false);
     		txtKill.setLineWrap(true);
     		txtKill.setWrapStyleWord(true);
-    		gridBagConstraints = new java.awt.GridBagConstraints();
+    		gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = row;
 			gridBagConstraints.weightx = 0.0;
-			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+			gridBagConstraints.fill = GridBagConstraints.NONE;
+			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 			pnlKills.add(lblDate, gridBagConstraints);
-			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 1;
 			gridBagConstraints.gridy = row;
 			gridBagConstraints.weightx = 1.0;
 			if(row == kills.size()) {
 				gridBagConstraints.weighty = 1.0;
 			}
-			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+			gridBagConstraints.fill = GridBagConstraints.BOTH;
+			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 			pnlKills.add(txtKill, gridBagConstraints);
 			row++;
 		}
