@@ -161,8 +161,7 @@ public class AtBGameThread extends GameThread {
                 	} catch (Exception e) {
                 		MekHQ.logError("Could not connect with Bot name " + fd.getName());
                 	}
-                	botClient.retrieveServerInfo();
-                    swingGui.getBots().put(name, botClient);
+                	swingGui.getBots().put(name, botClient);
                     /* Start another thread that waits for the server to add the
                      * bot then send entities and set team and starting position
                      */
