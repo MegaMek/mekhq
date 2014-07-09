@@ -476,7 +476,7 @@ public class ResolveScenarioTracker {
 				casualties = crew.size() - ((Infantry)en).getShootingStrength();
 			}
 			for(Person p : crew) {
-				status = new PersonStatus(p.getName(), u.getEntity().getDisplayName(), p.getHits());			
+				status = new PersonStatus(p.getFullName(), u.getEntity().getDisplayName(), p.getHits());			
 				if(u.usesSoloPilot()) {
 					Crew pilot = pilots.get(p.getId());
 					if(null == pilot) {
@@ -580,7 +580,7 @@ public class ResolveScenarioTracker {
 			p.setId(id);
 			
 			// Create a status for them
-			status = new PersonStatus(p.getName(), "None", p.getHits());
+			status = new PersonStatus(p.getFullName(), "None", p.getHits());
 			status.setHits(p.getHits());
 			status.setCaptured(true);
 			peopleStatus.put(id, status);
@@ -826,7 +826,7 @@ public class ResolveScenarioTracker {
  	   					status.isPrisoner()) {
     				getCampaign().getFinances().credit(50000, Transaction.C_MISC,
     						"Bonus for prisoner capture", getCampaign().getDate());
-   					if (Compute.d6(2) >= 10 + ((AtBContract)m).getEnemySkill() - AtBContract.getUnitRatingMod(getCampaign())) {
+   					if (Compute.d6(2) >= 10 + ((AtBContract)m).getEnemySkill() - getCampaign().getUnitRatingMod()) {
    						getCampaign().addReport("You have convinced "
    								+ person.getHyperlinkedName() + " to defect.");
    					}
@@ -954,12 +954,12 @@ public class ResolveScenarioTracker {
 		}
 		
 		if (campaign.getCampaignOptions().getUseAtB() && getMission() instanceof AtBContract) {
-			int dragoonRating = AtBContract.getUnitRatingMod(campaign);
+			int unitRatingMod = campaign.getUnitRatingMod();
 			for (Unit unit : units) {
-				unit.setSite(((AtBContract)getMission()).getRepairLocation(dragoonRating));
+				unit.setSite(((AtBContract)getMission()).getRepairLocation(unitRatingMod));
 			}
 			for (Unit unit : actualSalvage) {
-				unit.setSite(((AtBContract)getMission()).getRepairLocation(dragoonRating));
+				unit.setSite(((AtBContract)getMission()).getRepairLocation(unitRatingMod));
 			}
 		}
 		

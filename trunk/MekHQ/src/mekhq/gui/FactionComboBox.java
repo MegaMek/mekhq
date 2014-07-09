@@ -35,7 +35,7 @@ public class FactionComboBox extends JComboBox<Map.Entry<String, String>> {
 
 	@SuppressWarnings("serial")
 	public FactionComboBox() {
-		Comparator comp = new Comparator<Map.Entry<String, String>>() {
+		Comparator<Map.Entry<String, String>> comp = new Comparator<Map.Entry<String, String>>() {
 
 			@Override
 			public int compare(Entry<String, String> arg0,
@@ -47,10 +47,10 @@ public class FactionComboBox extends JComboBox<Map.Entry<String, String>> {
 		setModel(new SortedComboBoxModel<Map.Entry<String, String>>(comp));
 		setRenderer(new DefaultListCellRenderer() {
 			@Override
-			public  Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+			public  Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 				super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 				if (value != null) {
-					setText(((Map.Entry<String, String>)value).getValue());
+					setText((String)((Map.Entry<?, ?>)value).getValue());
 				}
 				return this;
 			}			
@@ -81,14 +81,14 @@ public class FactionComboBox extends JComboBox<Map.Entry<String, String>> {
 		if (getSelectedItem() == null) {
 			return null;
 		}
-		return ((Map.Entry<String, String>)getSelectedItem()).getKey();
+		return (String)((Map.Entry<?, ?>)getSelectedItem()).getKey();
 	}
 
 	public String getSelectedItemValue() {
 		if (getSelectedItem() == null) {
 			return null;
 		}
-		return ((Map.Entry<String, String>)getSelectedItem()).getValue();
+		return (String)((Map.Entry<?, ?>)getSelectedItem()).getValue();
 	}
 	
 	public void setSelectedItemByKey(String key) {

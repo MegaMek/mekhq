@@ -41,7 +41,6 @@ public class ContractSummaryPanel extends JPanel {
 	private boolean allowRerolls;
 
 	private JPanel mainPanel;
-	private JTextArea txtDesc;
 
 	private JLabel lblName;
 	private JTextField txtName;
@@ -101,7 +100,6 @@ public class ContractSummaryPanel extends JPanel {
 		java.awt.GridBagConstraints gbc;
 
 		mainPanel = new JPanel();
-		txtDesc = new JTextArea();
 
 		setLayout(new java.awt.GridBagLayout());
 

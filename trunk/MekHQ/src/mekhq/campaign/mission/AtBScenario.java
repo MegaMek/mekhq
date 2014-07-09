@@ -2459,21 +2459,21 @@ public class AtBScenario extends Scenario {
 						Node wn3 = nl2.item(i);
 						if (wn2.getNodeName().equalsIgnoreCase("forcedWithdrawal")) {
 							behaviorSettings.setForcedWithdrawal(Boolean.parseBoolean(wn2.getTextContent()));
-						} else if (wn2.getNodeName().equalsIgnoreCase("goHome")) {
+						} else if (wn3.getNodeName().equalsIgnoreCase("goHome")) {
 							behaviorSettings.setGoHome(Boolean.parseBoolean(wn2.getTextContent()));
-						} else if (wn2.getNodeName().equalsIgnoreCase("autoFlee")) {
+						} else if (wn3.getNodeName().equalsIgnoreCase("autoFlee")) {
 							behaviorSettings.setAutoFlee(Boolean.parseBoolean(wn2.getTextContent()));
-						} else if (wn2.getNodeName().equalsIgnoreCase("selfPreservationIndex")) {
+						} else if (wn3.getNodeName().equalsIgnoreCase("selfPreservationIndex")) {
 							behaviorSettings.setSelfPreservationIndex(Integer.parseInt(wn2.getTextContent()));
-						} else if (wn2.getNodeName().equalsIgnoreCase("fallShameIndex")) {
+						} else if (wn3.getNodeName().equalsIgnoreCase("fallShameIndex")) {
 							behaviorSettings.setFallShameIndex(Integer.parseInt(wn2.getTextContent()));
-						} else if (wn2.getNodeName().equalsIgnoreCase("hyperAggressionIndex")) {
+						} else if (wn3.getNodeName().equalsIgnoreCase("hyperAggressionIndex")) {
 							behaviorSettings.setHyperAggressionIndex(Integer.parseInt(wn2.getTextContent()));
-						} else if (wn2.getNodeName().equalsIgnoreCase("homeEdge")) {
+						} else if (wn3.getNodeName().equalsIgnoreCase("homeEdge")) {
 							behaviorSettings.setHomeEdge(Integer.parseInt(wn2.getTextContent()));
-						} else if (wn2.getNodeName().equalsIgnoreCase("herdMentalityIndex")) {
+						} else if (wn3.getNodeName().equalsIgnoreCase("herdMentalityIndex")) {
 							behaviorSettings.setHerdMentalityIndex(Integer.parseInt(wn2.getTextContent()));
-						} else if (wn2.getNodeName().equalsIgnoreCase("braveryIndex")) {
+						} else if (wn3.getNodeName().equalsIgnoreCase("braveryIndex")) {
 							behaviorSettings.setBraveryIndex(Integer.parseInt(wn2.getTextContent()));
 						}
 					}

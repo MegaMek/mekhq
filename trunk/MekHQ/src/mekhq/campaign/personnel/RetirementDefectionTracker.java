@@ -124,7 +124,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     			continue;
     		}
     		TargetRoll target = new TargetRoll(5, "Target");
-    		target.addModifier(p.getExperienceLevel(false) - AtBContract.getUnitRatingMod(campaign),
+    		target.addModifier(p.getExperienceLevel(false) - campaign.getUnitRatingMod(),
     				"Experience");
     		/* Retirement rolls are made before the contract status is set */
     		if (null != contract && (

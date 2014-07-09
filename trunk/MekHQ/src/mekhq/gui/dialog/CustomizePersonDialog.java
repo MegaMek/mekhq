@@ -76,7 +76,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private javax.swing.JButton btnRandomName;
     private javax.swing.JButton btnRandomBloodname;
     private javax.swing.JButton btnDate;
-    private javax.swing.JComboBox choiceGender;
+    private javax.swing.JComboBox<String> choiceGender;
     private javax.swing.JScrollPane scrOptions;
     private javax.swing.JScrollPane scrBio;
     private javax.swing.JScrollPane scrSkills;
@@ -98,7 +98,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private javax.swing.JTextField textBloodname;
     private javax.swing.JTextPane txtBio;
     private JCheckBox chkClan;
-    private JComboBox choicePheno;
+    private JComboBox<String> choicePheno;
     
     /* Against the Bot */
     private JComboBox<String> choiceUnitWeight;
@@ -143,7 +143,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         textBloodname = new javax.swing.JTextField();
         textToughness = new javax.swing.JTextField();
         lblToughness = new javax.swing.JLabel();
-        choiceGender = new javax.swing.JComboBox();
+        choiceGender = new javax.swing.JComboBox<String>();
         scrOptions = new javax.swing.JScrollPane();
         panOptions = new javax.swing.JPanel();
         scrSkills = new javax.swing.JScrollPane();
@@ -270,7 +270,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         panDemog.add(lblGender, gridBagConstraints);
 
-        DefaultComboBoxModel genderModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> genderModel = new DefaultComboBoxModel<String>();
         genderModel.addElement(Person.getGenderName(Person.G_MALE));
         genderModel.addElement(Person.getGenderName(Person.G_FEMALE));
         choiceGender.setModel(genderModel);
@@ -297,11 +297,11 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         panDemog.add(new JLabel("Phenotype:"), gridBagConstraints);
 
-        DefaultComboBoxModel phenoModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> phenoModel = new DefaultComboBoxModel<String>();
         for(int i = 0; i < Person.PHENOTYPE_NUM; i++) {
             phenoModel.addElement(Person.getPhenotypeName(i));
         }
-        choicePheno = new JComboBox(phenoModel);
+        choicePheno = new JComboBox<String>(phenoModel);
         choicePheno.setSelectedIndex(person.getPhenotype());
         choicePheno.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

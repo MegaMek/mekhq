@@ -82,7 +82,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     private javax.swing.JScrollPane scrDesc;
     private javax.swing.JTextArea txtReport;
     private javax.swing.JScrollPane scrReport;
-    private javax.swing.JComboBox choiceStatus;
+    private javax.swing.JComboBox<String> choiceStatus;
     private javax.swing.JLabel lblStatus;
     private javax.swing.JButton btnDate;
 
@@ -124,7 +124,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         btnClose = new javax.swing.JButton();
         scrDesc = new javax.swing.JScrollPane();
         scrReport = new javax.swing.JScrollPane();
-        choiceStatus = new javax.swing.JComboBox();
+        choiceStatus = new javax.swing.JComboBox<String>();
         lblStatus = new javax.swing.JLabel();  
         panMain = new javax.swing.JPanel();
         panBtn = new javax.swing.JPanel();
@@ -167,7 +167,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
 	        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
 	        panMain.add(lblStatus, gridBagConstraints);
 	        
-	        DefaultComboBoxModel statusModel = new DefaultComboBoxModel();
+	        DefaultComboBoxModel<String> statusModel = new DefaultComboBoxModel<String>();
 			for (int i = 1; i < Scenario.S_NUM; i++) {
 				statusModel.addElement(Scenario.getStatusName(i));
 			}

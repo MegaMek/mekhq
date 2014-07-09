@@ -88,7 +88,7 @@ public class ContractMarket implements Serializable {
 	}
 	
 	public AtBContract addAtBContract(Campaign campaign) {
-		AtBContract c = generateAtBContract(campaign, AtBContract.getUnitRatingMod(campaign));
+		AtBContract c = generateAtBContract(campaign, campaign.getUnitRatingMod());
 		contracts.add(c);
 		return c;
 	}
@@ -134,7 +134,7 @@ public class ContractMarket implements Serializable {
 				removeContract(c);
 			}
 
-			int unitRatingMod = AtBContract.getUnitRatingMod(campaign);
+			int unitRatingMod = campaign.getUnitRatingMod();
 			
 			for (Mission m : campaign.getMissions()) {
 				if (m instanceof AtBContract && m.isActive()) {
@@ -329,7 +329,7 @@ public class ContractMarket implements Serializable {
 		contract.calculateLength(campaign.getCampaignOptions().getVariableContractLength());
 		setAtBContractClauses(contract, unitRatingMod, campaign);
 		
-		contract.calculatePaymentMultiplier(campaign, unitRatingMod);
+		contract.calculatePaymentMultiplier(campaign);
 
 		contract.calculatePartsAvailabilityLevel(campaign);
 		
@@ -389,7 +389,7 @@ public class ContractMarket implements Serializable {
 		}
         contract.setTransportComp(100);
 		
-		contract.calculatePaymentMultiplier(campaign, unitRatingMod);
+		contract.calculatePaymentMultiplier(campaign);
 		contract.calculatePartsAvailabilityLevel(campaign);
         contract.calculateContract(campaign);
 
@@ -402,7 +402,7 @@ public class ContractMarket implements Serializable {
 			return;
 		}
 		AtBContract followup = generateAtBContract(campaign,
-				contract.getEmployerCode(), AtBContract.getUnitRatingMod(campaign));
+				contract.getEmployerCode(), campaign.getUnitRatingMod());
 		followup.setEnemyCode(contract.getEnemyCode());
 		followup.setPlanetName(contract.getPlanetName());
 		switch (contract.getMissionType()) {

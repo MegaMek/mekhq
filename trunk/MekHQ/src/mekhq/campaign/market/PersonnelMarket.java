@@ -552,7 +552,9 @@ public class PersonnelMarket {
                 }
         }
         for (Person p : toRemove) {
-        	attachedEntities.remove(p.getUnitId());
+        	if (attachedEntities.contains(p.getUnitId())) {
+        		attachedEntities.remove(p.getUnitId());
+        	}
         }
         personnel.removeAll(toRemove);
     }
@@ -855,7 +857,7 @@ public class PersonnelMarket {
     		mod = 0;
     	}
 
-    	mod += AtBContract.getUnitRatingMod(c) - IUnitRating.DRAGOON_C;
+    	mod += c.getUnitRatingMod() - IUnitRating.DRAGOON_C;
 		if (c.getFinances().isInDebt()) {
 			mod -= 3;
 		}
@@ -905,7 +907,7 @@ public class PersonnelMarket {
 			}
     	}
     	int mod = adminLog - SkillType.EXP_REGULAR;
-		mod += AtBContract.getUnitRatingMod(c) - 
+		mod += c.getUnitRatingMod() - 
 				IUnitRating.DRAGOON_C;
 		
 		int roll = Compute.d6(2) + mod;
