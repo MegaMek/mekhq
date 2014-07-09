@@ -64,14 +64,13 @@ public class PersonnelMarketDialog extends JDialog {
     private JButton btnAdd;
     private javax.swing.JButton btnHire;
     private javax.swing.JButton btnClose;
-    private javax.swing.JComboBox comboPersonType;
+    private javax.swing.JComboBox<String> comboPersonType;
     private javax.swing.JLabel lblPersonChoice;
     private javax.swing.JRadioButton radioNormalRoll;
     private javax.swing.JRadioButton radioPaidRecruitment;
     private javax.swing.JComboBox<String> comboRecruitType;
     private javax.swing.JRadioButton radioShipSearch;
     private javax.swing.JComboBox<String> comboShipType;
-    private javax.swing.JLabel lblShipSearch;
     private javax.swing.JPanel panelOKBtns;
     private javax.swing.JPanel panelMain;
     private javax.swing.JPanel panelFilterBtns;
@@ -105,7 +104,7 @@ public class PersonnelMarketDialog extends JDialog {
         tablePersonnel = new javax.swing.JTable();
         panelMain = new javax.swing.JPanel();
         panelFilterBtns = new javax.swing.JPanel();
-        comboPersonType = new javax.swing.JComboBox();
+        comboPersonType = new javax.swing.JComboBox<String>();
         radioNormalRoll = new javax.swing.JRadioButton();
         radioPaidRecruitment = new javax.swing.JRadioButton();
         comboRecruitType = new javax.swing.JComboBox<String>();
@@ -137,7 +136,7 @@ public class PersonnelMarketDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panelFilterBtns.add(lblPersonChoice, gridBagConstraints);
 
-        DefaultComboBoxModel personTypeModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> personTypeModel = new DefaultComboBoxModel<String>();
         for (int i = 0; i < CampaignGUI.PG_RETIRE; i++) {
         	personTypeModel.addElement(getPersonnelGroupName(i));
         }
@@ -521,7 +520,7 @@ public class PersonnelMarketDialog extends JDialog {
  		});
     }
 
-    public JComboBox getComboUnitType() {
+    public JComboBox<String> getComboUnitType() {
         return comboPersonType;
     }
 	

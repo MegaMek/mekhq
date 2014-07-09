@@ -279,7 +279,6 @@ public class RandomFactionGenerator implements Serializable {
 		final Date epoch_start = df.parse("0001-01-01");
 		final Date epoch_end = df.parse("9999-12-31");
 
-		String name = null;
 		Date start = epoch_start;
 		Date end = epoch_end;
 		if (node.getAttributes().getNamedItem("end") != null) {

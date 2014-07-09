@@ -71,8 +71,6 @@ public class AtBScenarioViewPanel extends JPanel {
 	private JFrame frame;
 	
 	private JPanel panStats;
-	private JPanel panPlayerForces;
-	private JPanel panBotForces;
 
 	private JLabel lblStatus = new JLabel();
 	private JLabel lblStatusDesc = new JLabel();
@@ -157,8 +155,6 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 		java.awt.GridBagConstraints gridBagConstraints;
 
 		panStats = new JPanel();
-		panPlayerForces = new JPanel();
-		panBotForces = new JPanel();
 		txtDesc = new JTextArea();
 		txtReport = new JTextArea();
 		playerForceTree = new JTree();
@@ -709,7 +705,7 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 
 		@Override
 		public void valueForPathChanged(TreePath arg0, Object arg1) {
-			// TODO Auto-generated method stub
+			//  Auto-generated method stub
 			
 		}
 		
@@ -848,24 +844,24 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 	
 		@Override
 		public Object getChild(Object parent, int index) {
-			if(parent instanceof ArrayList) {
-				return ((ArrayList)parent).get(index);
+			if(parent instanceof ArrayList<?>) {
+				return ((ArrayList<?>)parent).get(index);
 			} 
 			return null;
 		}
 
 		@Override
 		public int getChildCount(Object parent) {
-			if(parent instanceof ArrayList) {
-				return ((ArrayList)parent).size();
+			if(parent instanceof ArrayList<?>) {
+				return ((ArrayList<?>)parent).size();
 			}
 			return 0;
 		}
 
 		@Override
 		public int getIndexOfChild(Object parent, Object child) {
-			if(parent instanceof ArrayList) {
-				return ((ArrayList)parent).indexOf(child);
+			if(parent instanceof ArrayList<?>) {
+				return ((ArrayList<?>)parent).indexOf(child);
 			}
 			return 0;
 		}
@@ -882,7 +878,7 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 
 		@Override
 		public void valueForPathChanged(TreePath arg0, Object arg1) {
-			// TODO Auto-generated method stub
+			// Auto-generated method stub
 			
 		}
 		

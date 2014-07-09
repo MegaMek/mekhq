@@ -159,7 +159,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     /*
      * Assign Kills components
      */
-    private Hashtable<String, JComboBox> killChoices;
+    private Hashtable<String, JComboBox<String>> killChoices;
     
     /*
      * Collect Rewards components
@@ -170,7 +170,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     /*
      * Preview Panel components
      */
-    private javax.swing.JComboBox choiceStatus;
+    private javax.swing.JComboBox<String> choiceStatus;
     private javax.swing.JScrollPane scrReport;
     private javax.swing.JScrollPane scrRecoveredUnits;
     private javax.swing.JScrollPane scrRecoveredPilots;
@@ -685,7 +685,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     	 * Assign Kills panel
     	 */
     	pnlKills = new JPanel();
-        killChoices = new Hashtable<String, JComboBox>();
+        killChoices = new Hashtable<String, JComboBox<String>>();
         pnlKills.setLayout(new GridBagLayout()); 
         
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -704,13 +704,13 @@ public class ResolveScenarioWizardDialog extends JDialog {
         pnlKills.add(new JLabel(resourceMap.getString("claim")), gridBagConstraints);
         
         i = 2;
-        JComboBox comboAssign;
-        DefaultComboBoxModel assignModel; 
+        JComboBox<String> comboAssign;
+        DefaultComboBoxModel<String> assignModel; 
         j = 0;
         for(String killName : tracker.getKillCredits().keySet()) {
         	j++;
         	nameLbl = new JLabel(killName);
-        	assignModel = new DefaultComboBoxModel();
+        	assignModel = new DefaultComboBoxModel<String>();
         	assignModel.addElement(resourceMap.getString("none"));
         	int idx = 0;
         	int selected = 0;
@@ -728,7 +728,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     				selected = idx;
     			}
     		}
-        	comboAssign = new JComboBox(assignModel);
+        	comboAssign = new JComboBox<String>(assignModel);
         	comboAssign.setSelectedIndex(selected);
         	killChoices.put(killName, comboAssign);
         	gridBagConstraints.gridx = 0;
@@ -780,7 +780,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     	 * Preview Panel
     	 */
     	pnlPreview = new JPanel();
-    	choiceStatus = new javax.swing.JComboBox();
+    	choiceStatus = new javax.swing.JComboBox<String>();
         scrReport = new javax.swing.JScrollPane();
         scrRecoveredUnits = new javax.swing.JScrollPane();
         scrRecoveredPilots = new javax.swing.JScrollPane();
@@ -804,7 +804,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         JPanel pnlStatus = new JPanel();
         
         lblStatus.setText(resourceMap.getString("lblStatus.text"));
-        DefaultComboBoxModel statusModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> statusModel = new DefaultComboBoxModel<String>();
 		for (int k = 1; k < Scenario.S_NUM; k++) {
 			statusModel.addElement(Scenario.getStatusName(k));
 		}

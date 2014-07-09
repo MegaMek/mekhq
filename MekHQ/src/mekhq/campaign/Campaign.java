@@ -402,7 +402,7 @@ public class Campaign implements Serializable {
 				for (UUID pid : getRetirementDefectionTracker().getRetirees()) {
 					if (getPerson(pid).isActive()) {
 						changeStatus(getPerson(pid), Person.S_RETIRED);
-						addReport(getPerson(pid).getName() + " has retired.");
+						addReport(getPerson(pid).getFullName() + " has retired.");
 					}
 					if (Person.T_NONE != getRetirementDefectionTracker().getPayout(pid).getRecruitType()) {
 						getPersonnelMarket().addPerson(newPerson(getRetirementDefectionTracker().getPayout(pid).getRecruitType()));
@@ -1772,7 +1772,7 @@ public class Campaign implements Serializable {
             			}
             		}
             	}
-            	int roll = Compute.d6(2) + AtBContract.getUnitRatingMod(this) - 2;
+            	int roll = Compute.d6(2) + getUnitRatingMod() - 2;
             	if (roll < 2) roll = 2;
             	if (roll > 12) roll = 12;
             	int change = numPersonnel * (roll - 5) / 100;
@@ -2182,7 +2182,7 @@ public class Campaign implements Serializable {
                 for (Mission m : missions) {
             		if (m.isActive() && m instanceof AtBContract &&
             				!((AtBContract)m).getStartDate().after(getDate())) {
-            			((AtBContract)m).checkMorale(calendar, AtBContract.getUnitRatingMod(this));
+            			((AtBContract)m).checkMorale(calendar, getUnitRatingMod());
             			addReport("Enemy morale is now " +
             					((AtBContract)m).getMoraleLevelName() + " on contract " +
             					m.getName());
@@ -5208,7 +5208,7 @@ public class Campaign implements Serializable {
 				adminMod = p.getSkill(SkillType.S_ADMIN).getExperienceLevel();
 			}
 		}
-		return AtBContract.getUnitRatingMod(this) + adminMod - SkillType.EXP_REGULAR;
+		return getUnitRatingMod() + adminMod - SkillType.EXP_REGULAR;
 	}
 
     public void resetAstechMinutes() {
@@ -5637,6 +5637,25 @@ public class Campaign implements Serializable {
         return rating.getUnitRating();
     }
 
+	/** 
+	 * Against the Bot
+	 * Calculates and returns dragoon rating if that is the chosen method;
+	 * for IOps method, returns unit reputation / 10. If the player chooses not
+	 * to use unit rating at all, use a default value of C. Note that the AtB system
+	 * is designed for use with FMMerc dragoon rating, and use of the IOps Beta
+	 * system may have unsatisfactory results, but we follow the options
+	 * set by the user here. 
+	 */
+	public int getUnitRatingMod() {
+		if (!getCampaignOptions().useDragoonRating()) {
+			return IUnitRating.DRAGOON_C;
+		}
+		IUnitRating rating = UnitRatingFactory.getUnitRating(this);
+		rating.reInitialize();
+		return getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.FLD_MAN_MERCS_REV)?
+				rating.getUnitRatingAsInteger():rating.getModifier();
+	}
+	
     public RandomSkillPreferences getRandomSkillPreferences() {
         return rskillPrefs;
     }
@@ -7329,7 +7348,7 @@ public class Campaign implements Serializable {
     				break;
     			}
     		}
-    		if (join.equals(founding)) {
+    		if (null != join && join.equals(founding)) {
     			p.setFounder(true);
     		}
     		if (p.getPrimaryRole() == Person.T_MECHWARRIOR ||
@@ -7362,5 +7381,7 @@ public class Campaign implements Serializable {
     		}
     	}
     	addAllLances(this.forces);
+    	RandomFactionGenerator.getInstance().updateTables(calendar.getTime(),
+    			location.getCurrentPlanet(), campaignOptions);
     }
 }

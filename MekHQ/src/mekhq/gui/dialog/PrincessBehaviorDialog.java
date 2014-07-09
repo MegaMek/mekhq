@@ -13,8 +13,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -49,11 +47,9 @@ import megamek.common.logging.Logger;
  * Code copied from megamek.client.ui.swing.BotConfigDialog and modified
  * to function as a BehaviorSettings editor rather than a BotClient generator.
  * 
- * @author Neoancient
- *
  */
 
-public class PrincessBehaviorDialog extends JDialog implements ActionListener, KeyListener {
+public class PrincessBehaviorDialog extends JDialog implements ActionListener {
 
     /**
 	 * 
@@ -86,7 +82,6 @@ public class PrincessBehaviorDialog extends JDialog implements ActionListener, K
     private JComboBox<String> princessBehaviorNames;
 
     private JTextField nameField;
-    private boolean customName = false; // did user not use default name?
     public boolean dialogAborted = true; // did user not click Ok button?
 
     private final JButton butOK = new JButton(Messages.getString("Okay")); //$NON-NLS-1$
@@ -180,7 +175,6 @@ public class PrincessBehaviorDialog extends JDialog implements ActionListener, K
         nameField.setText(Messages.getString("BotConfigDialog.namefield.default"));
         nameField.setColumns(12);
         nameField.setToolTipText(Messages.getString("BotConfigDialog.namefield.tooltip"));
-        nameField.addKeyListener(this);
         namepanel.add(nameField);
         panel.add(namepanel);
 
@@ -464,16 +458,6 @@ public class PrincessBehaviorDialog extends JDialog implements ActionListener, K
     private void handleError(String method, Throwable t) {
         JOptionPane.showMessageDialog(this, t.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
         new Logger().log(getClass(), method, t);
-    }
-
-    public void keyTyped(KeyEvent e) {
-        customName = true;
-    }
-
-    public void keyReleased(KeyEvent e) {
-    }
-
-    public void keyPressed(KeyEvent e) {
     }
 
     public String getBotName() {

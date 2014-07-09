@@ -33,7 +33,6 @@ import mekhq.campaign.market.UnitMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.rating.UnitRatingFactory;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RandomFactionGenerator;
@@ -327,39 +326,19 @@ public class AtBContract extends Contract implements Serializable {
 				!Faction.getFaction(fName).isClan();
 	}
 	
-	/** Calculates and returns dragoon rating if that is the chosen method;
-	 * for IOps method, returns unit reputation / 10. If the player chooses not
-	 * to use unit rating at all, use a default value of C. Note that the AtB system
-	 * is designed for use with FMMerc dragoon rating, and use of the IOps Beta
-	 * system may have unsatisfactory results, but we follow the options
-	 * set by the user here. 
-	 */
-	public static int getUnitRatingMod(Campaign c) {
-		if (!c.getCampaignOptions().useDragoonRating()) {
-			return IUnitRating.DRAGOON_C;
-		}
-		IUnitRating rating = UnitRatingFactory.getUnitRating(c);
-		rating.reInitialize();
-		return c.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.FLD_MAN_MERCS_REV)?
-				rating.getUnitRatingAsInteger():rating.getModifier();
-	}
-	
 	public void calculatePaymentMultiplier(Campaign campaign) {
-		calculatePaymentMultiplier(campaign, getUnitRatingMod(campaign));
-	}
-
-	public void calculatePaymentMultiplier(Campaign campaign, int unitRatinMod) {
+		int unitRatingMod = campaign.getUnitRatingMod();
 		double multiplier = 1.0;
-		if (unitRatinMod >= IUnitRating.DRAGOON_A){
+		if (unitRatingMod >= IUnitRating.DRAGOON_A){
 			multiplier *= 2.0;
 		}
-		if (unitRatinMod == IUnitRating.DRAGOON_B){
+		if (unitRatingMod == IUnitRating.DRAGOON_B){
 			multiplier *= 1.5;
 		}
-		if (unitRatinMod == IUnitRating.DRAGOON_D){
+		if (unitRatingMod == IUnitRating.DRAGOON_D){
 			multiplier *= 0.8;
 		}
-		if (unitRatinMod == IUnitRating.DRAGOON_F){
+		if (unitRatingMod == IUnitRating.DRAGOON_F){
 			multiplier *= 0.5;
 		}
 		

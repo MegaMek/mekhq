@@ -391,7 +391,7 @@ public class CampaignGUI extends JPanel {
     private JSplitPane splitBrief;
     private JSplitPane splitMission;
     private JTable scenarioTable;
-    private JComboBox choiceMission;
+    private JComboBox<String> choiceMission;
     private JScrollPane scrollMissionView;
     private JScrollPane scrollScenarioView;
     private JPanel panMissionButtons;
@@ -420,8 +420,8 @@ public class CampaignGUI extends JPanel {
     private JPanel panPersonnel;
     private JSplitPane splitPersonnel;
     private JTable personnelTable;
-    private JComboBox choicePerson;
-    private JComboBox choicePersonView;
+    private JComboBox<String> choicePerson;
+    private JComboBox<String> choicePersonView;
     private JScrollPane scrollPersonnelView;
 
     /*For the hangar tab*/
@@ -429,8 +429,8 @@ public class CampaignGUI extends JPanel {
     private JSplitPane splitUnit;
     private JTable unitTable;
     private JTable acquireUnitsTable;
-    private JComboBox choiceUnit;
-    private JComboBox choiceUnitView;
+    private JComboBox<String> choiceUnit;
+    private JComboBox<String> choiceUnitView;
     private JScrollPane scrollUnitView;
 
     /*For the warehouse tab*/
@@ -444,8 +444,8 @@ public class CampaignGUI extends JPanel {
     private JLabel lblTargetNumWarehouse;
     private JTextArea textTargetWarehouse;
     private JLabel astechPoolLabelWarehouse;
-    private JComboBox choiceParts;
-    private JComboBox choicePartsView;
+    private JComboBox<String> choiceParts;
+    private JComboBox<String> choicePartsView;
 
     /*For the repair bay tab*/
     private JPanel panRepairBay;
@@ -804,7 +804,7 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.weighty = 0.0;
         panBriefing.add(new JLabel(resourceMap.getString("lblMission.text")), gridBagConstraints);
 
-        choiceMission = new JComboBox();
+        choiceMission = new JComboBox<String>();
         choiceMission.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 changeMission();
@@ -1135,11 +1135,11 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         panPersonnel.add(new JLabel(resourceMap.getString("lblPersonChoice.text")), gridBagConstraints);
 
-        DefaultComboBoxModel personGroupModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> personGroupModel = new DefaultComboBoxModel<String>();
         for (int i = 0; i < PG_NUM; i++) {
             personGroupModel.addElement(getPersonnelGroupName(i));
         }
-        choicePerson = new JComboBox(personGroupModel);
+        choicePerson = new JComboBox<String>(personGroupModel);
         choicePerson.setSelectedIndex(0);
         choicePerson.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
@@ -1163,11 +1163,11 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         panPersonnel.add(new JLabel(resourceMap.getString("lblPersonView.text")), gridBagConstraints);
 
-        DefaultComboBoxModel personViewModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> personViewModel = new DefaultComboBoxModel<String>();
         for (int i = 0; i < PV_NUM; i++) {
             personViewModel.addElement(getPersonnelViewName(i));
         }
-        choicePersonView = new JComboBox(personViewModel);
+        choicePersonView = new JComboBox<String>(personViewModel);
         choicePersonView.setSelectedIndex(0);
         choicePersonView.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1259,12 +1259,12 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         panHangar.add(new JLabel(resourceMap.getString("lblUnitChoice.text")), gridBagConstraints);
 
-        DefaultComboBoxModel unitGroupModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> unitGroupModel = new DefaultComboBoxModel<String>();
         unitGroupModel.addElement("All Units");
         for (int i = 0; i < UnitType.SIZE; i++) {
             unitGroupModel.addElement(UnitType.getTypeDisplayableName(i));
         }
-        choiceUnit = new JComboBox(unitGroupModel);
+        choiceUnit = new JComboBox<String>(unitGroupModel);
         choiceUnit.setSelectedIndex(0);
         choiceUnit.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1287,11 +1287,11 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         panHangar.add(new JLabel(resourceMap.getString("lblUnitView.text")), gridBagConstraints);
 
-        DefaultComboBoxModel unitViewModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> unitViewModel = new DefaultComboBoxModel<String>();
         for (int i = 0; i < UV_NUM; i++) {
             unitViewModel.addElement(getUnitViewName(i));
         }
-        choiceUnitView = new JComboBox(unitViewModel);
+        choiceUnitView = new JComboBox<String>(unitViewModel);
         choiceUnitView.setSelectedIndex(0);
         choiceUnitView.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1441,11 +1441,11 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
         panSupplies.add(new JLabel(resourceMap.getString("lblPartsChoice.text")), gridBagConstraints);
 
-        DefaultComboBoxModel partsGroupModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> partsGroupModel = new DefaultComboBoxModel<String>();
         for (int i = 0; i < SG_NUM; i++) {
             partsGroupModel.addElement(getPartsGroupName(i));
         }
-        choiceParts = new JComboBox(partsGroupModel);
+        choiceParts = new JComboBox<String>(partsGroupModel);
         choiceParts.setSelectedIndex(0);
         choiceParts.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1470,11 +1470,11 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
         panSupplies.add(new JLabel(resourceMap.getString("lblPartsChoiceView.text")), gridBagConstraints);
 
-        DefaultComboBoxModel partsGroupViewModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> partsGroupViewModel = new DefaultComboBoxModel<String>();
         for (int i = 0; i < SV_NUM; i++) {
             partsGroupViewModel.addElement(getPartsGroupViewName(i));
         }
-        choicePartsView = new JComboBox(partsGroupViewModel);
+        choicePartsView = new JComboBox<String>(partsGroupViewModel);
         choicePartsView.setSelectedIndex(0);
         choicePartsView.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -2642,9 +2642,19 @@ public class CampaignGUI extends JPanel {
             }
         });
         menuView.add(miBloodnameDialog);
-        
+
+        miRetirementDefectionDialog = new JMenuItem("Show Retirement/Defection Dialog...");
+        miRetirementDefectionDialog.setEnabled(true);
+        miRetirementDefectionDialog.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+        miRetirementDefectionDialog.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent evt) {
+        		showRetirementDefectionDialog();
+        	}
+        });
+        menuView.add(miRetirementDefectionDialog);
+
         menuBar.add(menuView);
-        
+
         JMenu menuManage = new JMenu("Manage Campaign");
         menuManage.setName("manageMenu");
         JMenuItem miGMToolsDialog = new JMenuItem("Show GM Tools Dialog");
@@ -3175,7 +3185,6 @@ public class CampaignGUI extends JPanel {
     
     private void useBonusPart() {
         int selectedRow = -1;
-        int partId = -1;
         if (acquireSelected()) {
             selectedRow = acquisitionTable.getSelectedRow();
             IAcquisitionWork acquisition = getSelectedAcquisition();

@@ -143,7 +143,7 @@ public class UnitMarket implements Serializable {
 					UnitTableData.UNIT_AERO, "MERC",
 					UnitTableData.QUALITY_C, 5);
 
-			if (AtBContract.getUnitRatingMod(campaign) >= IUnitRating.DRAGOON_B) {
+			if (campaign.getUnitRatingMod() >= IUnitRating.DRAGOON_B) {
 				ArrayList<Faction> factions = campaign.getCurrentPlanet().getCurrentFactions(campaign.getDate());
 				String faction = factions.get(Compute.randomInt(factions.size())).getShortName();
 				if (Faction.getFaction(campaign.getFactionCode()).isClan() ||

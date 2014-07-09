@@ -131,10 +131,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JSpinner spnClanPriceModifier;
     private JSpinner spnUsedPartsValue[];
     private JSpinner spnDamagedPartsValue;
-    private JComboBox comboFaction;
+    private JComboBox<String> comboFaction;
     SortedComboBoxModel factionModel;
-    private JComboBox comboFactionNames;
-    private JComboBox comboRanks;
+    private JComboBox<String> comboFactionNames;
+    private JComboBox<String> comboRanks;
     private JSlider sldGender;
     private JLabel lblCamo;
     private JLabel lblDate;
@@ -158,7 +158,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JTextField txtName;
     private JCheckBox useEraModsCheckBox;
     private JCheckBox useUnitRatingCheckBox;
-    private JComboBox unitRatingMethodCombo;
+    private JComboBox<String> unitRatingMethodCombo;
     private JCheckBox useFactionForNamesBox;
     private JCheckBox useTacticsBox;
     private JCheckBox useInitBonusBox;
@@ -195,7 +195,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     // Start Personnel Market
     private JPanel panPersonnelMarket;
-    private JComboBox personnelMarketType;
+    private JComboBox<String> personnelMarketType;
     private JTextField personnelMarketRandomEliteRemoval;
     private JTextField personnelMarketRandomVeteranRemoval;
     private JTextField personnelMarketRandomRegularRemoval;
@@ -261,7 +261,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     private JCheckBox chkSupportStaffOnly;
     private JSpinner spnAcquireWaitingPeriod;
-    private JComboBox choiceAcquireSkill;
+    private JComboBox<String> choiceAcquireSkill;
     private JSpinner spnAcquireClanPenalty;
     private JSpinner spnAcquireIsPenalty;
     private JTextField txtMaxAcquisitions;
@@ -269,11 +269,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     private JSpinner spnNDiceTransitTime;
     private JSpinner spnConstantTransitTime;
-    private JComboBox choiceTransitTimeUnits;
+    private JComboBox<String> choiceTransitTimeUnits;
     private JSpinner spnAcquireMosBonus;
-    private JComboBox choiceAcquireMosUnits;
+    private JComboBox<String> choiceAcquireMosUnits;
     private JSpinner spnAcquireMinimum;
-    private JComboBox choiceAcquireMinimumUnit;
+    private JComboBox<String> choiceAcquireMinimumUnit;
 
     private JCheckBox limitByYearBox;
     private JCheckBox allowClanPurchasesBox;
@@ -282,7 +282,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox useAmmoByTypeBox;
     //private JCheckBox disallowSLUnitsBox;
     private JLabel lblTechLevel;
-    private JComboBox choiceTechLevel;
+    private JComboBox<String> choiceTechLevel;
 
     private JLabel lblOverallRecruitBonus;
     private JSpinner spnOverallRecruitBonus;
@@ -465,9 +465,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         lblGender = new JLabel();
         lblDate = new JLabel();
         btnDate = new JButton();
-        comboFaction = new JComboBox();
-        comboFactionNames = new JComboBox();
-        comboRanks = new JComboBox();
+        comboFaction = new JComboBox<String>();
+        comboFactionNames = new JComboBox<String>();
+        comboRanks = new JComboBox<String>();
         sldGender = new JSlider(SwingConstants.HORIZONTAL);
         btnCamo = new JButton();
         lblCamo = new JLabel();
@@ -484,7 +484,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panRandomPortrait = new JPanel();
         useEraModsCheckBox = new JCheckBox();
         useUnitRatingCheckBox = new JCheckBox();
-        unitRatingMethodCombo = new JComboBox(UnitRatingMethod.getUnitRatingMethodNames());
+        unitRatingMethodCombo = new JComboBox<String>(UnitRatingMethod.getUnitRatingMethodNames());
         javax.swing.JLabel clanPriceModifierLabel = new JLabel();
         javax.swing.JLabel usedPartsValueLabel = new JLabel();
         javax.swing.JLabel damagedPartsValueLabel = new JLabel();
@@ -520,7 +520,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         allowISPurchasesBox = new JCheckBox();
         allowCanonOnlyBox = new JCheckBox();
         useAmmoByTypeBox = new JCheckBox();
-        choiceTechLevel = new JComboBox();
+        choiceTechLevel = new JComboBox<String>();
         btnOkay = new JButton();
         btnCancel = new JButton();
         scrRanks = new JScrollPane();
@@ -948,26 +948,26 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         spnAcquireMinimum = new JSpinner(new SpinnerNumberModel(options.getAcquireMinimumTime(), 0, 365, 1));
         ((JSpinner.DefaultEditor) spnAcquireMinimum.getEditor()).getTextField().setEditable(false);
 
-        DefaultComboBoxModel transitUnitModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> transitUnitModel = new DefaultComboBoxModel<String>();
         for (int i = 0; i < CampaignOptions.TRANSIT_UNIT_NUM; i++) {
             transitUnitModel.addElement(CampaignOptions.getTransitUnitName(i));
         }
         transitUnitModel.setSelectedItem(CampaignOptions.getTransitUnitName(options.getUnitTransitTime()));
-        choiceTransitTimeUnits = new JComboBox(transitUnitModel);
+        choiceTransitTimeUnits = new JComboBox<String>(transitUnitModel);
 
-        DefaultComboBoxModel transitMosUnitModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> transitMosUnitModel = new DefaultComboBoxModel<String>();
         for (int i = 0; i < CampaignOptions.TRANSIT_UNIT_NUM; i++) {
             transitMosUnitModel.addElement(CampaignOptions.getTransitUnitName(i));
         }
         transitMosUnitModel.setSelectedItem(CampaignOptions.getTransitUnitName(options.getAcquireMosUnit()));
-        choiceAcquireMosUnits = new JComboBox(transitMosUnitModel);
+        choiceAcquireMosUnits = new JComboBox<String>(transitMosUnitModel);
 
-        DefaultComboBoxModel transitMinUnitModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> transitMinUnitModel = new DefaultComboBoxModel<String>();
         for (int i = 0; i < CampaignOptions.TRANSIT_UNIT_NUM; i++) {
             transitMinUnitModel.addElement(CampaignOptions.getTransitUnitName(i));
         }
         transitMinUnitModel.setSelectedItem(CampaignOptions.getTransitUnitName(options.getAcquireMinimumTimeUnit()));
-        choiceAcquireMinimumUnit = new JComboBox(transitMinUnitModel);
+        choiceAcquireMinimumUnit = new JComboBox<String>(transitMinUnitModel);
 
 
         JPanel pnlTransitTime = new JPanel();
@@ -1073,7 +1073,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panTech.add(lblTechLevel, gridBagConstraints);
 
-        DefaultComboBoxModel techLevelComboBoxModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> techLevelComboBoxModel = new DefaultComboBoxModel<String>();
         techLevelComboBoxModel.addElement(CampaignOptions.getTechLevelName(CampaignOptions.TECH_INTRO));
         techLevelComboBoxModel.addElement(CampaignOptions.getTechLevelName(CampaignOptions.TECH_STANDARD));
         techLevelComboBoxModel.addElement(CampaignOptions.getTechLevelName(CampaignOptions.TECH_ADVANCED));
@@ -2348,7 +2348,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panRank.add(lblRank, gridBagConstraints);
 
-        DefaultComboBoxModel rankModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> rankModel = new DefaultComboBoxModel<String>();
         for (int i = 0; i < Ranks.RS_NUM; i++) {
             rankModel.addElement(Ranks.getRankSystemName(i));
         }
@@ -2507,7 +2507,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panNameGen.add(lblFactionNames, gridBagConstraints);
 
-        DefaultComboBoxModel factionNamesModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> factionNamesModel = new DefaultComboBoxModel<String>();
         for (Iterator<String> i = campaign.getRNG().getFactions(); i.hasNext(); ) {
             String faction = (String) i.next();
             factionNamesModel.addElement(faction);
@@ -2586,7 +2586,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         // Start Personnel Market
         panPersonnelMarket = new JPanel();
-        personnelMarketType = new JComboBox();
+        personnelMarketType = new JComboBox<String>();
         personnelMarketReportRefresh = new JCheckBox("Display a report when market refreshes");
         personnelMarketRandomEliteRemoval = new JTextField();
         personnelMarketRandomVeteranRemoval = new JTextField();
