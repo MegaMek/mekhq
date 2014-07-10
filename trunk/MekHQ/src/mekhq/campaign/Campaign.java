@@ -128,6 +128,7 @@ import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.MASC;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingMASC;
+import mekhq.campaign.personnel.Ancestors;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
@@ -177,6 +178,8 @@ public class Campaign implements Serializable {
     private Hashtable<UUID, Unit> unitIds = new Hashtable<UUID, Unit>();
     private ArrayList<Person> personnel = new ArrayList<Person>();
     private Hashtable<UUID, Person> personnelIds = new Hashtable<UUID, Person>();
+    private ArrayList<Ancestors> ancestors = new ArrayList<Ancestors>();
+    private Hashtable<UUID, Ancestors> ancestorsIds = new Hashtable<UUID, Ancestors>();
     private ArrayList<Part> parts = new ArrayList<Part>();
     private Hashtable<Integer, Part> partIds = new Hashtable<Integer, Part>();
     private Hashtable<Integer, Force> forceIds = new Hashtable<Integer, Force>();
@@ -766,6 +769,11 @@ public class Campaign implements Serializable {
         personnelIds.put(p.getId(), p);
     }
 
+    private void addAncestorsWithoutId(Ancestors a) {
+        ancestors.add(a);
+        ancestorsIds.put(a.getId(), a);
+    }
+
     public void addPersonWithoutId(Person p, boolean log) {
         while (null != personnelIds.get(p.getId())) {
             p.setId(UUID.randomUUID());
@@ -795,6 +803,10 @@ public class Campaign implements Serializable {
 
     public ArrayList<Person> getPersonnel() {
         return personnel;
+    }
+
+    public ArrayList<Ancestors> getAncestors() {
+        return ancestors;
     }
 
     public ArrayList<Person> getPatients() {
@@ -829,10 +841,24 @@ public class Campaign implements Serializable {
     }
 
     public Person getPerson(UUID id) {
-        if (null == id) {
+        if (id == null) {
             return null;
         }
         return personnelIds.get(id);
+    }
+
+    public Ancestors getAncestors(UUID id) {
+        if (id == null) {
+            return null;
+        }
+        return ancestorsIds.get(id);
+    }
+    
+    public Ancestors createAncestors(UUID father, UUID mother) {
+    	Ancestors na = new Ancestors(father, mother, this);
+    	ancestorsIds.put(na.getId(), na);
+    	ancestors.add(na);
+    	return na;
     }
 
     public void addPart(Part p, int transitDays) {
@@ -2850,6 +2876,7 @@ public class Campaign implements Serializable {
         writeArrayAndHashToXmlforUUID(pw1, 1, "units", units, unitIds); // Units
         writeArrayAndHashToXmlforUUID(pw1, 1, "personnel", personnel,
                                       personnelIds); // Personnel
+        writeArrayAndHashToXmlforUUID(pw1, 1, "ancestors", ancestors, ancestorsIds); // Ancestry trees
         writeArrayAndHashToXml(pw1, 1, "missions", missions, missionIds); // Missions
         // the forces structure is hierarchical, but that should be handled
         // internally
@@ -3151,6 +3178,8 @@ public class Campaign implements Serializable {
                     processPartNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("personnel")) {
                     processPersonnelNodes(retVal, wn, version);
+                } else if (xn.equalsIgnoreCase("ancestors")) {
+                    processAncestorNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("units")) {
                     processUnitNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("missions")) {
@@ -3625,6 +3654,40 @@ public class Campaign implements Serializable {
         }
 
         MekHQ.logMessage("Load Personnel Nodes Complete!", 4);
+    }
+
+    private static void processAncestorNodes(Campaign retVal, Node wn,
+                                              Version version) {
+        MekHQ.logMessage("Loading Ancestor Nodes from XML...", 4);
+
+        NodeList wList = wn.getChildNodes();
+
+        // Okay, lets iterate through the children, eh?
+        for (int x = 0; x < wList.getLength(); x++) {
+            Node wn2 = wList.item(x);
+
+            // If it's not an element node, we ignore it.
+            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (!wn2.getNodeName().equalsIgnoreCase("ancestor")) {
+                // Error condition of sorts!
+                // Errr, what should we do here?
+                MekHQ.logMessage("Unknown node type not loaded in Ancestor nodes: "
+                                 + wn2.getNodeName());
+
+                continue;
+            }
+
+            Ancestors a = Ancestors.generateInstanceFromXML(wn2, retVal, version);
+
+            if (a != null) {
+                retVal.addAncestorsWithoutId(a);
+            }
+        }
+
+        MekHQ.logMessage("Load Ancestor Nodes Complete!", 4);
     }
 
     private static void processSkillTypeNodes(Campaign retVal, Node wn,
