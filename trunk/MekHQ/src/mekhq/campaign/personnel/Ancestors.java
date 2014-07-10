@@ -100,6 +100,8 @@ public class Ancestors {
 			return false;
 		}
 		
+		depth++;
+		
 		// Nulls means we can't possibly have a match, eh?
 		if ((fatherID == null && motherID == null)
 				|| (anc.getFatherID() == null && anc.getMotherID() == null)){
@@ -113,28 +115,28 @@ public class Ancestors {
 		
 		// Check father...
 		if (fathersAncestors != null) {
-			if (campaign.getAncestors(fathersAncestors).checkMutualAncestors(anc)) {
+			if (campaign.getAncestors(fathersAncestors).checkMutualAncestors(anc, depth)) {
 				return true;
 			}
 		}
 		
 		// Check mother...
 		if (mothersAncestors != null) {
-			if (campaign.getAncestors(mothersAncestors).checkMutualAncestors(anc)) {
+			if (campaign.getAncestors(mothersAncestors).checkMutualAncestors(anc, depth)) {
 				return true;
 			}
 		}
 		
 		// Check their father...
 		if (anc.getFathersAncestors() != null) {
-			if (anc.getFathersAncestors().checkMutualAncestors(this)) {
+			if (anc.getFathersAncestors().checkMutualAncestors(this, depth)) {
 				return true;
 			}
 		}
 		
 		// Check their mother...
 		if (anc.getMothersAncestors() != null) {
-			if (anc.getMothersAncestors().checkMutualAncestors(this)) {
+			if (anc.getMothersAncestors().checkMutualAncestors(this, depth)) {
 				return true;
 			}
 		}
