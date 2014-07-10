@@ -58,6 +58,7 @@ v0.3.6 (SVN)
 + Feature: Procreation
 + Refactor of procreation to make it more intelligent and fix some bugs
 + Bug [#528]: NPE in MM after lobby "transmitting data"
++ Bug: Ancestors.checkMutualAncestors(Ancestors anc, int depth) wasn't recursively using depth
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
