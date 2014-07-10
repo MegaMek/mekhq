@@ -23,7 +23,7 @@
   <stayAlive>false</stayAlive>
   <icon>../packaging_utils/mekhq.ico</icon>
   <jre>
-    <minVersion>1.5.0</minVersion>
+    <minVersion>1.7.0</minVersion>
     <jdkPreference>preferJre</jdkPreference>
     <maxHeapSize>512</maxHeapSize>
   </jre>
