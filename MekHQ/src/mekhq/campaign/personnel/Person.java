@@ -138,8 +138,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     protected int oldId;
     
     // Lineage & Procreation
-    protected UUID fatherID;
-    protected UUID motherID;
+    protected UUID ancestorsID;
     protected UUID spouse;
     protected GregorianCalendar dueDate;
 
@@ -253,10 +252,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
 
     public Person(String name, Campaign c) {
-    	this(name, c, null, null);
-    }
-
-    public Person(String name, Campaign c, UUID mother, UUID father) {
         this.name = name;
         callsign = "";
         portraitCategory = Crew.ROOT_PORTRAIT;
@@ -292,8 +287,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         phenotype = PHENOTYPE_NONE;
         clan = campaign.getFaction().isClan();
         bloodname = "";
-        motherID = mother;
-        fatherID = father;
     }
 
     public int getPhenotype() {
@@ -807,30 +800,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         return id;
     }
 
-    public UUID getFatherID() {
-		return fatherID;
-	}
-
-	public void setFatherID(UUID fatherID) {
-		this.fatherID = fatherID;
-	}
-	
-	public Person getFather() {
-		return campaign.getPerson(fatherID);
-	}
-
-	public UUID getMotherID() {
-		return motherID;
-	}
-
-	public void setMotherID(UUID motherID) {
-		this.motherID = motherID;
-	}
-	
-	public Person getMother() {
-		return campaign.getPerson(motherID);
-	}
-
 	public UUID getSpouseID() {
 		return spouse;
 	}
@@ -855,10 +824,43 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		return dueDate != null;
 	}
 	
+	public UUID getAncestorsID() {
+		return ancestorsID;
+	}
+	
+	public void setAncestorsID(UUID id) {
+		ancestorsID = id;
+	}
+	
+	public Ancestors getAncestors() {
+		return campaign.getAncestors(ancestorsID);
+	}
+	
+	public Person getMother() {
+		return campaign.getPerson(getAncestors().getMotherID());
+	}
+	
+	public Person getFather() {
+		return campaign.getPerson(getAncestors().getFatherID());
+	}
+	
 	public Person birth() {
 		Person baby = campaign.newPerson(T_NONE);
-		baby.setMotherID(getId());
-		baby.setFatherID(getSpouseID());
+		
+		UUID tmpAncID = null;
+		
+		// Find already existing ancestor set of these parents
+		for (Ancestors a : campaign.getAncestors()) {
+			if (getId().equals(a.getMotherID()) && getSpouseID().equals(a.getFatherID())) {
+				tmpAncID = a.getId();
+				break;
+			}
+		}
+		
+		if (tmpAncID == null) {
+			
+		}
+		
 		String surname = "";
 		if (getName().contains(" ")) {
 			surname = getName().split(" ", 2)[1];
@@ -888,51 +890,14 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	}
 	
 	public boolean safeSpouse(Person p) {
-		if (p.equals(this)) {
-			return false;
-		}
-		// Our parents
-		Person f1 = getFather();
-		Person m1 = getMother();
-		
-		// Check back 5 generations on our side
-		for (int i = 0; i < 5; i++) {
-			// If both parents are null, we're done
-			if (f1.equals(null) && m1.equals(null))
-				break;
-			
-			// Their parents
-			Person f2 = p.getFather();
-			Person m2 = p.getMother();
-			
-			// Check back 5 generations on their side
-			for (int j = 0; j < 5; j++) {
-				// If both parents are null, break to outer loop
-				if (f2.equals(null) && m2.equals(null))
-					break;
-				
-				// If the father matches an ancestor...
-				if (!f1.equals(null) && f1.equals(f2)) {
-					return false;
-				}
-				
-				// If the mother matches an ancestor...
-				if (!m1.equals(null) && m1.equals(m2)) {
-					return false;
-				}
-				
-				// Iterate another generation
-				f2 = f2.getFather();
-				m2 = m2.getMother();
-			}
-			
-			// Iterate another generation
-			f2 = f2.getFather();
-			m2 = m2.getMother();
-		}
-		
-		// No matches made, we're safe
-		return true;
+		// Huge convoluted return statement
+		return (
+				!this.equals(p)
+				&& campaign.getAncestors(getAncestorsID()).checkMutualAncestors(campaign.getAncestors(p.getAncestorsID()))
+				&& p.getSpouseID() == null
+				&& getGender() != p.getGender()
+				&& p.getAge(campaign.getCalendar()) > 13
+		);
 	}
 	
 	public boolean isFemale() {
@@ -1017,6 +982,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
 
     public void writeToXml(PrintWriter pw1, int indent) {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\""
                     + id.toString()
                     + "\" type=\""
@@ -1067,26 +1034,27 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     + idleMonths
                     + "</idleMonths>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<id>"
-                    + this.id.toString()
-                    + "</id>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-	                + "<motherid>"
-	                + this.motherID.toString()
-	                + "</motherid>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-	                + "<fatherid>"
-	                + this.fatherID.toString()
-	                + "</fatherid>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-	                + "<spouse>"
-	                + this.spouse.toString()
-	                + "</spouse>");
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<dueDate>"
-                    + df.format(dueDate.getTime())
-                    + "</dueDate>");
+	                + "<id>"
+	                + this.id.toString()
+	                + "</id>");
+        if (ancestorsID != null) {
+	        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+		                + "<ancestors>"
+		                + this.ancestorsID.toString()
+		                + "</ancestors>");
+        }
+        if (spouse != null) {
+	        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+		                + "<spouse>"
+		                + this.spouse.toString()
+		                + "</spouse>");
+        }
+        if (dueDate != null) {
+	        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+	                    + "<dueDate>"
+	                    + df.format(dueDate.getTime())
+	                    + "</dueDate>");
+        }
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<portraitCategory>"
                     + MekHqXmlUtil.escape(portraitCategory)
@@ -1249,7 +1217,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
             // Instantiate the correct child class, and call its parsing function.
             retVal = new Person(c);
 
-            // Okay, now load Part-specific fields!
+            // Okay, now load Person-specific fields!
             NodeList nl = wn.getChildNodes();
 
             String advantages = null;
@@ -1298,10 +1266,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     } else {
                         retVal.id = UUID.fromString(wn2.getTextContent());
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("motherid")) {
-                    retVal.motherID = UUID.fromString(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("fatherID")) {
-                    retVal.fatherID = UUID.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("ancestors")) {
+                    retVal.ancestorsID = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("spouse")) {
                     retVal.spouse = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("duedate")) {

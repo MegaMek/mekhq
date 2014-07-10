@@ -8959,10 +8959,7 @@ public class CampaignGUI extends JPanel {
                 			&& person.getSpouseID() == null) {
                 		menu = new JMenu("Choose Spouse (Mate)");
                 		for (Person ps : getCampaign().getPersonnel()) {
-                			if (!person.equals(ps)
-                					&& person.getGender() != ps.getGender()
-                					&& ps.getAge(getCampaign().getCalendar()) > 13
-                					&& ps.getSpouseID() == null) {
+                			if (person.safeSpouse(ps)) {
                 				menuItem = new JMenuItem(ps.getFullName());
                 				menuItem.setActionCommand("SPOUSE|"+ps.getId().toString());
                 				menuItem.addActionListener(this);
