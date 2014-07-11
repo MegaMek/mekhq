@@ -43,7 +43,6 @@ import megamek.client.ui.Messages;
 import megamek.client.ui.swing.HelpDialog;
 import megamek.common.logging.LogLevel;
 import megamek.common.logging.Logger;
-import mekhq.MekHQ;
 
 /**
  * Code copied from megamek.client.ui.swing.BotConfigDialog and modified
