@@ -19,6 +19,7 @@ import megamek.client.RandomUnitGenerator;
 import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.bot.princess.HomeEdge;
+import megamek.client.bot.princess.PrincessException;
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Crew;
@@ -701,20 +702,30 @@ public class AtBScenario extends Scenario {
 		ArrayList<Entity> enemy = new ArrayList<Entity>();
 		int enemyStart;
 		int otherStart;
+		int playerHome;
+		int enemyHome;
 		ArrayList<Entity> otherForce;
 		BotForce botForce;
 		
 		switch (battleType) {
 		case HIDEANDSEEK:
 			if (attacker) {
-				start = startPos[Compute.randomInt(4)];
+				start = playerHome = startPos[Compute.randomInt(4)];
 				enemyStart = Board.START_CENTER;
+				enemyHome = playerHome + 4;
+				if (enemyHome > 8) {
+					enemyHome -= 8;
+				}
 			} else {
 				start = Board.START_CENTER;
-				enemyStart = startPos[Compute.randomInt(4)];
+				enemyStart = enemyHome = startPos[Compute.randomInt(4)];
+				playerHome = enemyHome + 4;
+				if (playerHome > 8) {
+					playerHome -= 8;
+				}
 			}
 			if (allyBot.size() > 0) {
-				botForces.add(getAllyBotForce(getContract(campaign), start, allyBot));
+				botForces.add(getAllyBotForce(getContract(campaign), start, playerHome, allyBot));
 			}
 			if (attacker) {
 				addEnemyForce(enemy, getLance(campaign).getWeightClass(campaign),
@@ -723,19 +734,27 @@ public class AtBScenario extends Scenario {
 				addEnemyForce(enemy, getLance(campaign).getWeightClass(campaign),	
 						UnitTableData.WT_HEAVY, 0, 0, campaign);
 			}
-			botForces.add(getEnemyBotForce(getContract(campaign), enemyStart, enemy));
+			botForces.add(getEnemyBotForce(getContract(campaign), enemyStart, enemyHome, enemy));
 			break;
 		case HOLDTHELINE:
 			if (attacker) {
-				start = startPos[Compute.randomInt(4)];
+				start = playerHome = startPos[Compute.randomInt(4)];
 				enemyStart = Board.START_CENTER;
+				enemyHome = playerHome + 4;
+				if (enemyHome > 8) {
+					enemyHome -= 8;
+				}
 			} else {
 				start = Board.START_CENTER;
-				enemyStart = startPos[Compute.randomInt(4)];
+				enemyStart = enemyHome = startPos[Compute.randomInt(4)];
+				playerHome = enemyHome + 4;
+				if (playerHome > 8) {
+					playerHome -= 8;
+				}
 			}
 
 			if (allyBot.size() > 0) {
-				botForces.add(getAllyBotForce(getContract(campaign), start, allyBot));
+				botForces.add(getAllyBotForce(getContract(campaign), start, playerHome, allyBot));
 			}
 			if (attacker) {
 				addEnemyForce(enemy, getLance(campaign).getWeightClass(campaign),
@@ -744,16 +763,24 @@ public class AtBScenario extends Scenario {
 				addEnemyForce(enemy, getLance(campaign).getWeightClass(campaign),
 						UnitTableData.WT_ASSAULT, 4, 0, campaign);
 			}
-			botForces.add(getEnemyBotForce(getContract(campaign), enemyStart, enemy));
+			botForces.add(getEnemyBotForce(getContract(campaign), enemyStart, enemyHome, enemy));
 			break;
 		case EXTRACTION:
 			if (attacker) {
-				start = startPos[Compute.randomInt(4)];
+				start = playerHome = startPos[Compute.randomInt(4)];
 				enemyStart = Board.START_CENTER;
+				enemyHome = playerHome + 4;
+				if (enemyHome > 8) {
+					enemyHome -= 8;
+				}
 				otherStart = start + 4;
 			} else {
 				start = Board.START_CENTER;
-				enemyStart = startPos[Compute.randomInt(4)];
+				enemyStart = enemyHome = startPos[Compute.randomInt(4)];
+				playerHome = enemyHome + 4;
+				if (playerHome > 8) {
+					playerHome -= 8;
+				}
 				otherStart = enemyStart + 4;
 			}
 			if (otherStart > 8) {
@@ -761,107 +788,145 @@ public class AtBScenario extends Scenario {
 			}
 
 			if (allyBot.size() > 0) {
-				botForces.add(getAllyBotForce(getContract(campaign), start, allyBot));
+				botForces.add(getAllyBotForce(getContract(campaign), start, playerHome, allyBot));
 			}
 			addEnemyForce(enemy, getLance(campaign).getWeightClass(campaign), campaign);
-			botForces.add(getEnemyBotForce(getContract(campaign), enemyStart, enemy));
+			botForces.add(getEnemyBotForce(getContract(campaign), enemyStart, enemyHome, enemy));
 			
 			otherForce = new ArrayList<Entity>();
 			addCivilianUnits(otherForce, 4, campaign);
 			if (attacker) {
 				botForces.add(new BotForce("Civilians", 1,
-						otherStart, otherForce));
+						otherStart, otherStart, otherForce));
 				for (Entity en : otherForce) {
 					survivalBonus.add(UUID.fromString(en.getExternalIdAsString()));
 				}
 			} else {
 				botForces.add(new BotForce("Civilians", 2,
-						otherStart, otherForce));
+						otherStart, otherStart, otherForce));
 			}
 			break;
 		case BREAKTHROUGH:
 			if (attacker) {
-				start = Board.START_S;
+				start = playerHome = Board.START_S;
 				enemyStart = Board.START_CENTER;
+				enemyHome = Board.START_N;
 			} else {
 				start = Board.START_CENTER;
-				enemyStart = Board.START_S;
+				playerHome = Board.START_N;
+				enemyStart = enemyHome = Board.START_S;
 			}
 
+			BotForce allyBotForce = null;
 			if (allyBot.size() > 0) {
-				botForces.add(getAllyBotForce(getContract(campaign), start, allyBot));
+				allyBotForce = getAllyBotForce(getContract(campaign), start, playerHome, allyBot);
+				botForces.add(allyBotForce);
 			}
 						
 			addEnemyForce(enemy, getLance(campaign).getWeightClass(campaign), campaign);
-			botForce = getEnemyBotForce(getContract(campaign), enemyStart, enemy);
-			if (!attacker) {
-				BehaviorSettings bs = botForce.getBehaviorSettings();
-				bs.setForcedWithdrawal(true);
-				bs.setAutoFlee(true);
-				bs.setHomeEdge(HomeEdge.NORTH);
+			botForce = getEnemyBotForce(getContract(campaign), enemyStart, enemyHome, enemy);
+			try {
+				if (attacker) {
+					if (null != allyBotForce) {
+						allyBotForce.setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
+					}
+				} else {
+					botForce.setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
+				}
+			} catch (PrincessException e) {
+				e.printStackTrace();
 			}
 			botForces.add(botForce);
 			
 			break;
 		case CHASE:
-			start = Board.START_S;
-			enemyStart = Board.START_S;
+			start = playerHome = Board.START_S;
+			enemyStart = enemyHome = Board.START_S;
+			if (attacker) {
+				playerHome = Board.START_N;
+			} else {
+				enemyHome = Board.START_N;
+			}
 
+			allyBotForce = null;
 			if (allyBot.size() > 0) {
-				botForces.add(getAllyBotForce(getContract(campaign), start, allyBot));
+				allyBotForce = getAllyBotForce(getContract(campaign), start, playerHome, allyBot);
+				botForces.add(allyBotForce);
 			}
 
 			addEnemyForce(enemy, getLance(campaign).getWeightClass(campaign),
 					UnitTableData.WT_ASSAULT, 0, -1, campaign);
 			addEnemyForce(enemy, getLance(campaign).getWeightClass(campaign),
 					UnitTableData.WT_ASSAULT, 0, -1, campaign);
-			botForce = getEnemyBotForce(getContract(campaign), enemyStart, enemy);
-			if (!attacker) {
-				BehaviorSettings bs = botForce.getBehaviorSettings();
-				bs.setForcedWithdrawal(true);
-				bs.setAutoFlee(true);
-				bs.setHomeEdge(HomeEdge.NORTH);
+			botForce = getEnemyBotForce(getContract(campaign), enemyStart, enemyHome, enemy);
+			try {
+				if (attacker) {
+					if (null != allyBotForce) {
+						allyBotForce.setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
+					}
+				} else {
+					botForce.setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
+				}
+			} catch (PrincessException e) {
+				e.printStackTrace();
 			}
 			botForces.add(botForce);
 			
 			break;
 		case PROBE:
-			start = startPos[Compute.randomInt(4)];
+			start = playerHome = startPos[Compute.randomInt(4)];
 			enemyStart = start + 4;
 			if (enemyStart > 8) {
 				enemyStart -= 8;
 			}
+			enemyHome = enemyStart;
 
 			if (allyBot.size() > 0) {
-				botForces.add(getAllyBotForce(getContract(campaign), start, allyBot));
+				botForces.add(getAllyBotForce(getContract(campaign), start, playerHome, allyBot));
 			}
 			addEnemyForce(enemy, getLance(campaign).getWeightClass(campaign),
 					UnitTableData.WT_MEDIUM, 0, 0, campaign);
-			botForces.add(getEnemyBotForce(getContract(campaign), enemyStart, enemy));
+			botForces.add(getEnemyBotForce(getContract(campaign), enemyStart, enemyHome, enemy));
 			break;
 		case RECONRAID:
 			if (attacker) {
-				start = startPos[Compute.randomInt(4)];
+				start = playerHome = startPos[Compute.randomInt(4)];
 				enemyStart = Board.START_CENTER;
+				enemyHome = playerHome + 4;
+				if (enemyHome > 8) {
+					enemyHome -= 8;
+				}
 			} else {
 				start = Board.START_CENTER;
-				enemyStart = startPos[Compute.randomInt(4)];
+				enemyStart = enemyHome = startPos[Compute.randomInt(4)];
+				playerHome = enemyHome + 4;
+				if (playerHome > 8) {
+					playerHome -= 8;
+				}
 			}
 
 			if (allyBot.size() > 0) {
-				botForces.add(getAllyBotForce(getContract(campaign), start, allyBot));
+				botForces.add(getAllyBotForce(getContract(campaign), start, playerHome, allyBot));
 			}
 			addEnemyForce(enemy, getLance(campaign).getWeightClass(campaign),
 					UnitTableData.WT_MEDIUM, 0, 0, campaign);
-			botForces.add(getEnemyBotForce(getContract(campaign), enemyStart, enemy));
+			botForces.add(getEnemyBotForce(getContract(campaign), enemyStart, enemyHome, enemy));
 			break;			
 		case BASEATTACK:
 			if (attacker) {
-				start = startPos[Compute.randomInt(4)];
+				start = playerHome = startPos[Compute.randomInt(4)];
 				enemyStart = Board.START_CENTER;
+				enemyHome = playerHome + 4;
+				if (enemyHome > 8) {
+					enemyHome -= 8;
+				}
 			} else {
 				start = Board.START_CENTER;
-				enemyStart = startPos[Compute.randomInt(4)];
+				enemyStart = enemyHome = startPos[Compute.randomInt(4)];
+				playerHome = enemyHome + 4;
+				if (playerHome > 8) {
+					playerHome -= 8;
+				}
 			}
 
 			/* Ally deploys 2 lances of a lighter weight class than the player */
@@ -872,31 +937,34 @@ public class AtBScenario extends Scenario {
 			addLance(allyBot, getContract(campaign).getEmployerCode(),
 					getContract(campaign).getAllySkill(), getContract(campaign).getAllyQuality(),
 					allyForce, campaign);
-			botForces.add(getAllyBotForce(getContract(campaign), start, allyBot));
+			botForces.add(getAllyBotForce(getContract(campaign), start, playerHome, allyBot));
 			
 			/* Roll 2x on bot lances roll */
 			addEnemyForce(enemy, getLance(campaign).getWeightClass(campaign), campaign);
 			addEnemyForce(enemy, getLance(campaign).getWeightClass(campaign), campaign);
-			botForces.add(getEnemyBotForce(getContract(campaign), enemyStart, enemy));
+			botForces.add(getEnemyBotForce(getContract(campaign), enemyStart, enemyHome, enemy));
 						
 			otherForce = new ArrayList<Entity>();
 			addCivilianUnits(otherForce, 10, campaign);
 			botForces.add(new BotForce("Civilians", attacker?2:1,
-					attacker?enemyStart:start, otherForce));
+					attacker?enemyHome:playerHome, attacker?enemyStart:start,
+							otherForce));
 			//TODO: add 6 turrets to defender
 			break;
 		case STANDUP:
 		default:
-			start = startPos[Compute.randomInt(4)];
+			start = playerHome = startPos[Compute.randomInt(4)];
 			enemyStart = start + 4;
 			if (enemyStart > 8) {
 				enemyStart -= 8;
 			}
+			enemyHome = enemyStart;
+
 			if (allyBot.size() > 0) {
-				botForces.add(getAllyBotForce(getContract(campaign), start, allyBot));
+				botForces.add(getAllyBotForce(getContract(campaign), start, playerHome, allyBot));
 			}
 			addEnemyForce(enemy, getLance(campaign).getWeightClass(campaign), campaign);
-			botForces.add(getEnemyBotForce(getContract(campaign), enemyStart, enemy));
+			botForces.add(getEnemyBotForce(getContract(campaign), enemyStart, enemyHome, enemy));
 			break;
 		}
 		/* Possible enemy reinforcements */
@@ -1582,18 +1650,18 @@ public class AtBScenario extends Scenario {
 		String weights = adjustForMaxWeight(lanceWeights[0][weightClass][Compute.d6() - 1],
 				maxWeight);
 		
-		int forceType;
-		int roll = Compute.d6();
-		if (roll < 4) {
-			forceType = FORCE_VEHICLE;
-		} else if (roll < 6) {
-			forceType = FORCE_MIXED;
-		} else {
-			forceType = FORCE_MEK;
-			if (campaign.getCampaignOptions().getRegionalMechVariations()) {
-				weights = adjustWeightsForFaction(weights, faction);
+		int forceType = FORCE_MEK;
+			if (campaign.getCampaignOptions().getUseVehicles()) {
+			int roll = Compute.d6();
+			if (roll < 4) {
+				forceType = FORCE_VEHICLE;
+			} else if (roll < 6) {
+				forceType = FORCE_MIXED;
 			}
 		}
+		if (forceType == FORCE_MEK && campaign.getCampaignOptions().getRegionalMechVariations()) {
+			weights = adjustWeightsForFaction(weights, faction);
+		}			
 		
 		int[] unitTypes = new int[weights.length()];
 		for (int i = 0; i < unitTypes.length; i++) {
@@ -1636,25 +1704,28 @@ public class AtBScenario extends Scenario {
 	private void addStar(ArrayList<Entity> list, String faction, int skill, int quality, int weightClass, int maxWeight, Campaign campaign, int arrivalTurn) {
 		int forceType = FORCE_MEK;
 		/* 1 chance in 12 of a Nova, per AtB rules; CHH/CSL
-		 * close to 2/3. Added a chance to encounter
+		 * close to 1/2, no chance for CBS. Added a chance to encounter
 		 * a vehicle Star in Clan second-line (rating C or lower) units,
 		 * or all unit ratings for CHH/CSL and CBS.
 		 */
 		int roll = Compute.d6(2);
-		int novaTarget = 10;
+		int novaTarget = 11;
 		if (faction.equals("CHH") || faction.equals("CSL")) {
-			novaTarget = 7;
+			novaTarget = 8;
+		} else if (faction.equals("CBS")) {
+			novaTarget = 13;
 		}
-		if (roll > novaTarget) {
+		int vehicleTarget = 4;
+		if (!faction.equals("CHH") || !faction.equals("CSL")
+				&& !faction.equals("CBS")) {
+			vehicleTarget -= quality;
+		}
+
+		if (roll >= novaTarget) {
 			forceType = FORCE_NOVA;
-		} else if (campaign.getCampaignOptions().getClanVehicles()) {
-			if (!faction.equals("CHH") || !faction.equals("CSL")
-					&& !faction.equals("CBS")) {
-				roll += quality;
-			}
-			if (roll <= 4) {
-				forceType = FORCE_VEHICLE;
-			}
+		} else if (campaign.getCampaignOptions().getClanVehicles() &&
+				roll <= vehicleTarget) {
+			forceType = FORCE_VEHICLE;
 		}
 		
 		String weights = adjustForMaxWeight(lanceWeights[1][weightClass][Compute.d6() - 1],
@@ -1689,7 +1760,7 @@ public class AtBScenario extends Scenario {
 			break;
 		}
 		
-		/* Ensure Novas use Frontline tables to get Omnis */
+		/* Ensure Novas use Frontline tables to get best chance at Omnis */
 		int tmpQuality = quality;
 		if (forceType == FORCE_NOVA && quality < IUnitRating.DRAGOON_B) {
 			tmpQuality = IUnitRating.DRAGOON_B;
@@ -1786,15 +1857,19 @@ public class AtBScenario extends Scenario {
 	}
 	
 	/* Convenience methods for frequently-used arguments */
-	private BotForce getAllyBotForce(AtBContract c, int start, ArrayList<Entity> entities) {
-		return new BotForce(c.getAllyBotName(), 1, start, entities,
+	private BotForce getAllyBotForce(AtBContract c, int start, int home, ArrayList<Entity> entities) {
+		return new BotForce(c.getAllyBotName(), 1, start, home, entities,
 				c.getAllyCamoCategory(),
 				c.getAllyCamoFileName(),
 				c.getAllyColorIndex());
 	}
 
 	private BotForce getEnemyBotForce(AtBContract c, int start, ArrayList<Entity> entities) {
-		return new BotForce(c.getEnemyBotName(), 2, start, entities,
+		return getEnemyBotForce(c, start, start, entities);
+	}
+	
+	private BotForce getEnemyBotForce(AtBContract c, int start, int home, ArrayList<Entity> entities) {
+		return new BotForce(c.getEnemyBotName(), 2, start, home, entities,
 				c.getEnemyCamoCategory(),
 				c.getEnemyCamoFileName(),
 				c.getEnemyColorIndex());
@@ -2336,14 +2411,23 @@ public class AtBScenario extends Scenario {
 		
 		public BotForce() {
 			this.entityList = new ArrayList<Entity>();
-			behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR;
+			try {
+				behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
+			} catch (PrincessException ex) {
+				MekHQ.logError("Error getting Princess default behaviors");
+				MekHQ.logError(ex);
+			}
 		};
 		
 		public BotForce(String name, int team, int start, ArrayList<Entity> entityList) {
-			this(name, team, start, entityList, Player.NO_CAMO, null, -1);
+			this(name, team, start, start, entityList, Player.NO_CAMO, null, -1);
+		}
+		
+		public BotForce(String name, int team, int start, int home, ArrayList<Entity> entityList) {
+			this(name, team, start, home, entityList, Player.NO_CAMO, null, -1);
 		}
 
-		public BotForce(String name, int team, int start, ArrayList<Entity> entityList,
+		public BotForce(String name, int team, int start, int home, ArrayList<Entity> entityList,
 				String camoCategory, String camoFileName, int colorIndex) {
 			this.name = name;
 			this.team = team;
@@ -2352,8 +2436,13 @@ public class AtBScenario extends Scenario {
 		    this.camoCategory = camoCategory;
 		    this.camoFileName = camoFileName;
 		    this.colorIndex = colorIndex;
-			behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR;
-			behaviorSettings.setHomeEdge(findHomeEdge(start));
+			try {
+				behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
+			} catch (PrincessException ex) {
+				MekHQ.logError("Error getting Princess default behaviors");
+				MekHQ.logError(ex);
+			}
+			behaviorSettings.setHomeEdge(findHomeEdge(home));
 		}
 		
 		/* Convert from MM's Board to Princess's HomeEdge */
@@ -2513,24 +2602,24 @@ public class AtBScenario extends Scenario {
 					NodeList nl2 = wn2.getChildNodes();
 					for (int i = 0; i < nl2.getLength(); i++) {
 						Node wn3 = nl2.item(i);
-						if (wn2.getNodeName().equalsIgnoreCase("forcedWithdrawal")) {
-							behaviorSettings.setForcedWithdrawal(Boolean.parseBoolean(wn2.getTextContent()));
+						if (wn3.getNodeName().equalsIgnoreCase("forcedWithdrawal")) {
+							behaviorSettings.setForcedWithdrawal(Boolean.parseBoolean(wn3.getTextContent()));
 						} else if (wn3.getNodeName().equalsIgnoreCase("goHome")) {
-							behaviorSettings.setGoHome(Boolean.parseBoolean(wn2.getTextContent()));
+							behaviorSettings.setGoHome(Boolean.parseBoolean(wn3.getTextContent()));
 						} else if (wn3.getNodeName().equalsIgnoreCase("autoFlee")) {
-							behaviorSettings.setAutoFlee(Boolean.parseBoolean(wn2.getTextContent()));
+							behaviorSettings.setAutoFlee(Boolean.parseBoolean(wn3.getTextContent()));
 						} else if (wn3.getNodeName().equalsIgnoreCase("selfPreservationIndex")) {
-							behaviorSettings.setSelfPreservationIndex(Integer.parseInt(wn2.getTextContent()));
+							behaviorSettings.setSelfPreservationIndex(Integer.parseInt(wn3.getTextContent()));
 						} else if (wn3.getNodeName().equalsIgnoreCase("fallShameIndex")) {
-							behaviorSettings.setFallShameIndex(Integer.parseInt(wn2.getTextContent()));
+							behaviorSettings.setFallShameIndex(Integer.parseInt(wn3.getTextContent()));
 						} else if (wn3.getNodeName().equalsIgnoreCase("hyperAggressionIndex")) {
-							behaviorSettings.setHyperAggressionIndex(Integer.parseInt(wn2.getTextContent()));
+							behaviorSettings.setHyperAggressionIndex(Integer.parseInt(wn3.getTextContent()));
 						} else if (wn3.getNodeName().equalsIgnoreCase("homeEdge")) {
-							behaviorSettings.setHomeEdge(Integer.parseInt(wn2.getTextContent()));
+							behaviorSettings.setHomeEdge(Integer.parseInt(wn3.getTextContent()));
 						} else if (wn3.getNodeName().equalsIgnoreCase("herdMentalityIndex")) {
-							behaviorSettings.setHerdMentalityIndex(Integer.parseInt(wn2.getTextContent()));
+							behaviorSettings.setHerdMentalityIndex(Integer.parseInt(wn3.getTextContent()));
 						} else if (wn3.getNodeName().equalsIgnoreCase("braveryIndex")) {
-							behaviorSettings.setBraveryIndex(Integer.parseInt(wn2.getTextContent()));
+							behaviorSettings.setBraveryIndex(Integer.parseInt(wn3.getTextContent()));
 						}
 					}
 				}			
