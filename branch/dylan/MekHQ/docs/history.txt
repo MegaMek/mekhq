@@ -66,6 +66,8 @@ v0.3.6 (SVN)
 + Bug: Person.birth() wasn't creating a new Ancestors object when needed
 + Use type.getCost() method for EquipmentParts that possess an Entity
 + Patch [34]: Against the Bot, 3rd Patch
++ Bug [#529]: SVN ClassCastException with Ancestors
++ Patch [34]: Against the Bot, 4th Patch
 
 v0.3.5-dylan (2014-04-28)
 -- No Changes--
