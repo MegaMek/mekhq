@@ -30,6 +30,7 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
 
 /**
  * Used by Against the Bot to track additional information about each force
@@ -70,6 +71,16 @@ public class Lance implements Serializable, MekHqXmlSerializable {
 	private int missionId;
 	private int role;
 	private UUID commanderId;
+	
+	public static int getStdLanceSize(Faction f) {
+    	if (f.isClan()) {
+    		return STR_CLAN;
+    	} else if (f.getShortName().equals("CS") || f.getShortName().equals("WOB")) {
+    		return STR_CS;
+    	} else {
+    		return STR_IS;
+    	}
+	}
 	
 	public Lance() {}
 
@@ -200,7 +211,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
 				}
 			}
 		}
-		weight = weight * 4.0 / c.getCampaignOptions().getLanceStructure();
+		weight = weight * 4.0 / getStdLanceSize(c.getFaction());
 		if (weight < 40) {
 			return EntityWeightClass.WEIGHT_ULTRA_LIGHT;
 		}
@@ -224,8 +235,8 @@ public class Lance implements Serializable, MekHqXmlSerializable {
 		 * and that the force contains at least one ground unit. */
 		if (c.getCampaignOptions().getLimitLanceNumUnits()) {
 			int size = getSize(c);
-			if (size < c.getCampaignOptions().getLanceStructure() - 1 ||
-					size > c.getCampaignOptions().getLanceStructure() + 2) {
+			if (size < getStdLanceSize(c.getFaction()) - 1 ||
+					size > getStdLanceSize(c.getFaction()) + 2) {
 				return false;
 			}
 		}

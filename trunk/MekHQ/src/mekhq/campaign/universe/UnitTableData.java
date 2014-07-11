@@ -200,6 +200,12 @@ public class UnitTableData implements Serializable, ActionListener {
 						compareTo(ratTree.get(arg0).keySet().iterator().next());
 			}
 		});
+
+		/* If a Clan table cannot be found, use a generic IS table */
+		if (!altFactions.contains("General")) {
+			altFactions.add("General");
+		}
+
 		for (String source : sorted) {
 			for (String f : altFactions) {
 				if (hasRAT(source, f, unitType)) {
@@ -229,13 +235,14 @@ public class UnitTableData implements Serializable, ActionListener {
 				retVal.add(s);
 			}
 		}
-		if (f.isClan()) {
-			retVal.add("CLAN");
-		}
 		if (f.isPeriphery()) {
 			retVal.add("Periphery");
 		}
-		retVal.add("General");
+		if (f.isClan()) {
+			retVal.add("CLAN");
+		} else {
+			retVal.add("General");
+		}
 		return retVal;
 	}
 

@@ -59,6 +59,11 @@ v0.3.6 (SVN)
 + Refactor of procreation to make it more intelligent and fix some bugs
 + Bug [#528]: NPE in MM after lobby "transmitting data"
 + Bug: Ancestors.checkMutualAncestors(Ancestors anc, int depth) wasn't recursively using depth
++ Added procreation w/out a spouse at a much reduced chance
++ Procreation frequency too high, lowering chance
++ Bug: Person.birth() wasn't creating a new Ancestors object when needed
++ Use type.getCost() method for EquipmentParts that possess an Entity
++ Patch [34]: Against the Bot, 3rd Patch
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4

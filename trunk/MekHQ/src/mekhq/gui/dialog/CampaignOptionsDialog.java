@@ -334,7 +334,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox chkCustomRetirementMods;
     private JCheckBox chkLimitLanceWeight;
     private JCheckBox chkLimitLanceNumUnits;
-    private JComboBox<String> cbLanceStructure;
     private JCheckBox chkUseLeadership;
     private JCheckBox chkUseStrategy;
     private JSpinner spnBaseStrategyDeployment;
@@ -2824,7 +2823,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         chkTrackOriginalUnit = new JCheckBox();
         chkLimitLanceWeight = new JCheckBox();
         chkLimitLanceNumUnits = new JCheckBox();
-        cbLanceStructure = new JComboBox<String>();
         chkUseLeadership = new JCheckBox();
         chkUseStrategy = new JCheckBox();
         spnBaseStrategyDeployment = new JSpinner();
@@ -3215,15 +3213,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblLanceStructure, gridBagConstraints);
 
-        cbLanceStructure.addItem("IS Lance (4 units)");
-        cbLanceStructure.addItem("Clan Star (5 points)");
-        cbLanceStructure.addItem("CS/WoB Level II (6 units)");
-        cbLanceStructure.setSelectedIndex(options.getLanceStructure() - 4);
-        cbLanceStructure.setToolTipText(resourceMap.getString("cbLanceStructure.toolTipText"));
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
-        panSubAtBContract.add(cbLanceStructure, gridBagConstraints);
-        
         chkUseStrategy.setText(resourceMap.getString("chkUseStrategy.text"));
         chkUseStrategy.setSelected(options.getUseStrategy());
         chkUseStrategy.setToolTipText(resourceMap.getString("chkUseStrategy.toolTipText"));
@@ -3757,7 +3746,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setCustomRetirementMods(chkCustomRetirementMods.isSelected());
         options.setLimitLanceWeight(chkLimitLanceWeight.isSelected());
         options.setLimitLanceNumUnits(chkLimitLanceNumUnits.isSelected());
-        options.setLanceStructure(cbLanceStructure.getSelectedIndex() + 4);
         options.setUseLeadership(chkUseLeadership.isSelected());
         options.setUseStrategy(chkUseStrategy.isSelected());
         options.setBaseStrategyDeployment((Integer)spnBaseStrategyDeployment.getValue());

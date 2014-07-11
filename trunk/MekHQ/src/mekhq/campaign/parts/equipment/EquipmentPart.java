@@ -482,7 +482,10 @@ public class EquipmentPart extends Part {
     
     private int resolveVariableCost(boolean isArmored) {
     	double varCost = 0;
-        if (type instanceof MiscType) {           
+    	Entity en = getUnit().getEntity();
+    	if (en != null) {
+    		varCost = type.getCost(en, isArmored, getLocation());
+    	} else if (type instanceof MiscType) {
         	if (type.hasFlag(MiscType.F_DRONE_CARRIER_CONTROL)) {
                 varCost = getTonnage() * 10000;
             } else if (type.hasFlag(MiscType.F_OFF_ROAD)) {
@@ -537,11 +540,11 @@ public class EquipmentPart extends Part {
                 varCost = (int) Math.ceil(getUnitTonnage() * 150);
             }
 
-        } 
+        }
         if (varCost == 0) {
           // if we don't know what it is...
           System.out.println("I don't know how much " + name + " costs.");
-        }      
+        }
         return (int) Math.ceil(varCost);
     }
     

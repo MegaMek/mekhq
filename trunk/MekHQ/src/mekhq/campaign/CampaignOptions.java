@@ -200,7 +200,7 @@ public class CampaignOptions implements Serializable {
     private boolean customRetirementMods;
     private boolean trackOriginalUnit;
     private boolean mercSizeLimited;
-    private String[] rats = {"FM Updates", "Xotl", "Total Warfare"};
+    private String[] rats = {"Xotl", "Total Warfare"};
     private String[] ratsNoEra = {"Xotl", "Total Warfare"};
     private int searchRadius;
     private double intensity;
@@ -217,7 +217,6 @@ public class CampaignOptions implements Serializable {
     private boolean restrictPartsByMission;
     private boolean limitLanceWeight;
     private boolean limitLanceNumUnits;
-    private int lanceStructure;
     private boolean useAtBCapture;
     private boolean contractMarketReportRefresh;
     private boolean unitMarketReportRefresh;
@@ -388,7 +387,6 @@ public class CampaignOptions implements Serializable {
     	restrictPartsByMission = true;
     	limitLanceWeight = true;
     	limitLanceNumUnits = true;
-    	lanceStructure = 4;
     	useAtBCapture = false;
         contractMarketReportRefresh = true;
         unitMarketReportRefresh = true;
@@ -1453,14 +1451,6 @@ public class CampaignOptions implements Serializable {
 		limitLanceNumUnits = limit;
 	}
 	
-	public int getLanceStructure() {
-		return lanceStructure;
-	}
-	
-	public void setLanceStructure(int struct) {
-		lanceStructure = struct;
-	}
-	
 	public boolean getUseAtBCapture() {
 		return useAtBCapture;
 	}
@@ -1618,7 +1608,6 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "restrictPartsByMission", restrictPartsByMission);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "limitLanceWeight", limitLanceWeight);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "limitLanceNumUnits", limitLanceNumUnits);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "lanceStructure", lanceStructure);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAtBCapture", useAtBCapture);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "contractMarketReportRefresh", contractMarketReportRefresh);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitMarketReportRefresh", unitMarketReportRefresh);
@@ -2101,8 +2090,6 @@ public class CampaignOptions implements Serializable {
                 retVal.limitLanceWeight = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("limitLanceNumUnits")) {
                 retVal.limitLanceNumUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("lanceStructure")) {
-                retVal.lanceStructure = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useAtBCapture")) {
                 retVal.useAtBCapture = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("contractMarketReportRefresh")) {
