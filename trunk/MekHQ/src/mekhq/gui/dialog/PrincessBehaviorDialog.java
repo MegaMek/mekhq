@@ -38,10 +38,12 @@ import javax.swing.border.TitledBorder;
 
 import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.bot.princess.BehaviorSettingsFactory;
+import megamek.client.bot.princess.PrincessException;
 import megamek.client.ui.Messages;
 import megamek.client.ui.swing.HelpDialog;
 import megamek.common.logging.LogLevel;
 import megamek.common.logging.Logger;
+import mekhq.MekHQ;
 
 /**
  * Code copied from megamek.client.ui.swing.BotConfigDialog and modified
@@ -90,7 +92,11 @@ public class PrincessBehaviorDialog extends JDialog implements ActionListener {
 	public PrincessBehaviorDialog(JFrame parent,
 			BehaviorSettings princessBehavior, String name) {
 		super(parent, name + " behavior", true);
-		this.princessBehavior = princessBehavior;
+		try {
+			this.princessBehavior = princessBehavior.getCopy();
+		} catch (PrincessException e) {
+			e.printStackTrace();
+		}
 		
         setLayout(new BorderLayout());
         JScrollPane princessScroll = new JScrollPane(princessPanel());
@@ -109,11 +115,21 @@ public class PrincessBehaviorDialog extends JDialog implements ActionListener {
 		return princessBehavior;
 	}
 
+    private boolean resetPrincessBehavior() {
+        princessBehavior = behaviorSettingsFactory.getBehavior((String) princessBehaviorNames.getSelectedItem());
+        if (princessBehavior == null) {
+            princessBehavior = new BehaviorSettings();
+            return false;
+        }
+        return true;
+    }
+
     private void setPrincessFields() {
         verbosityCombo.setSelectedIndex(0);
         forcedWithdrawalCheck.setSelected(princessBehavior.isForcedWithdrawal());
         goHomeCheck.setSelected(princessBehavior.shouldGoHome());
         autoFleeCheck.setSelected(princessBehavior.shouldAutoFlee());
+        autoFleeCheck.setEnabled(goHomeCheck.isSelected());
         selfPreservationSlidebar.setValue(princessBehavior.getSelfPreservationIndex());
         aggressionSlidebar.setValue(princessBehavior.getHyperAggressionIndex());
         fallShameSlidebar.setValue(princessBehavior.getFallShameIndex());
@@ -443,7 +459,9 @@ public class PrincessBehaviorDialog extends JDialog implements ActionListener {
             targetsListModel.removeElementAt(targetsList.getSelectedIndex());
 
         } else if (princessBehaviorNames.equals(e.getSource())) {
-            setPrincessFields();
+        	if (resetPrincessBehavior()) {
+        		setPrincessFields();
+        	}
 
         } else if (goHomeCheck.equals(e.getSource())) {
             if (!goHomeCheck.isSelected()) {
