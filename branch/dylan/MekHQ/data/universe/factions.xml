@@ -1379,4 +1379,32 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
         <periphery>false</periphery>
         <clan>false</clan>
     </faction>
+    <faction>
+        <shortname>UC</shortname>
+        <fullname>Umayyad Caliphate</fullname>
+		<startingPlanet>Granada,Granada,Granada,Granada,Granada,Granada,Granada,</startingPlanet>
+		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>0,255,0</colorRGB>
+		<periphery>true</periphery>
+		<clan>false</clan>
+	</faction>
+    <faction>
+        <shortname>REB</shortname>
+        <fullname>Rebels</fullname>
+        <eraMods>2,2,2,2,2,2,2,2,2</eraMods>
+        <nameGenerator>General</nameGenerator>
+        <periphery>false</periphery>
+        <clan>false</clan>
+    </faction>
+    <faction>
+        <shortname>RON</shortname>
+        <fullname>Ronin</fullname>
+		<startingPlanet>,,,,,,Predlitz,</startingPlanet>
+		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
+		<nameGenerator>DC</nameGenerator>
+		<colorRGB>234,45,46</colorRGB>
+		<periphery>false</periphery>
+		<clan>false</clan>
+    </faction>
 </factions>

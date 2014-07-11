@@ -1,0 +1,660 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+factionhints.xml
+written by Neoancient
+
+This file details relationships between factions and is used in computing probabilities of conflicts between various factions.
+
+<war> tags indicate limited periods of intense fighting. Bordering factions are twice as likely to fight if at war than otherwise.
+
+<alliance> tags are used for bordering factions which are unlikely to
+fight each other. They are not necessarily formal alliances.
+
+<rivals> tags are used for Clan rivalries. They are cumulative with wars and alliances.
+
+<location> tags are used for factions which are located within another faction and do not control any worlds there, but have an independent military force that may attack or be attacked. Examples include Wolf-in-Exile (in ARDC and later LA) and Nova Cat (in DC), and even temporary situations like the Second Star League operating in DC space during Operation Bulldog.
+
+War, alliance, and rivals nodes each have optional name, start, and end attributes. Those without start and end nodes are considered perpetual. Child nodes all have <parties> tags with a pair of faction codes separated by a comma. Any of the <parties> tags can have optional start or end attributes which override that value for that pair of factions. More than two factions may be listed in the same entry, provided that they are all at war with (or allied with or rivals of) each other. In cases of wars with two or more sides that do not attack each other, each combination must be given in a separate entry. In cases of civil wars, the same faction is listed twice in the entry.
+
+<neutral> nodes work like the inverse of alliance nodes. The faction named in the required "faction" atribute is considered to be allied with all factions not explicitly named by one or more <exception> tags. The <neutral> tag does not take start or end dates, but the <exception> tags may.
+
+<location> nodes have the same optional name, start, and end attributes as <war>, <alliance>, and <rivals> tags. The faction that controls the space in question is marked as <outer> and the faction contained within that space is marked as <inner>. An optional <fraction> tag indicates what portion of the outer faction's border should be apportioned to the inner faction. If empty, the full border is apportioned to both. The optional <opponents> tag restricts attacks by and against the inner faction to those listed (e.g. during Operation Bulldog, SL forces within the DC attack only Smoke Jaguar and not DC or any of its neighbors, and DC and its neighbors (other than SJ) do not attack SL forces).
+
+There are also some minor tags that appear only at the beginning of the file that are used in contract generation.
+-->
+<factionHints>
+ <deepPeriphery>HL,CI,NC,UC,KE,JF,TD,</deepPeriphery>
+ <majorPowers>CC,DC,FS,FWL,LA,FC,TH</majorPowers>
+ <neutral faction="CS">
+ 	<exceptions>PIR,TD,GV,MV,BoS,MM,WOB,IND,PIND</exceptions>
+	<exceptions end="3012-01-01">OC</exceptions>
+	<exceptions start="3052-05-01">CJF,CW,CGB,CSJ,CSV,CNC,CDS</exceptions>
+ </neutral>
+ 
+ <!--This only applies to mercenaries not under contract, to prevent mercenaries being treated as potential rivals to factions near such planets as Outreach and Northwind.-->
+ <neutral faction="MERC">
+ 	<exceptions>WOB</exceptions>
+ </neutral>
+	
+
+ <rivals>
+ 	<parties>CBS,CB</parties>
+ 	<parties>CBS,CM</parties>
+ 	<parties start="3059-02-16">CBS,CSA</parties>
+	<parties>CBS,CSV</parties>
+ 	<parties>CBS,CFM</parties>
+ 	<parties>CCC,CCO</parties>
+ 	<parties>CCO,CSA</parties>
+ 	<parties>CCO,CSJ</parties>
+ 	<parties>CCO,CJF</parties>
+ 	<parties>CDS,CSR</parties>
+ 	<parties>CFM,CGS</parties>
+ 	<parties>CFM,CHH</parties>
+ 	<parties>CFM,CSA</parties>
+ 	<parties>CFM,CSV</parties>
+ 	<parties end="3070-07-21">CGB,CHH</parties>
+ 	<parties>CGB,CSV</parties>
+ 	<parties start="3062-10-18">CGB,CNC</parties>
+ 	<parties>CGS,CNC</parties>
+	<parties>CJF,CSV</parties>
+	<parties>CJF,CW</parties>
+	<parties>CJF,CWIE</parties>
+	<parties>CM,CSR</parties>
+	<parties>CM,CSA</parties>
+	<parties start="2868-01-01">CSJ,CSA</parties>
+	<parties>CSJ,CW</parties>
+	<parties>CSR,CSV</parties>
+	<parties>CWI,CW</parties>
+	<parties>CW,CWIE</parties>
+	<parties>CWOV,CSR</parties>
+	<parties>CWOV,CW</parties>
+ </rivals>
+	
+	<!--Age of War-->
+	<war name="First Andurien War" start="2398-01-01" end="2404-12-31">
+		<parties>FWL,CC</parties>
+	</war>
+	
+	<war name="Commonwealth-Combine War" start="2407-01-01" end="2408-12-31">
+		<parties>LA,DC</parties>
+	</war>
+	
+	<war name="Rim War" start="2418-01-01" end="2422-12-31">
+		<parties>CC,TC</parties>
+	</war>
+	
+	<war name="The Long March" start="2463-01-01" end="2468-12-31">
+		<parties>LA,DC</parties>
+		<parties>LA,FWL</parties>
+	</war>
+		
+	<war name="Davion Civil War" start="2525-01-01" end="2540-12-31">
+		<parties>FS,FS</parties>
+	</war>
+	
+	<war name="Second Andurien War" start="2528-01-01" end="2531-12-31">
+		<parties>FWL,CC</parties>
+	</war>
+		
+	<war name="Third Andurien War" start="2551-01-01" end="2556-12-31">
+		<parties>FWL,CC</parties>
+	</war>
+	
+	<!--Star League-->
+	<alliance name="Star League" start="2571-07-09" end="2781-08-12">
+		<parties>SL,TH</parties>
+		<parties>SL,CC</parties>
+		<parties>SL,DC</parties>
+		<parties>SL,FS</parties>
+		<parties>SL,FWL</parties>
+		<parties>SL,LA</parties>
+		<parties start="2597-03-21" end="2765-01-01">SL,OA</parties>
+		<parties start="2597-03-21" end="2765-01-01">SL,TC</parties>
+		<parties start="2597-03-21" end="2765-01-01">SL,MOC</parties>
+		<parties start="2597-03-21" end="2765-01-01">SL,RWR</parties>		
+	</alliance>
+	
+	<location start="2572-08-22" end="2781-08-12">
+		<outer>TH</outer>
+		<inner>SL</inner>
+	</location>
+	<location start="2572-10-07" end="2781-08-12">
+		<outer>CC</outer>
+		<inner>SL</inner>
+		<fraction>0.4</fraction>
+	</location>
+	<location start="2572-10-07" end="2781-08-12">
+		<outer>DC</outer>
+		<inner>SL</inner>
+		<fraction>0.4</fraction>
+	</location>
+	<location start="2572-10-07" end="2781-08-12">
+		<outer>FS</outer>
+		<inner>SL</inner>
+		<fraction>0.4</fraction>
+	</location>
+	<location start="2572-10-07" end="2781-08-12">
+		<outer>FWL</outer>
+		<inner>SL</inner>
+		<fraction>0.4</fraction>
+	</location>
+	<location start="2572-10-07" end="2781-08-12">
+		<outer>LA</outer>
+		<inner>SL</inner>
+		<fraction>0.4</fraction>
+	</location>
+	
+	<war name="Reunification War" start="2578-04-30" end="2597-09-22">
+		<parties>SL,TC</parties>
+		<parties end="2588-12-06">SL,MOC</parties>
+		<parties end="2581-11-17">SL,OA</parties>
+		<parties end="2596-09-03">SL,RWR</parties>
+	</war>
+		
+	<location start="2597-03-21" end="2765-01-01">
+		<outer>TC</outer>
+		<inner>SL</inner>
+		<fraction>0.4</fraction>
+	</location>
+
+	<location start="2597-03-21" end="2765-01-01">
+		<outer>OA</outer>
+		<inner>SL</inner>
+		<fraction>0.4</fraction>
+	</location>
+
+	<location start="2597-03-21" end="2765-01-01">
+		<outer>MOC</outer>
+		<inner>SL</inner>
+		<fraction>0.4</fraction>
+	</location>
+
+	<location start="2597-03-21" end="2765-01-01">
+		<outer>RWR</outer>
+		<inner>SL</inner>
+		<fraction>0.4</fraction>
+	</location>
+
+	<war name="War of Davion Succession" start="2725-01-01" end="2729-12-31">
+		<parties>FS,DC</parties>
+	</war>
+	
+	<war name="Davion-Liao Border War" start="2760-01-01" end="2762-07-31">
+		<parties>FS,CC</parties>
+	</war>
+	
+	<war name="Periphery Revolt" start="2765-01-01" end="2767-12-31">
+		<parties>SL,TC</parties>
+		<parties>SL,MOC</parties>
+		<parties>SL,OA</parties>
+	</war>
+	
+	<war name="Amaris Civil War" start="2767-08-01" end="2779-12-31">
+		<parties>SL,RWR</parties>
+	</war>
+	<war name="The Republic-Commonwealth War" start="2773-04-01" end="2775-12-31">
+		<parties>LA,RWR</parties>
+	</war>
+	
+	<!--Succession Wars-->
+	
+	<location start="2830-01-01">
+		<outer>NC</outer>
+		<inner>UC</inner>
+		<fraction>0.6</fraction>
+	</location>
+	
+	<war name="First Succession War" start="2786-12-01" end="2821-05-16">
+		<parties>CC,FS</parties>		
+		<parties>CC,FWL</parties>		
+		<parties>DC,FS</parties>		
+		<parties>DC,FWL</parties>		
+		<parties>DC,LA</parties>		
+		<parties start="2785-03-01">FWL,LA</parties>		
+	</war>
+
+	<war name="Operation Klondike" start="2821-07-02" end="2822-05-26">
+		<parties>CLAN,REB</parties>
+	</war>
+	
+	<war name="Second Succession War" start="2830-05-01" end="2864-11-30">
+		<parties>CC,FS</parties>		
+		<parties>CC,FWL</parties>		
+		<parties>DC,FS</parties>		
+		<parties start="2830-03-14">DC,LA</parties>		
+		<parties start="2830-06-14">FWL,LA</parties>		
+	</war>
+
+	<war name="The Concordat-Magistracy War" start="2813-07-01" end="2814-06-30">
+		<parties>LA,RWR</parties>
+	</war>
+	<war name="Marik Civil War" start="3014-05-22" end="3015-05-31">
+		<parties>FWL,FWLR</parties>
+	</war>
+	
+	<war name="Fourth Succession War" start="3026-01-01" end="3030-12-31">
+		<parties>FS,CC</parties>
+		<parties>FS,DC</parties>
+		<parties>LA,CC</parties>
+		<parties>LA,DC</parties>
+	</war>
+	
+	<location start="3029-01-01" end="3081-04-02">
+		<outer>CC</outer>
+		<inner>CS</inner>
+		<fraction>0.01</fraction>
+	</location>
+	
+	<location start="3030-01-01" end="3081-04-02">
+		<outer>DC</outer>
+		<inner>CS</inner>
+		<fraction>0.01</fraction>
+	</location>
+	
+	<location start="3029-12-07" end="3081-04-02">
+		<outer>FC</outer>
+		<inner>CS</inner>
+		<fraction>0.01</fraction>
+	</location>
+	
+	<location start="3029-12-07" end="3081-04-02">
+		<outer>FS</outer>
+		<inner>CS</inner>
+		<fraction>0.01</fraction>
+	</location>
+	
+	<location start="3030-01-01" end="3052-07-01">
+		<outer>FWL</outer>
+		<inner>CS</inner>
+		<fraction>0.01</fraction>
+	</location>
+	
+	<location start="3030-01-01" end="3081-04-02">
+		<outer>LA</outer>
+		<inner>CS</inner>
+		<fraction>0.01</fraction>
+	</location>
+	
+	<location start="3034-03-14" end="3081-04-02">
+		<outer>FRR</outer>
+		<inner>CS</inner>
+		<fraction>0.01</fraction>
+	</location>
+	
+	<war name="War of 3039" start="3039-01-01" end="3040-12-31">
+		<parties>FC,DC</parties>
+	</war>
+	
+	<war name="Fourth Andurien War" start="3030-09-11" end="3040-01-31">
+		<parties end="3035-06-01">CC,MOC</parties>
+		<parties end="3035-06-01">CC,DA</parties>
+		<parties start="3035-10-01">FWL,DA</parties>
+	</war>
+
+	<war name="Ronin War" start="3034-03-14" end="3034-10-31">
+		<parties>DC,Ronin</parties>
+		<parties>FRR,Ronin</parties>
+	</war>
+	<location start="3034-03-14" end="3034-10-31">
+		<outer>FRR</outer>
+		<inner>Ronin</inner>
+		<opponents>DC,FRR</opponents>
+	</location>
+
+	<war name="Fire Mandrill Factionalism" start="2807-01-01" end="3080-12-31">
+		<parties>CFM,CFM</parties>
+	</war>
+	
+	<alliance name="Clan Alliances">
+		<parties>CBS,CFM</parties>
+		<parties>CBS,CSR</parties>
+		<parties>CBS,CDS</parties>
+		<parties>CB,CCC</parties>
+		<parties>CCC,CDS</parties>
+		<parties>CCC,CSR</parties>
+		<parties>CCO,CDS</parties>
+		<parties>CCO,CGB</parties>
+		<parties>CCO,CHH</parties>
+		<parties>CCO,CSL</parties>
+		<parties>CDS,CGB</parties>
+		<parties>CDS,CNC</parties>
+		<parties>CDS,CWIE</parties>
+		<parties>CGB,CSR</parties>
+		<parties>CGB,CGS</parties>
+		<parties>CGS,CSR</parties>
+		<parties>CSR,CSA</parties>
+		<parties start="3059-02-16">CCC,CSA</parties>
+		<parties end="3057-12-31">CCO,CW</parties>
+		<parties end="3057-12-31">CDS,CW</parties>
+		<parties end="3057-12-31">CGS,CW</parties>
+		<parties end="3064-08-12">CHH,CW</parties>
+	</alliance>
+
+	<!--Clan Invasion-->
+	<war name="Clan Invasion" start="3049-08-01" end="3052-06-01">
+		<parties>FC,CJF</parties>
+		<parties>FC,CSV</parties>
+		<parties>FC,CW</parties>
+		<parties>FRR,CW</parties>
+		<parties>FRR,CGB</parties>
+		<parties>DC,CGB</parties>
+		<parties>DC,CSJ</parties>
+		<parties>DC,CNC</parties>
+	</war>
+	
+	<alliance start="3049-11-02" end="3052-05-01">
+		<parties>CS,CJF</parties>
+		<parties>CS,CW</parties>
+		<parties>CS,CGB</parties>
+		<parties>CS,CSJ</parties>
+		<parties>CS,CSV</parties>
+		<parties>CS,CNC</parties>
+		<parties>CS,CDS</parties>
+	</alliance>
+	
+	<alliance start="3052-07-01" end="3081-04-02">
+		<parties>WOB,FWL</parties>
+	</alliance>
+	
+	<location start="3052-07-01" end="3081-04-02">
+		<outer>FWL</outer>
+		<inner>WOB</inner>
+		<fraction>0.1</fraction>
+	</location>
+	
+	<war name="Refusal War" start="3057-01-01" end="3057-12-31">
+		<parties>CJF,CW</parties>
+	</war>
+	<war name="Marian-Lothian War" start="3054-01-01" end="3054-12-31">
+		<parties>MH,LL</parties>
+	</war>
+	<war name="War of 3057" start="3057-01-01" end="3057-12-31">
+		<parties>CC,FS</parties>
+		<parties>FWL,FS</parties>
+	</war>
+	
+	<alliance start="3059-10-01">
+		<parties>CS,CNC</parties>
+	</alliance>
+	
+	<war name="Operation Bulldog" start="3059-05-20" end="3059-08-13">
+		<parties>SL,CSJ</parties>
+		<parties>DC,CSJ</parties>
+		<parties>CS,CSJ</parties>
+		<parties>CC,CSJ</parties>
+		<parties>FS,CSJ</parties>
+		<parties>FWL,CSJ</parties>
+		<parties>LA,CSJ</parties>
+		<parties>FRR,CSJ</parties>
+		<parties>SIC,CSJ</parties>
+	</war>
+	<location start="3059-05-20" end="3059-08-13">
+		<outer>DC</outer>
+		<inner>CS</inner>
+		<fraction>0.3</fraction>
+		<opponents>CSJ</opponents>
+	</location>
+	<location start="3059-05-20" end="3059-08-13">
+		<outer>DC</outer>
+		<inner>FWL</inner>
+		<fraction>0.08</fraction>
+		<opponents>CSJ</opponents>
+	</location>
+	<location start="3059-05-20" end="3059-08-13">
+		<outer>DC</outer>
+		<inner>LA</inner>
+		<fraction>0.15</fraction>
+		<opponents>CSJ</opponents>
+	</location>
+	<location start="3059-05-20" end="3059-08-13">
+		<outer>DC</outer>
+		<inner>FS</inner>
+		<fraction>0.2</fraction>
+		<opponents>CSJ</opponents>
+	</location>
+	<location start="3059-05-20" end="3059-08-13">
+		<outer>DC</outer>
+		<inner>CC</inner>
+		<fraction>0.13</fraction>
+		<opponents>CSJ</opponents>
+	</location>
+	<location start="3059-05-20" end="3059-08-13">
+		<outer>DC</outer>
+		<inner>FRR</inner>
+		<fraction>0.03</fraction>
+		<opponents>CSJ</opponents>
+	</location>
+	<location start="3059-05-20" end="3059-08-13">
+		<outer>DC</outer>
+		<inner>SIC</inner>
+		<fraction>0.05</fraction>
+		<opponents>CSJ</opponents>
+	</location>
+	<location start="3059-05-20" end="3059-08-13">
+		<outer>DC</outer>
+		<inner>CWIE</inner>
+		<fraction>0.05</fraction>
+		<opponents>CSJ</opponents>
+	</location>
+	<location start="3059-05-20" end="3059-08-13">
+		<outer>DC</outer>
+		<inner>CNC</inner>
+		<fraction>0.05</fraction>
+		<opponents>CSJ</opponents>
+	</location>
+	
+	<!--Civil War-->
+	<war name="Falcon-Viper War" start="3061-04-01" end="3061-07-04">
+		<parties>CJF,CSV</parties>
+	</war>
+	<war name="FedCom Civil War" start="3062-12-08" end="3067-04-20">
+		<parties>LA,FS</parties>
+		<parties>FS,DC</parties>
+	</war>
+	
+	<war name="Combine-Ghost Bear War" start="3062-10-18" end="3064-05-18">
+		<parties end="3063-12-22">CGB,DC</parties>
+		<parties start="3063-11-17">CGB,CHH</parties>
+		<parties start="3063-11-17">CGB,CW</parties>
+	</war>
+	
+	<war name="Marian-Illyrian War" start="3063-01-19" end="3063-06-30">
+		<parties>MH,IP</parties>
+	</war>
+	
+	<war name="Jade Falcon Incursion" start="3064-05-10" end="3065-02-27">
+		<parties>LA,CJF</parties>
+		<parties>CWIE,CJF</parties>
+	</war>
+	<war name="Jade Falcon/Wolf OZ War" start="3065-01-10" end="3065-06-27">
+		<parties>CW,CJF</parties>
+	</war>
+	
+	<war name="Capellan-St. Ives War" start="3061-01-27" end="3063-06-10">
+		<parties>CC,SIC</parties>
+	</war>
+	
+	<war name="Marian-Circinus War" start="3066-01-01" end="3066-05-31">
+		<parties>MH,CIR</parties>
+	</war>
+	
+<!--Jihad-->
+	<war name="Word of Blake Jihad" start="3067-12-05" end="3081-04-02">
+		<parties>WOB,LA</parties>
+		<parties>WOB,FS</parties>
+		<parties start="3067-10-15">WOB,MERC</parties>
+		<parties start="3068-01-01">WOB,DC</parties>
+		<parties start="3068-01-21">WOB,CS</parties>
+		<parties start="3070-01-07">WOB,CC</parties>
+		<parties start="3073-11-25">WOB,Stone</parties>
+		<parties start="3073-11-25">WOB,CNC</parties>
+		<parties start="3073-11-25">WOB,CJF</parties>
+		<parties start="3073-11-25">WOB,CW</parties>
+		<parties start="3074-12-15">WOB,CGB</parties>
+		<parties start="3076-02-16">WOB,CSR</parties>
+	</war>
+	<alliance start="3073-11-25" end="3081-04-02">
+		<parties start="3071-10-31">Stone,CNC</parties>
+		<parties>Stone,CNC,CJF,CW,LA,FS,DC,CS</parties>
+		<parties start="3075-09-21">Stone,CNC,CJF,CW,LA,FS,DC,CS,CGB</parties>
+		<parties start="3076-02-16">Stone,CNC,CJF,CW,LA,FS,DC,CS,CGB,CSR</parties>
+	</alliance>
+	
+	<location start="3073-11-25" end="3081-04-02">
+		<outer>Stone</outer>
+		<inner>CS</inner>
+		<opponents>WOB</opponents>
+	</location>
+	
+	<war name="Operation Hammerstrike" start="3068-02-04" end="3069-12-02">
+		<parties>LA,FWL</parties>
+	</war>
+	
+	<war name="Operation Sovereign Justice" start="3068-06-28" end="3070-03-19">
+		<parties>FS,CC</parties>
+	</war>
+	
+	<war name="Hell's Horses Stampede" start="3070-11-14" end="3072-01-31">
+		<parties>CHH,CW</parties>
+	</war>
+		<war name="Taurian-FedSuns War" start="3074-05-29" end="3080-07-02">
+		<parties>TC,FS</parties>
+	</war>
+	
+	<war name="Operation Golden Dawn" start="3081-03-25" end="3081-09-07">
+		<parties>ROS,SHC</parties>
+		<parties>ROS,MCM</parties>
+		<parties>ROS,SC</parties>
+		<parties end="3081-07-31">ROS,DO</parties>
+	</war>
+	<war name="Capellan Conflict" start="3081-10-01" end="3085-06-01">
+		<!--dates approximate-->
+		<parties>ROS,CC</parties>
+	</war>
+	
+	
+	<!--Dark Age, Republic Era-->
+	<war name="Second Dominion-Combine War" start="3098-07-01" end="3101-06-30">
+		<parties>CGB,DC</parties>
+	</war>
+	<war name="Capellan-Republic War" start="3110-07-01" end="3113-06-30">
+		<parties>CC,ROS</parties>
+	</war>
+	
+	<!--Dark Age-->
+	<war name="Capellan Invasion" start="3134-05-01" end="3136-10-14">
+		<parties>CC,ROS</parties>
+	</war>
+	<war name="Jade Falcon Invasion" start="3134-05-01" end="3135-12-31">
+		<parties>CJF,ROS</parties>
+	</war>
+	<war name="Combine Invasion" start="3135-04-20" end="3138-12-31">
+		<parties>CC,ROS</parties>
+	</war>
+	<war name="Draconis March Invasion" start="3139-03-01" end="3141-04-30">
+		<parties>DC,FS</parties>
+	</war>
+	<war name="Operation Hammerfall" start="3137-07-25" end="3142-01-01">
+		<parties start="3138-02-15" end="3140-05-19">CW,MSC</parties>
+		<parties start="3138-02-15" end="3140-05-19">CW,FWL</parties>
+		<parties end="3137-12-14">LA,DTA</parties>
+		<parties>LA,MSC</parties>
+		<parties>LA,FWL</parties>
+		<parties start="3140-05-23">CW,LA</parties>
+	</war>
+	<alliance start="3137-01-01" end="3140-05-19">
+		<parties>LA,CW</parties>
+	</alliance>
+	<war name="Oriente-Andurien War" start="3138-02-06" end="3138-08-05">
+		<parties>DO,DA</parties>
+	</war>
+	<war name="Nova Cat Rebellion" start="3141-6-14" end="3143-01-06">
+		<parties>DC,CNC</parties>
+	</war>
+	<alliance start="3140-01-15" end="3145-03-31">
+		<parties>CJF,CHH</parties>
+	</alliance>
+	<location start="3142-06-01" end="3145-03-31">
+		<outer>CJF</outer>
+		<inner>CHH</inner>
+		<opponents>LA,CWIE,CW</opponents>
+	</location>
+	<war name="Falcon/Horses Invasion" start="3142-06-01" end="3145-02-23">
+		<parties>CJF,LA</parties>
+		<parties>CHH,LA</parties>
+		<parties start="3142-11-24">CW,LA</parties>
+	</war>
+	<war name="Combine-FedSuns War" start="3144-03-14">
+		<parties>DC,FS</parties>
+	</war>
+	<war name="Capellan-FedSuns War" start="3144-11-11">
+		<parties>DC,FS</parties>
+	</war>
+	
+	<location start="3138-07-27">
+		<outer>CP</outer>
+		<inner>CDS</inner>
+		<inner>CNC</inner>
+	</location>
+	
+	<alliance start="3140-01-15">
+		<parties>CJF,CHH</parties>
+	</alliance>
+	
+	<alliance start="3135-05-13">
+		<parties>ROS,FS</parties>
+	</alliance>
+	<alliance start="3137-01-01">
+		<parties>LA,CW</parties>
+	</alliance>
+	
+	<alliance>
+		<parties>OC,EF</parties>
+	</alliance>
+	<alliance start="3020-01-01" end="3057-12-31">
+		<parties>FS,LA,FS</parties>
+	</alliance>
+	<alliance>
+		<parties>FS,LA,FC,SIC</parties>
+	</alliance>
+	<alliance end="3067-03-28">
+		<parties>FS,FC,LA,TFR</parties>
+	</alliance>
+	<alliance start="3059-05-20" end="3141-6-14">
+		<parties>DC,CNC</parties>
+	</alliance>
+	<location start="3059-05-20" end="3141-6-14">
+		<outer>DC</outer>
+		<inner>CNC</inner>
+		<fraction>0.4</fraction>
+	</location>
+	<alliance>
+		<parties>ARDC,CWIE,FC</parties>
+	</alliance>
+	<alliance start="3067-03-23">
+		<parties>LA,CWIE,ARDC</parties>
+	</alliance>
+	<location end="3067-03-22">
+		<outer>ARDC</outer>
+		<inner>CWIE</inner>
+	</location>
+	<location start="3067-03-23">
+		<outer>LA</outer>
+		<inner>CWIE</inner>
+		<fraction>0.15</fraction>
+		<opponents>CJF,CNC,CGB</opponents>
+	</location>
+	<alliance name="Trinity Alliance" start="3062-08-06">
+		<parties>CC,TC,MOC</parties>
+	</alliance>
+	<alliance start="3070-08-01">
+		<parties>FRR,CGB</parties>
+	</alliance>
+	<alliance start="3070-11-14" end="3071-11-01">
+		<parties>CHH,CIH</parties>
+	</alliance>
+	<alliance start="3064-02-18">
+		<parties>CSR,OA</parties>
+	</alliance>
+	
+</factionHints>

@@ -2517,7 +2517,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
         			nCrew++;
         		}
         		if(p.getRankNumeric() > bestRank) {
-        		    engineerName = p.getName();
+        		    engineerName = p.getFullName();
         		    bestRank = p.getRankNumeric();
         		}
         	}

@@ -53,8 +53,11 @@ import megamek.common.AmmoType;
 import megamek.common.MiscType;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
+import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.Mission;
 import mekhq.campaign.parts.AeroSensor;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Avionics;
@@ -125,6 +128,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     private JButton btnAdd;
     private JButton btnBuyBulk;
     private JButton btnBuy;
+    private JButton btnUseBonusPart;
     private JButton btnClose;
     
     /** Creates new form PartsStoreDialog */
@@ -258,6 +262,24 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_SUPPLY);
 	                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_QUEUE);            }
 	        });
+			btnUseBonusPart = new JButton();
+			if (campaign.getCampaignOptions().getUseAtB()) {
+				int numBonusParts = campaign.totalBonusParts();
+				btnUseBonusPart.setText("Use Bonus Part (" + numBonusParts + ")");
+				btnUseBonusPart.addActionListener(new java.awt.event.ActionListener() {
+		            public void actionPerformed(java.awt.event.ActionEvent evt) {
+		                addPart(true, false, true);
+		                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_TARGET);
+		                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_TRANSIT);
+		                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_SUPPLY);
+		                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_QUEUE);
+		            	int numBonusParts = campaign.totalBonusParts();
+						btnUseBonusPart.setText("Use Bonus Part (" + numBonusParts + ")");
+		            	btnUseBonusPart.setVisible(numBonusParts > 0);
+	                }
+		        });
+				btnUseBonusPart.setVisible(numBonusParts > 0);
+			}
 			btnClose = new JButton(resourceMap.getString("btnClose.text"));
 			btnClose.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -267,6 +289,9 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 			panButtons.setLayout(new GridBagLayout());
 			panButtons.add(btnBuyBulk, new GridBagConstraints());
 			panButtons.add(btnBuy, new GridBagConstraints());
+			if (campaign.getCampaignOptions().getUseAtB()) {				
+				panButtons.add(btnUseBonusPart, new GridBagConstraints());
+			}
 			panButtons.add(btnAdd, new GridBagConstraints());
 			panButtons.add(btnClose, new GridBagConstraints());
 		} else {
@@ -356,6 +381,10 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 
     
     private void addPart(boolean purchase, boolean bulk) {
+    	addPart(purchase, bulk, false);
+    }
+    
+    private void addPart(boolean purchase, boolean bulk, boolean bonus) {
     	int row = partsTable.getSelectedRow();
 		if(row < 0) {
 			return;
@@ -368,13 +397,30 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 			quantity = pcd.getValue();
 		}
 		
-		if(purchase) {
-		    campaign.getShoppingList().addShoppingItem(selectedPart.getAcquisitionWork(), quantity, campaign);
+		if(bonus) {
+			String report = selectedPart.getAcquisitionWork().find(0);
+			if (report.endsWith("0 days.")) {    			
+				AtBContract contract = null;
+				for (Mission m : campaign.getMissions()) {
+					if (m.isActive() && m instanceof AtBContract &&
+							((AtBContract)m).getNumBonusParts() > 0) {
+						contract = (AtBContract)m;
+						break;
+					}
+				}
+				if (null == contract) {
+					MekHQ.logError("AtB: used bonus part but no contract has bonus parts available.");
+				} else {
+					contract.useBonusPart();
+				}
+			}
+		} else if(purchase) {
+			campaign.getShoppingList().addShoppingItem(selectedPart.getAcquisitionWork(), quantity, campaign);
 		} else {
-		    while(quantity > 0) {
-		        campaign.addPart(selectedPart.clone(), 0);
-		        quantity--;
-		    }
+			while(quantity > 0) {
+				campaign.addPart(selectedPart.clone(), 0);
+				quantity--;
+			}
 		}
 		campaignGUI.refreshReport();
 		campaignGUI.refreshAcquireList();
@@ -382,7 +428,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		campaignGUI.refreshFinancialTransactions();
         campaignGUI.refreshOverview();
     }
-    
+
     private void setSelectedPart() {
     	int row = partsTable.getSelectedRow();
 		if(row < 0) {

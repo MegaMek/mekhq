@@ -41,7 +41,7 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
     	
         btnDone = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
-        choiceOutcome = new javax.swing.JComboBox();
+        choiceOutcome = new javax.swing.JComboBox<String>();
         lblOutcome = new javax.swing.JLabel();
         
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CompleteMissionDialog");
@@ -61,7 +61,7 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(lblOutcome, gridBagConstraints);
         
-        DefaultComboBoxModel outcomeModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> outcomeModel = new DefaultComboBoxModel<String>();
 		for (int i = 1; i < Mission.S_NUM; i++) {
 			outcomeModel.addElement(Mission.getStatusName(i));
 		}
@@ -129,7 +129,7 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
     private javax.swing.JButton btnDone;
     private javax.swing.JButton btnCancel;
     private javax.swing.JLabel lblOutcome;
-    private javax.swing.JComboBox choiceOutcome;
+    private javax.swing.JComboBox<String> choiceOutcome;
     // End of variables declaration//GEN-END:variables
 
 }

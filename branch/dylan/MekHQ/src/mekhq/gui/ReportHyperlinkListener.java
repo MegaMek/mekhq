@@ -36,6 +36,8 @@ public class ReportHyperlinkListener implements HyperlinkListener {
     public static final String MAINTENANCE = "MAINTENANCE";
     public static final String PERSONNEL_MARKET = "PERSONNEL_MARKET";
     public static final String REPAIR = "REPAIR";
+    public static final String CONTRACT_MARKET = "CONTRACT_MARKET";
+    public static final String UNIT_MARKET = "UNIT_MARKET";
 
 
     private CampaignGUI campaignGUI;
@@ -47,7 +49,11 @@ public class ReportHyperlinkListener implements HyperlinkListener {
     @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
         if (HyperlinkEvent.EventType.ACTIVATED == e.getEventType()) {
-            if(e.getDescription().startsWith(UNIT)) {
+            // Must come before UNIT since it starts with UNIT as well
+            if(e.getDescription().startsWith(UNIT_MARKET)) {
+            	campaignGUI.showUnitMarket();
+            }
+            else if(e.getDescription().startsWith(UNIT)) {
                 UUID id = UUID.fromString(e.getDescription().split(":")[1]);
                 campaignGUI.focusOnUnit(id);
             }
@@ -70,6 +76,9 @@ public class ReportHyperlinkListener implements HyperlinkListener {
             else if(e.getDescription().startsWith(REPAIR)) {
                 UUID id = UUID.fromString(e.getDescription().split("\\|")[1]);
                 campaignGUI.focusOnUnitInRepairBay(id);
+            }
+            else if(e.getDescription().startsWith(CONTRACT_MARKET)) {
+            	campaignGUI.showContractMarket();
             }
         }
     }

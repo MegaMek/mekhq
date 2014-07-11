@@ -33,6 +33,7 @@ import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.ResourceBundle;
@@ -45,11 +46,13 @@ import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -68,6 +71,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
@@ -92,6 +96,7 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.UnitTableData;
 import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.model.RankTableModel;
 import mekhq.gui.model.SortedComboBoxModel;
@@ -126,10 +131,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JSpinner spnClanPriceModifier;
     private JSpinner spnUsedPartsValue[];
     private JSpinner spnDamagedPartsValue;
-    private JComboBox comboFaction;
+    private JComboBox<String> comboFaction;
     SortedComboBoxModel factionModel;
-    private JComboBox comboFactionNames;
-    private JComboBox comboRanks;
+    private JComboBox<String> comboFactionNames;
+    private JComboBox<String> comboRanks;
     private JSlider sldGender;
     private JLabel lblCamo;
     private JLabel lblDate;
@@ -153,7 +158,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JTextField txtName;
     private JCheckBox useEraModsCheckBox;
     private JCheckBox useUnitRatingCheckBox;
-    private JComboBox unitRatingMethodCombo;
+    private JComboBox<String> unitRatingMethodCombo;
     private JCheckBox useFactionForNamesBox;
     private JCheckBox useTacticsBox;
     private JCheckBox useInitBonusBox;
@@ -190,7 +195,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     // Start Personnel Market
     private JPanel panPersonnelMarket;
-    private JComboBox personnelMarketType;
+    private JComboBox<String> personnelMarketType;
     private JTextField personnelMarketRandomEliteRemoval;
     private JTextField personnelMarketRandomVeteranRemoval;
     private JTextField personnelMarketRandomRegularRemoval;
@@ -256,7 +261,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     private JCheckBox chkSupportStaffOnly;
     private JSpinner spnAcquireWaitingPeriod;
-    private JComboBox choiceAcquireSkill;
+    private JComboBox<String> choiceAcquireSkill;
     private JSpinner spnAcquireClanPenalty;
     private JSpinner spnAcquireIsPenalty;
     private JTextField txtMaxAcquisitions;
@@ -264,11 +269,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     private JSpinner spnNDiceTransitTime;
     private JSpinner spnConstantTransitTime;
-    private JComboBox choiceTransitTimeUnits;
+    private JComboBox<String> choiceTransitTimeUnits;
     private JSpinner spnAcquireMosBonus;
-    private JComboBox choiceAcquireMosUnits;
+    private JComboBox<String> choiceAcquireMosUnits;
     private JSpinner spnAcquireMinimum;
-    private JComboBox choiceAcquireMinimumUnit;
+    private JComboBox<String> choiceAcquireMinimumUnit;
 
     private JCheckBox limitByYearBox;
     private JCheckBox allowClanPurchasesBox;
@@ -277,7 +282,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox useAmmoByTypeBox;
     //private JCheckBox disallowSLUnitsBox;
     private JLabel lblTechLevel;
-    private JComboBox choiceTechLevel;
+    private JComboBox<String> choiceTechLevel;
 
     private JLabel lblOverallRecruitBonus;
     private JSpinner spnOverallRecruitBonus;
@@ -312,6 +317,65 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     Hashtable<String, SpecialAbility> tempSPA;
     private JButton btnAddSPA;
+    
+    /* Against the Bot */
+    private JPanel panAtB;
+    private JCheckBox chkUseAtB;
+    
+    private javax.swing.JToggleButton btnUseAtBSkillCosts;
+    private javax.swing.JToggleButton btnUseAtBSPACosts;
+    Hashtable<String, SpecialAbility> atbSPA;
+    Hashtable<String, SpecialAbility> originalSPA;
+
+    private JComboBox<String> cbSkillLevel;
+    private JCheckBox chkUseShareSystem;
+    private JCheckBox chkTrackOriginalUnit;
+    private JCheckBox chkRetirementRolls;
+    private JCheckBox chkCustomRetirementMods;
+    private JCheckBox chkLimitLanceWeight;
+    private JCheckBox chkLimitLanceNumUnits;
+    private JCheckBox chkUseLeadership;
+    private JCheckBox chkUseStrategy;
+    private JSpinner spnBaseStrategyDeployment;
+    private JSpinner spnAdditionalStrategyDeployment;
+    private JCheckBox chkAdjustPaymentForStrategy;
+    
+    private JCheckBox chkUseAero;
+    private JCheckBox chkUseVehicles;
+    private JCheckBox chkClanVehicles;
+    private JCheckBox chkDoubleVehicles;
+    private JCheckBox chkAdjustPlayerVehicles;
+    private JCheckBox chkUseDropShips;
+    
+    private DefaultListModel<String> chosenRatModel;
+    private DefaultListModel<String> availableRatModel;
+    private JList<String> availableRats;
+    private JList<String> chosenRats;
+    private JButton btnAddRat;
+    private JButton btnRemoveRat;
+    private JButton btnMoveRatUp;
+    private JButton btnMoveRatDown;
+    
+    private JSpinner spnSearchRadius;
+    private JSpinner spnIntensity;
+    private JLabel lblFightPct;
+    private JLabel lblDefendPct;
+    private JLabel lblScoutPct;
+    private JLabel lblTrainingPct;
+    private JCheckBox chkVariableContractLength;
+    private JCheckBox chkMercSizeLimited;
+    private JCheckBox chkRestrictPartsByMission;
+    private JCheckBox chkRegionalMechVariations;
+    private JCheckBox chkUseWeatherConditions;
+    private JCheckBox chkUseLightConditions;
+    private JCheckBox chkUsePlanetaryConditions;
+    private JCheckBox chkUseAtBCapture;
+    
+    private JCheckBox chkAeroRecruitsHaveUnits;
+    private JCheckBox chkInstantUnitMarketDelivery;
+    private JCheckBox chkContractMarketReportRefresh;
+    private JCheckBox chkUnitMarketReportRefresh;
+    
     
     /**
      * Creates new form CampaignOptionsDialog
@@ -400,9 +464,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         lblGender = new JLabel();
         lblDate = new JLabel();
         btnDate = new JButton();
-        comboFaction = new JComboBox();
-        comboFactionNames = new JComboBox();
-        comboRanks = new JComboBox();
+        comboFaction = new JComboBox<String>();
+        comboFactionNames = new JComboBox<String>();
+        comboRanks = new JComboBox<String>();
         sldGender = new JSlider(SwingConstants.HORIZONTAL);
         btnCamo = new JButton();
         lblCamo = new JLabel();
@@ -419,7 +483,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panRandomPortrait = new JPanel();
         useEraModsCheckBox = new JCheckBox();
         useUnitRatingCheckBox = new JCheckBox();
-        unitRatingMethodCombo = new JComboBox(UnitRatingMethod.getUnitRatingMethodNames());
+        unitRatingMethodCombo = new JComboBox<String>(UnitRatingMethod.getUnitRatingMethodNames());
         javax.swing.JLabel clanPriceModifierLabel = new JLabel();
         javax.swing.JLabel usedPartsValueLabel = new JLabel();
         javax.swing.JLabel damagedPartsValueLabel = new JLabel();
@@ -455,7 +519,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         allowISPurchasesBox = new JCheckBox();
         allowCanonOnlyBox = new JCheckBox();
         useAmmoByTypeBox = new JCheckBox();
-        choiceTechLevel = new JComboBox();
+        choiceTechLevel = new JComboBox<String>();
         btnOkay = new JButton();
         btnCancel = new JButton();
         scrRanks = new JScrollPane();
@@ -883,26 +947,26 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         spnAcquireMinimum = new JSpinner(new SpinnerNumberModel(options.getAcquireMinimumTime(), 0, 365, 1));
         ((JSpinner.DefaultEditor) spnAcquireMinimum.getEditor()).getTextField().setEditable(false);
 
-        DefaultComboBoxModel transitUnitModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> transitUnitModel = new DefaultComboBoxModel<String>();
         for (int i = 0; i < CampaignOptions.TRANSIT_UNIT_NUM; i++) {
             transitUnitModel.addElement(CampaignOptions.getTransitUnitName(i));
         }
         transitUnitModel.setSelectedItem(CampaignOptions.getTransitUnitName(options.getUnitTransitTime()));
-        choiceTransitTimeUnits = new JComboBox(transitUnitModel);
+        choiceTransitTimeUnits = new JComboBox<String>(transitUnitModel);
 
-        DefaultComboBoxModel transitMosUnitModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> transitMosUnitModel = new DefaultComboBoxModel<String>();
         for (int i = 0; i < CampaignOptions.TRANSIT_UNIT_NUM; i++) {
             transitMosUnitModel.addElement(CampaignOptions.getTransitUnitName(i));
         }
         transitMosUnitModel.setSelectedItem(CampaignOptions.getTransitUnitName(options.getAcquireMosUnit()));
-        choiceAcquireMosUnits = new JComboBox(transitMosUnitModel);
+        choiceAcquireMosUnits = new JComboBox<String>(transitMosUnitModel);
 
-        DefaultComboBoxModel transitMinUnitModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> transitMinUnitModel = new DefaultComboBoxModel<String>();
         for (int i = 0; i < CampaignOptions.TRANSIT_UNIT_NUM; i++) {
             transitMinUnitModel.addElement(CampaignOptions.getTransitUnitName(i));
         }
         transitMinUnitModel.setSelectedItem(CampaignOptions.getTransitUnitName(options.getAcquireMinimumTimeUnit()));
-        choiceAcquireMinimumUnit = new JComboBox(transitMinUnitModel);
+        choiceAcquireMinimumUnit = new JComboBox<String>(transitMinUnitModel);
 
 
         JPanel pnlTransitTime = new JPanel();
@@ -1008,7 +1072,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panTech.add(lblTechLevel, gridBagConstraints);
 
-        DefaultComboBoxModel techLevelComboBoxModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> techLevelComboBoxModel = new DefaultComboBoxModel<String>();
         techLevelComboBoxModel.addElement(CampaignOptions.getTechLevelName(CampaignOptions.TECH_INTRO));
         techLevelComboBoxModel.addElement(CampaignOptions.getTechLevelName(CampaignOptions.TECH_STANDARD));
         techLevelComboBoxModel.addElement(CampaignOptions.getTechLevelName(CampaignOptions.TECH_ADVANCED));
@@ -1619,6 +1683,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         for(String name : spaNames) {
         	tempSPA.put(name, SpecialAbility.getAbility(name).clone());
         }
+        initAtBSPA();
         
         panXP.setName("panXP"); // NOI18N
         panXP.setLayout(new java.awt.GridBagLayout());
@@ -2282,7 +2347,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panRank.add(lblRank, gridBagConstraints);
 
-        DefaultComboBoxModel rankModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> rankModel = new DefaultComboBoxModel<String>();
         for (int i = 0; i < Ranks.RS_NUM; i++) {
             rankModel.addElement(Ranks.getRankSystemName(i));
         }
@@ -2441,7 +2506,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panNameGen.add(lblFactionNames, gridBagConstraints);
 
-        DefaultComboBoxModel factionNamesModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> factionNamesModel = new DefaultComboBoxModel<String>();
         for (Iterator<String> i = campaign.getRNG().getFactions(); i.hasNext(); ) {
             String faction = (String) i.next();
             factionNamesModel.addElement(faction);
@@ -2520,7 +2585,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         // Start Personnel Market
         panPersonnelMarket = new JPanel();
-        personnelMarketType = new JComboBox();
+        personnelMarketType = new JComboBox<String>();
         personnelMarketReportRefresh = new JCheckBox("Display a report when market refreshes");
         personnelMarketRandomEliteRemoval = new JTextField();
         personnelMarketRandomVeteranRemoval = new JTextField();
@@ -2742,6 +2807,582 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         tabOptions.addTab(resourceMap.getString("panPersonnelMarket.TabConstraints.tabTitle"),
                           panPersonnelMarket); // NOI18N
         // End Personnel Market
+        
+        // Start Against the Bot
+        
+        panAtB = new JPanel();
+        chkUseAtB = new JCheckBox();
+        
+        btnUseAtBSkillCosts = new javax.swing.JToggleButton();
+        btnUseAtBSPACosts = new javax.swing.JToggleButton();
+
+        cbSkillLevel = new JComboBox<String>();
+        chkUseShareSystem = new JCheckBox();
+        chkRetirementRolls = new JCheckBox();
+        chkCustomRetirementMods = new JCheckBox();
+        chkTrackOriginalUnit = new JCheckBox();
+        chkLimitLanceWeight = new JCheckBox();
+        chkLimitLanceNumUnits = new JCheckBox();
+        chkUseLeadership = new JCheckBox();
+        chkUseStrategy = new JCheckBox();
+        spnBaseStrategyDeployment = new JSpinner();
+        spnAdditionalStrategyDeployment = new JSpinner();
+        chkAdjustPaymentForStrategy = new JCheckBox();
+        
+        chkUseAero = new JCheckBox();
+        chkUseVehicles = new JCheckBox();
+        chkClanVehicles = new JCheckBox();
+        chkDoubleVehicles = new JCheckBox();
+        chkAdjustPlayerVehicles = new JCheckBox();
+        chkUseDropShips = new JCheckBox();
+        
+        availableRats = new JList<String>();
+        chosenRats = new JList<String>();
+        btnAddRat = new JButton();
+        btnRemoveRat = new JButton();
+        btnMoveRatUp = new JButton();
+        btnMoveRatDown = new JButton();
+        
+        spnSearchRadius = new JSpinner();
+        spnIntensity = new JSpinner();
+        chkVariableContractLength = new JCheckBox();
+        chkMercSizeLimited = new JCheckBox();
+        chkRestrictPartsByMission = new JCheckBox();
+        chkRegionalMechVariations = new JCheckBox();
+        chkUseWeatherConditions = new JCheckBox();
+        chkUseLightConditions = new JCheckBox();
+        chkUsePlanetaryConditions = new JCheckBox();
+        chkUseAtBCapture = new JCheckBox();
+        
+        chkAeroRecruitsHaveUnits = new JCheckBox();
+        chkInstantUnitMarketDelivery = new JCheckBox();
+        chkContractMarketReportRefresh = new JCheckBox();
+        chkUnitMarketReportRefresh = new JCheckBox();
+
+        
+        panAtB.setName("panAtB");
+        panAtB.setLayout(new java.awt.GridBagLayout());
+
+        chkUseAtB.setText(resourceMap.getString("chkUseAtB.text"));
+        chkUseAtB.setToolTipText(resourceMap.getString("chkUseAtB.toolTipText"));
+        chkUseAtB.setSelected(options.getUseAtB());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(10, 10, 10, 10);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panAtB.add(chkUseAtB, gridBagConstraints);
+        chkUseAtB.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				enableAtBComponents(panAtB, chkUseAtB.isSelected());
+			}
+        });
+		enableAtBComponents(panAtB, chkUseAtB.isSelected());
+        
+        JLabel lblSkillLevel = new JLabel(resourceMap.getString("lblSkillLevel.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        panAtB.add(lblSkillLevel, gridBagConstraints);
+        
+        cbSkillLevel.addItem("Ultra-green");
+        cbSkillLevel.addItem("Green");
+        cbSkillLevel.addItem("Regular");
+        cbSkillLevel.addItem("Veteran");
+        cbSkillLevel.addItem("Elite");
+        cbSkillLevel.setSelectedIndex(options.getSkillLevel());
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        panAtB.add(cbSkillLevel, gridBagConstraints);
+                
+        btnUseAtBSkillCosts.setText(resourceMap.getString("btnUseAtBSkillCosts.text"));
+        btnUseAtBSkillCosts.setToolTipText(resourceMap.getString("btnUseAtBSkillCosts.toolTipText"));
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        panAtB.add(btnUseAtBSkillCosts, gridBagConstraints);
+        btnUseAtBSkillCosts.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setAtBSkillCosts();
+			}
+        });
+
+        btnUseAtBSPACosts.setText(resourceMap.getString("btnUseAtBSPACosts.text"));
+        btnUseAtBSPACosts.setToolTipText(resourceMap.getString("btnUseAtBSPACosts.toolTipText"));
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 1;
+        panAtB.add(btnUseAtBSPACosts, gridBagConstraints);
+        btnUseAtBSPACosts.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setAtBSPACosts();
+			}
+        });
+
+        JPanel panSubAtBAdmin = new JPanel(new GridBagLayout());
+        JPanel panSubAtBRat = new JPanel(new GridBagLayout());
+        JPanel panSubAtBContract = new JPanel(new GridBagLayout());
+        JPanel panSubAtBScenario = new JPanel(new GridBagLayout());
+        panSubAtBAdmin.setBorder(BorderFactory.createTitledBorder("Unit Administration"));
+        panSubAtBRat.setBorder(BorderFactory.createTitledBorder("Random Assignment Tables"));
+        panSubAtBContract.setBorder(BorderFactory.createTitledBorder("Contract Operations"));
+        panSubAtBScenario.setBorder(BorderFactory.createTitledBorder("Scenarios"));
+        
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        panAtB.add(panSubAtBAdmin, gridBagConstraints);
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 2;
+        panAtB.add(panSubAtBRat, gridBagConstraints);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        panAtB.add(panSubAtBContract, gridBagConstraints);
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 3;
+        panAtB.add(panSubAtBScenario, gridBagConstraints);
+        
+        chkUseShareSystem.setText(resourceMap.getString("chkUseShareSystem.text"));
+        chkUseShareSystem.setToolTipText(resourceMap.getString("chkUseShareSystem.toolTipText"));
+        chkUseShareSystem.setSelected(options.getUseShareSystem());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubAtBAdmin.add(chkUseShareSystem, gridBagConstraints);
+
+        chkAeroRecruitsHaveUnits.setText(resourceMap.getString("chkAeroRecruitsHaveUnits.text"));
+        chkAeroRecruitsHaveUnits.setToolTipText(resourceMap.getString("chkAeroRecruitsHaveUnits.toolTipText"));
+        chkAeroRecruitsHaveUnits.setSelected(options.getAeroRecruitsHaveUnits());
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        panSubAtBAdmin.add(chkAeroRecruitsHaveUnits, gridBagConstraints);
+        
+        chkRetirementRolls.setText(resourceMap.getString("chkRetirementRolls.text"));
+        chkRetirementRolls.setToolTipText(resourceMap.getString("chkRetirementRolls.toolTipText"));
+        chkRetirementRolls.setSelected(options.doRetirementRolls());
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        panSubAtBAdmin.add(chkRetirementRolls, gridBagConstraints);
+        
+        chkCustomRetirementMods.setText(resourceMap.getString("chkCustomRetirementMods.text"));
+        chkCustomRetirementMods.setToolTipText(resourceMap.getString("chkCustomRetirementMods.toolTipText"));
+        chkCustomRetirementMods.setSelected(options.getCustomRetirementMods());
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        panSubAtBAdmin.add(chkCustomRetirementMods, gridBagConstraints);
+        
+        chkUseLeadership.setText(resourceMap.getString("chkUseLeadership.text"));
+        chkUseLeadership.setToolTipText(resourceMap.getString("chkUseLeadership.toolTipText"));
+        chkUseLeadership.setSelected(options.getUseLeadership());
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        panSubAtBAdmin.add(chkUseLeadership, gridBagConstraints);
+        
+        chkTrackOriginalUnit.setText(resourceMap.getString("chkTrackOriginalUnit.text"));
+        chkTrackOriginalUnit.setToolTipText(resourceMap.getString("chkTrackOriginalUnit.toolTipText"));
+        chkTrackOriginalUnit.setSelected(options.getTrackOriginalUnit());
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        panSubAtBAdmin.add(chkTrackOriginalUnit, gridBagConstraints);
+
+        chkUseAero.setText(resourceMap.getString("chkUseAero.text"));
+        chkUseAero.setToolTipText(resourceMap.getString("chkUseAero.toolTipText"));
+        chkUseAero.setSelected(options.getUseAero());
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        panSubAtBAdmin.add(chkUseAero, gridBagConstraints);
+
+        chkUseVehicles.setText(resourceMap.getString("chkUseVehicles.text"));
+        chkUseVehicles.setToolTipText(resourceMap.getString("chkUseVehicles.toolTipText"));
+        chkUseVehicles.setSelected(options.getUseVehicles());
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 7;
+        panSubAtBAdmin.add(chkUseVehicles, gridBagConstraints);
+
+        chkClanVehicles.setText(resourceMap.getString("chkClanVehicles.text"));
+        chkClanVehicles.setToolTipText(resourceMap.getString("chkClanVehicles.toolTipText"));
+        chkClanVehicles.setSelected(options.getUseVehicles());
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 8;
+        panSubAtBAdmin.add(chkClanVehicles, gridBagConstraints);
+
+        chkInstantUnitMarketDelivery.setText(resourceMap.getString("chkInstantUnitMarketDelivery.text"));
+        chkInstantUnitMarketDelivery.setToolTipText(resourceMap.getString("chkInstantUnitMarketDelivery.toolTipText"));
+        chkInstantUnitMarketDelivery.setSelected(options.getInstantUnitMarketDelivery());
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 9;
+        panSubAtBAdmin.add(chkInstantUnitMarketDelivery, gridBagConstraints);
+
+        chkContractMarketReportRefresh.setText(resourceMap.getString("chkContractMarketReportRefresh.text"));
+        chkContractMarketReportRefresh.setSelected(options.getContractMarketReportRefresh());
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 10;
+        panSubAtBAdmin.add(chkContractMarketReportRefresh, gridBagConstraints);
+
+        chkUnitMarketReportRefresh.setText(resourceMap.getString("chkUnitMarketReportRefresh.text"));
+        chkUnitMarketReportRefresh.setSelected(options.getUnitMarketReportRefresh());
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 11;
+        panSubAtBAdmin.add(chkUnitMarketReportRefresh, gridBagConstraints);
+
+        chosenRatModel = new DefaultListModel<String>();
+        for (String rat : options.getRATs()) {
+        	chosenRatModel.addElement(rat);
+        }
+        chosenRats.setModel(chosenRatModel);
+        chosenRats.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        chosenRats.addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent arg0) {
+				btnRemoveRat.setEnabled(chosenRats.getSelectedIndex() >= 0);
+				btnMoveRatUp.setEnabled(chosenRats.getSelectedIndex() > 0);
+				btnMoveRatDown.setEnabled(chosenRatModel.size() > chosenRats.getSelectedIndex() + 1);
+			}
+        });
+        availableRatModel = new DefaultListModel<String>();
+        for (String rat : UnitTableData.getInstance().getAllRATNames()) {
+        	if (!chosenRatModel.contains(rat)) {
+        		availableRatModel.addElement(rat);
+        	}
+        }
+        availableRats.setModel(availableRatModel);
+        availableRats.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        availableRats.addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent arg0) {
+				btnAddRat.setEnabled(availableRats.getSelectedIndex() >= 0);
+			}
+        });
+        
+        JTextArea txtRatInstructions = new JTextArea();
+        txtRatInstructions.setEditable(false);
+        txtRatInstructions.setWrapStyleWord(true);
+        txtRatInstructions.setLineWrap(true);        
+        txtRatInstructions.setText(resourceMap.getString("txtRatInstructions.text"));        
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubAtBRat.add(txtRatInstructions, gridBagConstraints);
+
+        JLabel lblChosenRats = new JLabel(resourceMap.getString("lblChosenRats.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;        
+        panSubAtBRat.add(lblChosenRats, gridBagConstraints);
+
+        JLabel lblAvailableRats = new JLabel(resourceMap.getString("lblAvailableRats.text"));
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;       
+        panSubAtBRat.add(lblAvailableRats, gridBagConstraints);
+
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        panSubAtBRat.add(chosenRats, gridBagConstraints);
+
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 2;
+        panSubAtBRat.add(availableRats, gridBagConstraints);
+        
+        JPanel panRatButtons = new JPanel();
+        panRatButtons.setLayout(new javax.swing.BoxLayout(panRatButtons, javax.swing.BoxLayout.Y_AXIS));
+        btnAddRat.setText(resourceMap.getString("btnAddRat.text"));
+        btnAddRat.setToolTipText(resourceMap.getString("btnAddRat.toolTipText"));
+        btnAddRat.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				int selectedIndex = availableRats.getSelectedIndex();
+				chosenRatModel.addElement(availableRats.getSelectedValue());
+				availableRatModel.removeElementAt(availableRats.getSelectedIndex());
+				availableRats.setSelectedIndex(Math.min(selectedIndex, availableRatModel.size() - 1));
+			}
+        });
+        btnAddRat.setEnabled(false);
+        panRatButtons.add(btnAddRat);
+        btnRemoveRat.setText(resourceMap.getString("btnRemoveRat.text"));
+        btnRemoveRat.setToolTipText(resourceMap.getString("btnRemoveRat.toolTipText"));
+        btnRemoveRat.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				int selectedIndex = chosenRats.getSelectedIndex();
+				availableRatModel.addElement(chosenRats.getSelectedValue());
+				chosenRatModel.removeElementAt(chosenRats.getSelectedIndex());
+				chosenRats.setSelectedIndex(Math.min(selectedIndex, chosenRatModel.size() - 1));
+			}
+        });
+        btnRemoveRat.setEnabled(false);
+        panRatButtons.add(btnRemoveRat);
+        btnMoveRatUp.setText(resourceMap.getString("btnMoveRatUp.text"));
+        btnMoveRatUp.setToolTipText(resourceMap.getString("btnMoveRatUp.toolTipText"));
+        btnMoveRatUp.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				int selectedIndex = chosenRats.getSelectedIndex();
+				String tmp = chosenRatModel.getElementAt(selectedIndex);
+				chosenRatModel.setElementAt(chosenRatModel.getElementAt(selectedIndex - 1), selectedIndex);
+				chosenRatModel.setElementAt(tmp, selectedIndex - 1);
+				chosenRats.setSelectedIndex(selectedIndex - 1);
+			}
+        });
+        btnMoveRatUp.setEnabled(false);
+        panRatButtons.add(btnMoveRatUp);
+        btnMoveRatDown.setText(resourceMap.getString("btnMoveRatDown.text"));
+        btnMoveRatDown.setToolTipText(resourceMap.getString("btnMoveRatDown.toolTipText"));
+        btnMoveRatDown.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				int selectedIndex = chosenRats.getSelectedIndex();
+				String tmp = chosenRatModel.getElementAt(selectedIndex);
+				chosenRatModel.setElementAt(chosenRatModel.getElementAt(selectedIndex + 1), selectedIndex);
+				chosenRatModel.setElementAt(tmp, selectedIndex + 1);
+				chosenRats.setSelectedIndex(selectedIndex + 1);
+			}
+        });
+        btnMoveRatDown.setEnabled(false);
+        panRatButtons.add(btnMoveRatDown);
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        panSubAtBRat.add(panRatButtons, gridBagConstraints);
+        
+        JLabel lblSearchRadius = new JLabel(resourceMap.getString("lblSearchRadius.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubAtBContract.add(lblSearchRadius, gridBagConstraints);
+
+        spnSearchRadius.setModel(new SpinnerNumberModel(options.getSearchRadius(), 100, 2500, 100));
+        spnSearchRadius.setToolTipText(resourceMap.getString("spnSearchRadius.toolTipText"));
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        panSubAtBContract.add(spnSearchRadius, gridBagConstraints);
+        
+        chkVariableContractLength.setText(resourceMap.getString("chkVariableContractLength.text"));
+        chkVariableContractLength.setSelected(options.getVariableContractLength());
+        chkVariableContractLength.setToolTipText(resourceMap.getString("chkVariableContractLength.toolTipText"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        panSubAtBContract.add(chkVariableContractLength, gridBagConstraints);
+
+        chkMercSizeLimited.setText(resourceMap.getString("chkMercSizeLimited.text"));
+        chkMercSizeLimited.setSelected(options.isMercSizeLimited());
+        chkMercSizeLimited.setToolTipText(resourceMap.getString("chkMercSizeLimited.toolTipText"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        panSubAtBContract.add(chkMercSizeLimited, gridBagConstraints);
+
+        chkRestrictPartsByMission.setText(resourceMap.getString("chkRestrictPartsByMission.text"));
+        chkRestrictPartsByMission.setSelected(options.getRestrictPartsByMission());
+        chkRestrictPartsByMission.setToolTipText(resourceMap.getString("chkRestrictPartsByMission.toolTipText"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 2;
+        panSubAtBContract.add(chkRestrictPartsByMission, gridBagConstraints);
+
+        chkLimitLanceWeight.setText(resourceMap.getString("chkLimitLanceWeight.text"));
+        chkLimitLanceWeight.setSelected(options.getLimitLanceWeight());
+        chkLimitLanceWeight.setToolTipText(resourceMap.getString("chkLimitLanceWeight.toolTipText"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 2;
+        panSubAtBContract.add(chkLimitLanceWeight, gridBagConstraints);
+
+        chkLimitLanceNumUnits.setText(resourceMap.getString("chkLimitLanceNumUnits.text"));
+        chkLimitLanceNumUnits.setSelected(options.getLimitLanceNumUnits());
+        chkLimitLanceNumUnits.setToolTipText(resourceMap.getString("chkLimitLanceNumUnits.toolTipText"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 2;
+        panSubAtBContract.add(chkLimitLanceNumUnits, gridBagConstraints);
+
+        JLabel lblLanceStructure = new JLabel(resourceMap.getString("lblLanceStructure.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = 1;
+        panSubAtBContract.add(lblLanceStructure, gridBagConstraints);
+
+        chkUseStrategy.setText(resourceMap.getString("chkUseStrategy.text"));
+        chkUseStrategy.setSelected(options.getUseStrategy());
+        chkUseStrategy.setToolTipText(resourceMap.getString("chkUseStrategy.toolTipText"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridwidth = 2;
+        panSubAtBContract.add(chkUseStrategy, gridBagConstraints);
+
+        JLabel lblBaseStrategyDeployment = new JLabel(resourceMap.getString("lblBaseStrategyDeployment.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridwidth = 1;
+        panSubAtBContract.add(lblBaseStrategyDeployment, gridBagConstraints);
+
+        spnBaseStrategyDeployment.setModel(new SpinnerNumberModel(options.getBaseStrategyDeployment(), 0, 10, 1));
+        spnBaseStrategyDeployment.setToolTipText(resourceMap.getString("spnBaseStrategyDeployment.toolTipText"));
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 8;
+        panSubAtBContract.add(spnBaseStrategyDeployment, gridBagConstraints);
+        
+        JLabel lblAdditionalStrategyDeployment = new JLabel(resourceMap.getString("lblAdditionalStrategyDeployment.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridwidth = 1;
+        panSubAtBContract.add(lblAdditionalStrategyDeployment, gridBagConstraints);
+
+        spnAdditionalStrategyDeployment.setModel(new SpinnerNumberModel(options.getAdditionalStrategyDeployment(), 0, 10, 1));
+        spnAdditionalStrategyDeployment.setToolTipText(resourceMap.getString("spnAdditionalStrategyDeployment.toolTipText"));
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 9;
+        panSubAtBContract.add(spnAdditionalStrategyDeployment, gridBagConstraints);
+        
+        chkAdjustPaymentForStrategy.setText(resourceMap.getString("chkAdjustPaymentForStrategy.text"));
+        chkAdjustPaymentForStrategy.setSelected(options.getAdjustPaymentForStrategy());
+        chkAdjustPaymentForStrategy.setToolTipText(resourceMap.getString("chkAdjustPaymentForStrategy.toolTipText"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridwidth = 2;
+        panSubAtBContract.add(chkAdjustPaymentForStrategy, gridBagConstraints);
+
+        JLabel lblIntensity = new JLabel(resourceMap.getString("lblIntensity.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 11;
+        panSubAtBContract.add(lblIntensity, gridBagConstraints);
+        
+        spnIntensity.setModel(new SpinnerNumberModel(options.getIntensity(), 0.1, 5.0, 0.1));
+        spnIntensity.setToolTipText(resourceMap.getString("spnIntensity.toolTipText"));
+        spnIntensity.setValue(options.getIntensity());
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 12;
+        panSubAtBContract.add(spnIntensity, gridBagConstraints);
+        spnIntensity.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent arg0) {
+				updateBattleChances();
+			}
+        });
+
+        JLabel lblBattleFrequency = new JLabel(resourceMap.getString("lblBattleFrequency.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 12;
+        gridBagConstraints.gridwidth = 2;
+        panSubAtBContract.add(lblBattleFrequency, gridBagConstraints);
+
+        JLabel lblFightChance = new JLabel(resourceMap.getString("lblFightChance.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 13;
+        gridBagConstraints.gridwidth = 1;
+        panSubAtBContract.add(lblFightChance, gridBagConstraints);
+
+        lblFightPct = new JLabel();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 13;
+        panSubAtBContract.add(lblFightPct, gridBagConstraints);
+        
+        JLabel lblDefendChance = new JLabel(resourceMap.getString("lblDefendChance.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 14;
+        gridBagConstraints.gridwidth = 1;
+        panSubAtBContract.add(lblDefendChance, gridBagConstraints);
+
+        lblDefendPct = new JLabel();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 14;
+        panSubAtBContract.add(lblDefendPct, gridBagConstraints);
+        
+        JLabel lblScoutChance = new JLabel(resourceMap.getString("lblScoutChance.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 15;
+        gridBagConstraints.gridwidth = 1;
+        panSubAtBContract.add(lblScoutChance, gridBagConstraints);
+
+        lblScoutPct = new JLabel();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 15;
+        panSubAtBContract.add(lblScoutPct, gridBagConstraints);
+        
+        JLabel lblTrainingChance = new JLabel(resourceMap.getString("lblTrainingChance.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 16;
+        gridBagConstraints.gridwidth = 1;
+        panSubAtBContract.add(lblTrainingChance, gridBagConstraints);
+
+        lblTrainingPct = new JLabel();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 16;
+        panSubAtBContract.add(lblTrainingPct, gridBagConstraints);
+        
+        updateBattleChances();
+
+        chkDoubleVehicles.setText(resourceMap.getString("chkDoubleVehicles.text"));
+        chkDoubleVehicles.setToolTipText(resourceMap.getString("chkDoubleVehicles.toolTipText"));
+        chkDoubleVehicles.setSelected(options.getDoubleVehicles());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubAtBScenario.add(chkDoubleVehicles, gridBagConstraints);
+
+        chkAdjustPlayerVehicles.setText(resourceMap.getString("chkAdjustPlayerVehicles.text"));
+        chkAdjustPlayerVehicles.setToolTipText(resourceMap.getString("chkAdjustPlayerVehicles.toolTipText"));
+        chkAdjustPlayerVehicles.setSelected(options.getAdjustPlayerVehicles());
+        gridBagConstraints.gridy = 1;
+        panSubAtBScenario.add(chkAdjustPlayerVehicles, gridBagConstraints);
+
+        chkRegionalMechVariations.setText(resourceMap.getString("chkRegionalMechVariations.text"));
+        chkRegionalMechVariations.setToolTipText(resourceMap.getString("chkRegionalMechVariations.toolTipText"));
+        chkRegionalMechVariations.setSelected(options.getRegionalMechVariations());
+        gridBagConstraints.gridy = 2;
+        panSubAtBScenario.add(chkRegionalMechVariations, gridBagConstraints);
+
+        chkUseDropShips.setText(resourceMap.getString("chkUseDropShips.text"));
+        chkUseDropShips.setToolTipText(resourceMap.getString("chkUseDropShips.toolTipText"));
+        chkUseDropShips.setSelected(options.getUseDropShips());
+        gridBagConstraints.gridy = 3;
+        panSubAtBScenario.add(chkUseDropShips, gridBagConstraints);
+
+        chkUseWeatherConditions.setText(resourceMap.getString("chkUseWeatherConditions.text"));
+        chkUseWeatherConditions.setToolTipText(resourceMap.getString("chkUseWeatherConditions.toolTipText"));
+        chkUseWeatherConditions.setSelected(options.getUseWeatherConditions());
+        gridBagConstraints.gridy = 4;
+        panSubAtBScenario.add(chkUseWeatherConditions, gridBagConstraints);
+
+        chkUseLightConditions.setText(resourceMap.getString("chkUseLightConditions.text"));
+        chkUseLightConditions.setToolTipText(resourceMap.getString("chkUseLightConditions.toolTipText"));
+        chkUseLightConditions.setSelected(options.getUseLightConditions());
+        gridBagConstraints.gridy = 5;
+        panSubAtBScenario.add(chkUseLightConditions, gridBagConstraints);
+
+        chkUsePlanetaryConditions.setText(resourceMap.getString("chkUsePlanetaryConditions.text"));
+        chkUsePlanetaryConditions.setToolTipText(resourceMap.getString("chkUsePlanetaryConditions.toolTipText"));
+        chkUsePlanetaryConditions.setSelected(options.getUsePlanetaryConditions());
+        gridBagConstraints.gridy = 6;
+        panSubAtBScenario.add(chkUsePlanetaryConditions, gridBagConstraints);
+
+        chkUseAtBCapture.setText(resourceMap.getString("chkUseAtBCapture.text"));
+        chkUseAtBCapture.setToolTipText(resourceMap.getString("chkUseAtBCapture.toolTipText"));
+        chkUseAtBCapture.setSelected(options.getUseAtBCapture());
+        gridBagConstraints.gridy = 7;
+        panSubAtBScenario.add(chkUseAtBCapture, gridBagConstraints);
+
+        JScrollPane scrAtB = new JScrollPane(panAtB);
+        scrAtB.setPreferredSize(new java.awt.Dimension(500, 400));
+
+        tabOptions.addTab(resourceMap.getString("panAtB.TabConstraints.tabTitle"),
+                scrAtB); // NOI18N
+		enableAtBComponents(panAtB, chkUseAtB.isSelected());
+
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -3095,6 +3736,49 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setPersonnelMarketReportRefresh(personnelMarketReportRefresh.isSelected());
         options.setPersonnelMarketType(personnelMarketType.getSelectedIndex());
         // End Personnel Market
+        
+        // Start Against the Bot
+        options.setUseAtB(chkUseAtB.isSelected());
+        options.setSkillLevel(cbSkillLevel.getSelectedIndex());
+        options.setUseShareSystem(chkUseShareSystem.isSelected());
+        options.setTrackOriginalUnit(chkTrackOriginalUnit.isSelected());
+        options.setRetirementRolls(chkRetirementRolls.isSelected());
+        options.setCustomRetirementMods(chkCustomRetirementMods.isSelected());
+        options.setLimitLanceWeight(chkLimitLanceWeight.isSelected());
+        options.setLimitLanceNumUnits(chkLimitLanceNumUnits.isSelected());
+        options.setUseLeadership(chkUseLeadership.isSelected());
+        options.setUseStrategy(chkUseStrategy.isSelected());
+        options.setBaseStrategyDeployment((Integer)spnBaseStrategyDeployment.getValue());
+        options.setAdditionalStrategyDeployment((Integer)spnAdditionalStrategyDeployment.getValue());
+        options.setAdjustPaymentForStrategy(chkAdjustPaymentForStrategy.isSelected());
+        
+        options.setUseAero(chkUseAero.isSelected());
+        options.setUseVehicles(chkUseVehicles.isSelected());
+        options.setClanVehicles(chkClanVehicles.isSelected());
+        options.setDoubleVehicles(chkDoubleVehicles.isSelected());
+        options.setAdjustPlayerVehicles(chkAdjustPlayerVehicles.isSelected());
+        options.setUseDropShips(chkUseDropShips.isSelected());
+        
+        String[] ratList = new String[chosenRatModel.size()];
+        chosenRatModel.copyInto(ratList);
+        options.setRATs(ratList);
+        options.setSearchRadius((Integer)spnSearchRadius.getValue());
+        options.setIntensity((Double)spnIntensity.getValue());
+        options.setVariableContractLength(chkVariableContractLength.isSelected());
+        options.setMercSizeLimited(chkMercSizeLimited.isSelected());
+        options.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
+        options.setRegionalMechVariations(chkRegionalMechVariations.isSelected());
+        options.setUseWeatherConditions(chkUseWeatherConditions.isSelected());
+        options.setUseLightConditions(chkUseLightConditions.isSelected());
+        options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
+        options.setUseAtBCapture(chkUseAtBCapture.isSelected());
+        
+        options.setAeroRecruitsHaveUnits(chkAeroRecruitsHaveUnits.isSelected());
+        options.setInstantUnitMarketDelivery(chkInstantUnitMarketDelivery.isSelected());
+        options.setContractMarketReportRefresh(chkContractMarketReportRefresh.isSelected());
+        options.setContractMarketReportRefresh(chkUnitMarketReportRefresh.isSelected());
+        
+        // End Against the Bot
     }
 
     private void updateXPCosts() {
@@ -3322,6 +4006,182 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         	colorIndex = 0;
         	setCamoIcon();
         }
+    }
+    
+    private void enableAtBComponents(JPanel panel, boolean enabled) {
+    	for (Component c : panel.getComponents()) {
+    		if (c.equals(chkUseAtB)) {
+    			continue;
+    		}
+    		if (c instanceof JPanel) {
+    			enableAtBComponents((JPanel)c, enabled);
+    		} else if (enabled && c.equals(btnAddRat)) {
+    			c.setEnabled(availableRats.getSelectedIndex() >= 0);
+    		} else if (enabled && c.equals(btnRemoveRat)) {
+    			c.setEnabled(chosenRats.getSelectedIndex() >= 0);
+    		} else if (enabled && c.equals(btnMoveRatUp)) {
+				c.setEnabled(chosenRats.getSelectedIndex() > 0);
+    		} else if (enabled && c.equals(btnMoveRatDown)) {
+				c.setEnabled(availableRats.getSelectedIndex() >= 0 && 
+						chosenRatModel.size() > chosenRats.getSelectedIndex() + 1);
+    		} else {
+    			c.setEnabled(enabled);
+    		}
+    	}
+    }
+    
+    private void setAtBSkillCosts() {
+    	if (btnUseAtBSkillCosts.isSelected()) {
+    		final String[] combatSkills = {SkillType.S_PILOT_MECH,SkillType.S_GUN_MECH,SkillType.S_PILOT_AERO,SkillType.S_GUN_AERO,
+    				SkillType.S_PILOT_GVEE,SkillType.S_PILOT_VTOL,SkillType.S_PILOT_NVEE,SkillType.S_GUN_VEE,
+    				SkillType.S_PILOT_JET,SkillType.S_GUN_JET,SkillType.S_PILOT_SPACE,SkillType.S_GUN_SPACE,SkillType.S_ARTILLERY,
+    				SkillType.S_GUN_BA,SkillType.S_GUN_PROTO,SkillType.S_SMALL_ARMS,SkillType.S_ANTI_MECH};
+    		final String[] supportSkills = {SkillType.S_TECH_MECH,SkillType.S_TECH_MECHANIC,SkillType.S_TECH_AERO,SkillType.S_TECH_BA,SkillType.S_TECH_VESSEL,SkillType.S_ASTECH,
+    				SkillType.S_DOCTOR,SkillType.S_MEDTECH,SkillType.S_NAV,
+    				SkillType.S_ADMIN,SkillType.S_NEG,SkillType.S_SCROUNGE};
+    		final String[] officerSkills = {SkillType.S_TACTICS,SkillType.S_STRATEGY,SkillType.S_LEADER};
+
+    		final int[] combatXp = {5, 5, 5, 5, 10, 20, 40, 60, 100, -1, -1};
+    		final int[] supportXp = {5, 0, 5, 10, 20, 40, -1, -1, -1, -1, -1};
+    		final int[] officerXp = {10, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
+
+    		HashMap<String, Integer> skillIndices = new HashMap<String, Integer>();
+    		for (int i = 0; i < SkillType.skillList.length; i++) {
+    			skillIndices.put(SkillType.skillList[i], i);
+    		}
+
+    		for (String skillName : combatSkills) {
+    			hashSkillTargets.get(skillName).setValue(8);
+    			for (int i = 0; i < combatXp.length; i++) {
+    				tableXP.setValueAt(Integer.toString(combatXp[i]),
+    						skillIndices.get(skillName), i);
+    			}
+    		}
+    		for (String skillName : supportSkills) {
+    			hashSkillTargets.get(skillName).setValue(10);
+    			for (int i = 0; i < supportXp.length; i++) {
+    				tableXP.setValueAt(Integer.toString(supportXp[i]),
+    						skillIndices.get(skillName), i);
+    			}
+    		}
+    		for (String skillName : officerSkills) {
+    			hashSkillTargets.get(skillName).setValue(0);
+    			for (int i = 0; i < officerXp.length; i++) {
+    				tableXP.setValueAt(Integer.toString(officerXp[i]),
+    						skillIndices.get(skillName), i);
+    			}
+    		}
+    		btnUseAtBSkillCosts.setText("Restore previous skill costs");
+    	} else {
+    		for (int i = 0; i < SkillType.skillList.length; i++) {
+    			String skillName = SkillType.skillList[i];
+    			hashSkillTargets.get(skillName).setValue(SkillType.getType(skillName).getTarget());
+    			for (int j = 0; j < 11; j++) {
+    				tableXP.setValueAt(Integer.toString(SkillType.getType(skillName).getCost(j)), i, j);
+    			}
+			}
+    		btnUseAtBSkillCosts.setText("Use AtB costs for skills");
+    	}
+    }
+    
+    private void setAtBSPACosts() {
+    	if (btnUseAtBSPACosts.isSelected()) {
+    		tempSPA = atbSPA;
+    		btnUseAtBSPACosts.setText("Restore default special ability settings");
+    	} else {
+    		tempSPA = originalSPA;
+    		btnUseAtBSPACosts.setText("Use AtB costs for special abilities");
+    	}
+    	
+    	panSpecialAbilities.removeAll();
+        
+        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx =1.0;
+        gridBagConstraints.weighty =0.0;
+        panSpecialAbilities.add(btnAddSPA, gridBagConstraints);
+        btnAddSPA.setEnabled(true);
+        
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx =1.0;
+        gridBagConstraints.weighty =1.0;
+
+        for(String title : tempSPA.keySet()) {
+            panSpecialAbilities.add(new SpecialAbilityPanel(tempSPA.get(title), this), gridBagConstraints);
+            gridBagConstraints.gridy++;
+        }      
+        panSpecialAbilities.revalidate();
+        panSpecialAbilities.repaint();
+    }
+
+    private void initAtBSPA() {	
+    	Set<String> spaNames = SpecialAbility.getAllSpecialAbilities().keySet();
+    	atbSPA = new Hashtable<String, SpecialAbility>();
+    	originalSPA = new Hashtable<String, SpecialAbility>();
+	    for(String name : spaNames) {
+	    	originalSPA.put(name, SpecialAbility.getAbility(name).clone());
+	    	SpecialAbility spa = SpecialAbility.getAbility(name).clone();
+	    	switch (spa.getName()) {
+	    	case "dodge_maneuver":
+	    	case "hopping_jack":
+	    	case "melee_specialist":
+	    	case "melee_master":
+	    	case "weapon_specialist":
+	    	case "pain_resistance":
+	    	case "iron_man":
+	    	case "sensor_geek":
+	    		spa.setCost(20);
+	    		spa.setWeight(10);
+	    		break;
+	    	case "hot_dog":
+	    	case "maneuvering_ace":
+	    	case "cluster_hitter":
+	    	case "multi_tasker":
+	    	case "sandblaster":
+	    	case "some_like_it_hot":
+	    		spa.setCost(40);
+	    		spa.setWeight(5);
+	    		break;
+	    	case "jumping_jack":
+	    		spa.setCost(40);
+	    		spa.setWeight(10);
+	    		break;
+	    	case "cluster_master":
+	    		spa.setCost(60);
+	    		spa.setWeight(5);
+	    	case "allweather":
+	    	case "oblique_attacker":
+	    	case "sniper":
+	    	case "weathered":
+	    	case "blind_fighter":
+	    		spa.setCost(60);
+	    		spa.setWeight(2);
+	    		break;
+	    	case "specialist":
+	    		spa.setCost(40);
+	    		spa.setWeight(12);
+	    		break;
+	    	case "aptitude_gunnery":
+	    	case "tactical_genius":
+	    		spa.setCost(-1);
+	    		spa.setWeight(1);
+	    	}
+	    	atbSPA.put(name, spa);
+	    }
+    }
+
+    private void updateBattleChances() {
+    	double intensity = (Double)spnIntensity.getValue();
+    	lblFightPct.setText((int)(40.0 * intensity / (40.0 * intensity + 60.0) * 100.0 + 0.5) + "%");
+    	lblDefendPct.setText((int)(20.0 * intensity / (20.0 * intensity + 80.0) * 100.0 + 0.5) + "%");
+    	lblScoutPct.setText((int)(60.0 * intensity / (60.0 * intensity + 40.0) * 100.0 + 0.5) + "%");
+    	lblTrainingPct.setText((int)(10.0 * intensity / (10.0 * intensity + 90.0) * 100.0 + 0.5) + "%");
     }
 
     /*

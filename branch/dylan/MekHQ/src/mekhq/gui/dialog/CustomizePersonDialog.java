@@ -6,10 +6,13 @@
 
 package mekhq.gui.dialog;
 
+import java.awt.Component;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.text.SimpleDateFormat;
@@ -22,9 +25,11 @@ import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
@@ -39,8 +44,10 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.unit.Unit;
 
 /**
  *
@@ -67,8 +74,9 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private javax.swing.JButton btnClose;
     private javax.swing.JButton btnOk;
     private javax.swing.JButton btnRandomName;
+    private javax.swing.JButton btnRandomBloodname;
     private javax.swing.JButton btnDate;
-    private javax.swing.JComboBox choiceGender;
+    private javax.swing.JComboBox<String> choiceGender;
     private javax.swing.JScrollPane scrOptions;
     private javax.swing.JScrollPane scrBio;
     private javax.swing.JScrollPane scrSkills;
@@ -78,6 +86,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private javax.swing.JLabel lblBday;
     private javax.swing.JLabel lblAge;
     private javax.swing.JLabel lblNickname;
+    private javax.swing.JLabel lblBloodname;
     private javax.swing.JPanel panButtons;
     private javax.swing.JPanel panDemog;
     private javax.swing.JTabbedPane tabStats;
@@ -86,9 +95,17 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private javax.swing.JTextField textToughness;
     private javax.swing.JTextField textName;
     private javax.swing.JTextField textNickname;
+    private javax.swing.JTextField textBloodname;
     private javax.swing.JTextPane txtBio;
     private JCheckBox chkClan;
-    private JComboBox choicePheno;
+    private JComboBox<String> choicePheno;
+    
+    /* Against the Bot */
+    private JComboBox<String> choiceUnitWeight;
+    private JComboBox<String> choiceUnitTech;
+    private JLabel lblShares;
+    private JCheckBox chkFounder;
+    private JComboBox<Unit> choiceOriginalUnit;
     
     private Campaign campaign;
     
@@ -109,7 +126,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     	initComponents();
     }
 
-    private void initComponents() {
+    @SuppressWarnings("serial")
+	private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
         panDemog = new javax.swing.JPanel();
@@ -119,11 +137,13 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         lblBday = new javax.swing.JLabel();
         lblAge = new javax.swing.JLabel();
         lblNickname = new javax.swing.JLabel();
+        lblBloodname = new javax.swing.JLabel();
         textName = new javax.swing.JTextField();
         textNickname = new javax.swing.JTextField();
+        textBloodname = new javax.swing.JTextField();
         textToughness = new javax.swing.JTextField();
         lblToughness = new javax.swing.JLabel();
-        choiceGender = new javax.swing.JComboBox();
+        choiceGender = new javax.swing.JComboBox<String>();
         scrOptions = new javax.swing.JScrollPane();
         panOptions = new javax.swing.JPanel();
         scrSkills = new javax.swing.JScrollPane();
@@ -135,6 +155,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         
         btnClose = new javax.swing.JButton();
         btnRandomName = new javax.swing.JButton();
+        btnRandomBloodname = new javax.swing.JButton();
         btnDate = new javax.swing.JButton();
 
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizePersonDialog");
@@ -180,26 +201,65 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         panDemog.add(btnRandomName, gridBagConstraints);
         
-        lblNickname.setText(resourceMap.getString("lblNickname.text")); // NOI18N
-        lblNickname.setName("lblNickname"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
-        panDemog.add(lblNickname, gridBagConstraints);
-        
-        textNickname.setText(person.getCallsign());
-        textNickname.setName("textNickname"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        panDemog.add(textNickname, gridBagConstraints);
+        if (person.isClanner()) {
+            lblBloodname.setText(resourceMap.getString("lblBloodname.text")); // NOI18N
+            lblBloodname.setName("lblBloodname"); // NOI18N
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 2;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+            panDemog.add(lblBloodname, gridBagConstraints);
+
+            textBloodname.setMinimumSize(new java.awt.Dimension(150, 28));
+            textBloodname.setName("textBloodname"); // NOI18N
+            textBloodname.setPreferredSize(new java.awt.Dimension(150, 28));
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = 2;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            textBloodname.setText(person.getBloodname());
+            panDemog.add(textBloodname, gridBagConstraints);
+
+            btnRandomBloodname.setText(resourceMap.getString("btnRandomBloodname.text")); // NOI18N
+            btnRandomBloodname.setName("btnRandomBloodname"); // NOI18N
+            btnRandomBloodname.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                	randomBloodname();
+                 }
+            });
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 2;
+            gridBagConstraints.gridy = 2;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            panDemog.add(btnRandomBloodname, gridBagConstraints);        	
+        } else {
+        	lblNickname.setText(resourceMap.getString("lblNickname.text")); // NOI18N
+        	lblNickname.setName("lblNickname"); // NOI18N
+        	gridBagConstraints = new java.awt.GridBagConstraints();
+        	gridBagConstraints.gridx = 0;
+        	gridBagConstraints.gridy = 2;
+        	gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        	gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        	panDemog.add(lblNickname, gridBagConstraints);
+
+        	textNickname.setText(person.getCallsign());
+        	textNickname.setName("textNickname"); // NOI18N
+        	gridBagConstraints = new java.awt.GridBagConstraints();
+        	gridBagConstraints.gridx = 1;
+        	gridBagConstraints.gridy = 2;
+        	gridBagConstraints.gridwidth = 1;
+        	gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        	gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        	panDemog.add(textNickname, gridBagConstraints);
+        }
         
         lblGender.setText(resourceMap.getString("lblGender.text")); // NOI18N
         lblGender.setName("lblGender"); // NOI18N
@@ -210,7 +270,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         panDemog.add(lblGender, gridBagConstraints);
 
-        DefaultComboBoxModel genderModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> genderModel = new DefaultComboBoxModel<String>();
         genderModel.addElement(Person.getGenderName(Person.G_MALE));
         genderModel.addElement(Person.getGenderName(Person.G_FEMALE));
         choiceGender.setModel(genderModel);
@@ -237,11 +297,11 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         panDemog.add(new JLabel("Phenotype:"), gridBagConstraints);
 
-        DefaultComboBoxModel phenoModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> phenoModel = new DefaultComboBoxModel<String>();
         for(int i = 0; i < Person.PHENOTYPE_NUM; i++) {
             phenoModel.addElement(Person.getPhenotypeName(i));
         }
-        choicePheno = new JComboBox(phenoModel);
+        choicePheno = new JComboBox<String>(phenoModel);
         choicePheno.setSelectedIndex(person.getPhenotype());
         choicePheno.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -328,6 +388,115 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             panDemog.add(textToughness, gridBagConstraints);
         }
         
+        JLabel lblUnit = new JLabel();
+        lblUnit.setText("Original unit:"); // NOI18N
+        lblUnit.setName("lblUnit"); // NOI18N
+        
+        choiceUnitWeight = new JComboBox<String>();
+        choiceUnitWeight.addItem("None");
+        choiceUnitWeight.addItem("Light");
+        choiceUnitWeight.addItem("Medium");
+        choiceUnitWeight.addItem("Heavy");
+        choiceUnitWeight.addItem("Assault");
+        choiceUnitWeight.setSelectedIndex(person.getOriginalUnitWeight());
+
+        choiceUnitTech = new JComboBox<String>();
+        choiceUnitTech.addItem("IS1");
+        choiceUnitTech.addItem("IS2");
+        choiceUnitTech.addItem("Clan");
+        choiceUnitTech.setSelectedIndex(person.getOriginalUnitTech());
+        
+        lblShares = new JLabel();
+        lblShares.setText(person.getNumShares() + " shares");
+        
+        chkFounder = new JCheckBox("Founding member");
+        chkFounder.setSelected(person.isFounder());
+        
+        choiceOriginalUnit = new JComboBox<Unit>();
+        choiceOriginalUnit.setRenderer(new DefaultListCellRenderer() {
+			@Override
+        	public Component getListCellRendererComponent(JList<?> list,
+        			Object value, int index, boolean isSelected,
+        			boolean cellHasFocus) {
+        		if (null == value) {
+        			setText("None");
+         		} else {
+        			setText(((Unit)value).getName());
+        		}
+        		return this;
+        	}
+        });
+    	choiceOriginalUnit.addItem(null);       
+        for (Unit unit : campaign.getUnits()) {
+        	choiceOriginalUnit.addItem(unit);
+        }
+        if (null == person.getOriginalUnitId()) {
+        	choiceOriginalUnit.setSelectedItem(null);
+        } else {
+        	choiceOriginalUnit.setSelectedItem(campaign.getUnit(person.getOriginalUnitId()));
+        }
+        choiceOriginalUnit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent ev) {
+				if (null == choiceOriginalUnit.getSelectedItem()) {
+					choiceUnitWeight.setSelectedIndex(0);
+					choiceUnitTech.setSelectedIndex(0);
+				} else {
+					Unit unit = (Unit)choiceOriginalUnit.getSelectedItem();
+					choiceUnitWeight.setSelectedIndex(unit.getEntity().getWeightClass());
+					if (unit.getEntity().isClan()) {
+						choiceUnitTech.setSelectedIndex(2);
+					} else if (unit.getEntity().getTechLevel() > megamek.common.TechConstants.T_INTRO_BOXSET) {
+						choiceUnitTech.setSelectedIndex(1);						
+					} else {
+						choiceUnitTech.setSelectedIndex(0);	
+					}
+				}
+			}
+        });
+        
+        if (campaign.getCampaignOptions().getUseAtB()) {
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 7;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+	        panDemog.add(lblUnit, gridBagConstraints);
+	        
+	        gridBagConstraints.gridx = 1;
+	        gridBagConstraints.gridy = 7;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+	        panDemog.add(choiceUnitWeight, gridBagConstraints);
+
+	        gridBagConstraints.gridx = 2;
+	        gridBagConstraints.gridy = 7;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+	        panDemog.add(choiceUnitTech, gridBagConstraints);
+
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 8;
+	        gridBagConstraints.gridwidth = 3;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+	        panDemog.add(choiceOriginalUnit, gridBagConstraints);
+	        
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = 9;
+	        gridBagConstraints.gridwidth = 2;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+	        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+	        panDemog.add(chkFounder, gridBagConstraints);
+	        
+	        if (campaign.getCampaignOptions().getUseShareSystem()) {
+	        	gridBagConstraints.gridx = 2;
+	        	gridBagConstraints.gridy = 9;
+	        	gridBagConstraints.gridwidth = 1;
+	        	gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+	        	panDemog.add(lblShares, gridBagConstraints);
+	        }
+        }
+
+         
+        
         scrBio.setName("scrBio"); // NOI18N
 
         txtBio.setName("txtBio"); // NOI18N
@@ -339,7 +508,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 10;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 1.0;
@@ -428,7 +597,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
         
         person.setName(textName.getText());
-        person.setCallsign(textNickname.getText());   
+        person.setCallsign(textNickname.getText());
+        person.setBloodname(textBloodname.getText());
         person.setBiography(txtBio.getText());
         person.setGender(choiceGender.getSelectedIndex());
         person.setBirthday(birthdate);  
@@ -439,6 +609,13 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         } catch(NumberFormatException e) {
         	//dont do anything
         }
+        if (null == choiceOriginalUnit.getSelectedItem()) {
+        	person.setOriginalUnitWeight(choiceUnitWeight.getSelectedIndex());
+        	person.setOriginalUnitTech(choiceUnitTech.getSelectedIndex());
+        } else {
+        	person.setOriginalUnitId(((Unit)choiceOriginalUnit.getSelectedItem()).getId());
+        }
+        person.setFounder(chkFounder.isSelected());
         setSkills();
         setOptions();       
         setVisible(false);
@@ -447,6 +624,33 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private void randomName() {
 		textName.setText(campaign.getRNG().generate(choiceGender.getSelectedIndex() == Person.G_FEMALE));
 	}
+    
+    private void randomBloodname() {
+		int phenotype = Bloodname.P_GENERAL;
+		switch (person.getPrimaryRole()) {
+		case Person.T_MECHWARRIOR:
+			phenotype = Bloodname.P_MECHWARRIOR;
+			break;
+		case Person.T_BA:
+			phenotype = Bloodname.P_ELEMENTAL;
+			break;
+		case Person.T_AERO_PILOT:
+		case Person.T_CONV_PILOT:
+			phenotype = Bloodname.P_AEROSPACE;
+			break;
+		case Person.T_SPACE_CREW:
+		case Person.T_NAVIGATOR:
+		case Person.T_SPACE_GUNNER:
+		case Person.T_SPACE_PILOT:
+			phenotype = Bloodname.P_NAVAL;
+			break;
+		case Person.T_PROTO_PILOT:
+			phenotype = Bloodname.P_PROTOMECH;
+			break;
+		}
+		textBloodname.setText(Bloodname.randomBloodname(campaign.getFactionCode(), phenotype,
+					campaign.getCalendar().get(Calendar.YEAR)).getName());   	
+    }
 
     public void refreshSkills() {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizePersonDialog");

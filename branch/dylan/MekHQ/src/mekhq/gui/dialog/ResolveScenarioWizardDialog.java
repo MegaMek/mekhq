@@ -33,6 +33,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -55,9 +56,11 @@ import megamek.client.ui.swing.MechEditorDialog;
 import megamek.client.ui.swing.MechViewPanel;
 import megamek.common.Entity;
 import megamek.common.GunEmplacement;
+import mekhq.Utilities;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.ResolveScenarioTracker.UnitStatus;
+import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Scenario;
@@ -76,8 +79,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
 	final static String KILLPANEL    = "Assign Kills";
 	final static String REWARDPANEL    = "Collect Rewards";
 	final static String PREVIEWPANEL = "Preview";
+	/* Used by AtB to determine minor contract breaches and bonus rolls */
+	final static String ALLYPANEL    = "Ally Status";
 
-	final static String[] panelOrder = {UNITSPANEL,PILOTPANEL,SALVAGEPANEL,KILLPANEL,REWARDPANEL,PREVIEWPANEL};
+	final static String[] panelOrder = {UNITSPANEL,ALLYPANEL,PILOTPANEL,SALVAGEPANEL,KILLPANEL,REWARDPANEL,PREVIEWPANEL};
 	
 	private JFrame frame;
 	
@@ -96,6 +101,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private JScrollPane scrMain;
     private JPanel pnlMain;
     private JPanel pnlUnitStatus;
+    private JPanel pnlAllyStatus;
     private JPanel pnlPilotStatus;
     private JPanel pnlSalvage;
     private JPanel pnlKills;
@@ -110,6 +116,11 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private ArrayList<JButton> btnsEditUnit;
     private ArrayList<UnitStatus> ustatuses;
     private ArrayList<JLabel> lblsUnitName;
+    
+    /*
+     * Ally status panel components
+     */
+    private ArrayList<JCheckBox> chksAllyLost;
     
     /*
      * Pilot status panel components
@@ -148,7 +159,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     /*
      * Assign Kills components
      */
-    private Hashtable<String, JComboBox> killChoices;
+    private Hashtable<String, JComboBox<String>> killChoices;
     
     /*
      * Collect Rewards components
@@ -159,7 +170,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     /*
      * Preview Panel components
      */
-    private javax.swing.JComboBox choiceStatus;
+    private javax.swing.JComboBox<String> choiceStatus;
     private javax.swing.JScrollPane scrReport;
     private javax.swing.JScrollPane scrRecoveredUnits;
     private javax.swing.JScrollPane scrRecoveredPilots;
@@ -297,11 +308,92 @@ public class ResolveScenarioWizardDialog extends JDialog {
             i++;
         }       
         pnlMain.add(pnlUnitStatus, UNITSPANEL);
-    	
-    	/*
-    	 * Pilot Status Panel
-    	 */
-    	pnlPilotStatus = new JPanel();
+        
+        /*
+         * Ally Status Panel
+         */
+        pnlAllyStatus = new JPanel();
+        if (tracker.getCampaign().getCampaignOptions().getUseAtB() &&
+        		tracker.getScenario() instanceof AtBScenario) {
+        	pnlAllyStatus.setLayout(new GridBagLayout());
+        	gridBagConstraints = new java.awt.GridBagConstraints();
+        	gridBagConstraints.gridx = 1;
+        	gridBagConstraints.gridy = 1;
+        	gridBagConstraints.gridwidth = 1;
+        	gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        	gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        	pnlAllyStatus.add(new JLabel("Lost"), gridBagConstraints);
+        	chksAllyLost = new ArrayList<JCheckBox>();
+        	i = 2;
+        	j = 0;
+        	JCheckBox chkAllyLost;
+        	HashMap<UUID, Entity> allies = new HashMap<UUID, Entity>();
+        	for (Entity en : tracker.getAlliedUnits()) {
+        		allies.put(UUID.fromString(en.getExternalIdAsString()), en);
+        	}
+        	for (UUID id : ((AtBScenario)tracker.getScenario()).getAttachedUnits()) {
+        		Entity entity = allies.get(id);
+        		j++;
+        		chkAllyLost = new JCheckBox();
+        		chksAllyLost.add(chkAllyLost);
+        		chkAllyLost.setSelected (null == entity ||
+        				entity.isDestroyed() || entity.isDoomed());
+        		/* A bit of debugging info
+        		if (!allies.containsKey(id)) {
+        			System.out.println(((AtBScenario)tracker.getScenario()).getEntity(id).getShortName() + " not found among allied units.");
+        		} else if (entity.isDestroyed()) {
+        			System.out.println(entity.getShortName() + " is destroyed.");
+        		} else if (entity.isDoomed()) {
+        			System.out.println(entity.getShortName() + " is doomed.");
+        		}
+				*/
+        		gridBagConstraints = new java.awt.GridBagConstraints();
+        		gridBagConstraints.gridx = 0;
+        		gridBagConstraints.gridy = i;
+        		gridBagConstraints.gridwidth = 1;
+        		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
+        		gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        		gridBagConstraints.weightx = 0.0;
+        		if (((AtBScenario)tracker.getScenario()).getSurvivalBonus().size() == 0 &&
+        				j == ((AtBScenario)tracker.getScenario()).getAttachedUnits().size()) {
+        			gridBagConstraints.weighty = 1.0;
+        		}
+        		pnlAllyStatus.add(chkAllyLost, gridBagConstraints);
+        		gridBagConstraints.gridx = 1;
+        		pnlAllyStatus.add(new JLabel(((AtBScenario)tracker.getScenario()).getEntity(id).getShortName()), gridBagConstraints);
+        		i++;
+        	}
+        	j = 0;
+        	for (UUID id : ((AtBScenario)tracker.getScenario()).getSurvivalBonus()) {
+           		Entity entity = allies.get(id);
+        		j++;
+        		chkAllyLost = new JCheckBox();
+        		chksAllyLost.add(chkAllyLost);
+        		chkAllyLost.setSelected (null == entity ||
+        				entity.isDestroyed() || entity.isDoomed());
+
+        		gridBagConstraints = new java.awt.GridBagConstraints();
+        		gridBagConstraints.gridx = 0;
+        		gridBagConstraints.gridy = i;
+        		gridBagConstraints.gridwidth = 1;
+        		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
+        		gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        		gridBagConstraints.weightx = 0.0;
+        		if (j == ((AtBScenario)tracker.getScenario()).getSurvivalBonus().size()) {
+        			gridBagConstraints.weighty = 1.0;
+        		}
+        		pnlAllyStatus.add(chkAllyLost, gridBagConstraints);
+        		gridBagConstraints.gridx = 1;
+        		pnlAllyStatus.add(new JLabel(((AtBScenario)tracker.getScenario()).getEntity(id).getShortName()), gridBagConstraints);
+        		i++;
+        	}
+        }
+        pnlMain.add(pnlAllyStatus, ALLYPANEL);
+
+        /*
+         * Pilot Status Panel
+         */
+        pnlPilotStatus = new JPanel();
         pnlPilotStatus.setLayout(new GridBagLayout()); 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -409,6 +501,28 @@ public class ResolveScenarioWizardDialog extends JDialog {
             captured.add(bondsmanCheck);
             captured.add(escapeCheck);
             i++;
+            if (status.isCaptured() &&
+            		tracker.getCampaign().getCampaignOptions().getUseAtB() &&
+            		tracker.getCampaign().getCampaignOptions().getUseAtBCapture()) {
+        		boolean wasCaptured = false;
+        		if (status.wasPickedUp()) {
+        			wasCaptured = true;
+        		} else {
+        			for (int n = 0; n < status.getHits() + 1; n++) {
+        				if (Utilities.dice(1, 6) == 1) {
+        					wasCaptured = true;
+        					break;
+        				}
+        			}
+        		}
+        		if (wasCaptured && tracker.getCampaign().getFaction().isClan()) {
+        			bondsmanCheck.setSelected(true);
+        		} else if (wasCaptured) {
+        			prisonerCheck.setSelected(true);
+        		} else {
+        			escapeCheck.setSelected(true);
+        		}
+        	}
         }    	
     	pnlMain.add(pnlPilotStatus, PILOTPANEL);
     	
@@ -571,7 +685,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     	 * Assign Kills panel
     	 */
     	pnlKills = new JPanel();
-        killChoices = new Hashtable<String, JComboBox>();
+        killChoices = new Hashtable<String, JComboBox<String>>();
         pnlKills.setLayout(new GridBagLayout()); 
         
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -590,13 +704,13 @@ public class ResolveScenarioWizardDialog extends JDialog {
         pnlKills.add(new JLabel(resourceMap.getString("claim")), gridBagConstraints);
         
         i = 2;
-        JComboBox comboAssign;
-        DefaultComboBoxModel assignModel; 
+        JComboBox<String> comboAssign;
+        DefaultComboBoxModel<String> assignModel; 
         j = 0;
         for(String killName : tracker.getKillCredits().keySet()) {
         	j++;
         	nameLbl = new JLabel(killName);
-        	assignModel = new DefaultComboBoxModel();
+        	assignModel = new DefaultComboBoxModel<String>();
         	assignModel.addElement(resourceMap.getString("none"));
         	int idx = 0;
         	int selected = 0;
@@ -614,7 +728,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     				selected = idx;
     			}
     		}
-        	comboAssign = new JComboBox(assignModel);
+        	comboAssign = new JComboBox<String>(assignModel);
         	comboAssign.setSelectedIndex(selected);
         	killChoices.put(killName, comboAssign);
         	gridBagConstraints.gridx = 0;
@@ -666,7 +780,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     	 * Preview Panel
     	 */
     	pnlPreview = new JPanel();
-    	choiceStatus = new javax.swing.JComboBox();
+    	choiceStatus = new javax.swing.JComboBox<String>();
         scrReport = new javax.swing.JScrollPane();
         scrRecoveredUnits = new javax.swing.JScrollPane();
         scrRecoveredPilots = new javax.swing.JScrollPane();
@@ -690,7 +804,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         JPanel pnlStatus = new JPanel();
         
         lblStatus.setText(resourceMap.getString("lblStatus.text"));
-        DefaultComboBoxModel statusModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> statusModel = new DefaultComboBoxModel<String>();
 		for (int k = 1; k < Scenario.S_NUM; k++) {
 			statusModel.addElement(Scenario.getStatusName(k));
 		}
@@ -1001,6 +1115,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
     	}
     	else if(currentPanel.equals(REWARDPANEL)) {
             txtInstructions.setText(resourceMap.getString("txtInstructions.text.reward"));
+    	}
+        else if(currentPanel.equals(ALLYPANEL)) {
+                txtInstructions.setText(resourceMap.getString("txtInstructions.text.ally"));
         }
     	else {
     		txtInstructions.setText("");
@@ -1084,6 +1201,30 @@ public class ResolveScenarioWizardDialog extends JDialog {
     		tracker.getUnitsStatus().get(id).setTotalLoss(box.isSelected()); 
     	}
     	
+    	if (tracker.getCampaign().getCampaignOptions().getUseAtB() && 
+    			tracker.getScenario() instanceof AtBScenario) {
+    		AtBScenario scenario = (AtBScenario)tracker.getScenario();
+	    	int breaches = 0;
+	    	int bonuses = 0;
+	    	for (int i = 0; i < chksAllyLost.size(); i++) {
+	    		if (i < scenario.getAttachedUnits().size()) {
+	    			if (chksAllyLost.get(i).isSelected()) {
+	    				breaches++;
+	    				long etype = scenario.getEntity(scenario.getAttachedUnits().get(i)).getEntityType();
+	    				if ((etype & megamek.common.Entity.ETYPE_DROPSHIP) != 0) {
+	    					breaches += 4;
+	    				}
+	    			}
+	    		} else {
+	    			if (!chksAllyLost.get(i).isSelected()) {
+	    				bonuses++;
+	    			}
+	    		}
+	    	}
+	    	tracker.setContractBreaches(breaches);
+	    	tracker.setBonusRolls(bonuses);
+    	}
+    	
     	//now personnel
     	for(int i = 0; i < pstatuses.size(); i++) {
     		PersonStatus status = pstatuses.get(i);
@@ -1137,6 +1278,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private boolean usePanel(String panelName) {
     	if(panelName.equals(UNITSPANEL)) {
     		return tracker.getUnitsStatus().keySet().size() > 0;
+    	}
+    	else if (panelName.equals(ALLYPANEL)) {
+    		return tracker.getCampaign().getCampaignOptions().getUseAtB() &&
+    				tracker.getScenario() instanceof AtBScenario &&
+    				(((AtBScenario)tracker.getScenario()).getAttachedUnits().size() +
+    				((AtBScenario)tracker.getScenario()).getSurvivalBonus().size() > 0);
     	}
     	else if(panelName.equals(PILOTPANEL)) {
     		return tracker.getPeopleStatus().keySet().size() > 0;

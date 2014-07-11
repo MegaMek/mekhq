@@ -60,12 +60,15 @@ import megamek.common.event.GameTurnChangeEvent;
 import megamek.server.Server;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.StartUpGUI;
 import mekhq.gui.dialog.LaunchGameDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
+import mekhq.gui.dialog.RetirementDefectionDialog;
 
 /**
  * The main class of the application.
@@ -292,7 +295,11 @@ public class MekHQ implements GameListener {
         
         //Start the game thread
         client = new Client(lgd.playerName, "127.0.0.1", lgd.port);
-        gameThread = new GameThread(lgd.playerName, client, this, meks);
+        if (campaign.getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario) {
+        	gameThread = new AtBGameThread(lgd.playerName, client, this, meks, (AtBScenario)scenario);
+        } else {
+        	gameThread = new GameThread(lgd.playerName, client, this, meks);
+        }
         gameThread.start();
     }
 
@@ -378,9 +385,24 @@ public class MekHQ implements GameListener {
             	//tracker.postProcessEntities(control);
             	ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(campaigngui.getFrame(), true, tracker);
             	resolveDialog.setVisible(true);
+            	if (campaigngui.getCampaign().getCampaignOptions().getUseAtB() &&
+            			campaign.getMission(currentScenario.getMissionId()) instanceof AtBContract &&
+            			campaigngui.getCampaign().getRetirementDefectionTracker().getRetirees().size() > 0) {
+            		RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaigngui,
+            				(AtBContract)campaign.getMission(currentScenario.getMissionId()), false);
+            		rdd.setVisible(true);
+            		if (!rdd.wasAborted()) {
+            			getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
+            		}
+            	}
             	gameThread.requestStop();
             	stopHost();
-            	campaigngui.refreshScenarioList();
+                /*Megamek dumps these in the deployment phase to free memory*/
+                if (getCampaign().getCampaignOptions().getUseAtB()) {
+	                megamek.client.RandomUnitGenerator.getInstance();
+	                megamek.client.RandomNameGenerator.getInstance();
+                }
+                campaigngui.refreshScenarioList();
                 campaigngui.refreshOrganization();
                 campaigngui.refreshServicedUnitList();
                 campaigngui.refreshUnitList();

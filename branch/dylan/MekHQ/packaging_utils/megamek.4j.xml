@@ -26,7 +26,6 @@
     <cp>lib/xom-1.1.jar</cp>
     <cp>lib/xpp3_min-1.1.4c.jar</cp>
     <cp>lib/xstream-1.4.4.jar</cp>
-    <cp>lib/xstream-distribution-1.4.4-src.zip</cp>
   </classPath>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
@@ -38,8 +37,8 @@
   <stayAlive>false</stayAlive>
   <icon>../data/images/misc/megamek.ico</icon>
   <jre>
-    <minVersion>1.5.0</minVersion>
+    <minVersion>1.7.0</minVersion>
     <jdkPreference>preferJre</jdkPreference>
-    <maxHeapSize>512</maxHeapSize>
+    <maxHeapSize>1024</maxHeapSize>
   </jre>
 </launch4jConfig>

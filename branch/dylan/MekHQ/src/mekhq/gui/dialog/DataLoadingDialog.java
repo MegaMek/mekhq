@@ -37,13 +37,17 @@ import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
+import megamek.client.RandomNameGenerator;
 import megamek.common.DefaultQuirksHandler;
 import megamek.common.MechSummaryCache;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planets;
+import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.campaign.universe.UnitTableData;
 
 public class DataLoadingDialog extends JDialog implements PropertyChangeListener {
 
@@ -116,6 +120,11 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             } catch (Exception ex) {
     			ex.printStackTrace();
             }
+            try {
+            	Bloodname.loadBloodnameData();
+            } catch (Exception ex) {
+    			ex.printStackTrace();
+            }
             while (!Planets.getInstance().isInitialized()) {
                 //Sleep for up to one second.
                 try {
@@ -124,7 +133,24 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 	
                 }
             }
-            setProgress(1);
+            while (!RandomFactionGenerator.getInstance().isInitialized()) {
+                //Sleep for up to one second.
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException ignore) {
+                	
+                }
+            }
+            while (!UnitTableData.getInstance().isInitialized()) {
+                //Sleep for up to one second.
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException ignore) {
+                	
+                }
+            }
+            RandomNameGenerator.getInstance();
+           setProgress(1);
             try {
                 DefaultQuirksHandler.initQuirksList();
             } catch (IOException e) {
@@ -208,6 +234,14 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         			campaign.generateNewPersonnelMarket();
         			campaign.reloadNews();
         			campaign.addReport("<b>" + campaign.getDateAsString() + "</b>");
+        			if (campaign.getCampaignOptions().getUseAtB()) {
+        				RandomFactionGenerator.getInstance().updateTables(campaign.getDate(),
+        						campaign.getLocation().getCurrentPlanet(),
+        						campaign.getCampaignOptions());
+        				campaign.getContractMarket().generateContractOffers(campaign, true);
+        				campaign.getUnitMarket().generateUnitOffers(campaign);
+        				campaign.getRetirementDefectionTracker().setLastRetirementRoll(campaign.getCalendar());
+        			}
         		}
             }
             return null;
