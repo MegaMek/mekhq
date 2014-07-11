@@ -30,6 +30,7 @@ import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.PlanetaryConditions;
 import megamek.common.Player;
+import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
@@ -40,6 +41,7 @@ import mekhq.campaign.force.Lance;
 import mekhq.campaign.market.UnitMarket;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
@@ -651,7 +653,7 @@ public class AtBScenario extends Scenario {
 		int numAttachedBot = 0;
 		if (getContract(campaign).getMissionType() == AtBContract.MT_CADREDUTY) {
 			numAttachedPlayer = 3;
-		} else {
+		} else if (campaign.getFactionCode().equals("MERC")) {
 			if (getContract(campaign).getCommandRights() == Contract.COM_INTEGRATED) {
 				numAttachedBot = 2;
 			}
@@ -1445,14 +1447,42 @@ public class AtBScenario extends Scenario {
 		
 		RandomNameGenerator rng = RandomNameGenerator.getInstance();
 		rng.setChosenFaction(f.getNameGenerator());
+		String crewName = rng.generate();
 
 		RandomSkillsGenerator rsg = new RandomSkillsGenerator();
 		rsg.setMethod(RandomSkillsGenerator.M_TAHARQA);
 		rsg.setLevel(skill);
-
-		if (f.isClan()) rsg.setType(RandomSkillsGenerator.T_CLAN);
+		
+		if (f.isClan()) {
+			rsg.setType(RandomSkillsGenerator.T_CLAN);
+		}
 		int[] skills = rsg.getRandomSkills(en);
-		en.setCrew(new Crew(rng.generate(),
+
+		if (f.isClan() && Compute.d6(2) > 8 - getContract(campaign).getEnemySkill()
+				+ skills[0] + skills[1]) {
+			int phenotype;
+			switch (UnitType.determineUnitTypeCode(en)) {
+			case UnitType.MEK:
+				phenotype = Bloodname.P_MECHWARRIOR;
+				break;
+			case UnitType.BATTLE_ARMOR:
+				phenotype = Bloodname.P_ELEMENTAL;
+				break;
+			case UnitType.AERO:
+				phenotype = Bloodname.P_AEROSPACE;
+				break;
+			case UnitType.PROTOMEK:
+				phenotype = Bloodname.P_PROTOMECH;
+				break;
+			default:
+				phenotype = -1;
+			}
+			if (phenotype >= 0) {
+				crewName += " " + Bloodname.randomBloodname(faction, phenotype, campaign.getCalendar().get(Calendar.YEAR)).getName();
+			}
+		}
+
+		en.setCrew(new Crew(crewName,
 							Compute.getFullCrewSize(en),
 							skills[0], skills[1]));
 		
@@ -1510,28 +1540,32 @@ public class AtBScenario extends Scenario {
 	}
 	
 	private String adjustForMaxWeight(String weights, int maxWeight) {
+		String retVal = weights;
 		if (maxWeight == UnitTableData.WT_HEAVY) {
 			//Hide and Seek (defender)
-			weights.replaceAll("A", "LM");
+			retVal = weights.replaceAll("A", "LM");
 		} else if (maxWeight == UnitTableData.WT_MEDIUM) {
 			//Probe, Recon Raid (attacker)
-			weights.replaceAll("A", "MM");
-			weights.replaceAll("H", "LM");
+			retVal = weights.replaceAll("A", "MM");
+			retVal = retVal.replaceAll("H", "LM");
 		}
-		return weights;
+		return retVal;
 	}
 	
 	private String adjustWeightsForFaction(String weights, String faction) {
+		String retVal = weights;
 		if (faction.equals("DC")) {
-			weights.replaceFirst("MM", "LH");
+			retVal = weights.replaceFirst("MM", "LH");
 		}
-		if (faction.equals("LA") && weights.matches("[LM]{3,}")) {
-			weights.replaceFirst("M", "H");
+		if ((faction.equals("LA") ||
+				faction.equals("CCO") || faction.equals("CGB"))
+				&& weights.matches("[LM]{3,}")) {
+			retVal = weights.replaceFirst("M", "H");
 		}
-		if (faction.equals("FWL")) {
-			weights.replaceFirst("HA", "HH");
+		if (faction.equals("FWL") || faction.equals("CIH")) {
+			retVal = weights.replaceFirst("HA", "HH");
 		}
-		return weights;
+		return retVal;
 	}
 	
 	private void addLance(ArrayList<Entity> list, String faction, int skill, int quality, int weightClass,
@@ -1601,17 +1635,22 @@ public class AtBScenario extends Scenario {
 	
 	private void addStar(ArrayList<Entity> list, String faction, int skill, int quality, int weightClass, int maxWeight, Campaign campaign, int arrivalTurn) {
 		int forceType = FORCE_MEK;
-		/* 1 chance in 12 of a Nova, per AtB rules; added a chance to encounter
-		 * a vehicle Star in Clan second-line (rating C or lower) units, with a
-		 * higher chance for Hell's Horses (and Stone Lion).
+		/* 1 chance in 12 of a Nova, per AtB rules; CHH/CSL
+		 * close to 2/3. Added a chance to encounter
+		 * a vehicle Star in Clan second-line (rating C or lower) units,
+		 * or all unit ratings for CHH/CSL and CBS.
 		 */
 		int roll = Compute.d6(2);
-		if (roll > 10) {
+		int novaTarget = 10;
+		if (faction.equals("CHH") || faction.equals("CSL")) {
+			novaTarget = 7;
+		}
+		if (roll > novaTarget) {
 			forceType = FORCE_NOVA;
 		} else if (campaign.getCampaignOptions().getClanVehicles()) {
-			roll -= quality;
-			if (faction.equals("CHH") || faction.equals("CSL")) {
-				roll += 2;
+			if (!faction.equals("CHH") || !faction.equals("CSL")
+					&& !faction.equals("CBS")) {
+				roll += quality;
 			}
 			if (roll <= 4) {
 				forceType = FORCE_VEHICLE;
@@ -1622,32 +1661,49 @@ public class AtBScenario extends Scenario {
 				maxWeight);
 		
 		int unitType = (forceType == FORCE_VEHICLE)?UnitTableData.UNIT_VEHICLE:UnitTableData.UNIT_MECH;
+		
+		if (campaign.getCampaignOptions().getRegionalMechVariations()) {
+			if (unitType == UnitTableData.UNIT_MECH) {
+				weights = adjustWeightsForFaction(weights, faction);
+			}
+			/* medium vees are rare among the Clans, FM:CC, p. 8 */
+			if (unitType == UnitTableData.UNIT_VEHICLE) {
+				weights = adjustWeightsForFaction(weights, "DC");
+			}
+		}
 
-		int unitsPerStar;
+		int unitsPerPoint;
 		switch (unitType) {
 		case UnitTableData.UNIT_VEHICLE:
 		case UnitTableData.UNIT_AERO:
-			unitsPerStar = 10;
+			unitsPerPoint = 2;
 			break;
 		case UnitTableData.UNIT_PROTOMECH:
-			unitsPerStar = 25;
+			unitsPerPoint = 5;
 			break;
 		case UnitTableData.UNIT_MECH:
 		case UnitTableData.UNIT_INFANTRY:
 		case UnitTableData.UNIT_BATTLEARMOR:
 		default:
-			unitsPerStar = 5;
+			unitsPerPoint = 1;
 			break;
 		}
 		
-		for (int i = 0; i < unitsPerStar; i++) {
-			Entity en = getEntity(faction, skill, quality, unitType,
-					decodeWeightStr(weights, i),
-					campaign);
-			if (null != en) {
-				en.setDeployRound(arrivalTurn);
+		/* Ensure Novas use Frontline tables to get Omnis */
+		int tmpQuality = quality;
+		if (forceType == FORCE_NOVA && quality < IUnitRating.DRAGOON_B) {
+			tmpQuality = IUnitRating.DRAGOON_B;
+		}
+		for (int point = 0; point < weights.length(); point++) {
+			for (int unit = 0; unit < unitsPerPoint; unit++) {
+				Entity en = getEntity(faction, skill, tmpQuality, unitType,
+						decodeWeightStr(weights, point),
+						campaign);
+				if (null != en) {
+					en.setDeployRound(arrivalTurn);
+				}
+				list.add(en);
 			}
-			list.add(en);
 		}
 		if (forceType == FORCE_NOVA || forceType == FORCE_VEENOVA) {
 			unitType = forceType == FORCE_VEENOVA? UnitTableData.UNIT_INFANTRY:UnitTableData.UNIT_BATTLEARMOR;

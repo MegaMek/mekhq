@@ -586,12 +586,14 @@ public class ContractMarket implements Serializable {
 			for (int i = 0; i < CLAUSE_NUM; i++) {
 				mods.mods[i]++;
 			}
+			// Command is fixed at integrated
+			mods.rerolls[CLAUSE_COMMAND] = 0;
 		}
 		
 		if (campaign.getCampaignOptions().isMercSizeLimited() &&
 				campaign.getFactionCode().equals("MERC")) {
 			int max = (unitRatingMod + 1) * 12;
-			int numMods = (AtBContract.getNumUnits(campaign) - max) / 2;
+			int numMods = (AtBContract.getEffectiveNumUnits(campaign) - max) / 2;
 			while (numMods > 0) {
 				mods.mods[Compute.randomInt(4)]--;
 				numMods--;
@@ -655,7 +657,11 @@ public class ContractMarket implements Serializable {
 			mods.mods[CLAUSE_TRANSPORT] += 0;
 		}
 		
-		rollCommandClause(contract, mods.mods[CLAUSE_COMMAND]);
+		if (campaign.getFactionCode().equals("MERC")) {
+			rollCommandClause(contract, mods.mods[CLAUSE_COMMAND]);
+		} else {
+			contract.setCommandRights(Contract.COM_INTEGRATED);
+		}
 		rollSalvageClause(contract, mods.mods[CLAUSE_SALVAGE]);
 		rollSupportClause(contract, mods.mods[CLAUSE_SUPPORT]);
 		rollTransportClause(contract, mods.mods[CLAUSE_TRANSPORT]);

@@ -1989,15 +1989,7 @@ public class Campaign implements Serializable {
             			babies.add(p.birth());
             		}
             	} else {
-            		if (p.getSpouseID() != null) {
-            			Person spouse = getPerson(p.getSpouseID());
-            			if (spouse.isActive() && !spouse.isDeployed() && !p.isDeployed()) {
-            				// Age limitations...
-            				if (p.getAge(calendar) > 13 && p.getAge(calendar) < 51 && spouse.getAge(calendar) > 13) {
-            					p.procreate();
-            				}
-            			}
-            		}
+					p.procreate();
             	}
             }
             
@@ -2918,6 +2910,7 @@ public class Campaign implements Serializable {
         if (getCampaignOptions().getUseAtB()) {
             contractMarket.writeToXml(pw1, 1);
             unitMarket.writeToXml(pw1, 1);
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "colorIndex", colorIndex);
             if (lances.size() > 0)   {
             	pw1.println("\t<lances>");
             	for (Lance l : lances.values()) {

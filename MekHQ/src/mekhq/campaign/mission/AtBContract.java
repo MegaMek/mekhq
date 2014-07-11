@@ -15,12 +15,8 @@ import java.util.UUID;
 
 import megamek.client.RandomSkillsGenerator;
 import megamek.client.RandomUnitGenerator;
-import megamek.common.Aero;
 import megamek.common.Compute;
-import megamek.common.Dropship;
 import megamek.common.Entity;
-import megamek.common.Infantry;
-import megamek.common.Jumpship;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.Player;
@@ -188,12 +184,12 @@ public class AtBContract extends Contract implements Serializable {
 		if (parentContract != null) {
 			requiredLances = 1;
 		} else {
-			requiredLances = Math.max(getNumUnits(campaign) / 6, 1);
+			requiredLances = Math.max(getEffectiveNumUnits(campaign) / 6, 1);
 		}
 		
-        if (getNumUnits(campaign) <= 12) {
+        if (getEffectiveNumUnits(campaign) <= 12) {
         	setOverheadComp(OH_FULL);
-        } else if (getNumUnits(campaign) <= 48) {
+        } else if (getEffectiveNumUnits(campaign) <= 48) {
         	setOverheadComp(OH_HALF);
         } else {
         	setOverheadComp(OH_NONE);
@@ -295,30 +291,37 @@ public class AtBContract extends Contract implements Serializable {
 		}
 	}
 
-	public static int getNumUnits(Campaign campaign) {
-		int numUnits = 0;
-		int numProto = 0;
+	public static int getEffectiveNumUnits(Campaign campaign) {
+		double numUnits = 0;
         for (UUID uuid : campaign.getForces().getAllUnits()) {
-            Unit u = campaign.getUnit(uuid);
-            if (u == null) {
-                continue;
-            }
-            if (u.getEntity() instanceof Infantry ||
-            		u.getEntity() instanceof Dropship ||
-                    u.getEntity() instanceof Jumpship) {
-            	continue;
-            }
-            if (u.getEntity() instanceof Aero &&
-            		!campaign.getCampaignOptions().getUseAero()) {
-            	continue;
-            }
-            if (UnitType.determineUnitTypeCode(u.getEntity()) == UnitType.PROTOMEK) {
-            	numProto++;
-            } else {
-            	numUnits++;
-            }
+        	if (null == campaign.getUnit(uuid)) {
+        		continue;
+        	}
+        	switch (UnitType.determineUnitTypeCode(campaign.getUnit(uuid).getEntity())) {
+        	case UnitType.MEK:
+        		numUnits += 1;
+        		break;
+        	case UnitType.TANK:
+        	case UnitType.VTOL:
+        	case UnitType.NAVAL:
+        		numUnits += campaign.getFaction().isClan()?0.5:1;
+        		break;
+        	case UnitType.CONV_FIGHTER:
+        	case UnitType.AERO:
+        		if (campaign.getCampaignOptions().getUseAero()) {
+        			numUnits += campaign.getFaction().isClan()?0.5:1;
+        		}
+        		break;
+        	case UnitType.PROTOMEK:
+        		numUnits += 0.2;
+        		break;
+        	case UnitType.BATTLE_ARMOR:
+        	case UnitType.INFANTRY:
+        	default:
+        		/* don't count */
+        	}
         }
-		return numUnits + numProto / 5;
+		return (int)numUnits;
 	}
 
 	public static boolean isMinorPower(String fName) {
@@ -397,7 +400,7 @@ public class AtBContract extends Contract implements Serializable {
 			campaign.getCampaignOptions().getAdditionalStrategyDeployment() *
 			cmdrStrategy;
 		
-		int required = Math.max(getNumUnits(campaign) / 6, 1);
+		int required = Math.max(getEffectiveNumUnits(campaign) / 6, 1);
 		if (campaign.getCampaignOptions().getAdjustPaymentForStrategy() &&
 				required > maxDeployedLances) {
 			multiplier *= (double)maxDeployedLances / (double)required;
@@ -1378,7 +1381,7 @@ public class AtBContract extends Contract implements Serializable {
 			enemyCode = "REB";
 		}
 		
-		requiredLances = Math.max(getNumUnits(campaign) / 6, 1);
+		requiredLances = Math.max(getEffectiveNumUnits(campaign) / 6, 1);
 		calculatePartsAvailabilityLevel(campaign);
         allyBotName = getEmployerName(campaign.getEra());
         enemyBotName = getEnemyName(campaign.getEra());

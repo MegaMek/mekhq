@@ -298,6 +298,11 @@ public class ContractSummaryPanel extends JPanel {
 			JumpPath path = campaign.calculateJumpPath(campaign.getCurrentPlanetName(), contract.getPlanetName());
 			int days = (int)Math.ceil((path).getTotalTime(campaign.getLocation().getTransitTime()));
 			int jumps = path.getJumps();
+			if (campaign.getCurrentPlanetName().equals(contract.getPlanetName())
+					&&campaign.getLocation().isOnPlanet()) {
+				days = 0;
+				jumps = 0;
+			}
 			txtDistance.setText(days + "(" + jumps + ")");
 			txtDistance.setEditable(false);
 			txtDistance.setLineWrap(true);

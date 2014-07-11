@@ -851,20 +851,21 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		
 		// Find already existing ancestor set of these parents
 		for (Ancestors a : campaign.getAncestors()) {
-			if (getId().equals(a.getMotherID()) && getSpouseID().equals(a.getFatherID())) {
+			if (getId().equals(a.getMotherID())
+					&& ((getSpouseID() == null && a.getFatherID() == null) || getSpouseID().equals(a.getFatherID()))) {
 				tmpAncID = a.getId();
 				break;
 			}
 		}
 		
 		if (tmpAncID == null) {
-			
+			tmpAncID = campaign.createAncestors(getSpouseID(), id).getId();
 		}
 		
 		String surname = "";
 		if (getName().contains(" ")) {
 			surname = getName().split(" ", 2)[1];
-		} else if (baby.getFather().getName().contains(" ")) {
+		} else if (baby.getFather() != null && baby.getFather().getName().contains(" ")) {
 			surname = baby.getFather().getName().split(" ", 2)[1];
 		}
 		baby.setName(baby.getName().split(" ", 2)[0] + " " + surname);
@@ -880,12 +881,30 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	}
 	
 	public void procreate() {
-		// 0.5% chance that this procreation attempt will create a child
-		if (Compute.randomInt(1000) < 5) {
-			GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
-			tCal.add(GregorianCalendar.DAY_OF_YEAR, 40*7);
-			setDueDate(tCal);
-			campaign.addReport(getFullName()+" has conceived");
+		if (!isDeployed()) {
+			// Age limitations...
+			if (getAge(campaign.getCalendar()) > 13 && getAge(campaign.getCalendar()) < 51) {
+				if (getSpouseID() == null) {
+					// 0.005% chance that this procreation attempt will create a child
+					if (Compute.randomInt(100000) < 2) {
+						GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
+						tCal.add(GregorianCalendar.DAY_OF_YEAR, 40*7);
+						setDueDate(tCal);
+						campaign.addReport(getFullName()+" has conceived");
+					}
+				} else {
+					Person spouse = campaign.getPerson(getSpouseID());
+					if (spouse.isActive() && !spouse.isDeployed() && spouse.getAge(campaign.getCalendar()) > 13) {
+						// 0.05% chance that this procreation attempt will create a child
+						if (Compute.randomInt(10000) < 2) {
+							GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
+							tCal.add(GregorianCalendar.DAY_OF_YEAR, 40*7);
+							setDueDate(tCal);
+							campaign.addReport(getFullName()+" has conceived");
+						}
+					}
+				}
+			}
 		}
 	}
 	
@@ -893,7 +912,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		// Huge convoluted return statement
 		return (
 				!this.equals(p)
-				&& campaign.getAncestors(getAncestorsID()).checkMutualAncestors(campaign.getAncestors(p.getAncestorsID()))
+				&& (getAncestorsID() == null || campaign.getAncestors(getAncestorsID()).checkMutualAncestors(campaign.getAncestors(p.getAncestorsID())))
 				&& p.getSpouseID() == null
 				&& getGender() != p.getGender()
 				&& p.getAge(campaign.getCalendar()) > 13
