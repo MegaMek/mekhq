@@ -482,7 +482,10 @@ public class EquipmentPart extends Part {
     
     private int resolveVariableCost(boolean isArmored) {
     	double varCost = 0;
-    	Entity en = getUnit().getEntity();
+    	Entity en = null;
+    	if (getUnit() != null) {
+    		en = getUnit().getEntity();
+    	}
     	if (en != null) {
     		varCost = type.getCost(en, isArmored, getLocation());
     	} else if (type instanceof MiscType) {
