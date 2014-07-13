@@ -2323,6 +2323,9 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	int bestRank = -1;
     	Person commander = null;
     	for(UUID id : vesselCrew) {
+    		if (id == null) {
+    			continue;
+    		}
     		Person p = campaign.getPerson(id);
     		if(null != p && p.getRankNumeric() > bestRank) {
     			commander = p;
@@ -2330,8 +2333,11 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     		}
     	}
     	for(UUID pid : gunners) {
+    		if (pid == null) {
+    			continue;
+    		}
     		Person p = campaign.getPerson(pid);
-    		if((entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0) { 
+    		if(p != null && entity != null && (entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0) { 
     			continue;
     		}
     		if(p.getRankNumeric() > bestRank) {
@@ -2340,8 +2346,11 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     		}
     	}
     	for(UUID pid : drivers) {
+    		if (pid == null) {
+    			continue;
+    		}
     		Person p = campaign.getPerson(pid);
-    		if((entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0) { 
+    		if(p != null && entity != null && (entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0) { 
     			continue;
     		}
     		if(p.getRankNumeric() > bestRank) {

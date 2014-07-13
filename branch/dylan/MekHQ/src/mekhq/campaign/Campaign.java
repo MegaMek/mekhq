@@ -6662,8 +6662,7 @@ public class Campaign implements Serializable {
 
     public double getTotalInsulatedCargoCapacity() {
         double capacity = 0;
-        for (UUID id : getForces().getAllUnits()) {
-            Unit u = getUnit(id);
+        for (Unit u : getUnits()) {
             capacity += u.getInsulatedCargoCapacity();
         }
         return capacity;
@@ -6671,8 +6670,7 @@ public class Campaign implements Serializable {
 
     public double getTotalRefrigeratedCargoCapacity() {
         double capacity = 0;
-        for (UUID id : getForces().getAllUnits()) {
-            Unit u = getUnit(id);
+        for (Unit u : getUnits()) {
             capacity += u.getRefrigeratedCargoCapacity();
         }
         return capacity;
@@ -6680,8 +6678,7 @@ public class Campaign implements Serializable {
 
     public double getTotalLivestockCargoCapacity() {
         double capacity = 0;
-        for (UUID id : getForces().getAllUnits()) {
-            Unit u = getUnit(id);
+        for (Unit u : getUnits()) {
             capacity += u.getLivestockCargoCapacity();
         }
         return capacity;
@@ -6689,8 +6686,7 @@ public class Campaign implements Serializable {
 
     public double getTotalLiquidCargoCapacity() {
         double capacity = 0;
-        for (UUID id : getForces().getAllUnits()) {
-            Unit u = getUnit(id);
+        for (Unit u : getUnits()) {
             capacity += u.getLiquidCargoCapacity();
         }
         return capacity;
@@ -6698,8 +6694,7 @@ public class Campaign implements Serializable {
 
     public double getTotalCargoCapacity() {
         double capacity = 0;
-        for (UUID id : getForces().getAllUnits()) {
-            Unit u = getUnit(id);
+        for (Unit u : getUnits()) {
             capacity += u.getCargoCapacity();
         }
         return capacity;
