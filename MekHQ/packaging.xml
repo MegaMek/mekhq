@@ -144,7 +144,7 @@
             <fileset dir="${svndir}/${datadir}-OLD" >
                 <include name="universe/" />
                 <include name="fonts/" />
-                <include name="spa/" />
+                <include name="mapgen/" />
                 <include name="images/force/" />
                 <include name="images/portraits/" />
                 <include name="images/fluff/mech/*.png" />
