@@ -337,7 +337,6 @@
                 <include name="${docdir}/" />
                 <include name="${confdir}/" />
                 <include name="campaigns/" />
-                <include name="campaigns/FoxsTeeth.cpnx" />
                 <!--<include name="MegaMek.jar" />
                 <include name="MegaMekLab.jar" />-->
                 <include name="MegaMek.exe" />
