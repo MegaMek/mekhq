@@ -30,17 +30,17 @@ class GameThread extends Thread implements CloseClientListener {
     protected ClientGUI swingGui;
     protected MekHQ app;
 
-    protected ArrayList<Unit> mechs = new ArrayList<Unit>();
+    protected ArrayList<Unit> units = new ArrayList<Unit>();
 
     protected volatile boolean stop = false;
     
     // CONSTRUCTOR
-    public GameThread(String name, Client c, MekHQ app, ArrayList<Unit> mechs) {
+    public GameThread(String name, Client c, MekHQ app, ArrayList<Unit> units) {
         super(name);
         myname = name.trim();
         this.client = c;
         this.app = app;
-        this.mechs = mechs;
+        this.units = units;
     }
 
     public Client getClient() {
@@ -87,7 +87,7 @@ class GameThread extends Thread implements CloseClientListener {
             	
                 client.getGame().getOptions().loadOptions();
                 client.sendGameOptions("", app.getCampaign().getGameOptionsVector());
-                for (Unit unit : mechs) {
+                for (Unit unit : units) {
                     // Get the Entity
                     Entity entity = unit.getEntity();
                     // Set the TempID for autoreporting
