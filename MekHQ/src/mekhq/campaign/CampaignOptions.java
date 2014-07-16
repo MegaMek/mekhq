@@ -220,6 +220,7 @@ public class CampaignOptions implements Serializable {
     private boolean useAtBCapture;
     private boolean contractMarketReportRefresh;
     private boolean unitMarketReportRefresh;
+    private int startGameDelay;
     
 
     public CampaignOptions() {
@@ -390,6 +391,7 @@ public class CampaignOptions implements Serializable {
     	useAtBCapture = false;
         contractMarketReportRefresh = true;
         unitMarketReportRefresh = true;
+        startGameDelay = 500;
    }
 
     public UnitRatingMethod getUnitRatingMethod() {
@@ -1475,6 +1477,14 @@ public class CampaignOptions implements Serializable {
 		unitMarketReportRefresh = refresh;
 	}
 	
+	public int getStartGameDelay() {
+		return startGameDelay;
+	}
+	
+	public void setStartGameDelay(int delay) {
+		startGameDelay = delay;
+	}
+	
 	public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanPriceModifier", clanPriceModifier); //private double
@@ -1611,7 +1621,8 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAtBCapture", useAtBCapture);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "contractMarketReportRefresh", contractMarketReportRefresh);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitMarketReportRefresh", unitMarketReportRefresh);
-
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "startGameDelay", startGameDelay);
+        
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<salaryTypeBase>"
                     + Utilities.printIntegerArray(salaryTypeBase)
@@ -2096,6 +2107,8 @@ public class CampaignOptions implements Serializable {
                 retVal.contractMarketReportRefresh = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketReportRefresh")) {
                 retVal.unitMarketReportRefresh = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("startGameDelay")) {
+                retVal.startGameDelay = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("rats")) {
             	retVal.rats = MekHqXmlUtil.unEscape(wn2.getTextContent().trim()).split(",");
             } else if (wn2.getNodeName().equalsIgnoreCase("ratsNoEra")) {

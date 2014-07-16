@@ -1100,6 +1100,9 @@ public class PersonnelMarket {
     }
     
     public void adjustSkill (Person p, String skillName, int mod) {
+    	if (p.getSkill(skillName) == null) {
+    		return;
+    	}
     	if (mod > 0) {
     		p.improveSkill(skillName);
     	}

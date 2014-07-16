@@ -376,6 +376,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox chkContractMarketReportRefresh;
     private JCheckBox chkUnitMarketReportRefresh;
     
+    private JSpinner spnStartGameDelay;
+    
     
     /**
      * Creates new form CampaignOptionsDialog
@@ -2853,6 +2855,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         chkUseLightConditions = new JCheckBox();
         chkUsePlanetaryConditions = new JCheckBox();
         chkUseAtBCapture = new JCheckBox();
+        spnStartGameDelay = new JSpinner();
         
         chkAeroRecruitsHaveUnits = new JCheckBox();
         chkInstantUnitMarketDelivery = new JCheckBox();
@@ -3329,52 +3332,124 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(chkDoubleVehicles, gridBagConstraints);
 
         chkAdjustPlayerVehicles.setText(resourceMap.getString("chkAdjustPlayerVehicles.text"));
         chkAdjustPlayerVehicles.setToolTipText(resourceMap.getString("chkAdjustPlayerVehicles.toolTipText"));
         chkAdjustPlayerVehicles.setSelected(options.getAdjustPlayerVehicles());
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(chkAdjustPlayerVehicles, gridBagConstraints);
 
         chkRegionalMechVariations.setText(resourceMap.getString("chkRegionalMechVariations.text"));
         chkRegionalMechVariations.setToolTipText(resourceMap.getString("chkRegionalMechVariations.toolTipText"));
         chkRegionalMechVariations.setSelected(options.getRegionalMechVariations());
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(chkRegionalMechVariations, gridBagConstraints);
 
         chkUseDropShips.setText(resourceMap.getString("chkUseDropShips.text"));
         chkUseDropShips.setToolTipText(resourceMap.getString("chkUseDropShips.toolTipText"));
         chkUseDropShips.setSelected(options.getUseDropShips());
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(chkUseDropShips, gridBagConstraints);
 
         chkUseWeatherConditions.setText(resourceMap.getString("chkUseWeatherConditions.text"));
         chkUseWeatherConditions.setToolTipText(resourceMap.getString("chkUseWeatherConditions.toolTipText"));
         chkUseWeatherConditions.setSelected(options.getUseWeatherConditions());
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(chkUseWeatherConditions, gridBagConstraints);
 
         chkUseLightConditions.setText(resourceMap.getString("chkUseLightConditions.text"));
         chkUseLightConditions.setToolTipText(resourceMap.getString("chkUseLightConditions.toolTipText"));
         chkUseLightConditions.setSelected(options.getUseLightConditions());
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(chkUseLightConditions, gridBagConstraints);
 
         chkUsePlanetaryConditions.setText(resourceMap.getString("chkUsePlanetaryConditions.text"));
         chkUsePlanetaryConditions.setToolTipText(resourceMap.getString("chkUsePlanetaryConditions.toolTipText"));
         chkUsePlanetaryConditions.setSelected(options.getUsePlanetaryConditions());
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(chkUsePlanetaryConditions, gridBagConstraints);
 
         chkUseAtBCapture.setText(resourceMap.getString("chkUseAtBCapture.text"));
         chkUseAtBCapture.setToolTipText(resourceMap.getString("chkUseAtBCapture.toolTipText"));
         chkUseAtBCapture.setSelected(options.getUseAtBCapture());
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(chkUseAtBCapture, gridBagConstraints);
+
+        JTextArea txtStartGameDelay = new JTextArea();
+        txtStartGameDelay.setText(resourceMap.getString("txtStartGameDelay.text"));
+        txtStartGameDelay.setName("txtStartGameDelay");
+        txtStartGameDelay.setEditable(false);
+        txtStartGameDelay.setLineWrap(true);
+        txtStartGameDelay.setWrapStyleWord(true);
+        txtStartGameDelay.setOpaque(false);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panSubAtBScenario.add(txtStartGameDelay, gridBagConstraints);
+
+        JLabel lblStartGameDelay = new JLabel(resourceMap.getString("spnStartGameDelay.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panSubAtBScenario.add(lblStartGameDelay, gridBagConstraints);
+
+        spnStartGameDelay.setModel(new SpinnerNumberModel(options.getStartGameDelay(), 0, 1500, 25));
+        spnStartGameDelay.setToolTipText(resourceMap.getString("spnStartGameDelay.toolTipText"));
+        spnStartGameDelay.setValue(options.getStartGameDelay());
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panSubAtBScenario.add(spnStartGameDelay, gridBagConstraints);
 
         JScrollPane scrAtB = new JScrollPane(panAtB);
         scrAtB.setPreferredSize(new java.awt.Dimension(500, 400));
@@ -3772,6 +3847,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUseLightConditions(chkUseLightConditions.isSelected());
         options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
         options.setUseAtBCapture(chkUseAtBCapture.isSelected());
+        options.setStartGameDelay((Integer)spnStartGameDelay.getValue());
         
         options.setAeroRecruitsHaveUnits(chkAeroRecruitsHaveUnits.isSelected());
         options.setInstantUnitMarketDelivery(chkInstantUnitMarketDelivery.isSelected());
