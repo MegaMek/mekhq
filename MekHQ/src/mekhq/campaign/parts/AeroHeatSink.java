@@ -102,7 +102,8 @@ public class AeroHeatSink extends Part {
 	public void updateConditionFromPart() {
 		if(null != unit && unit.getEntity() instanceof Aero) {
 			if(hits == 0) {
-				((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks()+1);
+				Aero a = (Aero)unit.getEntity();
+				a.setHeatSinks(Math.min(a.getHeatSinks()+1, a.getOHeatSinks()));
 			}
 		}
 		
