@@ -551,8 +551,8 @@ public class PersonnelMarket {
                 }
         }
         for (Person p : toRemove) {
-        	if (attachedEntities.contains(p.getUnitId())) {
-        		attachedEntities.remove(p.getUnitId());
+        	if (attachedEntities.contains(p.getId())) {
+        		attachedEntities.remove(p.getId());
         	}
         }
         personnel.removeAll(toRemove);
