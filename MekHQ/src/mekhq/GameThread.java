@@ -20,6 +20,7 @@ import megamek.client.ui.swing.ClientGUI;
 import megamek.common.Entity;
 import megamek.common.IGame;
 import megamek.common.preference.PreferenceManager;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 
 class GameThread extends Thread implements CloseClientListener {
@@ -29,6 +30,8 @@ class GameThread extends Thread implements CloseClientListener {
     protected Client client;
     protected ClientGUI swingGui;
     protected MekHQ app;
+    protected Campaign campaign;
+    protected boolean started;
 
     protected ArrayList<Unit> units = new ArrayList<Unit>();
 
@@ -36,11 +39,17 @@ class GameThread extends Thread implements CloseClientListener {
     
     // CONSTRUCTOR
     public GameThread(String name, Client c, MekHQ app, ArrayList<Unit> units) {
+    	this(name, c, app, units, true);
+    }
+    
+    public GameThread(String name, Client c, MekHQ app, ArrayList<Unit> units, boolean started) {
         super(name);
         myname = name.trim();
         this.client = c;
         this.app = app;
         this.units = units;
+        this.started = started;
+        this.campaign = app.getCampaign();
     }
 
     public Client getClient() {
@@ -85,8 +94,12 @@ class GameThread extends Thread implements CloseClientListener {
             	client.getLocalPlayer().setCamoCategory(app.getCampaign().getCamoCategory());
                 client.getLocalPlayer().setCamoFileName(app.getCampaign().getCamoFileName());
             	
-                client.getGame().getOptions().loadOptions();
-                client.sendGameOptions("", app.getCampaign().getGameOptionsVector());
+                if (started) {
+                	client.getGame().getOptions().loadOptions();
+                	client.sendGameOptions("", app.getCampaign().getGameOptionsVector());
+    				Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                }
+                
                 for (Unit unit : units) {
                     // Get the Entity
                     Entity entity = unit.getEntity();
@@ -97,7 +110,7 @@ class GameThread extends Thread implements CloseClientListener {
                     // Add Mek to game
                     client.sendAddEntity(entity);
                     // Wait a few secs to not overuse bandwith
-                    Thread.sleep(125);
+                    Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
                 }
 
                 client.sendPlayerInfo();
