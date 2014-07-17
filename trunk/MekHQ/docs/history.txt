@@ -73,6 +73,7 @@ v0.3.6 (SVN)
 + Bug [#533]: Aerospace Heatsinks
 + Patch [34]: Against the Bot, 5th Patch
 + New campaign option to set Start Game Delay
++ Bug [#324]: Transmitting Data error - NCD for XStream
 + Bug [#535]: NPE in Personnel Market from AtB code addition using wrong UUID
 + Bug [#536]: Joining Games overwrites Server settings
 
