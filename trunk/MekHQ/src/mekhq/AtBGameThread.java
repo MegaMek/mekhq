@@ -18,7 +18,6 @@ import megamek.common.MapSettings;
 import megamek.common.PlanetaryConditions;
 import megamek.common.Player;
 import megamek.common.logging.LogLevel;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.unit.Unit;
@@ -32,12 +31,14 @@ import mekhq.campaign.unit.Unit;
  */
 public class AtBGameThread extends GameThread {
 	
-    private Campaign campaign;
 	AtBScenario scenario;
 
-     public AtBGameThread(String name, Client c, MekHQ app, ArrayList<Unit> mechs, AtBScenario scenario) {
-        super(name, c, app, mechs);
-        this.campaign = app.getCampaign();
+     public AtBGameThread(String name, Client c, MekHQ app, ArrayList<Unit> units, AtBScenario scenario) {
+    	 this(name, c, app, units, scenario, true);
+     }
+     
+     public AtBGameThread(String name, Client c, MekHQ app, ArrayList<Unit> units, AtBScenario scenario, boolean started) {
+        super(name, c, app, units, started);
         this.scenario = scenario;
     }
 
@@ -80,9 +81,11 @@ public class AtBGameThread extends GameThread {
             	client.getLocalPlayer().setCamoCategory(app.getCampaign().getCamoCategory());
                 client.getLocalPlayer().setCamoFileName(app.getCampaign().getCamoFileName());
             	
-                client.getGame().getOptions().loadOptions();
-                client.sendGameOptions("", app.getCampaign().getGameOptionsVector());
-				Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                if (started) {
+                	client.getGame().getOptions().loadOptions();
+                	client.sendGameOptions("", app.getCampaign().getGameOptionsVector());
+    				Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                }
 
                 MapSettings mapSettings = new MapSettings(scenario.getMapX(), scenario.getMapY(), 1, 1);
                 File f = new File("data/mapgen/" + scenario.getMap() + ".xml");
