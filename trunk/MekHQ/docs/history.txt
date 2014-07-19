@@ -77,6 +77,7 @@ v0.3.6 (SVN)
 + Bug [#535]: NPE in Personnel Market from AtB code addition using wrong UUID
 + Bug [#536]: Joining Games overwrites Server settings
 + Bug: Bloodnames folder missing from packaging
++ Bug [#538]: Day advance bug when SpouseID is not NULL, but that ID returns a NULL Person from the campaign
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
