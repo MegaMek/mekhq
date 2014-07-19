@@ -363,8 +363,6 @@ public class Utilities {
 		ArrayList<Person> gunners = new ArrayList<Person>();
 		ArrayList<Person> vesselCrew = new ArrayList<Person>();
 		Person navigator = null;
-		int bonus = c.getFaction().isClan() ? 1 : 0;
-		int expLvl;
 		int totalGunnery = 0;
 		int totalPiloting = 0;
 		drivers.clear();
@@ -557,8 +555,6 @@ public class Utilities {
 		ArrayList<Person> gunners = new ArrayList<Person>();
 		ArrayList<Person> vesselCrew = new ArrayList<Person>();
 		Person navigator = null;
-		int bonus = c.getFaction().isClan() ? 1 : 0;
-		int expLvl;
 		int totalGunnery = 0;
 		int totalPiloting = 0;
 		drivers.clear();

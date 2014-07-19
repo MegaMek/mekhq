@@ -1614,7 +1614,8 @@ class UnitAssignmentTableModel extends AbstractTableModel {
 					hasFocus, row, column);
 			int actualRow = table.convertRowIndexToModel(row);
 			int actualCol = table.convertColumnIndexToModel(column);
-			Unit u = getUnit(actualRow); // FIXME
+			@SuppressWarnings("unused")
+			Unit u = getUnit(actualRow); // FIXME: Why is this here w/out being used?
 			setHorizontalAlignment(getAlignment(actualCol));
 			setForeground(isSelected?Color.WHITE:Color.BLACK);
 			if (isSelected) {
