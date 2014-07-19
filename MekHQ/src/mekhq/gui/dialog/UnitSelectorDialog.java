@@ -89,8 +89,8 @@ public class UnitSelectorDialog extends JDialog {
     private JButton btnAddGM;
     private javax.swing.JButton btnBuy;
     private javax.swing.JButton btnClose;
-    private javax.swing.JComboBox comboUnitType;
-    private javax.swing.JComboBox comboWeight;
+    private javax.swing.JComboBox<String> comboUnitType;
+    private javax.swing.JComboBox<String> comboWeight;
     private javax.swing.JLabel lblFilter;
     private javax.swing.JLabel lblImage;
     private javax.swing.JLabel lblUnitType;
@@ -136,9 +136,9 @@ public class UnitSelectorDialog extends JDialog {
         panelFilterBtns = new javax.swing.JPanel();
         panelLeft = new javax.swing.JPanel();
         lblWeight = new javax.swing.JLabel();
-        comboWeight = new javax.swing.JComboBox();
+        comboWeight = new javax.swing.JComboBox<String>();
         lblUnitType = new javax.swing.JLabel();
-        comboUnitType = new javax.swing.JComboBox();
+        comboUnitType = new javax.swing.JComboBox<String>();
         txtFilter = new javax.swing.JTextField();
         lblFilter = new javax.swing.JLabel();
         lblImage = new javax.swing.JLabel();
@@ -167,7 +167,7 @@ public class UnitSelectorDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panelFilterBtns.add(lblUnitType, gridBagConstraints);
 
-        DefaultComboBoxModel unitTypeModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> unitTypeModel = new DefaultComboBoxModel<String>();
         for (int i = 0; i < UnitType.SIZE; i++) {
             unitTypeModel.addElement(UnitType.getTypeDisplayableName(i));
         }
@@ -195,7 +195,7 @@ public class UnitSelectorDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panelFilterBtns.add(lblWeight, gridBagConstraints);
 
-        DefaultComboBoxModel weightModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> weightModel = new DefaultComboBoxModel<String>();
         for (int i = 0; i < EntityWeightClass.SIZE; i++) {
             weightModel.addElement(EntityWeightClass.getClassName(i));
         }
@@ -612,11 +612,11 @@ public class UnitSelectorDialog extends JDialog {
         });
     }
 
-    public JComboBox getComboUnitType() {
+    public JComboBox<String> getComboUnitType() {
         return comboUnitType;
     }
 
-    public JComboBox getComboWeight() {
+    public JComboBox<String> getComboWeight() {
         return comboWeight;
     }
 

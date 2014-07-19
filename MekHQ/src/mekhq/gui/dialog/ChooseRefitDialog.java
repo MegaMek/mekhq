@@ -75,7 +75,7 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
     private javax.swing.JButton btnOK;
     private JTable refitTable;
     private JScrollPane scrRefitTable;
-    private JList lstShopping;
+    private JList<String> lstShopping;
     private JScrollPane scrShoppingList;
     private JTextPane txtOldUnit;
     private JTextPane txtNewUnit;
@@ -265,7 +265,7 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
     		return;
     	}
     	btnOK.setEnabled(true);
-    	lstShopping = new JList(r.getShoppingListDescription());
+    	lstShopping = new JList<String>(r.getShoppingListDescription());
     	scrShoppingList.setViewportView(lstShopping);
         MechView mv = new MechView(r.getNewEntity(), false);
 		txtNewUnit.setText("<div style='font: 12pt monospaced'>" + mv.getMechReadout() + "</div>");

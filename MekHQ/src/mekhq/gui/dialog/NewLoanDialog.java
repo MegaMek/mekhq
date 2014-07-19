@@ -86,7 +86,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     private JSlider sldInterest;
     private JSlider sldCollateral;
     private JSlider sldLength;
-    private JComboBox choiceSchedule;
+    private JComboBox<String> choiceSchedule;
 
     private JLabel lblAPR;
     private JLabel lblCollateralPct;
@@ -281,11 +281,11 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         sldCollateral.addChangeListener(this);
         sldLength.addChangeListener(this);
 
-        DefaultComboBoxModel scheduleModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> scheduleModel = new DefaultComboBoxModel<String>();
         for (int i = 0; i < Finances.SCHEDULE_NUM; i++) {
             scheduleModel.addElement(Finances.getScheduleName(i));
         }
-        choiceSchedule = new JComboBox(scheduleModel);
+        choiceSchedule = new JComboBox<String>(scheduleModel);
         choiceSchedule.setSelectedIndex(loan.getPaymentSchedule());
 
         choiceSchedule.addActionListener(this);

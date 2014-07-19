@@ -108,7 +108,8 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	private static final int SG_COCKPIT  = 11;
 	private static final int SG_NUM      = 12;
 	
-    private Frame frame;
+    @SuppressWarnings("unused")
+	private Frame frame; // FIXME: Unused? Do we need it?
     private Campaign campaign;
     private CampaignGUI campaignGUI;
     private DecimalFormat formatter;
@@ -122,7 +123,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     private JPanel panFilter;
     private JLabel lblFilter;
     private javax.swing.JTextField txtFilter;
-    private JComboBox choiceParts;
+    private JComboBox<String> choiceParts;
 	private JLabel lblPartsChoice;
     private JPanel panButtons;
     private JButton btnAdd;
@@ -182,11 +183,11 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		GridBagConstraints c = new GridBagConstraints();
 		panFilter = new JPanel();
 		lblPartsChoice = new JLabel(resourceMap.getString("lblPartsChoice.text")); // NOI18N
-		DefaultComboBoxModel partsGroupModel = new DefaultComboBoxModel();
+		DefaultComboBoxModel<String> partsGroupModel = new DefaultComboBoxModel<String>();
 		for (int i = 0; i < SG_NUM; i++) {
 			partsGroupModel.addElement(getPartsGroupName(i));
 		}
-		choiceParts = new JComboBox(partsGroupModel);
+		choiceParts = new JComboBox<String>(partsGroupModel);
 		choiceParts.setName("choiceParts"); // NOI18N
 		choiceParts.setSelectedIndex(0);
 		choiceParts.addActionListener(new java.awt.event.ActionListener() {

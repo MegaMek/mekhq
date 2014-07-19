@@ -15,6 +15,8 @@ import mekhq.gui.BasicInfo;
 /**
  * A table model for displaying personnel in the infirmary
  */
+// TODO: Raw types should be fixed
+@SuppressWarnings("rawtypes")
 public class PatientTableModel extends AbstractListModel {
     private static final long serialVersionUID = -1615929049408417297L;
 

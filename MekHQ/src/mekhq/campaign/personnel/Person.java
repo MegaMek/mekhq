@@ -1978,11 +1978,13 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         	rank += " " + Rank.getManeiDominiRankName(maneiDominiRank);
         }
         
+        // This is used for the rank sorter. If you have a better way to accomplish it, by all means...
+        // Of course, nothing that uses Full Title actually uses the rank sorter yet I guess...
+        // Still, I've turned it back on and I don't see it messing anything up anywhere.
+        // - Dylan
         // If we need it in html for any reason, make it so.
-        //Taharqa: This is messing up the font display for personnel so I am commenting it out. I don't believe it
-        //is functional anyway
-        //if (html)
-        //	rank = makeHTMLRankDiv();
+        if (html)
+        	rank = makeHTMLRankDiv();
         
         return rank + " " + getFullName();
     }
