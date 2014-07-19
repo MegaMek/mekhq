@@ -28,7 +28,6 @@ import java.awt.Frame;
 import java.awt.GridLayout;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.ResourceBundle;
 
 import javax.swing.JPanel;
@@ -52,7 +51,6 @@ public class EditPersonnelLogDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
     private Frame frame;
     private Campaign campaign;
-    private Date date;
     private Person person;
     private ArrayList<LogEntry> log;
     private LogTableModel logModel;

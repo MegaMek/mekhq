@@ -33,8 +33,9 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
 
 	private Campaign campaign;
 	
-    private JComboBox choiceType;
-    private JComboBox choiceRanks;
+    private JComboBox<String> choiceType;
+    private JComboBox<String> choiceRanks;
+    private DefaultComboBoxModel<String> rankModel;
     private JSpinner spnNumber;
     
     private JLabel lblType;
@@ -64,8 +65,8 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
         
-        choiceType = new javax.swing.JComboBox();
-        choiceRanks = new javax.swing.JComboBox();
+        choiceType = new javax.swing.JComboBox<String>();
+        choiceRanks = new javax.swing.JComboBox<String>();
 
         lblType = new javax.swing.JLabel(resourceMap.getString("lblType.text"));
         lblRank = new javax.swing.JLabel(resourceMap.getString("lblRank.text"));
@@ -87,7 +88,7 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(lblType, gridBagConstraints);
         
-        DefaultComboBoxModel personTypeModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> personTypeModel = new DefaultComboBoxModel<String>();
         for(int i = 1; i < Person.T_NUM; i++) {
         	personTypeModel.addElement(Person.getRoleDesc(i,campaign.getFaction().isClan()));
         }
@@ -116,7 +117,7 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(lblRank, gridBagConstraints);
         
-        DefaultComboBoxModel rankModel = new DefaultComboBoxModel();
+        rankModel = new DefaultComboBoxModel<String>();
         choiceRanks.setModel(rankModel);
         choiceRanks.setName("choiceRanks"); // NOI18N
         refreshRanksCombo();
@@ -199,7 +200,8 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
     }
    
     private void refreshRanksCombo() {
-    	DefaultComboBoxModel ranksModel = new DefaultComboBoxModel();
+    	// Clear everything and start over! Wee!
+    	rankModel.removeAllElements();
     	
     	// Determine correct profession to pass into the loop
     	int profession = Person.getProfessionFromPrimaryRole((choiceType.getSelectedIndex() + 1));
@@ -221,9 +223,9 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
         		continue;
         	}
         	
-        	ranksModel.addElement(rank.getName(p));
+        	rankModel.addElement(rank.getName(p));
         }
-        choiceRanks.setModel(ranksModel);
+        choiceRanks.setModel(rankModel);
         choiceRanks.setSelectedIndex(0);
     }
 }

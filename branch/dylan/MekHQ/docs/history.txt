@@ -15,24 +15,24 @@ v0.3.6 (SVN)
     specific Tech's ID to place at the front of the returned list (partially satisfying Feature Request 162).
 + Bug [#518]: IntOps: Tech/Astech divide by zero
 + Bug: Infinite Loop from Bugfix for [#518]
-+ Bug [515]: Tech Import bug (cosmetic only I think)
++ Bug [#515]: Tech Import bug (cosmetic only I think)
 + Update to News.xml
 + New MegaMek.jar 0.38.0 & MegaMekLab.jar 0.1.29
 + Re-work if statements and otherwise make Utilities.getAllVariants() more readable
 + Bug: Salvaged units were not being initialized and diagnosed for non-contract missions
-+ Bug [516]: Scrapping breached location does not remove breach
-+ Bug [507]: Special characters causing problems in xml files
-+ Bug [511]: Ammo Reload Tasks Disappearing
-+ Bug [514]: List of available vehicles for assignment error
-+ Bug [512]: Error on loading save with ASF bombs loaded in mekhq
-+ Bug [491]: Doctor Queue never clears Permanent Injuries
-+ Bug [505]: Resolution with a captured JS/DS/WS/SC eats memory and never completes
-+ Bug [489]: Typo - in News Item
-+ Bug [390]: Replacing Torso Impossible w/ Blown Off Limb
-+ Bug [416]: Unsalvageable rotor on a Warrior VTOL (Also affected tank turrets)
++ Bug [#516]: Scrapping breached location does not remove breach
++ Bug [#507]: Special characters causing problems in xml files
++ Bug [#511]: Ammo Reload Tasks Disappearing
++ Bug [#514]: List of available vehicles for assignment error
++ Bug [#512]: Error on loading save with ASF bombs loaded in mekhq
++ Bug [#491]: Doctor Queue never clears Permanent Injuries
++ Bug [#505]: Resolution with a captured JS/DS/WS/SC eats memory and never completes
++ Bug [#489]: Typo - in News Item
++ Bug [#390]: Replacing Torso Impossible w/ Blown Off Limb
++ Bug [#416]: Unsalvageable rotor on a Warrior VTOL (Also affected tank turrets)
 + Bug: Various issues with loans, including names and reference numbers not being correct when values are changed on the dialog
-+ Bug [380]: Aerospace Fuel Refueling
-+ Bug [488]: Activation of mothballed unit...
++ Bug [#380]: Aerospace Fuel Refueling
++ Bug [#488]: Activation of mothballed unit...
 + Data: Updated all campaigns to be fully compatible with 0.3.6
 + Bug: By person rank system option not showing up on the menu for campaigns with WoB as the default system
 + Feature: Added in Comstar/WoB Branch Designations (WIP)
@@ -46,7 +46,7 @@ v0.3.6 (SVN)
 + Data: krazzyharry Force images & Clan Wolverine image
 + Fix folder name for the Miscellaneous force images
 + Bug: packaging_local.xml looking in wrong place for history files of MM and MML
-+ Bug [524]: Version.java not intelligent in splitting the version "extras" out
++ Bug [#524]: Version.java not intelligent in splitting the version "extras" out
 + Data: Force icons for xenoplanetary, Scuba Infantry, and Space Marines
 + Patch [32]: Conventional Pilot Rank
 + Patch [36]: Bloodnames
@@ -71,7 +71,15 @@ v0.3.6 (SVN)
 + Bug: 0 cost SPAs impossible
 + Bug: NPE resulting from null Unit on a part, and only null entity is guarded against
 + Bug: Unit.getCommander() NPE possible in multiple places
-+ Bug [527]: Campaign due to Cargo Capacity NPE
++ Bug [#527]: Campaign due to Cargo Capacity NPE
++ Bug [#533]: Aerospace Heatsinks
++ Patch [34]: Against the Bot, 5th Patch
++ New campaign option to set Start Game Delay
++ Bug [#324]: Transmitting Data error - NCD for XStream
++ Bug [#535]: NPE in Personnel Market from AtB code addition using wrong UUID
++ Bug [#536]: Joining Games overwrites Server settings
++ Bug: Bloodnames folder missing from packaging
++ Bug [#538]: Day advance bug when SpouseID is not NULL, but that ID returns a NULL Person from the campaign
 
 v0.3.5-dylan (2014-04-28)
 -- No Changes--

@@ -535,7 +535,8 @@ public class AtBScenario extends Scenario {
 			if (getForces(campaign).getAllUnits().size() > 0) {
 				return false;
 			}
-			if (battleType == OFFICERDUEL && unit.getCommander().getRank().isOfficer()) {
+			if ((battleType == OFFICERDUEL || battleType == CIVILIANHELP)
+					&& unit.getCommander().getRank().isOfficer()) {
 				return true;
 			}
 			if (battleType == ACEDUEL && !unit.getCommander().getRank().isOfficer()) {

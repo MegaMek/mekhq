@@ -27,7 +27,7 @@ public class AddFundsDialog extends javax.swing.JDialog implements FocusListener
 	private static final long serialVersionUID = -6946480787293179307L;
 
     private JFormattedTextField descriptionField;
-    private JComboBox categoryCombo;
+    private JComboBox<String> categoryCombo;
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddFundsDialog");
 
 	/** Creates new form AlertPopup */
@@ -79,7 +79,7 @@ public class AddFundsDialog extends javax.swing.JDialog implements FocusListener
         jFormattedTextFieldFundsQuantity.setColumns(10);
         panel.add(jFormattedTextFieldFundsQuantity);
 
-        categoryCombo = new JComboBox(Transaction.getCategoryList());
+        categoryCombo = new JComboBox<String>(Transaction.getCategoryList());
         categoryCombo.setSelectedItem(Transaction.getCategoryName(Transaction.C_MISC));
         categoryCombo.setToolTipText("The category the transaction falls into.");
         categoryCombo.setName("categoryCombo");

@@ -881,6 +881,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	}
 	
 	public void procreate() {
+		// Spouse NULL protection...
+		if (getSpouseID() != null && getSpouse() == null) {
+			setSpouseID(null);
+		}
 		if (!isDeployed()) {
 			// Age limitations...
 			if (getAge(campaign.getCalendar()) > 13 && getAge(campaign.getCalendar()) < 51) {
@@ -893,8 +897,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 						campaign.addReport(getFullName()+" has conceived");
 					}
 				} else {
-					Person spouse = campaign.getPerson(getSpouseID());
-					if (spouse.isActive() && !spouse.isDeployed() && spouse.getAge(campaign.getCalendar()) > 13) {
+					if (getSpouse().isActive() && !getSpouse().isDeployed() && getSpouse().getAge(campaign.getCalendar()) > 13) {
 						// 0.05% chance that this procreation attempt will create a child
 						if (Compute.randomInt(10000) < 2) {
 							GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
@@ -1978,11 +1981,13 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         	rank += " " + Rank.getManeiDominiRankName(maneiDominiRank);
         }
         
+        // This is used for the rank sorter. If you have a better way to accomplish it, by all means...
+        // Of course, nothing that uses Full Title actually uses the rank sorter yet I guess...
+        // Still, I've turned it back on and I don't see it messing anything up anywhere.
+        // - Dylan
         // If we need it in html for any reason, make it so.
-        //Taharqa: This is messing up the font display for personnel so I am commenting it out. I don't believe it
-        //is functional anyway
-        //if (html)
-        //	rank = makeHTMLRankDiv();
+        if (html)
+        	rank = makeHTMLRankDiv();
         
         return rank + " " + getFullName();
     }

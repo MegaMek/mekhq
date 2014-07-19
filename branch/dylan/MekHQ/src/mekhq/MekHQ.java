@@ -268,7 +268,7 @@ public class MekHQ implements GameListener {
         currentScenario = scenario;
         
         //Start the game thread
-        gameThread = new GameThread(lgd.playerName, client, this, meks);
+        gameThread = new GameThread(lgd.playerName, client, this, meks, false);
         gameThread.start();
     }
     

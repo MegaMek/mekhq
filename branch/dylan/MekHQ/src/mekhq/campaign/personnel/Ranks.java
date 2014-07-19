@@ -101,6 +101,7 @@ public class Ranks {
 	public static final int RPROF_NUM	= 6;
 	
 	private static Hashtable<Integer, Ranks> rankSystems;
+	@SuppressWarnings("unused") // FIXME
 	private static final int[] officerCut = {/*SLDF*/7,/*AFFS*/6,/*AFFC*/8,/*LCAF*/14,/*LAAF*/11,/*FWLM*/9,/*CCAF*/5,/*CCWH*/2,/*DCMD*/9,/*Clan*/3,/*COM*/2,/*WOB*/2};
 	public static final int RANK_BONDSMAN = -1;
 	public static final int RANK_PRISONER = -2;
@@ -541,7 +542,8 @@ public class Ranks {
 	
 	public void setRanksFromModel(RankTableModel model) {
         ranks = new ArrayList<Rank>();
-	    Vector<Vector> vectors = model.getDataVector();
+	    @SuppressWarnings("unchecked") // Broken java doesn't have typed vectors in the DefaultTableModel
+		Vector<Vector<Object>> vectors = model.getDataVector();
 	    for(Vector<Object> row : vectors) {
 	        String[] names = { (String)row.get(RankTableModel.COL_NAME_MW), (String)row.get(RankTableModel.COL_NAME_ASF),
 	        		(String)row.get(RankTableModel.COL_NAME_VEE), (String)row.get(RankTableModel.COL_NAME_NAVAL),

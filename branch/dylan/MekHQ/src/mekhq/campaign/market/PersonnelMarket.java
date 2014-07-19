@@ -551,8 +551,8 @@ public class PersonnelMarket {
                 }
         }
         for (Person p : toRemove) {
-        	if (attachedEntities.contains(p.getUnitId())) {
-        		attachedEntities.remove(p.getUnitId());
+        	if (attachedEntities.contains(p.getId())) {
+        		attachedEntities.remove(p.getId());
         	}
         }
         personnel.removeAll(toRemove);
@@ -1100,6 +1100,9 @@ public class PersonnelMarket {
     }
     
     public void adjustSkill (Person p, String skillName, int mod) {
+    	if (p.getSkill(skillName) == null) {
+    		return;
+    	}
     	if (mod > 0) {
     		p.improveSkill(skillName);
     	}

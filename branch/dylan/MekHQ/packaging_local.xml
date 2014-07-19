@@ -143,7 +143,8 @@
             <fileset dir="${localdir}/${datadir}-OLD" >
                 <include name="universe/" />
                 <include name="fonts/" />
-                <include name="spa/" />
+                <include name="mapgen/" />
+                <include name="names/bloodnames/" />
                 <include name="images/force/" />
                 <include name="images/portraits/FoxsTeeth/" />
                 <include name="images/fluff/mech/*.png" />
@@ -343,7 +344,6 @@
 				<include name="${docdir}/" />
 				<include name="${confdir}/" />
 				<include name="campaigns/" />
-				<include name="campaigns/FoxsTeeth.cpnx" />
 				<!--<include name="MegaMek.jar" />
 				<include name="MegaMekLab.jar" />-->
 				<include name="MegaMek.exe" />

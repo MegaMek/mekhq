@@ -46,7 +46,7 @@ public class JSuggestField extends JTextField {
 	private Point location;
 
 	/** List contained in the drop-down dialog. */
-	private JList list;
+	private JList<String> list;
 
 	/**
 	 * Vectors containing the original data and the filtered data for the
@@ -169,7 +169,7 @@ public class JSuggestField extends JTextField {
 		d.setUndecorated(true);
 		d.setFocusableWindowState(false);
 		d.setFocusable(false);
-		list = new JList();
+		list = new JList<String>();
 		list.addMouseListener(new MouseListener() {
 			private int selected;
 

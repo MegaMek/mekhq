@@ -72,7 +72,7 @@ public class HangarReport extends Report {
         JTree overviewHangarTree = new JTree(top);
  
         // BattleMechs
-        boolean expandMechs = false;
+        // boolean expandMechs = false;
         int countMechs = 0;
         int countBattleMechs = 0;
         int countOmniMechs = 0;
@@ -90,7 +90,7 @@ public class HangarReport extends Report {
         int ultralightOmniMech = 0;
         
         // ASF
-        boolean expandASF = false;
+        //boolean expandASF = false;
         int countASF = 0;
         int countStandardASF = 0;
         int countOmniASF = 0;
@@ -102,7 +102,7 @@ public class HangarReport extends Report {
         int countOmniHeavyASF = 0;
         
         // Vehicles
-        boolean expandVees = false;
+        //boolean expandVees = false;
         int countVees = 0;
         int countStandardVees = 0;
         int countOmniVees = 0;
@@ -184,7 +184,7 @@ public class HangarReport extends Report {
         int countOmniHydrofoilLight = 0;
         
         // Battle Armor and Infantry
-        boolean expandInfantry = false;
+        //boolean expandInfantry = false;
         int countInfantry = 0;
         int countFootInfantry = 0;
         int countJumpInfantry = 0;
@@ -198,7 +198,7 @@ public class HangarReport extends Report {
         int countBAAssault = 0;
         
         // Jumpships, Warships, Dropships, and SmallCraft
-        boolean expandSpace = false;
+        //boolean expandSpace = false;
         int countSpace = 0;
         int countJumpships = 0;
         int countWarships = 0;
@@ -299,7 +299,7 @@ public class HangarReport extends Report {
         int countGE = 0;
         
         // Protomechs
-        boolean expandProtos = false;
+        //boolean expandProtos = false;
         int countProtos = 0;
         int countLightProtos = 0;
         int countMediumProtos = 0;
@@ -893,7 +893,7 @@ public class HangarReport extends Report {
         for (Unit u : getCampaign().getUnits()) {
             Entity e = u.getEntity();
             if (e instanceof Mech) {
-                expandMechs = true;
+                //expandMechs = true;
                 if (e.isOmni()) {
                     if (e.getWeightClass() == EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
                         ultralightomnis.add(new DefaultMutableTreeNode(u.getName()));
@@ -926,17 +926,17 @@ public class HangarReport extends Report {
             } else if (e instanceof ConvFighter) {
                 conv.add(new DefaultMutableTreeNode(u.getName()));
             } else if (e instanceof Warship) {
-                expandSpace = true;
+                //expandSpace = true;
                 if (e.getWeightClass() == EntityWeightClass.WEIGHT_SMALL_WAR) {
                     smws.add(new DefaultMutableTreeNode(u.getName()));
                 } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_LARGE_WAR) {
                     lgws.add(new DefaultMutableTreeNode(u.getName()));
                 }
             } else if (e instanceof Jumpship) {
-                expandSpace = true;
+                //expandSpace = true;
                 js.add(new DefaultMutableTreeNode(u.getName()));
             } else if (e instanceof Dropship) {
-                expandSpace = true;
+                //expandSpace = true;
                 if (e.getWeightClass() == EntityWeightClass.WEIGHT_SMALL_DROP) {
                     smds.add(new DefaultMutableTreeNode(u.getName()));
                 } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM_DROP) {
@@ -945,10 +945,10 @@ public class HangarReport extends Report {
                     lgds.add(new DefaultMutableTreeNode(u.getName()));
                 }
             } else if (e instanceof SmallCraft) {
-                expandSpace = true;
+                //expandSpace = true;
                 sc.add(new DefaultMutableTreeNode(u.getName()));
             } else if (e instanceof Aero) {
-                expandASF = true;
+                //expandASF = true;
                 if (e.isOmni()) {
                     if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
                         oLightASF.add(new DefaultMutableTreeNode(u.getName()));
@@ -967,7 +967,7 @@ public class HangarReport extends Report {
                     }
                 }
             } else if (e instanceof Protomech) {
-                expandProtos = true;
+                //expandProtos = true;
                 if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
                     plight.add(new DefaultMutableTreeNode(u.getName()));
                 } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_MEDIUM) {
@@ -982,7 +982,7 @@ public class HangarReport extends Report {
             } else if (e instanceof SupportTank || e instanceof SupportVTOL) {
                 continue;
             } else if (e instanceof Tank) {
-                expandVees = true;
+                //expandVees = true;
                 if (e.isOmni()) {
                     if (e instanceof VTOL) {
                         if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
@@ -1141,7 +1141,7 @@ public class HangarReport extends Report {
                     }
                 }
             } else if (e instanceof BattleArmor) {
-                expandInfantry = true;
+                //expandInfantry = true;
                 if (e.getWeightClass() == EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
                     baPAL.add(new DefaultMutableTreeNode(u.getName()));
                 } else if (e.getWeightClass() == EntityWeightClass.WEIGHT_LIGHT) {
@@ -1154,7 +1154,7 @@ public class HangarReport extends Report {
                     baAssault.add(new DefaultMutableTreeNode(u.getName()));
                 }
             } else if (e instanceof Infantry) {
-                expandInfantry = true;
+                //expandInfantry = true;
                 if (((Infantry) e).isMechanized()) {
                     infMechanized.add(new DefaultMutableTreeNode(u.getName()));
                 } else if (e.getMovementMode() == EntityMovementMode.INF_JUMP) {
@@ -1168,12 +1168,14 @@ public class HangarReport extends Report {
         }
         
         // Reset our UI
+        /*
         final boolean expandMechsFinal = expandMechs;
         final boolean expandASFFinal = expandASF;
         final boolean expandVeesFinal = expandVees;
         final boolean expandInfantryFinal = expandInfantry; 
         final boolean expandSpaceFinal = expandSpace;
         final boolean expandProtosFinal = expandProtos;
+        */
         
         overviewHangarTree.setSelectionPath(null);
         overviewHangarTree.expandPath(new TreePath(top.getPath()));

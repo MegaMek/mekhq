@@ -50,7 +50,7 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
     private JFormattedTextField amountField;
     private JTextField descriptionField;
     private JButton dateButton;
-    private JComboBox categoryCombo;
+    private JComboBox<String> categoryCombo;
 
     private JButton saveButton;
     private JButton cancelButton;
@@ -132,7 +132,7 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
         panel.add(dateButton);
 
         c.gridx++;
-        categoryCombo = new JComboBox(Transaction.getCategoryList());
+        categoryCombo = new JComboBox<String>(Transaction.getCategoryList());
         categoryCombo.setSelectedItem(Transaction.getCategoryName(newTransaction.getCategory()));
         categoryCombo.setToolTipText("Category of the transaction");
         categoryCombo.setName("categoryCombo");

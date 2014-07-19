@@ -587,20 +587,20 @@ public class NewContractDialog extends javax.swing.JDialog {
         spnMultiplier = new JSpinner(new SpinnerNumberModel(contract.getMultiplier(), 1.0, 10.0, 0.1));
         spnMultiplier.addChangeListener(contractUpdateChangeListener);
         
-        DefaultComboBoxModel overheadModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> overheadModel = new DefaultComboBoxModel<String>();
 		for (int i = 0; i < Contract.OH_NUM; i++) {
 			overheadModel.addElement(Contract.getOverheadCompName(i));
 		}
-		choiceOverhead = new JComboBox(overheadModel);
+		choiceOverhead = new JComboBox<String>(overheadModel);
 		choiceOverhead.setSelectedIndex(contract.getOverheadComp());
         choiceOverhead.addActionListener(contractUpdateActionListener);
         choiceOverhead.addFocusListener(contractUpdateFocusListener);
         
-        DefaultComboBoxModel commandModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> commandModel = new DefaultComboBoxModel<String>();
 		for (int i = 0; i < Contract.COM_NUM; i++) {
 			commandModel.addElement(Contract.getCommandRightsName(i));
 		}
-		choiceCommand = new JComboBox(commandModel);
+		choiceCommand = new JComboBox<String>(commandModel);
 		choiceCommand.setSelectedIndex(contract.getCommandRights());
 		choiceCommand.addActionListener(contractUpdateActionListener);
 		
@@ -928,8 +928,8 @@ public class NewContractDialog extends javax.swing.JDialog {
     protected JSuggestField suggestPlanet;
 
     protected javax.swing.JButton btnDate;
-    protected JComboBox choiceOverhead;
-    protected JComboBox choiceCommand;
+    protected JComboBox<String> choiceOverhead;
+    protected JComboBox<String> choiceCommand;
     protected JSpinner spnLength;
     protected JSpinner spnMultiplier;
     protected JSpinner spnTransport;

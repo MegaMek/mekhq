@@ -477,8 +477,8 @@ public class CampaignGUI extends JPanel {
     private JTable docTable;
     private JButton btnAssignDoc;
     private JButton btnUnassignDoc;
-    private JList listAssignedPatient;
-    private JList listUnassignedPatient;
+    private JList<Person> listAssignedPatient;
+    private JList<Person> listUnassignedPatient;
 
     /*For the mek lab tab*/
     private MekLabPanel panMekLab;
@@ -498,7 +498,8 @@ public class CampaignGUI extends JPanel {
     private JLabel lblFunds;
     private JLabel lblTempAstechs;
     private JLabel lblTempMedics;
-    private JLabel lblCargo;
+    @SuppressWarnings("unused")
+	private JLabel lblCargo; // FIXME: Re-add this in an optionized form
 
     /*for the top button panel*/
     private JPanel btnPanel;
@@ -2179,7 +2180,7 @@ public class CampaignGUI extends JPanel {
 
 
         assignedPatientModel = new PatientTableModel(getCampaign());
-        listAssignedPatient = new JList(assignedPatientModel);
+        listAssignedPatient = new JList<Person>(assignedPatientModel);
         listAssignedPatient.setCellRenderer(assignedPatientModel.getRenderer(getIconPackage()));
         listAssignedPatient.setLayoutOrientation(JList.VERTICAL_WRAP);
         listAssignedPatient.setVisibleRowCount(5);
@@ -2195,7 +2196,7 @@ public class CampaignGUI extends JPanel {
         scrollAssignedPatient.setPreferredSize(new java.awt.Dimension(300, 360));
 
         unassignedPatientModel = new PatientTableModel(getCampaign());
-        listUnassignedPatient = new JList(unassignedPatientModel);
+        listUnassignedPatient = new JList<Person>(unassignedPatientModel);
         listUnassignedPatient.setCellRenderer(unassignedPatientModel.getRenderer(getIconPackage()));
         listUnassignedPatient.setLayoutOrientation(JList.HORIZONTAL_WRAP);
         listUnassignedPatient.setVisibleRowCount(-1);
@@ -7034,7 +7035,8 @@ public class CampaignGUI extends JPanel {
 
         public void actionPerformed(ActionEvent action) {
             String command = action.getActionCommand();
-            Unit selectedUnit = servicedUnitModel.getUnit(servicedUnitTable.convertRowIndexToModel(servicedUnitTable.getSelectedRow()));
+            @SuppressWarnings("unused") // FIXME
+			Unit selectedUnit = servicedUnitModel.getUnit(servicedUnitTable.convertRowIndexToModel(servicedUnitTable.getSelectedRow()));
             int[] rows = servicedUnitTable.getSelectedRows();
             Unit[] units = new Unit[rows.length];
             for (int i = 0; i < rows.length; i++) {
@@ -7169,9 +7171,11 @@ public class CampaignGUI extends JPanel {
                 if (servicedUnitTable.getSelectedRowCount() == 0) {
                     return;
                 }
-                int[] rows = servicedUnitTable.getSelectedRows();
+                @SuppressWarnings("unused") // FIXME
+				int[] rows = servicedUnitTable.getSelectedRows();
                 int row = servicedUnitTable.getSelectedRow();
-                boolean oneSelected = servicedUnitTable.getSelectedRowCount() == 1;
+                @SuppressWarnings("unused") // FIXME
+				boolean oneSelected = servicedUnitTable.getSelectedRowCount() == 1;
                 Unit unit = servicedUnitModel.getUnit(servicedUnitTable.convertRowIndexToModel(row));
                 JMenuItem menuItem = null;
                 JMenu menu = null;
@@ -10254,10 +10258,12 @@ public class CampaignGUI extends JPanel {
                 if (row < 0) {
                     return;
                 }
-                Scenario scenario = scenarioModel.getScenario(row);
+                @SuppressWarnings("unused") // FIXME
+				Scenario scenario = scenarioModel.getScenario(row);
                 JMenuItem menuItem = null;
                 JMenu menu = null;
-                JCheckBoxMenuItem cbMenuItem = null;
+                @SuppressWarnings("unused") // Placeholder for future expansion
+				JCheckBoxMenuItem cbMenuItem = null;
                 // **lets fill the pop up menu**//
                 menuItem = new JMenuItem("Edit...");
                 menuItem.setActionCommand("EDIT");
@@ -10916,7 +10922,8 @@ public class CampaignGUI extends JPanel {
                 if (unitTable.getSelectedRowCount() == 0) {
                     return;
                 }
-                int[] rows = unitTable.getSelectedRows();
+                @SuppressWarnings("unused") // FIXME
+				int[] rows = unitTable.getSelectedRows();
                 int row = unitTable.getSelectedRow();
                 boolean oneSelected = unitTable.getSelectedRowCount() == 1;
                 Unit unit = unitModel.getUnit(unitTable.convertRowIndexToModel(row));
@@ -11238,7 +11245,8 @@ public class CampaignGUI extends JPanel {
                 return false;
             }
             // Extract transfer data.
-            Unit unit = null;
+            @SuppressWarnings("unused") // FIXME
+			Unit unit = null;
             Force force = null;
             Transferable t = support.getTransferable();
             try {

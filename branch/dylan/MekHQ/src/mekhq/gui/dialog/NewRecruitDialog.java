@@ -44,7 +44,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     
     private javax.swing.JButton btnClose;
     private javax.swing.JButton btnOk;
-    private javax.swing.JComboBox choiceRanks;
+    private javax.swing.JComboBox<String> choiceRanks;
     private javax.swing.JButton btnRandomName;
     private javax.swing.JButton btnRandomPortrait;
     private javax.swing.JButton btnChoosePortrait;
@@ -96,7 +96,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
         btnChoosePortrait = new javax.swing.JButton();
         btnEditPerson = new javax.swing.JButton();
         btnRegenerate = new javax.swing.JButton();
-        choiceRanks = new javax.swing.JComboBox();
+        choiceRanks = new javax.swing.JComboBox<String>();
 
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewRecruitDialog");
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -271,7 +271,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
    
     private void refreshRanksCombo() {
-    	DefaultComboBoxModel ranksModel = new DefaultComboBoxModel();
+    	DefaultComboBoxModel<String> ranksModel = new DefaultComboBoxModel<String>();
     	
     	// Determine correct profession to pass into the loop
     	int profession = person.getProfession();

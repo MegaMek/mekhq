@@ -4953,7 +4953,8 @@ public class Campaign implements Serializable {
      * Hopefully, StellarOps will clarify all of this.
      * Cleaned this up some, to take advantage of my new methods, but it needs a lot more work - Dylan
      */
-    public long calculateCostPerJump(boolean excludeOwnTransports) {
+    @SuppressWarnings("unused") // FIXME: Waiting for Dylan to finish re-writing
+	public long calculateCostPerJump(boolean excludeOwnTransports) {
         // first we need to get the total number of units by type
         int nMech = getNumberOfUnitsByType(Entity.ETYPE_MECH);
         int nLVee = getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true);
@@ -5547,7 +5548,8 @@ public class Campaign implements Serializable {
             }
             // If we're assigned as a tech for any unit, remove us from it/them
             if (!person.getTechUnitIDs().isEmpty()) {
-            	ArrayList<UUID> techIDs = (ArrayList<UUID>) person.getTechUnitIDs().clone();
+            	@SuppressWarnings("unchecked") // Broken assed Java returning Object from clone
+				ArrayList<UUID> techIDs = (ArrayList<UUID>) person.getTechUnitIDs().clone();
             	for (UUID tuuid : techIDs) {
             		Unit t = getUnit(tuuid);
             		t.remove(person, true);
@@ -6779,7 +6781,8 @@ public class Campaign implements Serializable {
     	return getCargoTonnage(inTransit, false);
     }
 
-    public double getCargoTonnage(boolean inTransit, boolean mothballed) {
+    @SuppressWarnings("unused") // FIXME: This whole method needs re-worked once Dropship Assignments are in
+	public double getCargoTonnage(boolean inTransit, boolean mothballed) {
         double cargoTonnage = 0;
         double mothballedTonnage = 0;
         int mechs = getNumberOfUnitsByType(Entity.ETYPE_MECH);
@@ -6976,13 +6979,15 @@ public class Campaign implements Serializable {
         int noMech = Math.max(getNumberOfUnitsByType(Entity.ETYPE_MECH) - getOccupiedBays(Entity.ETYPE_MECH), 0);
         int noDS = Math.max(getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP) - getOccupiedBays(Entity.ETYPE_DROPSHIP), 0);
         int noSC = Math.max(getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) - getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
-        int noCF = Math.max(getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER) - getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
+        @SuppressWarnings("unused") // FIXME: What type of bays do ConvFighters use?
+		int noCF = Math.max(getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER) - getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
         int noASF = Math.max(getNumberOfUnitsByType(Entity.ETYPE_AERO) - getOccupiedBays(Entity.ETYPE_AERO), 0);
         int nolv = Math.max(getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) - getOccupiedBays(Entity.ETYPE_TANK, true), 0);
         int nohv = Math.max(getNumberOfUnitsByType(Entity.ETYPE_TANK) - getOccupiedBays(Entity.ETYPE_TANK), 0);
         int noinf = Math.max(getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) - getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
         int noBA = Math.max(getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) - getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
-        int noProto = Math.max(getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH) - getOccupiedBays(Entity.ETYPE_PROTOMECH), 0);
+        @SuppressWarnings("unused") // FIXME: This should be used somewhere...
+		int noProto = Math.max(getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH) - getOccupiedBays(Entity.ETYPE_PROTOMECH), 0);
         int freehv = Math.max(getTotalHeavyVehicleBays() - getOccupiedBays(Entity.ETYPE_TANK), 0);
         int freeinf = Math.max(getTotalInfantryBays() - getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
         int freeba = Math.max(getTotalBattleArmorBays() - getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);

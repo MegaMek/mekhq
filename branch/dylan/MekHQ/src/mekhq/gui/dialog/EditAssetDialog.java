@@ -40,7 +40,8 @@ import mekhq.campaign.finances.Finances;
  */
 public class EditAssetDialog extends JDialog {
     private static final long serialVersionUID = -8038099101234445018L;
-    private Frame frame;
+    @SuppressWarnings("unused")
+	private Frame frame; // FIXME: Why is this here?
     private Asset asset;
     
     private JButton btnClose;
@@ -48,7 +49,7 @@ public class EditAssetDialog extends JDialog {
     private JTextField txtName;
     private JTextField txtValue;
     private JTextField txtIncome;
-    private JComboBox choiceSchedule;
+    private JComboBox<String> choiceSchedule;
     boolean cancelled;
     
     public EditAssetDialog(Frame parent, Asset a) {
@@ -141,10 +142,10 @@ public class EditAssetDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel("Income Schedule:"), gridBagConstraints);
         
-        DefaultComboBoxModel scheduleModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> scheduleModel = new DefaultComboBoxModel<String>();
         scheduleModel.addElement(Finances.getScheduleName(Finances.SCHEDULE_MONTHLY));
         scheduleModel.addElement(Finances.getScheduleName(Finances.SCHEDULE_YEARLY));
-        choiceSchedule = new JComboBox(scheduleModel);
+        choiceSchedule = new JComboBox<String>(scheduleModel);
         choiceSchedule.setSelectedIndex(0);
         if(asset.getSchedule() == Finances.SCHEDULE_YEARLY) {
             choiceSchedule.setSelectedIndex(1);
