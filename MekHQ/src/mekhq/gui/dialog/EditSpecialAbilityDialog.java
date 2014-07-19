@@ -72,10 +72,13 @@ public class EditSpecialAbilityDialog extends JDialog {
     private JLabel lblInvalidAbil;
     private JLabel lblRemoveAbil;
 
-    public EditSpecialAbilityDialog(Frame parent, SpecialAbility spa, Hashtable<String, SpecialAbility> hash) {
+    @SuppressWarnings("unchecked")
+	public EditSpecialAbilityDialog(Frame parent, SpecialAbility spa, Hashtable<String, SpecialAbility> hash) {
         super(parent, true);
         this.ability = spa;
         this.allSPA = hash;
+        // FIXME: Java is broken, so we had to supress unchecked warnings for these 4 lines
+        // Basically, Vector<E>.clone() returns an Object instead of a new Vector<E> - DOH!
         prereqAbilities = (Vector<String>)ability.getPrereqAbilities().clone();
         invalidAbilities = (Vector<String>)ability.getInvalidAbilities().clone();
         removeAbilities = (Vector<String>)ability.getRemovedAbilities().clone();

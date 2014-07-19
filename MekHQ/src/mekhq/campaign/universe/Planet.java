@@ -73,15 +73,15 @@ public class Planet implements Serializable {
 	private static final int TYPE_GAS_GIANT		= 5;
 	private static final int TYPE_ICE_GIANT		= 6;
 	
-	private static final String LUM_0   = "0";
-	private static final String LUM_IA  = "Ia";
-	private static final String LUM_IB  = "Ib";
-	private static final String LUM_II  = "II";
-	private static final String LUM_III = "III";
-	private static final String LUM_IV  = "IV";
-	private static final String LUM_V   = "V";
-	private static final String LUM_VI  = "VI";
-	private static final String LUM_VII = "VII";
+	public static final String LUM_0   = "0";
+	public static final String LUM_IA  = "Ia";
+	public static final String LUM_IB  = "Ib";
+	public static final String LUM_II  = "II";
+	public static final String LUM_III = "III";
+	public static final String LUM_IV  = "IV";
+	public static final String LUM_V   = "V";
+	public static final String LUM_VI  = "VI";
+	public static final String LUM_VII = "VII";
 
 	private static final int LIFE_NONE    = 0;
 	private static final int LIFE_MICROBE = 1;

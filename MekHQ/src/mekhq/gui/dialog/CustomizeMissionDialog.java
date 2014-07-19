@@ -37,7 +37,8 @@ import mekhq.gui.JSuggestField;
  */
 public class CustomizeMissionDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
-    private Frame frame;
+    @SuppressWarnings("unused") // FIXME
+	private Frame frame;
     private Mission mission;
     private Campaign campaign;
     private boolean newMission;
