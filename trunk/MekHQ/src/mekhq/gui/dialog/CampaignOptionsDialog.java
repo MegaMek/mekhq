@@ -132,7 +132,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JSpinner spnUsedPartsValue[];
     private JSpinner spnDamagedPartsValue;
     private JComboBox<String> comboFaction;
-    SortedComboBoxModel factionModel;
+    SortedComboBoxModel<String> factionModel;
     private JComboBox<String> comboFactionNames;
     private JComboBox<String> comboRanks;
     private JSlider sldGender;
@@ -234,8 +234,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JTable tableRanks;
     private RankTableModel ranksModel;
     private JScrollPane scrRanks;
-    private JButton btnAddRank;
-    private JButton btnDeleteRank;
+    @SuppressWarnings("unused")
+	private JButton btnAddRank; // FIXME: Unused?
+    @SuppressWarnings("unused")
+	private JButton btnDeleteRank; // FIXME: Unused?
     String[] rankColNames = { "Rate", "MW Rank", "ASF Rank", "Vee Crew Rank", "Naval Rank", "Infantry Rank", "Tech Rank", "Officer", "Pay Multiplier"};
 
     private JTextArea txtInstructionsXP;
@@ -598,7 +600,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panGeneral.add(btnDate, gridBagConstraints);
 
-        factionModel = new SortedComboBoxModel();
+        factionModel = new SortedComboBoxModel<String>();
         for (String sname : Faction.choosableFactionCodes) {
             factionModel.addElement(Faction.getFaction(sname).getFullName(Era.getEra(date.get(Calendar.YEAR))));
         }
@@ -2435,7 +2437,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 			}
         	
         };
-        TableCellListener rankCellListener = new TableCellListener(tableRanks, rankCellAction);
+        @SuppressWarnings("unused") // FIXME:
+		TableCellListener rankCellListener = new TableCellListener(tableRanks, rankCellAction);
         scrRanks.setViewportView(tableRanks);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -3540,12 +3543,14 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         }
     }
 
-    private void tableRanksValueChanged(javax.swing.event.ListSelectionEvent evt) {
+    @SuppressWarnings("unused") // FIXME:
+	private void tableRanksValueChanged(javax.swing.event.ListSelectionEvent evt) {
         int row = tableRanks.getSelectedRow();
         //btnDeleteRank.setEnabled(row != -1);
     }
 
-    private void addRank() {
+    @SuppressWarnings("unused") // FIXME
+	private void addRank() {
         Object[] rank = {"Unknown", false, 1.0};
         int row = tableRanks.getSelectedRow();
         if (row == -1) {
@@ -3561,7 +3566,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         }
     }
 
-    private void removeRank() {
+    @SuppressWarnings("unused") // FIXME
+	private void removeRank() {
         int row = tableRanks.getSelectedRow();
         if (row > -1) {
             ranksModel.removeRow(row);
@@ -3913,7 +3919,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             date = dc.getDate();
             btnDate.setText(getDateAsString());
-            factionModel = new SortedComboBoxModel();
+            factionModel = new SortedComboBoxModel<String>();
             for (String sname : Faction.choosableFactionCodes) {
                 factionModel.addElement(Faction.getFaction(sname).getFullName(Era.getEra(date.get(Calendar.YEAR))));
             }

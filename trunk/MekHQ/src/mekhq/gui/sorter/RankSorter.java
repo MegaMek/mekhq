@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Ranks;
 
  /**
      * A comparator for ranks written as strings with "-" sorted to the bottom always
@@ -20,11 +19,9 @@ import mekhq.campaign.personnel.Ranks;
         private Campaign campaign;
         private Pattern pattern;
         private Matcher matcher;
-        private Ranks ranks;
-        
         public RankSorter(Campaign c) {
             campaign = c;
-            ranks = c.getRanks();
+            c.getRanks();
         }
         
         @Override

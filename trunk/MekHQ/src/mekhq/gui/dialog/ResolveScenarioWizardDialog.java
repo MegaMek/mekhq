@@ -1412,7 +1412,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         
     }
     
-    private void showUnit(UUID id) {
+    @SuppressWarnings("unused") // FIXME
+	private void showUnit(UUID id) {
     	showUnit(id, false);
     }
     
@@ -1463,7 +1464,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         dialog.setVisible(true);
     }
     
-    private void editUnit(UUID id, int idx) {
+    @SuppressWarnings("unused") // FIXME
+	private void editUnit(UUID id, int idx) {
     	editUnit(id, idx, false);
     }
     

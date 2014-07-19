@@ -75,7 +75,7 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
 
         scrPortrait = new javax.swing.JScrollPane();
         tablePortrait = new javax.swing.JTable();
-        comboCategories = new javax.swing.JComboBox();
+        comboCategories = new javax.swing.JComboBox<String>();
         btnSelect = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
 
@@ -105,7 +105,7 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
         gridBagConstraints.weighty = 1.0;
         getContentPane().add(scrPortrait, gridBagConstraints);
 
-        DefaultComboBoxModel categoryModel = new DefaultComboBoxModel();
+        DefaultComboBoxModel<String> categoryModel = new DefaultComboBoxModel<String>();
         String match = null;
         categoryModel.addElement(Crew.ROOT_PORTRAIT);
         if (portraits != null) {
@@ -408,7 +408,7 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnSelect;
-    private javax.swing.JComboBox comboCategories;
+    private javax.swing.JComboBox<String> comboCategories;
     private javax.swing.JScrollPane scrPortrait;
     private javax.swing.JTable tablePortrait;
     // End of variables declaration//GEN-END:variables

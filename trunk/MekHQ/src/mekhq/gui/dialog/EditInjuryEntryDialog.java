@@ -40,19 +40,20 @@ import mekhq.campaign.personnel.Person;
  */
 public class EditInjuryEntryDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
-    private Frame frame;
+    @SuppressWarnings("unused")
+	private Frame frame; // FIXME: Unusued => Unneeded?
     private Injury injury;
     
     private javax.swing.JButton btnClose;
     private javax.swing.JButton btnOK;
     private javax.swing.JTextArea txtDays;
-    private javax.swing.JComboBox ddLocation;
-    private javax.swing.JComboBox ddType;
+    private javax.swing.JComboBox<String> ddLocation;
+    private javax.swing.JComboBox<String> ddType;
     private javax.swing.JTextArea txtFluff;
     private javax.swing.JTextArea txtHits;
-    private javax.swing.JComboBox ddPermanent;
-    private javax.swing.JComboBox ddWorkedOn;
-    private javax.swing.JComboBox ddExtended;
+    private javax.swing.JComboBox<String> ddPermanent;
+    private javax.swing.JComboBox<String> ddWorkedOn;
+    private javax.swing.JComboBox<String> ddExtended;
     private javax.swing.JPanel panBtn;
     private javax.swing.JPanel panMain;
     
@@ -78,13 +79,13 @@ public class EditInjuryEntryDialog extends javax.swing.JDialog {
     	}
     	String[] tf = { "True", "False" };
     	txtDays = new javax.swing.JTextArea();
-    	ddLocation = new javax.swing.JComboBox(locNames);
-    	ddType = new javax.swing.JComboBox(typeNames);
+    	ddLocation = new javax.swing.JComboBox<String>(locNames);
+    	ddType = new javax.swing.JComboBox<String>(typeNames);
     	txtFluff = new javax.swing.JTextArea();
     	txtHits = new javax.swing.JTextArea();
-    	ddPermanent = new javax.swing.JComboBox(tf);
-    	ddWorkedOn = new javax.swing.JComboBox(tf);
-    	ddExtended = new javax.swing.JComboBox(tf);
+    	ddPermanent = new javax.swing.JComboBox<String>(tf);
+    	ddWorkedOn = new javax.swing.JComboBox<String>(tf);
+    	ddExtended = new javax.swing.JComboBox<String>(tf);
         btnOK = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
         panBtn = new javax.swing.JPanel();

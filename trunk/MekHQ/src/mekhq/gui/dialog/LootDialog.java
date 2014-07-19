@@ -60,8 +60,8 @@ public class LootDialog extends javax.swing.JDialog {
     private JButton btnRemoveUnit;
     private JButton btnAddPart;
     private JButton btnRemovePart;
-    private JList listUnits;
-    private JList listParts;
+    private JList<String> listUnits;
+    private JList<String> listParts;
     private JScrollPane scrUnits;
     private JScrollPane scrParts;
 
@@ -94,8 +94,8 @@ public class LootDialog extends javax.swing.JDialog {
         btnRemoveUnit = new JButton("Remove");
         btnAddPart = new JButton("Add");
         btnRemovePart = new JButton("Remove");
-        listUnits = new JList(new DefaultListModel());
-        listParts = new JList(new DefaultListModel());
+        listUnits = new JList<String>(new DefaultListModel<String>());
+        listParts = new JList<String>(new DefaultListModel<String>());
 
         //ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.KillDialog");
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -349,7 +349,7 @@ public class LootDialog extends javax.swing.JDialog {
  
     private void refreshUnitList() {
         int selectedRow = listUnits.getSelectedIndex();
-        DefaultListModel model = (DefaultListModel)listUnits.getModel();
+        DefaultListModel<String> model = (DefaultListModel<String>)listUnits.getModel();
         model.removeAllElements();
         //listUnits.removeAll();
         for(Entity e : units) {
@@ -358,8 +358,8 @@ public class LootDialog extends javax.swing.JDialog {
         }
         scrUnits.setViewportView(listUnits);
         if(selectedRow != -1) {
-            if(((DefaultListModel)listUnits.getModel()).getSize() > 0) {
-                if(((DefaultListModel)listUnits.getModel()).getSize() == selectedRow) {
+            if(((DefaultListModel<String>)listUnits.getModel()).getSize() > 0) {
+                if(((DefaultListModel<String>)listUnits.getModel()).getSize() == selectedRow) {
                     listUnits.setSelectedIndex(selectedRow-1);
                 } else {
                     listUnits.setSelectedIndex(selectedRow);
@@ -370,7 +370,7 @@ public class LootDialog extends javax.swing.JDialog {
  
     private void refreshPartList() {
         int selectedRow = listParts.getSelectedIndex();
-        DefaultListModel model = (DefaultListModel)listParts.getModel();
+        DefaultListModel<String> model = (DefaultListModel<String>)listParts.getModel();
         model.removeAllElements();
         //listUnits.removeAll();
         for(Part p : parts) {
@@ -379,8 +379,8 @@ public class LootDialog extends javax.swing.JDialog {
         }
         scrParts.setViewportView(listParts);
         if(selectedRow != -1) {
-            if(((DefaultListModel)listParts.getModel()).getSize() > 0) {
-                if(((DefaultListModel)listParts.getModel()).getSize() == selectedRow) {
+            if(((DefaultListModel<String>)listParts.getModel()).getSize() > 0) {
+                if(((DefaultListModel<String>)listParts.getModel()).getSize() == selectedRow) {
                     listParts.setSelectedIndex(selectedRow-1);
                 } else {
                     listParts.setSelectedIndex(selectedRow);

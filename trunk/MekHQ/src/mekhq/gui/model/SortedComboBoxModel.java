@@ -18,7 +18,7 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
 	 * 
 	 */
 	private static final long serialVersionUID = 3728158859609424148L;
-	private Comparator comparator;
+	private Comparator<E> comparator;
 
 	/*
 	 *  Create an empty model that will use the natural sort order of the item
@@ -31,7 +31,7 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
 	/*
 	 *  Create an empty model that will use the specified Comparator
 	 */
-	public SortedComboBoxModel(Comparator comparator)
+	public SortedComboBoxModel(Comparator<E> comparator)
 	{
 		super();
 		this.comparator = comparator;
@@ -48,7 +48,7 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
 	/*
 	 *  Create a model with data and use the specified Comparator
 	 */
-	public SortedComboBoxModel(E items[], Comparator comparator)
+	public SortedComboBoxModel(E items[], Comparator<E> comparator)
 	{
 		this.comparator = comparator;
 
@@ -69,7 +69,7 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
 	/*
 	 *  Create a model with data and use the specified Comparator
 	 */
-	public SortedComboBoxModel(Vector<E> items, Comparator comparator)
+	public SortedComboBoxModel(Vector<E> items, Comparator<E> comparator)
 	{
 		this.comparator = comparator;
 
@@ -103,7 +103,7 @@ public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
 			}
 			else
 			{
-				Comparable c = (Comparable)getElementAt(index);
+				Comparable<E> c = (Comparable<E>)getElementAt(index);
 				if (c.compareTo(element) > 0)
 					break;
 			}
