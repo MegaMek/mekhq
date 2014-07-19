@@ -522,8 +522,7 @@ public class MekHqXmlUtil {
 	 */
 	private static String getLocString(Entity entity, int indentLvl) {
 		boolean isMech = entity instanceof Mech;
-        boolean haveSlot = false;
-		StringBuffer output = new StringBuffer();
+        StringBuffer output = new StringBuffer();
 		StringBuffer thisLoc = new StringBuffer();
 		boolean isDestroyed = false;
 
@@ -586,7 +585,6 @@ public class MekHqXmlUtil {
 						thisLoc.append(MekHqXmlUtil.indentStr(indentLvl+1) + "<slot index=\"");
 						thisLoc.append(String.valueOf(loop + 1));
 						thisLoc.append("\" type=\"Empty\"/>\n");
-						haveSlot = true;
 					}
 				} else {
 					// Yup. If the equipment isn't a system, get it.
@@ -604,17 +602,14 @@ public class MekHqXmlUtil {
 						thisLoc.append(formatSlot(String.valueOf(loop + 1),
 								mount, slot.isHit(), slot.isDestroyed(),
 								slot.isRepairable(), slot.isMissing(), indentLvl+1));
-						haveSlot = true;
 					} else if (slot.isDamaged()) { // Record damaged slots.
 						thisLoc.append(formatSlot(String.valueOf(loop + 1),
 								mount, slot.isHit(), slot.isDestroyed(),
 								slot.isRepairable(), slot.isMissing(), indentLvl+1));
-						haveSlot = true;
 					} else if (null != mount && mount.countQuirks() > 0) { // record any quirks
 						thisLoc.append(formatSlot(String.valueOf(loop + 1),
 								mount, slot.isHit(), slot.isDestroyed(),
 								slot.isRepairable(), slot.isMissing(), indentLvl+1));
-						haveSlot = true;
 					} else if (mount != null
 							&& mount.getType() instanceof AmmoType) {
 						// Record ammunition slots in undestroyed locations.
@@ -626,7 +621,6 @@ public class MekHqXmlUtil {
 						thisLoc.append("\" shots=\"");
 						thisLoc.append(String.valueOf(mount.getBaseShotsLeft()));
 						thisLoc.append("\"/>\n");
-						haveSlot = true;
 					} else if (mount != null
 							&& mount.getType() instanceof WeaponType
 							&& (mount.getType()).hasFlag(WeaponType.F_ONESHOT)) {
@@ -634,7 +628,6 @@ public class MekHqXmlUtil {
 						thisLoc.append(formatSlot(String.valueOf(loop + 1),
 								mount, slot.isHit(), slot.isDestroyed(),
 								slot.isRepairable(), slot.isMissing(), indentLvl+1));
-						haveSlot = true;
 					}
 				} // End have-slot
 			} // Check the next slot in this location
@@ -647,7 +640,6 @@ public class MekHqXmlUtil {
 					if (mount.getLocation() == loc) {
 						thisLoc.append(formatSlot("N/A", mount, false, false,
 								false, false, indentLvl+1));
-						haveSlot = true;
 					}
 
 				} // Check the next ammo.
