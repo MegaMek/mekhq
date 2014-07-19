@@ -114,7 +114,8 @@ public class SpecialAbility implements MekHqXmlSerializable {
         weight = 1;
     }
     
-    public SpecialAbility clone() {
+    @SuppressWarnings("unchecked") // FIXME: Broken Java with it's Object clones
+	public SpecialAbility clone() {
     	SpecialAbility clone = new SpecialAbility(lookupName);
     	clone.displayName = this.displayName;
     	clone.desc = this.desc;

@@ -15,9 +15,7 @@ import mekhq.gui.BasicInfo;
 /**
  * A table model for displaying personnel in the infirmary
  */
-// TODO: Raw types should be fixed
-@SuppressWarnings("rawtypes")
-public class PatientTableModel extends AbstractListModel {
+public class PatientTableModel extends AbstractListModel<Person> {
     private static final long serialVersionUID = -1615929049408417297L;
 
     ArrayList<Person> patients;
@@ -36,7 +34,7 @@ public class PatientTableModel extends AbstractListModel {
     }
 
     @Override
-    public Object getElementAt(int index) {
+    public Person getElementAt(int index) {
         return patients.get(index);
     }
 
@@ -53,7 +51,7 @@ public class PatientTableModel extends AbstractListModel {
         return new PatientTableModel.Renderer(icons);
     }
 
-    public class Renderer extends BasicInfo implements ListCellRenderer {
+    public class Renderer extends BasicInfo implements ListCellRenderer<Object> {
         public Renderer(IconPackage icons) {
             super(icons);
         }
@@ -61,7 +59,7 @@ public class PatientTableModel extends AbstractListModel {
         private static final long serialVersionUID = -406535109900807837L;
 
         public Component getListCellRendererComponent(
-                JList list,
+                JList<?> list,
                 Object value,
                 int index,
                 boolean isSelected,
@@ -83,6 +81,4 @@ public class PatientTableModel extends AbstractListModel {
             return c;
         }
     }
-
-
 }

@@ -1196,6 +1196,14 @@ public class ResolveScenarioTracker {
                 }
             }
         }
+		
+		public boolean toRemove() {
+			return remove;
+		}
+		
+		public void setRemove(boolean set) {
+			remove = set;
+		}
  
         public String getName() {
             return name;

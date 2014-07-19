@@ -37,7 +37,8 @@ import mekhq.campaign.parts.Refit;
  */
 public class RefitNameDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
-    private Frame frame;
+    @SuppressWarnings("unused") // FIXME
+	private Frame frame;
     private Refit refit;
     private boolean cancelled;
     

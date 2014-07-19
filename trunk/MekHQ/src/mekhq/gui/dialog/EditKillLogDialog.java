@@ -28,7 +28,6 @@ import java.awt.Frame;
 import java.awt.GridLayout;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.ResourceBundle;
 
 import javax.swing.JPanel;
@@ -56,7 +55,6 @@ public class EditKillLogDialog extends javax.swing.JDialog {
 	
 	private Frame frame;
     private Campaign campaign;
-    private Date date;
     private Person person;
     private ArrayList<Kill> kills;
     private KillTableModel killModel;

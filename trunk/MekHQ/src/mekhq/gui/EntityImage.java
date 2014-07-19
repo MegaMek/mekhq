@@ -11,7 +11,8 @@ import java.awt.image.PixelGrabber;
      */
     public class EntityImage {
         private Image base;
-        private Image wreck;
+        @SuppressWarnings("unused") // FIXME: wreck image may be unused in MHQ, here for completeness?
+		private Image wreck;
         private Image icon;
         int tint;
         private Image camo;

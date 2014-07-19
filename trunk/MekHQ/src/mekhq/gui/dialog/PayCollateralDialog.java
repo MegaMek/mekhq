@@ -63,7 +63,8 @@ public class PayCollateralDialog extends JDialog {
      */
     private static final long serialVersionUID = 6995319032267472795L;
     
-    private Frame frame;
+    @SuppressWarnings("unused") // FIXME
+	private Frame frame;
     private Campaign campaign;
     private boolean cancelled;
     private boolean paid;

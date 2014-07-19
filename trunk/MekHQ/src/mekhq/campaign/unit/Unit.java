@@ -232,6 +232,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	private Person engineer;
 	
 	//for backwards compatability with 0.1.8, but otherwise is no longer used 
+	@SuppressWarnings("unused")
 	private int pilotId = -1;
 	
 	private String history;
