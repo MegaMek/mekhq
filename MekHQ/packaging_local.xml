@@ -144,6 +144,7 @@
                 <include name="universe/" />
                 <include name="fonts/" />
                 <include name="mapgen/" />
+                <include name="names/bloodnames/" />
                 <include name="images/force/" />
                 <include name="images/portraits/FoxsTeeth/" />
                 <include name="images/fluff/mech/*.png" />
