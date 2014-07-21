@@ -5522,13 +5522,14 @@ public class Campaign implements Serializable {
 
     public void changeRank(Person person, int rank, int rankLevel, boolean report) {
     	int oldRank = person.getRankNumeric();
+    	int oldRankLevel = person.getRankLevel();
         person.setRankNumeric(rank);
         person.setRankLevel(rankLevel);
         personUpdated(person);
         if (report) {
-            if (rank > oldRank || (rank == oldRank && rankLevel > person.getRankLevel())) {
+            if (rank > oldRank || (rank == oldRank && rankLevel > oldRankLevel)) {
                 person.addLogEntry(getDate(), "Promoted to " + person.getRankName());
-            } else if (rank < oldRank || (rank == oldRank && rankLevel < person.getRankLevel())) {
+            } else if (rank < oldRank || (rank == oldRank && rankLevel < oldRankLevel)) {
                 person.addLogEntry(getDate(), "Demoted to " + person.getRankName());
             }
         }

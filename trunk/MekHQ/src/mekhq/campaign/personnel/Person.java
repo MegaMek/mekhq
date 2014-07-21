@@ -1698,7 +1698,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	int profession = getProfession();
     	
     	// If we're using an "empty" profession, default to MechWarrior
-    	if (getRanks().isEmptyProfession(profession)) {
+    	while (getRanks().isEmptyProfession(profession)) {
     		profession = campaign.getRanks().getAlternateProfession(profession);
     	}
     	
