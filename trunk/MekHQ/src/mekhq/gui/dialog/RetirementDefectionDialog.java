@@ -18,8 +18,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
@@ -65,7 +63,6 @@ import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.UnitType;
 import mekhq.IconPackage;
-import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -485,7 +482,8 @@ public class RetirementDefectionDialog extends JDialog {
 						targetRolls.get(id).addModifier(miscModifier(id), "Misc");
 					}
 				}
-				rdTracker.rollRetirement(contract, targetRolls, getShareValue(),
+				rdTracker.rollRetirement(contract, targetRolls,
+						RetirementDefectionTracker.getShareValue(hqView.getCampaign()),
 								hqView.getCampaign());
 				initResults();
 
@@ -774,29 +772,11 @@ public class RetirementDefectionDialog extends JDialog {
 	private int getTotalShares() {
 		int retVal = 0;
 		for (UUID id : targetRolls.keySet()) {
-			retVal += hqView.getCampaign().getPerson(id).getNumShares();
+			retVal += hqView.getCampaign().getPerson(id).getNumShares(hqView.getCampaign().getCampaignOptions().getSharesForAll());
 		}
 		return retVal;
 	}
 	
-	private long getShareValue() {
-		if (!hqView.getCampaign().getCampaignOptions().getUseShareSystem()) {
-			return 0;
-		}
-		String financialReport = hqView.getCampaign().getFinancialReport();
-		long netWorth = 0;
-		try {
-			Pattern p = Pattern.compile("Net Worth\\D*(.*)");
-			Matcher m = p.matcher(financialReport);
-			m.find();
-			netWorth = (Long)formatter.parse(m.group(1));
-		} catch (Exception e) {
-			MekHQ.logError("Error parsing net worth in financial report");
-			MekHQ.logError(e);
-		}
-		return netWorth / getTotalShares();
-	}
-
 	private long getTotalBonus() {
 		long retVal = 0;
 		for (UUID id : targetRolls.keySet()) {
@@ -1236,7 +1216,7 @@ class RetirementTableModel extends AbstractTableModel {
 			}
 			return miscMods.get(p.getId());
 		case COL_SHARES:
-			return p.getNumShares();
+			return p.getNumShares(campaign.getCampaignOptions().getSharesForAll());
 		case COL_PAYOUT:
 			if (null == campaign.getRetirementDefectionTracker().getPayout(p.getId())) {
             	return "";
@@ -1612,10 +1592,7 @@ class UnitAssignmentTableModel extends AbstractTableModel {
 				int row, int column) {
 			super.getTableCellRendererComponent(table, value, isSelected,
 					hasFocus, row, column);
-			int actualRow = table.convertRowIndexToModel(row);
 			int actualCol = table.convertColumnIndexToModel(column);
-			@SuppressWarnings("unused")
-			Unit u = getUnit(actualRow); // FIXME: Why is this here w/out being used?
 			setHorizontalAlignment(getAlignment(actualCol));
 			setForeground(isSelected?Color.WHITE:Color.BLACK);
 			if (isSelected) {

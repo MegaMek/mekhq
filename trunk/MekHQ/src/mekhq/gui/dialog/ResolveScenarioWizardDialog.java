@@ -518,7 +518,11 @@ public class ResolveScenarioWizardDialog extends JDialog {
         		if (wasCaptured && tracker.getCampaign().getFaction().isClan()) {
         			bondsmanCheck.setSelected(true);
         		} else if (wasCaptured) {
-        			prisonerCheck.setSelected(true);
+        			if (tracker.getCampaign().getFaction().isClan()) {
+        				bondsmanCheck.setSelected(true);
+        			} else {
+        				prisonerCheck.setSelected(true);
+        			}
         		} else {
         			escapeCheck.setSelected(true);
         		}

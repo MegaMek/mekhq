@@ -3450,7 +3450,14 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	originalUnitWeight = unit.getEntity().getWeightClass();        
     }
     
-    public int getNumShares() {
+    public int getNumShares(boolean sharesForAll) {
+    	if (isPrisoner() || isBondsman()) {
+    		return 0;
+    	}
+    	if (!sharesForAll && primaryRole != T_MECHWARRIOR &&
+    			secondaryRole != T_MECHWARRIOR) {
+    		return 0;
+    	}
     	int shares = 1;
     	if (founder) {
     		shares++;

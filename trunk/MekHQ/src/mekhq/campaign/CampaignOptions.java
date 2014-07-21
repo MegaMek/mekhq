@@ -196,6 +196,7 @@ public class CampaignOptions implements Serializable {
     private boolean regionalMechVariations;
     private boolean aeroRecruitsHaveUnits;
     private boolean useShareSystem;
+    private boolean sharesForAll;
     private boolean retirementRolls;
     private boolean customRetirementMods;
     private boolean trackOriginalUnit;
@@ -368,6 +369,7 @@ public class CampaignOptions implements Serializable {
     	skillLevel = 2;
         aeroRecruitsHaveUnits = false;
         useShareSystem = false;
+        sharesForAll = false;
         retirementRolls = true;
         customRetirementMods = false;
         trackOriginalUnit = false;
@@ -1277,6 +1279,14 @@ public class CampaignOptions implements Serializable {
 		return useShareSystem;
 	}
 	
+	public boolean getSharesForAll() {
+		return sharesForAll;
+	}
+	
+	public void setSharesForAll(boolean set) {
+		sharesForAll = set;
+	}
+	
 	public boolean doRetirementRolls() {
 		return retirementRolls;
 	}
@@ -1598,6 +1608,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "skillLevel", skillLevel);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "aeroRecruitsHaveUnits", aeroRecruitsHaveUnits);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useShareSystem", useShareSystem);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "sharesForAll", sharesForAll);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "retirementRolls", retirementRolls);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "customRetirementMods", customRetirementMods);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "mercSizeLimited", mercSizeLimited);
@@ -2061,6 +2072,8 @@ public class CampaignOptions implements Serializable {
                 retVal.aeroRecruitsHaveUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useShareSystem")) {
                 retVal.useShareSystem = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("sharesForAll")) {
+                retVal.sharesForAll = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("retirementRolls")) {
                 retVal.retirementRolls = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("customRetirementMods")) {

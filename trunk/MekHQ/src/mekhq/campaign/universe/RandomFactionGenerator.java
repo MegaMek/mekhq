@@ -1,6 +1,24 @@
-/**
- * 
+/*
+ * RandomFactionGenerator.java
+ *
+ * Copyright (c) 2014 Carl Spain. All rights reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package mekhq.campaign.universe;
 
 import java.awt.event.ActionEvent;
@@ -37,11 +55,26 @@ import org.w3c.dom.NodeList;
  * for the action.
  *
  */
+
+/* TODO: Redesign the system for tracking factions that do not control any planets
+ * of their own to make it easier to follow.
+ * TODO: Account for the de facto alliance of the invading Clans and the
+ * Fortress Republic in a way that doesn't involve hard-coding them here.
+ */
 public class RandomFactionGenerator implements Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -7346225681238948390L;
+	
+	/* When checking for potential enemies, count the planets controlled
+	 * by potentially hostile factions within a certain number of jumps of
+	 * friendly worlds; the number is based on the region of space.
+	 */
+	private static final int BORDER_RANGE_IS = 60;
+	private static final int BORDER_RANGE_CLAN = 90;
+	private static final int BORDER_RANGE_NEAR_PERIPHERY = 90;
+	private static final int BORDER_RANGE_DEEP_PERIPHERY = 210; //a bit more than this distance between HL and NC
 
 	private static RandomFactionGenerator rfg = null;
 	
@@ -321,10 +354,8 @@ public class RandomFactionGenerator implements Serializable {
 	
 	public void updateTables(Date date, Planet currentLocation,
 			CampaignOptions options) {
-		/* ComStar is not an effective employer before the ComGuard was
-		 * made public or after it was disbanded.
-		 */
-		if (!date.after(lastUpdate) && currentLocation == lastLocation) {
+        final Date FORTRESS_REPUBLIC = new Date (new GregorianCalendar(3135,10,1).getTimeInMillis());
+        if (!date.after(lastUpdate) && currentLocation == lastLocation) {
 			return;
 		}
 		lastUpdate.setTime(date.getTime());
@@ -340,6 +371,9 @@ public class RandomFactionGenerator implements Serializable {
 						fName.equals("CLAN") ||
 						fName.equals("NONE")) {
 					continue;
+				}
+				if (fName.equals("ROS") && date.after(FORTRESS_REPUBLIC)) {
+					 continue;
 				}
 				currentFactions.add(fName);
 				if (p.getDistanceTo(currentLocation) <= options.getSearchRadius()) {
@@ -373,14 +407,13 @@ public class RandomFactionGenerator implements Serializable {
 	}
 	
 	private void updateBorders(Faction f, Planet p) {
-		int distance = 30;
-		if (f.isPeriphery() || f.isClan()) {
-			if (deepPeriphery.contains(f.getShortName())) {
-				distance = 210;
-				//a bit more than the distance between HL and NC
-			} else {
-				distance = 60;
-			}
+		int distance = BORDER_RANGE_IS;
+		if (f.isClan()) {
+			distance = BORDER_RANGE_CLAN;
+		} else if (deepPeriphery.contains(f.getShortName())) {
+			distance = BORDER_RANGE_DEEP_PERIPHERY;			
+		} else if (f.isPeriphery()) {
+			distance = BORDER_RANGE_NEAR_PERIPHERY;
 		}
 		for (String planetKey : Planets.getNearbyPlanets(p, distance)) {
 			for (Faction f2 : Planets.getInstance().getPlanets().
@@ -413,6 +446,8 @@ public class RandomFactionGenerator implements Serializable {
 	}
 
 	private void addBorderEnemy(String fName, Planet p, String eName) {
+		final Date FORTRESS_REPUBLIC = new Date (new GregorianCalendar(3135,10,1).getTimeInMillis());
+
 		if (borders.get(fName) == null) {
 			borders.put(fName, new HashMap<String, HashSet<Planet>>());
 			borders.get(fName).put("REB", new HashSet<Planet>());
@@ -449,6 +484,10 @@ public class RandomFactionGenerator implements Serializable {
 			}
 			if (neutralFactions.contains(eName) &&
 					!hintApplies(neutralExceptions, eName, fName, lastUpdate)) {
+				return;
+			}
+			if ((fName.equals("ROS") || eName.equals("ROS")) &&
+					lastUpdate.after(FORTRESS_REPUBLIC)) {
 				return;
 			}
 
@@ -583,7 +622,7 @@ public class RandomFactionGenerator implements Serializable {
 	
 	public ArrayList<Planet> getMissionTargetList(String attacker, String defender, Date date) {
 		ArrayList<Planet> planetList = new ArrayList<Planet>();
-		int maxJumps = 2;
+		int maxJumps = 3;
 		if (deepPeriphery.contains(attacker) || deepPeriphery.contains(defender)) {
 			maxJumps = 8;
 		}

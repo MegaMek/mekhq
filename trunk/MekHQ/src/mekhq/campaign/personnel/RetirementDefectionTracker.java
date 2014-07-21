@@ -5,6 +5,7 @@ package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -13,6 +14,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -59,6 +62,28 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 		unresolvedPersonnel = new HashMap<Integer, HashSet<UUID>>();
 		payouts = new HashMap<UUID, Payout>();
 		lastRetirementRoll = new GregorianCalendar();
+	}
+
+	public static long getShareValue(Campaign campaign) {
+		if (!campaign.getCampaignOptions().getUseShareSystem()) {
+			return 0;
+		}
+		String financialReport = campaign.getFinancialReport();
+		long netWorth = 0;
+		try {
+			Pattern p = Pattern.compile("Net Worth\\D*(.*)");
+			Matcher m = p.matcher(financialReport);
+			m.find();
+			netWorth = (Long)(new DecimalFormat().parse(m.group(1)));
+		} catch (Exception e) {
+			MekHQ.logError("Error parsing net worth in financial report");
+			MekHQ.logError(e);
+		}
+		int totalShares = 0;
+		for (Person p : campaign.getPersonnel()) {
+			totalShares += p.getNumShares(campaign.getCampaignOptions().getSharesForAll());
+		}
+		return netWorth / totalShares;
 	}
 
     public HashMap<UUID, TargetRoll> calculateTargetNumbers(AtBContract contract,
@@ -207,7 +232,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     				unresolvedPersonnel.get(contract.getId()).add(id);
     			}
     			payouts.put(id, new Payout(c.getPerson(id),
-    					shareValue, false));
+    					shareValue, false, c.getCampaignOptions().getSharesForAll()));
     		}
     	}
     	if (null != contract) {
@@ -225,8 +250,9 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     }
     
     public void removeFromCampaign(Person person, boolean killed,
-    		int shares, AtBContract contract) {
-    	payouts.put(person.getId(), new Payout(person, shares, killed));
+    		int shares, Campaign campaign, AtBContract contract) {
+    	payouts.put(person.getId(), new Payout(person, getShareValue(campaign),
+    			killed, campaign.getCampaignOptions().getSharesForAll()));
     	if (null != contract) {
     		if (null == unresolvedPersonnel.get(contract.getId())) {
     			unresolvedPersonnel.put(contract.getId(), new HashSet<UUID>());
@@ -318,10 +344,10 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 		
 		public Payout() {}
 		
-		public Payout(Person p, long shareValue, boolean killed) {
+		public Payout(Person p, long shareValue, boolean killed, boolean sharesForAll) {
 			calculatePayout(p, killed, shareValue > 0);
 			if (shareValue > 0) {
-				cbills += shareValue * p.getNumShares();
+				cbills += shareValue * p.getNumShares(sharesForAll);
 			}
 			if (killed) {
 				switch (Compute.d6()) {

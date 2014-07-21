@@ -331,6 +331,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     private JComboBox<String> cbSkillLevel;
     private JCheckBox chkUseShareSystem;
+    private JCheckBox chkSharesForAll;
     private JCheckBox chkTrackOriginalUnit;
     private JCheckBox chkRetirementRolls;
     private JCheckBox chkCustomRetirementMods;
@@ -2823,6 +2824,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         cbSkillLevel = new JComboBox<String>();
         chkUseShareSystem = new JCheckBox();
+        chkSharesForAll = new JCheckBox();
         chkRetirementRolls = new JCheckBox();
         chkCustomRetirementMods = new JCheckBox();
         chkTrackOriginalUnit = new JCheckBox();
@@ -2961,79 +2963,91 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubAtBAdmin.add(chkUseShareSystem, gridBagConstraints);
 
+        chkSharesForAll.setText(resourceMap.getString("chkSharesForAll.text"));
+        chkSharesForAll.setToolTipText(resourceMap.getString("chkSharesForAll.toolTipText"));
+        chkSharesForAll.setSelected(options.getSharesForAll());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubAtBAdmin.add(chkSharesForAll, gridBagConstraints);
+
         chkAeroRecruitsHaveUnits.setText(resourceMap.getString("chkAeroRecruitsHaveUnits.text"));
         chkAeroRecruitsHaveUnits.setToolTipText(resourceMap.getString("chkAeroRecruitsHaveUnits.toolTipText"));
         chkAeroRecruitsHaveUnits.setSelected(options.getAeroRecruitsHaveUnits());
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         panSubAtBAdmin.add(chkAeroRecruitsHaveUnits, gridBagConstraints);
         
         chkRetirementRolls.setText(resourceMap.getString("chkRetirementRolls.text"));
         chkRetirementRolls.setToolTipText(resourceMap.getString("chkRetirementRolls.toolTipText"));
         chkRetirementRolls.setSelected(options.doRetirementRolls());
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         panSubAtBAdmin.add(chkRetirementRolls, gridBagConstraints);
         
         chkCustomRetirementMods.setText(resourceMap.getString("chkCustomRetirementMods.text"));
         chkCustomRetirementMods.setToolTipText(resourceMap.getString("chkCustomRetirementMods.toolTipText"));
         chkCustomRetirementMods.setSelected(options.getCustomRetirementMods());
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         panSubAtBAdmin.add(chkCustomRetirementMods, gridBagConstraints);
         
         chkUseLeadership.setText(resourceMap.getString("chkUseLeadership.text"));
         chkUseLeadership.setToolTipText(resourceMap.getString("chkUseLeadership.toolTipText"));
         chkUseLeadership.setSelected(options.getUseLeadership());
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         panSubAtBAdmin.add(chkUseLeadership, gridBagConstraints);
         
         chkTrackOriginalUnit.setText(resourceMap.getString("chkTrackOriginalUnit.text"));
         chkTrackOriginalUnit.setToolTipText(resourceMap.getString("chkTrackOriginalUnit.toolTipText"));
         chkTrackOriginalUnit.setSelected(options.getTrackOriginalUnit());
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         panSubAtBAdmin.add(chkTrackOriginalUnit, gridBagConstraints);
 
         chkUseAero.setText(resourceMap.getString("chkUseAero.text"));
         chkUseAero.setToolTipText(resourceMap.getString("chkUseAero.toolTipText"));
         chkUseAero.setSelected(options.getUseAero());
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         panSubAtBAdmin.add(chkUseAero, gridBagConstraints);
 
         chkUseVehicles.setText(resourceMap.getString("chkUseVehicles.text"));
         chkUseVehicles.setToolTipText(resourceMap.getString("chkUseVehicles.toolTipText"));
         chkUseVehicles.setSelected(options.getUseVehicles());
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 8;
         panSubAtBAdmin.add(chkUseVehicles, gridBagConstraints);
 
         chkClanVehicles.setText(resourceMap.getString("chkClanVehicles.text"));
         chkClanVehicles.setToolTipText(resourceMap.getString("chkClanVehicles.toolTipText"));
         chkClanVehicles.setSelected(options.getUseVehicles());
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = 9;
         panSubAtBAdmin.add(chkClanVehicles, gridBagConstraints);
 
         chkInstantUnitMarketDelivery.setText(resourceMap.getString("chkInstantUnitMarketDelivery.text"));
         chkInstantUnitMarketDelivery.setToolTipText(resourceMap.getString("chkInstantUnitMarketDelivery.toolTipText"));
         chkInstantUnitMarketDelivery.setSelected(options.getInstantUnitMarketDelivery());
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridy = 10;
         panSubAtBAdmin.add(chkInstantUnitMarketDelivery, gridBagConstraints);
 
         chkContractMarketReportRefresh.setText(resourceMap.getString("chkContractMarketReportRefresh.text"));
         chkContractMarketReportRefresh.setSelected(options.getContractMarketReportRefresh());
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridy = 11;
         panSubAtBAdmin.add(chkContractMarketReportRefresh, gridBagConstraints);
 
         chkUnitMarketReportRefresh.setText(resourceMap.getString("chkUnitMarketReportRefresh.text"));
         chkUnitMarketReportRefresh.setSelected(options.getUnitMarketReportRefresh());
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 11;
+        gridBagConstraints.gridy = 12;
         panSubAtBAdmin.add(chkUnitMarketReportRefresh, gridBagConstraints);
 
         chosenRatModel = new DefaultListModel<String>();
@@ -3822,6 +3836,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUseAtB(chkUseAtB.isSelected());
         options.setSkillLevel(cbSkillLevel.getSelectedIndex());
         options.setUseShareSystem(chkUseShareSystem.isSelected());
+        options.setUseShareSystem(chkSharesForAll.isSelected());
         options.setTrackOriginalUnit(chkTrackOriginalUnit.isSelected());
         options.setRetirementRolls(chkRetirementRolls.isSelected());
         options.setCustomRetirementMods(chkCustomRetirementMods.isSelected());
