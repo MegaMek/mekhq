@@ -1,6 +1,24 @@
-/**
- * 
+/*
+ * Lance.java
+ *
+ * Copyright (c) 2011 Carl Spain. All rights reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package mekhq.campaign.force;
 
 import java.io.PrintWriter;
@@ -381,7 +399,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
 						getBattleDate(c.getCalendar()));
 			} else if (roll < 13 + noBattle) {
 				return null;
-			} else if (roll < 97 + noBattle) {
+			} else if (roll < 17 + noBattle) {
 				return new AtBScenario(c, this,
 						AtBScenario.HIDEANDSEEK, true,
 						getBattleDate(c.getCalendar()));

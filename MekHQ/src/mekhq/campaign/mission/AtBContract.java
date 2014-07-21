@@ -1,6 +1,24 @@
-/**
- * 
+/*
+ * AtBContract.java
+ *
+ * Copyright (c) 2014 Carl Spain. All rights reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
@@ -119,6 +137,8 @@ public class AtBContract extends Contract implements Serializable {
 	protected String enemyCamoFileName;
 	protected int enemyColorIndex;
 	
+	protected int extensionLength;
+	
 	protected int requiredLances;
 	protected int moraleLevel;
 	protected Date routEnd;
@@ -169,6 +189,8 @@ public class AtBContract extends Contract implements Serializable {
 		enemyCamoCategory = Player.NO_CAMO;
 		enemyCamoFileName = null;
 		enemyColorIndex = 2;
+		
+		extensionLength = 0;
 
 		sharesPct = 0;
 		moraleLevel = MORALE_NORMAL;
@@ -518,6 +540,7 @@ public class AtBContract extends Contract implements Serializable {
 	public int getScore() {
 		int score = employerMinorBreaches - playerMinorBreaches;
 		int battles = 0;
+		boolean earlySuccess = false;
 		for (Scenario s : getScenarios()) {
 			
 			/* Special Missions get no points for victory and and only -1
@@ -548,9 +571,21 @@ public class AtBContract extends Contract implements Serializable {
 					break;
 				}
 			}
+			if (((AtBScenario)s).getBattleType() == AtBScenario.BASEATTACK
+					&& ((AtBScenario)s).isAttacker()
+					&& (s.getStatus() == Scenario.S_VICTORY ||
+					s.getStatus() == Scenario.S_MVICTORY)) {
+				earlySuccess = true;
+			}
+			if (missionType > MT_RIOTDUTY && moraleLevel == MORALE_ROUT) {
+				earlySuccess = true;
+			}
 		}
 		if (battles == 0) {
 			score++;
+		}
+		if (earlySuccess) {
+			score += 4;
 		}
 		return score;
 	}
@@ -826,6 +861,7 @@ public class AtBContract extends Contract implements Serializable {
 				AtBScenario s = new AtBScenario(c, null,
 						specialEventScenarioType, false,
 						specialEventScenarioDate);
+				s.setMissionId(getId());
 				c.addScenario(s, this);
     			s.setForces(c);
 				specialEventScenarioDate = null;
@@ -917,6 +953,60 @@ public class AtBContract extends Contract implements Serializable {
 		}
 	}
 	
+	public boolean contractExtended (Campaign campaign) {
+		if (getMissionType() != MT_PIRATEHUNTING &&
+				getMissionType() != MT_RIOTDUTY) {
+			String warName = RandomFactionGenerator.getInstance().getCurrentWar(getEmployerCode(),
+					getEnemyCode(), campaign.getDate());
+			if (null != warName) {
+				int extension = 0;
+				int roll = Compute.d6();
+				if (roll == 1) {
+					extension = Math.max(1, getLength() / 2);
+				}
+				if (roll == 2) {
+					extension = 1;
+				}
+				if (extension > 0) {
+					campaign.addReport("Due to the " + warName +
+							" crisis your employer has invoked the emergency clause and extended the contract " +
+							extension + ((extension == 1)?" month":" months"));
+					GregorianCalendar newEndDate = new GregorianCalendar();
+					newEndDate.setTime(getEndingDate());
+					newEndDate.add(Calendar.MONTH, extension);
+					getEndingDate().setTime(newEndDate.getTimeInMillis());
+					extensionLength += extension;
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	@Override
+	public long getMonthlyPayOut() {
+		if (extensionLength == 0) {
+			return super.getMonthlyPayOut();
+		}
+		/* The tranport clause and the advance monies have already been
+		 * accounted for over the original length of the contract. The extension
+		 * uses the base monthly amounts for support and overhead, with a 
+		 * 50% bonus to the base amount.
+		 */
+		return (long)((getBaseAmount() * 1.5 + getSupportAmount()
+				+ getOverheadAmount()) / getLength());
+	}
+	
+    public void checkForFollowup(Campaign campaign) {
+    	if ((getMissionType() == AtBContract.MT_DIVERSIONARYRAID ||
+    			getMissionType() == AtBContract.MT_RECONRAID ||
+    			getMissionType() == AtBContract.MT_RIOTDUTY) &&
+    			Compute.d6() == 6) {
+    		campaign.getContractMarket().addFollowup(campaign, this);
+    		campaign.addReport("Your employer has offered a follow-up contract (available on the <a href=\"CONTRACT_MARKET\">contract market</a>).");
+    	}
+    }
+
 	protected void writeToXmlBegin(PrintWriter pw1, int indent) {
 		super.writeToXmlBegin(pw1, indent);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -1002,6 +1092,10 @@ public class AtBContract extends Contract implements Serializable {
 				+partsAvailabilityLevel
 				+"</partsAvailabilityLevel>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<extensionLength>"
+				+extensionLength
+				+"</extensionLength>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<sharesPct>"
 				+sharesPct
 				+"</sharesPct>");
@@ -1084,6 +1178,8 @@ public class AtBContract extends Contract implements Serializable {
 				routEnd = new SimpleDateFormat("yyyy-MM-dd").parse(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("partsAvailabilityLevel")) {
 				partsAvailabilityLevel = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("extensionLength")) {
+				extensionLength = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("sharesPct")) {
 				sharesPct = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("numBonusParts")) {

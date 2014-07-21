@@ -83,6 +83,7 @@ v0.3.6 (SVN)
 + Updated MM.jar to r11072
 + Updated MML.jar to r1424
 + Applied patching for compatibility with MM r11072
++ Patch [34]: Against the Bot, 6th Patch (atb07patch, not sure how the numbering there got off)
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
