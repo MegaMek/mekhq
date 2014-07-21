@@ -12,13 +12,16 @@
 
 package mekhq;
 
+import java.awt.KeyboardFocusManager;
 import java.util.ArrayList;
 
 import megamek.client.Client;
 import megamek.client.CloseClientListener;
 import megamek.client.ui.swing.ClientGUI;
+import megamek.client.ui.swing.util.MegaMekController;
 import megamek.common.Entity;
 import megamek.common.IGame;
+import megamek.common.KeyBindParser;
 import megamek.common.preference.PreferenceManager;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
@@ -29,6 +32,7 @@ class GameThread extends Thread implements CloseClientListener {
     protected String myname;
     protected Client client;
     protected ClientGUI swingGui;
+    protected MegaMekController controller;
     protected MekHQ app;
     protected Campaign campaign;
     protected boolean started;
@@ -66,7 +70,9 @@ class GameThread extends Thread implements CloseClientListener {
         	}
         	swingGui.getBots().clear();
         }
-        swingGui = new ClientGUI(client);
+        createController();
+        swingGui = new ClientGUI(client, controller);
+        controller.clientgui = swingGui;
         swingGui.initialize();
 
         try {
@@ -149,5 +155,14 @@ class GameThread extends Thread implements CloseClientListener {
         // GC'ed.
         System.gc();
     }
+    
+    public void createController(){
+    	controller = new MegaMekController();
+    	KeyboardFocusManager kbfm = 
+    			KeyboardFocusManager.getCurrentKeyboardFocusManager();
+    	kbfm.addKeyEventDispatcher(controller);
+    	
+    	KeyBindParser.parseKeyBindings(controller);
+    } 
 
 }

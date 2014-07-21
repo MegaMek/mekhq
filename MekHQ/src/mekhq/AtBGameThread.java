@@ -52,7 +52,9 @@ public class AtBGameThread extends GameThread {
         	}
         	swingGui.getBots().clear();
         }
-        swingGui = new ClientGUI(client);
+        createController();
+        swingGui = new ClientGUI(client, controller);
+        controller.clientgui = swingGui;
         swingGui.initialize();
 
         try {
