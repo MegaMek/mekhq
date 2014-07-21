@@ -80,6 +80,12 @@ v0.3.6 (SVN)
 + Bug [#536]: Joining Games overwrites Server settings
 + Bug: Bloodnames folder missing from packaging
 + Bug [#538]: Day advance bug when SpouseID is not NULL, but that ID returns a NULL Person from the campaign
++ RFE [#153]: Permanent Injury color
++ Bug [#532]: Issue with Ranks
++ Updated MM.jar to r11072
++ Updated MML.jar to r1424
++ Applied patching for compatibility with MM r11072
++ Patch [34]: Against the Bot, 6th Patch (atb07patch, not sure how the numbering there got off)
 
 v0.3.5-dylan (2014-04-28)
 -- No Changes--

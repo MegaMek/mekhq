@@ -1698,7 +1698,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	int profession = getProfession();
     	
     	// If we're using an "empty" profession, default to MechWarrior
-    	if (getRanks().isEmptyProfession(profession)) {
+    	while (getRanks().isEmptyProfession(profession)) {
     		profession = campaign.getRanks().getAlternateProfession(profession);
     	}
     	
@@ -3280,7 +3280,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         if (injuries.size() > 0) {
             if (permCheck) {
                 for (Injury injury : injuries) {
-                    if (!injury.getPermanent()) {
+                    if (!injury.getPermanent() || injury.getTime() > 0) {
                         tf = true;
                         break;
                     }
@@ -3290,6 +3290,18 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
             }
         }
         return tf;
+    }
+    
+    public boolean hasOnlyHealedPermanentInjuries() {
+    	if (injuries.size() == 0) {
+    		return false;
+    	}
+    	for (Injury injury : injuries) {
+    		if (!injury.getPermanent() || injury.getTime() > 0) {
+    			return false;
+    		}
+    	}
+    	return true;
     }
 
     public ArrayList<Injury> getInjuriesByLocation(int loc) {
@@ -3438,7 +3450,14 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	originalUnitWeight = unit.getEntity().getWeightClass();        
     }
     
-    public int getNumShares() {
+    public int getNumShares(boolean sharesForAll) {
+    	if (isPrisoner() || isBondsman()) {
+    		return 0;
+    	}
+    	if (!sharesForAll && primaryRole != T_MECHWARRIOR &&
+    			secondaryRole != T_MECHWARRIOR) {
+    		return 0;
+    	}
     	int shares = 1;
     	if (founder) {
     		shares++;

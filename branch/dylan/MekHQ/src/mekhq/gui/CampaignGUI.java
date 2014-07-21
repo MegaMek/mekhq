@@ -3040,7 +3040,7 @@ public class CampaignGUI extends JPanel {
 
             		if (getCampaign().getCampaignOptions().getUseAtB() &&
             				mission instanceof AtBContract) {
-            			if (getCampaign().contractExtended((AtBContract)mission)) {
+            			if (((AtBContract)mission).contractExtended(getCampaign())) {
             				mission.setStatus(Mission.S_ACTIVE);
             			} else {
 	            			if (getCampaign().getCampaignOptions().doRetirementRolls()) {
@@ -3089,7 +3089,7 @@ public class CampaignGUI extends JPanel {
             	if (!mission.isActive()) {
             		if (getCampaign().getCampaignOptions().getUseAtB() &&
             				mission instanceof AtBContract) {
-            			getCampaign().checkForFollowup((AtBContract)mission);
+            			((AtBContract)mission).checkForFollowup(getCampaign());
             		}
             		if (getCampaign().getSortedMissions().size() > 0) {
             			selectedMission = getCampaign().getSortedMissions().get(0).getId();
@@ -8466,8 +8466,8 @@ public class CampaignGUI extends JPanel {
             } else if (command.equalsIgnoreCase("SACK")) {
                 for (Person person : people) {
                 	getCampaign().getRetirementDefectionTracker().removeFromCampaign(person,
-                			false, getCampaign().getCampaignOptions().getUseShareSystem()?person.getNumShares():0,
-                					null);
+                			false, getCampaign().getCampaignOptions().getUseShareSystem()?person.getNumShares(getCampaign().getCampaignOptions().getSharesForAll()):0,
+                					getCampaign(), null);
                 }
                 RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGUI(),
                 		null, false);

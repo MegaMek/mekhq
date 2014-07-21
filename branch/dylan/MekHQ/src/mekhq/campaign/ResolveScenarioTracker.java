@@ -848,8 +848,8 @@ public class ResolveScenarioTracker {
 				if (campaign.getCampaignOptions().getUseAtB() &&
 						m instanceof AtBContract) {
 					campaign.getRetirementDefectionTracker().removeFromCampaign(person,
-							true, campaign.getCampaignOptions().getUseShareSystem()?person.getNumShares():0,
-									(AtBContract)m);
+							true, campaign.getCampaignOptions().getUseShareSystem()?person.getNumShares(campaign.getCampaignOptions().getSharesForAll()):0,
+									campaign, (AtBContract)m);
 				}
 			}
 			if (campaign.getCampaignOptions().useAdvancedMedical()) {

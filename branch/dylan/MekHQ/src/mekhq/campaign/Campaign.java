@@ -5564,13 +5564,14 @@ public class Campaign implements Serializable {
 
     public void changeRank(Person person, int rank, int rankLevel, boolean report) {
     	int oldRank = person.getRankNumeric();
+    	int oldRankLevel = person.getRankLevel();
         person.setRankNumeric(rank);
         person.setRankLevel(rankLevel);
         personUpdated(person);
         if (report) {
-            if (rank > oldRank || (rank == oldRank && rankLevel > person.getRankLevel())) {
+            if (rank > oldRank || (rank == oldRank && rankLevel > oldRankLevel)) {
                 person.addLogEntry(getDate(), "Promoted to " + person.getRankName());
-            } else if (rank < oldRank || (rank == oldRank && rankLevel < person.getRankLevel())) {
+            } else if (rank < oldRank || (rank == oldRank && rankLevel < oldRankLevel)) {
                 person.addLogEntry(getDate(), "Demoted to " + person.getRankName());
             }
         }
@@ -6100,45 +6101,6 @@ public class Campaign implements Serializable {
         }
     }
     
-    public boolean contractExtended (AtBContract contract) {
-    	if (contract.getMissionType() != AtBContract.MT_PIRATEHUNTING &&
-    			contract.getMissionType() != AtBContract.MT_RIOTDUTY) {
-    		String warName = RandomFactionGenerator.getInstance().getCurrentWar(contract.getEmployerCode(),
-    				contract.getEnemyCode(), getDate());
-    		if (null != warName) {
-    			int extension = 0;
-    			int roll = Compute.d6();
-    			if (roll == 1) {
-    				extension = Math.max(1, contract.getLength() / 2);
-    			}
-    			if (roll == 2) {
-    				extension = 1;
-    			}
-    			if (extension > 0) {
-    				AtBContract contractExtension =
-    						AtBContract.getContractExtension(contract,
-    								extension, this);
-    				addMission(contractExtension);
-    				addReport("Due to the " + warName +
-    						" crisis your employer has invoked the emergency clause and extended the contract " +
-    						extension + ((extension == 1)?" month":" months"));
-    			}
-    			return true;
-    		}
-    	}
-    	return false;
-    }
-    
-    public void checkForFollowup(AtBContract contract) {
-    	if ((contract.getMissionType() == AtBContract.MT_DIVERSIONARYRAID ||
-    			contract.getMissionType() == AtBContract.MT_RECONRAID ||
-    			contract.getMissionType() == AtBContract.MT_RIOTDUTY) &&
-    			Compute.d6() == 6) {
-    		getContractMarket().addFollowup(this, contract);
-    		addReport("Your employer has offered a follow-up contract (available on the <a href=\"CONTRACT_MARKET\">contract market</a>).");
-    	}
-    }
-
     public void completeMission(int id, int status) {
         Mission mission = getMission(id);
         if (null == mission) {
