@@ -12,6 +12,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 
+@SuppressWarnings("unused") // FIXME!
 public class PlanetEditorGUI extends JPanel {
 	private static final long serialVersionUID = -4988871070680951144L;
 	private JPanel pnlGeneral = new JPanel();
