@@ -80,6 +80,9 @@ v0.3.6 (SVN)
 + Bug [#538]: Day advance bug when SpouseID is not NULL, but that ID returns a NULL Person from the campaign
 + RFE [#153]: Permanent Injury color
 + Bug [#532]: Issue with Ranks
++ Updated MM.jar to r11072
++ Updated MML.jar to r1424
++ Applied patching for compatibility with MM r11072
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4

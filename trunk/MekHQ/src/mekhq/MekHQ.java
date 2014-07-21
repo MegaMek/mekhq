@@ -41,6 +41,7 @@ import megamek.client.Client;
 import megamek.common.IGame;
 import megamek.common.event.GameBoardChangeEvent;
 import megamek.common.event.GameBoardNewEvent;
+import megamek.common.event.GameCFREvent;
 import megamek.common.event.GameEndEvent;
 import megamek.common.event.GameEntityChangeEvent;
 import megamek.common.event.GameEntityNewEvent;
@@ -465,5 +466,10 @@ public class MekHQ implements GameListener {
 	
 	public IconPackage getIconPackage() {
 	    return iconPackage;
+	}
+
+	public void gameClientFeedbackRquest(GameCFREvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 }
