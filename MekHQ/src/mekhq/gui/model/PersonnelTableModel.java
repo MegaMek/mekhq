@@ -619,6 +619,8 @@ import mekhq.gui.BasicInfo;
                         setBackground(Color.LIGHT_GRAY);
                     } else if((Integer)getValueAt(actualRow,COL_HITS) > 0 || getPerson(actualRow).hasInjuries(true)) {
                         setBackground(Color.RED);
+                    } else if (getPerson(actualRow).hasOnlyHealedPermanentInjuries()) {
+                    	setBackground(new Color(0xee9a00));
                     } else {
                         setBackground(Color.WHITE);
                     }
