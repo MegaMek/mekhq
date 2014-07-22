@@ -571,7 +571,8 @@ public class AtBContract extends Contract implements Serializable {
 					break;
 				}
 			}
-			if (((AtBScenario)s).getBattleType() == AtBScenario.BASEATTACK
+			if (s instanceof AtBScenario
+					&& ((AtBScenario)s).getBattleType() == AtBScenario.BASEATTACK
 					&& ((AtBScenario)s).isAttacker()
 					&& (s.getStatus() == Scenario.S_VICTORY ||
 					s.getStatus() == Scenario.S_MVICTORY)) {
