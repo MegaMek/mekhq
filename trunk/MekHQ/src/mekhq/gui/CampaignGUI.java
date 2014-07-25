@@ -7977,13 +7977,17 @@ public class CampaignGUI extends JPanel {
                 refreshPersonnelList();
                 refreshOrganization();
             } else if (command.contains("REMOVE_SPOUSE")) {
+            	selectedPerson.getSpouse().addLogEntry(getCampaign().getDate(), "Divorced from " + selectedPerson.getFullName());
+            	selectedPerson.addLogEntry(getCampaign().getDate(), "Divorced from " + selectedPerson.getSpouse().getFullName());
             	selectedPerson.getSpouse().setSpouseID(null);
             	selectedPerson.setSpouseID(null);
                 refreshPersonnelList();
             } else if (command.contains("SPOUSE")) {
             	Person spouse = getCampaign().getPerson(UUID.fromString(st.nextToken()));
             	spouse.setSpouseID(selectedPerson.getId());
+            	spouse.addLogEntry(getCampaign().getDate(), "Marries " + selectedPerson.getFullName());
             	selectedPerson.setSpouseID(spouse.getId());
+            	selectedPerson.addLogEntry(getCampaign().getDate(), "Marries " + spouse.getFullName());
                 refreshPersonnelList();
             } else if (command.contains("IMPROVE")) {
                 String type = st.nextToken();
@@ -8964,11 +8968,17 @@ public class CampaignGUI extends JPanel {
                 		menu = new JMenu("Choose Spouse (Mate)");
                 		for (Person ps : getCampaign().getPersonnel()) {
                 			if (person.safeSpouse(ps)) {
-                				menuItem = new JMenuItem(ps.getFullName());
+                				menuItem = new JMenuItem(ps.getFullName()
+                						+ ", "
+                						+ ps.getAge(getCampaign().getCalendar())
+                						+ ", " + ps.getRoleDesc());
                 				menuItem.setActionCommand("SPOUSE|"+ps.getId().toString());
                 				menuItem.addActionListener(this);
                 				menu.add(menuItem);
                 			}
+                		}
+                		if (menu.getItemCount() > 30) {
+                			MenuScroller.setScrollerFor(menu, 20);
                 		}
                 		popup.add(menu);
                 	}
