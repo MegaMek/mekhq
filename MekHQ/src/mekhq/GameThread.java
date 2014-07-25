@@ -132,6 +132,7 @@ class GameThread extends Thread implements CloseClientListener {
 	        client.die();
 	        client = null;
 	        swingGui = null;
+	        controller = null;
         }
     }
 

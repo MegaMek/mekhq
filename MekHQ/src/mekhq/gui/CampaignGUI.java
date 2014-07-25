@@ -8355,7 +8355,7 @@ public class CampaignGUI extends JPanel {
                 PopupValueChoiceDialog pcvd = new PopupValueChoiceDialog(frame, true, "Change Salary (-1 to remove custom salary)", selectedPerson.getSalary(), -1, 100000);
                 pcvd.setVisible(true);
                 int salary = pcvd.getValue();
-                if (salary < 0) {
+                if (salary < -1) {
                     return;
                 }
                 for (Person person : people) {
