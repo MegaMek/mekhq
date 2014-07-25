@@ -207,6 +207,7 @@ public class AtBGameThread extends GameThread {
 	        client.die();
 	        client = null;
 	        swingGui = null;
+	        controller = null;
         }
     }
  
