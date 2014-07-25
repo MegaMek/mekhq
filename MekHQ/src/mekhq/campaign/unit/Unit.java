@@ -195,6 +195,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	private boolean salvaged;
 	private UUID id;
 	private int oldId;
+	private String fluffName = "";
 	
 	//assignments
 	private int forceId;
@@ -273,6 +274,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 		this.daysActivelyMaintained = 0;
 		this.astechDaysMaintained = 0;
 		this.lastMaintenanceReport = null;
+		this.fluffName = "";
 		reCalc();
 	}
 	
@@ -1321,6 +1323,10 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
                 +mothballed
                 +"</mothballed>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
+                +"<fluffName>"
+                +MekHqXmlUtil.escape(fluffName)
+                +"</fluffName>");
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
                 +"<history>"
                 +MekHqXmlUtil.escape(history)
                 +"</history>");
@@ -1419,6 +1425,8 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 					retVal.refit = Refit.generateInstanceFromXML(wn2, retVal, version);
 				} else if (wn2.getNodeName().equalsIgnoreCase("history")) {
 					retVal.history = wn2.getTextContent();
+				} else if (wn2.getNodeName().equalsIgnoreCase("fluffName")) {
+					retVal.fluffName = wn2.getTextContent();
 				} else if (wn2.getNodeName().equalsIgnoreCase("lastMaintenanceReport")) {
                     retVal.lastMaintenanceReport = wn2.getTextContent();
                 } 
@@ -2891,6 +2899,9 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     }
     
     public String getName() {
+    	if (getFluffName() != null && !getFluffName().equals("")) {
+    		return entity.getShortName() + " - " + getFluffName();
+    	}
     	return entity.getShortName();
     }
     
@@ -3209,5 +3220,19 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     public void resetParts() {
         parts = new ArrayList<Part>();
     }
+
+	/**
+	 * @return the name
+	 */
+	public String getFluffName() {
+		return this.fluffName;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setFluffName(String name) {
+		this.fluffName = name;
+	}
     
 }

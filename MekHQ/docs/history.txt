@@ -89,6 +89,7 @@ v0.3.6 (SVN)
 + Bug [#543]: Packaging_local.xml missing portraits
 + Patch [37]: Procreation add-ons
 + Bug [#540]: Using Slider in Loans causing 1st payment to change date
++ Feature [110]: Individual unit names
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
