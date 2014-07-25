@@ -146,7 +146,7 @@
                 <include name="mapgen/" />
                 <include name="names/bloodnames/" />
                 <include name="images/force/" />
-                <include name="images/portraits/FoxsTeeth/" />
+                <include name="images/portraits/" />
                 <include name="images/fluff/mech/*.png" />
                 <include name="images/misc/mekhq-load.png" />
                 <include name="images/misc/mekhq-splash.png" />
