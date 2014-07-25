@@ -10512,6 +10512,23 @@ public class CampaignGUI extends JPanel {
                     refreshAcquireList();
                     refreshOrganization();
                 }
+            } else if (command.equalsIgnoreCase("FLUFF_NAME")) {
+            	if (selectedUnit != null) {
+            		String fluffName = (String)JOptionPane.showInputDialog(getFrame(),
+            				"Name for this unit?",
+            				"Unit Name",
+            				JOptionPane.QUESTION_MESSAGE,
+            				null,
+            				null,
+            				selectedUnit.getFluffName() == null ? "" : selectedUnit.getFluffName());
+            		selectedUnit.setFluffName(fluffName);
+                    selectedUnit.runDiagnostic();
+                    refreshServicedUnitList();
+                    refreshUnitList();
+                    refreshTaskList();
+                    refreshUnitView();
+                    refreshOrganization();
+            	}
             }
         }
 
@@ -10787,6 +10804,11 @@ public class CampaignGUI extends JPanel {
                     menuItem.setActionCommand("REMOVE_PILOT");
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(!unit.isUnmanned() && !unit.isDeployed());
+                    popup.add(menuItem);
+                    menuItem = new JMenuItem("Name Unit");
+                    menuItem.setActionCommand("FLUFF_NAME");
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(true);
                     popup.add(menuItem);
                 }
                 // sell unit
