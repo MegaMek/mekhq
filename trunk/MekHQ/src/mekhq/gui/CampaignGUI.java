@@ -269,6 +269,7 @@ import mekhq.gui.view.AtBScenarioViewPanel;
 import mekhq.gui.view.ContractViewPanel;
 import mekhq.gui.view.ForceViewPanel;
 import mekhq.gui.view.JumpPathViewPanel;
+import mekhq.gui.view.LanceAssignmentView;
 import mekhq.gui.view.MissionViewPanel;
 import mekhq.gui.view.PersonViewPanel;
 import mekhq.gui.view.PlanetViewPanel;

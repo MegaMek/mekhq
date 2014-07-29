@@ -19,7 +19,7 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.gui;
+package mekhq.gui.view;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -411,11 +411,12 @@ class LanceAssignmentTableModel extends DataTableModel {
 	private static final long serialVersionUID = -2688617737510762878L;
 	
 	public static final int COL_FORCE = 0;
-	public static final int COL_CONTRACT = 1;
-	public static final int COL_ROLE = 2;
-	public static final int COL_NUM = 3;
+	public static final int COL_WEIGHT_CLASS = 1;
+	public static final int COL_CONTRACT = 2;
+	public static final int COL_ROLE = 3;
+	public static final int COL_NUM = 4;
 
-    protected String[] columnNames = {"Force", "Mission", "Role"};
+    protected String[] columnNames = {"Force", "Wt", "Mission", "Role"};
     private Campaign campaign;
     
     public LanceAssignmentTableModel(Campaign campaign) {
@@ -438,6 +439,8 @@ class LanceAssignmentTableModel extends DataTableModel {
     	case COL_FORCE:
     	case COL_CONTRACT:
         	return 100;
+    	case COL_WEIGHT_CLASS:
+    		return 5;
         default:
         	return 50;
         }
@@ -458,7 +461,7 @@ class LanceAssignmentTableModel extends DataTableModel {
 
     @Override
     public boolean isCellEditable(int row, int col) {
-        return col > COL_FORCE;
+        return col > COL_WEIGHT_CLASS;
     }
     
     public Lance getRow(int row) {
@@ -467,6 +470,7 @@ class LanceAssignmentTableModel extends DataTableModel {
     
 	@Override
 	public Object getValueAt(int row, int column) {
+		final String[] WEIGHT_CODES = {"UL", "L", "M", "H", "A", "SH"};
 		 
 		if (row >= getRowCount()) {
 			return "";
@@ -474,6 +478,8 @@ class LanceAssignmentTableModel extends DataTableModel {
 		switch (column) {
 		case COL_FORCE:
 			return campaign.getForce(((Lance)data.get(row)).getForceId());
+		case COL_WEIGHT_CLASS:
+			return WEIGHT_CODES[((Lance)data.get(row)).getWeightClass(campaign)];
 		case COL_CONTRACT:
 			return (AtBContract)campaign.getMission(((Lance)data.get(row)).getMissionId());
 		case COL_ROLE:

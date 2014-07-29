@@ -259,6 +259,7 @@ public class AtBScenario extends Scenario {
 		survivalBonus = new ArrayList<UUID>();
 		entityIds = new HashMap<UUID, Entity>();
 		if (null != lance) {
+			setMissionId(lance.getMissionId());
 			for (UUID id : c.getForce(lance.getForceId()).getAllUnits()) {
 				entityIds.put(id, c.getUnit(id).getEntity());
 			}
@@ -1182,6 +1183,7 @@ public class AtBScenario extends Scenario {
 			otherForce.add(e);
 			//TODO: During SW offer a choice between an employer exchange or a contract breach
 			Loot loot = new Loot();
+			loot.setName("Star League Mek");
 			loot.addUnit(e);
 			getLoot().add(loot);
 			botForces.add(new BotForce("Tech", 1, start, otherForce));
