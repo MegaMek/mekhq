@@ -51,7 +51,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.UnitTableData;
-import mekhq.gui.LanceAssignmentView;
+import mekhq.gui.view.LanceAssignmentView;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -851,18 +851,24 @@ public class AtBContract extends Contract implements Serializable {
 				break;
 			}
 		}
-		if (null != specialEventScenarioDate) {
+		/* If the campaign somehow gets past the scheduled date (such as by
+		 * changing the date in the campaign options), ignore it rather
+		 * than generating a new scenario in the past. The event will still be
+		 * available (if the campaign date is restored) until another special mission
+		 * or big battle event is rolled.
+		 */
+		if (null != specialEventScenarioDate
+				&& !specialEventScenarioDate.before(c.getDate())) {
 			GregorianCalendar nextMonday = (GregorianCalendar)c.getCalendar().clone();
-			if (c.getCalendar().get(Calendar.DAY_OF_MONTH) == 1) {
-				nextMonday.add(Calendar.DAY_OF_WEEK, Calendar.MONDAY + 7 - c.getCalendar().get(Calendar.DAY_OF_WEEK));
-			} else if (c.getCalendar().get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
+			/* value of Calendar.MONDAY depends on locale */
+			if (c.getCalendar().get(Calendar.DAY_OF_WEEK) >= Calendar.MONDAY) {
 				nextMonday.add(Calendar.DAY_OF_WEEK, 7);
 			}
+			nextMonday.add(Calendar.DAY_OF_WEEK, Calendar.MONDAY - c.getCalendar().get(Calendar.DAY_OF_WEEK));
 			if (specialEventScenarioDate.before(nextMonday.getTime())) {	
 				AtBScenario s = new AtBScenario(c, null,
 						specialEventScenarioType, false,
 						specialEventScenarioDate);
-				s.setMissionId(getId());
 				c.addScenario(s, this);
     			s.setForces(c);
 				specialEventScenarioDate = null;
@@ -977,8 +983,8 @@ public class AtBContract extends Contract implements Serializable {
 					newEndDate.add(Calendar.MONTH, extension);
 					getEndingDate().setTime(newEndDate.getTimeInMillis());
 					extensionLength += extension;
+					return true;
 				}
-				return true;
 			}
 		}
 		return false;

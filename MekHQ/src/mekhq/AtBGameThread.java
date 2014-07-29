@@ -171,8 +171,8 @@ public class AtBGameThread extends GameThread {
                 
                 /* Add bots */
                 for (int i = 0; i < scenario.getNumBots(); i++) {
-                	AtBScenario.BotForce fd = scenario.getBotForce(i);
-                	String name = fd.getName();
+                	AtBScenario.BotForce bf = scenario.getBotForce(i);
+                	String name = bf.getName();
                 	if (swingGui.getBots().containsKey(name)) {
                 		int append = 2;
                 		while (swingGui.getBots().containsKey(name + append)) {
@@ -181,18 +181,15 @@ public class AtBGameThread extends GameThread {
                 		name += append;
                 	}
                 	Princess botClient = new Princess(name, client.getHost(), client.getPort(), LogLevel.ERROR);
-                	botClient.setBehaviorSettings(fd.getBehaviorSettings());
+                	botClient.setBehaviorSettings(bf.getBehaviorSettings());
                 	try {
                 		botClient.connect();
                 	} catch (Exception e) {
-                		MekHQ.logError("Could not connect with Bot name " + fd.getName());
+                		MekHQ.logError("Could not connect with Bot name " + bf.getName());
                 	}
                 	swingGui.getBots().put(name, botClient);
-                    /* Start another thread that waits for the server to add the
-                     * bot then send entities and set team and starting position
-                     */
-                    ConfigureBot thread = new ConfigureBot(botClient, fd);
-                	thread.start();
+                	
+                	configureBot(botClient, bf);
                 }
 
             }
@@ -209,51 +206,52 @@ public class AtBGameThread extends GameThread {
 	        swingGui = null;
 	        controller = null;
         }
+        
     }
  
-    public class ConfigureBot extends Thread {
-    	private BotClient botClient;
-    	private AtBScenario.BotForce botForce;
-    	
-    	public ConfigureBot(BotClient bc, AtBScenario.BotForce fd) {
-    		super("Configure bot " + bc.getName());
-    		botClient = bc;
-    		botForce = fd;
-    	}
-    	public void run() {
-    		try {
-    			int retries = 50;
-    			while (retries-- > 0 && null == botClient.getLocalPlayer()) {
-    				sleep(50);
-    			}
-    			if (null == botClient.getLocalPlayer()) {
-    				MekHQ.logError("Could not configure bot " + botClient.getName());
-    			} else {
-    				for (Entity entity : botForce.getEntityList()) {
-                    	if (null == entity) {
-                    		continue;
-                    	}
-    					entity.setOwner(botClient.getLocalPlayer());
-    					botClient.sendAddEntity(entity);
-    					Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
-    				}
-    				botClient.getLocalPlayer().setTeam(botForce.getTeam());
-    				botClient.getLocalPlayer().setStartingPos(botForce.getStart());
+    /**
+     * wait for the server to add the bot client, then send starting position,
+     * camo, and entities
+     * 
+     * @param botClient
+     * @param botForce
+     */
+    private void configureBot(BotClient botClient, AtBScenario.BotForce botForce) {
+		try {
+			/* Wait for the server to add the bot client, but allow a timeout
+			 * rather than blocking
+			 */
+			int retries = 50;
+			while (retries-- > 0 && null == botClient.getLocalPlayer()) {
+				sleep(50);
+			}
+			if (null == botClient.getLocalPlayer()) {
+				MekHQ.logError("Could not configure bot " + botClient.getName());
+			} else {
+				for (Entity entity : botForce.getEntityList()) {
+                	if (null == entity) {
+                		continue;
+                	}
+					entity.setOwner(botClient.getLocalPlayer());
+					botClient.sendAddEntity(entity);
+					Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+				}
+				botClient.getLocalPlayer().setTeam(botForce.getTeam());
+				botClient.getLocalPlayer().setStartingPos(botForce.getStart());
 
-    				if (botForce.getCamoCategory() == Player.NO_CAMO) {
-    					if (botForce.getColorIndex() >= 0) {
-    						botClient.getLocalPlayer().setColorIndex(botForce.getColorIndex());
-    					}
-    				} else {
-    					client.getLocalPlayer().setCamoCategory(botForce.getCamoCategory());
-    					client.getLocalPlayer().setCamoFileName(botForce.getCamoFileName());
-    				}
+				if (botForce.getCamoCategory() == Player.NO_CAMO) {
+					if (botForce.getColorIndex() >= 0) {
+						botClient.getLocalPlayer().setColorIndex(botForce.getColorIndex());
+					}
+				} else {
+					botClient.getLocalPlayer().setCamoCategory(botForce.getCamoCategory());
+					botClient.getLocalPlayer().setCamoFileName(botForce.getCamoFileName());
+				}
 
-    				botClient.sendPlayerInfo();
-    			}
-    		} catch (Exception e) {
-    			MekHQ.logError(e);
-    		}
-    	}
+				botClient.sendPlayerInfo();
+			}
+		} catch (Exception e) {
+			MekHQ.logError(e);
+		}    	
     }
 }
