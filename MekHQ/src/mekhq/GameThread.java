@@ -150,6 +150,10 @@ class GameThread extends Thread implements CloseClientListener {
     	stop = true;
     }
     
+    public boolean stopRequested() {
+    	return stop;
+    }
+    
     public void quit() {
     	client.die();
         client = null;// explicit null of the MM client. Wasn't/isn't being
