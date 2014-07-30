@@ -373,6 +373,9 @@ public class MekHQ implements GameListener {
 	
 	@Override
 	public void gameVictory(GameVictoryEvent e) {
+		if (gameThread.stopRequested()) {
+			return;
+		}
 		try {
         	boolean control = JOptionPane.showConfirmDialog(campaigngui.getFrame(),
                     "Did your side control the battlefield at the end of the scenario?",
