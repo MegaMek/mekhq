@@ -305,7 +305,7 @@ public class MekHQ implements GameListener {
     }
 
     // Stop & send the close game event to the Server
-    public void stopHost() {
+    public synchronized void stopHost() {
        if(null != myServer) {
     	   //myServer.getGame().removeGameListener(this);
     	   myServer.die();
@@ -396,7 +396,6 @@ public class MekHQ implements GameListener {
             		}
             	}
             	gameThread.requestStop();
-            	stopHost();
                 /*Megamek dumps these in the deployment phase to free memory*/
                 if (getCampaign().getCampaignOptions().getUseAtB()) {
 	                megamek.client.RandomUnitGenerator.getInstance();
