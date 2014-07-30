@@ -2,7 +2,7 @@
 <options>
    <gameoption>
       <optionname>friendly_fire</optionname>
-      <optionvalue>true</optionvalue>
+      <optionvalue>false</optionvalue>
    </gameoption>
    <gameoption>
       <optionname>skip_ineligable_movement</optionname>
@@ -33,12 +33,8 @@
       <optionvalue>false</optionvalue>
    </gameoption>
    <gameoption>
-      <optionname>no_force_size_mod</optionname>
-      <optionvalue>false</optionvalue>
-   </gameoption>
-   <gameoption>
       <optionname>exclusive_db_deployment</optionname>
-      <optionvalue>false</optionvalue>
+      <optionvalue>true</optionvalue>
    </gameoption>
    <gameoption>
       <optionname>deep_deployment</optionname>
@@ -101,12 +97,20 @@
       <optionvalue>false</optionvalue>
    </gameoption>
    <gameoption>
+      <optionname>year</optionname>
+      <optionvalue>3145</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>random_basements</optionname>
+      <optionvalue>true</optionvalue>
+   </gameoption>
+   <gameoption>
       <optionname>skip_forced_victory</optionname>
-      <optionvalue>false</optionvalue>
+      <optionvalue>true</optionvalue>
    </gameoption>
    <gameoption>
       <optionname>check_victory</optionname>
-      <optionvalue>false</optionvalue>
+      <optionvalue>true</optionvalue>
    </gameoption>
    <gameoption>
       <optionname>achieve_conditions</optionname>
@@ -137,6 +141,14 @@
       <optionvalue>10</optionvalue>
    </gameoption>
    <gameoption>
+      <optionname>use_kill_count</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>game_kill_count</optionname>
+      <optionvalue>4</optionvalue>
+   </gameoption>
+   <gameoption>
       <optionname>commander_killed</optionname>
       <optionvalue>false</optionvalue>
    </gameoption>
@@ -146,7 +158,7 @@
    </gameoption>
    <gameoption>
       <optionname>allow_advanced_units</optionname>
-      <optionvalue>false</optionvalue>
+      <optionvalue>true</optionvalue>
    </gameoption>
    <gameoption>
       <optionname>allow_illegal_units</optionname>
@@ -154,6 +166,10 @@
    </gameoption>
    <gameoption>
       <optionname>allow_advanced_ammo</optionname>
+      <optionvalue>true</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>allow_experimental_ammo</optionname>
       <optionvalue>false</optionvalue>
    </gameoption>
    <gameoption>
@@ -182,15 +198,15 @@
    </gameoption>
    <gameoption>
       <optionname>double_blind</optionname>
-      <optionvalue>true</optionvalue>
+      <optionvalue>false</optionvalue>
    </gameoption>
    <gameoption>
       <optionname>tacops_sensors</optionname>
-      <optionvalue>true</optionvalue>
+      <optionvalue>false</optionvalue>
    </gameoption>
    <gameoption>
       <optionname>supress_all_double_blind_messages</optionname>
-      <optionvalue>true</optionvalue>
+      <optionvalue>false</optionvalue>
    </gameoption>
    <gameoption>
       <optionname>team_vision</optionname>
@@ -237,7 +253,23 @@
       <optionvalue>false</optionvalue>
    </gameoption>
    <gameoption>
+      <optionname>tacops_fumbles</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>tacops_self_destruct</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>tacops_tank_crews</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
       <optionname>stratops_quirks</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>stratops_partialrepairs</optionname>
       <optionvalue>false</optionvalue>
    </gameoption>
    <gameoption>
@@ -253,6 +285,10 @@
       <optionvalue>false</optionvalue>
    </gameoption>
    <gameoption>
+      <optionname>magscan_nohills</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
       <optionname>woods_burn_down</optionname>
       <optionvalue>false</optionvalue>
    </gameoption>
@@ -262,10 +298,6 @@
    </gameoption>
    <gameoption>
       <optionname>no_ignite_clear</optionname>
-      <optionvalue>false</optionvalue>
-   </gameoption>
-   <gameoption>
-      <optionname>a4homing_target_area</optionname>
       <optionvalue>false</optionvalue>
    </gameoption>
    <gameoption>
@@ -286,6 +318,38 @@
    </gameoption>
    <gameoption>
       <optionname>pilots_cannot_spot</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>metal_content</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>ba_grab_bars</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>maxtech_movement_mods</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>alternate_masc</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>alternate_masc_enhanced</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>geometric_mean_bv</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>reduced_overheat_modifier_bv</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>alternate_pilot_bv_mod</optionname>
       <optionvalue>false</optionvalue>
    </gameoption>
    <gameoption>
@@ -377,6 +441,10 @@
       <optionvalue>false</optionvalue>
    </gameoption>
    <gameoption>
+      <optionname>kind_rapid_ac</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
       <optionname>tacops_grappling</optionname>
       <optionvalue>false</optionvalue>
    </gameoption>
@@ -429,6 +497,18 @@
       <optionvalue>false</optionvalue>
    </gameoption>
    <gameoption>
+      <optionname>vehicles_threshold</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>vehicles_threshold_variable</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>vehicles_threshold_divisor</optionname>
+      <optionvalue>10</optionvalue>
+   </gameoption>
+   <gameoption>
       <optionname>vehicles_safe_from_infernos</optionname>
       <optionvalue>false</optionvalue>
    </gameoption>
@@ -438,6 +518,46 @@
    </gameoption>
    <gameoption>
       <optionname>indirect_always_possible</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>increased_ac_dmg</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>increased_iserll_range</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>unjam_uac</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>uac_tworolls</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>clubs_punch</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>on_map_predesignate</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>num_hexes_predesignate</optionname>
+      <optionvalue>5</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>map_area_predesignate</optionname>
+      <optionvalue>1088</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>max_external_heat</optionname>
+      <optionvalue>15</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>case_pilot_damage</optionname>
       <optionvalue>false</optionvalue>
    </gameoption>
    <gameoption>
@@ -509,6 +629,14 @@
       <optionvalue>false</optionvalue>
    </gameoption>
    <gameoption>
+      <optionname>mek_lance_movement</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>mek_lance_movement_number</optionname>
+      <optionvalue>4</optionvalue>
+   </gameoption>
+   <gameoption>
       <optionname>no_immobile_vehicles</optionname>
       <optionvalue>false</optionvalue>
    </gameoption>
@@ -538,6 +666,10 @@
    </gameoption>
    <gameoption>
       <optionname>psr_jump_heavy_woods</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>no_night_move_pen</optionname>
       <optionvalue>false</optionvalue>
    </gameoption>
    <gameoption>
@@ -582,7 +714,7 @@
    </gameoption>
    <gameoption>
       <optionname>stratops_aa_fire</optionname>
-      <optionvalue>true</optionvalue>
+      <optionvalue>false</optionvalue>
    </gameoption>
    <gameoption>
       <optionname>stratops_aaa_laser</optionname>
@@ -617,6 +749,10 @@
       <optionvalue>false</optionvalue>
    </gameoption>
    <gameoption>
+      <optionname>aero_sanity</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
       <optionname>ind_weapons_grounded_dropper</optionname>
       <optionvalue>false</optionvalue>
    </gameoption>
@@ -626,7 +762,15 @@
    </gameoption>
    <gameoption>
       <optionname>aa_move_mod</optionname>
-      <optionvalue>true</optionvalue>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>allow_large_squadrons</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>single_no_cap</optionname>
+      <optionvalue>false</optionvalue>
    </gameoption>
    <gameoption>
       <optionname>inf_move_even</optionname>
@@ -686,7 +830,7 @@
    </gameoption>
    <gameoption>
       <optionname>pilot_advantages</optionname>
-      <optionvalue>false</optionvalue>
+      <optionvalue>true</optionvalue>
    </gameoption>
    <gameoption>
       <optionname>edge</optionname>
@@ -714,6 +858,18 @@
    </gameoption>
    <gameoption>
       <optionname>toughness</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>conditional_ejection</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>manual_shutdown</optionname>
+      <optionvalue>false</optionvalue>
+   </gameoption>
+   <gameoption>
+      <optionname>begin_shutdown</optionname>
       <optionvalue>false</optionvalue>
    </gameoption>
 </options>
