@@ -92,6 +92,7 @@ v0.3.6 (SVN)
 + Feature [110]: Individual unit names
 + Patch [34]: Against the Bot, 8th Patch
 + Refactor: Moved LanceAssignmentView.java from mekhq.gui into the mekhq.gui.view
++ Bug: Race condition with server.die() called from 2 locations
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
