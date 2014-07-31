@@ -25,12 +25,12 @@ import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * This object tracks a specific skill prerequisite for a special ability. This object can list more 

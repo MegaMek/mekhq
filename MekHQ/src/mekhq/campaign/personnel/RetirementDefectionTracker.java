@@ -17,9 +17,6 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.Compute;
 import megamek.common.TargetRoll;
 import megamek.common.options.IOption;
@@ -31,6 +28,9 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Neoancient
