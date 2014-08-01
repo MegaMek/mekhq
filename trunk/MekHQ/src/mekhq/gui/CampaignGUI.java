@@ -5797,6 +5797,7 @@ public class CampaignGUI extends JPanel {
         } else {
             Part part = getSelectedTask();
             if (null != part) {
+                ((TechSorter)techSorter.getComparator(0)).setPart(part);
                 Unit u = part.getUnit();
                 Person tech = getSelectedTech();
                 if (null != u && u.isSelfCrewed()) {
@@ -5819,6 +5820,7 @@ public class CampaignGUI extends JPanel {
                     }
                 }
             }
+            ((TechSorter)techSorter.getComparator(0)).clearPart();
         }
         JButton btn = btnDoTask;
         JTextArea text = textTarget;
