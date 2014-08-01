@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import megamek.common.Aero;
 import megamek.common.ConvFighter;
 import megamek.common.Dropship;
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.SmallCraft;
 import megamek.common.TechConstants;
@@ -227,5 +228,16 @@ public class StructuralIntegrity extends Part {
         ((Aero)unit.getEntity()).setSI(points);
         updateConditionFromEntity();
     }
+
+	@Override
+	public String getLocationName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getLocation() {
+		return Entity.LOC_NONE;
+	}
 	
 }

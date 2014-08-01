@@ -322,4 +322,14 @@ public class TankLocation extends Part {
          unit.getEntity().setInternal(points, loc);
          updateConditionFromEntity();
      }
+
+	@Override
+	public String getLocationName() {
+		return unit.getEntity().getLocationName(loc);
+	}
+
+	@Override
+	public int getLocation() {
+		return loc;
+	}
 }

@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.Aero;
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import mekhq.MekHqXmlUtil;
@@ -227,6 +228,17 @@ public class Thrusters extends Part {
 	
 	public void setLeftThrusters(boolean b) {
 		isLeftThrusters = b;
+	}
+
+	@Override
+	public String getLocationName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getLocation() {
+		return Entity.LOC_NONE;
 	}
 	
 }

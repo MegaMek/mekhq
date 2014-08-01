@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
 import megamek.common.TechConstants;
@@ -168,5 +169,16 @@ public class VeeSensor extends Part {
 	@Override
 	public boolean isRightTechType(String skillType) {
 		return skillType.equals(SkillType.S_TECH_MECHANIC);
+	}
+
+	@Override
+	public String getLocationName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getLocation() {
+		return Entity.LOC_NONE;
 	}
 }

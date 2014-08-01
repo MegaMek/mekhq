@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.Aero;
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
@@ -206,6 +207,17 @@ public class FireControlSystem extends Part {
 				cost = Long.parseLong(wn2.getTextContent());
 			} 
 		}
+	}
+
+	@Override
+	public String getLocationName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getLocation() {
+		return Entity.LOC_NONE;
 	}
 	
 }

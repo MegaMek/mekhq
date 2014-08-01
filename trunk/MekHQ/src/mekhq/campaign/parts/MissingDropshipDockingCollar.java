@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.Dropship;
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
@@ -117,6 +118,17 @@ public class MissingDropshipDockingCollar extends MissingPart {
 	@Override
 	public boolean isAcceptableReplacement(Part part, boolean refit) {
 		return part instanceof DropshipDockingCollar;
+	}
+
+	@Override
+	public String getLocationName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getLocation() {
+		return Entity.LOC_NONE;
 	}
 	
 }

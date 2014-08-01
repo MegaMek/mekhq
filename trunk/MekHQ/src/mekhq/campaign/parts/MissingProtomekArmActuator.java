@@ -164,4 +164,9 @@ public class MissingProtomekArmActuator extends MissingPart {
         return new ProtomekArmActuator(getUnitTonnage(), location, campaign);
     }
 
+	@Override
+	public String getLocationName() {
+		return unit.getEntity().getLocationName(location);
+	}
+
 }

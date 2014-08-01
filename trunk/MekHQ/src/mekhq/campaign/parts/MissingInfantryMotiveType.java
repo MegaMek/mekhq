@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -137,6 +138,17 @@ public class MissingInfantryMotiveType extends MissingPart {
 				assignName();
 			}
 		}
+	}
+
+	@Override
+	public String getLocationName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getLocation() {
+		return Entity.LOC_NONE;
 	}
 
 	

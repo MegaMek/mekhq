@@ -601,4 +601,15 @@ public class EquipmentPart extends Part {
     	//TODO: is this on equipment type?
     	return true;
     }
+
+	@Override
+	public String getLocationName() {
+		if(null != unit) {
+			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+			if(null != mounted && mounted.getLocation() != -1) {
+				return unit.getEntity().getLocationName(mounted.getLocation());
+			}
+    	}
+		return null;
+	}
 }
