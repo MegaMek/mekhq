@@ -158,6 +158,7 @@ public class CampaignOptions implements Serializable {
     private int destroyMargin;
     private int repairSystem;
     private boolean useEraMods;
+	private boolean assignedTechFirst;
 
     //maintenance related
     private boolean checkMaintenance;
@@ -229,6 +230,7 @@ public class CampaignOptions implements Serializable {
         useFactionForNames = true;
         repairSystem = REPAIR_SYSTEM_STRATOPS;
         useEraMods = false;
+        assignedTechFirst = false;
         useUnitRating = true;
         useTactics = false;
         useInitBonus = false;
@@ -445,6 +447,14 @@ public class CampaignOptions implements Serializable {
     public void setEraMods(boolean b) {
         this.useEraMods = b;
     }
+    
+    public boolean useAssignedTechFirst() {
+		return assignedTechFirst;
+	}
+
+	public void setAssignedTechFirst(boolean assignedTechFirst) {
+		this.assignedTechFirst = assignedTechFirst;
+	}
 
     public boolean useDragoonRating() {
         return useUnitRating;
@@ -1505,6 +1515,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnitRating", useUnitRating);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitRatingMethod", unitRatingMethod.getDescription());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useEraMods", useEraMods);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "assignedTechFirst", assignedTechFirst);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTactics", useTactics);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useInitBonus", useInitBonus);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useToughness", useToughness);
@@ -1703,131 +1714,49 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("repairSystem")) {
                 retVal.repairSystem = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useEraMods")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.useEraMods = true;
-                } else {
-                    retVal.useEraMods = false;
-                }
+            	retVal.useEraMods = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("assignedTechFirst")) {
+            	retVal.assignedTechFirst = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useTactics")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.useTactics = true;
-                } else {
-                    retVal.useTactics = false;
-                }
+                retVal.useTactics = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useInitBonus")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.useInitBonus = true;
-                } else {
-                    retVal.useInitBonus = false;
-                }
+            	retVal.useInitBonus = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useToughness")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.useToughness = true;
-                } else {
-                    retVal.useToughness = false;
-                }
+                retVal.useToughness = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useArtillery")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.useArtillery = true;
-                } else {
-                    retVal.useArtillery = false;
-                }
+                retVal.useArtillery = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useAbilities")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.useAbilities = true;
-                } else {
-                    retVal.useAbilities = false;
-                }
+                retVal.useAbilities = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useEdge")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.useEdge = true;
-                } else {
-                    retVal.useEdge = false;
-                }
+                retVal.useEdge = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useImplants")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.useImplants = true;
-                } else {
-                    retVal.useImplants = false;
-                }
+                retVal.useImplants = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useAdvancedMedical")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.useAdvancedMedical = true;
-                } else {
-                    retVal.useAdvancedMedical = false;
-                }
+                retVal.useAdvancedMedical = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useDylansRandomXp")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.useDylansRandomXp = true;
-                } else {
-                    retVal.useDylansRandomXp = false;
-                }
+                retVal.useDylansRandomXp = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useQuirks")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.useQuirks = true;
-                } else {
-                    retVal.useQuirks = false;
-                }
+                retVal.useQuirks = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("payForParts")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.payForParts = true;
-                } else {
-                    retVal.payForParts = false;
-                }
+                retVal.payForParts = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("payForUnits")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.payForUnits = true;
-                } else {
-                    retVal.payForUnits = false;
-                }
+                retVal.payForUnits = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("payForSalaries")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.payForSalaries = true;
-                } else {
-                    retVal.payForSalaries = false;
-                }
+                retVal.payForSalaries = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("payForOverhead")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.payForOverhead = true;
-                } else {
-                    retVal.payForOverhead = false;
-                }
+                retVal.payForOverhead = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("payForMaintain")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.payForMaintain = true;
-                } else {
-                    retVal.payForMaintain = false;
-                }
+                retVal.payForMaintain = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("payForTransport")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.payForTransport = true;
-                } else {
-                    retVal.payForTransport = false;
-                }
+                retVal.payForTransport = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("payForRecruitment")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.payForRecruitment = true;
-                } else {
-                    retVal.payForRecruitment = false;
-                }
+                retVal.payForRecruitment = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useLoanLimits")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.useLoanLimits = true;
-                } else {
-                    retVal.useLoanLimits = false;
-                }
+                retVal.useLoanLimits = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("sellUnits")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.sellUnits = true;
-                } else {
-                    retVal.sellUnits = false;
-                }
+                retVal.sellUnits = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("sellParts")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.sellParts = true;
-                } else {
-                    retVal.sellParts = false;
-                }
+                retVal.sellParts = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueA")) {
                 retVal.usedPartsValue[0] = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueB")) {
