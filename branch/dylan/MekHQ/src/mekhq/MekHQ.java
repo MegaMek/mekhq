@@ -38,7 +38,6 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import megamek.client.Client;
-import megamek.common.IGame;
 import megamek.common.event.GameBoardChangeEvent;
 import megamek.common.event.GameBoardNewEvent;
 import megamek.common.event.GameCFREvent;
@@ -58,6 +57,7 @@ import megamek.common.event.GamePlayerDisconnectedEvent;
 import megamek.common.event.GameReportEvent;
 import megamek.common.event.GameSettingsChangeEvent;
 import megamek.common.event.GameTurnChangeEvent;
+import megamek.common.event.GameVictoryEvent;
 import megamek.server.Server;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
@@ -305,7 +305,7 @@ public class MekHQ implements GameListener {
     }
 
     // Stop & send the close game event to the Server
-    public void stopHost() {
+    public synchronized void stopHost() {
        if(null != myServer) {
     	   //myServer.getGame().removeGameListener(this);
     	   myServer.die();
@@ -369,53 +369,53 @@ public class MekHQ implements GameListener {
 
 	@Override
 	public void gamePhaseChange(GamePhaseChangeEvent e) {
+	}
+	
+	@Override
+	public void gameVictory(GameVictoryEvent e) {
+		if (gameThread.stopRequested()) {
+			return;
+		}
 		try {
-			//FIXME: I would prefer to check on the old victory phase but for some reason
-			//it wont progress to that stage with the test bot
-            if (e.getOldPhase() == IGame.Phase.PHASE_VICTORY) {
-         	
-            	boolean control = JOptionPane.showConfirmDialog(campaigngui.getFrame(),
-                        "Did your side control the battlefield at the end of the scenario?",
-                        "Control of Battlefield?",
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE) ==
-                        JOptionPane.YES_OPTION;
-            	ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, campaign, control);
-                tracker.setClient(gameThread.getClient());
-            	tracker.processGame();
-            	//tracker.postProcessEntities(control);
-            	ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(campaigngui.getFrame(), true, tracker);
-            	resolveDialog.setVisible(true);
-            	if (campaigngui.getCampaign().getCampaignOptions().getUseAtB() &&
-            			campaign.getMission(currentScenario.getMissionId()) instanceof AtBContract &&
-            			campaigngui.getCampaign().getRetirementDefectionTracker().getRetirees().size() > 0) {
-            		RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaigngui,
-            				(AtBContract)campaign.getMission(currentScenario.getMissionId()), false);
-            		rdd.setVisible(true);
-            		if (!rdd.wasAborted()) {
-            			getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
-            		}
-            	}
-            	gameThread.requestStop();
-            	stopHost();
-                /*Megamek dumps these in the deployment phase to free memory*/
-                if (getCampaign().getCampaignOptions().getUseAtB()) {
-	                megamek.client.RandomUnitGenerator.getInstance();
-	                megamek.client.RandomNameGenerator.getInstance();
-                }
-                campaigngui.refreshScenarioList();
-                campaigngui.refreshOrganization();
-                campaigngui.refreshServicedUnitList();
-                campaigngui.refreshUnitList();
-                campaigngui.filterPersonnel();
-                campaigngui.refreshPersonnelList();
-                campaigngui.refreshDoctorsList();
-                campaigngui.refreshPatientList();
-                campaigngui.refreshReport();
-                campaigngui.changeMission();
-                campaigngui.refreshFinancialTransactions();
+        	boolean control = JOptionPane.showConfirmDialog(campaigngui.getFrame(),
+                    "Did your side control the battlefield at the end of the scenario?",
+                    "Control of Battlefield?",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE) ==
+                    JOptionPane.YES_OPTION;
+        	ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, campaign, control);
+            tracker.setClient(gameThread.getClient());
+        	tracker.processGame();
+        	ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(campaigngui.getFrame(), true, tracker);
+        	resolveDialog.setVisible(true);
+        	if (campaigngui.getCampaign().getCampaignOptions().getUseAtB() &&
+        			campaign.getMission(currentScenario.getMissionId()) instanceof AtBContract &&
+        			campaigngui.getCampaign().getRetirementDefectionTracker().getRetirees().size() > 0) {
+        		RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaigngui,
+        				(AtBContract)campaign.getMission(currentScenario.getMissionId()), false);
+        		rdd.setVisible(true);
+        		if (!rdd.wasAborted()) {
+        			getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
+        		}
+        	}
+        	gameThread.requestStop();
+            /*Megamek dumps these in the deployment phase to free memory*/
+            if (getCampaign().getCampaignOptions().getUseAtB()) {
+                megamek.client.RandomUnitGenerator.getInstance();
+                megamek.client.RandomNameGenerator.getInstance();
                 campaigngui.refreshOverview();
             }
+            campaigngui.refreshScenarioList();
+            campaigngui.refreshOrganization();
+            campaigngui.refreshServicedUnitList();
+            campaigngui.refreshUnitList();
+            campaigngui.filterPersonnel();
+            campaigngui.refreshPersonnelList();
+            campaigngui.refreshDoctorsList();
+            campaigngui.refreshPatientList();
+            campaigngui.refreshReport();
+            campaigngui.changeMission();
+            campaigngui.refreshFinancialTransactions();
 
         }// end try
         catch (Exception ex) {
@@ -464,13 +464,13 @@ public class MekHQ implements GameListener {
 		// TODO Auto-generated method stub
 		
 	}
-	
-	public IconPackage getIconPackage() {
-	    return iconPackage;
-	}
 
 	public void gameClientFeedbackRquest(GameCFREvent e) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public IconPackage getIconPackage() {
+	    return iconPackage;
 	}
 }

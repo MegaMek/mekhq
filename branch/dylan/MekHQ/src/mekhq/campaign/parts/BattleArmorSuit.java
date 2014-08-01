@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import megamek.common.BattleArmor;
+import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;
 import megamek.common.EquipmentType;
@@ -590,6 +591,17 @@ public class BattleArmorSuit extends Part {
         remove(false);
         
     }
+
+	@Override
+	public String getLocationName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getLocation() {
+		return Entity.LOC_NONE;
+	}
     
     
 }

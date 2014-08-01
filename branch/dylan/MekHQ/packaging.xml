@@ -219,7 +219,6 @@
                 <include name="${docdir}/" />
                 <include name="${confdir}/" />
                 <include name="campaigns/" />
-                <include name="campaigns/FoxsTeeth.cpnx" />
                 <include name="*README.html" />
                 <include name="SubmitBug.html" />
                 <include name="license.txt" />

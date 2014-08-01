@@ -30,6 +30,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
@@ -559,6 +560,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     	loan.setRefNumber(txtNumber.getText());
     	
     	// Recalculate information based on settings
+    	loan.setNextPayment((GregorianCalendar)campaign.getCalendar().clone());
     	loan.setFirstPaymentDate();
     	loan.calculateAmortization();
     	

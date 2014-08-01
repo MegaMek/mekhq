@@ -282,4 +282,16 @@ public class MissingProtomekLocation extends MissingPart {
             u.runDiagnostic();
         }
     }
+
+
+	@Override
+	public String getLocationName() {
+		return unit.getEntity().getLocationName(loc);
+	}
+
+
+	@Override
+	public int getLocation() {
+		return loc;
+	}
 }

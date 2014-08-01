@@ -157,6 +157,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JTabbedPane tabOptions;
     private JTextField txtName;
     private JCheckBox useEraModsCheckBox;
+    private JCheckBox assignedTechFirstCheckBox;
     private JCheckBox useUnitRatingCheckBox;
     private JComboBox<String> unitRatingMethodCombo;
     private JCheckBox useFactionForNamesBox;
@@ -220,6 +221,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JSpinner spnMaintenanceDays;
     private JSpinner spnMaintenanceBonus;
     private JCheckBox useQualityMaintenance;
+    private JCheckBox useUnofficalMaintenance;
 
 
     private JRadioButton btnContractEquipment;
@@ -411,6 +413,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         // Rules panel
         useEraModsCheckBox.setSelected(options.useEraMods());
+        assignedTechFirstCheckBox.setSelected(options.useAssignedTechFirst());
         useUnitRatingCheckBox.setSelected(options.useDragoonRating());
         unitRatingMethodCombo.setSelectedItem(options.getUnitRatingMethod().getDescription());
         useFactionForNamesBox.setSelected(options.useFactionForNames());
@@ -436,6 +439,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         useDamageMargin.setSelected(options.isDestroyByMargin());
         useQualityMaintenance.setSelected(options.useQualityMaintenance());
+        useUnofficalMaintenance.setSelected(options.useUnofficalMaintenance());
         checkMaintenance.setSelected(options.checkMaintenance());
 
         sellUnitsBox.setSelected(options.canSellUnits());
@@ -487,6 +491,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panRandomSkill = new JPanel();
         panRandomPortrait = new JPanel();
         useEraModsCheckBox = new JCheckBox();
+        assignedTechFirstCheckBox = new JCheckBox();
         useUnitRatingCheckBox = new JCheckBox();
         unitRatingMethodCombo = new JComboBox<String>(UnitRatingMethod.getUnitRatingMethodNames());
         javax.swing.JLabel clanPriceModifierLabel = new JLabel();
@@ -531,6 +536,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         useDamageMargin = new JCheckBox();
         useQualityMaintenance = new JCheckBox();
+        useUnofficalMaintenance = new JCheckBox();
         checkMaintenance = new JCheckBox();
         logMaintenance = new JCheckBox();
 
@@ -699,12 +705,24 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubRepair.add(useEraModsCheckBox, gridBagConstraints);
 
+        assignedTechFirstCheckBox.setText(resourceMap.getString("assignedTechFirstCheckBox.text")); // NOI18N
+        assignedTechFirstCheckBox.setToolTipText(resourceMap.getString("assignedTechFirstCheckBox.toolTipText")); // NOI18N
+        assignedTechFirstCheckBox.setName("assignedTechFirstCheckBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubRepair.add(assignedTechFirstCheckBox, gridBagConstraints);
+
         useQuirksBox.setText(resourceMap.getString("useQuirksBox.text")); // NOI18N
         useQuirksBox.setToolTipText(resourceMap.getString("useQuirksBox.toolTipText")); // NOI18N
         useQuirksBox.setName("useQuirksBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
@@ -715,7 +733,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useDamageMargin.setToolTipText(resourceMap.getString("useDamageMargin.toolTipText")); // NOI18N   
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
@@ -742,7 +760,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
@@ -765,11 +783,13 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                 if (checkMaintenance.isSelected()) {
                     spnMaintenanceDays.setEnabled(true);
                     useQualityMaintenance.setEnabled(true);
+                    useUnofficalMaintenance.setEnabled(true);
                     spnMaintenanceBonus.setEnabled(true);
                     logMaintenance.setEnabled(true);
                 } else {
                     spnMaintenanceDays.setEnabled(false);
                     useQualityMaintenance.setEnabled(false);
+                    useUnofficalMaintenance.setEnabled(false);
                     spnMaintenanceBonus.setEnabled(false);
                     logMaintenance.setEnabled(false);
                 }
@@ -823,11 +843,22 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubMaintenance.add(useQualityMaintenance, gridBagConstraints);
 
+        useUnofficalMaintenance.setText(resourceMap.getString("useUnofficalMaintenance.text")); // NOI18N
+        useUnofficalMaintenance.setToolTipText(resourceMap.getString("useUnofficalMaintenance.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubMaintenance.add(useUnofficalMaintenance, gridBagConstraints);
+
         logMaintenance.setText(resourceMap.getString("logMaintenance.text")); // NOI18N
         logMaintenance.setToolTipText(resourceMap.getString("logMaintenance.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -3635,6 +3666,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         // Rules panel
         options.setEraMods(useEraModsCheckBox.isSelected());
+        options.setAssignedTechFirst(assignedTechFirstCheckBox.isSelected());
         options.setClanPriceModifier((Double) spnClanPriceModifier.getModel().getValue());
         for (int i = Part.QUALITY_A; i <= Part.QUALITY_F; i++) {
             options.setUsedPartsValue((Double) spnUsedPartsValue[i].getModel().getValue(), i);
@@ -3655,6 +3687,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         }
         options.setCheckMaintenance(checkMaintenance.isSelected());
         options.setUseQualityMaintenance(useQualityMaintenance.isSelected());
+        options.setUseUnofficalMaintenance(useUnofficalMaintenance.isSelected());
         options.setMaintenanceBonus((Integer) spnMaintenanceBonus.getModel().getValue());
         options.setMaintenanceCycleDays((Integer) spnMaintenanceDays.getModel().getValue());
         options.setInitBonus(useInitBonusBox.isSelected());

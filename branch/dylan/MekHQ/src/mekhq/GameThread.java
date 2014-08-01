@@ -132,6 +132,7 @@ class GameThread extends Thread implements CloseClientListener {
 	        client.die();
 	        client = null;
 	        swingGui = null;
+	        controller = null;
         }
     }
 
@@ -147,6 +148,10 @@ class GameThread extends Thread implements CloseClientListener {
     public void requestStop() {
     	PreferenceManager.getInstance().save();
     	stop = true;
+    }
+    
+    public boolean stopRequested() {
+    	return stop;
     }
     
     public void quit() {

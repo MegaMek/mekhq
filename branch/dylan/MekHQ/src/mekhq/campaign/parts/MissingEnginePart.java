@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import megamek.common.Aero;
 import megamek.common.CriticalSlot;
 import megamek.common.Engine;
+import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
@@ -314,6 +315,17 @@ public class MissingEnginePart extends MissingPart {
 	@Override
 	public String getAcquisitionName() {
 		return getPartName() + ",  " + getTonnage() + " tons";
+	}
+
+	@Override
+	public String getLocationName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getLocation() {
+		return Entity.LOC_NONE;
 	}
 
 

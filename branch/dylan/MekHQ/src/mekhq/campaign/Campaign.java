@@ -62,6 +62,7 @@ import megamek.common.Crew;
 import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
+import megamek.common.EquipmentType;
 import megamek.common.FighterSquadron;
 import megamek.common.Game;
 import megamek.common.GunEmplacement;
@@ -1924,7 +1925,6 @@ public class Campaign implements Serializable {
         			}
         			AtBScenario scenario = l.checkForBattle(this);
         			if (null != scenario) {
-            			scenario.setMissionId(l.getContract(this).getId());
         				if (scenario.getBattleType() == AtBScenario.BASEATTACK && scenario.isAttacker()) {
         					baseAttack = scenario;
         					break;
@@ -1960,16 +1960,27 @@ public class Campaign implements Serializable {
         					}
         				}
         				if (!hasBaseAttack) {
+        					/* find a lance to act as defender, giving preference
+        					 * to those assigned to defense roles
+        					 */
         					ArrayList<Lance> lList = new ArrayList<Lance>();
 	        				for (Lance l : lances.values()) {
-	        					if (l.getMissionId() == m.getId()) {
+	        					if (l.getMissionId() == m.getId()
+	        							&& l.getRole() == Lance.ROLE_DEFEND) {
 	        						lList.add(l);
+	        					}
+	        				}
+	        				if (lList.size() == 0) {
+	        					for (Lance l : lances.values()) {
+	        						if (l.getMissionId() == m.getId()
+	        								&& l.isEligible(this)) {
+	        							lList.add(l);
+	        						}
 	        					}
 	        				}
 	        				if (lList.size() > 0) {
 	        					Lance lance = lList.get(Compute.randomInt(lList.size()));
-	        					AtBScenario scenario = new AtBScenario(this, lance,
-	        							AtBScenario.BASEATTACK, false,
+	        					AtBScenario scenario = new AtBScenario(this, lance, AtBScenario.BASEATTACK, false,
 	        							Lance.getBattleDate(calendar));
 	        					for (int i = 0; i < sList.size(); i++) {
 	        						if (sList.get(i).getLanceForceId() ==
@@ -1982,7 +1993,7 @@ public class Campaign implements Serializable {
 	        						sList.add(scenario);
 	        					}
 	        				} else {
-	        					//What to do if there are no lances assigned to this contract?
+	        					//TODO: What to do if there are no lances assigned to this contract?
 	        				}
         				}
         			}
@@ -5271,11 +5282,66 @@ public class Campaign implements Serializable {
         if (getCampaignOptions().getUseAtB() &&
         		getCampaignOptions().getRestrictPartsByMission() &&
         		acquisition instanceof Part) {
-            int partAvailability = ((Part)acquisition).getAvailability(getEra());
-            if (acquisition instanceof EquipmentPart &&
-            		((EquipmentPart)acquisition).getType() instanceof megamek.common.AmmoType) {
+        	int partAvailability = ((Part)acquisition).getAvailability(getEra());
+    		megamek.common.EquipmentType et = null;
+    		if (acquisition instanceof EquipmentPart) {
+    			et = ((EquipmentPart)acquisition).getType();
+    		} else if (acquisition instanceof MissingEquipmentPart) {
+    			et = ((MissingEquipmentPart)acquisition).getType();
+    		}
+
+        	/* Even if we can acquire Clan parts, they have a minimum availability of F
+        	 * for non-Clan units
+        	 */
+        	if (acquisition.getTechBase() == Part.T_CLAN
+        			&& !getFaction().isClan()) {
+        		partAvailability = Math.max(partAvailability, megamek.common.EquipmentType.RATING_F);
+        	} else if (et != null) {
+        		/* AtB rules do not simply affect difficulty of obtaining parts,
+        		 * but whether they can be obtained at all. Changing the system
+        		 * to use availability codes can have a serious effect on game play,
+        		 * so we apply a few tweaks to keep some of the more basic items
+        		 * from becoming completely unobtainable, while applying a minimum
+        		 * for non-flamer energy weapons, which was the reason this
+        		 * rule was included in AtB to begin with.
+        		 */
+        		if (et instanceof megamek.common.weapons.EnergyWeapon
+        				&& !(et instanceof megamek.common.weapons.FlamerWeapon)
+        				&& partAvailability < megamek.common.EquipmentType.RATING_C) {
+        			partAvailability = megamek.common.EquipmentType.RATING_C;
+        		}
+        		if (et instanceof megamek.common.weapons.ACWeapon) {
+        			partAvailability -= 2;
+        		}
+        		if (et instanceof megamek.common.weapons.GaussWeapon
+        				|| et instanceof megamek.common.weapons.FlamerWeapon) {
+        			partAvailability--;
+        		}
+                if (et instanceof megamek.common.AmmoType) {
+                	switch (((megamek.common.AmmoType)et).getAmmoType()) {
+                	case megamek.common.AmmoType.T_AC:
+    	            	partAvailability -= 2;
+    	            	break;
+                	case megamek.common.AmmoType.T_GAUSS:
+                		partAvailability -= 1;
+                	}
+                	if (((megamek.common.AmmoType)et).getMunitionType() == megamek.common.AmmoType.M_STANDARD) {
+                		partAvailability--;
+                	}
+                }
+                
+        	}
+        	
+            if (Era.convertEra(getEra()) != EquipmentType.ERA_SW &&
+            		(acquisition instanceof Armor
+    				|| acquisition instanceof MissingMekActuator
+    				|| acquisition instanceof mekhq.campaign.parts.MissingMekCockpit
+    				|| acquisition instanceof mekhq.campaign.parts.MissingMekLifeSupport
+    				|| acquisition instanceof mekhq.campaign.parts.MissingMekLocation
+    				|| acquisition instanceof mekhq.campaign.parts.MissingMekSensor)) {
             	partAvailability--;
             }
+
         	if (partAvailability >
         			findAtBPartsAvailabilityLevel(acquisition)) {
                 return new TargetRoll(TargetRoll.IMPOSSIBLE,
@@ -7258,7 +7324,7 @@ public class Campaign implements Serializable {
 	                    case Part.QUALITY_F:
 	                        if (margin < -2) {
 	                            p.decreaseQuality();
-	                            if (margin < -6) {
+	                            if (margin < -6 && !campaignOptions.useUnofficalMaintenance()) {
 	                                partsToDamage.put(p.getId(), 1);
 	                            }
 	                        }
@@ -7269,7 +7335,7 @@ public class Campaign implements Serializable {
 	                    case Part.QUALITY_E:
 	                        if (margin < -2) {
 	                            p.decreaseQuality();
-	                            if (margin < -5) {
+	                            if (margin < -5 && !campaignOptions.useUnofficalMaintenance()) {
 	                                partsToDamage.put(p.getId(), 1);
 	                            }
 	                        }
@@ -7280,7 +7346,7 @@ public class Campaign implements Serializable {
 	                    case Part.QUALITY_D:
 	                        if (margin < -3) {
 	                            p.decreaseQuality();
-	                            if (margin < -4) {
+	                            if (margin < -4 && !campaignOptions.useUnofficalMaintenance()) {
 	                                partsToDamage.put(p.getId(), 1);
 	                            }
 	                        }
@@ -7289,41 +7355,49 @@ public class Campaign implements Serializable {
 	                        }
 	                        break;
 	                    case Part.QUALITY_C:
-	                        if (margin < -6) {
-	                            partsToDamage.put(p.getId(), 2);
-	                        } else if (margin < -3) {
-	                            partsToDamage.put(p.getId(), 1);
-	                        }
 	                        if (margin < -4) {
 	                            p.decreaseQuality();
 	                        }
+	                    	if (!campaignOptions.useUnofficalMaintenance()) {
+		                        if (margin < -6) {
+		                            partsToDamage.put(p.getId(), 2);
+		                        } else if (margin < -3) {
+		                            partsToDamage.put(p.getId(), 1);
+		                        }
+	                    	}
 	                        if (margin >= 5) {
 	                            p.improveQuality();
 	                        }
 	                        break;
 	                    case Part.QUALITY_B:
-	                        if (margin < -6) {
-	                            partsToDamage.put(p.getId(), 2);
-	                        } else if (margin < -2) {
-	                            partsToDamage.put(p.getId(), 1);
-	                        }
 	                        if (margin < -5) {
 	                            p.decreaseQuality();
 	                        }
+	                    	if (!campaignOptions.useUnofficalMaintenance()) {
+		                        if (margin < -6) {
+		                            partsToDamage.put(p.getId(), 2);
+		                        } else if (margin < -2) {
+		                            partsToDamage.put(p.getId(), 1);
+		                        }
+	                    	}
 	                        if (margin >= 4) {
 	                            p.improveQuality();
 	                        }
 	                        break;
 	                    case Part.QUALITY_A:
-	                        if (margin < -6) {
-	                            partsToDamage.put(p.getId(), 4);
-	                        } else if (margin < -4) {
-	                            partsToDamage.put(p.getId(), 3);
-	                        } else if (margin == -4) {
-	                            partsToDamage.put(p.getId(), 2);
-	                        } else if (margin < -1) {
-	                            partsToDamage.put(p.getId(), 1);
-	                        }
+	                    	if (!campaignOptions.useUnofficalMaintenance()) {
+		                        if (margin < -6) {
+		                            partsToDamage.put(p.getId(), 4);
+		                        } else if (margin < -4) {
+		                            partsToDamage.put(p.getId(), 3);
+		                        } else if (margin == -4) {
+		                            partsToDamage.put(p.getId(), 2);
+		                        } else if (margin < -1) {
+		                            partsToDamage.put(p.getId(), 1);
+		                        }
+	                    	} else if (margin < -6) {
+	                    		partsToDamage.put(p.getId(), 1);
+	                    	}
 	                        if (margin >= 4) {
 	                            p.improveQuality();
 	                        }

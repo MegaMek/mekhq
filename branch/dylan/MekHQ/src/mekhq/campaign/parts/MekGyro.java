@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.CriticalSlot;
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import megamek.common.TechConstants;
@@ -301,4 +302,15 @@ public class MekGyro extends Part {
 	 public boolean isRightTechType(String skillType) {
 		 return skillType.equals(SkillType.S_TECH_MECH);
 	 }
+
+	@Override
+	public String getLocationName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getLocation() {
+		return Entity.LOC_NONE;
+	}
 }

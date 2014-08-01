@@ -229,4 +229,15 @@ public class MekLifeSupport extends Part {
 	public boolean isRightTechType(String skillType) {
 		return skillType.equals(SkillType.S_TECH_MECH);
 	}
+
+	@Override
+	public String getLocationName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getLocation() {
+		return Entity.LOC_NONE;
+	}
 }

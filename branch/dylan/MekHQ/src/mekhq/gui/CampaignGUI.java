@@ -126,6 +126,7 @@ import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
 import megamek.common.Crew;
 import megamek.common.Dropship;
+import megamek.common.Engine;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import megamek.common.GunEmplacement;
@@ -176,6 +177,7 @@ import mekhq.campaign.parts.MekGyro;
 import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
+import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.ProtomekArmor;
 import mekhq.campaign.parts.Refit;
@@ -266,6 +268,7 @@ import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.LevelSorter;
 import mekhq.gui.sorter.RankSorter;
 import mekhq.gui.sorter.TargetSorter;
+import mekhq.gui.sorter.TaskSorter;
 import mekhq.gui.sorter.TechSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
@@ -275,6 +278,7 @@ import mekhq.gui.view.AtBScenarioViewPanel;
 import mekhq.gui.view.ContractViewPanel;
 import mekhq.gui.view.ForceViewPanel;
 import mekhq.gui.view.JumpPathViewPanel;
+import mekhq.gui.view.LanceAssignmentView;
 import mekhq.gui.view.MissionViewPanel;
 import mekhq.gui.view.PersonViewPanel;
 import mekhq.gui.view.PlanetViewPanel;
@@ -471,6 +475,7 @@ public class CampaignGUI extends JPanel {
     private JTextPane txtServicedUnitView;
     private JTextArea textTarget;
     private JLabel astechPoolLabel;
+    private JComboBox<String> choiceLocation;
 
     /*For the infirmary tab*/
     private JPanel panInfirmary;
@@ -532,6 +537,7 @@ public class CampaignGUI extends JPanel {
     private TableRowSorter<ProcurementTableModel> acquirePartsSorter;
     private TableRowSorter<UnitTableModel> unitSorter;
     private TableRowSorter<UnitTableModel> servicedUnitSorter;
+    private TableRowSorter<TaskTableModel> taskSorter;
     private TableRowSorter<TechTableModel> techSorter;
     private TableRowSorter<TechTableModel> whTechSorter;
 
@@ -1976,13 +1982,28 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 3;
+        gridBagConstraints.gridheight = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         panDoTask.add(scrTextTarget, gridBagConstraints);
+        
+        choiceLocation = new JComboBox<String>();
+        choiceLocation.removeAllItems();
+    	choiceLocation.addItem("All");
+        choiceLocation.setEnabled(false);
+        choiceLocation.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                filterTasks();
+            }
+        });
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.gridheight = 1;
+        panDoTask.add(choiceLocation, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -2002,6 +2023,12 @@ public class CampaignGUI extends JPanel {
                         taskTableValueChanged(evt);
                     }
                 });
+        taskSorter = new TableRowSorter<TaskTableModel>(taskModel);
+        taskSorter.setComparator(0, new TaskSorter());
+        taskTable.setRowSorter(taskSorter);
+        sortKeys = new ArrayList<RowSorter.SortKey>();
+        sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
+        taskSorter.setSortKeys(sortKeys);
         taskTable.addMouseListener(new TaskTableMouseAdapter());
         JScrollPane scrollTaskTable = new JScrollPane(taskTable);
         scrollTaskTable.setMinimumSize(new java.awt.Dimension(200, 200));
@@ -2118,7 +2145,6 @@ public class CampaignGUI extends JPanel {
 
         filterTechs(true);
         filterTechs(false);
-
     }
 
     private void initInfirmaryTab() {
@@ -3439,6 +3465,17 @@ public class CampaignGUI extends JPanel {
                 MechView mv = new MechView(unit.getEntity(), false);
                 txtServicedUnitView.setText("<div style='font: 12pt monospaced'>" + mv.getMechReadoutBasic() + "<br>" + mv.getMechReadoutLoadout() + "</div>");
             }
+        }
+        if (getSelectedServicedUnit() != null && getSelectedServicedUnit().getEntity() != null) {
+        	choiceLocation.removeAllItems();
+        	choiceLocation.addItem("All");
+        	for (String s : getSelectedServicedUnit().getEntity().getLocationAbbrs()) {
+        		choiceLocation.addItem(s);
+        	}
+        	choiceLocation.setEnabled(true);
+        } else {
+        	choiceLocation.removeAllItems();
+        	choiceLocation.setEnabled(false);
         }
     }
 
@@ -6096,7 +6133,7 @@ public class CampaignGUI extends JPanel {
         } else {
             Part part = getSelectedTask();
             if (null != part) {
-                Unit u = part.getUnit();
+            	Unit u = part.getUnit();
                 Person tech = getSelectedTech();
                 if (null != u && u.isSelfCrewed()) {
                     tech = u.getEngineer();
@@ -6118,6 +6155,7 @@ public class CampaignGUI extends JPanel {
                     }
                 }
             }
+            ((TechSorter)techSorter.getComparator(0)).clearPart();
         }
         JButton btn = btnDoTask;
         JTextArea text = textTarget;
@@ -6153,6 +6191,61 @@ public class CampaignGUI extends JPanel {
         		btnUseBonusPart.setVisible(false);
         	}
         }
+    }
+
+    public void filterTasks() {
+        RowFilter<TaskTableModel, Integer> taskLocationFilter = null;
+        final String loc = (String)choiceLocation.getSelectedItem();
+        taskLocationFilter = new RowFilter<TaskTableModel, Integer>() {
+            @Override
+            public boolean include(Entry<? extends TaskTableModel, ? extends Integer> entry) {
+            	TaskTableModel taskModel = entry.getModel();
+            	Part part = taskModel.getTaskAt(entry.getIdentifier());
+            	if (part == null) {
+            		return false;
+            	}
+            	if (loc != null) {
+	                if (loc.equals("All")) {
+	                    return true;
+	                } else if (part.getLocation() == part.getUnit().getEntity().getLocationFromAbbr(loc)) {
+	                    return true;
+	                } else if ((part instanceof EnginePart || part instanceof MissingEnginePart)
+	                		&& part.getUnit() != null && part.getUnit().getEntity() != null
+	                		&& part.getUnit().getEntity() instanceof Mech) {
+	                	if (part.getUnit().getEntity().getLocationFromAbbr(loc) == Mech.LOC_CT) {
+	                		return true;
+	                	}
+	                	boolean needsSideTorso = false;
+	                	if (part instanceof EnginePart) {
+	                		switch (((EnginePart)part).getEngine().getEngineType()) {
+		                		case Engine.XL_ENGINE:
+		                        case Engine.LIGHT_ENGINE:
+		                        case Engine.XXL_ENGINE:
+		                        	needsSideTorso = true;
+		                            break;
+	                		}
+	                	} else if (part instanceof MissingEnginePart) {
+	                		switch (((EnginePart)part).getEngine().getEngineType()) {
+		                		case Engine.XL_ENGINE:
+		                        case Engine.LIGHT_ENGINE:
+		                        case Engine.XXL_ENGINE:
+		                        	needsSideTorso = true;
+		                            break;
+	                		}
+	                	}
+	                	if (needsSideTorso
+	                			&& (part.getUnit().getEntity().getLocationFromAbbr(loc) == Mech.LOC_LT
+	                			|| part.getUnit().getEntity().getLocationFromAbbr(loc) == Mech.LOC_RT)) {
+	                		return true;
+	                	}
+	                } else {
+	                	return false;
+	                }
+            	}
+                return false;
+            }
+        };
+        taskSorter.setRowFilter(taskLocationFilter);
     }
 
     public void filterPersonnel() {
@@ -6311,6 +6404,9 @@ public class CampaignGUI extends JPanel {
         if (warehouse) {
             whTechSorter.setRowFilter(techTypeFilter);
         } else {
+        	if (getCampaign().getCampaignOptions().useAssignedTechFirst()) {
+        		((TechSorter)techSorter.getComparator(0)).setPart(part);
+        	}
             techSorter.setRowFilter(techTypeFilter);
         }
     }
@@ -7035,7 +7131,7 @@ public class CampaignGUI extends JPanel {
 
         public void actionPerformed(ActionEvent action) {
             String command = action.getActionCommand();
-            @SuppressWarnings("unused") // FIXME
+            @SuppressWarnings("unused")
 			Unit selectedUnit = servicedUnitModel.getUnit(servicedUnitTable.convertRowIndexToModel(servicedUnitTable.getSelectedRow()));
             int[] rows = servicedUnitTable.getSelectedRows();
             Unit[] units = new Unit[rows.length];
@@ -8308,13 +8404,17 @@ public class CampaignGUI extends JPanel {
                 refreshOrganization();
                 refreshOverview();
             } else if (command.contains("REMOVE_SPOUSE")) {
+            	selectedPerson.getSpouse().addLogEntry(getCampaign().getDate(), "Divorced from " + selectedPerson.getFullName());
+            	selectedPerson.addLogEntry(getCampaign().getDate(), "Divorced from " + selectedPerson.getSpouse().getFullName());
             	selectedPerson.getSpouse().setSpouseID(null);
             	selectedPerson.setSpouseID(null);
                 refreshPersonnelList();
             } else if (command.contains("SPOUSE")) {
             	Person spouse = getCampaign().getPerson(UUID.fromString(st.nextToken()));
             	spouse.setSpouseID(selectedPerson.getId());
+            	spouse.addLogEntry(getCampaign().getDate(), "Marries " + selectedPerson.getFullName());
             	selectedPerson.setSpouseID(spouse.getId());
+            	selectedPerson.addLogEntry(getCampaign().getDate(), "Marries " + spouse.getFullName());
                 refreshPersonnelList();
             } else if (command.contains("IMPROVE")) {
                 String type = st.nextToken();
@@ -8709,7 +8809,7 @@ public class CampaignGUI extends JPanel {
                 PopupValueChoiceDialog pcvd = new PopupValueChoiceDialog(frame, true, "Change Salary (-1 to remove custom salary)", selectedPerson.getSalary(), -1, 100000);
                 pcvd.setVisible(true);
                 int salary = pcvd.getValue();
-                if (salary < 0) {
+                if (salary < -1) {
                     return;
                 }
                 for (Person person : people) {
@@ -9318,11 +9418,17 @@ public class CampaignGUI extends JPanel {
                 		menu = new JMenu("Choose Spouse (Mate)");
                 		for (Person ps : getCampaign().getPersonnel()) {
                 			if (person.safeSpouse(ps)) {
-                				menuItem = new JMenuItem(ps.getFullName());
+                				menuItem = new JMenuItem(ps.getFullName()
+                						+ ", "
+                						+ ps.getAge(getCampaign().getCalendar())
+                						+ ", " + ps.getRoleDesc());
                 				menuItem.setActionCommand("SPOUSE|"+ps.getId().toString());
                 				menuItem.addActionListener(this);
                 				menu.add(menuItem);
                 			}
+                		}
+                		if (menu.getItemCount() > 30) {
+                			MenuScroller.setScrollerFor(menu, 20);
                 		}
                 		popup.add(menu);
                 	}
@@ -10889,6 +10995,23 @@ public class CampaignGUI extends JPanel {
                     refreshAcquireList();
                     refreshOrganization();
                 }
+            } else if (command.equalsIgnoreCase("FLUFF_NAME")) {
+            	if (selectedUnit != null) {
+            		String fluffName = (String)JOptionPane.showInputDialog(getFrame(),
+            				"Name for this unit?",
+            				"Unit Name",
+            				JOptionPane.QUESTION_MESSAGE,
+            				null,
+            				null,
+            				selectedUnit.getFluffName() == null ? "" : selectedUnit.getFluffName());
+            		selectedUnit.setFluffName(fluffName);
+                    selectedUnit.runDiagnostic();
+                    refreshServicedUnitList();
+                    refreshUnitList();
+                    refreshTaskList();
+                    refreshUnitView();
+                    refreshOrganization();
+            	}
             }
         }
 
@@ -11164,6 +11287,11 @@ public class CampaignGUI extends JPanel {
                     menuItem.setActionCommand("REMOVE_PILOT");
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(!unit.isUnmanned() && !unit.isDeployed());
+                    popup.add(menuItem);
+                    menuItem = new JMenuItem("Name Unit");
+                    menuItem.setActionCommand("FLUFF_NAME");
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(true);
                     popup.add(menuItem);
                 }
                 // sell unit

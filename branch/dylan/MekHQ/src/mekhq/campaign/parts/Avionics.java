@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.Aero;
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
@@ -185,6 +186,17 @@ public class Avionics extends Part {
 	@Override
 	public boolean isRightTechType(String skillType) {
 		return skillType.equals(SkillType.S_TECH_AERO);
+	}
+
+	@Override
+	public String getLocationName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getLocation() {
+		return Entity.LOC_NONE;
 	}
 	
 }

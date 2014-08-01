@@ -1127,5 +1127,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         resetTimeSpent();
         setShorthandedMod(0);
     }
+    
+    public abstract String getLocationName();
+    
+    public abstract int getLocation();
 }
 

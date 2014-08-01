@@ -86,6 +86,25 @@ v0.3.6 (SVN)
 + Updated MML.jar to r1424
 + Applied patching for compatibility with MM r11072
 + Patch [34]: Against the Bot, 6th Patch (atb07patch, not sure how the numbering there got off)
++ Patch [34]: Against the Bot, 7th Patch
++ Bug [#465]: Salary: Set salary no reversible (Again, whups)
++ Bug [#543]: Packaging_local.xml missing portraits
++ Patch [37]: Procreation add-ons
++ Bug [#540]: Using Slider in Loans causing 1st payment to change date
++ Feature [110]: Individual unit names
++ Patch [34]: Against the Bot, 8th Patch
++ Refactor: Moved LanceAssignmentView.java from mekhq.gui into the mekhq.gui.view
++ Bug: Race condition with server.die() called from 2 locations
++ Refactored GameListener call to use the new gameVictory() method
+    This fixes Bug [#541]: Auto Resolve failing
++ Bug: new gameVictory() gets called twice
++ Feature [162]: Repair Bay: Assigned Tech at top of list
++ Optionized the code for Feature 162
++ Bug: Original commit for Feature 162 had the part assignment in the wrong place
++ Feature [116]: Filter repairs by location
++ Feature: New unofficial maintenance option that significantly improves the canon maintenance rules
++ Bug: "A" quality for the new unofficial maintenance option wasn't right
++ Bug [#547]: Unable to load campaign after child born
 
 v0.3.5-dylan (2014-04-28)
 -- No Changes--

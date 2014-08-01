@@ -31,10 +31,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.UUID;
 
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
@@ -49,6 +45,10 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
+
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Used by Against the Bot to track additional information about each force

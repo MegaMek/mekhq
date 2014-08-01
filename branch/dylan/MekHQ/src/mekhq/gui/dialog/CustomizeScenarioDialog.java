@@ -43,10 +43,10 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumn;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.AtBScenario;
 import mekhq.gui.model.LootTableModel;
 
 /**

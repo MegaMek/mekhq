@@ -4,14 +4,14 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.UUID;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class Ancestors implements Serializable, MekHqXmlSerializable {
 	/**
@@ -154,6 +154,7 @@ public class Ancestors implements Serializable, MekHqXmlSerializable {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<ancestor id=\""
                 + id.toString()
                 + "\">");
+		indent++;
 		pw1.println(MekHqXmlUtil.indentStr(indent)
 				+ "<id>"
 				+ id.toString()
@@ -182,6 +183,8 @@ public class Ancestors implements Serializable, MekHqXmlSerializable {
 					+ mothersAncestors.toString()
 					+ "</mothersAncestors>");
 		}
+		indent--;
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "</ancestor>");
 	}
 	
 	public static Ancestors generateInstanceFromXML(Node wn, Campaign c, Version version) {
