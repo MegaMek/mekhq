@@ -101,6 +101,7 @@ v0.3.6 (SVN)
 + Bug: Original commit for Feature 162 had the part assignment in the wrong place
 + Feature [116]: Filter repairs by location
 + Feature: New unofficial maintenance option that significantly improves the canon maintenance rules
++ Bug: "A" quality for the new unofficial maintenance option wasn't right
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
