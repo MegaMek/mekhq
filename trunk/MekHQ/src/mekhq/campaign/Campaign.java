@@ -7343,15 +7343,19 @@ public class Campaign implements Serializable {
 	                        }
 	                        break;
 	                    case Part.QUALITY_A:
-	                        if (margin < -6 && !campaignOptions.useUnofficalMaintenance()) {
-	                            partsToDamage.put(p.getId(), 4);
-	                        } else if (margin < -4 && !campaignOptions.useUnofficalMaintenance()) {
-	                            partsToDamage.put(p.getId(), 3);
-	                        } else if (margin == -4 && !campaignOptions.useUnofficalMaintenance()) {
-	                            partsToDamage.put(p.getId(), 2);
-	                        } else if (margin < -1) {
-	                            partsToDamage.put(p.getId(), 1);
-	                        }
+	                    	if (!campaignOptions.useUnofficalMaintenance()) {
+		                        if (margin < -6) {
+		                            partsToDamage.put(p.getId(), 4);
+		                        } else if (margin < -4) {
+		                            partsToDamage.put(p.getId(), 3);
+		                        } else if (margin == -4) {
+		                            partsToDamage.put(p.getId(), 2);
+		                        } else if (margin < -1) {
+		                            partsToDamage.put(p.getId(), 1);
+		                        }
+	                    	} else if (margin < -6) {
+	                    		partsToDamage.put(p.getId(), 1);
+	                    	}
 	                        if (margin >= 4) {
 	                            p.improveQuality();
 	                        }
