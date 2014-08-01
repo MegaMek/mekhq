@@ -165,6 +165,7 @@ public class CampaignOptions implements Serializable {
     private int maintenanceCycleDays;
     private int maintenanceBonus;
     private boolean useQualityMaintenance;
+	private boolean useUnofficalMaintenance;
 
     //Dragoon's Rating
     private UnitRatingMethod unitRatingMethod;
@@ -308,6 +309,7 @@ public class CampaignOptions implements Serializable {
         maintenanceCycleDays = 7;
         maintenanceBonus = -1;
         useQualityMaintenance = true;
+        useUnofficalMaintenance = false;
         checkMaintenance = true;
         useRandomHitsForVees = false;
         minimumHitsForVees = 1;
@@ -1097,6 +1099,14 @@ public class CampaignOptions implements Serializable {
         useQualityMaintenance = b;
     }
 
+    public boolean useUnofficalMaintenance() {
+        return useUnofficalMaintenance;
+    }
+
+    public void setUseUnofficalMaintenance(boolean b) {
+    	useUnofficalMaintenance = b;
+    }
+
     public boolean checkMaintenance() {
         return checkMaintenance;
     }
@@ -1584,6 +1594,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maintenanceCycleDays", maintenanceCycleDays);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maintenanceBonus", maintenanceBonus);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useQualityMaintenance", useQualityMaintenance);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficalMaintenance", useUnofficalMaintenance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "checkMaintenance", checkMaintenance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomHitsForVees", useRandomHitsForVees);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minimumHitsForVees", minimumHitsForVees);
@@ -1918,11 +1929,9 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceBonus")) {
                 retVal.maintenanceBonus = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useQualityMaintenance")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.useQualityMaintenance = true;
-                } else {
-                    retVal.useQualityMaintenance = false;
-                }
+                retVal.useQualityMaintenance = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficalMaintenance")) {
+                retVal.useUnofficalMaintenance = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {
                 if (wn2.getTextContent().equalsIgnoreCase("true")) {
                     retVal.checkMaintenance = true;
