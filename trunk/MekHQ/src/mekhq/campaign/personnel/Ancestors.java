@@ -154,6 +154,7 @@ public class Ancestors implements Serializable, MekHqXmlSerializable {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<ancestor id=\""
                 + id.toString()
                 + "\">");
+		indent++;
 		pw1.println(MekHqXmlUtil.indentStr(indent)
 				+ "<id>"
 				+ id.toString()
@@ -182,6 +183,8 @@ public class Ancestors implements Serializable, MekHqXmlSerializable {
 					+ mothersAncestors.toString()
 					+ "</mothersAncestors>");
 		}
+		indent--;
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "</ancestor>");
 	}
 	
 	public static Ancestors generateInstanceFromXML(Node wn, Campaign c, Version version) {
