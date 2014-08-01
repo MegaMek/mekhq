@@ -5797,10 +5797,7 @@ public class CampaignGUI extends JPanel {
         } else {
             Part part = getSelectedTask();
             if (null != part) {
-            	if (getCampaign().getCampaignOptions().useAssignedTechFirst()) {
-            		((TechSorter)techSorter.getComparator(0)).setPart(part);
-            	}
-                Unit u = part.getUnit();
+            	Unit u = part.getUnit();
                 Person tech = getSelectedTech();
                 if (null != u && u.isSelfCrewed()) {
                     tech = u.getEngineer();
@@ -6016,6 +6013,9 @@ public class CampaignGUI extends JPanel {
         if (warehouse) {
             whTechSorter.setRowFilter(techTypeFilter);
         } else {
+        	if (getCampaign().getCampaignOptions().useAssignedTechFirst()) {
+        		((TechSorter)techSorter.getComparator(0)).setPart(part);
+        	}
             techSorter.setRowFilter(techTypeFilter);
         }
     }
