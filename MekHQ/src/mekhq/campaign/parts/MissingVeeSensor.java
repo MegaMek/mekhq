@@ -21,6 +21,7 @@
 
 package mekhq.campaign.parts;
 
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
 import mekhq.campaign.Campaign;
@@ -89,5 +90,16 @@ public class MissingVeeSensor extends MissingPart {
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		//nothing to load
+	}
+
+	@Override
+	public String getLocationName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getLocation() {
+		return Entity.LOC_NONE;
 	}
 }

@@ -257,4 +257,9 @@ public class ProtomekArmActuator extends Part {
     public boolean isOmniPoddable() {
         return false;
     }
+
+	@Override
+	public String getLocationName() {
+		return unit.getEntity().getLocationName(location);
+	}
 }

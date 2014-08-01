@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 
 import megamek.common.Aero;
 import megamek.common.CriticalSlot;
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Jumpship;
 import megamek.common.Mech;
@@ -261,4 +262,15 @@ public class SpacecraftEngine extends Part {
 	 public boolean isRightTechType(String skillType) {
 		 return skillType.equals(SkillType.S_TECH_AERO);	
 	 }
+
+	@Override
+	public String getLocationName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getLocation() {
+		return Entity.LOC_NONE;
+	}
 }

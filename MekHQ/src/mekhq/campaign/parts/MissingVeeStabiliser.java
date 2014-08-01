@@ -133,5 +133,10 @@ public class MissingVeeStabiliser extends MissingPart {
 			((Tank)unit.getEntity()).setStabiliserHit(loc);
 		}
 	}
+
+	@Override
+	public String getLocationName() {
+		return unit.getEntity().getLocationName(loc);
+	}
 	
 }

@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.Entity;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
@@ -355,6 +356,17 @@ public class InfantryArmorPart extends Part {
     public boolean needsMaintenance() {
         return false;
     }
+
+	@Override
+	public String getLocationName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getLocation() {
+		return Entity.LOC_NONE;
+	}
 	
 	
 }

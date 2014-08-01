@@ -197,6 +197,10 @@ public class Armor extends Part implements IAcquisitionWork {
     	return location;
     }
     
+    public String getLocationName() {
+    	return unit.getEntity().getLocationName(location);
+    }
+    
     public boolean isRearMounted() {
     	return rear;
     }

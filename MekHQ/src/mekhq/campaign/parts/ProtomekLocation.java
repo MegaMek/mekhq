@@ -610,4 +610,14 @@ public class ProtomekLocation extends Part {
         unit.getEntity().setInternal(points, loc);
         updateConditionFromEntity();
     }
+
+	@Override
+	public String getLocationName() {
+		return unit.getEntity().getLocationName(loc);
+	}
+
+	@Override
+	public int getLocation() {
+		return loc;
+	}
 }

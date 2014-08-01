@@ -379,4 +379,14 @@ public class MissingMekLocation extends MissingPart {
             newPart.updateConditionFromPart(); 
         }
 	}
+
+	@Override
+	public String getLocationName() {
+		return unit.getEntity().getLocationName(loc);
+	}
+
+	@Override
+	public int getLocation() {
+		return loc;
+	}
 }

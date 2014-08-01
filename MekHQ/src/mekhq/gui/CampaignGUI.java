@@ -122,6 +122,7 @@ import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
 import megamek.common.Crew;
 import megamek.common.Dropship;
+import megamek.common.Engine;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import megamek.common.GunEmplacement;
@@ -172,6 +173,7 @@ import mekhq.campaign.parts.MekGyro;
 import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
+import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.ProtomekArmor;
 import mekhq.campaign.parts.Refit;
@@ -260,6 +262,7 @@ import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.LevelSorter;
 import mekhq.gui.sorter.RankSorter;
 import mekhq.gui.sorter.TargetSorter;
+import mekhq.gui.sorter.TaskSorter;
 import mekhq.gui.sorter.TechSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
@@ -466,6 +469,7 @@ public class CampaignGUI extends JPanel {
     private JTextPane txtServicedUnitView;
     private JTextArea textTarget;
     private JLabel astechPoolLabel;
+    private JComboBox<String> choiceLocation;
 
     /*For the infirmary tab*/
     private JPanel panInfirmary;
@@ -527,6 +531,7 @@ public class CampaignGUI extends JPanel {
     private TableRowSorter<ProcurementTableModel> acquirePartsSorter;
     private TableRowSorter<UnitTableModel> unitSorter;
     private TableRowSorter<UnitTableModel> servicedUnitSorter;
+    private TableRowSorter<TaskTableModel> taskSorter;
     private TableRowSorter<TechTableModel> techSorter;
     private TableRowSorter<TechTableModel> whTechSorter;
 
@@ -1847,13 +1852,28 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 3;
+        gridBagConstraints.gridheight = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         panDoTask.add(scrTextTarget, gridBagConstraints);
+        
+        choiceLocation = new JComboBox<String>();
+        choiceLocation.removeAllItems();
+    	choiceLocation.addItem("All");
+        choiceLocation.setEnabled(false);
+        choiceLocation.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                filterTasks();
+            }
+        });
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.gridheight = 1;
+        panDoTask.add(choiceLocation, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -1873,6 +1893,12 @@ public class CampaignGUI extends JPanel {
                         taskTableValueChanged(evt);
                     }
                 });
+        taskSorter = new TableRowSorter<TaskTableModel>(taskModel);
+        taskSorter.setComparator(0, new TaskSorter());
+        taskTable.setRowSorter(taskSorter);
+        sortKeys = new ArrayList<RowSorter.SortKey>();
+        sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
+        taskSorter.setSortKeys(sortKeys);
         taskTable.addMouseListener(new TaskTableMouseAdapter());
         JScrollPane scrollTaskTable = new JScrollPane(taskTable);
         scrollTaskTable.setMinimumSize(new java.awt.Dimension(200, 200));
@@ -1989,7 +2015,6 @@ public class CampaignGUI extends JPanel {
 
         filterTechs(true);
         filterTechs(false);
-
     }
 
     private void initInfirmaryTab() {
@@ -3309,6 +3334,17 @@ public class CampaignGUI extends JPanel {
                 MechView mv = new MechView(unit.getEntity(), false);
                 txtServicedUnitView.setText("<div style='font: 12pt monospaced'>" + mv.getMechReadoutBasic() + "<br>" + mv.getMechReadoutLoadout() + "</div>");
             }
+        }
+        if (getSelectedServicedUnit() != null && getSelectedServicedUnit().getEntity() != null) {
+        	choiceLocation.removeAllItems();
+        	choiceLocation.addItem("All");
+        	for (String s : getSelectedServicedUnit().getEntity().getLocationAbbrs()) {
+        		choiceLocation.addItem(s);
+        	}
+        	choiceLocation.setEnabled(true);
+        } else {
+        	choiceLocation.removeAllItems();
+        	choiceLocation.setEnabled(false);
         }
     }
 
@@ -5857,6 +5893,61 @@ public class CampaignGUI extends JPanel {
         }
     }
 
+    public void filterTasks() {
+        RowFilter<TaskTableModel, Integer> taskLocationFilter = null;
+        final String loc = (String)choiceLocation.getSelectedItem();
+        taskLocationFilter = new RowFilter<TaskTableModel, Integer>() {
+            @Override
+            public boolean include(Entry<? extends TaskTableModel, ? extends Integer> entry) {
+            	TaskTableModel taskModel = entry.getModel();
+            	Part part = taskModel.getTaskAt(entry.getIdentifier());
+            	if (part == null) {
+            		return false;
+            	}
+            	if (loc != null) {
+	                if (loc.equals("All")) {
+	                    return true;
+	                } else if (part.getLocation() == part.getUnit().getEntity().getLocationFromAbbr(loc)) {
+	                    return true;
+	                } else if ((part instanceof EnginePart || part instanceof MissingEnginePart)
+	                		&& part.getUnit() != null && part.getUnit().getEntity() != null
+	                		&& part.getUnit().getEntity() instanceof Mech) {
+	                	if (part.getUnit().getEntity().getLocationFromAbbr(loc) == Mech.LOC_CT) {
+	                		return true;
+	                	}
+	                	boolean needsSideTorso = false;
+	                	if (part instanceof EnginePart) {
+	                		switch (((EnginePart)part).getEngine().getEngineType()) {
+		                		case Engine.XL_ENGINE:
+		                        case Engine.LIGHT_ENGINE:
+		                        case Engine.XXL_ENGINE:
+		                        	needsSideTorso = true;
+		                            break;
+	                		}
+	                	} else if (part instanceof MissingEnginePart) {
+	                		switch (((EnginePart)part).getEngine().getEngineType()) {
+		                		case Engine.XL_ENGINE:
+		                        case Engine.LIGHT_ENGINE:
+		                        case Engine.XXL_ENGINE:
+		                        	needsSideTorso = true;
+		                            break;
+	                		}
+	                	}
+	                	if (needsSideTorso
+	                			&& (part.getUnit().getEntity().getLocationFromAbbr(loc) == Mech.LOC_LT
+	                			|| part.getUnit().getEntity().getLocationFromAbbr(loc) == Mech.LOC_RT)) {
+	                		return true;
+	                	}
+	                } else {
+	                	return false;
+	                }
+            	}
+                return false;
+            }
+        };
+        taskSorter.setRowFilter(taskLocationFilter);
+    }
+
     public void filterPersonnel() {
         RowFilter<PersonnelTableModel, Integer> personTypeFilter = null;
         final int nGroup = choicePerson.getSelectedIndex();
@@ -6736,7 +6827,7 @@ public class CampaignGUI extends JPanel {
 
         public void actionPerformed(ActionEvent action) {
             String command = action.getActionCommand();
-            @SuppressWarnings("unused") // FIXME
+            @SuppressWarnings("unused")
 			Unit selectedUnit = servicedUnitModel.getUnit(servicedUnitTable.convertRowIndexToModel(servicedUnitTable.getSelectedRow()));
             int[] rows = servicedUnitTable.getSelectedRows();
             Unit[] units = new Unit[rows.length];

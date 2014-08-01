@@ -214,4 +214,9 @@ public class VeeStabiliser extends Part {
 	public boolean isRightTechType(String skillType) {
 		return skillType.equals(SkillType.S_TECH_MECHANIC);
 	}
+
+	@Override
+	public String getLocationName() {
+		return unit.getEntity().getLocationName(loc);
+	}
 }

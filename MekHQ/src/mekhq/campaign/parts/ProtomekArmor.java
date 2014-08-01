@@ -578,4 +578,9 @@ public class ProtomekArmor extends Part implements IAcquisitionWork {
     public boolean isPriceAdustedForAmount() {
         return true;
     }
+
+	@Override
+	public String getLocationName() {
+		return unit.getEntity().getLocationName(location);
+	}
 }
