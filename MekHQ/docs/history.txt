@@ -96,6 +96,7 @@ v0.3.6 (SVN)
 + Refactored GameListener call to use the new gameVictory() method
     This fixes Bug [#541]: Auto Resolve failing
 + Bug: new gameVictory() gets called twice
++ Feature [162]: Repair Bay: Assigned Tech at top of list 
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
