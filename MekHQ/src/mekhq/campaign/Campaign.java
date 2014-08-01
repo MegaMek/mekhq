@@ -7282,7 +7282,7 @@ public class Campaign implements Serializable {
 	                    case Part.QUALITY_F:
 	                        if (margin < -2) {
 	                            p.decreaseQuality();
-	                            if (margin < -6) {
+	                            if (margin < -6 && !campaignOptions.useUnofficalMaintenance()) {
 	                                partsToDamage.put(p.getId(), 1);
 	                            }
 	                        }
@@ -7293,7 +7293,7 @@ public class Campaign implements Serializable {
 	                    case Part.QUALITY_E:
 	                        if (margin < -2) {
 	                            p.decreaseQuality();
-	                            if (margin < -5) {
+	                            if (margin < -5 && !campaignOptions.useUnofficalMaintenance()) {
 	                                partsToDamage.put(p.getId(), 1);
 	                            }
 	                        }
@@ -7304,7 +7304,7 @@ public class Campaign implements Serializable {
 	                    case Part.QUALITY_D:
 	                        if (margin < -3) {
 	                            p.decreaseQuality();
-	                            if (margin < -4) {
+	                            if (margin < -4 && !campaignOptions.useUnofficalMaintenance()) {
 	                                partsToDamage.put(p.getId(), 1);
 	                            }
 	                        }
@@ -7313,37 +7313,41 @@ public class Campaign implements Serializable {
 	                        }
 	                        break;
 	                    case Part.QUALITY_C:
-	                        if (margin < -6) {
-	                            partsToDamage.put(p.getId(), 2);
-	                        } else if (margin < -3) {
-	                            partsToDamage.put(p.getId(), 1);
-	                        }
 	                        if (margin < -4) {
 	                            p.decreaseQuality();
 	                        }
+	                    	if (!campaignOptions.useUnofficalMaintenance()) {
+		                        if (margin < -6) {
+		                            partsToDamage.put(p.getId(), 2);
+		                        } else if (margin < -3) {
+		                            partsToDamage.put(p.getId(), 1);
+		                        }
+	                    	}
 	                        if (margin >= 5) {
 	                            p.improveQuality();
 	                        }
 	                        break;
 	                    case Part.QUALITY_B:
-	                        if (margin < -6) {
-	                            partsToDamage.put(p.getId(), 2);
-	                        } else if (margin < -2) {
-	                            partsToDamage.put(p.getId(), 1);
-	                        }
 	                        if (margin < -5) {
 	                            p.decreaseQuality();
 	                        }
+	                    	if (!campaignOptions.useUnofficalMaintenance()) {
+		                        if (margin < -6) {
+		                            partsToDamage.put(p.getId(), 2);
+		                        } else if (margin < -2) {
+		                            partsToDamage.put(p.getId(), 1);
+		                        }
+	                    	}
 	                        if (margin >= 4) {
 	                            p.improveQuality();
 	                        }
 	                        break;
 	                    case Part.QUALITY_A:
-	                        if (margin < -6) {
+	                        if (margin < -6 && !campaignOptions.useUnofficalMaintenance()) {
 	                            partsToDamage.put(p.getId(), 4);
-	                        } else if (margin < -4) {
+	                        } else if (margin < -4 && !campaignOptions.useUnofficalMaintenance()) {
 	                            partsToDamage.put(p.getId(), 3);
-	                        } else if (margin == -4) {
+	                        } else if (margin == -4 && !campaignOptions.useUnofficalMaintenance()) {
 	                            partsToDamage.put(p.getId(), 2);
 	                        } else if (margin < -1) {
 	                            partsToDamage.put(p.getId(), 1);
