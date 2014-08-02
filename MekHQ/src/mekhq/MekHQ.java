@@ -408,8 +408,8 @@ public class MekHQ implements GameListener {
             campaigngui.refreshOrganization();
             campaigngui.refreshServicedUnitList();
             campaigngui.refreshUnitList();
-            campaigngui.filterPersonnel();
             campaigngui.refreshPersonnelList();
+            campaigngui.filterPersonnel();
             campaigngui.refreshDoctorsList();
             campaigngui.refreshPatientList();
             campaigngui.refreshReport();

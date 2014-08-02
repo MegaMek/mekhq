@@ -103,6 +103,8 @@ v0.3.6 (SVN)
 + Feature: New unofficial maintenance option that significantly improves the canon maintenance rules
 + Bug: "A" quality for the new unofficial maintenance option wasn't right
 + Bug [#547]: Unable to load campaign after child born
++ Bug: Gyro not shown when repair location dropdown was set to CT
++ Bug [#551]: Repair Location menu isn't sticky
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
