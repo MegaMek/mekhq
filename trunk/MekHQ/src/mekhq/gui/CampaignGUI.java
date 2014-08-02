@@ -3055,6 +3055,7 @@ public class CampaignGUI extends JPanel {
     private void doTask() {// GEN-FIRST:event_btnDoTaskActionPerformed
         int selectedRow = -1;
         int partId = -1;
+        int selectedLocation = -1;
         // int selectedTechRow = -1;
         Person tech = getSelectedTech();
         if (onWarehouseTab()) {
@@ -3081,6 +3082,7 @@ public class CampaignGUI extends JPanel {
         } else if (repairsSelected()) {
             selectedRow = taskTable.getSelectedRow();
             // selectedTechRow = TechTable.getSelectedRow();
+            selectedLocation = choiceLocation.getSelectedIndex();
             Part part = getSelectedTask();
             if (null == part) {
                 return;
@@ -3151,6 +3153,7 @@ public class CampaignGUI extends JPanel {
         refreshReport();
         refreshFunds();
         refreshFinancialTransactions();
+        filterTasks();
 
         //get the selected row back for tasks
         if (selectedRow != -1) {
@@ -3207,6 +3210,12 @@ public class CampaignGUI extends JPanel {
                 }
             }
         }
+        if (selectedLocation != -1) {
+        	if (selectedLocation >= choiceLocation.getItemCount()) {
+        		selectedLocation = 0;
+        	}
+        	choiceLocation.setSelectedIndex(selectedLocation);
+        }
 
     }// GEN-LAST:event_btnDoTaskActionPerformed
     
@@ -3248,6 +3257,7 @@ public class CampaignGUI extends JPanel {
         refreshReport();
         refreshFunds();
         refreshFinancialTransactions();
+        filterTasks();
 
         if (selectedRow != -1) {
             if (acquireSelected()) {
@@ -3921,6 +3931,7 @@ public class CampaignGUI extends JPanel {
         refreshTechsList();
         refreshTaskList();
         refreshAcquireList();
+        filterTasks();
     }// GEN-LAST:event_btnOvertimeActionPerformed
 
     private void btnGMModeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnGMModeActionPerformed
@@ -5155,6 +5166,7 @@ public class CampaignGUI extends JPanel {
             refreshPatientList();
             refreshPersonnelList();
             refreshScenarioList();
+            filterTasks();
         }
     }
 
@@ -5194,8 +5206,8 @@ public class CampaignGUI extends JPanel {
         refreshOrganization();
         refreshServicedUnitList();
         refreshUnitList();
-        filterPersonnel();
         refreshPersonnelList();
+        filterPersonnel();
         refreshDoctorsList();
         refreshPatientList();
         refreshReport();
@@ -5938,6 +5950,8 @@ public class CampaignGUI extends JPanel {
 	                			|| part.getUnit().getEntity().getLocationFromAbbr(loc) == Mech.LOC_RT)) {
 	                		return true;
 	                	}
+	                } else if (part instanceof MekGyro && part.getUnit().getEntity().getLocationFromAbbr(loc) == Mech.LOC_CT) {
+	                	return true;
 	                } else {
 	                	return false;
 	                }
@@ -6628,6 +6642,7 @@ public class CampaignGUI extends JPanel {
                 refreshPartsList();
                 refreshAcquireList();
                 refreshReport();
+                filterTasks();
             } else if (command.contains("SWAP_AMMO")) {
                 /*
                 WorkItem task = taskModel.getTaskAt(TaskTable.getSelectedRow());
@@ -6785,6 +6800,7 @@ public class CampaignGUI extends JPanel {
                 refreshTaskList();
                 refreshAcquireList();
                 refreshPartsList();
+                filterTasks();
             }
         }
 
@@ -6874,6 +6890,7 @@ public class CampaignGUI extends JPanel {
                 refreshAcquireList();
                 refreshServicedUnitList();
                 refreshUnitList();
+                filterTasks();
             } else if (command.contains("CHANGE_SITE")) {
                 for (Unit unit : units) {
                     if (!unit.isDeployed()) {
@@ -9452,6 +9469,7 @@ public class CampaignGUI extends JPanel {
                 refreshReport();
                 refreshFunds();
                 refreshFinancialTransactions();
+                filterTasks();
             } else if (command.equalsIgnoreCase("SELL_ALL")) {
                 for (Part p : parts) {
                     if (null != p) {
@@ -9847,6 +9865,7 @@ public class CampaignGUI extends JPanel {
                         refreshTaskList();
                         refreshAcquireList();
                         refreshReport();
+                        filterTasks();
                     }
                 });
                 menuItem.setEnabled(getCampaign().isGM());
@@ -9917,6 +9936,7 @@ public class CampaignGUI extends JPanel {
                         refreshTaskList();
                         refreshAcquireList();
                         refreshReport();
+                        filterTasks();
                     }
                 });
                 menuItem.setEnabled(getCampaign().isGM());
@@ -9943,6 +9963,7 @@ public class CampaignGUI extends JPanel {
                         refreshUnitList();
                         refreshTaskList();
                         refreshAcquireList();
+                        filterTasks();
                     }
                 });
                 menuItem.setEnabled(getCampaign().isGM());
@@ -10331,6 +10352,7 @@ public class CampaignGUI extends JPanel {
                 refreshAcquireList();
                 refreshServicedUnitList();
                 refreshUnitList();
+                filterTasks();
             } else if (command.contains("CHANGE_SITE")) {
                 for (Unit unit : units) {
                     if (!unit.isDeployed()) {
