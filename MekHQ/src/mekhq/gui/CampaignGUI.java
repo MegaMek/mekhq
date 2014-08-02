@@ -3056,6 +3056,7 @@ public class CampaignGUI extends JPanel {
         int selectedRow = -1;
         int partId = -1;
         int selectedLocation = -1;
+        Unit selectedUnit = null;
         // int selectedTechRow = -1;
         Person tech = getSelectedTech();
         if (onWarehouseTab()) {
@@ -3083,6 +3084,7 @@ public class CampaignGUI extends JPanel {
             selectedRow = taskTable.getSelectedRow();
             // selectedTechRow = TechTable.getSelectedRow();
             selectedLocation = choiceLocation.getSelectedIndex();
+            selectedUnit = getSelectedServicedUnit();
             Part part = getSelectedTask();
             if (null == part) {
                 return;
@@ -3211,7 +3213,10 @@ public class CampaignGUI extends JPanel {
             }
         }
         if (selectedLocation != -1) {
-        	if (selectedLocation >= choiceLocation.getItemCount()) {
+        	if (selectedUnit == null
+        			|| getSelectedServicedUnit() == null
+        			|| !selectedUnit.equals(getSelectedServicedUnit())
+        			|| selectedLocation >= choiceLocation.getItemCount()) {
         		selectedLocation = 0;
         	}
         	choiceLocation.setSelectedIndex(selectedLocation);
