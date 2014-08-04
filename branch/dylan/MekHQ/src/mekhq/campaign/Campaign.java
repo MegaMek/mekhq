@@ -124,6 +124,7 @@ import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.ProtomekArmor;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.parts.StructuralIntegrity;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
@@ -1068,6 +1069,11 @@ public class Campaign implements Serializable {
     public Hashtable<String, Integer> getPartsInUse() {
     	Hashtable<String, Integer> inUse = new Hashtable<String, Integer>();
     	for (Part p : parts) {
+    		// SI isn't a proper "part"
+    		if (p instanceof StructuralIntegrity) {
+    			continue;
+    		}
+    		
     		String pname = p.getName();
 			Unit u = p.getUnit();
 			if (!(p instanceof MissingBattleArmorSuit)) {

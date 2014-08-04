@@ -2,6 +2,7 @@ VERSION HISTORY
 ----------------------------------
 v0.3.6-dylan (SVN)
 + Bug [#549]: Parts in Use tab displays HTML Tags
++ Bug [#550]: Parts in Use tab displays SI not on unit wazz up msg
 
 v0.3.6 (SVN)
 + Bug [#496]: NPE in mission resolution dialogue
