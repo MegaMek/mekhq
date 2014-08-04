@@ -3391,7 +3391,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         chkAdjustPlayerVehicles.setSelected(options.getAdjustPlayerVehicles());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -3869,7 +3869,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUseAtB(chkUseAtB.isSelected());
         options.setSkillLevel(cbSkillLevel.getSelectedIndex());
         options.setUseShareSystem(chkUseShareSystem.isSelected());
-        options.setUseShareSystem(chkSharesForAll.isSelected());
+        options.setSharesForAll(chkSharesForAll.isSelected());
         options.setTrackOriginalUnit(chkTrackOriginalUnit.isSelected());
         options.setRetirementRolls(chkRetirementRolls.isSelected());
         options.setCustomRetirementMods(chkCustomRetirementMods.isSelected());

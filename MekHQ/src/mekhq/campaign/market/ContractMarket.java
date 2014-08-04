@@ -299,8 +299,7 @@ public class ContractMarket implements Serializable {
 		else if (contract.getMissionType() == AtBContract.MT_RIOTDUTY)
 			contract.setEnemyCode("REB");
 		else {
-			boolean rebsAllowed = contract.getMissionType() != AtBContract.MT_PLANETARYASSAULT &&
-					contract.getMissionType() != AtBContract.MT_GUERRILLAWARFARE;
+			boolean rebsAllowed = contract.getMissionType() <= AtBContract.MT_RIOTDUTY;
 			contract.setEnemyCode(RandomFactionGenerator.getInstance().getEnemy(contract.getEmployerCode(), rebsAllowed));
 		}
 		if (contract.getMissionType() == AtBContract.MT_GARRISONDUTY && contract.getEnemyCode().equals("REB")) {
@@ -576,7 +575,7 @@ public class ContractMarket implements Serializable {
 					p.getSkill(SkillType.S_ADMIN).getExperienceLevel() >= adminTransport) {
 				adminTransport = p.getSkill(SkillType.S_ADMIN).getExperienceLevel();
 				if (null != p.getSkill(SkillType.S_NEG)) {
-					if (p.getSkill(SkillType.S_ADMIN).getExperienceLevel() == adminCommand) {
+					if (p.getSkill(SkillType.S_ADMIN).getExperienceLevel() == adminTransport) {
 						mods.rerolls[CLAUSE_TRANSPORT] = Math.max(p.getSkill(SkillType.S_NEG).getLevel(), mods.rerolls[CLAUSE_TRANSPORT]);
 					} else {
 						mods.rerolls[CLAUSE_TRANSPORT] = p.getSkill(SkillType.S_NEG).getLevel();
@@ -588,7 +587,7 @@ public class ContractMarket implements Serializable {
 					p.getSkill(SkillType.S_ADMIN).getExperienceLevel() >= adminLogistics) {
 				adminLogistics = p.getSkill(SkillType.S_ADMIN).getExperienceLevel();
 				if (null != p.getSkill(SkillType.S_NEG)) {
-					if (p.getSkill(SkillType.S_ADMIN).getExperienceLevel() == adminCommand) {
+					if (p.getSkill(SkillType.S_ADMIN).getExperienceLevel() == adminLogistics) {
 						mods.rerolls[CLAUSE_SUPPORT] = Math.max(p.getSkill(SkillType.S_NEG).getLevel(), mods.rerolls[CLAUSE_SUPPORT]);
 					} else {
 						mods.rerolls[CLAUSE_SUPPORT] = p.getSkill(SkillType.S_NEG).getLevel();
