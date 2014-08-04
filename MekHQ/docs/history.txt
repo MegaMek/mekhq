@@ -107,6 +107,7 @@ v0.3.6 (SVN)
 + Bug [#551]: Repair Location menu isn't sticky
 + Changed repair location dropdown to reset if the unit itself is changed
 + Bug [#556]: TOE: Name field empty after hitting cancel for Change Name
++ Bug [#553]: Prev. Fix for Ultra-Green and Green sorting is broken
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
