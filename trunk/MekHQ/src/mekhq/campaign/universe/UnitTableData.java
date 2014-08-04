@@ -257,7 +257,7 @@ public class UnitTableData implements Serializable, ActionListener {
 			retVal.add("Periphery");
 		}
 		if (f.isClan()) {
-			retVal.add("CLAN");
+			retVal.add("Clan");
 		} else {
 			retVal.add("General");
 		}

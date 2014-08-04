@@ -1883,11 +1883,11 @@ public class Campaign implements Serializable {
         			}
         			AtBScenario scenario = l.checkForBattle(this);
         			if (null != scenario) {
+        				sList.add(scenario);
         				if (scenario.getBattleType() == AtBScenario.BASEATTACK && scenario.isAttacker()) {
         					baseAttack = scenario;
         					break;
         				}
-        				sList.add(scenario);
         			}
         		}
 
@@ -1897,7 +1897,7 @@ public class Campaign implements Serializable {
         		if (null != baseAttack) {
         			ArrayList<Scenario> sameContract = new ArrayList<Scenario>();
         			for (AtBScenario s : sList) {
-        				if (s != baseAttack && s.getId() == baseAttack.getId()) {
+        				if (s != baseAttack && s.getMissionId() == baseAttack.getMissionId()) {
         					sameContract.add(s);
         				}
         			}

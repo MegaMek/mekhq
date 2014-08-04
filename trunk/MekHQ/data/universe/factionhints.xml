@@ -29,13 +29,18 @@ There are also some minor tags that appear only at the beginning of the file tha
  	<exceptions>PIR,TD,GV,MV,BoS,MM,WOB,IND,PIND</exceptions>
 	<exceptions end="3012-01-01">OC</exceptions>
 	<exceptions start="3052-05-01">CJF,CW,CGB,CSJ,CSV,CNC,CDS</exceptions>
+	<exceptions start="3068-01-21">WOB</exceptions>
  </neutral>
  
  <!--This only applies to mercenaries not under contract, to prevent mercenaries being treated as potential rivals to factions near such planets as Outreach and Northwind.-->
  <neutral faction="MERC">
  	<exceptions>WOB</exceptions>
  </neutral>
-	
+
+<!-- I lack sufficient information on the Azami Brotherhood, but it seems to me
+they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for now. -->
+ <neutral faction="AB">
+ </neutral>	
 
  <rivals>
  	<parties>CBS,CB</parties>
@@ -47,7 +52,6 @@ There are also some minor tags that appear only at the beginning of the file tha
  	<parties>CCO,CSA</parties>
  	<parties>CCO,CSJ</parties>
  	<parties>CCO,CJF</parties>
- 	<parties>CDS,CSR</parties>
  	<parties>CFM,CGS</parties>
  	<parties>CFM,CHH</parties>
  	<parties>CFM,CSA</parties>
@@ -59,8 +63,8 @@ There are also some minor tags that appear only at the beginning of the file tha
 	<parties>CJF,CSV</parties>
 	<parties>CJF,CW</parties>
 	<parties>CJF,CWIE</parties>
-	<parties>CM,CSR</parties>
-	<parties>CM,CSA</parties>
+	<parties>CMG,CSR</parties>
+	<parties>CMG,CSA</parties>
 	<parties start="2868-01-01">CSJ,CSA</parties>
 	<parties>CSJ,CW</parties>
 	<parties>CSR,CSV</parties>
@@ -521,6 +525,10 @@ There are also some minor tags that appear only at the beginning of the file tha
 		<parties>TC,FS</parties>
 	</war>
 	
+	<alliance>
+		<parties>ROS,Stone</parties>
+	</alliance>
+	
 	<war name="Operation Golden Dawn" start="3081-03-25" end="3081-09-07">
 		<parties>ROS,SHC</parties>
 		<parties>ROS,MCM</parties>
@@ -534,6 +542,11 @@ There are also some minor tags that appear only at the beginning of the file tha
 	
 	
 	<!--Dark Age, Republic Era-->
+	<alliance name="Escorpión Imperio" start="3080-04-01">
+		<!-- start date is a guess based on conquest beginning late January 3080 -->
+		<parties>CGS,NC,UC</parties>
+	</alliance>
+	
 	<war name="Second Dominion-Combine War" start="3098-07-01" end="3101-06-30">
 		<parties>CGB,DC</parties>
 	</war>
@@ -648,13 +661,13 @@ There are also some minor tags that appear only at the beginning of the file tha
 		<parties>CC,TC,MOC</parties>
 	</alliance>
 	<alliance start="3070-08-01">
-		<parties>FRR,CGB</parties>
+		<parties>FRR,CGB,RD</parties>
 	</alliance>
 	<alliance start="3070-11-14" end="3071-11-01">
 		<parties>CHH,CIH</parties>
 	</alliance>
 	<alliance start="3064-02-18">
-		<parties>CSR,OA</parties>
+		<parties>CSR,OA,RA</parties>
 	</alliance>
 	
 </factionHints>

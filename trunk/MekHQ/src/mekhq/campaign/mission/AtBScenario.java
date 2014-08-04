@@ -969,7 +969,13 @@ public class AtBScenario extends Scenario {
 			botForces.add(new BotForce("Civilians", attacker?2:1,
 					attacker?enemyHome:playerHome, attacker?enemyStart:start,
 							otherForce));
-			//TODO: add 6 turrets to defender
+			for (int i = 0; i < 6; i++) {
+				if (attacker) {
+					enemy.add(this.getEntityByName(randomGunEmplacement(), getContract(campaign).getEnemyCode(), campaign));
+				} else {
+					allyBot.add(this.getEntityByName(randomGunEmplacement(), getContract(campaign).getEmployerCode(), campaign));
+				}
+			}
 			break;
 		case STANDUP:
 		default:
@@ -989,14 +995,20 @@ public class AtBScenario extends Scenario {
 		}
 		/* Possible enemy reinforcements */
 		int roll = Compute.d6();
-		if (roll == 6) {
-			addLance(enemy, getContract(campaign).getEnemyCode(),
+		if (roll > 3) {
+			ArrayList<Entity> reinforcements = new ArrayList<Entity>();
+			if (roll == 6) {
+				addLance(reinforcements, getContract(campaign).getEnemyCode(),
 					getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
 					UnitTableData.WT_MEDIUM, UnitTableData.WT_ASSAULT, campaign, 8);
-		} else if (roll > 3) {
-			addLance(enemy, getContract(campaign).getEnemyCode(),
-					getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
-					UnitTableData.WT_LIGHT, UnitTableData.WT_ASSAULT, campaign, 6);
+			} else {
+				addLance(reinforcements, getContract(campaign).getEnemyCode(),
+						getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
+						UnitTableData.WT_LIGHT, UnitTableData.WT_ASSAULT, campaign, 6);
+			}
+			BotForce bf = getEnemyBotForce(getContract(campaign), enemyStart, enemyHome, reinforcements);
+			bf.setName(bf.getName() + " (Reinforcements)");
+			botForces.add(bf);
 		}
 		
 		if (campaign.getCampaignOptions().getUseDropShips()) {
@@ -1016,7 +1028,7 @@ public class AtBScenario extends Scenario {
 					}
 				}
 				if (!dropshipFound) {
-					Entity dropship = getDropship("Leopard (2537)",
+					Entity dropship = getEntityByName("Leopard (2537)",
 							getContract(campaign).getEmployerCode(), campaign);
 					alliesPlayer.add(dropship);
 				}
@@ -1359,7 +1371,7 @@ public class AtBScenario extends Scenario {
 								UnitMarket.getRandomMechWeight(),
 								campaign));
 			}
-			botForces.add(new BotForce("Pirates", 3, Board.START_S, enemy));
+			botForces.add(new BotForce("Pirates", 3, Board.START_S, otherForce));
 			break;
 		}
 		bigBattleAllies = new ArrayList<Entity>();
@@ -1492,6 +1504,53 @@ public class AtBScenario extends Scenario {
 		lanceCount++;
 	}
 	
+	/* From chart provided by Makinus */
+	private String randomGunEmplacement() {
+		boolean dual = false;
+		int roll = Compute.randomInt(20) + 1;
+		if (roll >= 19) {
+			dual = true;
+			roll = Compute.randomInt(18) + 1;
+		}
+		if (roll < 4) {
+			return dual?"AC Turret (Dual) AC2":"AC Turret AC2";
+		}
+		if (roll < 7) {
+			return dual?"AC Turret (Dual) AC5":"AC Turret AC5";
+		}
+		if (roll == 7) {
+			return dual?"AC Turret (Dual) AC10":"AC Turret AC10";
+		}
+		if (roll == 8) {
+			return dual?"SRM Turret (Dual) SRM2":"SRM Turret SRM2";
+		}
+		if (roll == 9) {
+			return dual?"SRM Turret (Dual) SRM4":"SRM Turret SRM4";
+		}
+		if (roll == 10) {
+			return dual?"SRM Turret (Dual) SRM6":"SRM Turret SRM6";
+		}
+		if (roll < 13) {
+			return dual?"LRM Turret (Dual) LRM5":"LRM Turret LRM5";
+		}
+		if (roll == 13) {
+			return dual?"LRM Turret (Dual) LRM10":"LRM Turret LRM10";
+		}
+		if (roll == 14) {
+			return dual?"LRM Turret (Dual) LRM15":"LRM Turret LRM15";
+		}
+		if (roll == 15) {
+			return dual?"LRM Turret (Dual) LRM20":"LRM Turret LRM20";
+		}
+		if (roll == 16) {
+			return dual?"Laser Turret (Dual) SL":"Laser Turret SL";
+		}
+		if (roll == 17) {
+			return dual?"Laser Turret (Dual) ML":"Laser Turret ML";
+		}
+		return dual?"Laser Turret (Dual) LL":"Laser Turret LL";
+	}
+	
 	private Entity getEntity(String faction, int skill, int quality, int unitType, int weightClass, Campaign c) {
 		UnitTableData.FactionTables ft = UnitTableData.getInstance().getBestRAT(c.getCampaignOptions().getRATs(), c.getCalendar().get(Calendar.YEAR), faction, unitType);
 		if (null != ft) {
@@ -1585,7 +1644,7 @@ public class AtBScenario extends Scenario {
 		return en;
 	}
 	
-	private Entity getDropship(String name, String fName, Campaign campaign) {
+	private Entity getEntityByName(String name, String fName, Campaign campaign) {
 		Entity en = Campaign.getBrandNewUndamagedEntity(name);
 		
 		en.setOwner(campaign.getPlayer());
@@ -1906,7 +1965,6 @@ public class AtBScenario extends Scenario {
 						en.getCrew().getGunnery() + "/" +
 						en.getCrew().getPiloting() + "), " +
 						"<i>" + en.getShortName() + "</i>" + 
-						((en.getDeployRound() > 0)?" [Reinforcements]":"") +
 						"</html>");
 			}
 		}
@@ -2227,7 +2285,7 @@ public class AtBScenario extends Scenario {
 			}
 		}
 	}
-	
+		
 	private ArrayList<String> getEntityStub(Node wn) {
 		ArrayList<String> stub = new ArrayList<String>();
 		NodeList nl = wn.getChildNodes();

@@ -2122,256 +2122,286 @@ After the <rat> nodes there are a series of <altTable> nodes which give addition
 </rat> <!--War of 39 (3039)-->
 <rat name="Xotl" era="2750">
 	<faction code="SL">
-		<mech weight="light">SLReg2750LightMechs|SLRoy2750LightMechs</mech>
-		<mech weight="medium">SLReg2750MediumMechs|SLRoy2750MediumMechs</mech>
-		<mech weight="heavy">SLReg2750HeavyMechs|SLRoy2750HeavyMechs</mech>
-		<mech weight="assault">SLReg2750AssaultMechs|SLRoy2750AssaultMechs</mech>
+		<mech weight="light">Star League Regular 2750 Light Mechs|Star League Royal 2750 Light Mechs</mech>
+		<mech weight="medium">Star League Regular 2750 Medium Mechs|Star League Royal 2750 Medium Mechs</mech>
+		<mech weight="heavy">Star League Regular 2750 Heavy Mechs|Star League Royal 2750 Heavy Mechs</mech>
+		<mech weight="assault">Star League Regular 2750 Assault Mechs|Star League Royal 2750 Assault Mechs</mech>
 	</faction>
 </rat> <!--Xotl (2750)-->
 <rat name="Xotl" era="3028">
 	<faction code="CC">
-		<mech weight="light">Liao3028LightMechs_F|Liao3028LightMechs_D|Liao3028LightMechs_C|Liao3028LightMechs_B|Liao3028LightMechs_A</mech>
-		<mech weight="medium">Liao3028MediumMechs_F|Liao3028MediumMechs_D|Liao3028MediumMechs_C|Liao3028MediumMechs_B|Liao3028MediumMechs_A</mech>
-		<mech weight="heavy">Liao3028HeavyMechs_F|Liao3028HeavyMechs_D|Liao3028HeavyMechs_C|Liao3028HeavyMechs_B|Liao3028HeavyMechs_A</mech>
-		<mech weight="assault">Liao3028AssaultMechs_F|Liao3028AssaultMechs_D|Liao3028AssaultMechs_C|Liao3028AssaultMechs_B|Liao3028AssaultMechs_A</mech>
-		<vehicle weight="light">Liao3028LightVehicles_F|Liao3028LightVehicles_D|Liao3028LightVehicles_C|Liao3028LightVehicles_B|Liao3028LightVehicles_A</vehicle>
-		<vehicle weight="medium">Liao3028MediumVehicles_F|Liao3028MediumVehicles_D|Liao3028MediumVehicles_C|Liao3028MediumVehicles_B|Liao3028MediumVehicles_A</vehicle>
-		<vehicle weight="heavy">Liao3028HeavyVehicles_F|Liao3028HeavyVehicles_D|Liao3028HeavyVehicles_C|Liao3028HeavyVehicles_B|Liao3028HeavyVehicles_A</vehicle>
-		<vehicle weight="assault">Liao3028AssaultVehicles_F|Liao3028AssaultVehicles_D|Liao3028AssaultVehicles_C|Liao3028AssaultVehicles_B|Liao3028AssaultVehicles_A</vehicle>
+		<mech weight="light">Liao 3028 Light Mechs F|Liao 3028 Light Mechs D|Liao 3028 Light Mechs C|Liao 3028 Light Mechs B|Liao 3028 Light Mechs A</mech>
+		<mech weight="medium">Liao 3028 Medium Mechs F|Liao 3028 Medium Mechs D|Liao 3028 Medium Mechs C|Liao 3028 Medium Mechs B|Liao 3028 Medium Mechs A</mech>
+		<mech weight="heavy">Liao 3028 Heavy Mechs F|Liao 3028 Heavy Mechs D|Liao 3028 Heavy Mechs C|Liao 3028 Heavy Mechs B|Liao 3028 Heavy Mechs A</mech>
+		<mech weight="assault">Liao 3028 Assault Mechs F|Liao 3028 Assault Mechs D|Liao 3028 Assault Mechs C|Liao 3028 Assault Mechs B|Liao 3028 Assault Mechs A</mech>
+		<vehicle weight="light">Liao 3028 Light Vehicles F|Liao 3028 Light Vehicles D|Liao 3028 Light Vehicles C|Liao 3028 Light Vehicles B|Liao 3028 Light Vehicles A</vehicle>
+		<vehicle weight="medium">Liao 3028 Medium Vehicles F|Liao 3028 Medium Vehicles D|Liao 3028 Medium Vehicles C|Liao 3028 Medium Vehicles B|Liao 3028 Medium Vehicles A</vehicle>
+		<vehicle weight="heavy">Liao 3028 Heavy Vehicles F|Liao 3028 Heavy Vehicles D|Liao 3028 Heavy Vehicles C|Liao 3028 Heavy Vehicles B|Liao 3028 Heavy Vehicles A</vehicle>
+		<vehicle weight="assault">Liao 3028 Assault Vehicles F|Liao 3028 Assault Vehicles D|Liao 3028 Assault Vehicles C|Liao 3028 Assault Vehicles B|Liao 3028 Assault Vehicles A</vehicle>
 	</faction>
 	<faction code="DC">
-		<mech weight="light">Kurita3028LightMechs_F|Kurita3028LightMechs_D|Kurita3028LightMechs_C|Kurita3028LightMechs_B|Kurita3028LightMechs_A</mech>
-		<mech weight="medium">Kurita3028MediumMechs_F|Kurita3028MediumMechs_D|Kurita3028MediumMechs_C|Kurita3028MediumMechs_B|Kurita3028MediumMechs_A</mech>
-		<mech weight="heavy">Kurita3028HeavyMechs_F|Kurita3028HeavyMechs_D|Kurita3028HeavyMechs_C|Kurita3028HeavyMechs_B|Kurita3028HeavyMechs_A</mech>
-		<mech weight="assault">Kurita3028AssaultMechs_F|Kurita3028AssaultMechs_D|Kurita3028AssaultMechs_C|Kurita3028AssaultMechs_B|Kurita3028AssaultMechs_A</mech>
-		<vehicle weight="light">Kurita3028LightVehicles_F|Kurita3028LightVehicles_D|Kurita3028LightVehicles_C|Kurita3028LightVehicles_B|Kurita3028LightVehicles_A</vehicle>
-		<vehicle weight="medium">Kurita3028MediumVehicles_F|Kurita3028MediumVehicles_D|Kurita3028MediumVehicles_C|Kurita3028MediumVehicles_B|Kurita3028MediumVehicles_A</vehicle>
-		<vehicle weight="heavy">Kurita3028HeavyVehicles_F|Kurita3028HeavyVehicles_D|Kurita3028HeavyVehicles_C|Kurita3028HeavyVehicles_B|Kurita3028HeavyVehicles_A</vehicle>
-		<vehicle weight="assault">Kurita3028AssaultVehicles_F|Kurita3028AssaultVehicles_D|Kurita3028AssaultVehicles_C|Kurita3028AssaultVehicles_B|Kurita3028AssaultVehicles_A</vehicle>
+		<mech weight="light">Kurita 3028 Light Mechs F|Kurita 3028 Light Mechs D|Kurita 3028 Light Mechs C|Kurita 3028 Light Mechs B|Kurita 3028 Light Mechs A</mech>
+		<mech weight="medium">Kurita 3028 Medium Mechs F|Kurita 3028 Medium Mechs D|Kurita 3028 Medium Mechs C|Kurita 3028 Medium Mechs B|Kurita 3028 Medium Mechs A</mech>
+		<mech weight="heavy">Kurita 3028 Heavy Mechs F|Kurita 3028 Heavy Mechs D|Kurita 3028 Heavy Mechs C|Kurita 3028 Heavy Mechs B|Kurita 3028 Heavy Mechs A</mech>
+		<mech weight="assault">Kurita 3028 Assault Mechs F|Kurita 3028 Assault Mechs D|Kurita 3028 Assault Mechs C|Kurita 3028 Assault Mechs B|Kurita 3028 Assault Mechs A</mech>
+		<vehicle weight="light">Kurita 3028 Light Vehicles F|Kurita 3028 Light Vehicles D|Kurita 3028 Light Vehicles C|Kurita 3028 Light Vehicles B|Kurita 3028 Light Vehicles A</vehicle>
+		<vehicle weight="medium">Kurita 3028 Medium Vehicles F|Kurita 3028 Medium Vehicles D|Kurita 3028 Medium Vehicles C|Kurita 3028 Medium Vehicles B|Kurita 3028 Medium Vehicles A</vehicle>
+		<vehicle weight="heavy">Kurita 3028 Heavy Vehicles F|Kurita 3028 Heavy Vehicles D|Kurita 3028 Heavy Vehicles C|Kurita 3028 Heavy Vehicles B|Kurita 3028 Heavy Vehicles A</vehicle>
+		<vehicle weight="assault">Kurita 3028 Assault Vehicles F|Kurita 3028 Assault Vehicles D|Kurita 3028 Assault Vehicles C|Kurita 3028 Assault Vehicles B|Kurita 3028 Assault Vehicles A</vehicle>
 	</faction>
 	<faction code="FS">
-		<mech weight="light">Davion3028LightMechs_F|Davion3028LightMechs_D|Davion3028LightMechs_C|Davion3028LightMechs_B|Davion3028LightMechs_A</mech>
-		<mech weight="medium">Davion3028MediumMechs_F|Davion3028MediumMechs_D|Davion3028MediumMechs_C|Davion3028MediumMechs_B|Davion3028MediumMechs_A</mech>
-		<mech weight="heavy">Davion3028HeavyMechs_F|Davion3028HeavyMechs_D|Davion3028HeavyMechs_C|Davion3028HeavyMechs_B|Davion3028HeavyMechs_A</mech>
-		<mech weight="assault">Davion3028AssaultMechs_F|Davion3028AssaultMechs_D|Davion3028AssaultMechs_C|Davion3028AssaultMechs_B|Davion3028AssaultMechs_A</mech>
-		<vehicle weight="light">Davion3028LightVehicles_F|Davion3028LightVehicles_D|Davion3028LightVehicles_C|Davion3028LightVehicles_B|Davion3028LightVehicles_A</vehicle>
-		<vehicle weight="medium">Davion3028MediumVehicles_F|Davion3028MediumVehicles_D|Davion3028MediumVehicles_C|Davion3028MediumVehicles_B|Davion3028MediumVehicles_A</vehicle>
-		<vehicle weight="heavy">Davion3028HeavyVehicles_F|Davion3028HeavyVehicles_D|Davion3028HeavyVehicles_C|Davion3028HeavyVehicles_B|Davion3028HeavyVehicles_A</vehicle>
-		<vehicle weight="assault">Davion3028AssaultVehicles_F|Davion3028AssaultVehicles_D|Davion3028AssaultVehicles_C|Davion3028AssaultVehicles_B|Davion3028AssaultVehicles_A</vehicle>
+		<mech weight="light">Davion 3028 Light Mechs F|Davion 3028 Light Mechs D|Davion 3028 Light Mechs C|Davion 3028 Light Mechs B|Davion 3028 Light Mechs A</mech>
+		<mech weight="medium">Davion 3028 Medium Mechs F|Davion 3028 Medium Mechs D|Davion 3028 Medium Mechs C|Davion 3028 Medium Mechs B|Davion 3028 Medium Mechs A</mech>
+		<mech weight="heavy">Davion 3028 Heavy Mechs F|Davion 3028 Heavy Mechs D|Davion 3028 Heavy Mechs C|Davion 3028 Heavy Mechs B|Davion 3028 Heavy Mechs A</mech>
+		<mech weight="assault">Davion 3028 Assault Mechs F|Davion 3028 Assault Mechs D|Davion 3028 Assault Mechs C|Davion 3028 Assault Mechs B|Davion 3028 Assault Mechs A</mech>
+		<vehicle weight="light">Davion 3028 Light Vehicles F|Davion 3028 Light Vehicles D|Davion 3028 Light Vehicles C|Davion 3028 Light Vehicles B|Davion 3028 Light Vehicles A</vehicle>
+		<vehicle weight="medium">Davion 3028 Medium Vehicles F|Davion 3028 Medium Vehicles D|Davion 3028 Medium Vehicles C|Davion 3028 Medium Vehicles B|Davion 3028 Medium Vehicles A</vehicle>
+		<vehicle weight="heavy">Davion 3028 Heavy Vehicles F|Davion 3028 Heavy Vehicles D|Davion 3028 Heavy Vehicles C|Davion 3028 Heavy Vehicles B|Davion 3028 Heavy Vehicles A</vehicle>
+		<vehicle weight="assault">Davion 3028 Assault Vehicles F|Davion 3028 Assault Vehicles D|Davion 3028 Assault Vehicles C|Davion 3028 Assault Vehicles B|Davion 3028 Assault Vehicles A</vehicle>
 	</faction>
 	<faction code="FWL">
-		<mech weight="light">Marik3028LightMechs_F|Marik3028LightMechs_D|Marik3028LightMechs_C|Marik3028LightMechs_B|Marik3028LightMechs_A</mech>
-		<mech weight="medium">Marik3028MediumMechs_F|Marik3028MediumMechs_D|Marik3028MediumMechs_C|Marik3028MediumMechs_B|Marik3028MediumMechs_A</mech>
-		<mech weight="heavy">Marik3028HeavyMechs_F|Marik3028HeavyMechs_D|Marik3028HeavyMechs_C|Marik3028HeavyMechs_B|Marik3028HeavyMechs_A</mech>
-		<mech weight="assault">Marik3028AssaultMechs_F|Marik3028AssaultMechs_D|Marik3028AssaultMechs_C|Marik3028AssaultMechs_B|Marik3028AssaultMechs_A</mech>
-		<vehicle weight="light">Marik3028LightVehicles_F|Marik3028LightVehicles_D|Marik3028LightVehicles_C|Marik3028LightVehicles_B|Marik3028LightVehicles_A</vehicle>
-		<vehicle weight="medium">Marik3028MediumVehicles_F|Marik3028MediumVehicles_D|Marik3028MediumVehicles_C|Marik3028MediumVehicles_B|Marik3028MediumVehicles_A</vehicle>
-		<vehicle weight="heavy">Marik3028HeavyVehicles_F|Marik3028HeavyVehicles_D|Marik3028HeavyVehicles_C|Marik3028HeavyVehicles_B|Marik3028HeavyVehicles_A</vehicle>
-		<vehicle weight="assault">Marik3028AssaultVehicles_F|Marik3028AssaultVehicles_D|Marik3028AssaultVehicles_C|Marik3028AssaultVehicles_B|Marik3028AssaultVehicles_A</vehicle>
+		<mech weight="light">Marik 3028 Light Mechs F|Marik 3028 Light Mechs D|Marik 3028 Light Mechs C|Marik 3028 Light Mechs B|Marik 3028 Light Mechs A</mech>
+		<mech weight="medium">Marik 3028 Medium Mechs F|Marik 3028 Medium Mechs D|Marik 3028 Medium Mechs C|Marik 3028 Medium Mechs B|Marik 3028 Medium Mechs A</mech>
+		<mech weight="heavy">Marik 3028 Heavy Mechs F|Marik 3028 Heavy Mechs D|Marik 3028 Heavy Mechs C|Marik 3028 Heavy Mechs B|Marik 3028 Heavy Mechs A</mech>
+		<mech weight="assault">Marik 3028 Assault Mechs F|Marik 3028 Assault Mechs D|Marik 3028 Assault Mechs C|Marik 3028 Assault Mechs B|Marik 3028 Assault Mechs A</mech>
+		<vehicle weight="light">Marik 3028 Light Vehicles F|Marik 3028 Light Vehicles D|Marik 3028 Light Vehicles C|Marik 3028 Light Vehicles B|Marik 3028 Light Vehicles A</vehicle>
+		<vehicle weight="medium">Marik 3028 Medium Vehicles F|Marik 3028 Medium Vehicles D|Marik 3028 Medium Vehicles C|Marik 3028 Medium Vehicles B|Marik 3028 Medium Vehicles A</vehicle>
+		<vehicle weight="heavy">Marik 3028 Heavy Vehicles F|Marik 3028 Heavy Vehicles D|Marik 3028 Heavy Vehicles C|Marik 3028 Heavy Vehicles B|Marik 3028 Heavy Vehicles A</vehicle>
+		<vehicle weight="assault">Marik 3028 Assault Vehicles F|Marik 3028 Assault Vehicles D|Marik 3028 Assault Vehicles C|Marik 3028 Assault Vehicles B|Marik 3028 Assault Vehicles A</vehicle>
 	</faction>
 	<faction code="General">
-		<mech weight="light">MerPerGen30283050LightMechs_F|MerPerGen30283050LightMechs_D|MerPerGen30283050LightMechs_C|MerPerGen30283050LightMechs_B|MerPerGen30283050LightMechs_A</mech>
-		<mech weight="medium">MerPerGen30283050MediumMechs_F|MerPerGen30283050MediumMechs_D|MerPerGen30283050MediumMechs_C|MerPerGen30283050MediumMechs_B|MerPerGen30283050MediumMechs_A</mech>
-		<mech weight="heavy">MerPerGen30283050HeavyMechs_F|MerPerGen30283050HeavyMechs_D|MerPerGen30283050HeavyMechs_C|MerPerGen30283050HeavyMechs_B|MerPerGen30283050HeavyMechs_A</mech>
-		<mech weight="assault">MerPerGen30283050AssaultMechs_F|MerPerGen30283050AssaultMechs_D|MerPerGen30283050AssaultMechs_C|MerPerGen30283050AssaultMechs_B|MerPerGen30283050AssaultMechs_A</mech>
-		<vehicle weight="light">MerPerGen3028LightVehicles_F|MerPerGen3028LightVehicles_D|MerPerGen3028LightVehicles_C|MerPerGen3028LightVehicles_B|MerPerGen3028LightVehicles_A</vehicle>
-		<vehicle weight="medium">MerPerGen3028MediumVehicles_F|MerPerGen3028MediumVehicles_D|MerPerGen3028MediumVehicles_C|MerPerGen3028MediumVehicles_B|MerPerGen3028MediumVehicles_A</vehicle>
-		<vehicle weight="heavy">MerPerGen3028HeavyVehicles_F|MerPerGen3028HeavyVehicles_D|MerPerGen3028HeavyVehicles_C|MerPerGen3028HeavyVehicles_B|MerPerGen3028HeavyVehicles_A</vehicle>
-		<vehicle weight="assault">MerPerGen3028AssaultVehicles_F|MerPerGen3028AssaultVehicles_D|MerPerGen3028AssaultVehicles_C|MerPerGen3028AssaultVehicles_B|MerPerGen3028AssaultVehicles_A</vehicle>
+		<mech weight="light">Mercenary Periphery General 3028-3050 Light Mechs F|Mercenary Periphery General 3028-3050 Light Mechs D|Mercenary Periphery General 3028-3050 Light Mechs C|Mercenary Periphery General 3028-3050 Light Mechs B|Mercenary Periphery General 3028-3050 Light Mechs A</mech>
+		<mech weight="medium">Mercenary Periphery General 3028-3050 Medium Mechs F|Mercenary Periphery General 3028-3050 Medium Mechs D|Mercenary Periphery General 3028-3050 Medium Mechs C|Mercenary Periphery General 3028-3050 Medium Mechs B|Mercenary Periphery General 3028-3050 Medium Mechs A</mech>
+		<mech weight="heavy">Mercenary Periphery General 3028-3050 Heavy Mechs F|Mercenary Periphery General 3028-3050 Heavy Mechs D|Mercenary Periphery General 3028-3050 Heavy Mechs C|Mercenary Periphery General 3028-3050 Heavy Mechs B|Mercenary Periphery General 3028-3050 Heavy Mechs A</mech>
+		<mech weight="assault">Mercenary Periphery General 3028-3050 Assault Mechs F|Mercenary Periphery General 3028-3050 Assault Mechs D|Mercenary Periphery General 3028-3050 Assault Mechs C|Mercenary Periphery General 3028-3050 Assault Mechs B|Mercenary Periphery General 3028-3050 Assault Mechs A</mech>
+		<vehicle weight="light">Mercenary Periphery General 3028 Light Vehicles F|Mercenary Periphery General 3028 Light Vehicles D|Mercenary Periphery General 3028 Light Vehicles C|Mercenary Periphery General 3028 Light Vehicles B|Mercenary Periphery General 3028 Light Vehicles A</vehicle>
+		<vehicle weight="medium">Mercenary Periphery General 3028 Medium Vehicles F|Mercenary Periphery General 3028 Medium Vehicles D|Mercenary Periphery General 3028 Medium Vehicles C|Mercenary Periphery General 3028 Medium Vehicles B|Mercenary Periphery General 3028 Medium Vehicles A</vehicle>
+		<vehicle weight="heavy">Mercenary Periphery General 3028 Heavy Vehicles F|Mercenary Periphery General 3028 Heavy Vehicles D|Mercenary Periphery General 3028 Heavy Vehicles C|Mercenary Periphery General 3028 Heavy Vehicles B|Mercenary Periphery General 3028 Heavy Vehicles A</vehicle>
+		<vehicle weight="assault">Mercenary Periphery General 3028 Assault Vehicles F|Mercenary Periphery General 3028 Assault Vehicles D|Mercenary Periphery General 3028 Assault Vehicles C|Mercenary Periphery General 3028 Assault Vehicles B|Mercenary Periphery General 3028 Assault Vehicles A</vehicle>
 	</faction>
 	<faction code="LA">
-		<mech weight="light">Steiner3028LightMechs_F|Steiner3028LightMechs_D|Steiner3028LightMechs_C|Steiner3028LightMechs_B|Steiner3028LightMechs_A</mech>
-		<mech weight="medium">Steiner3028MediumMechs_F|Steiner3028MediumMechs_D|Steiner3028MediumMechs_C|Steiner3028MediumMechs_B|Steiner3028MediumMechs_A</mech>
-		<mech weight="heavy">Steiner3028HeavyMechs_F|Steiner3028HeavyMechs_D|Steiner3028HeavyMechs_C|Steiner3028HeavyMechs_B|Steiner3028HeavyMechs_A</mech>
-		<mech weight="assault">Steiner3028AssaultMechs_F|Steiner3028AssaultMechs_D|Steiner3028AssaultMechs_C|Steiner3028AssaultMechs_B|Steiner3028AssaultMechs_A</mech>
-		<vehicle weight="light">Steiner3028LightVehicles_F|Steiner3028LightVehicles_D|Steiner3028LightVehicles_C|Steiner3028LightVehicles_B|Steiner3028LightVehicles_A</vehicle>
-		<vehicle weight="medium">Steiner3028MediumVehicles_F|Steiner3028MediumVehicles_D|Steiner3028MediumVehicles_C|Steiner3028MediumVehicles_B|Steiner3028MediumVehicles_A</vehicle>
-		<vehicle weight="heavy">Steiner3028HeavyVehicles_F|Steiner3028HeavyVehicles_D|Steiner3028HeavyVehicles_C|Steiner3028HeavyVehicles_B|Steiner3028HeavyVehicles_A</vehicle>
-		<vehicle weight="assault">Steiner3028AssaultVehicles_F|Steiner3028AssaultVehicles_D|Steiner3028AssaultVehicles_C|Steiner3028AssaultVehicles_B|Steiner3028AssaultVehicles_A</vehicle>
+		<mech weight="light">Steiner 3028 Light Mechs F|Steiner 3028 Light Mechs D|Steiner 3028 Light Mechs C|Steiner 3028 Light Mechs B|Steiner 3028 Light Mechs A</mech>
+		<mech weight="medium">Steiner 3028 Medium Mechs F|Steiner 3028 Medium Mechs D|Steiner 3028 Medium Mechs C|Steiner 3028 Medium Mechs B|Steiner 3028 Medium Mechs A</mech>
+		<mech weight="heavy">Steiner 3028 Heavy Mechs F|Steiner 3028 Heavy Mechs D|Steiner 3028 Heavy Mechs C|Steiner 3028 Heavy Mechs B|Steiner 3028 Heavy Mechs A</mech>
+		<mech weight="assault">Steiner 3028 Assault Mechs F|Steiner 3028 Assault Mechs D|Steiner 3028 Assault Mechs C|Steiner 3028 Assault Mechs B|Steiner 3028 Assault Mechs A</mech>
+		<vehicle weight="light">Steiner 3028 Light Vehicles F|Steiner 3028 Light Vehicles D|Steiner 3028 Light Vehicles C|Steiner 3028 Light Vehicles B|Steiner 3028 Light Vehicles A</vehicle>
+		<vehicle weight="medium">Steiner 3028 Medium Vehicles F|Steiner 3028 Medium Vehicles D|Steiner 3028 Medium Vehicles C|Steiner 3028 Medium Vehicles B|Steiner 3028 Medium Vehicles A</vehicle>
+		<vehicle weight="heavy">Steiner 3028 Heavy Vehicles F|Steiner 3028 Heavy Vehicles D|Steiner 3028 Heavy Vehicles C|Steiner 3028 Heavy Vehicles B|Steiner 3028 Heavy Vehicles A</vehicle>
+		<vehicle weight="assault">Steiner 3028 Assault Vehicles F|Steiner 3028 Assault Vehicles D|Steiner 3028 Assault Vehicles C|Steiner 3028 Assault Vehicles B|Steiner 3028 Assault Vehicles A</vehicle>
 	</faction>
 	<faction code="MOC">
-		<mech weight="light">Canopus30283050LightMechs_F|Canopus30283050LightMechs_D|Canopus30283050LightMechs_C|Canopus30283050LightMechs_B|Canopus30283050LightMechs_A</mech>
-		<mech weight="medium">Canopus30283050MediumMechs_F|Canopus30283050MediumMechs_D|Canopus30283050MediumMechs_C|Canopus30283050MediumMechs_B|Canopus30283050MediumMechs_A</mech>
-		<mech weight="heavy">Canopus30283050HeavyMechs_F|Canopus30283050HeavyMechs_D|Canopus30283050HeavyMechs_C|Canopus30283050HeavyMechs_B|Canopus30283050HeavyMechs_A</mech>
-		<mech weight="assault">Canopus30283050AssaultMechs_F|Canopus30283050AssaultMechs_D|Canopus30283050AssaultMechs_C|Canopus30283050AssaultMechs_B|Canopus30283050AssaultMechs_A</mech>
-		<vehicle weight="light">Canopus3028LightVehicles_F|Canopus3028LightVehicles_D|Canopus3028LightVehicles_C|Canopus3028LightVehicles_B|Canopus3028LightVehicles_A</vehicle>
-		<vehicle weight="medium">Canopus3028MediumVehicles_F|Canopus3028MediumVehicles_D|Canopus3028MediumVehicles_C|Canopus3028MediumVehicles_B|Canopus3028MediumVehicles_A</vehicle>
-		<vehicle weight="heavy">Canopus3028HeavyVehicles_F|Canopus3028HeavyVehicles_D|Canopus3028HeavyVehicles_C|Canopus3028HeavyVehicles_B|Canopus3028HeavyVehicles_A</vehicle>
-		<vehicle weight="assault">Canopus3028AssaultVehicles_F|Canopus3028AssaultVehicles_D|Canopus3028AssaultVehicles_C|Canopus3028AssaultVehicles_B|Canopus3028AssaultVehicles_A</vehicle>
+		<mech weight="light">Canopus 3028-3050 Light Mechs F|Canopus 3028-3050 Light Mechs D|Canopus 3028-3050 Light Mechs C|Canopus 3028-3050 Light Mechs B|Canopus 3028-3050 Light Mechs A</mech>
+		<mech weight="medium">Canopus 3028-3050 Medium Mechs F|Canopus 3028-3050 Medium Mechs D|Canopus 3028-3050 Medium Mechs C|Canopus 3028-3050 Medium Mechs B|Canopus 3028-3050 Medium Mechs A</mech>
+		<mech weight="heavy">Canopus 3028-3050 Heavy Mechs F|Canopus 3028-3050 Heavy Mechs D|Canopus 3028-3050 Heavy Mechs C|Canopus 3028-3050 Heavy Mechs B|Canopus 3028-3050 Heavy Mechs A</mech>
+		<mech weight="assault">Canopus 3028-3050 Assault Mechs F|Canopus 3028-3050 Assault Mechs D|Canopus 3028-3050 Assault Mechs C|Canopus 3028-3050 Assault Mechs B|Canopus 3028-3050 Assault Mechs A</mech>
+		<vehicle weight="light">Canopus 3028 Light Vehicles F|Canopus 3028 Light Vehicles D|Canopus 3028 Light Vehicles C|Canopus 3028 Light Vehicles B|Canopus 3028 Light Vehicles A</vehicle>
+		<vehicle weight="medium">Canopus 3028 Medium Vehicles F|Canopus 3028 Medium Vehicles D|Canopus 3028 Medium Vehicles C|Canopus 3028 Medium Vehicles B|Canopus 3028 Medium Vehicles A</vehicle>
+		<vehicle weight="heavy">Canopus 3028 Heavy Vehicles F|Canopus 3028 Heavy Vehicles D|Canopus 3028 Heavy Vehicles C|Canopus 3028 Heavy Vehicles B|Canopus 3028 Heavy Vehicles A</vehicle>
+		<vehicle weight="assault">Canopus 3028 Assault Vehicles F|Canopus 3028 Assault Vehicles D|Canopus 3028 Assault Vehicles C|Canopus 3028 Assault Vehicles B|Canopus 3028 Assault Vehicles A</vehicle>
 	</faction>
 	<faction code="OA">
-		<mech weight="light">Outworlds30283050LightMechs_F|Outworlds30283050LightMechs_D|Outworlds30283050LightMechs_C|Outworlds30283050LightMechs_B|Outworlds30283050LightMechs_A</mech>
-		<mech weight="medium">Outworlds30283050MediumMechs_F|Outworlds30283050MediumMechs_D|Outworlds30283050MediumMechs_C|Outworlds30283050MediumMechs_B|Outworlds30283050MediumMechs_A</mech>
-		<mech weight="heavy">Outworlds30283050HeavyMechs_F|Outworlds30283050HeavyMechs_D|Outworlds30283050HeavyMechs_C|Outworlds30283050HeavyMechs_B|Outworlds30283050HeavyMechs_A</mech>
-		<mech weight="assault">Outworlds30283050AssaultMechs_F|Outworlds30283050AssaultMechs_D|Outworlds30283050AssaultMechs_C|Outworlds30283050AssaultMechs_B|Outworlds30283050AssaultMechs_A</mech>
-		<vehicle weight="light">Outworlds3028LightVehicles_F|Outworlds3028LightVehicles_D|Outworlds3028LightVehicles_C|Outworlds3028LightVehicles_B|Outworlds3028LightVehicles_A</vehicle>
-		<vehicle weight="medium">Outworlds3028MediumVehicles_F|Outworlds3028MediumVehicles_D|Outworlds3028MediumVehicles_C|Outworlds3028MediumVehicles_B|Outworlds3028MediumVehicles_A</vehicle>
-		<vehicle weight="heavy">Outworlds3028HeavyVehicles_F|Outworlds3028HeavyVehicles_D|Outworlds3028HeavyVehicles_C|Outworlds3028HeavyVehicles_B|Outworlds3028HeavyVehicles_A</vehicle>
-		<vehicle weight="assault">Outworlds3028AssaultVehicles_F|Outworlds3028AssaultVehicles_D|Outworlds3028AssaultVehicles_C|Outworlds3028AssaultVehicles_B|Outworlds3028AssaultVehicles_A</vehicle>
+		<mech weight="light">Outworlds Alliance 3028-3050 Light Mechs F|Outworlds Alliance 3028-3050 Light Mechs D|Outworlds Alliance 3028-3050 Light Mechs C|Outworlds Alliance 3028-3050 Light Mechs B|Outworlds Alliance 3028-3050 Light Mechs A</mech>
+		<mech weight="medium">Outworlds Alliance 3028-3050 Medium Mechs F|Outworlds Alliance 3028-3050 Medium Mechs D|Outworlds Alliance 3028-3050 Medium Mechs C|Outworlds Alliance 3028-3050 Medium Mechs B|Outworlds Alliance 3028-3050 Medium Mechs A</mech>
+		<mech weight="heavy">Outworlds Alliance 3028-3050 Heavy Mechs F|Outworlds Alliance 3028-3050 Heavy Mechs D|Outworlds Alliance 3028-3050 Heavy Mechs C|Outworlds Alliance 3028-3050 Heavy Mechs B|Outworlds Alliance 3028-3050 Heavy Mechs A</mech>
+		<mech weight="assault">Outworlds Alliance 3028-3050 Assault Mechs F|Outworlds Alliance 3028-3050 Assault Mechs D|Outworlds Alliance 3028-3050 Assault Mechs C|Outworlds Alliance 3028-3050 Assault Mechs B|Outworlds Alliance 3028-3050 Assault Mechs A</mech>
+		<vehicle weight="light">Outworlds 3028 Light Vehicles F|Outworlds 3028 Light Vehicles D|Outworlds 3028 Light Vehicles C|Outworlds 3028 Light Vehicles B|Outworlds 3028 Light Vehicles A</vehicle>
+		<vehicle weight="medium">Outworlds 3028 Medium Vehicles F|Outworlds 3028 Medium Vehicles D|Outworlds 3028 Medium Vehicles C|Outworlds 3028 Medium Vehicles B|Outworlds 3028 Medium Vehicles A</vehicle>
+		<vehicle weight="heavy">Outworlds 3028 Heavy Vehicles F|Outworlds 3028 Heavy Vehicles D|Outworlds 3028 Heavy Vehicles C|Outworlds 3028 Heavy Vehicles B|Outworlds 3028 Heavy Vehicles A</vehicle>
+		<vehicle weight="assault">Outworlds 3028 Assault Vehicles F|Outworlds 3028 Assault Vehicles D|Outworlds 3028 Assault Vehicles C|Outworlds 3028 Assault Vehicles B|Outworlds 3028 Assault Vehicles A</vehicle>
 	</faction>
 	<faction code="TC">
-		<mech weight="light">Taurian30283050LightMechs_F|Taurian30283050LightMechs_D|Taurian30283050LightMechs_C|Taurian30283050LightMechs_B|Taurian30283050LightMechs_A</mech>
-		<mech weight="medium">Taurian30283050MediumMechs_F|Taurian30283050MediumMechs_D|Taurian30283050MediumMechs_C|Taurian30283050MediumMechs_B|Taurian30283050MediumMechs_A</mech>
-		<mech weight="heavy">Taurian30283050HeavyMechs_F|Taurian30283050HeavyMechs_D|Taurian30283050HeavyMechs_C|Taurian30283050HeavyMechs_B|Taurian30283050HeavyMechs_A</mech>
-		<mech weight="assault">Taurian30283050AssaultMechs_F|Taurian30283050AssaultMechs_D|Taurian30283050AssaultMechs_C|Taurian30283050AssaultMechs_B|Taurian30283050AssaultMechs_A</mech>
-		<vehicle weight="light">Taurian3028LightVehicles_F|Taurian3028LightVehicles_D|Taurian3028LightVehicles_C|Taurian3028LightVehicles_B|Taurian3028LightVehicles_A</vehicle>
-		<vehicle weight="medium">Taurian3028MediumVehicles_F|Taurian3028MediumVehicles_D|Taurian3028MediumVehicles_C|Taurian3028MediumVehicles_B|Taurian3028MediumVehicles_A</vehicle>
-		<vehicle weight="heavy">Taurian3028HeavyVehicles_F|Taurian3028HeavyVehicles_D|Taurian3028HeavyVehicles_C|Taurian3028HeavyVehicles_B|Taurian3028HeavyVehicles_A</vehicle>
-		<vehicle weight="assault">Taurian3028AssaultVehicles_F|Taurian3028AssaultVehicles_D|Taurian3028AssaultVehicles_C|Taurian3028AssaultVehicles_B|Taurian3028AssaultVehicles_A</vehicle>
+		<mech weight="light">Taurian 3028-3050 Light Mechs F|Taurian 3028-3050 Light Mechs D|Taurian 3028-3050 Light Mechs C|Taurian 3028-3050 Light Mechs B|Taurian 3028-3050 Light Mechs A</mech>
+		<mech weight="medium">Taurian 3028-3050 Medium Mechs F|Taurian 3028-3050 Medium Mechs D|Taurian 3028-3050 Medium Mechs C|Taurian 3028-3050 Medium Mechs B|Taurian 3028-3050 Medium Mechs A</mech>
+		<mech weight="heavy">Taurian 3028-3050 Heavy Mechs F|Taurian 3028-3050 Heavy Mechs D|Taurian 3028-3050 Heavy Mechs C|Taurian 3028-3050 Heavy Mechs B|Taurian 3028-3050 Heavy Mechs A</mech>
+		<mech weight="assault">Taurian 3028-3050 Assault Mechs F|Taurian 3028-3050 Assault Mechs D|Taurian 3028-3050 Assault Mechs C|Taurian 3028-3050 Assault Mechs B|Taurian 3028-3050 Assault Mechs A</mech>
+		<vehicle weight="light">Taurian 3028 Light Vehicles F|Taurian 3028 Light Vehicles D|Taurian 3028 Light Vehicles C|Taurian 3028 Light Vehicles B|Taurian 3028 Light Vehicles A</vehicle>
+		<vehicle weight="medium">Taurian 3028 Medium Vehicles F|Taurian 3028 Medium Vehicles D|Taurian 3028 Medium Vehicles C|Taurian 3028 Medium Vehicles B|Taurian 3028 Medium Vehicles A</vehicle>
+		<vehicle weight="heavy">Taurian 3028 Heavy Vehicles F|Taurian 3028 Heavy Vehicles D|Taurian 3028 Heavy Vehicles C|Taurian 3028 Heavy Vehicles B|Taurian 3028 Heavy Vehicles A</vehicle>
+		<vehicle weight="assault">Taurian 3028 Assault Vehicles F|Taurian 3028 Assault Vehicles D|Taurian 3028 Assault Vehicles C|Taurian 3028 Assault Vehicles B|Taurian 3028 Assault Vehicles A</vehicle>
 	</faction>
 </rat> <!--Xotl (3028)-->
 <rat name="Xotl" era="3039">
 	<faction code="CC">
-		<mech weight="light">Liao3039LightMechs_F|Liao3039LightMechs_D|Liao3039LightMechs_C|Liao3039LightMechs_B|Liao3039LightMechs_A</mech>
-		<mech weight="medium">Liao3039MediumMechs_F|Liao3039MediumMechs_D|Liao3039MediumMechs_C|Liao3039MediumMechs_B|Liao3039MediumMechs_A</mech>
-		<mech weight="heavy">Liao3039HeavyMechs_F|Liao3039HeavyMechs_D|Liao3039HeavyMechs_C|Liao3039HeavyMechs_B|Liao3039HeavyMechs_A</mech>
-		<mech weight="assault">Liao3039AssaultMechs_F|Liao3039AssaultMechs_D|Liao3039AssaultMechs_C|Liao3039AssaultMechs_B|Liao3039AssaultMechs_A</mech>
-		<vehicle weight="light">Liao3039LightVehicles_F|Liao3039LightVehicles_D|Liao3039LightVehicles_C|Liao3039LightVehicles_B|Liao3039LightVehicles_A</vehicle>
-		<vehicle weight="medium">Liao3039MediumVehicles_F|Liao3039MediumVehicles_D|Liao3039MediumVehicles_C|Liao3039MediumVehicles_B|Liao3039MediumVehicles_A</vehicle>
-		<vehicle weight="heavy">Liao3039HeavyVehicles_F|Liao3039HeavyVehicles_D|Liao3039HeavyVehicles_C|Liao3039HeavyVehicles_B|Liao3039HeavyVehicles_A</vehicle>
-		<vehicle weight="assault">Liao3039AssaultVehicles_F|Liao3039AssaultVehicles_D|Liao3039AssaultVehicles_C|Liao3039AssaultVehicles_B|Liao3039AssaultVehicles_A</vehicle>
+		<mech weight="light">Liao 3039 Light Mechs F|Liao 3039 Light Mechs D|Liao 3039 Light Mechs C|Liao 3039 Light Mechs B|Liao 3039 Light Mechs A</mech>
+		<mech weight="medium">Liao 3039 Medium Mechs F|Liao 3039 Medium Mechs D|Liao 3039 Medium Mechs C|Liao 3039 Medium Mechs B|Liao 3039 Medium Mechs A</mech>
+		<mech weight="heavy">Liao 3039 Heavy Mechs F|Liao 3039 Heavy Mechs D|Liao 3039 Heavy Mechs C|Liao 3039 Heavy Mechs B|Liao 3039 Heavy Mechs A</mech>
+		<mech weight="assault">Liao 3039 Assault Mechs F|Liao 3039 Assault Mechs D|Liao 3039 Assault Mechs C|Liao 3039 Assault Mechs B|Liao 3039 Assault Mechs A</mech>
+		<vehicle weight="light">Liao 3039 Light Vehicles F|Liao 3039 Light Vehicles D|Liao 3039 Light Vehicles C|Liao 3039 Light Vehicles B|Liao 3039 Light Vehicles A</vehicle>
+		<vehicle weight="medium">Liao 3039 Medium Vehicles F|Liao 3039 Medium Vehicles D|Liao 3039 Medium Vehicles C|Liao 3039 Medium Vehicles B|Liao 3039 Medium Vehicles A</vehicle>
+		<vehicle weight="heavy">Liao 3039 Heavy Vehicles F|Liao 3039 Heavy Vehicles D|Liao 3039 Heavy Vehicles C|Liao 3039 Heavy Vehicles B|Liao 3039 Heavy Vehicles A</vehicle>
+		<vehicle weight="assault">Liao 3039 Assault Vehicles F|Liao 3039 Assault Vehicles D|Liao 3039 Assault Vehicles C|Liao 3039 Assault Vehicles B|Liao 3039 Assault Vehicles A</vehicle>
 	</faction>
 	<faction code="DC">
-		<mech weight="light">Kurita3039LightMechs_F|Kurita3039LightMechs_D|Kurita3039LightMechs_C|Kurita3039LightMechs_B|Kurita3039LightMechs_A|KuritaA3039LightMechs_C</mech>
-		<mech weight="medium">Kurita3039MediumMechs_F|Kurita3039MediumMechs_D|Kurita3039MediumMechs_C|Kurita3039MediumMechs_B|Kurita3039MediumMechs_A|KuritaA3039MediumMechs_C</mech>
-		<mech weight="heavy">Kurita3039HeavyMechs_F|Kurita3039HeavyMechs_D|Kurita3039HeavyMechs_C|Kurita3039HeavyMechs_B|Kurita3039HeavyMechs_A|KuritaA3039HeavyMechs_C</mech>
-		<mech weight="assault">Kurita3039AssaultMechs_F|Kurita3039AssaultMechs_D|Kurita3039AssaultMechs_C|Kurita3039AssaultMechs_B|Kurita3039AssaultMechs_A|KuritaA3039AssaultMechs_C</mech>
-		<vehicle weight="light">Kurita3039LightVehicles_F|Kurita3039LightVehicles_D|Kurita3039LightVehicles_C|Kurita3039LightVehicles_B|Kurita3039LightVehicles_A</vehicle>
-		<vehicle weight="medium">Kurita3039MediumVehicles_F|Kurita3039MediumVehicles_D|Kurita3039MediumVehicles_C|Kurita3039MediumVehicles_B|Kurita3039MediumVehicles_A</vehicle>
-		<vehicle weight="heavy">Kurita3039HeavyVehicles_F|Kurita3039HeavyVehicles_D|Kurita3039HeavyVehicles_C|Kurita3039HeavyVehicles_B|Kurita3039HeavyVehicles_A</vehicle>
-		<vehicle weight="assault">Kurita3039AssaultVehicles_F|Kurita3039AssaultVehicles_D|Kurita3039AssaultVehicles_C|Kurita3039AssaultVehicles_B|Kurita3039AssaultVehicles_A</vehicle>
+		<mech weight="light">Kurita 3039 Light Mechs F|Kurita 3039 Light Mechs D|Kurita 3039 Light Mechs C|Kurita 3039 Light Mechs B|Kurita 3039 Light Mechs A|Kurita Elite 3039 Light Mechs</mech>
+		<mech weight="medium">Kurita 3039 Medium Mechs F|Kurita 3039 Medium Mechs D|Kurita 3039 Medium Mechs C|Kurita 3039 Medium Mechs B|Kurita 3039 Medium Mechs A|Kurita Elite 3039 Medium Mechs</mech>
+		<mech weight="heavy">Kurita 3039 Heavy Mechs F|Kurita 3039 Heavy Mechs D|Kurita 3039 Heavy Mechs C|Kurita 3039 Heavy Mechs B|Kurita 3039 Heavy Mechs A|Kurita Elite 3039 Heavy Mechs</mech>
+		<mech weight="assault">Kurita 3039 Assault Mechs F|Kurita 3039 Assault Mechs D|Kurita 3039 Assault Mechs C|Kurita 3039 Assault Mechs B|Kurita 3039 Assault Mechs A|Kurita Elite 3039 Assault Mechs</mech>
+		<vehicle weight="light">Kurita 3039 Light Vehicles F|Kurita 3039 Light Vehicles D|Kurita 3039 Light Vehicles C|Kurita 3039 Light Vehicles B|Kurita 3039 Light Vehicles A</vehicle>
+		<vehicle weight="medium">Kurita 3039 Medium Vehicles F|Kurita 3039 Medium Vehicles D|Kurita 3039 Medium Vehicles C|Kurita 3039 Medium Vehicles B|Kurita 3039 Medium Vehicles A</vehicle>
+		<vehicle weight="heavy">Kurita 3039 Heavy Vehicles F|Kurita 3039 Heavy Vehicles D|Kurita 3039 Heavy Vehicles C|Kurita 3039 Heavy Vehicles B|Kurita 3039 Heavy Vehicles A</vehicle>
+		<vehicle weight="assault">Kurita 3039 Assault Vehicles F|Kurita 3039 Assault Vehicles D|Kurita 3039 Assault Vehicles C|Kurita 3039 Assault Vehicles B|Kurita 3039 Assault Vehicles A</vehicle>
 	</faction>
 	<faction code="FRR">
-		<mech weight="light">FRR3039LightMechs_F|FRR3039LightMechs_D|FRR3039LightMechs_C|FRR3039LightMechs_B|FRR3039LightMechs_A</mech>
-		<mech weight="medium">FRR3039MediumMechs_F|FRR3039MediumMechs_D|FRR3039MediumMechs_C|FRR3039MediumMechs_B|FRR3039MediumMechs_A</mech>
-		<mech weight="heavy">FRR3039HeavyMechs_F|FRR3039HeavyMechs_D|FRR3039HeavyMechs_C|FRR3039HeavyMechs_B|FRR3039HeavyMechs_A</mech>
-		<mech weight="assault">FRR3039AssaultMechs_F|FRR3039AssaultMechs_D|FRR3039AssaultMechs_C|FRR3039AssaultMechs_B|FRR3039AssaultMechs_A</mech>
-		<vehicle weight="light">FRR3039LightVehicles_F|FRR3039LightVehicles_D|FRR3039LightVehicles_C|FRR3039LightVehicles_B|FRR3039LightVehicles_A</vehicle>
-		<vehicle weight="medium">FRR3039MediumVehicles_F|FRR3039MediumVehicles_D|FRR3039MediumVehicles_C|FRR3039MediumVehicles_B|FRR3039MediumVehicles_A</vehicle>
-		<vehicle weight="heavy">FRR3039HeavyVehicles_F|FRR3039HeavyVehicles_D|FRR3039HeavyVehicles_C|FRR3039HeavyVehicles_B|FRR3039HeavyVehicles_A</vehicle>
-		<vehicle weight="assault">FRR3039AssaultVehicles_F|FRR3039AssaultVehicles_D|FRR3039AssaultVehicles_C|FRR3039AssaultVehicles_B|FRR3039AssaultVehicles_A</vehicle>
+		<mech weight="light">Rasalhague 3039 Light Mechs F|Rasalhague 3039 Light Mechs D|Rasalhague 3039 Light Mechs C|Rasalhague 3039 Light Mechs B|Rasalhague 3039 Light Mechs A</mech>
+		<mech weight="medium">Rasalhague 3039 Medium Mechs F|Rasalhague 3039 Medium Mechs D|Rasalhague 3039 Medium Mechs C|Rasalhague 3039 Medium Mechs B|Rasalhague 3039 Medium Mechs A</mech>
+		<mech weight="heavy">Rasalhague 3039 Heavy Mechs F|Rasalhague 3039 Heavy Mechs D|Rasalhague 3039 Heavy Mechs C|Rasalhague 3039 Heavy Mechs B|Rasalhague 3039 Heavy Mechs A</mech>
+		<mech weight="assault">Rasalhague 3039 Assault Mechs F|Rasalhague 3039 Assault Mechs D|Rasalhague 3039 Assault Mechs C|Rasalhague 3039 Assault Mechs B|Rasalhague 3039 Assault Mechs A</mech>
+		<vehicle weight="light">Rasalhague 3039 Light Vehicles F|Rasalhague 3039 Light Vehicles D|Rasalhague 3039 Light Vehicles C|Rasalhague 3039 Light Vehicles B|Rasalhague 3039 Light Vehicles A</vehicle>
+		<vehicle weight="medium">Rasalhague 3039 Medium Vehicles F|Rasalhague 3039 Medium Vehicles D|Rasalhague 3039 Medium Vehicles C|Rasalhague 3039 Medium Vehicles B|Rasalhague 3039 Medium Vehicles A</vehicle>
+		<vehicle weight="heavy">Rasalhague 3039 Heavy Vehicles F|Rasalhague 3039 Heavy Vehicles D|Rasalhague 3039 Heavy Vehicles C|Rasalhague 3039 Heavy Vehicles B|Rasalhague 3039 Heavy Vehicles A</vehicle>
+		<vehicle weight="assault">Rasalhague 3039 Assault Vehicles F|Rasalhague 3039 Assault Vehicles D|Rasalhague 3039 Assault Vehicles C|Rasalhague 3039 Assault Vehicles B|Rasalhague 3039 Assault Vehicles A</vehicle>
 	</faction>
 	<faction code="FS">
-		<mech weight="light">Davion3039LightMechs_F|Davion3039LightMechs_D|Davion3039LightMechs_C|Davion3039LightMechs_B|Davion3039LightMechs_A</mech>
-		<mech weight="medium">Davion3039MediumMechs_F|Davion3039MediumMechs_D|Davion3039MediumMechs_C|Davion3039MediumMechs_B|Davion3039MediumMechs_A</mech>
-		<mech weight="heavy">Davion3039HeavyMechs_F|Davion3039HeavyMechs_D|Davion3039HeavyMechs_C|Davion3039HeavyMechs_B|Davion3039HeavyMechs_A</mech>
-		<mech weight="assault">Davion3039AssaultMechs_F|Davion3039AssaultMechs_D|Davion3039AssaultMechs_C|Davion3039AssaultMechs_B|Davion3039AssaultMechs_A</mech>
-		<vehicle weight="light">Davion3039LightVehicles_F|Davion3039LightVehicles_D|Davion3039LightVehicles_C|Davion3039LightVehicles_B|Davion3039LightVehicles_A</vehicle>
-		<vehicle weight="medium">Davion3039MediumVehicles_F|Davion3039MediumVehicles_D|Davion3039MediumVehicles_C|Davion3039MediumVehicles_B|Davion3039MediumVehicles_A</vehicle>
-		<vehicle weight="heavy">Davion3039HeavyVehicles_F|Davion3039HeavyVehicles_D|Davion3039HeavyVehicles_C|Davion3039HeavyVehicles_B|Davion3039HeavyVehicles_A</vehicle>
-		<vehicle weight="assault">Davion3039AssaultVehicles_F|Davion3039AssaultVehicles_D|Davion3039AssaultVehicles_C|Davion3039AssaultVehicles_B|Davion3039AssaultVehicles_A</vehicle>
+		<mech weight="light">Davion 3039 Light Mechs F|Davion 3039 Light Mechs D|Davion 3039 Light Mechs C|Davion 3039 Light Mechs B|Davion 3039 Light Mechs A</mech>
+		<mech weight="medium">Davion 3039 Medium Mechs F|Davion 3039 Medium Mechs D|Davion 3039 Medium Mechs C|Davion 3039 Medium Mechs B|Davion 3039 Medium Mechs A</mech>
+		<mech weight="heavy">Davion 3039 Heavy Mechs F|Davion 3039 Heavy Mechs D|Davion 3039 Heavy Mechs C|Davion 3039 Heavy Mechs B|Davion 3039 Heavy Mechs A</mech>
+		<mech weight="assault">Davion 3039 Assault Mechs F|Davion 3039 Assault Mechs D|Davion 3039 Assault Mechs C|Davion 3039 Assault Mechs B|Davion 3039 Assault Mechs A</mech>
+		<vehicle weight="light">Davion 3039 Light Vehicles F|Davion 3039 Light Vehicles D|Davion 3039 Light Vehicles C|Davion 3039 Light Vehicles B|Davion 3039 Light Vehicles A</vehicle>
+		<vehicle weight="medium">Davion 3039 Medium Vehicles F|Davion 3039 Medium Vehicles D|Davion 3039 Medium Vehicles C|Davion 3039 Medium Vehicles B|Davion 3039 Medium Vehicles A</vehicle>
+		<vehicle weight="heavy">Davion 3039 Heavy Vehicles F|Davion 3039 Heavy Vehicles D|Davion 3039 Heavy Vehicles C|Davion 3039 Heavy Vehicles B|Davion 3039 Heavy Vehicles A</vehicle>
+		<vehicle weight="assault">Davion 3039 Assault Vehicles F|Davion 3039 Assault Vehicles D|Davion 3039 Assault Vehicles C|Davion 3039 Assault Vehicles B|Davion 3039 Assault Vehicles A</vehicle>
 	</faction>
 	<faction code="FWL">
-		<mech weight="light">Marik3039LightMechs_F|Marik3039LightMechs_D|Marik3039LightMechs_C|Marik3039LightMechs_B|Marik3039LightMechs_A</mech>
-		<mech weight="medium">Marik3039MediumMechs_F|Marik3039MediumMechs_D|Marik3039MediumMechs_C|Marik3039MediumMechs_B|Marik3039MediumMechs_A</mech>
-		<mech weight="heavy">Marik3039HeavyMechs_F|Marik3039HeavyMechs_D|Marik3039HeavyMechs_C|Marik3039HeavyMechs_B|Marik3039HeavyMechs_A</mech>
-		<mech weight="assault">Marik3039AssaultMechs_F|Marik3039AssaultMechs_D|Marik3039AssaultMechs_C|Marik3039AssaultMechs_B|Marik3039AssaultMechs_A</mech>
-		<vehicle weight="light">Marik3039LightVehicles_F|Marik3039LightVehicles_D|Marik3039LightVehicles_C|Marik3039LightVehicles_B|Marik3039LightVehicles_A</vehicle>
-		<vehicle weight="medium">Marik3039MediumVehicles_F|Marik3039MediumVehicles_D|Marik3039MediumVehicles_C|Marik3039MediumVehicles_B|Marik3039MediumVehicles_A</vehicle>
-		<vehicle weight="heavy">Marik3039HeavyVehicles_F|Marik3039HeavyVehicles_D|Marik3039HeavyVehicles_C|Marik3039HeavyVehicles_B|Marik3039HeavyVehicles_A</vehicle>
-		<vehicle weight="assault">Marik3039AssaultVehicles_F|Marik3039AssaultVehicles_D|Marik3039AssaultVehicles_C|Marik3039AssaultVehicles_B|Marik3039AssaultVehicles_A</vehicle>
+		<mech weight="light">Marik 3039 Light Mechs F|Marik 3039 Light Mechs D|Marik 3039 Light Mechs C|Marik 3039 Light Mechs B|Marik 3039 Light Mechs A</mech>
+		<mech weight="medium">Marik 3039 Medium Mechs F|Marik 3039 Medium Mechs D|Marik 3039 Medium Mechs C|Marik 3039 Medium Mechs B|Marik 3039 Medium Mechs A</mech>
+		<mech weight="heavy">Marik 3039 Heavy Mechs F|Marik 3039 Heavy Mechs D|Marik 3039 Heavy Mechs C|Marik 3039 Heavy Mechs B|Marik 3039 Heavy Mechs A</mech>
+		<mech weight="assault">Marik 3039 Assault Mechs F|Marik 3039 Assault Mechs D|Marik 3039 Assault Mechs C|Marik 3039 Assault Mechs B|Marik 3039 Assault Mechs A</mech>
+		<vehicle weight="light">Marik 3039 Light Vehicles F|Marik 3039 Light Vehicles D|Marik 3039 Light Vehicles C|Marik 3039 Light Vehicles B|Marik 3039 Light Vehicles A</vehicle>
+		<vehicle weight="medium">Marik 3039 Medium Vehicles F|Marik 3039 Medium Vehicles D|Marik 3039 Medium Vehicles C|Marik 3039 Medium Vehicles B|Marik 3039 Medium Vehicles A</vehicle>
+		<vehicle weight="heavy">Marik 3039 Heavy Vehicles F|Marik 3039 Heavy Vehicles D|Marik 3039 Heavy Vehicles C|Marik 3039 Heavy Vehicles B|Marik 3039 Heavy Vehicles A</vehicle>
+		<vehicle weight="assault">Marik 3039 Assault Vehicles F|Marik 3039 Assault Vehicles D|Marik 3039 Assault Vehicles C|Marik 3039 Assault Vehicles B|Marik 3039 Assault Vehicles A</vehicle>
 	</faction>
 	<faction code="General">
-		<vehicle weight="light">MerPerGen3039LightVehicles_F|MerPerGen3039LightVehicles_D|MerPerGen3039LightVehicles_C|MerPerGen3039LightVehicles_B|MerPerGen3039LightVehicles_A</vehicle>
-		<vehicle weight="medium">MerPerGen3039MediumVehicles_F|MerPerGen3039MediumVehicles_D|MerPerGen3039MediumVehicles_C|MerPerGen3039MediumVehicles_B|MerPerGen3039MediumVehicles_A</vehicle>
-		<vehicle weight="heavy">MerPerGen3039HeavyVehicles_F|MerPerGen3039HeavyVehicles_D|MerPerGen3039HeavyVehicles_C|MerPerGen3039HeavyVehicles_B|MerPerGen3039HeavyVehicles_A</vehicle>
-		<vehicle weight="assault">MerPerGen3039AssaultVehicles_F|MerPerGen3039AssaultVehicles_D|MerPerGen3039AssaultVehicles_C|MerPerGen3039AssaultVehicles_B|MerPerGen3039AssaultVehicles_A</vehicle>
+		<vehicle weight="light">Mercenary Periphery General 3039 Light Vehicles F|Mercenary Periphery General 3039 Light Vehicles D|Mercenary Periphery General 3039 Light Vehicles C|Mercenary Periphery General 3039 Light Vehicles B|Mercenary Periphery General 3039 Light Vehicles A</vehicle>
+		<vehicle weight="medium">Mercenary Periphery General 3039 Medium Vehicles F|Mercenary Periphery General 3039 Medium Vehicles D|Mercenary Periphery General 3039 Medium Vehicles C|Mercenary Periphery General 3039 Medium Vehicles B|Mercenary Periphery General 3039 Medium Vehicles A</vehicle>
+		<vehicle weight="heavy">Mercenary Periphery General 3039 Heavy Vehicles F|Mercenary Periphery General 3039 Heavy Vehicles D|Mercenary Periphery General 3039 Heavy Vehicles C|Mercenary Periphery General 3039 Heavy Vehicles B|Mercenary Periphery General 3039 Heavy Vehicles A</vehicle>
+		<vehicle weight="assault">Mercenary Periphery General 3039 Assault Vehicles F|Mercenary Periphery General 3039 Assault Vehicles D|Mercenary Periphery General 3039 Assault Vehicles C|Mercenary Periphery General 3039 Assault Vehicles B|Mercenary Periphery General 3039 Assault Vehicles A</vehicle>
 	</faction>
 	<faction code="LA">
-		<mech weight="light">Steiner3039LightMechs_F|Steiner3039LightMechs_D|Steiner3039LightMechs_C|Steiner3039LightMechs_B|Steiner3039LightMechs_A</mech>
-		<mech weight="medium">Steiner3039MediumMechs_F|Steiner3039MediumMechs_D|Steiner3039MediumMechs_C|Steiner3039MediumMechs_B|Steiner3039MediumMechs_A</mech>
-		<mech weight="heavy">Steiner3039HeavyMechs_F|Steiner3039HeavyMechs_D|Steiner3039HeavyMechs_C|Steiner3039HeavyMechs_B|Steiner3039HeavyMechs_A</mech>
-		<mech weight="assault">Steiner3039AssaultMechs_F|Steiner3039AssaultMechs_D|Steiner3039AssaultMechs_C|Steiner3039AssaultMechs_B|Steiner3039AssaultMechs_A</mech>
-		<vehicle weight="light">Steiner3039LightVehicles_F|Steiner3039LightVehicles_D|Steiner3039LightVehicles_C|Steiner3039LightVehicles_B|Steiner3039LightVehicles_A</vehicle>
-		<vehicle weight="medium">Steiner3039MediumVehicles_F|Steiner3039MediumVehicles_D|Steiner3039MediumVehicles_C|Steiner3039MediumVehicles_B|Steiner3039MediumVehicles_A</vehicle>
-		<vehicle weight="heavy">Steiner3039HeavyVehicles_F|Steiner3039HeavyVehicles_D|Steiner3039HeavyVehicles_C|Steiner3039HeavyVehicles_B|Steiner3039HeavyVehicles_A</vehicle>
-		<vehicle weight="assault">Steiner3039AssaultVehicles_F|Steiner3039AssaultVehicles_D|Steiner3039AssaultVehicles_C|Steiner3039AssaultVehicles_B|Steiner3039AssaultVehicles_A</vehicle>
+		<mech weight="light">Steiner 3039 Light Mechs F|Steiner 3039 Light Mechs D|Steiner 3039 Light Mechs C|Steiner 3039 Light Mechs B|Steiner 3039 Light Mechs A</mech>
+		<mech weight="medium">Steiner 3039 Medium Mechs F|Steiner 3039 Medium Mechs D|Steiner 3039 Medium Mechs C|Steiner 3039 Medium Mechs B|Steiner 3039 Medium Mechs A</mech>
+		<mech weight="heavy">Steiner 3039 Heavy Mechs F|Steiner 3039 Heavy Mechs D|Steiner 3039 Heavy Mechs C|Steiner 3039 Heavy Mechs B|Steiner 3039 Heavy Mechs A</mech>
+		<mech weight="assault">Steiner 3039 Assault Mechs F|Steiner 3039 Assault Mechs D|Steiner 3039 Assault Mechs C|Steiner 3039 Assault Mechs B|Steiner 3039 Assault Mechs A</mech>
+		<vehicle weight="light">Steiner 3039 Light Vehicles F|Steiner 3039 Light Vehicles D|Steiner 3039 Light Vehicles C|Steiner 3039 Light Vehicles B|Steiner 3039 Light Vehicles A</vehicle>
+		<vehicle weight="medium">Steiner 3039 Medium Vehicles F|Steiner 3039 Medium Vehicles D|Steiner 3039 Medium Vehicles C|Steiner 3039 Medium Vehicles B|Steiner 3039 Medium Vehicles A</vehicle>
+		<vehicle weight="heavy">Steiner 3039 Heavy Vehicles F|Steiner 3039 Heavy Vehicles D|Steiner 3039 Heavy Vehicles C|Steiner 3039 Heavy Vehicles B|Steiner 3039 Heavy Vehicles A</vehicle>
+		<vehicle weight="assault">Steiner 3039 Assault Vehicles F|Steiner 3039 Assault Vehicles D|Steiner 3039 Assault Vehicles C|Steiner 3039 Assault Vehicles B|Steiner 3039 Assault Vehicles A</vehicle>
 	</faction>
 	<faction code="MOC">
-		<vehicle weight="light">Canopus3039LightVehicles_F|Canopus3039LightVehicles_D|Canopus3039LightVehicles_C|Canopus3039LightVehicles_B|Canopus3039LightVehicles_A</vehicle>
-		<vehicle weight="medium">Canopus3039MediumVehicles_F|Canopus3039MediumVehicles_D|Canopus3039MediumVehicles_C|Canopus3039MediumVehicles_B|Canopus3039MediumVehicles_A</vehicle>
-		<vehicle weight="heavy">Canopus3039HeavyVehicles_F|Canopus3039HeavyVehicles_D|Canopus3039HeavyVehicles_C|Canopus3039HeavyVehicles_B|Canopus3039HeavyVehicles_A</vehicle>
-		<vehicle weight="assault">Canopus3039AssaultVehicles_F|Canopus3039AssaultVehicles_D|Canopus3039AssaultVehicles_C|Canopus3039AssaultVehicles_B|Canopus3039AssaultVehicles_A</vehicle>
+		<vehicle weight="light">Canopus 3039 Light Vehicles F|Canopus 3039 Light Vehicles D|Canopus 3039 Light Vehicles C|Canopus 3039 Light Vehicles B|Canopus 3039 Light Vehicles A</vehicle>
+		<vehicle weight="medium">Canopus 3039 Medium Vehicles F|Canopus 3039 Medium Vehicles D|Canopus 3039 Medium Vehicles C|Canopus 3039 Medium Vehicles B|Canopus 3039 Medium Vehicles A</vehicle>
+		<vehicle weight="heavy">Canopus 3039 Heavy Vehicles F|Canopus 3039 Heavy Vehicles D|Canopus 3039 Heavy Vehicles C|Canopus 3039 Heavy Vehicles B|Canopus 3039 Heavy Vehicles A</vehicle>
+		<vehicle weight="assault">Canopus 3039 Assault Vehicles F|Canopus 3039 Assault Vehicles D|Canopus 3039 Assault Vehicles C|Canopus 3039 Assault Vehicles B|Canopus 3039 Assault Vehicles A</vehicle>
 	</faction>
 	<faction code="OA">
-		<vehicle weight="light">Outworlds3039LightVehicles_F|Outworlds3039LightVehicles_D|Outworlds3039LightVehicles_C|Outworlds3039LightVehicles_B|Outworlds3039LightVehicles_A</vehicle>
-		<vehicle weight="medium">Outworlds3039MediumVehicles_F|Outworlds3039MediumVehicles_D|Outworlds3039MediumVehicles_C|Outworlds3039MediumVehicles_B|Outworlds3039MediumVehicles_A</vehicle>
-		<vehicle weight="heavy">Outworlds3039HeavyVehicles_F|Outworlds3039HeavyVehicles_D|Outworlds3039HeavyVehicles_C|Outworlds3039HeavyVehicles_B|Outworlds3039HeavyVehicles_A</vehicle>
-		<vehicle weight="assault">Outworlds3039AssaultVehicles_F|Outworlds3039AssaultVehicles_D|Outworlds3039AssaultVehicles_C|Outworlds3039AssaultVehicles_B|Outworlds3039AssaultVehicles_A</vehicle>
+		<vehicle weight="light">Outworlds 3039 Light Vehicles F|Outworlds 3039 Light Vehicles D|Outworlds 3039 Light Vehicles C|Outworlds 3039 Light Vehicles B|Outworlds 3039 Light Vehicles A</vehicle>
+		<vehicle weight="medium">Outworlds 3039 Medium Vehicles F|Outworlds 3039 Medium Vehicles D|Outworlds 3039 Medium Vehicles C|Outworlds 3039 Medium Vehicles B|Outworlds 3039 Medium Vehicles A</vehicle>
+		<vehicle weight="heavy">Outworlds 3039 Heavy Vehicles F|Outworlds 3039 Heavy Vehicles D|Outworlds 3039 Heavy Vehicles C|Outworlds 3039 Heavy Vehicles B|Outworlds 3039 Heavy Vehicles A</vehicle>
+		<vehicle weight="assault">Outworlds 3039 Assault Vehicles F|Outworlds 3039 Assault Vehicles D|Outworlds 3039 Assault Vehicles C|Outworlds 3039 Assault Vehicles B|Outworlds 3039 Assault Vehicles A</vehicle>
 	</faction>
 	<faction code="SIC">
-		<mech weight="light">StIves3039LightMechs_F|StIves3039LightMechs_D|StIves3039LightMechs_C|StIves3039LightMechs_B|StIves3039LightMechs_A</mech>
-		<mech weight="medium">StIves3039MediumMechs_F|StIves3039MediumMechs_D|StIves3039MediumMechs_C|StIves3039MediumMechs_B|StIves3039MediumMechs_A</mech>
-		<mech weight="heavy">StIves3039HeavyMechs_F|StIves3039HeavyMechs_D|StIves3039HeavyMechs_C|StIves3039HeavyMechs_B|StIves3039HeavyMechs_A</mech>
-		<mech weight="assault">StIves3039AssaultMechs_F|StIves3039AssaultMechs_D|StIves3039AssaultMechs_C|StIves3039AssaultMechs_B|StIves3039AssaultMechs_A</mech>
-		<vehicle weight="light">StIves3039LightVehicles_F|StIves3039LightVehicles_D|StIves3039LightVehicles_C|StIves3039LightVehicles_B|StIves3039LightVehicles_A</vehicle>
-		<vehicle weight="medium">StIves3039MediumVehicles_F|StIves3039MediumVehicles_D|StIves3039MediumVehicles_C|StIves3039MediumVehicles_B|StIves3039MediumVehicles_A</vehicle>
-		<vehicle weight="heavy">StIves3039HeavyVehicles_F|StIves3039HeavyVehicles_D|StIves3039HeavyVehicles_C|StIves3039HeavyVehicles_B|StIves3039HeavyVehicles_A</vehicle>
-		<vehicle weight="assault">StIves3039AssaultVehicles_F|StIves3039AssaultVehicles_D|StIves3039AssaultVehicles_C|StIves3039AssaultVehicles_B|StIves3039AssaultVehicles_A</vehicle>
+		<mech weight="light">St Ives 3039 Light Mechs F|St Ives 3039 Light Mechs D|St Ives 3039 Light Mechs C|St Ives 3039 Light Mechs B|St Ives 3039 Light Mechs A</mech>
+		<mech weight="medium">St Ives 3039 Medium Mechs F|St Ives 3039 Medium Mechs D|St Ives 3039 Medium Mechs C|St Ives 3039 Medium Mechs B|St Ives 3039 Medium Mechs A</mech>
+		<mech weight="heavy">St Ives 3039 Heavy Mechs F|St Ives 3039 Heavy Mechs D|St Ives 3039 Heavy Mechs C|St Ives 3039 Heavy Mechs B|St Ives 3039 Heavy Mechs A</mech>
+		<mech weight="assault">St Ives 3039 Assault Mechs F|St Ives 3039 Assault Mechs D|St Ives 3039 Assault Mechs C|St Ives 3039 Assault Mechs B|St Ives 3039 Assault Mechs A</mech>
+		<vehicle weight="light">St Ives 3039 Light Vehicles F|St Ives 3039 Light Vehicles D|St Ives 3039 Light Vehicles C|St Ives 3039 Light Vehicles B|St Ives 3039 Light Vehicles A</vehicle>
+		<vehicle weight="medium">St Ives 3039 Medium Vehicles F|St Ives 3039 Medium Vehicles D|St Ives 3039 Medium Vehicles C|St Ives 3039 Medium Vehicles B|St Ives 3039 Medium Vehicles A</vehicle>
+		<vehicle weight="heavy">St Ives 3039 Heavy Vehicles F|St Ives 3039 Heavy Vehicles D|St Ives 3039 Heavy Vehicles C|St Ives 3039 Heavy Vehicles B|St Ives 3039 Heavy Vehicles A</vehicle>
+		<vehicle weight="assault">St Ives 3039 Assault Vehicles F|St Ives 3039 Assault Vehicles D|St Ives 3039 Assault Vehicles C|St Ives 3039 Assault Vehicles B|St Ives 3039 Assault Vehicles A</vehicle>
 	</faction>
 	<faction code="TC">
-		<vehicle weight="light">Taurian3039LightVehicles_F|Taurian3039LightVehicles_D|Taurian3039LightVehicles_C|Taurian3039LightVehicles_B|Taurian3039LightVehicles_A</vehicle>
-		<vehicle weight="medium">Taurian3039MediumVehicles_F|Taurian3039MediumVehicles_D|Taurian3039MediumVehicles_C|Taurian3039MediumVehicles_B|Taurian3039MediumVehicles_A</vehicle>
-		<vehicle weight="heavy">Taurian3039HeavyVehicles_F|Taurian3039HeavyVehicles_D|Taurian3039HeavyVehicles_C|Taurian3039HeavyVehicles_B|Taurian3039HeavyVehicles_A</vehicle>
-		<vehicle weight="assault">Taurian3039AssaultVehicles_F|Taurian3039AssaultVehicles_D|Taurian3039AssaultVehicles_C|Taurian3039AssaultVehicles_B|Taurian3039AssaultVehicles_A</vehicle>
+		<vehicle weight="light">Taurian 3039 Light Vehicles F|Taurian 3039 Light Vehicles D|Taurian 3039 Light Vehicles C|Taurian 3039 Light Vehicles B|Taurian 3039 Light Vehicles A</vehicle>
+		<vehicle weight="medium">Taurian 3039 Medium Vehicles F|Taurian 3039 Medium Vehicles D|Taurian 3039 Medium Vehicles C|Taurian 3039 Medium Vehicles B|Taurian 3039 Medium Vehicles A</vehicle>
+		<vehicle weight="heavy">Taurian 3039 Heavy Vehicles F|Taurian 3039 Heavy Vehicles D|Taurian 3039 Heavy Vehicles C|Taurian 3039 Heavy Vehicles B|Taurian 3039 Heavy Vehicles A</vehicle>
+		<vehicle weight="assault">Taurian 3039 Assault Vehicles F|Taurian 3039 Assault Vehicles D|Taurian 3039 Assault Vehicles C|Taurian 3039 Assault Vehicles B|Taurian 3039 Assault Vehicles A</vehicle>
 	</faction>
 </rat> <!--Xotl (3039)-->
 <rat name="Xotl" era="3050">
+	<faction code="CC">
+		<mech weight="light">Liao 3050 Light Mechs F|Liao 3050 Light Mechs D|Liao 3050 Light Mechs C|Liao 3050 Light Mechs B|Liao 3050 Light Mechs A</mech>
+		<mech weight="medium">Liao 3050 Medium Mechs F|Liao 3050 Medium Mechs D|Liao 3050 Medium Mechs C|Liao 3050 Medium Mechs B|Liao 3050 Medium Mechs A</mech>
+		<mech weight="heavy">Liao 3050 Heavy Mechs F|Liao 3050 Heavy Mechs D|Liao 3050 Heavy Mechs C|Liao 3050 Heavy Mechs B|Liao 3050 Heavy Mechs A</mech>
+		<mech weight="assault">Liao 3050 Assault Mechs F|Liao 3050 Assault Mechs D|Liao 3050 Assault Mechs C|Liao 3050 Assault Mechs B|Liao 3050 Assault Mechs A</mech>
+	</faction>
 	<faction code="CDS">
-		<mech weight="light">DiamondShark3050LightMechs_F|DiamondShark3050LightMechs_D|DiamondShark3050LightMechs_C|DiamondShark3050LightMechs_B|DiamondShark3050LightMechs_A</mech>
-		<mech weight="medium">DiamondShark3050MediumMechs_F|DiamondShark3050MediumMechs_D|DiamondShark3050MediumMechs_C|DiamondShark3050MediumMechs_B|DiamondShark3050MediumMechs_A</mech>
-		<mech weight="heavy">DiamondShark3050HeavyMechs_F|DiamondShark3050HeavyMechs_D|DiamondShark3050HeavyMechs_C|DiamondShark3050HeavyMechs_B|DiamondShark3050HeavyMechs_A</mech>
-		<mech weight="assault">DiamondShark3050AssaultMechs_F|DiamondShark3050AssaultMechs_D|DiamondShark3050AssaultMechs_C|DiamondShark3050AssaultMechs_B|DiamondShark3050AssaultMechs_A</mech>
+		<mech weight="light">Clan Diamond Shark 3050 Light Mechs F|Clan Diamond Shark 3050 Light Mechs D|Clan Diamond Shark 3050 Light Mechs C|Clan Diamond Shark 3050 Light Mechs B|Clan Diamond Shark 3050 Light Mechs A</mech>
+		<mech weight="medium">Clan Diamond Shark 3050 Medium Mechs F|Clan Diamond Shark 3050 Medium Mechs D|Clan Diamond Shark 3050 Medium Mechs C|Clan Diamond Shark 3050 Medium Mechs B|Clan Diamond Shark 3050 Medium Mechs A</mech>
+		<mech weight="heavy">Clan Diamond Shark 3050 Heavy Mechs F|Clan Diamond Shark 3050 Heavy Mechs D|Clan Diamond Shark 3050 Heavy Mechs C|Clan Diamond Shark 3050 Heavy Mechs B|Clan Diamond Shark 3050 Heavy Mechs A</mech>
+		<mech weight="assault">Clan Diamond Shark 3050 Assault Mechs F|Clan Diamond Shark 3050 Assault Mechs D|Clan Diamond Shark 3050 Assault Mechs C|Clan Diamond Shark 3050 Assault Mechs B|Clan Diamond Shark 3050 Assault Mechs A</mech>
 	</faction>
 	<faction code="CGB">
-		<mech weight="light">GhostBear3050LightMechs_F|GhostBear3050LightMechs_D|GhostBear3050LightMechs_C|GhostBear3050LightMechs_B|GhostBear3050LightMechs_A</mech>
-		<mech weight="medium">GhostBear3050MediumMechs_F|GhostBear3050MediumMechs_D|GhostBear3050MediumMechs_C|GhostBear3050MediumMechs_B|GhostBear3050MediumMechs_A</mech>
-		<mech weight="heavy">GhostBear3050HeavyMechs_F|GhostBear3050HeavyMechs_D|GhostBear3050HeavyMechs_C|GhostBear3050HeavyMechs_B|GhostBear3050HeavyMechs_A</mech>
-		<mech weight="assault">GhostBear3050AssaultMechs_F|GhostBear3050AssaultMechs_D|GhostBear3050AssaultMechs_C|GhostBear3050AssaultMechs_B|GhostBear3050AssaultMechs_A</mech>
+		<mech weight="light">Clan Ghost Bear 3050 Light Mechs F|Clan Ghost Bear 3050 Light Mechs D|Clan Ghost Bear 3050 Light Mechs C|Clan Ghost Bear 3050 Light Mechs B|Clan Ghost Bear 3050 Light Mechs A</mech>
+		<mech weight="medium">Clan Ghost Bear 3050 Medium Mechs F|Clan Ghost Bear 3050 Medium Mechs D|Clan Ghost Bear 3050 Medium Mechs C|Clan Ghost Bear 3050 Medium Mechs B|Clan Ghost Bear 3050 Medium Mechs A</mech>
+		<mech weight="heavy">Clan Ghost Bear 3050 Heavy Mechs F|Clan Ghost Bear 3050 Heavy Mechs D|Clan Ghost Bear 3050 Heavy Mechs C|Clan Ghost Bear 3050 Heavy Mechs B|Clan Ghost Bear 3050 Heavy Mechs A</mech>
+		<mech weight="assault">Clan Ghost Bear 3050 Assault Mechs F|Clan Ghost Bear 3050 Assault Mechs D|Clan Ghost Bear 3050 Assault Mechs C|Clan Ghost Bear 3050 Assault Mechs B|Clan Ghost Bear 3050 Assault Mechs A</mech>
 	</faction>
 	<faction code="CJF">
-		<mech weight="light">JadeFalcon3050LightMechs_F|JadeFalcon3050LightMechs_D|JadeFalcon3050LightMechs_C|JadeFalcon3050LightMechs_B|JadeFalcon3050LightMechs_A</mech>
-		<mech weight="medium">JadeFalcon3050MediumMechs_F|JadeFalcon3050MediumMechs_D|JadeFalcon3050MediumMechs_C|JadeFalcon3050MediumMechs_B|JadeFalcon3050MediumMechs_A</mech>
-		<mech weight="heavy">JadeFalcon3050HeavyMechs_F|JadeFalcon3050HeavyMechs_D|JadeFalcon3050HeavyMechs_C|JadeFalcon3050HeavyMechs_B|JadeFalcon3050HeavyMechs_A</mech>
-		<mech weight="assault">JadeFalcon3050AssaultMechs_F|JadeFalcon3050AssaultMechs_D|JadeFalcon3050AssaultMechs_C|JadeFalcon3050AssaultMechs_B|JadeFalcon3050AssaultMechs_A</mech>
+		<mech weight="light">Clan Jade Falcon 3050 Light Mechs F|Clan Jade Falcon 3050 Light Mechs D|Clan Jade Falcon 3050 Light Mechs C|Clan Jade Falcon 3050 Light Mechs B|Clan Jade Falcon 3050 Light Mechs A</mech>
+		<mech weight="medium">Clan Jade Falcon 3050 Medium Mechs F|Clan Jade Falcon 3050 Medium Mechs D|Clan Jade Falcon 3050 Medium Mechs C|Clan Jade Falcon 3050 Medium Mechs B|Clan Jade Falcon 3050 Medium Mechs A</mech>
+		<mech weight="heavy">Clan Jade Falcon 3050 Heavy Mechs F|Clan Jade Falcon 3050 Heavy Mechs D|Clan Jade Falcon 3050 Heavy Mechs C|Clan Jade Falcon 3050 Heavy Mechs B|Clan Jade Falcon 3050 Heavy Mechs A</mech>
+		<mech weight="assault">Clan Jade Falcon 3050 Assault Mechs F|Clan Jade Falcon 3050 Assault Mechs D|Clan Jade Falcon 3050 Assault Mechs C|Clan Jade Falcon 3050 Assault Mechs B|Clan Jade Falcon 3050 Assault Mechs A</mech>
 	</faction>
 	<faction code="CNC">
-		<mech weight="light">NovaCat3050LightMechs_F|NovaCat3050LightMechs_D|NovaCat3050LightMechs_C|NovaCat3050LightMechs_B|NovaCat3050LightMechs_A</mech>
-		<mech weight="medium">NovaCat3050MediumMechs_F|NovaCat3050MediumMechs_D|NovaCat3050MediumMechs_C|NovaCat3050MediumMechs_B|NovaCat3050MediumMechs_A</mech>
-		<mech weight="heavy">NovaCat3050HeavyMechs_F|NovaCat3050HeavyMechs_D|NovaCat3050HeavyMechs_C|NovaCat3050HeavyMechs_B|NovaCat3050HeavyMechs_A</mech>
-		<mech weight="assault">NovaCat3050AssaultMechs_F|NovaCat3050AssaultMechs_D|NovaCat3050AssaultMechs_C|NovaCat3050AssaultMechs_B|NovaCat3050AssaultMechs_A</mech>
+		<mech weight="light">Clan Nova Cat 3050 Light Mechs F|Clan Nova Cat 3050 Light Mechs D|Clan Nova Cat 3050 Light Mechs C|Clan Nova Cat 3050 Light Mechs B|Clan Nova Cat 3050 Light Mechs A</mech>
+		<mech weight="medium">Clan Nova Cat 3050 Medium Mechs F|Clan Nova Cat 3050 Medium Mechs D|Clan Nova Cat 3050 Medium Mechs C|Clan Nova Cat 3050 Medium Mechs B|Clan Nova Cat 3050 Medium Mechs A</mech>
+		<mech weight="heavy">Clan Nova Cat 3050 Heavy Mechs F|Clan Nova Cat 3050 Heavy Mechs D|Clan Nova Cat 3050 Heavy Mechs C|Clan Nova Cat 3050 Heavy Mechs B|Clan Nova Cat 3050 Heavy Mechs A</mech>
+		<mech weight="assault">Clan Nova Cat 3050 Assault Mechs F|Clan Nova Cat 3050 Assault Mechs D|Clan Nova Cat 3050 Assault Mechs C|Clan Nova Cat 3050 Assault Mechs B|Clan Nova Cat 3050 Assault Mechs A</mech>
 	</faction>
 	<faction code="CSJ">
-		<mech weight="light">SmokeJaguar3050LightMechs_F|SmokeJaguar3050LightMechs_D|SmokeJaguar3050LightMechs_C|SmokeJaguar3050LightMechs_B|SmokeJaguar3050LightMechs_A</mech>
-		<mech weight="medium">SmokeJaguar3050MediumMechs_F|SmokeJaguar3050MediumMechs_D|SmokeJaguar3050MediumMechs_C|SmokeJaguar3050MediumMechs_B|SmokeJaguar3050MediumMechs_A</mech>
-		<mech weight="heavy">SmokeJaguar3050HeavyMechs_F|SmokeJaguar3050HeavyMechs_D|SmokeJaguar3050HeavyMechs_C|SmokeJaguar3050HeavyMechs_B|SmokeJaguar3050HeavyMechs_A</mech>
-		<mech weight="assault">SmokeJaguar3050AssaultMechs_F|SmokeJaguar3050AssaultMechs_D|SmokeJaguar3050AssaultMechs_C|SmokeJaguar3050AssaultMechs_B|SmokeJaguar3050AssaultMechs_A</mech>
+		<mech weight="light">Clan Smoke Jaguar 3050 Light Mechs F|Clan Smoke Jaguar 3050 Light Mechs D|Clan Smoke Jaguar 3050 Light Mechs C|Clan Smoke Jaguar 3050 Light Mechs B|Clan Smoke Jaguar 3050 Light Mechs A</mech>
+		<mech weight="medium">Clan Smoke Jaguar 3050 Medium Mechs F|Clan Smoke Jaguar 3050 Medium Mechs D|Clan Smoke Jaguar 3050 Medium Mechs C|Clan Smoke Jaguar 3050 Medium Mechs B|Clan Smoke Jaguar 3050 Medium Mechs A</mech>
+		<mech weight="heavy">Clan Smoke Jaguar 3050 Heavy Mechs F|Clan Smoke Jaguar 3050 Heavy Mechs D|Clan Smoke Jaguar 3050 Heavy Mechs C|Clan Smoke Jaguar 3050 Heavy Mechs B|Clan Smoke Jaguar 3050 Heavy Mechs A</mech>
+		<mech weight="assault">Clan Smoke Jaguar 3050 Assault Mechs F|Clan Smoke Jaguar 3050 Assault Mechs D|Clan Smoke Jaguar 3050 Assault Mechs C|Clan Smoke Jaguar 3050 Assault Mechs B|Clan Smoke Jaguar 3050 Assault Mechs A</mech>
 	</faction>
 	<faction code="CSV">
-		<mech weight="light">SteelViper3050LightMechs_F|SteelViper3050LightMechs_D|SteelViper3050LightMechs_C|SteelViper3050LightMechs_B|SteelViper3050LightMechs_A</mech>
-		<mech weight="medium">SteelViper3050MediumMechs_F|SteelViper3050MediumMechs_D|SteelViper3050MediumMechs_C|SteelViper3050MediumMechs_B|SteelViper3050MediumMechs_A</mech>
-		<mech weight="heavy">SteelViper3050HeavyMechs_F|SteelViper3050HeavyMechs_D|SteelViper3050HeavyMechs_C|SteelViper3050HeavyMechs_B|SteelViper3050HeavyMechs_A</mech>
-		<mech weight="assault">SteelViper3050AssaultMechs_F|SteelViper3050AssaultMechs_D|SteelViper3050AssaultMechs_C|SteelViper3050AssaultMechs_B|SteelViper3050AssaultMechs_A</mech>
+		<mech weight="light">Clan Steel Viper 3050 Light Mechs F|Clan Steel Viper 3050 Light Mechs D|Clan Steel Viper 3050 Light Mechs C|Clan Steel Viper 3050 Light Mechs B|Clan Steel Viper 3050 Light Mechs A</mech>
+		<mech weight="medium">Clan Steel Viper 3050 Medium Mechs F|Clan Steel Viper 3050 Medium Mechs D|Clan Steel Viper 3050 Medium Mechs C|Clan Steel Viper 3050 Medium Mechs B|Clan Steel Viper 3050 Medium Mechs A</mech>
+		<mech weight="heavy">Clan Steel Viper 3050 Heavy Mechs F|Clan Steel Viper 3050 Heavy Mechs D|Clan Steel Viper 3050 Heavy Mechs C|Clan Steel Viper 3050 Heavy Mechs B|Clan Steel Viper 3050 Heavy Mechs A</mech>
+		<mech weight="assault">Clan Steel Viper 3050 Assault Mechs F|Clan Steel Viper 3050 Assault Mechs D|Clan Steel Viper 3050 Assault Mechs C|Clan Steel Viper 3050 Assault Mechs B|Clan Steel Viper 3050 Assault Mechs A</mech>
 	</faction>
 	<faction code="CW">
-		<mech weight="light">Wolf3050LightMechs_F|Wolf3050LightMechs_D|Wolf3050LightMechs_C|Wolf3050LightMechs_B|Wolf3050LightMechs_A</mech>
-		<mech weight="medium">Wolf3050MediumMechs_F|Wolf3050MediumMechs_D|Wolf3050MediumMechs_C|Wolf3050MediumMechs_B|Wolf3050MediumMechs_A</mech>
-		<mech weight="heavy">Wolf3050HeavyMechs_F|Wolf3050HeavyMechs_D|Wolf3050HeavyMechs_C|Wolf3050HeavyMechs_B|Wolf3050HeavyMechs_A</mech>
-		<mech weight="assault">Wolf3050AssaultMechs_F|Wolf3050AssaultMechs_D|Wolf3050AssaultMechs_C|Wolf3050AssaultMechs_B|Wolf3050AssaultMechs_A</mech>
+		<mech weight="light">Clan Wolf 3050 Light Mechs F|Clan Wolf 3050 Light Mechs D|Clan Wolf 3050 Light Mechs C|Clan Wolf 3050 Light Mechs B|Clan Wolf 3050 Light Mechs A</mech>
+		<mech weight="medium">Clan Wolf 3050 Medium Mechs F|Clan Wolf 3050 Medium Mechs D|Clan Wolf 3050 Medium Mechs C|Clan Wolf 3050 Medium Mechs B|Clan Wolf 3050 Medium Mechs A</mech>
+		<mech weight="heavy">Clan Wolf 3050 Heavy Mechs F|Clan Wolf 3050 Heavy Mechs D|Clan Wolf 3050 Heavy Mechs C|Clan Wolf 3050 Heavy Mechs B|Clan Wolf 3050 Heavy Mechs A</mech>
+		<mech weight="assault">Clan Wolf 3050 Assault Mechs F|Clan Wolf 3050 Assault Mechs D|Clan Wolf 3050 Assault Mechs C|Clan Wolf 3050 Assault Mechs B|Clan Wolf 3050 Assault Mechs A</mech>
+	</faction>
+	<faction code="DC">
+		<mech weight="light">Kurita 3050 Light Mechs F|Kurita 3050 Light Mechs D|Kurita 3050 Light Mechs C|Kurita 3050 Light Mechs B|Kurita 3050 Light Mechs A</mech>
+		<mech weight="medium">Kurita 3050 Medium Mechs F|Kurita 3050 Medium Mechs D|Kurita 3050 Medium Mechs C|Kurita 3050 Medium Mechs B|Kurita 3050 Medium Mechs A</mech>
+		<mech weight="heavy">Kurita 3050 Heavy Mechs F|Kurita 3050 Heavy Mechs D|Kurita 3050 Heavy Mechs C|Kurita 3050 Heavy Mechs B|Kurita 3050 Heavy Mechs A</mech>
+		<mech weight="assault">Kurita 3050 Assault Mechs F|Kurita 3050 Assault Mechs D|Kurita 3050 Assault Mechs C|Kurita 3050 Assault Mechs B|Kurita 3050 Assault Mechs A</mech>
+	</faction>
+	<faction code="FS">
+		<mech weight="light">Davion 3050 Light Mechs F|Davion 3050 Light Mechs D|Davion 3050 Light Mechs C|Davion 3050 Light Mechs B|Davion 3050 Light Mechs A</mech>
+		<mech weight="medium">Davion 3050 Medium Mechs F|Davion 3050 Medium Mechs D|Davion 3050 Medium Mechs C|Davion 3050 Medium Mechs B|Davion 3050 Medium Mechs A</mech>
+		<mech weight="heavy">Davion 3050 Heavy Mechs F|Davion 3050 Heavy Mechs D|Davion 3050 Heavy Mechs C|Davion 3050 Heavy Mechs B|Davion 3050 Heavy Mechs A</mech>
+		<mech weight="assault">Davion 3050 Assault Mechs F|Davion 3050 Assault Mechs D|Davion 3050 Assault Mechs C|Davion 3050 Assault Mechs B|Davion 3050 Assault Mechs A</mech>
+	</faction>
+	<faction code="FWL">
+		<mech weight="light">Marik 3050 Light Mechs F|Marik 3050 Light Mechs D|Marik 3050 Light Mechs C|Marik 3050 Light Mechs B|Marik 3050 Light Mechs A</mech>
+		<mech weight="medium">Marik 3050 Medium Mechs F|Marik 3050 Medium Mechs D|Marik 3050 Medium Mechs C|Marik 3050 Medium Mechs B|Marik 3050 Medium Mechs A</mech>
+		<mech weight="heavy">Marik 3050 Heavy Mechs F|Marik 3050 Heavy Mechs D|Marik 3050 Heavy Mechs C|Marik 3050 Heavy Mechs B|Marik 3050 Heavy Mechs A</mech>
+		<mech weight="assault">Marik 3050 Assault Mechs F|Marik 3050 Assault Mechs D|Marik 3050 Assault Mechs C|Marik 3050 Assault Mechs B|Marik 3050 Assault Mechs A</mech>
+	</faction>
+	<faction code="LA">
+		<mech weight="light">Steiner CDF 3050 Light Mechs F|Steiner CDF 3050 Light Mechs D|Steiner CDF 3050 Light Mechs C|Steiner AB 3050 Light Mechs B|Steiner AB 3050 Light Mechs A</mech>
+		<mech weight="medium">Steiner CDF 3050 Medium Mechs F|Steiner CDF 3050 Medium Mechs D|Steiner CDF 3050 Medium Mechs C|Steiner AB 3050 Medium Mechs B|Steiner AB 3050 Medium Mechs A</mech>
+		<mech weight="heavy">Steiner CDF 3050 Heavy Mechs F|Steiner CDF 3050 Heavy Mechs D|Steiner CDF 3050 Heavy Mechs C|Steiner AB 3050 Heavy Mechs B|Steiner AB 3050 Heavy Mechs A</mech>
+		<mech weight="assault">Steiner CDF 3050 Assault Mechs F|Steiner CDF 3050 Assault Mechs D|Steiner CDF 3050 Assault Mechs C|Steiner AB 3050 Assault Mechs B|Steiner AB 3050 Assault Mechs A</mech>
 	</faction>
 </rat> <!--Xotl (3050)-->
 <rat name="Xotl" era="3052">
 	<faction code="CGB">
-		<mech weight="light">GhostBear3052LightMechs_F|GhostBear3052LightMechs_D|GhostBear3052LightMechs_C|GhostBear3052LightMechs_B|GhostBear3052LightMechs_A</mech>
-		<mech weight="medium">GhostBear3052MediumMechs_F|GhostBear3052MediumMechs_D|GhostBear3052MediumMechs_C|GhostBear3052MediumMechs_B|GhostBear3052MediumMechs_A</mech>
-		<mech weight="heavy">GhostBear3052HeavyMechs_F|GhostBear3052HeavyMechs_D|GhostBear3052HeavyMechs_C|GhostBear3052HeavyMechs_B|GhostBear3052HeavyMechs_A</mech>
-		<mech weight="assault">GhostBear3052AssaultMechs_F|GhostBear3052AssaultMechs_D|GhostBear3052AssaultMechs_C|GhostBear3052AssaultMechs_B|GhostBear3052AssaultMechs_A</mech>
+		<mech weight="light">Clan Ghost Bear 3052 Light Mechs F|Clan Ghost Bear 3052 Light Mechs D|Clan Ghost Bear 3052 Light Mechs C|Clan Ghost Bear 3052 Light Mechs B|Clan Ghost Bear 3052 Light Mechs A</mech>
+		<mech weight="medium">Clan Ghost Bear 3052 Medium Mechs F|Clan Ghost Bear 3052 Medium Mechs D|Clan Ghost Bear 3052 Medium Mechs C|Clan Ghost Bear 3052 Medium Mechs B|Clan Ghost Bear 3052 Medium Mechs A</mech>
+		<mech weight="heavy">Clan Ghost Bear 3052 Heavy Mechs F|Clan Ghost Bear 3052 Heavy Mechs D|Clan Ghost Bear 3052 Heavy Mechs C|Clan Ghost Bear 3052 Heavy Mechs B|Clan Ghost Bear 3052 Heavy Mechs A</mech>
+		<mech weight="assault">Clan Ghost Bear 3052 Assault Mechs F|Clan Ghost Bear 3052 Assault Mechs D|Clan Ghost Bear 3052 Assault Mechs C|Clan Ghost Bear 3052 Assault Mechs B|Clan Ghost Bear 3052 Assault Mechs A</mech>
 	</faction>
 	<faction code="CW">
-		<mech weight="light">Wolf3052LightMechs_F|Wolf3052LightMechs_D|Wolf3052LightMechs_C|Wolf3052LightMechs_B|Wolf3052LightMechs_A</mech>
-		<mech weight="medium">Wolf3052MediumMechs_F|Wolf3052MediumMechs_D|Wolf3052MediumMechs_C|Wolf3052MediumMechs_B|Wolf3052MediumMechs_A</mech>
-		<mech weight="heavy">Wolf3052HeavyMechs_F|Wolf3052HeavyMechs_D|Wolf3052HeavyMechs_C|Wolf3052HeavyMechs_B|Wolf3052HeavyMechs_A</mech>
-		<mech weight="assault">Wolf3052AssaultMechs_F|Wolf3052AssaultMechs_D|Wolf3052AssaultMechs_C|Wolf3052AssaultMechs_B|Wolf3052AssaultMechs_A</mech>
+		<mech weight="light">Clan Wolf 3052 Light Mechs F|Clan Wolf 3052 Light Mechs D|Clan Wolf 3052 Light Mechs C|Clan Wolf 3052 Light Mechs B|Clan Wolf 3052 Light Mechs A</mech>
+		<mech weight="medium">Clan Wolf 3052 Medium Mechs F|Clan Wolf 3052 Medium Mechs D|Clan Wolf 3052 Medium Mechs C|Clan Wolf 3052 Medium Mechs B|Clan Wolf 3052 Medium Mechs A</mech>
+		<mech weight="heavy">Clan Wolf 3052 Heavy Mechs F|Clan Wolf 3052 Heavy Mechs D|Clan Wolf 3052 Heavy Mechs C|Clan Wolf 3052 Heavy Mechs B|Clan Wolf 3052 Heavy Mechs A</mech>
+		<mech weight="assault">Clan Wolf 3052 Assault Mechs F|Clan Wolf 3052 Assault Mechs D|Clan Wolf 3052 Assault Mechs C|Clan Wolf 3052 Assault Mechs B|Clan Wolf 3052 Assault Mechs A</mech>
 	</faction>
 </rat> <!--Xotl (3052)-->
 
