@@ -7198,7 +7198,9 @@ public class CampaignGUI extends JPanel {
                             null,
                             null,
                             singleForce.getName());
-                    singleForce.setName(name);
+                    if (name != null) {
+                    	singleForce.setName(name);
+                    }
                     refreshOrganization();
                 }
             } else if (command.contains("CHANGE_DESC")) {
