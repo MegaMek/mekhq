@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.3.6-dylan (SVN)
++ Bug [#549]: Parts in Use tab displays HTML Tags
 
 v0.3.6 (SVN)
 + Bug [#496]: NPE in mission resolution dialogue

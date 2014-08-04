@@ -4408,7 +4408,7 @@ public class CampaignGUI extends JPanel {
     			opaque = true;
     		}
     		int pnum = pinu.get(pname);
-    		partName = new JLabel("  <html>"+pname+"</html>  ");
+    		partName = new JLabel("<html>&nbsp;&nbsp;&nbsp;"+pname+"&nbsp;&nbsp;&nbsp;</html>");
     		partName.setBackground(bgc);
     		partName.setOpaque(opaque);
     		partName.setVerticalAlignment(SwingConstants.CENTER);
