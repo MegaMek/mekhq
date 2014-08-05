@@ -3,21 +3,24 @@
 	<store name="ClientSettings">
 		<preference name="LastPlayerCamoName" value="7th Crucis Lancers RCT.jpg"/>
 		<preference name="LastPlayerCategory" value="Davion/Crucis Lancers/"/>
-		<preference name="megamek.megamek.goalplayers" value="2"/>
 		<preference name="LastPlayerColor" value="0"/>
+		<preference name="megamek.megamek.goalplayers" value="2"/>
 		<preference name="LastPlayerName" value="bob"/>
 		<preference name="megamek.megamek.metaservername" value="http://www.damour.info/cgi-bin/james/metaserver"/>
 	</store>
 	<store name="megamek.client.ui.AWT.GUIPreferences">
 	</store>
 	<store name="megamek.client.ui.swing.GUIPreferences">
-		<preference name="GameOptionsSizeWidth" value="758"/>
-		<preference name="MechSelectorUnitType" value="1"/>
+		<preference name="MinimapPosY" value="25"/>
+		<preference name="DisplayPosY" value="25"/>
 		<preference name="MechSelectorWeightClass" value="2"/>
-		<preference name="WindowSizeHeight" value="1030"/>
-		<preference name="WindowPosY" value="25"/>
-		<preference name="WindowPosX" value="0"/>
 		<preference name="MechSelectorRuleType" value="3"/>
-		<preference name="WindowSizeWidth" value="1920"/>
+		<preference name="NagForNoAction" value="false"/>
+		<preference name="WindowSizeHeight" value="1033"/>
+		<preference name="WindowPosY" value="25"/>
+		<preference name="MechSelectorUnitType" value="1"/>
+		<preference name="WindowPosX" value="0"/>
+		<preference name="GameOptionsSizeWidth" value="758"/>
+		<preference name="WindowSizeWidth" value="1928"/>
 	</store>
 </MegaMekSettings>

@@ -483,7 +483,7 @@ public class Armor extends Part implements IAcquisitionWork {
 		if(currentArmor < 0) {
 			currentArmor = 0;
 		}
-		if(salvaging || isMountedOnDestroyedLocation()) {
+		if(salvaging) {
 			amountNeeded = currentArmor;
 			amount = unit.getEntity().getOArmor(location, rear) - amountNeeded;
 		} else {			
@@ -491,7 +491,7 @@ public class Armor extends Part implements IAcquisitionWork {
 			amount = currentArmor;
 		}
 		//time should be based on amount available if less than amount needed
-		if(salvaging || isMountedOnDestroyedLocation()) {
+		if(salvaging) {
 			time = getBaseTimeFor(unit.getEntity()) * amountNeeded;
 		} else {
 			time = getBaseTimeFor(unit.getEntity()) * Math.min(amountNeeded, getAmountAvailable());
@@ -501,7 +501,7 @@ public class Armor extends Part implements IAcquisitionWork {
 	
 	@Override
 	public boolean isSalvaging() {
-		return (salvaging || isMountedOnDestroyedLocation()) && amountNeeded > 0;
+		return salvaging && amountNeeded > 0;
 	}
 	
 	@Override
