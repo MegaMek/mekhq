@@ -888,7 +888,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		if (!isDeployed()) {
 			// Age limitations...
 			if (getAge(campaign.getCalendar()) > 13 && getAge(campaign.getCalendar()) < 51) {
-				if (getSpouseID() == null) {
+				if (getSpouseID() == null && campaign.getCampaignOptions().useUnofficialProcreationNoRelationship()) {
 					// 0.005% chance that this procreation attempt will create a child
 					if (Compute.randomInt(100000) < 2) {
 						GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();

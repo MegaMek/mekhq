@@ -1996,10 +1996,14 @@ public class Campaign implements Serializable {
             // Procreation
             if (p.isFemale()) {
             	if (p.isPregnant()) {
-            		if (getCalendar().compareTo((p.getDueDate())) == 0) {
-            			babies.add(p.birth());
+            		if (getCampaignOptions().useUnofficialProcreation()) {
+	            		if (getCalendar().compareTo((p.getDueDate())) == 0) {
+	            			babies.add(p.birth());
+	            		}
+            		} else {
+            			p.setDueDate(null);
             		}
-            	} else {
+            	} else if (getCampaignOptions().useUnofficialProcreation()) {
 					p.procreate();
             	}
             }
