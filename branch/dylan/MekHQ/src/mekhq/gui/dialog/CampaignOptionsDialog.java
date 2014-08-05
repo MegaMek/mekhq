@@ -269,6 +269,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JSpinner spnAcquireClanPenalty;
     private JSpinner spnAcquireIsPenalty;
     private JTextField txtMaxAcquisitions;
+    private JCheckBox chkUseUnofficialProcreation;
+    private JCheckBox chkUseUnofficialProcreationNoRelationship;
 
 
     private JSpinner spnNDiceTransitTime;
@@ -970,7 +972,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubAcquire.add(pnlMaxAcquisitions, gridBagConstraints);
 
-
         spnNDiceTransitTime = new JSpinner(new SpinnerNumberModel(options.getNDiceTransitTime(), 0, 365, 1));
         ((JSpinner.DefaultEditor) spnNDiceTransitTime.getEditor()).getTextField().setEditable(false);
 
@@ -1303,6 +1304,18 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panPersonnel.add(useTougherHealing, gridBagConstraints);
 
+        chkUseUnofficialProcreation = new JCheckBox("Use procreation (Unofficial)"); // NOI18N
+        chkUseUnofficialProcreation.setSelected(options.useUnofficialProcreation());
+        //chkUseUnofficialProcreation.setToolTipText(resourceMap.getString("chkUseUnofficialProcreation.toolTipText")); // NOI18N
+        gridBagConstraints.gridy = 14;
+        panPersonnel.add(chkUseUnofficialProcreation, gridBagConstraints);
+
+        chkUseUnofficialProcreationNoRelationship = new JCheckBox("Use procreation without a relationship (Unofficial)"); // NOI18N
+        chkUseUnofficialProcreationNoRelationship.setSelected(options.useUnofficialProcreationNoRelationship());
+        //chkUseUnofficialProcreationNoRelationship.setToolTipText(resourceMap.getString("chkUseUnofficialProcreationNoRelationship.toolTipText")); // NOI18N
+        gridBagConstraints.gridy = 15;
+        panPersonnel.add(chkUseUnofficialProcreationNoRelationship, gridBagConstraints);
+
         JPanel panSalary = new JPanel(new GridBagLayout());
         panSalary.setBorder(BorderFactory.createTitledBorder("Salary"));
 
@@ -1405,7 +1418,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 14;
+        gridBagConstraints.gridheight = 16;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -3391,7 +3404,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         chkAdjustPlayerVehicles.setSelected(options.getAdjustPlayerVehicles());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -3805,6 +3818,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setMinimumHitsForVees((Integer) spnMinimumHitsForVees.getModel().getValue());
         options.setUseRandomHitsForVees(useRandomHitsForVees.isSelected());
         options.setTougherHealing(useTougherHealing.isSelected());
+        options.setUseUnofficialProcreation(chkUseUnofficialProcreation.isSelected());
+        options.setUseUnofficialProcreationNoRelationship(chkUseUnofficialProcreationNoRelationship.isSelected());
 
         rskillPrefs.setOverallRecruitBonus((Integer) spnOverallRecruitBonus.getModel().getValue());
         for (int i = 0; i < Person.T_NUM; i++) {
@@ -3869,7 +3884,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUseAtB(chkUseAtB.isSelected());
         options.setSkillLevel(cbSkillLevel.getSelectedIndex());
         options.setUseShareSystem(chkUseShareSystem.isSelected());
-        options.setUseShareSystem(chkSharesForAll.isSelected());
+        options.setSharesForAll(chkSharesForAll.isSelected());
         options.setTrackOriginalUnit(chkTrackOriginalUnit.isSelected());
         options.setRetirementRolls(chkRetirementRolls.isSelected());
         options.setCustomRetirementMods(chkCustomRetirementMods.isSelected());

@@ -21,17 +21,18 @@ import java.util.Comparator;
                 //probably easiest to turn into numbers and then sort that way
                 int l0 = 0;
                 int l1 = 0;
-                if(s0.contains("Ultra-Green")) {
-                    l0 = 1;
-                }
-                if(s1.contains("Ultra-Green")) {
-                    l1 = 1;
-                }
                 if(s0.contains("Green")) {
                     l0 = 2;
                 }
                 if(s1.contains("Green")) {
                     l1 = 2;
+                }
+                // Ultra-Green has to be below Green when using String.contains() because it contains Green
+                if(s0.contains("Ultra-Green")) {
+                    l0 = 1;
+                }
+                if(s1.contains("Ultra-Green")) {
+                    l1 = 1;
                 }
                 if(s0.contains("Regular")) {
                     l0 = 3;

@@ -3185,6 +3185,8 @@ public class CampaignGUI extends JPanel {
     private void doTask() {// GEN-FIRST:event_btnDoTaskActionPerformed
         int selectedRow = -1;
         int partId = -1;
+        int selectedLocation = -1;
+        Unit selectedUnit = null;
         // int selectedTechRow = -1;
         Person tech = getSelectedTech();
         if (onWarehouseTab()) {
@@ -3211,6 +3213,8 @@ public class CampaignGUI extends JPanel {
         } else if (repairsSelected()) {
             selectedRow = taskTable.getSelectedRow();
             // selectedTechRow = TechTable.getSelectedRow();
+            selectedLocation = choiceLocation.getSelectedIndex();
+            selectedUnit = getSelectedServicedUnit();
             Part part = getSelectedTask();
             if (null == part) {
                 return;
@@ -3282,6 +3286,7 @@ public class CampaignGUI extends JPanel {
         refreshFunds();
         refreshFinancialTransactions();
         refreshOverview();
+        filterTasks();
 
         //get the selected row back for tasks
         if (selectedRow != -1) {
@@ -3338,6 +3343,15 @@ public class CampaignGUI extends JPanel {
                 }
             }
         }
+        if (selectedLocation != -1) {
+        	if (selectedUnit == null
+        			|| getSelectedServicedUnit() == null
+        			|| !selectedUnit.equals(getSelectedServicedUnit())
+        			|| selectedLocation >= choiceLocation.getItemCount()) {
+        		selectedLocation = 0;
+        	}
+        	choiceLocation.setSelectedIndex(selectedLocation);
+        }
 
     }// GEN-LAST:event_btnDoTaskActionPerformed
     
@@ -3379,6 +3393,7 @@ public class CampaignGUI extends JPanel {
         refreshReport();
         refreshFunds();
         refreshFinancialTransactions();
+        filterTasks();
 
         if (selectedRow != -1) {
             if (acquireSelected()) {
@@ -4053,6 +4068,7 @@ public class CampaignGUI extends JPanel {
         refreshTechsList();
         refreshTaskList();
         refreshAcquireList();
+        filterTasks();
     }// GEN-LAST:event_btnOvertimeActionPerformed
 
     private void btnGMModeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnGMModeActionPerformed
@@ -5453,6 +5469,7 @@ public class CampaignGUI extends JPanel {
             refreshPersonnelList();
             refreshScenarioList();
             refreshOverview();
+            filterTasks();
         }
     }
 
@@ -5492,8 +5509,8 @@ public class CampaignGUI extends JPanel {
         refreshOrganization();
         refreshServicedUnitList();
         refreshUnitList();
-        filterPersonnel();
         refreshPersonnelList();
+        filterPersonnel();
         refreshDoctorsList();
         refreshPatientList();
         refreshReport();
@@ -6238,6 +6255,8 @@ public class CampaignGUI extends JPanel {
 	                			|| part.getUnit().getEntity().getLocationFromAbbr(loc) == Mech.LOC_RT)) {
 	                		return true;
 	                	}
+	                } else if (part instanceof MekGyro && part.getUnit().getEntity().getLocationFromAbbr(loc) == Mech.LOC_CT) {
+	                	return true;
 	                } else {
 	                	return false;
 	                }
@@ -6929,6 +6948,7 @@ public class CampaignGUI extends JPanel {
                 refreshAcquireList();
                 refreshReport();
                 refreshOverview();
+                filterTasks();
             } else if (command.contains("SWAP_AMMO")) {
                 /*
                 WorkItem task = taskModel.getTaskAt(TaskTable.getSelectedRow());
@@ -7089,6 +7109,7 @@ public class CampaignGUI extends JPanel {
                 refreshAcquireList();
                 refreshPartsList();
                 refreshOverview();
+                filterTasks();
             }
         }
 
@@ -7179,6 +7200,7 @@ public class CampaignGUI extends JPanel {
                 refreshServicedUnitList();
                 refreshUnitList();
                 refreshOverview();
+                filterTasks();
             } else if (command.contains("CHANGE_SITE")) {
                 for (Unit unit : units) {
                     if (!unit.isDeployed()) {
@@ -7489,7 +7511,9 @@ public class CampaignGUI extends JPanel {
                             null,
                             null,
                             singleForce.getName());
-                    singleForce.setName(name);
+                    if (name != null) {
+                    	singleForce.setName(name);
+                    }
                     refreshOrganization();
                 }
             } else if (command.contains("CHANGE_DESC")) {
@@ -9807,6 +9831,7 @@ public class CampaignGUI extends JPanel {
                 refreshFunds();
                 refreshFinancialTransactions();
                 refreshOverview();
+                filterTasks();
             } else if (command.equalsIgnoreCase("SELL_ALL")) {
                 for (Part p : parts) {
                     if (null != p) {
@@ -10209,6 +10234,7 @@ public class CampaignGUI extends JPanel {
                         refreshAcquireList();
                         refreshReport();
                         refreshOverview();
+                        filterTasks();
                     }
                 });
                 menuItem.setEnabled(getCampaign().isGM());
@@ -10280,6 +10306,7 @@ public class CampaignGUI extends JPanel {
                         refreshAcquireList();
                         refreshReport();
                         refreshOverview();
+                        filterTasks();
                     }
                 });
                 menuItem.setEnabled(getCampaign().isGM());
@@ -10307,6 +10334,7 @@ public class CampaignGUI extends JPanel {
                         refreshTaskList();
                         refreshAcquireList();
                         refreshOverview();
+                        filterTasks();
                     }
                 });
                 menuItem.setEnabled(getCampaign().isGM());
@@ -10703,6 +10731,7 @@ public class CampaignGUI extends JPanel {
                 refreshServicedUnitList();
                 refreshUnitList();
                 refreshOverview();
+                filterTasks();
             } else if (command.contains("CHANGE_SITE")) {
                 for (Unit unit : units) {
                     if (!unit.isDeployed()) {

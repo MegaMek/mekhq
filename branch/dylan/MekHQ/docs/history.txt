@@ -107,6 +107,15 @@ v0.3.6 (SVN)
 + Feature: New unofficial maintenance option that significantly improves the canon maintenance rules
 + Bug: "A" quality for the new unofficial maintenance option wasn't right
 + Bug [#547]: Unable to load campaign after child born
++ Bug: Gyro not shown when repair location dropdown was set to CT
++ Bug [#551]: Repair Location menu isn't sticky
++ Changed repair location dropdown to reset if the unit itself is changed
++ Bug [#556]: TOE: Name field empty after hitting cancel for Change Name
++ Bug [#553]: Prev. Fix for Ultra-Green and Green sorting is broken
++ Patch [34]: Against the Bot, 9th Patch
+    Fixes Bug[#548] ATB Shares System do not "stick"
++ Bug [#555]: Armor appears on destroyed locations
++ Optionized Procreation
 
 v0.3.5-dylan (2014-04-28)
 -- No Changes--
@@ -114,7 +123,7 @@ v0.3.5-dylan (2014-04-28)
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
 + Bug [#490]: Error Exporting Campaign Options
-+ Bug [#492]: Repair mode resetting after every repair attempt.
++ Bug [#492]: Repair mode resetting after every repair attempt
 + Bug [#462]: BA Repairs
 + new MM.jar
 + better instructions for how to fix unit names in loading error dialog
