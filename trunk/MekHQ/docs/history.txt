@@ -111,6 +111,7 @@ v0.3.6 (SVN)
 + Patch [34]: Against the Bot, 9th Patch
     Fixes Bug[#548] ATB Shares System do not "stick"
 + Bug [#555]: Armor appears on destroyed locations
++ Optionized Procreation
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4

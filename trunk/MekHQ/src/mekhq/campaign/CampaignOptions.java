@@ -81,6 +81,8 @@ public class CampaignOptions implements Serializable {
     private int minimumHitsForVees;
     private boolean tougherHealing;
     private int maxAcquisitions;
+    private boolean useUnofficialProcreation;
+    private boolean useUnofficialProcreationNoRelationship;
 
     //personnel market related
     private boolean personnelMarketReportRefresh;
@@ -314,6 +316,8 @@ public class CampaignOptions implements Serializable {
         useRandomHitsForVees = false;
         minimumHitsForVees = 1;
         maxAcquisitions = 0;
+        useUnofficialProcreation = false;
+        useUnofficialProcreationNoRelationship = false;
         personnelMarketReportRefresh = true;
         personnelMarketType = PersonnelMarket.TYPE_STRAT_OPS;
         personnelMarketRandomEliteRemoval = 10;
@@ -1147,6 +1151,22 @@ public class CampaignOptions implements Serializable {
         maxAcquisitions = d;
     }
 
+    public boolean useUnofficialProcreation() {
+        return useUnofficialProcreation;
+    }
+
+    public void setUseUnofficialProcreation(boolean b) {
+    	useUnofficialProcreation = b;
+    }
+
+    public boolean useUnofficialProcreationNoRelationship() {
+        return useUnofficialProcreationNoRelationship;
+    }
+
+    public void setUseUnofficialProcreationNoRelationship(boolean b) {
+    	useUnofficialProcreationNoRelationship = b;
+    }
+
     public int getMinimumHitsForVees() {
         return minimumHitsForVees;
     }
@@ -1599,6 +1619,8 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomHitsForVees", useRandomHitsForVees);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "minimumHitsForVees", minimumHitsForVees);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maxAcquisitions", maxAcquisitions);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficialProcreation", useUnofficialProcreation);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficialProcreationNoRelationship", useUnofficialProcreationNoRelationship);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketType", personnelMarketType);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomEliteRemoval",
                                        personnelMarketRandomEliteRemoval);
@@ -1942,6 +1964,10 @@ public class CampaignOptions implements Serializable {
                 retVal.minimumHitsForVees = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("maxAcquisitions")) {
                 retVal.maxAcquisitions = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreation")) {
+            	retVal.useUnofficialProcreation = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreationNoRelationship")) {
+            	retVal.useUnofficialProcreationNoRelationship = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVees")) {
                 if (wn2.getTextContent().equalsIgnoreCase("true")) {
                     retVal.useRandomHitsForVees = true;
