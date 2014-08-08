@@ -1175,7 +1175,7 @@ public class CampaignGUI extends JPanel {
             personViewModel.addElement(getPersonnelViewName(i));
         }
         choicePersonView = new JComboBox<String>(personViewModel);
-        choicePersonView.setSelectedIndex(0);
+        choicePersonView.setSelectedIndex(PV_GENERAL);
         choicePersonView.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 changePersonnelView();

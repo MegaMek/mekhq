@@ -112,6 +112,7 @@ v0.3.6 (SVN)
     Fixes Bug[#548] ATB Shares System do not "stick"
 + Bug [#555]: Armor appears on destroyed locations
 + Optionized Procreation
++ Made "General" the default Personnel View
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
