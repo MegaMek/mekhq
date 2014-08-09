@@ -114,6 +114,8 @@ v0.3.6 (SVN)
 + Optionized Procreation
 + Made "General" the default Personnel View
 + NPE in Procreation related to the new option for no-spouse chance
++ Bug [558]: Can not start "Against the Bot" battle
++ Bug: ATB "Big Battles" forces could not deploy properly due to bad if check for special missions
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4

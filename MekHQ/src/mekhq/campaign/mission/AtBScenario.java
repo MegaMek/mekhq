@@ -610,7 +610,7 @@ public class AtBScenario extends Scenario {
 			if (battleType >= BIGBATTLES &&
 					getForces(c).getAllUnits().size() + units.size() > 8) {
 				return false;
-			} else if (battleType >= SPECIALMISSIONS &&
+			} else if (battleType >= SPECIALMISSIONS && battleType < BIGBATTLES &&
 					getForces(c).getAllUnits().size() + units.size() > 0) {
 				return false;
 			}
@@ -623,7 +623,7 @@ public class AtBScenario extends Scenario {
 		if (battleType >= BIGBATTLES &&
 				getForces(c).getAllUnits().size() + total > 8) {
 			return false;
-		} else if (battleType >= SPECIALMISSIONS &&
+		} else if (battleType >= SPECIALMISSIONS && battleType < BIGBATTLES &&
 				getForces(c).getAllUnits().size() + total > 0) {
 			return false;
 		}
