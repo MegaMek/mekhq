@@ -113,6 +113,7 @@ v0.3.6 (SVN)
 + Bug [#555]: Armor appears on destroyed locations
 + Optionized Procreation
 + Made "General" the default Personnel View
++ NPE in Procreation related to the new option for no-spouse chance
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
