@@ -154,6 +154,8 @@ public class CampaignOptions implements Serializable {
     private int idleXP;
     private int targetIdleXP;
     private int monthsIdleXP;
+    private int contractNegotiationXP;
+    private int adminWeeklyXP;
 
     //repair related
     private boolean destroyByMargin;
@@ -287,6 +289,8 @@ public class CampaignOptions implements Serializable {
         idleXP = 0;
         targetIdleXP = 10;
         monthsIdleXP = 2;
+        contractNegotiationXP = 1;
+        adminWeeklyXP = 1;
         unitRatingMethod = UnitRatingMethod.INTERSTELLAR_OPS;
         waitingPeriod = 7;
         acquisitionSkill = S_TECH;
@@ -933,6 +937,22 @@ public class CampaignOptions implements Serializable {
 
     public void setMonthsIdleXP(int m) {
         monthsIdleXP = m;
+    }
+
+    public int getContractNegotiationXP() {
+        return contractNegotiationXP;
+    }
+
+    public void setContractNegotiationXP(int m) {
+        contractNegotiationXP = m;
+    }
+
+    public int getAdminWeeklyXP() {
+        return adminWeeklyXP;
+    }
+
+    public void setAdminWeeklyXP(int m) {
+        adminWeeklyXP = m;
     }
 
     public int getWaitingPeriod() {
@@ -1582,6 +1602,8 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "idleXP", idleXP);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "targetIdleXP", targetIdleXP);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "monthsIdleXP", monthsIdleXP);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "contractNegotiationXP", contractNegotiationXP);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "adminWeeklyXP", adminWeeklyXP);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "limitByYear", limitByYear);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowClanPurchases", allowClanPurchases);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowISPurchases", allowISPurchases);
@@ -1826,6 +1848,10 @@ public class CampaignOptions implements Serializable {
                 retVal.targetIdleXP = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("monthsIdleXP")) {
                 retVal.monthsIdleXP = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("contractNegotiationXP")) {
+                retVal.contractNegotiationXP = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("adminWeeklyXP")) {
+                retVal.adminWeeklyXP = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("waitingPeriod")) {
                 retVal.waitingPeriod = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("healWaitingPeriod")) {
