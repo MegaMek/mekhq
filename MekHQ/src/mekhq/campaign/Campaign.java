@@ -1844,6 +1844,14 @@ public class Campaign implements Serializable {
             					" requirements resulted in " + deficit +
             					((deficit==1)?" minor contract breach":" minor contract breaches"));
             		}
+            		// Administrator Weekly XP
+            		if (campaignOptions.getAdminWeeklyXP() > 0) {
+                		for (Person p : this.getPersonnel()) {
+                		    if (p.isAdminPrimary()) {
+                		        p.awardXP(campaignOptions.getAdminWeeklyXP());
+                		    }
+                		}
+            		}
             	}
         		
         		for (Scenario s : m.getScenarios()) {

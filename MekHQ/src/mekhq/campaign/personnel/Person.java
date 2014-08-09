@@ -943,6 +943,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public void setXp(int xp) {
         this.xp = xp;
     }
+    
+    public void awardXP(int xp) {
+        this.xp += xp;
+    }
 
     public int getAcquisitions() {
         return acquisitions;
