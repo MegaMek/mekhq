@@ -138,7 +138,7 @@ public class LanceAssignmentView extends JPanel {
             });
         }
         TableRowSorter<RequiredLancesTableModel>sorter = new TableRowSorter<RequiredLancesTableModel>(rlModel);
-         tblRequiredLances.setRowSorter(sorter);
+        tblRequiredLances.setRowSorter(sorter);
         
         tblRequiredLances.setIntercellSpacing(new Dimension(0, 0));
         tblRequiredLances.setShowGrid(false);
