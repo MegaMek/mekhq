@@ -9439,7 +9439,8 @@ public class CampaignGUI extends JPanel {
         private boolean allHaveSameUnit(Person[] people) {
         	UUID unitId = people[0].getUnitId();
         	for (Person person : people) {
-        		if ((unitId == null && person.getUnitId() == null) || person.getUnitId().equals(unitId)) {
+        		if ((unitId == null && person.getUnitId() == null)
+        		        || (person.getUnitId() != null && person.getUnitId().equals(unitId))) {
         			continue;
         		}
         		return false;
