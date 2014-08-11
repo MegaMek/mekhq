@@ -124,6 +124,7 @@ v0.3.6 (SVN)
 + Bug [#557]: Assigning Kills for Retreated and Killed
 + Bug: When person status changed to an inactive status, repairs and refits assigned to them
     cannot be completed
++ Bug [#519]: SPA defaults not loading properly from campaign save
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4

@@ -120,14 +120,14 @@ public class SkillPrereq implements MekHqXmlSerializable {
             int lvl = skillset.get(key);
             if(lvl <= 0) {
                 pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                        +"<displayName>"
+                        +"<skill>"
                         +key
-                        +"</displayName>");
+                        +"</skill>");
             } else {
                 pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                        +"<displayName>"
+                        +"<skill>"
                         +key + "::" + SkillType.getExperienceLevelName(lvl)
-                        +"</displayName>");
+                        +"</skill>");
             }
         }
         
@@ -144,10 +144,15 @@ public class SkillPrereq implements MekHqXmlSerializable {
             for (int x=0; x<nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("skill")) {
-                    String skillName = parseStringForName(wn2.getTextContent());
+                    String skillName = wn2.getTextContent();
+                    int level = 0;
+                    if (skillName.contains("::")) {
+                        level = parseStringForLevel(skillName);
+                        skillName = parseStringForName(skillName);
+                    }
                     //if the skill name does not match existing skills, then ignore
                     if(null != SkillType.getType(skillName)) {
-                        retVal.skillset.put(skillName, parseStringForLevel(wn2.getTextContent()));
+                        retVal.addPrereq(skillName, level);
                     }
                 }
             }       

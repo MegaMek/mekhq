@@ -9,7 +9,7 @@
 		<skillPrereq>
 	    	<skill>Piloting/Mech::Regular</skill>
 	    	<skill>Piloting/Protomech::Regular</skill>
-	    </skillPrereq>	
+	    </skillPrereq>
 	</ability>
 	<ability>
 		<lookupName>hot_dog</lookupName>	
