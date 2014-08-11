@@ -5591,6 +5591,12 @@ public class Campaign implements Serializable {
             		t.remove(person, true);
             	}
             }
+            // If we're assigned to any repairs or refits, remove that assignment
+            for (Part part : getParts()) {
+                if (person.getId().equals(part.getAssignedTeamId())) {
+                    part.cancelAssignment();
+                }
+            }
         }
     }
 
