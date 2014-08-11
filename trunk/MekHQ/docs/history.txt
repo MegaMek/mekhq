@@ -121,6 +121,7 @@ v0.3.6 (SVN)
 + Bug [#560]: VTOL Turrets are not repairable
 + Made "General" the default Unit View
     Also refactored a lot of == 0 stuff to the appropriate view constants
++ Bug [#557]: Assigning Kills for Retreated and Killed
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
