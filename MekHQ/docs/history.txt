@@ -119,6 +119,8 @@ v0.3.6 (SVN)
 + NPE Selecting multiple people when some have a unit and some do not
 + Feature: Admin Weekly XP & Negotiator Contract XP options
 + Bug [#560]: VTOL Turrets are not repairable
++ Made "General" the default Unit View
+    Also refactored a lot of == 0 stuff to the appropriate view constants
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
