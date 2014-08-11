@@ -242,7 +242,13 @@ public class ResolveScenarioTracker {
 				if(control) {
 					// Kill credit automatically assigned only if they can't escape 
 					if (!e.canEscape()) {
-						killCredits.put(e.getDisplayName(), "None");
+					    Entity killer = client.getGame().getEntity(e.getKillerId());
+		                if(null != killer && killer.getOwnerId() == pid) {
+		                    //the killer is one of your units, congrats!
+		                    killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
+		                } else {
+		                    killCredits.put(e.getDisplayName(), "None");
+		                }
 					}
 					if(e instanceof Infantry && !(e instanceof BattleArmor)) {
 						continue;
@@ -251,7 +257,20 @@ public class ResolveScenarioTracker {
 					newPilots.addAll(Utilities.generateRandomCrewWithCombinedSkill(e, campaign));
 				}
 			}
-		}	
+		}
+		// Utterly destroyed entities
+		for (Enumeration<Entity> iter = client.getGame().getDevastatedEntities(); iter.hasMoreElements();) {
+		    Entity e = iter.nextElement();
+		    if(e.getOwner().isEnemyOf(client.getLocalPlayer())) {
+                Entity killer = client.getGame().getEntity(e.getKillerId());
+                if(null != killer && killer.getOwnerId() == pid) {
+                    //the killer is one of your units, congrats!
+                    killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
+                } else {
+                    killCredits.put(e.getDisplayName(), "None");
+                }
+		    }
+		}
 		//add retreated units
 		for (Enumeration<Entity> iter = client.getGame().getRetreatedEntities(); iter.hasMoreElements();) {
             Entity e = iter.nextElement();
@@ -431,7 +450,7 @@ public class ResolveScenarioTracker {
 	public void assignKills() {
 		for(Unit u : units) {
 			for(String killed : killCredits.keySet()) {
-				if(killCredits.get(killed).equalsIgnoreCase("none")) {
+				if(killCredits.get(killed).equalsIgnoreCase("None")) {
 					continue;
 				}
 				if(u.getId().toString().equals(killCredits.get(killed))) {
