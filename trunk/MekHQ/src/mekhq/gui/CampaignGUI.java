@@ -1299,7 +1299,7 @@ public class CampaignGUI extends JPanel {
             unitViewModel.addElement(getUnitViewName(i));
         }
         choiceUnitView = new JComboBox<String>(unitViewModel);
-        choiceUnitView.setSelectedIndex(0);
+        choiceUnitView.setSelectedIndex(UV_GENERAL);
         choiceUnitView.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 changeUnitView();
@@ -1336,7 +1336,7 @@ public class CampaignGUI extends JPanel {
         for (int i = 0; i < UnitTableModel.N_COL; i++) {
             column = unitTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(unitModel.getColumnWidth(i));
-            column.setCellRenderer(unitModel.getRenderer(choiceUnitView.getSelectedIndex() == 0, getIconPackage()));
+            column.setCellRenderer(unitModel.getRenderer(choiceUnitView.getSelectedIndex() == UV_GRAPHIC, getIconPackage()));
         }
         unitTable.setIntercellSpacing(new Dimension(0, 0));
         unitTable.setShowGrid(false);
@@ -6141,7 +6141,7 @@ public class CampaignGUI extends JPanel {
         TableColumn column = null;
         for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
             column = columnModel.getColumnByModelIndex(i);
-            column.setCellRenderer(personModel.getRenderer(choicePersonView.getSelectedIndex() == 0, getIconPackage()));
+            column.setCellRenderer(personModel.getRenderer(choicePersonView.getSelectedIndex() == PV_GRAPHIC, getIconPackage()));
             if (i == PersonnelTableModel.COL_RANK) {
                 if (view == PV_GRAPHIC) {
                     column.setPreferredWidth(125);
@@ -6487,7 +6487,7 @@ public class CampaignGUI extends JPanel {
         TableColumn column = null;
         for (int i = 0; i < UnitTableModel.N_COL; i++) {
             column = columnModel.getColumnByModelIndex(i);
-            column.setCellRenderer(unitModel.getRenderer(choiceUnitView.getSelectedIndex() == 0, getIconPackage()));
+            column.setCellRenderer(unitModel.getRenderer(choiceUnitView.getSelectedIndex() == UV_GRAPHIC, getIconPackage()));
             if (i == UnitTableModel.COL_WCLASS) {
                 if (view == UV_GRAPHIC) {
                     column.setPreferredWidth(125);
