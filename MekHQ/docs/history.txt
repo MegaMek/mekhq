@@ -122,6 +122,8 @@ v0.3.6 (SVN)
 + Made "General" the default Unit View
     Also refactored a lot of == 0 stuff to the appropriate view constants
 + Bug [#557]: Assigning Kills for Retreated and Killed
++ Bug: When person status changed to an inactive status, repairs and refits assigned to them
+    cannot be completed
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
