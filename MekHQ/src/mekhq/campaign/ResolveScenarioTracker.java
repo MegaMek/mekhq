@@ -913,6 +913,7 @@ public class ResolveScenarioTracker {
 				}
 				campaign.removeUnit(unit.getId());
 			} else {
+			    en.setDeployed(false);
 			    checkForEquipmentStatus(en, control);
 				long currentValue = unit.getValueOfAllMissingParts();
 				campaign.clearGameData(en);
