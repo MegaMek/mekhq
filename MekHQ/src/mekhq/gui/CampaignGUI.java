@@ -4970,7 +4970,7 @@ public class CampaignGUI extends JPanel {
                             continue;
                         }
                     
-                        SpecialAbility.generateInstanceFromXML(wn2, poptions);
+                        SpecialAbility.generateInstanceFromXML(wn2, poptions, null);
                     }
                 }
                 

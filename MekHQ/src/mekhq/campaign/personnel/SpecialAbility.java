@@ -44,6 +44,7 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
+import mekhq.Version;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -64,6 +65,7 @@ import org.w3c.dom.NodeList;
 public class SpecialAbility implements MekHqXmlSerializable {
 
     private static Hashtable<String, SpecialAbility> specialAbilities;
+    private static Hashtable<String, SpecialAbility> defaultSpecialAbilities;
     
     private String displayName;
     private String lookupName;
@@ -256,7 +258,8 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
     
     
-    public static void generateInstanceFromXML(Node wn, PilotOptions options) {
+    @SuppressWarnings("unchecked")
+    public static void generateInstanceFromXML(Node wn, PilotOptions options, Version v) {
         SpecialAbility retVal = null;
         
         try {       
@@ -289,7 +292,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
                         retVal.prereqSkills.add(skill);
                     }
                 }
-            }       
+            }
         } catch (Exception ex) {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
@@ -303,13 +306,20 @@ public class SpecialAbility implements MekHqXmlSerializable {
                 retVal.displayName = option.getDisplayableName();
             }
         }
+        
         if(retVal.desc.isEmpty()) { 
             IOption option = options.getOption(retVal.lookupName);
             if(null != option) {
                 retVal.desc = option.getDescription();
             }
         }
-        
+        if (v != null) {
+            if (defaultSpecialAbilities != null && Version.versionCompare(v, "0.3.6-r1965")) {
+                if (defaultSpecialAbilities.get(retVal.lookupName).getPrereqSkills() != null) {
+                    retVal.prereqSkills = (Vector<SkillPrereq>) defaultSpecialAbilities.get(retVal.lookupName).getPrereqSkills().clone();
+                }
+            }
+        }
         specialAbilities.put(retVal.lookupName, retVal);
     }
     
@@ -357,7 +367,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
                 String xn = wn.getNodeName();
     
                 if (xn.equalsIgnoreCase("ability")) {
-                    SpecialAbility.generateInstanceFromXML(wn, options);
+                    SpecialAbility.generateInstanceFromXML(wn, options, null);
                 }
             }
         }   
@@ -497,6 +507,15 @@ public class SpecialAbility implements MekHqXmlSerializable {
     
     public static void clearSPA() {
         specialAbilities.clear();
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static void trackDefaultSPA() {
+        defaultSpecialAbilities = (Hashtable<String, SpecialAbility>)specialAbilities.clone();
+    }
+    
+    public static void nullifyDefaultSPA() {
+        defaultSpecialAbilities = null;
     }
     
     //TODO: also put some static methods here that return the available options for a given SPA, so
