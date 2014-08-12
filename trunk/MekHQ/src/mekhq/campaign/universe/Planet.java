@@ -236,7 +236,7 @@ public class Planet implements Serializable {
 	public static String getClimateName(int cl) {
 		switch(cl) {
 		case CLIMATE_ARCTIC:
-			return "Acrtic";
+			return "Arctic";
 		case CLIMATE_BOREAL:
 			return "Boreal";
 		case CLIMATE_COOLTEM:
@@ -437,7 +437,11 @@ public class Planet implements Serializable {
 	}
 	
 	public int getRechargeTime() {
-		return 141 + 10*spectralClass + subtype;
+		if(zenithCharge || nadirCharge) {
+			return Math.min(176, 141 + 10*spectralClass + subtype);
+		} else {
+			return 141 + 10*spectralClass + subtype;
+		}
 	}
 	
 	public double getTimeToJumpPoint(double acceleration) {
