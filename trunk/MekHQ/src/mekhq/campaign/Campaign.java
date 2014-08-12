@@ -2302,9 +2302,9 @@ public class Campaign implements Serializable {
             }
         }
         // add in astechs from the astech pool
-        // we will assume vee mechanic * able-bodied * enlisted
-        // 640 * 0.5 * 0.6 = 192
-        salaries += (192 * astechPool);
+        // we will assume Mech Tech * able-bodied * enlisted (changed from vee mechanic)
+        // 800 * 0.5 * 0.6 = 240
+        salaries += (240 * astechPool);
         salaries += (320 * medicPool);
         return salaries;
     }
