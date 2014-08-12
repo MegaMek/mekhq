@@ -3743,6 +3743,7 @@ public class Campaign implements Serializable {
         MekHQ.logMessage("Loading Special Ability Nodes from XML...", 4);
         
         PilotOptions options = new PilotOptions();
+        SpecialAbility.trackDefaultSPA();
         SpecialAbility.clearSPA();
         
         NodeList wList = wn.getChildNodes();
@@ -3765,8 +3766,9 @@ public class Campaign implements Serializable {
                 continue;
             }
         
-            SpecialAbility.generateInstanceFromXML(wn2, options);
+            SpecialAbility.generateInstanceFromXML(wn2, options, version);
         }
+        SpecialAbility.nullifyDefaultSPA();
         
         MekHQ.logMessage("Load Special Ability Nodes Complete!", 4);
 }
