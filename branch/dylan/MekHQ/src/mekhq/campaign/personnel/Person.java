@@ -888,7 +888,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		if (!isDeployed()) {
 			// Age limitations...
 			if (getAge(campaign.getCalendar()) > 13 && getAge(campaign.getCalendar()) < 51) {
-				if (getSpouseID() == null && campaign.getCampaignOptions().useUnofficialProcreationNoRelationship()) {
+				if (getSpouse() == null && campaign.getCampaignOptions().useUnofficialProcreationNoRelationship()) {
 					// 0.005% chance that this procreation attempt will create a child
 					if (Compute.randomInt(100000) < 2) {
 						GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
@@ -896,7 +896,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 						setDueDate(tCal);
 						campaign.addReport(getFullName()+" has conceived");
 					}
-				} else {
+				} else if (getSpouse() != null) {
 					if (getSpouse().isActive() && !getSpouse().isDeployed() && getSpouse().getAge(campaign.getCalendar()) > 13) {
 						// 0.05% chance that this procreation attempt will create a child
 						if (Compute.randomInt(10000) < 2) {
@@ -915,7 +915,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		// Huge convoluted return statement
 		return (
 				!this.equals(p)
-				&& (getAncestorsID() == null || campaign.getAncestors(getAncestorsID()).checkMutualAncestors(campaign.getAncestors(p.getAncestorsID())))
+				&& (getAncestorsID() == null
+				|| campaign.getAncestors(getAncestorsID()).checkMutualAncestors(campaign.getAncestors(p.getAncestorsID())))
 				&& p.getSpouseID() == null
 				&& getGender() != p.getGender()
 				&& p.getAge(campaign.getCalendar()) > 13
@@ -941,6 +942,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public void setXp(int xp) {
         this.xp = xp;
+    }
+    
+    public void awardXP(int xp) {
+        this.xp += xp;
     }
 
     public int getAcquisitions() {

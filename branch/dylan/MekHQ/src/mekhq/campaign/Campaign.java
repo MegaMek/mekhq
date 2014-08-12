@@ -1892,6 +1892,14 @@ public class Campaign implements Serializable {
             					" requirements resulted in " + deficit +
             					((deficit==1)?" minor contract breach":" minor contract breaches"));
             		}
+            		// Administrator Weekly XP
+            		if (campaignOptions.getAdminWeeklyXP() > 0) {
+                		for (Person p : this.getPersonnel()) {
+                		    if (p.isAdminPrimary()) {
+                		        p.awardXP(campaignOptions.getAdminWeeklyXP());
+                		    }
+                		}
+            		}
             	}
         		
         		for (Scenario s : m.getScenarios()) {
@@ -2342,9 +2350,9 @@ public class Campaign implements Serializable {
             }
         }
         // add in astechs from the astech pool
-        // we will assume vee mechanic * able-bodied * enlisted
-        // 640 * 0.5 * 0.6 = 192
-        salaries += (192 * astechPool);
+        // we will assume Mech Tech * able-bodied * enlisted (changed from vee mechanic)
+        // 800 * 0.5 * 0.6 = 240
+        salaries += (240 * astechPool);
         salaries += (320 * medicPool);
         return salaries;
     }
@@ -3783,6 +3791,7 @@ public class Campaign implements Serializable {
         MekHQ.logMessage("Loading Special Ability Nodes from XML...", 4);
         
         PilotOptions options = new PilotOptions();
+        SpecialAbility.trackDefaultSPA();
         SpecialAbility.clearSPA();
         
         NodeList wList = wn.getChildNodes();
@@ -3805,8 +3814,9 @@ public class Campaign implements Serializable {
                 continue;
             }
         
-            SpecialAbility.generateInstanceFromXML(wn2, options);
+            SpecialAbility.generateInstanceFromXML(wn2, options, version);
         }
+        SpecialAbility.nullifyDefaultSPA();
         
         MekHQ.logMessage("Load Special Ability Nodes Complete!", 4);
 }
@@ -5630,6 +5640,12 @@ public class Campaign implements Serializable {
             		Unit t = getUnit(tuuid);
             		t.remove(person, true);
             	}
+            }
+            // If we're assigned to any repairs or refits, remove that assignment
+            for (Part part : getParts()) {
+                if (person.getId().equals(part.getAssignedTeamId())) {
+                    part.cancelAssignment();
+                }
             }
         }
     }

@@ -1686,7 +1686,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     		} else if(part instanceof Rotor) {
     			locations[((Rotor)part).getLoc()] = part;	
     		} else if(part instanceof MissingRotor) {
-    			locations[VTOL.LOC_ROTOR] = part;	
+    			locations[VTOL.LOC_ROTOR] = part;
     		} else if(part instanceof Turret) {
     			locations[((Turret)part).getLoc()] = part;	
     		} else if(part instanceof MissingTurret) {
@@ -1847,10 +1847,26 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
                     addPart(protomekLocation);
                     partsToAdd.add(protomekLocation);
     			} else if(entity instanceof Tank && i != Tank.LOC_BODY) {
-    				if(i == Tank.LOC_TURRET && entity instanceof VTOL) {
-    					Rotor rotor = new Rotor((int)getEntity().getWeight(), campaign);
-    					addPart(rotor);
-    					partsToAdd.add(rotor);
+    				if(entity instanceof VTOL) {
+    				    if (i == VTOL.LOC_ROTOR) {
+        					Rotor rotor = new Rotor((int)getEntity().getWeight(), campaign);
+        					addPart(rotor);
+        					partsToAdd.add(rotor);
+    				    } else if (i == VTOL.LOC_TURRET) {
+                            if(((VTOL)entity).hasNoTurret()) {
+                                continue;
+                            }
+                            Turret turret = new Turret(i, (int)getEntity().getWeight(), campaign);
+                            addPart(turret);
+                            partsToAdd.add(turret);
+                        } else if (i == VTOL.LOC_TURRET_2) {
+                            if(((VTOL)entity).hasNoDualTurret()) {
+                                continue;
+                            }
+                            Turret turret = new Turret(i, (int)getEntity().getWeight(), campaign);
+                            addPart(turret);
+                            partsToAdd.add(turret);
+                        }
     				} else if(i == Tank.LOC_TURRET) {
     					 if(((Tank)entity).hasNoTurret()) {
     						 continue;

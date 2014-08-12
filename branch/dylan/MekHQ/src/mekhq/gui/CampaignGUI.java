@@ -1305,7 +1305,7 @@ public class CampaignGUI extends JPanel {
             personViewModel.addElement(getPersonnelViewName(i));
         }
         choicePersonView = new JComboBox<String>(personViewModel);
-        choicePersonView.setSelectedIndex(0);
+        choicePersonView.setSelectedIndex(PV_GENERAL);
         choicePersonView.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 changePersonnelView();
@@ -1429,7 +1429,7 @@ public class CampaignGUI extends JPanel {
             unitViewModel.addElement(getUnitViewName(i));
         }
         choiceUnitView = new JComboBox<String>(unitViewModel);
-        choiceUnitView.setSelectedIndex(0);
+        choiceUnitView.setSelectedIndex(UV_GENERAL);
         choiceUnitView.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 changeUnitView();
@@ -1466,7 +1466,7 @@ public class CampaignGUI extends JPanel {
         for (int i = 0; i < UnitTableModel.N_COL; i++) {
             column = unitTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(unitModel.getColumnWidth(i));
-            column.setCellRenderer(unitModel.getRenderer(choiceUnitView.getSelectedIndex() == 0, getIconPackage()));
+            column.setCellRenderer(unitModel.getRenderer(choiceUnitView.getSelectedIndex() == UV_GRAPHIC, getIconPackage()));
         }
         unitTable.setIntercellSpacing(new Dimension(0, 0));
         unitTable.setShowGrid(false);
@@ -3725,8 +3725,10 @@ public class CampaignGUI extends JPanel {
         }
 
         if (getCampaign().getAstechPoolMinutes() < totalAstechMinutesNeeded) {
+            int needed = (totalAstechMinutesNeeded - getCampaign().getAstechPoolMinutes()) / 480 + 1;
             if (0 != JOptionPane.showConfirmDialog(null,
-                                                   "You do not have enough astechs to provide for full maintenance. Do you wish to proceed?",
+                    "You do not have enough astechs to provide for full maintenance. You need "
+                            + needed + " more astech(s). Do you wish to proceed?",
                                                    "Astech shortage",
                                                    JOptionPane.YES_NO_OPTION)) {
                 return true;
@@ -5267,7 +5269,7 @@ public class CampaignGUI extends JPanel {
                             continue;
                         }
                     
-                        SpecialAbility.generateInstanceFromXML(wn2, poptions);
+                        SpecialAbility.generateInstanceFromXML(wn2, poptions, null);
                     }
                 }
                 
@@ -6441,7 +6443,7 @@ public class CampaignGUI extends JPanel {
         TableColumn column = null;
         for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
             column = columnModel.getColumnByModelIndex(i);
-            column.setCellRenderer(personModel.getRenderer(choicePersonView.getSelectedIndex() == 0, getIconPackage()));
+            column.setCellRenderer(personModel.getRenderer(choicePersonView.getSelectedIndex() == PV_GRAPHIC, getIconPackage()));
             if (i == PersonnelTableModel.COL_RANK) {
                 if (view == PV_GRAPHIC) {
                     column.setPreferredWidth(125);
@@ -6787,7 +6789,7 @@ public class CampaignGUI extends JPanel {
         TableColumn column = null;
         for (int i = 0; i < UnitTableModel.N_COL; i++) {
             column = columnModel.getColumnByModelIndex(i);
-            column.setCellRenderer(unitModel.getRenderer(choiceUnitView.getSelectedIndex() == 0, getIconPackage()));
+            column.setCellRenderer(unitModel.getRenderer(choiceUnitView.getSelectedIndex() == UV_GRAPHIC, getIconPackage()));
             if (i == UnitTableModel.COL_WCLASS) {
                 if (view == UV_GRAPHIC) {
                     column.setPreferredWidth(125);
@@ -9793,7 +9795,8 @@ public class CampaignGUI extends JPanel {
         private boolean allHaveSameUnit(Person[] people) {
         	UUID unitId = people[0].getUnitId();
         	for (Person person : people) {
-        		if ((unitId == null && person.getUnitId() == null) || person.getUnitId().equals(unitId)) {
+        		if ((unitId == null && person.getUnitId() == null)
+        		        || (person.getUnitId() != null && person.getUnitId().equals(unitId))) {
         			continue;
         		}
         		return false;

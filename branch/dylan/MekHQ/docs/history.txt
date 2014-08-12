@@ -116,6 +116,24 @@ v0.3.6 (SVN)
     Fixes Bug[#548] ATB Shares System do not "stick"
 + Bug [#555]: Armor appears on destroyed locations
 + Optionized Procreation
++ Made "General" the default Personnel View
++ NPE in Procreation related to the new option for no-spouse chance
++ Bug [558]: Can not start "Against the Bot" battle
++ Bug: ATB "Big Battles" forces could not deploy properly due to bad if check for special missions
++ NPE Selecting multiple people when some have a unit and some do not
++ Feature: Admin Weekly XP & Negotiator Contract XP options
++ Bug [#560]: VTOL Turrets are not repairable
++ Made "General" the default Unit View
+    Also refactored a lot of == 0 stuff to the appropriate view constants
++ Bug [#557]: Assigning Kills for Retreated and Killed
++ Bug: When person status changed to an inactive status, repairs and refits assigned to them
+    cannot be completed
++ Bug [#519]: SPA defaults not loading properly from campaign save
++ Bug [#519]: Addendum - restore all skill prereqs from defaults on loading old campaigns
++ Bug [#552]: NPE: Same Force Deployment
++ Patch [29]: Show number of Astechs needed when it complains about not enough of them
++ Patch [31]: Temp Astech pay correction
++ Patch [8]: Recharge stations and spelling correction V2
 
 v0.3.5-dylan (2014-04-28)
 -- No Changes--

@@ -50,6 +50,8 @@ import javax.swing.event.ChangeListener;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.gui.JSuggestField;
 
 /**
@@ -63,6 +65,7 @@ public class NewContractDialog extends javax.swing.JDialog {
     protected Campaign campaign;
     protected DecimalFormat formatter;
     protected SimpleDateFormat dateFormatter;
+    private JComboBox<Person> cboNegotiator;
 
     
     /** Creates new form NewTeamDialog */
@@ -177,6 +180,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         JLabel lblName = new JLabel();
         txtEmployer = new javax.swing.JTextField();
         JLabel lblEmployer = new JLabel();
+        cboNegotiator = new JComboBox<Person>();
         txtType = new javax.swing.JTextField();
         JLabel lblType = new JLabel();
         btnOK = new javax.swing.JButton();
@@ -281,6 +285,31 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(txtEmployer, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        descPanel.add(new JLabel("Negotiator"), gridBagConstraints);
+
+        cboNegotiator.setName("cboNegotiator");
+        // Add negotiators
+        for (Person p : campaign.getPersonnel()) {
+            if (p.hasSkill(SkillType.S_NEG)) {
+                cboNegotiator.addItem(p);
+            }
+        }
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        descPanel.add(cboNegotiator, gridBagConstraints);
  
         txtDesc.setText(contract.getDescription());
         txtDesc.setName("txtDesc");
@@ -295,7 +324,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         scrDesc.setMinimumSize(new Dimension(400, 200));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -871,6 +900,13 @@ public class NewContractDialog extends javax.swing.JDialog {
     	contract.setCommandRights(choiceCommand.getSelectedIndex());
     	campaign.getFinances().credit(contract.getTotalAdvanceMonies(), Transaction.C_CONTRACT, "Advance monies for " + contract.getName(), campaign.getCalendar().getTime());
     	campaign.addMission(contract);
+    	
+    	// Negotiator XP
+    	Person negotiator = (Person)cboNegotiator.getSelectedItem();
+    	if (negotiator != null && campaign.getCampaignOptions().getContractNegotiationXP() > 0) {
+    	    negotiator.awardXP(campaign.getCampaignOptions().getContractNegotiationXP());
+    	}
+    	
     	this.setVisible(false);
     }
     
