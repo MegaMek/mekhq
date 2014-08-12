@@ -3593,8 +3593,10 @@ public class CampaignGUI extends JPanel {
         }
 
         if (getCampaign().getAstechPoolMinutes() < totalAstechMinutesNeeded) {
+            int needed = (totalAstechMinutesNeeded - getCampaign().getAstechPoolMinutes()) / 480 + 1;
             if (0 != JOptionPane.showConfirmDialog(null,
-                                                   "You do not have enough astechs to provide for full maintenance. Do you wish to proceed?",
+                    "You do not have enough astechs to provide for full maintenance. You need "
+                            + needed + " more astech(s). Do you wish to proceed?",
                                                    "Astech shortage",
                                                    JOptionPane.YES_NO_OPTION)) {
                 return true;
