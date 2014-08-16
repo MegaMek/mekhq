@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <MegaMekSettings>
 	<store name="ClientSettings">
-		<preference name="LastPlayerCamoName" value="null"/>
-		<preference name="LastPlayerCategory" value="-- No Camo --"/>
-		<preference name="LastPlayerColor" value="1"/>
+		<preference name="LastPlayerCamoName" value="5th Sword of Light.jpg"/>
+		<preference name="LastPlayerCategory" value="Kurita/Sword of Light/"/>
 		<preference name="megamek.megamek.goalplayers" value="2"/>
+		<preference name="LastPlayerColor" value="1"/>
 		<preference name="LastPlayerName" value="bob"/>
 		<preference name="megamek.megamek.metaservername" value="http://www.damour.info/cgi-bin/james/metaserver"/>
 	</store>
@@ -19,8 +19,8 @@
 		<preference name="WindowSizeHeight" value="1033"/>
 		<preference name="WindowPosY" value="25"/>
 		<preference name="MechSelectorUnitType" value="1"/>
-		<preference name="WindowPosX" value="0"/>
 		<preference name="GameOptionsSizeWidth" value="758"/>
+		<preference name="WindowPosX" value="0"/>
 		<preference name="WindowSizeWidth" value="1928"/>
 	</store>
 </MegaMekSettings>
