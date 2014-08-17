@@ -4355,7 +4355,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void addFundsActionPerformed(java.awt.event.ActionEvent evt) {
-        AddFundsDialog addFundsDialog = new AddFundsDialog(null, true);
+        AddFundsDialog addFundsDialog = new AddFundsDialog(getFrame(), true);
         addFundsDialog.setVisible(true);
         long funds = addFundsDialog.getFundsQuantity();
         String description = addFundsDialog.getFundsDescription();
