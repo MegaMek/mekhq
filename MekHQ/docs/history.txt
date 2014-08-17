@@ -131,6 +131,7 @@ v0.3.6 (SVN)
 + Patch [31]: Temp Astech pay correction
 + Patch [8]: Recharge stations and spelling correction V2
 + Bug: GameVictoryEvent never processed when a player uses Join Game
++ Bug: Mechs w/out pilots show as crippled
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4

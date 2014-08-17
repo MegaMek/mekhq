@@ -3230,7 +3230,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     }
     
     public static int getDamageState(Entity en) {
-    	return en.getDamageLevel();
+    	return en.getDamageLevel(false);
     }
     
     public void resetParts() {
