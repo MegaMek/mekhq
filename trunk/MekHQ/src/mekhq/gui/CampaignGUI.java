@@ -4357,13 +4357,15 @@ public class CampaignGUI extends JPanel {
     private void addFundsActionPerformed(java.awt.event.ActionEvent evt) {
         AddFundsDialog addFundsDialog = new AddFundsDialog(getFrame(), true);
         addFundsDialog.setVisible(true);
-        long funds = addFundsDialog.getFundsQuantity();
-        String description = addFundsDialog.getFundsDescription();
-        int category = addFundsDialog.getCategory();
-        getCampaign().addFunds(funds, description, category);
-        refreshReport();
-        refreshFunds();
-        refreshFinancialTransactions();
+        if (addFundsDialog.getClosedType() == JOptionPane.OK_OPTION) {
+            long funds = addFundsDialog.getFundsQuantity();
+            String description = addFundsDialog.getFundsDescription();
+            int category = addFundsDialog.getCategory();
+            getCampaign().addFunds(funds, description, category);
+            refreshReport();
+            refreshFunds();
+            refreshFinancialTransactions();
+        }
     }
 
     private void manageAssets() {

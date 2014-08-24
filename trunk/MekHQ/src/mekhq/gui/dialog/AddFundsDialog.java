@@ -7,15 +7,29 @@
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.text.NumberFormat;
 import java.util.ResourceBundle;
 
+import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.NumberFormatter;
 
 import mekhq.campaign.finances.Transaction;
 
@@ -23,15 +37,16 @@ import mekhq.campaign.finances.Transaction;
  *
  * @author natit
  */
-public class AddFundsDialog extends javax.swing.JDialog implements FocusListener {
+public class AddFundsDialog extends JDialog implements FocusListener {
 	private static final long serialVersionUID = -6946480787293179307L;
 
     private JFormattedTextField descriptionField;
     private JComboBox<String> categoryCombo;
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddFundsDialog");
+    private int closedType = JOptionPane.CLOSED_OPTION;
 
 	/** Creates new form AlertPopup */
-    public AddFundsDialog(java.awt.Frame parent, boolean modal) {
+    public AddFundsDialog(Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
     }
@@ -43,9 +58,9 @@ public class AddFundsDialog extends javax.swing.JDialog implements FocusListener
      */
     private void initComponents() {
 
-        btnAddFunds = new javax.swing.JButton();
+        btnAddFunds = new JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 
         setTitle(resourceMap.getString("Form.title"));
@@ -53,8 +68,8 @@ public class AddFundsDialog extends javax.swing.JDialog implements FocusListener
         btnAddFunds.setText(resourceMap.getString("btnAddFunds.text")); // NOI18N
         btnAddFunds.setActionCommand(resourceMap.getString("btnAddFunds.actionCommand")); // NOI18N
         btnAddFunds.setName("btnAddFunds"); // NOI18N
-        btnAddFunds.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnAddFunds.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 btnAddFundsActionPerformed(evt);
             }
         });
@@ -70,9 +85,9 @@ public class AddFundsDialog extends javax.swing.JDialog implements FocusListener
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 2));
 
         
-        jFormattedTextFieldFundsQuantity = new javax.swing.JFormattedTextField();
+        jFormattedTextFieldFundsQuantity = new JFormattedTextField();
         jFormattedTextFieldFundsQuantity.addFocusListener(this);
-        jFormattedTextFieldFundsQuantity.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(java.text.NumberFormat.getIntegerInstance())));
+        jFormattedTextFieldFundsQuantity.setFormatterFactory(new DefaultFormatterFactory(new NumberFormatter(NumberFormat.getIntegerInstance())));
         jFormattedTextFieldFundsQuantity.setText(resourceMap.getString("jFormattedTextFieldFundsQuantity.text")); // NOI18N
         jFormattedTextFieldFundsQuantity.setToolTipText(resourceMap.getString("jFormattedTextFieldFundsQuantity.toolTipText")); // NOI18N
         jFormattedTextFieldFundsQuantity.setName("jFormattedTextFieldFundsQuantity"); // NOI18N
@@ -95,7 +110,8 @@ public class AddFundsDialog extends javax.swing.JDialog implements FocusListener
         return panel;
     }
 
-    private void btnAddFundsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddFundsActionPerformed
+    private void btnAddFundsActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnAddFundsActionPerformed
+        this.closedType = JOptionPane.OK_OPTION;
         this.setVisible(false);
     }//GEN-LAST:event_btnAddFundsActionPerformed
 
@@ -103,11 +119,11 @@ public class AddFundsDialog extends javax.swing.JDialog implements FocusListener
     * @param args the command line arguments
     */
     public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
+        EventQueue.invokeLater(new Runnable() {
             public void run() {
-                AddFundsDialog dialog = new AddFundsDialog(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    public void windowClosing(java.awt.event.WindowEvent e) {
+                AddFundsDialog dialog = new AddFundsDialog(new JFrame(), true);
+                dialog.addWindowListener(new WindowAdapter() {
+                    public void windowClosing(WindowEvent e) {
                         System.exit(0);
                     }
                 });
@@ -129,8 +145,8 @@ public class AddFundsDialog extends javax.swing.JDialog implements FocusListener
         return Transaction.getCategoryIndex((String)categoryCombo.getSelectedItem());
     }
 
-    private javax.swing.JButton btnAddFunds;
-    private javax.swing.JFormattedTextField jFormattedTextFieldFundsQuantity;
+    private JButton btnAddFunds;
+    private JFormattedTextField jFormattedTextFieldFundsQuantity;
 
     @Override
     public void focusGained(FocusEvent e) {
@@ -153,5 +169,9 @@ public class AddFundsDialog extends javax.swing.JDialog implements FocusListener
     @Override
     public void focusLost(FocusEvent e) {
         //not used
+    }
+    
+    public int getClosedType() {
+        return closedType;
     }
 }
