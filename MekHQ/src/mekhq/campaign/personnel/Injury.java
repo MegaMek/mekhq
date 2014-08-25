@@ -17,6 +17,8 @@
  * 
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * @author: Dylan Myers <ralgith@gmail.com>
  */
 
 package mekhq.campaign.personnel;
@@ -32,6 +34,7 @@ import mekhq.campaign.Campaign;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+// Injury class based on Jayof9s' <jayof9s@gmail.com> Advanced Medical documents
 public class Injury {
 	private String fluff;
 	private int days;
@@ -44,6 +47,7 @@ public class Injury {
 	private boolean extended;
 	protected UUID id;
 	
+	// Static defines for type of injury
 	// Do not reorder these for backwards compatibility!
  	public static final int INJ_CUT = 0;
  	public static final int INJ_BRUISE = 1;
@@ -62,6 +66,7 @@ public class Injury {
  	public static final int INJ_BROKEN_BACK = 14;
  	public static final int INJ_NUM = 15;
  	
+ 	// Base constructor, in reality should never be used
  	public Injury() {
 		fluff = "";
 		days = 0;
@@ -74,14 +79,17 @@ public class Injury {
 		extended = false;
 	}
 	
+ 	// Normal constructor for a new injury that has not been treated by a doctor & does not have extended time
 	public Injury(int time, String text, int loc, int type, int num, boolean perm) {
 		this(time, text, loc, type, num, perm, false);
 	}
 
+	// Constructor if this injury has been treated by a doctor, but without extended time
 	public Injury(int time, String text, int loc, int type, int num, boolean perm, boolean workedOn) {
 		this(time, text, loc, type, num, perm, workedOn, false);
 	}
 	
+	// Constructor for when this injury has extended time, full options includng worked on by a doctor
 	public Injury(int time, String text, int loc, int type, int num, boolean perm, boolean workedOn, boolean extended) {
 		setTime(time);
 		setOriginalTime(time);
@@ -95,6 +103,7 @@ public class Injury {
 		id = UUID.randomUUID();
 	}
 	
+	// UUID Control Methods
 	public UUID getUUID() {
 		return id;
 	}
@@ -106,7 +115,9 @@ public class Injury {
 	public String getUUIDAsString() {
 		return id.toString();
 	}
+    // End UUID Control Methods
 	
+	// Time Control Methods
 	public int getTime() {
 		return days;
 	}
@@ -122,7 +133,9 @@ public class Injury {
 	public void setOriginalTime(int time) {
 		originalDays = time;
 	}
+	// End Time Control Methods
 	
+	// Details Methods (Fluff, Location on Body, how many hits did it take, etc...)
 	public String getFluff() {
 		return fluff;
 	}
@@ -178,7 +191,9 @@ public class Injury {
 	public void setType(int type) {
 		this.type = type;
 	}
+	// End Details Methods
 	
+	// Returns the full long name of this injury including location and type as applicable
 	public String getName() {
 		String buffer = "";
 		
@@ -257,6 +272,8 @@ public class Injury {
 		return buffer;
 	}
 	
+	// Save to campaign file as XML
+	// Also used by the personnel exporter
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<injury>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -302,6 +319,8 @@ public class Injury {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</injury>");
 	}
 	
+	// Load from campaign file XML
+    // Also used by the personnel exporter
 	public static Injury generateInstanceFromXML(Node wn) {
 		Injury retVal = new Injury();
 		
@@ -354,10 +373,12 @@ public class Injury {
 		return retVal;
 	}
 	
+	// Return the location name for the injury by passing location to the static overload
 	public String getLocationName() {
 		return getLocationName(location);
 	}
 	
+	// Return the location name for a specific body location
 	public static String getLocationName(int loc) {
 		if (loc == Person.BODY_HEAD) {
 			return "Head";
@@ -383,10 +404,12 @@ public class Injury {
 		return "";
 	}
 	
+	// Return the name for this type of injury by passing the type to the static overload
 	public String getTypeName() {
 		return getTypeName(type);
 	}
 	
+	// Return the name of a specific type of injury
 	public static String getTypeName(int type) {
 		String buffer = "";
 		
@@ -441,6 +464,7 @@ public class Injury {
 		return buffer;
 	}
 	
+	// Generate appropriate fluff text for this injury based on type and location. Uses proper gender pronouns.
 	public static String generateInjuryFluffText(int type, int location, int genderType) {
 		String name;
 		switch (location) {
@@ -520,6 +544,7 @@ public class Injury {
 		return "";
 	}
 	
+	// Called when creating a new injury to determine the type of injury it is
 	public static int getInjuryTypeByLocation(int loc, int roll, int hit_location) {
 		switch (loc) {
 		case Person.BODY_LEFT_ARM:
@@ -585,6 +610,7 @@ public class Injury {
 		return 0;
 	}
 	
+	// Called when creating a new injury to generate a slightly randomized healing time
 	public static int generateHealingTime(Campaign c, int type, int hits, Person p) {
 		int rand = Compute.randomInt(100);
 		int mod = 100;
