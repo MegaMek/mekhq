@@ -290,12 +290,13 @@ public class MekHQ implements GameListener {
 			MekHQ.logError(ex);
             return;
         }
+        
+        client = new Client(lgd.playerName, "127.0.0.1", lgd.port);
 
-        myServer.getGame().addGameListener(this);
+        client.getGame().addGameListener(this);
         currentScenario = scenario;
         
         //Start the game thread
-        client = new Client(lgd.playerName, "127.0.0.1", lgd.port);
         if (campaign.getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario) {
         	gameThread = new AtBGameThread(lgd.playerName, client, this, meks, (AtBScenario)scenario);
         } else {
