@@ -137,6 +137,9 @@ v0.3.6 (SVN)
 + Bug: GameVictoryEvent never processed when a player uses Join Game
 + Bug: Mechs w/out pilots show as crippled
 + Bug: Add Funds Dialog can add funds even when you close the dialog
++ Bug: DefaultQuirksHandler was renamed to QuirksHandler
++ Updated MegaMek.jar to 0.39.1 official
++ Updated MegaMekLab.jar to 0.1.30 official
 
 v0.3.5-dylan (2014-04-28)
 -- No Changes--
