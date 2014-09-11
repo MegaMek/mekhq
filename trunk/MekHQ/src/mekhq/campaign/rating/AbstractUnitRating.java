@@ -675,6 +675,10 @@ public abstract class AbstractUnitRating implements IUnitRating {
         this.numberInfSquads = numberInfSquads;
     }
 
+    int calcInfantryPlatoons() {
+        return (int) Math.ceil(getInfantryCount() / 28);
+    }
+
     protected int getDropshipCount() {
         return dropshipCount;
     }
