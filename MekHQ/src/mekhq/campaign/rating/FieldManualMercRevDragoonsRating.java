@@ -636,18 +636,20 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     public BigDecimal getTransportPercent() {
         // todo Superheavys.
         //Find out how short of transport bays we are.
+        int heavyVeeBays = getHeavyVeeBayCount();
         int numberWithoutTransport = Math.max((getMechCount() - getMechBayCount()), 0);
         numberWithoutTransport += Math.max(getProtoCount() - getProtoBayCount(), 0);
-        numberWithoutTransport += Math.max((getLightVeeCount() - getLightVeeBayCount()), 0);
-        numberWithoutTransport += Math.max(getHeavyVeeCount() - getHeavyVeeBayCount(), 0);
-        numberWithoutTransport += Math.max((getFighterCount() - getFighterCount()), 0);
+        numberWithoutTransport += Math.max(getHeavyVeeCount() - heavyVeeBays, 0);
+        heavyVeeBays -= getHeavyVeeCount();
+        numberWithoutTransport += Math.max((getLightVeeCount() - (getLightVeeBayCount() + heavyVeeBays)), 0);
+        numberWithoutTransport += Math.max((getFighterCount() - getFighterBayCount()), 0);
         numberWithoutTransport += Math.max((getNumberBaSquads() - getBaBayCount()), 0);
-        numberWithoutTransport += Math.max((getNumberInfSquads() - getInfantryBayCount()), 0);
+        numberWithoutTransport += Math.max((calcInfantryPlatoons() - getInfantryBayCount()), 0);
         BigDecimal transportNeeded = new BigDecimal(numberWithoutTransport);
 
         //Find the percentage of units that are transported.
-        BigDecimal totalUnits = new BigDecimal(getMechCount() + getLightVeeCount() + getHeavyVeeCount() + getFighterCount() +
-                                               getNumberBaSquads() + getNumberInfSquads());
+        BigDecimal totalUnits = new BigDecimal(getMechCount() + getLightVeeCount() + getHeavyVeeCount() +
+                                               getFighterCount() + getNumberBaSquads() + calcInfantryPlatoons());
         if (totalUnits.compareTo(BigDecimal.ZERO) == 0) {
             return BigDecimal.ZERO;
         }

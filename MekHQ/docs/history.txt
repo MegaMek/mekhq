@@ -136,6 +136,7 @@ v0.3.6 (SVN)
 + Bug: DefaultQuirksHandler was renamed to QuirksHandler
 + Updated MegaMek.jar to 0.39.1 official
 + Updated MegaMekLab.jar to 0.1.30 official
++ Bug [#568]: Transport/Dragoons Rating Error with Squads
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
