@@ -1407,4 +1407,14 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<periphery>false</periphery>
 		<clan>false</clan>
     </faction>
+    <faction>
+		<shortname>AXP</shortname>
+		<fullname>Axumite Providence</fullname>
+		<startingPlanet>Thala,Thala,Thala,Thala,Thala,Thala,Thala,Thala</startingPlanet>
+		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>153,50,204</colorRGB>
+		<periphery>true</periphery>
+		<clan>false</clan>
+	</faction>
 </factions>
