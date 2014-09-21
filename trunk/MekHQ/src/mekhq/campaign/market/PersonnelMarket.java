@@ -1,20 +1,20 @@
 /*
  * PersonnelMarket.java
- * 
+ *
  * Copyright (c) 2013 Dylan Myers <dylan at dylanspcs.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -87,20 +87,22 @@ public class PersonnelMarket {
 		int roll;
 		int q = 0;
 		Person p;
+		boolean updated = false;
 
 		if (!personnel.isEmpty()) {
 			removePersonnelForDay(c);
 		}
 
 		if (paidRecruitment && c.getCalendar().get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
-			if (c.getFinances().debit(100000, Transaction.C_MISC, 
+			if (c.getFinances().debit(100000, Transaction.C_MISC,
 					"Paid recruitment roll", c.getDate())) {
 				doPaidRecruitment(c);
+				updated = true;
 			} else {
 				c.addReport("<html><font color=\"red\">Insufficient funds for paid recruitment.</font></html>");
 			}
 		} else  if (shipSearch && c.getCalendar().get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
-			if (c.getFinances().debit(100000, Transaction.C_UNIT, 
+			if (c.getFinances().debit(100000, Transaction.C_UNIT,
 					"Ship search", c.getDate())) {
 				doShipSearch(c);
 			} else {
@@ -188,6 +190,7 @@ public class PersonnelMarket {
 						addRecruitUnit(p, c);
 					}
 				}
+				updated = true;
 				break;
 			case TYPE_FMMR:
 				long mft = getUnitMainForceType(c);
@@ -241,6 +244,7 @@ public class PersonnelMarket {
 							}
 						}
 					}
+					updated = true;
 				}
 				break;
 			case TYPE_STRAT_OPS:
@@ -293,6 +297,7 @@ public class PersonnelMarket {
 					if (c.getCampaignOptions().getUseAtB()) {
 						addRecruitUnit(p, c);
 					}
+					updated = true;
 				} else {
 					incrementDaysSinceRolled();
 				}
@@ -356,7 +361,7 @@ public class PersonnelMarket {
 							p = c.newPerson(Person.T_BA);
 						} else {
 							p = c.newPerson(Person.T_INFANTRY);
-						} 
+						}
 					} else if (roll == 12) {
 						p = c.newPerson(Person.T_DOCTOR);
 					}
@@ -385,7 +390,7 @@ public class PersonnelMarket {
 								int nabil = Math.max(0, p.getExperienceLevel(false) - SkillType.EXP_REGULAR);
 								while (nabil > 0 && null != c.rollSPA(p.getPrimaryRole(), p)) {
 									nabil--;
-								}						
+								}
 								id = UUID.randomUUID();
 								while (null != personnelIds.get(id)) {
 									id = UUID.randomUUID();
@@ -446,7 +451,7 @@ public class PersonnelMarket {
 							break;
 						case Person.T_VEE_GUNNER:
 							adjustSkill(p, SkillType.S_GUN_VEE, gunneryMod);
-							break;    						
+							break;
 						case Person.T_AERO_PILOT:
 							adjustSkill(p, SkillType.S_GUN_AERO, gunneryMod);
 							adjustSkill(p, SkillType.S_PILOT_AERO, pilotingMod);
@@ -466,8 +471,9 @@ public class PersonnelMarket {
 						int nabil = Math.max(0, p.getExperienceLevel(false) - SkillType.EXP_REGULAR);
 						while (nabil > 0 && null != c.rollSPA(p.getPrimaryRole(), p)) {
 							nabil--;
-						}						
+						}
 					}
+					updated = true;
 				}
 
 				break;
@@ -488,6 +494,7 @@ public class PersonnelMarket {
 					p.setId(id);
 					personnel.add(p);
 					personnelIds.put(id, p);
+					updated = true;
 					if (c.getCampaignOptions().getUseAtB()) {
 						addRecruitUnit(p, c);
 					}
@@ -495,7 +502,7 @@ public class PersonnelMarket {
 			}
 		}
 
-		if (c.getCampaignOptions().getPersonnelMarketReportRefresh()) {
+		if (updated && c.getCampaignOptions().getPersonnelMarketReportRefresh()) {
 			c.addReport("<a href='PERSONNEL_MARKET'>Personnel market updated</a>");
 		}
 	}
@@ -574,7 +581,7 @@ public class PersonnelMarket {
 		p.setId(id);
         personnel.add(p);
     }
-    
+
     public void addPerson(Person p, Entity e) {
     	addPerson(p);
     	attachedEntities.put(p.getId(), e);
@@ -586,39 +593,39 @@ public class PersonnelMarket {
         	attachedEntities.remove(p.getId());
         }
     }
-    
+
     public Entity getAttachedEntity(Person p) {
     	return attachedEntities.get(p.getId());
     }
-    
+
     public Entity getAttachedEntity(UUID pid) {
     	return attachedEntities.get(pid);
     }
-    
+
     public void removeAttachedEntity(UUID id) {
     	attachedEntities.remove(id);
     }
-    
+
     public boolean getPaidRecruitment() {
     	return paidRecruitment;
     }
-    
+
     public void setPaidRecruitment(boolean pr) {
     	paidRecruitment = pr;
     }
-    
+
     public boolean getShipSearch() {
     	return shipSearch;
     }
-    
+
     public void setShipSearch(boolean ss) {
     	shipSearch = ss;
     }
-    
+
     public int getPaidRecruitType() {
     	return paidRecruitType;
     }
-    
+
     public void setPaidRecruitType(int pr) {
     	paidRecruitType = pr;
     }
@@ -635,7 +642,7 @@ public class PersonnelMarket {
         for (UUID id : attachedEntities.keySet()) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<entity id=\"" + id.toString() + "\">"
-                    + attachedEntities.get(id).getShortNameRaw() 
+                    + attachedEntities.get(id).getShortNameRaw()
                     + "</entity>");
          }
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</personnelMarket>");
@@ -835,7 +842,7 @@ public class PersonnelMarket {
         }
         return retval;
     }
-    
+
     private void doPaidRecruitment(Campaign c) {
     	int mod;
     	switch (paidRecruitType) {
@@ -860,7 +867,7 @@ public class PersonnelMarket {
 		if (c.getFinances().isInDebt()) {
 			mod -= 3;
 		}
-		
+
 		int q = 0;
 		int r = Compute.d6(2) + mod;
 		if (r > 15) {
@@ -892,10 +899,10 @@ public class PersonnelMarket {
             personnelIds.put(id, p);
             if (c.getCampaignOptions().getUseAtB()) {
             	addRecruitUnit(p, c);
-            }			
+            }
 		}
     }
-    
+
     private void doShipSearch(Campaign c) {
     	int adminLog = SkillType.EXP_ULTRA_GREEN;
     	for (Person p : c.getAdmins()) {
@@ -906,9 +913,9 @@ public class PersonnelMarket {
 			}
     	}
     	int mod = adminLog - SkillType.EXP_REGULAR;
-		mod += c.getUnitRatingMod() - 
+		mod += c.getUnitRatingMod() -
 				IUnitRating.DRAGOON_C;
-		
+
 		int roll = Compute.d6(2) + mod;
 		Person p = null;
 		if (paidRecruitType == Person.T_NAVIGATOR && roll >= 12) {
@@ -927,14 +934,14 @@ public class PersonnelMarket {
             personnelIds.put(id, p);
             if (c.getCampaignOptions().getUseAtB()) {
             	addRecruitUnit(p, c, true);
-            }						
+            }
 		}
     }
-    
+
     private void addRecruitUnit(Person p, Campaign c) {
     	addRecruitUnit(p, c, false);
     }
-    
+
     private void addRecruitUnit(Person p, Campaign c, boolean spaceShips) {
     	int unitType;
     	switch (p.getPrimaryRole()) {
@@ -995,7 +1002,7 @@ public class PersonnelMarket {
 	    	}
     	}
     	Entity en = null;
-    	
+
     	String faction = getRecruitFaction(c);
 		MechSummary ms = null;
 
@@ -1042,7 +1049,7 @@ public class PersonnelMarket {
 	            MekHQ.logError(ex);
 			}
 		}
-		
+
 		if (null != en) {
 			attachedEntities.put(p.getId(), en);
 			/* adjust vehicle pilot roles according to the type of vehicle rolled */
@@ -1083,7 +1090,7 @@ public class PersonnelMarket {
 			}
 		}
     }
-    
+
     private void swapSkills(Person p, String skill1, String skill2) {
     	int s1 = p.hasSkill(skill1)?p.getSkill(skill1).getLevel():0;
     	int b1 = p.hasSkill(skill1)?p.getSkill(skill1).getBonus():0;
@@ -1098,7 +1105,7 @@ public class PersonnelMarket {
     		p.removeSkill(skill2);
     	}
     }
-    
+
     public void adjustSkill (Person p, String skillName, int mod) {
     	if (p.getSkill(skillName) == null) {
     		return;
@@ -1111,7 +1118,7 @@ public class PersonnelMarket {
     		p.getSkill(skillName).setLevel(Math.max(lvl, 0));
     	}
     }
-    
+
     public static String getRecruitFaction(Campaign c) {
     	if (!c.getFactionCode().equals("MERC")) {
     		return c.getFactionCode();
