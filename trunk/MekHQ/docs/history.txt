@@ -158,6 +158,7 @@ v0.3.6 (SVN)
         Bug: Maximum weight set to medium for bot forces in recon raid scenarios for attacker
             and defender instead of just when bot is attacker
         Bug: Corrected component layout in CampaignOptionsDialog and AtBScenarioViewPanel
++ Bug: SPAs not loading correctly since r1970 release under certain circumstances
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
