@@ -159,6 +159,7 @@ v0.3.6 (SVN)
             and defender instead of just when bot is attacker
         Bug: Corrected component layout in CampaignOptionsDialog and AtBScenarioViewPanel
 + Bug: SPAs not loading correctly since r1970 release under certain circumstances
++ Bug: Automatic resolution not working in r1978
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4

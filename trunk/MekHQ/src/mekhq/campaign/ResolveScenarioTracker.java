@@ -52,6 +52,7 @@ import megamek.common.MechSummaryCache;
 import megamek.common.MechWarrior;
 import megamek.common.Mounted;
 import megamek.common.Tank;
+import megamek.common.event.GameVictoryEvent;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -100,6 +101,7 @@ public class ResolveScenarioTracker {
 	JFileChooser salvageList;
 	Client client;
 	Boolean control;
+    private GameVictoryEvent victoryEvent;
 
 	public ResolveScenarioTracker(Scenario s, Campaign c, boolean ctrl) {
 		this.scenario = s;
@@ -220,7 +222,7 @@ public class ResolveScenarioTracker {
 		int pid = client.getLocalPlayer().getId();
 		int team = client.getLocalPlayer().getTeam();
 
-		for (Enumeration<Entity> iter = client.getGame().getEntities(); iter.hasMoreElements();) {
+		for (Enumeration<Entity> iter = victoryEvent.getEntities(); iter.hasMoreElements();) {
 			Entity e = iter.nextElement();
 			if(e.getOwnerId() == pid || e.getOwner().getTeam() == team) {
 				if(e.canEscape() || control) {
@@ -242,7 +244,7 @@ public class ResolveScenarioTracker {
 				if(control) {
 					// Kill credit automatically assigned only if they can't escape
 					if (!e.canEscape()) {
-					    Entity killer = client.getGame().getEntity(e.getKillerId());
+					    Entity killer = victoryEvent.getEntity(e.getKillerId());
 		                if(null != killer && killer.getOwnerId() == pid) {
 		                    //the killer is one of your units, congrats!
 		                    killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
@@ -259,10 +261,10 @@ public class ResolveScenarioTracker {
 			}
 		}
 		// Utterly destroyed entities
-		for (Enumeration<Entity> iter = client.getGame().getDevastatedEntities(); iter.hasMoreElements();) {
+		for (Enumeration<Entity> iter = victoryEvent.getDevastatedEntities(); iter.hasMoreElements();) {
 		    Entity e = iter.nextElement();
 		    if(e.getOwner().isEnemyOf(client.getLocalPlayer())) {
-                Entity killer = client.getGame().getEntity(e.getKillerId());
+                Entity killer = victoryEvent.getEntity(e.getKillerId());
                 if(null != killer && killer.getOwnerId() == pid) {
                     //the killer is one of your units, congrats!
                     killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
@@ -272,7 +274,7 @@ public class ResolveScenarioTracker {
 		    }
 		}
 		//add retreated units
-		for (Enumeration<Entity> iter = client.getGame().getRetreatedEntities(); iter.hasMoreElements();) {
+		for (Enumeration<Entity> iter = victoryEvent.getRetreatedEntities(); iter.hasMoreElements();) {
             Entity e = iter.nextElement();
             if(e.getOwnerId() == pid || e.getOwner().getTeam() == team) {
             	if(!e.getExternalIdAsString().equals("-1")) {
@@ -292,7 +294,7 @@ public class ResolveScenarioTracker {
         }
 
 
-        Enumeration<Entity> wrecks = client.getGame().getWreckedEntities();
+        Enumeration<Entity> wrecks = victoryEvent.getWreckedEntities();
         while (wrecks.hasMoreElements()) {
         	Entity e = wrecks.nextElement();
         	if(e.getOwnerId() == pid || e.getOwner().getTeam() == team) {
@@ -312,7 +314,7 @@ public class ResolveScenarioTracker {
 					}
 				}
         	} else if(e.getOwner().isEnemyOf(client.getLocalPlayer())) {
-        		Entity killer = client.getGame().getEntity(e.getKillerId());
+        		Entity killer = victoryEvent.getEntity(e.getKillerId());
         		if(null != killer && killer.getOwnerId() == pid) {
         			//the killer is one of your units, congrats!
         			killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
@@ -474,7 +476,7 @@ public class ResolveScenarioTracker {
 
 		for(Unit u : units) {
 			for (int mwid : u.getEntity().getPickedUpMechWarriors()) {
-				megamek.common.MechWarrior mw = (megamek.common.MechWarrior)client.getGame().getEntity(mwid);
+				megamek.common.MechWarrior mw = (megamek.common.MechWarrior)victoryEvent.getEntity(mwid);
 				pickedUpPilots.add(mw.getOriginalRideId());
 			}
 		}
@@ -1288,5 +1290,9 @@ public class ResolveScenarioTracker {
             return s;
 
         }
+    }
+
+    public void setEvent(GameVictoryEvent gve) {
+        victoryEvent = gve;
     }
 }
