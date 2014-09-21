@@ -208,6 +208,10 @@ public class UnitMarket implements Serializable {
 		FactionTables ft = UnitTableData.getInstance().getBestRAT(campaign.getCampaignOptions().getRATs(),
 				campaign.getCalendar().get(Calendar.YEAR),
 				faction, unitType);
+		if (ft == null) {
+			MekHQ.logMessage("Unit market could not locate appropriate RAT");
+			return;
+		}
 		for (int i = 0; i < num; i++) {
 			int weight = getRandomWeight(unitType, faction,
 					campaign.getCampaignOptions().getRegionalMechVariations());
@@ -220,7 +224,7 @@ public class UnitMarket implements Serializable {
 					ms = msl.get(0);
 				}
 			}
-			int pct = 100 - (Compute.d6() - priceTarget) * 5;
+			int pct = 100 - (Compute.d6(2) - priceTarget) * 5;
 			offers.add(new MarketOffer(market, unitType, weight,
 					ms, pct));
 		}

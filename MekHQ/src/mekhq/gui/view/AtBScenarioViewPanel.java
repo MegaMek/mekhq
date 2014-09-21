@@ -336,13 +336,13 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 		}
 		
 		chkReroll[REROLL_TERRAIN] = new JCheckBox();
+		lblTerrain.setText(resourceMap.getString("lblTerrain.text"));
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = y;
+		gridBagConstraints.gridwidth = 1;
+		panStats.add(lblTerrain, gridBagConstraints);
+
 		if (scenario.isCurrent()) {
-			lblTerrain.setText(resourceMap.getString("lblTerrain.text"));
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = y;
-			gridBagConstraints.gridwidth = 1;
-			panStats.add(lblTerrain, gridBagConstraints);
-			
 			gridBagConstraints.gridx = 1;
 			gridBagConstraints.gridy = y;
 			gridBagConstraints.gridwidth = 1;

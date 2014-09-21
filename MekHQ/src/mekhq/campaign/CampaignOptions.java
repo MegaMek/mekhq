@@ -202,6 +202,7 @@ public class CampaignOptions implements Serializable {
     private boolean regionalMechVariations;
     private boolean aeroRecruitsHaveUnits;
     private boolean useShareSystem;
+    private boolean sharesExcludeLargeCraft;
     private boolean sharesForAll;
     private boolean retirementRolls;
     private boolean customRetirementMods;
@@ -381,6 +382,7 @@ public class CampaignOptions implements Serializable {
     	skillLevel = 2;
         aeroRecruitsHaveUnits = false;
         useShareSystem = false;
+        sharesExcludeLargeCraft = false;
         sharesForAll = false;
         retirementRolls = true;
         customRetirementMods = false;
@@ -1339,6 +1341,14 @@ public class CampaignOptions implements Serializable {
 		return useShareSystem;
 	}
 	
+	public boolean getSharesExcludeLargeCraft() {
+		return sharesExcludeLargeCraft;
+	}
+	
+	public void setSharesExcludeLargeCraft(boolean exclude) {
+		sharesExcludeLargeCraft = exclude;
+	}
+	
 	public boolean getSharesForAll() {
 		return sharesForAll;
 	}
@@ -1674,6 +1684,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "skillLevel", skillLevel);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "aeroRecruitsHaveUnits", aeroRecruitsHaveUnits);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useShareSystem", useShareSystem);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "sharesExcludeLargeCraft", sharesExcludeLargeCraft);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "sharesForAll", sharesForAll);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "retirementRolls", retirementRolls);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "customRetirementMods", customRetirementMods);
@@ -2062,6 +2073,8 @@ public class CampaignOptions implements Serializable {
                 retVal.aeroRecruitsHaveUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useShareSystem")) {
                 retVal.useShareSystem = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("sharesExcludeLargeCraft")) {
+                retVal.sharesExcludeLargeCraft = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("sharesForAll")) {
                 retVal.sharesForAll = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("retirementRolls")) {
