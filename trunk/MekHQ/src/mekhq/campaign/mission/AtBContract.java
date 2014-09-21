@@ -433,6 +433,15 @@ public class AtBContract extends Contract implements Serializable {
 	}
 	
 	public void checkMorale(GregorianCalendar calendar, int dragoonRating) {
+		if (null != routEnd) {
+			if (calendar.getTime().after(routEnd)) {
+				moraleLevel = MORALE_NORMAL;
+				routEnd = null;
+			} else {
+				moraleLevel = MORALE_ROUT;
+			}
+			return;
+		}
 		int victories = 0;
 		int defeats = 0;
 		GregorianCalendar lastMonth = (GregorianCalendar)calendar.clone();
@@ -487,10 +496,6 @@ public class AtBContract extends Contract implements Serializable {
 		}
 		
 		moraleMod = 0;
-	}
-	
-	public boolean enemyIsRouted(Date date) {
-		return null != routEnd && routEnd.after(date);
 	}
 	
 	public int getRepairLocation(int dragoonRating) {
@@ -594,18 +599,16 @@ public class AtBContract extends Contract implements Serializable {
 	public void doBonusRoll(Campaign c) {
 		int number;
 		String rat = null;
-		switch (Compute.d6()) {
+		int roll = Compute.d6();
+		switch (roll) {
 		case 1: /* 1d6 dependents */
 			number = Compute.d6();
 			c.addReport("Bonus: " + number + " dependent" + ((number>1)?"s":""));
-	    	while(number > 0 ) {
+			for (int i = 0; i < number; i++) {
 	    		Person p = c.newPerson(Person.T_ASTECH);
 	    		p.setDependent(true);
-	    		if (c.recruitPerson(p)) {
-	    			number--;
-	    		} else {
-	    			number = 0;
-	    		}
+	            p.setId(UUID.randomUUID());
+	            c.addPersonWithoutId(p, true);
 	    	}
 			break;
 		case 2: /* Recruit (choose) */
