@@ -138,6 +138,7 @@ v0.3.6 (SVN)
 + Updated MegaMekLab.jar to 0.1.30 official
 + Bug [#568]: Transport/Dragoons Rating Error with Squads
 + Bug [#575]: Final contract payment broken
++ Bug [#566]: Daily log shows Personnel Market updated dialog when market has not updated
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
