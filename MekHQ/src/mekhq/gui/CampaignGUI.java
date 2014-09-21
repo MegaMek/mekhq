@@ -7892,10 +7892,34 @@ public class CampaignGUI extends JPanel {
                 refreshDoctorsList();
                 refreshOrganization();
             } else if (command.startsWith("MD_CLASS")) {
-            	int md_class = Integer.parseInt(st.nextToken());
-            	for (Person person : people) {
-            		person.setManeiDominiClass(md_class);
-            	}
+                int md_class = Integer.parseInt(st.nextToken());
+                for (Person person : people) {
+                    person.setManeiDominiClass(md_class);
+                }
+                refreshServicedUnitList();
+                refreshUnitList();
+                refreshPatientList();
+                refreshPersonnelList();
+                refreshTechsList();
+                refreshDoctorsList();
+                refreshOrganization();
+            } else if (command.startsWith("DESIG_PRI")) {
+                int designation = Integer.parseInt(st.nextToken());
+                for (Person person : people) {
+                    person.setPrimaryDesignator(designation);
+                }
+                refreshServicedUnitList();
+                refreshUnitList();
+                refreshPatientList();
+                refreshPersonnelList();
+                refreshTechsList();
+                refreshDoctorsList();
+                refreshOrganization();
+            } else if (command.startsWith("DESIG_SEC")) {
+                int designation = Integer.parseInt(st.nextToken());
+                for (Person person : people) {
+                    person.setSecondaryDesignator(designation);
+                }
                 refreshServicedUnitList();
                 refreshUnitList();
                 refreshPatientList();
@@ -8615,11 +8639,20 @@ public class CampaignGUI extends JPanel {
         }
 
         private boolean areAllWoB(Person[] people) {
-        	for (Person p : people) {
-        		if (p.getRanks().getRankSystem() != Ranks.RS_WOB)
-        			return false;
-        	}
-        	return true;
+            for (Person p : people) {
+                if (p.getRankSystem() != Ranks.RS_WOB)
+                    return false;
+            }
+            return true;
+        }
+
+        private boolean areAllWoBOrComstar(Person[] people) {
+            for (Person p : people) {
+                if (p.getRankSystem() != Ranks.RS_WOB
+                        && p.getRankSystem() != Ranks.RS_COM)
+                    return false;
+            }
+            return true;
         }
 
         private Person[] getSelectedPeople() {
@@ -8650,7 +8683,7 @@ public class CampaignGUI extends JPanel {
                 // **lets fill the pop up menu**//
                 if (areAllEligible(selected)) {
                     menu = new JMenu("Change Rank");
-                    Ranks ranks = person.getRanks() == null ? getCampaign().getRanks() : person.getRanks();
+                    Ranks ranks = person.getRanks();
                     for (int rankOrder = 0; rankOrder < Ranks.RC_NUM; rankOrder++) {
                     	Rank rank = ranks.getAllRanks().get(rankOrder);
                         int profession = person.getProfession();
@@ -8685,6 +8718,9 @@ public class CampaignGUI extends JPanel {
     	                        cbMenuItem.setEnabled(true);
     	                        submenu.add(cbMenuItem);
                     		}
+                            if (submenu.getItemCount() > 20) {
+                                MenuScroller.setScrollerFor(submenu, 20);
+                            }
                     		menu.add(submenu);
                     	} else {
 	                        cbMenuItem = new JCheckBoxMenuItem(rank.getName(profession));
@@ -8722,7 +8758,10 @@ public class CampaignGUI extends JPanel {
                     }
                     menu.add(cbMenuItem);
                 }
-            	popup.add(menu);
+                if (menu.getItemCount() > 20) {
+                    MenuScroller.setScrollerFor(menu, 20);
+                }
+                popup.add(menu);
                 if (areAllWoB(selected)) {
                 	// MD Ranks
                 	menu = new JMenu("Change Manei Domini Rank");
@@ -8736,7 +8775,10 @@ public class CampaignGUI extends JPanel {
                         }
                         menu.add(cbMenuItem);
                 	}
-                	popup.add(menu);
+                	if (menu.getItemCount() > 20) {
+                        MenuScroller.setScrollerFor(menu, 20);
+                    }
+                    popup.add(menu);
 
                 	// MD Classes
                 	menu = new JMenu("Change Manei Domini Class");
@@ -8750,9 +8792,44 @@ public class CampaignGUI extends JPanel {
                         }
                         menu.add(cbMenuItem);
                 	}
-                	popup.add(menu);
+                	if (menu.getItemCount() > 20) {
+                        MenuScroller.setScrollerFor(menu, 20);
+                    }
+                    popup.add(menu);
                 }
-                popup.add(menu);
+                if (areAllWoBOrComstar(selected)) {
+                    menu = new JMenu("Change Primary Designation");
+                    for (int i = Person.DESIG_NONE; i < Person.DESIG_NUM; i++) {
+                        cbMenuItem = new JCheckBoxMenuItem(Person.parseDesignator(i));
+                        cbMenuItem.setActionCommand("DESIG_PRI|" + i);
+                        cbMenuItem.addActionListener(this);
+                        cbMenuItem.setEnabled(true);
+                        if (i == person.getPrimaryDesignator()) {
+                            cbMenuItem.setSelected(true);
+                        }
+                        menu.add(cbMenuItem);
+                    }
+                    if (menu.getItemCount() > 20) {
+                        MenuScroller.setScrollerFor(menu, 20);
+                    }
+                    popup.add(menu);
+
+                    menu = new JMenu("Change Secondary Designation");
+                    for (int i = Person.DESIG_NONE; i < Person.DESIG_NUM; i++) {
+                        cbMenuItem = new JCheckBoxMenuItem(Person.parseDesignator(i));
+                        cbMenuItem.setActionCommand("DESIG_SEC|" + i);
+                        cbMenuItem.addActionListener(this);
+                        cbMenuItem.setEnabled(true);
+                        if (i == person.getSecondaryDesignator()) {
+                            cbMenuItem.setSelected(true);
+                        }
+                        menu.add(cbMenuItem);
+                    }
+                    if (menu.getItemCount() > 20) {
+                        MenuScroller.setScrollerFor(menu, 20);
+                    }
+                    popup.add(menu);
+                }
                 menu = new JMenu("Change Status");
                 for (int s = 0; s < Person.S_NUM; s++) {
                     cbMenuItem = new JCheckBoxMenuItem(Person.getStatusName(s));

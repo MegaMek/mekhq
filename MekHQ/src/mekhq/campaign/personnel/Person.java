@@ -1,20 +1,20 @@
 /*
  * Person.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -126,7 +126,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public static final int PRISONER_BONDSMAN = 2;
     public static final int PRISONER_NUM = 3;
 
-    //phenotypes
+    // Phenotypes
     public static final int PHENOTYPE_NONE = 0;
     public static final int PHENOTYPE_MW = 1;
     public static final int PHENOTYPE_BA = 2;
@@ -134,9 +134,26 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public static final int PHENOTYPE_VEE = 4;
     public static final int PHENOTYPE_NUM = 5;
 
+    // ROM Designations
+    public static final int DESIG_NONE    = 0;
+    public static final int DESIG_EPSILON = 1;
+    public static final int DESIG_PI      = 2;
+    public static final int DESIG_IOTA    = 3;
+    public static final int DESIG_XI      = 4;
+    public static final int DESIG_THETA   = 5;
+    public static final int DESIG_ZETA    = 6;
+    public static final int DESIG_MU      = 7;
+    public static final int DESIG_RHO     = 8;
+    public static final int DESIG_LAMBDA  = 9;
+    public static final int DESIG_PSI     = 10;
+    public static final int DESIG_OMICRON = 11;
+    public static final int DESIG_CHI     = 12;
+    public static final int DESIG_GAMMA   = 13;
+    public static final int DESIG_NUM     = 14;
+
     protected UUID id;
     protected int oldId;
-    
+
     // Lineage & Procreation
     protected UUID ancestorsID;
     protected UUID spouse;
@@ -148,6 +165,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     private int primaryRole;
     private int secondaryRole;
+
+    private int primaryDesignator;
+    private int secondaryDesignator;
 
     protected String biography;
     protected GregorianCalendar birthday;
@@ -199,7 +219,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     // If this Person uses a custom rank system (-1 for no)
     private int rankSystem = -1;
     private Ranks ranks;
-    
+
     // Manei Domini "Classes"
     public static final int MD_NONE			= 0;
     public static final int MD_GHOST		= 1;
@@ -236,7 +256,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     /**
      * * End Advanced Medical ***
      */
-    
+
     /* Against the Bot */
     private boolean founder; // +1 share if using shares system
     private int originalUnitWeight; // uses EntityWeightClass; 0 (Extra-Light) for no original unit
@@ -287,6 +307,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         phenotype = PHENOTYPE_NONE;
         clan = campaign.getFaction().isClan();
         bloodname = "";
+        primaryDesignator = DESIG_NONE;
+        secondaryDesignator = DESIG_NONE;
     }
 
     public int getPhenotype() {
@@ -312,11 +334,11 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
             return "Inner Sphere";
         }
     }
-    
+
     public String getBloodname() {
     	return bloodname;
     }
-    
+
     public void setBloodname(String bn) {
     	bloodname = bn;
     }
@@ -450,7 +472,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                 return "?";
         }
     }
-    
+
     public String pregnancyStatus() {
     	return isPregnant() ? " (Pregnant)" : "";
     }
@@ -514,7 +536,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public String getPrisonerStatusName() {
         return getPrisonerStatusName(prisonerStatus);
     }
-    
+
     public String getName() {
     	return name;
     }
@@ -807,7 +829,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	public void setSpouseID(UUID spouse) {
 		this.spouse = spouse;
 	}
-	
+
 	public Person getSpouse() {
 		return campaign.getPerson(spouse);
 	}
@@ -819,36 +841,36 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	public void setDueDate(GregorianCalendar dueDate) {
 		this.dueDate = dueDate;
 	}
-	
+
 	public boolean isPregnant() {
 		return dueDate != null;
 	}
-	
+
 	public UUID getAncestorsID() {
 		return ancestorsID;
 	}
-	
+
 	public void setAncestorsID(UUID id) {
 		ancestorsID = id;
 	}
-	
+
 	public Ancestors getAncestors() {
 		return campaign.getAncestors(ancestorsID);
 	}
-	
+
 	public Person getMother() {
 		return campaign.getPerson(getAncestors().getMotherID());
 	}
-	
+
 	public Person getFather() {
 		return campaign.getPerson(getAncestors().getFatherID());
 	}
-	
+
 	public Person birth() {
 		Person baby = campaign.newPerson(T_NONE);
-		
+
 		UUID tmpAncID = null;
-		
+
 		// Find already existing ancestor set of these parents
 		for (Ancestors a : campaign.getAncestors()) {
 			if (getId().equals(a.getMotherID())
@@ -857,11 +879,11 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				break;
 			}
 		}
-		
+
 		if (tmpAncID == null) {
 			tmpAncID = campaign.createAncestors(getSpouseID(), id).getId();
 		}
-		
+
 		String surname = "";
 		if (getName().contains(" ")) {
 			surname = getName().split(" ", 2)[1];
@@ -879,7 +901,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		setDueDate(null);
 		return baby;
 	}
-	
+
 	public void procreate() {
 		// Spouse NULL protection...
 		if (getSpouseID() != null && getSpouse() == null) {
@@ -910,7 +932,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 			}
 		}
 	}
-	
+
 	public boolean safeSpouse(Person p) {
 		// Huge convoluted return statement
 		return (
@@ -922,15 +944,15 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				&& p.getAge(campaign.getCalendar()) > 13
 		);
 	}
-	
+
 	public boolean isFemale() {
 		return gender == G_FEMALE;
 	}
-	
+
 	public boolean isMale() {
 		return gender == G_MALE;
 	}
-	
+
 	// Currently this isn't used
 	public boolean isNeuter() {
 		return !isMale() && !isFemale();
@@ -943,7 +965,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public void setXp(int xp) {
         this.xp = xp;
     }
-    
+
     public void awardXP(int xp) {
         this.xp += xp;
     }
@@ -1010,7 +1032,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public void writeToXml(PrintWriter pw1, int indent) {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        
+
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\""
                     + id.toString()
                     + "\" type=\""
@@ -1578,7 +1600,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
             MekHQ.logMessage("ID not pre-defined; generating person's ID.", 5);
             retVal.id = UUID.randomUUID();
         }
-        
+
         // Prisoner and Bondsman updating
         if (retVal.prisonerStatus != PRISONER_NOT && retVal.rank == 0) {
         	if (retVal.prisonerStatus == PRISONER_BONDSMAN) {
@@ -1594,7 +1616,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public void setSalary(int s) {
         salary = s;
     }
-    
+
     public int getRawSalary() {
     	return salary;
     }
@@ -1651,27 +1673,27 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	if (rankLevel > getRank().getRankLevels(getProfession())) {
     		rankLevel = getRank().getRankLevels(getProfession());
     	}
-    	
+
         return rankLevel;
     }
 
     public void setRankLevel(int level) {
         rankLevel = level;
     }
-    
+
     public int getRankSystem() {
     	if (rankSystem == -1) {
     		return campaign.getRanks().getRankSystem();
     	}
     	return rankSystem;
     }
-    
+
     public void setRankSystem(int system) {
     	rankSystem = system;
     	if (system == campaign.getRanks().getRankSystem()) {
     		rankSystem = -1;
     	}
-    	
+
     	// Set the ranks too
     	if (rankSystem == -1) {
     		ranks = null;
@@ -1679,7 +1701,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         	ranks = new Ranks(rankSystem);
     	}
     }
-    
+
     public Ranks getRanks() {
     	if (rankSystem != -1) {
     		// Null protection
@@ -1697,21 +1719,21 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	}
         return campaign.getRanks().getRank(rank);
     }
-    
+
     public String getRankName() {
     	String rankName;
     	int profession = getProfession();
-    	
+
     	// If we're using an "empty" profession, default to MechWarrior
     	while (getRanks().isEmptyProfession(profession)) {
     		profession = campaign.getRanks().getAlternateProfession(profession);
     	}
-    	
+
     	// If we're set to a rank that no longer exists, demote ourself
     	while (getRank().getName(profession).equals("-")) {
     		setRankNumeric(--rank);
     	}
-    	
+
     	// re-route through any profession redirections
     	while (getRank().getName(profession).startsWith("--") && profession != Ranks.RPROF_MW) {
 	    	// We've hit a rank that defaults to the MechWarrior table, so grab the equivalent name from there
@@ -1721,14 +1743,25 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	    		profession = getRanks().getAlternateProfession(getRank().getName(profession));
 	    	}
     	}
-    	
+
     	rankName = getRank().getName(profession);
-        
-    	// TODO: Add an override system for this...
-        if (getRanks().getRankSystem() == Ranks.RS_COM || (getRanks().getRankSystem() == Ranks.RS_WOB && getManeiDominiRank() == Rank.MD_RANK_NONE)) {
-        	rankName += getComstarBranchDesignation();
+
+    	// Manei Domini Additions
+        if (getRankSystem() != Ranks.RS_WOB) {
+            // Oops, clear our MD variables
+            maneiDominiClass = MD_NONE;
+            maneiDominiRank = Rank.MD_RANK_NONE;
         }
-    	
+        if (maneiDominiClass != MD_NONE) {
+            rankName = getManeiDominiClassNames() + " " + rankName;
+        }
+        if (maneiDominiRank != Rank.MD_RANK_NONE) {
+            rankName += " " + Rank.getManeiDominiRankName(maneiDominiRank);
+        }
+        if (getRankSystem() == Ranks.RS_COM || getRankSystem() == Ranks.RS_WOB) {
+            rankName += getComstarBranchDesignation();
+        }
+
     	// If we have a rankLevel, add it
     	if (rankLevel > 0) {
     		if (getRank().getRankLevels(profession) > 0)
@@ -1736,7 +1769,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     		else // Oops! Our rankLevel didn't get correctly cleared, they's remedy that.
     			rankLevel = 0;
     	}
-    	
+
     	// We have our name, return it
     	return rankName;
     }
@@ -1756,16 +1789,16 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	public void setManeiDominiRank(int maneiDominiRank) {
 		this.maneiDominiRank = maneiDominiRank;
 	}
-	
+
 	public String getManeiDominiClassNames() {
-		return getManeiDominiClassNames(maneiDominiClass, getRanks().getRankSystem());
+		return getManeiDominiClassNames(maneiDominiClass, getRankSystem());
 	}
-	
+
 	public static String getManeiDominiClassNames(int maneiDominiClass, int rankSystem) {
 		// Only WoB
 		if (rankSystem != Ranks.RS_WOB)
 			return "";
-		
+
 		switch (maneiDominiClass) {
 			case MD_NONE: return "";
 			case MD_GHOST: return "Ghost";
@@ -1958,10 +1991,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public String getFullTitle() {
     	return getFullTitle(false);
     }
-    
+
     public String getFullTitle(boolean html) {
         String rank = getRankName();
-        
+
         // Do prisoner checks
         if (rank.equalsIgnoreCase("None")) {
             if (isPrisoner()) {
@@ -1972,20 +2005,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
             }
             return getFullName();
         }
-        
-        // Manei Domini Additions
-        if (getRanks().getRankSystem() != Ranks.RS_WOB) {
-        	// Oops, clear our MD variables
-        	maneiDominiClass = MD_NONE;
-        	maneiDominiRank = Rank.MD_RANK_NONE;
-        }
-        if (maneiDominiClass != MD_NONE) {
-        	rank = getManeiDominiClassNames() + " " + rank;
-        }
-        if (maneiDominiRank != Rank.MD_RANK_NONE) {
-        	rank += " " + Rank.getManeiDominiRankName(maneiDominiRank);
-        }
-        
+
         // This is used for the rank sorter. If you have a better way to accomplish it, by all means...
         // Of course, nothing that uses Full Title actually uses the rank sorter yet I guess...
         // Still, I've turned it back on and I don't see it messing anything up anywhere.
@@ -1993,14 +2013,14 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         // If we need it in html for any reason, make it so.
         if (html)
         	rank = makeHTMLRankDiv();
-        
+
         return rank + " " + getFullName();
     }
-    
+
     public String makeHTMLRank() {
     	return "<html>"+makeHTMLRankDiv()+"</html>";
     }
-    
+
     public String makeHTMLRankDiv() {
     	return "<div id=\""+getId()+"\">"+getRankName()+"</div>";
     }
@@ -2008,46 +2028,140 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public String getHyperlinkedFullTitle() {
         return "<a href='PERSON:" + getId() + "'>" + getFullTitle() + "</a>";
     }
-    
+
     public String getComstarBranchDesignation() {
-    	if (isTechPrimary()) {
-    		return " Zeta";
+        StringBuilder sb = new StringBuilder(" ");
+
+        // Primary
+        if (getPrimaryDesignator() != DESIG_NONE) {
+            sb.append(parseDesignator(getPrimaryDesignator()));
+        } else if (isTechPrimary()) {
+    		sb.append("Zeta");
+    	} else if (isAdminPrimary()) {
+    		sb.append("Chi");
+    	} else {
+        	parseRoleForDesignation(getPrimaryRole(), sb);
     	}
-    	if (isAdminPrimary()) {
-    		return " Chi";
-    	}
-    	switch (getPrimaryRole()) {
-    	case T_MECHWARRIOR: return " Epsilon";
-    	case T_AERO_PILOT: return " Pi";
-    	case T_BA:
-    	case T_INFANTRY:
-    		return " Iota";
-    	case T_SPACE_CREW:
-    	case T_SPACE_GUNNER:
-    	case T_SPACE_PILOT:
-    	case T_NAVIGATOR:
-    		Unit u = campaign.getUnit(getUnitId());
-    		if (u != null) {
-    			Entity en = u.getEntity();
-    			if (en instanceof Dropship) {
-    				return " Xi";
-    			}
-    			if (en instanceof Jumpship) {
-    				return " Theta";
-    			}
-    		}
-    		return " ";
-    	case T_DOCTOR:
-    	case T_MEDIC:
-    		return " Kappa";
-    	case T_GVEE_DRIVER:
-    	case T_NVEE_DRIVER:
-    	case T_VTOL_PILOT:
-    	case T_VEE_GUNNER:
-    	case T_CONV_PILOT:
-    		return " Lambda";
-    	default: return "";
-    	}
+
+        // Secondary
+        if (getSecondaryDesignator() != DESIG_NONE) {
+            sb.append(" ");
+            sb.append(parseDesignator(getSecondaryDesignator()));
+        } else if (isTechSecondary()) {
+            sb.append(" Zeta");
+        } else if (isAdminSecondary()) {
+            sb.append(" Chi");
+        } else if (getSecondaryRole() != T_NONE) {
+            sb.append(" ");
+            parseRoleForDesignation(getSecondaryRole(), sb);
+        }
+
+    	return sb.toString();
+    }
+
+    private void parseRoleForDesignation(int role, StringBuilder sb) {
+        switch (role) {
+            case T_MECHWARRIOR:
+                sb.append("Epsilon");
+                break;
+            case T_AERO_PILOT:
+                sb.append("Pi");
+                break;
+            case T_BA:
+            case T_INFANTRY:
+                sb.append("Iota");
+                break;
+            case T_SPACE_CREW:
+            case T_SPACE_GUNNER:
+            case T_SPACE_PILOT:
+            case T_NAVIGATOR:
+                Unit u = campaign.getUnit(getUnitId());
+                if (u != null) {
+                    Entity en = u.getEntity();
+                    if (en instanceof Dropship) {
+                        sb.append("Xi");
+                    }
+                    if (en instanceof Jumpship) {
+                        sb.append("Theta");
+                    }
+                }
+                break;
+            case T_DOCTOR:
+            case T_MEDIC:
+                sb.append("Kappa");
+                break;
+            case T_GVEE_DRIVER:
+            case T_NVEE_DRIVER:
+            case T_VTOL_PILOT:
+            case T_VEE_GUNNER:
+            case T_CONV_PILOT:
+                sb.append("Lambda");
+                break;
+            default: break;
+        }
+    }
+
+    public static String parseDesignator(int designator) {
+        switch (designator) {
+            case DESIG_NONE:
+                return "None (Auto-Set)";
+            case DESIG_EPSILON:
+                return "Epsilon";
+            case DESIG_PI:
+                return "Pi";
+            case DESIG_IOTA:
+                return "Iota";
+            case DESIG_XI:
+                return "Xi";
+            case DESIG_THETA:
+                return "Theta";
+            case DESIG_ZETA:
+                return "Zeta";
+            case DESIG_MU:
+                return "Mu";
+            case DESIG_RHO:
+                return "Rho";
+            case DESIG_LAMBDA:
+                return "Lambda";
+            case DESIG_PSI:
+                return "Psi";
+            case DESIG_OMICRON:
+                return "Omicron";
+            case DESIG_CHI:
+                return "Chi";
+            case DESIG_GAMMA:
+                return "Gamma";
+            default:
+                return "";
+        }
+    }
+
+    /**
+     * @return the primaryDesignator
+     */
+    public int getPrimaryDesignator() {
+        return primaryDesignator;
+    }
+
+    /**
+     * @param primaryDesignator the primaryDesignator to set
+     */
+    public void setPrimaryDesignator(int primaryDesignator) {
+        this.primaryDesignator = primaryDesignator;
+    }
+
+    /**
+     * @return the secondaryDesignator
+     */
+    public int getSecondaryDesignator() {
+        return secondaryDesignator;
+    }
+
+    /**
+     * @param secondaryDesignator the secondaryDesignator to set
+     */
+    public void setSecondaryDesignator(int secondaryDesignator) {
+        this.secondaryDesignator = secondaryDesignator;
     }
 
     @Override
@@ -2271,7 +2385,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
             }
         }
     }
-    
+
     /*
      * This will set a specific edge trigger, regardless of the current status
      */
@@ -2463,7 +2577,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public void addTechUnitID(UUID i) {
         techUnitIds.add(i);
     }
-    
+
     public void clearTechUnitIDs() {
     	techUnitIds.clear();
     }
@@ -2827,7 +2941,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public void clearInjuries() {
         injuries.clear();
-        
+
         // Clear the doctor if there is one
         doctorId = null;
     }
@@ -3296,7 +3410,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         }
         return tf;
     }
-    
+
     public boolean hasOnlyHealedPermanentInjuries() {
     	if (injuries.size() == 0) {
     		return false;
@@ -3367,11 +3481,11 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public void addInjury(Injury i) {
         injuries.add(i);
     }
-    
+
     public int getProfession() {
 		return getProfessionFromPrimaryRole(primaryRole);
 	}
-    	    
+
     public static int getProfessionFromPrimaryRole(int role) {
     	switch (role) {
 			case T_MECHWARRIOR:
@@ -3409,41 +3523,41 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         		return Ranks.RPROF_MW;
 		}
 	}
-    
+
     /* For use by Against the Bot retirement/defection rolls */
-    
+
     public boolean isFounder() {
     	return founder;
     }
-    
+
     public void setFounder(boolean founder) {
     	this.founder = founder;
     }
-    
+
     public int getOriginalUnitWeight() {
     	return originalUnitWeight;
     }
-    
+
     public void setOriginalUnitWeight(int weight) {
     	originalUnitWeight = weight;
     }
-    
+
     public int getOriginalUnitTech() {
     	return originalUnitTech;
     }
-    
+
     public void setOriginalUnitTech(int tech) {
     	originalUnitTech = tech;
     }
-    
+
     public UUID getOriginalUnitId() {
     	return originalUnitId;
     }
-    
+
     public void setOriginalUnitId(UUID id) {
     	originalUnitId = id;
     }
-    
+
     public void setOriginalUnit(Unit unit) {
     	originalUnitId = unit.getId();
     	originalUnitTech = 0;
@@ -3452,9 +3566,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	} else if (unit.getEntity().getTechLevel() > megamek.common.TechConstants.T_INTRO_BOXSET) {
 			originalUnitTech++;
     	}
-    	originalUnitWeight = unit.getEntity().getWeightClass();        
+    	originalUnitWeight = unit.getEntity().getWeightClass();
     }
-    
+
     public int getNumShares(boolean sharesForAll) {
     	if (isPrisoner() || isBondsman()) {
     		return 0;
@@ -3468,9 +3582,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     		shares++;
     	}
     	shares += Math.max(-1, getExperienceLevel(false) - 2);
-    	
+
     	if (getRank().isOfficer()) {
-            Ranks ranks = getRanks() == null ? campaign.getRanks() : getRanks();
+            Ranks ranks = getRanks();
             int rankOrder = ranks.getOfficerCut();
             while (rankOrder <= rank && rankOrder < Ranks.RC_NUM) {
             	Rank rank = ranks.getAllRanks().get(rankOrder);
@@ -3487,7 +3601,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     		shares++;
     	}
     	shares += originalUnitTech;
-    	
+
     	return shares;
     }
 }
