@@ -1055,6 +1055,14 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     + secondaryRole
                     + "</secondaryRole>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                    + "<primaryDesignator>"
+                    + primaryDesignator
+                    + "</primaryDesignator>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                    + "<secondaryDesignator>"
+                    + secondaryDesignator
+                    + "</secondaryDesignator>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<commander>"
                     + MekHqXmlUtil.escape(Boolean.toString(commander))
                     + "</commander>");
@@ -1305,6 +1313,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     retVal.primaryRole = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("secondaryRole")) {
                     retVal.secondaryRole = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("primaryDesignator")) {
+                    retVal.primaryDesignator = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("secondaryDesignator")) {
+                    retVal.secondaryDesignator = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysToWaitForHealing")) {
                     retVal.daysToWaitForHealing = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("idleMonths")) {
