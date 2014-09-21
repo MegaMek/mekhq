@@ -137,6 +137,7 @@ v0.3.6 (SVN)
 + Updated MegaMek.jar to 0.39.1 official
 + Updated MegaMekLab.jar to 0.1.30 official
 + Bug [#568]: Transport/Dragoons Rating Error with Squads
++ Bug [#575]: Final contract payment broken
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
@@ -419,7 +420,7 @@ v0.3.3 (2013-09-20)
   There are now four methods of randomization to choose from.
   Dylan's method and the Random (original implementation) method both generate daily, but don't "clear"
   Dylan's method uses a weighted version of the Random method to frequently choose personnel for your most common unit type(s)
-  Random method is totally random, though it now has options on how personnel are removed based on roll on 2d6 (if it's less than that target)  
+  Random method is totally random, though it now has options on how personnel are removed based on roll on 2d6 (if it's less than that target)
   FM:Mercs Revised method is as close as I could code to what that book offers with a couple of TODO for roll modifiers
   StratOps method follows the rules in StratOps based on whatever you set your Maint. Cycle as
   This is still a WIP and there are currently no tooltips for the options.
@@ -705,11 +706,11 @@ v0.1.24 Release Candidate 3 (2013-03-12)
 + Bug 319: Repair Bay ArrayIndexOutOfBoundsException
 + Planetary data update 35
 + better version tracking in campaign loading
-+ escaping of some user data entry fields that were not being escaped 
++ escaping of some user data entry fields that were not being escaped
 + Bug 324: Deployment delay is being saved
 + Bug 328: weapon specialization does not save
 
-v0.1.23 Release Candidate 2 (2013-03-03)  
+v0.1.23 Release Candidate 2 (2013-03-03)
 + updated code for changes to MegaMek entity.setC3Master
 + Bug 312: Multiple entries in the units.cache
 + Bug 309: MekLab Body part Issue
@@ -742,7 +743,7 @@ v0.1.21 (2013-02-07)
         lab.sh - starts MML
         mm-server.sh - starts MegaMek with 1GB of RAM and uses the full script from the MegaMek package to use $HOME/.megamek
         mm-startup.sh - starts MegaMek with 512MB of RAM and stays in the local MekHQ folder
-+ Planetary Update 27, 28, and 29 
++ Planetary Update 27, 28, and 29
 + update to stay current with MML
 + Planetary Update 30
 + updates for infantry in MekLabPanel
@@ -802,7 +803,7 @@ v0.1.19 (2012-10-05)
 + Bug 262: Dragoon's Rating tech support error when using the FMM:R method
 + Bug 265: Missing final contract payment
 + Bug 266: Choose-Unit price Alpha sort
-+ Planetary data update 25 
++ Planetary data update 25
 + Conventional infantry customization (won't work until updated MML.jar is available)
 + updated MM and MML jars
 
@@ -818,7 +819,7 @@ v0.1.17 (2012-09-28)
 + Bug 3529464: Divide by zero - Dragoon's Rating
 + Fixed NumberFormatException in AbstractDragoonsRating
 + Updated MegaMek.jar to r8823 for new Ultra AC options & unjamming bugfix
-+ fixed error in FieldManualMercRevDragoonsRating - no BigDecimal.HUNDRED Bug 
++ fixed error in FieldManualMercRevDragoonsRating - no BigDecimal.HUNDRED Bug
 + Bug 3529484: Tanks tagged as custom do not save to campaign file properly
 + Non-canon costs for infantry and infantry parts (WIP)
 + Fixed problem with Dragoons Rating Transport score not being limited to a max of 25.
@@ -1002,7 +1003,7 @@ v0.1.14 (2012-02-08)
 + Bug: salvaged units have no value in resolveScenarioWizard
 + Bug 3477265: Salvaging MASC leads to campaign corruption
 + finished random skills and special abilities (need to allow user customization)
-+ random portrait selection 
++ random portrait selection
 + NewRecruitDialog and HireBulkPersonnelDialog
 + warning dialog when game is not saved correctly
 + campaign option to generate portrait only for certain personnel types
@@ -1045,7 +1046,7 @@ v0.1.13 (2012-01-11)
 + Bug: negative engine costs
 + subfolder for equipment parts in preparation for subclassing of variable ton/cost equipment
 + MASC suptype for EquipmentPart
-+ Bug: equipTonnage is double when loading XML 
++ Bug: equipTonnage is double when loading XML
 + Bug: need flag for MiscType when checking whether equipment type is MASC
 + Bug: NPE when loading refit and newArmorSupplies are null
 + don't add BA equipment and tank chassis modifications to parts store
@@ -1435,7 +1436,7 @@ v0.1.7 (2011-05-26)
 + correction to A* pathfinding technique
 + alt+shift click to add a planet manually to the jump path
 + all jump paths calculated starting from current planetary location
-+ new functoinality to mousePressed in InterstellarMapPanel: 
++ new functoinality to mousePressed in InterstellarMapPanel:
 		alt+click - jump path from current planet to clicked planet; shift+click - extend existing jump path to clicked planet
 + calculate jump path button for InterstellarMap
 + begin transit button for interstellar map (doesn't do anything yet)
@@ -1540,8 +1541,8 @@ v0.1.6 (2011-05-17)
 + beginning of BIG change to repair system - no more tasks, repairs are performed directly on parts
    don't use this yet, salvage and replacement are not implemented
 + Mech repairs complete under new system (still need salvage and replacement)
-+ mech salvage complete under new system 
-+ tasktablemouseadapter 
++ mech salvage complete under new system
++ tasktablemouseadapter
 + MissingPart and MissingMekGyro (beginning of replacements under new system)
 + Mech replacements complete under new system
 + Bug: repair destroyed mech locations
@@ -1697,7 +1698,7 @@ v0.1.5 (2011-05-05)
 + included a rank reference from campaign in Person.java and refactored Campaign#GetTitleFor(Person) into Person.java
 + adjust salaries by experience and officer status
 + financial balance sheet in Finance tab
-+ added Finances to XML load and save 
++ added Finances to XML load and save
 + pay for maintenance, sell units for money, and sell parts for money options added
 + Planet object
 + read in planet.xml data (from MekWars) for InterstellarMap
@@ -1770,7 +1771,7 @@ v0.1.4 (2011-04-28)
 + updated MegaMek.jar
 + added "use edge" campaign option
 + addded "Select Edge Trigger" menu option and "Set Edge" menu (GM mode) option to PersonnelTable context menu
-+ custom renderer for PersonnelTable 
++ custom renderer for PersonnelTable
 + special ability, implants, and hits columns for PersonnelTable
 + tiger striping of PersonnelTable for readability
 + wounded personnel have a red background in PersonnelTable
@@ -1818,7 +1819,7 @@ v0.1.3 (2011-04-22)
 + gender variable in Person (still need to link it to random name generator)
 + birthday and age variables in Person
 + Bug: personnelTable not refreshing when new personnel are hired
-+ Personnel Options tab 
++ Personnel Options tab
 + Game options to use artillery skill, init bonus, tactics bonus, and toughness
 + NPE when cancelling loadXML
 + PersonnelList not refreshing when doctors hired
@@ -1860,7 +1861,7 @@ v0.1.2 (2011-04-15)
 + Added "reCalc" function to all Units, Parts, Persons, WorkItems, and Teams.
 	+ Moved all calculated values in constructors into reCalc and called in constructors.
 	+ Added "reCalc" to XML de-serialization to catch up on missing values.
-+ XML Serialization/de-serialization completed. 
++ XML Serialization/de-serialization completed.
 + Altered NewTechTeamDialog so that it generates a new name once a tech is hired.
 + Put partial implementation of "getMonthlySalary()" on Person, as a step towards finances (using FM:Mercs(R) rules).
 + Added "Team Type" to SupportTeam for differentiation without class type comparison.
@@ -1893,7 +1894,7 @@ v0.1.1 (2009-09-29)
 + UnitSelectorDialog (for hiring new units)
 + tooltip text and button labels for Deploy Units and Retrieve Units updated
 + load forces from MUL menu item (for loading initial forces including pilots)
-+ RFE 2841678: Dialogue on unsuccessful deploy 
++ RFE 2841678: Dialogue on unsuccessful deploy
 + Clan/IS ammo limits
 + Bug: NPE when getTasksForUnit called and no units selected
 + Era
