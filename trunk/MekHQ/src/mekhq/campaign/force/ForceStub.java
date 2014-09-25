@@ -112,11 +112,11 @@ public class ForceStub implements Serializable {
 				+"</name>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<iconCategory>"
-				+iconCategory
+				+MekHqXmlUtil.escape(iconCategory)
 				+"</iconCategory>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<iconFileName>"
-				+iconFileName
+				+MekHqXmlUtil.escape(iconFileName)
 				+"</iconFileName>");
 		if(units.size() > 0) {
 			pw1.println(MekHqXmlUtil.indentStr(indent+1)

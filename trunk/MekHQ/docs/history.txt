@@ -162,6 +162,7 @@ v0.3.6 (SVN)
 + Bug: Automatic resolution not working in r1978
 + Updated MegaMek.jar to r11273
 + Updated MegaMekLab.jar to 1434
++ Bug [#585]: campaign will not load if custom icon/portrait filenames use XML metacharacters
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
