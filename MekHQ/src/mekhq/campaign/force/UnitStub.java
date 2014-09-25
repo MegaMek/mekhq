@@ -100,11 +100,11 @@ import org.w3c.dom.NodeList;
 					+"</desc>");
 			pw1.println(MekHqXmlUtil.indentStr(indent+1)
 					+"<portraitCategory>"
-					+portraitCategory
+					+MekHqXmlUtil.escape(portraitCategory)
 					+"</portraitCategory>");
 			pw1.println(MekHqXmlUtil.indentStr(indent+1)
 					+"<portraitFileName>"
-					+portraitFileName
+					+MekHqXmlUtil.escape(portraitFileName)
 					+"</portraitFileName>");
 			pw1.println(MekHqXmlUtil.indentStr(indent) + "</unitStub>");
 		}
