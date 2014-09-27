@@ -655,7 +655,7 @@ public class AtBContract extends Contract implements Serializable {
 	}
 	
 	public boolean isSubcontract() {
-		return parentContract == null;
+		return parentContract != null;
 	}
 	
 	public AtBContract getParentContract() {

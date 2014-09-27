@@ -1949,12 +1949,20 @@ public class AtBScenario extends Scenario {
 				maxWeight);
 		
 		int forceType = FORCE_MEK;
-			if (campaign.getCampaignOptions().getUseVehicles()) {
-			int roll = Compute.d6();
-			if (roll < 4) {
-				forceType = FORCE_VEHICLE;
-			} else if (roll < 6) {
-				forceType = FORCE_MIXED;
+		if (campaign.getCampaignOptions().getUseVehicles()) {
+			int totalWeight = campaign.getCampaignOptions().getOpforLanceTypeMechs() +
+					campaign.getCampaignOptions().getOpforLanceTypeMixed() +
+					campaign.getCampaignOptions().getOpforLanceTypeVehicles();
+			if (totalWeight <= 0) {
+				forceType = FORCE_MEK;
+			} else {
+				int roll = Compute.randomInt(totalWeight);
+				if (roll < campaign.getCampaignOptions().getOpforLanceTypeVehicles()) {
+					forceType = FORCE_VEHICLE;
+				} else if (roll < campaign.getCampaignOptions().getOpforLanceTypeVehicles() +
+						campaign.getCampaignOptions().getOpforLanceTypeMixed()) {
+					forceType = FORCE_MIXED;
+				}
 			}
 		}
 		if (forceType == FORCE_MEK && campaign.getCampaignOptions().getRegionalMechVariations()) {
@@ -2493,7 +2501,7 @@ public class AtBScenario extends Scenario {
 				NodeList nl2 = wn2.getChildNodes();
 				for (int i = 0; i < nl2.getLength(); i++) {
 					Node wn3 = nl2.item(i);
-					if (wn3.getNodeName().equalsIgnoreCase("weight")) {
+					if (wn3.getNodeName().equalsIgnoreCase("playerWeight")) {
 						int weightClass = Integer.parseInt(wn3.getAttributes().getNamedItem("class").getTextContent());
 						NodeList nl3 = wn3.getChildNodes();
 						for (int j = 0; j < nl3.getLength(); j++) {
@@ -2501,13 +2509,15 @@ public class AtBScenario extends Scenario {
 							if (wn4.getNodeName().equalsIgnoreCase("entity")) {
 								Entity en = null;
 								try {
-									en = MekHqXmlUtil.getEntityFromXmlString(wn3);
+									en = MekHqXmlUtil.getEntityFromXmlString(wn4);
 								} catch (Exception e) {
 									MekHQ.logError("Error loading allied unit in scenario");
 									MekHQ.logError(e);
 								}
-								specMissionEnemies.get(weightClass).add(en);
-								entityIds.put(UUID.fromString(en.getExternalIdAsString()), en);
+								if (null != en) {
+									specMissionEnemies.get(weightClass).add(en);
+									entityIds.put(UUID.fromString(en.getExternalIdAsString()), en);
+								}
 							}
 						}
 					}

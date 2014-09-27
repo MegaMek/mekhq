@@ -163,6 +163,13 @@ v0.3.6 (SVN)
 + Updated MegaMek.jar to r11273
 + Updated MegaMekLab.jar to 1434
 + Bug [#585]: campaign will not load if custom icon/portrait filenames use XML metacharacters
++ Patch [34]: Against the Bot, 11th Patch
+    Fixes...
+        Bug [#581]: AtB: Civilian Help opposition disappearing
+        Bug: Sub-contracts not indicated in the contract market
+    Implements...
+        Feature [feature-requests:#201]: [ATB] "Enemies use vehicle?" slider (Implements the
+            basic request, but not the additional suggestions at this time)
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
