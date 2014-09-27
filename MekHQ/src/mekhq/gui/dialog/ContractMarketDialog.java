@@ -290,7 +290,11 @@ public class ContractMarketDialog extends JDialog {
 			if (c instanceof AtBContract) {
 				row.add(((AtBContract)c).getEmployerName(campaign.getEra()));
 				row.add(((AtBContract)c).getEnemyName(campaign.getEra()));
-				row.add(((AtBContract)c).getMissionTypeName());
+				if (((AtBContract)c).isSubcontract()) {
+					row.add(((AtBContract)c).getMissionTypeName() + " (Subcontract)");
+				} else {
+					row.add(((AtBContract)c).getMissionTypeName());
+				}
 			} else {
 				row.add(c.getEmployer());
 				row.add("");
