@@ -527,6 +527,7 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
         // Find out how short of transport bays we are.
         boolean doubleCapacity = true;
         boolean fullCapacity = true;
+        int heavyVeeBays = getHeavyVeeBayCount();
         if (getMechBayCount() < super.getMechCount()) {
             fullCapacity = false;
             doubleCapacity = false;
@@ -539,16 +540,18 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
         } else if (getProtoBayCount() < super.getProtoCount() * 2) {
             doubleCapacity = false;
         }
-        if (getLightVeeBayCount() < getLightVeeCount()) {
-            fullCapacity = false;
-            doubleCapacity = false;
-        } else if (getLightVeeBayCount() < getLightVeeCount() * 2) {
-            doubleCapacity = false;
-        }
         if (getHeavyVeeBayCount() < getHeavyVeeCount()) {
             fullCapacity = false;
             doubleCapacity = false;
         } else if (getHeavyVeeBayCount() < getHeavyVeeCount() * 2) {
+            doubleCapacity = false;
+        }
+        heavyVeeBays -= getHeavyVeeBayCount();
+        int lightVeeBays = getLightVeeBayCount() + heavyVeeBays;
+        if (getLightVeeBayCount() < lightVeeBays) {
+            fullCapacity = false;
+            doubleCapacity = false;
+        } else if (getLightVeeBayCount() < lightVeeBays * 2) {
             doubleCapacity = false;
         }
         if (getFighterBayCount() < super.getFighterCount()) {

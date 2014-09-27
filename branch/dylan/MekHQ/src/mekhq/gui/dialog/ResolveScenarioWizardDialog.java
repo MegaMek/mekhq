@@ -1,20 +1,20 @@
 /*
  * ResolveScenarioWizardDialog.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -72,7 +72,7 @@ import mekhq.campaign.unit.Unit;
  */
 public class ResolveScenarioWizardDialog extends JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
-	
+
 	final static String UNITSPANEL   = "Unit Status";
 	final static String PILOTPANEL   = "Pilot Status";
 	final static String SALVAGEPANEL = "Claim Salvage";
@@ -83,21 +83,21 @@ public class ResolveScenarioWizardDialog extends JDialog {
 	final static String ALLYPANEL    = "Ally Status";
 
 	final static String[] panelOrder = {UNITSPANEL,ALLYPANEL,PILOTPANEL,SALVAGEPANEL,KILLPANEL,REWARDPANEL,PREVIEWPANEL};
-	
+
 	private JFrame frame;
-	
+
 	private ResolveScenarioTracker tracker;
-    
+
 	private javax.swing.JPanel panButtons;
 	private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnNext;
     private javax.swing.JButton btnFinish;
     private javax.swing.JButton btnBack;
     private javax.swing.JTextArea txtInstructions;
-    
+
     private CardLayout cardLayout;
     private String currentPanel;
-    
+
     private JScrollPane scrMain;
     private JPanel pnlMain;
     private JPanel pnlUnitStatus;
@@ -107,7 +107,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private JPanel pnlKills;
     private JPanel pnlRewards;
     private JPanel pnlPreview;
-    
+
     /*
      * Unit status panel components
      */
@@ -116,12 +116,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private ArrayList<JButton> btnsEditUnit;
     private ArrayList<UnitStatus> ustatuses;
     private ArrayList<JLabel> lblsUnitName;
-    
+
     /*
      * Ally status panel components
      */
     private ArrayList<JCheckBox> chksAllyLost;
-    
+
     /*
      * Pilot status panel components
      */
@@ -131,7 +131,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private ArrayList<JCheckBox> escapeBtns;
     private ArrayList<JSlider> hitSliders;
     private ArrayList<PersonStatus> pstatuses;
-    
+
     /*
      * Salvage panel components
      */
@@ -141,26 +141,26 @@ public class ResolveScenarioWizardDialog extends JDialog {
 	Hashtable<UUID, UnitStatus> salvageStatus;
     private ArrayList<JButton> btnsSalvageViewUnit;
     private ArrayList<JButton> btnsSalvageEditUnit;
-    
+
     private JLabel lblSalvageValueUnit1;
     private JLabel lblSalvageValueEmployer1;
     private JLabel lblSalvagePct1;
     private JLabel lblSalvageValueUnit2;
     private JLabel lblSalvageValueEmployer2;
     private JLabel lblSalvagePct2;
-	
+
     private long salvageEmployer;
     private long salvageUnit;
     private int currentSalvagePct;
     private int maxSalvagePct;
-    
+
     DecimalFormat formatter;
-    
+
     /*
      * Assign Kills components
      */
     private Hashtable<String, JComboBox<String>> killChoices;
-    
+
     /*
      * Collect Rewards components
      */
@@ -187,7 +187,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private javax.swing.JTextArea txtSalvage;
     private javax.swing.JTextArea txtRewards;
     private javax.swing.JLabel lblStatus;
-    
+
     public ResolveScenarioWizardDialog(JFrame parent, boolean modal, ResolveScenarioTracker t) {
         super(parent, modal);
         this.frame = parent;
@@ -206,18 +206,18 @@ public class ResolveScenarioWizardDialog extends JDialog {
         initComponents();
         setLocationRelativeTo(parent);
     }
-    
+
     private void initComponents() {
     	java.awt.GridBagConstraints gridBagConstraints;
 
     	cardLayout = new CardLayout();
-    	    	
+
     	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveScenarioWizardDialog");
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
-        
+
         getContentPane().setLayout(new BorderLayout());
-        
+
         setTitle(resourceMap.getString("title"));
 
         /*
@@ -234,18 +234,18 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtInstructions.setMinimumSize(new Dimension(590,100));
         txtInstructions.setPreferredSize(new Dimension(590,100));
         getContentPane().add(txtInstructions, BorderLayout.PAGE_START);
-        
+
         /*
          * Set up main panel with cards
          */
-        pnlMain = new JPanel(cardLayout); 
-       
+        pnlMain = new JPanel(cardLayout);
+
     	/*
     	 * Unit Status Panel
     	 */
-        
+
     	pnlUnitStatus = new JPanel();
-    	pnlUnitStatus.setLayout(new GridBagLayout()); 
+    	pnlUnitStatus.setLayout(new GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -306,9 +306,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.weightx = 1.0;
             pnlUnitStatus.add(btnEditUnit, gridBagConstraints);
             i++;
-        }       
+        }
         pnlMain.add(pnlUnitStatus, UNITSPANEL);
-        
+
         /*
          * Ally Status Panel
          */
@@ -394,7 +394,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
          * Pilot Status Panel
          */
         pnlPilotStatus = new JPanel();
-        pnlPilotStatus.setLayout(new GridBagLayout()); 
+        pnlPilotStatus.setLayout(new GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -428,7 +428,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         JCheckBox bondsmanCheck;
         JCheckBox escapeCheck;
         ButtonGroup captured;
-        JSlider hitSlider; 
+        JSlider hitSlider;
         Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
         labelTable.put( new Integer( 0 ), new JLabel("0") );
         labelTable.put( new Integer( 1 ), new JLabel("1") );
@@ -454,7 +454,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         	hitSliders.add(hitSlider);
         	if(status.isMissing()) {
         		miaCheck.setSelected(true);
-        	} 
+        	}
         	gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
@@ -527,22 +527,22 @@ public class ResolveScenarioWizardDialog extends JDialog {
         			escapeCheck.setSelected(true);
         		}
         	}
-        }    	
+        }
     	pnlMain.add(pnlPilotStatus, PILOTPANEL);
-    	
+
     	/*
     	 * Salvage panel
     	 */
     	pnlSalvage = new JPanel();
     	salvageBoxes = new ArrayList<JCheckBox>();
     	escapeBoxes = new ArrayList<JCheckBox>();
-    	pnlSalvage.setLayout(new GridBagLayout()); 
+    	pnlSalvage.setLayout(new GridBagLayout());
         btnsSalvageViewUnit = new ArrayList<JButton>();
         btnsSalvageEditUnit = new ArrayList<JButton>();
         JPanel pnlSalvageValue = new JPanel(new GridBagLayout());
         i = 0;
         if(tracker.getMission() instanceof Contract) {
-        	lblSalvageValueUnit1 = new JLabel(resourceMap.getString("lblSalvageValueUnit1.text"));   	
+        	lblSalvageValueUnit1 = new JLabel(resourceMap.getString("lblSalvageValueUnit1.text"));
         	gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 0;
@@ -551,7 +551,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.weightx = 0.0;
             gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
             pnlSalvageValue.add(lblSalvageValueUnit1, gridBagConstraints);
-        	lblSalvageValueUnit2 = new JLabel(formatter.format(salvageUnit) + " C-Bills");   	
+        	lblSalvageValueUnit2 = new JLabel(formatter.format(salvageUnit) + " C-Bills");
         	gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 0;
@@ -561,7 +561,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.weightx = 1.0;
             pnlSalvageValue.add(lblSalvageValueUnit2, gridBagConstraints);
             i++;
-            lblSalvageValueEmployer1 = new JLabel(resourceMap.getString("lblSalvageValueEmployer1.text"));   	
+            lblSalvageValueEmployer1 = new JLabel(resourceMap.getString("lblSalvageValueEmployer1.text"));
         	gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 1;
@@ -584,7 +584,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             if(currentSalvagePct > maxSalvagePct) {
             	lead = "<html><font color='red'>";
             }
-            lblSalvagePct1 = new JLabel(resourceMap.getString("lblSalvagePct1.text"));   	
+            lblSalvagePct1 = new JLabel(resourceMap.getString("lblSalvagePct1.text"));
         	gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 2;
@@ -628,7 +628,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         	u.initializeParts(false);
         	u.runDiagnostic();
         	salvageables.add(u);
-        	salvageStatus.put(u.getId(), tracker.new UnitStatus(u.getName(), u.getEntity().getChassis(), u.getEntity().getModel()));
+        	salvageStatus.put(u.getId(), tracker.new UnitStatus(u));
         	UnitStatus status = salvageStatus.get(u.getId());
         	status.assignFoundEntity(en);
         	String txtBoxString = status.getDesc().replace(en.getDisplayName(), en.getDisplayName() + " (" + formatter.format(u.getSellValue()) + " C-Bills)");
@@ -684,14 +684,14 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
         checkSalvageRights();
     	pnlMain.add(pnlSalvage, SALVAGEPANEL);
-    	
+
     	/*
     	 * Assign Kills panel
     	 */
     	pnlKills = new JPanel();
         killChoices = new Hashtable<String, JComboBox<String>>();
-        pnlKills.setLayout(new GridBagLayout()); 
-        
+        pnlKills.setLayout(new GridBagLayout());
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -706,10 +706,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         pnlKills.add(new JLabel(resourceMap.getString("claim")), gridBagConstraints);
-        
+
         i = 2;
         JComboBox<String> comboAssign;
-        DefaultComboBoxModel<String> assignModel; 
+        DefaultComboBoxModel<String> assignModel;
         j = 0;
         for(String killName : tracker.getKillCredits().keySet()) {
         	j++;
@@ -721,7 +721,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         	if(null == tracker.getKillCredits().get(killName)) {
         		continue;
         	}
-    		for(Unit u : tracker.getUnits()) {	
+    		for(Unit u : tracker.getUnits()) {
     			idx++;
     			if (u.getEntity() instanceof GunEmplacement) {
     				assignModel.addElement("AutoTurret, " + u.getName());
@@ -749,14 +749,14 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.gridx = 1;
             pnlKills.add(comboAssign, gridBagConstraints);
             i++;
-        }     
+        }
     	pnlMain.add(pnlKills, KILLPANEL);
-    	
+
     	/*
          * Collect Rewards Panel
          */
         pnlRewards = new JPanel();
-        pnlRewards.setLayout(new GridBagLayout()); 
+        pnlRewards.setLayout(new GridBagLayout());
         lootBoxes = new ArrayList<JCheckBox>();
         i = 0;
         j = 0;
@@ -779,7 +779,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             i++;
         }
         pnlMain.add(pnlRewards, REWARDPANEL);
-    	
+
     	/*
     	 * Preview Panel
     	 */
@@ -802,11 +802,11 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtSalvage = new javax.swing.JTextArea();
         txtRewards = new javax.swing.JTextArea();
         lblStatus = new javax.swing.JLabel();
-    	
+
         pnlPreview.setLayout(new GridBagLayout());
-        
+
         JPanel pnlStatus = new JPanel();
-        
+
         lblStatus.setText(resourceMap.getString("lblStatus.text"));
         DefaultComboBoxModel<String> statusModel = new DefaultComboBoxModel<String>();
 		for (int k = 1; k < Scenario.S_NUM; k++) {
@@ -814,7 +814,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 		}
 		choiceStatus.setModel(statusModel);
 		choiceStatus.setName("choiceStatus"); // NOI18N
-		choiceStatus.setSelectedIndex(0);     
+		choiceStatus.setSelectedIndex(0);
 		pnlStatus.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 5));
 		pnlStatus.add(lblStatus);
 		pnlStatus.add(choiceStatus);
@@ -828,7 +828,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         pnlPreview.add(pnlStatus, gridBagConstraints);
-		
+
         txtRewards.setText(resourceMap.getString("none"));
         txtRewards.setEditable(false);
         txtRewards.setLineWrap(true);
@@ -846,7 +846,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         pnlPreview.add(new JScrollPane(txtRewards), gridBagConstraints);
-        
+
         txtReport.setText("");
         txtReport.setName("txtReport");
         txtReport.setEditable(true);
@@ -868,7 +868,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         pnlPreview.add(scrReport, gridBagConstraints);
-	         
+
         txtRecoveredUnits.setName("txtRecoveredUnits");
         txtRecoveredUnits.setText(resourceMap.getString("none"));
         txtRecoveredUnits.setEditable(false);
@@ -888,7 +888,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         pnlPreview.add(scrRecoveredUnits, gridBagConstraints);
-        
+
         txtRecoveredPilots.setName("txtRecoveredPilots");
         txtRecoveredPilots.setText(resourceMap.getString("none"));
         txtRecoveredPilots.setEditable(false);
@@ -908,7 +908,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         pnlPreview.add(scrRecoveredPilots, gridBagConstraints);
-        
+
         txtMissingUnits.setName("txtMissingUnits");
         txtMissingUnits.setText(resourceMap.getString("none"));
         txtMissingUnits.setEditable(false);
@@ -928,7 +928,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         pnlPreview.add(scrMissingUnits, gridBagConstraints);
-        
+
         txtMissingPilots.setName("txtMissingPilots");
         txtMissingPilots.setText(resourceMap.getString("none"));
         txtMissingPilots.setEditable(false);
@@ -948,7 +948,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         pnlPreview.add(scrMissingPilots, gridBagConstraints);
-        
+
         txtSalvage.setName("txtSalvage");
         txtSalvage.setText("None");
         txtSalvage.setEditable(false);
@@ -968,7 +968,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         pnlPreview.add(scrSalvage, gridBagConstraints);
-        
+
         txtDeadPilots.setName("txtDeadPilots");
         txtDeadPilots.setText(resourceMap.getString("none"));
         txtDeadPilots.setEditable(false);
@@ -989,21 +989,21 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         pnlPreview.add(scrDeadPilots, gridBagConstraints);
     	pnlMain.add(pnlPreview, PREVIEWPANEL);
-        
-        
+
+
     	scrMain = new JScrollPane(pnlMain);
     	scrMain.setMinimumSize(new Dimension(600,500));
     	scrMain.setPreferredSize(new Dimension(600,500));
     	getContentPane().add(scrMain, BorderLayout.CENTER);
-    	
-    	
+
+
     	/*
     	 * Set up button panel
     	 */
     	panButtons = new JPanel();
         panButtons.setName("panButtons");
-        panButtons.setLayout(new GridBagLayout());  
-        
+        panButtons.setLayout(new GridBagLayout());
+
         btnCancel = new JButton(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnClose"); // NOI18N
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
@@ -1011,7 +1011,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         		cancel();
         	}
         });
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -1020,7 +1020,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         panButtons.add(btnCancel, gridBagConstraints);
-		
+
         btnBack = new JButton(resourceMap.getString("btnBack.text")); // NOI18N
         btnBack.setName("btnBack"); // NOI18N
         btnBack.addActionListener(new java.awt.event.ActionListener() {
@@ -1036,7 +1036,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         panButtons.add(btnBack, gridBagConstraints);
-        
+
         btnNext = new JButton(resourceMap.getString("btnNext.text")); // NOI18N
         btnNext.setName("btnNext"); // NOI18N
         btnNext.addActionListener(new java.awt.event.ActionListener() {
@@ -1052,7 +1052,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         panButtons.add(btnNext, gridBagConstraints);
-		
+
         btnFinish = new JButton(resourceMap.getString("btnFinish.text")); // NOI18N
         btnFinish.setName("btnFinish"); // NOI18N
         btnFinish.addActionListener(new java.awt.event.ActionListener() {
@@ -1068,23 +1068,23 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         panButtons.add(btnFinish, gridBagConstraints);
-        
+
         getContentPane().add(panButtons, BorderLayout.PAGE_END);
-    
+
         switchPanel(currentPanel);
         if(!usePanel(currentPanel)) {
         	next();
         }
-        
+
       	btnNext.setEnabled(true);
       	btnBack.setEnabled(false);
       	btnFinish.setEnabled(false);
-      	
-        pack();     
-        
+
+        pack();
+
 
     }
-    
+
     private void switchPanel(String name) {
     	if(name.equals(PREVIEWPANEL)) {
     		updatePreviewPanel();
@@ -1094,12 +1094,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
     	cardLayout.show(pnlMain, currentPanel);
     	switchInstructions();
     	javax.swing.SwingUtilities.invokeLater(new Runnable() {
-			public void run() { 
+			public void run() {
 				scrMain.getVerticalScrollBar().setValue(0);
 			}
 		});
     }
-    
+
     private void switchInstructions() {
     	final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveScenarioWizardDialog");
     	if(currentPanel.equals(UNITSPANEL)) {
@@ -1136,7 +1136,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtInstructions.setPreferredSize(new Dimension(590,100));
         getContentPane().add(txtInstructions, BorderLayout.PAGE_START);
     }
-    
+
     private void next() {
 		btnNext.setEnabled(false);
 		btnBack.setEnabled(true);
@@ -1161,10 +1161,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
     		}
     		else if(name.equals(currentPanel)) {
     			passedCurrent = true;
-    		} 
+    		}
     	}
 	}
-    
+
     private void back() {
     	btnNext.setEnabled(true);
 		btnBack.setEnabled(false);
@@ -1178,7 +1178,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         			if(usePanel(name)) {
         				if(!switchMade) {
         					switchPanel(name);
-        					switchMade = true;					
+        					switchMade = true;
         				} else {
         					btnBack.setEnabled(true);
         					break;
@@ -1188,13 +1188,13 @@ public class ResolveScenarioWizardDialog extends JDialog {
     		}
     		else if(name.equals(currentPanel)) {
     			passedCurrent = true;
-    		} 
+    		}
     	}
     }
-    
+
     private void finish() {
-    	
-        
+
+
     	//unit status
     	for(int i = 0; i < chksTotaled.size(); i++) {
     		JCheckBox box = chksTotaled.get(i);
@@ -1202,10 +1202,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
     		if(null == id || null == tracker.getUnitsStatus().get(id)) {
     		    continue;
     		}
-    		tracker.getUnitsStatus().get(id).setTotalLoss(box.isSelected()); 
+    		tracker.getUnitsStatus().get(id).setTotalLoss(box.isSelected());
     	}
-    	
-    	if (tracker.getCampaign().getCampaignOptions().getUseAtB() && 
+
+    	if (tracker.getCampaign().getCampaignOptions().getUseAtB() &&
     			tracker.getScenario() instanceof AtBScenario) {
     		AtBScenario scenario = (AtBScenario)tracker.getScenario();
 	    	int breaches = 0;
@@ -1228,7 +1228,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 	    	tracker.setContractBreaches(breaches);
 	    	tracker.setBonusRolls(bonuses);
     	}
-    	
+
     	//now personnel
     	for(int i = 0; i < pstatuses.size(); i++) {
     		PersonStatus status = pstatuses.get(i);
@@ -1238,7 +1238,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     		status.setBondsman(bondsmanBtns.get(i).isSelected());
     		status.setRemove(escapeBtns.get(i).isSelected());
     	}
-    	
+
     	//now salvage
     	for(int i = 0; i < salvageBoxes.size(); i++) {
     		JCheckBox box = salvageBoxes.get(i);
@@ -1248,7 +1248,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     			tracker.dontSalvageUnit(i);
     		}
     	}
-    	
+
     	//now assign kills
     	for(String killName : tracker.getKillCredits().keySet()) {
     		if(killChoices.get(killName).getSelectedIndex() == 0) {
@@ -1261,24 +1261,24 @@ public class ResolveScenarioWizardDialog extends JDialog {
     		}
     	}
     	tracker.assignKills();
-    	
+
     	//now get loot
         for(int i = 0; i < lootBoxes.size(); i++) {
             JCheckBox box = lootBoxes.get(i);
             if(box.isSelected()) {
                 tracker.addLoot(loots.get(i));
-            } 
+            }
         }
-        
+
     	//now process
     	tracker.resolveScenario(choiceStatus.getSelectedIndex()+1,txtReport.getText());
     	this.setVisible(false);
     }
-    
+
     private void cancel() {
     	setVisible(false);
     }
-    
+
     private boolean usePanel(String panelName) {
     	if(panelName.equals(UNITSPANEL)) {
     		return tracker.getUnitsStatus().keySet().size() > 0;
@@ -1293,7 +1293,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     		return tracker.getPeopleStatus().keySet().size() > 0;
     	}
     	else if(panelName.equals(SALVAGEPANEL)) {
-    		return tracker.getPotentialSalvage().size() > 0 
+    		return tracker.getPotentialSalvage().size() > 0
     				&& (!(tracker.getMission() instanceof Contract) || ((Contract)tracker.getMission()).canSalvage());
     	}
     	else if(panelName.equals(KILLPANEL)) {
@@ -1307,7 +1307,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     	}
     	return false;
     }
-    
+
     private void checkSalvageRights() {
     	// Perform a little magic to make sure we aren't trying to do both of these things
     	for (JCheckBox escaped : escapeBoxes) {
@@ -1333,7 +1333,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     		if (escapeBoxes.get(i).isSelected()) {
     			continue;
     		}
-    		
+
     		// Set up the values
     		if(salvageBoxes.get(i).isSelected()) {
     			salvageUnit += salvageables.get(i).getSellValue();
@@ -1358,9 +1358,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
         lblSalvagePct2.setText(lead + currentSalvagePct + "%</font> <font color='black'>(max " + maxSalvagePct + "%)</font></html>");
 
     }
-    
+
     private void updatePreviewPanel() {
-    	        
+
         //pilots first
         String missingNames = "";
         String kiaNames = "";
@@ -1378,8 +1378,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtRecoveredPilots.setText(recoverNames);
         txtMissingPilots.setText(missingNames);
         txtDeadPilots.setText(kiaNames);
-        
- 
+
+
         //now units
         String recoverUnits = "";
         String missUnits = "";
@@ -1393,34 +1393,34 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
         txtRecoveredUnits.setText(recoverUnits);
         txtMissingUnits.setText(missUnits);
-        
+
         //now salvage
         String salvageUnits = "";
         for(int i = 0; i < salvageBoxes.size(); i++) {
     		JCheckBox box = salvageBoxes.get(i);
     		if(box.isSelected()) {
     			salvageUnits += salvageables.get(i).getName() + "\n";
-    		} 
+    		}
     	}
         txtSalvage.setText(salvageUnits);
-        
+
         //now rewards
         String claimed = "";
         for(int i = 0; i < lootBoxes.size(); i++) {
             JCheckBox box = lootBoxes.get(i);
             if(box.isSelected()) {
                 claimed += loots.get(i).getShortDescription() + "\n";
-            } 
+            }
         }
         txtRewards.setText(claimed);
-        
+
     }
-    
+
     @SuppressWarnings("unused") // FIXME
 	private void showUnit(UUID id) {
     	showUnit(id, false);
     }
-    
+
     private void showUnit(UUID id, boolean salvage) {
         //TODO: I am not sure I like the pop up dialog, might just make this a view on this
         //dialog
@@ -1467,12 +1467,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
         dialog.setLocationRelativeTo(frame);
         dialog.setVisible(true);
     }
-    
+
     @SuppressWarnings("unused") // FIXME
 	private void editUnit(UUID id, int idx) {
     	editUnit(id, idx, false);
     }
-    
+
     private void editUnit(UUID id, int idx, boolean salvage) {
         UnitStatus ustatus = tracker.getUnitsStatus().get(id);
         if (salvage) {
@@ -1487,7 +1487,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         JLabel name = lblsUnitName.get(idx);
         name.setText(ustatus.getDesc());
     }
-    
+
     private class CheckTotalListener implements ItemListener {
 
         @Override
@@ -1497,14 +1497,14 @@ public class ResolveScenarioWizardDialog extends JDialog {
             btnsEditUnit.get(idx).setEnabled(!chksTotaled.get(idx).isSelected());
         }
     }
-    
+
     private class ViewUnitListener implements ActionListener {
     	boolean salvage = false;
-        
+
         public ViewUnitListener(boolean b) {
 			salvage = b;
 		}
-       
+
         public ViewUnitListener() {
 		}
 
@@ -1514,10 +1514,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
             showUnit(id, salvage);
         }
     }
-    
+
     private class EditUnitListener implements ActionListener {
     	boolean salvage = false;
-        
+
         public EditUnitListener(boolean b) {
 			salvage = b;
 		}

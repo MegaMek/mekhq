@@ -1,16 +1,16 @@
 /**
  *  This class listens for changes made to the data in the table via the
  *  TableCellEditor. When editing is started, the value of the cell is saved
- *  When editing is stopped the new value is saved. When the oold and new
+ *  When editing is stopped the new value is saved. When the old and new
  *  values are different, then the provided Action is invoked.
  *
  *  The source of the Action is a TableCellListener instance.
- *  
+ *
  *  @author Robert Camick
- *  
+ *
  *  @see <a href="http://tips4java.wordpress.com/2009/06/07/table-cell-listener/">http://tips4java.wordpress.com/2009/06/07/table-cell-listener/</a>
  *  @see <a href="http://www.camick.com/java/source/TableCellListener.java">http://www.camick.com/java/source/TableCellListener.java</a>
- *  
+ *
  */
 
 package mekhq.gui.utilities;
@@ -113,7 +113,7 @@ public class TableCellListener implements PropertyChangeListener, Runnable
   {
     return table;
   }
- 
+
   //
   //  Implement the PropertyChangeListener interface
   //
@@ -142,7 +142,7 @@ public class TableCellListener implements PropertyChangeListener, Runnable
 
     SwingUtilities.invokeLater(this);
   }
- 
+
   /*
    *  See above.
    */

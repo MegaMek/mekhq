@@ -142,7 +142,7 @@ public class AtBGameThread extends GameThread {
                 	entity.setOwner(client.getLocalPlayer()); 
                 	// Calculate deployment round
                 	int deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - entity.getWalkMP());
-                	if (null != scenario.getLance(campaign) && scenario.getLance(campaign).getRole() == Lance.ROLE_SCOUT) {
+                	if (scenario.getLanceRole() == Lance.ROLE_SCOUT) {
                 		deploymentRound = Math.max(deploymentRound, 6 - entity.getWalkMP());
                 	}
                 	entity.setDeployRound(deploymentRound);

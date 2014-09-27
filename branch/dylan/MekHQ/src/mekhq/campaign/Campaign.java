@@ -1855,9 +1855,12 @@ public class Campaign implements Serializable {
             		removePerson(dependents.get(Compute.randomInt(dependents.size())).getId());
             		change++;
             	}
-            	while (change > 0 && recruitPerson(newPerson(Person.T_ASTECH))) {
-            		change--;
-            	}
+    			for (int i = 0; i < change; i++) {
+    	    		Person p = newPerson(Person.T_ASTECH);
+    	    		p.setDependent(true);
+    	            p.setId(UUID.randomUUID());
+    	            addPersonWithoutId(p, true);
+    	    	}
             }
         	
         	for (Mission m : missions) {
@@ -1911,7 +1914,7 @@ public class Campaign implements Serializable {
         				((AtBContract)m).addPlayerMinorBreach();
         				addReport("Failure to deploy for " + s.getName() +
         						" resulted in defeat and a minor contract breach.");
-        			}
+        			} 
         		}
         	}
 
@@ -1933,8 +1936,7 @@ public class Campaign implements Serializable {
         			if (l.getRole() == Lance.ROLE_TRAINING) {
         				awardTrainingXP(l);
         			}
-        			if (l.getContract(this).getMoraleLevel() <= AtBContract.MORALE_VERYLOW ||
-        					l.getContract(this).enemyIsRouted(getDate())) {
+        			if (l.getContract(this).getMoraleLevel() <= AtBContract.MORALE_VERYLOW) {
         				continue;
         			}
         			AtBScenario scenario = l.checkForBattle(this);
@@ -2022,16 +2024,6 @@ public class Campaign implements Serializable {
         		for (AtBScenario s : sList) {
         			addScenario(s, missionIds.get(s.getMissionId()));
         			s.setForces(this);
-        			if (null != lances.get(s.getLanceForceId())) {
-        				forceIds.get(s.getLanceForceId()).setScenarioId(s.getId());
-        				s.addForces(s.getLanceForceId());
-        				for (UUID uid : forceIds.get(s.getLanceForceId()).getAllUnits()) {
-        					Unit u = getUnit(uid);
-        					if (null != u) {
-        						u.setScenarioId(s.getId());
-        					}
-        				}
-        			}
         		}
         	}
         	
@@ -2039,6 +2031,25 @@ public class Campaign implements Serializable {
         		if (m.isActive() && m instanceof AtBContract &&
         				!((AtBContract)m).getStartDate().after(getDate())) {
         			((AtBContract)m).checkEvents(this);
+        		}
+        		/* If there is a standard battle set for today, deploy
+        		 * the lance.
+        		 */
+        		for (Scenario s : m.getScenarios()) {
+        			if (s.getDate().equals(calendar.getTime())) {
+        				int forceId = ((AtBScenario)s).getLanceForceId();
+        				if (null != lances.get(forceId)
+        						&& !forceIds.get(forceId).isDeployed()) {
+        					forceIds.get(forceId).setScenarioId(s.getId());
+        					s.addForces(forceId);
+        					for (UUID uid : forceIds.get(forceId).getAllUnits()) {
+        						Unit u = getUnit(uid);
+        						if (null != u) {
+        							u.setScenarioId(s.getId());
+        						}
+        					}
+        				}
+        			}
         		}
         	}
         }
@@ -5302,8 +5313,8 @@ public class Campaign implements Serializable {
         if (getCampaignOptions().getUseAtB() &&
         		getCampaignOptions().getRestrictPartsByMission() &&
         		acquisition instanceof Part) {
-        	int partAvailability = ((Part)acquisition).getAvailability(getEra());
-    		megamek.common.EquipmentType et = null;
+        	int partAvailability = ((Part)acquisition).getAvailability(Era.convertEra(getEra()));
+    		EquipmentType et = null;
     		if (acquisition instanceof EquipmentPart) {
     			et = ((EquipmentPart)acquisition).getType();
     		} else if (acquisition instanceof MissingEquipmentPart) {
@@ -5315,7 +5326,7 @@ public class Campaign implements Serializable {
         	 */
         	if (acquisition.getTechBase() == Part.T_CLAN
         			&& !getFaction().isClan()) {
-        		partAvailability = Math.max(partAvailability, megamek.common.EquipmentType.RATING_F);
+        		partAvailability = Math.max(partAvailability, EquipmentType.RATING_F);
         	} else if (et != null) {
         		/* AtB rules do not simply affect difficulty of obtaining parts,
         		 * but whether they can be obtained at all. Changing the system
@@ -5327,8 +5338,8 @@ public class Campaign implements Serializable {
         		 */
         		if (et instanceof megamek.common.weapons.EnergyWeapon
         				&& !(et instanceof megamek.common.weapons.FlamerWeapon)
-        				&& partAvailability < megamek.common.EquipmentType.RATING_C) {
-        			partAvailability = megamek.common.EquipmentType.RATING_C;
+        				&& partAvailability < EquipmentType.RATING_C) {
+        			partAvailability = EquipmentType.RATING_C;
         		}
         		if (et instanceof megamek.common.weapons.ACWeapon) {
         			partAvailability -= 2;
@@ -5352,7 +5363,8 @@ public class Campaign implements Serializable {
                 
         	}
         	
-            if (Era.convertEra(getEra()) != EquipmentType.ERA_SW &&
+            if ((getCalendar().get(Calendar.YEAR) < 2950
+            		|| getCalendar().get(Calendar.YEAR) > 3040)  &&
             		(acquisition instanceof Armor
     				|| acquisition instanceof MissingMekActuator
     				|| acquisition instanceof mekhq.campaign.parts.MissingMekCockpit

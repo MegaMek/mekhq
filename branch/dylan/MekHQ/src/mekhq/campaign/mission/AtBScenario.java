@@ -175,7 +175,10 @@ public class AtBScenario extends Scenario {
 	
 	private int battleType;
 	private boolean attacker;
-	private int lanceForceId;
+	private int lanceForceId; // -1 if scenario is not generated for a specific lance (special mission, big battle)
+	private int lanceRole; /* set when scenario is created in case it is changed for the next week before the scenario is resolved;
+							specifically affects scenarios generated for scout lances, in which the deployment may be delayed
+							for slower units */
 	private int terrainType;
 	private int light;
 	private int weather;
@@ -223,6 +226,7 @@ public class AtBScenario extends Scenario {
 	public AtBScenario () {
 		super();
 		lanceForceId = -1;
+		lanceRole = Lance.ROLE_UNASSIGNED;
 		alliesPlayer = new ArrayList<Entity>();
 		botForces = new ArrayList<BotForce>();
 		alliesPlayerStub = new ArrayList<String>();
@@ -246,11 +250,7 @@ public class AtBScenario extends Scenario {
 		super(battleTypes[type] + (attacker?" (Attacker)":" (Defender)"));
 		battleType = type;
 		this.attacker = attacker;
-		if (null == lance) {
-			lanceForceId = -1;
-		} else {
-			this.lanceForceId = lance.getForceId();
-		}
+
 		alliesPlayer = new ArrayList<Entity>();
 		botForces = new ArrayList<BotForce>();
 		alliesPlayerStub = new ArrayList<String>();
@@ -258,8 +258,15 @@ public class AtBScenario extends Scenario {
 		attachedUnits = new ArrayList<UUID>();
 		survivalBonus = new ArrayList<UUID>();
 		entityIds = new HashMap<UUID, Entity>();
-		if (null != lance) {
+
+		if (null == lance) {
+			lanceForceId = -1;
+			lanceRole = Lance.ROLE_UNASSIGNED;
+		} else {
+			this.lanceForceId = lance.getForceId();
+			lanceRole = lance.getRole();
 			setMissionId(lance.getMissionId());
+
 			for (UUID id : c.getForce(lance.getForceId()).getAllUnits()) {
 				entityIds.put(id, c.getUnit(id).getEntity());
 			}
@@ -278,17 +285,22 @@ public class AtBScenario extends Scenario {
 		initBattle(c);
 	}
 
-	private void initBattle(Campaign c) {
+	/**
+	 * Determines battle conditions: terrain, weather, map.
+	 * 
+	 * @param campaign
+	 */
+	private void initBattle(Campaign campaign) {
 		setTerrain();
-		if (c.getCampaignOptions().getUseLightConditions()) {
+		if (campaign.getCampaignOptions().getUseLightConditions()) {
 			setLightConditions();
 		}
-		if (c.getCampaignOptions().getUseWeatherConditions()) {
+		if (campaign.getCampaignOptions().getUseWeatherConditions()) {
 			setWeather();
 		}
-		if (c.getCampaignOptions().getUsePlanetaryConditions() &&
-				null != c.getMission(getId())) {
-			Planet p = Planets.getInstance().getPlanets().get(c.getMission(getId()).getPlanetName());
+		if (campaign.getCampaignOptions().getUsePlanetaryConditions() &&
+				null != campaign.getMission(getId())) {
+			Planet p = Planets.getInstance().getPlanets().get(campaign.getMission(getId()).getPlanetName());
 			if (null != p) {
 				atmosphere = p.getPressure();
 				gravity = (float)p.getGravity();
@@ -302,10 +314,10 @@ public class AtBScenario extends Scenario {
 			lanceCount = 2;
 		}
 
-		if (null != getLance(c)) {
-			getLance(c).refreshCommander(c);
-			if (null != getLance(c).getCommander(c).getSkill(SkillType.S_TACTICS)) {
-				rerollsRemaining = getLance(c).getCommander(c).getSkill(SkillType.S_TACTICS).getLevel();
+		if (null != getLance(campaign)) {
+			getLance(campaign).refreshCommander(campaign);
+			if (null != getLance(campaign).getCommander(campaign).getSkill(SkillType.S_TACTICS)) {
+				rerollsRemaining = getLance(campaign).getCommander(campaign).getSkill(SkillType.S_TACTICS).getLevel();
 			}
 		}
 	}
@@ -515,8 +527,14 @@ public class AtBScenario extends Scenario {
 		return battleType != OFFICERDUEL && battleType != ACEDUEL;
 	}
 	
-	/* Determines whether an additional unit is qualified to deploy
-	 * to this scenario
+	/**
+	 * Determines whether a unit is eligible to deploy to the scenario. The 
+	 * default is true, but some special missions and big battles restrict
+	 * the participants.
+	 * 
+	 * @param unit
+	 * @param campaign
+	 * @return true if the unit is eligible, otherwise false
 	 */
 	public boolean canDeploy(Unit unit, Campaign campaign) {
 		final String[] antiRiotWeapons = {
@@ -569,39 +587,61 @@ public class AtBScenario extends Scenario {
 		return true;
 	}
 	
-	public boolean canDeploy(Force force, Campaign c) {
+	/**
+	 * Determines whether a force is eligible to deploy to a scenario by
+	 * checking all units contained in the force
+	 * 
+	 * @param force
+	 * @param campaign
+	 * @return true if the force is eligible to deploy, otherwise false
+	 */
+	public boolean canDeploy(Force force, Campaign campaign) {
 		Vector<UUID> units = force.getAllUnits();
 		if (battleType >= BIGBATTLES &&
-				getForces(c).getAllUnits().size() + units.size() > 8) {
+				getForces(campaign).getAllUnits().size() + units.size() > 8) {
 			return false;
 		} else if (battleType >= SPECIALMISSIONS &&
-				getForces(c).getAllUnits().size() + units.size() > 0) {
+				getForces(campaign).getAllUnits().size() + units.size() > 0) {
 			return false;
 		}
 		for (UUID id : units) {
-			if (!canDeploy(c.getUnit(id), c)) {
+			if (!canDeploy(campaign.getUnit(id), campaign)) {
 				return false;
 			}
 		}
 		return true;
 	}
 	
-	public boolean canDeployUnits(Vector<Unit> units, Campaign c) {
+	/**
+	 * Determines whether a list of units is eligible to deploy to the scenario.
+	 * 
+	 * @param units
+	 * @param campaign
+	 * @return true if all units in the list are eligible, otherwise false
+	 */
+	public boolean canDeployUnits(Vector<Unit> units, Campaign campaign) {
 		if (battleType >= BIGBATTLES &&
-				getForces(c).getAllUnits().size() + units.size() > 8) {
+				getForces(campaign).getAllUnits().size() + units.size() > 8) {
 			return false;
 		} else if (battleType >= SPECIALMISSIONS && battleType < BIGBATTLES &&
-				getForces(c).getAllUnits().size() + units.size() > 1) {
+				getForces(campaign).getAllUnits().size() + units.size() > 1) {
 			return false;
 		}
 		for (Unit unit : units) {
-			if (!canDeploy(unit, c)) {
+			if (!canDeploy(unit, campaign)) {
 				return false;
 			}
 		}
 		return true;
 	}
 	
+	/**
+	 * Determines whether a list of forces is eligible to deploy to the scenario.
+	 * 
+	 * @param units
+	 * @param campaign
+	 * @return true if all units in all forces in the list are eligible, otherwise false
+	 */
 	public boolean canDeployForces(Vector<Force> forces, Campaign c) {
 		int total = 0;
 		for (Force force : forces) {
@@ -630,15 +670,18 @@ public class AtBScenario extends Scenario {
 		return true;
 	}
 	
-	/* Corrects the enemy (special missions) and allies (big battles)
+	/**
+	 * Corrects the enemy (special missions) and allies (big battles)
 	 * as necessary based on player deployments. This ought to be called
 	 * when the scenario details are displayed or the scenario is started.
+	 * 
+	 * @param campaign
 	 */
-	public void refresh(Campaign c) {
+	public void refresh(Campaign campaign) {
 		if (battleType < SPECIALMISSIONS) {
 			return;
 		}
-		Vector<UUID> deployed = getForces(c).getAllUnits();
+		Vector<UUID> deployed = getForces(campaign).getAllUnits();
 		if (battleType >= BIGBATTLES) {
 			int numAllies = Math.min(4, 8 - deployed.size());
 			alliesPlayer.clear();
@@ -649,25 +692,44 @@ public class AtBScenario extends Scenario {
 			if (deployed.size() == 0) {
 				return;
 			}
-			int weight = c.getUnit(deployed.get(0)).getEntity().getWeightClass() - 1;
+			int weight = campaign.getUnit(deployed.get(0)).getEntity().getWeightClass() - 1;
 			botForces.get(0).setEntityList(specMissionEnemies.get(weight));
 		}
 	}
 	
-	public void setForces(Campaign c) {
+	/**
+	 * Determines enemy and allied forces for the scenario. The forces for a standard
+	 * battle are based on the player's deployed lance. The enemy forces for
+	 * special missions depend on the weight class of the player's deployed
+	 * unit and the number of allies in big battles varies according to the
+	 * number the player deploys. Since the various possibilities are rather
+	 * limited, all possibilities are generated and the most appropriate is
+	 * chosen rather than rerolling every time the player changes. This is
+	 * both for efficiency and to prevent shopping.
+	 * 
+	 * @param campaign
+	 */
+	public void setForces(Campaign campaign) {
 		if (battleType < SPECIALMISSIONS) {
-			setStandardBattleForces(c);
+			setStandardBattleForces(campaign);
 		} else if (battleType < BIGBATTLES) {
-			setSpecialMissionForces(c);
+			setSpecialMissionForces(campaign);
 		} else {
-			setBigBattleForces(c);
+			setBigBattleForces(campaign);
 		}
 	}
 	
+	/**
+	 * Generates attached allied units (bot or player controlled), the main
+	 * enemy force, any enemy reinforcements, and any additional forces
+	 * (such as civilian).
+	 * 
+	 * @param campaign
+	 */
 	private void setStandardBattleForces(Campaign campaign) {
 		/* Find the number of attached units required by the command rights clause */
 		int attachedUnitWeight = UnitTableData.WT_MEDIUM;
-		if (getLance(campaign).getRole() == Lance.ROLE_SCOUT || getLance(campaign).getRole() == Lance.ROLE_TRAINING) {
+		if (lanceRole == Lance.ROLE_SCOUT || lanceRole == Lance.ROLE_TRAINING) {
 			attachedUnitWeight = UnitTableData.WT_LIGHT;
 		}
 		int numAttachedPlayer = 0;
@@ -929,7 +991,7 @@ public class AtBScenario extends Scenario {
 				botForces.add(getAllyBotForce(getContract(campaign), start, playerHome, allyBot));
 			}
 			addEnemyForce(enemy, getLance(campaign).getWeightClass(campaign),
-					UnitTableData.WT_MEDIUM, 0, 0, campaign);
+					attacker?UnitTableData.WT_ASSAULT:UnitTableData.WT_MEDIUM, 0, 0, campaign);
 			botForces.add(getEnemyBotForce(getContract(campaign), enemyStart, enemyHome, enemy));
 			break;			
 		case BASEATTACK:
@@ -1043,6 +1105,12 @@ public class AtBScenario extends Scenario {
 		}
 	}
 	
+	/**
+	 * Generate four sets of forces: one for each weight class the player
+	 * can choose to deploy.
+	 * 
+	 * @param campaign
+	 */
 	private void setSpecialMissionForces(Campaign campaign) {
 		//enemy must always be the first on the botforce list so we can find it on refresh()
 		specMissionEnemies = new ArrayList<ArrayList<Entity>>();
@@ -1226,6 +1294,12 @@ public class AtBScenario extends Scenario {
 		}
 	}
 
+	/**
+	 * Generates enemy forces and four allied units that may be used if the player
+	 * deploys fewer than eight of his or her own units.
+	 * 
+	 * @param campaign
+	 */
 	private void setBigBattleForces(Campaign campaign) {
 		ArrayList<Entity> enemy = new ArrayList<Entity>();
 		ArrayList<Entity> otherForce;
@@ -1384,123 +1458,203 @@ public class AtBScenario extends Scenario {
 		addEnemyForce(list, weightClass, UnitTableData.WT_ASSAULT, 0, 0, c);
 	}
 	
+	/**
+	 * Generates the enemy force based on the weight class of the lance deployed
+	 * by the player. Certain scenario types may set a maximum weight class for
+	 * enemy units or modify the roll.
+	 * 
+	 * @param list			All generated enemy entities are added to this list.
+	 * @param weightClass	The weight class of the player's lance.
+	 * @param maxWeight		The maximum weight class of each generated enemy entity
+	 * @param rollMod		Modifier to the enemy lances roll.
+	 * @param weightMod		Modifier to the weight class of enemy lances.
+	 * @param campaign
+	 */
 	private void addEnemyForce(ArrayList<Entity> list, int weightClass,
-			int maxWeight, int rollMod, int weightMod, Campaign c) {
+			int maxWeight, int rollMod, int weightMod, Campaign campaign) {
 		int roll = Compute.randomInt(20) + 1;
-		roll += (c.getCampaignOptions().getSkillLevel() - 2) * 5;
+		roll += (campaign.getCampaignOptions().getSkillLevel() - 2) * 5;
 		roll += rollMod;
 		switch (weightClass) {
 		case EntityWeightClass.WEIGHT_ULTRA_LIGHT:
 		case EntityWeightClass.WEIGHT_LIGHT:
 			if (roll < 1) {
-				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, campaign);
 			} else if (roll <= 10) {
-				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, campaign);
 			} else if (roll < 17) {
-				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, campaign);
+				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
+					addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, campaign);
+				}
 			} else if (roll < 21) {
-				addEnemyLance(list, UnitTableData.WT_HEAVY + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_HEAVY + weightMod, maxWeight, campaign);
 			} else {
-				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, campaign);
+				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
+					addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, campaign);
+				}
 			}
 			break;
 		case EntityWeightClass.WEIGHT_MEDIUM:
 			if (roll < 1) {
-				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, campaign);
 			} else if (roll < 6) {
-				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, campaign);
+				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
+					addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, campaign);
+				}
 			} else if (roll < 11) {
-				addEnemyLance(list, UnitTableData.WT_HEAVY + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_HEAVY + weightMod, maxWeight, campaign);
 			} else if (roll < 21) {
-				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, campaign);
+				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
+					addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, campaign);
+				}
 			} else {
-				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, campaign);
+				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
+					addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, campaign);
+				}
 			}
 			break;
 		case EntityWeightClass.WEIGHT_HEAVY:
 			if (roll < 1) {
-				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, campaign);
+				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
+					addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, campaign);
+				}
 			} else if (roll < 4) {
-				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, campaign);
+				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
+					addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, campaign);
+				}
+				if (campaign.getCampaignOptions().getSkillLevel() > 1) {
+					addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, campaign);
+				}
 			} else if (roll < 8) {
-				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, campaign);
+				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
+					addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, campaign);
+				}
 			} else if (roll < 10) {
-				addEnemyLance(list, UnitTableData.WT_ASSAULT + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_ASSAULT + weightMod, maxWeight, campaign);
 			} else if (roll < 13) {
-				addEnemyLance(list, UnitTableData.WT_HEAVY + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_HEAVY + weightMod, maxWeight, campaign);
+				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
+					addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, campaign);
+				}
 			} else if (roll < 17) {
-				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, campaign);
+				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
+					addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, campaign);
+				}
+				if (campaign.getCampaignOptions().getSkillLevel() > 1) {
+					addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, campaign);
+				}
 			} else if (roll < 21) {
-				addEnemyLance(list, UnitTableData.WT_HEAVY + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_HEAVY + weightMod, maxWeight, campaign);
+				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
+					addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, campaign);
+				}
 			} else {
-				addEnemyLance(list, UnitTableData.WT_HEAVY + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_HEAVY + weightMod, maxWeight, campaign);
+				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
+					addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, campaign);
+				}
+				if (campaign.getCampaignOptions().getSkillLevel() > 1) {
+					addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, campaign);
+				}
 			}
 			break;
 		case EntityWeightClass.WEIGHT_ASSAULT:
 		case EntityWeightClass.WEIGHT_SUPER_HEAVY:
 			if (roll < 1) {
-				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, campaign);
+				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
+					addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, campaign);
+				}
+				if (campaign.getCampaignOptions().getSkillLevel() > 1) {
+					addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, campaign);
+				}
 			} else if (roll < 5) {
-				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, campaign);
+				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
+					addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, campaign);
+				}
+				if (campaign.getCampaignOptions().getSkillLevel() > 1) {
+					addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, campaign);
+				}
 			} else if (roll < 8) {
-				addEnemyLance(list, UnitTableData.WT_HEAVY + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_HEAVY + weightMod, maxWeight, campaign);
+				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
+					addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, campaign);
+				}
+				if (campaign.getCampaignOptions().getSkillLevel() > 1) {
+					addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, campaign);
+				}
 			} else if (roll < 10) {
-				addEnemyLance(list, UnitTableData.WT_HEAVY + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_HEAVY + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_HEAVY + weightMod, maxWeight, campaign);
+				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
+					addEnemyLance(list, UnitTableData.WT_HEAVY + weightMod, maxWeight, campaign);
+				}
 			} else if (roll < 12) {
-				addEnemyLance(list, UnitTableData.WT_ASSAULT + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_ASSAULT + weightMod, maxWeight, campaign);
+				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
+					addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, campaign);
+				}
 			} else if (roll < 16) {
-				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, campaign);
+				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
+					addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, campaign);
+				}
+				if (campaign.getCampaignOptions().getSkillLevel() > 1) {
+					addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, campaign);
+				}
 			} else if (roll < 19) {
-				addEnemyLance(list, UnitTableData.WT_HEAVY + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_HEAVY + weightMod, maxWeight, campaign);
+				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
+					addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, campaign);
+				}
+				if (campaign.getCampaignOptions().getSkillLevel() > 1) {
+					addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, campaign);
+				}
 			} else if (roll < 21) {
-				addEnemyLance(list, UnitTableData.WT_ASSAULT + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_ASSAULT + weightMod, maxWeight, campaign);
+				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
+					addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, campaign);
+				}
 			} else {
-				addEnemyLance(list, UnitTableData.WT_ASSAULT + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, c);
-				addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, c);
+				addEnemyLance(list, UnitTableData.WT_ASSAULT + weightMod, maxWeight, campaign);
+				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
+					addEnemyLance(list, UnitTableData.WT_MEDIUM + weightMod, maxWeight, campaign);
+				}
+				if (campaign.getCampaignOptions().getSkillLevel() > 1) {
+					addEnemyLance(list, UnitTableData.WT_LIGHT + weightMod, maxWeight, campaign);
+				}
 			}
 			break;
 		}
 	}
 	
-	private void addEnemyLance(ArrayList<Entity> list, int weight, int maxWeight, Campaign c) {
+	/**
+	 * Generates an enemy lance of a given weight class.
+	 * 
+	 * @param list			Generated enemy entities are added to this list.
+	 * @param weight		Weight class of the enemy lance.
+	 * @param maxWeight		Maximum weight of enemy entities.
+	 * @param campaign
+	 */
+	private void addEnemyLance(ArrayList<Entity> list, int weight, int maxWeight, Campaign campaign) {
 		if (weight < UnitTableData.WT_LIGHT) {
 			weight = UnitTableData.WT_LIGHT;
 		}
 		if (weight > UnitTableData.WT_ASSAULT) {
 			weight = UnitTableData.WT_ASSAULT;
 		}
-		addLance(list, getContract(c).getEnemyCode(),
-				getContract(c).getEnemySkill(), getContract(c).getEnemyQuality(),
-				weight, maxWeight, c);
+		addLance(list, getContract(campaign).getEnemyCode(),
+				getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
+				weight, maxWeight, campaign);
 		lanceCount++;
 	}
 	
@@ -1551,16 +1705,36 @@ public class AtBScenario extends Scenario {
 		return dual?"Laser Turret (Dual) LL":"Laser Turret LL";
 	}
 	
-	private Entity getEntity(String faction, int skill, int quality, int unitType, int weightClass, Campaign c) {
-		UnitTableData.FactionTables ft = UnitTableData.getInstance().getBestRAT(c.getCampaignOptions().getRATs(), c.getCalendar().get(Calendar.YEAR), faction, unitType);
+	/**
+	 * Determines the most appropriate RAT and uses it to generate a random Entity
+	 * 
+	 * @param faction		The faction code to use for locating the correct RAT and assigning a crew name
+	 * @param skill			The RandomSkillGenerator constant that represents the skill level of the overall force.
+	 * @param quality		The equipment rating of the force.
+	 * @param unitType		The UnitTableData constant for the type of unit to generate.
+	 * @param weightClass	The weight class of the unit to generate
+	 * @param campaign
+	 * @return				A new Entity with crew.
+	 */
+	private Entity getEntity(String faction, int skill, int quality, int unitType, int weightClass, Campaign campaign) {
+		UnitTableData.FactionTables ft = UnitTableData.getInstance().getBestRAT(campaign.getCampaignOptions().getRATs(), campaign.getCalendar().get(Calendar.YEAR), faction, unitType);
 		if (null != ft) {
 			return getUnitFromRat(ft.getTable(unitType, weightClass, quality),
-					faction, skill, c);
+					faction, skill, campaign);
 		}
 		System.err.println("Error finding faction tables for " + faction + ", unit type " + unitType);
 		return null;
 	}
 	
+	/**
+	 * Generates an Entity and assigns skills and crew name
+	 * 
+	 * @param rat		The name of the RAT to pass to RandomUnitGenerator 
+	 * @param faction	The code for the faction to use in generating the crew name
+	 * @param skill		The skill level to pass to RandomSkillsGenerator
+	 * @param campaign
+	 * @return			A new Entity
+	 */
 	private Entity getUnitFromRat(String rat, String faction, int skill, Campaign campaign) {
 		Entity en = null;
 		MechSummary ms = null;
@@ -1644,6 +1818,15 @@ public class AtBScenario extends Scenario {
 		return en;
 	}
 	
+	/**
+	 * Generates a new Entity without using a RAT. Used for turrets and employer-assigned
+	 * Leopard Dropships.
+	 * 
+	 * @param name			Full name (chassis + model) of the entity to generate.
+	 * @param fName			Faction code to use for crew name generation
+	 * @param campaign
+	 * @return				A new Entity
+	 */
 	private Entity getEntityByName(String name, String fName, Campaign campaign) {
 		Entity en = Campaign.getBrandNewUndamagedEntity(name);
 		
@@ -1675,18 +1858,14 @@ public class AtBScenario extends Scenario {
 		return en;
 	}
 	
-	private void addLance(ArrayList<Entity> list, String faction,
-			int skill, int quality, int weightClass, Campaign c) {
-		addLance(list, faction, skill, quality, weightClass,
-				UnitTableData.WT_ASSAULT, c, 0);
-	}
-	
-	private void addLance(ArrayList<Entity> list, String faction,
-			int skill, int quality, int weightClass, int maxWeight, Campaign c) {
-		addLance(list, faction, skill, quality, weightClass,
-				maxWeight, c, 0);
-	}
-	
+	/**
+	 * Units that exceed the maximum weight for individual entities in the scenario
+	 * are replaced in the lance by two lighter units.
+	 * 
+	 * @param weights		A string of single-character letter codes for the weights of the units in the lance (e.g. "LMMH")
+	 * @param maxWeight		The maximum weight allowed for the force by the parameters of the scenario type
+	 * @return				A new String of the same format as weights 
+	 */
 	private String adjustForMaxWeight(String weights, int maxWeight) {
 		String retVal = weights;
 		if (maxWeight == UnitTableData.WT_HEAVY) {
@@ -1700,7 +1879,18 @@ public class AtBScenario extends Scenario {
 		return retVal;
 	}
 	
+	/**
+	 * Adjust weights of units in a lance for factions that do not fit the typical
+	 * weight distribution.
+	 * 
+	 * @param weights		A string of single-character letter codes for the weights of the units in the lance (e.g. "LMMH")
+	 * @param faction		The code of the faction to which the force belongs.
+	 * @return				A new String of the same format as weights 
+	 */
 	private String adjustWeightsForFaction(String weights, String faction) {
+		/* Official AtB rules only specify DC, LA, and FWL; I have added
+		 * variations for some Clans.
+		 */
 		String retVal = weights;
 		if (faction.equals("DC")) {
 			retVal = weights.replaceFirst("MM", "LH");
@@ -1716,6 +1906,34 @@ public class AtBScenario extends Scenario {
 		return retVal;
 	}
 	
+	/*
+	 * Convenience functions overloaded to provide default values.
+	 */
+	private void addLance(ArrayList<Entity> list, String faction,
+			int skill, int quality, int weightClass, Campaign campaign) {
+		addLance(list, faction, skill, quality, weightClass,
+				UnitTableData.WT_ASSAULT, campaign, 0);
+	}
+	
+	private void addLance(ArrayList<Entity> list, String faction,
+			int skill, int quality, int weightClass, int maxWeight, Campaign c) {
+		addLance(list, faction, skill, quality, weightClass,
+				maxWeight, c, 0);
+	}
+	
+	/**
+	 * 
+	 * Generates a lance of the indicated weight class. If the faction is Clan,
+	 * calls addStar instead. If the faction is CS/WoB, calls addLevelII.
+	 * 
+	 * @param list			Generated Entities are added to this list.
+	 * @param faction		The faction code to use in generating the Entity
+	 * @param skill			The overall skill level of the force
+	 * @param quality		The force's equipment level
+	 * @param weightClass	The weight class of the lance or equivalent to generate
+	 * @param campaign
+	 * @param arrivalTurn	The turn in which the Lance is deployed in the scenario.
+	 */
 	private void addLance(ArrayList<Entity> list, String faction, int skill, int quality, int weightClass,
 			int maxWeight, Campaign campaign, int arrivalTurn) {
 		if (Faction.getFaction(faction).isClan()) {
@@ -1731,12 +1949,20 @@ public class AtBScenario extends Scenario {
 				maxWeight);
 		
 		int forceType = FORCE_MEK;
-			if (campaign.getCampaignOptions().getUseVehicles()) {
-			int roll = Compute.d6();
-			if (roll < 4) {
-				forceType = FORCE_VEHICLE;
-			} else if (roll < 6) {
-				forceType = FORCE_MIXED;
+		if (campaign.getCampaignOptions().getUseVehicles()) {
+			int totalWeight = campaign.getCampaignOptions().getOpforLanceTypeMechs() +
+					campaign.getCampaignOptions().getOpforLanceTypeMixed() +
+					campaign.getCampaignOptions().getOpforLanceTypeVehicles();
+			if (totalWeight <= 0) {
+				forceType = FORCE_MEK;
+			} else {
+				int roll = Compute.randomInt(totalWeight);
+				if (roll < campaign.getCampaignOptions().getOpforLanceTypeVehicles()) {
+					forceType = FORCE_VEHICLE;
+				} else if (roll < campaign.getCampaignOptions().getOpforLanceTypeVehicles() +
+						campaign.getCampaignOptions().getOpforLanceTypeMixed()) {
+					forceType = FORCE_MIXED;
+				}
 			}
 		}
 		if (forceType == FORCE_MEK && campaign.getCampaignOptions().getRegionalMechVariations()) {
@@ -1781,6 +2007,17 @@ public class AtBScenario extends Scenario {
 		}
 	}
 	
+	/**
+	 * Generates a Star of the indicated weight class.
+	 * 
+	 * @param list			Generated Entities are added to this list.
+	 * @param faction		The faction code to use in generating the Entity
+	 * @param skill			The overall skill level of the force
+	 * @param quality		The force's equipment level
+	 * @param weightClass	The weight class of the lance or equivalent to generate
+	 * @param campaign
+	 * @param arrivalTurn	The turn in which the Lance is deployed in the scenario.
+	 */
 	private void addStar(ArrayList<Entity> list, String faction, int skill, int quality, int weightClass, int maxWeight, Campaign campaign, int arrivalTurn) {
 		int forceType = FORCE_MEK;
 		/* 1 chance in 12 of a Nova, per AtB rules; CHH/CSL
@@ -1869,6 +2106,17 @@ public class AtBScenario extends Scenario {
 		}
 	}
 	
+	/**
+	 * Generates a ComStar/WoB Level II of the indicated weight class.
+	 * 
+	 * @param list			Generated Entities are added to this list.
+	 * @param faction		The faction code to use in generating the Entity
+	 * @param skill			The overall skill level of the force
+	 * @param quality		The force's equipment level
+	 * @param weightClass	The weight class of the lance or equivalent to generate
+	 * @param campaign
+	 * @param arrivalTurn	The turn in which the Lance is deployed in the scenario.
+	 */
 	private void addLevelII(ArrayList<Entity> list, String faction, int skill, int quality, int weightClass,
 			int maxWeight, Campaign campaign, int arrivalTurn) {
 		String weights = adjustForMaxWeight(lanceWeights[2][weightClass][Compute.d6() - 1],
@@ -1920,6 +2168,14 @@ public class AtBScenario extends Scenario {
 		}
 	}
 	
+	/**
+	 * Translates character code in the indicated position to the appropriate weight
+	 * class constant.
+	 * 
+	 * @param s		A String of single-character codes that indicate the weight classes of the units in a lance (e.g. "LMMH")
+	 * @param i		The index of the code to be translated
+	 * @return		The value used by UnitTableData to find the correct RAT for the weight class
+	 */
 	private int decodeWeightStr(String s, int i) {
 		switch (s.charAt(i)) {
 		case 'L': return UnitTableData.WT_LIGHT;
@@ -1930,9 +2186,16 @@ public class AtBScenario extends Scenario {
 		return 0;
 	}
 
-	private void addCivilianUnits(ArrayList<Entity> list, int num, Campaign c) {
+	/**
+	 * Generates the indicated number of civilian entities.
+	 * 
+	 * @param list		Generated entities are added to this list
+	 * @param num		The number of civilian entities to generate
+	 * @param campaign
+	 */
+	private void addCivilianUnits(ArrayList<Entity> list, int num, Campaign campaign) {
 		for (int i = 0; i < num; i++) {
-			list.add(getUnitFromRat("CivilianUnits", "IND", RandomSkillsGenerator.L_GREEN, c));
+			list.add(getUnitFromRat("CivilianUnits", "IND", RandomSkillsGenerator.L_GREEN, campaign));
 		}
 	}
 	
@@ -2016,6 +2279,7 @@ public class AtBScenario extends Scenario {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "battleType", battleType);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "attacker", attacker);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "lanceForceId", lanceForceId);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "lanceRole", lanceRole);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "terrainType", terrainType);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "light", light);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "weather", weather);
@@ -2166,6 +2430,8 @@ public class AtBScenario extends Scenario {
 				attacker = Boolean.parseBoolean(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("lanceForceId")) {
 				lanceForceId = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("lanceRole")) {
+				lanceRole = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("terrainType")) {
 				terrainType = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("light")) {
@@ -2235,7 +2501,7 @@ public class AtBScenario extends Scenario {
 				NodeList nl2 = wn2.getChildNodes();
 				for (int i = 0; i < nl2.getLength(); i++) {
 					Node wn3 = nl2.item(i);
-					if (wn3.getNodeName().equalsIgnoreCase("weight")) {
+					if (wn3.getNodeName().equalsIgnoreCase("playerWeight")) {
 						int weightClass = Integer.parseInt(wn3.getAttributes().getNamedItem("class").getTextContent());
 						NodeList nl3 = wn3.getChildNodes();
 						for (int j = 0; j < nl3.getLength(); j++) {
@@ -2243,13 +2509,15 @@ public class AtBScenario extends Scenario {
 							if (wn4.getNodeName().equalsIgnoreCase("entity")) {
 								Entity en = null;
 								try {
-									en = MekHqXmlUtil.getEntityFromXmlString(wn3);
+									en = MekHqXmlUtil.getEntityFromXmlString(wn4);
 								} catch (Exception e) {
 									MekHQ.logError("Error loading allied unit in scenario");
 									MekHQ.logError(e);
 								}
-								specMissionEnemies.get(weightClass).add(en);
-								entityIds.put(UUID.fromString(en.getExternalIdAsString()), en);
+								if (null != en) {
+									specMissionEnemies.get(weightClass).add(en);
+									entityIds.put(UUID.fromString(en.getExternalIdAsString()), en);
+								}
 							}
 						}
 					}
@@ -2315,6 +2583,10 @@ public class AtBScenario extends Scenario {
 	
 	public int getLanceForceId() {
 		return lanceForceId;
+	}
+	
+	public int getLanceRole() {
+		return lanceRole;
 	}
 	
 	public Lance getLance(Campaign c) {
@@ -2626,7 +2898,9 @@ public class AtBScenario extends Scenario {
 
 			pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<entities>");
 			for (Entity en : entityList) {
-				pw1.println(writeEntityWithCrewToXmlString(en, indent + 2, entityList));
+				if (en != null) {
+					pw1.println(writeEntityWithCrewToXmlString(en, indent + 2, entityList));
+				}
 			}
 			pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</entities>");
 			

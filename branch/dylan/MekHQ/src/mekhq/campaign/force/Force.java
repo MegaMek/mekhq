@@ -340,11 +340,11 @@ public class Force implements Serializable {
 				+"</desc>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<iconCategory>"
-				+iconCategory
+				+MekHqXmlUtil.escape(iconCategory)
 				+"</iconCategory>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<iconFileName>"
-				+iconFileName
+				+MekHqXmlUtil.escape(iconFileName)
 				+"</iconFileName>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<scenarioId>"

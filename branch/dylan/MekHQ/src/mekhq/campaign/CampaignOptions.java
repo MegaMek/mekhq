@@ -199,9 +199,13 @@ public class CampaignOptions implements Serializable {
     private int skillLevel;
     private boolean doubleVehicles;
     private boolean adjustPlayerVehicles;
+    private int opforLanceTypeMechs;
+    private int opforLanceTypeMixed;
+    private int opforLanceTypeVehicles;
     private boolean regionalMechVariations;
     private boolean aeroRecruitsHaveUnits;
     private boolean useShareSystem;
+    private boolean sharesExcludeLargeCraft;
     private boolean sharesForAll;
     private boolean retirementRolls;
     private boolean customRetirementMods;
@@ -377,10 +381,14 @@ public class CampaignOptions implements Serializable {
     	clanVehicles = false;
     	doubleVehicles = true;
         adjustPlayerVehicles = false;
+        opforLanceTypeMechs = 1;
+        opforLanceTypeMixed = 2;
+        opforLanceTypeVehicles = 3;
     	useDropShips = false;
     	skillLevel = 2;
         aeroRecruitsHaveUnits = false;
         useShareSystem = false;
+        sharesExcludeLargeCraft = false;
         sharesForAll = false;
         retirementRolls = true;
         customRetirementMods = false;
@@ -1307,6 +1315,30 @@ public class CampaignOptions implements Serializable {
 		return adjustPlayerVehicles;
 	}
 	
+	public int getOpforLanceTypeMechs() {
+		return opforLanceTypeMechs;
+	}
+	
+	public void setOpforLanceTypeMechs(int weight) {
+		opforLanceTypeMechs = weight;
+	}
+	
+	public int getOpforLanceTypeMixed() {
+		return opforLanceTypeMixed;
+	}
+	
+	public void setOpforLanceTypeMixed(int weight) {
+		opforLanceTypeMixed = weight;
+	}
+	
+	public int getOpforLanceTypeVehicles() {
+		return opforLanceTypeVehicles;
+	}
+	
+	public void setOpforLanceTypeVehicles(int weight) {
+		opforLanceTypeVehicles = weight;
+	}
+	
 	public void setAdjustPlayerVehicles(boolean adjust) {
 		adjustPlayerVehicles = adjust;
 	}
@@ -1337,6 +1369,14 @@ public class CampaignOptions implements Serializable {
 
 	public boolean getUseShareSystem() {
 		return useShareSystem;
+	}
+	
+	public boolean getSharesExcludeLargeCraft() {
+		return sharesExcludeLargeCraft;
+	}
+	
+	public void setSharesExcludeLargeCraft(boolean exclude) {
+		sharesExcludeLargeCraft = exclude;
 	}
 	
 	public boolean getSharesForAll() {
@@ -1670,10 +1710,14 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanVehicles", clanVehicles);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "doubleVehicles", doubleVehicles);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "adjustPlayerVehicles", adjustPlayerVehicles);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforLanceTypeMechs", opforLanceTypeMechs);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforLanceTypeMixed", opforLanceTypeMixed);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforLanceTypeVehicles", opforLanceTypeVehicles);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useDropShips", useDropShips);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "skillLevel", skillLevel);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "aeroRecruitsHaveUnits", aeroRecruitsHaveUnits);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useShareSystem", useShareSystem);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "sharesExcludeLargeCraft", sharesExcludeLargeCraft);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "sharesForAll", sharesForAll);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "retirementRolls", retirementRolls);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "customRetirementMods", customRetirementMods);
@@ -2054,7 +2098,13 @@ public class CampaignOptions implements Serializable {
                 retVal.doubleVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("adjustPlayerVehicles")) {
                 retVal.adjustPlayerVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useDropShips")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("opforLanceTypeMechs")) {
+                retVal.opforLanceTypeMechs = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("opforLanceTypeMixed")) {
+                retVal.opforLanceTypeMixed = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("opforLanceTypeVehicles")) {
+                retVal.opforLanceTypeVehicles = Integer.parseInt(wn2.getTextContent().trim());
+           } else if (wn2.getNodeName().equalsIgnoreCase("useDropShips")) {
                 retVal.useDropShips = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("skillLevel")) {
                 retVal.skillLevel = Integer.parseInt(wn2.getTextContent().trim());
@@ -2062,6 +2112,8 @@ public class CampaignOptions implements Serializable {
                 retVal.aeroRecruitsHaveUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useShareSystem")) {
                 retVal.useShareSystem = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("sharesExcludeLargeCraft")) {
+                retVal.sharesExcludeLargeCraft = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("sharesForAll")) {
                 retVal.sharesForAll = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("retirementRolls")) {

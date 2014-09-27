@@ -247,17 +247,17 @@ public class ContractMarket implements Serializable {
 		if (contract.getMissionType() == AtBContract.MT_GARRISONDUTY) {
 			int numSubcontracts = 0;
 			for (Mission m : campaign.getMissions()) {
-				if (numSubcontracts >= unitRatingMod - 1) {
-					return;
-				}
 				if (m instanceof AtBContract &&
 						((AtBContract)m).getParentContract() == contract) {
 					numSubcontracts++;
 				}
+				if (numSubcontracts >= unitRatingMod - 1) {
+					return;
+				}
+				if (Compute.d6(2) >= 10) {
+					contracts.add(generateAtBSubcontract(campaign, contract, unitRatingMod));
+				}
 			}
-		}
-		if (Compute.d6(2) >= 10) {
-			contracts.add(generateAtBSubcontract(campaign, contract, unitRatingMod));
 		}
 	}
 	
@@ -359,6 +359,7 @@ public class ContractMarket implements Serializable {
 			AtBContract parent, int unitRatingMod) {
 		AtBContract contract = generateAtBContract(campaign,
 				parent.getEmployerCode(), unitRatingMod);
+		contract.setName("New Subcontract");
 		contract.setParentContract(parent);
         contract.initContractDetails(campaign);
 		lastId++;
