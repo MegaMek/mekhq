@@ -586,8 +586,10 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
         			"heir", payouts.get(pid).hasHeir());
         	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3,
         			"stolenUnit", payouts.get(pid).hasStolenUnit());
-        	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3,
-        			"stolenUnitId", payouts.get(pid).getStolenUnitId().toString());
+        	if (null != payouts.get(pid).getStolenUnitId()) {
+	        	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3,
+	        			"stolenUnitId", payouts.get(pid).getStolenUnitId().toString());
+        	}
         	pw1.println(MekHqXmlUtil.indentStr(indent + 2)
         			+ "</payout>");
         }

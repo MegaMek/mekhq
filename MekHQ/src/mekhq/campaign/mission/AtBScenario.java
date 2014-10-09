@@ -47,6 +47,7 @@ import megamek.common.IStartingPositions;
 import megamek.common.Mech;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
+import megamek.common.MechSummaryCache;
 import megamek.common.PlanetaryConditions;
 import megamek.common.Player;
 import megamek.common.UnitType;
@@ -341,8 +342,8 @@ public class AtBScenario extends Scenario {
 	}
 
 	public void setLightConditions() {
+		light = PlanetaryConditions.L_DAY;
 		if (battleType == OFFICERDUEL || battleType == ACEDUEL) {
-			light = PlanetaryConditions.L_DAY;
 			return;
 		}
 		int roll = Compute.randomInt(10) + 1;
@@ -354,10 +355,10 @@ public class AtBScenario extends Scenario {
 	}
 
 	public void setWeather() {
+		weather = PlanetaryConditions.WE_NONE;
+		wind = PlanetaryConditions.WI_NONE;
+		fog = PlanetaryConditions.FOG_NONE;
 		if (battleType == OFFICERDUEL || battleType == ACEDUEL) {
-			weather = PlanetaryConditions.WE_NONE;
-			wind = PlanetaryConditions.WI_NONE;
-			fog = PlanetaryConditions.FOG_NONE;
 			return;
 		}
 		int roll = Compute.randomInt(10) + 1;
@@ -1744,14 +1745,17 @@ public class AtBScenario extends Scenario {
 		}
 
 		RandomUnitGenerator.getInstance().setChosenRAT(rat);
-		ArrayList<MechSummary> msl = RandomUnitGenerator.getInstance().generate(1);
-		if (msl.size() > 0) {
-			ms = msl.get(0);
-		}
-		if (null == ms) {
-			MekHQ.logError("Unable to load summary from RAT " + rat + " while generating scenario");
-			return null;
-		}
+		do {
+			ArrayList<MechSummary> msl = RandomUnitGenerator.getInstance().generate(1);
+			if (msl.size() > 0) {
+				ms = msl.get(0);
+			}
+			if (null == ms) {
+				MekHQ.logError("Unable to load summary from RAT " + rat + " while generating scenario");
+				return null;
+			}
+		} while (!campaign.getCampaignOptions().getOpforUsesVTOLs() &&
+				ms.getUnitType().equals("VTOL"));
 
 		try {
 			en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
@@ -1828,7 +1832,24 @@ public class AtBScenario extends Scenario {
 	 * @return				A new Entity
 	 */
 	private Entity getEntityByName(String name, String fName, Campaign campaign) {
-		Entity en = Campaign.getBrandNewUndamagedEntity(name);
+        MechSummary mechSummary = MechSummaryCache.getInstance().getMech(
+                name);
+        if (mechSummary == null) {
+            return null;
+        }
+
+        MechFileParser mechFileParser = null;
+        try {
+            mechFileParser = new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName());
+        } catch (EntityLoadingException ex) {
+            MekHQ.logError(ex);
+            MekHQ.logError("Unable to load unit: " + name);
+        }
+        if (mechFileParser == null) {
+            return null;
+        }
+
+		Entity en = mechFileParser.getEntity();
 		
 		en.setOwner(campaign.getPlayer());
 		en.setGame(campaign.getGame());

@@ -3506,9 +3506,9 @@ public class CampaignGUI extends JPanel {
             return;
         }
         if (getCampaign().getRetirementDefectionTracker().getRetirees().size() > 0) {
-        	Object[] options = {"Show Retirement Dialog", "Cancel"};
+        	Object[] options = {"Show Payout Dialog", "Cancel"};
             if (JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(frame,
-                                          "You have former personnel that have not received their final payout.\nYou must deal with these payments before advancing the day.\nHere are some options:\n  - Sell off equipment to generate funds.\n  - Pay one or more personnel in equipment.\n  - Just cheat and use GM mode to edit the settlement.",
+            		"You have personnel who have left the unit or been killed in action but have not received their final payout.\nYou must deal with these payments before advancing the day.\nHere are some options:\n  - Sell off equipment to generate funds.\n  - Pay one or more personnel in equipment.\n  - Just cheat and use GM mode to edit the settlement.",
                                           "Unresolved Final Payments",
                                           JOptionPane.OK_CANCEL_OPTION,
                                           JOptionPane.WARNING_MESSAGE,
