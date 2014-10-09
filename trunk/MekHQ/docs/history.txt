@@ -170,6 +170,19 @@ v0.3.6 (SVN)
     Implements...
         Feature [feature-requests:#201]: [ATB] "Enemies use vehicle?" slider (Implements the
             basic request, but not the additional suggestions at this time)
++ Patch [34]: Against the Bot, 12th Patch
+    Fixes...
+        Bug [#584] Killed Soldiers in AtB render campaign unsaveable on autoresolve
+        Bug [#586]: Daily Log does not update for Mondays (NPE when training lance has a crewless unit).
+        Bug [#587]: Retirement bug (Campaign will not save when there are outstanding payments for retirees/KIAs).
+        Bug: EntityLoadingException when generating scenario with gun turrets or allied DropShip.
+        Bug: Rerolling battle conditions never changes to daylight or clear weather.
+        Bug: Does not track original unit even when option is set.
+        Bug: Using GM add on personnel market does not add unit (if any).
+        Bug: Successful JumpShip search generates crew member but not the ship.
+    Implements...
+        Display TN calculation for DS/JS search and report result in the daily log.
+        Option to exclude VTOLs from enemy force.
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4

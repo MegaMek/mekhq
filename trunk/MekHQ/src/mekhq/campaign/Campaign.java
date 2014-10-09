@@ -2417,9 +2417,9 @@ public class Campaign implements Serializable {
     
     private void awardTrainingXP(Lance l) {
 		for (UUID trainerId : forceIds.get(l.getForceId()).getAllUnits()) {
-			if (getUnit(trainerId).getCommander().getRank().isOfficer() &&
-					getUnit(trainerId).getEntity().getCrew().getGunnery() +
-					getUnit(trainerId).getEntity().getCrew().getPiloting() <= 6) {
+			if (getUnit(trainerId).getCommander() != null &&
+					getUnit(trainerId).getCommander().getRank().isOfficer() &&
+					getUnit(trainerId).getCommander().getExperienceLevel(false) > SkillType.EXP_REGULAR) {
 				for (UUID traineeId : forceIds.get(l.getForceId()).getAllUnits()) {
 					for (Person p : getUnit(traineeId).getCrew()) {
 						if (p.getExperienceLevel(false) < SkillType.EXP_REGULAR) {

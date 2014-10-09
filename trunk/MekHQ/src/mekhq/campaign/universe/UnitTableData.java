@@ -196,17 +196,17 @@ public class UnitTableData implements Serializable, ActionListener {
 			}
 			sorted.add(source);
 		}
-		/* A hack to deal with the lack of asfs in RATs before 3050 */
-		if (unitType == UNIT_AERO && year < 3050) {
+		/* A hack to deal with the lack of aero in RATs before 3050 */
+		if ((unitType == UNIT_AERO || unitType == UNIT_DROPSHIP) && year < 3050) {
 			for (String f : altFactions) {
-				if (hasRAT("War of 39", f, UNIT_AERO)) {
-					return getFirstRAT("War of 39", f, UNIT_AERO);
+				if (hasRAT("War of 39", f, unitType)) {
+					return getFirstRAT("War of 39", f, unitType);
 				}
 			}
 			String[] successorStates = {"CC", "DC", "FS", "FWL", "LA"};
 			return getFirstRAT("War of 39",
 					successorStates[Compute.randomInt(successorStates.length)],
-					UNIT_AERO);
+					unitType);
 		}
 		/* Sort the sources according to the earliest year that appears
 		 * in each; may miss some overlap but should be accurate in

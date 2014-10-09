@@ -430,7 +430,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         for (Unit unit : campaign.getUnits()) {
         	choiceOriginalUnit.addItem(unit);
         }
-        if (null == person.getOriginalUnitId()) {
+        if (null == person.getOriginalUnitId() || null == campaign.getUnit(person.getOriginalUnitId())) {
         	choiceOriginalUnit.setSelectedItem(null);
         } else {
         	choiceOriginalUnit.setSelectedItem(campaign.getUnit(person.getOriginalUnitId()));

@@ -1264,6 +1264,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         		+ "<originalUnitTech>"
         		+ originalUnitTech
         		+ "</originalUnitTech>");
+        if (originalUnitId != null) {
+	        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+	        		+ "<originalUnitId>"
+	        		+ originalUnitId.toString()
+	        		+ "</originalUnitId>");
+        }
        pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
     }
 
@@ -1487,6 +1493,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     retVal.originalUnitWeight = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitTech")) {
                     retVal.originalUnitTech = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitId")) {
+                    retVal.originalUnitId = UUID.fromString(wn2.getTextContent());
                 }
             }
 
