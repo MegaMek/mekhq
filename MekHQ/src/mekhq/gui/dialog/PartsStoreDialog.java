@@ -1,20 +1,20 @@
 /*
  * PartsStoreDialog.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -85,6 +85,7 @@ import mekhq.campaign.parts.VeeStabiliser;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.sorter.ShotsSorter;
 
 /**
  *
@@ -92,7 +93,7 @@ import mekhq.gui.CampaignGUI;
  */
 public class PartsStoreDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
-	
+
 	//parts filter groups
 	private static final int SG_ALL      = 0;
 	private static final int SG_ARMOR    = 1;
@@ -107,7 +108,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	private static final int SG_ACT      = 10;
 	private static final int SG_COCKPIT  = 11;
 	private static final int SG_NUM      = 12;
-	
+
     @SuppressWarnings("unused")
 	private Frame frame; // FIXME: Unused? Do we need it?
     private Campaign campaign;
@@ -117,7 +118,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	private TableRowSorter<PartsTableModel> partsSorter;
     boolean addToCampaign;
     Part selectedPart = null;
-	
+
     private JTable partsTable;
     private JScrollPane scrollPartsTable;
     private JPanel panFilter;
@@ -131,16 +132,16 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     private JButton btnBuy;
     private JButton btnUseBonusPart;
     private JButton btnClose;
-    
+
     /** Creates new form PartsStoreDialog */
     public PartsStoreDialog(boolean modal, CampaignGUI gui) {
     	this(gui.getFrame(), modal, gui, gui.getCampaign(), true);
     }
-    
+
     /** Creates new form PartsStoreDialog */
     public PartsStoreDialog(Frame frame, boolean modal, CampaignGUI gui, Campaign campaign, boolean add) {
         super(frame, modal);
-        this.frame = frame;  
+        this.frame = frame;
         this.campaignGUI = gui;
         this.campaign = campaign;
         this.addToCampaign = add;
@@ -153,19 +154,20 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     }
 
     private void initComponents() {
-    	
+
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsStoreDialog");
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("Form.title"));
-        
+
         getContentPane().setLayout(new BorderLayout());
-      
+
         partsTable = new JTable(partsModel);
 		partsTable.setName("partsTable"); // NOI18N
 		partsSorter = new TableRowSorter<PartsTableModel>(partsModel);
 		partsSorter.setComparator(PartsTableModel.COL_TARGET, new TargetSorter());
         partsSorter.setComparator(PartsTableModel.COL_COST, new FormattedNumberSorter());
+        partsSorter.setComparator(PartsTableModel.COL_DETAIL, new ShotsSorter());
         partsTable.setRowSorter(partsSorter);
 		TableColumn column = null;
         for (int i = 0; i < PartsTableModel.N_COL; i++) {
@@ -205,7 +207,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		c.gridx = 1;
 		c.weightx = 1.0;
 		panFilter.add(choiceParts, c);
-		
+
 		lblFilter = new JLabel(resourceMap.getString("lblFilter.text")); // NOI18N
         lblFilter.setName("lblFilter"); // NOI18N
         c.gridx = 0;
@@ -290,7 +292,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 			panButtons.setLayout(new GridBagLayout());
 			panButtons.add(btnBuyBulk, new GridBagConstraints());
 			panButtons.add(btnBuy, new GridBagConstraints());
-			if (campaign.getCampaignOptions().getUseAtB()) {				
+			if (campaign.getCampaignOptions().getUseAtB()) {
 				panButtons.add(btnUseBonusPart, new GridBagConstraints());
 			}
 			panButtons.add(btnAdd, new GridBagConstraints());
@@ -305,7 +307,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	            }
 	        });
             panButtons.add(btnAdd, new GridBagConstraints());
-            
+
             btnClose = new JButton("Cancel"); // NOI18N
 			btnClose.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -315,11 +317,11 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	        });
             panButtons.add(btnClose, new GridBagConstraints());
 		}
-		getContentPane().add(panButtons, BorderLayout.PAGE_END);		
+		getContentPane().add(panButtons, BorderLayout.PAGE_END);
 		this.setPreferredSize(new Dimension(700,600));
         pack();
     }
-    
+
     public void filterParts() {
         RowFilter<PartsTableModel, Integer> partsTypeFilter = null;
         final int nGroup = choiceParts.getSelectedIndex();
@@ -373,18 +375,18 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         			return part instanceof MekActuator || part instanceof ProtomekArmActuator || part instanceof ProtomekLegActuator;
         		} else if(nGroup == SG_COCKPIT) {
         			return part instanceof MekCockpit;
-        		} 
+        		}
         		return false;
         	}
         };
         partsSorter.setRowFilter(partsTypeFilter);
     }
 
-    
+
     private void addPart(boolean purchase, boolean bulk) {
     	addPart(purchase, bulk, false);
     }
-    
+
     private void addPart(boolean purchase, boolean bulk, boolean bonus) {
     	int row = partsTable.getSelectedRow();
 		if(row < 0) {
@@ -397,10 +399,10 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 			pcd.setVisible(true);
 			quantity = pcd.getValue();
 		}
-		
+
 		if(bonus) {
 			String report = selectedPart.getAcquisitionWork().find(0);
-			if (report.endsWith("0 days.")) {    			
+			if (report.endsWith("0 days.")) {
 				AtBContract contract = null;
 				for (Mission m : campaign.getMissions()) {
 					if (m.isActive() && m instanceof AtBContract &&
@@ -436,11 +438,11 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		}
 		selectedPart = partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
     }
-    
+
     public Part getPart() {
     	return selectedPart;
     }
-    
+
     public static String getPartsGroupName(int group) {
     	switch(group) {
     	case SG_ALL:
@@ -471,7 +473,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     		return "?";
     	}
     }
-    
+
     /**
 	 * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
 	 */
@@ -491,11 +493,11 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	    public final static int COL_TRANSIT   =  7;
 	    public final static int COL_QUEUE     =  8;
         public final static int N_COL          = 9;
-		
+
 		public PartsTableModel(ArrayList<Part> inventory) {
 			data = inventory;
 		}
-		
+
 		public int getRowCount() {
             return data.size();
         }
@@ -583,12 +585,12 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 			}
 			return "?";
 		}
-		
+
 		@Override
 		public boolean isCellEditable(int row, int col) {
 			return false;
 		}
-		
+
 		@Override
 		public Class<? extends Object> getColumnClass(int c) {
 			return getValueAt(0, c).getClass();
@@ -606,7 +608,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 			}
 			return parts;
 		}
-		
+
 		 public int getColumnWidth(int c) {
 	            switch(c) {
 	            case COL_NAME:
@@ -614,7 +616,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	        		return 100;
 	            case COL_COST:
 	            case COL_TARGET:
-	                return 40;  
+	                return 40;
 	            case COL_SUPPLY:
 	            case COL_TRANSIT:
 	            case COL_QUEUE:
@@ -623,7 +625,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	                return 15;
 	            }
 	        }
-	        
+
 	        public int getAlignment(int col) {
 	            switch(col) {
 	            case COL_COST:
@@ -677,13 +679,13 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 					int actualRow = table.convertRowIndexToModel(row);
 					setHorizontalAlignment(getAlignment(actualCol));
 					setToolTipText(getTooltip(actualRow, actualCol));
-					
+
 					return this;
 				}
 
 			}
 	}
-	
+
 	/**
      * A comparator for target numbers written as strings
      * @author Jay Lawson
@@ -707,7 +709,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
                 r0 = Integer.MIN_VALUE;
             } else {
                 r0 = Integer.parseInt(s0);
-            }   
+            }
             if(s1.equals("Impossible")) {
                 r1 = Integer.MAX_VALUE;
             }
@@ -718,12 +720,12 @@ public class PartsStoreDialog extends javax.swing.JDialog {
                 r1 = Integer.MIN_VALUE;
             } else {
                 r1 = Integer.parseInt(s1);
-            }   
+            }
             return ((Comparable<Integer>)r0).compareTo(r1);
 
         }
     }
-	
+
 	/**
 	 * A comparator for numbers that have been formatted with DecimalFormat
 	 * @author Jay Lawson
