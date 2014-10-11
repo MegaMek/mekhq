@@ -261,7 +261,7 @@ import mekhq.gui.sorter.BonusSorter;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.LevelSorter;
 import mekhq.gui.sorter.RankSorter;
-import mekhq.gui.sorter.ShotsSorter;
+import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.TargetSorter;
 import mekhq.gui.sorter.TaskSorter;
 import mekhq.gui.sorter.TechSorter;
@@ -1503,7 +1503,7 @@ public class CampaignGUI extends JPanel {
         partsTable = new JTable(partsModel);
         partsSorter = new TableRowSorter<PartsTableModel>(partsModel);
         partsSorter.setComparator(PartsTableModel.COL_COST, new FormattedNumberSorter());
-        partsSorter.setComparator(PartsTableModel.COL_DETAIL, new ShotsSorter());
+        partsSorter.setComparator(PartsTableModel.COL_DETAIL, new PartsDetailSorter());
         partsTable.setRowSorter(partsSorter);
         TableColumn column = null;
         for (int i = 0; i < PartsTableModel.N_COL; i++) {
