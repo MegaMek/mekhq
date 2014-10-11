@@ -7,7 +7,7 @@ import java.util.Comparator;
  * @author Dylan Myers
  * Comparator for comparing details in the warehouse and parts store
  */
-public class ShotsSorter implements Comparator<String> {
+public class PartsDetailSorter implements Comparator<String> {
 
     @Override
     public int compare(String s0, String s1) {

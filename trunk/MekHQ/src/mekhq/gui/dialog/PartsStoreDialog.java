@@ -85,7 +85,7 @@ import mekhq.campaign.parts.VeeStabiliser;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.sorter.ShotsSorter;
+import mekhq.gui.sorter.PartsDetailSorter;
 
 /**
  *
@@ -167,7 +167,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		partsSorter = new TableRowSorter<PartsTableModel>(partsModel);
 		partsSorter.setComparator(PartsTableModel.COL_TARGET, new TargetSorter());
         partsSorter.setComparator(PartsTableModel.COL_COST, new FormattedNumberSorter());
-        partsSorter.setComparator(PartsTableModel.COL_DETAIL, new ShotsSorter());
+        partsSorter.setComparator(PartsTableModel.COL_DETAIL, new PartsDetailSorter());
         partsTable.setRowSorter(partsSorter);
 		TableColumn column = null;
         for (int i = 0; i < PartsTableModel.N_COL; i++) {
