@@ -5311,6 +5311,7 @@ public class CampaignGUI extends JPanel {
             if (null != u.getEntity()) {
                 if (null == u.checkDeployment()) {
                     chosen.add(u);
+                    u.getEntity().getCrew().setSize(u.getActiveCrew().size()); // So MegaMek has correct crew sizes set
                 } else {
                     undeployed.append("\n")
                               .append(u.getName())

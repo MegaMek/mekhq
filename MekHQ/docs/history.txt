@@ -186,6 +186,7 @@ v0.3.6 (SVN)
 + Bug [#588]: Sorting parts by Detail is out of order
 + Bug [#499]: Not enough AsTech warning being calculated wrong
 + Bug [#666]: Repair bay : Right click -> assign all tasks does nothing.
++ Bug [#642]: MekHQ not passing correct crew size to MegaMek
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
