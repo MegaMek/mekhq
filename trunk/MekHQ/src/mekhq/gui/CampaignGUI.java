@@ -7015,7 +7015,7 @@ public class CampaignGUI extends JPanel {
                 menu.setEnabled(unit.isAvailable());
                 popup.add(menu);
                 // assign all tasks to a certain tech
-                menu = new JMenu("Assign all tasks");
+                /*menu = new JMenu("Assign all tasks");
                 i = 0;
                 for (Person tech : getCampaign().getTechs()) {
                     menuItem = new JMenuItem(tech.getFullName());
@@ -7029,7 +7029,7 @@ public class CampaignGUI extends JPanel {
                 if (menu.getItemCount() > 20) {
                     MenuScroller.setScrollerFor(menu, 20);
                 }
-                popup.add(menu);
+                popup.add(menu);*/
                 // swap ammo
                 menu = new JMenu("Swap ammo");
                 JMenu ammoMenu = null;
