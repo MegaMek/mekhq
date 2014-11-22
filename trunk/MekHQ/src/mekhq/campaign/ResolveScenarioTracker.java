@@ -68,7 +68,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
 /**
- * This object will be the main workforce for the scenario
+ * This object will be the main workhorse for the scenario
  * resolution wizard. It will keep track of information and be
  * fed back and forth between the various wizards
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -87,8 +87,8 @@ public class ResolveScenarioTracker {
 	ArrayList<Unit> units;
 	ArrayList<Loot> potentialLoot;
 	ArrayList<Loot> actualLoot;
-	Hashtable<UUID, PersonStatus> peopleStatus;
-	ArrayList<PersonStatus> newPeopleStatus;
+    Hashtable<UUID, PersonStatus> peopleStatus;
+    Hashtable<UUID, PersonStatus> prisonerStatus;
 	Hashtable<String, String> killCredits;
 
 	/* AtB */
@@ -118,8 +118,8 @@ public class ResolveScenarioTracker {
 		units = new ArrayList<Unit>();
 		potentialLoot = scenario.getLoot();
 		actualLoot = new ArrayList<Loot>();
-		peopleStatus = new Hashtable<UUID, PersonStatus>();
-		newPeopleStatus = new ArrayList<PersonStatus>();
+        peopleStatus = new Hashtable<UUID, PersonStatus>();
+        prisonerStatus = new Hashtable<UUID, PersonStatus>();
 		killCredits = new Hashtable<String, String>();
 		for(UUID uid : scenario.getForces(campaign).getAllUnits()) {
 			Unit u = campaign.getUnit(uid);
@@ -604,7 +604,7 @@ public class ResolveScenarioTracker {
 			status = new PersonStatus(p.getFullName(), "None", p.getHits());
 			status.setHits(p.getHits());
 			status.setCaptured(true);
-			peopleStatus.put(id, status);
+			prisonerStatus.put(id, status);
 		}
 	}
 
@@ -825,70 +825,113 @@ public class ResolveScenarioTracker {
 		}
 
 		//now lets update personnel
-		for(UUID pid : peopleStatus.keySet()) {
-			Person person = campaign.getPerson(pid);
-			if (person == null) {
-				for (Person p : newPilots) {
-					if (p != null && p.getId() == pid) {
-						person = p;
-						break;
-					}
-				}
-			}
-			PersonStatus status = peopleStatus.get(pid);
-			if(null == person || null == status) {
-				continue;
-			}
-			if (status.isPrisoner() || status.isBondsman()) {
-    			getCampaign().recruitPerson(person, status.isPrisoner(), status.isBondsman());
-    			if (getCampaign().getCampaignOptions().getUseAtB() &&
-    					getCampaign().getCampaignOptions().getUseAtBCapture() &&
- 						m instanceof AtBContract &&
- 	   					status.isPrisoner()) {
-    				getCampaign().getFinances().credit(50000, Transaction.C_MISC,
-    						"Bonus for prisoner capture", getCampaign().getDate());
-   					if (Compute.d6(2) >= 10 + ((AtBContract)m).getEnemySkill() - getCampaign().getUnitRatingMod()) {
-   						getCampaign().addReport("You have convinced "
-   								+ person.getHyperlinkedName() + " to defect.");
-   					}
-    			}
-    		}
-			person.setXp(person.getXp() + status.xp);
-			if(status.getHits() > person.getHits()) {
-			    person.setHits(status.getHits());
-			}
-			person.addLogEntry(campaign.getDate(), "Participated in " + scenario.getName() + " during mission " + m.getName());
-			for(Kill k : status.getKills()) {
-				campaign.addKill(k);
-			}
-			if(status.isMissing()) {
-				campaign.changeStatus(person, Person.S_MIA);
-			}
-			if(status.isDead()) {
-				campaign.changeStatus(person, Person.S_KIA);
-				if (campaign.getCampaignOptions().getUseAtB() &&
-						m instanceof AtBContract) {
-					campaign.getRetirementDefectionTracker().removeFromCampaign(person,
-							true, campaign.getCampaignOptions().getUseShareSystem()?person.getNumShares(campaign.getCampaignOptions().getSharesForAll()):0,
-									campaign, (AtBContract)m);
-				}
-			}
-			if (campaign.getCampaignOptions().useAdvancedMedical()) {
-				person.diagnose(status.getHits());
-			}
-			if (status.isBondsman()) {
-				person.setBondsman();
-			}
-			if (status.isPrisoner()) {
-				person.setPrisoner();
-			}
-			if (!status.isBondsman() && !status.isPrisoner() && status.isCaptured()) {
-				person.setFreeMan();
-			}
-			if (status.toRemove()) {
-				campaign.removePerson(pid);
-			}
-		}
+        for(UUID pid : peopleStatus.keySet()) {
+            Person person = campaign.getPerson(pid);
+            PersonStatus status = peopleStatus.get(pid);
+            if(null == person || null == status) {
+                continue;
+            }
+            person.setXp(person.getXp() + status.xp);
+            if(status.getHits() > person.getHits()) {
+                person.setHits(status.getHits());
+            }
+            person.addLogEntry(campaign.getDate(), "Participated in " + scenario.getName() + " during mission " + m.getName());
+            for(Kill k : status.getKills()) {
+                campaign.addKill(k);
+            }
+            if(status.isMissing()) {
+                campaign.changeStatus(person, Person.S_MIA);
+            }
+            if(status.isDead()) {
+                campaign.changeStatus(person, Person.S_KIA);
+                if (campaign.getCampaignOptions().getUseAtB() &&
+                        m instanceof AtBContract) {
+                    campaign.getRetirementDefectionTracker().removeFromCampaign(person,
+                            true, campaign.getCampaignOptions().getUseShareSystem()?person.getNumShares(campaign.getCampaignOptions().getSharesForAll()):0,
+                                    campaign, (AtBContract)m);
+                }
+            }
+            if (campaign.getCampaignOptions().useAdvancedMedical()) {
+                person.diagnose(status.getHits());
+            }
+            if (status.isBondsman()) {
+                person.setBondsman();
+            }
+            if (status.isPrisoner()) {
+                person.setPrisoner();
+            }
+            if (!status.isBondsman() && !status.isPrisoner() && status.isCaptured()) {
+                person.setFreeMan();
+            }
+            if (status.toRemove()) {
+                campaign.removePerson(pid);
+            }
+        }
+        // update prisoners
+        for(UUID pid : prisonerStatus.keySet()) {
+            Person person = campaign.getPerson(pid);
+            if (person == null) {
+                for (Person p : newPilots) {
+                    if (p != null && p.getId() == pid) {
+                        person = p;
+                        break;
+                    }
+                }
+            }
+            PersonStatus status = prisonerStatus.get(pid);
+            if(null == person || null == status) {
+                continue;
+            }
+            if (status.isPrisoner() || status.isBondsman()) {
+                getCampaign().recruitPerson(person, status.isPrisoner(), status.isBondsman());
+                if (getCampaign().getCampaignOptions().getUseAtB() &&
+                        getCampaign().getCampaignOptions().getUseAtBCapture() &&
+                        m instanceof AtBContract &&
+                        status.isPrisoner()) {
+                    getCampaign().getFinances().credit(50000, Transaction.C_MISC,
+                            "Bonus for prisoner capture", getCampaign().getDate());
+                    if (Compute.d6(2) >= 10 + ((AtBContract)m).getEnemySkill() - getCampaign().getUnitRatingMod()) {
+                        getCampaign().addReport("You have convinced "
+                                + person.getHyperlinkedName() + " to defect.");
+                    }
+                }
+            }
+            person.setXp(person.getXp() + status.xp);
+            if(status.getHits() > person.getHits()) {
+                person.setHits(status.getHits());
+            }
+            person.addLogEntry(campaign.getDate(), "Participated in " + scenario.getName() + " during mission " + m.getName());
+            for(Kill k : status.getKills()) {
+                campaign.addKill(k);
+            }
+            if(status.isMissing()) {
+                campaign.changeStatus(person, Person.S_MIA);
+            }
+            if(status.isDead()) {
+                campaign.changeStatus(person, Person.S_KIA);
+                if (campaign.getCampaignOptions().getUseAtB() &&
+                        m instanceof AtBContract) {
+                    campaign.getRetirementDefectionTracker().removeFromCampaign(person,
+                            true, campaign.getCampaignOptions().getUseShareSystem()?person.getNumShares(campaign.getCampaignOptions().getSharesForAll()):0,
+                                    campaign, (AtBContract)m);
+                }
+            }
+            if (campaign.getCampaignOptions().useAdvancedMedical()) {
+                person.diagnose(status.getHits());
+            }
+            if (status.isBondsman()) {
+                person.setBondsman();
+            }
+            if (status.isPrisoner()) {
+                person.setPrisoner();
+            }
+            if (!status.isBondsman() && !status.isPrisoner() && status.isCaptured()) {
+                person.setFreeMan();
+            }
+            if (status.toRemove()) {
+                campaign.removePerson(pid);
+            }
+        }
 
 		//now lets update all units
 		for(Unit unit : units) {
@@ -1044,9 +1087,13 @@ public class ResolveScenarioTracker {
 		return recovered;
 	}
 
-	public Hashtable<UUID, PersonStatus> getPeopleStatus() {
-		return peopleStatus;
-	}
+    public Hashtable<UUID, PersonStatus> getPeopleStatus() {
+        return peopleStatus;
+    }
+
+    public Hashtable<UUID, PersonStatus> getPrisonerStatus() {
+        return prisonerStatus;
+    }
 
 	public Hashtable<UUID, UnitStatus> getUnitsStatus() {
 	    return unitsStatus;
