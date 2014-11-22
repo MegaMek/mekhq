@@ -3586,7 +3586,7 @@ public class CampaignGUI extends JPanel {
         }
 
         if (notMaintained.size() > 0) {
-            if (0 != JOptionPane.showConfirmDialog(null,
+            if (JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(null,
                                                    "You have unmaintained units. Do you really wish to advance the day?",
                                                    "Unmaintained Units",
                                                    JOptionPane.YES_NO_OPTION)) {
@@ -3594,9 +3594,13 @@ public class CampaignGUI extends JPanel {
             }
         }
 
-        if (getCampaign().getAstechPoolMinutes() < totalAstechMinutesNeeded) {
-            int needed = (totalAstechMinutesNeeded - getCampaign().getAstechPoolMinutes()) / 480 + 1;
-            if (0 != JOptionPane.showConfirmDialog(null,
+        int minutesAvail = getCampaign().getPossibleAstechPoolMinutes();
+        if (getCampaign().isOvertimeAllowed()) {
+            minutesAvail += getCampaign().getPossibleAstechPoolOvertime();
+        }
+        if (minutesAvail < totalAstechMinutesNeeded) {
+            int needed = (int) Math.ceil((totalAstechMinutesNeeded - minutesAvail) / 480);
+            if (JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(null,
                     "You do not have enough astechs to provide for full maintenance. You need "
                             + needed + " more astech(s). Do you wish to proceed?",
                                                    "Astech shortage",
