@@ -76,13 +76,14 @@ public class ResolveScenarioWizardDialog extends JDialog {
 	final static String UNITSPANEL   = "Unit Status";
 	final static String PILOTPANEL   = "Pilot Status";
 	final static String SALVAGEPANEL = "Claim Salvage";
+    final static String PRISONERPANEL= "Captured Personnel Status";
 	final static String KILLPANEL    = "Assign Kills";
-	final static String REWARDPANEL    = "Collect Rewards";
+	final static String REWARDPANEL  = "Collect Rewards";
 	final static String PREVIEWPANEL = "Preview";
 	/* Used by AtB to determine minor contract breaches and bonus rolls */
 	final static String ALLYPANEL    = "Ally Status";
 
-	final static String[] panelOrder = {UNITSPANEL,ALLYPANEL,PILOTPANEL,SALVAGEPANEL,KILLPANEL,REWARDPANEL,PREVIEWPANEL};
+	final static String[] panelOrder = {UNITSPANEL,ALLYPANEL,PILOTPANEL,SALVAGEPANEL,PRISONERPANEL,KILLPANEL,REWARDPANEL,PREVIEWPANEL};
 
 	private JFrame frame;
 
@@ -104,6 +105,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private JPanel pnlAllyStatus;
     private JPanel pnlPilotStatus;
     private JPanel pnlSalvage;
+    private JPanel pnlPrisonerStatus;
     private JPanel pnlKills;
     private JPanel pnlRewards;
     private JPanel pnlPreview;
@@ -409,13 +411,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         pnlPilotStatus.add(new JLabel(resourceMap.getString("mia")), gridBagConstraints);
-        gridBagConstraints.gridx = 3;
-        pnlPilotStatus.add(new JLabel(resourceMap.getString("prisoner")), gridBagConstraints);
-        gridBagConstraints.gridx = 4;
-        pnlPilotStatus.add(new JLabel(resourceMap.getString("bondsman")), gridBagConstraints);
-        gridBagConstraints.gridx = 5;
-        gridBagConstraints.weightx = 1.0;
-        pnlPilotStatus.add(new JLabel(resourceMap.getString("escaped")), gridBagConstraints);
         miaBtns = new ArrayList<JCheckBox>();
         prisonerBtns = new ArrayList<JCheckBox>();
         bondsmanBtns = new ArrayList<JCheckBox>();
@@ -424,10 +419,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
         pstatuses = new ArrayList<PersonStatus>();
         i = 2;
         JCheckBox miaCheck;
-        JCheckBox prisonerCheck;
-        JCheckBox bondsmanCheck;
-        JCheckBox escapeCheck;
-        ButtonGroup captured;
         JSlider hitSlider;
         Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
         labelTable.put( new Integer( 0 ), new JLabel("0") );
@@ -439,23 +430,23 @@ public class ResolveScenarioWizardDialog extends JDialog {
         labelTable.put( new Integer( 6 ), new JLabel(resourceMap.getString("dead")) );
         j = 0;
         for(UUID pid : tracker.getPeopleStatus().keySet()) {
-        	j++;
-        	PersonStatus status = tracker.getPeopleStatus().get(pid);
-        	pstatuses.add(status);
-        	nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
-        	miaCheck = new JCheckBox("");
-        	miaBtns.add(miaCheck);
-        	hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 6, status.getHits());
-        	hitSlider.setMajorTickSpacing(1);
-        	hitSlider.setPaintTicks(true);
-        	hitSlider.setLabelTable(labelTable);
-        	hitSlider.setPaintLabels(true);
-        	hitSlider.setSnapToTicks(true);
-        	hitSliders.add(hitSlider);
-        	if(status.isMissing()) {
-        		miaCheck.setSelected(true);
-        	}
-        	gridBagConstraints = new java.awt.GridBagConstraints();
+            j++;
+            PersonStatus status = tracker.getPeopleStatus().get(pid);
+            pstatuses.add(status);
+            nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
+            miaCheck = new JCheckBox("");
+            miaBtns.add(miaCheck);
+            hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 6, status.getHits());
+            hitSlider.setMajorTickSpacing(1);
+            hitSlider.setPaintTicks(true);
+            hitSlider.setLabelTable(labelTable);
+            hitSlider.setPaintLabels(true);
+            hitSlider.setSnapToTicks(true);
+            hitSliders.add(hitSlider);
+            if(status.isMissing()) {
+                miaCheck.setSelected(true);
+            }
+            gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
             gridBagConstraints.gridwidth = 1;
@@ -463,72 +454,146 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
             gridBagConstraints.weightx = 0.0;
             if(j == tracker.getPeopleStatus().keySet().size()) {
-            	gridBagConstraints.weighty = 1.0;
+                gridBagConstraints.weighty = 1.0;
             }
             pnlPilotStatus.add(nameLbl, gridBagConstraints);
             gridBagConstraints.gridx = 1;
             pnlPilotStatus.add(hitSlider, gridBagConstraints);
             gridBagConstraints.gridx = 2;
             pnlPilotStatus.add(miaCheck, gridBagConstraints);
+            i++;
+        }
+        pnlMain.add(pnlPilotStatus, PILOTPANEL);
+
+        /*
+         * Prisoner Status Panel
+         */
+        pnlPrisonerStatus = new JPanel();
+        pnlPrisonerStatus.setLayout(new GridBagLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        pnlPrisonerStatus.add(new JLabel(resourceMap.getString("hits")), gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        pnlPrisonerStatus.add(new JLabel(resourceMap.getString("mia")), gridBagConstraints);
+        gridBagConstraints.gridx = 3;
+        pnlPrisonerStatus.add(new JLabel(resourceMap.getString("prisoner")), gridBagConstraints);
+        gridBagConstraints.gridx = 4;
+        pnlPrisonerStatus.add(new JLabel(resourceMap.getString("bondsman")), gridBagConstraints);
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.weightx = 1.0;
+        pnlPrisonerStatus.add(new JLabel(resourceMap.getString("escaped")), gridBagConstraints);
+        miaBtns = new ArrayList<JCheckBox>();
+        prisonerBtns = new ArrayList<JCheckBox>();
+        bondsmanBtns = new ArrayList<JCheckBox>();
+        escapeBtns = new ArrayList<JCheckBox>();
+        hitSliders = new ArrayList<JSlider>();
+        pstatuses = new ArrayList<PersonStatus>();
+        i = 2;
+        JCheckBox prisonerCheck;
+        JCheckBox bondsmanCheck;
+        JCheckBox escapeCheck;
+        ButtonGroup captured;
+        j = 0;
+        for(UUID pid : tracker.getPrisonerStatus().keySet()) {
+            j++;
+            PersonStatus status = tracker.getPrisonerStatus().get(pid);
+            pstatuses.add(status);
+            nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
+            miaCheck = new JCheckBox("");
+            miaBtns.add(miaCheck);
+            hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 6, status.getHits());
+            hitSlider.setMajorTickSpacing(1);
+            hitSlider.setPaintTicks(true);
+            hitSlider.setLabelTable(labelTable);
+            hitSlider.setPaintLabels(true);
+            hitSlider.setSnapToTicks(true);
+            hitSliders.add(hitSlider);
+            if(status.isMissing()) {
+                miaCheck.setSelected(true);
+            }
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = i;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+            gridBagConstraints.weightx = 0.0;
+            if(j == tracker.getPrisonerStatus().keySet().size()) {
+                gridBagConstraints.weighty = 1.0;
+            }
+            pnlPrisonerStatus.add(nameLbl, gridBagConstraints);
+            gridBagConstraints.gridx = 1;
+            pnlPrisonerStatus.add(hitSlider, gridBagConstraints);
+            gridBagConstraints.gridx = 2;
+            pnlPrisonerStatus.add(miaCheck, gridBagConstraints);
             prisonerCheck = new JCheckBox("");
             prisonerBtns.add(prisonerCheck);
             gridBagConstraints.gridx = 3;
             if (!status.isCaptured())
-            	prisonerCheck.setEnabled(false);
-            pnlPilotStatus.add(prisonerCheck, gridBagConstraints);
+                prisonerCheck.setEnabled(false);
+            pnlPrisonerStatus.add(prisonerCheck, gridBagConstraints);
             bondsmanCheck = new JCheckBox("");
             bondsmanBtns.add(bondsmanCheck);
             gridBagConstraints.gridx = 4;
             if (!status.isCaptured())
-            	bondsmanCheck.setEnabled(false);
+                bondsmanCheck.setEnabled(false);
             else {
-            	if (tracker.getCampaign().getFaction().isClan()) {
-            		bondsmanCheck.setSelected(true);
-            	} else {
-            		prisonerCheck.setSelected(true);
-            	}
+                if (tracker.getCampaign().getFaction().isClan()) {
+                    bondsmanCheck.setSelected(true);
+                } else {
+                    prisonerCheck.setSelected(true);
+                }
             }
-            pnlPilotStatus.add(bondsmanCheck, gridBagConstraints);
+            pnlPrisonerStatus.add(bondsmanCheck, gridBagConstraints);
             escapeCheck = new JCheckBox("");
             escapeBtns.add(escapeCheck);
             gridBagConstraints.gridx = 5;
             gridBagConstraints.weightx = 1.0;
             if (!status.isCaptured())
-            	escapeCheck.setEnabled(false);
-            pnlPilotStatus.add(escapeCheck, gridBagConstraints);
+                escapeCheck.setEnabled(false);
+            pnlPrisonerStatus.add(escapeCheck, gridBagConstraints);
             captured = new ButtonGroup();
             captured.add(prisonerCheck);
             captured.add(bondsmanCheck);
             captured.add(escapeCheck);
             i++;
             if (status.isCaptured() &&
-            		tracker.getCampaign().getCampaignOptions().getUseAtB() &&
-            		tracker.getCampaign().getCampaignOptions().getUseAtBCapture()) {
-        		boolean wasCaptured = false;
-        		if (status.wasPickedUp()) {
-        			wasCaptured = true;
-        		} else {
-        			for (int n = 0; n < status.getHits() + 1; n++) {
-        				if (Utilities.dice(1, 6) == 1) {
-        					wasCaptured = true;
-        					break;
-        				}
-        			}
-        		}
-        		if (wasCaptured && tracker.getCampaign().getFaction().isClan()) {
-        			bondsmanCheck.setSelected(true);
-        		} else if (wasCaptured) {
-        			if (tracker.getCampaign().getFaction().isClan()) {
-        				bondsmanCheck.setSelected(true);
-        			} else {
-        				prisonerCheck.setSelected(true);
-        			}
-        		} else {
-        			escapeCheck.setSelected(true);
-        		}
-        	}
+                    tracker.getCampaign().getCampaignOptions().getUseAtB() &&
+                    tracker.getCampaign().getCampaignOptions().getUseAtBCapture()) {
+                boolean wasCaptured = false;
+                if (status.wasPickedUp()) {
+                    wasCaptured = true;
+                } else {
+                    for (int n = 0; n < status.getHits() + 1; n++) {
+                        if (Utilities.dice(1, 6) == 1) {
+                            wasCaptured = true;
+                            break;
+                        }
+                    }
+                }
+                if (wasCaptured && tracker.getCampaign().getFaction().isClan()) {
+                    bondsmanCheck.setSelected(true);
+                } else if (wasCaptured) {
+                    if (tracker.getCampaign().getFaction().isClan()) {
+                        bondsmanCheck.setSelected(true);
+                    } else {
+                        prisonerCheck.setSelected(true);
+                    }
+                } else {
+                    escapeCheck.setSelected(true);
+                }
+            }
         }
-    	pnlMain.add(pnlPilotStatus, PILOTPANEL);
+        pnlMain.add(pnlPrisonerStatus, PRISONERPANEL);
 
     	/*
     	 * Salvage panel
@@ -1114,6 +1179,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
     	else if(currentPanel.equals(KILLPANEL)) {
     		txtInstructions.setText(resourceMap.getString("txtInstructions.text.kills"));
     	}
+        else if(currentPanel.equals(PRISONERPANEL)) {
+            txtInstructions.setText(resourceMap.getString("txtInstructions.text.personnel"));
+        }
     	else if(currentPanel.equals(PREVIEWPANEL)) {
     		txtInstructions.setText(resourceMap.getString("txtInstructions.text.preview"));
     	}
@@ -1289,9 +1357,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
     				(((AtBScenario)tracker.getScenario()).getAttachedUnits().size() +
     				((AtBScenario)tracker.getScenario()).getSurvivalBonus().size() > 0);
     	}
-    	else if(panelName.equals(PILOTPANEL)) {
-    		return tracker.getPeopleStatus().keySet().size() > 0;
-    	}
+        else if(panelName.equals(PILOTPANEL)) {
+            return tracker.getPeopleStatus().keySet().size() > 0;
+        }
+        else if(panelName.equals(PRISONERPANEL)) {
+            return tracker.getPrisonerStatus().keySet().size() > 0;
+        }
     	else if(panelName.equals(SALVAGEPANEL)) {
     		return tracker.getPotentialSalvage().size() > 0
     				&& (!(tracker.getMission() instanceof Contract) || ((Contract)tracker.getMission()).canSalvage());
