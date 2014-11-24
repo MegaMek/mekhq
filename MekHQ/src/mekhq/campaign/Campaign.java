@@ -1250,6 +1250,8 @@ public class Campaign implements Serializable {
         int fumble;
         int critSuccess;
         int xpGained = 0;
+        int mistakeXP = 0;
+        int successXP = 0;
         String report = "";
         String eol = System.getProperty("line.separator");
 
@@ -1304,6 +1306,15 @@ public class Campaign implements Serializable {
                 break;
         }
 
+        // Determine XP, if any
+        if (roll < Math.max(1, fumble / 10)) {
+            mistakeXP += getCampaignOptions().getMistakeXP();
+            xpGained += mistakeXP;
+        } else if (roll > Math.min(98, 99 - Math.round(99 - critSuccess) / 10)) {
+            successXP += getCampaignOptions().getSuccessXP();
+            xpGained += successXP;
+        }
+
         for (Injury injury : medWork.getInjuries()) {
             if (!injury.getWorkedOn()) {
                 if (roll < fumble) {
@@ -1321,19 +1332,12 @@ public class Campaign implements Serializable {
                         // broken ribs (punctured lung/death chance) internal
                         // bleeding (death chance)
                     }
-                    if (roll < Math.max(1, fumble / 10)) {
-                        xpGained += getCampaignOptions().getMistakeXP();
-                    }
                 } else if (roll > critSuccess) {
                     injury.setTime((int) Math.floor(injury.getTime() * 90 / 100));
                     report = report + doctor.getHyperlinkedFullTitle()
                              + " performed some amazing work in treating "
                              + medWork.getHyperlinkedName() + "'s " + injury.getName()
                              + " (10% less time to heal)";
-                    if (roll > Math.min(98,
-                                        99 - Math.round(99 - critSuccess) / 10)) {
-                        xpGained += getCampaignOptions().getSuccessXP();
-                    }
                 } else {
                     if (doctor.getNTasks() >= getCampaignOptions()
                             .getNTasksXP()) {
@@ -1355,10 +1359,12 @@ public class Campaign implements Serializable {
                          + medWork.getGenderPronoun(Person.PRONOUN_HISHER) + " "
                          + injury.getName() + "!";
             }
-            if (xpGained > 0) {
-                doctor.setXp(doctor.getXp() + xpGained);
-                report += " (" + xpGained + "XP gained)";
-            }
+            report += eol;
+        }
+        if (xpGained > 0) {
+            doctor.setXp(doctor.getXp() + xpGained);
+            report += " (" + xpGained + "XP gained, "+mistakeXP+" for mistakes, "+successXP+" for critical successes, and"
+                    + ""+(xpGained - mistakeXP - successXP)+" for tasks)";
             report += eol;
         }
         medWork.AMheal();
