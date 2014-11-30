@@ -1,19 +1,19 @@
  /* Finances.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -45,10 +45,10 @@ import org.w3c.dom.NodeList;
 public class Finances implements Serializable {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 8533117455496219692L;
-	
+
 	private ArrayList<Transaction> transactions;
 	private ArrayList<Loan> loans;
 	private ArrayList<Asset> assets;
@@ -60,8 +60,8 @@ public class Finances implements Serializable {
     public static final int SCHEDULE_MONTHLY   = 1;
     public static final int SCHEDULE_QUARTERLY = 2;
     public static final int SCHEDULE_YEARLY    = 3;
-    public static final int SCHEDULE_NUM       = 4;  
-    
+    public static final int SCHEDULE_NUM       = 4;
+
     public static String getScheduleName(int schedule) {
         switch(schedule) {
         case Finances.SCHEDULE_BIWEEKLY:
@@ -76,7 +76,7 @@ public class Finances implements Serializable {
             return "?";
         }
     }
-	
+
 	public Finances() {
 		transactions = new ArrayList<Transaction>();
 	    loans = new ArrayList<Loan>();
@@ -85,7 +85,7 @@ public class Finances implements Serializable {
 	    failCollateral = 0;
 	    wentIntoDebt = null;
 	}
-	
+
 	public long getBalance() {
 		long balance = 0;
 		for(Transaction transaction : transactions) {
@@ -93,7 +93,7 @@ public class Finances implements Serializable {
 		}
 		return balance;
 	}
-	
+
 	public long getLoanBalance() {
 	    long balance = 0;
 	    for(Loan loan : loans) {
@@ -101,25 +101,25 @@ public class Finances implements Serializable {
 	    }
 	    return balance;
 	}
-	
+
 	public boolean isInDebt() {
-		return getBalance() < getLoanBalance();
+		return getLoanBalance() > 0;
 	}
-	
+
 	public int getFullYearsInDebt(GregorianCalendar cal) {
 	    if(null == wentIntoDebt) {
 	        return 0;
 	    }
 	    return Utilities.getDiffFullYears(wentIntoDebt, cal);
 	}
-	
+
 	public int getPartialYearsInDebt(GregorianCalendar cal) {
 		if (wentIntoDebt == null) {
 			return 0;
 		}
 		return Utilities.getDiffPartialYears(wentIntoDebt, cal);
 	}
-	
+
 	public boolean debit(long amount, int category, String reason, Date date) {
 	    if(getBalance() < amount) {
 	        return false;
@@ -130,14 +130,14 @@ public class Finances implements Serializable {
         }
 		return true;
 	}
-	
+
 	public void credit(long amount, int category, String reason, Date date) {
 		transactions.add(new Transaction(amount, category, reason, date));
 		if(null == wentIntoDebt && isInDebt()) {
 		    wentIntoDebt = date;
 		}
 	}
-	
+
 	/**
 	 * This function will update the starting amount to the current balance
 	 * and clear transactions
@@ -149,19 +149,19 @@ public class Finances implements Serializable {
 		transactions = new ArrayList<Transaction>();
 		credit(carryover, Transaction.C_START, "Carryover from previous year", date);
 	}
-	
+
 	public ArrayList<Transaction> getAllTransactions() {
 		return transactions;
 	}
-	
+
 	public ArrayList<Loan> getAllLoans() {
 	    return loans;
 	}
-	
+
 	public ArrayList<Asset> getAllAssets() {
 	    return assets;
 	}
-	
+
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<finances>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -183,7 +183,7 @@ public class Finances implements Serializable {
 		}
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</finances>");
 	}
-	
+
 	public static Finances generateInstanceFromXML(Node wn) {
 		Finances retVal = new Finances();
 		NodeList nl = wn.getChildNodes();
@@ -200,7 +200,7 @@ public class Finances implements Serializable {
              }
 			 else if (wn2.getNodeName().equalsIgnoreCase("loanDefaults")) {
                  retVal.loanDefaults = Integer.parseInt(wn2.getTextContent().trim());
-             } 
+             }
 			 else if (wn2.getNodeName().equalsIgnoreCase("wentIntoDebt")) {
 			     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 			     try {
@@ -212,16 +212,16 @@ public class Finances implements Serializable {
 			         // TODO Auto-generated catch block
 			         e.printStackTrace();
 			     }
-			 } 
+			 }
 		}
-		
+
 		return retVal;
 	}
-	
+
 	public void addLoan(Loan loan) {
 	    loans.add(loan);
 	}
-	
+
 	public void newDay(Campaign campaign) {
 	    ArrayList<Loan> newLoans = new ArrayList<Loan>();
 	    for(Loan loan : loans) {
@@ -254,7 +254,7 @@ public class Finances implements Serializable {
 	        }
 	    }
 	}
-	
+
 	public long checkOverdueLoanPayments(Campaign campaign) {
 	    ArrayList<Loan> newLoans = new ArrayList<Loan>();
 	    long overdueAmount = 0;
@@ -279,14 +279,14 @@ public class Finances implements Serializable {
         }
 	    return overdueAmount;
 	}
-	
+
 	public void removeLoan(Loan loan) {
 	    loans.remove(loan);
 	    if(null != wentIntoDebt && !isInDebt()) {
             wentIntoDebt = null;
         }
 	}
-	
+
 	public void defaultOnLoan(Loan loan, boolean paidCollateral) {
         loanDefaults++;
         if(!paidCollateral) {
@@ -294,15 +294,15 @@ public class Finances implements Serializable {
         }
         removeLoan(loan);
     }
-	
+
 	public int getLoanDefaults() {
 	    return loanDefaults;
 	}
-	
+
 	public int getFailedCollateral() {
 	    return failCollateral;
 	}
-	
+
 	public long getTotalLoanCollateral() {
 	    long amount = 0;
 	    for(Loan loan : loans) {
@@ -310,7 +310,7 @@ public class Finances implements Serializable {
 	    }
 	    return amount;
 	}
-	
+
 	public long getTotalAssetValue() {
 	    long amount = 0;
 	    for(Asset asset : assets) {
@@ -318,11 +318,11 @@ public class Finances implements Serializable {
 	    }
 	    return amount;
 	}
-	
+
 	public void setAssets(ArrayList<Asset> newAssets) {
 	    assets = newAssets;
 	}
-	
+
 	public long getMaxCollateral(Campaign c) {
         return c.getTotalEquipmentValue() + getTotalAssetValue() - getTotalLoanCollateral();
     }
