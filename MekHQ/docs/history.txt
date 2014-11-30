@@ -193,6 +193,7 @@ v0.3.6 (SVN)
 + Bug [#675]: Hangar -> Right click -> change site does nothing if same site is selected
 + Bug [#631]: 0.3.6 : Armor sell price bugged - 5000 pts of armor = 900+ million sell price
 + Bug [#608]: 0.3.6 : Clicking the "x" button for bulk buys does not cancel the purchase
++ Fix to Campaign.java for switch from entity enumeration to entity vector in MM's Game.java
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
