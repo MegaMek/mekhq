@@ -5964,10 +5964,7 @@ public class Campaign implements Serializable {
             if (null != entity && (entity.hasC3() || entity.hasC3i())) {
                 boolean C3iSet = false;
 
-                for (Enumeration<Entity> entities = game.getEntities(); entities
-                        .hasMoreElements(); ) {
-                    Entity e = entities.nextElement();
-
+                for (Entity e : game.getEntitiesVector()) {
                     // C3 Checks
                     if (entity.hasC3()) {
                         if ((entity.getC3MasterIsUUIDAsString() != null)
