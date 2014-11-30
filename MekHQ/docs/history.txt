@@ -191,6 +191,7 @@ v0.3.6 (SVN)
 + Bug [#619]: 0.3.6 : Prisoners gain XP via the monthly role checks
 + Bug [#677]: Doctor gains too much XP on a roll of 12
 + Bug [#675]: Hangar -> Right click -> change site does nothing if same site is selected
++ Bug [#631]: 0.3.6 : Armor sell price bugged - 5000 pts of armor = 900+ million sell price
 
 v0.3.5 (2014-04-28)
 + new MegaMek.jar, fixes Bug [#486]: Ammo Bins destroyed when upgrading to 0.3.4
