@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.6 (SVN)
+v0.3.6 (2014-12-02)
 + Bug [#496]: NPE in mission resolution dialogue
 + Add status to unit name label on salvage screen to match the player's own recovered units screen
 + Bug [#498]: Repair Bay sort order: Status
