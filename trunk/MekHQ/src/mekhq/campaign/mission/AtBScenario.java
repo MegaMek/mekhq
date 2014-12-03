@@ -113,11 +113,14 @@ public class AtBScenario extends Scenario {
 	
 	public static final String[] battleTypes = {"Base Attack", "Extraction",
 		"Chase", "Hold the Line", "Breakthrough", "Hide and Seek", "Stand Up",
-		"Recon Raid", "Probe", "Officer Duel", "Ace Duel", "Ambush",
-		"Civilian Help", "Allied Traitors", "Prison Break",
-		"Star League Cache 1", "Star League Cache 2", "Ally Rescue",
-		"Civilian Riot", "Convoy Rescue", "Convoy Attack",
-		"Pirates Free-for-All"};
+		"Recon Raid", "Probe",
+		"Special Mission: Officer Duel", "Special Mission: Ace Duel",
+		"Special Mission: Ambush", "Special Mission: Civilian Help",
+		"Special Mission: Allied Traitors", "Special Mission: Prison Break",
+		"Special Mission: Star League Cache 1", "Special Mission: Star League Cache 2",
+		"Big Battle: Ally Rescue", "Big Battle: Civilian Riot",
+		"Big Battle: Convoy Rescue", "Big Battle: Convoy Attack",
+		"Big Battle: Pirates Free-for-All"};
 	
 	public static final int TER_HILLS = 0;
 	public static final int TER_BADLANDS = 1;
@@ -300,12 +303,8 @@ public class AtBScenario extends Scenario {
 			setWeather();
 		}
 		if (campaign.getCampaignOptions().getUsePlanetaryConditions() &&
-				null != campaign.getMission(getId())) {
-			Planet p = Planets.getInstance().getPlanets().get(campaign.getMission(getId()).getPlanetName());
-			if (null != p) {
-				atmosphere = p.getPressure();
-				gravity = (float)p.getGravity();
-			}
+				null != campaign.getMission(getMissionId())) {
+			setPlanetaryConditions(campaign.getMission(getMissionId()));
 		}
 		setMapSize();
 		setMapFile();
@@ -386,6 +385,16 @@ public class AtBScenario extends Scenario {
 		} else {
 			if (r2 < 5) fog = PlanetaryConditions.FOG_LIGHT;
 			else fog = PlanetaryConditions.FOG_HEAVY;
+		}
+	}
+
+	public void setPlanetaryConditions(Mission mission) {
+		if (null != mission) {
+			Planet p = Planets.getInstance().getPlanets().get(mission.getPlanetName());
+			if (null != p) {
+				atmosphere = p.getPressure();
+				gravity = (float)p.getGravity();
+			}
 		}
 	}
 

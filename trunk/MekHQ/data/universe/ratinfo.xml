@@ -1485,6 +1485,78 @@ After the <rat> nodes there are a series of <altTable> nodes which give addition
 		<dropship>WoB Military Dropship 3067 (FMU)</dropship>
 	</faction>
 </rat> <!--FM Updates (3067)-->
+<rat name="Field Report 2765" era="2765">
+	<faction code="CC">
+		<mech weight="light">Confederation Reserve Cavalry Light Mechs|Liao Guards Light Mechs|Andurien Hussars Light Mechs|Capellan Chargers Light Mechs|Capellan Hussars Light Mechs</mech>
+		<mech weight="medium">Confederation Reserve Cavalry Medium Mechs|Liao Guards Medium Mechs|Andurien Hussars Medium Mechs|Capellan Chargers Medium Mechs|Capellan Hussars Medium Mechs</mech>
+		<mech weight="heavy">Confederation Reserve Cavalry Heavy Mechs|Liao Guards Heavy Mechs|Andurien Hussars Heavy Mechs|Capellan Chargers Heavy Mechs|Capellan Hussars Heavy Mechs</mech>
+		<mech weight="assault">Confederation Reserve Cavalry Assault Mechs|Liao Guards Assault Mechs|Andurien Hussars Assault Mechs|Capellan Chargers Assault Mechs|Capellan Hussars Assault Mechs</mech>
+		<vehicle weight="light">Confederation Reserve Cavalry Light Vehicles|Liao Guards Light Vehicles|Andurien Hussars Light Vehicles|Capellan Chargers Light Vehicles|Capellan Hussars Light Vehicles</vehicle>
+		<vehicle weight="medium">Confederation Reserve Cavalry Medium Vehicles|Liao Guards Medium Vehicles|Andurien Hussars Medium Vehicles|Capellan Chargers Medium Vehicles|Capellan Hussars Medium Vehicles</vehicle>
+		<vehicle weight="heavy">Confederation Reserve Cavalry Heavy Vehicles|Liao Guards Heavy Vehicles|Andurien Hussars Heavy Vehicles|Capellan Chargers Heavy Vehicles|Capellan Hussars Heavy Vehicles</vehicle>
+		<vehicle weight="assault">Confederation Reserve Cavalry Assault Vehicles|Liao Guards Assault Vehicles|Andurien Hussars Assault Vehicles|Capellan Chargers Assault Vehicles|Capellan Hussars Assault Vehicles</vehicle>
+		<aerospace weight="light">Confederation Reserve Cavalry Light Aerospace|Liao Guards Light Aerospace|Andurien Hussars Light Aerospace|Capellan Chargers Light Aerospace|Capellan Hussars Light Aerospace</aerospace>
+		<aerospace weight="medium">Confederation Reserve Cavalry Medium Aerospace|Liao Guards Medium Aerospace|Andurien Hussars Medium Aerospace|Capellan Chargers Medium Aerospace|Capellan Hussars Medium Aerospace</aerospace>
+		<aerospace weight="heavy">Confederation Reserve Cavalry Heavy Aerospace|Liao Guards Heavy Aerospace|Andurien Hussars Heavy Aerospace|Capellan Chargers Heavy Aerospace|Capellan Hussars Heavy Aerospace</aerospace>
+		<dropship>Confederation Reserve Cavalry Dropship|Liao Guards Dropship|Andurien Hussars Dropship|Capellan Chargers Dropship|Capellan Hussars Dropship</dropship>
+	</faction>
+	<faction code="DC">
+		<mech weight="light">Pesht Regulars Light Mechs|Arkab Legions Light Mechs|Benjamin Regulars Light Mechs|Galedon Regulars Light Mechs|Sword of Light Light Mechs</mech>
+		<mech weight="medium">Pesht Regulars Medium Mechs|Arkab Legions Medium Mechs|Benjamin Regulars Medium Mechs|Galedon Regulars Medium Mechs|Sword of Light Medium Mechs</mech>
+		<mech weight="heavy">Pesht Regulars Heavy Mechs|Arkab Legions Heavy Mechs|Benjamin Regulars Heavy Mechs|Galedon Regulars Heavy Mechs|Sword of Light Heavy Mechs</mech>
+		<mech weight="assault">Pesht Regulars Assault Mechs|Arkab Legions Assault Mechs|Benjamin Regulars Assault Mechs|Galedon Regulars Assault Mechs|Sword of Light Assault Mechs</mech>
+		<vehicle weight="light">Pesht Regulars Light Vehicles|Arkab Legions Light Vehicles|Benjamin Regulars Light Vehicles|Galedon Regulars Light Vehicles|Sword of Light Light Vehicles</vehicle>
+		<vehicle weight="medium">Pesht Regulars Medium Vehicles|Arkab Legions Medium Vehicles|Benjamin Regulars Medium Vehicles|Galedon Regulars Medium Vehicles|Sword of Light Medium Vehicles</vehicle>
+		<vehicle weight="heavy">Pesht Regulars Heavy Vehicles|Arkab Legions Heavy Vehicles|Benjamin Regulars Heavy Vehicles|Galedon Regulars Heavy Vehicles|Sword of Light Heavy Vehicles</vehicle>
+		<vehicle weight="assault">Pesht Regulars Assault Vehicles|Arkab Legions Assault Vehicles|Benjamin Regulars Assault Vehicles|Galedon Regulars Assault Vehicles|Sword of Light Assault Vehicles</vehicle>
+		<aerospace weight="light">Pesht Regulars Light Aerospace|Arkab Legions Light Aerospace|Benjamin Regulars Light Aerospace|Galedon Regulars Light Aerospace|Sword of Light Light Aerospace</aerospace>
+		<aerospace weight="medium">Pesht Regulars Medium Aerospace|Arkab Legions Medium Aerospace|Benjamin Regulars Medium Aerospace|Galedon Regulars Medium Aerospace|Sword of Light Medium Aerospace</aerospace>
+		<aerospace weight="heavy">Pesht Regulars Heavy Aerospace|Arkab Legions Heavy Aerospace|Benjamin Regulars Heavy Aerospace|Galedon Regulars Heavy Aerospace|Sword of Light Heavy Aerospace</aerospace>
+		<dropship>Pesht Regulars Dropship|Arkab Legions Dropship|Benjamin Regulars Dropship|Galedon Regulars Dropship|Sword of Light Dropship</dropship>
+	</faction>
+	<faction code="FS">
+		<mech weight="light">Capellan &amp; Draconis March Militia Light Mechs|Ceti Hussars Light Mechs|Arcadian Cuirassiers Light Mechs|Dragonlords Light Mechs|Davion Brigade of Guards Light Mechs</mech>
+		<mech weight="medium">Capellan &amp; Draconis March Militia Medium Mechs|Ceti Hussars Medium Mechs|Arcadian Cuirassiers Medium Mechs|Dragonlords Medium Mechs|Davion Brigade of Guards Medium Mechs</mech>
+		<mech weight="heavy">Capellan &amp; Draconis March Militia Heavy Mechs|Ceti Hussars Heavy Mechs|Arcadian Cuirassiers Heavy Mechs|Dragonlords Heavy Mechs|Davion Brigade of Guards Heavy Mechs</mech>
+		<mech weight="assault">Capellan &amp; Draconis March Militia Assault Mechs|Ceti Hussars Assault Mechs|Arcadian Cuirassiers Assault Mechs|Dragonlords Assault Mechs|Davion Brigade of Guards Assault Mechs</mech>
+		<vehicle weight="light">Capellan &amp; Draconis March Militia Light Vehicles|Ceti Hussars Light Vehicles|Arcadian Cuirassiers Light Vehicles|Dragonlords Light Vehicles|Davion Brigade of Guards Light Vehicles</vehicle>
+		<vehicle weight="medium">Capellan &amp; Draconis March Militia Medium Vehicles|Ceti Hussars Medium Vehicles|Arcadian Cuirassiers Medium Vehicles|Dragonlords Medium Vehicles|Davion Brigade of Guards Medium Vehicles</vehicle>
+		<vehicle weight="heavy">Capellan &amp; Draconis March Militia Heavy Vehicles|Ceti Hussars Heavy Vehicles|Arcadian Cuirassiers Heavy Vehicles|Dragonlords Heavy Vehicles|Davion Brigade of Guards Heavy Vehicles</vehicle>
+		<vehicle weight="assault">Capellan &amp; Draconis March Militia Assault Vehicles|Ceti Hussars Assault Vehicles|Arcadian Cuirassiers Assault Vehicles|Dragonlords Assault Vehicles|Davion Brigade of Guards Assault Vehicles</vehicle>
+		<aerospace weight="light">Capellan &amp; Draconis March Militia Light Aerospace|Ceti Hussars Light Aerospace|Arcadian Cuirassiers Light Aerospace|Dragonlords Light Aerospace|Davion Brigade of Guards Light Aerospace</aerospace>
+		<aerospace weight="medium">Capellan &amp; Draconis March Militia Medium Aerospace|Ceti Hussars Medium Aerospace|Arcadian Cuirassiers Medium Aerospace|Dragonlords Medium Aerospace|Davion Brigade of Guards Medium Aerospace</aerospace>
+		<aerospace weight="heavy">Capellan &amp; Draconis March Militia Heavy Aerospace|Ceti Hussars Heavy Aerospace|Arcadian Cuirassiers Heavy Aerospace|Dragonlords Heavy Aerospace|Davion Brigade of Guards Heavy Aerospace</aerospace>
+		<dropship>Capellan &amp; Draconis March Militia Dropship|Ceti Hussars Dropship|Arcadian Cuirassiers Dropship|Dragonlords Dropship|Davion Brigade of Guards Dropship</dropship>
+	</faction>
+	<faction code="FWL">
+		<mech weight="light">Defenders of Andurien Light Mechs|Bolan Defenders Light Mechs|Marik Guard Light Mechs|Atrean Dragoons Light Mechs|Fusiliers of Oriente Light Mechs</mech>
+		<mech weight="medium">Defenders of Andurien Medium Mechs|Bolan Defenders Medium Mechs|Marik Guard Medium Mechs|Atrean Dragoons Medium Mechs|Fusiliers of Oriente Medium Mechs</mech>
+		<mech weight="heavy">Defenders of Andurien Heavy Mechs|Bolan Defenders Heavy Mechs|Marik Guard Heavy Mechs|Atrean Dragoons Heavy Mechs|Fusiliers of Oriente Heavy Mechs</mech>
+		<mech weight="assault">Defenders of Andurien Assault Mechs|Bolan Defenders Assault Mechs|Marik Guard Assault Mechs|Atrean Dragoons Assault Mechs|Fusiliers of Oriente Assault Mechs</mech>
+		<vehicle weight="light">Defenders of Andurien Light Vehicles|Bolan Defenders Light Vehicles|Marik Guard Light Vehicles|Atrean Dragoons Light Vehicles|Fusiliers of Oriente Light Vehicles</vehicle>
+		<vehicle weight="medium">Defenders of Andurien Medium Vehicles|Bolan Defenders Medium Vehicles|Marik Guard Medium Vehicles|Atrean Dragoons Medium Vehicles|Fusiliers of Oriente Medium Vehicles</vehicle>
+		<vehicle weight="heavy">Defenders of Andurien Heavy Vehicles|Bolan Defenders Heavy Vehicles|Marik Guard Heavy Vehicles|Atrean Dragoons Heavy Vehicles|Fusiliers of Oriente Heavy Vehicles</vehicle>
+		<vehicle weight="assault">Defenders of Andurien Assault Vehicles|Bolan Defenders Assault Vehicles|Marik Guard Assault Vehicles|Atrean Dragoons Assault Vehicles|Fusiliers of Oriente Assault Vehicles</vehicle>
+		<aerospace weight="light">Defenders of Andurien Light Aerospace|Bolan Defenders Light Aerospace|Marik Guard Light Aerospace|Atrean Dragoons Light Aerospace|Fusiliers of Oriente Light Aerospace</aerospace>
+		<aerospace weight="medium">Defenders of Andurien Medium Aerospace|Bolan Defenders Medium Aerospace|Marik Guard Medium Aerospace|Atrean Dragoons Medium Aerospace|Fusiliers of Oriente Medium Aerospace</aerospace>
+		<aerospace weight="heavy">Defenders of Andurien Heavy Aerospace|Bolan Defenders Heavy Aerospace|Marik Guard Heavy Aerospace|Atrean Dragoons Heavy Aerospace|Fusiliers of Oriente Heavy Aerospace</aerospace>
+		<dropship>Defenders of Andurien Dropship|Bolan Defenders Dropship|Marik Guard Dropship|Atrean Dragoons Dropship|Fusiliers of Oriente Dropship</dropship>
+	</faction>
+	<faction code="LA">
+		<mech weight="light">Hesperus Guards Light Mechs|Lyran Guards Light Mechs|Arcturan Guards Light Mechs|Donegal Guards Light Mechs|Royal Guards Light Mechs</mech>
+		<mech weight="medium">Hesperus Guards Medium Mechs|Lyran Guards Medium Mechs|Arcturan Guards Medium Mechs|Donegal Guards Medium Mechs|Royal Guards Medium Mechs</mech>
+		<mech weight="heavy">Hesperus Guards Heavy Mechs|Lyran Guards Heavy Mechs|Arcturan Guards Heavy Mechs|Donegal Guards Heavy Mechs|Royal Guards Heavy Mechs</mech>
+		<mech weight="assault">Hesperus Guards Assault Mechs|Lyran Guards Assault Mechs|null|Donegal Guards Assault Mechs|Arcturan Guards Assault Mechs</mech>
+		<vehicle weight="light">Hesperus Guards Light Vehicles|Lyran Guards Light Vehicles|Arcturan Guards Light Vehicles|Donegal Guards Light Vehicles|Royal Guards Light Vehicles</vehicle>
+		<vehicle weight="medium">Hesperus Guards Medium Vehicles|Lyran Guards Medium Vehicles|Arcturan Guards Medium Vehicles|Donegal Guards Medium Vehicles|Royal Guards Medium Vehicles</vehicle>
+		<vehicle weight="heavy">Hesperus Guards Heavy Vehicles|Lyran Guards Heavy Vehicles|Arcturan Guards Heavy Vehicles|Donegal Guards Heavy Vehicles|Royal Guards Heavy Vehicles</vehicle>
+		<vehicle weight="assault">Hesperus Guards Assault Vehicles|Lyran Guards Assault Vehicles|Arcturan Guards Assault Vehicles|Donegal Guards Assault Vehicles|Royal Guards Assault Vehicles</vehicle>
+		<aerospace weight="light">Hesperus Guards Light Aerospace|Lyran Guards Light Aerospace|Arcturan Guards Light Aerospace|Donegal Guards Light Aerospace|Royal Guards Light Aerospace</aerospace>
+		<aerospace weight="medium">Hesperus Guards Medium Aerospace|Lyran Guards Medium Aerospace|Arcturan Guards Medium Aerospace|Donegal Guards Medium Aerospace|Royal Guards Medium Aerospace</aerospace>
+		<aerospace weight="heavy">Hesperus Guards Heavy Aerospace|Lyran Guards Heavy Aerospace|Arcturan Guards Heavy Aerospace|Donegal Guards Heavy Aerospace|Royal Guards Heavy Aerospace</aerospace>
+		<dropship>Hesperus Guards Dropship|Lyran Guards Dropship|Arcturan Guards Dropship|Donegal Guards Dropship|Royal Guards Dropship</dropship>
+	</faction>
+</rat> <!--Field Report 2765 (2765)-->
 <rat name="Golden Century" era="2820">
 	<faction code="Clan">
 		<mech weight="light">2858 Golden Century Light Mech</mech>

@@ -1994,7 +1994,7 @@ public class Campaign implements Serializable {
         		 * the lance.
         		 */
         		for (Scenario s : m.getScenarios()) {
-        			if (s.getDate().equals(calendar.getTime())) {
+        			if (s.getDate() != null && s.getDate().equals(calendar.getTime())) {
         				int forceId = ((AtBScenario)s).getLanceForceId();
         				if (null != lances.get(forceId)
         						&& !forceIds.get(forceId).isDeployed()) {
