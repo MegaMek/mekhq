@@ -1,6 +1,9 @@
 VERSION HISTORY
 ----------------------------------
 v0.3.7 (SVN)
++ Patch [34]: Against the Bot, 13th Patch
+    Fixes Bug [#589] [AtB] Changing tabs still works but HQ will no longer advance days
+    Fixes Bug [#591] [AtB] Planet gravity is not used
 
 v0.3.6 (2014-12-02)
 + Bug [#496]: NPE in mission resolution dialogue
