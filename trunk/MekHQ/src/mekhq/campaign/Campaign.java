@@ -39,6 +39,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -5936,6 +5937,15 @@ public class Campaign implements Serializable {
         entity.setFacing(0);
         entity.setPosition(null);
         entity.setDeployRound(0);
+        if (entity instanceof Aero) {
+        	if(((Aero)entity).isSpheroid()) {
+        		entity.setMovementMode(EntityMovementMode.SPHEROID);
+        	} else {
+        		entity.setMovementMode(EntityMovementMode.AERODYNE);
+        	}
+        	((Aero)entity).setAltitude(5);
+        }        
+        entity.getSecondaryPositions().clear();
         // TODO: still a lot of stuff to do here, but oh well
         entity.setOwner(player);
         entity.setGame(game);
