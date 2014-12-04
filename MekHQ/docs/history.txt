@@ -5,6 +5,7 @@ v0.3.7 (SVN)
     Fixes Bug [#589] [AtB] Changing tabs still works but HQ will no longer advance days
     Fixes Bug [#591] [AtB] Planet gravity is not used
 + Bug [#654]: Incorrect conventional infantry generation
++ Bug [#694]: Dropship suddenly becomes 0/0 and may no longer be deployed but no damage is visible
 
 v0.3.6 (2014-12-02)
 + Bug [#496]: NPE in mission resolution dialogue
