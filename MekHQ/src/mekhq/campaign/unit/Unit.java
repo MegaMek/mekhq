@@ -2413,7 +2413,13 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     		if(p.hasSkill(driveType)) {
     			sumPiloting += p.getSkill(driveType).getFinalSkillValue();
     			nDrivers++;
+    		} else if(entity instanceof Infantry) {
+    			//For infantry we need to assign an 8 if they have no antimech skill
+    			sumPiloting += 8;
+    			nDrivers++;
     		}
+    		
+    		
     		if(campaign.getCampaignOptions().useAdvancedMedical()) {
         		sumPiloting += p.getPilotingInjuryMod();
         	}
