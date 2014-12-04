@@ -3913,7 +3913,7 @@ public class CampaignGUI extends JPanel {
         }
         if (minutesAvail < totalAstechMinutesNeeded) {
             int needed = (int) Math
-                    .ceil((totalAstechMinutesNeeded - minutesAvail) / 480);
+                    .ceil((totalAstechMinutesNeeded - minutesAvail) / 480D);
             if (JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(null,
                     "You do not have enough astechs to provide for full maintenance. You need "
                             + needed
