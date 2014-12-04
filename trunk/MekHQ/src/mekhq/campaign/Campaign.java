@@ -39,7 +39,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -5944,7 +5943,7 @@ public class Campaign implements Serializable {
         		entity.setMovementMode(EntityMovementMode.AERODYNE);
         	}
         	((Aero)entity).setAltitude(5);
-        }        
+        }
         entity.getSecondaryPositions().clear();
         // TODO: still a lot of stuff to do here, but oh well
         entity.setOwner(player);
