@@ -5944,6 +5944,8 @@ public class Campaign implements Serializable {
         entity.setDone(false);
         entity.resetTransporter();
         entity.setDeployRound(0);
+        entity.setSwarmAttackerId(Entity.NONE);
+        entity.setSwarmTargetId(Entity.NONE);
         if (entity instanceof Aero) {
         	if(((Aero)entity).isSpheroid()) {
         		entity.setMovementMode(EntityMovementMode.SPHEROID);
