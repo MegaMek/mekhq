@@ -6,8 +6,9 @@ v0.3.7 (SVN)
     Fixes Bug [#591] [AtB] Planet gravity is not used
 + Bug [#654]: Incorrect conventional infantry generation
 + Bug [#694]: Dropship suddenly becomes 0/0 and may no longer be deployed but no damage is visible
-+ Bug [#592] "Ghost" Heat
-+ Bug [#668] NPE when clicking "finish" at end of battle salvage screen
++ Bug [#592]: "Ghost" Heat
++ Bug [#668]: NPE when clicking "finish" at end of battle salvage screen
++ Bug [#700]: Entity.swarmTargetId shoulds be cleared by MHQ at the end of a game
 
 v0.3.6 (2014-12-02)
 + Bug [#496]: NPE in mission resolution dialogue
