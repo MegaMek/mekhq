@@ -2543,13 +2543,16 @@ public class Campaign implements Serializable {
                 Vector<Unit> removedUnits = new Vector<Unit>();
                 removedUnits.add(u);
                 removeUnitsFromNetwork(removedUnits);
+                u.getEntity().setC3MasterIsUUIDAsString(null);
+                u.getEntity().setC3Master(null, true);
                 refreshNetworks();
             }
             if (u.getEntity().hasC3M()) {
                 removeUnitsFromC3Master(u);
+                u.getEntity().setC3MasterIsUUIDAsString(null);
+                u.getEntity().setC3Master(null, true);
             }
-            u.getEntity().setC3MasterIsUUIDAsString(null);
-            u.getEntity().setC3Master(null, true);
+            
 
             if (campaignOptions.getUseAtB() && force.getUnits().size() == 0) {
             	lances.remove(force.getId());
