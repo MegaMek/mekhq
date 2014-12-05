@@ -5935,6 +5935,10 @@ public class Campaign implements Serializable {
         entity.setEvading(false);
         entity.setFacing(0);
         entity.setPosition(null);
+        entity.setProne(false);
+        entity.setHullDown(false);
+        entity.heat = 0;
+        entity.heatBuildup = 0;
         entity.setDeployRound(0);
         if (entity instanceof Aero) {
         	if(((Aero)entity).isSpheroid()) {
