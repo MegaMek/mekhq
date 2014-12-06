@@ -1,10 +1,22 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.6-dylan (SVN)
+
+v0.3.7 (SVN)
++ Patch [34]: Against the Bot, 13th Patch
+    Fixes Bug [#589] [AtB] Changing tabs still works but HQ will no longer advance days
+    Fixes Bug [#591] [AtB] Planet gravity is not used
++ Bug [#654]: Incorrect conventional infantry generation
++ Bug [#694]: Dropship suddenly becomes 0/0 and may no longer be deployed but no damage is visible
++ Bug [#592]: "Ghost" Heat
++ Bug [#668]: NPE when clicking "finish" at end of battle salvage screen
++ Bug [#700]: Entity.swarmTargetId shoulds be cleared by MHQ at the end of a game
++ Bug [#687]: C3I lance being incorrectly passed to megamek
+
+v0.3.6-dylan (never released)
 + Bug [#549]: Parts in Use tab displays HTML Tags
 + Bug [#550]: Parts in Use tab displays SI not on unit wazz up msg
 
-v0.3.6 (SVN)
+v0.3.6 (2014-12-02)
 + Bug [#496]: NPE in mission resolution dialogue
 + Add status to unit name label on salvage screen to match the player's own recovered units screen
 + Bug [#498]: Repair Bay sort order: Status
@@ -174,6 +186,31 @@ v0.3.6 (SVN)
     Implements...
         Feature [feature-requests:#201]: [ATB] "Enemies use vehicle?" slider (Implements the
             basic request, but not the additional suggestions at this time)
++ Patch [34]: Against the Bot, 12th Patch
+    Fixes...
+        Bug [#584] Killed Soldiers in AtB render campaign unsaveable on autoresolve
+        Bug [#586]: Daily Log does not update for Mondays (NPE when training lance has a crewless unit).
+        Bug [#587]: Retirement bug (Campaign will not save when there are outstanding payments for retirees/KIAs).
+        Bug: EntityLoadingException when generating scenario with gun turrets or allied DropShip.
+        Bug: Rerolling battle conditions never changes to daylight or clear weather.
+        Bug: Does not track original unit even when option is set.
+        Bug: Using GM add on personnel market does not add unit (if any).
+        Bug: Successful JumpShip search generates crew member but not the ship.
+    Implements...
+        Display TN calculation for DS/JS search and report result in the daily log.
+        Option to exclude VTOLs from enemy force.
++ Bug [#588]: Sorting parts by Detail is out of order
++ Bug [#499]: Not enough AsTech warning being calculated wrong
++ Bug [#666]: Repair bay : Right click -> assign all tasks does nothing.
++ Bug [#642]: MekHQ not passing correct crew size to MegaMek
++ RFE [feature-requests:174]: Saperate Screen for Opposition Crew Capture
++ Bug [#619]: 0.3.6 : Prisoners gain XP via the monthly role checks
++ Bug [#677]: Doctor gains too much XP on a roll of 12
++ Bug [#675]: Hangar -> Right click -> change site does nothing if same site is selected
++ Bug [#631]: 0.3.6 : Armor sell price bugged - 5000 pts of armor = 900+ million sell price
++ Bug [#608]: 0.3.6 : Clicking the "x" button for bulk buys does not cancel the purchase
++ Fix to Campaign.java for switch from entity enumeration to entity vector in MM's Game.java
++ Bug [#447]: Being in debt not working properly
 
 v0.3.5-dylan (2014-04-28)
 -- No Changes--

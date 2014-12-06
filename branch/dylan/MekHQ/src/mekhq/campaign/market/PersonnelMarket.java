@@ -35,6 +35,7 @@ import megamek.common.EntityMovementMode;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
+import megamek.common.TargetRoll;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -902,28 +903,34 @@ public class PersonnelMarket {
             }
 		}
     }
-
-    private void doShipSearch(Campaign c) {
+    
+    public TargetRoll getShipSearchTarget(Campaign campaign, boolean jumpship) {
+    	TargetRoll target = new TargetRoll(jumpship?12:10, "Base");
     	int adminLog = SkillType.EXP_ULTRA_GREEN;
-    	for (Person p : c.getAdmins()) {
+    	for (Person p : campaign.getAdmins()) {
 			if ((p.getPrimaryRole() == Person.T_ADMIN_LOG ||
 					p.getSecondaryRole() == Person.T_ADMIN_LOG) &&
 					p.getSkill(SkillType.S_ADMIN).getExperienceLevel() > adminLog) {
 				adminLog = p.getSkill(SkillType.S_ADMIN).getExperienceLevel();
 			}
     	}
-    	int mod = adminLog - SkillType.EXP_REGULAR;
-		mod += c.getUnitRatingMod() -
-				IUnitRating.DRAGOON_C;
+    	target.addModifier(SkillType.EXP_REGULAR - adminLog, "Admin/Logistics");
+    	target.addModifier(IUnitRating.DRAGOON_C - campaign.getUnitRatingMod(),
+    			"Unit Rating");
+    	return target;
+    }
 
-		int roll = Compute.d6(2) + mod;
-		Person p = null;
-		if (paidRecruitType == Person.T_NAVIGATOR && roll >= 12) {
-			p = c.newPerson(Person.T_NAVIGATOR);
-		} else if (paidRecruitType == Person.T_SPACE_PILOT && roll >= 10) {
-			p = c.newPerson(Person.T_SPACE_PILOT);
+    private void doShipSearch(Campaign c) {
+    	TargetRoll target = getShipSearchTarget(c, paidRecruitType == Person.T_NAVIGATOR);
+		int roll = Compute.d6(2);
+		if (roll < target.getValue()) {
+			c.addReport("Ship search unsuccessful");
+			return;
 		}
-		//TODO: ships available for long-term higher with mos == 0
+		c.addReport("<a href='PERSONNEL_MARKET'>Ship search successful</a>");
+		Person p = null;
+		p = c.newPerson(paidRecruitType);
+		//TODO: ships available for long-term hire with mos == 0
 		if (null != p) {
             UUID id = UUID.randomUUID();
             while (null != personnelIds.get(id)) {
@@ -932,17 +939,15 @@ public class PersonnelMarket {
             p.setId(id);
             personnel.add(p);
             personnelIds.put(id, p);
-            if (c.getCampaignOptions().getUseAtB()) {
-            	addRecruitUnit(p, c, true);
-            }
-		}
+           	addRecruitUnit(p, c, true);
+ 		}
     }
 
     private void addRecruitUnit(Person p, Campaign c) {
     	addRecruitUnit(p, c, false);
     }
 
-    private void addRecruitUnit(Person p, Campaign c, boolean spaceShips) {
+    private void addRecruitUnit(Person p, Campaign c, boolean largeCraft) {
     	int unitType;
     	switch (p.getPrimaryRole()) {
     	case Person.T_MECHWARRIOR:
@@ -961,14 +966,14 @@ public class PersonnelMarket {
     	case Person.T_SPACE_CREW:
     	case Person.T_SPACE_GUNNER:
     	case Person.T_SPACE_PILOT:
-    		if (spaceShips) {
+    		if (largeCraft) {
     			unitType = UnitTableData.UNIT_DROPSHIP;
     		} else {
     			return;
     		}
     		break;
     	case Person.T_NAVIGATOR:
-    		if (spaceShips) {
+    		if (largeCraft) {
     			unitType = -1;
     		} else {
     			return;
@@ -988,7 +993,7 @@ public class PersonnelMarket {
     	}
 
     	int weight = 0;
-    	if (unitType <= UnitTableData.UNIT_AERO) {
+    	if (unitType >= 0 && unitType <= UnitTableData.UNIT_AERO) {
 			int roll = Compute.d6(2);
 	    	if (roll < 8) {
 	    		return;
@@ -1011,11 +1016,11 @@ public class PersonnelMarket {
     		String name;
     		int roll = Compute.d6();
     		if (roll == 1) {
-    			name = "Scout Jumpship";
+    			name = "Scout JumpShip (Standard)";
     		} else if (roll < 4) {
-    			name = "Merchant Jumpship";
+    			name = "Merchant Jumpship (Standard)";
     		} else {
-    			name = "Invader Jumpship";
+    			name = "Invader Jumpship (Standard)";
     		}
     		ms = MechSummaryCache.getInstance().getMech(name);
     	} else {

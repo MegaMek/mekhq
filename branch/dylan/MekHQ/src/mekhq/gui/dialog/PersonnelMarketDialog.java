@@ -9,6 +9,8 @@ package mekhq.gui.dialog;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -30,6 +32,7 @@ import javax.swing.table.TableRowSorter;
 import megamek.client.ui.swing.MechViewPanel;
 import megamek.common.Compute;
 import megamek.common.Entity;
+import megamek.common.TargetRoll;
 import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
@@ -71,6 +74,7 @@ public class PersonnelMarketDialog extends JDialog {
     private javax.swing.JComboBox<String> comboRecruitType;
     private javax.swing.JRadioButton radioShipSearch;
     private javax.swing.JComboBox<String> comboShipType;
+    private javax.swing.JLabel lblShipSearchTarget;
     private javax.swing.JPanel panelOKBtns;
     private javax.swing.JPanel panelMain;
     private javax.swing.JPanel panelFilterBtns;
@@ -110,6 +114,7 @@ public class PersonnelMarketDialog extends JDialog {
         comboRecruitType = new javax.swing.JComboBox<String>();
         radioShipSearch = new javax.swing.JRadioButton();
         comboShipType = new javax.swing.JComboBox<String>();
+        lblShipSearchTarget = new javax.swing.JLabel();
         lblUnitCost = new javax.swing.JLabel();
         panelOKBtns = new javax.swing.JPanel();
         btnHire = new javax.swing.JButton();
@@ -195,6 +200,12 @@ public class PersonnelMarketDialog extends JDialog {
                 gridBagConstraints.gridwidth = 2;
                 gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
                 panelFilterBtns.add(radioShipSearch, gridBagConstraints);
+                radioShipSearch.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+		                updateShipSearchTarget();
+					}
+                });
 
                 comboShipType.addItem("DropShip");
                 comboShipType.addItem("JumpShip");
@@ -203,6 +214,19 @@ public class PersonnelMarketDialog extends JDialog {
                 gridBagConstraints.gridwidth = 1;
                 gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
                 panelFilterBtns.add(comboShipType, gridBagConstraints);
+                comboShipType.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+		                updateShipSearchTarget();
+					}
+                });
+                
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = 4;
+                gridBagConstraints.gridwidth = 3;
+                gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+                panelFilterBtns.add(lblShipSearchTarget, gridBagConstraints);
+                updateShipSearchTarget();
                 
                 javax.swing.ButtonGroup group = new javax.swing.ButtonGroup();
                 group.add(radioNormalRoll);
@@ -315,6 +339,15 @@ public class PersonnelMarketDialog extends JDialog {
         pack();
     }
     
+    private void updateShipSearchTarget() {
+		if (radioShipSearch.isSelected()) {
+			TargetRoll target = campaign.getPersonnelMarket().getShipSearchTarget(campaign,
+					comboShipType.getSelectedIndex() == 1); 
+			lblShipSearchTarget.setText("Target: " + target.getValueAsString()
+					+ " [" + target.getDesc() + "]");
+		}
+	}
+
 	public Person getPerson() {
 	    return selectedPerson;
 	}
@@ -333,7 +366,7 @@ public class PersonnelMarketDialog extends JDialog {
 	    		if(campaign.recruitPerson(selectedPerson)) {
 	    			Entity en = personnelMarket.getAttachedEntity(pid);
 	    			if (null != en) {
-	    				addUnit(en);
+	    				addUnit(en, true);
 	    				personnelMarket.removeAttachedEntity(pid);
 	    			}
 	    			personnelMarket.removePerson(selectedPerson);
@@ -347,19 +380,23 @@ public class PersonnelMarketDialog extends JDialog {
 
 	private void addPerson() {
 		Entity en = personnelMarket.getAttachedEntity(selectedPerson);
+		UUID pid = selectedPerson.getId();
 	    if(null != selectedPerson) {
 	    	campaign.addPersonWithoutId(selectedPerson, true);
+			addUnit(en, false);
 	    	personnelMarket.removePerson(selectedPerson);
     		personnelModel.setData(personnelMarket.getPersonnel());
-			addUnit(en);
+			personnelMarket.removeAttachedEntity(pid);
 	    	refreshHqView();
 	    	refreshPersonView();
 	    }
 	}
 
-	private void addUnit(Entity en) {
-		if ((null == en)  || 
-				!campaign.getFinances().debit(unitCost, Transaction.C_UNIT,
+	private void addUnit(Entity en, boolean pay) {
+		if (null == en) {
+			return; 
+		}
+		if (pay && !campaign.getFinances().debit(unitCost, Transaction.C_UNIT,
 				"Purchased " + en.getShortName(),
 				campaign.getCalendar().getTime())) {
 			return;
@@ -538,7 +575,7 @@ public class PersonnelMarketDialog extends JDialog {
         return personnelModel.new Renderer();
     }
 
-    public static String getPersonnelGroupName(int group) {
+	public static String getPersonnelGroupName(int group) {
         switch(group) {
         case CampaignGUI.PG_ACTIVE:
             return "All Personnel";

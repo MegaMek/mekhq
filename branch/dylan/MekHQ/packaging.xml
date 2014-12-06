@@ -20,7 +20,7 @@
     <!-- Global properties for this build -->
     <!-- Version and packaging properties -->
     <property name="project.name" value="mekhq" />
-    <property name="version" value="0.3.5"/>
+    <property name="version" value="0.3.7"/>
     <property name="osxdist" value="${project.name}-${version}-mac" />
     <property name="windist" value="${project.name}-${version}-windows" />
     <property name="nixdist" value="${project.name}-${version}" />
@@ -34,6 +34,8 @@
     <property name="datadir" value="data" />
     <property name="apidocsdir" value="apidocs" />
     <property name="docdir" value="docs" />
+    <property name="docmmdir" value="docs-mm" />
+    <property name="docmmldir" value="docs-mml" />
     <property name="svndir" value="svndev" />
     <property name="localdir" value="localdev" />
     <property name="util" value="packaging_utils" />
@@ -126,19 +128,14 @@
         <exec executable="svn">
             <arg line="--force export ${svnlibs} ${svndir}/${libdir}" />
         </exec>
-    	<!-- Move MekHQ's history.txt out of the way... -->
-        <move file="${svndir}/${docdir}/history.txt" tofile="${svndir}/${docdir}/history-mhq.txt"/>
-        <!-- now add in doc files -->
+        <!-- now add in MM and MML doc files -->
         <exec executable="svn">
-            <arg line="export ${svnmmdocs} ${svndir}/${docdir}" />
+            <arg line="export ${svnmmdocs} ${svndir}/${docdir}/${docmmdir}" />
         </exec>
     	<move file="${svndir}/${docdir}/history.txt" tofile="${svndir}/${docdir}/history-mm.txt"/>
         <exec executable="svn">
-            <arg line="export ${svnmmldocs} ${svndir}/${docdir}" />
-        </exec>
-        <move file="${svndir}/${docdir}/history.txt" tofile="${svndir}/${docdir}/history-mml.txt"/>
-        <!-- Move MekHQ's history.txt back... -->
-        <move file="${svndir}/${docdir}/history-mhq.txt" tofile="${svndir}/${docdir}/history.txt"/>
+            <arg line="export ${svnmmldocs} ${svndir}/${docdir}/${docmmldir}" />
+        </exec>       
         <!-- ok now move some stuff back into data that needs to be there-->
         <copy todir="${svndir}/${datadir}">
             <fileset dir="${svndir}/${datadir}-OLD" >

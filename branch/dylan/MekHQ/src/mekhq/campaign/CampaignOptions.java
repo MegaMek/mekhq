@@ -202,6 +202,7 @@ public class CampaignOptions implements Serializable {
     private int opforLanceTypeMechs;
     private int opforLanceTypeMixed;
     private int opforLanceTypeVehicles;
+    private boolean opforUsesVTOLs;
     private boolean regionalMechVariations;
     private boolean aeroRecruitsHaveUnits;
     private boolean useShareSystem;
@@ -384,6 +385,7 @@ public class CampaignOptions implements Serializable {
         opforLanceTypeMechs = 1;
         opforLanceTypeMixed = 2;
         opforLanceTypeVehicles = 3;
+        opforUsesVTOLs = true;
     	useDropShips = false;
     	skillLevel = 2;
         aeroRecruitsHaveUnits = false;
@@ -1339,6 +1341,14 @@ public class CampaignOptions implements Serializable {
 		opforLanceTypeVehicles = weight;
 	}
 	
+	public boolean getOpforUsesVTOLs() {
+		return opforUsesVTOLs;
+	}
+	
+	public void setOpforUsesVTOLs(boolean vtol) {
+		opforUsesVTOLs = vtol;
+	}
+	
 	public void setAdjustPlayerVehicles(boolean adjust) {
 		adjustPlayerVehicles = adjust;
 	}
@@ -1713,6 +1723,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforLanceTypeMechs", opforLanceTypeMechs);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforLanceTypeMixed", opforLanceTypeMixed);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforLanceTypeVehicles", opforLanceTypeVehicles);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforUsesVTOLs", opforUsesVTOLs);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useDropShips", useDropShips);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "skillLevel", skillLevel);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "aeroRecruitsHaveUnits", aeroRecruitsHaveUnits);
@@ -2104,7 +2115,9 @@ public class CampaignOptions implements Serializable {
                 retVal.opforLanceTypeMixed = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("opforLanceTypeVehicles")) {
                 retVal.opforLanceTypeVehicles = Integer.parseInt(wn2.getTextContent().trim());
-           } else if (wn2.getNodeName().equalsIgnoreCase("useDropShips")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("opforUsesVTOLs")) {
+                retVal.opforUsesVTOLs = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useDropShips")) {
                 retVal.useDropShips = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("skillLevel")) {
                 retVal.skillLevel = Integer.parseInt(wn2.getTextContent().trim());
