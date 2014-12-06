@@ -117,12 +117,14 @@ import mekhq.campaign.parts.BaArmor;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekLocation;
+import mekhq.campaign.parts.MissingBattleArmorSuit;
 import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.MissingMekActuator;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.ProtomekArmor;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.parts.StructuralIntegrity;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
@@ -1062,6 +1064,52 @@ public class Campaign implements Serializable {
      */
     public ArrayList<Part> getParts() {
         return parts;
+    }
+    
+    public Hashtable<String, Integer> getPartsInUse() {
+    	Hashtable<String, Integer> inUse = new Hashtable<String, Integer>();
+    	for (Part p : parts) {
+    		// SI isn't a proper "part"
+    		if (p instanceof StructuralIntegrity) {
+    			continue;
+    		}
+    		
+    		String pname = p.getName();
+			Unit u = p.getUnit();
+			if (!(p instanceof MissingBattleArmorSuit)) {
+				p.setUnit(null);
+			}
+			String details = p.getDetails();
+			p.setUnit(u);
+		    details = details.replaceFirst("\\d+\\shit\\(s\\),\\s", "");
+		    details = details.replaceFirst("\\d+\\shit\\(s\\)", "");
+		    if (details.length() > 0 && !(p instanceof Armor || p instanceof BaArmor || p instanceof ProtomekArmor)) {
+		    	pname +=  " (" + details + ")";
+		    }
+    		int q = 1;
+    		if (p instanceof Armor) {
+    			Armor a = (Armor) p;
+    			q = a.getAmount();
+    		}
+    		if (p instanceof BaArmor) {
+    			BaArmor a = (BaArmor) p;
+    			q = a.getAmount();
+    		}
+    		if (p instanceof ProtomekArmor) {
+    			ProtomekArmor a = (ProtomekArmor) p;
+    			q = a.getAmount();
+    		}
+    		if (p.getUnit() != null || p.getUnitId() != null) {
+    			if (inUse.containsKey(pname)) {
+    				int temp = inUse.get(pname);
+    				temp += q;
+    				inUse.put(pname, temp);
+    			} else {
+    				inUse.put(pname, q);
+    			}
+    		}
+    	}
+    	return inUse;
     }
 
     public Part getPart(int id) {
