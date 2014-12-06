@@ -21,6 +21,7 @@
 package mekhq.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -54,9 +55,11 @@ import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
@@ -98,6 +101,7 @@ import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SortOrder;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
@@ -187,6 +191,8 @@ import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.rating.UnitRatingFactory;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
@@ -536,6 +542,29 @@ public class CampaignGUI extends JPanel {
     private TableRowSorter<TechTableModel> techSorter;
     private TableRowSorter<TechTableModel> whTechSorter;
 
+    // Start Overview Tab
+    private JPanel panOverview;
+    private JTabbedPane tabOverview;
+    // Overview Parts In Use
+    private JScrollPane scrollOverviewParts;
+    private JPanel overviewPartsPanel;
+    // Overview Transport
+    private JScrollPane scrollOverviewTransport;
+    // Overview Personnel
+    private JScrollPane scrollOverviewCombatPersonnel;
+    private JScrollPane scrollOverviewSupportPersonnel;
+    private JSplitPane splitOverviewPersonnel;
+    // Overview Hangar
+    private JScrollPane scrollOverviewHangar;
+    private JTextArea overviewHangarArea;
+    private JSplitPane splitOverviewHangar;
+    // Overview Rating
+    private JScrollPane scrollOverviewUnitRating;
+    private IUnitRating rating;
+    // Overview Cargo
+    private JScrollPane scrollOverviewCargo;
+    // End Overview Tab
+
     ReportHyperlinkListener reportHLL;
 
     public int selectedMission;
@@ -686,6 +715,11 @@ public class CampaignGUI extends JPanel {
                 resourceMap.getString("panFinances.TabConstraints.tabTitle"),
                 panFinances); // NOI18N
 
+        initOverviewTab();
+        tabMain.addTab(
+                resourceMap.getString("panOverview.TabConstraints.tabTitle"),
+                panOverview); // NOI18N
+
         initMain();
         initTopButtons();
         initStatusBar();
@@ -717,6 +751,7 @@ public class CampaignGUI extends JPanel {
         refreshTempAstechs();
         refreshTempMedics();
         refreshScenarioList();
+        refreshOverview();
 
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 
@@ -780,8 +815,7 @@ public class CampaignGUI extends JPanel {
         scrollForceView
                 .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
-        splitOrg = new JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT,
-                new JScrollPane(orgTree), scrollForceView);
+        splitOrg = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(orgTree), scrollForceView);
         splitOrg.setOneTouchExpandable(true);
         splitOrg.setResizeWeight(1.0);
         splitOrg.addPropertyChangeListener(
@@ -931,9 +965,7 @@ public class CampaignGUI extends JPanel {
         scrollScenarioTable.setMinimumSize(new java.awt.Dimension(200, 200));
         scrollScenarioTable.setPreferredSize(new java.awt.Dimension(200, 200));
 
-        splitMission = new javax.swing.JSplitPane(
-                javax.swing.JSplitPane.VERTICAL_SPLIT, panBriefing,
-                scrollScenarioTable);
+        splitMission = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panBriefing, scrollScenarioTable);
         splitMission.setOneTouchExpandable(true);
         splitMission.setResizeWeight(1.0);
 
@@ -1159,9 +1191,7 @@ public class CampaignGUI extends JPanel {
         scrollPlanetView
                 .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPlanetView.setViewportView(null);
-        splitMap = new javax.swing.JSplitPane(
-                javax.swing.JSplitPane.HORIZONTAL_SPLIT, panMapView,
-                scrollPlanetView);
+        splitMap = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panMapView, scrollPlanetView);
         splitMap.setOneTouchExpandable(true);
         splitMap.setResizeWeight(1.0);
         splitMap.addPropertyChangeListener(
@@ -1176,6 +1206,101 @@ public class CampaignGUI extends JPanel {
 
         panMap.setCampaign(getCampaign());
     }
+
+	private void initOverviewTab() {
+		GridBagConstraints gridBagConstraints;
+
+		panOverview = new JPanel();
+		tabOverview = new JTabbedPane();
+		scrollOverviewParts = new JScrollPane();
+		overviewPartsPanel = new JPanel(new GridBagLayout());
+		scrollOverviewTransport = new JScrollPane();
+		scrollOverviewCombatPersonnel = new JScrollPane();
+		scrollOverviewSupportPersonnel = new JScrollPane();
+		scrollOverviewHangar = new JScrollPane();
+		overviewHangarArea = new JTextArea();
+		splitOverviewHangar = new JSplitPane();
+		scrollOverviewUnitRating = new JScrollPane();
+		scrollOverviewCargo = new JScrollPane();
+
+		// Overview tab
+		panOverview.setName("panelOverview"); // NOI18N
+		panOverview.setLayout(new java.awt.GridBagLayout());
+
+		tabOverview.setToolTipText(resourceMap.getString("tabOverview.toolTipText")); // NOI18N
+		tabOverview.setMinimumSize(new java.awt.Dimension(250, 250));
+		tabOverview.setName("tabOverview"); // NOI18N
+		tabOverview.setPreferredSize(new java.awt.Dimension(800, 300));
+
+		scrollOverviewTransport.setToolTipText(resourceMap.getString("scrollOverviewTransport.TabConstraints.toolTipText")); // NOI18N
+		scrollOverviewTransport.setMinimumSize(new java.awt.Dimension(350, 400));
+		scrollOverviewTransport.setPreferredSize(new java.awt.Dimension(350, 400));
+		scrollOverviewTransport.setViewportView(new TransportReport(getCampaign()).getReport());
+		tabOverview.addTab(resourceMap.getString("scrollOverviewTransport.TabConstraints.tabTitle"), scrollOverviewTransport);
+
+		scrollOverviewCargo.setToolTipText(resourceMap.getString("scrollOverviewCargo.TabConstraints.toolTipText")); // NOI18N
+		scrollOverviewCargo.setMinimumSize(new java.awt.Dimension(350, 400));
+		scrollOverviewCargo.setPreferredSize(new java.awt.Dimension(350, 400));
+		scrollOverviewCargo.setViewportView(new CargoReport(getCampaign()).getReport());
+		tabOverview.addTab(resourceMap.getString("scrollOverviewCargo.TabConstraints.tabTitle"), scrollOverviewCargo);
+
+		scrollOverviewCombatPersonnel.setMinimumSize(new java.awt.Dimension(350, 400));
+		scrollOverviewCombatPersonnel.setPreferredSize(new java.awt.Dimension(350, 400));
+		scrollOverviewCombatPersonnel.setViewportView(new PersonnelReport(getCampaign()).getCombatPersonnelReport());
+		scrollOverviewSupportPersonnel.setMinimumSize(new java.awt.Dimension(350, 400));
+		scrollOverviewSupportPersonnel.setPreferredSize(new java.awt.Dimension(350, 400));
+        scrollOverviewSupportPersonnel.setViewportView(new PersonnelReport(getCampaign()).getSupportPersonnelReport());
+
+		splitOverviewPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollOverviewCombatPersonnel, scrollOverviewSupportPersonnel);
+		splitOverviewPersonnel.setName("splitOverviewPersonnel");
+		splitOverviewPersonnel.setOneTouchExpandable(true);
+		splitOverviewPersonnel.setResizeWeight(0.5);
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 1.0;
+		tabOverview.addTab(resourceMap.getString("scrollOverviewPersonnel.TabConstraints.tabTitle"), splitOverviewPersonnel);
+
+		scrollOverviewHangar.setViewportView(new HangarReport(getCampaign()).getHangarTree());
+		overviewHangarArea.setName("overviewHangarArea"); // NOI18N
+		overviewHangarArea.setLineWrap(false);
+		overviewHangarArea.setFont(new Font("Courier New", Font.PLAIN, 18));
+		overviewHangarArea.setText("");
+		overviewHangarArea.setEditable(false);
+		overviewHangarArea.setName("overviewHangarArea"); // NOI18N
+		splitOverviewHangar = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollOverviewHangar, overviewHangarArea);
+		splitOverviewHangar.setName("splitOverviewHangar");
+		splitOverviewHangar.setOneTouchExpandable(true);
+		splitOverviewHangar.setResizeWeight(0.5);
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 1.0;
+		tabOverview.addTab(resourceMap.getString("scrollOverviewHangar.TabConstraints.tabTitle"), splitOverviewHangar);
+
+		overviewPartsPanel.setName("overviewPartsPanel"); // NOI18N
+		scrollOverviewParts.setViewportView(overviewPartsPanel);
+		tabOverview.addTab(resourceMap.getString("scrollOverviewParts.TabConstraints.tabTitle"), scrollOverviewParts);
+
+		rating = UnitRatingFactory.getUnitRating(getCampaign());
+		rating.reInitialize();
+		scrollOverviewUnitRating.setViewportView(new RatingReport(getCampaign()).getReport());
+		tabOverview.addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"), scrollOverviewUnitRating);
+
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 1.0;
+		//gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+		panOverview.add(tabOverview, gridBagConstraints);
+	}
 
     private void initPersonnelTab() {
         GridBagConstraints gridBagConstraints;
@@ -1502,9 +1627,7 @@ public class CampaignGUI extends JPanel {
         panAcquireUnit.setMinimumSize(new Dimension(200, 200));
         panAcquireUnit.setPreferredSize(new Dimension(200, 200));
 
-        JSplitPane splitLeftUnit = new JSplitPane(
-                javax.swing.JSplitPane.VERTICAL_SPLIT, new JScrollPane(
-                        unitTable), panAcquireUnit);
+        JSplitPane splitLeftUnit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(unitTable), panAcquireUnit);
         splitLeftUnit.setOneTouchExpandable(true);
         splitLeftUnit.setResizeWeight(1.0);
 
@@ -1517,9 +1640,7 @@ public class CampaignGUI extends JPanel {
                 .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollUnitView.setViewportView(null);
 
-        splitUnit = new javax.swing.JSplitPane(
-                javax.swing.JSplitPane.HORIZONTAL_SPLIT, splitLeftUnit,
-                scrollUnitView);
+        splitUnit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitLeftUnit, scrollUnitView);
         splitUnit.setOneTouchExpandable(true);
         splitUnit.setResizeWeight(1.0);
         splitUnit.addPropertyChangeListener(
@@ -1850,14 +1971,10 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panelDoTaskWarehouse.add(astechPoolLabelWarehouse, gridBagConstraints);
 
-        JSplitPane splitLeft = new javax.swing.JSplitPane(
-                javax.swing.JSplitPane.VERTICAL_SPLIT, panSupplies,
-                acquirePartsPanel);
+        JSplitPane splitLeft = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panSupplies, acquirePartsPanel);
         splitLeft.setOneTouchExpandable(true);
         splitLeft.setResizeWeight(1.0);
-        splitWarehouse = new javax.swing.JSplitPane(
-                javax.swing.JSplitPane.HORIZONTAL_SPLIT, splitLeft,
-                panelDoTaskWarehouse);
+        splitWarehouse = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitLeft, panelDoTaskWarehouse);
         splitWarehouse.setOneTouchExpandable(true);
         splitWarehouse.setResizeWeight(1.0);
     }
@@ -2368,11 +2485,9 @@ public class CampaignGUI extends JPanel {
         scrollLoanTable.setMinimumSize(new java.awt.Dimension(450, 150));
         scrollLoanTable.setPreferredSize(new java.awt.Dimension(450, 150));
         panLoan.setBorder(BorderFactory.createTitledBorder("Active Loans"));
-        // JSplitPane splitFinances = new
-        // JSplitPane(javax.swing.JSplitPane.VERTICAL_SPLIT,panBalance,
-        // panLoan);
-        // splitFinances.setOneTouchExpandable(true);
-        // splitFinances.setResizeWeight(1.0);
+        //JSplitPane splitFinances = new JSplitPane(JSplitPane.VERTICAL_SPLIT,panBalance, panLoan);
+        //splitFinances.setOneTouchExpandable(true);
+        //splitFinances.setResizeWeight(1.0);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -2946,8 +3061,7 @@ public class CampaignGUI extends JPanel {
         gmTools = new GMToolsDialog(getFrame());
         bloodnameDialog = new BloodnameDialog(getFrame());
 
-        mainPanel = new javax.swing.JSplitPane(
-                javax.swing.JSplitPane.HORIZONTAL_SPLIT, tabMain, panLog);
+        mainPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tabMain, panLog);
         mainPanel.setOneTouchExpandable(true);
         mainPanel.setResizeWeight(1.0);
     }
@@ -3423,6 +3537,7 @@ public class CampaignGUI extends JPanel {
         refreshReport();
         refreshFunds();
         refreshFinancialTransactions();
+        refreshOverview();
         filterTasks();
 
         // get the selected row back for tasks
@@ -3877,6 +3992,7 @@ public class CampaignGUI extends JPanel {
         refreshReport();
         refreshFunds();
         refreshFinancialTransactions();
+        refreshOverview();
         panMap.repaint();
     }// GEN-LAST:event_btnAdvanceDayActionPerformed
 
@@ -4274,7 +4390,7 @@ public class CampaignGUI extends JPanel {
         getCampaign().setGMMode(btnGMMode.isSelected());
         btnAddFunds.setEnabled(btnGMMode.isSelected());
         btnManageAssets.setEnabled(btnGMMode.isSelected());
-
+        refreshOverview();
     }// GEN-LAST:event_btnGMModeActionPerformed
 
     private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuOptionsActionPerformed
@@ -4301,6 +4417,7 @@ public class CampaignGUI extends JPanel {
         getCampaign().reloadNews();
         changePersonnelView();
         refreshPersonnelList();
+        refreshOverview();
         panMap.repaint();
     }// GEN-LAST:event_menuOptionsActionPerformed
 
@@ -4314,6 +4431,7 @@ public class CampaignGUI extends JPanel {
             refreshCalendar();
             changePersonnelView();
             refreshPersonnelList();
+            refreshOverview();
         }
     }// GEN-LAST:event_menuOptionsActionPerformed
 
@@ -4391,6 +4509,7 @@ public class CampaignGUI extends JPanel {
         refreshReport();
         refreshFunds();
         refreshFinancialTransactions();
+        refreshOverview();
     }// GEN-LAST:event_miPurchaseUnitActionPerformed
 
     private void buyParts() {
@@ -4398,6 +4517,7 @@ public class CampaignGUI extends JPanel {
         psd.setVisible(true);
         refreshPartsList();
         refreshAcquireList();
+        refreshOverview();
     }
 
     private void showNewLoanDialog() {
@@ -4504,6 +4624,7 @@ public class CampaignGUI extends JPanel {
         refreshServicedUnitList();
         refreshOrganization();
         refreshPartsList();
+        refreshOverview();
     }
 
     private void showReport(Report report) {
@@ -4556,6 +4677,164 @@ public class CampaignGUI extends JPanel {
             return null;
         }
         return techHash.get(s).getId();
+    }
+
+    public Part getPartByNameAndDetails(String pnd) {
+    	ArrayList<Part> store = getCampaign().getPartsStore().getInventory();
+    	for (Part p : store) {
+    		String pname = p.getName();
+			String details = p.getDetails();
+			details = details.replaceFirst("\\d+\\shit\\(s\\),\\s", "");
+		    details = details.replaceFirst("\\d+\\shit\\(s\\)", "");
+		    if (details.length() > 0 && !(p instanceof Armor || p instanceof BaArmor || p instanceof ProtomekArmor)) {
+		    	pname +=  " (" + details + ")";
+		    }
+		    if (pname.equals(pnd)) {
+		    	return p;
+		    }
+    	}
+    	return null;
+    }
+
+    public void refreshOverview() {
+    	int drIndex = tabOverview.indexOfComponent(scrollOverviewUnitRating);
+        if (!getCampaign().getCampaignOptions().useDragoonRating() && drIndex != -1) {
+        	tabOverview.removeTabAt(drIndex);
+        } else {
+        	if (drIndex == -1) {
+        		tabOverview.addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"), scrollOverviewUnitRating);
+        	}
+        }
+
+        scrollOverviewUnitRating.setViewportView(new RatingReport(getCampaign()).getReport());
+        scrollOverviewCombatPersonnel.setViewportView(new PersonnelReport(getCampaign()).getCombatPersonnelReport());
+        scrollOverviewSupportPersonnel.setViewportView(new PersonnelReport(getCampaign()).getSupportPersonnelReport());
+        scrollOverviewTransport.setViewportView(new TransportReport(getCampaign()).getReport());
+        scrollOverviewCargo.setViewportView(new CargoReport(getCampaign()).getReport());
+        HangarReport hr = new HangarReport(getCampaign());
+        overviewHangarArea.setText(hr.getHangarTotals());
+        scrollOverviewHangar.setViewportView(hr.getHangarTree());
+        refreshOverviewPartsInUse();
+    }
+
+    public void refreshOverviewPartsInUse() {
+    	overviewPartsPanel.removeAll();
+    	int i = 0;
+    	int j = 0;
+    	GridBagConstraints gbc;
+    	JLabel partName;
+    	JLabel partNum;
+    	JButton partBuy;
+    	JButton partBuyInBulk;
+    	JButton partAddGM;
+    	JButton partAddBulkGM;
+    	Color bgc = new Color(255, 255, 255);
+    	boolean opaque;
+    	Hashtable<String, Integer> pinu = getCampaign().getPartsInUse();
+    	String[] keys = (String[]) pinu.keySet().toArray(new String[0]);
+    	Arrays.sort(keys);
+    	for (String pname : keys) {
+    		final String pn = pname;
+    		j++;
+    		if (i % 2 == 0) {
+    			opaque = false;
+    		} else {
+    			opaque = true;
+    		}
+    		int pnum = pinu.get(pname);
+    		partName = new JLabel("<html>&nbsp;&nbsp;&nbsp;"+pname+"&nbsp;&nbsp;&nbsp;</html>");
+    		partName.setBackground(bgc);
+    		partName.setOpaque(opaque);
+    		partName.setVerticalAlignment(SwingConstants.CENTER);
+    		gbc = new java.awt.GridBagConstraints();
+    		gbc.gridx = 0;
+    		gbc.gridy = i;
+    		gbc.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    		gbc.fill = GridBagConstraints.BOTH;
+    		gbc.weightx = 1.0;
+            if(j == pinu.size()) {
+            	gbc.weighty = 1.0;
+            }
+            overviewPartsPanel.add(partName, gbc);
+    		partNum = new JLabel("  "+Integer.toString(pnum)+"  ");
+    		partNum.setBackground(bgc);
+    		partNum.setOpaque(opaque);
+    		partNum.setVerticalAlignment(SwingConstants.CENTER);
+    		partNum.setHorizontalAlignment(SwingConstants.TRAILING);
+    		gbc.gridx = 1;
+    		gbc.weightx = 0.0;
+    		overviewPartsPanel.add(partNum, gbc);
+    		partBuy = new JButton("Buy");
+    		partBuy.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	            	Part p = getPartByNameAndDetails(pn);
+	            	getCampaign().getShoppingList().addShoppingItem(p.getAcquisitionWork(), 1, getCampaign());
+	            	refreshReport();
+	        		refreshAcquireList();
+	        		refreshPartsList();
+	        		refreshFinancialTransactions();
+	                refreshOverview();
+	            }
+	        });
+    		gbc.gridx = 2;
+    		overviewPartsPanel.add(partBuy, gbc);
+    		partBuyInBulk = new JButton("Buy in Bulk");
+    		partBuyInBulk.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	            	Part p = getPartByNameAndDetails(pn);
+	            	int quantity = 1;
+	            	PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true, "How Many " + p.getName(), quantity, 1, 100);
+	    			pcd.setVisible(true);
+	    			quantity = pcd.getValue();
+	            	getCampaign().getShoppingList().addShoppingItem(p.getAcquisitionWork(), quantity, getCampaign());
+	            	refreshReport();
+	        		refreshAcquireList();
+	        		refreshPartsList();
+	        		refreshFinancialTransactions();
+	                refreshOverview();
+	            }
+	        });
+    		gbc.gridx = 3;
+    		overviewPartsPanel.add(partBuyInBulk, gbc);
+    		partAddGM = new JButton("Add (GM)");
+    		partAddGM.setEnabled(getCampaign().isGM());
+    		partAddGM.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	            	Part p = getPartByNameAndDetails(pn);
+	            	getCampaign().addPart(p.clone(), 0);
+	            	refreshReport();
+	        		refreshAcquireList();
+	        		refreshPartsList();
+	        		refreshFinancialTransactions();
+	                refreshOverview();
+	            }
+	        });
+    		gbc.gridx = 4;
+    		overviewPartsPanel.add(partAddGM, gbc);
+    		partAddBulkGM = new JButton("Add in Bulk (GM)");
+    		partAddBulkGM.setEnabled(getCampaign().isGM());
+    		partAddBulkGM.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	            	Part p = getPartByNameAndDetails(pn);
+	            	int quantity = 1;
+	            	PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true, "How Many " + p.getName(), quantity, 1, 100);
+	    			pcd.setVisible(true);
+	    			quantity = pcd.getValue();
+	    			while(quantity > 0) {
+	    				getCampaign().addPart(p.clone(), 0);
+	    		        quantity--;
+	    		    }
+	            	refreshReport();
+	        		refreshAcquireList();
+	        		refreshPartsList();
+	        		refreshFinancialTransactions();
+	                refreshOverview();
+	            }
+	        });
+    		gbc.gridx = 5;
+    		overviewPartsPanel.add(partAddBulkGM, gbc);
+            i++;
+    	}
     }
 
     private void refreshPersonnelView() {
@@ -4804,6 +5083,7 @@ public class CampaignGUI extends JPanel {
         refreshPersonnelList();
         refreshPatientList();
         refreshReport();
+        refreshOverview();
     }
 
     protected void loadPersonFile() throws IOException {
@@ -4910,6 +5190,7 @@ public class CampaignGUI extends JPanel {
         refreshDoctorsList();
         refreshReport();
         refreshFinancialTransactions();
+        refreshOverview();
     }
 
     private void savePersonFile() throws IOException {
@@ -5555,6 +5836,7 @@ public class CampaignGUI extends JPanel {
             refreshPatientList();
             refreshPersonnelList();
             refreshScenarioList();
+            refreshOverview();
             filterTasks();
         }
     }
@@ -5609,6 +5891,7 @@ public class CampaignGUI extends JPanel {
         refreshReport();
         changeMission();
         refreshFinancialTransactions();
+        refreshOverview();
     }
 
     protected void printRecordSheets() {
@@ -5895,6 +6178,7 @@ public class CampaignGUI extends JPanel {
         refreshUnitList();
         refreshPatientList();
         refreshPersonnelList();
+        refreshOverview();
 
         if (undeployed.length() > 0) {
             JOptionPane.showMessageDialog(
@@ -7926,6 +8210,7 @@ public class CampaignGUI extends JPanel {
                 refreshPartsList();
                 refreshAcquireList();
                 refreshReport();
+                refreshOverview();
                 filterTasks();
             } else if (command.contains("SWAP_AMMO")) {
                 /*
@@ -7949,6 +8234,7 @@ public class CampaignGUI extends JPanel {
                 refreshTaskList();
                 refreshUnitView();
                 refreshAcquireList();
+                refreshOverview();
             } else if (command.contains("UNASSIGN")) {
                 /*
                  * for (WorkItem task : tasks) { task.resetTimeSpent();
@@ -7977,6 +8263,7 @@ public class CampaignGUI extends JPanel {
                     refreshTaskList();
                     refreshAcquireList();
                     refreshPartsList();
+                    refreshOverview();
                 }
             }
         }
@@ -8067,6 +8354,7 @@ public class CampaignGUI extends JPanel {
                 refreshTaskList();
                 refreshAcquireList();
                 refreshPartsList();
+                refreshOverview();
                 filterTasks();
             }
         }
@@ -8150,6 +8438,7 @@ public class CampaignGUI extends JPanel {
                 refreshAcquireList();
                 refreshServicedUnitList();
                 refreshUnitList();
+                refreshOverview();
                 filterTasks();
             } else if (command.contains("CHANGE_SITE")) {
                 for (Unit unit : units) {
@@ -8165,6 +8454,7 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshTaskList();
                 refreshAcquireList();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("SALVAGE")) {
                 for (Unit unit : units) {
                     if (!unit.isDeployed()) {
@@ -8174,6 +8464,7 @@ public class CampaignGUI extends JPanel {
                 }
                 refreshServicedUnitList();
                 refreshUnitList();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("REPAIR")) {
                 for (Unit unit : units) {
                     if (!unit.isDeployed() && unit.isRepairable()) {
@@ -8183,6 +8474,7 @@ public class CampaignGUI extends JPanel {
                 }
                 refreshServicedUnitList();
                 refreshUnitList();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("REMOVE")) {
                 for (Unit unit : units) {
                     if (!unit.isDeployed()) {
@@ -8198,6 +8490,7 @@ public class CampaignGUI extends JPanel {
                 refreshServicedUnitList();
                 refreshUnitList();
                 refreshReport();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("UNDEPLOY")) {
                 for (Unit unit : units) {
                     if (unit.isDeployed()) {
@@ -8215,6 +8508,7 @@ public class CampaignGUI extends JPanel {
                 refreshReport();
                 refreshPatientList();
                 refreshScenarioList();
+                refreshOverview();
             }
         }
 
@@ -8403,6 +8697,7 @@ public class CampaignGUI extends JPanel {
                         refreshPersonnelList();
                         refreshUnitList();
                         refreshServicedUnitList();
+                        refreshOverview();
                     }
                 }
             } else if (command.contains("UNDEPLOY_FORCE")) {
@@ -8414,6 +8709,7 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshServicedUnitList();
                 refreshScenarioList();
+                refreshOverview();
             } else if (command.contains("DEPLOY_FORCE")) {
                 int sid = Integer.parseInt(target);
                 Scenario scenario = getCampaign().getScenario(sid);
@@ -8435,6 +8731,7 @@ public class CampaignGUI extends JPanel {
                 refreshPersonnelList();
                 refreshUnitList();
                 refreshServicedUnitList();
+                refreshOverview();
             } else if (command.contains("CHANGE_ICON")) {
                 if (null != singleForce) {
                     PortraitChoiceDialog pcd = new PortraitChoiceDialog(
@@ -8485,6 +8782,7 @@ public class CampaignGUI extends JPanel {
                 refreshPersonnelList();
                 refreshScenarioList();
                 refreshUnitList();
+                refreshOverview();
             } else if (command.contains("REMOVE_UNIT")) {
                 for (Unit unit : units) {
                     if (null != unit) {
@@ -8499,6 +8797,7 @@ public class CampaignGUI extends JPanel {
                 refreshPersonnelList();
                 refreshScenarioList();
                 refreshUnitList();
+                refreshOverview();
             } else if (command.contains("UNDEPLOY_UNIT")) {
                 for (Unit unit : units) {
                     undeployUnit(unit);
@@ -8508,6 +8807,7 @@ public class CampaignGUI extends JPanel {
                 refreshPersonnelList();
                 refreshUnitList();
                 refreshServicedUnitList();
+                refreshOverview();
             } else if (command.contains("GOTO_UNIT")) {
                 if (null != singleUnit) {
                     focusOnUnit(singleUnit.getId());
@@ -8531,6 +8831,7 @@ public class CampaignGUI extends JPanel {
                 refreshPersonnelList();
                 refreshUnitList();
                 refreshServicedUnitList();
+                refreshOverview();
             } else if (command.contains("C3I")) {
                 // don't set them directly, set the C3i UUIDs and then
                 // run refreshNetworks on the campaign
@@ -9177,6 +9478,7 @@ public class CampaignGUI extends JPanel {
                 refreshTechsList();
                 refreshDoctorsList();
                 refreshOrganization();
+                refreshOverview();
             } else if (command.startsWith("MD_RANK")) {
                 int md_rank = Integer.parseInt(st.nextToken());
                 for (Person person : people) {
@@ -9189,6 +9491,7 @@ public class CampaignGUI extends JPanel {
                 refreshTechsList();
                 refreshDoctorsList();
                 refreshOrganization();
+                refreshOverview();
             } else if (command.startsWith("MD_CLASS")) {
                 int md_class = Integer.parseInt(st.nextToken());
                 for (Person person : people) {
@@ -9201,6 +9504,7 @@ public class CampaignGUI extends JPanel {
                 refreshTechsList();
                 refreshDoctorsList();
                 refreshOrganization();
+                refreshOverview();
             } else if (command.startsWith("DESIG_PRI")) {
                 int designation = Integer.parseInt(st.nextToken());
                 for (Person person : people) {
@@ -9213,6 +9517,7 @@ public class CampaignGUI extends JPanel {
                 refreshTechsList();
                 refreshDoctorsList();
                 refreshOrganization();
+                refreshOverview();
             } else if (command.startsWith("DESIG_SEC")) {
                 int designation = Integer.parseInt(st.nextToken());
                 for (Person person : people) {
@@ -9225,6 +9530,7 @@ public class CampaignGUI extends JPanel {
                 refreshTechsList();
                 refreshDoctorsList();
                 refreshOrganization();
+                refreshOverview();
             } else if (command.contains("PROLE")) {
                 int role = Integer.parseInt(st.nextToken());
                 for (Person person : people) {
@@ -9238,6 +9544,7 @@ public class CampaignGUI extends JPanel {
                 refreshTechsList();
                 refreshDoctorsList();
                 refreshOrganization();
+                refreshOverview();
             } else if (command.contains("SROLE")) {
                 int role = Integer.parseInt(st.nextToken());
                 for (Person person : people) {
@@ -9251,6 +9558,7 @@ public class CampaignGUI extends JPanel {
                 refreshTechsList();
                 refreshDoctorsList();
                 refreshOrganization();
+                refreshOverview();
             } else if (command.contains("REMOVE_UNIT")) {
                 for (Person person : people) {
                     Unit u = getCampaign().getUnit(person.getUnitId());
@@ -9277,6 +9585,7 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshPersonnelList();
                 refreshOrganization();
+                refreshOverview();
             } else if (command.contains("ADD_PILOT")) {
                 UUID selected = UUID.fromString(st.nextToken());
                 Unit u = getCampaign().getUnit(selected);
@@ -9294,6 +9603,7 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshPersonnelList();
                 refreshOrganization();
+                refreshOverview();
             } else if (command.contains("ADD_SOLDIER")) {
                 UUID selected = UUID.fromString(st.nextToken());
                 Unit u = getCampaign().getUnit(selected);
@@ -9314,6 +9624,7 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshPersonnelList();
                 refreshOrganization();
+                refreshOverview();
             } else if (command.contains("ADD_DRIVER")) {
                 UUID selected = UUID.fromString(st.nextToken());
                 Unit u = getCampaign().getUnit(selected);
@@ -9331,6 +9642,7 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshPersonnelList();
                 refreshOrganization();
+                refreshOverview();
             } else if (command.contains("ADD_VESSEL_PILOT")) {
                 UUID selected = UUID.fromString(st.nextToken());
                 Unit u = getCampaign().getUnit(selected);
@@ -9351,6 +9663,7 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshPersonnelList();
                 refreshOrganization();
+                refreshOverview();
             } else if (command.contains("ADD_GUNNER")) {
                 UUID selected = UUID.fromString(st.nextToken());
                 Unit u = getCampaign().getUnit(selected);
@@ -9371,6 +9684,7 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshPersonnelList();
                 refreshOrganization();
+                refreshOverview();
             } else if (command.contains("ADD_CREW")) {
                 UUID selected = UUID.fromString(st.nextToken());
                 Unit u = getCampaign().getUnit(selected);
@@ -9391,6 +9705,7 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshPersonnelList();
                 refreshOrganization();
+                refreshOverview();
             } else if (command.contains("ADD_NAV")) {
                 UUID selected = UUID.fromString(st.nextToken());
                 Unit u = getCampaign().getUnit(selected);
@@ -9411,6 +9726,7 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshPersonnelList();
                 refreshOrganization();
+                refreshOverview();
             } else if (command.contains("ADD_TECH")) {
                 UUID selected = UUID.fromString(st.nextToken());
                 Unit u = getCampaign().getUnit(selected);
@@ -9425,6 +9741,7 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshPersonnelList();
                 refreshOrganization();
+                refreshOverview();
             } else if (command.contains("REMOVE_SPOUSE")) {
                 selectedPerson.getSpouse().addLogEntry(getCampaign().getDate(),
                         "Divorced from " + selectedPerson.getFullName());
@@ -9487,6 +9804,7 @@ public class CampaignGUI extends JPanel {
                 refreshDoctorsList();
                 refreshReport();
                 refreshOrganization();
+                refreshOverview();
             } else if (command.contains("ABILITY")) {
                 String selected = st.nextToken();
                 int cost = Integer.parseInt(st.nextToken());
@@ -9501,6 +9819,7 @@ public class CampaignGUI extends JPanel {
                 refreshTechsList();
                 refreshDoctorsList();
                 refreshReport();
+                refreshOverview();
             } else if (command.contains("WSPECIALIST")) {
                 String selected = st.nextToken();
                 int cost = Integer.parseInt(st.nextToken());
@@ -9515,6 +9834,7 @@ public class CampaignGUI extends JPanel {
                 refreshTechsList();
                 refreshDoctorsList();
                 refreshReport();
+                refreshOverview();
             } else if (command.contains("SPECIALIST")) {
                 String selected = st.nextToken();
                 int cost = Integer.parseInt(st.nextToken());
@@ -9529,6 +9849,7 @@ public class CampaignGUI extends JPanel {
                 refreshTechsList();
                 refreshDoctorsList();
                 refreshReport();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("STATUS")) {
                 int selected = Integer.parseInt(st.nextToken());
                 for (Person person : people) {
@@ -9550,6 +9871,7 @@ public class CampaignGUI extends JPanel {
                 refreshDoctorsList();
                 refreshReport();
                 refreshOrganization();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("PRISONER_STATUS")) {
                 int selected = Integer.parseInt(st.nextToken());
                 for (Person person : people) {
@@ -9564,6 +9886,7 @@ public class CampaignGUI extends JPanel {
                 refreshDoctorsList();
                 refreshReport();
                 refreshOrganization();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("EDGE")) {
                 String trigger = st.nextToken();
                 if (people.length > 1) {
@@ -9578,6 +9901,7 @@ public class CampaignGUI extends JPanel {
                 }
                 refreshPersonnelList();
                 refreshPersonnelView();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("REMOVE")) {
                 for (Person person : people) {
                     if (0 == JOptionPane.showConfirmDialog(
@@ -9596,6 +9920,7 @@ public class CampaignGUI extends JPanel {
                 refreshDoctorsList();
                 refreshOrganization();
                 refreshReport();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("SACK")) {
                 for (Person person : people) {
                     getCampaign().getRetirementDefectionTracker()
@@ -9639,6 +9964,7 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshPersonnelList();
                 refreshOrganization();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("HEAL")) {
                 for (Person person : people) {
                     person.setHits(0);
@@ -9652,6 +9978,7 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshPersonnelList();
                 refreshOrganization();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("PORTRAIT")) {
                 PortraitChoiceDialog pcd = new PortraitChoiceDialog(getFrame(),
                         true, selectedPerson.getPortraitCategory(),
@@ -9664,6 +9991,7 @@ public class CampaignGUI extends JPanel {
                 refreshPatientList();
                 refreshPersonnelList();
                 refreshOrganization();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("BIOGRAPHY")) {
                 TextAreaDialog tad = new TextAreaDialog(getFrame(), true,
                         "Edit Biography", selectedPerson.getBiography());
@@ -9672,12 +10000,14 @@ public class CampaignGUI extends JPanel {
                     selectedPerson.setBiography(tad.getText());
                 }
                 refreshPersonnelList();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("XP_ADD")) {
                 for (Person person : people) {
                     person.setXp(person.getXp() + 1);
                 }
                 refreshPatientList();
                 refreshPersonnelList();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("XP_SET")) {
                 PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
                         getFrame(), true, "XP", selectedPerson.getXp(), 0,
@@ -9692,6 +10022,7 @@ public class CampaignGUI extends JPanel {
                 }
                 refreshPatientList();
                 refreshPersonnelList();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("EDGE_SET")) {
                 PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
                         getFrame(), true, "Edge", selectedPerson.getEdge(), 0,
@@ -9706,6 +10037,7 @@ public class CampaignGUI extends JPanel {
                     getCampaign().personUpdated(person);
                 }
                 refreshPersonnelList();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("KILL")) {
                 KillDialog nkd;
                 if (people.length > 1) {
@@ -9750,16 +10082,19 @@ public class CampaignGUI extends JPanel {
                     }
                 }
                 refreshPersonnelList();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("KILL_LOG")) {
                 EditKillLogDialog ekld = new EditKillLogDialog(getFrame(),
                         true, getCampaign(), selectedPerson);
                 ekld.setVisible(true);
                 refreshPersonnelList();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("LOG")) {
                 EditPersonnelLogDialog epld = new EditPersonnelLogDialog(
                         getFrame(), true, getCampaign(), selectedPerson);
                 epld.setVisible(true);
                 refreshPersonnelList();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("LOG_SINGLE")) {
                 EditLogEntryDialog eeld = new EditLogEntryDialog(frame, true,
                         new LogEntry(getCampaign().getDate(), ""));
@@ -9771,6 +10106,7 @@ public class CampaignGUI extends JPanel {
                     }
                 }
                 refreshPersonnelList();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("COMMANDER")) {
                 selectedPerson.setCommander(!selectedPerson.isCommander());
                 if (selectedPerson.isCommander()) {
@@ -9813,6 +10149,7 @@ public class CampaignGUI extends JPanel {
                 }
                 getCampaign().personUpdated(selectedPerson);
                 refreshPersonnelList();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("CLEAR_INJURIES")) {
                 for (Person person : people) {
                     person.clearInjuries();
@@ -9823,6 +10160,7 @@ public class CampaignGUI extends JPanel {
                 }
                 refreshPatientList();
                 refreshPersonnelList();
+                refreshOverview();
             } else if (command.contains("REMOVE_INJURY")) {
                 String sel = command.split(":")[1];
                 Injury toRemove = null;
@@ -9841,12 +10179,14 @@ public class CampaignGUI extends JPanel {
                 }
                 refreshPatientList();
                 refreshPersonnelList();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("EDIT_INJURIES")) {
                 EditPersonnelInjuriesDialog epid = new EditPersonnelInjuriesDialog(
                         getFrame(), true, getCampaign(), selectedPerson);
                 epid.setVisible(true);
                 refreshPatientList();
                 refreshPersonnelList();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("BLOODNAME")) {
                 for (Person p : people) {
                     if (!p.isClanner()) {
@@ -11044,6 +11384,7 @@ public class CampaignGUI extends JPanel {
                 refreshReport();
                 refreshFunds();
                 refreshFinancialTransactions();
+                refreshOverview();
                 filterTasks();
             } else if (command.equalsIgnoreCase("SELL_ALL")) {
                 for (Part p : parts) {
@@ -11062,6 +11403,7 @@ public class CampaignGUI extends JPanel {
                 refreshReport();
                 refreshFunds();
                 refreshFinancialTransactions();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("SELL_N")) {
                 if (null != selectedPart) {
                     int n = selectedPart.getQuantity();
@@ -11086,6 +11428,7 @@ public class CampaignGUI extends JPanel {
                 refreshTaskList();
                 refreshAcquireList();
                 refreshReport();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("CANCEL_ORDER")) {
                 double refund = getCampaign().getCampaignOptions()
                         .GetCanceledOrderReimbursement();
@@ -11106,6 +11449,7 @@ public class CampaignGUI extends JPanel {
                 refreshTaskList();
                 refreshAcquireList();
                 refreshReport();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("ARRIVE")) {
                 for (Part p : parts) {
                     if (null != p) {
@@ -11116,6 +11460,7 @@ public class CampaignGUI extends JPanel {
                 refreshTaskList();
                 refreshAcquireList();
                 refreshReport();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("REMOVE")) {
                 for (Part p : parts) {
                     if (null != p) {
@@ -11126,6 +11471,7 @@ public class CampaignGUI extends JPanel {
                 refreshTaskList();
                 refreshAcquireList();
                 refreshReport();
+                refreshOverview();
             } else if (command.contains("SET_QUALITY")) {
                 int q = -1;
                 Object[] possibilities = { "F", "E", "D", "C", "B", "A" };
@@ -11167,6 +11513,7 @@ public class CampaignGUI extends JPanel {
                 int selected = Integer.parseInt(sel);
                 selectedPart.setMode(selected);
                 refreshPartsList();
+                refreshOverview();
             }
         }
 
@@ -11509,6 +11856,7 @@ public class CampaignGUI extends JPanel {
                         refreshTaskList();
                         refreshAcquireList();
                         refreshReport();
+                        refreshOverview();
                         filterTasks();
                     }
                 });
@@ -11645,6 +11993,7 @@ public class CampaignGUI extends JPanel {
                         refreshTaskList();
                         refreshAcquireList();
                         refreshReport();
+                        refreshOverview();
                         filterTasks();
                     }
                 });
@@ -11672,6 +12021,7 @@ public class CampaignGUI extends JPanel {
                         refreshUnitList();
                         refreshTaskList();
                         refreshAcquireList();
+                        refreshOverview();
                         filterTasks();
                     }
                 });
@@ -11709,6 +12059,7 @@ public class CampaignGUI extends JPanel {
                     refreshOrganization();
                     refreshPersonnelList();
                     refreshUnitList();
+                    refreshOverview();
                 }
 
             }
@@ -11879,6 +12230,7 @@ public class CampaignGUI extends JPanel {
                     refreshUnitList();
                     refreshReport();
                     refreshPartsList();
+                    refreshOverview();
                 }
             } else if (command.equalsIgnoreCase("PAY_BALANCE")) {
                 getCampaign().payOffLoan(selectedLoan);
@@ -11962,12 +12314,17 @@ public class CampaignGUI extends JPanel {
                 refreshServicedUnitList();
                 refreshUnitList();
                 refreshOrganization();
-            }/*
-              * else if (command.contains("QUIRK")) { String sel =
-              * command.split(":")[1]; selectedUnit.acquireQuirk(sel, true);
-              * refreshServicedUnitList(); refreshUnitList();
-              * refreshTechsList(); refreshReport(); refreshCargo(); }
-              */else if (command.contains("MAINTENANCE_REPORT")) {
+                refreshOverview();
+            }/* else if (command.contains("QUIRK")) {
+                String sel = command.split(":")[1];
+                    selectedUnit.acquireQuirk(sel, true);
+                    refreshServicedUnitList();
+                    refreshUnitList();
+                    refreshTechsList();
+                    refreshReport();
+                    refreshCargo();
+                    refreshOverview();
+            }*/ else if (command.contains("MAINTENANCE_REPORT")) {
                 showMaintenanceReport(selectedUnit.getId());
             } else if (command.contains("ASSIGN")) {
                 String sel = command.split(":")[1];
@@ -11985,6 +12342,7 @@ public class CampaignGUI extends JPanel {
                 refreshTechsList();
                 refreshPersonnelList();
                 refreshReport();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("SET_QUALITY")) {
                 int q = -1;
                 Object[] possibilities = { "F", "E", "D", "C", "B", "A" };
@@ -12042,6 +12400,7 @@ public class CampaignGUI extends JPanel {
                 refreshReport();
                 refreshFunds();
                 refreshFinancialTransactions();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("LOSS")) {
                 for (Unit unit : units) {
                     if (0 == JOptionPane.showConfirmDialog(null,
@@ -12056,6 +12415,7 @@ public class CampaignGUI extends JPanel {
                 refreshPersonnelList();
                 refreshOrganization();
                 refreshReport();
+                refreshOverview();
             } else if (command.contains("SWAP_AMMO")) {
                 String sel = command.split(":")[1];
                 int selAmmoId = Integer.parseInt(sel);
@@ -12071,6 +12431,7 @@ public class CampaignGUI extends JPanel {
                 refreshAcquireList();
                 refreshServicedUnitList();
                 refreshUnitList();
+                refreshOverview();
                 filterTasks();
             } else if (command.contains("CHANGE_SITE")) {
                 for (Unit unit : units) {
@@ -12086,6 +12447,7 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshTaskList();
                 refreshAcquireList();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("SALVAGE")) {
                 for (Unit unit : units) {
                     if (!unit.isDeployed()) {
@@ -12095,6 +12457,7 @@ public class CampaignGUI extends JPanel {
                 }
                 refreshServicedUnitList();
                 refreshUnitList();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("REPAIR")) {
                 for (Unit unit : units) {
                     if (!unit.isDeployed() && unit.isRepairable()) {
@@ -12104,6 +12467,7 @@ public class CampaignGUI extends JPanel {
                 }
                 refreshServicedUnitList();
                 refreshUnitList();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("TAG_CUSTOM")) {
                 String sCustomsDir = "data/mechfiles/customs/";
                 String sCustomsDirCampaign = sCustomsDir
@@ -12187,6 +12551,7 @@ public class CampaignGUI extends JPanel {
                 refreshPersonnelList();
                 refreshOrganization();
                 refreshReport();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("DISBAND")) {
                 for (Unit unit : units) {
                     if (!unit.isDeployed()) {
@@ -12211,6 +12576,7 @@ public class CampaignGUI extends JPanel {
                 refreshPersonnelList();
                 refreshOrganization();
                 refreshReport();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("UNDEPLOY")) {
                 for (Unit unit : units) {
                     if (unit.isDeployed()) {
@@ -12228,6 +12594,7 @@ public class CampaignGUI extends JPanel {
                 refreshReport();
                 refreshPatientList();
                 refreshScenarioList();
+                refreshOverview();
             } else if (command.contains("HIRE_FULL")) {
                 for (Unit unit : units) {
                     getCampaign().hirePersonnelFor(unit.getId());
@@ -12238,6 +12605,7 @@ public class CampaignGUI extends JPanel {
                 refreshOrganization();
                 refreshFinancialTransactions();
                 refreshReport();
+                refreshOverview();
             } else if (command.contains("CUSTOMIZE")
                     && !command.contains("CANCEL")) {
                 panMekLab.loadUnit(selectedUnit);
@@ -12251,6 +12619,7 @@ public class CampaignGUI extends JPanel {
                 refreshForceView();
                 refreshOrganization();
                 refreshPartsList();
+                refreshOverview();
             } else if (command.contains("REFIT_KIT")) {
                 ChooseRefitDialog crd = new ChooseRefitDialog(getFrame(), true,
                         getCampaign(), selectedUnit, getCampaignGUI());
@@ -12266,6 +12635,7 @@ public class CampaignGUI extends JPanel {
                         refreshUnitList();
                         refreshForceView();
                         refreshOrganization();
+                        refreshOverview();
                     }
                 }
             } else if (command.contains("REMOVE_INDI_CAMO")) {
@@ -12289,6 +12659,7 @@ public class CampaignGUI extends JPanel {
                     refreshForceView();
                     refreshUnitView();
                 }
+                refreshOverview();
             } else if (command.equalsIgnoreCase("CANCEL_ORDER")) {
                 double refund = getCampaign().getCampaignOptions()
                         .GetCanceledOrderReimbursement();
@@ -12305,12 +12676,14 @@ public class CampaignGUI extends JPanel {
                 refreshFinancialTransactions();
                 refreshUnitList();
                 refreshReport();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("ARRIVE")) {
                 if (null != selectedUnit) {
                     selectedUnit.setDaysToArrival(0);
                 }
                 refreshUnitList();
                 refreshReport();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("MOTHBALL")) {
                 UUID id = null;
                 if (!selectedUnit.isSelfCrewed()) {
@@ -12325,6 +12698,7 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshServicedUnitList();
                 refreshReport();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("ACTIVATE")) {
                 UUID id = null;
                 if (!selectedUnit.isSelfCrewed()) {
@@ -12339,6 +12713,7 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshServicedUnitList();
                 refreshReport();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("CANCEL_MOTHBALL")) {
                 if (null != selectedUnit) {
                     selectedUnit.setMothballTime(0);
@@ -12346,6 +12721,7 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshServicedUnitList();
                 refreshReport();
+                refreshOverview();
             } else if (command.equalsIgnoreCase("BOMBS")) {
                 if (null != selectedUnit
                         && selectedUnit.getEntity() instanceof Aero) {

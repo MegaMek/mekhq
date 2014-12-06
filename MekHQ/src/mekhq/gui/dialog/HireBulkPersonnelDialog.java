@@ -196,6 +196,7 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
         hqView.refreshDoctorsList();
         hqView.refreshReport();
         hqView.refreshFinancialTransactions();
+        hqView.refreshOverview();
     }
    
     private void refreshRanksCombo() {
