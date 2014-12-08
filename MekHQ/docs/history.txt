@@ -10,6 +10,7 @@ v0.3.7 (SVN)
 + Bug [#668]: NPE when clicking "finish" at end of battle salvage screen
 + Bug [#700]: Entity.swarmTargetId shoulds be cleared by MHQ at the end of a game
 + Bug [#687]: C3I lance being incorrectly passed to megamek
++ Bug [#713]: Warship price column sorting appears to be broken
 
 v0.3.6 (2014-12-02)
 + Bug [#496]: NPE in mission resolution dialogue
