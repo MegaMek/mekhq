@@ -12,6 +12,7 @@ v0.3.7 (SVN)
 + Bug [#687]: C3I lance being incorrectly passed to megamek
 + Bug [#713]: Warship price column sorting appears to be broken
 + Bug [#717]: Buy in Bulk Buys 1 if you enter over 100
++ Removed the automated repair assignments for large vessels (DS, JS, WS)
 
 v0.3.6 (2014-12-02)
 + Bug [#496]: NPE in mission resolution dialogue
