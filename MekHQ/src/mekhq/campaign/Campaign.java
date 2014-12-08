@@ -2203,9 +2203,16 @@ public class Campaign implements Serializable {
         for (int pid : assignedPartIds) {
             Part part = getPart(pid);
             if (null != part) {
-                Person tech = getPerson(part.getAssignedTeamId());
+                Person tech = null;
+                if (part.getUnit() != null && part.getUnit().getEngineer() != null) {
+                    tech = part.getUnit().getEngineer();
+                } else {
+                    tech = getPerson(part.getAssignedTeamId());
+                }
                 if (null != tech) {
                     fixPart(part, tech);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Could not find tech for part: "+part.getName()+" on unit: "+part.getUnit().getHyperlinkedName(), "Invalid Auto-continue", JOptionPane.ERROR_MESSAGE);
                 }
                 // check to see if this part can now be combined with other
                 // spare parts
