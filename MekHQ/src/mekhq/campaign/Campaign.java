@@ -1065,7 +1065,7 @@ public class Campaign implements Serializable {
     public ArrayList<Part> getParts() {
         return parts;
     }
-    
+
     public Hashtable<String, Integer> getPartsInUse() {
     	Hashtable<String, Integer> inUse = new Hashtable<String, Integer>();
     	for (Part p : parts) {
@@ -1073,7 +1073,7 @@ public class Campaign implements Serializable {
     		if (p instanceof StructuralIntegrity) {
     			continue;
     		}
-    		
+
     		String pname = p.getName();
 			Unit u = p.getUnit();
 			if (!(p instanceof MissingBattleArmorSuit)) {
@@ -2183,41 +2183,12 @@ public class Campaign implements Serializable {
         // concurrent mod problems
         ArrayList<Integer> assignedPartIds = new ArrayList<Integer>();
         ArrayList<Integer> arrivedPartIds = new ArrayList<Integer>();
-        boolean engineerAssigned = false;
         for (Part part : getParts()) {
         	if (part instanceof Refit) {
         		continue;
         	}
             if (part.getAssignedTeamId() != null) {
                 assignedPartIds.add(part.getId());
-            }
-            /*
-             * If dropship or jumpship and the engineer has time left
-             * Autoassign him to the first part we find. This allows manual
-             * Prioritization to take place.
-             */
-            if (part.needsFixing()) {
-	            Unit u = part.getUnit();
-	        	// Loop through all the parts on this unit to see
-	        	// if the engineer is already assigned
-	        	if (u != null) {
-		        	for (Part uPart : u.getParts()) {
-		        		if (uPart == null || uPart.getAssignedTeamId() == null) {
-		        			continue;
-		        		}
-		        		if (u.getEngineer() != null && uPart.getAssignedTeamId().equals(u.getEngineer().getId())) {
-		        			engineerAssigned = true;
-		        		}
-		        	}
-		            if (!engineerAssigned && null != u
-		            		&& (u.getEntity() instanceof Dropship
-		            				|| u.getEntity() instanceof Jumpship)
-		                    && u.getEngineer().getMinutesLeft() > 0) {
-		        	    part.setTeamId(u.getEngineer().getId());
-		                assignedPartIds.add(part.getId());
-		                engineerAssigned = true;
-		            }
-	        	}
             }
             if (part.checkArrival()) {
                 arrivedPartIds.add(part.getId());
@@ -2600,7 +2571,7 @@ public class Campaign implements Serializable {
                 u.getEntity().setC3MasterIsUUIDAsString(null);
                 u.getEntity().setC3Master(null, true);
             }
-            
+
 
             if (campaignOptions.getUseAtB() && force.getUnits().size() == 0) {
             	lances.remove(force.getId());
