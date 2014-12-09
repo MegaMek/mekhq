@@ -4422,12 +4422,12 @@ public class CampaignGUI extends JPanel {
     }// GEN-LAST:event_menuOptionsActionPerformed
 
     private void menuOptionsMMActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuOptionsActionPerformed
-        GameOptionsDialog god = new GameOptionsDialog(getFrame(), getCampaign()
-                .getGameOptions());
+        GameOptionsDialog god = new GameOptionsDialog(getFrame(), getCampaign());
         god.refreshOptions();
         god.setVisible(true);
         if (!god.wasCancelled()) {
             getCampaign().setGameOptions(god.getOptions());
+            god.setCampaignOptionsFromGameOptions();
             refreshCalendar();
             changePersonnelView();
             refreshPersonnelList();

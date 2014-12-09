@@ -47,6 +47,7 @@ import megamek.common.options.GameOptions;
 import megamek.common.options.IBasicOption;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import mekhq.campaign.Campaign;
 
 /**
  * Responsible for displaying the current game options and allowing the user to
@@ -61,11 +62,13 @@ public class GameOptionsDialog extends JDialog implements ActionListener,
      *
      */
     private static final long serialVersionUID = -6072295678938594119L;
+
+    private Campaign campaign;
     private GameOptions options;
 
     private boolean editable = true;
     private boolean cancelled = false;
-    
+
     private Vector<DialogOptionComponent> optionComps = new Vector<DialogOptionComponent>();
 
     private int maxOptionWidth;
@@ -88,9 +91,10 @@ public class GameOptionsDialog extends JDialog implements ActionListener,
      * @param frame - the <code>Frame</code> parent of this dialog.
      * @param options - the <code>GameOptions</code> to be displayed.
      */
-    private void init(JFrame frame, GameOptions options) {
-        this.options = options;
+    private void init(JFrame frame, Campaign c) {
+        this.options = c.getGameOptions();
         currentFrame = frame;
+        campaign = c;
 
         setupButtons();
         JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -125,9 +129,9 @@ public class GameOptionsDialog extends JDialog implements ActionListener,
      * @param frame - the <code>Frame</code> parent of this dialog.
      * @param options - the <code>GameOptions</code> to be displayed.
      */
-    public GameOptionsDialog(JFrame frame, GameOptions options) {
+    public GameOptionsDialog(JFrame frame, Campaign c) {
         super(frame, Messages.getString("GameOptionsDialog.title"), true); //$NON-NLS-1$
-        init(frame, options);
+        init(frame, c);
     }
 
     public Vector<IBasicOption> getOptions() {
@@ -472,6 +476,48 @@ public class GameOptionsDialog extends JDialog implements ActionListener,
         setVisible(false);
     }
 
+    public void setCampaignOptionsFromGameOptions() {
+        for (Enumeration<DialogOptionComponent> i = optionComps.elements(); i
+                .hasMoreElements();) {
+            DialogOptionComponent optionComp = i.nextElement();
+            if ("command_init".equals(optionComp.getOption().getName())) { //$NON-NLS-1$
+                campaign.getCampaignOptions().setUseTactics(optionComp.getOption().booleanValue());
+            }
+            if ("individual_initiative".equals(optionComp.getOption().getName())) { //$NON-NLS-1$
+                campaign.getCampaignOptions().setInitBonus(optionComp.getOption().booleanValue());
+            }
+            if ("toughness".equals(optionComp.getOption().getName())) { //$NON-NLS-1$
+                campaign.getCampaignOptions().setToughness(optionComp.getOption().booleanValue());
+            }
+            if ("artillery_skill".equals(optionComp.getOption().getName())) { //$NON-NLS-1$
+                campaign.getCampaignOptions().setArtillery(optionComp.getOption().booleanValue());
+            }
+            if ("pilot_advantages".equals(optionComp.getOption().getName())) { //$NON-NLS-1$
+                campaign.getCampaignOptions().setAbilities(optionComp.getOption().booleanValue());
+            }
+            if ("edge".equals(optionComp.getOption().getName())) { //$NON-NLS-1$
+                campaign.getCampaignOptions().setEdge(optionComp.getOption().booleanValue());
+            }
+            if ("manei_domini".equals(optionComp.getOption().getName())) { //$NON-NLS-1$
+                campaign.getCampaignOptions().setImplants(optionComp.getOption().booleanValue());
+            }
+            if ("stratops_quirks".equals(optionComp.getOption().getName())) { //$NON-NLS-1$
+                campaign.getCampaignOptions().setQuirks(optionComp.getOption().booleanValue());
+            }
+            if ("is_eq_limits".equals(optionComp.getOption().getName())) { //$NON-NLS-1$
+                campaign.getCampaignOptions().setLimitByYear(optionComp.getOption().booleanValue());
+            }
+            if ("canon_only".equals(optionComp.getOption().getName())) { //$NON-NLS-1$
+                campaign.getCampaignOptions().setAllowCanonOnly(optionComp.getOption().booleanValue());
+            }
+            if (("allow_advanced_units".equals(optionComp.getOption().getName())
+                    || "allow_advanced_ammo".equals(optionComp.getOption().getName()))
+                    && !optionComp.getOption().booleanValue()) { //$NON-NLS-1$
+                campaign.getCampaignOptions().setTechLevel(0);
+            }
+        }
+    }
+
     /**
      * Determine whether the dialog is editable or view-only.
      *
@@ -481,7 +527,7 @@ public class GameOptionsDialog extends JDialog implements ActionListener,
     public boolean isEditable() {
         return editable;
     }
-    
+
     public boolean wasCancelled() {
     	return cancelled;
     }
