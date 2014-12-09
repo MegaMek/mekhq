@@ -5964,7 +5964,7 @@ public class Campaign implements Serializable {
     public void clearGameData(Entity entity) {
         for (Mounted m : entity.getEquipment()) {
             m.setUsedThisRound(false);
-            m.setJammed(false);
+            m.resetJam();
         }
         entity.setPassedThrough(new Vector<Coords>());
         entity.resetFiringArcs();
@@ -6001,6 +6001,12 @@ public class Campaign implements Serializable {
                 entity.setMovementMode(EntityMovementMode.AERODYNE);
             }
             a.setAltitude(5);
+        }
+        if(entity instanceof Tank) {
+        	Tank t = (Tank)entity;
+        	t.unjamTurret(t.getLocTurret());
+        	t.unjamTurret(t.getLocTurret2());
+        	t.resetJammedWeapons();
         }
         entity.getSecondaryPositions().clear();
         // TODO: still a lot of stuff to do here, but oh well
