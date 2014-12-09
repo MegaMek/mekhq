@@ -1270,6 +1270,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	        		+ originalUnitId.toString()
 	        		+ "</originalUnitId>");
         }
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                + "<acquisitions>"
+                + acquisitions
+                + "</acquisitions>");
        pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
     }
 
@@ -1319,6 +1323,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     retVal.primaryRole = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("secondaryRole")) {
                     retVal.secondaryRole = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("acquisitions")) {
+                    retVal.acquisitions = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("primaryDesignator")) {
                     retVal.primaryDesignator = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("secondaryDesignator")) {
