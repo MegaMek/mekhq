@@ -18,6 +18,7 @@ v0.3.7 (SVN)
 + Bug [#714]: Maximum number of Acquistions limit is gone when save/loading
 + Bug [#470]: SPA: Not tied together between MM & HQ
 + Bug [#715]: Maximum number of acquistion disregarded when trying to fulfill pending orders
++ Bug [#622]: 0.3.6 : Jammed weapons do not show up in the repair bay
 
 v0.3.6 (2014-12-02)
 + Bug [#496]: NPE in mission resolution dialogue
