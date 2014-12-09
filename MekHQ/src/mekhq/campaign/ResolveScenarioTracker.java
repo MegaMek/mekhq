@@ -941,7 +941,6 @@ public class ResolveScenarioTracker {
 		        continue;
 		    }
 		    Entity en = ustatus.getEntity();
-			//Entity en = entities.get(unit.getId());
 			if(ustatus.isTotalLoss()) {
 				//missing unit
 				if(blc > 0) {
@@ -1312,6 +1311,7 @@ public class ResolveScenarioTracker {
         }
 
         public String getDesc() {
+            Unit unit = new Unit(entity, this.unit.campaign);
             String color = "black";
             if (!unit.isRepairable()) {
                 color = "rgb(190, 150, 55)";

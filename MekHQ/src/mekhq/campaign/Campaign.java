@@ -55,6 +55,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import megamek.client.RandomNameGenerator;
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
+import megamek.common.BombType;
 import megamek.common.Compute;
 import megamek.common.ConvFighter;
 import megamek.common.Coords;
@@ -5976,12 +5977,23 @@ public class Campaign implements Serializable {
         entity.setSwarmAttackerId(Entity.NONE);
         entity.setSwarmTargetId(Entity.NONE);
         if (entity instanceof Aero) {
-        	if(((Aero)entity).isSpheroid()) {
-        		entity.setMovementMode(EntityMovementMode.SPHEROID);
-        	} else {
-        		entity.setMovementMode(EntityMovementMode.AERODYNE);
-        	}
-        	((Aero)entity).setAltitude(5);
+            Aero a = (Aero) entity;
+            int[] bombChoices = a.getBombChoices();
+            for (Mounted m : a.getBombs()) {
+                if (!(m.getType() instanceof BombType)) {
+                    continue;
+                }
+                bombChoices[BombType.getBombTypeFromInternalName(m.getType().getShortName())]
+                        += m.getBaseShotsLeft();
+            }
+            a.setBombChoices(bombChoices);
+            a.clearBombs();
+            if(a.isSpheroid()) {
+                entity.setMovementMode(EntityMovementMode.SPHEROID);
+            } else {
+                entity.setMovementMode(EntityMovementMode.AERODYNE);
+            }
+            a.setAltitude(5);
         }
         entity.getSecondaryPositions().clear();
         // TODO: still a lot of stuff to do here, but oh well

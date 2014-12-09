@@ -374,6 +374,7 @@ public class MekHQ implements GameListener {
 
 	@Override
 	public void gameVictory(GameVictoryEvent gve) {
+	    // Prevent double run
 		if (gameThread.stopRequested()) {
 			return;
 		}

@@ -14,6 +14,7 @@ v0.3.7 (SVN)
 + Bug [#717]: Buy in Bulk Buys 1 if you enter over 100
 + Removed the automated repair assignments for large vessels (DS, JS, WS)
 + Bug [#664]: 0.3.6 : Dropship captain attempts to auto-repair damaged PPC, but is unable to
++ Bug [#710]: ASFs which were deployed with bombs return with empty Ammo Slots
 
 v0.3.6 (2014-12-02)
 + Bug [#496]: NPE in mission resolution dialogue
