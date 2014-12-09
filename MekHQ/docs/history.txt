@@ -15,6 +15,7 @@ v0.3.7 (SVN)
 + Removed the automated repair assignments for large vessels (DS, JS, WS)
 + Bug [#664]: 0.3.6 : Dropship captain attempts to auto-repair damaged PPC, but is unable to
 + Bug [#710]: ASFs which were deployed with bombs return with empty Ammo Slots
++ Bug [#714]: Maximum number of Acquistions limit is gone when save/loading
 
 v0.3.6 (2014-12-02)
 + Bug [#496]: NPE in mission resolution dialogue
