@@ -106,11 +106,6 @@ public class ShoppingList implements MekHqXmlSerializable {
         if(newWork instanceof AmmoBin) {
             newWork = ((AmmoBin) newWork).getAcquisitionWork();
         }
-        Person person = campaign.getLogisticsPerson();
-        if(null == person && !campaign.getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
-            campaign.addReport("Your force has no one currently capable of acquiring equipment.");
-            return;
-        }
         for(IAcquisitionWork shoppingItem : shoppingList) {
             if(isSameEquipment(shoppingItem.getNewEquipment(), newWork.getNewEquipment())) {
                 campaign.addReport(newWork.getShoppingListReport(quantity));
@@ -126,7 +121,7 @@ public class ShoppingList implements MekHqXmlSerializable {
              campaign.addReport("<font color='red'><b>You cannot afford to purchase " + newWork.getAcquisitionName() + "</b></font>");
              canAfford = false;
         }
-        while(canAfford && quantity > 0 && campaign.acquireEquipment(newWork, person)) {
+        while(canAfford && quantity > 0 && campaign.acquireEquipment(newWork)) {
             quantity--;
             if(quantity > 0 && campaign.getFunds() < getTrueBuyCost(newWork, campaign)) {
                 canAfford = false;
@@ -144,21 +139,18 @@ public class ShoppingList implements MekHqXmlSerializable {
     }
     
     public void newDay(Campaign campaign) {
-        Person person = campaign.getLogisticsPerson();
-        if(null == person && !campaign.getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
-            campaign.addReport("Your force has no one capable of acquiring equipment.");
-            return;
-        }
         ArrayList<IAcquisitionWork> newShoppingList = new ArrayList<IAcquisitionWork>();
+        boolean noStaff = false;
         for(IAcquisitionWork shoppingItem : shoppingList) {
             shoppingItem.decrementDaysToWait();
-            if(shoppingItem.getDaysToWait() <= 0) {
-                boolean canAfford = true;
+           
+            if(shoppingItem.getDaysToWait() <= 0 && !noStaff) {
+            	boolean canAfford = true;
                 if(campaign.getFunds() < getTrueBuyCost(shoppingItem, campaign)) {
                      campaign.addReport("<font color='red'><b>You cannot afford to purchase " + shoppingItem.getAcquisitionName() + "</b></font>");
                      canAfford = false;
                 }
-                while(canAfford && shoppingItem.getQuantity() > 0 && campaign.acquireEquipment(shoppingItem, person)) {
+                while(canAfford && shoppingItem.getQuantity() > 0 && campaign.acquireEquipment(shoppingItem)) {
                     shoppingItem.decrementQuantity();
                     if(shoppingItem.getQuantity() > 0 && campaign.getFunds() < getTrueBuyCost(shoppingItem, campaign)) {
                         canAfford = false;

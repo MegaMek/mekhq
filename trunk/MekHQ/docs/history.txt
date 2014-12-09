@@ -17,6 +17,7 @@ v0.3.7 (SVN)
 + Bug [#710]: ASFs which were deployed with bombs return with empty Ammo Slots
 + Bug [#714]: Maximum number of Acquistions limit is gone when save/loading
 + Bug [#470]: SPA: Not tied together between MM & HQ
++ Bug [#715]: Maximum number of acquistion disregarded when trying to fulfill pending orders
 
 v0.3.6 (2014-12-02)
 + Bug [#496]: NPE in mission resolution dialogue

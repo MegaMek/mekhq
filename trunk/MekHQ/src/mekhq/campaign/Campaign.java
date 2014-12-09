@@ -1497,9 +1497,16 @@ public class Campaign implements Serializable {
         return admin;
     }
 
-    public boolean acquireEquipment(IAcquisitionWork acquisition, Person person) {
+    public boolean acquireEquipment(IAcquisitionWork acquisition) {
         boolean found = false;
         String report = "";
+        
+        Person person = getLogisticsPerson();
+        if(null == person && !getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
+        	addReport("Your force has no one capable of acquiring equipment.");
+        	return false;
+        }
+        
         TargetRoll target = getTargetForAcquisition(acquisition, person, false);
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             addReport(target.getDesc());

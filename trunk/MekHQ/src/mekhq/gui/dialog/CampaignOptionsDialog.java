@@ -967,7 +967,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         JPanel pnlMaxAcquisitions = new JPanel();
         pnlMaxAcquisitions.add(txtMaxAcquisitions);
-        pnlMaxAcquisitions.add(new JLabel("Maximum Acquisitions Per Cycle (0 for unlimited)"));
+        pnlMaxAcquisitions.add(new JLabel("Maximum Acquisitions Per Day (0 for unlimited)"));
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
