@@ -11265,15 +11265,15 @@ public class CampaignGUI extends JPanel {
                         miExportPersonActionPerformed(evt);
                     }
                 });
+                menuItem.setEnabled(true);
+                popup.add(menuItem);
                 if (getCampaign().getCampaignOptions().getUseAtB()
                         && areAllActive(selected)) {
                     menuItem = new JMenuItem("Sack...");
                     menuItem.setActionCommand("SACK");
                     menuItem.addActionListener(this);
-                    menu.add(menuItem);
+                    popup.add(menuItem);
                 }
-                menuItem.setEnabled(true);
-                popup.add(menuItem);
                 menu = new JMenu("GM Mode");
                 menuItem = new JMenuItem("Remove Person");
                 menuItem.setActionCommand("REMOVE");
