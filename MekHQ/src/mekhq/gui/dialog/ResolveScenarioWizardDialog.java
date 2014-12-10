@@ -127,12 +127,19 @@ public class ResolveScenarioWizardDialog extends JDialog {
     /*
      * Pilot status panel components
      */
-    private ArrayList<JCheckBox> miaBtns;
-    private ArrayList<JCheckBox> prisonerBtns;
-    private ArrayList<JCheckBox> bondsmanBtns;
-    private ArrayList<JCheckBox> escapeBtns;
-    private ArrayList<JSlider> hitSliders;
-    private ArrayList<PersonStatus> pstatuses;
+    private ArrayList<JCheckBox> miaBtns = new ArrayList<JCheckBox>();
+    private ArrayList<JSlider> hitSliders = new ArrayList<JSlider>();
+    private ArrayList<PersonStatus> pstatuses = new ArrayList<PersonStatus>();
+
+    /*
+     * Prisoner status panel components
+     */
+    private ArrayList<JCheckBox> pr_miaBtns = new ArrayList<JCheckBox>();
+    private ArrayList<JCheckBox> prisonerBtns = new ArrayList<JCheckBox>();
+    private ArrayList<JCheckBox> bondsmanBtns = new ArrayList<JCheckBox>();
+    private ArrayList<JSlider> pr_hitSliders = new ArrayList<JSlider>();
+    private ArrayList<PersonStatus> prstatuses = new ArrayList<PersonStatus>();
+    private ArrayList<JCheckBox> escapeBtns = new ArrayList<JCheckBox>();
 
     /*
      * Salvage panel components
@@ -411,12 +418,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         pnlPilotStatus.add(new JLabel(resourceMap.getString("mia")), gridBagConstraints);
-        miaBtns = new ArrayList<JCheckBox>();
-        prisonerBtns = new ArrayList<JCheckBox>();
-        bondsmanBtns = new ArrayList<JCheckBox>();
-        escapeBtns = new ArrayList<JCheckBox>();
-        hitSliders = new ArrayList<JSlider>();
-        pstatuses = new ArrayList<PersonStatus>();
         i = 2;
         JCheckBox miaCheck;
         JSlider hitSlider;
@@ -491,12 +492,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.gridx = 5;
         gridBagConstraints.weightx = 1.0;
         pnlPrisonerStatus.add(new JLabel(resourceMap.getString("escaped")), gridBagConstraints);
-        miaBtns = new ArrayList<JCheckBox>();
-        prisonerBtns = new ArrayList<JCheckBox>();
-        bondsmanBtns = new ArrayList<JCheckBox>();
-        escapeBtns = new ArrayList<JCheckBox>();
-        hitSliders = new ArrayList<JSlider>();
-        pstatuses = new ArrayList<PersonStatus>();
         i = 2;
         JCheckBox prisonerCheck;
         JCheckBox bondsmanCheck;
@@ -506,17 +501,17 @@ public class ResolveScenarioWizardDialog extends JDialog {
         for(UUID pid : tracker.getPrisonerStatus().keySet()) {
             j++;
             PersonStatus status = tracker.getPrisonerStatus().get(pid);
-            pstatuses.add(status);
+            prstatuses.add(status);
             nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
             miaCheck = new JCheckBox("");
-            miaBtns.add(miaCheck);
+            pr_miaBtns.add(miaCheck);
             hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 6, status.getHits());
             hitSlider.setMajorTickSpacing(1);
             hitSlider.setPaintTicks(true);
             hitSlider.setLabelTable(labelTable);
             hitSlider.setPaintLabels(true);
             hitSlider.setSnapToTicks(true);
-            hitSliders.add(hitSlider);
+            pr_hitSliders.add(hitSlider);
             if(status.isMissing()) {
                 miaCheck.setSelected(true);
             }
@@ -1297,15 +1292,22 @@ public class ResolveScenarioWizardDialog extends JDialog {
 	    	tracker.setBonusRolls(bonuses);
     	}
 
-    	//now personnel
-    	for(int i = 0; i < pstatuses.size(); i++) {
-    		PersonStatus status = pstatuses.get(i);
-    		status.setMissing(miaBtns.get(i).isSelected());
-    		status.setHits(hitSliders.get(i).getValue());
-    		status.setPrisoner(prisonerBtns.get(i).isSelected());
-    		status.setBondsman(bondsmanBtns.get(i).isSelected());
-    		status.setRemove(escapeBtns.get(i).isSelected());
-    	}
+        //now personnel
+        for(int i = 0; i < pstatuses.size(); i++) {
+            PersonStatus status = pstatuses.get(i);
+            status.setMissing(miaBtns.get(i).isSelected());
+            status.setHits(hitSliders.get(i).getValue());
+        }
+
+        //now prisoners
+        for(int i = 0; i < prstatuses.size(); i++) {
+            PersonStatus status = prstatuses.get(i);
+            status.setMissing(pr_miaBtns.get(i).isSelected());
+            status.setHits(pr_hitSliders.get(i).getValue());
+            status.setPrisoner(prisonerBtns.get(i).isSelected());
+            status.setBondsman(bondsmanBtns.get(i).isSelected());
+            status.setRemove(escapeBtns.get(i).isSelected());
+        }
 
     	//now salvage
     	for(int i = 0; i < salvageBoxes.size(); i++) {

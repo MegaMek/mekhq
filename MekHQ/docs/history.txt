@@ -20,6 +20,7 @@ v0.3.7 (SVN)
 + Bug [#715]: Maximum number of acquistion disregarded when trying to fulfill pending orders
 + Bug [#622]: 0.3.6 : Jammed weapons do not show up in the repair bay
 + Bug [#722]: Export Personnel missing if AtB turned on
++ Bug [#720]: Resolution screen personnel and prisoners not taking damage or status changes correctly
 
 v0.3.6 (2014-12-02)
 + Bug [#496]: NPE in mission resolution dialogue
