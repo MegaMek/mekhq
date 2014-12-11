@@ -205,6 +205,7 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.Modes;
 import mekhq.gui.dialog.AddFundsDialog;
+import mekhq.gui.dialog.AdvanceDaysDialog;
 import mekhq.gui.dialog.BloodnameDialog;
 import mekhq.gui.dialog.BombsDialog;
 import mekhq.gui.dialog.CamoChoiceDialog;
@@ -571,6 +572,7 @@ public class CampaignGUI extends JPanel {
 
     private DailyReportLogDialog logDialog;
     private GMToolsDialog gmTools;
+    private AdvanceDaysDialog advanceDaysDialog;
     private BloodnameDialog bloodnameDialog;
 
     public CampaignGUI(MekHQ app) {
@@ -629,6 +631,12 @@ public class CampaignGUI extends JPanel {
 
     public void showGMToolsDialog() {
         gmTools.setVisible(true);
+    }
+
+    public void showAdvanceDaysDialog() {
+        advanceDaysDialog = new AdvanceDaysDialog(getFrame(), this, reportHLL);
+        advanceDaysDialog.setVisible(true);
+        advanceDaysDialog.dispose();
     }
 
     public void randomizeAllBloodnames() {
@@ -3028,6 +3036,14 @@ public class CampaignGUI extends JPanel {
             }
         });
         menuManage.add(miGMToolsDialog);
+        JMenuItem miAdvanceMultipleDays = new JMenuItem("Advance Multiple Days");
+        miAdvanceMultipleDays.setEnabled(true);
+        miAdvanceMultipleDays.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                showAdvanceDaysDialog();
+            }
+        });
+        menuManage.add(miAdvanceMultipleDays);
         JMenuItem miBloodnames = new JMenuItem(
                 "Randomize Bloodnames All Personnel");
         miBloodnames.setEnabled(true);
@@ -3912,56 +3928,26 @@ public class CampaignGUI extends JPanel {
         updateTechTarget();
     }
 
+    public InterstellarMapPanel getMapPanel() {
+        return panMap;
+    }
+
     private void advanceDay() {
         // first check for overdue loan payments - dont allow advancement until
         // these are addressed
-        long overdueAmount = getCampaign().getFinances()
-                .checkOverdueLoanPayments(getCampaign());
-        if (overdueAmount > 0) {
-            JOptionPane
-                    .showMessageDialog(
-                            frame,
-                            "You have overdue loan payments totaling "
-                                    + DecimalFormat.getInstance().format(
-                                            overdueAmount)
-                                    + " C-bills.\nYou must deal with these payments before advancing the day.\nHere are some options:\n  - Sell off equipment to generate funds.\n  - Pay off the collateral on the loan.\n  - Default on the loan.\n  - Just cheat and remove the loan via GM mode.",
-                            "Overdue Loan Payments",
-                            JOptionPane.WARNING_MESSAGE);
+        if (getCampaign().checkOverDueLoans()) {
             refreshFunds();
             refreshFinancialTransactions();
             refreshReport();
             return;
         }
-        if (getCampaign().getRetirementDefectionTracker().getRetirees().size() > 0) {
-            Object[] options = { "Show Payout Dialog", "Cancel" };
-            if (JOptionPane.YES_OPTION == JOptionPane
-                    .showOptionDialog(
-                            frame,
-                            "You have personnel who have left the unit or been killed in action but have not received their final payout.\nYou must deal with these payments before advancing the day.\nHere are some options:\n  - Sell off equipment to generate funds.\n  - Pay one or more personnel in equipment.\n  - Just cheat and use GM mode to edit the settlement.",
-                            "Unresolved Final Payments",
-                            JOptionPane.OK_CANCEL_OPTION,
-                            JOptionPane.WARNING_MESSAGE, null, options,
-                            options[0])) {
-                showRetirementDefectionDialog();
-            }
+        if (getCampaign().checkRetirementDefections()) {
+            showRetirementDefectionDialog();
             return;
         }
-        if (getCampaign().getCampaignOptions().getUseAtB()
-                && Utilities.getDaysBetween(getCampaign()
-                        .getRetirementDefectionTracker()
-                        .getLastRetirementRoll().getTime(), getCampaign()
-                        .getDate()) == 365) {
-            Object[] options = { "Show Retirement Dialog", "Not Now" };
-            if (JOptionPane.YES_OPTION == JOptionPane
-                    .showOptionDialog(
-                            frame,
-                            "It has been a year since the last retirement/defection roll, and it is time to do another.",
-                            "Retirement/Defection roll required",
-                            JOptionPane.OK_CANCEL_OPTION,
-                            JOptionPane.WARNING_MESSAGE, null, options,
-                            options[0])) {
-                showRetirementDefectionDialog();
-            }
+        if (getCampaign().checkYearlyRetirements()) {
+            showRetirementDefectionDialog();
+            return;
         }
         if (nagShortMaintenance()) {
             return;
@@ -3996,7 +3982,7 @@ public class CampaignGUI extends JPanel {
         panMap.repaint();
     }// GEN-LAST:event_btnAdvanceDayActionPerformed
 
-    private boolean nagShortMaintenance() {
+    public boolean nagShortMaintenance() {
         if (!getCampaign().getCampaignOptions().checkMaintenance()) {
             return false;
         }
@@ -4042,7 +4028,7 @@ public class CampaignGUI extends JPanel {
         return false;
     }
 
-    private boolean nagShortDeployments() {
+    public boolean nagShortDeployments() {
         if (getCampaign().getCalendar().get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
             return false;
         }
@@ -4063,7 +4049,7 @@ public class CampaignGUI extends JPanel {
         return false;
     }
 
-    private boolean nagOutstandingScenarios() {
+    public boolean nagOutstandingScenarios() {
         for (Mission m : getCampaign().getMissions()) {
             if (!m.isActive() || !(m instanceof AtBContract)) {
                 continue;
@@ -6479,7 +6465,7 @@ public class CampaignGUI extends JPanel {
         refreshRating();
     }
 
-    protected void refreshFunds() {
+    public void refreshFunds() {
         long funds = getCampaign().getFunds();
         NumberFormat numberFormat = NumberFormat.getIntegerInstance();
         String inDebt = "";
