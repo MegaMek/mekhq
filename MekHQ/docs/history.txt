@@ -21,6 +21,7 @@ v0.3.7 (SVN)
 + Bug [#622]: 0.3.6 : Jammed weapons do not show up in the repair bay
 + Bug [#722]: Export Personnel missing if AtB turned on
 + Bug [#720]: Resolution screen personnel and prisoners not taking damage or status changes correctly
++ Bug [feature-requests:#232]: Fast Forward 'Advance Day'
 
 v0.3.6 (2014-12-02)
 + Bug [#496]: NPE in mission resolution dialogue

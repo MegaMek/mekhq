@@ -1500,13 +1500,13 @@ public class Campaign implements Serializable {
     public boolean acquireEquipment(IAcquisitionWork acquisition) {
         boolean found = false;
         String report = "";
-        
+
         Person person = getLogisticsPerson();
         if(null == person && !getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
         	addReport("Your force has no one capable of acquiring equipment.");
         	return false;
         }
-        
+
         TargetRoll target = getTargetForAcquisition(acquisition, person, false);
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             addReport(target.getDesc());
@@ -7616,5 +7616,57 @@ public class Campaign implements Serializable {
     	addAllLances(this.forces);
     	RandomFactionGenerator.getInstance().updateTables(calendar.getTime(),
     			location.getCurrentPlanet(), campaignOptions);
+    }
+
+    public boolean checkOverDueLoans() {
+        long overdueAmount = getFinances().checkOverdueLoanPayments(this);
+        if (overdueAmount > 0) {
+            JOptionPane.showMessageDialog(
+                            null,
+                            "You have overdue loan payments totaling "
+                                    + DecimalFormat.getInstance().format(
+                                            overdueAmount)
+                                    + " C-bills.\nYou must deal with these payments before advancing the day.\nHere are some options:\n  - Sell off equipment to generate funds.\n  - Pay off the collateral on the loan.\n  - Default on the loan.\n  - Just cheat and remove the loan via GM mode.",
+                            "Overdue Loan Payments",
+                            JOptionPane.WARNING_MESSAGE);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean checkRetirementDefections() {
+        if (getRetirementDefectionTracker().getRetirees().size() > 0) {
+            Object[] options = { "Show Payout Dialog", "Cancel" };
+            if (JOptionPane.YES_OPTION == JOptionPane
+                    .showOptionDialog(
+                            null,
+                            "You have personnel who have left the unit or been killed in action but have not received their final payout.\nYou must deal with these payments before advancing the day.\nHere are some options:\n  - Sell off equipment to generate funds.\n  - Pay one or more personnel in equipment.\n  - Just cheat and use GM mode to edit the settlement.",
+                            "Unresolved Final Payments",
+                            JOptionPane.OK_CANCEL_OPTION,
+                            JOptionPane.WARNING_MESSAGE, null, options,
+                            options[0])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean checkYearlyRetirements() {
+        if (getCampaignOptions().getUseAtB()
+                && Utilities.getDaysBetween(getRetirementDefectionTracker()
+                        .getLastRetirementRoll().getTime(), getDate()) == 365) {
+            Object[] options = { "Show Retirement Dialog", "Not Now" };
+            if (JOptionPane.YES_OPTION == JOptionPane
+                    .showOptionDialog(
+                            null,
+                            "It has been a year since the last retirement/defection roll, and it is time to do another.",
+                            "Retirement/Defection roll required",
+                            JOptionPane.OK_CANCEL_OPTION,
+                            JOptionPane.WARNING_MESSAGE, null, options,
+                            options[0])) {
+                return true;
+            }
+        }
+        return false;
     }
 }
