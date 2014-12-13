@@ -347,9 +347,10 @@ public class CampaignGUI extends JPanel {
     // parts views
     private static final int SV_ALL = 0;
     private static final int SV_IN_TRANSIT = 1;
-    private static final int SV_UNDAMAGED = 2;
-    private static final int SV_DAMAGED = 3;
-    private static final int SV_NUM = 4;
+    private static final int SV_RESERVED = 2;
+    private static final int SV_UNDAMAGED = 3;
+    private static final int SV_DAMAGED = 4;
+    private static final int SV_NUM = 5;
 
     // personnel views
     private static final int PV_GRAPHIC = 0;
@@ -4317,6 +4318,8 @@ public class CampaignGUI extends JPanel {
                 return "All";
             case SV_IN_TRANSIT:
                 return "In Transit";
+            case SV_RESERVED:
+                return "Reserved for Refit/Repair";
             case SV_UNDAMAGED:
                 return "Undamaged";
             case SV_DAMAGED:
@@ -6778,10 +6781,13 @@ public class CampaignGUI extends JPanel {
                     inView = true;
                 } else if (nGroupView == SV_IN_TRANSIT) {
                     inView = !part.isPresent();
+                } else if (nGroupView == SV_RESERVED) {
+                    inView = part.isReservedForRefit() || part.isReservedForReplacement();
                 } else if (nGroupView == SV_UNDAMAGED) {
                     inView = !part.needsFixing();
                 } else if (nGroupView == SV_DAMAGED) {
                     inView = part.needsFixing();
+                    MekHQ.logMessage("DEBUG: "+part.getName()+" with ID "+part.getId()+" is marked as damaged");
                 }
                 return (inGroup && inView);
             }
