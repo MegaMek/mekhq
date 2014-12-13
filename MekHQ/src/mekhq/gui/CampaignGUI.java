@@ -6787,7 +6787,6 @@ public class CampaignGUI extends JPanel {
                     inView = !part.needsFixing();
                 } else if (nGroupView == SV_DAMAGED) {
                     inView = part.needsFixing();
-                    MekHQ.logMessage("DEBUG: "+part.getName()+" with ID "+part.getId()+" is marked as damaged");
                 }
                 return (inGroup && inView);
             }
