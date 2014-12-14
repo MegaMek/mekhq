@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.7 (SVN)
+v0.3.7 (2014-12-14 19:25 UTC)
 + Patch [34]: Against the Bot, 13th Patch
     Fixes Bug [#589] [AtB] Changing tabs still works but HQ will no longer advance days
     Fixes Bug [#591] [AtB] Planet gravity is not used
@@ -25,6 +25,7 @@ v0.3.7 (SVN)
 + Bug [#644]: 0.3.6 : Parts reserved for refits incorrectly show up as damaged
 + Feature: Warehouse Status filter now has entry for parts reserved for refit or repair
 + Bug [#597]: [ATB] Battle Loss Compensation never higher than 10%
++ Updated MegaMek.jar to 0.39.4 and MegaMekLab.jar to 0.1.33
 
 v0.3.6 (2014-12-02)
 + Bug [#496]: NPE in mission resolution dialogue
