@@ -1,5 +1,7 @@
 VERSION HISTORY
 ----------------------------------
+v0.3.8-dev (SVN)
+
 v0.3.7 (2014-12-14 19:25 UTC)
 + Patch [34]: Against the Bot, 13th Patch
     Fixes Bug [#589] [AtB] Changing tabs still works but HQ will no longer advance days
