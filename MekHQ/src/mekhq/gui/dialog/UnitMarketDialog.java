@@ -85,6 +85,12 @@ public class UnitMarketDialog extends JDialog {
 	 */
 	private static final long serialVersionUID = -7668601227249317220L;
 	
+	private static boolean showMeks = true;
+	private static boolean showVees = true;
+	private static boolean showAero = false;
+	private static boolean pctThreshold = false;
+	private static int threshold = 120;
+	
 	private UnitMarketTableModel marketModel;
 	private Campaign campaign;
 	private CampaignGUI hqView;
@@ -141,7 +147,7 @@ public class UnitMarketDialog extends JDialog {
         chkShowAero = new JCheckBox();
         chkPctThreshold = new JCheckBox();
         lblPctThreshold = new JLabel();
-        spnThreshold = new JSpinner(new SpinnerNumberModel(125, 60, 130, 5));
+        spnThreshold = new JSpinner(new SpinnerNumberModel(threshold, 60, 130, 5));
         lblBlackMarketWarning = new JLabel();
         panelOKBtns = new javax.swing.JPanel();
         btnPurchase = new javax.swing.JButton();
@@ -158,12 +164,17 @@ public class UnitMarketDialog extends JDialog {
         ItemListener checkboxListener = new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent arg0) {
+				showMeks = chkShowMeks.isSelected();
+				showAero = chkShowAero.isSelected();
+				showVees = chkShowVees.isSelected();
+				pctThreshold = chkPctThreshold.isSelected();
+				spnThreshold.setEnabled(chkPctThreshold.isSelected());
 				filterOffers();
 			}
         };
 
         chkShowMeks.setText(resourceMap.getString("chkShowMeks.text"));
-        chkShowMeks.setSelected(true);
+        chkShowMeks.setSelected(showMeks);
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 0.0;
@@ -173,7 +184,7 @@ public class UnitMarketDialog extends JDialog {
         chkShowMeks.addItemListener(checkboxListener);
 
         chkShowVees.setText(resourceMap.getString("chkShowVees.text"));
-        chkShowVees.setSelected(campaign.getCampaignOptions().getUseVehicles());
+        chkShowVees.setSelected(showVees);
         gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.weightx = 0.0;
@@ -183,7 +194,7 @@ public class UnitMarketDialog extends JDialog {
         chkShowVees.addItemListener(checkboxListener);
        
         chkShowAero.setText(resourceMap.getString("chkShowAero.text"));
-        chkShowAero.setSelected(campaign.getCampaignOptions().getUseAero());
+        chkShowAero.setSelected(showAero);
         gbc.gridx = 2;
         gbc.gridy = 0;
         gbc.weightx = 1.0;
@@ -194,7 +205,8 @@ public class UnitMarketDialog extends JDialog {
        
         JPanel panel = new JPanel();
         chkPctThreshold.setText(resourceMap.getString("chkPctThreshold.text"));
-        chkPctThreshold.setSelected(false);
+        chkPctThreshold.setSelected(pctThreshold);
+        spnThreshold.setEnabled(pctThreshold);
         lblPctThreshold.setText(resourceMap.getString("lblPctThreshold.text"));
         panel.add(chkPctThreshold);
         panel.add(spnThreshold);
@@ -203,6 +215,7 @@ public class UnitMarketDialog extends JDialog {
         spnThreshold.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent arg0) {
+				threshold = (Integer)spnThreshold.getValue();
 				filterOffers();
 			}
         });
