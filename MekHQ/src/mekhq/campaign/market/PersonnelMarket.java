@@ -869,6 +869,15 @@ public class PersonnelMarket {
 			mod -= 3;
 		}
 
+		int adminHR = SkillType.EXP_ULTRA_GREEN;
+		for (Person a :c.getAdmins()) {
+			if ((a.getPrimaryRole() == Person.T_ADMIN_HR ||
+					a.getSecondaryRole() == Person.T_ADMIN_HR) &&
+					a.getSkill(SkillType.S_ADMIN).getExperienceLevel() > adminHR) {
+				adminHR = a.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+			}
+		}
+		mod += adminHR - 2;
 		int q = 0;
 		int r = Compute.d6(2) + mod;
 		if (r > 15) {
@@ -885,12 +894,7 @@ public class PersonnelMarket {
 			q = 1;
 		}
 		for (int i = 0; i < q; i++) {
-			int type = paidRecruitType;
-			if ((type == Person.T_GVEE_DRIVER || type == Person.T_NVEE_DRIVER ||
-					type == Person.T_VTOL_PILOT) && Compute.d6() > 2) {
-				type = Person.T_VEE_GUNNER;
-			}
-            Person p = c.newPerson(type);
+            Person p = c.newPerson(paidRecruitType);
             UUID id = UUID.randomUUID();
             while (null != personnelIds.get(id)) {
                 id = UUID.randomUUID();
