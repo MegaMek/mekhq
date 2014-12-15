@@ -501,11 +501,13 @@ public class AtBScenario extends Scenario {
 			terrainType = TER_FLATLANDS;
 		} else if (battleType == STARLEAGUECACHE1 || battleType == STARLEAGUECACHE2) {
 			map = "Brian-cache";
-			terrainType = TER_HEAVYURBAN;
+			terrainType = TER_LIGHTURBAN;
 		} else if (battleType == ALLYRESCUE) {
 			map = "Ally-rescue";
+			terrainType = TER_LIGHTURBAN;
 		} else if (battleType == CONVOYRESCUE || battleType == CONVOYATTACK) {
 			map = "Convoy";
+			terrainType = TER_WOODED;
 		} else
 			map = maps[terrainType][Compute.d6() - 1];
 	}

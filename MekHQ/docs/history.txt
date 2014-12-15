@@ -28,7 +28,8 @@ v0.3.7 (2014-12-14 19:25 UTC)
 + Feature: Warehouse Status filter now has entry for parts reserved for refit or repair
 + Bug [#597]: [ATB] Battle Loss Compensation never higher than 10%
 + Updated MegaMek.jar to 0.39.4 and MegaMekLab.jar to 0.1.33
-+ Bug [#718]: [AtB] Unit MArket does not retain unit selections 
++ Bug [#718]: [AtB] Unit MArket does not retain unit selections
++ Bug [#702]: ATB : Convoy attack : badlands map turns out to be heavily wooded 
 
 v0.3.6 (2014-12-02)
 + Bug [#496]: NPE in mission resolution dialogue
