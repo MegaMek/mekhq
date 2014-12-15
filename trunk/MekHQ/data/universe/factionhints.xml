@@ -296,12 +296,12 @@ they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for 
 	</war>
 
 	<war name="Ronin War" start="3034-03-14" end="3034-10-31">
-		<parties>DC,Ronin</parties>
-		<parties>FRR,Ronin</parties>
+		<parties>DC,RON</parties>
+		<parties>FRR,RON</parties>
 	</war>
 	<location start="3034-03-14" end="3034-10-31">
 		<outer>FRR</outer>
-		<inner>Ronin</inner>
+		<inner>RON</inner>
 		<opponents>DC,FRR</opponents>
 	</location>
 

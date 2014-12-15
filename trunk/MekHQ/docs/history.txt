@@ -31,6 +31,7 @@ v0.3.7 (2014-12-14 19:25 UTC)
 + Bug [#718]: [AtB] Unit MArket does not retain unit selections
 + Bug [#702]: ATB : Convoy attack : badlands map turns out to be heavily wooded
 + Bug [feature-requests:226] ATB : Have the program remember retainer status  
++ Bug [#570]: [ATB] Can not load campaign file 
 
 v0.3.6 (2014-12-02)
 + Bug [#496]: NPE in mission resolution dialogue
