@@ -2883,6 +2883,9 @@ public class Campaign implements Serializable {
 
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "name", name);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "faction", factionCode);
+        if (retainerEmployerCode != null) {
+        	MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "retainerEmployerCode", retainerEmployerCode);
+        }
 
         // Ranks
         ranks.writeToXml(pw1, 3);
@@ -4305,6 +4308,8 @@ public class Campaign implements Serializable {
                     } else {
                         retVal.factionCode = wn.getTextContent();
                     }
+                } else if (xn.equalsIgnoreCase("retainerEmployerCode")) {
+                	retVal.retainerEmployerCode = wn.getTextContent();
                 } else if (xn.equalsIgnoreCase("officerCut")) {
                     officerCut = Integer.parseInt(wn.getTextContent().trim());
                 } else if (xn.equalsIgnoreCase("rankNames")) {
