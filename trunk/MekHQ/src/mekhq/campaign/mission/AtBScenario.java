@@ -2584,6 +2584,17 @@ public class AtBScenario extends Scenario {
 				}
 			}
 		}
+		/* In the event a discrepancy occurs between a RAT entry and the unit lookup name,
+		 * remove the entry from the list of entities that give survival bonuses
+		 * to avoid an critical error that prevents battle resolution.
+		 */
+		ArrayList<UUID> toRemove = new ArrayList<UUID>();
+		for (UUID uid : survivalBonus) {
+			if (!entityIds.containsKey(uid)) {
+				toRemove.add(uid);
+			}
+		}
+		survivalBonus.removeAll(toRemove);
 	}
 		
 	private ArrayList<String> getEntityStub(Node wn) {
@@ -2979,8 +2990,10 @@ public class AtBScenario extends Scenario {
 								MekHQ.logError("Error loading allied unit in scenario");
 								MekHQ.logError(e);
 							}
-							entityList.add(en);
-							entityIds.put(UUID.fromString(en.getExternalIdAsString()), en);
+							if (en != null) {
+								entityList.add(en);
+								entityIds.put(UUID.fromString(en.getExternalIdAsString()), en);
+							}
 						}
 					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("behaviorSettings")) {

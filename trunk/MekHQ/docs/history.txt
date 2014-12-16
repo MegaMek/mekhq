@@ -33,6 +33,7 @@ v0.3.7 (2014-12-14 19:25 UTC)
 + Bug [feature-requests:226] ATB : Have the program remember retainer status  
 + Bug [#570]: [ATB] Can not load campaign file
 + Bug [#640]: 0.3.6 : ATB : Paid recruitment roll bug 
++ Bug [#706] ATB : End of battle window does not popup at all -> NPE 
 
 v0.3.6 (2014-12-02)
 + Bug [#496]: NPE in mission resolution dialogue
