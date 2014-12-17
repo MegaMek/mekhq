@@ -11,6 +11,7 @@ import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.BasicInfo;
+import mekhq.gui.CampaignGUI;
 
 /**
  * A table model for displaying work items
@@ -18,12 +19,12 @@ import mekhq.gui.BasicInfo;
 public class TechTableModel extends DataTableModel {
     private static final long serialVersionUID = 2738333372316332962L;
 
-    private Campaign campaign;
-    
-    public TechTableModel(Campaign c) {
+    private CampaignGUI gui;
+
+    public TechTableModel(CampaignGUI gui) {
         columnNames = new String[] { "Techs" };
         data = new ArrayList<Person>();
-        campaign = c;
+        this.gui = gui;
     }
 
     public Object getValueAt(int row, int col) {
@@ -33,9 +34,9 @@ public class TechTableModel extends DataTableModel {
     public Person getTechAt(int row) {
         return (Person) data.get(row);
     }
-    
+
     public Campaign getCampaign() {
-        return campaign;
+        return gui.getCampaign();
     }
 
     public TechTableModel.Renderer getRenderer(IconPackage icons) {
@@ -56,7 +57,7 @@ public class TechTableModel extends DataTableModel {
             int actualRow = table.convertRowIndexToModel(row);
             setOpaque(true);
             setPortrait(getTechAt(actualRow));
-            setText(getTechAt(actualRow).getTechDesc(getCampaign().isOvertimeAllowed()), "black");
+            setText(getTechAt(actualRow).getTechDesc(getCampaign().isOvertimeAllowed(), gui.getSelectedTask()), "black");
             if (isSelected) {
                 highlightBorder();
             } else {

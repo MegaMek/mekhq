@@ -63,6 +63,7 @@ import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.LogEntry;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IMedicalWork;
@@ -2827,7 +2828,14 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
 
     public String getTechDesc(boolean overtimeAllowed) {
+        return getTechDesc(overtimeAllowed, null);
+    }
+
+    public String getTechDesc(boolean overtimeAllowed, Part part) {
         String toReturn = "<html><font size='2'><b>" + getFullName() + "</b><br/>";
+        if (getTechUnitIDs().contains(part.getUnitId())) {
+            toReturn = "<html><font size='2' color='green'><b>@" + getFullName() + "</b><br/>";
+        }
         Skill mechSkill = getSkill(SkillType.S_TECH_MECH);
         Skill mechanicSkill = getSkill(SkillType.S_TECH_MECHANIC);
         Skill baSkill = getSkill(SkillType.S_TECH_BA);

@@ -109,6 +109,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -1934,7 +1935,7 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         panelDoTaskWarehouse.add(btnShowAllTechsWarehouse, gridBagConstraints);
 
-        techsModel = new TechTableModel(getCampaign());
+        techsModel = new TechTableModel(this);
         whTechTable = new JTable(techsModel);
         whTechTable.setRowHeight(60);
         whTechTable.getColumnModel().getColumn(0)
@@ -2073,9 +2074,9 @@ public class CampaignGUI extends JPanel {
         techTable.getColumnModel().getColumn(0)
                 .setCellRenderer(techsModel.getRenderer(getIconPackage()));
         techTable.getSelectionModel().addListSelectionListener(
-                new javax.swing.event.ListSelectionListener() {
+                new ListSelectionListener() {
                     public void valueChanged(
-                            javax.swing.event.ListSelectionEvent evt) {
+                            ListSelectionEvent evt) {
                         updateTechTarget();
                     }
                 });
@@ -3710,7 +3711,7 @@ public class CampaignGUI extends JPanel {
         return doctorsModel.getDoctorAt(docTable.convertRowIndexToModel(row));
     }
 
-    private Part getSelectedTask() {
+    public Part getSelectedTask() {
         if (onWarehouseTab()) {
             int row = partsTable.getSelectedRow();
             if (row < 0) {
