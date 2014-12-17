@@ -221,6 +221,7 @@ public class CampaignOptions implements Serializable {
     private boolean useWeatherConditions;
     private boolean useLightConditions;
     private boolean usePlanetaryConditions;
+    private boolean useAltMapgen; 
     private boolean useLeadership;
     private boolean useStrategy;
     private int baseStrategyDeployment;
@@ -404,6 +405,7 @@ public class CampaignOptions implements Serializable {
         useWeatherConditions = true;
     	useLightConditions = true;
     	usePlanetaryConditions = true;
+    	usePlanetaryConditions = false;
     	useLeadership = true;
     	useStrategy = true;
     	baseStrategyDeployment = 3;
@@ -1509,6 +1511,14 @@ public class CampaignOptions implements Serializable {
 		this.usePlanetaryConditions = usePlanetaryConditions;
 	}
 
+	public boolean getUseAltMapgen() {
+		return useAltMapgen;
+	}
+	
+	public void setUseAltMapgen(boolean useAltMapgen) {
+		this.useAltMapgen = useAltMapgen;
+	}
+
 	public boolean getUseLeadership() {
 		return useLeadership;
 	}
@@ -1742,6 +1752,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useWeatherConditions", useWeatherConditions);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useLightConditions", useLightConditions);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePlanetaryConditions", usePlanetaryConditions);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAltMapgen", useAltMapgen);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useLeadership", useLeadership);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useStrategy", useStrategy);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "baseStrategyDeployment", baseStrategyDeployment);
@@ -2153,6 +2164,8 @@ public class CampaignOptions implements Serializable {
                 retVal.useLightConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("usePlanetaryConditions")) {
                 retVal.usePlanetaryConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useAltMapgen")) {
+                retVal.useAltMapgen = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useLeadership")) {
                 retVal.useLeadership = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useStrategy")) {
