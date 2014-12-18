@@ -10,6 +10,7 @@ v0.3.8-dev (SVN)
 + Bug [#557]: Assigning Kills for Retreated and Killed - Take 2
 + Feature: [feature-requests:#246]: Visual Indicator for Assigned Techs
 + Feature: [feature-requests:#237]: New AtB Maps request - alt maps added as option for player
++ Bug [#738]: Personnel Market has wrong window title
 
 v0.3.7 (2014-12-14 19:25 UTC)
 + Patch [34]: Against the Bot, 13th Patch

@@ -54,7 +54,7 @@ import mekhq.gui.view.PersonViewPanel;
  */
 public class PersonnelMarketDialog extends JDialog {
 	private static final long serialVersionUID = 707579637170575313L;
-	
+
 	private PersonnelTableModel personnelModel;
 	private Campaign campaign;
 	private CampaignGUI hqView;
@@ -85,8 +85,8 @@ public class PersonnelMarketDialog extends JDialog {
     private TableRowSorter<PersonnelTableModel> sorter;
     ArrayList <RowSorter.SortKey> sortKeys;
     private javax.swing.JSplitPane splitMain;
-    
-    /** Creates new form UnitSelectorDialog */
+
+    /** Creates new form PersonnelMarketDialog */
     public PersonnelMarketDialog(Frame frame, CampaignGUI view, Campaign c, DirectoryItems portraits) {
         super(frame, true);
         hqView = view;
@@ -125,12 +125,12 @@ public class PersonnelMarketDialog extends JDialog {
 
 		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitSelectorDialog");
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle(resourceMap.getString("Form.title")); // NOI18N
+        setTitle("Personnel Market"); // NOI18N
         setName("Form"); // NOI18N
         getContentPane().setLayout(new BorderLayout());
 
         panelFilterBtns.setLayout(new java.awt.GridBagLayout());
-        
+
         lblPersonChoice.setText("Personnel Type:"); // NOI18N
         lblPersonChoice.setName("lblPersonChoice"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -177,14 +177,14 @@ public class PersonnelMarketDialog extends JDialog {
                 gridBagConstraints.gridwidth = 2;
                 gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
                 panelFilterBtns.add(radioNormalRoll, gridBagConstraints);
-                
+
         		radioPaidRecruitment.setText("Make paid recruitment roll next week (100,000 C-bills)");
                 gridBagConstraints.gridx = 0;
                 gridBagConstraints.gridy = 2;
                 gridBagConstraints.gridwidth = 2;
                 gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
                 panelFilterBtns.add(radioPaidRecruitment, gridBagConstraints);
-                
+
                 for (int i = 1; i < Person.T_NUM; i++) {
                 	comboRecruitType.addItem(Person.getRoleDesc(i, campaign.getFaction().isClan()));
                 }
@@ -220,19 +220,19 @@ public class PersonnelMarketDialog extends JDialog {
 		                updateShipSearchTarget();
 					}
                 });
-                
+
                 gridBagConstraints.gridx = 0;
                 gridBagConstraints.gridy = 4;
                 gridBagConstraints.gridwidth = 3;
                 gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
                 panelFilterBtns.add(lblShipSearchTarget, gridBagConstraints);
                 updateShipSearchTarget();
-                
+
                 javax.swing.ButtonGroup group = new javax.swing.ButtonGroup();
                 group.add(radioNormalRoll);
                 group.add(radioPaidRecruitment);
                 group.add(radioShipSearch);
-                
+
                 if (personnelMarket.getPaidRecruitment()) {
                 	radioPaidRecruitment.setSelected(true);
                 	comboRecruitType.setSelectedIndex(personnelMarket.getPaidRecruitType() - 1);
@@ -244,7 +244,7 @@ public class PersonnelMarketDialog extends JDialog {
                 }
         	}
         }
-        
+
         scrollTablePersonnel.setMinimumSize(new java.awt.Dimension(500, 400));
         scrollTablePersonnel.setName("srcTablePersonnel"); // NOI18N
         scrollTablePersonnel.setPreferredSize(new java.awt.Dimension(500, 400));
@@ -283,23 +283,23 @@ public class PersonnelMarketDialog extends JDialog {
         tablePersonnel.setShowGrid(false);
         column.setCellRenderer(getRenderer());
         scrollTablePersonnel.setViewportView(tablePersonnel);
-        
+
         scrollPersonnelView.setMinimumSize(new java.awt.Dimension(500, 600));
         scrollPersonnelView.setPreferredSize(new java.awt.Dimension(500, 600));
         scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPersonnelView.setViewportView(null);
- 
+
         panelMain.setLayout(new BorderLayout());
         panelMain.add(panelFilterBtns, BorderLayout.PAGE_START);
         panelMain.add(scrollTablePersonnel, BorderLayout.CENTER);
-        
+
         splitMain = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT,panelMain, scrollPersonnelView);
         splitMain.setOneTouchExpandable(true);
         splitMain.setResizeWeight(0.0);
         getContentPane().add(splitMain, BorderLayout.CENTER);
-          
+
         panelOKBtns.setLayout(new java.awt.GridBagLayout());
-        
+
         btnHire.setText("Hire");
         btnHire.setName("btnHire"); // NOI18N
         btnHire.addActionListener(new java.awt.event.ActionListener() {
@@ -318,7 +318,7 @@ public class PersonnelMarketDialog extends JDialog {
         btnAdd.setEnabled(campaign.isGM());
         panelOKBtns.add(btnAdd, new java.awt.GridBagConstraints());
 
-        
+
         btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
@@ -333,16 +333,16 @@ public class PersonnelMarketDialog extends JDialog {
         panel.add(lblUnitCost);
         panel.add(panelOKBtns);
         panel.add(new javax.swing.JPanel());
-                
+
         getContentPane().add(panel, BorderLayout.PAGE_END);
 
         pack();
     }
-    
+
     private void updateShipSearchTarget() {
 		if (radioShipSearch.isSelected()) {
 			TargetRoll target = campaign.getPersonnelMarket().getShipSearchTarget(campaign,
-					comboShipType.getSelectedIndex() == 1); 
+					comboShipType.getSelectedIndex() == 1);
 			lblShipSearchTarget.setText("Target: " + target.getValueAsString()
 					+ " [" + target.getDesc() + "]");
 		}
@@ -351,10 +351,10 @@ public class PersonnelMarketDialog extends JDialog {
 	public Person getPerson() {
 	    return selectedPerson;
 	}
-	
+
 	private void hirePerson(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
 	    if(null != selectedPerson) {
-	    	if (campaign.getFunds() < unitCost + 
+	    	if (campaign.getFunds() < unitCost +
 	    			(campaign.getCampaignOptions().payForRecruitment()?
 	    					selectedPerson.getSalary() * 2:0)) {
 				 campaign.addReport("<font color='red'><b>Insufficient funds. Transaction cancelled</b>.</font>");
@@ -394,7 +394,7 @@ public class PersonnelMarketDialog extends JDialog {
 
 	private void addUnit(Entity en, boolean pay) {
 		if (null == en) {
-			return; 
+			return;
 		}
 		if (pay && !campaign.getFinances().debit(unitCost, Transaction.C_UNIT,
 				"Purchased " + en.getShortName(),
@@ -423,10 +423,10 @@ public class PersonnelMarketDialog extends JDialog {
 		} else {
 			unit.addVesselCrew(selectedPerson);
 		}
-		
+
 		campaign.hirePersonnelFor(unit.getId());
 	}
-	
+
     private void refreshHqView() {
         hqView.refreshPersonnelList();
         hqView.refreshUnitList();
@@ -436,7 +436,7 @@ public class PersonnelMarketDialog extends JDialog {
         hqView.refreshReport();
         hqView.refreshFinancialTransactions();
     }
-	
+
 	private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
 	    selectedPerson = null;
     	personnelMarket.setPaidRecruitment(radioPaidRecruitment.isSelected());
@@ -450,7 +450,7 @@ public class PersonnelMarketDialog extends JDialog {
     	}
 	    setVisible(false);
 	}//GEN-LAST:event_btnCloseActionPerformed
-	
+
     private void filterPersonnel() {
         RowFilter<PersonnelTableModel, Integer> personTypeFilter = null;
         final int nGroup = comboPersonType.getSelectedIndex();
@@ -544,14 +544,14 @@ public class PersonnelMarketDialog extends JDialog {
              MechViewPanel mvp = new MechViewPanel();
              mvp.setMech(en);
              tabUnit.add("Unit", mvp);
-             scrollPersonnelView.setViewportView(tabUnit);        	 
+             scrollPersonnelView.setViewportView(tabUnit);
          } else {
         	 scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, campaign, portraits));
          }
  		//This odd code is to make sure that the scrollbar stays at the top
  		//I cant just call it here, because it ends up getting reset somewhere later
  		javax.swing.SwingUtilities.invokeLater(new Runnable() {
- 			public void run() { 
+ 			public void run() {
  				scrollPersonnelView.getVerticalScrollBar().setValue(0);
  			}
  		});
@@ -560,14 +560,14 @@ public class PersonnelMarketDialog extends JDialog {
     public JComboBox<String> getComboUnitType() {
         return comboPersonType;
     }
-	
+
 	@Override
     public void setVisible(boolean visible) {
         filterPersonnel();
         //changePersonnelView();
         super.setVisible(visible);
     }
-	
+
 	public TableCellRenderer getRenderer() {
         //if(choicePersonView.getSelectedIndex() == CampaignGUI.PV_GRAPHIC) {
             //return personnelModel.new VisualRenderer(hqView.getCamos(), portraits, hqView.getMechTiles());
@@ -615,5 +615,5 @@ public class PersonnelMarketDialog extends JDialog {
             return "?";
         }
     }
-    
+
 }
