@@ -2254,7 +2254,7 @@ public class AtBScenario extends Scenario {
 		ArrayList<String> stub = new ArrayList<String>();
 		for (Entity en : entities) {
 			if (null == en) {
-				stub.add("<html><font color='red'>Unit could not be loaded</font></html>");
+				stub.add("<html><font color='red'>No random assignment table found for faction</font></html>");
 			} else {
 				stub.add("<html>" + en.getCrew().getName() + " (" +
 						en.getCrew().getGunnery() + "/" +
@@ -2334,13 +2334,17 @@ public class AtBScenario extends Scenario {
 		if (null != bigBattleAllies && bigBattleAllies.size() > 0) {
 			pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<bigBattleAllies>");
 			for (Entity entity : bigBattleAllies) {
-				pw1.println(writeEntityWithCrewToXmlString(entity, indent+2, bigBattleAllies));			
+				if (entity != null) {
+					pw1.println(writeEntityWithCrewToXmlString(entity, indent+2, bigBattleAllies));
+				}
 			}
 			pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</bigBattleAllies>");
 		} else if (alliesPlayer.size() > 0) {
 			pw1.println(MekHqXmlUtil.indentStr(indent+1)+"<alliesPlayer>");
 			for (Entity entity : alliesPlayer) {
-				pw1.println(writeEntityWithCrewToXmlString(entity, indent+2, alliesPlayer));			
+				if (entity != null) {
+					pw1.println(writeEntityWithCrewToXmlString(entity, indent+2, alliesPlayer));
+				}
 			}
 			pw1.println(MekHqXmlUtil.indentStr(indent+1)+"</alliesPlayer>");
 		}
@@ -2384,7 +2388,9 @@ public class AtBScenario extends Scenario {
 			for (int i = 0; i < specMissionEnemies.size(); i++) {
 				pw1.println(MekHqXmlUtil.indentStr(indent+2) + "<playerWeight class=\"" + i + "\">");
 				for (Entity entity : specMissionEnemies.get(i)) {
-					pw1.println(writeEntityWithCrewToXmlString(entity, indent+3, specMissionEnemies.get(i)));			
+					if (entity != null) {
+						pw1.println(writeEntityWithCrewToXmlString(entity, indent+3, specMissionEnemies.get(i)));
+					}
 				}
 				pw1.println(MekHqXmlUtil.indentStr(indent+2) + "</playerWeight>");
 			}
@@ -2504,8 +2510,10 @@ public class AtBScenario extends Scenario {
 							MekHQ.logError("Error loading allied unit in scenario");
 							MekHQ.logError(e);
 						}
-						alliesPlayer.add(en);
-						entityIds.put(UUID.fromString(en.getExternalIdAsString()), en);
+						if (en != null) {
+							alliesPlayer.add(en);
+							entityIds.put(UUID.fromString(en.getExternalIdAsString()), en);
+						}
 					}
 				}
 			} else if (wn2.getNodeName().equalsIgnoreCase("bigBattleAllies")) {
@@ -2521,8 +2529,10 @@ public class AtBScenario extends Scenario {
 							MekHQ.logError("Error loading allied unit in scenario");
 							MekHQ.logError(e);
 						}
-						bigBattleAllies.add(en);
-						entityIds.put(UUID.fromString(en.getExternalIdAsString()), en);
+						if (en != null) {
+							bigBattleAllies.add(en);
+							entityIds.put(UUID.fromString(en.getExternalIdAsString()), en);
+						}
 					}
 				}
 			} else if (wn2.getNodeName().equalsIgnoreCase("specMissionEnemies")) {
