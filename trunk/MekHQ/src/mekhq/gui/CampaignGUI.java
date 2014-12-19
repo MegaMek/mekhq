@@ -31,10 +31,6 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.Window;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -49,10 +45,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -103,7 +97,6 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SortOrder;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.ChangeEvent;
@@ -121,7 +114,6 @@ import javax.swing.tree.TreeSelectionModel;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import megamek.client.ui.swing.MechEditorDialog;
 import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
@@ -135,16 +127,13 @@ import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.MULParser;
 import megamek.common.Mech;
-import megamek.common.MechSummaryCache;
 import megamek.common.MechView;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
-import megamek.common.Player;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.UnitType;
 import megamek.common.WeaponType;
-import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
@@ -160,7 +149,6 @@ import mekhq.campaign.Kill;
 import mekhq.campaign.LogEntry;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.ResolveScenarioTracker;
-import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
@@ -205,14 +193,16 @@ import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.Modes;
+import mekhq.gui.adapter.FinanceTableMouseAdapter;
+import mekhq.gui.adapter.LoanTableMouseAdapter;
+import mekhq.gui.adapter.ProcurementTableMouseAdapter;
+import mekhq.gui.adapter.ScenarioTableMouseAdapter;
+import mekhq.gui.adapter.UnitTableMouseAdapter;
 import mekhq.gui.dialog.AddFundsDialog;
 import mekhq.gui.dialog.AdvanceDaysDialog;
 import mekhq.gui.dialog.BloodnameDialog;
-import mekhq.gui.dialog.BombsDialog;
-import mekhq.gui.dialog.CamoChoiceDialog;
 import mekhq.gui.dialog.CampaignOptionsDialog;
 import mekhq.gui.dialog.ChooseMulFilesDialog;
-import mekhq.gui.dialog.ChooseRefitDialog;
 import mekhq.gui.dialog.CompleteMissionDialog;
 import mekhq.gui.dialog.ContractMarketDialog;
 import mekhq.gui.dialog.CustomizeAtBContractDialog;
@@ -225,7 +215,6 @@ import mekhq.gui.dialog.EditKillLogDialog;
 import mekhq.gui.dialog.EditLogEntryDialog;
 import mekhq.gui.dialog.EditPersonnelInjuriesDialog;
 import mekhq.gui.dialog.EditPersonnelLogDialog;
-import mekhq.gui.dialog.EditTransactionDialog;
 import mekhq.gui.dialog.GMToolsDialog;
 import mekhq.gui.dialog.GameOptionsDialog;
 import mekhq.gui.dialog.HireBulkPersonnelDialog;
@@ -239,11 +228,9 @@ import mekhq.gui.dialog.NewLoanDialog;
 import mekhq.gui.dialog.NewRecruitDialog;
 import mekhq.gui.dialog.NewsReportDialog;
 import mekhq.gui.dialog.PartsStoreDialog;
-import mekhq.gui.dialog.PayCollateralDialog;
 import mekhq.gui.dialog.PersonnelMarketDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
 import mekhq.gui.dialog.PortraitChoiceDialog;
-import mekhq.gui.dialog.QuirksDialog;
 import mekhq.gui.dialog.RefitNameDialog;
 import mekhq.gui.dialog.ReportDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
@@ -251,6 +238,7 @@ import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.dialog.UnitMarketDialog;
 import mekhq.gui.dialog.UnitSelectorDialog;
+import mekhq.gui.handler.OrgTreeTransferHandler;
 import mekhq.gui.model.AcquisitionTableModel;
 import mekhq.gui.model.DocTableModel;
 import mekhq.gui.model.FinanceTableModel;
@@ -268,8 +256,8 @@ import mekhq.gui.model.XTableColumnModel;
 import mekhq.gui.sorter.BonusSorter;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.LevelSorter;
-import mekhq.gui.sorter.RankSorter;
 import mekhq.gui.sorter.PartsDetailSorter;
+import mekhq.gui.sorter.RankSorter;
 import mekhq.gui.sorter.TargetSorter;
 import mekhq.gui.sorter.TaskSorter;
 import mekhq.gui.sorter.TechSorter;
@@ -305,10 +293,10 @@ public class CampaignGUI extends JPanel {
      */
     private static final long serialVersionUID = -687162569841072579L;
 
-    private static final int UNIT_VIEW_WIDTH = 450;
-    private static final int PERSONNEL_VIEW_WIDTH = 500;
-    private static final int MAX_START_WIDTH = 1400;
-    private static final int MAX_START_HEIGHT = 900;
+    public static final int UNIT_VIEW_WIDTH = 450;
+    public static final int PERSONNEL_VIEW_WIDTH = 500;
+    public static final int MAX_START_WIDTH = 1400;
+    public static final int MAX_START_HEIGHT = 900;
 
     // personnel filter groups
     public static final int PG_ACTIVE = 0;
@@ -718,7 +706,7 @@ public class CampaignGUI extends JPanel {
         panMekLab = new MekLabPanel(this);
         tabMain.addTab(
                 resourceMap.getString("panMekLab.TabConstraints.tabTitle"),
-                new JScrollPane(panMekLab)); // NOI18N
+                new JScrollPane(getPanMekLab())); // NOI18N
 
         initFinanceTab();
         tabMain.addTab(
@@ -817,7 +805,7 @@ public class CampaignGUI extends JPanel {
         });
         orgTree.setDragEnabled(true);
         orgTree.setDropMode(DropMode.ON);
-        orgTree.setTransferHandler(new OrgTreeTransferHandler());
+        orgTree.setTransferHandler(new OrgTreeTransferHandler(this));
 
         scrollForceView = new JScrollPane();
         scrollForceView.setMinimumSize(new java.awt.Dimension(550, 600));
@@ -961,7 +949,7 @@ public class CampaignGUI extends JPanel {
         scenarioTable = new JTable(scenarioModel);
         scenarioTable.setShowGrid(false);
         scenarioTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        scenarioTable.addMouseListener(new ScenarioTableMouseAdapter());
+        scenarioTable.addMouseListener(new ScenarioTableMouseAdapter(this));
         scenarioTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         scenarioTable.setIntercellSpacing(new Dimension(0, 0));
         scenarioTable.getSelectionModel().addListSelectionListener(
@@ -1521,13 +1509,13 @@ public class CampaignGUI extends JPanel {
         panHangar.add(choiceUnitView, gridBagConstraints);
 
         unitModel = new UnitTableModel(getCampaign());
-        unitTable = new JTable(unitModel);
-        unitTable
+        unitTable = new JTable(getUnitModel());
+        getUnitTable()
                 .setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         XTableColumnModel unitColumnModel = new XTableColumnModel();
-        unitTable.setColumnModel(unitColumnModel);
-        unitTable.createDefaultColumnsFromModel();
-        unitSorter = new TableRowSorter<UnitTableModel>(unitModel);
+        getUnitTable().setColumnModel(unitColumnModel);
+        getUnitTable().createDefaultColumnsFromModel();
+        unitSorter = new TableRowSorter<UnitTableModel>(getUnitModel());
         unitSorter.setComparator(UnitTableModel.COL_STATUS,
                 new UnitStatusSorter());
         unitSorter.setComparator(UnitTableModel.COL_TYPE, new UnitTypeSorter());
@@ -1535,27 +1523,27 @@ public class CampaignGUI extends JPanel {
                 new WeightClassSorter());
         unitSorter.setComparator(UnitTableModel.COL_COST,
                 new FormattedNumberSorter());
-        unitTable.setRowSorter(unitSorter);
+        getUnitTable().setRowSorter(unitSorter);
         ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
         sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_TYPE,
                 SortOrder.DESCENDING));
         sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_WCLASS,
                 SortOrder.DESCENDING));
         unitSorter.setSortKeys(sortKeys);
-        unitTable.addMouseListener(new UnitTableMouseAdapter());
-        unitTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        getUnitTable().addMouseListener(new UnitTableMouseAdapter(this));
+        getUnitTable().setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         TableColumn column = null;
         for (int i = 0; i < UnitTableModel.N_COL; i++) {
-            column = unitTable.getColumnModel().getColumn(i);
-            column.setPreferredWidth(unitModel.getColumnWidth(i));
-            column.setCellRenderer(unitModel.getRenderer(
+            column = getUnitTable().getColumnModel().getColumn(i);
+            column.setPreferredWidth(getUnitModel().getColumnWidth(i));
+            column.setCellRenderer(getUnitModel().getRenderer(
                     choiceUnitView.getSelectedIndex() == UV_GRAPHIC,
                     getIconPackage()));
         }
-        unitTable.setIntercellSpacing(new Dimension(0, 0));
-        unitTable.setShowGrid(false);
+        getUnitTable().setIntercellSpacing(new Dimension(0, 0));
+        getUnitTable().setShowGrid(false);
         changeUnitView();
-        unitTable.getSelectionModel().addListSelectionListener(
+        getUnitTable().getSelectionModel().addListSelectionListener(
                 new javax.swing.event.ListSelectionListener() {
                     public void valueChanged(
                             javax.swing.event.ListSelectionEvent evt) {
@@ -1580,7 +1568,7 @@ public class CampaignGUI extends JPanel {
         }
         acquireUnitsTable.setIntercellSpacing(new Dimension(0, 0));
         acquireUnitsTable.setShowGrid(false);
-        acquireUnitsTable.addMouseListener(new ProcurementTableMouseAdapter());
+        acquireUnitsTable.addMouseListener(new ProcurementTableMouseAdapter(this));
         acquireUnitsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         acquireUnitsTable.getInputMap(JComponent.WHEN_FOCUSED).put(
@@ -1637,7 +1625,7 @@ public class CampaignGUI extends JPanel {
         panAcquireUnit.setMinimumSize(new Dimension(200, 200));
         panAcquireUnit.setPreferredSize(new Dimension(200, 200));
 
-        JSplitPane splitLeftUnit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(unitTable), panAcquireUnit);
+        JSplitPane splitLeftUnit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(getUnitTable()), panAcquireUnit);
         splitLeftUnit.setOneTouchExpandable(true);
         splitLeftUnit.setResizeWeight(1.0);
 
@@ -1651,9 +1639,9 @@ public class CampaignGUI extends JPanel {
         scrollUnitView.setViewportView(null);
 
         splitUnit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitLeftUnit, scrollUnitView);
-        splitUnit.setOneTouchExpandable(true);
-        splitUnit.setResizeWeight(1.0);
-        splitUnit.addPropertyChangeListener(
+        getSplitUnit().setOneTouchExpandable(true);
+        getSplitUnit().setResizeWeight(1.0);
+        getSplitUnit().addPropertyChangeListener(
                 JSplitPane.DIVIDER_LOCATION_PROPERTY,
                 new PropertyChangeListener() {
                     @Override
@@ -1668,7 +1656,7 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        panHangar.add(splitUnit, gridBagConstraints);
+        panHangar.add(getSplitUnit(), gridBagConstraints);
     }
 
     private void initWarehouseTab() {
@@ -1791,7 +1779,7 @@ public class CampaignGUI extends JPanel {
         }
         acquirePartsTable.setIntercellSpacing(new Dimension(0, 0));
         acquirePartsTable.setShowGrid(false);
-        acquirePartsTable.addMouseListener(new ProcurementTableMouseAdapter());
+        acquirePartsTable.addMouseListener(new ProcurementTableMouseAdapter(this));
         acquirePartsTable
                 .setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
@@ -2454,7 +2442,7 @@ public class CampaignGUI extends JPanel {
         financeModel = new FinanceTableModel();
         financeTable = new JTable(financeModel);
         financeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        financeTable.addMouseListener(new FinanceTableMouseAdapter());
+        financeTable.addMouseListener(new FinanceTableMouseAdapter(this));
         financeTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         TableColumn column = null;
         for (int i = 0; i < FinanceTableModel.N_COL; i++) {
@@ -2468,7 +2456,7 @@ public class CampaignGUI extends JPanel {
         loanModel = new LoanTableModel();
         loanTable = new JTable(loanModel);
         loanTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        loanTable.addMouseListener(new LoanTableMouseAdapter());
+        loanTable.addMouseListener(new LoanTableMouseAdapter(this));
         loanTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         column = null;
         for (int i = 0; i < LoanTableModel.N_COL; i++) {
@@ -2642,7 +2630,7 @@ public class CampaignGUI extends JPanel {
                 resourceMap.getString("miExportUnitCSV.text")); // NOI18N
         miExportUnitCSV.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exportTable(unitTable, getCampaign().getName()
+                exportTable(getUnitTable(), getCampaign().getName()
                         + getCampaign().getShortDateAsString()
                         + "_ExportedUnit" + ".csv");
             }
@@ -3799,12 +3787,12 @@ public class CampaignGUI extends JPanel {
                 mainPanel.resetToPreferredSizes();
             }
         }
-        splitUnit.resetToPreferredSizes();
+        getSplitUnit().resetToPreferredSizes();
         tabMain.setSelectedIndex(getTabIndexByName(resourceMap
                 .getString("panHangar.TabConstraints.tabTitle")));
         int row = -1;
-        for (int i = 0; i < unitTable.getRowCount(); i++) {
-            if (unitModel.getUnit(unitTable.convertRowIndexToModel(i)).getId()
+        for (int i = 0; i < getUnitTable().getRowCount(); i++) {
+            if (getUnitModel().getUnit(getUnitTable().convertRowIndexToModel(i)).getId()
                     .equals(id)) {
                 row = i;
                 break;
@@ -3813,8 +3801,8 @@ public class CampaignGUI extends JPanel {
         if (row == -1) {
             // try expanding the filter to all units
             choiceUnit.setSelectedIndex(0);
-            for (int i = 0; i < unitTable.getRowCount(); i++) {
-                if (unitModel.getUnit(unitTable.convertRowIndexToModel(i))
+            for (int i = 0; i < getUnitTable().getRowCount(); i++) {
+                if (getUnitModel().getUnit(getUnitTable().convertRowIndexToModel(i))
                         .getId().equals(id)) {
                     row = i;
                     break;
@@ -3823,8 +3811,8 @@ public class CampaignGUI extends JPanel {
 
         }
         if (row != -1) {
-            unitTable.setRowSelectionInterval(row, row);
-            unitTable.scrollRectToVisible(unitTable.getCellRect(row, 0, true));
+            getUnitTable().setRowSelectionInterval(row, row);
+            getUnitTable().scrollRectToVisible(getUnitTable().getCellRect(row, 0, true));
         }
 
     }
@@ -4606,7 +4594,7 @@ public class CampaignGUI extends JPanel {
             return;
         }
         getCampaign().refit(r);
-        panMekLab.clearUnit();
+        getPanMekLab().clearUnit();
         refreshReport();
         refreshFunds();
         refreshFinancialTransactions();
@@ -4847,13 +4835,13 @@ public class CampaignGUI extends JPanel {
         });
     }
 
-    private void refreshUnitView() {
-        int row = unitTable.getSelectedRow();
+    public void refreshUnitView() {
+        int row = getUnitTable().getSelectedRow();
         if (row < 0) {
             scrollUnitView.setViewportView(null);
             return;
         }
-        Unit selectedUnit = unitModel.getUnit(unitTable
+        Unit selectedUnit = getUnitModel().getUnit(getUnitTable()
                 .convertRowIndexToModel(row));
         scrollUnitView.setViewportView(new UnitViewPanel(selectedUnit,
                 getCampaign(), getIconPackage().getCamos(), getIconPackage()
@@ -4918,7 +4906,7 @@ public class CampaignGUI extends JPanel {
 
     }
 
-    protected void refreshForceView() {
+    public void refreshForceView() {
         Object node = orgTree.getLastSelectedPathComponent();
         if (null == node
                 || -1 == orgTree.getRowForPath(orgTree.getSelectionPath())) {
@@ -6268,20 +6256,20 @@ public class CampaignGUI extends JPanel {
 
     public void refreshUnitList() {
         UUID selectedUUID = null;
-        int selectedRow = unitTable.getSelectedRow();
+        int selectedRow = getUnitTable().getSelectedRow();
         if (selectedRow != -1) {
-            Unit u = unitModel.getUnit(unitTable
+            Unit u = getUnitModel().getUnit(getUnitTable()
                     .convertRowIndexToModel(selectedRow));
             if (null != u) {
                 selectedUUID = u.getId();
             }
         }
-        unitModel.setData(getCampaign().getUnits());
+        getUnitModel().setData(getCampaign().getUnits());
         // try to put the focus back on same person if they are still available
-        for (int row = 0; row < unitTable.getRowCount(); row++) {
-            Unit u = unitModel.getUnit(unitTable.convertRowIndexToModel(row));
+        for (int row = 0; row < getUnitTable().getRowCount(); row++) {
+            Unit u = getUnitModel().getUnit(getUnitTable().convertRowIndexToModel(row));
             if (u.getId().equals(selectedUUID)) {
-                unitTable.setRowSelectionInterval(row, row);
+                getUnitTable().setRowSelectionInterval(row, row);
                 refreshUnitView();
                 break;
             }
@@ -6333,21 +6321,21 @@ public class CampaignGUI extends JPanel {
     }
 
     public void refreshLab() {
-        if (null == panMekLab) {
+        if (null == getPanMekLab()) {
             return;
         }
-        Unit u = panMekLab.getUnit();
+        Unit u = getPanMekLab().getUnit();
         if (null == u) {
             return;
         }
         if (null == getCampaign().getUnit(u.getId())) {
             // this unit has been removed so clear the mek lab
-            panMekLab.clearUnit();
+            getPanMekLab().clearUnit();
         } else {
             // put a try-catch here so that bugs in the meklab don't screw up
             // other stuff
             try {
-                panMekLab.refreshSummary();
+                getPanMekLab().refreshSummary();
             } catch (Exception err) {
                 err.printStackTrace();
             }
@@ -7917,15 +7905,15 @@ public class CampaignGUI extends JPanel {
     private void changeUnitView() {
 
         int view = choiceUnitView.getSelectedIndex();
-        XTableColumnModel columnModel = (XTableColumnModel) unitTable
+        XTableColumnModel columnModel = (XTableColumnModel) getUnitTable()
                 .getColumnModel();
-        unitTable.setRowHeight(15);
+        getUnitTable().setRowHeight(15);
 
         // set the renderer
         TableColumn column = null;
         for (int i = 0; i < UnitTableModel.N_COL; i++) {
             column = columnModel.getColumnByModelIndex(i);
-            column.setCellRenderer(unitModel.getRenderer(
+            column.setCellRenderer(getUnitModel().getRenderer(
                     choiceUnitView.getSelectedIndex() == UV_GRAPHIC,
                     getIconPackage()));
             if (i == UnitTableModel.COL_WCLASS) {
@@ -7940,7 +7928,7 @@ public class CampaignGUI extends JPanel {
         }
 
         if (view == UV_GRAPHIC) {
-            unitTable.setRowHeight(80);
+            getUnitTable().setRowHeight(80);
             columnModel.setColumnVisible(
                     columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME),
                     false);
@@ -8527,7 +8515,7 @@ public class CampaignGUI extends JPanel {
                         .convertRowIndexToModel(row));
                 Unit[] units = new Unit[rows.length];
                 for (int i = 0; i < rows.length; i++) {
-                    units[i] = unitModel.getUnit(unitTable
+                    units[i] = getUnitModel().getUnit(getUnitTable()
                             .convertRowIndexToModel(rows[i]));
                 }
                 JMenuItem menuItem = null;
@@ -11698,1566 +11686,7 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    public class ProcurementTableMouseAdapter extends MouseInputAdapter {
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        @SuppressWarnings("serial")
-        private void maybeShowPopup(MouseEvent e) {
-            JPopupMenu popup = new JPopupMenu();
-            JMenuItem menuItem;
-            JMenu menu;
-            final JTable table = (JTable) e.getSource();
-            final ProcurementTableModel model = (ProcurementTableModel) table
-                    .getModel();
-            if (table.getSelectedRow() < 0) {
-                return;
-            }
-            if (table.getSelectedRowCount() == 0) {
-                return;
-            }
-            final int row = table
-                    .convertRowIndexToModel(table.getSelectedRow());
-            final int[] rows = table.getSelectedRows();
-            final boolean oneSelected = table.getSelectedRowCount() == 1;
-            if (e.isPopupTrigger()) {
-                // **lets fill the pop up menu**//
-                // GM mode
-                menu = new JMenu("GM Mode");
-
-                menuItem = new JMenuItem("Procure single item now");
-                menuItem.addActionListener(new AbstractAction() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        if (row < 0) {
-                            return;
-                        }
-                        if (oneSelected) {
-                            IAcquisitionWork acquisition = model
-                                    .getAcquisition(row);
-                            Object equipment = acquisition.getNewEquipment();
-                            if (equipment instanceof Part) {
-                                if (getCampaign().buyPart(
-                                        (Part) equipment,
-                                        getCampaign().calculatePartTransitTime(
-                                                0))) {
-                                    getCampaign()
-                                            .addReport(
-                                                    "<font color='Green'><b>"
-                                                            + acquisition
-                                                                    .getAcquisitionName()
-                                                            + " found.</b></font>");
-                                    acquisition.decrementQuantity();
-                                } else {
-                                    getCampaign()
-                                            .addReport(
-                                                    "<font color='red'><b>You cannot afford to purchase "
-                                                            + acquisition
-                                                                    .getAcquisitionName()
-                                                            + "</b></font>");
-                                }
-                            } else if (equipment instanceof Entity) {
-                                if (getCampaign().buyUnit(
-                                        (Entity) equipment,
-                                        getCampaign().calculatePartTransitTime(
-                                                0))) {
-                                    getCampaign()
-                                            .addReport(
-                                                    "<font color='Green'><b>"
-                                                            + acquisition
-                                                                    .getAcquisitionName()
-                                                            + " found.</b></font>");
-                                    acquisition.decrementQuantity();
-                                } else {
-                                    getCampaign()
-                                            .addReport(
-                                                    "<font color='red'><b>You cannot afford to purchase "
-                                                            + acquisition
-                                                                    .getAcquisitionName()
-                                                            + "</b></font>");
-                                }
-                            }
-                        } else {
-                            for (int curRow : rows) {
-                                if (curRow < 0) {
-                                    continue;
-                                }
-                                int row = table.convertRowIndexToModel(curRow);
-                                IAcquisitionWork acquisition = model
-                                        .getAcquisition(row);
-                                Object equipment = acquisition
-                                        .getNewEquipment();
-                                if (equipment instanceof Part) {
-                                    if (getCampaign()
-                                            .buyPart(
-                                                    (Part) equipment,
-                                                    getCampaign()
-                                                            .calculatePartTransitTime(
-                                                                    0))) {
-                                        getCampaign()
-                                                .addReport(
-                                                        "<font color='Green'><b>"
-                                                                + acquisition
-                                                                        .getAcquisitionName()
-                                                                + " found.</b></font>");
-                                        acquisition.decrementQuantity();
-                                    } else {
-                                        getCampaign()
-                                                .addReport(
-                                                        "<font color='red'><b>You cannot afford to purchase "
-                                                                + acquisition
-                                                                        .getAcquisitionName()
-                                                                + "</b></font>");
-                                    }
-                                } else if (equipment instanceof Entity) {
-                                    if (getCampaign()
-                                            .buyUnit(
-                                                    (Entity) equipment,
-                                                    getCampaign()
-                                                            .calculatePartTransitTime(
-                                                                    0))) {
-                                        getCampaign()
-                                                .addReport(
-                                                        "<font color='Green'><b>"
-                                                                + acquisition
-                                                                        .getAcquisitionName()
-                                                                + " found.</b></font>");
-                                        acquisition.decrementQuantity();
-                                    } else {
-                                        getCampaign()
-                                                .addReport(
-                                                        "<font color='red'><b>You cannot afford to purchase "
-                                                                + acquisition
-                                                                        .getAcquisitionName()
-                                                                + "</b></font>");
-                                    }
-                                }
-                            }
-                        }
-
-                        refreshPartsList();
-                        refreshUnitList();
-                        refreshTaskList();
-                        refreshAcquireList();
-                        refreshReport();
-                        refreshOverview();
-                        filterTasks();
-                    }
-                });
-                menuItem.setEnabled(getCampaign().isGM());
-                menu.add(menuItem);
-                menuItem = new JMenuItem("Procure all items now");
-                menuItem.addActionListener(new AbstractAction() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        if (row < 0) {
-                            return;
-                        }
-                        if (oneSelected) {
-                            IAcquisitionWork acquisition = model
-                                    .getAcquisition(row);
-                            boolean canAfford = true;
-                            while (canAfford && acquisition.getQuantity() > 0) {
-                                Object equipment = acquisition
-                                        .getNewEquipment();
-                                if (equipment instanceof Part) {
-                                    if (getCampaign()
-                                            .buyPart(
-                                                    (Part) equipment,
-                                                    getCampaign()
-                                                            .calculatePartTransitTime(
-                                                                    0))) {
-                                        getCampaign()
-                                                .addReport(
-                                                        "<font color='Green'><b>"
-                                                                + acquisition
-                                                                        .getAcquisitionName()
-                                                                + " found.</b></font>");
-                                        acquisition.decrementQuantity();
-                                    } else {
-                                        getCampaign()
-                                                .addReport(
-                                                        "<font color='red'><b>You cannot afford to purchase "
-                                                                + acquisition
-                                                                        .getAcquisitionName()
-                                                                + "</b></font>");
-                                        canAfford = false;
-                                    }
-                                } else if (equipment instanceof Entity) {
-                                    if (getCampaign()
-                                            .buyUnit(
-                                                    (Entity) equipment,
-                                                    getCampaign()
-                                                            .calculatePartTransitTime(
-                                                                    0))) {
-                                        getCampaign()
-                                                .addReport(
-                                                        "<font color='Green'><b>"
-                                                                + acquisition
-                                                                        .getAcquisitionName()
-                                                                + " found.</b></font>");
-                                        acquisition.decrementQuantity();
-                                    } else {
-                                        getCampaign()
-                                                .addReport(
-                                                        "<font color='red'><b>You cannot afford to purchase "
-                                                                + acquisition
-                                                                        .getAcquisitionName()
-                                                                + "</b></font>");
-                                        canAfford = false;
-                                    }
-                                }
-                            }
-                        } else {
-                            for (int curRow : rows) {
-                                if (curRow < 0) {
-                                    continue;
-                                }
-                                int row = table.convertRowIndexToModel(curRow);
-                                IAcquisitionWork acquisition = model
-                                        .getAcquisition(row);
-                                boolean canAfford = true;
-                                while (canAfford
-                                        && acquisition.getQuantity() > 0) {
-                                    Object equipment = acquisition
-                                            .getNewEquipment();
-                                    if (equipment instanceof Part) {
-                                        if (getCampaign()
-                                                .buyPart(
-                                                        (Part) equipment,
-                                                        getCampaign()
-                                                                .calculatePartTransitTime(
-                                                                        0))) {
-                                            getCampaign()
-                                                    .addReport(
-                                                            "<font color='Green'><b>"
-                                                                    + acquisition
-                                                                            .getAcquisitionName()
-                                                                    + " found.</b></font>");
-                                            acquisition.decrementQuantity();
-                                        } else {
-                                            getCampaign()
-                                                    .addReport(
-                                                            "<font color='red'><b>You cannot afford to purchase "
-                                                                    + acquisition
-                                                                            .getAcquisitionName()
-                                                                    + "</b></font>");
-                                            canAfford = false;
-                                        }
-                                    } else if (equipment instanceof Entity) {
-                                        if (getCampaign()
-                                                .buyUnit(
-                                                        (Entity) equipment,
-                                                        getCampaign()
-                                                                .calculatePartTransitTime(
-                                                                        0))) {
-                                            getCampaign()
-                                                    .addReport(
-                                                            "<font color='Green'><b>"
-                                                                    + acquisition
-                                                                            .getAcquisitionName()
-                                                                    + " found.</b></font>");
-                                            acquisition.decrementQuantity();
-                                        } else {
-                                            getCampaign()
-                                                    .addReport(
-                                                            "<font color='red'><b>You cannot afford to purchase "
-                                                                    + acquisition
-                                                                            .getAcquisitionName()
-                                                                    + "</b></font>");
-                                            canAfford = false;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        refreshPartsList();
-                        refreshUnitList();
-                        refreshTaskList();
-                        refreshAcquireList();
-                        refreshReport();
-                        refreshOverview();
-                        filterTasks();
-                    }
-                });
-                menuItem.setEnabled(getCampaign().isGM());
-                menu.add(menuItem);
-                menuItem = new JMenuItem("Clear From the List");
-                menuItem.addActionListener(new AbstractAction() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        if (row < 0) {
-                            return;
-                        }
-                        if (oneSelected) {
-                            model.removeRow(row);
-                        } else {
-                            for (int curRow : rows) {
-                                if (curRow < 0) {
-                                    continue;
-                                }
-                                int row = table.convertRowIndexToModel(curRow);
-                                model.removeRow(row);
-                            }
-                        }
-                        refreshPartsList();
-                        refreshUnitList();
-                        refreshTaskList();
-                        refreshAcquireList();
-                        refreshOverview();
-                        filterTasks();
-                    }
-                });
-                menuItem.setEnabled(getCampaign().isGM());
-                menu.add(menuItem);
-                // end
-                popup.addSeparator();
-                popup.add(menu);
-                popup.show(e.getComponent(), e.getX(), e.getY());
-            }
-        }
-    }
-
-    public class ScenarioTableMouseAdapter extends MouseInputAdapter implements
-            ActionListener {
-
-        public void actionPerformed(ActionEvent action) {
-            String command = action.getActionCommand();
-            Scenario scenario = scenarioModel.getScenario(scenarioTable
-                    .getSelectedRow());
-            Mission mission = getCampaign().getMission(selectedMission);
-            if (command.equalsIgnoreCase("EDIT")) {
-                if (null != mission && null != scenario) {
-                    CustomizeScenarioDialog csd = new CustomizeScenarioDialog(
-                            getFrame(), true, scenario, mission, getCampaign());
-                    csd.setVisible(true);
-                    refreshScenarioList();
-                }
-            } else if (command.equalsIgnoreCase("REMOVE")) {
-                if (0 == JOptionPane.showConfirmDialog(null,
-                        "Do you really want to delete the scenario?",
-                        "Delete Scenario?", JOptionPane.YES_NO_OPTION)) {
-                    getCampaign().removeScenario(scenario.getId());
-                    refreshScenarioList();
-                    refreshOrganization();
-                    refreshPersonnelList();
-                    refreshUnitList();
-                    refreshOverview();
-                }
-
-            }
-        }
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        private void maybeShowPopup(MouseEvent e) {
-            JPopupMenu popup = new JPopupMenu();
-            if (e.isPopupTrigger()) {
-                int row = scenarioTable.getSelectedRow();
-                if (row < 0) {
-                    return;
-                }
-                @SuppressWarnings("unused")
-                // FIXME
-                Scenario scenario = scenarioModel.getScenario(row);
-                JMenuItem menuItem = null;
-                JMenu menu = null;
-                @SuppressWarnings("unused")
-                // Placeholder for future expansion
-                JCheckBoxMenuItem cbMenuItem = null;
-                // **lets fill the pop up menu**//
-                menuItem = new JMenuItem("Edit...");
-                menuItem.setActionCommand("EDIT");
-                menuItem.addActionListener(this);
-                popup.add(menuItem);
-                // GM mode
-                menu = new JMenu("GM Mode");
-                // remove scenario
-                menuItem = new JMenuItem("Remove Scenario");
-                menuItem.setActionCommand("REMOVE");
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(getCampaign().isGM());
-                menu.add(menuItem);
-                // end
-                popup.addSeparator();
-                popup.add(menu);
-                popup.show(e.getComponent(), e.getX(), e.getY());
-            }
-        }
-    }
-
-    public class FinanceTableMouseAdapter extends MouseInputAdapter implements
-            ActionListener {
-
-        public void actionPerformed(ActionEvent action) {
-            String command = action.getActionCommand();
-            FinanceTableModel financeModel = (FinanceTableModel) financeTable
-                    .getModel();
-            Transaction transaction = financeModel.getTransaction(financeTable
-                    .getSelectedRow());
-            int row = financeTable.getSelectedRow();
-            if (null == transaction) {
-                return;
-            }
-            if (command.equalsIgnoreCase("DELETE")) {
-                getCampaign().addReport(transaction.voidTransaction());
-                financeModel.deleteTransaction(row);
-                refreshFinancialTransactions();
-                refreshReport();
-            } else if (command.contains("EDIT")) {
-                EditTransactionDialog dialog = new EditTransactionDialog(
-                        transaction, getFrame(), true);
-                dialog.setVisible(true);
-                transaction = dialog.getNewTransaction();
-                financeModel.setTransaction(row, transaction);
-                getCampaign().addReport(
-                        transaction.updateTransaction(dialog
-                                .getOldTransaction()));
-                refreshFinancialTransactions();
-                refreshReport();
-            }
-        }
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        private void maybeShowPopup(MouseEvent e) {
-            JPopupMenu popup = new JPopupMenu();
-            if (e.isPopupTrigger()) {
-                int row = financeTable.getSelectedRow();
-                if (row < 0) {
-                    return;
-                }
-                JMenu menu = new JMenu("GM Mode");
-                popup.add(menu);
-
-                JMenuItem deleteItem = new JMenuItem("Delete Transaction");
-                deleteItem.setActionCommand("DELETE");
-                deleteItem.addActionListener(this);
-                deleteItem.setEnabled(getCampaign().isGM());
-                menu.add(deleteItem);
-
-                JMenuItem editItem = new JMenuItem("Edit Transaction");
-                editItem.setActionCommand("EDIT");
-                editItem.addActionListener(this);
-                editItem.setEnabled(getCampaign().isGM());
-                menu.add(editItem);
-
-                popup.show(e.getComponent(), e.getX(), e.getY());
-            }
-        }
-    }
-
-    public class LoanTableMouseAdapter extends MouseInputAdapter implements
-            ActionListener {
-
-        public void actionPerformed(ActionEvent action) {
-            String command = action.getActionCommand();
-            int row = loanTable.getSelectedRow();
-            if (row < 0) {
-                return;
-            }
-            Loan selectedLoan = loanModel.getLoan(loanTable
-                    .convertRowIndexToModel(row));
-            if (null == selectedLoan) {
-                return;
-            }
-            if (command.equalsIgnoreCase("DEFAULT")) {
-                if (0 == JOptionPane
-                        .showConfirmDialog(
-                                null,
-                                "Defaulting on this loan will affect your unit rating the same as a contract breach.\nDo you wish to proceed?",
-                                "Default on " + selectedLoan.getDescription()
-                                        + "?", JOptionPane.YES_NO_OPTION)) {
-                    PayCollateralDialog pcd = new PayCollateralDialog(
-                            getFrame(), true, getCampaign(), selectedLoan);
-                    pcd.setVisible(true);
-                    if (pcd.wasCancelled()) {
-                        return;
-                    }
-                    getCampaign().getFinances().defaultOnLoan(selectedLoan,
-                            pcd.wasPaid());
-                    if (pcd.wasPaid()) {
-                        for (UUID id : pcd.getUnits()) {
-                            getCampaign().removeUnit(id);
-                        }
-                        for (int[] part : pcd.getParts()) {
-                            Part p = getCampaign().getPart(part[0]);
-                            if (null != p) {
-                                int quantity = part[1];
-                                while (quantity > 0 && p.getQuantity() > 0) {
-                                    p.decrementQuantity();
-                                    quantity--;
-                                }
-                            }
-                        }
-                        getCampaign().getFinances().setAssets(
-                                pcd.getRemainingAssets());
-                    }
-                    refreshFinancialTransactions();
-                    refreshUnitList();
-                    refreshReport();
-                    refreshPartsList();
-                    refreshOverview();
-                }
-            } else if (command.equalsIgnoreCase("PAY_BALANCE")) {
-                getCampaign().payOffLoan(selectedLoan);
-                refreshFinancialTransactions();
-                refreshReport();
-            } else if (command.equalsIgnoreCase("REMOVE")) {
-                getCampaign().getFinances().removeLoan(selectedLoan);
-                refreshFinancialTransactions();
-            }
-        }
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        private void maybeShowPopup(MouseEvent e) {
-            JPopupMenu popup = new JPopupMenu();
-            if (e.isPopupTrigger()) {
-                if (loanTable.getSelectedRowCount() == 0) {
-                    return;
-                }
-                int row = loanTable.getSelectedRow();
-                Loan loan = loanModel.getLoan(loanTable
-                        .convertRowIndexToModel(row));
-                JMenuItem menuItem = null;
-                JMenu menu = null;
-                // **lets fill the pop up menu**//
-                menuItem = new JMenuItem("Pay Off Full Balance ("
-                        + DecimalFormat.getInstance().format(
-                                loan.getRemainingValue()) + ")");
-                menuItem.setActionCommand("PAY_BALANCE");
-                menuItem.setEnabled(getCampaign().getFunds() >= loan
-                        .getRemainingValue());
-                menuItem.addActionListener(this);
-                popup.add(menuItem);
-                menuItem = new JMenuItem("Default on This Loan");
-                menuItem.setActionCommand("DEFAULT");
-                menuItem.addActionListener(this);
-                popup.add(menuItem);
-                // GM mode
-                menu = new JMenu("GM Mode");
-                // remove part
-                menuItem = new JMenuItem("Remove Loan");
-                menuItem.setActionCommand("REMOVE");
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(getCampaign().isGM());
-                menu.add(menuItem);
-                // end
-                popup.addSeparator();
-                popup.add(menu);
-                popup.show(e.getComponent(), e.getX(), e.getY());
-            }
-        }
-    }
-
-    public class UnitTableMouseAdapter extends MouseInputAdapter implements
-            ActionListener {
-
-        public void actionPerformed(ActionEvent action) {
-            String command = action.getActionCommand();
-            Unit selectedUnit = unitModel.getUnit(unitTable
-                    .convertRowIndexToModel(unitTable.getSelectedRow()));
-            int[] rows = unitTable.getSelectedRows();
-            Unit[] units = new Unit[rows.length];
-            for (int i = 0; i < rows.length; i++) {
-                units[i] = unitModel.getUnit(unitTable
-                        .convertRowIndexToModel(rows[i]));
-            }
-            if (command.equalsIgnoreCase("REMOVE_PILOT")) {
-                for (Unit unit : units) {
-                    for (Person p : unit.getCrew()) {
-                        unit.remove(p, true);
-                    }
-                }
-                refreshServicedUnitList();
-                refreshUnitList();
-                refreshOrganization();
-                refreshOverview();
-            }/* else if (command.contains("QUIRK")) {
-                String sel = command.split(":")[1];
-                    selectedUnit.acquireQuirk(sel, true);
-                    refreshServicedUnitList();
-                    refreshUnitList();
-                    refreshTechsList();
-                    refreshReport();
-                    refreshCargo();
-                    refreshOverview();
-            }*/ else if (command.contains("MAINTENANCE_REPORT")) {
-                showMaintenanceReport(selectedUnit.getId());
-            } else if (command.contains("ASSIGN")) {
-                String sel = command.split(":")[1];
-                UUID id = UUID.fromString(sel);
-                Person tech = getCampaign().getPerson(id);
-                if (null != tech) {
-                    // remove any existing techs
-                    if (null != selectedUnit.getTech()) {
-                        selectedUnit.remove(selectedUnit.getTech(), true);
-                    }
-                    selectedUnit.setTech(tech);
-                }
-                refreshServicedUnitList();
-                refreshUnitList();
-                refreshTechsList();
-                refreshPersonnelList();
-                refreshReport();
-                refreshOverview();
-            } else if (command.equalsIgnoreCase("SET_QUALITY")) {
-                int q = -1;
-                Object[] possibilities = { "F", "E", "D", "C", "B", "A" };
-                String quality = (String) JOptionPane.showInputDialog(frame,
-                        "Choose the new quality level", "Set Quality",
-                        JOptionPane.PLAIN_MESSAGE, null, possibilities, "F");
-                switch (quality) {
-                    case "A":
-                        q = 0;
-                        break;
-                    case "B":
-                        q = 1;
-                        break;
-                    case "C":
-                        q = 2;
-                        break;
-                    case "D":
-                        q = 3;
-                        break;
-                    case "E":
-                        q = 4;
-                        break;
-                    case "F":
-                        q = 5;
-                        break;
-                    default:
-                        q = -1;
-                        break;
-                }
-                if (q != -1) {
-                    for (Unit unit : units) {
-                        unit.setQuality(q);
-                    }
-                }
-            } else if (command.equalsIgnoreCase("SELL")) {
-                for (Unit unit : units) {
-                    if (!unit.isDeployed()) {
-                        long sellValue = unit.getSellValue();
-                        NumberFormat numberFormat = NumberFormat
-                                .getNumberInstance();
-                        String text = numberFormat.format(sellValue) + " "
-                                + (sellValue != 0 ? "CBills" : "CBill");
-                        if (0 == JOptionPane.showConfirmDialog(null,
-                                "Do you really want to sell " + unit.getName()
-                                        + " for " + text, "Sell Unit?",
-                                JOptionPane.YES_NO_OPTION)) {
-                            getCampaign().sellUnit(unit.getId());
-                        }
-                    }
-                }
-                refreshServicedUnitList();
-                refreshUnitList();
-                refreshPersonnelList();
-                refreshOrganization();
-                refreshReport();
-                refreshFunds();
-                refreshFinancialTransactions();
-                refreshOverview();
-            } else if (command.equalsIgnoreCase("LOSS")) {
-                for (Unit unit : units) {
-                    if (0 == JOptionPane.showConfirmDialog(null,
-                            "Do you really want to consider " + unit.getName()
-                                    + " a combat loss?", "Remove Unit?",
-                            JOptionPane.YES_NO_OPTION)) {
-                        getCampaign().removeUnit(unit.getId());
-                    }
-                }
-                refreshServicedUnitList();
-                refreshUnitList();
-                refreshPersonnelList();
-                refreshOrganization();
-                refreshReport();
-                refreshOverview();
-            } else if (command.contains("SWAP_AMMO")) {
-                String sel = command.split(":")[1];
-                int selAmmoId = Integer.parseInt(sel);
-                Part part = getCampaign().getPart(selAmmoId);
-                if (null == part || !(part instanceof AmmoBin)) {
-                    return;
-                }
-                AmmoBin ammo = (AmmoBin) part;
-                sel = command.split(":")[2];
-                long munition = Long.parseLong(sel);
-                ammo.changeMunition(munition);
-                refreshTaskList();
-                refreshAcquireList();
-                refreshServicedUnitList();
-                refreshUnitList();
-                refreshOverview();
-                filterTasks();
-            } else if (command.contains("CHANGE_SITE")) {
-                for (Unit unit : units) {
-                    if (!unit.isDeployed()) {
-                        String sel = command.split(":")[1];
-                        int selected = Integer.parseInt(sel);
-                        if ((selected > -1) && (selected < Unit.SITE_N)) {
-                            unit.setSite(selected);
-                        }
-                    }
-                }
-                refreshServicedUnitList();
-                refreshUnitList();
-                refreshTaskList();
-                refreshAcquireList();
-                refreshOverview();
-            } else if (command.equalsIgnoreCase("SALVAGE")) {
-                for (Unit unit : units) {
-                    if (!unit.isDeployed()) {
-                        unit.setSalvage(true);
-                        unit.runDiagnostic();
-                    }
-                }
-                refreshServicedUnitList();
-                refreshUnitList();
-                refreshOverview();
-            } else if (command.equalsIgnoreCase("REPAIR")) {
-                for (Unit unit : units) {
-                    if (!unit.isDeployed() && unit.isRepairable()) {
-                        unit.setSalvage(false);
-                        unit.runDiagnostic();
-                    }
-                }
-                refreshServicedUnitList();
-                refreshUnitList();
-                refreshOverview();
-            } else if (command.equalsIgnoreCase("TAG_CUSTOM")) {
-                String sCustomsDir = "data/mechfiles/customs/";
-                String sCustomsDirCampaign = sCustomsDir
-                        + getCampaign().getName() + "/";
-                File customsDir = new File(sCustomsDir);
-                if (!customsDir.exists()) {
-                    customsDir.mkdir();
-                }
-                File customsDirCampaign = new File(sCustomsDirCampaign);
-                if (!customsDirCampaign.exists()) {
-                    customsDir.mkdir();
-                }
-                for (Unit unit : units) {
-                    String fileName = unit.getEntity().getChassis() + " "
-                            + unit.getEntity().getModel();
-                    try {
-                        if (unit.getEntity() instanceof Mech) {
-                            // if this file already exists then don't overwrite
-                            // it or we will end up with a bunch of copies
-                            String fileOutName = sCustomsDir + File.separator
-                                    + fileName + ".mtf";
-                            String fileNameCampaign = sCustomsDirCampaign
-                                    + File.separator + fileName + ".mtf";
-                            if ((new File(fileOutName)).exists()
-                                    || (new File(fileNameCampaign)).exists()) {
-                                JOptionPane
-                                        .showMessageDialog(
-                                                null,
-                                                "A file already exists for this unit, cannot tag as custom. (Unit name and model)",
-                                                "File Already Exists",
-                                                JOptionPane.ERROR_MESSAGE);
-                                return;
-                            }
-                            FileOutputStream out = new FileOutputStream(
-                                    fileNameCampaign);
-                            PrintStream p = new PrintStream(out);
-                            p.println(((Mech) unit.getEntity()).getMtf());
-                            p.close();
-                            out.close();
-                        } else {
-                            // if this file already exists then don't overwrite
-                            // it or we will end up with a bunch of copies
-                            String fileOutName = sCustomsDir + File.separator
-                                    + fileName + ".blk";
-                            String fileNameCampaign = sCustomsDirCampaign
-                                    + File.separator + fileName + ".blk";
-                            if ((new File(fileOutName)).exists()
-                                    || (new File(fileNameCampaign)).exists()) {
-                                JOptionPane
-                                        .showMessageDialog(
-                                                null,
-                                                "A file already exists for this unit, cannot tag as custom. (Unit name and model)",
-                                                "File Already Exists",
-                                                JOptionPane.ERROR_MESSAGE);
-                                return;
-                            }
-                            BLKFile.encode(fileNameCampaign, unit.getEntity());
-                        }
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                    getCampaign().addCustom(
-                            unit.getEntity().getChassis() + " "
-                                    + unit.getEntity().getModel());
-                }
-                MechSummaryCache.getInstance().loadMechData();
-            } else if (command.equalsIgnoreCase("REMOVE")) {
-                for (Unit unit : units) {
-                    if (!unit.isDeployed()) {
-                        if (0 == JOptionPane.showConfirmDialog(
-                                null,
-                                "Do you really want to remove "
-                                        + unit.getName() + "?", "Remove Unit?",
-                                JOptionPane.YES_NO_OPTION)) {
-                            getCampaign().removeUnit(unit.getId());
-                        }
-                    }
-                }
-                refreshServicedUnitList();
-                refreshUnitList();
-                refreshPersonnelList();
-                refreshOrganization();
-                refreshReport();
-                refreshOverview();
-            } else if (command.equalsIgnoreCase("DISBAND")) {
-                for (Unit unit : units) {
-                    if (!unit.isDeployed()) {
-                        if (0 == JOptionPane.showConfirmDialog(null,
-                                "Do you really want to disband this unit "
-                                        + unit.getName() + "?",
-                                "Disband Unit?", JOptionPane.YES_NO_OPTION)) {
-                            Vector<Part> parts = new Vector<Part>();
-                            for (Part p : unit.getParts()) {
-                                parts.add(p);
-                            }
-                            for (Part p : parts) {
-                                p.remove(true);
-                            }
-                            getCampaign().removeUnit(unit.getId());
-                        }
-                    }
-                }
-                refreshServicedUnitList();
-                refreshUnitList();
-                refreshPartsList();
-                refreshPersonnelList();
-                refreshOrganization();
-                refreshReport();
-                refreshOverview();
-            } else if (command.equalsIgnoreCase("UNDEPLOY")) {
-                for (Unit unit : units) {
-                    if (unit.isDeployed()) {
-                        undeployUnit(unit);
-                    }
-                }
-                refreshPersonnelList();
-                refreshServicedUnitList();
-                refreshUnitList();
-                refreshOrganization();
-                refreshTaskList();
-                refreshUnitView();
-                refreshPartsList();
-                refreshAcquireList();
-                refreshReport();
-                refreshPatientList();
-                refreshScenarioList();
-                refreshOverview();
-            } else if (command.contains("HIRE_FULL")) {
-                for (Unit unit : units) {
-                    getCampaign().hirePersonnelFor(unit.getId());
-                }
-                refreshServicedUnitList();
-                refreshUnitList();
-                refreshPersonnelList();
-                refreshOrganization();
-                refreshFinancialTransactions();
-                refreshReport();
-                refreshOverview();
-            } else if (command.contains("CUSTOMIZE")
-                    && !command.contains("CANCEL")) {
-                panMekLab.loadUnit(selectedUnit);
-                tabMain.setSelectedIndex(8);
-            } else if (command.contains("CANCEL_CUSTOMIZE")) {
-                if (selectedUnit.isRefitting()) {
-                    selectedUnit.getRefit().cancel();
-                }
-                refreshServicedUnitList();
-                refreshUnitList();
-                refreshForceView();
-                refreshOrganization();
-                refreshPartsList();
-                refreshOverview();
-            } else if (command.contains("REFIT_KIT")) {
-                ChooseRefitDialog crd = new ChooseRefitDialog(getFrame(), true,
-                        getCampaign(), selectedUnit, getCampaignGUI());
-                crd.setVisible(true);
-            } else if (command.contains("CHANGE_HISTORY")) {
-                if (null != selectedUnit) {
-                    TextAreaDialog tad = new TextAreaDialog(getFrame(), true,
-                            "Edit Unit History", selectedUnit.getHistory());
-                    tad.setVisible(true);
-                    if (tad.wasChanged()) {
-                        selectedUnit.setHistory(tad.getText());
-                        refreshServicedUnitList();
-                        refreshUnitList();
-                        refreshForceView();
-                        refreshOrganization();
-                        refreshOverview();
-                    }
-                }
-            } else if (command.contains("REMOVE_INDI_CAMO")) {
-                selectedUnit.getEntity().setCamoCategory(null);
-                selectedUnit.getEntity().setCamoFileName(null);
-            } else if (command.contains("INDI_CAMO")) {
-                String category = selectedUnit.getCamoCategory();
-                if ("".equals(category)) {
-                    category = Player.ROOT_CAMO;
-                }
-                CamoChoiceDialog ccd = new CamoChoiceDialog(getFrame(), true,
-                        category, selectedUnit.getCamoFileName(), getCampaign()
-                                .getColorIndex(), getIconPackage().getCamos());
-                ccd.setLocationRelativeTo(getFrame());
-                ccd.setVisible(true);
-
-                if (ccd.clickedSelect() == true) {
-                    selectedUnit.getEntity().setCamoCategory(ccd.getCategory());
-                    selectedUnit.getEntity().setCamoFileName(ccd.getFileName());
-
-                    refreshForceView();
-                    refreshUnitView();
-                }
-                refreshOverview();
-            } else if (command.equalsIgnoreCase("CANCEL_ORDER")) {
-                double refund = getCampaign().getCampaignOptions()
-                        .GetCanceledOrderReimbursement();
-                if (null != selectedUnit) {
-                    long refundAmount = (long) (refund * selectedUnit
-                            .getBuyCost());
-                    getCampaign().removeUnit(selectedUnit.getId());
-                    getCampaign().getFinances().credit(refundAmount,
-                            Transaction.C_EQUIP,
-                            "refund for cancelled equipmemt sale",
-                            getCampaign().getDate());
-
-                }
-                refreshFinancialTransactions();
-                refreshUnitList();
-                refreshReport();
-                refreshOverview();
-            } else if (command.equalsIgnoreCase("ARRIVE")) {
-                if (null != selectedUnit) {
-                    selectedUnit.setDaysToArrival(0);
-                }
-                refreshUnitList();
-                refreshReport();
-                refreshOverview();
-            } else if (command.equalsIgnoreCase("MOTHBALL")) {
-                UUID id = null;
-                if (!selectedUnit.isSelfCrewed()) {
-                    id = selectTech(selectedUnit, "mothball");
-                    if (null == id) {
-                        return;
-                    }
-                }
-                if (null != selectedUnit) {
-                    selectedUnit.startMothballing(id);
-                }
-                refreshUnitList();
-                refreshServicedUnitList();
-                refreshReport();
-                refreshOverview();
-            } else if (command.equalsIgnoreCase("ACTIVATE")) {
-                UUID id = null;
-                if (!selectedUnit.isSelfCrewed()) {
-                    id = selectTech(selectedUnit, "activation");
-                    if (null == id) {
-                        return;
-                    }
-                }
-                if (null != selectedUnit) {
-                    selectedUnit.startMothballing(id);
-                }
-                refreshUnitList();
-                refreshServicedUnitList();
-                refreshReport();
-                refreshOverview();
-            } else if (command.equalsIgnoreCase("CANCEL_MOTHBALL")) {
-                if (null != selectedUnit) {
-                    selectedUnit.setMothballTime(0);
-                }
-                refreshUnitList();
-                refreshServicedUnitList();
-                refreshReport();
-                refreshOverview();
-            } else if (command.equalsIgnoreCase("BOMBS")) {
-                if (null != selectedUnit
-                        && selectedUnit.getEntity() instanceof Aero) {
-                    BombsDialog dialog = new BombsDialog(
-                            (Aero) selectedUnit.getEntity(), getCampaign(),
-                            frame);
-                    dialog.setVisible(true);
-                    refreshUnitList();
-                }
-            } else if (command.equalsIgnoreCase("QUIRKS")) {
-                if (null != selectedUnit) {
-                    QuirksDialog dialog = new QuirksDialog(
-                            selectedUnit.getEntity(), frame);
-                    dialog.setVisible(true);
-                    refreshUnitList();
-                }
-            } else if (command.equalsIgnoreCase("EDIT_DAMAGE")) {
-                if (null != selectedUnit) {
-                    Entity entity = selectedUnit.getEntity();
-                    MechEditorDialog med = new MechEditorDialog(frame, entity);
-                    med.setVisible(true);
-                    selectedUnit.runDiagnostic();
-                    refreshServicedUnitList();
-                    refreshUnitList();
-                    refreshTaskList();
-                    refreshUnitView();
-                    refreshAcquireList();
-                    refreshOrganization();
-                }
-            } else if (command.equalsIgnoreCase("FLUFF_NAME")) {
-                if (selectedUnit != null) {
-                    String fluffName = (String) JOptionPane.showInputDialog(
-                            getFrame(), "Name for this unit?", "Unit Name",
-                            JOptionPane.QUESTION_MESSAGE, null, null,
-                            selectedUnit.getFluffName() == null ? ""
-                                    : selectedUnit.getFluffName());
-                    selectedUnit.setFluffName(fluffName);
-                    selectedUnit.runDiagnostic();
-                    refreshServicedUnitList();
-                    refreshUnitList();
-                    refreshTaskList();
-                    refreshUnitView();
-                    refreshOrganization();
-                }
-            }
-        }
-
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            if (e.getClickCount() == 2) {
-                if ((splitUnit.getSize().width - splitUnit.getDividerLocation() + splitUnit
-                        .getDividerSize()) < UNIT_VIEW_WIDTH) {
-                    // expand
-                    splitUnit.resetToPreferredSizes();
-                } else {
-                    // collapse
-                    splitUnit.setDividerLocation(1.0);
-                }
-
-            }
-        }
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        private void maybeShowPopup(MouseEvent e) {
-            JPopupMenu popup = new JPopupMenu();
-            if (e.isPopupTrigger()) {
-                if (unitTable.getSelectedRowCount() == 0) {
-                    return;
-                }
-                int[] rows = unitTable.getSelectedRows();
-                int row = unitTable.getSelectedRow();
-                boolean oneSelected = unitTable.getSelectedRowCount() == 1;
-                Unit unit = unitModel.getUnit(unitTable
-                        .convertRowIndexToModel(row));
-                Unit[] units = new Unit[rows.length];
-                for (int i = 0; i < rows.length; i++) {
-                    units[i] = unitModel.getUnit(unitTable
-                            .convertRowIndexToModel(rows[i]));
-                }
-                JMenuItem menuItem = null;
-                JMenu menu = null;
-                JCheckBoxMenuItem cbMenuItem = null;
-                // **lets fill the pop up menu**//
-                if (oneSelected && !unit.isPresent()) {
-                    menuItem = new JMenuItem("Cancel This Delivery");
-                    menuItem.setActionCommand("CANCEL_ORDER");
-                    menuItem.addActionListener(this);
-                    popup.add(menuItem);
-                    // GM mode
-                    menu = new JMenu("GM Mode");
-                    menuItem = new JMenuItem("Deliver Part Now");
-                    menuItem.setActionCommand("ARRIVE");
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(getCampaign().isGM());
-                    menu.add(menuItem);
-                    popup.addSeparator();
-                    popup.add(menu);
-                    popup.show(e.getComponent(), e.getX(), e.getY());
-                    return;
-                }
-                // change the location
-                menu = new JMenu("Change site");
-                int i = 0;
-                for (i = 0; i < Unit.SITE_N; i++) {
-                    cbMenuItem = new JCheckBoxMenuItem(Unit.getSiteName(i));
-                    if (areAllSameSite(units) && unit.getSite() == i) {
-                        cbMenuItem.setSelected(true);
-                    } else {
-                        cbMenuItem.setActionCommand("CHANGE_SITE:" + i);
-                        cbMenuItem.addActionListener(this);
-                    }
-                    menu.add(cbMenuItem);
-                }
-                menu.setEnabled(unit.isAvailable());
-                popup.add(menu);
-
-                // swap ammo
-                if (oneSelected) {
-                    menu = new JMenu("Swap ammo");
-                    JMenu ammoMenu = null;
-                    for (AmmoBin ammo : unit.getWorkingAmmoBins()) {
-                        ammoMenu = new JMenu(ammo.getType().getDesc());
-                        AmmoType curType = (AmmoType) ammo.getType();
-                        for (AmmoType atype : Utilities.getMunitionsFor(unit
-                                .getEntity(), curType, getCampaign()
-                                .getCampaignOptions().getTechLevel())) {
-                            cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
-                            if (atype.equals(curType)) {
-                                cbMenuItem.setSelected(true);
-                            } else {
-                                cbMenuItem.setActionCommand("SWAP_AMMO:"
-                                        + ammo.getId() + ":"
-                                        + atype.getMunitionType());
-                                cbMenuItem.addActionListener(this);
-                            }
-                            ammoMenu.add(cbMenuItem);
-                        }
-                        if (ammoMenu.getItemCount() > 20) {
-                            MenuScroller.setScrollerFor(ammoMenu, 20);
-                        }
-                        menu.add(ammoMenu);
-                    }
-                    menu.setEnabled(unit.isAvailable());
-                    if (menu.getItemCount() > 20) {
-                        MenuScroller.setScrollerFor(menu, 20);
-                    }
-                    popup.add(menu);
-                }
-                // Select bombs.
-                if (oneSelected && (unit.getEntity() instanceof Aero)) {
-                    menuItem = new JMenuItem("Select Bombs");
-                    menuItem.setActionCommand("BOMBS");
-                    menuItem.addActionListener(this);
-                    popup.add(menuItem);
-                }
-                // Salvage / Repair
-                if (oneSelected
-                        && !(unit.getEntity() instanceof Infantry && !(unit
-                                .getEntity() instanceof BattleArmor))) {
-                    menu = new JMenu("Repair Status");
-                    menu.setEnabled(unit.isAvailable());
-                    cbMenuItem = new JCheckBoxMenuItem("Repair");
-                    if (!unit.isSalvage()) {
-                        cbMenuItem.setSelected(true);
-                    }
-                    cbMenuItem.setActionCommand("REPAIR");
-                    cbMenuItem.addActionListener(this);
-                    cbMenuItem.setEnabled(unit.isAvailable()
-                            && unit.isRepairable());
-                    menu.add(cbMenuItem);
-                    cbMenuItem = new JCheckBoxMenuItem("Salvage");
-                    if (unit.isSalvage()) {
-                        cbMenuItem.setSelected(true);
-                    }
-                    cbMenuItem.setActionCommand("SALVAGE");
-                    cbMenuItem.addActionListener(this);
-                    cbMenuItem.setEnabled(unit.isAvailable());
-                    menu.add(cbMenuItem);
-                    popup.add(menu);
-                }
-                if (oneSelected
-                        && !(unit.getEntity() instanceof Infantry && !(unit
-                                .getEntity() instanceof BattleArmor))) {
-                    if (unit.isMothballing()) {
-                        menuItem = new JMenuItem(
-                                "Cancel Mothballing/Activation");
-                        menuItem.setActionCommand("CANCEL_MOTHBALL");
-                        menuItem.addActionListener(this);
-                        menuItem.setEnabled(true);
-                        popup.add(menuItem);
-                    } else if (unit.isMothballed()) {
-                        menuItem = new JMenuItem("Activate Unit");
-                        menuItem.setActionCommand("ACTIVATE");
-                        menuItem.addActionListener(this);
-                        menuItem.setEnabled(!unit.isSelfCrewed()
-                                || null != unit.getEngineer());
-                        popup.add(menuItem);
-                    } else {
-                        menuItem = new JMenuItem("Mothball Unit");
-                        menuItem.setActionCommand("MOTHBALL");
-                        menuItem.addActionListener(this);
-                        menuItem.setEnabled(unit.isAvailable()
-                                && (!unit.isSelfCrewed() || null != unit
-                                        .getEngineer()));
-                        popup.add(menuItem);
-                    }
-                }
-                if (oneSelected && unit.requiresMaintenance()
-                        && !unit.isSelfCrewed() && unit.isAvailable()) {
-                    menu = new JMenu("Assign Tech");
-                    for (Person tech : getCampaign().getTechs()) {
-                        if (tech.canTech(unit.getEntity())
-                                && (tech.getMaintenanceTimeUsing() + unit
-                                        .getMaintenanceTime()) <= 480) {
-                            String skillLvl = "Unknown";
-                            if (null != tech.getSkillForWorkingOn(unit)) {
-                                skillLvl = SkillType
-                                        .getExperienceLevelName(tech
-                                                .getSkillForWorkingOn(unit)
-                                                .getExperienceLevel());
-                            }
-                            cbMenuItem = new JCheckBoxMenuItem(
-                                    tech.getFullTitle() + " (" + skillLvl
-                                            + ", "
-                                            + tech.getMaintenanceTimeUsing()
-                                            + "m)");
-                            cbMenuItem.setActionCommand("ASSIGN:"
-                                    + tech.getId());
-                            cbMenuItem.setEnabled(true);
-                            if (null != unit.getTechId()
-                                    && unit.getTechId().equals(tech.getId())) {
-                                cbMenuItem.setSelected(true);
-                            } else {
-                                cbMenuItem.addActionListener(this);
-                            }
-                            menu.add(cbMenuItem);
-                        }
-                    }
-                    if (menu.getItemCount() > 0) {
-                        popup.add(menu);
-                        if (menu.getItemCount() > 20) {
-                            MenuScroller.setScrollerFor(menu, 20);
-                        }
-                    }
-                }
-                if (oneSelected && unit.requiresMaintenance()) {
-                    menuItem = new JMenuItem("Show Last Maintenance Report");
-                    menuItem.setActionCommand("MAINTENANCE_REPORT");
-                    menuItem.addActionListener(this);
-                    popup.add(menuItem);
-                }
-                if (oneSelected && unit.getEntity() instanceof Infantry
-                        && !(unit.getEntity() instanceof BattleArmor)) {
-                    menuItem = new JMenuItem("Disband");
-                    menuItem.setActionCommand("DISBAND");
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(unit.isAvailable());
-                    popup.add(menuItem);
-                }
-                // Customize
-                if (oneSelected) {
-                    menu = new JMenu("Customize");
-                    menuItem = new JMenuItem("Choose Refit Kit...");
-                    menuItem.setActionCommand("REFIT_KIT");
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(unit.isAvailable()
-                            && (unit.getEntity() instanceof megamek.common.Mech
-                                    || unit.getEntity() instanceof megamek.common.Tank
-                                    || unit.getEntity() instanceof megamek.common.Aero || (unit
-                                        .getEntity() instanceof Infantry)));
-                    menu.add(menuItem);
-                    menuItem = new JMenuItem("Customize in Mek Lab...");
-                    menuItem.setActionCommand("CUSTOMIZE");
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(unit.isAvailable()
-                            && (unit.getEntity() instanceof megamek.common.Mech
-                                    || unit.getEntity() instanceof megamek.common.Tank
-                                    || (unit.getEntity() instanceof megamek.common.Aero && unit
-                                            .getEntity().getClass() == Aero.class) || (unit
-                                        .getEntity() instanceof Infantry)));
-                    menu.add(menuItem);
-                    if (unit.isRefitting()) {
-                        menuItem = new JMenuItem("Cancel Customization");
-                        menuItem.setActionCommand("CANCEL_CUSTOMIZE");
-                        menuItem.addActionListener(this);
-                        menuItem.setEnabled(true);
-                        menu.add(menuItem);
-                    }
-                    menu.setEnabled(unit.isAvailable() && unit.isRepairable());
-                    popup.add(menu);
-                }
-                // fill with personnel
-                if (unit.getCrew().size() < unit.getFullCrewSize()) {
-                    menuItem = new JMenuItem("Hire full complement");
-                    menuItem.setActionCommand("HIRE_FULL");
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(unit.isAvailable());
-                    popup.add(menuItem);
-                }
-                // Camo
-                if (oneSelected) {
-                    if (!unit.isEntityCamo()) {
-                        menuItem = new JMenuItem(
-                                resourceMap
-                                        .getString("customizeMenu.individualCamo.text"));
-                        menuItem.setActionCommand("INDI_CAMO");
-                        menuItem.addActionListener(this);
-                        menuItem.setEnabled(true);
-                        popup.add(menuItem);
-                    } else {
-                        menuItem = new JMenuItem(
-                                resourceMap
-                                        .getString("customizeMenu.removeIndividualCamo.text"));
-                        menuItem.setActionCommand("REMOVE_INDI_CAMO");
-                        menuItem.addActionListener(this);
-                        menuItem.setEnabled(true);
-                        popup.add(menuItem);
-                    }
-                }
-                if (oneSelected && !getCampaign().isCustom(unit)) {
-                    menuItem = new JMenuItem("Tag as a custom unit");
-                    menuItem.setActionCommand("TAG_CUSTOM");
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(true);
-                    popup.add(menuItem);
-                }
-                if (oneSelected
-                        && getCampaign().getCampaignOptions().useQuirks()) {
-                    menuItem = new JMenuItem("Edit Quirks");
-                    menuItem.setActionCommand("QUIRKS");
-                    menuItem.addActionListener(this);
-                    popup.add(menuItem);
-                }
-                if (oneSelected) {
-                    menuItem = new JMenuItem("Edit Unit History...");
-                    menuItem.setActionCommand("CHANGE_HISTORY");
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(true);
-                    popup.add(menuItem);
-                    // remove pilot
-                    popup.addSeparator();
-                    menuItem = new JMenuItem("Remove all personnel");
-                    menuItem.setActionCommand("REMOVE_PILOT");
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(!unit.isUnmanned()
-                            && !unit.isDeployed());
-                    popup.add(menuItem);
-                    menuItem = new JMenuItem("Name Unit");
-                    menuItem.setActionCommand("FLUFF_NAME");
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(true);
-                    popup.add(menuItem);
-                }
-                // sell unit
-                if (getCampaign().getCampaignOptions().canSellUnits()) {
-                    popup.addSeparator();
-                    menuItem = new JMenuItem("Sell Unit");
-                    menuItem.setActionCommand("SELL");
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(!unit.isDeployed());
-                    popup.add(menuItem);
-                }
-                // GM mode
-                menu = new JMenu("GM Mode");
-                menuItem = new JMenuItem("Remove Unit");
-                menuItem.setActionCommand("REMOVE");
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(getCampaign().isGM());
-                menu.add(menuItem);
-                menuItem = new JMenuItem("Undeploy Unit");
-                menuItem.setActionCommand("UNDEPLOY");
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(getCampaign().isGM() && unit.isDeployed());
-                menu.add(menuItem);
-                menuItem = new JMenuItem("Edit Damage...");
-                menuItem.setActionCommand("EDIT_DAMAGE");
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(getCampaign().isGM());
-                menu.add(menuItem);
-                menuItem = new JMenuItem("Set Quality...");
-                menuItem.setActionCommand("SET_QUALITY");
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(getCampaign().isGM());
-                menu.add(menuItem);
-                popup.addSeparator();
-                popup.add(menu);
-                popup.show(e.getComponent(), e.getX(), e.getY());
-            }
-        }
-    }
-
-    public class OrgTreeTransferHandler extends TransferHandler {
-
-        /**
-         *
-         */
-        private static final long serialVersionUID = -1276891849078287710L;
-
-        @Override
-        public int getSourceActions(JComponent c) {
-            return MOVE;
-        }
-
-        @Override
-        public void exportDone(JComponent c, Transferable t, int action) {
-            if (action == MOVE) {
-                refreshOrganization();
-            }
-        }
-
-        @Override
-        protected Transferable createTransferable(JComponent c) {
-            JTree tree = (JTree) c;
-            Object node = tree.getLastSelectedPathComponent();
-            if (node instanceof Unit) {
-                return new StringSelection("UNIT|"
-                        + ((Unit) node).getId().toString());
-            } else if (node instanceof Force) {
-                return new StringSelection("FORCE|"
-                        + Integer.toString(((Force) node).getId()));
-            }
-            return null;
-        }
-
-        public boolean canImport(TransferHandler.TransferSupport support) {
-            if (!support.isDrop()) {
-                return false;
-            }
-            support.setShowDropLocation(true);
-            if (!support.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                return false;
-            }
-            // Extract transfer data.
-            @SuppressWarnings("unused")
-            // FIXME
-            Unit unit = null;
-            Force force = null;
-            Transferable t = support.getTransferable();
-            try {
-                StringTokenizer st = new StringTokenizer(
-                        (String) t.getTransferData(DataFlavor.stringFlavor),
-                        "|");
-                String type = st.nextToken();
-                String id = st.nextToken();
-                if (type.equals("UNIT")) {
-                    unit = getCampaign().getUnit(UUID.fromString(id));
-                }
-                if (type.equals("FORCE")) {
-                    force = getCampaign().getForce(Integer.parseInt(id));
-                }
-            } catch (UnsupportedFlavorException ufe) {
-                System.out.println("UnsupportedFlavor: " + ufe.getMessage());
-            } catch (java.io.IOException ioe) {
-                System.out.println("I/O error: " + ioe.getMessage());
-            }
-            // Do not allow a drop on the drag source selections.
-            JTree.DropLocation dl = (JTree.DropLocation) support
-                    .getDropLocation();
-            JTree tree = (JTree) support.getComponent();
-            int dropRow = tree.getRowForPath(dl.getPath());
-            int[] selRows = tree.getSelectionRows();
-            for (int i = 0; i < selRows.length; i++) {
-                if (selRows[i] == dropRow) {
-                    return false;
-                }
-            }
-            TreePath dest = dl.getPath();
-            Object parent = dest.getLastPathComponent();
-            Force superForce = null;
-            if (parent instanceof Force) {
-                superForce = (Force) parent;
-            } else if (parent instanceof Unit) {
-                superForce = getCampaign().getForce(
-                        ((Unit) parent).getForceId());
-            }
-            if (null != force && null != superForce
-                    && force.isAncestorOf(superForce)) {
-                return false;
-            }
-
-            return parent instanceof Force || parent instanceof Unit;
-        }
-
-        public boolean importData(TransferHandler.TransferSupport support) {
-            if (!canImport(support)) {
-                return false;
-            }
-            // Extract transfer data.
-            Unit unit = null;
-            Force force = null;
-            Transferable t = support.getTransferable();
-            try {
-                StringTokenizer st = new StringTokenizer(
-                        (String) t.getTransferData(DataFlavor.stringFlavor),
-                        "|");
-                String type = st.nextToken();
-                String id = st.nextToken();
-                if (type.equals("UNIT")) {
-                    unit = getCampaign().getUnit(UUID.fromString(id));
-                }
-                if (type.equals("FORCE")) {
-                    force = getCampaign().getForce(Integer.parseInt(id));
-                }
-            } catch (UnsupportedFlavorException ufe) {
-                System.out.println("UnsupportedFlavor: " + ufe.getMessage());
-            } catch (java.io.IOException ioe) {
-                System.out.println("I/O error: " + ioe.getMessage());
-            }
-            // Get drop location info.
-            JTree.DropLocation dl = (JTree.DropLocation) support
-                    .getDropLocation();
-            TreePath dest = dl.getPath();
-            Force superForce = null;
-            Object parent = dest.getLastPathComponent();
-            if (parent instanceof Force) {
-                superForce = (Force) parent;
-            } else if (parent instanceof Unit) {
-                superForce = getCampaign().getForce(
-                        ((Unit) parent).getForceId());
-            }
-            if (null != superForce) {
-                if (null != unit) {
-                    getCampaign().addUnitToForce(unit, superForce.getId());
-                    return true;
-                }
-                if (null != force) {
-                    getCampaign().moveForce(force, superForce);
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
-
-    private void undeployUnit(Unit u) {
+    public void undeployUnit(Unit u) {
         Force f = getCampaign().getForce(u.getForceId());
         if (f != null) {
             undeployForce(f, false);
@@ -13315,5 +11744,86 @@ public class CampaignGUI extends JPanel {
             }
         }
         return true;
+    }
+
+    /**
+     * @return the unitModel
+     */
+    public UnitTableModel getUnitModel() {
+        return unitModel;
+    }
+
+    /**
+     * @return the unitTable
+     */
+    public JTable getUnitTable() {
+        return unitTable;
+    }
+
+    /**
+     * @return the panMekLab
+     */
+    public MekLabPanel getPanMekLab() {
+        return panMekLab;
+    }
+
+    /**
+     * @return the splitUnit
+     */
+    public JSplitPane getSplitUnit() {
+        return splitUnit;
+    }
+
+    public JTabbedPane getTabMain() {
+        return tabMain;
+    }
+
+    /**
+     * @return the resourceMap
+     */
+    public ResourceBundle getResourceMap() {
+        return resourceMap;
+    }
+
+    /**
+     * @return the loanTable
+     */
+    public JTable getLoanTable() {
+        return loanTable;
+    }
+
+    /**
+     * @return the loanModel
+     */
+    public LoanTableModel getLoanModel() {
+        return loanModel;
+    }
+
+    /**
+     * @return the financeTable
+     */
+    public JTable getFinanceTable() {
+        return financeTable;
+    }
+
+    /**
+     * @return the scenarioModel
+     */
+    public ScenarioTableModel getScenarioModel() {
+        return scenarioModel;
+    }
+
+    /**
+     * @return the scenarioTable
+     */
+    public JTable getScenarioTable() {
+        return scenarioTable;
+    }
+
+    /**
+     * @return the selectedMission
+     */
+    public int getSelectedMission() {
+        return selectedMission;
     }
 }
