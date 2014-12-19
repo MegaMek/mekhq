@@ -22,6 +22,13 @@ v0.3.8-dev (SVN)
     ScenarioTableMouseAdapter
     UnitTableMouseAdapter
         All of the Adapter classes are now in mekhq.gui.adapter package
++ Major refactor of CampaignGUI phase 2
+    Split out:
+    OrgTreeMouseAdapter
+    PartsTableMouseAdapter
+    ServicedUnitsTableMouseAdapter
+    All of the areAllXXX and doAllXXX check methods into a new mekhq.gui.utils.StaticChecks class,
+        and made them all static
 
 v0.3.7 (2014-12-14 19:25 UTC)
 + Patch [34]: Against the Bot, 13th Patch

@@ -41,6 +41,7 @@ import mekhq.gui.dialog.CamoChoiceDialog;
 import mekhq.gui.dialog.ChooseRefitDialog;
 import mekhq.gui.dialog.QuirksDialog;
 import mekhq.gui.dialog.TextAreaDialog;
+import mekhq.gui.utilities.StaticChecks;
 
 public class UnitTableMouseAdapter extends MouseInputAdapter implements
         ActionListener {
@@ -593,7 +594,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             int i = 0;
             for (i = 0; i < Unit.SITE_N; i++) {
                 cbMenuItem = new JCheckBoxMenuItem(Unit.getSiteName(i));
-                if (gui.areAllSameSite(units) && unit.getSite() == i) {
+                if (StaticChecks.areAllSameSite(units) && unit.getSite() == i) {
                     cbMenuItem.setSelected(true);
                 } else {
                     cbMenuItem.setActionCommand("CHANGE_SITE:" + i);
