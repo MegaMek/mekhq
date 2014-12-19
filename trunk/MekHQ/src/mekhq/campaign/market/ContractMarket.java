@@ -652,7 +652,7 @@ public class ContractMarket implements Serializable {
 			{0, 2, 2, 1}, {-1, 0, 1, 2}, {-1, -2, 1, -1}, {-1, -1, 2, 1}
 		};
 		for (int i = 0; i < 4; i++) {
-			mods.mods[i] = missionMods[contract.getMissionType()][i];
+			mods.mods[i] += missionMods[contract.getMissionType()][i];
 		}
 
 		if (RandomFactionGenerator.getInstance().isISMajorPower(contract.getEmployerCode())) {
