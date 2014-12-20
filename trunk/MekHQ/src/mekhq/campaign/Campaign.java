@@ -258,6 +258,7 @@ public class Campaign implements Serializable {
     private ContractMarket contractMarket; //AtB
     private UnitMarket unitMarket; //AtB
     private RetirementDefectionTracker retirementDefectionTracker; // AtB
+    private AtBConfiguration atbConfig; //AtB
 
     public Campaign() {
         game = new Game();
@@ -299,6 +300,7 @@ public class Campaign implements Serializable {
         contractMarket = new ContractMarket();
         unitMarket = new UnitMarket();
         retirementDefectionTracker = new RetirementDefectionTracker();
+        atbConfig = null;
     }
 
     public Game getGame() {
@@ -400,6 +402,13 @@ public class Campaign implements Serializable {
 
     public RetirementDefectionTracker getRetirementDefectionTracker() {
     	return retirementDefectionTracker;
+    }
+    
+    public AtBConfiguration getAtBConfig() {
+    	if (atbConfig == null) {
+    		atbConfig = AtBConfiguration.loadFromXml();
+    	}
+    	return atbConfig;
     }
 
     public boolean applyRetirement(long totalPayout, HashMap<UUID, UUID> unitAssignments) {
@@ -3313,6 +3322,9 @@ public class Campaign implements Serializable {
         }
         if (null == retVal.retirementDefectionTracker) {
         	retVal.retirementDefectionTracker = new RetirementDefectionTracker();
+        }
+        if (retVal.getCampaignOptions().getUseAtB()) {
+        	retVal.atbConfig = AtBConfiguration.loadFromXml();
         }
 
 
@@ -7619,6 +7631,7 @@ public class Campaign implements Serializable {
     		}
     	}
     	addAllLances(this.forces);
+    	atbConfig = AtBConfiguration.loadFromXml();
     	RandomFactionGenerator.getInstance().updateTables(calendar.getTime(),
     			location.getCurrentPlanet(), campaignOptions);
     }

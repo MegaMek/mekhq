@@ -29,6 +29,10 @@ v0.3.8-dev (SVN)
     ServicedUnitsTableMouseAdapter
     All of the areAllXXX and doAllXXX check methods into a new mekhq.gui.utils.StaticChecks class,
         and made them all static
++ Added external configuration file for AtB to allow player customization beyond options in CampaignOptions
+		and to remove hard-coded universe details.
+	Moved details on hiring halls from contract generation code into the new atbconfig.xml file
+		as the first entry and added era details.
 
 v0.3.7 (2014-12-14 19:25 UTC)
 + Patch [34]: Against the Bot, 13th Patch
