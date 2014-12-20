@@ -1953,6 +1953,7 @@ public class Campaign implements Serializable {
 
         		for (Lance l : lances.values()) {
         			if (null == l.getContract(this) || !l.getContract(this).isActive() ||
+        					!l.isEligible(this) ||
         					getDate().before(l.getContract(this).getStartDate())) {
         				continue;
         			}
@@ -2000,12 +2001,14 @@ public class Campaign implements Serializable {
         				}
         				if (!hasBaseAttack) {
         					/* find a lance to act as defender, giving preference
-        					 * to those assigned to defense roles
+        					 * first to those assigned to the same contract,
+        					 * then to those assigned to defense roles
         					 */
         					ArrayList<Lance> lList = new ArrayList<Lance>();
 	        				for (Lance l : lances.values()) {
 	        					if (l.getMissionId() == m.getId()
-	        							&& l.getRole() == Lance.ROLE_DEFEND) {
+	        							&& l.getRole() == Lance.ROLE_DEFEND
+	        							&& l.isEligible(this)) {
 	        						lList.add(l);
 	        					}
 	        				}
@@ -2013,6 +2016,13 @@ public class Campaign implements Serializable {
 	        					for (Lance l : lances.values()) {
 	        						if (l.getMissionId() == m.getId()
 	        								&& l.isEligible(this)) {
+	        							lList.add(l);
+	        						}
+	        					}
+	        				}
+	        				if (lList.size() == 0) {
+	        					for (Lance l : lances.values()) {
+	        						if (l.isEligible(this)) {
 	        							lList.add(l);
 	        						}
 	        					}
