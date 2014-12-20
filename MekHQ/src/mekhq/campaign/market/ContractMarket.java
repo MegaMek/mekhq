@@ -39,7 +39,6 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planets;
 import mekhq.campaign.universe.RandomFactionGenerator;
@@ -199,14 +198,16 @@ public class ContractMarket implements Serializable {
 
 			//TODO: add hiring halls beyond planets that are starting points for Mercs
 			if (campaign.getFactionCode().equals("MERC") || campaign.getFactionCode().equals("PIR")) {
-				boolean hasHiringHall = false;
-				for (int era = 0; era < Era.E_NUM; era++) {
-					if (campaign.getCurrentPlanet().getName().equals(Faction.factions.get("MERC").getStartingPlanet(era))) {
-						hasHiringHall = true;
-					}
-				}
-				if (hasHiringHall) {
+				if (campaign.getAtBConfig().isHiringHall(campaign.getCurrentPlanet().getName(), campaign.getDate())) {
 					numContracts++;
+					/* Though the rules do not state these modifiers are mutually exclusive, the fact that the
+					 * distance of Galatea from a border means that it has no advantage for Mercs over border
+					 * worlds. Common sense dictates that worlds with hiring halls should not be
+					 * subject to the -1 for backwater/interior.
+					 */
+					if (inBackwater) {
+						numContracts++;
+					}
 				}
 			} else {
 				/* Per IOps Beta, government units determine number of contracts as on a system with a great hall */

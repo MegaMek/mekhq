@@ -1,0 +1,36 @@
+<!--
+atbconfig.xml
+written by Neoancient
+
+This file allows users to change the various tables and some universe
+details used by the Against the Bot campaign system.
+
+Note that this feature is in development, and more options will be appearing.
+
+-->
+
+<atbPrefs>
+
+	<contractGeneration>
+	
+		<!-- Units stationed on worlds with hiring halls receive +1
+			to the monthly roll for number of contracts. This list
+			comes from information in the FM:Mercs(R), its supplementals,
+			and FM 3085. Dates are mostly approximate due to lack of precise detail
+			in the source material.
+			*Note that start and end dates are optional, but must
+			follow yyyy-MM-dd format. Planet names much match the
+			name in planets.xml exactly.-->
+		<hiringHalls>
+			<hall start="3031-01-01" end="3067-10-15">Outreach</hall>
+			<hall start="2700-01-01">Solaris</hall>
+			<hall start="3057-01-01">Arc-Royal</hall>
+			<hall start="3058-01-01" end="3081-03-15">Fletcher</hall>
+			<hall start="2650-01-01">Galatea</hall>
+			<hall start="3000-01-01">Westerhand</hall>
+			<hall start="3057-01-01" end="3081-03-15">Northwind</hall>
+			<hall start="3020-01-01">Herotitus</hall>
+		</hiringHalls>
+		
+	</contractGeneration>
+</atbPrefs>
