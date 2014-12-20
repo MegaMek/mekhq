@@ -33,6 +33,7 @@ v0.3.8-dev (SVN)
 		and to remove hard-coded universe details.
 	Moved details on hiring halls from contract generation code into the new atbconfig.xml file
 		as the first entry and added era details.
++ Bug [#746]: indepedent - spelling
 
 v0.3.7 (2014-12-14 19:25 UTC)
 + Patch [34]: Against the Bot, 13th Patch

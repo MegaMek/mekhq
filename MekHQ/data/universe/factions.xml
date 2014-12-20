@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 
+<!--
 factions.xml
 1/19/2012
 Jay Lawson
-This file defines the factions used by MekHQ. Keep in mind that the faction shortnames are used by 
+This file defines the factions used by MekHQ. Keep in mind that the faction shortnames are used by
 the planets.xml file, so if you remove a faction here, you need to remove all references to it in
 that file. Not all of the factions listed here are available to play by default. To add a faction as
-playable add its shortname to the comma-separated list enclosed by choosableFactionCodes at the 
-top of this xml file. 
+playable add its shortname to the comma-separated list enclosed by choosableFactionCodes at the
+top of this xml file.
 
 Here is a description of what goes in each faction tag
 shortname - this is the abbreviation that is used to identify each faction in planets.xml and within
             MekHQ itself. This code must be unique.
-fullname  - the full display name for the faction. 
+fullname  - the full display name for the faction.
 altNames - a comma-separated 9-item list that identifies alternate names for a given era. Use a single
 	       space between commas to indicate that the regular fullname should be used.
-startingPlanet - A comma-separated 9-item list that identifies the starting planet if you 
+startingPlanet - A comma-separated 9-item list that identifies the starting planet if you
 			     begin a new campaign with this faction. The name of the planet must be the name
 			     as it is recognized in MekHQ. Each item corresponds to a different era as follows:
 			     Age of War, Reunification Wars, Star League, 1SW, 2SW, 3SW, 4SW, Clan Invasion, Jihad
@@ -24,7 +24,7 @@ eraMods - A comma-separated 9-item list of optional modifiers to repair/replacem
           Strat Ops. If left out, then this defaults to 0 for all eras.
 nameGenerator - The name of the faction name generator that should be used for this faction. If
 		        left out, then this defaults to "General."
-colorRGB - a comma-separated 3-item list defining the RGB codes for the color used on the map 
+colorRGB - a comma-separated 3-item list defining the RGB codes for the color used on the map
            for this faction. Defaults to light gray if missing.
 clan - include "true" if this is a clan faction. Defaults to false if missing.
 periphery - include "true" if this is a periphery faction. Defaults to false if missing.
@@ -596,7 +596,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 	</faction>
 	<faction>
 		<shortname>PIND</shortname>
-		<fullname>Indepedent (Periphery)</fullname>
+		<fullname>Independent (Periphery)</fullname>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>190,190,190</colorRGB>
