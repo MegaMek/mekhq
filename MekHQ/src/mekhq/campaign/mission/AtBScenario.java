@@ -705,7 +705,14 @@ public class AtBScenario extends Scenario {
 				return;
 			}
 			int weight = campaign.getUnit(deployed.get(0)).getEntity().getWeightClass() - 1;
-			botForces.get(0).setEntityList(specMissionEnemies.get(weight));
+			/* In the event that Star League Cache 1 generates a primitive 'Mech,
+			 * the player can keep the 'Mech without a battle so no enemy
+			 * units are generated.
+			 */
+			if (botForces.get(0) != null && specMissionEnemies != null
+					&& specMissionEnemies.get(weight) != null) {
+				botForces.get(0).setEntityList(specMissionEnemies.get(weight));
+			}
 		}
 	}
 	
