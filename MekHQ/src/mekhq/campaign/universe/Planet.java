@@ -1,20 +1,20 @@
 /*
  * Planet.java
- * 
+ *
  * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -44,19 +44,19 @@ import org.w3c.dom.NodeList;
 
 
 /**
- * This is the start of a planet object that will keep lots of information about 
+ * This is the start of a planet object that will keep lots of information about
  * planets that can be displayed on the interstellar map.
- * 
- * 
+ *
+ *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Planet implements Serializable {
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -8699502165157515099L;
-	
+
 	private static final int SPECTRAL_O = 0;
 	private static final int SPECTRAL_B = 1;
 	private static final int SPECTRAL_A = 2;
@@ -64,7 +64,7 @@ public class Planet implements Serializable {
 	private static final int SPECTRAL_G = 4;
 	private static final int SPECTRAL_K = 5;
 	private static final int SPECTRAL_M = 6;
-	
+
 	private static final int TYPE_EMPTY			= 0;
 	private static final int TYPE_ASTEROID		= 1;
 	private static final int TYPE_DWARF			= 2;
@@ -72,7 +72,7 @@ public class Planet implements Serializable {
 	private static final int TYPE_GIANT 		= 4;
 	private static final int TYPE_GAS_GIANT		= 5;
 	private static final int TYPE_ICE_GIANT		= 6;
-	
+
 	public static final String LUM_0   = "0";
 	public static final String LUM_IA  = "Ia";
 	public static final String LUM_IB  = "Ib";
@@ -92,17 +92,17 @@ public class Planet implements Serializable {
 	private static final int LIFE_BIRD    = 6;
 	private static final int LIFE_MAMMAL  = 7;
 	private static final int LIFE_INSECT  = 8;
-	
+
 	private static final int CLIMATE_ARCTIC   = 0;
 	private static final int CLIMATE_BOREAL   = 1;
-	private static final int CLIMATE_COOLTEM  = 2; 
+	private static final int CLIMATE_COOLTEM  = 2;
 	private static final int CLIMATE_WARMTEM  = 3;
 	private static final int CLIMATE_ARID     = 4;
 	private static final int CLIMATE_TROPICAL = 5;
-	
-	private double x; 
+
+	private double x;
 	private double y;
-	
+
 	/**
 	 * This is the base faction which the program will fall back on if
 	 * no better faction is found in the faction history given the date
@@ -111,18 +111,18 @@ public class Planet implements Serializable {
 	private ArrayList<String> garrisonUnits;
 	private String name;
 	private String shortName;
-	
+
 	//star type
 	private int spectralClass;
 	private int subtype;
 	private String luminosity;
 	private int sysPos;
-	
+
 	private int pressure;
 	private double gravity;
 	private boolean nadirCharge;
 	private boolean zenithCharge;
-	
+
 	//fluff
 	private int lifeForm;
 	private int climate;
@@ -130,24 +130,24 @@ public class Planet implements Serializable {
 	private int temperature;
 	private int hpg;
 	private String desc;
-	
+
 	//socioindustrial levels
 	private int tech;
 	private int industry;
 	private int rawMaterials;
 	private int output;
 	private int agriculture;
-	
+
 	//keep some string information in arraylists
 	private ArrayList<String> satellites;
 	private ArrayList<String> landMasses;
-	
+
 	//a hash to keep track of dynamic faction changes
 	TreeMap<Date,ArrayList<String>> factionHistory;
-	
+
 	//a hash to keep track of dynamic garrison changes
 	TreeMap<Date,ArrayList<String>> garrisonHistory;
-	
+
 	public Planet() {
 		this.x = 0;
 		this.y = 0;
@@ -156,23 +156,23 @@ public class Planet implements Serializable {
 		this.garrisonUnits = new ArrayList<String>();
 		this.name = "Terra";
 		this.shortName = "Terra";
-		
-		this.spectralClass = SPECTRAL_G;
-		this.subtype = 2;
+
+		this.setSpectralClass(SPECTRAL_G);
+		this.setSubtype(2);
 		this.luminosity = LUM_V;
 		this.sysPos = 1;
-		
+
 		this.pressure = PlanetaryConditions.ATMO_STANDARD;
 		this.gravity = 1.0;
 		this.nadirCharge = false;
 		this.zenithCharge = false;
-		
+
 		this.lifeForm = LIFE_NONE;
 		this.climate = CLIMATE_WARMTEM;
 		this.percentWater = 70;
 		this.temperature = 20;
 		this.desc = "Nothing here yet. Who wants to volunteer to enter planet data?";
-		
+
 		this.tech = EquipmentType.RATING_C;
 		this.industry = EquipmentType.RATING_C;
 		this.rawMaterials = EquipmentType.RATING_C;
@@ -181,13 +181,41 @@ public class Planet implements Serializable {
 
 		this.satellites = new ArrayList<String>();
 		this.landMasses = new ArrayList<String>();
-		
+
 		this.hpg = EquipmentType.RATING_B;
-		
+
 		this.factionHistory = new TreeMap<Date,ArrayList<String>>();
 	}
-	
-	public static String getLifeFormName(int life) {
+
+	/**
+     * @return the spectralClass
+     */
+    public int getSpectralClass() {
+        return spectralClass;
+    }
+
+    /**
+     * @param spectralClass the spectralClass to set
+     */
+    public void setSpectralClass(int spectralClass) {
+        this.spectralClass = spectralClass;
+    }
+
+    /**
+     * @return the subtype
+     */
+    public int getSubtype() {
+        return subtype;
+    }
+
+    /**
+     * @param subtype the subtype to set
+     */
+    public void setSubtype(int subtype) {
+        this.subtype = subtype;
+    }
+
+    public static String getLifeFormName(int life) {
 		switch(life) {
 		case LIFE_NONE:
 			return "None";
@@ -211,7 +239,7 @@ public class Planet implements Serializable {
 			return "Unknown";
 		}
 	}
-	
+
 	public static String getSpectralClassName(int spectral) {
 		switch(spectral) {
 		case SPECTRAL_O:
@@ -232,7 +260,7 @@ public class Planet implements Serializable {
 			return "?";
 		}
 	}
-	
+
 	public static String getClimateName(int cl) {
 		switch(cl) {
 		case CLIMATE_ARCTIC:
@@ -251,15 +279,15 @@ public class Planet implements Serializable {
 			return "Unknown";
 		}
 	}
-	
+
 	public String getSocioIndustrialLevel() {
 		return EquipmentType.getRatingName(tech) + "-" + EquipmentType.getRatingName(industry) + "-" + EquipmentType.getRatingName(rawMaterials) + "-" + EquipmentType.getRatingName(output) + "-" + EquipmentType.getRatingName(agriculture);
 	}
-	
+
 	public String getHPGClass() {
 		return EquipmentType.getRatingName(hpg);
 	}
-	
+
 	public static int getSpectralClassFrom(String spectral) {
 		if(spectral.trim().equalsIgnoreCase("B")) {
 			return SPECTRAL_B;
@@ -283,27 +311,27 @@ public class Planet implements Serializable {
 			return SPECTRAL_O;
 		}
 	}
-	
+
 	public double getX() {
 		return x;
 	}
-	
+
 	public double getY() {
 		return y;
 	}
-	
+
 	public ArrayList<String> getGarrisonUnits() {
 		return garrisonUnits;
 	}
-	
+
 	public ArrayList<String> getBaseFactionCodes() {
 		return factionCodes;
 	}
-	
+
 	public ArrayList<Faction> getBaseFactions() {
 		return getFactionsFrom(factionCodes);
 	}
-	
+
 	private static ArrayList<Faction> getFactionsFrom(ArrayList<String> codes) {
 		ArrayList<Faction> factions = new ArrayList<Faction>();
 		for(String code : codes) {
@@ -311,11 +339,11 @@ public class Planet implements Serializable {
 		}
 		return factions;
 	}
-	
+
 	public int getSystemPosition() {
 		return sysPos;
 	}
-	
+
 	public ArrayList<Faction> getCurrentFactions(Date date) {
 		ArrayList<String> currentFactionCode = getBaseFactionCodes();
 		for(Date event : factionHistory.keySet()) {
@@ -327,19 +355,19 @@ public class Planet implements Serializable {
 		}
 		return getFactionsFrom(currentFactionCode);
 	}
-	
+
 	public String getName() {
 		return name;
 	}
-	
+
 	public String getShortName() {
 		return shortName;
 	}
-	
+
 	public String getShortDesc(Date date) {
 		return getShortName() + " (" + getFactionDesc(date) + ")";
 	}
-	
+
 	public String getFactionDesc(Date date) {
 		GregorianCalendar cal = new GregorianCalendar();
 		cal.setTime(date);
@@ -354,7 +382,7 @@ public class Planet implements Serializable {
 		}
 		return desc;
 	}
-	
+
 	/**
 	 * Used when there are planets with duplicate names
 	 * @param n
@@ -364,39 +392,39 @@ public class Planet implements Serializable {
 		this.name = n;
 	}
 
-	
+
 	public double getGravity() {
 		return gravity;
 	}
-	
+
 	public int getPressure() {
 		return pressure;
 	}
-	
+
 	public String getPressureName() {
 		return PlanetaryConditions.getAtmosphereDisplayableName(pressure);
 	}
-	
+
 	public String getLifeFormName() {
 		return getLifeFormName(lifeForm);
 	}
-	
+
 	public String getClimateName() {
 		return getClimateName(climate);
 	}
-	
+
 	public int getPercentWater() {
 		return percentWater;
 	}
-	
+
 	public int getTemperature() {
 		return temperature;
 	}
-	
+
 	public String getStarType() {
-		return getSpectralClassName(spectralClass) + subtype + luminosity;
+		return getSpectralClassName(getSpectralClass()) + getSubtype() + luminosity;
 	}
-	
+
 	public String getSatelliteDescription() {
 		if(satellites.isEmpty()) {
 			return "0";
@@ -405,25 +433,25 @@ public class Planet implements Serializable {
 		for(int i = 0; i < satellites.size(); i++) {
 			toReturn += satellites.get(i);
 			if(i < (satellites.size() - 1)) {
-				toReturn += ", ";	
+				toReturn += ", ";
 			} else {
 				toReturn += ")";
 			}
 		}
 		return toReturn;
 	}
-	
+
 	public String getLandMassDescription() {
 		String toReturn = "";
 		for(int i = 0; i < landMasses.size(); i++) {
 			toReturn += landMasses.get(i);
 			if(i < (landMasses.size() - 1)) {
 				toReturn += ", ";
-			} 
+			}
 		}
 		return toReturn;
 	}
-	
+
 	public String getRechargeStations() {
 		if(zenithCharge && nadirCharge) {
 			return "Zenith, Nadir";
@@ -435,24 +463,24 @@ public class Planet implements Serializable {
 			return "None";
 		}
 	}
-	
+
 	public int getRechargeTime() {
 		if(zenithCharge || nadirCharge) {
-			return Math.min(176, 141 + 10*spectralClass + subtype);
+			return Math.min(176, 141 + 10*getSpectralClass() + getSubtype());
 		} else {
-			return 141 + 10*spectralClass + subtype;
+			return 141 + 10*getSpectralClass() + getSubtype();
 		}
 	}
-	
+
 	public double getTimeToJumpPoint(double acceleration) {
 		//based on the formula in StratOps
 		return Math.sqrt((getDistanceToJumpPoint()*1000)/(9.8*acceleration))/43200;
 	}
-	
+
 	public float getDistanceToJumpPoint() {
-		return getDistanceToJumpPoint(spectralClass, subtype);
+		return getDistanceToJumpPoint(getSpectralClass(), getSubtype());
 	}
-	
+
 	/**
 	 * Distance to jump point given a spectral class and subtype
 	 * measured in kilometers
@@ -461,13 +489,13 @@ public class Planet implements Serializable {
 	 * @return
 	 */
 	public static float getDistanceToJumpPoint(int spectral, int subtype) {
-		
+
 		//taken from Dropships and Jumpships sourcebook, pg. 17
 		switch(spectral) {
 		case SPECTRAL_M:
 			if(subtype == 0) {
 				return 179915179f;
-			} 
+			}
 			else if(subtype == 1) {
 				return 162301133f;
 			}
@@ -498,7 +526,7 @@ public class Planet implements Serializable {
 		case SPECTRAL_K:
 			if(subtype == 0) {
 				return 549582283f;
-			} 
+			}
 			else if(subtype == 1) {
 				return 487907078f;
 			}
@@ -529,7 +557,7 @@ public class Planet implements Serializable {
 		case SPECTRAL_G:
 			if(subtype == 0) {
 				return 1993403717f;
-			} 
+			}
 			else if(subtype == 1) {
 				return 1737789950f;
 			}
@@ -560,7 +588,7 @@ public class Planet implements Serializable {
 		case SPECTRAL_F:
 			if(subtype == 0) {
 				return 8795520975f;
-			} 
+			}
 			else if(subtype == 1) {
 				return 7509758447f;
 			}
@@ -591,7 +619,7 @@ public class Planet implements Serializable {
 		case SPECTRAL_A:
 			if(subtype == 0) {
 				return 48590182199f;
-			} 
+			}
 			else if(subtype == 1) {
 				return 40506291619f;
 			}
@@ -622,7 +650,7 @@ public class Planet implements Serializable {
 		case SPECTRAL_B:
 			if(subtype == 0) {
 				return 347840509855f;
-			} 
+			}
 			else if(subtype == 1) {
 				return 282065439915f;
 			}
@@ -653,22 +681,22 @@ public class Planet implements Serializable {
 		default:
 			return 0;
 		}
-		
-		
+
+
 	}
-	
+
 	public double getDistanceTo(Planet anotherPlanet) {
 		return Math.sqrt(Math.pow(x - anotherPlanet.getX(), 2) + Math.pow(y - anotherPlanet.getY(), 2));
 	}
-	
+
 	public String getDescription() {
 		return desc;
 	}
-	
+
 	public static int convertRatingToCode(String rating) {
 		if(rating.equalsIgnoreCase("A")) {
 			return EquipmentType.RATING_A;
-		} 
+		}
 		else if(rating.equalsIgnoreCase("B")) {
 			return EquipmentType.RATING_B;
 		}
@@ -686,11 +714,11 @@ public class Planet implements Serializable {
 		}
 		return EquipmentType.RATING_C;
 	}
-	
+
 	public static Planet getPlanetFromXML(Node wn) throws DOMException, ParseException {
 		Planet retVal = new Planet();
 		NodeList nl = wn.getChildNodes();
-		
+
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
 			if (wn2.getNodeName().equalsIgnoreCase("name")) {
@@ -734,9 +762,9 @@ public class Planet implements Serializable {
 			} else if (wn2.getNodeName().equalsIgnoreCase("temperature")) {
 				retVal.temperature = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("spectralClass")) {
-				retVal.spectralClass = getSpectralClassFrom(wn2.getTextContent());
+				retVal.setSpectralClass(getSpectralClassFrom(wn2.getTextContent()));
 			} else if (wn2.getNodeName().equalsIgnoreCase("subtype")) {
-				retVal.subtype = Integer.parseInt(wn2.getTextContent());
+				retVal.setSubtype(Integer.parseInt(wn2.getTextContent()));
 			} else if (wn2.getNodeName().equalsIgnoreCase("luminosity")) {
 				retVal.luminosity = wn2.getTextContent();
 			} else if (wn2.getNodeName().equalsIgnoreCase("factionChange")) {
@@ -762,7 +790,7 @@ public class Planet implements Serializable {
 		}
 		return retVal;
 	}
-	
+
 	private static void processFactionChange(Planet retVal, Node wni) throws DOMException, ParseException {
 		NodeList nl = wni.getChildNodes();
 
@@ -796,12 +824,12 @@ public class Planet implements Serializable {
 			retVal.factionHistory.put(date, factions);
 		}
 	}
-	
+
 	@Override
 	public boolean equals(Object object) {
 		if(object instanceof Planet) {
 			Planet planet = (Planet)object;
-			if(planet.getName().equalsIgnoreCase(name) 
+			if(planet.getName().equalsIgnoreCase(name)
 					&& planet.getX() == x
 					&& planet.getY() == y) {
 				return true;
@@ -809,7 +837,7 @@ public class Planet implements Serializable {
 		}
 		return false;
 	}
-	
+
 	private static ArrayList<String> processFactionCodes(String codeList) throws NoSuchFieldException {
 		ArrayList<String> factions = new ArrayList<String>();
 		String[] codes = codeList.split(",");
@@ -821,7 +849,7 @@ public class Planet implements Serializable {
 		}
 		return factions;
 	}
-	
+
 	public static int generateStarType() {
 		switch (Compute.d6(2)) {
 			case 2:
@@ -863,7 +891,7 @@ public class Planet implements Serializable {
 				return SPECTRAL_M;
 		}
 	}
-	
+
 	public static int generateSubtype() {
 		switch (Compute.d6()) {
 			case 1:
@@ -882,17 +910,18 @@ public class Planet implements Serializable {
 				return 1;
 		}
 	}
-	
+
 	public static int calculateNumberOfSlots() {
 		return Compute.d6(2) + 3;
 	}
-	
+
 	public static HashMap<String, Integer> generateSlotType(boolean outOfZone) {
 		HashMap<String, Integer> map = new HashMap<String, Integer>();
 		int roll = Compute.d6(2);
-		if (outOfZone)
+		if (outOfZone) {
 			roll += 2;
-		
+		}
+
 		switch (roll) {
 			case 2:
 			case 3:
@@ -955,7 +984,128 @@ public class Planet implements Serializable {
 				map.put("day_length", 0);
 				break;
 		}
-		
+
 		return map;
 	}
+
+	public static HashMap<String, Integer> genMoons(int type) {
+	    HashMap<String, Integer> map = new HashMap<String, Integer>();
+
+	    // Fill the map with default 0s
+        map.put("giant", 0);
+        map.put("large", 0);
+        map.put("medium", 0);
+        map.put("small", 0);
+        map.put("rings", 0);
+
+        int roll = Compute.d6(1);
+	    switch (type) {
+	        case TYPE_DWARF:
+	            switch (roll) {
+	                case 1:
+	                case 2:
+                        map.put("medium", Math.max(0, Compute.d6()-5));
+                        map.put("small", Math.max(0, Compute.d6()-2));
+	                    break;
+	                case 3:
+	                case 4:
+                        map.put("small", Math.max(0, Compute.d6()-2));
+	                    break;
+	            }
+	            break;
+	        case TYPE_TERRESTRIAL:
+                switch (roll) {
+                    case 1:
+                    case 2:
+                        map.put("large", Math.max(0, Compute.d6()-5));
+                        break;
+                    case 3:
+                    case 4:
+                        map.put("medium", Math.max(0, Compute.d6()-3));
+                        map.put("small", Math.max(0, Compute.d6()-3));
+                        break;
+                    case 5:
+                    case 6:
+                        map.put("small", Math.max(0, Compute.d6(2)-4));
+                        map.put("rings", Math.max(0, Compute.d6()-5));
+                        break;
+                }
+                break;
+	        case TYPE_GIANT:
+                switch (roll) {
+                    case 1:
+                    case 2:
+                        map.put("giant", Math.max(0, Compute.d6()-5));
+                        break;
+                    case 3:
+                    case 4:
+                        map.put("large", Math.max(0, Compute.d6()-4));
+                        map.put("medium", Math.max(0, Compute.d6()-3));
+                        map.put("small", Math.max(0, Compute.d6()-2));
+                        break;
+                    case 5:
+                    case 6:
+                        map.put("medium", Math.max(0, Compute.d6()-3));
+                        map.put("small", Math.max(0, Compute.d6(2)));
+                        map.put("rings", Math.max(0, Compute.d6()-4));
+                        break;
+                }
+                break;
+	        case TYPE_GAS_GIANT:
+                switch (roll) {
+                    case 1:
+                    case 2:
+                        map.put("giant", Math.max(0, Compute.d6()-4));
+                        map.put("large", Math.max(0, Compute.d6()-1));
+                        map.put("medium", Math.max(0, Compute.d6()-2));
+                        map.put("small", Math.max(0, Compute.d6(5)));
+                        map.put("rings", Math.max(0, Compute.d6()-3));
+                        break;
+                    case 3:
+                    case 4:
+                        map.put("large", Math.max(0, Compute.d6()-3));
+                        map.put("medium", Math.max(0, Compute.d6()-2));
+                        map.put("small", Math.max(0, Compute.d6(5)));
+                        map.put("rings", Math.max(0, Compute.d6()-2));
+                        break;
+                    case 5:
+                    case 6:
+                        map.put("large", Math.max(0, Compute.d6()-4));
+                        map.put("medium", Math.max(0, Compute.d6()-3));
+                        map.put("small", Math.max(0, Compute.d6(5)));
+                        map.put("rings", Math.max(0, Compute.d6()-2));
+                        break;
+                }
+                break;
+	        case TYPE_ICE_GIANT:
+                switch (roll) {
+                    case 1:
+                    case 2:
+                        map.put("giant", Math.max(0, Compute.d6()-4));
+                        map.put("large", Math.max(0, Compute.d6()-3));
+                        map.put("small", Math.max(0, Compute.d6(2)));
+                        break;
+                    case 3:
+                    case 4:
+                        map.put("large", Math.max(0, Compute.d6()-3));
+                        map.put("medium", Math.max(0, Compute.d6()-2));
+                        map.put("small", Math.max(0, Compute.d6(2)));
+                        map.put("rings", Math.max(0, Compute.d6()-3));
+                        break;
+                    case 5:
+                    case 6:
+                        map.put("large", Math.max(0, Compute.d6()-4));
+                        map.put("medium", Math.max(0, Compute.d6()-3));
+                        map.put("small", Math.max(0, Compute.d6(2)));
+                        map.put("rings", Math.max(0, Compute.d6()-3));
+                        break;
+                }
+                break;
+	        default:
+	            break;
+	    }
+	    return map;
+	}
+
+
 }

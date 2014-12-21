@@ -35,9 +35,10 @@ v0.3.8-dev (SVN)
 		as the first entry and added era details.
 + Bug [#746]: indepedent - spelling
 + Bug [#634]: [ATB] 0.3.6 : Invalid lance in TO&E can still trigger battles
-	also removed ineligible lances from the required lances table on the briefing room tab 
-+ Bug [#659: 0.3.6 : ATB : Tactics re-roll checkbox when light conditions are turned off 
+	also removed ineligible lances from the required lances table on the briefing room tab
++ Bug [#659: 0.3.6 : ATB : Tactics re-roll checkbox when light conditions are turned off
 	Also corrected the same issue for weather conditions.
++ Planet Editor: Made some more progress getting this ready
 
 v0.3.7 (2014-12-14 19:25 UTC)
 + Patch [34]: Against the Bot, 13th Patch

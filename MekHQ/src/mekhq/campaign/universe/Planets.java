@@ -18,7 +18,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class Planets {
-	
+
 	private boolean initialized = false;
 	private boolean initializing = false;
 	private static Planets planets;
@@ -27,13 +27,13 @@ public class Planets {
 	/*organizes systems into a grid of 30lyx30ly squares so we can find
 	 * nearby systems without iterating through the entire planet list*/
     private Thread loader;
-	
+
 
     private Planets() {
         planetList = new Hashtable<String, Planet>();
 		planetGrid = new HashMap<Integer,HashMap<Integer,ArrayList<Planet>>>();
    }
-    
+
     public static ArrayList<String> getNearbyPlanets(Planet p, int distance) {
     	ArrayList<String> neighbors = new ArrayList<String>();
     	int gridRadius = (int)Math.ceil(distance / 30.0);
@@ -56,7 +56,7 @@ public class Planets {
 		}
 		return neighbors;
     }
-	
+
 	public static Planets getInstance() {
 		if (planets == null) {
             planets = new Planets();
@@ -71,9 +71,9 @@ public class Planets {
             planets.loader.setPriority(Thread.NORM_PRIORITY - 1);
             planets.loader.start();
         }
-		return planets;	
+		return planets;
 	}
-	
+
 	private void initialize() {
 		try {
 			planetList = generatePlanets();
@@ -85,62 +85,62 @@ public class Planets {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public Hashtable<String, Planet> getPlanets() {
 		return planetList;
 	}
-	
+
 	private void done() {
         initialized = true;
         initializing = false;
 	}
-	
+
 	public boolean isInitialized() {
         return initialized;
     }
-	
+
 	public Hashtable<String,Planet> generatePlanets() throws DOMException, ParseException {
 		MekHQ.logMessage("Starting load of planetary data from XML...");
 		// Initialize variables.
 		Hashtable<String,Planet> retVal = new Hashtable<String,Planet>();
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		Document xmlDoc = null;
-	
-		
+
+
 		try {
 			FileInputStream fis = new FileInputStream("data/universe/planets.xml");
 			// Using factory get an instance of document builder
 			DocumentBuilder db = dbf.newDocumentBuilder();
-	
+
 			// Parse using builder to get DOM representation of the XML file
 			xmlDoc = db.parse(fis);
 		} catch (Exception ex) {
 			MekHQ.logError(ex);
 		}
-	
+
 		Element planetEle = xmlDoc.getDocumentElement();
 		NodeList nl = planetEle.getChildNodes();
-	
+
 		// Get rid of empty text nodes and adjacent text nodes...
 		// Stupid weird parsing of XML.  At least this cleans it up.
-		planetEle.normalize(); 
-	
+		planetEle.normalize();
+
 		// Okay, lets iterate through the children, eh?
 		for (int x = 0; x < nl.getLength(); x++) {
 			Node wn = nl.item(x);
-	
+
 			if (wn.getParentNode() != planetEle)
 				continue;
-	
+
 			int xc = wn.getNodeType();
-	
+
 			if (xc == Node.ELEMENT_NODE) {
 				// This is what we really care about.
 				// All the meat of our document is in this node type, at this
 				// level.
 				// Okay, so what element is it?
 				String xn = wn.getNodeName();
-	
+
 				if (xn.equalsIgnoreCase("planet")) {
 					Planet p = Planet.getPlanetFromXML(wn);
 					if(null == p.getBaseFactions().get(0)) {
@@ -159,7 +159,7 @@ public class Planets {
 						p.resetName(p.getName() + " (" + p.getBaseFactions().get(0).getFullName(Era.E_AOW) + ")");
 						retVal.put(p.getName(), p);
 					}
-					
+
 				}
 			}
 		}
@@ -178,5 +178,14 @@ public class Planets {
 		done();
 		return retVal;
 	}
-	
+
+	public static Planet createNewSystem() {
+	    Planet planet = new Planet();
+	    planet.setSpectralClass(Planet.generateStarType());
+	    planet.setSubtype(Planet.generateSubtype());
+	    int slots = Planet.calculateNumberOfSlots();
+	    for (int i = 0; i < slots; i++) {
+	    }
+	    return planet;
+	}
 }
