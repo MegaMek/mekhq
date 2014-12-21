@@ -405,7 +405,7 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 		panStats.add(lblLight, gridBagConstraints);
 		
 		chkReroll[REROLL_LIGHT] = new JCheckBox();
-		if (scenario.isCurrent()) {
+		if (scenario.isCurrent() && campaign.getCampaignOptions().getUseLightConditions()) {
 			gridBagConstraints.gridx = 1;
 			gridBagConstraints.gridy = y;
 			gridBagConstraints.gridwidth = 1;
@@ -428,7 +428,7 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 		panStats.add(lblWeather, gridBagConstraints);
 		
 		chkReroll[REROLL_WEATHER] = new JCheckBox();
-		if (scenario.isCurrent()) {
+		if (scenario.isCurrent() && campaign.getCampaignOptions().getUseWeatherConditions()) {
 			gridBagConstraints.gridx = 1;
 			gridBagConstraints.gridy = y;
 			gridBagConstraints.gridwidth = 1;
