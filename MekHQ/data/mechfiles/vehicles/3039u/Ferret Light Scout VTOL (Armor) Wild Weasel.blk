@@ -17,7 +17,7 @@ Ferret Light Scout VTOL
 </Name>
 
 <Model>
-(Armor) "Wild Weasel"
+(Armor) 'Wild Weasel'
 </Model>
 
 <year>
@@ -25,7 +25,7 @@ Ferret Light Scout VTOL
 </year>
 
 <source>
-Succession Wars
+RS 3039 Unabriged
 </source>
 
 <type>
