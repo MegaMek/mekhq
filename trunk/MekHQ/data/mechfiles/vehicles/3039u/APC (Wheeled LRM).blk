@@ -21,11 +21,11 @@ Armored Personnel Carrier
 </Model>
 
 <year>
-2400
+2500
 </year>
 
 <source>
-Star League
+RS 3039 Unabriged
 </source>
 
 <type>
@@ -73,6 +73,5 @@ LRM 5
 </Rear Equipment>
 
 <transporters>
-TroopSpace: 1
 </transporters>
 
