@@ -403,7 +403,7 @@ public class Campaign implements Serializable {
     public RetirementDefectionTracker getRetirementDefectionTracker() {
     	return retirementDefectionTracker;
     }
-    
+
     public AtBConfiguration getAtBConfig() {
     	if (atbConfig == null) {
     		atbConfig = AtBConfiguration.loadFromXml();
@@ -2363,8 +2363,9 @@ public class Campaign implements Serializable {
         long salaries = 0;
         for (Person p : personnel) {
         	// Optionized infantry (Unofficial)
-        	if (noInfantry && p.getPrimaryRole() == Person.T_INFANTRY)
+        	if (noInfantry && p.getPrimaryRole() == Person.T_INFANTRY) {
         		continue;
+        	}
 
             if (p.isActive() && !p.isDependent()
                 && !(p.isPrisoner() || p.isBondsman())) {
