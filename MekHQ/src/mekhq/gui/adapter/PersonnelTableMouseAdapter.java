@@ -193,6 +193,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 Unit u = gui.getCampaign().getUnit(person.getUnitId());
                 if (null != u) {
                     u.remove(person, true);
+                    u.resetEngineerOrTech();
+                    u.runDiagnostic();
                 }
                 // check for tech unit assignments
                 if (!person.getTechUnitIDs().isEmpty()) {
@@ -206,6 +208,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         u = gui.getCampaign().getUnit(i);
                         if (null != u) {
                             u.remove(person, true);
+                            u.resetEngineerOrTech();
+                            u.runDiagnostic();
                         }
                     }
                 }
