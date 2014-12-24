@@ -4609,7 +4609,7 @@ public class CampaignGUI extends JPanel {
                         + ", "
                         + SkillType.getExperienceLevelName(tech
                                 .getSkillForWorkingOn(u).getExperienceLevel())
-                        + " (" + (480 - tech.getMaintenanceTimeUsing())
+                        + " (" + Math.max(0, (tech.getMinutesLeft() - tech.getMaintenanceTimeUsing()))
                         + "min)";
                 techHash.put(name, tech);
             }
