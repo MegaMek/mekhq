@@ -42,6 +42,7 @@ v0.3.8-dev (SVN)
 + Bug [#660]: 0.3.6 : ATB : Star league cache 1 (defender) mission may not be started
 + Bug [#741]: Ghost Repairing Dropships and Warships
 + Bug [#744]: Mothball/Re-activate 0-time spent
++ Bug [#740]: Destroyed Infantry Resolve Issue
 
 v0.3.7 (2014-12-14 19:25 UTC)
 + Patch [34]: Against the Bot, 13th Patch
