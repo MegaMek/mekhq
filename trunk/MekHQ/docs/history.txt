@@ -2,6 +2,7 @@ VERSION HISTORY
 ----------------------------------
 v0.3.9-dev (SVN)
 + Bug: packaging.xml was renaming mhq's hitory.txt to history-mm.txt due to change in where mm docs are copied to
++ Bug: packaging_local.xml out of date compared to packaging.xml
 
 v0.3.8 (2014-12-25 15:30 UTC)
 + Bug [#718]: [AtB] Unit MArket does not retain unit selections
