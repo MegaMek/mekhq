@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.8-dev (SVN)
+v0.3.8 (2014-12-25 15:30 UTC)
 + Bug [#718]: [AtB] Unit MArket does not retain unit selections
 + Bug [#702]: ATB : Convoy attack : badlands map turns out to be heavily wooded
 + Bug [feature-requests:#226] ATB : Have the program remember retainer status
@@ -44,6 +44,7 @@ v0.3.8-dev (SVN)
 + Bug [#744]: Mothball/Re-activate 0-time spent
 + Bug [#740]: Destroyed Infantry Resolve Issue
 + Bug [#723]: Refresh bug effecting Prisoners
++ Update MegaMek.jar to 0.39.5 and MegaMekLab.jar to 0.1.34
 
 v0.3.7 (2014-12-14 19:25 UTC)
 + Patch [34]: Against the Bot, 13th Patch
