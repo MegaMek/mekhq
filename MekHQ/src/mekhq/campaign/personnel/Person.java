@@ -369,6 +369,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public void setPrisoner() {
         prisonerStatus = PRISONER_YES;
+        setRankNumeric(Ranks.RANK_PRISONER);
     }
 
     public boolean isBondsman() {
@@ -380,6 +381,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public void setBondsman() {
         prisonerStatus = PRISONER_BONDSMAN;
+        setRankNumeric(Ranks.RANK_BONDSMAN);
     }
 
     public boolean isFree() {
