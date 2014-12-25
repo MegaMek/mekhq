@@ -1,5 +1,7 @@
 VERSION HISTORY
 ----------------------------------
+v0.3.9-dev (SVN)
+
 v0.3.8 (2014-12-25 15:30 UTC)
 + Bug [#718]: [AtB] Unit MArket does not retain unit selections
 + Bug [#702]: ATB : Convoy attack : badlands map turns out to be heavily wooded
