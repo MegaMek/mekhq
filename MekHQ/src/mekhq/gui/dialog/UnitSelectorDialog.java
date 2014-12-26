@@ -25,8 +25,12 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
@@ -87,22 +91,22 @@ public class UnitSelectorDialog extends JDialog {
     private boolean addToCampaign;
 
     private JButton btnAddGM;
-    private javax.swing.JButton btnBuy;
-    private javax.swing.JButton btnClose;
-    private javax.swing.JComboBox<String> comboUnitType;
-    private javax.swing.JComboBox<String> comboWeight;
-    private javax.swing.JLabel lblFilter;
-    private javax.swing.JLabel lblImage;
-    private javax.swing.JLabel lblUnitType;
-    private javax.swing.JLabel lblWeight;
-    private javax.swing.JPanel panelFilterBtns;
-    private javax.swing.JPanel panelOKBtns;
-    private javax.swing.JPanel panelLeft;
-    private javax.swing.JScrollPane scrTableUnits;
+    private JButton btnBuy;
+    private JButton btnClose;
+    private JComboBox<String> comboUnitType;
+    private JComboBox<String> comboWeight;
+    private JLabel lblFilter;
+    private JLabel lblImage;
+    private JLabel lblUnitType;
+    private JLabel lblWeight;
+    private JPanel panelFilterBtns;
+    private JPanel panelOKBtns;
+    private JPanel panelLeft;
+    private JScrollPane scrTableUnits;
     private MechViewPanel panelMekView;
-    private javax.swing.JTable tableUnits;
-    private javax.swing.JTextField txtFilter;
-    private javax.swing.JSplitPane splitMain;
+    private JTable tableUnits;
+    private JTextField txtFilter;
+    private JSplitPane splitMain;
     private JButton btnAdvSearch;
     private JButton btnResetSearch;
     private JPanel panelSearchBtns;
@@ -130,21 +134,21 @@ public class UnitSelectorDialog extends JDialog {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        scrTableUnits = new javax.swing.JScrollPane();
-        tableUnits = new javax.swing.JTable();
+        scrTableUnits = new JScrollPane();
+        tableUnits = new JTable();
         panelMekView = new MechViewPanel();
-        panelFilterBtns = new javax.swing.JPanel();
-        panelLeft = new javax.swing.JPanel();
-        lblWeight = new javax.swing.JLabel();
-        comboWeight = new javax.swing.JComboBox<String>();
-        lblUnitType = new javax.swing.JLabel();
-        comboUnitType = new javax.swing.JComboBox<String>();
-        txtFilter = new javax.swing.JTextField();
-        lblFilter = new javax.swing.JLabel();
-        lblImage = new javax.swing.JLabel();
-        panelOKBtns = new javax.swing.JPanel();
-        btnBuy = new javax.swing.JButton();
-        btnClose = new javax.swing.JButton();
+        panelFilterBtns = new JPanel();
+        panelLeft = new JPanel();
+        lblWeight = new JLabel();
+        comboWeight = new JComboBox<String>();
+        lblUnitType = new JLabel();
+        comboUnitType = new JComboBox<String>();
+        txtFilter = new JTextField();
+        lblFilter = new JLabel();
+        lblImage = new JLabel();
+        panelOKBtns = new JPanel();
+        btnBuy = new JButton();
+        btnClose = new JButton();
         btnAdvSearch = new JButton();
         btnResetSearch = new JButton();
         panelSearchBtns = new JPanel();
@@ -347,7 +351,7 @@ public class UnitSelectorDialog extends JDialog {
         panelLeft.add(panelFilterBtns, BorderLayout.PAGE_START);
         panelLeft.add(scrTableUnits, BorderLayout.CENTER);
 
-        splitMain = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT,panelLeft, panelMekView);
+        splitMain = new JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT,panelLeft, panelMekView);
         splitMain.setOneTouchExpandable(true);
         splitMain.setResizeWeight(0.0);
         getContentPane().add(splitMain, BorderLayout.CENTER);
@@ -493,8 +497,8 @@ public class UnitSelectorDialog extends JDialog {
                 /* Technology Level */
                 campaign.getCampaignOptions().getTechLevel() >= Utilities.getSimpleTechLevel(mech.getType()) &&
                 /*Unit type*/
-                 ((nUnit == UnitType.SIZE) || mech.getUnitType().equals(UnitType.getTypeName(nUnit))) &&
-                 ((searchFilter==null) || MechSearchFilter.isMatch(mech, searchFilter))) {
+                (nUnit == UnitType.SIZE || mech.getUnitType().equals(UnitType.getTypeName(nUnit))) &&
+                (searchFilter==null || MechSearchFilter.isMatch(mech, searchFilter))) {
                 	if(txtFilter.getText().length() > 0) {
                         String text = txtFilter.getText();
                         return mech.getName().toLowerCase().contains(text.toLowerCase());

@@ -75,29 +75,29 @@ import mekhq.gui.sorter.WeightClassSorter;
 
 /**
  * Code copied heavily from PersonnelMarketDialog
- * 
+ *
  * @author Neoancient
  *
  */
 public class UnitMarketDialog extends JDialog {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -7668601227249317220L;
-	
+
 	private static boolean showMeks = true;
 	private static boolean showVees = true;
 	private static boolean showAero = false;
 	private static boolean pctThreshold = false;
 	private static int threshold = 120;
-	
+
 	private UnitMarketTableModel marketModel;
 	private Campaign campaign;
 	private CampaignGUI hqView;
     private UnitMarket unitMarket;
     boolean addToCampaign;
     Entity selectedEntity = null;
-    
+
     private JButton btnAdd;
     private JButton btnPurchase;
     private JButton btnClose;
@@ -149,9 +149,9 @@ public class UnitMarketDialog extends JDialog {
         lblPctThreshold = new JLabel();
         spnThreshold = new JSpinner(new SpinnerNumberModel(threshold, 60, 130, 5));
         lblBlackMarketWarning = new JLabel();
-        panelOKBtns = new javax.swing.JPanel();
-        btnPurchase = new javax.swing.JButton();
-        btnClose = new javax.swing.JButton();
+        panelOKBtns = new JPanel();
+        btnPurchase = new JButton();
+        btnClose = new JButton();
 
 		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitMarketDialog");
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -160,7 +160,7 @@ public class UnitMarketDialog extends JDialog {
         getContentPane().setLayout(new BorderLayout());
 
         panelFilterBtns.setLayout(new GridBagLayout());
-   
+
         ItemListener checkboxListener = new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent arg0) {
@@ -192,7 +192,7 @@ public class UnitMarketDialog extends JDialog {
         gbc.insets = new java.awt.Insets(5, 5, 0, 0);
         panelFilterBtns.add(chkShowVees, gbc);
         chkShowVees.addItemListener(checkboxListener);
-       
+
         chkShowAero.setText(resourceMap.getString("chkShowAero.text"));
         chkShowAero.setSelected(showAero);
         gbc.gridx = 2;
@@ -202,7 +202,7 @@ public class UnitMarketDialog extends JDialog {
         gbc.insets = new java.awt.Insets(5, 5, 0, 0);
         panelFilterBtns.add(chkShowAero, gbc);
         chkShowAero.addItemListener(checkboxListener);
-       
+
         JPanel panel = new JPanel();
         chkPctThreshold.setText(resourceMap.getString("chkPctThreshold.text"));
         chkPctThreshold.setSelected(pctThreshold);
@@ -219,7 +219,7 @@ public class UnitMarketDialog extends JDialog {
 				filterOffers();
 			}
         });
-        
+
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.weightx = 0.0;
@@ -227,7 +227,7 @@ public class UnitMarketDialog extends JDialog {
         gbc.anchor = java.awt.GridBagConstraints.WEST;
         gbc.insets = new java.awt.Insets(5, 5, 0, 0);
         panelFilterBtns.add(panel, gbc);
-                
+
         scrollTableUnits.setMinimumSize(new java.awt.Dimension(500, 400));
         scrollTableUnits.setName("srcTablePersonnel"); // NOI18N
         scrollTableUnits.setPreferredSize(new java.awt.Dimension(500, 400));
@@ -279,7 +279,7 @@ public class UnitMarketDialog extends JDialog {
         scrollTableUnits.setViewportView(tableUnits);
 
         lblBlackMarketWarning.setText(resourceMap.getString("lblBlackMarketWarning.text"));
-         
+
         scrollTableUnits.setMinimumSize(new java.awt.Dimension(500, 400));
         scrollTableUnits.setName("scrollTableUnits"); // NOI18N
         scrollTableUnits.setPreferredSize(new java.awt.Dimension(500, 400));
@@ -287,19 +287,19 @@ public class UnitMarketDialog extends JDialog {
         panelMain.add(panelFilterBtns, BorderLayout.PAGE_START);
         panelMain.add(scrollTableUnits, BorderLayout.CENTER);
         panelMain.add(lblBlackMarketWarning, BorderLayout.PAGE_END);
-        
+
         scrollUnitView.setMinimumSize(new java.awt.Dimension(500, 600));
         scrollUnitView.setPreferredSize(new java.awt.Dimension(500, 600));
         scrollUnitView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollUnitView.setViewportView(mechViewPanel);
- 
-        splitMain = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT,panelMain, scrollUnitView);
+
+        splitMain = new JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT,panelMain, scrollUnitView);
         splitMain.setOneTouchExpandable(true);
         splitMain.setResizeWeight(0.0);
         getContentPane().add(splitMain, BorderLayout.CENTER);
-          
+
         panelOKBtns.setLayout(new java.awt.GridBagLayout());
-        
+
         btnPurchase.setText(resourceMap.getString("btnPurchase.text"));
         btnPurchase.setName("btnPurchase"); // NOI18N
         btnPurchase.addActionListener(new java.awt.event.ActionListener() {
@@ -319,7 +319,7 @@ public class UnitMarketDialog extends JDialog {
         btnAdd.setEnabled(null !=  selectedEntity);
         panelOKBtns.add(btnAdd, new java.awt.GridBagConstraints());
 
-        
+
         btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
@@ -337,7 +337,7 @@ public class UnitMarketDialog extends JDialog {
 	public Entity getUnit() {
 	    return selectedEntity;
 	}
-	
+
 	private void purchaseUnit(ActionEvent evt) {
 	    if(null != selectedEntity) {
 	    	int transitDays = campaign.getCampaignOptions().getInstantUnitMarketDelivery()?0:
@@ -349,7 +349,7 @@ public class UnitMarketDialog extends JDialog {
 				 refreshHqView();
 				 return;
 			}
-			
+
 			int roll = Compute.d6();
 			if (offer.market == UnitMarket.MARKET_BLACK && roll <= 2) {
 				campaign.getFinances().debit(cost / roll, Transaction.C_UNIT,
@@ -373,7 +373,7 @@ public class UnitMarketDialog extends JDialog {
 	    	refreshOfferView();
 	    }
 	}
-	
+
 	private void addUnit() {
 		if (null != selectedEntity) {
 			campaign.addUnit(selectedEntity, false, 0);
@@ -391,12 +391,12 @@ public class UnitMarketDialog extends JDialog {
         hqView.refreshFinancialTransactions();
         hqView.refreshReport();
     }
-	
+
 	private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {
 	    selectedEntity = null;
 	    setVisible(false);
 	}
-	
+
     private void filterOffers() {
     	RowFilter<UnitMarketTableModel, Integer> unitTypeFilter = null;
     	unitTypeFilter = new RowFilter<UnitMarketTableModel,Integer>() {
@@ -427,7 +427,7 @@ public class UnitMarketDialog extends JDialog {
             selectedEntity= null;
             refreshOfferView();
             return;
-        }        
+        }
 		MechSummary ms = marketModel.getOffer(tableUnits.convertRowIndexToModel(view)).unit;
 		try {
 			selectedEntity = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
@@ -451,7 +451,7 @@ public class UnitMarketDialog extends JDialog {
 	 		//This odd code is to make sure that the scrollbar stays at the top
 	 		//I cant just call it here, because it ends up getting reset somewhere later
 	 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	 			public void run() { 
+	 			public void run() {
 	 				scrollUnitView.getVerticalScrollBar().setValue(0);
 	 			}
 	 		});
@@ -464,5 +464,5 @@ public class UnitMarketDialog extends JDialog {
     public void setVisible(boolean visible) {
         filterOffers();
          super.setVisible(visible);
-    }    
+    }
 }
