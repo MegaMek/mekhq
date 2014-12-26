@@ -621,7 +621,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				} else if (wn2.getNodeName().equalsIgnoreCase("daysToWait")) {
                     retVal.daysToWait = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
-					if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
+					if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
 						retVal.oldTeamId = Integer.parseInt(wn2.getTextContent());
 					} else {
 						if(!wn2.getTextContent().equals("null")) {
@@ -629,7 +629,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 						}
 					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
-					if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
+					if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
 						retVal.oldUnitId = Integer.parseInt(wn2.getTextContent());
 					} else {
 						if(!wn2.getTextContent().equals("null")) {
@@ -639,7 +639,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				} else if (wn2.getNodeName().equalsIgnoreCase("shorthandedMod")) {
 					retVal.shorthandedMod = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("refitId")) {
-					if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
+					if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
 						retVal.oldRefitId = Integer.parseInt(wn2.getTextContent());
 					} else {
 						if(!wn2.getTextContent().equals("null")) {
@@ -678,6 +678,11 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 			// Or the listed name doesn't exist.
 			// Doh!
 			MekHQ.logError(ex);
+		}
+
+		// Refit protection of unit id
+		if (retVal.unitId != null && retVal.refitId != null) {
+		    retVal.setUnit(null);
 		}
 
 		return retVal;
