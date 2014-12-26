@@ -126,12 +126,14 @@
             </fileset>
         </copy>
         <!-- now add in doc files from mm and mml -->
+		<mkdir dir="${localdir}/${docdir}/${docmmdir}" />
         <copy todir="${localdir}/${docdir}/${docmmdir}">
             <fileset dir="${mmdir}/${docdir}">
             </fileset>
         </copy>
-        <copy todir="${localdir}/${docdir}">
-            <fileset dir="${mmldir}/${docdir}/${docmmldir}">
+        <mkdir dir="${localdir}/${docdir}/${docmmldir}" />
+        <copy todir="${localdir}/${docdir}/${docmmldir}">
+            <fileset dir="${mmldir}/${docdir}">
             </fileset>
         </copy>
         <!-- ok now move some stuff back into data that needs to be there-->
