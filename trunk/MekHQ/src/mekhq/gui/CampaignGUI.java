@@ -4543,6 +4543,8 @@ public class CampaignGUI extends JPanel {
             RefitNameDialog rnd = new RefitNameDialog(frame, true, r);
             rnd.setVisible(true);
             if (rnd.wasCancelled()) {
+                // Set the tech team to null since we may want to change it when we re-do the refit
+                r.setTeamId(null);
                 return;
             }
         }
