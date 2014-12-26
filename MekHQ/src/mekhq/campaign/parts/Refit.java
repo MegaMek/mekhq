@@ -657,7 +657,6 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                     //automatically add armor by location, we will check for the lump sum of
                     //armor using newArmorSupplies
                     oldUnit.campaign.addPart(part, 0);
-                    part.setUnit(oldUnit);
                     part.setRefitId(oldUnit.getId());
                     newUnitParts.add(part.getId());
                 }
