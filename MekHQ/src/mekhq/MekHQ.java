@@ -162,6 +162,8 @@ public class MekHQ implements GameListener {
 
     public void showNewView() {
     	campaigngui = new CampaignGUI(this);
+    	campaigngui.getTabOverview().setVisible(campaign.isOverviewLoadingValue());
+    	campaigngui.showHideTabOverview();
     }
 
     /**
@@ -251,6 +253,20 @@ public class MekHQ implements GameListener {
 
     public void setCampaign(Campaign c) {
     	campaign = c;
+    }
+
+    /**
+     * @return the campaigngui
+     */
+    public CampaignGUI getCampaigngui() {
+        return campaigngui;
+    }
+
+    /**
+     * @param campaigngui the campaigngui to set
+     */
+    public void setCampaigngui(CampaignGUI campaigngui) {
+        this.campaigngui = campaigngui;
     }
 
     public void joinGame(Scenario scenario, ArrayList<Unit> meks) {

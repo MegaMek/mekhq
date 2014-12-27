@@ -234,6 +234,7 @@ public class Campaign implements Serializable {
 
     private boolean overtime;
     private boolean gmMode;
+    private transient boolean overviewLoadingValue = true;
 
     private String camoCategory = Player.NO_CAMO;
     private String camoFileName = null;
@@ -251,6 +252,7 @@ public class Campaign implements Serializable {
 
     private CampaignOptions campaignOptions = new CampaignOptions();
     private RandomSkillPreferences rskillPrefs = new RandomSkillPreferences();
+    private MekHQ app;
 
     private ShoppingList shoppingList;
 
@@ -301,6 +303,34 @@ public class Campaign implements Serializable {
         unitMarket = new UnitMarket();
         retirementDefectionTracker = new RetirementDefectionTracker();
         atbConfig = null;
+    }
+
+    /**
+     * @return the app
+     */
+    public MekHQ getApp() {
+        return app;
+    }
+
+    /**
+     * @param app the app to set
+     */
+    public void setApp(MekHQ app) {
+        this.app = app;
+    }
+
+    /**
+     * @return the overviewLoadingValue
+     */
+    public boolean isOverviewLoadingValue() {
+        return overviewLoadingValue;
+    }
+
+    /**
+     * @param overviewLoadingValue the overviewLoadingValue to set
+     */
+    public void setOverviewLoadingValue(boolean overviewLoadingValue) {
+        this.overviewLoadingValue = overviewLoadingValue;
     }
 
     public Game getGame() {
@@ -2916,6 +2946,7 @@ public class Campaign implements Serializable {
                                        rng.getPercentFemale());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "overtime", overtime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "gmMode", gmMode);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "showOverview", app.getCampaigngui().getTabOverview().isVisible());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "astechPool", astechPool);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "astechPoolMinutes",
                                        astechPoolMinutes);
@@ -2929,8 +2960,7 @@ public class Campaign implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastPartId", lastPartId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastForceId", lastForceId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastMissionId", lastMissionId);
-        MekHqXmlUtil
-                .writeSimpleXmlTag(pw1, 2, "lastScenarioId", lastScenarioId);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastScenarioId", lastScenarioId);
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "calendar",
                                        df.format(calendar.getTime()));
@@ -3147,11 +3177,12 @@ public class Campaign implements Serializable {
      * @throws DOMException
      */
     public static Campaign createCampaignFromXMLFileInputStream(
-            FileInputStream fis) throws DOMException, ParseException,
+            FileInputStream fis, MekHQ app) throws DOMException, ParseException,
                                         NullEntityException {
         MekHQ.logMessage("Starting load of campaign file from XML...");
         // Initialize variables.
         Campaign retVal = new Campaign();
+        retVal.app = app;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         Document xmlDoc = null;
 
@@ -4344,11 +4375,9 @@ public class Campaign implements Serializable {
                         retVal.ranks = Ranks.generateInstanceFromXML(wn, version);
                     }
                 } else if (xn.equalsIgnoreCase("gmMode")) {
-                    if (wn.getTextContent().trim().equals("true")) {
-                        retVal.gmMode = true;
-                    } else {
-                        retVal.gmMode = false;
-                    }
+                    retVal.gmMode = Boolean.parseBoolean(wn.getTextContent().trim());
+                } else if (xn.equalsIgnoreCase("showOverview")) {
+                    retVal.overviewLoadingValue = Boolean.parseBoolean(wn.getTextContent().trim());
                 } else if (xn.equalsIgnoreCase("lastPartId")) {
                     retVal.lastPartId = Integer.parseInt(wn.getTextContent()
                                                            .trim());
@@ -4362,8 +4391,7 @@ public class Campaign implements Serializable {
                     retVal.lastMissionId = Integer.parseInt(wn.getTextContent()
                                                               .trim());
                 } else if (xn.equalsIgnoreCase("lastScenarioId")) {
-                    retVal.lastScenarioId = Integer.parseInt(wn
-                                                                     .getTextContent().trim());
+                    retVal.lastScenarioId = Integer.parseInt(wn.getTextContent().trim());
                 } else if (xn.equalsIgnoreCase("name")) {
                     String val = wn.getTextContent().trim();
 
@@ -4373,23 +4401,16 @@ public class Campaign implements Serializable {
                         retVal.name = val;
                     }
                 } else if (xn.equalsIgnoreCase("overtime")) {
-                    if (wn.getTextContent().trim().equals("true")) {
-                        retVal.overtime = true;
-                    } else {
-                        retVal.overtime = false;
-                    }
+                    retVal.overtime = Boolean.parseBoolean(wn.getTextContent().trim());
                 } else if (xn.equalsIgnoreCase("astechPool")) {
                     retVal.astechPool = Integer.parseInt(wn.getTextContent()
                                                            .trim());
                 } else if (xn.equalsIgnoreCase("astechPoolMinutes")) {
-                    retVal.astechPoolMinutes = Integer.parseInt(wn
-                                                                        .getTextContent().trim());
+                    retVal.astechPoolMinutes = Integer.parseInt(wn.getTextContent().trim());
                 } else if (xn.equalsIgnoreCase("astechPoolOvertime")) {
-                    retVal.astechPoolOvertime = Integer.parseInt(wn
-                                                                         .getTextContent().trim());
+                    retVal.astechPoolOvertime = Integer.parseInt(wn.getTextContent().trim());
                 } else if (xn.equalsIgnoreCase("medicPool")) {
-                    retVal.medicPool = Integer.parseInt(wn.getTextContent()
-                                                          .trim());
+                    retVal.medicPool = Integer.parseInt(wn.getTextContent().trim());
                 }
             }
         }
