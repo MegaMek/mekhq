@@ -356,6 +356,7 @@ public class CampaignGUI extends JPanel {
     private JMenuItem miContractMarket;
     private JMenuItem miUnitMarket;
     private JMenuItem miRetirementDefectionDialog;
+    private JCheckBoxMenuItem miShowOverview;
 
     /* For the TO&E tab */
     private JPanel panOrganization;
@@ -595,6 +596,25 @@ public class CampaignGUI extends JPanel {
         refreshFunds();
         refreshFinancialTransactions();
         refreshRating();
+    }
+
+    public void toggleOverviewTab() {
+        getTabOverview().setVisible(!getTabOverview().isVisible());
+        miShowOverview.setSelected(getTabOverview().isVisible());
+        showHideTabOverview();
+    }
+
+    public void showHideTabOverview() {
+        miShowOverview.setSelected(tabOverview.isVisible());
+        int drIndex = getTabMain().indexOfComponent(panOverview);
+        if (drIndex > -1 && !tabOverview.isVisible()) {
+            getTabMain().removeTabAt(drIndex);
+        } else {
+            if (drIndex == -1) {
+                getTabMain().addTab(resourceMap.getString("panOverview.TabConstraints.tabTitle"),
+                        panOverview);
+            }
+        }
     }
 
     public void showGMToolsDialog() {
@@ -1187,7 +1207,7 @@ public class CampaignGUI extends JPanel {
 		GridBagConstraints gridBagConstraints;
 
 		panOverview = new JPanel();
-		tabOverview = new JTabbedPane();
+		setTabOverview(new JTabbedPane());
 		scrollOverviewParts = new JScrollPane();
 		overviewPartsPanel = new JPanel(new GridBagLayout());
 		scrollOverviewTransport = new JScrollPane();
@@ -1203,22 +1223,22 @@ public class CampaignGUI extends JPanel {
 		panOverview.setName("panelOverview"); // NOI18N
 		panOverview.setLayout(new java.awt.GridBagLayout());
 
-		tabOverview.setToolTipText(resourceMap.getString("tabOverview.toolTipText")); // NOI18N
-		tabOverview.setMinimumSize(new java.awt.Dimension(250, 250));
-		tabOverview.setName("tabOverview"); // NOI18N
-		tabOverview.setPreferredSize(new java.awt.Dimension(800, 300));
+		getTabOverview().setToolTipText(resourceMap.getString("tabOverview.toolTipText")); // NOI18N
+		getTabOverview().setMinimumSize(new java.awt.Dimension(250, 250));
+		getTabOverview().setName("tabOverview"); // NOI18N
+		getTabOverview().setPreferredSize(new java.awt.Dimension(800, 300));
 
 		scrollOverviewTransport.setToolTipText(resourceMap.getString("scrollOverviewTransport.TabConstraints.toolTipText")); // NOI18N
 		scrollOverviewTransport.setMinimumSize(new java.awt.Dimension(350, 400));
 		scrollOverviewTransport.setPreferredSize(new java.awt.Dimension(350, 400));
 		scrollOverviewTransport.setViewportView(new TransportReport(getCampaign()).getReport());
-		tabOverview.addTab(resourceMap.getString("scrollOverviewTransport.TabConstraints.tabTitle"), scrollOverviewTransport);
+		getTabOverview().addTab(resourceMap.getString("scrollOverviewTransport.TabConstraints.tabTitle"), scrollOverviewTransport);
 
 		scrollOverviewCargo.setToolTipText(resourceMap.getString("scrollOverviewCargo.TabConstraints.toolTipText")); // NOI18N
 		scrollOverviewCargo.setMinimumSize(new java.awt.Dimension(350, 400));
 		scrollOverviewCargo.setPreferredSize(new java.awt.Dimension(350, 400));
 		scrollOverviewCargo.setViewportView(new CargoReport(getCampaign()).getReport());
-		tabOverview.addTab(resourceMap.getString("scrollOverviewCargo.TabConstraints.tabTitle"), scrollOverviewCargo);
+		getTabOverview().addTab(resourceMap.getString("scrollOverviewCargo.TabConstraints.tabTitle"), scrollOverviewCargo);
 
 		scrollOverviewCombatPersonnel.setMinimumSize(new java.awt.Dimension(350, 400));
 		scrollOverviewCombatPersonnel.setPreferredSize(new java.awt.Dimension(350, 400));
@@ -1237,7 +1257,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
-		tabOverview.addTab(resourceMap.getString("scrollOverviewPersonnel.TabConstraints.tabTitle"), splitOverviewPersonnel);
+		getTabOverview().addTab(resourceMap.getString("scrollOverviewPersonnel.TabConstraints.tabTitle"), splitOverviewPersonnel);
 
 		scrollOverviewHangar.setViewportView(new HangarReport(getCampaign()).getHangarTree());
 		overviewHangarArea.setName("overviewHangarArea"); // NOI18N
@@ -1256,16 +1276,16 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
-		tabOverview.addTab(resourceMap.getString("scrollOverviewHangar.TabConstraints.tabTitle"), splitOverviewHangar);
+		getTabOverview().addTab(resourceMap.getString("scrollOverviewHangar.TabConstraints.tabTitle"), splitOverviewHangar);
 
 		overviewPartsPanel.setName("overviewPartsPanel"); // NOI18N
 		scrollOverviewParts.setViewportView(overviewPartsPanel);
-		tabOverview.addTab(resourceMap.getString("scrollOverviewParts.TabConstraints.tabTitle"), scrollOverviewParts);
+		getTabOverview().addTab(resourceMap.getString("scrollOverviewParts.TabConstraints.tabTitle"), scrollOverviewParts);
 
 		rating = UnitRatingFactory.getUnitRating(getCampaign());
 		rating.reInitialize();
 		scrollOverviewUnitRating.setViewportView(new RatingReport(getCampaign()).getReport());
-		tabOverview.addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"), scrollOverviewUnitRating);
+		getTabOverview().addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"), scrollOverviewUnitRating);
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -1275,7 +1295,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
 		//gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-		panOverview.add(tabOverview, gridBagConstraints);
+		panOverview.add(getTabOverview(), gridBagConstraints);
 	}
 
     private void initPersonnelTab() {
@@ -2992,6 +3012,15 @@ public class CampaignGUI extends JPanel {
         });
         menuView.add(miRetirementDefectionDialog);
 
+        miShowOverview = new JCheckBoxMenuItem("Show Overview Tab");
+        miShowOverview.setSelected(getTabOverview().isVisible());
+        miShowOverview.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                toggleOverviewTab();
+            }
+        });
+        menuView.add(miShowOverview);
+
         menuBar.add(menuView);
 
         JMenu menuManage = new JMenu("Manage Campaign");
@@ -3166,6 +3195,20 @@ public class CampaignGUI extends JPanel {
 
     private static boolean isMacOSX() {
         return System.getProperty("os.name").indexOf("Mac OS X") >= 0;
+    }
+
+    /**
+     * @return the tabOverview
+     */
+    public JTabbedPane getTabOverview() {
+        return tabOverview;
+    }
+
+    /**
+     * @param tabOverview the tabOverview to set
+     */
+    public void setTabOverview(JTabbedPane tabOverview) {
+        this.tabOverview = tabOverview;
     }
 
     private void miChatActionPerformed(ActionEvent evt) {
@@ -4655,12 +4698,12 @@ public class CampaignGUI extends JPanel {
     }
 
     public void refreshOverview() {
-    	int drIndex = tabOverview.indexOfComponent(scrollOverviewUnitRating);
+    	int drIndex = getTabOverview().indexOfComponent(scrollOverviewUnitRating);
         if (!getCampaign().getCampaignOptions().useDragoonRating() && drIndex != -1) {
-        	tabOverview.removeTabAt(drIndex);
+        	getTabOverview().removeTabAt(drIndex);
         } else {
         	if (drIndex == -1) {
-        		tabOverview.addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"), scrollOverviewUnitRating);
+        		getTabOverview().addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"), scrollOverviewUnitRating);
         	}
         }
 

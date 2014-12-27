@@ -52,7 +52,7 @@ import mekhq.campaign.universe.UnitTableData;
 public class DataLoadingDialog extends JDialog implements PropertyChangeListener {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -3454307876761238915L;
     private JProgressBar progressBar;
@@ -62,13 +62,13 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     Campaign campaign;
     File fileCampaign;
     ResourceBundle resourceMap;
- 
+
     public DataLoadingDialog(MekHQ app, JFrame frame, File f) {
         super(frame, "Data Loading"); //$NON-NLS-1$
         this.frame = frame;
         this.app = app;
         this.fileCampaign = f;
-        
+
         resourceMap = ResourceBundle.getBundle("mekhq.resources.DataLoadingDialog");
 
         setUndecorated(true);
@@ -78,7 +78,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
 
         progressBar.setVisible(true);
         progressBar.setString(resourceMap.getString("loadPlanet.text"));
-        
+
         // initialize splash image
         Image imgSplash = getToolkit().getImage("data/images/misc/mekhq-load.png"); //$NON-NLS-1$
 
@@ -92,25 +92,25 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         }
         // make splash image panel
         ImageIcon icon = new ImageIcon(imgSplash);
-        JLabel splash = new JLabel(icon);      
+        JLabel splash = new JLabel(icon);
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(splash, BorderLayout.CENTER);
         getContentPane().add(progressBar, BorderLayout.PAGE_END);
-        
+
         setSize(500, 350);
         this.setLocationRelativeTo(frame);
-       
+
         task = new Task();
         task.addPropertyChangeListener(this);
         task.execute();
     }
-    
+
     class Task extends SwingWorker<Void, Void> {
         /*
          * Main task. Executed in background thread.
-         */    	
+         */
     	private boolean cancelled = false;
-    	
+
         @Override
         public Void doInBackground() {
             //Initialize progress property.
@@ -130,7 +130,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException ignore) {
-                	
+
                 }
             }
             while (!RandomFactionGenerator.getInstance().isInitialized()) {
@@ -138,7 +138,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException ignore) {
-                	
+
                 }
             }
             while (!UnitTableData.getInstance().isInitialized()) {
@@ -146,7 +146,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException ignore) {
-                	
+
                 }
             }
             RandomNameGenerator.getInstance();
@@ -173,6 +173,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             	try {
 					newCampaign = true;
 					campaign = new Campaign();
+					campaign.setApp(app);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -185,12 +186,12 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
 
         		try {
         			fis = new FileInputStream(fileCampaign);
-        			campaign = Campaign.createCampaignFromXMLFileInputStream(fis);
+        			campaign = Campaign.createCampaignFromXMLFileInputStream(fis, app);
         			// Restores all transient attributes from serialized objects
         			campaign.restore();
         			fis.close();
         		} catch (NullEntityException ex) {
-        			JOptionPane.showMessageDialog(null, 
+        			JOptionPane.showMessageDialog(null,
         					"The following units could not be loaded by the campaign:\n" + ex.getError() + "\n\nPlease be sure to copy over any custom units before starting a new version of MekHQ.\nIf you believe the units listed are not customs, then try deleting the file data/mechfiles/units.cache and restarting MekHQ.\nIt is also possible that unit chassi and model names have changed across versions of MegaMek. You can check this by\nopening up MegaMek and searching for the units. Chassis and models can be edited in your MekHQ save file with a text editor." ,
         					"Unit Loading Error",
         					JOptionPane.ERROR_MESSAGE);
@@ -198,15 +199,15 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         			cancel(true);
         		} catch (Exception ex) {
         			ex.printStackTrace();
-        			JOptionPane.showMessageDialog(null, 
+        			JOptionPane.showMessageDialog(null,
         					"The campaign file could not be loaded.\nPlease check the log file for details.",
         					"Campaign Loading Error",
         				    JOptionPane.ERROR_MESSAGE);
         			//setVisible(false);
         			cancelled = true;
         			cancel(true);
-        		} catch(OutOfMemoryError e) { 
-        		    JOptionPane.showMessageDialog(null, 
+        		} catch(OutOfMemoryError e) {
+        		    JOptionPane.showMessageDialog(null,
                             "MekHQ ran out of memory attempting to load the campaign file. \nTry increasing the memory allocated to MekHQ and reloading.\nSee the FAQ at http://megamek.info for details.",
                             "Not Enough Memory",
                             JOptionPane.ERROR_MESSAGE);
@@ -258,7 +259,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         		frame.setVisible(false);
         		frame.dispose();
         		app.showNewView();
-        	}	
+        	}
         }
     }
 
@@ -281,5 +282,5 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
 			break;
 		}
 	}
-    
+
 }
