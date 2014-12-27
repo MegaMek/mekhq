@@ -6,6 +6,7 @@ v0.3.9-dev (SVN)
 + Bug: packaging_local.xml needs to mkdir before the copies used in place of svn exports
 + Bug [#676]: Campaign file could not be loaded : Array index out of bounds
 + Bug [#730]: Refit chances reduced to Impossible
++ Feature: New view menu toggle option for the overview tab
 
 v0.3.8 (2014-12-25 15:30 UTC)
 + Bug [#718]: [AtB] Unit MArket does not retain unit selections
