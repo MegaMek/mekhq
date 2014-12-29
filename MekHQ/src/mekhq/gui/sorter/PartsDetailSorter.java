@@ -13,13 +13,13 @@ public class PartsDetailSorter implements Comparator<String> {
     public int compare(String s0, String s1) {
         String[] ss0 = s0.replace("<html>", "").replace("</html>", "").split(" ");
         String[] ss1 = s1.replace("<html>", "").replace("</html>", "").split(" ");
-        int l0 = Integer.parseInt(ss0[0]);
-        int l1 = Integer.parseInt(ss1[0]);
+        double l0 = Double.parseDouble(ss0[0]);
+        double l1 = Double.parseDouble(ss1[0]);
         s0 = ss0[1];
         s1 = ss1[1];
         int sComp = s0.compareTo(s1);
         if (sComp == 0) {
-            return ((Comparable<Integer>)l0).compareTo(l1);
+            return ((Comparable<Double>)l0).compareTo(l1);
         } else {
             return sComp;
         }
