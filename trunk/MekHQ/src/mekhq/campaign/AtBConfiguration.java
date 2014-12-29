@@ -81,7 +81,7 @@ public class AtBConfiguration implements Serializable {
 	
 	public boolean isHiringHall(String planet, Date date) {
 		for (DatedRecord<String> rec : hiringHalls) {
-			if (rec.fitsDate(date) && rec.getValue().equals(planet)) {
+			if (rec.getValue().equals(planet) && rec.fitsDate(date)) {
 				return true;
 			}
 		}
@@ -225,7 +225,7 @@ public class AtBConfiguration implements Serializable {
 		 */
 		public boolean fitsDate(Date d) {
 			return (start == null || !start.after(d))
-					&& (end == null) || !end.before(d);
+					&& (end == null || !end.before(d));
 		}
 	}
 }
