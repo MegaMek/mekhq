@@ -4261,6 +4261,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     }
 
     private void setAtBSkillCosts() {
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog");
     	if (btnUseAtBSkillCosts.isSelected()) {
     		final String[] combatSkills = {SkillType.S_PILOT_MECH,SkillType.S_GUN_MECH,SkillType.S_PILOT_AERO,SkillType.S_GUN_AERO,
     				SkillType.S_PILOT_GVEE,SkillType.S_PILOT_VTOL,SkillType.S_PILOT_NVEE,SkillType.S_GUN_VEE,
@@ -4275,7 +4276,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     		final int[] supportXp = {5, 0, 5, 10, 20, 40, -1, -1, -1, -1, -1};
     		final int[] officerXp = {10, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
 
-    		HashMap<String, Integer> skillIndices = new HashMap<String, Integer>();
+            HashMap<String, Integer> skillIndices = new HashMap<String, Integer>();
     		for (int i = 0; i < SkillType.skillList.length; i++) {
     			skillIndices.put(SkillType.skillList[i], i);
     		}
@@ -4301,7 +4302,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     						skillIndices.get(skillName), i);
     			}
     		}
-    		btnUseAtBSkillCosts.setText("Restore previous skill costs");
+    		btnUseAtBSkillCosts.setText(resourceMap.getString("btnRestoreAtBSkillCosts.text"));
+    		btnUseAtBSkillCosts.setToolTipText(resourceMap.getString("btnRestoreAtBSkillCosts.toolTipText"));
     	} else {
     		for (int i = 0; i < SkillType.skillList.length; i++) {
     			String skillName = SkillType.skillList[i];
@@ -4310,17 +4312,22 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     				tableXP.setValueAt(Integer.toString(SkillType.getType(skillName).getCost(j)), i, j);
     			}
 			}
-    		btnUseAtBSkillCosts.setText("Use AtB costs for skills");
+    		btnUseAtBSkillCosts.setText(resourceMap.getString("btnUseAtBSkillCosts.text"));
+    		btnUseAtBSkillCosts.setToolTipText(resourceMap.getString("btnUseAtBSkillCosts.toolTipText"));
     	}
     }
 
     private void setAtBSPACosts() {
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog");
+
     	if (btnUseAtBSPACosts.isSelected()) {
     		tempSPA = atbSPA;
-    		btnUseAtBSPACosts.setText("Restore default special ability settings");
+    		btnUseAtBSPACosts.setText(resourceMap.getString("btnRestoreAtBSPACosts.text"));
+    		btnUseAtBSPACosts.setToolTipText(resourceMap.getString("btnRestoreAtBSPACosts.toolTipText"));
     	} else {
     		tempSPA = originalSPA;
-    		btnUseAtBSPACosts.setText("Use AtB costs for special abilities");
+    		btnUseAtBSPACosts.setText(resourceMap.getString("btnUseAtBSPACosts.text"));
+    		btnUseAtBSPACosts.setToolTipText(resourceMap.getString("btnUseAtBSPACosts.toolTipText"));
     	}
 
     	panSpecialAbilities.removeAll();

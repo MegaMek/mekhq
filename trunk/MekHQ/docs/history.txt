@@ -9,6 +9,7 @@ v0.3.9-dev (SVN)
 + Feature: New view menu toggle option for the overview tab
 + Bug [#75]: Warehouse NPE for parts with a decimal in the tonnage
 + Bug [#754]: Contracts not created, Unit Market has nothing in it 
++ Changed text and tooltip text of CampaignOptionsDialog/AtB tab skill/SPA toggle buttons in an attempt to clarify function.
 
 v0.3.8 (2014-12-25 15:30 UTC)
 + Bug [#718]: [AtB] Unit MArket does not retain unit selections
