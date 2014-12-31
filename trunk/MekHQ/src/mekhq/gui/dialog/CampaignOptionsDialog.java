@@ -1665,9 +1665,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panMercenary.setName("panMercenary"); // NOI18N
         panMercenary.setLayout(new java.awt.GridBagLayout());
 
-        btnContractEquipment = new JRadioButton("Base contract payment on percentage of TO&E unit value (StellarOps " +
-                                                "Beta)");
-        btnContractPersonnel = new JRadioButton("Base contract payment on personnel payroll (FMMr)");
+        btnContractEquipment = new JRadioButton(resourceMap.getString("panMercenary.IntOpsPayment.title"));
+        btnContractEquipment.setToolTipText(resourceMap.getString("panMercenary.IntOpsPayment.tooltip"));
+        btnContractPersonnel = new JRadioButton(resourceMap.getString("panMercenary.FMMRPayment.title"));
+        btnContractPersonnel.setToolTipText(resourceMap.getString("panMercenary.FMMRPayment.tooltip"));
 
         if (options.useEquipmentContractBase()) {
             btnContractEquipment.setSelected(true);
