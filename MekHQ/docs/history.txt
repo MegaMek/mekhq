@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.9-dev (SVN)
+v0.3.9 (2015-01-01 21:25 UTC)
 + Bug: packaging.xml was renaming mhq's hitory.txt to history-mm.txt due to change in where mm docs are copied to
 + Bug: packaging_local.xml out of date compared to packaging.xml
 + Bug: packaging_local.xml needs to mkdir before the copies used in place of svn exports
@@ -11,6 +11,7 @@ v0.3.9-dev (SVN)
 + Bug [#754]: Contracts not created, Unit Market has nothing in it
 + Changed text and tooltip text of CampaignOptionsDialog/AtB tab skill/SPA toggle buttons in an attempt to clarify function
 + Bug [#763]: Change StellarOps to IO
++ Update MegaMek.jar to 0.40.0 and MegaMekLab.jar to 0.1.35
 
 v0.3.8 (2014-12-25 15:30 UTC)
 + Bug [#718]: [AtB] Unit MArket does not retain unit selections
