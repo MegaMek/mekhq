@@ -4,7 +4,6 @@
 	<classpathentry kind="lib" path="lib/TinyXML.jar"/>
 	<classpathentry kind="lib" path="lib/PngEncoder.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="MegaMek.jar" sourcepath="/MegaMek/trunk/megamek"/>
 	<classpathentry kind="lib" path="MegaMekLab.jar" sourcepath="/MegaMekLab/trunk"/>
 	<classpathentry kind="lib" path="lib/cglib-nodep-2.2.jar"/>
 	<classpathentry kind="lib" path="lib/dom4j-1.6.1.jar"/>

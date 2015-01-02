@@ -52,7 +52,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 
 import megamek.client.ui.Messages;
-import megamek.client.ui.swing.MechEditorDialog;
+import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.client.ui.swing.MechViewPanel;
 import megamek.common.Entity;
 import megamek.common.GunEmplacement;
@@ -1555,7 +1555,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             return;
         }
         Entity entity = ustatus.getEntity();
-        MechEditorDialog med = new MechEditorDialog(frame, entity);
+        UnitEditorDialog med = new UnitEditorDialog(frame, entity);
         med.setVisible(true);
         JLabel name = lblsUnitName.get(idx);
         name.setText(ustatus.getDesc());

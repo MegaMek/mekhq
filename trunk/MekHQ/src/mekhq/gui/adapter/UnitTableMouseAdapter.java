@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.event.MouseInputAdapter;
 
-import megamek.client.ui.swing.MechEditorDialog;
+import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
@@ -499,7 +499,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
         } else if (command.equalsIgnoreCase("EDIT_DAMAGE")) {
             if (null != selectedUnit) {
                 Entity entity = selectedUnit.getEntity();
-                MechEditorDialog med = new MechEditorDialog(gui.getFrame(), entity);
+                UnitEditorDialog med = new UnitEditorDialog(gui.getFrame(), entity);
                 med.setVisible(true);
                 selectedUnit.runDiagnostic();
                 gui.refreshServicedUnitList();
