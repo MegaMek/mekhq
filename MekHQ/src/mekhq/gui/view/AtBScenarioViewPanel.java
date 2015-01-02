@@ -56,7 +56,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import megamek.client.ui.swing.MechEditorDialog;
+import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.common.Crew;
 import megamek.common.IStartingPositions;
 import megamek.common.PlanetaryConditions;
@@ -76,10 +76,10 @@ import mekhq.gui.dialog.PrincessBehaviorDialog;
 public class AtBScenarioViewPanel extends JPanel {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -3104784717190158181L;
-	
+
 	private AtBScenario scenario;
 	private Campaign campaign;
 	private ForceStub playerForces;
@@ -87,7 +87,7 @@ public class AtBScenarioViewPanel extends JPanel {
 	private ArrayList<BotForceStub> botStubs;
 	private IconPackage icons;
 	private JFrame frame;
-	
+
 	private JPanel panStats;
 
 	private JLabel lblStatus = new JLabel();
@@ -116,7 +116,7 @@ public class AtBScenarioViewPanel extends JPanel {
 	private JLabel	lblGravityDesc = new JLabel();
 	private JLabel lblPlayerStart = new JLabel();
 	private JLabel lblPlayerStartPos = new JLabel();
-	
+
 	private JTextArea txtDetails = new JTextArea();
 
 	private final static int REROLL_TERRAIN = 0;
@@ -127,25 +127,25 @@ public class AtBScenarioViewPanel extends JPanel {
 	private final static int REROLL_NUM = 5;
 	private JCheckBox[] chkReroll = new JCheckBox[REROLL_NUM];
 	JButton btnReroll;
-	
+
 	private JTree playerForceTree;
 
 	private JTextArea txtDesc;
 	private JTextArea txtReport;
-	
+
 	private StubTreeModel playerForceModel;
-	
+
 	private static final String[] battleResourceKeys = {
 		"baseAttack", "extraction", "chase", "holdTheLine", "breakthrough",
 		"hideAndSeek", "standup", "reconRaid", "probe",
 
 		"officerDuel", "aceDuel", "ambush", "civilianHelp",
 		"alliedTraitors", "prisonBreak", "starLeagueCache1", "starLeagueCache2",
-		
+
 		"allyRescue", "civilianRiot", "convoyRescue",
 		"convoyAttack", "pirateFreeForAll"
 	};
-	
+
 public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame frame) {
 		this.frame = frame;
 		this.scenario = s;
@@ -168,7 +168,7 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 		playerForceModel = new StubTreeModel(playerForces);
 		initComponents();
 	}
-	
+
 	private void initComponents() {
 		java.awt.GridBagConstraints gridBagConstraints;
 
@@ -176,13 +176,13 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 		txtDesc = new JTextArea();
 		txtReport = new JTextArea();
 		playerForceTree = new JTree();
-		       
+
 		setLayout(new GridBagLayout());
 
 		setBackground(Color.WHITE);
 
 		int y = 0;
-		
+
 		panStats.setName("pnlStats");
 		panStats.setBorder(BorderFactory.createTitledBorder(scenario.getName()));
 		panStats.setBackground(Color.WHITE);
@@ -194,9 +194,9 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 		gridBagConstraints.weightx = 0.0;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		add(panStats, gridBagConstraints);
-		
+
 		txtReport.setName("txtReport");
 		txtReport.setText(scenario.getReport());
 		txtReport.setEditable(false);
@@ -219,12 +219,12 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
     private void fillStats() {
     	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBScenarioViewPanel");
     	lblStatus = new javax.swing.JLabel();
-    	
+
     	GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		panStats.setLayout(new java.awt.GridBagLayout());
-		
+
 		int y = 0;
-		
+
 		lblStatus.setName("lblStatus"); // NOI18N
 		lblStatus.setText(resourceMap.getString("lblStatus.text"));
 		gridBagConstraints.gridx = 0;
@@ -235,13 +235,13 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 		gridBagConstraints.fill = GridBagConstraints.NONE;
 		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 		panStats.add(lblStatus, gridBagConstraints);
-		
+
 		lblStatusDesc.setName("lblOwner"); // NOI18N
 		lblStatusDesc.setText(scenario.getStatusName());
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = y++;
 		panStats.add(lblStatusDesc, gridBagConstraints);
-		
+
 		playerForceTree.setModel(playerForceModel);
 		playerForceTree.setCellRenderer(new ForceStubRenderer());
 		playerForceTree.setRowHeight(50);
@@ -255,9 +255,9 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 		gridBagConstraints.weighty = 1.0;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		panStats.add(playerForceTree, gridBagConstraints);
-		
+
 		if (attachedAllyStub.size() > 0) {
 			DefaultMutableTreeNode top = new DefaultMutableTreeNode("Attached Allies");
 			for (String en : attachedAllyStub) {
@@ -273,17 +273,17 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 			gridBagConstraints.weighty = 1.0;
 			gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
 			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 			panStats.add(tree, gridBagConstraints);
 		}
-		
-		
+
+
 
 		for (int i = 0; i < botStubs.size(); i++) {
 			if (null == botStubs.get(i)) {
 				continue;
 			}
-			
+
 			DefaultMutableTreeNode top = new DefaultMutableTreeNode(botStubs.get(i).getName());
 			for (String en : botStubs.get(i).getEntityList()) {
 				top.add(new DefaultMutableTreeNode(en));
@@ -299,7 +299,7 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 			gridBagConstraints.weighty = 1.0;
 			gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
 			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 			panStats.add(tree, gridBagConstraints);
 			if (scenario.isCurrent()) {
 				tree.addMouseListener(new TreeMouseAdapter(tree, i));
@@ -311,7 +311,7 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = y;
 		gridBagConstraints.fill = GridBagConstraints.NONE;
-		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;	
+		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 		panStats.add(lblType, gridBagConstraints);
 
 		lblTypeDesc.setText(AtBScenario.battleTypes[scenario.getBattleType()] + (scenario.isAttacker()?" (Attacker)":" (Defender)"));
@@ -325,7 +325,7 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 			gridBagConstraints.gridy = y;
 			gridBagConstraints.gridwidth = 1;
 			panStats.add(lblForce, gridBagConstraints);
-			
+
 			if (null != scenario.getLance(campaign)) {
 				lblForceDesc.setText(campaign.getForce(scenario.getLanceForceId()).getFullName());
 			}
@@ -334,7 +334,7 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 			gridBagConstraints.gridwidth = 1;
 			panStats.add(lblForceDesc, gridBagConstraints);
 		}
-		
+
 		chkReroll[REROLL_TERRAIN] = new JCheckBox();
 		lblTerrain.setText(resourceMap.getString("lblTerrain.text"));
 		gridBagConstraints.gridx = 0;
@@ -355,13 +355,13 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = y++;
 		panStats.add(lblTerrainDesc, gridBagConstraints);
-		
+
 		lblMap.setText(resourceMap.getString("lblMap.text"));
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = y;
 		gridBagConstraints.gridwidth = 1;
 		panStats.add(lblMap, gridBagConstraints);
-		
+
 		chkReroll[REROLL_MAP] = new JCheckBox();
 		if (scenario.isCurrent()) {
 			gridBagConstraints.gridx = 1;
@@ -376,13 +376,13 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = y++;
 		panStats.add(lblMapDesc, gridBagConstraints);
-		
+
 		lblMapSize.setText(resourceMap.getString("lblMapSize.text"));
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = y;
 		gridBagConstraints.gridwidth = 1;
 		panStats.add(lblMapSize, gridBagConstraints);
-		
+
 		chkReroll[REROLL_MAPSIZE] = new JCheckBox();
 		if (scenario.isCurrent()) {
 			gridBagConstraints.gridx = 1;
@@ -392,18 +392,18 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 			chkReroll[REROLL_MAPSIZE].setVisible(scenario.getRerollsRemaining() > 0 && scenario.canRerollMapSize());
 			chkReroll[REROLL_MAPSIZE].addItemListener(checkBoxListener);
 		}
-		
+
 		lblMapSizeDesc.setText(scenario.getMapX() + "x" + scenario.getMapY());
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = y++;
 		panStats.add(lblMapSizeDesc, gridBagConstraints);
-		
+
 		lblLight.setText(resourceMap.getString("lblLight.text"));
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = y;
 		gridBagConstraints.gridwidth = 1;
 		panStats.add(lblLight, gridBagConstraints);
-		
+
 		chkReroll[REROLL_LIGHT] = new JCheckBox();
 		if (scenario.isCurrent() && campaign.getCampaignOptions().getUseLightConditions()) {
 			gridBagConstraints.gridx = 1;
@@ -420,13 +420,13 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 		panStats.add(lblLightDesc, gridBagConstraints);
 		lblLight.setVisible(campaign.getCampaignOptions().getUseLightConditions());
 		lblLightDesc.setVisible(campaign.getCampaignOptions().getUseLightConditions());
-		
+
 		lblWeather.setText(resourceMap.getString("lblWeather.text"));
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = y;
 		gridBagConstraints.gridwidth = 1;
 		panStats.add(lblWeather, gridBagConstraints);
-		
+
 		chkReroll[REROLL_WEATHER] = new JCheckBox();
 		if (scenario.isCurrent() && campaign.getCampaignOptions().getUseWeatherConditions()) {
 			gridBagConstraints.gridx = 1;
@@ -436,40 +436,40 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 			chkReroll[REROLL_WEATHER].setVisible(scenario.getRerollsRemaining() > 0 && scenario.canRerollWeather());
 			chkReroll[REROLL_WEATHER].addItemListener(checkBoxListener);
 		}
-		
+
 		lblWeatherDesc.setText(PlanetaryConditions.getWeatherDisplayableName(scenario.getWeather()));
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = y++;
 		panStats.add(lblWeatherDesc, gridBagConstraints);
 		lblWeather.setVisible(campaign.getCampaignOptions().getUseWeatherConditions());
 		lblWeatherDesc.setVisible(campaign.getCampaignOptions().getUseWeatherConditions());
-		
+
 		lblWind.setText(resourceMap.getString("lblWind.text"));
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = y;
 		gridBagConstraints.gridwidth = 1;
 		panStats.add(lblWind, gridBagConstraints);
-		
+
 		lblWindDesc.setText(PlanetaryConditions.getWindDisplayableName(scenario.getWind()));
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = y++;
 		panStats.add(lblWindDesc, gridBagConstraints);
 		lblWind.setVisible(campaign.getCampaignOptions().getUseWeatherConditions());
 		lblWindDesc.setVisible(campaign.getCampaignOptions().getUseWeatherConditions());
-		
+
 		lblFog.setText(resourceMap.getString("lblFog.text"));
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = y;
 		gridBagConstraints.gridwidth = 1;
 		panStats.add(lblFog, gridBagConstraints);
-		
+
 		lblFogDesc.setText(PlanetaryConditions.getFogDisplayableName(scenario.getFog()));
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = y++;
 		panStats.add(lblFogDesc, gridBagConstraints);
 		lblFog.setVisible(campaign.getCampaignOptions().getUseWeatherConditions());
 		lblFogDesc.setVisible(campaign.getCampaignOptions().getUseWeatherConditions());
-		
+
 		lblGravity.setText(resourceMap.getString("lblGravity.text"));
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = y;
@@ -495,13 +495,13 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 		panStats.add(lblAtmosphereDesc, gridBagConstraints);
 		lblAtmosphere.setVisible(scenario.getAtmosphere() != PlanetaryConditions.ATMO_STANDARD);
 		lblAtmosphereDesc.setVisible(scenario.getAtmosphere() != PlanetaryConditions.ATMO_STANDARD);
-		
+
 		lblPlayerStart.setText(resourceMap.getString("lblPlayerStart.text"));
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = y;
 		gridBagConstraints.gridwidth = 1;
 		panStats.add(lblPlayerStart, gridBagConstraints);
-		
+
 		lblPlayerStartPos.setText(IStartingPositions.START_LOCATION_NAMES[scenario.getStart()]);
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = y++;
@@ -523,7 +523,7 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 				}
 			});
 		}
-		
+
 		txtDetails.setLineWrap(true);
 		txtDetails.setWrapStyleWord(true);
 		txtDetails.setEditable(false);
@@ -534,7 +534,7 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 					(scenario.isAttacker()?
 							".attacker.victory":
 								".defender.victory")) + "\n\n" +
-					
+
 					"Observations:\n" +
 					resourceMap.getString("battleDetails." +
 					battleResourceKeys[scenario.getBattleType()] +
@@ -547,16 +547,16 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 					battleResourceKeys[scenario.getBattleType()] +
 					".description"));
 		} else {
-			txtDetails.setText("Special Conditions:\n" + 
+			txtDetails.setText("Special Conditions:\n" +
 					resourceMap.getString("battleDetails." +
 					battleResourceKeys[scenario.getBattleType()] +
 					".specialConditions") + "\n\n" +
-					
+
 					"Victory Conditions:\n" +
 					resourceMap.getString("battleDetails." +
 					battleResourceKeys[scenario.getBattleType()] +
 					".victory") + "\n\n" +
-					
+
 					"Observations:\n" +
 					resourceMap.getString("battleDetails." +
 					battleResourceKeys[scenario.getBattleType()] +
@@ -571,8 +571,8 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		panStats.add(txtDetails, gridBagConstraints);
-		
-		
+
+
 		txtDesc.setName("txtDesc");
 		txtDesc.setText(scenario.getDescription());
 		txtDesc.setEditable(false);
@@ -587,7 +587,7 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		panStats.add(txtDesc, gridBagConstraints);
-		
+
 		if(scenario.getLoot().size() > 0) {
 	        gridBagConstraints.gridx = 0;
 	        gridBagConstraints.gridy = y++;
@@ -598,7 +598,7 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 	        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 	        panStats.add(new JLabel("<html><b>Potential Rewards:</b></html>"), gridBagConstraints);
-	        
+
 	        for(Loot loot : scenario.getLoot()) {
 	            gridBagConstraints.gridx = 0;
 	            gridBagConstraints.gridy++;
@@ -608,18 +608,18 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 	            gridBagConstraints.insets = new java.awt.Insets(0, 10, 5, 0);
 	            gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 	            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-	            panStats.add(new JLabel(loot.getShortDescription()), gridBagConstraints);	            
+	            panStats.add(new JLabel(loot.getShortDescription()), gridBagConstraints);
 	        }
-		}	
+		}
     }
-    
+
     private ItemListener checkBoxListener = new ItemListener() {
 		@Override
 		public void itemStateChanged(ItemEvent e) {
 			countRerollBoxes();
 		}
     };
-    
+
     private void countRerollBoxes() {
     	int checkedBoxes = 0;
     	for (int i = 0; i < REROLL_NUM; i++) {
@@ -677,21 +677,21 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
     	btnReroll.setEnabled(scenario.getRerollsRemaining() > 0);
     	countRerollBoxes();
     }
-    
+
 	protected class StubTreeModel implements TreeModel {
 
 		private ForceStub rootForce;
 		private Vector<TreeModelListener> listeners = new Vector<TreeModelListener>();
-		
+
 		public StubTreeModel(ForceStub root) {
 	        rootForce = root;
 	    }
-	
+
 		@Override
 		public Object getChild(Object parent, int index) {
 			if(parent instanceof ForceStub) {
 				return ((ForceStub)parent).getAllChildren().get(index);
-			} 
+			}
 			return null;
 		}
 
@@ -724,9 +724,9 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 		@Override
 		public void valueForPathChanged(TreePath arg0, Object arg1) {
 			//  Auto-generated method stub
-			
+
 		}
-		
+
 		public void addTreeModelListener( TreeModelListener listener ) {
 		      if ( listener != null && !listeners.contains( listener ) ) {
 		         listeners.addElement( listener );
@@ -739,16 +739,16 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 		      }
 		   }
 	}
-    
+
     protected class ForceStubRenderer extends DefaultTreeCellRenderer {
-        
+
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = 4076620029822185784L;
 
 		public ForceStubRenderer() {
-        	
+
         }
 
         public Component getTreeCellRendererComponent(
@@ -769,9 +769,9 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 
             return this;
         }
-        
+
         protected Icon getIcon(Object node) {
-        	
+
         	if(node instanceof UnitStub) {
         		return getIconFrom((UnitStub)node);
         	} else if(node instanceof ForceStub) {
@@ -780,15 +780,15 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
         		return null;
         	}
         }
-        
+
         protected Icon getIconFrom(UnitStub unit) {
         	String category = unit.getPortraitCategory();
         	String file = unit.getPortraitFileName();
-        	
+
         	if(Crew.ROOT_PORTRAIT.equals(category)) {
         		category = "";
         	}
-        	
+
         	// Return a null if the player has selected no portrait file.
         	if ((null == category) || (null == file) || Crew.PORTRAIT_NONE.equals(file)) {
         		file = "default.gif";
@@ -798,11 +798,11 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
             try {
                 portrait = (Image) icons.getPortraits().getItem(category, file);
                 if(null != portrait) {
-                    portrait = portrait.getScaledInstance(50, -1, Image.SCALE_DEFAULT);               
+                    portrait = portrait.getScaledInstance(50, -1, Image.SCALE_DEFAULT);
                 } else {
                 	portrait = (Image) icons.getPortraits().getItem("", "default.gif");
                 	if(null != portrait) {
-                        portrait = portrait.getScaledInstance(50, -1, Image.SCALE_DEFAULT);               
+                        portrait = portrait.getScaledInstance(50, -1, Image.SCALE_DEFAULT);
                 	}
                 }
                 return new ImageIcon(portrait);
@@ -811,7 +811,7 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
                 return null;
             }
         }
-        
+
         protected Icon getIconFrom(ForceStub force) {
             String category = force.getIconCategory();
             String file = force.getIconFileName();
@@ -840,31 +840,31 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
            	 return new ImageIcon(portrait);
             } catch (Exception err) {
            	 err.printStackTrace();
-           	 return null;     	
+           	 return null;
             }
        }
-    }	
+    }
 
     protected class EntityListModel implements TreeModel {
 
 		private ArrayList<String> root;
 		private Vector<TreeModelListener> listeners = new Vector<TreeModelListener>();
 		private String name;
-		
+
 		public EntityListModel(ArrayList<String> root, String name) {
 	        this.root = root;
 	        this.name = name;
 	    }
-		
+
 		public String getName() {
 			return name;
 		}
-	
+
 		@Override
 		public Object getChild(Object parent, int index) {
 			if(parent instanceof ArrayList<?>) {
 				return ((ArrayList<?>)parent).get(index);
-			} 
+			}
 			return null;
 		}
 
@@ -897,9 +897,9 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 		@Override
 		public void valueForPathChanged(TreePath arg0, Object arg1) {
 			// Auto-generated method stub
-			
+
 		}
-		
+
 		public void addTreeModelListener( TreeModelListener listener ) {
 		      if ( listener != null && !listeners.contains( listener ) ) {
 		         listeners.addElement( listener );
@@ -916,7 +916,7 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
     private class TreeMouseAdapter extends MouseInputAdapter implements ActionListener {
     	private JTree tree;
     	int index;
-    	
+
     	public TreeMouseAdapter(JTree tree, int index) {
     		this.tree = tree;
     		this.index = index;
@@ -927,7 +927,7 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 
 			if (command.equalsIgnoreCase("CONFIG_BOT")) {
 		    	PrincessBehaviorDialog pbd = new PrincessBehaviorDialog(frame,
-		    	    	scenario.getBotForce(index).getBehaviorSettings(), 
+		    	    	scenario.getBotForce(index).getBehaviorSettings(),
 		    	    	scenario.getBotForce(index).getName());
 		    	pbd.setVisible(true);
 		    	if (!pbd.dialogAborted) {
@@ -938,13 +938,13 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
     			if (tree.getSelectionCount() > 0) {
     				// row 0 is root node
     				int i = tree.getSelectionRows()[0] - 1;
-                    MechEditorDialog med = new MechEditorDialog(frame,
+                    UnitEditorDialog med = new UnitEditorDialog(frame,
                     		scenario.getBotForce(index).getEntityList().get(i));
                     med.setVisible(true);
     			}
     		}
     	}
-			
+
     	@Override
     	public void mousePressed(MouseEvent e) {
     		maybeShowPopup(e);
@@ -972,7 +972,7 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
     			popup.add(menuItem);
     			popup.show(e.getComponent(), e.getX(), e.getY());
     		}
-    	}    	
+    	}
     };
 
 }
