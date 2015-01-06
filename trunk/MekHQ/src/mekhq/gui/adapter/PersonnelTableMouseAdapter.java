@@ -555,8 +555,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             gui.refreshReport();
             gui.refreshOverview();
         } else if (command.equalsIgnoreCase("SACK")) {
+        	boolean showDialog = false;
+        	ArrayList<UUID> toRemove = new ArrayList<UUID>();
             for (Person person : people) {
-                gui.getCampaign().getRetirementDefectionTracker()
+            	if (gui.getCampaign().getRetirementDefectionTracker()
                         .removeFromCampaign(
                                 person,
                                 false,
@@ -565,17 +567,39 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                                         .getNumShares(gui.getCampaign()
                                                 .getCampaignOptions()
                                                 .getSharesForAll()) : 0,
-                                gui.getCampaign(), null);
+                                gui.getCampaign(), null)) {
+            		showDialog = true;
+            	} else {
+            		toRemove.add(person.getId());
+            	}
             }
-            RetirementDefectionDialog rdd = new RetirementDefectionDialog(
-                    gui, null, false);
-            rdd.setVisible(true);
-            if (rdd.wasAborted()
-                    || !gui.getCampaign().applyRetirement(rdd.totalPayout(),
-                            rdd.getUnitAssignments())) {
-                for (Person person : people) {
-                    gui.getCampaign().getRetirementDefectionTracker()
-                            .removePayout(person);
+            if (showDialog) {
+	            RetirementDefectionDialog rdd = new RetirementDefectionDialog(
+	                    gui, null, false);
+	            rdd.setVisible(true);
+	            if (rdd.wasAborted()
+	                    || !gui.getCampaign().applyRetirement(rdd.totalPayout(),
+	                            rdd.getUnitAssignments())) {
+	                for (Person person : people) {
+	                    gui.getCampaign().getRetirementDefectionTracker()
+	                            .removePayout(person);
+	                }
+	            } else {
+	            	for (UUID id : toRemove) {
+	            		gui.getCampaign().removePerson(id);
+	            	}
+	            }
+            } else {
+                if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(
+                        null,
+                        "Do you really want to remove " +
+                        		((people.length > 1)?"personnel?":
+                                people[0].getFullTitle() + "?"),
+                        "Remove?",
+                        JOptionPane.YES_NO_OPTION)) {
+                	for (Person person : people) {
+                		gui.getCampaign().removePerson(person.getId());
+                	}
                 }
             }
             gui.refreshServicedUnitList();
