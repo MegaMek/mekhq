@@ -249,9 +249,11 @@ public class AtBScenario extends Scenario {
 		lanceCount = 0;
 		rerollsRemaining = 0;
 	}
-
+	
 	public AtBScenario (Campaign c, Lance lance, int type, boolean attacker, Date date) {
-		super(battleTypes[type] + (attacker?" (Attacker)":" (Defender)"));
+		super(battleTypes[type] + ((type < SPECIALMISSIONS)?
+				(attacker?" (Attacker)":" (Defender)"):
+					""));
 		battleType = type;
 		this.attacker = attacker;
 
@@ -289,6 +291,12 @@ public class AtBScenario extends Scenario {
 		initBattle(c);
 	}
 
+	public String getDesc() {
+		return battleTypes[battleType] + ((battleType < SPECIALMISSIONS)?
+				(attacker?" (Attacker)":" (Defender)"):
+					"");
+	}
+	
 	/**
 	 * Determines battle conditions: terrain, weather, map.
 	 * 
