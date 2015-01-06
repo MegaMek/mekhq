@@ -3,6 +3,7 @@ VERSION HISTORY
 v0.3.10-dev (SVN)
 + Updated SubmitBug.html with corrected links and a new link for the bug reporting policy/howto
 + Bug [#737]: ATB - Sacked Prisoner's get 50,000 C-bills 
++ Bug [#600]: ATB : Incorrect missions being generated? 
 
 v0.3.9 (2015-01-01 21:25 UTC)
 + Bug: packaging.xml was renaming mhq's hitory.txt to history-mm.txt due to change in where mm docs are copied to

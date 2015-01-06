@@ -314,7 +314,7 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 		panStats.add(lblType, gridBagConstraints);
 
-		lblTypeDesc.setText(AtBScenario.battleTypes[scenario.getBattleType()] + (scenario.isAttacker()?" (Attacker)":" (Defender)"));
+		lblTypeDesc.setText(scenario.getDesc());
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = y++;
 		panStats.add(lblTypeDesc, gridBagConstraints);
