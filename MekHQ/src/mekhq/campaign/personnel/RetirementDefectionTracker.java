@@ -293,16 +293,18 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
      * @param campaign
      * @param contract	If not null, the payout must be resolved before the
      * 					contract can be resolved.
+     * @return			true if the person is due a payout; otherwise false
      */
-    public void removeFromCampaign(Person person, boolean killed,
+    public boolean removeFromCampaign(Person person, boolean killed,
     		int shares, Campaign campaign, AtBContract contract) {
     	/* Payouts to Infantry/Battle armor platoons/squads/points are
     	 * handled as a unit in the AtB rules, so we're just going to ignore
     	 * them here. 
     	 */
     	if (person.getPrimaryRole() == Person.T_INFANTRY ||
-    			person.getPrimaryRole() == Person.T_BA) {
-    		return;
+   			person.getPrimaryRole() == Person.T_BA ||
+    			person.isPrisoner() || person.isBondsman()) {
+    		return false;
     	}
     	payouts.put(person.getId(), new Payout(person, getShareValue(campaign),
     			killed, campaign.getCampaignOptions().getSharesForAll()));
@@ -312,6 +314,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     		}
     		unresolvedPersonnel.get(contract.getId()).add(person.getId());
     	}
+    	return true;
     }
     
     public void removePayout(Person person) {
