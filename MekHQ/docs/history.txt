@@ -6,6 +6,7 @@ v0.3.10-dev (SVN)
 + Bug [#600]: ATB : Incorrect missions being generated
 + Bug: Index out of bounds when resolving games where ASF are carrying certain types of bombs
 + Bug: Possible NPE if RAT names change and are not updated in ratinfo.xml
++ Bug: [#688]: ATB contract generation causes NPE 
 
 v0.3.9 (2015-01-01 21:25 UTC)
 + Bug: packaging.xml was renaming mhq's hitory.txt to history-mm.txt due to change in where mm docs are copied to
