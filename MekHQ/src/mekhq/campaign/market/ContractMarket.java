@@ -199,7 +199,6 @@ public class ContractMarket implements Serializable {
 				numContracts--;
 			}
 
-			//TODO: add hiring halls beyond planets that are starting points for Mercs
 			if (campaign.getFactionCode().equals("MERC") || campaign.getFactionCode().equals("PIR")) {
 				if (campaign.getAtBConfig().isHiringHall(campaign.getCurrentPlanet().getName(), campaign.getDate())) {
 					numContracts++;
@@ -261,11 +260,14 @@ public class ContractMarket implements Serializable {
 						((AtBContract)m).getParentContract() == contract) {
 					numSubcontracts++;
 				}
-				if (numSubcontracts >= unitRatingMod - 1) {
-					return;
-				}
-				if (Compute.d6(2) >= 10) {
-					contracts.add(generateAtBSubcontract(campaign, contract, unitRatingMod));
+			}
+			if (numSubcontracts >= unitRatingMod - 1) {
+				return;
+			}
+			if (Compute.d6(2) >= 10) {
+				AtBContract sub = generateAtBSubcontract(campaign, contract, unitRatingMod);
+				if (sub.getEndingDate().before(contract.getEndingDate())) {
+					contracts.add(sub);
 				}
 			}
 		}
