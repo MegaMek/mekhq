@@ -189,6 +189,9 @@ public class UnitTableData implements Serializable, ActionListener {
 		ArrayList<String> sorted = new ArrayList<String>();
 		ArrayList<String> altFactions = getAltFactions(faction);
 		for (String source : rats) {
+			if (!ratTree.containsKey(source)) {
+				continue;
+			}
 			for (String f : altFactions) {
 				if (hasRAT(source, year, f, unitType)) {
 					return getClosestRAT(source, year, f, unitType);
