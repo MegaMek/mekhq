@@ -779,7 +779,14 @@ public class ResolveScenarioTracker {
 	}
 
 	public void salvageUnit(int i) {
-		actualSalvage.add(new Unit(potentialSalvage.get(i), campaign));
+	    // Do some hoops here so that the new mech gets it's old individual paint job!
+	    Entity salvage = potentialSalvage.get(i);
+	    String cat = salvage.getCamoCategory();
+	    String fn = salvage.getCamoFileName();
+	    Unit salvageUnit = new Unit(salvage, campaign);
+	    salvageUnit.getEntity().setCamoCategory(cat);
+	    salvageUnit.getEntity().setCamoFileName(fn);
+		actualSalvage.add(salvageUnit);
 	}
 
 	public void dontSalvageUnit(int i) {
