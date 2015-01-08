@@ -1192,7 +1192,8 @@ public class Campaign implements Serializable {
 					&& p.getSkill(primary) != null) {
 				if (p.getSkill(primary).getLevel() > highest) {
 					retVal = p;
-				} else if (secondary != null && p.getSkill(primary).getExperienceLevel() == highest &&
+					highest = p.getSkill(primary).getLevel();
+				} else if (secondary != null && p.getSkill(primary).getLevel() == highest &&
 						/* If the skill level of the current person is the same as the previous highest,
 						 * select the current instead under the following conditions: */
 						(retVal == null || //None has been selected yet (current has level 0)
