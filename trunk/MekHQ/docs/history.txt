@@ -12,6 +12,7 @@ v0.3.10-dev (SVN)
 + Bug: [#669]: ATB : Base attack (defender) scenario generated with no opfor
 + Bug: MissingBattleArmorSuit NPE due to unit variable not being set
 + Bug: NPE with the tech color coding for assigned to the part's unit tech in the repair bay
++ Bug: [#701]: (ATB) Probe condition is incorrect
 
 v0.3.9 (2015-01-01 21:25 UTC)
 + Bug: packaging.xml was renaming mhq's hitory.txt to history-mm.txt due to change in where mm docs are copied to
