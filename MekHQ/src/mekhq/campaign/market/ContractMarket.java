@@ -623,7 +623,7 @@ public class ContractMarket implements Serializable {
 		if (roll == 11) return IUnitRating.DRAGOON_B;
 		return IUnitRating.DRAGOON_A;
 	}
-
+	
 	protected void setAtBContractClauses(AtBContract contract, int unitRatingMod, Campaign campaign) {
 		ClauseMods mods = new ClauseMods();
 		clauseMods.put(contract.getId(), mods);
@@ -635,47 +635,18 @@ public class ContractMarket implements Serializable {
 		 * the highest admin skill, or higher negotiation if the admin
 		 * skills are equal.
 		 */
-		int adminCommand = SkillType.EXP_ULTRA_GREEN;
-		int adminTransport = SkillType.EXP_ULTRA_GREEN;
-		int adminLogistics = SkillType.EXP_ULTRA_GREEN;
-		for (Person p :campaign.getAdmins()) {
-			if ((p.getPrimaryRole() == Person.T_ADMIN_COM ||
-					p.getSecondaryRole() == Person.T_ADMIN_COM) &&
-					p.getSkill(SkillType.S_ADMIN).getExperienceLevel() >= adminCommand) {
-				adminCommand = p.getSkill(SkillType.S_ADMIN).getExperienceLevel();
-				if (null != p.getSkill(SkillType.S_NEG)) {
-					if (p.getSkill(SkillType.S_ADMIN).getExperienceLevel() == adminCommand) {
-						mods.rerolls[CLAUSE_COMMAND] = Math.max(p.getSkill(SkillType.S_NEG).getLevel(), mods.rerolls[CLAUSE_COMMAND]);
-					} else {
-						mods.rerolls[CLAUSE_COMMAND] = p.getSkill(SkillType.S_NEG).getLevel();
-					}
-				}
-			}
-			if ((p.getPrimaryRole() == Person.T_ADMIN_TRA ||
-					p.getSecondaryRole() == Person.T_ADMIN_TRA) &&
-					p.getSkill(SkillType.S_ADMIN).getExperienceLevel() >= adminTransport) {
-				adminTransport = p.getSkill(SkillType.S_ADMIN).getExperienceLevel();
-				if (null != p.getSkill(SkillType.S_NEG)) {
-					if (p.getSkill(SkillType.S_ADMIN).getExperienceLevel() == adminTransport) {
-						mods.rerolls[CLAUSE_TRANSPORT] = Math.max(p.getSkill(SkillType.S_NEG).getLevel(), mods.rerolls[CLAUSE_TRANSPORT]);
-					} else {
-						mods.rerolls[CLAUSE_TRANSPORT] = p.getSkill(SkillType.S_NEG).getLevel();
-					}
-				}
-			}
-			if ((p.getPrimaryRole() == Person.T_ADMIN_LOG ||
-					p.getSecondaryRole() == Person.T_ADMIN_LOG) &&
-					p.getSkill(SkillType.S_ADMIN).getExperienceLevel() >= adminLogistics) {
-				adminLogistics = p.getSkill(SkillType.S_ADMIN).getExperienceLevel();
-				if (null != p.getSkill(SkillType.S_NEG)) {
-					if (p.getSkill(SkillType.S_ADMIN).getExperienceLevel() == adminLogistics) {
-						mods.rerolls[CLAUSE_SUPPORT] = Math.max(p.getSkill(SkillType.S_NEG).getLevel(), mods.rerolls[CLAUSE_SUPPORT]);
-					} else {
-						mods.rerolls[CLAUSE_SUPPORT] = p.getSkill(SkillType.S_NEG).getLevel();
-					}
-				}
-			}
-		}
+		Person adminCommand = campaign.findBestInRole(Person.T_ADMIN_COM, SkillType.S_ADMIN, SkillType.S_NEG);
+		Person adminTransport = campaign.findBestInRole(Person.T_ADMIN_TRA, SkillType.S_ADMIN, SkillType.S_NEG);
+		Person adminLogistics = campaign.findBestInRole(Person.T_ADMIN_LOG, SkillType.S_ADMIN, SkillType.S_NEG);
+		int adminCommandExp = (adminCommand == null)?SkillType.EXP_ULTRA_GREEN:adminCommand.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+		int adminTransportExp = (adminTransport == null)?SkillType.EXP_ULTRA_GREEN:adminTransport.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+		int adminLogisticsExp = (adminLogistics == null)?SkillType.EXP_ULTRA_GREEN:adminLogistics.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+		mods.rerolls[CLAUSE_COMMAND] = (adminCommand.getSkill(SkillType.S_NEG) == null)?0:
+			adminCommand.getSkill(SkillType.S_NEG).getLevel();
+		mods.rerolls[CLAUSE_TRANSPORT] = (adminTransport.getSkill(SkillType.S_NEG) == null)?0:
+			adminTransport.getSkill(SkillType.S_NEG).getLevel();
+		mods.rerolls[CLAUSE_SUPPORT] = (adminLogistics.getSkill(SkillType.S_NEG) == null)?0:
+			adminLogistics.getSkill(SkillType.S_NEG).getLevel();
 
 		/* Treat government units like merc units that have a retainer contract */
 		if ((!campaign.getFactionCode().equals("MERC") &&
@@ -698,10 +669,10 @@ public class ContractMarket implements Serializable {
 			}
 		}
 
-		mods.mods[CLAUSE_COMMAND] = adminCommand - SkillType.EXP_REGULAR;
+		mods.mods[CLAUSE_COMMAND] = adminCommandExp - SkillType.EXP_REGULAR;
 		mods.mods[CLAUSE_SALVAGE] = 0;
-		mods.mods[CLAUSE_TRANSPORT] = adminTransport - SkillType.EXP_REGULAR;
-		mods.mods[CLAUSE_SUPPORT] = adminLogistics - SkillType.EXP_REGULAR;
+		mods.mods[CLAUSE_TRANSPORT] = adminTransportExp - SkillType.EXP_REGULAR;
+		mods.mods[CLAUSE_SUPPORT] = adminLogisticsExp - SkillType.EXP_REGULAR;
 		if (unitRatingMod >= IUnitRating.DRAGOON_A) {
 			mods.mods[Compute.randomInt(4)] += 2;
 			mods.mods[Compute.randomInt(4)] += 2;
