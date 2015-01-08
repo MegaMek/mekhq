@@ -57,7 +57,6 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
@@ -125,7 +124,9 @@ public class ContractMarketDialog extends JDialog {
 		campaign = c;
 		contractMarket = c.getContractMarket();
 		possibleRetainerContracts = new ArrayList<String>();
-		countSuccessfulContracts();
+		if (c.getFactionCode().equals("MERC")) {
+			countSuccessfulContracts();
+		}
 		
         initComponents();
         setLocationRelativeTo(frame);
@@ -312,7 +313,9 @@ public class ContractMarketDialog extends JDialog {
 		tblContracts.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		tblContracts.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-				contractChanged(evt);
+				if (!evt.getValueIsAdjusting()) {
+					contractChanged();
+				}
 			}
 		});
 
@@ -491,7 +494,7 @@ public class ContractMarketDialog extends JDialog {
 	    setVisible(false);
 	}
 	
-    private void contractChanged(ListSelectionEvent evt) {
+    private void contractChanged() {
         int view = tblContracts.getSelectedRow();
         if(view < 0) {
             //selection got filtered away
