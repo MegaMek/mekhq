@@ -113,16 +113,15 @@ public class ContractMarket implements Serializable {
 		return c;
 	}
 
-	public int getRerolls(Contract c, int clause) {
+	public int getRerollsUsed(Contract c, int clause) {
 		if (null != clauseMods.get(c.getId())) {
-			return clauseMods.get(c.getId()).rerolls[clause];
+			return clauseMods.get(c.getId()).rerollsUsed[clause];
 		}
 		return 0;
 	}
 
 	public void rerollClause(AtBContract c, int clause, Campaign campaign) {
-		if (null != clauseMods.get(c.getId()) &&
-				clauseMods.get(c.getId()).rerolls[clause] > 0) {
+		if (null != clauseMods.get(c.getId())) {
 			switch (clause) {
 			case CLAUSE_COMMAND:
 				rollCommandClause(c, clauseMods.get(c.getId()).mods[clause]);
@@ -137,7 +136,7 @@ public class ContractMarket implements Serializable {
 				rollSupportClause(c, clauseMods.get(c.getId()).mods[clause]);
 				break;
 			}
-			clauseMods.get(c.getId()).rerolls[clause]--;
+			clauseMods.get(c.getId()).rerollsUsed[clause]++;
 			c.calculateContract(campaign);
 		}
 	}
@@ -641,12 +640,6 @@ public class ContractMarket implements Serializable {
 		int adminCommandExp = (adminCommand == null)?SkillType.EXP_ULTRA_GREEN:adminCommand.getSkill(SkillType.S_ADMIN).getExperienceLevel();
 		int adminTransportExp = (adminTransport == null)?SkillType.EXP_ULTRA_GREEN:adminTransport.getSkill(SkillType.S_ADMIN).getExperienceLevel();
 		int adminLogisticsExp = (adminLogistics == null)?SkillType.EXP_ULTRA_GREEN:adminLogistics.getSkill(SkillType.S_ADMIN).getExperienceLevel();
-		mods.rerolls[CLAUSE_COMMAND] = (adminCommand.getSkill(SkillType.S_NEG) == null)?0:
-			adminCommand.getSkill(SkillType.S_NEG).getLevel();
-		mods.rerolls[CLAUSE_TRANSPORT] = (adminTransport.getSkill(SkillType.S_NEG) == null)?0:
-			adminTransport.getSkill(SkillType.S_NEG).getLevel();
-		mods.rerolls[CLAUSE_SUPPORT] = (adminLogistics.getSkill(SkillType.S_NEG) == null)?0:
-			adminLogistics.getSkill(SkillType.S_NEG).getLevel();
 
 		/* Treat government units like merc units that have a retainer contract */
 		if ((!campaign.getFactionCode().equals("MERC") &&
@@ -655,8 +648,6 @@ public class ContractMarket implements Serializable {
 			for (int i = 0; i < CLAUSE_NUM; i++) {
 				mods.mods[i]++;
 			}
-			// Command is fixed at integrated
-			mods.rerolls[CLAUSE_COMMAND] = 0;
 		}
 
 		if (campaign.getCampaignOptions().isMercSizeLimited() &&
@@ -795,11 +786,11 @@ public class ContractMarket implements Serializable {
         	String rerolls = "";
         	String mods = "";
         	for (int i = 0; i < CLAUSE_NUM; i++) {
-        		rerolls += clauseMods.get(key).rerolls[i] + ((i < CLAUSE_NUM - 1)?",":"");
+        		rerolls += clauseMods.get(key).rerollsUsed[i] + ((i < CLAUSE_NUM - 1)?",":"");
         		mods += clauseMods.get(key).mods[i] + ((i < CLAUSE_NUM - 1)?",":"");
         	}
         	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "mods", mods);
-        	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "rerolls", rerolls);
+        	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "rerollsUsed", rerolls);
         	pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</clauseMods>");
         }
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</contractMarket>");
@@ -844,10 +835,10 @@ public class ContractMarket implements Serializable {
                 			for (int j = 0; j < s.length; j++) {
                 				cm.mods[j] = Integer.parseInt(s[j]);
                 			}
-                		} else if (wn3.getNodeName().equalsIgnoreCase("rerolls")) {
+                		} else if (wn3.getNodeName().equalsIgnoreCase("rerollsUsed")) {
                 			String [] s = wn3.getTextContent().split(",");
                 			for (int j = 0; j < s.length; j++) {
-                				cm.rerolls[j] = Integer.parseInt(s[j]);
+                				cm.rerollsUsed[j] = Integer.parseInt(s[j]);
                 			}
                 		}
                 	}
@@ -869,7 +860,7 @@ public class ContractMarket implements Serializable {
      * the random clause bonuses should be persistent.
      */
     public class ClauseMods {
-    	public int[] rerolls = {0, 0, 0, 0};
+    	public int[] rerollsUsed = {0, 0, 0, 0};
     	public int[] mods = {0, 0, 0, 0};
     }
 }
