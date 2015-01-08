@@ -2835,7 +2835,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public String getTechDesc(boolean overtimeAllowed, Part part) {
         String toReturn = "<html><font size='2'><b>" + getFullName() + "</b><br/>";
-        if (getTechUnitIDs().contains(part.getUnitId())) {
+        if (null != part && getTechUnitIDs().contains(part.getUnitId())) {
             toReturn = "<html><font size='2' color='green'><b>@" + getFullName() + "</b><br/>";
         }
         Skill mechSkill = getSkill(SkillType.S_TECH_MECH);
