@@ -9,6 +9,7 @@ v0.3.10-dev (SVN)
 + Bug: [#688]: ATB contract generation causes NPE 
 + Bug: (AtB) Incorrectly computes maximum number of subcontract offers
 	Only offer subcontracts that do not last beyond the ending date of the main contract.
++ Bug: [#669]: ATB : Base attack (defender) scenario generated with no opfor 
 
 v0.3.9 (2015-01-01 21:25 UTC)
 + Bug: packaging.xml was renaming mhq's hitory.txt to history-mm.txt due to change in where mm docs are copied to
