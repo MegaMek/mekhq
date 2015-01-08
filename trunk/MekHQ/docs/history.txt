@@ -16,6 +16,7 @@ v0.3.10-dev (SVN)
 + Feature: Salvaged mechs that were using individual camos now import with those individual camos
 + Bug: Individual camo reset after unit participates in a battle
 + Bug: [#639]: 0.3.6 : ATB : Negotiation bugs
++ Bug: Retainer contract offers are visible in the contract market dialog even when not playing a mercenary unit.
 
 v0.3.9 (2015-01-01 21:25 UTC)
 + Bug: packaging.xml was renaming mhq's hitory.txt to history-mm.txt due to change in where mm docs are copied to
