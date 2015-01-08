@@ -1038,8 +1038,10 @@ public class AtBScenario extends Scenario {
 				}
 			}
 
-			/* Ally deploys 2 lances of a lighter weight class than the player */
-			int allyForce = Math.max(getLance(campaign).getWeightClass(campaign) - 1, 0);
+			/* Ally deploys 2 lances of a lighter weight class than the player. We subtract one more
+			 * to convert from EntityWeightClass (0 = ultra-light, 1 = light) to UnitTableData (0 = light)
+			 */
+			int allyForce = Math.max(getLance(campaign).getWeightClass(campaign) - 2, 0);
 			addLance(allyBot, getContract(campaign).getEmployerCode(),
 					getContract(campaign).getAllySkill(), getContract(campaign).getAllyQuality(),
 					allyForce, campaign);
