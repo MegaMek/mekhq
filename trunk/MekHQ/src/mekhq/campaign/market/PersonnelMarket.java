@@ -402,17 +402,11 @@ public class PersonnelMarket {
 							}
 						}
 
-						int adminHR = SkillType.EXP_ULTRA_GREEN;
-						for (Person a :c.getAdmins()) {
-							if ((a.getPrimaryRole() == Person.T_ADMIN_HR ||
-									a.getSecondaryRole() == Person.T_ADMIN_HR) &&
-									a.getSkill(SkillType.S_ADMIN).getExperienceLevel() > adminHR) {
-								adminHR = a.getSkill(SkillType.S_ADMIN).getExperienceLevel();
-							}
-						}
+						Person adminHR = c.findBestInRole(Person.T_ADMIN_HR, SkillType.S_ADMIN);
+						int adminHRExp = (adminHR == null)?SkillType.EXP_ULTRA_GREEN:adminHR.getSkill(SkillType.S_ADMIN).getExperienceLevel();
 						int gunneryMod = 0;
 						int pilotingMod = 0;
-						switch (adminHR) {
+						switch (adminHRExp) {
 						case SkillType.EXP_ULTRA_GREEN:
 							gunneryMod = -1;
 							pilotingMod = -1;
@@ -869,15 +863,9 @@ public class PersonnelMarket {
 			mod -= 3;
 		}
 
-		int adminHR = SkillType.EXP_ULTRA_GREEN;
-		for (Person a :c.getAdmins()) {
-			if ((a.getPrimaryRole() == Person.T_ADMIN_HR ||
-					a.getSecondaryRole() == Person.T_ADMIN_HR) &&
-					a.getSkill(SkillType.S_ADMIN).getExperienceLevel() > adminHR) {
-				adminHR = a.getSkill(SkillType.S_ADMIN).getExperienceLevel();
-			}
-		}
-		mod += adminHR - 2;
+		Person adminHR = c.findBestInRole(Person.T_ADMIN_HR, SkillType.S_ADMIN);
+		int adminHRExp = (adminHR == null)?SkillType.EXP_ULTRA_GREEN:adminHR.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+		mod += adminHRExp - 2;
 		int q = 0;
 		int r = Compute.d6(2) + mod;
 		if (r > 15) {
@@ -910,15 +898,16 @@ public class PersonnelMarket {
     
     public TargetRoll getShipSearchTarget(Campaign campaign, boolean jumpship) {
     	TargetRoll target = new TargetRoll(jumpship?12:10, "Base");
-    	int adminLog = SkillType.EXP_ULTRA_GREEN;
+		Person adminLog = campaign.findBestInRole(Person.T_ADMIN_LOG, SkillType.S_ADMIN);
+		int adminLogExp = (adminLog == null)?SkillType.EXP_ULTRA_GREEN:adminLog.getSkill(SkillType.S_ADMIN).getExperienceLevel();
     	for (Person p : campaign.getAdmins()) {
 			if ((p.getPrimaryRole() == Person.T_ADMIN_LOG ||
 					p.getSecondaryRole() == Person.T_ADMIN_LOG) &&
-					p.getSkill(SkillType.S_ADMIN).getExperienceLevel() > adminLog) {
-				adminLog = p.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+					p.getSkill(SkillType.S_ADMIN).getExperienceLevel() > adminLogExp) {
+				adminLogExp = p.getSkill(SkillType.S_ADMIN).getExperienceLevel();
 			}
     	}
-    	target.addModifier(SkillType.EXP_REGULAR - adminLog, "Admin/Logistics");
+    	target.addModifier(SkillType.EXP_REGULAR - adminLogExp, "Admin/Logistics");
     	target.addModifier(IUnitRating.DRAGOON_C - campaign.getUnitRatingMod(),
     			"Unit Rating");
     	return target;

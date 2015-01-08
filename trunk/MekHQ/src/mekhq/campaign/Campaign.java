@@ -1173,7 +1173,44 @@ public class Campaign implements Serializable {
         return toReturn;
     }
 
-    /**
+	/**
+	 * Finds the active person in a particular role with the highest level
+	 * in a given, with an optional secondary skill to break ties.
+	 * 
+	 * @param role One of the Person.T_* constants
+	 * @param primary	The skill to use for comparison.
+	 * @param secondary If not null and there is more than one person tied for
+	 * 					the most the highest, preference will be given to the one
+	 * 					with a higher level in the secondary skill.
+	 * @return The admin in the designated role with the most experience.
+	 */
+	public Person findBestInRole(int role, String primary, String secondary) {
+		int highest = 0;
+		Person retVal = null;
+		for (Person p : getPersonnel()) {
+			if (p.isActive() && (p.getPrimaryRole() == role || p.getSecondaryRole() == role)
+					&& p.getSkill(primary) != null) {
+				if (p.getSkill(primary).getLevel() > highest) {
+					retVal = p;
+				} else if (secondary != null && p.getSkill(primary).getExperienceLevel() == highest &&
+						/* If the skill level of the current person is the same as the previous highest,
+						 * select the current instead under the following conditions: */
+						(retVal == null || //None has been selected yet (current has level 0)
+						retVal.getSkill(secondary) == null || //Previous selection does not have secondary skill
+						(p.getSkill(secondary) != null //Current has secondary skill and it is higher than the previous.
+							&& p.getSkill(secondary).getLevel() > retVal.getSkill(secondary).getLevel()))) {
+					retVal = p;
+				}
+			}
+		}
+		return retVal;
+	}
+	
+	public Person findBestInRole(int role, String skill) {
+		return findBestInRole(role, skill, null);
+	}
+
+   /**
      * Returns a list of active technicians.
      *
      * @param noZeroMinute If TRUE, then techs with no time remaining will be excluded from the list.
@@ -5466,15 +5503,9 @@ public class Campaign implements Serializable {
 			return contract.getPartsAvailabilityLevel();
 		}
 		/* If contract is still null, the unit is not in a contract.*/
-		int adminMod = SkillType.EXP_ULTRA_GREEN;
-		for (Person p :getAdmins()) {
-			if ((p.getPrimaryRole() == Person.T_ADMIN_LOG ||
-					p.getSecondaryRole() == Person.T_ADMIN_LOG) &&
-					p.getSkill(SkillType.S_ADMIN).getExperienceLevel() > adminMod) {
-				adminMod = p.getSkill(SkillType.S_ADMIN).getExperienceLevel();
-			}
-		}
-		return getUnitRatingMod() + adminMod - SkillType.EXP_REGULAR;
+		Person adminLog = findBestInRole(Person.T_ADMIN_LOG, SkillType.S_ADMIN);
+		int adminLogExp = (adminLog == null)?SkillType.EXP_ULTRA_GREEN:adminLog.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+		return getUnitRatingMod() + adminLogExp - SkillType.EXP_REGULAR;
 	}
 
     public void resetAstechMinutes() {

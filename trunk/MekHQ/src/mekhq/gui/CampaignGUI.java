@@ -3338,36 +3338,18 @@ public class CampaignGUI extends JPanel {
                                             && getCampaign().getFinances()
                                                     .getBalance() >= rdd
                                                     .totalPayout()) {
-                                        Person[] bestAdmins = new Person[4];
-                                        for (Person p : getCampaign()
-                                                .getAdmins()) {
-                                            int i = p.getPrimaryRole()
-                                                    - Person.T_ADMIN_COM;
-                                            if (i < 0 || i > 3) {
-                                                i = p.getSecondaryRole()
-                                                        - Person.T_ADMIN_COM;
-                                            }
-                                            if (null == bestAdmins[i]
-                                                    || (null != p
-                                                            .getSkill(SkillType.S_ADMIN) && p
-                                                            .getSkill(
-                                                                    SkillType.S_ADMIN)
-                                                            .getLevel() > bestAdmins[i]
-                                                            .getSkill(
-                                                                    SkillType.S_ADMIN)
-                                                            .getLevel())) {
-                                                bestAdmins[i] = p;
-                                            }
-                                        }
-                                        for (Person p : bestAdmins) {
-                                            if (null != p) {
-                                                p.setXp(p.getXp() + 1);
+                                    	final int[] admins = {Person.T_ADMIN_COM, Person.T_ADMIN_HR,
+                                    			Person.T_ADMIN_LOG, Person.T_ADMIN_TRA};
+                                    	for (int role : admins) {
+                                    		Person admin = getCampaign().findBestInRole(role, SkillType.S_ADMIN);
+                                    		if (admin != null) {
+                                                admin.setXp(admin.getXp() + 1);
                                                 getCampaign()
                                                         .addReport(
-                                                                p.getHyperlinkedName()
-                                                                        + " has gained 1 XP.");
-                                            }
-                                        }
+                                                                admin.getHyperlinkedName()
+                                                                        + " has gained 1 XP.");                                   			
+                                    		}
+                                    	}
                                     }
                                     if (!getCampaign().applyRetirement(
                                             rdd.totalPayout(),
