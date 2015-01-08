@@ -518,8 +518,10 @@ public class ContractMarketDialog extends JDialog {
              scrollContractView.setViewportView(null);
              return;
          }
-         contractView = new ContractSummaryPanel(selectedContract,
-        		 campaign, campaign.getCampaignOptions().getUseAtB());
+         contractView = new ContractSummaryPanel(selectedContract, campaign,
+        		 campaign.getCampaignOptions().getUseAtB() &&
+        		 selectedContract instanceof AtBContract &&
+        		 !((AtBContract)selectedContract).isSubcontract());
     	 scrollContractView.setViewportView(contractView);
  		//This odd code is to make sure that the scrollbar stays at the top
  		//I cant just call it here, because it ends up getting reset somewhere later

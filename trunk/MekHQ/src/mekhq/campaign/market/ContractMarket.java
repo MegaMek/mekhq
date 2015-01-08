@@ -260,13 +260,13 @@ public class ContractMarket implements Serializable {
 					numSubcontracts++;
 				}
 			}
-			if (numSubcontracts >= unitRatingMod - 1) {
-				return;
-			}
-			if (Compute.d6(2) >= 10) {
-				AtBContract sub = generateAtBSubcontract(campaign, contract, unitRatingMod);
-				if (sub.getEndingDate().before(contract.getEndingDate())) {
-					contracts.add(sub);
+			for (int i = numSubcontracts; i < unitRatingMod - 1; i++) {
+				int roll = Compute.d6(2);
+				if (roll >= 10) {
+					AtBContract sub = generateAtBSubcontract(campaign, contract, unitRatingMod);
+					if (sub.getEndingDate().before(contract.getEndingDate())) {
+						contracts.add(sub);
+					}
 				}
 			}
 		}
@@ -781,6 +781,9 @@ public class ContractMarket implements Serializable {
             c.writeToXml(pw1, indent + 1);
         }
         for (Integer key : clauseMods.keySet()) {
+        	if (!contracts.contains(key)) {
+        		continue;
+        	}
         	pw1.println(MekHqXmlUtil.indentStr(indent+1)
         			+ "<clauseMods id=\"" + key + "\">");
         	String rerolls = "";
