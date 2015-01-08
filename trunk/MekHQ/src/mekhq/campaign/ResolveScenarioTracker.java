@@ -1322,7 +1322,9 @@ public class ResolveScenarioTracker {
         }
 
         public String getDesc() {
-            Unit unit = new Unit(entity, this.unit.campaign);
+            // Commenting out since I can't remember why I added it... and it's weird to create a new unit when we have a unit!
+            // It's also causing bugs with individual camos - ralgith
+            // Unit unit = new Unit(entity, this.unit.campaign);
             String color = "black";
             if (!unit.isRepairable()) {
                 color = "rgb(190, 150, 55)";
