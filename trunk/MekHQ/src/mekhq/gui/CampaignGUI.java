@@ -3634,6 +3634,9 @@ public class CampaignGUI extends JPanel {
             if (null == acquisition) {
                 return;
             }
+            if(acquisition instanceof AmmoBin) {
+                acquisition = ((AmmoBin) acquisition).getAcquisitionWork();
+            }
             String report = acquisition.find(0);
             if (report.endsWith("0 days.")) {
                 AtBContract contract = getCampaign().getAttachedAtBContract(
