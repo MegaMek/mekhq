@@ -22,7 +22,13 @@ v0.3.10-dev (SVN)
 + Bug: [#767]: Contract ended, retirement payout window not processing
 		Also set final payout amount to zero for retiring infantry that are not assigned to a unit. 
 + Bug: [#757] ATB - Incorrect Map Sizes 
-+ Bug: [#727]: [AtB] Pilot retiring while mech deployed 
++ Bug: [#727]: [AtB] Pilot retiring while mech deployed
++ Bug: [#633]: [AtB] 0.3.6 : Jump platoons on scout scenarios deploy incorrectly
+	Made the following related changes as well:
+      + Use jump movement for all conventional and battlearmor infantry
+      + Use walking + 1 for jump-capable 'Mechs
+      + Apply scout lance delay to attached allies as well
+      + Ignore delayed deployment when making a combat drop
 
 v0.3.9 (2015-01-01 21:25 UTC)
 + Bug: packaging.xml was renaming mhq's hitory.txt to history-mm.txt due to change in where mm docs are copied to

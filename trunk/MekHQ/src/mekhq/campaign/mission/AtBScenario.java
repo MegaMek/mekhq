@@ -192,6 +192,7 @@ public class AtBScenario extends Scenario {
 	private float gravity;
 	private int start;
 	private int deploymentDelay;
+	private boolean dropshipRequired;
 	private int mapSizeX, mapSizeY;
 	private String map;
 	private int lanceCount;	
@@ -246,6 +247,7 @@ public class AtBScenario extends Scenario {
 		atmosphere = PlanetaryConditions.ATMO_STANDARD;
 		gravity = (float)1.0;
 		deploymentDelay = 0;
+		dropshipRequired = false;
 		lanceCount = 0;
 		rerollsRemaining = 0;
 	}
@@ -1129,6 +1131,33 @@ public class AtBScenario extends Scenario {
 							UnitMarket.getRandomWeight(UnitTableData.UNIT_MECH, getContract(campaign).getEnemyCode(),
 								campaign.getCampaignOptions().getRegionalMechVariations()),
 							UnitTableData.WT_ASSAULT, campaign, 6);
+				}
+			} else if (getLanceRole() == Lance.ROLE_SCOUT) {
+				/* Set allied forces to deploy in (6 - speed) turns just as player's units,
+				 * but only if not deploying by dropship.
+				 */
+				int speed;
+				for (Entity entity : alliesPlayer) {
+            		speed = entity.getWalkMP();
+            		if (entity.getJumpMP() > 0) {
+	            		if (entity instanceof megamek.common.Infantry) {
+	            			speed = entity.getJumpMP();
+	            		} else {
+	            			speed++;
+	            		}
+            		}
+                	entity.setDeployRound(Math.max(0, 6 - speed));					
+				}
+				for (Entity entity : allyBot) {
+            		speed = entity.getWalkMP();
+            		if (entity.getJumpMP() > 0) {
+	            		if (entity instanceof megamek.common.Infantry) {
+	            			speed = entity.getJumpMP();
+	            		} else {
+	            			speed++;
+	            		}
+            		}
+                	entity.setDeployRound(Math.max(0, 6 - speed));					
 				}
 			}
 		}
