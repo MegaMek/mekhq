@@ -591,9 +591,11 @@ public class RetirementDefectionDialog extends JDialog {
 							hqView.getCampaign().getUnit(p.getOriginalUnitId()).getBuyCost()));
 				}
 			}
-			/* Infantry retire/defect as a unit */
-			if (p.getPrimaryRole() == Person.T_INFANTRY ||
-					p.getPrimaryRole() == Person.T_BA) {
+			/* For infantry, the unit commander makes a retirement roll on behalf of the
+			 * entire unit. Unassigned infantry can retire individually.
+			 */
+			if (p.getUnitId() != null && (p.getPrimaryRole() == Person.T_INFANTRY ||
+					p.getPrimaryRole() == Person.T_BA)) {
 				unitAssignments.put(id, p.getUnitId());
 			}
 			((UnitAssignmentTableModel)unitAssignmentTable.getModel()).setData(availableUnits);
