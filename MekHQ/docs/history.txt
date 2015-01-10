@@ -22,6 +22,7 @@ v0.3.10-dev (SVN)
 + Bug: [#767]: Contract ended, retirement payout window not processing
 		Also set final payout amount to zero for retiring infantry that are not assigned to a unit. 
 + Bug: [#757] ATB - Incorrect Map Sizes 
++ Bug: [#727]: [AtB] Pilot retiring while mech deployed 
 
 v0.3.9 (2015-01-01 21:25 UTC)
 + Bug: packaging.xml was renaming mhq's hitory.txt to history-mm.txt due to change in where mm docs are copied to
