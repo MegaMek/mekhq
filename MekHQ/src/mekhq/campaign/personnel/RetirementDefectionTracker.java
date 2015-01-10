@@ -83,9 +83,8 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 			netWorth = (Long)(df.parse(m.group(1)));
 			if (campaign.getCampaignOptions().getSharesExcludeLargeCraft()) {
 				p = Pattern.compile("Large Craft\\D*(.*)");
-				m = p.matcher(financialReport);
-				m.find();
-				if (null != m.group(1)) {
+				m = p.matcher(financialReport);				
+				if (m.find() && null != m.group(1)) {
 					netWorth -= (Long)(df.parse(m.group(1)));
 				}
 			}
@@ -223,7 +222,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     			//Bonus payments handled by dialog
     		}
     		if (p.getPrimaryRole() == Person.T_INFANTRY) {
-    			target.addModifier(-1, "Infantry Platoon");
+    			target.addModifier(-1, "Infantry");
     		}
     		int injuryMod = 0;
     		for (Injury i : p.getInjuries()) {
@@ -454,7 +453,9 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 				stolenUnit = true;
 			} else {
 				if (p.getProfession() == Ranks.RPROF_INF) {
-					cbills = 50000;
+					if (p.getUnitId() != null) {
+						cbills = 50000;
+					}
 				} else {
 					cbills = getBonusCost(p);
 					if (p.getRank().isOfficer()) {

@@ -18,7 +18,9 @@ v0.3.10-dev (SVN)
 + Bug: [#639]: 0.3.6 : ATB : Negotiation bugs
 + Bug: Retainer contract offers are visible in the contract market dialog even when not playing a mercenary unit
 + Stop de-selecting pieces of the TO&E when a change is made that refreshes it
-+ Bug: [#708]: ATB : Use bonus part does nothing if ammo is selected in the acquistion tab 
++ Bug: [#708]: ATB : Use bonus part does nothing if ammo is selected in the acquistion tab
++ Bug: [#767]: Contract ended, retirement payout window not processing
+		Also set final payout amount to zero for retiring infantry that are not assigned to a unit. 
 
 v0.3.9 (2015-01-01 21:25 UTC)
 + Bug: packaging.xml was renaming mhq's hitory.txt to history-mm.txt due to change in where mm docs are copied to
