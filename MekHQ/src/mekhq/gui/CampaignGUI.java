@@ -3347,7 +3347,7 @@ public class CampaignGUI extends JPanel {
                                                 getCampaign()
                                                         .addReport(
                                                                 admin.getHyperlinkedName()
-                                                                        + " has gained 1 XP.");                                   			
+                                                                        + " has gained 1 XP.");
                                     		}
                                     	}
                                     }
@@ -6452,7 +6452,10 @@ public class CampaignGUI extends JPanel {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 orgTree.updateUI();
-                orgTree.setSelectionPath(null);
+                // This seems like bad juju since it makes it annoying as hell to
+                // add multiple units to a force if it's de-selected every single time
+                // So, commenting it out - ralgith
+                // orgTree.setSelectionPath(null);
                 refreshForceView();
                 if (getCampaign().getCampaignOptions().getUseAtB()) {
                     refreshLanceAssignments();
