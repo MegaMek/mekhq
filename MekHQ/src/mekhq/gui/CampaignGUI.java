@@ -6001,8 +6001,15 @@ public class CampaignGUI extends JPanel {
                         int slowest = 12;
                         for (UUID id : units) {
                             if (chosen.contains(getCampaign().getUnit(id))) {
-                                slowest = Math.min(slowest, getCampaign()
-                                        .getUnit(id).getEntity().getWalkMP());
+                            	int speed = getCampaign().getUnit(id).getEntity().getWalkMP();
+                            	if (getCampaign().getUnit(id).getEntity().getJumpMP() > 0) {
+                            		if (getCampaign().getUnit(id).getEntity() instanceof megamek.common.Infantry) {
+                            			speed = getCampaign().getUnit(id).getEntity().getJumpMP(); 
+                            		} else {
+                            			speed++;
+                            		}
+                            	}
+                                slowest = Math.min(slowest, speed);
                             }
                         }
                         int deployRound = 12 - slowest;
