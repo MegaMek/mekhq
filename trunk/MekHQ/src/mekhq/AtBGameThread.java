@@ -107,7 +107,7 @@ public class AtBGameThread extends GameThread {
     				Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
                 }
 
-                MapSettings mapSettings = new MapSettings(scenario.getMapX(), scenario.getMapY(), 1, 1);
+                MapSettings mapSettings = new MapSettings();
                 File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml");
                 if (campaign.getCampaignOptions().getUseAltMapgen()) {
                 	File alt = new File("data/mapgen/" + scenario.getMap() + " - Jazz.xml");
@@ -121,6 +121,8 @@ public class AtBGameThread extends GameThread {
                 	MekHQ.logError("Could not load map file data/mapgen/" + scenario.getMap() + ".xml");
                 	MekHQ.logError(ex);
                 }
+                mapSettings.setBoardSize(scenario.getMapX(), scenario.getMapY());
+                mapSettings.setMapSize(1,  1);
                 mapSettings.getBoardsSelectedVector().clear();
                 mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
                 client.sendMapSettings(mapSettings);
