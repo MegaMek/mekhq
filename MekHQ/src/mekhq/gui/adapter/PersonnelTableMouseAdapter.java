@@ -1190,9 +1190,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             /*
              * if(!person.isAssigned()) { cbMenuItem.setSelected(true); }
              */
-            cbMenuItem.setActionCommand("REMOVE_UNIT|" + -1);
-            cbMenuItem.addActionListener(this);
-            menu.add(cbMenuItem);
             if (oneSelected && person.isActive()
                     && !(person.isPrisoner() || person.isBondsman())) {
                 for (Unit unit : gui.getCampaign().getUnits()) {
@@ -1477,6 +1474,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 menu.setEnabled(!person.isDeployed());
                 popup.add(menu);
             }
+            cbMenuItem.setActionCommand("REMOVE_UNIT|" + -1);
+            cbMenuItem.addActionListener(this);
+            menu.add(cbMenuItem);
             if (oneSelected && person.isActive()) {
                 if (person.getAge(gui.getCampaign().getCalendar()) > 13
                         && person.getSpouseID() == null) {
