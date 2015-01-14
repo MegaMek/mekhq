@@ -147,14 +147,14 @@ public class MekHqXmlUtil {
         		 && tgtEnt.getCamoCategory() != IPlayer.NO_CAMO
         		 && !tgtEnt.getCamoCategory().isEmpty()) {
              retVal += "\" camoCategory=\"";
-             retVal += tgtEnt.getCamoCategory();
+             retVal += String.valueOf(escape(tgtEnt.getCamoCategory()));
          }
 
          if (null != tgtEnt.getCamoFileName()
         		 && tgtEnt.getCamoFileName() != IPlayer.NO_CAMO
         		 && !tgtEnt.getCamoFileName().isEmpty()) {
              retVal += "\" camoFileName=\"";
-             retVal += tgtEnt.getCamoFileName();
+             retVal += String.valueOf(escape(tgtEnt.getCamoFileName()));
          }
 
 		retVal += "\">\n";
