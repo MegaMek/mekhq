@@ -27,5 +27,6 @@
 	<classpathentry kind="lib" path="lib/Ostermiller.jar"/>
 	<classpathentry kind="lib" path="lib/TabPanel.jar"/>
 	<classpathentry kind="lib" path="lib/vecmath.jar"/>
+	<classpathentry kind="lib" path="MegaMek.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
