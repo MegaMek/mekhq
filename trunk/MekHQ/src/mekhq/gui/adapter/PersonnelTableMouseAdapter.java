@@ -1186,7 +1186,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             JMenu soldierMenu = new JMenu("As Soldier");
             JMenu techMenu = new JMenu("As Tech");
             JMenu navMenu = new JMenu("As Navigator");
-            cbMenuItem = new JCheckBoxMenuItem("None");
             /*
              * if(!person.isAssigned()) { cbMenuItem.setSelected(true); }
              */
@@ -1474,6 +1473,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 menu.setEnabled(!person.isDeployed());
                 popup.add(menu);
             }
+            cbMenuItem = new JCheckBoxMenuItem("None");
             cbMenuItem.setActionCommand("REMOVE_UNIT|" + -1);
             cbMenuItem.addActionListener(this);
             menu.add(cbMenuItem);
