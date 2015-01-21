@@ -38,9 +38,9 @@ import mekhq.campaign.universe.Planet;
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class InterstellarMapPanel extends javax.swing.JPanel {
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -1110105822399704646L;
 
@@ -52,21 +52,21 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 	private Planet selectedPlanet = null;
 	Point lastMousePos = null;
     int mouseMod = 0;
-	
+
 	public InterstellarMapPanel(Campaign c, CampaignGUI view) {
 		campaign = c;
 		planets = campaign.getPlanets();
 		hqview = view;
 		jumpPath = new JumpPath();
-		
+
 		setBorder(BorderFactory.createLineBorder(Color.black));
-        
+
 		//TODO: get the key listener working
 		addKeyListener(new KeyAdapter() {
 			/** Handle the key pressed event from the text field. */
 			public void keyPressed(KeyEvent e) {
 				int keyCode = e.getKeyCode();
-	        
+
 				if (keyCode == 37)// left arrow
 		        {
 		        	conf.offset.y -= conf.scale;
@@ -85,9 +85,9 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 		        repaint();
 			}
 		});
-		
+
         addMouseListener(new MouseAdapter() {
-        	
+
         	public void mouseEntered(MouseEvent e) {
                 lastMousePos = new Point(e.getX(), e.getY());
             }
@@ -95,18 +95,18 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
             public void mouseExited(MouseEvent e) {
                 lastMousePos = null;
             }
-            
+
             public void mouseReleased(MouseEvent e) {
             	maybeShowPopup(e);
                 mouseMod = 0;
             }
-            
+
             public void mousePressed(MouseEvent e) {
             	maybeShowPopup(e);
             	mouseMod = e.getButton();
-            }          
-            
-     
+            }
+
+
             public void maybeShowPopup(MouseEvent e) {
                 if (e.isPopupTrigger()) {
                 	JPopupMenu popup = new JPopupMenu();
@@ -173,7 +173,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                             public void actionPerformed(ActionEvent ae) {
                                 campaign.getLocation().setCurrentPlanet(selectedPlanet);
                                 campaign.getLocation().setTransitTime(0.0);
-                                campaign.getLocation().setJumpPath(null);                    
+                                campaign.getLocation().setJumpPath(null);
                                 jumpPath = new JumpPath();
                                 center(selectedPlanet);
                                 hqview.refreshLocation();
@@ -185,17 +185,17 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                 	popup.show(e.getComponent(), e.getX() + 10, e.getY() + 10);
                 }
             }
-                
+
             public void mouseClicked(MouseEvent e) {
             	if (e.getButton() == MouseEvent.BUTTON1) {
-        		
+
             		if (e.getClickCount() >= 2) {
             			//center and zoom
-            			changeSelectedPlanet(nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY())));  
+            			changeSelectedPlanet(nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY())));
             			if(conf.scale < 4.0) {
             				conf.scale = 4.0;
             			}
-            			center(selectedPlanet);             	
+            			center(selectedPlanet);
             		} else {
             			Planet target = nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY()));
                         if(null == target) {
@@ -208,7 +208,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                     		repaint();
                     		hqview.refreshPlanetView();
                     		return;
-                        	
+
                         }
                         else if(e.isShiftDown()) {
                         	//add to the existing jump path
@@ -232,21 +232,22 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
             	}
             }
         });
-        
+
         addMouseMotionListener(new MouseAdapter() {
-        	
+
         	public void mouseDragged(MouseEvent e) {
                 if (mouseMod != MouseEvent.BUTTON1) {
                    return;
                 }
-                //TODO: dragging is too fast and awkward
                 if (lastMousePos != null) {
                     conf.offset.x -= lastMousePos.x - e.getX();
                     conf.offset.y -= lastMousePos.y - e.getY();
+                    lastMousePos.x = e.getX();
+                    lastMousePos.y = e.getY();
                 }
                 repaint();
             }
-        	
+
         	public void mouseMoved(MouseEvent e) {
 
                 if (lastMousePos == null) {
@@ -257,25 +258,25 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                 }
             }
         });
-        
+
         addMouseWheelListener(new MouseAdapter() {
         	 public void mouseWheelMoved(MouseWheelEvent e) {
         		 zoom(Math.pow(1.5,-1 * e.getWheelRotation()));
         	 }
         });
 	}
-	
+
 	public void setCampaign(Campaign c) {
 		this.campaign = c;
 		this.planets = campaign.getPlanets();
 		repaint();
 	}
-	
+
 	public void setJumpPath(JumpPath path) {
 		jumpPath = path;
 		repaint();
 	}
-	
+
 	/**
      * Computes the map-coordinate from the screen koordinate system
      */
@@ -294,17 +295,17 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
     private double map2scrY(double y) {
         return Math.round(getHeight() / 2 - y * conf.scale) + conf.offset.y;
     }
-    
+
     public void setSelectedPlanet(Planet p) {
     	selectedPlanet = p;
     	if(conf.scale < 4.0) {
 			conf.scale = 4.0;
 		}
-		center(selectedPlanet);      
+		center(selectedPlanet);
     	repaint();
     }
 
-	
+
 	protected void paintComponent(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
 		g2.setColor(Color.BLACK);
@@ -320,14 +321,14 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 			double jumpRadius = (z - x);
 			g2.setPaint(Color.DARK_GRAY);
 			arc.setArcByCenter(x, y, jumpRadius, 0, 360, Arc2D.OPEN);
-			g2.fill(arc);	
+			g2.fill(arc);
         }
-        	
+
       //draw a jump path
-		for(int i = 0; i < jumpPath.size(); i++) {	
+		for(int i = 0; i < jumpPath.size(); i++) {
 			Planet planetB = jumpPath.get(i);
 			double x = map2scrX(planetB.getX());
-			double y = map2scrY(planetB.getY());		
+			double y = map2scrY(planetB.getY());
 			//lest try rings
 			g2.setPaint(Color.WHITE);
 			arc.setArcByCenter(x, y, size * 1.8, 0, 360, Arc2D.OPEN);
@@ -347,14 +348,14 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 				g2.draw(new Line2D.Double(map2scrX(planetA.getX()), map2scrY(planetA.getY()), map2scrX(planetB.getX()), map2scrY(planetB.getY())));
 			}
 		}
-		
+
 		//check to see if the unit is traveling on a jump path currently and if so
 		//draw this one too, in a different color
 		if(null != campaign.getLocation().getJumpPath()) {
-			for(int i = 0; i < campaign.getLocation().getJumpPath().size(); i++) {	
+			for(int i = 0; i < campaign.getLocation().getJumpPath().size(); i++) {
 				Planet planetB = campaign.getLocation().getJumpPath().get(i);
 				double x = map2scrX(planetB.getX());
-				double y = map2scrY(planetB.getY());	
+				double y = map2scrY(planetB.getY());
 				//lest try rings
 				g2.setPaint(Color.YELLOW);
 				arc.setArcByCenter(x, y, size * 1.8, 0, 360, Arc2D.OPEN);
@@ -375,10 +376,10 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 				}
 			}
 		}
-        
+
 		for(Planet planet : planets) {
 			double x = map2scrX(planet.getX());
-			double y = map2scrY(planet.getY());		
+			double y = map2scrY(planet.getY());
 			if(planet.equals(campaign.getCurrentPlanet())) {
 				//lest try rings
 				g2.setPaint(Color.ORANGE);
@@ -416,8 +417,8 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 				arc.setArcByCenter(x, y, size, 0, 360.0 * (1-((double)i)/factions.size()), Arc2D.PIE);
 				g2.fill(arc);
 			}
-			
-			
+
+
 		}
 
 		//cycle through planets again and assign names - to make sure names go on outside
@@ -431,9 +432,9 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 	            g2.drawString(planet.getShortName(), (float)(x+size * 1.8), (float)y);
 	        }
 		}
-		
+
 	}
-	
+
 	 /**
      * Calculate the nearest neighbour for the given point If anyone has a better algorithm than this stupid kind of shit, please, feel free to exchange my brute force thing... An good idea would be an voronoi diagram and the sweep algorithm from Steven Fortune.
      */
@@ -450,7 +451,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
         }
         return minPlanet;
     }
-    
+
     /**
      * Activate and Center
      */
@@ -462,7 +463,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
         conf.offset.setLocation(-p.getX() * conf.scale, p.getY() * conf.scale);
         repaint();
     }
-    
+
     private void zoom(double percent) {
     	conf.scale *= percent;
         if (selectedPlanet != null) {
@@ -470,21 +471,21 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
         }
         repaint();
     }
-    
+
     public Planet getSelectedPlanet() {
     	return selectedPlanet;
     }
-    
+
     public JumpPath getJumpPath() {
     	return jumpPath;
     }
-    
+
     private void changeSelectedPlanet(Planet p) {
     	selectedPlanet = p;
     	jumpPath = new JumpPath();
     	hqview.refreshPlanetView();
     }
-    
+
     /**
      * All configuration behaviour of InterStellarMap are saved here.
      *
@@ -525,4 +526,3 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
         int planetID;
     }
 }
-	
