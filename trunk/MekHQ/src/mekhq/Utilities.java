@@ -1,20 +1,20 @@
 /*
  * Utilities.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -68,6 +68,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.equipment.MissingAmmoBin;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -79,50 +80,50 @@ import mekhq.campaign.unit.Unit;
  */
 public class Utilities {
 	private static final int MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24;
-	
+
 	// A couple of arrays for use in the getLevelName() method
-    private static int[]    arabicNumbers = { 1000,  900,  500,  400,  100,   90,  
+    private static int[]    arabicNumbers = { 1000,  900,  500,  400,  100,   90,
         50,   40,   10,    9,    5,    4,    1 };
     private static String[] romanNumerals = { "M",  "CM",  "D",  "CD", "C",  "XC",
       "L",  "XL",  "X",  "IX", "V",  "IV", "I" };
 
-    public static int roll3d6() {      
+    public static int roll3d6() {
         Vector<Integer> rolls = new Vector<Integer>();
         rolls.add(Compute.d6());
         rolls.add(Compute.d6());
         rolls.add(Compute.d6());
         Collections.sort(rolls);
-        return (rolls.elementAt(0) + rolls.elementAt(1));       
+        return (rolls.elementAt(0) + rolls.elementAt(1));
     }
-    
+
     /*
      * Roll a certain number of dice with a certain number of faces
      */
     public static int dice(int num, int faces) {
     	int result = 0;
-    	
+
     	// Roll however many dice as necessary
     	for (int i = 0; i < num; i++) {
             result += Compute.randomInt(faces) + 1;
         }
-    	
+
     	return result;
     }
-    
+
     public static ArrayList<AmmoType> getMunitionsFor(Entity entity, AmmoType cur_atype, int techLvl) {
         ArrayList<AmmoType> atypes = new ArrayList<AmmoType>();
         for(AmmoType atype : AmmoType.getMunitionsFor(cur_atype.getAmmoType())) {
             //this is an abbreviated version of setupMunitions in the CustomMechDialog
             //TODO: clan/IS limitations?
-            
+
             if ((entity instanceof Aero)
                         && !((atype.getAmmoType() == AmmoType.T_MML)
                                 || (atype.getAmmoType() == AmmoType.T_ATM)
-                                || (atype.getAmmoType() == AmmoType.T_NARC) 
+                                || (atype.getAmmoType() == AmmoType.T_NARC)
                                 || (atype.getAmmoType() == AmmoType.T_AC_LBX))) {
                 continue;
             }
-            
+
             int lvl = atype.getTechLevel(entity.getTechLevelYear());
             if(lvl < 0) {
             	lvl = 0;
@@ -171,17 +172,17 @@ public class Utilities {
             return false;
         return true;
     }
-    
+
 
 	public static String getCurrencyString(long value) {
 		NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
 		String text = numberFormat.format(value) + " C-Bills";
 		return text;
 	}
-	
+
 	/**
 	 * Returns the last file modified in a directory and all subdirectories
-	 * that conforms to a FilenameFilter 
+	 * that conforms to a FilenameFilter
 	 * @param dir
 	 * @param filter
 	 * @return
@@ -209,10 +210,10 @@ public class Utilities {
         		choice = subFile;
         		lastMod = subFile.lastModified();
         	}
-        }       
+        }
         return choice;
     }
-	
+
 	public static ArrayList<String> getAllVariants(Entity en, int year, CampaignOptions options) {
 		ArrayList<String> variants = new ArrayList<String>();
 		for(MechSummary summary : MechSummaryCache.getInstance().getAllMechs()) {
@@ -239,7 +240,7 @@ public class Utilities {
 		}
 		return variants;
 	}
-	
+
 	public static int generateExpLevel(int bonus) {
 		int roll = Compute.d6(2) + bonus;
 		if(roll < 2) {
@@ -258,7 +259,7 @@ public class Utilities {
 			return SkillType.EXP_ELITE;
 		}
 	}
-	
+
     public static Person findCommander(Entity entity, ArrayList<Person> vesselCrew, ArrayList<Person> gunners, ArrayList<Person> drivers, Person navigator) {
     	//take first by rank
     	//if rank is tied, take gunners over drivers
@@ -291,7 +292,7 @@ public class Utilities {
     	}
     	return commander;
     }
-    
+
     /*
      * Simple utility function to take a specified number and randomize it a little bit
      * roll 1d6 results in:
@@ -314,7 +315,7 @@ public class Utilities {
     	}
     	return Math.max(target, 0);
     }
-    
+
     /*
      * If an infantry platoon or vehicle crew took damage, perform the personnel injuries
      */
@@ -338,18 +339,18 @@ public class Utilities {
 				}
 			}
 		}
-		
+
 		return newCrew;
     }
-    
+
     public static boolean isDeadCrew(Entity e) {
 		if (Compute.getFullCrewSize(e) == 0 || e.getCrew().isDead()) {
 			return true;
 		}
-		
+
 		return false;
     }
-	
+
     // TODO: There is a lot of code duplication between these 2 methods.
     // Time to split out the duplicated code and have both of these methods reference it.
 	public static ArrayList<Person> generateRandomCrewWithCombinedSkill(Entity e, Campaign c) {
@@ -369,12 +370,12 @@ public class Utilities {
 		gunners.clear();
 		vesselCrew.clear();
 		navigator = null;
-		
+
 		// If the entire crew is dead, we don't want to generate them.
 		if (isDeadCrew(e)) {
 			return newCrew;
 		}
-		
+
 		// Generate solo crews
 		if (unit.usesSoloPilot()) {
 			Person p = null;
@@ -439,7 +440,7 @@ public class Utilities {
 	    		}
 	    		drivers.add(p);
 	    	}
-			
+
 			// Regenerate as needed to balance
 			if (drivers.size() != 0) {
 				averageGunnery = (int)Math.round(((double)totalGunnery)/drivers.size());
@@ -473,7 +474,7 @@ public class Utilities {
 					}
 				}
 			}
-			
+
 			// Generate gunners for multi-crew vehicles
 	    	while(gunners.size() < unit.getTotalGunnerNeeds()) {
 	    		Person p = null;
@@ -488,7 +489,7 @@ public class Utilities {
 	    		}
 	    		gunners.add(p);
 	    	}
-	    	
+
 	    	// Regenerate gunners as needed to balance
 	    	if (gunners.size() != 0) {
 	    		averageGunnery = (int)Math.round(((double)totalGunnery)/gunners.size());
@@ -513,19 +514,19 @@ public class Utilities {
 	    		}
 	    	}
 		}
-    	
+
     	while(vesselCrew.size() < unit.getTotalCrewNeeds()) {
     		Person p = c.newPerson(Person.T_SPACE_CREW);
 			vesselCrew.add(p);
     	}
-    	
+
     	if(unit.canTakeNavigator()) {
     		Person p = c.newPerson(Person.T_NAVIGATOR);
     		navigator = p;
     	}
-    	
+
     	findCommander(e, vesselCrew, gunners, drivers, navigator).setName(commanderName);
-    	
+
     	// Add everyone to the crew
     	if (!drivers.isEmpty()) {
     		newCrew.addAll(drivers);
@@ -539,14 +540,15 @@ public class Utilities {
     	if (navigator != null) {
     		newCrew.add(navigator);
     	}
-		
+
 		// We need to be able to handle incoming captured personnel
 		newCrew = doCrewInjuries(e, c, newCrew);
-		
+
 		return newCrew;
 	}
-	
-	public static void generateRandomCrewWithCombinedSkill(Unit unit, Campaign c) {
+
+	public static ArrayList<Person> generateRandomCrewWithCombinedSkill(Unit unit, Campaign c) {
+        ArrayList<Person> newCrew = new ArrayList<Person>();
 		Crew oldCrew = unit.getEntity().getCrew();
 		String commanderName = oldCrew.getName();
 		int averageGunnery = 0;
@@ -561,12 +563,12 @@ public class Utilities {
 		gunners.clear();
 		vesselCrew.clear();
 		navigator = null;
-		
+
 		// If the entire crew is dead, we don't want to generate them.
 		if (isDeadCrew(unit.getEntity())) {
-			return;
+			return null;
 		}
-		
+
 		// Generate solo crews
 		if (unit.usesSoloPilot()) {
 			Person p = null;
@@ -632,7 +634,7 @@ public class Utilities {
 	    		}
 	    		drivers.add(p);
 	    	}
-			
+
 			// Regenerate as needed to balance
 			if (drivers.size() != 0) {
 				averageGunnery = (int)Math.round(((double)totalGunnery)/drivers.size());
@@ -666,7 +668,7 @@ public class Utilities {
 					}
 				}
 			}
-			
+
 			// Generate gunners for multi-crew vehicles
 	    	while(gunners.size() < unit.getTotalGunnerNeeds()) {
 	    		Person p = null;
@@ -681,7 +683,7 @@ public class Utilities {
 	    		}
 	    		gunners.add(p);
 	    	}
-	    	
+
 	    	// Regenerate gunners as needed to balance
 	    	if (gunners.size() != 0) {
 	    		averageGunnery = (int)Math.round(((double)totalGunnery)/gunners.size());
@@ -706,20 +708,20 @@ public class Utilities {
 	    		}
 	    	}
 		}
-    	
+
     	while(vesselCrew.size() < unit.getTotalCrewNeeds()) {
     		Person p = c.newPerson(Person.T_SPACE_CREW);
 			vesselCrew.add(p);
     	}
-    	
+
     	if(unit.canTakeNavigator()) {
     		Person p = c.newPerson(Person.T_NAVIGATOR);
     		navigator = p;
     	}
-		
+
 		for (Person p : drivers) {
 			if (!c.recruitPerson(p)) {
-				return;
+				return null;
 			}
 			if(unit.usesSoloPilot() || unit.usesSoldiers()) {
 				unit.addPilotOrSoldier(p);
@@ -727,32 +729,39 @@ public class Utilities {
 				unit.addDriver(p);
 			}
 		}
-		
+		newCrew.addAll(drivers);
+
 		for (Person p : gunners) {
 			if (!c.recruitPerson(p)) {
-				return;
+				return null;
 			}
 			if (!(unit.usesSoloPilot() || unit.usesSoldiers()) && unit.canTakeMoreGunners()) {
 				unit.addGunner(p);
 			}
 		}
-		
+        newCrew.addAll(gunners);
+
 		for (Person p : vesselCrew) {
 			if (!c.recruitPerson(p)) {
-				return;
+				return null;
 			}
 			if (!(unit.usesSoloPilot() || unit.usesSoldiers()) && unit.canTakeMoreVesselCrew()) {
 				unit.addVesselCrew(p);
 			}
 		}
+        newCrew.addAll(vesselCrew);
+
 		if (navigator != null & unit.canTakeNavigator()) {
 			if (!c.recruitPerson(navigator)) {
-				return;
+				return null;
 			}
 			unit.setNavigator(navigator);
 		}
+        newCrew.add(navigator);
+
 		unit.getCommander().setName(commanderName);
 		unit.resetPilotAndEntity();
+		return newCrew;
 	}
 
 	public static int generateRandomExp() {
@@ -768,7 +777,7 @@ public class Utilities {
 		}
 		return 0; // 20% chance of no xp
 	}
-	
+
 	public static int rollSpecialAbilities(int bonus) {
 		int roll = Compute.d6(2) + bonus;
 		if(roll < 10) {
@@ -781,11 +790,11 @@ public class Utilities {
 			return 2;
 		}
 	}
-	
+
 	public static boolean rollProbability(int prob) {
 		return Compute.randomInt(100) <= prob;
 	}
-	
+
 	public static int getAgeByExpLevel(int expLevel, boolean clan) {
 		int baseage = 19;
 		int ndice = 1;
@@ -800,7 +809,7 @@ public class Utilities {
 			ndice = 4;
 			break;
 		}
-		
+
 		int age = baseage;
 		while(ndice > 0) {
 			int roll = Compute.d6();
@@ -816,7 +825,7 @@ public class Utilities {
 		}
 		return age;
 	}
-	
+
 	public static String getOptionDisplayName(IOption option) {
 		String name = option.getDisplayableNameWithValue();
 		name = name.replaceAll("\\(.+?\\)", "");
@@ -825,7 +834,7 @@ public class Utilities {
 		}
 		return name;
 	}
-	
+
 	public static String printIntegerArray(int[] array) {
 		String values = "";
 		for(int i = 0; i < array.length; i++) {
@@ -836,7 +845,7 @@ public class Utilities {
 		}
 		return values;
 	}
-	
+
 	public static String printDoubleArray(double[] array) {
         String values = "";
         for(int i = 0; i < array.length; i++) {
@@ -847,7 +856,7 @@ public class Utilities {
         }
         return values;
     }
-	
+
 	public static String printBooleanArray(boolean[] array) {
 		String values = "";
 		for(int i = 0; i < array.length; i++) {
@@ -858,7 +867,7 @@ public class Utilities {
 		}
 		return values;
 	}
-	
+
 	public static int getSimpleTechLevel(int level) {
 	    switch(level) {
 	    case TechConstants.T_ALLOWED_ALL:
@@ -882,12 +891,12 @@ public class Utilities {
             return CampaignOptions.TECH_INTRO;
 	    }
 	}
-	
+
 	//copied from http://www.roseindia.net/java/beginners/copyfile.shtml
 	public static void copyfile(File inFile, File outFile){
 		try{
 			InputStream in = new FileInputStream(inFile);
-		  
+
 			//For Append the file.
 			//  OutputStream out = new FileOutputStream(f2,true);
 
@@ -907,23 +916,31 @@ public class Utilities {
 			System.out.println(ex.getMessage() + " in the specified directory.");
 		}
 		catch(IOException e){
-			System.out.println(e.getMessage());  
+			System.out.println(e.getMessage());
 		}
 	}
-	
+
 	public static void unscrambleEquipmentNumbers(Unit unit) {
         ArrayList<Integer> equipNums = new ArrayList<Integer>();
         for(Mounted m : unit.getEntity().getEquipment()) {
             equipNums.add(unit.getEntity().getEquipmentNum(m));
         }
         for(Part part : unit.getParts()) {
+            if(!(part instanceof EquipmentPart)) {
+                continue;
+            }
+            EquipmentPart ep = ((EquipmentPart) part);
+            Mounted m = unit.getEntity().getEquipment(ep.getEquipmentNum());
+            if (m.getType().getInternalName().equals(ep.getType().getInternalName())) {
+
+            }
             if(part instanceof AmmoBin) {
                 AmmoBin bin = (AmmoBin)part;
                 int i = -1;
                 boolean found = false;
                 for(int equipNum : equipNums) {
                     i++;
-                    Mounted m = unit.getEntity().getEquipment(equipNum);
+                    m = unit.getEntity().getEquipment(equipNum);
                     if(!(m.getType() instanceof AmmoType)) {
                         continue;
                     }
@@ -939,13 +956,34 @@ public class Utilities {
                     equipNums.remove(i);
                 }
             }
+            else if(part instanceof MissingAmmoBin) {
+                MissingAmmoBin bin = (MissingAmmoBin)part;
+                int i = -1;
+                boolean found = false;
+                for(int equipNum : equipNums) {
+                    i++;
+                    m = unit.getEntity().getEquipment(equipNum);
+                    if(!(m.getType() instanceof AmmoType)) {
+                        continue;
+                    }
+                    if(m.getType().getInternalName().equals(bin.getType().getInternalName())
+                            && m.isDestroyed()) {
+                        bin.setEquipmentNum(equipNum);
+                        found = true;
+                        break;
+                    }
+                }
+                if(found) {
+                    equipNums.remove(i);
+                }
+            }
             else if(part instanceof EquipmentPart) {
                 EquipmentPart epart = (EquipmentPart)part;
                 int i = -1;
                 boolean found = false;
                 for(int equipNum : equipNums) {
                     i++;
-                    Mounted m = unit.getEntity().getEquipment(equipNum);
+                    m = unit.getEntity().getEquipment(equipNum);
                     if(m.getType() instanceof AmmoType) {
                         continue;
                     }
@@ -966,7 +1004,7 @@ public class Utilities {
                 boolean found = false;
                 for(int equipNum : equipNums) {
                     i++;
-                    Mounted m = unit.getEntity().getEquipment(equipNum);
+                    m = unit.getEntity().getEquipment(equipNum);
                     if(m.getType().getInternalName().equals(epart.getType().getInternalName())
                             && m.isDestroyed()) {
                         epart.setEquipmentNum(equipNum);
@@ -980,11 +1018,11 @@ public class Utilities {
             }
         }
     }
-	
+
 	public static int getDaysBetween(Date date1, Date date2) {
 	    return (int) ((date2.getTime() - date1.getTime()) / MILLISECONDS_IN_DAY );
 	}
-	
+
     /**
      * Calculates the number of days between start and end dates, taking
      * into consideration leap years, year boundaries etc.
@@ -1016,18 +1054,18 @@ public class Utilities {
 
         return (endTime - startTime) / MILLISECONDS_IN_DAY;
     }
-	
+
 	public static int getDiffFullYears(Date date, GregorianCalendar b) {
 	    GregorianCalendar a = new GregorianCalendar();
 	    a.setTime(date);
 	    int diff = b.get(GregorianCalendar.YEAR) - a.get(GregorianCalendar.YEAR);
-	    if (a.get(GregorianCalendar.MONTH) > b.get(GregorianCalendar.MONTH) || 
+	    if (a.get(GregorianCalendar.MONTH) > b.get(GregorianCalendar.MONTH) ||
 	        (a.get(GregorianCalendar.MONTH) == b.get(GregorianCalendar.MONTH) && a.get(GregorianCalendar.DATE) > b.get(GregorianCalendar.DATE))) {
 	        diff--;
 	    }
 	    return diff;
 	}
-	
+
 	public static int getDiffPartialYears(Date date, GregorianCalendar b) {
 	    GregorianCalendar a = new GregorianCalendar();
 	    a.setTime(date);
@@ -1037,7 +1075,7 @@ public class Utilities {
 	    }
 	    return diff;
 	}
-	
+
 	/**
 	 * export a jtable to TSV
 	 * code derived from:
@@ -1081,7 +1119,7 @@ public class Utilities {
 
 	    }catch(IOException e){ System.out.println(e); }
 	}
-	
+
 	public static Vector<String> splitString(String str, String sep) {
         StringTokenizer st = new StringTokenizer(str, sep);
         Vector<String> output = new Vector<String>();
@@ -1090,7 +1128,7 @@ public class Utilities {
         }
         return output;
     }
-    
+
     public static String combineString(Vector<String> vec, String sep) {
         String output = "";
         Enumeration<String> eVec = vec.elements();
@@ -1102,13 +1140,13 @@ public class Utilities {
         }
         return output;
     }
-    
+
     public static String getRomanNumeralsFromArabicNumber(int level, boolean checkZero) {
     	// If we're 0, then we just return an empty string
     	if (checkZero && level == 0) {
     		return "";
     	}
-    	
+
     	// Roman numeral, prepended with a space for display purposes
     	String roman = " ";
         int num = level+1;
@@ -1119,17 +1157,17 @@ public class Utilities {
 				num -= arabicNumbers[i];
 			}
         }
-        
+
         return roman;
     }
-    
+
     // TODO: Optionize this to allow user to choose roman or arabic numerals
     public static int getArabicNumberFromRomanNumerals(String name) {
     	// If we're 0, then we just return an empty string
     	if (name.equals("")) {
     		return 0;
     	}
-    	
+
     	// Roman numeral, prepended with a space for display purposes
     	int arabic = 0;
         String roman = name;
@@ -1144,10 +1182,10 @@ public class Utilities {
         			i++;
         		}
         	}
-        	
+
         	arabic += num;
         }
-        
+
         return arabic-1;
     }
 }

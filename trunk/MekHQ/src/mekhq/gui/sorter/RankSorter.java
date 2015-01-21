@@ -23,18 +23,20 @@ import mekhq.campaign.personnel.Person;
             campaign = c;
             c.getRanks();
         }
-        
+
         @Override
         public int compare(String s0, String s1) {
         	// get the numbers associated with each rank string, and compare
         	pattern = Pattern.compile("id=\"([^\"]+)\"");
         	matcher = pattern.matcher(s0);
         	matcher.find();
+        	String s00 = matcher.group(1);
+            matcher = pattern.matcher(s1);
+            matcher.find();
+            String s11 = matcher.group(1);
         	try {
-	        	Person p0 = campaign.getPerson(UUID.fromString(matcher.group(1)));
-	        	matcher = pattern.matcher(s1);
-	        	matcher.find();
-	        	Person p1 = campaign.getPerson(UUID.fromString(matcher.group(1)));
+	        	Person p0 = campaign.getPerson(UUID.fromString(s00));
+	        	Person p1 = campaign.getPerson(UUID.fromString(s11));
 	        	// the rank orders match, try comparing the levels
 	        	if (p0.getRankNumeric() == p1.getRankNumeric()) {
 	        		// the levels match too, try comparing MD rank
@@ -45,7 +47,7 @@ import mekhq.campaign.personnel.Person;
 	        	}
 	            return ((Comparable<Integer>)p0.getRankNumeric()).compareTo(p1.getRankNumeric());
         	} catch (Exception e) {
-        		MekHQ.logError("[DEBUG] RankSorter Exception, s0: "+s0+", s1: "+s1);
+        		MekHQ.logError("[DEBUG] RankSorter Exception, s0: "+s00+", s1: "+s11);
         		e.printStackTrace();
         		return 0;
         	}
