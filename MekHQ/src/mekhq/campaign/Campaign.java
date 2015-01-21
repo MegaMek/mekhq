@@ -1176,7 +1176,7 @@ public class Campaign implements Serializable {
 	/**
 	 * Finds the active person in a particular role with the highest level
 	 * in a given, with an optional secondary skill to break ties.
-	 * 
+	 *
 	 * @param role One of the Person.T_* constants
 	 * @param primary	The skill to use for comparison.
 	 * @param secondary If not null and there is more than one person tied for
@@ -1206,7 +1206,7 @@ public class Campaign implements Serializable {
 		}
 		return retVal;
 	}
-	
+
 	public Person findBestInRole(int role, String skill) {
 		return findBestInRole(role, skill, null);
 	}
