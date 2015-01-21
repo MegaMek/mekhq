@@ -32,6 +32,7 @@ v0.3.10-dev (SVN)
 + Bug: Unscrambling equipment numbers messes up ammobins that are loaded with a different ammo type
     if you leave leave any bins loaded with the original ammo type
 + Bug [#771]: MekHQ 0.3.9 - Campain will not load if individual camon folder contain "&" Character
++ Bug: "None" unit assignment messed up after change to move it below the popup menu of actual units
 
 v0.3.9 (2015-01-01 21:25 UTC)
 + Bug: packaging.xml was renaming mhq's hitory.txt to history-mm.txt due to change in where mm docs are copied to
