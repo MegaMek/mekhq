@@ -40,6 +40,7 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener, C
     private SpinnerNumberModel model;
     private boolean validData = true;
     private int max;
+    private int min;
     // End of variables declaration//GEN-END:variables
 
     /**
@@ -55,7 +56,8 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener, C
     public PopupValueChoiceDialog(Frame parent, boolean modal, String title, int current, int min, int max) {
         super(parent, modal);
         this.max = max;
-        model = new SpinnerNumberModel(current, min, null, 1);
+        this.min = min;
+        model = new SpinnerNumberModel(current, min, max, 1);
         setTitle(title);
         initComponents();
         setLocationRelativeTo(parent);
@@ -182,7 +184,7 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener, C
     public void stateChanged(ChangeEvent arg0) {
         if (value != null) {
             Integer val = (Integer)((JSpinner)value).getModel().getValue();
-            if (val > max || val < 1) {
+            if (val > max || val < min) {
                 validData = false;
             } else {
                 validData = true;
@@ -192,7 +194,7 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener, C
 
     private void showInvalidPopup() {
         JOptionPane.showMessageDialog(null,
-                "Accepted values for bulk purchases are 1-"+max
+                "Accepted values for bulk purchases are "+min+"-"+max
                     +System.lineSeparator()+"You've entered: "+((Integer)((JSpinner)value).getModel().getValue()),
                 "Invalid value",
                 JOptionPane.ERROR_MESSAGE);
