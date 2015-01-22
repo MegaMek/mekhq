@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.10-dev (SVN)
+v0.3.10 (2015-01-22 22:15 UTC)
 + Updated SubmitBug.html with corrected links and a new link for the bug reporting policy/howto
 + Bug [#737]: ATB - Sacked Prisoner's get 50,000 C-bills
 + Bug [#600]: ATB : Incorrect missions being generated
