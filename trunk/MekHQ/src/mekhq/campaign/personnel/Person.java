@@ -1698,9 +1698,14 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
 
     public int getRankLevel() {
-    	// If we're somehow about the max level for this rank, drop to that level
-    	if (rankLevel > getRank().getRankLevels(getProfession())) {
-    		rankLevel = getRank().getRankLevels(getProfession());
+    	// If we're somehow above the max level for this rank, drop to that level
+        int profession = getProfession();
+        while (profession != Ranks.RPROF_MW && getRanks().isEmptyProfession(profession)) {
+            profession = getRanks().getAlternateProfession(profession);
+        }
+
+    	if (rankLevel > getRank().getRankLevels(profession)) {
+    		rankLevel = getRank().getRankLevels(profession);
     	}
 
         return rankLevel;
