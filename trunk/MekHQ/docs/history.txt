@@ -36,6 +36,7 @@ v0.3.10-dev (SVN)
 + Bug [#765]: Capture Personnel Dialog data conflicts with Salvage Window data
 + Bug [#769]: Set XP to Zero Generates Bulk Purchase Exception
 + Bug [#773]: Interstellar Map dragging too fast (methods "forgets" to update current mouse coordinates)
++ Bug [#742]: IllegalArgumentException : Unable to edit special abilities if xp cost is set to -1
 
 v0.3.9 (2015-01-01 21:25 UTC)
 + Bug: packaging.xml was renaming mhq's hitory.txt to history-mm.txt due to change in where mm docs are copied to
