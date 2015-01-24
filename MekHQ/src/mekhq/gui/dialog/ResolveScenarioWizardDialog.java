@@ -1490,7 +1490,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private void showUnit(UUID id, boolean salvage) {
         //TODO: I am not sure I like the pop up dialog, might just make this a view on this
         //dialog
-        UnitStatus ustatus = tracker.getUnitsStatus().get(id);
+        UnitStatus ustatus;
+        if(salvage) {
+            ustatus = tracker.getSalvageStatus().get(id);
+        } else {
+            ustatus = tracker.getUnitsStatus().get(id);
+        }
         if(null == ustatus || null == ustatus.getEntity()) {
             return;
         }
