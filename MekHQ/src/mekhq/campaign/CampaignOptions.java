@@ -46,6 +46,9 @@ public class CampaignOptions implements Serializable {
     public final static int TECH_ADVANCED = 2;
     public final static int TECH_EXPERIMENTAL = 3;
     public final static int TECH_UNOFFICIAL = 4;
+    // This must always be the highest tech level in order to hide parts
+    // that haven't been invented yet, or that are completely extinct
+    public final static int TECH_UNKNOWN = 5;
 
     public final static int TRANSIT_UNIT_DAY = 0;
     public final static int TRANSIT_UNIT_WEEK = 1;
@@ -189,7 +192,7 @@ public class CampaignOptions implements Serializable {
 
     //random portraits related
     private boolean[] usePortraitForType;
-    
+
     //Against the Bot related
     private boolean useAtB;
     private boolean useAero;
@@ -221,7 +224,7 @@ public class CampaignOptions implements Serializable {
     private boolean useWeatherConditions;
     private boolean useLightConditions;
     private boolean usePlanetaryConditions;
-    private boolean useAltMapgen; 
+    private boolean useAltMapgen;
     private boolean useLeadership;
     private boolean useStrategy;
     private int baseStrategyDeployment;
@@ -234,7 +237,7 @@ public class CampaignOptions implements Serializable {
     private boolean contractMarketReportRefresh;
     private boolean unitMarketReportRefresh;
     private int startGameDelay;
-    
+
 
     public CampaignOptions() {
         clanPriceModifier = 1.0;
@@ -469,7 +472,7 @@ public class CampaignOptions implements Serializable {
     public void setEraMods(boolean b) {
         this.useEraMods = b;
     }
-    
+
     public boolean useAssignedTechFirst() {
 		return assignedTechFirst;
 	}
@@ -863,11 +866,11 @@ public class CampaignOptions implements Serializable {
     public void setUsePercentageMaint(boolean b) {
         usePercentageMaint = b;
     }
-    
+
     public boolean useInfantryDontCount() {
     	return infantryDontCount;
     }
-    
+
     public void setUseInfantryDontCount(boolean b) {
     	infantryDontCount = b;
     }
@@ -1274,11 +1277,11 @@ public class CampaignOptions implements Serializable {
 	public void setUseTactics(boolean useTactics) {
 		this.useTactics = useTactics;
 	}
-	
+
 	public boolean getUseAtB() {
 		return useAtB;
 	}
-	
+
 	public void setUseAtB(boolean useAtB) {
 		this.useAtB = useAtB;
 	}
@@ -1298,11 +1301,11 @@ public class CampaignOptions implements Serializable {
 	public void setUseVehicles(boolean useVehicles) {
 		this.useVehicles = useVehicles;
 	}
-	
+
 	public boolean getClanVehicles() {
 		return clanVehicles;
 	}
-	
+
 	public void setClanVehicles(boolean clanVehicles) {
 		this.clanVehicles = clanVehicles;
 	}
@@ -1314,43 +1317,43 @@ public class CampaignOptions implements Serializable {
 	public void setDoubleVehicles(boolean doubleVehicles) {
 		this.doubleVehicles = doubleVehicles;
 	}
-	
+
 	public boolean getAdjustPlayerVehicles() {
 		return adjustPlayerVehicles;
 	}
-	
+
 	public int getOpforLanceTypeMechs() {
 		return opforLanceTypeMechs;
 	}
-	
+
 	public void setOpforLanceTypeMechs(int weight) {
 		opforLanceTypeMechs = weight;
 	}
-	
+
 	public int getOpforLanceTypeMixed() {
 		return opforLanceTypeMixed;
 	}
-	
+
 	public void setOpforLanceTypeMixed(int weight) {
 		opforLanceTypeMixed = weight;
 	}
-	
+
 	public int getOpforLanceTypeVehicles() {
 		return opforLanceTypeVehicles;
 	}
-	
+
 	public void setOpforLanceTypeVehicles(int weight) {
 		opforLanceTypeVehicles = weight;
 	}
-	
+
 	public boolean getOpforUsesVTOLs() {
 		return opforUsesVTOLs;
 	}
-	
+
 	public void setOpforUsesVTOLs(boolean vtol) {
 		opforUsesVTOLs = vtol;
 	}
-	
+
 	public void setAdjustPlayerVehicles(boolean adjust) {
 		adjustPlayerVehicles = adjust;
 	}
@@ -1362,19 +1365,19 @@ public class CampaignOptions implements Serializable {
 	public void setUseDropShips(boolean useDropShips) {
 		this.useDropShips = useDropShips;
 	}
-	
+
 	public int getSkillLevel() {
 		return skillLevel;
 	}
-	
+
 	public void setSkillLevel(int level) {
 		skillLevel = level;
 	}
-	
+
 	public boolean getAeroRecruitsHaveUnits() {
 		return aeroRecruitsHaveUnits;
 	}
-	
+
 	public void setAeroRecruitsHaveUnits(boolean haveUnits) {
 		aeroRecruitsHaveUnits = haveUnits;
 	}
@@ -1382,55 +1385,55 @@ public class CampaignOptions implements Serializable {
 	public boolean getUseShareSystem() {
 		return useShareSystem;
 	}
-	
+
 	public boolean getSharesExcludeLargeCraft() {
 		return sharesExcludeLargeCraft;
 	}
-	
+
 	public void setSharesExcludeLargeCraft(boolean exclude) {
 		sharesExcludeLargeCraft = exclude;
 	}
-	
+
 	public boolean getSharesForAll() {
 		return sharesForAll;
 	}
-	
+
 	public void setSharesForAll(boolean set) {
 		sharesForAll = set;
 	}
-	
+
 	public boolean doRetirementRolls() {
 		return retirementRolls;
 	}
-	
+
 	public void setRetirementRolls(boolean roll) {
 		retirementRolls = roll;
 	}
-	
+
 	public boolean getCustomRetirementMods() {
 		return customRetirementMods;
 	}
-	
+
 	public void setCustomRetirementMods(boolean mods) {
 		customRetirementMods = mods;
 	}
-	
+
 	public boolean getTrackOriginalUnit() {
 		return trackOriginalUnit;
 	}
-	
+
 	public void setTrackOriginalUnit(boolean track) {
 		trackOriginalUnit = track;
 	}
-	
+
 	public boolean isMercSizeLimited() {
 		return mercSizeLimited;
 	}
-	
+
 	public void setMercSizeLimited(boolean limit) {
 		mercSizeLimited = limit;
 	}
-	
+
 	public void setUseShareSystem(boolean shares) {
 		useShareSystem = shares;
 	}
@@ -1446,11 +1449,11 @@ public class CampaignOptions implements Serializable {
 	public String[] getRATs() {
 		return rats;
 	}
-	
+
 	public void setRATs (String[] rats) {
 		this.rats = rats;
 	}
-	
+
 	public String[] getRATsNoEra() {
 		return ratsNoEra;
 	}
@@ -1458,15 +1461,15 @@ public class CampaignOptions implements Serializable {
 	public int getSearchRadius() {
 		return searchRadius;
 	}
-	
+
 	public void setSearchRadius(int radius) {
 		searchRadius = radius;
 	}
-	
+
 	public boolean getInstantUnitMarketDelivery() {
 		return instantUnitMarketDelivery;
 	}
-	
+
 	public void setInstantUnitMarketDelivery(boolean instant) {
 		instantUnitMarketDelivery = instant;
 	}
@@ -1478,11 +1481,11 @@ public class CampaignOptions implements Serializable {
 	public void setIntensity(double intensity) {
 		this.intensity = intensity;
 	}
-	
+
 	public boolean getVariableContractLength() {
 		return variableContractLength;
 	}
-	
+
 	public void setVariableContractLength(boolean variable) {
 		variableContractLength = variable;
 	}
@@ -1502,11 +1505,11 @@ public class CampaignOptions implements Serializable {
 	public void setUseLightConditions(boolean useLightConditions) {
 		this.useLightConditions = useLightConditions;
 	}
-	
+
 	public boolean getUsePlanetaryConditions() {
 		return usePlanetaryConditions;
 	}
-	
+
 	public void setUsePlanetaryConditions(boolean usePlanetaryConditions) {
 		this.usePlanetaryConditions = usePlanetaryConditions;
 	}
@@ -1514,7 +1517,7 @@ public class CampaignOptions implements Serializable {
 	public boolean getUseAltMapgen() {
 		return useAltMapgen;
 	}
-	
+
 	public void setUseAltMapgen(boolean useAltMapgen) {
 		this.useAltMapgen = useAltMapgen;
 	}
@@ -1558,7 +1561,7 @@ public class CampaignOptions implements Serializable {
 	public void setAdjustPaymentForStrategy(boolean adjustPaymentForStrategy) {
 		this.adjustPaymentForStrategy = adjustPaymentForStrategy;
 	}
-	
+
 	public boolean getRestrictPartsByMission() {
 		return restrictPartsByMission;
 	}
@@ -1566,27 +1569,27 @@ public class CampaignOptions implements Serializable {
 	public void setRestrictPartsByMission(boolean restrictPartsByMission) {
 		this.restrictPartsByMission = restrictPartsByMission;
 	}
-	
+
 	public boolean getLimitLanceWeight() {
 		return limitLanceWeight;
 	}
-	
+
 	public void setLimitLanceWeight(boolean limit) {
 		limitLanceWeight = limit;
 	}
-	
+
 	public boolean getLimitLanceNumUnits() {
 		return limitLanceNumUnits;
 	}
-	
+
 	public void setLimitLanceNumUnits(boolean limit) {
 		limitLanceNumUnits = limit;
 	}
-	
+
 	public boolean getUseAtBCapture() {
 		return useAtBCapture;
 	}
-	
+
 	public void setUseAtBCapture(boolean set) {
 		useAtBCapture = set;
 	}
@@ -1594,27 +1597,27 @@ public class CampaignOptions implements Serializable {
 	public boolean getContractMarketReportRefresh() {
 		return contractMarketReportRefresh;
 	}
-	
+
 	public void setContractMarketReportRefresh(boolean refresh) {
 		contractMarketReportRefresh = refresh;
 	}
-	
+
 	public boolean getUnitMarketReportRefresh() {
 		return unitMarketReportRefresh;
 	}
-	
+
 	public void setUnitMarketReportRefresh(boolean refresh) {
 		unitMarketReportRefresh = refresh;
 	}
-	
+
 	public int getStartGameDelay() {
 		return startGameDelay;
 	}
-	
+
 	public void setStartGameDelay(int delay) {
 		startGameDelay = delay;
 	}
-	
+
 	public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanPriceModifier", clanPriceModifier); //private double
@@ -1765,7 +1768,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "contractMarketReportRefresh", contractMarketReportRefresh);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitMarketReportRefresh", unitMarketReportRefresh);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "startGameDelay", startGameDelay);
-        
+
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<salaryTypeBase>"
                     + Utilities.printIntegerArray(salaryTypeBase)

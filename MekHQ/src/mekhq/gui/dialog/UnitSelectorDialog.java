@@ -484,28 +484,28 @@ public class UnitSelectorDialog extends JDialog {
                 public boolean include(Entry<? extends MechTableModel, ? extends Integer> entry) {
                     MechTableModel mechModel = entry.getModel();
                     MechSummary mech = mechModel.getMechSummary(entry.getIdentifier());
-                if (
-                /*year limits*/
-                (!campaign.getCampaignOptions().limitByYear() || mech.getYear() <= year) &&
-                /*Clan/IS limits*/
-                (campaign.getCampaignOptions().allowClanPurchases() || !TechConstants.isClan(mech.getType())) &&
-                (campaign.getCampaignOptions().allowISPurchases() || TechConstants.isClan(mech.getType())) &&
-                /* Canon */
-                (mech.isCanon() || !campaign.getCampaignOptions().allowCanonOnly()) &&
-                /* Weight */
-                (mech.getWeightClass() == nClass || nClass == EntityWeightClass.SIZE) &&
-                /* Technology Level */
-                campaign.getCampaignOptions().getTechLevel() >= Utilities.getSimpleTechLevel(mech.getType()) &&
-                /*Unit type*/
-                (nUnit == UnitType.SIZE || mech.getUnitType().equals(UnitType.getTypeName(nUnit))) &&
-                (searchFilter==null || MechSearchFilter.isMatch(mech, searchFilter))) {
-                	if(txtFilter.getText().length() > 0) {
-                        String text = txtFilter.getText();
-                        return mech.getName().toLowerCase().contains(text.toLowerCase());
+                    if (
+                            /*year limits*/
+                            (!campaign.getCampaignOptions().limitByYear() || mech.getYear() <= year) &&
+                            /*Clan/IS limits*/
+                            (campaign.getCampaignOptions().allowClanPurchases() || !TechConstants.isClan(mech.getType())) &&
+                            (campaign.getCampaignOptions().allowISPurchases() || TechConstants.isClan(mech.getType())) &&
+                            /* Canon */
+                            (mech.isCanon() || !campaign.getCampaignOptions().allowCanonOnly()) &&
+                            /* Weight */
+                            (mech.getWeightClass() == nClass || nClass == EntityWeightClass.SIZE) &&
+                            /* Technology Level */
+                            campaign.getCampaignOptions().getTechLevel() >= Utilities.getSimpleTechLevel(mech.getType()) &&
+                            /*Unit type*/
+                            (nUnit == UnitType.SIZE || mech.getUnitType().equals(UnitType.getTypeName(nUnit))) &&
+                            (searchFilter==null || MechSearchFilter.isMatch(mech, searchFilter))) {
+                        if(txtFilter.getText().length() > 0) {
+                            String text = txtFilter.getText();
+                            return mech.getName().toLowerCase().contains(text.toLowerCase());
+                        }
+                        return true;
                     }
-                    return true;
-                }
-                return false;
+                    return false;
                 }
             };
         } catch (java.util.regex.PatternSyntaxException e) {

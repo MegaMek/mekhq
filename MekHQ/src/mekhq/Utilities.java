@@ -887,6 +887,8 @@ public class Utilities {
         case TechConstants.T_IS_UNOFFICIAL:
         case TechConstants.T_CLAN_UNOFFICIAL:
             return CampaignOptions.TECH_UNOFFICIAL;
+        case TechConstants.T_TECH_UNKNOWN:
+            return CampaignOptions.TECH_UNKNOWN;
         default:
             return CampaignOptions.TECH_INTRO;
 	    }
