@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package mekhq.campaign.personnel;
 
@@ -30,7 +30,7 @@ import org.w3c.dom.NodeList;
  */
 public class Bloodname implements Serializable {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 3958964485520416824L;
 
@@ -218,19 +218,25 @@ public class Bloodname implements Serializable {
 
 		return retVal;
 	}
-	
+
 	public static Bloodname randomBloodname(String factionCode, int phenotype, int year) {
 		return randomBloodname(Clan.getClan(factionCode), phenotype, year);
 	}
-	
+
 	public static Bloodname randomBloodname(Clan faction, int phenotype, int year) {
+	    if (null == faction) {
+	        MekHQ.logError("Random Bloodname attempted for a clan that does not exist."
+	                + System.lineSeparator()
+	                + "Please ensure that your clan exists in both the clans.xml and bloodnames.xml files as appropriate.");
+	        return null;
+	    }
 		if (Compute.randomInt(20) == 0) {
 			return randomBloodname(faction.getRivalClan(year), phenotype, year);
 		}
 		if (Compute.randomInt(20) == 0) {
 			phenotype = Bloodname.P_GENERAL;
 		}
-		
+
 		HashMap<Bloodname, Fraction> weights = new HashMap<Bloodname, Fraction>();
 		ArrayList<Bloodname> nonExclusives = new ArrayList<Bloodname>();
 		double nonExclusivesWeight = 0.0;
@@ -296,7 +302,7 @@ public class Bloodname implements Serializable {
 				weights.put(name, weight);
 			}
 		}
-		
+
 		int lcd = Fraction.lcd(weights.values());
 		for (Fraction f : weights.values()) {
 			f.mul(lcd);
@@ -317,7 +323,7 @@ public class Bloodname implements Serializable {
 		}
 		return nameList.get(roll);
 	}
-	
+
 	private static Fraction eraFraction(int year) {
 		if (year < 2900) {
 			return new Fraction(1);
@@ -333,11 +339,11 @@ public class Bloodname implements Serializable {
 		}
 		return new Fraction (3, 5);
 	}
-	
+
 	public static void loadBloodnameData() {
 		Clan.loadClanData();
 		bloodnames = new ArrayList<Bloodname>();
-		
+
 		File f = new File("data/names/bloodnames/bloodnames.xml");
 		FileInputStream fis = null;
 		try {
@@ -346,21 +352,21 @@ public class Bloodname implements Serializable {
 			MekHQ.logError("Cannot find file bloodnames.xml");
 			return;
 		}
-		
+
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		Document doc = null;
-		
+
 		try {
 			DocumentBuilder db = dbf.newDocumentBuilder();
 			doc = db.parse(fis);
 		} catch (Exception ex) {
 			System.err.println(ex.getMessage());
 		}
-		
+
 		Element bloodnameElement = doc.getDocumentElement();
 		NodeList nl = bloodnameElement.getChildNodes();
 		bloodnameElement.normalize();
-		
+
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node wn = nl.item(i);
 			if (wn.getNodeType() == Node.ELEMENT_NODE) {
@@ -387,7 +393,7 @@ class DatedRecord {
 	public int startDate;
 	public int endDate;
 	public String descr;
-	
+
 	public DatedRecord(int s, int e, String d) {
 		startDate = s;
 		endDate = e;
@@ -398,7 +404,7 @@ class DatedRecord {
 
 class Clan {
 	private static HashMap<String, Clan> allClans;
-	
+
 	private String code;
 	private String fullName;
 	private int startDate;
@@ -407,13 +413,13 @@ class Clan {
 	private ArrayList<DatedRecord> rivals;
 	private ArrayList<DatedRecord> nameChanges;
 	private boolean homeClan;
-	
+
 	public Clan() {
 		startDate = endDate = abjurationDate = 0;
 		rivals = new ArrayList<DatedRecord>();
 		nameChanges = new ArrayList<DatedRecord>();
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof Clan) {
@@ -424,11 +430,11 @@ class Clan {
 		}
 		return false;
 	}
-	
+
 	public static Clan getClan(String code) {
 		return allClans.get(code);
 	}
-	
+
 	public String getCode() {
 		return code;
 	}
@@ -468,7 +474,7 @@ class Clan {
 	public boolean isHomeClan() {
 		return homeClan;
 	}
-	
+
 	public Clan getRivalClan(int year) {
 		ArrayList<Clan> rivals = getRivals(year);
 		int roll = Compute.randomInt(rivals.size() + 1);
@@ -477,7 +483,7 @@ class Clan {
 		}
 		return rivals.get(roll);
 	}
-	
+
 	public static Clan randomClan(int year, boolean homeClan) {
 		ArrayList<Clan> list = new ArrayList<Clan>();
 		for (Clan c : allClans.values()) {
@@ -490,7 +496,7 @@ class Clan {
 		}
 		return list.get(Compute.randomInt(list.size()));
 	}
-	
+
 	public static void loadClanData() {
 		allClans = new HashMap<String, Clan>();
 		File f = new File("data/names/bloodnames/clans.xml");
@@ -501,21 +507,21 @@ class Clan {
 			MekHQ.logError("Cannot find file clans.xml");
 			return;
 		}
-		
+
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		Document doc = null;
-		
+
 		try {
 			DocumentBuilder db = dbf.newDocumentBuilder();
 			doc = db.parse(fis);
 		} catch (Exception ex) {
 			System.err.println(ex.getMessage());
 		}
-		
+
 		Element clanElement = doc.getDocumentElement();
 		NodeList nl = clanElement.getChildNodes();
 		clanElement.normalize();
-		
+
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node wn = nl.item(i);
 			if (wn.getNodeName().equalsIgnoreCase("clan")) {
@@ -524,10 +530,10 @@ class Clan {
 			}
 		}
 	}
-	
+
 	private static Clan loadFromXml(Node node) {
 		Clan retVal = new Clan();
-		
+
 		retVal.code = node.getAttributes().getNamedItem("code").getTextContent().trim();
 		if (null != node.getAttributes().getNamedItem("start")) {
 			retVal.startDate = Integer.parseInt(node.getAttributes().getNamedItem("start").getTextContent().trim());
@@ -538,9 +544,9 @@ class Clan {
 		NodeList nl = node.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node wn = nl.item(i);
-			
+
 			if (wn.getNodeName().equalsIgnoreCase("fullName")) {
-				retVal.fullName = wn.getTextContent().trim(); 
+				retVal.fullName = wn.getTextContent().trim();
 			} else if (wn.getNodeName().equalsIgnoreCase("abjured")) {
 				retVal.abjurationDate = Integer.parseInt(wn.getTextContent().trim());
 			} else if (wn.getNodeName().equalsIgnoreCase("nameChange")) {
@@ -570,21 +576,21 @@ class Clan {
 				retVal.homeClan = true;
 			}
 		}
-		
+
 		return retVal;
 	}
 }
 
 class Fraction {
-	
+
 	private int numerator;
 	private int denominator;
-	
+
 	public Fraction() {
 		numerator = 0;
 		denominator = 1;
 	}
-	
+
 	public Fraction(int n, int d) {
 		if (d == 0) {
 			throw new IllegalArgumentException("Denominator is zero.");
@@ -596,35 +602,35 @@ class Fraction {
 		numerator = n;
 		denominator = d;
 	}
-	
+
 	public Fraction(int i) {
 		numerator = i;
 		denominator = 1;
 	}
-	
+
 	public Fraction(Fraction f) {
 		numerator = f.numerator;
 		denominator = f.denominator;
 	}
-	
+
 	@Override
 	public Object clone() {
-		return new Fraction(this);		
+		return new Fraction(this);
 	}
-	
+
 	@Override
 	public String toString() {
 		return numerator + "/" + denominator;
 	}
-	
+
 	public boolean equals(Fraction f) {
 		return value() == f.value();
 	}
-	
+
 	public double value() {
 		return (double)numerator / (double)denominator;
 	}
-	
+
 	public void reduce() {
 		if (denominator > 1) {
 			for (int i = denominator - 1; i > 1; i--) {
@@ -636,21 +642,21 @@ class Fraction {
 			}
 		}
 	}
-	
+
 	public int getNumerator() {
 		return numerator;
 	}
-	
+
 	public int getDenominator() {
 		return denominator;
 	}
-	
+
 	public void add(Fraction f) {
 		numerator = numerator * f.denominator + f.numerator * denominator;
 		denominator = denominator * f.denominator;
 		reduce();
 	}
-	
+
 	public void add(int i) {
 		numerator += i * denominator;
 		reduce();
@@ -661,7 +667,7 @@ class Fraction {
 		denominator = denominator * f.denominator;
 		reduce();
 	}
-	
+
 	public void sub(int i) {
 		numerator -= i * denominator;
 		reduce();
@@ -672,7 +678,7 @@ class Fraction {
 		denominator *= f.denominator;
 		reduce();
 	}
-	
+
 	public void mul(int i) {
 		numerator *= i;
 		reduce();
@@ -683,7 +689,7 @@ class Fraction {
 		denominator *= f.numerator;
 		reduce();
 	}
-	
+
 	public void div(int i) {
 		denominator *= i;
 	}
@@ -706,6 +712,6 @@ class Fraction {
 			}
 		}
 		return retVal;
-		
+
 	}
 }
