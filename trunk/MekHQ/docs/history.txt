@@ -3,6 +3,7 @@ VERSION HISTORY
 v0.3.11-dev (SVN)
 + Bug [#783]: Scenario Resolution, Unable to View Unit or Edit Unit
 + Added logging output for when null clans exist because a new clan faction is created but not added to the clans.xml file
++ Bug: NPE when resolving manually hits code to generate salvage statuses
 
 v0.3.10 (2015-01-22 22:15 UTC)
 + Updated SubmitBug.html with corrected links and a new link for the bug reporting policy/howto

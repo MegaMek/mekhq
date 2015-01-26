@@ -906,7 +906,7 @@ public class ResolveScenarioTracker {
     						pilots.put(UUID.fromString(entity.getCrew().getExternalIdAsString()), entity.getCrew());
     					}
     				} else {
-    				    Unit nu = new Unit(entity, campaign);
+    				    Unit nu = generateNewUnit(entity);
                         UnitStatus us = new UnitStatus(nu);
                         salvageStatus.put(nu.getId(), us);
                         potentialSalvage.add(nu);
