@@ -1,20 +1,20 @@
 /*
  * EnginePart.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -42,7 +42,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * 
+ *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class EnginePart extends Part {
@@ -60,7 +60,7 @@ public class EnginePart extends Part {
 		this.forHover = hover;
 		this.name = engine.getEngineName() + " Engine";
 	}
-	
+
 	public EnginePart clone() {
 		EnginePart clone = new EnginePart(getUnitTonnage(), new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, forHover);
         clone.copyBaseData(this);
@@ -70,7 +70,7 @@ public class EnginePart extends Part {
 	public Engine getEngine() {
 		return engine;
 	}
-	
+
 	@Override
 	public double getTonnage() {
 		float weight = Engine.ENGINE_RATINGS[(int) Math.ceil(engine.getRating() / 5.0)];
@@ -114,12 +114,12 @@ public class EnginePart extends Part {
         }
         return toReturn;
 	}
-	
-	@Override 
+
+	@Override
 	public long getStickerPrice() {
 		return (long)Math.round((getEngine().getBaseCost()/75.0) * getEngine().getRating() * getUnitTonnage());
 	}
-	
+
 	public void fixTankFlag(boolean hover) {
 		int flags = engine.getFlags();
 		if(!engine.hasFlag(Engine.TANK_ENGINE)) {
@@ -129,7 +129,7 @@ public class EnginePart extends Part {
 		this.name = engine.getEngineName() + " Engine";
 		this.forHover = hover;
 	}
-	
+
 	public void fixClanFlag() {
 		int flags = engine.getFlags();
 		if(!engine.hasFlag(Engine.CLAN_ENGINE)) {
@@ -153,12 +153,12 @@ public class EnginePart extends Part {
 				&& getUnitTonnage() == ((EnginePart) part).getUnitTonnage()
 				&& getTonnage() == ((EnginePart)part).getTonnage();
 	}
-	
+
 	@Override
 	public int getTechLevel() {
 		if (getEngine().getTechType() < 0
 				|| getEngine().getTechType() >= TechConstants.SIZE)
-			return TechConstants.T_IS_TW_NON_BOX;
+			return TechConstants.T_TECH_UNKNOWN;
 		else
 			return getEngine().getTechType();
 	}
@@ -190,10 +190,10 @@ public class EnginePart extends Part {
 		int engineType = -1;
 		int engineRating = -1;
 		int engineFlags = 0;
-		
+
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
-			
+
 			if (wn2.getNodeName().equalsIgnoreCase("engineType")) {
 				engineType = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("engineRating")) {
@@ -206,9 +206,9 @@ public class EnginePart extends Part {
 				} else {
 					forHover = false;
 				}
-			} 
+			}
 		}
-		
+
 		engine = new Engine(engineRating, engineType, engineFlags);
 	}
 
@@ -283,7 +283,7 @@ public class EnginePart extends Part {
 		case Engine.FUEL_CELL:
 		case Engine.FISSION:
 			return EquipmentType.RATING_D;
-		case Engine.XL_ENGINE:	
+		case Engine.XL_ENGINE:
 		case Engine.LIGHT_ENGINE:
 		case Engine.COMPACT_ENGINE:
 			return EquipmentType.RATING_E;
@@ -378,12 +378,12 @@ public class EnginePart extends Part {
 			    engineCrits = 1;
 			    if(unit.getEntity().getInternal(Protomech.LOC_TORSO) == IArmorState.ARMOR_DESTROYED) {
 			        engineHits = 1;
-			    } 
+			    }
 			}
 			if(engineHits >= engineCrits) {
 				remove(false);
 				return;
-			} 
+			}
 			else if(engineHits > 0) {
 				hits = engineHits;
 			} else {
@@ -410,7 +410,7 @@ public class EnginePart extends Part {
 		if(isSalvaging()) {
 			this.time = 360;
 			this.difficulty = -1;
-		}	
+		}
 	}
 
 	@Override
@@ -450,7 +450,7 @@ public class EnginePart extends Part {
 			}
 		}
 	}
-	
+
 	@Override
 	 public String checkFixable() {
 		if(isSalvaging()) {
@@ -467,7 +467,7 @@ public class EnginePart extends Part {
 		 }
 		 return null;
 	 }
-	
+
 	@Override
 	public boolean isMountedOnDestroyedLocation() {
 		if(null == unit) {
@@ -481,7 +481,7 @@ public class EnginePart extends Part {
 		 }
 		return false;
 	}
-	
+
 	 @Override
 	 public String getDetails() {
 		 if(null != unit) {
@@ -493,12 +493,12 @@ public class EnginePart extends Part {
 		 }
 		 return super.getDetails() + ", " + getUnitTonnage() + " tons" + hvrString;
 	 }
-	 
+
 	 @Override
 	 public boolean isPartForEquipmentNum(int index, int loc) {
 		 return Mech.SYSTEM_ENGINE == index;
 	 }
-	 
+
 	 @Override
 		public boolean isRightTechType(String skillType) {
 		 	if(getEngine().hasFlag(Engine.TANK_ENGINE)) {

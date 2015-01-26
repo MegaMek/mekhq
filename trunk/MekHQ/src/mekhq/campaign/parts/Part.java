@@ -76,6 +76,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	public static final int PART_TYPE_OTHER = 11;
 	public static final int PART_TYPE_MEK_COCKPIT = 12;
 
+	public static final int T_UNKNOWN = -1;
 	public static final int T_BOTH = 0;
 	public static final int T_IS   = 1;
 	public static final int T_CLAN = 2;
@@ -394,6 +395,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	    if(getTechLevel() == TechConstants.T_ALLOWED_ALL) {
 	        return T_BOTH;
 	    }
+	    if (getTechLevel() == TechConstants.T_TECH_UNKNOWN) {
+	        return T_UNKNOWN;
+	    }
 		if(isClanTechBase()) {
 			return T_CLAN;
 		} else {
@@ -413,6 +417,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 			return "Clan";
 		case T_IS:
 			return "IS";
+		case T_UNKNOWN:
+		    return "UNKNOWN";
 		default:
 			return "??";
 		}

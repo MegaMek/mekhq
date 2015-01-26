@@ -155,7 +155,7 @@ public class EquipmentPart extends Part {
     @Override
     public int getTechLevel() {
         if (getType().getTechLevel(campaign.getCalendar().get(GregorianCalendar.YEAR)) < 0 || getType().getTechLevel(campaign.getCalendar().get(GregorianCalendar.YEAR)) >= TechConstants.SIZE)
-            return TechConstants.T_INTRO_BOXSET;
+            return TechConstants.T_TECH_UNKNOWN;
         else
             return getType().getTechLevel(campaign.getCalendar().get(GregorianCalendar.YEAR));
     }
