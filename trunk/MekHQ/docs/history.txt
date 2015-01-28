@@ -1,10 +1,11 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.11-dev (SVN)
+v0.3.11 (2015-01-28 18:00 UTC)
 + Bug [#783]: Scenario Resolution, Unable to View Unit or Edit Unit
 + Added logging output for when null clans exist because a new clan faction is created but not added to the clans.xml file
 + Bug: NPE when resolving manually hits code to generate salvage statuses
 + Bug: Parts showing up before they've been invented, and defaulting as IS intro tech level until they are invented
++ Updated MegaMek.jar to 0.41.1 and MegaMekLab.jar to 0.1.37
 
 v0.3.10 (2015-01-22 22:15 UTC)
 + Updated SubmitBug.html with corrected links and a new link for the bug reporting policy/howto
