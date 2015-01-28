@@ -1097,6 +1097,9 @@ public class ResolveScenarioTracker {
                                 + person.getHyperlinkedName() + " to defect.");
                     }
                 }
+            } else {
+                campaign.removePerson(pid);
+                continue;
             }
             person.setXp(person.getXp() + status.xp);
             if(status.getHits() > person.getHits()) {
