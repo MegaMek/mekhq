@@ -1291,7 +1291,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             status.setHits(pr_hitSliders.get(i).getValue());
             status.setPrisoner(prisonerBtns.get(i).isSelected());
             status.setBondsman(bondsmanBtns.get(i).isSelected());
-            status.setRemove(escapeBtns.get(i).isSelected());
+            status.setRemove(escapeBtns.get(i).isSelected() && !(prisonerBtns.get(i).isSelected() || bondsmanBtns.get(i).isSelected()));
         }
 
     	//now salvage
@@ -1331,6 +1331,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     }
 
     private void cancel() {
+        tracker.clearNewPersonnel();
     	setVisible(false);
     }
 

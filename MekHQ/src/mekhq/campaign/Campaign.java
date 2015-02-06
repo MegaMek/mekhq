@@ -756,7 +756,15 @@ public class Campaign implements Serializable {
         return recruitPerson(p, false, false);
     }
 
+    public boolean recruitPerson(Person p, boolean log) {
+        return recruitPerson(p, false, false, log);
+    }
+
     public boolean recruitPerson(Person p, boolean prisoner, boolean bondsman) {
+        return recruitPerson(p, prisoner, bondsman, true);
+    }
+
+    public boolean recruitPerson(Person p, boolean prisoner, boolean bondsman, boolean log) {
         if (prisoner && bondsman) {
             addReport("<font color='red'><b>Cannot have someone who is both a prisoner and a bondsman, there is an error in the code.</b></font>");
             return false;
@@ -781,7 +789,9 @@ public class Campaign implements Serializable {
         personnel.add(p);
         personnelIds.put(id, p);
         String add = prisoner == true ? " as a prisoner" : bondsman == true ? " as a bondsman" : "";
-        addReport(p.getHyperlinkedName() + " has been added to the personnel roster"+add+".");
+        if (log) {
+            addReport(p.getHyperlinkedName() + " has been added to the personnel roster"+add+".");
+        }
         if (p.getPrimaryRole() == Person.T_ASTECH) {
             astechPoolMinutes += 480;
             astechPoolOvertime += 240;
@@ -796,13 +806,19 @@ public class Campaign implements Serializable {
         }
         if (prisoner) {
             p.setPrisoner();
-            p.addLogEntry(getDate(), "Made Prisoner " + getName() + rankEntry);
+            if (log) {
+                p.addLogEntry(getDate(), "Made Prisoner " + getName() + rankEntry);
+            }
         } else if (bondsman) {
             p.setBondsman();
-            p.addLogEntry(getDate(), "Made Bondsman " + getName() + rankEntry);
+            if (log) {
+                p.addLogEntry(getDate(), "Made Bondsman " + getName() + rankEntry);
+            }
         } else {
             p.setFreeMan();
-            p.addLogEntry(getDate(), "Joined " + getName() + rankEntry);
+            if (log) {
+                p.addLogEntry(getDate(), "Joined " + getName() + rankEntry);
+            }
         }
         return true;
     }
@@ -2515,8 +2531,11 @@ public class Campaign implements Serializable {
         addReport(unit.getName() + " has been removed from the unit roster.");
 
     }
-
     public void removePerson(UUID id) {
+        removePerson(id, true);
+    }
+
+    public void removePerson(UUID id, boolean log) {
         Person person = getPerson(id);
 
         if (person == null) {
@@ -2529,8 +2548,11 @@ public class Campaign implements Serializable {
         }
         removeAllPatientsFor(person);
 
-        addReport(person.getFullTitle()
+        if (log) {
+            addReport(person.getFullTitle()
                   + " has been removed from the personnel roster.");
+        }
+
         personnel.remove(person);
         personnelIds.remove(id);
         if (person.getPrimaryRole() == Person.T_ASTECH) {
