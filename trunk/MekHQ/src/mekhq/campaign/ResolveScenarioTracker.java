@@ -279,7 +279,7 @@ public class ResolveScenarioTracker {
                     UnitStatus us = new UnitStatus(nu);
                     salvageStatus.put(nu.getId(), us);
                     potentialSalvage.add(nu);
-                    ArrayList<Person> crewMembers = Utilities.generateRandomCrewWithCombinedSkill(nu, campaign);
+                    ArrayList<Person> crewMembers = Utilities.generateRandomCrewWithCombinedSkill(nu, campaign, false);
                     if (null != crewMembers) {
                         newPilots.addAll(crewMembers);
                     }
@@ -375,7 +375,7 @@ public class ResolveScenarioTracker {
                     UnitStatus us = new UnitStatus(nu);
                     salvageStatus.put(nu.getId(), us);
                     potentialSalvage.add(nu);
-                    ArrayList<Person> crewMembers = Utilities.generateRandomCrewWithCombinedSkill(nu, campaign);
+                    ArrayList<Person> crewMembers = Utilities.generateRandomCrewWithCombinedSkill(nu, campaign, false);
                     if (null != crewMembers) {
                         newPilots.addAll(crewMembers);
                     }
@@ -552,7 +552,7 @@ public class ResolveScenarioTracker {
                 }
             }
             for(Person p : crew) {
-                status = new PersonStatus(p.getFullName(), u.getEntity().getDisplayName(), p.getHits());
+                status = new PersonStatus(p.getFullName(), u.getEntity().getDisplayName(), p.getHits(), p.getId());
                 if(u.usesSoloPilot()) {
                     Crew pilot = pilots.get(p.getId());
                     if(null == pilot) {
@@ -659,7 +659,7 @@ public class ResolveScenarioTracker {
                 }
             }
             for(Person p : crew) {
-                status = new PersonStatus(p.getFullName(), u.getEntity().getDisplayName(), p.getHits());
+                status = new PersonStatus(p.getFullName(), u.getEntity().getDisplayName(), p.getHits(), p.getId());
                 if(u.usesSoloPilot()) {
                     Crew pilot = null;
                     if (null != u.getEntity()) {
@@ -769,7 +769,7 @@ public class ResolveScenarioTracker {
                 if (id == null) {
                     id = UUID.randomUUID();
                 }
-                while (campaign.getPerson(id) != null) {
+                while (campaign.getPerson(id) != null && !campaign.getPerson(id).equals(p)) {
                     id = UUID.randomUUID();
                 }
                 p.setId(id);
@@ -792,13 +792,13 @@ public class ResolveScenarioTracker {
             if (id == null) {
                 id = UUID.randomUUID();
             }
-            while (campaign.getPerson(id) != null) {
+            while (campaign.getPerson(id) != null && !campaign.getPerson(id).equals(p)) {
                 id = UUID.randomUUID();
             }
             p.setId(id);
 
             // Create a status for them
-            status = new PersonStatus(p.getFullName(), "None", p.getHits());
+            status = new PersonStatus(p.getFullName(), "None", p.getHits(), p.getId());
             status.setCaptured(true);
             prisonerStatus.put(id, status);
         }
@@ -910,7 +910,7 @@ public class ResolveScenarioTracker {
                         UnitStatus us = new UnitStatus(nu);
                         salvageStatus.put(nu.getId(), us);
                         potentialSalvage.add(nu);
-                        ArrayList<Person> crewMembers = Utilities.generateRandomCrewWithCombinedSkill(nu, campaign);
+                        ArrayList<Person> crewMembers = Utilities.generateRandomCrewWithCombinedSkill(nu, campaign, false);
                         if (null != crewMembers) {
                             newPilots.addAll(crewMembers);
                         }
@@ -1066,12 +1066,13 @@ public class ResolveScenarioTracker {
                 person.diagnose(status.getHits());
             }
             if (status.toRemove()) {
-                campaign.removePerson(pid);
+                campaign.removePerson(pid, false);
             }
         }
         // update prisoners
         for(UUID pid : prisonerStatus.keySet()) {
             Person person = campaign.getPerson(pid);
+            campaign.removePerson(pid, false);
             if (person == null) {
                 for (Person p : newPilots) {
                     if (p != null && p.getId() == pid) {
@@ -1098,7 +1099,6 @@ public class ResolveScenarioTracker {
                     }
                 }
             } else {
-                campaign.removePerson(pid);
                 continue;
             }
             person.setXp(person.getXp() + status.xp);
@@ -1134,7 +1134,7 @@ public class ResolveScenarioTracker {
                 person.setFreeMan();
             }
             if (status.toRemove()) {
-                campaign.removePerson(pid);
+                campaign.removePerson(pid, false);
             }
         }
 
@@ -1334,8 +1334,9 @@ public class ResolveScenarioTracker {
 		private boolean bondsman;
 		private boolean remove;
 		private boolean pickedUp;
+		private UUID personId;
 
-		public PersonStatus(String n, String u, int h) {
+		public PersonStatus(String n, String u, int h, UUID id) {
 			name = n;
 			unitName = u;
 			hits = h;
@@ -1347,15 +1348,24 @@ public class ResolveScenarioTracker {
 			bondsman = false;
 			remove = false;
 			pickedUp = false;
+			personId = id;
 		}
 
-		public boolean toRemove() {
-			return remove;
-		}
+        public UUID getId() {
+            return personId;
+        }
 
-		public void setRemove(boolean set) {
-			remove = set;
-		}
+        public void setRemove(UUID set) {
+            personId = set;
+        }
+
+        public boolean toRemove() {
+            return remove;
+        }
+
+        public void setRemove(boolean set) {
+            remove = set;
+        }
 
 		public boolean isCaptured() {
 			return captured;
@@ -1552,5 +1562,11 @@ public class ResolveScenarioTracker {
 
     public void setEvent(GameVictoryEvent gve) {
         victoryEvent = gve;
+    }
+
+    public void clearNewPersonnel() {
+        for(UUID pid : prisonerStatus.keySet()) {
+            campaign.removePerson(pid, false);
+        }
     }
 }

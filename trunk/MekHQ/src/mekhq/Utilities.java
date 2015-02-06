@@ -548,6 +548,10 @@ public class Utilities {
 	}
 
 	public static ArrayList<Person> generateRandomCrewWithCombinedSkill(Unit unit, Campaign c) {
+	    return Utilities.generateRandomCrewWithCombinedSkill(unit, c, true);
+	}
+
+	public static ArrayList<Person> generateRandomCrewWithCombinedSkill(Unit unit, Campaign c, boolean log) {
         ArrayList<Person> newCrew = new ArrayList<Person>();
 		Crew oldCrew = unit.getEntity().getCrew();
 		String commanderName = oldCrew.getName();
@@ -709,8 +713,12 @@ public class Utilities {
 	    	}
 		}
 
+		boolean nameset = false;
     	while(vesselCrew.size() < unit.getTotalCrewNeeds()) {
     		Person p = c.newPerson(Person.T_SPACE_CREW);
+    		if (!nameset) {
+    		    p.setName(commanderName);
+    		}
 			vesselCrew.add(p);
     	}
 
@@ -720,7 +728,10 @@ public class Utilities {
     	}
 
 		for (Person p : drivers) {
-			if (!c.recruitPerson(p)) {
+            if (!nameset) {
+                p.setName(commanderName);
+            }
+			if (!c.recruitPerson(p, log)) {
 				return null;
 			}
 			if(unit.usesSoloPilot() || unit.usesSoldiers()) {
@@ -732,7 +743,10 @@ public class Utilities {
 		newCrew.addAll(drivers);
 
 		for (Person p : gunners) {
-			if (!c.recruitPerson(p)) {
+            if (!nameset) {
+                p.setName(commanderName);
+            }
+			if (!c.recruitPerson(p, log)) {
 				return null;
 			}
 			if (!(unit.usesSoloPilot() || unit.usesSoldiers()) && unit.canTakeMoreGunners()) {
@@ -742,7 +756,7 @@ public class Utilities {
         newCrew.addAll(gunners);
 
 		for (Person p : vesselCrew) {
-			if (!c.recruitPerson(p)) {
+			if (!c.recruitPerson(p, log)) {
 				return null;
 			}
 			if (!(unit.usesSoloPilot() || unit.usesSoldiers()) && unit.canTakeMoreVesselCrew()) {
@@ -752,14 +766,16 @@ public class Utilities {
         newCrew.addAll(vesselCrew);
 
 		if (navigator != null & unit.canTakeNavigator()) {
-			if (!c.recruitPerson(navigator)) {
+            if (!nameset) {
+                navigator.setName(commanderName);
+            }
+			if (!c.recruitPerson(navigator, log)) {
 				return null;
 			}
 			unit.setNavigator(navigator);
 		}
         newCrew.add(navigator);
 
-		unit.getCommander().setName(commanderName);
 		unit.resetPilotAndEntity();
 		return newCrew;
 	}
