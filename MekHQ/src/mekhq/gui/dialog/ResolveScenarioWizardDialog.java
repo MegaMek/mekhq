@@ -1543,7 +1543,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     }
 
     private void editUnit(UUID id, int idx, boolean salvage) {
-        UnitStatus ustatus = tracker.getUnitsStatus().get(id);
+        UnitStatus ustatus = salvage ? tracker.getSalvageStatus().get(id) : tracker.getUnitsStatus().get(id);
         if(null == ustatus || null == ustatus.getEntity()) {
             return;
         }

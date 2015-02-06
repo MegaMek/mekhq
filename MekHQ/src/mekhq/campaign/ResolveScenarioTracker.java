@@ -1477,7 +1477,7 @@ public class ResolveScenarioTracker {
 
             } else {
                 try {
-                    entity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+                    entity = unit.getEntity() == null ? new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity() : unit.getEntity();
                     baseEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
                 } catch (EntityLoadingException e) {
                     // TODO Auto-generated catch block
