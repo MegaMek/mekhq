@@ -5,6 +5,10 @@ v0.3.12-dev (SVN)
 + Bug [#786]: AtB: Rank sort and prisoner rolls broken after battle
 + Bug: Edit Unit buttons doing nothing for salvaged units
 + Bug: Entities were not being correctly set on UnitStatuses
++ Bug [#792]: Battle resolution does not start in MHQ after MM game
+    I've fixed the NPE, but this still leaves the root cause of the issue unknown
+    until questions in the ticket are answered. It would be best to fix that extraneous
+    issue as well.
 
 v0.3.11 (2015-01-28 18:00 UTC)
 + Bug [#783]: Scenario Resolution, Unable to View Unit or Edit Unit

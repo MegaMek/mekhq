@@ -290,15 +290,17 @@ public class ResolveScenarioTracker {
 		for (Enumeration<Entity> iter = victoryEvent.getDevastatedEntities(); iter.hasMoreElements();) {
 		    Entity e = iter.nextElement();
 		    if(e.getOwnerId() == pid || e.getOwner().getTeam() == team) {
-		        UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
-                if(null != status) {
-                    status.assignFoundEntity(e);
-                } else {
-                    Unit nu = generateNewUnit(e);
-                    UnitStatus us = new UnitStatus(nu);
-                    unitsStatus.put(nu.getId(), us);
-                    alliedUnits.add(nu);
-                }
+		        if(!e.getExternalIdAsString().equals("-1")) {
+		            UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
+		            if(null != status) {
+		                status.assignFoundEntity(e);
+		            } else {
+		                Unit nu = generateNewUnit(e);
+		                UnitStatus us = new UnitStatus(nu);
+		                unitsStatus.put(nu.getId(), us);
+		                alliedUnits.add(nu);
+		            }
+		        }
 		    } else {
                 Entity killer = victoryEvent.getEntity(e.getKillerId());
                 if(null != killer && killer.getOwnerId() == pid) {
