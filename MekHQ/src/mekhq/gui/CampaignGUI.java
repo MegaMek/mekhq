@@ -125,6 +125,7 @@ import megamek.common.TargetRoll;
 import megamek.common.UnitType;
 import megamek.common.WeaponType;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.options.GameOptions;
 import megamek.common.options.PilotOptions;
 import megameklab.com.util.UnitPrintManager;
 import mekhq.IconPackage;
@@ -6035,6 +6036,12 @@ public class CampaignGUI extends JPanel {
         }
 
         if (chosen.size() > 0) {
+            // Ensure that the MegaMek year GameOption matches the campaign year
+            GameOptions gameOpts = getCampaign().getGameOptions();            
+            int campaignYear = getCampaign().getCalendar().get(Calendar.YEAR);     
+            if (gameOpts.intOption("year") != campaignYear) {
+                gameOpts.getOption("year").setValue(campaignYear);
+            }
             ((MekHQ) getApplication()).startHost(scenario, false, chosen);
         }
     }

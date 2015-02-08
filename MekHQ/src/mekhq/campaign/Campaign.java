@@ -294,6 +294,7 @@ public class Campaign implements Serializable {
         partsStore = new PartsStore(this);
         gameOptions = new GameOptions();
         gameOptions.initialize();
+        gameOptions.getOption("year").setValue(calendar.get(Calendar.YEAR));
         game.setOptions(gameOptions);
         customs = new ArrayList<String>();
         shoppingList = new ShoppingList();
@@ -1926,6 +1927,11 @@ public class Campaign implements Serializable {
 
         if (calendar.get(Calendar.DAY_OF_YEAR) == 1) {
             reloadNews();
+        }
+        
+        // Ensure that the MegaMek year GameOption matches the campaign year
+        if (gameOptions.intOption("year") != calendar.get(Calendar.YEAR)) {
+            gameOptions.getOption("year").setValue(calendar.get(Calendar.YEAR));
         }
 
         //read the news

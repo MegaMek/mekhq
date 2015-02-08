@@ -79,6 +79,7 @@ import javax.swing.table.TableColumn;
 
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Player;
+import megamek.common.options.GameOptions;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
@@ -3769,6 +3770,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             this.setVisible(false);
         }
         campaign.calendar = date;
+        // Ensure that the MegaMek year GameOption matches the campaign year
+        GameOptions gameOpts = campaign.getGameOptions();            
+        int campaignYear = campaign.getCalendar().get(Calendar.YEAR);     
+        if (gameOpts.intOption("year") != campaignYear) {
+            gameOpts.getOption("year").setValue(campaignYear);
+        }
         campaign.setFactionCode(Faction.getFactionFromFullNameAndEra
         		(String.valueOf(comboFaction.getSelectedItem()), Era.getEra(date.get(Calendar.YEAR))).getShortName());
         if (null != comboFactionNames.getSelectedItem()) {
