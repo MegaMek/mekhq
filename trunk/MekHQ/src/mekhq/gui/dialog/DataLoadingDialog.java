@@ -27,6 +27,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.ResourceBundle;
 
 import javax.swing.ImageIcon;
@@ -40,6 +41,7 @@ import javax.swing.SwingWorker;
 import megamek.client.RandomNameGenerator;
 import megamek.common.MechSummaryCache;
 import megamek.common.QuirksHandler;
+import megamek.common.options.GameOptions;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
@@ -224,6 +226,12 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 // user can eiter choose a date or cancel by closing
                 if (dc.showDateChooser() == DateChooser.OK_OPTION) {
                 	campaign.calendar = dc.getDate();
+                	// Ensure that the MegaMek year GameOption matches the campaign year
+                    GameOptions gameOpts = campaign.getGameOptions();            
+                    int campaignYear = campaign.getCalendar().get(Calendar.YEAR);     
+                    if (gameOpts.intOption("year") != campaignYear) {
+                        gameOpts.getOption("year").setValue(campaignYear);
+                    }
                 }
             	CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(frame, true, campaign, app.getIconPackage().getCamos());
             	optionsDialog.setVisible(true);

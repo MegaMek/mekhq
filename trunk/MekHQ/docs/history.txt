@@ -9,6 +9,7 @@ v0.3.12-dev (SVN)
     I've fixed the NPE, but this still leaves the root cause of the issue unknown
     until questions in the ticket are answered. It would be best to fix that extraneous
     issue as well.
++ Bug [#749]: MM displays wrong year when launched from MHQ
 
 v0.3.11 (2015-01-28 18:00 UTC)
 + Bug [#783]: Scenario Resolution, Unable to View Unit or Edit Unit
@@ -2321,6 +2322,7 @@ v0.1.0 (2009-07-29)
 + Gyro repair and replacement
 + serialized classes
 + changed package structure
+
 + Fixed list selection indexing
 + mul example
 + new MegaMek.jar
