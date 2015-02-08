@@ -85,7 +85,10 @@ public class Rotor extends TankLocation {
 		super.fix();
 		damage--;
 		if(null != unit && unit.getEntity() instanceof VTOL) {
-			unit.getEntity().setInternal(unit.getEntity().getInternal(VTOL.LOC_ROTOR)+1, VTOL.LOC_ROTOR);
+		    int currIsVal = unit.getEntity().getInternal(VTOL.LOC_ROTOR); 
+		    int maxIsVal = unit.getEntity().getOInternal(VTOL.LOC_ROTOR); 
+		    int repairedIsVal = Math.min(maxIsVal, currIsVal + 1);
+			unit.getEntity().setInternal(repairedIsVal, VTOL.LOC_ROTOR);
 		}
 	}
 
