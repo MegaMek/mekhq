@@ -8295,7 +8295,7 @@ public class CampaignGUI extends JPanel {
                 if (row < 0) {
                     return;
                 }
-                Part part = taskModel.getTaskAt(row);
+                Part part = taskModel.getTaskAt(taskTable.convertRowIndexToModel(row));
                 JMenuItem menuItem = null;
                 JMenu menu = null;
                 JCheckBoxMenuItem cbMenuItem = null;
