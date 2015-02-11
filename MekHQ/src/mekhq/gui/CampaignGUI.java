@@ -3765,19 +3765,6 @@ public class CampaignGUI extends JPanel {
                                 + mv.getMechReadoutLoadout() + "</div>");
             }
         }
-        if (getSelectedServicedUnit() != null
-                && getSelectedServicedUnit().getEntity() != null) {
-            choiceLocation.removeAllItems();
-            choiceLocation.addItem("All");
-            for (String s : getSelectedServicedUnit().getEntity()
-                    .getLocationAbbrs()) {
-                choiceLocation.addItem(s);
-            }
-            choiceLocation.setEnabled(true);
-        } else {
-            choiceLocation.removeAllItems();
-            choiceLocation.setEnabled(false);
-        }
     }
 
     public void focusOnUnit(UUID id) {
@@ -6306,6 +6293,26 @@ public class CampaignGUI extends JPanel {
             uuid = getSelectedServicedUnit().getId();
         }
         taskModel.setData(getCampaign().getPartsNeedingServiceFor(uuid));
+
+        if (getSelectedServicedUnit() != null
+                && getSelectedServicedUnit().getEntity() != null) {
+            int index = choiceLocation.getSelectedIndex();
+            int numLocations = choiceLocation.getModel().getSize();
+            choiceLocation.removeAllItems();
+            choiceLocation.addItem("All");
+            for (String s : getSelectedServicedUnit().getEntity()
+                    .getLocationAbbrs()) {
+                choiceLocation.addItem(s);
+            }
+            choiceLocation.setSelectedIndex(0);
+            if (index > -1 && choiceLocation.getModel().getSize() == numLocations) {
+                choiceLocation.setSelectedIndex(index);
+            }
+            choiceLocation.setEnabled(true);
+        } else {
+            choiceLocation.removeAllItems();
+            choiceLocation.setEnabled(false);
+        }
     }
 
     public void refreshAcquireList() {
@@ -6640,7 +6647,7 @@ public class CampaignGUI extends JPanel {
                 if (part == null) {
                     return false;
                 }
-                if (loc != null) {
+                if (loc != null && !loc.isEmpty()) {
                     if (loc.equals("All")) {
                         return true;
                     } else if (part.getLocation() == part.getUnit().getEntity()
@@ -6688,7 +6695,7 @@ public class CampaignGUI extends JPanel {
                         return false;
                     }
                 }
-                return false;
+                return true;
             }
         };
         taskSorter.setRowFilter(taskLocationFilter);

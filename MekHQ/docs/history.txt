@@ -13,6 +13,7 @@ v0.3.12-dev (SVN)
 + Bug [#756]: VTOL Repair Issue Causes Internal Structure to Go Over Max IS
 + Bug [#790]: Heat sinks may not be purchased on intro tech level
 + Bug [#791]: Admin skills - scrounge sort order incorrect
++ Bug [#806]: Repair bay : Location filter is reset to "All" if you adjust the time of a task
 
 v0.3.11 (2015-01-28 18:00 UTC)
 + Bug [#783]: Scenario Resolution, Unable to View Unit or Edit Unit
