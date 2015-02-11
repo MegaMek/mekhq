@@ -1376,12 +1376,10 @@ public class CampaignGUI extends JPanel {
         personnelSorter = new TableRowSorter<PersonnelTableModel>(personModel);
         personnelSorter.setComparator(PersonnelTableModel.COL_RANK,
                 new RankSorter(getCampaign()));
-        personnelSorter.setComparator(PersonnelTableModel.COL_SKILL,
-                new LevelSorter());
-        personnelSorter.setComparator(PersonnelTableModel.COL_TACTICS,
-                new BonusSorter());
-        personnelSorter.setComparator(PersonnelTableModel.COL_TOUGH,
-                new BonusSorter());
+        personnelSorter.setComparator(PersonnelTableModel.COL_SKILL, new LevelSorter());
+        for (int i = PersonnelTableModel.COL_MECH; i < PersonnelTableModel.N_COL; i++) {
+            personnelSorter.setComparator(i, new BonusSorter());
+        }
         personnelSorter.setComparator(PersonnelTableModel.COL_SALARY,
                 new FormattedNumberSorter());
         personnelTable.setRowSorter(personnelSorter);
@@ -6005,7 +6003,7 @@ public class CampaignGUI extends JPanel {
                             	int speed = getCampaign().getUnit(id).getEntity().getWalkMP();
                             	if (getCampaign().getUnit(id).getEntity().getJumpMP() > 0) {
                             		if (getCampaign().getUnit(id).getEntity() instanceof megamek.common.Infantry) {
-                            			speed = getCampaign().getUnit(id).getEntity().getJumpMP(); 
+                            			speed = getCampaign().getUnit(id).getEntity().getJumpMP();
                             		} else {
                             			speed++;
                             		}
@@ -6037,8 +6035,8 @@ public class CampaignGUI extends JPanel {
 
         if (chosen.size() > 0) {
             // Ensure that the MegaMek year GameOption matches the campaign year
-            GameOptions gameOpts = getCampaign().getGameOptions();            
-            int campaignYear = getCampaign().getCalendar().get(Calendar.YEAR);     
+            GameOptions gameOpts = getCampaign().getGameOptions();
+            int campaignYear = getCampaign().getCalendar().get(Calendar.YEAR);
             if (gameOpts.intOption("year") != campaignYear) {
                 gameOpts.getOption("year").setValue(campaignYear);
             }

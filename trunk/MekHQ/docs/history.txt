@@ -12,6 +12,7 @@ v0.3.12-dev (SVN)
 + Bug [#749]: MM displays wrong year when launched from MHQ
 + Bug [#756]: VTOL Repair Issue Causes Internal Structure to Go Over Max IS
 + Bug [#790]: Heat sinks may not be purchased on intro tech level
++ Bug [#791]: Admin skills - scroungs sort order incorrect
 
 v0.3.11 (2015-01-28 18:00 UTC)
 + Bug [#783]: Scenario Resolution, Unable to View Unit or Edit Unit
