@@ -3600,19 +3600,26 @@ public class CampaignGUI extends JPanel {
                     }
                 }
             }
-            // also get the selected tech back
-            JTable table = techTable;
-            if (onWarehouseTab()) {
-                table = whTechTable;
-            }
-            for (int i = 0; i < table.getRowCount(); i++) {
-                Person p = techsModel
-                        .getTechAt(table.convertRowIndexToModel(i));
-                if (tech.getId().equals(p.getId())) {
-                    table.setRowSelectionInterval(i, i);
-                    break;
-                }
-            }
+			
+			JTable table = techTable;
+			if (onWarehouseTab()) {
+				table = whTechTable;
+			}
+			
+			// If requested, switch to top entry
+			if(getCampaign().getCampaignOptions().useResetToFirstTech() && table.getRowCount() > 0) {
+				table.setRowSelectionInterval(0, 0);
+			} else {
+				// Or get the selected tech back
+				for (int i = 0; i < table.getRowCount(); i++) {
+					Person p = techsModel
+							.getTechAt(table.convertRowIndexToModel(i));
+					if (tech.getId().equals(p.getId())) {
+						table.setRowSelectionInterval(i, i);
+						break;
+					}
+				}
+			}
         }
         if (selectedLocation != -1) {
             if (selectedUnit == null || getSelectedServicedUnit() == null

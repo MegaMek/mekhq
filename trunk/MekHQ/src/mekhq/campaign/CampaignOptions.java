@@ -166,6 +166,7 @@ public class CampaignOptions implements Serializable {
     private int repairSystem;
     private boolean useEraMods;
 	private boolean assignedTechFirst;
+	private boolean resetToFirstTech;
 
     //maintenance related
     private boolean checkMaintenance;
@@ -245,6 +246,7 @@ public class CampaignOptions implements Serializable {
         repairSystem = REPAIR_SYSTEM_STRATOPS;
         useEraMods = false;
         assignedTechFirst = false;
+		resetToFirstTech = false;
         useUnitRating = true;
         useTactics = false;
         useInitBonus = false;
@@ -479,6 +481,14 @@ public class CampaignOptions implements Serializable {
 
 	public void setAssignedTechFirst(boolean assignedTechFirst) {
 		this.assignedTechFirst = assignedTechFirst;
+	}
+	
+	public boolean useResetToFirstTech() {
+		return resetToFirstTech;
+	}
+	
+	public void setResetToFirstTech(boolean resetToFirstTech) {
+		this.resetToFirstTech = resetToFirstTech;
 	}
 
     public boolean useDragoonRating() {
@@ -1629,6 +1639,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitRatingMethod", unitRatingMethod.getDescription());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useEraMods", useEraMods);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "assignedTechFirst", assignedTechFirst);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "resetToFirstTech", resetToFirstTech);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTactics", useTactics);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useInitBonus", useInitBonus);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useToughness", useToughness);
@@ -1841,6 +1852,8 @@ public class CampaignOptions implements Serializable {
             	retVal.useEraMods = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("assignedTechFirst")) {
             	retVal.assignedTechFirst = Boolean.parseBoolean(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("resetToFirstTech")) {
+            	retVal.resetToFirstTech = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useTactics")) {
                 retVal.useTactics = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useInitBonus")) {
