@@ -1,5 +1,7 @@
 VERSION HISTORY
 ----------------------------------
+v0.3.13-dev (SVN)
+
 v0.3.12 (2015-02-12 15:45 UTC)
 + Bug: OpFor personnel are captured, even when not selected as prisoner or bondsman
 + Bug [#786]: AtB: Rank sort and prisoner rolls broken after battle
