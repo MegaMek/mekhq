@@ -1382,8 +1382,6 @@ public class CampaignGUI extends JPanel {
         }
         personnelSorter.setComparator(PersonnelTableModel.COL_SALARY,
                 new FormattedNumberSorter());
-        personnelSorter.setComparator(PersonnelTableModel.COL_XP,
-                new FormattedNumberSorter());
         personnelTable.setRowSorter(personnelSorter);
         ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
         sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_RANK,
