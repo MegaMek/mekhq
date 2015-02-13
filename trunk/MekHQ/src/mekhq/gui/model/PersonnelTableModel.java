@@ -35,7 +35,7 @@ import mekhq.gui.BasicInfo;
         private static final long serialVersionUID = -5207167419079014157L;
 
         private Campaign campaign;
-        
+
         public final static int COL_RANK     =    0;
         public final static int COL_NAME     =    1;
         public final static int COL_CALL     =    2;
@@ -81,7 +81,7 @@ import mekhq.gui.BasicInfo;
             data = new ArrayList<Person>();
             campaign = c;
         }
- 
+
         @Override
         public int getColumnCount() {
             return N_COL;
@@ -279,7 +279,7 @@ import mekhq.gui.BasicInfo;
                 return p.getGenderName();
             }
             if(col == COL_AGE) {
-                return p.getAge(getCampaign().getCalendar());
+                return Integer.toString(p.getAge(getCampaign().getCalendar()));
             }
             if(col == COL_TYPE) {
                 return p.getRoleDesc();
@@ -507,7 +507,7 @@ import mekhq.gui.BasicInfo;
 
             }
             if(col == COL_HITS) {
-                return p.getHits();
+                return Integer.toString(p.getHits());
             }
             if(col == COL_SKILL) {
                 return p.getSkillSummary();
@@ -548,11 +548,11 @@ import mekhq.gui.BasicInfo;
                     } else {
                         return "" + p.getTechUnitIDs().size() + " units (" + p.getMaintenanceTimeUsing() + "m)";
                     }
-                }             
+                }
                 return "-";
             }
             if(col == COL_XP) {
-                return p.getXp();
+                return Integer.toString(p.getXp());
             }
             if(col == COL_DEPLOY) {
                 Unit u = getCampaign().getUnit(p.getUnitId());
@@ -578,11 +578,11 @@ import mekhq.gui.BasicInfo;
             }
             return "?";
         }
-        
+
         private Campaign getCampaign() {
             return campaign;
         }
-        
+
         public void refreshData() {
             setData(getCampaign().getPersonnel());
         }
@@ -629,7 +629,7 @@ import mekhq.gui.BasicInfo;
             }
 
         }
-        
+
         public class VisualRenderer extends BasicInfo implements TableCellRenderer {
 
             private static final long serialVersionUID = -9154596036677641620L;
@@ -637,7 +637,7 @@ import mekhq.gui.BasicInfo;
             public VisualRenderer(IconPackage icons) {
                 super(icons);
             }
-            
+
             public Component getTableCellRendererComponent(JTable table,
                     Object value, boolean isSelected, boolean hasFocus,
                     int row, int column) {
@@ -711,7 +711,7 @@ import mekhq.gui.BasicInfo;
                         setText("", color);
                     }
                 }
-                
+
                 if (isSelected) {
                     c.setBackground(Color.DARK_GRAY);
                 } else {
@@ -724,7 +724,7 @@ import mekhq.gui.BasicInfo;
                 }
                 return c;
             }
-            
+
             private Image getHitsImage(int hits) {
                 switch(hits) {
                 case 1:
