@@ -260,8 +260,9 @@
 	</target>
 
 	<!-- Replace actual stubs with symlinks on mac systems -->
+	<!-- Currently disabled because we're using a shell script instead of an actual app stub -->
 	<target name="mac-stub" if="isOsMac" description="Create a dmg file from the OS X distribution (NOTE: only works on OSX)">
-		<delete file="${osxdist}/MekHQ.app/Contents/MacOS/JavaApplicationStub" />
+		<!-- <delete file="${osxdist}/MekHQ.app/Contents/MacOS/JavaApplicationStub" />
 		<exec executable="ln">
 			<arg line="-s /System/Library/Frameworks/JavaVM.framework/Resources/MacOS/JavaApplicationStub" />
 			<arg value="${osxdist}/MekHQ.app/Contents/MacOS/JavaApplicationStub" />
@@ -270,7 +271,7 @@
 		<exec executable="ln">
 			<arg line="-s /System/Library/Frameworks/JavaVM.framework/Resources/MacOS/JavaApplicationStub" />
 			<arg value="${osxdist}/MegaMek.app/Contents/MacOS/JavaApplicationStub" />
-		</exec>
+		</exec> -->
 	</target>
 
 	<target name="mac-zip">
@@ -384,6 +385,14 @@
 		<delete dir="${srcdist}" />
 	</target>
 
-	<target name="release" depends="localdev-build, mac-package, nix-package, win-package, source-package, localdev-clean" description="Build the project from local source and package it as Windows, Mac, Unix, and source-only" />
+    <target name="release" depends="localdev-build, mac-package, nix-package, win-package, source-package, localdev-clean" description="Build the project from local source and package it as Windows, Mac, Unix, and source-only" />
+
+    <target name="mac-release" depends="localdev-build, mac-package, localdev-clean" description="Build the project from local source and package it as Mac" />
+
+    <target name="win-release" depends="localdev-build, win-package, localdev-clean" description="Build the project from local source and package it as Windows" />
+
+    <target name="nix-release" depends="localdev-build, nix-package, localdev-clean" description="Build the project from local source and package it as Unix" />
+
+    <target name="src-release" depends="localdev-build, source-package, localdev-clean" description="Build the project from local source and package it as source-only" />
 
 </project>

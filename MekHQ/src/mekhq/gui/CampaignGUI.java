@@ -1382,6 +1382,8 @@ public class CampaignGUI extends JPanel {
         }
         personnelSorter.setComparator(PersonnelTableModel.COL_SALARY,
                 new FormattedNumberSorter());
+        personnelSorter.setComparator(PersonnelTableModel.COL_XP,
+                new FormattedNumberSorter());
         personnelTable.setRowSorter(personnelSorter);
         ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
         sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_RANK,
@@ -3600,12 +3602,12 @@ public class CampaignGUI extends JPanel {
                     }
                 }
             }
-			
+
 			JTable table = techTable;
 			if (onWarehouseTab()) {
 				table = whTechTable;
 			}
-			
+
 			// If requested, switch to top entry
 			if(getCampaign().getCampaignOptions().useResetToFirstTech() && table.getRowCount() > 0) {
 				table.setRowSelectionInterval(0, 0);
