@@ -617,7 +617,7 @@ import mekhq.gui.BasicInfo;
                     // tiger stripes
                     if (isDeployed(actualRow)) {
                         setBackground(Color.LIGHT_GRAY);
-                    } else if((Integer)getValueAt(actualRow,COL_HITS) > 0 || getPerson(actualRow).hasInjuries(true)) {
+                    } else if(Integer.parseInt((String) getValueAt(actualRow,COL_HITS)) > 0 || getPerson(actualRow).hasInjuries(true)) {
                         setBackground(Color.RED);
                     } else if (getPerson(actualRow).hasOnlyHealedPermanentInjuries()) {
                     	setBackground(new Color(0xee9a00));
