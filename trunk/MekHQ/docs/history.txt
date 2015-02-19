@@ -2,6 +2,7 @@ VERSION HISTORY
 ----------------------------------
 v0.3.13-dev (SVN)
 + Bug: Inappropriate mixing of string and integer in personnel table fields leads to class cast errors
++ Bug: Compiling with JDK 7 breaks Mac releases
 
 v0.3.12 (2015-02-12 15:45 UTC)
 + Bug: OpFor personnel are captured, even when not selected as prisoner or bondsman
