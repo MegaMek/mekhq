@@ -253,7 +253,7 @@
 
     <!-- Replace actual stubs with symlinks on mac systems -->
     <target name="mac-stub" if="isOsMac" description="Create a dmg file from the OS X distribution (NOTE: only works on OSX)">
-        <delete file="${osxdist}/MekHQ.app/Contents/MacOS/JavaApplicationStub" />
+        <!-- <delete file="${osxdist}/MekHQ.app/Contents/MacOS/JavaApplicationStub" />
         <exec executable="ln">
             <arg line="-s /System/Library/Frameworks/JavaVM.framework/Resources/MacOS/JavaApplicationStub" />
             <arg value="${osxdist}/MekHQ.app/Contents/MacOS/JavaApplicationStub" />
@@ -262,7 +262,7 @@
         <exec executable="ln">
             <arg line="-s /System/Library/Frameworks/JavaVM.framework/Resources/MacOS/JavaApplicationStub" />
             <arg value="${osxdist}/MegaMek.app/Contents/MacOS/JavaApplicationStub" />
-        </exec>
+        </exec> -->
     </target>
 
     <target name="mac-zip">

@@ -26,7 +26,7 @@
       <key>MainClass</key>
       <string>megameklab.com.MegaMekLab</string>
       <key>JVMVersion</key>
-      <string>1.6+</string>
+      <string>1.7+</string>
       <key>ClassPath</key>
       <array>
         <string>$JAVAROOT/../../../../MekHQ.app/Contents/Resources/Java/MegaMekLab.jar</string>
