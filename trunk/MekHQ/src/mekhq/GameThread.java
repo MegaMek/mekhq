@@ -13,6 +13,7 @@
 package mekhq;
 
 import java.awt.KeyboardFocusManager;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import megamek.client.Client;
@@ -22,6 +23,7 @@ import megamek.client.ui.swing.util.MegaMekController;
 import megamek.common.Entity;
 import megamek.common.IGame;
 import megamek.common.KeyBindParser;
+import megamek.common.WeaponOrderHandler;
 import megamek.common.preference.PreferenceManager;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
@@ -147,6 +149,12 @@ class GameThread extends Thread implements CloseClientListener {
     
     public void requestStop() {
     	PreferenceManager.getInstance().save();
+    	try {
+            WeaponOrderHandler.saveWeaponOrderFile();
+        } catch (IOException e) {
+            System.out.println("Error saving custom weapon orders!");
+            e.printStackTrace();
+        }
     	stop = true;
     }
     
