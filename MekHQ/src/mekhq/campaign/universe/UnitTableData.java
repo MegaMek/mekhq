@@ -34,7 +34,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -71,6 +70,9 @@ public class UnitTableData implements Serializable, ActionListener {
 	private Thread loader;
 	private boolean initialized;
 	private boolean initializing;
+	
+	//used for CampaignOptionsDialog
+	private static ArrayList<String> allRatNames;
 
 	private ArrayList<ActionListener> listeners;
 
@@ -107,8 +109,12 @@ public class UnitTableData implements Serializable, ActionListener {
 	public static final int QUALITY_A = 4;
 	public static final int QUALITY_AA = 5;
 
-	public Set<String> getAllRATNames() {
-		return ratTree.keySet();
+	public static ArrayList<String> getAllRATNames() {
+		if (allRatNames == null) {
+			allRatNames = new ArrayList<String>();
+			populateRatNames();
+		}
+		return allRatNames;
 	}
 	
 	/**
@@ -508,6 +514,76 @@ public class UnitTableData implements Serializable, ActionListener {
 
 	public boolean isInitialized() {
 		return initialized;
+	}
+
+	/**
+	 * Scans ratinfo.xml for names of RATs and their eras for use in CampaignOptionsDialog
+	 * to avoid having all the data in memory for non-AtB campaigns
+	 */
+	public static void populateRatNames() {
+		//Remember the first and last eras for each RAT
+		HashMap<String, Integer> earliest = new HashMap<String, Integer>();
+		HashMap<String, Integer> latest = new HashMap<String, Integer>();
+		
+		File f = new File("data/universe/ratinfo.xml");
+		FileInputStream fis = null;
+
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		Document xmlDoc = null;
+		DocumentBuilder db;
+
+		try {
+			fis = new FileInputStream(f);
+			db = dbf.newDocumentBuilder();
+			xmlDoc = db.parse(fis);
+			fis.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			MekHQ.logError("While loading unit table data: " + ex.getMessage());
+		}
+				
+		Element elem = xmlDoc.getDocumentElement();
+		NodeList nl = elem.getChildNodes();
+		elem.normalize();
+		
+		for (int i = 0; i < nl.getLength(); i++) {
+			Node ratNode = nl.item(i);
+			if (ratNode.getParentNode() != elem) {
+				continue;
+			}
+			
+			int xc = ratNode.getNodeType();
+			
+			if (xc == Node.ELEMENT_NODE) {
+				String xn = ratNode.getNodeName();
+				if (xn.equalsIgnoreCase("rat")) {
+					String ratSource = ratNode.getAttributes().getNamedItem("name").getTextContent();
+					int year = Integer.parseInt(ratNode.getAttributes().getNamedItem("era").getTextContent());
+					if (earliest.containsKey(ratSource)) {
+						if (year < earliest.get(ratSource)) {
+							earliest.put(ratSource, year);
+						}
+						if (year > latest.get(ratSource)) {
+							latest.put(ratSource, year);
+						}
+					} else {
+						earliest.put(ratSource, year);
+						latest.put(ratSource, year);
+					}
+				}
+			}
+		}
+		if (allRatNames == null) {
+			allRatNames = new ArrayList<String>();
+		}
+		for (String rat : earliest.keySet()) {
+			if (earliest.get(rat).equals(latest.get(rat))) {
+				allRatNames.add("(" + earliest.get(rat) + ") " + rat);
+			} else {
+				allRatNames.add("(" + earliest.get(rat) + "-" + latest.get(rat) + ") " + rat);
+			}
+		}
+		Collections.sort(allRatNames);
 	}
 
 	public class FactionTables {

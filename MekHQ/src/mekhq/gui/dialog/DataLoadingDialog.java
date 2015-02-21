@@ -127,23 +127,13 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             } catch (Exception ex) {
     			ex.printStackTrace();
             }
+            try {
+            	//Load values needed for CampaignOptionsDialog
+            	UnitTableData.populateRatNames();
+            } catch (Exception ex) {
+    			ex.printStackTrace();
+            }
             while (!Planets.getInstance().isInitialized()) {
-                //Sleep for up to one second.
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException ignore) {
-
-                }
-            }
-            while (!RandomFactionGenerator.getInstance().isInitialized()) {
-                //Sleep for up to one second.
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException ignore) {
-
-                }
-            }
-            while (!UnitTableData.getInstance().isInitialized()) {
                 //Sleep for up to one second.
                 try {
                     Thread.sleep(50);
