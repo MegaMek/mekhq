@@ -4305,7 +4305,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     		final String[] officerSkills = {SkillType.S_TACTICS,SkillType.S_STRATEGY,SkillType.S_LEADER};
 
     		final int[] combatXp = {5, 5, 5, 5, 10, 20, 40, 60, 100, -1, -1};
-    		final int[] supportXp = {5, 0, 5, 10, 20, 40, -1, -1, -1, -1, -1};
+    		final int[] supportXp = {1, 5, 0, 10, 20, 40, -1, -1, -1, -1, -1};
     		final int[] officerXp = {10, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
 
             HashMap<String, Integer> skillIndices = new HashMap<String, Integer>();
