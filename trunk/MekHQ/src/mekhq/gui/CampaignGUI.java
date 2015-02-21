@@ -110,6 +110,8 @@ import javax.swing.tree.TreeSelectionModel;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import megamek.client.RandomNameGenerator;
+import megamek.client.RandomUnitGenerator;
 import megamek.common.AmmoType;
 import megamek.common.Crew;
 import megamek.common.Dropship;
@@ -174,6 +176,8 @@ import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.campaign.universe.UnitTableData;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.Modes;
 import mekhq.gui.adapter.FinanceTableMouseAdapter;
@@ -4205,10 +4209,17 @@ public class CampaignGUI extends JPanel {
         if (null == f) {
             return;
         }
+        boolean hadAtB = getCampaign().getCampaignOptions().getUseAtB();
         DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(
                 getApplication(), getFrame(), f);
         // TODO: does this effectively deal with memory management issues?
         dataLoadingDialog.setVisible(true);
+        if (hadAtB && !getCampaign().getCampaignOptions().getUseAtB()) {
+        	UnitTableData.getInstance().dispose();
+        	RandomFactionGenerator.getInstance().dispose();
+        	RandomUnitGenerator.getInstance().dispose();
+        	RandomNameGenerator.getInstance().dispose();
+        }
     }
 
     private File selectLoadCampaignFile() {
@@ -4389,6 +4400,43 @@ public class CampaignGUI extends JPanel {
                     .getUseAtB());
             miRetirementDefectionDialog.setVisible(getCampaign()
                     .getCampaignOptions().getUseAtB());
+            if (getCampaign().getCampaignOptions().getUseAtB()) {
+                while (!RandomFactionGenerator.getInstance().isInitialized()) {
+                    //Sleep for up to one second.
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException ignore) {
+
+                    }
+                }
+                while (!UnitTableData.getInstance().isInitialized()) {
+                    //Sleep for up to one second.
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException ignore) {
+
+                    }
+                }
+                /* UnitTableData starts initializing RandomUnitGenerator, but we want to make
+                 * sure it's finished before allowing actions that will need it.
+                 */
+                while (!RandomUnitGenerator.getInstance().isInitialized()) {
+                    //Sleep for up to one second.
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException ignore) {
+
+                    }
+                }
+                RandomNameGenerator.getInstance();
+    			RandomFactionGenerator.getInstance().updateTables(getCampaign().getDate(),
+    					getCampaign().getCurrentPlanet(), getCampaign().getCampaignOptions());
+            } else {
+            	RandomFactionGenerator.getInstance().dispose();
+            	UnitTableData.getInstance().dispose();
+            	RandomUnitGenerator.getInstance().dispose();
+            	RandomNameGenerator.getInstance().dispose();
+            }
         }
         refreshCalendar();
         getCampaign().reloadNews();

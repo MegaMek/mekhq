@@ -53,6 +53,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import megamek.client.RandomNameGenerator;
+import megamek.client.RandomUnitGenerator;
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
 import megamek.common.BombType;
@@ -152,6 +153,7 @@ import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planets;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.campaign.universe.UnitTableData;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IPartWork;
@@ -2752,6 +2754,34 @@ public class Campaign implements Serializable {
         shoppingList.restore();
 
 		if (getCampaignOptions().getUseAtB()) {
+            while (!RandomFactionGenerator.getInstance().isInitialized()) {
+                //Sleep for up to one second.
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException ignore) {
+
+                }
+            }
+            while (!UnitTableData.getInstance().isInitialized()) {
+                //Sleep for up to one second.
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException ignore) {
+
+                }
+            }
+            /* UnitTableData starts initializing RandomUnitGenerator, but we want to make
+             * sure it's finished before allowing actions that will need it.
+             */
+            while (!RandomUnitGenerator.getInstance().isInitialized()) {
+                //Sleep for up to one second.
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException ignore) {
+
+                }
+            }
+            RandomNameGenerator.getInstance();
 			RandomFactionGenerator.getInstance().updateTables(getDate(),
 					location.getCurrentPlanet(), getCampaignOptions());
 		}

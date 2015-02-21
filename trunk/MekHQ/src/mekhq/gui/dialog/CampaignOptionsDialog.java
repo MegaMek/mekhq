@@ -3173,7 +3173,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         chosenRatModel = new DefaultListModel<String>();
         for (String rat : options.getRATs()) {
-        	chosenRatModel.addElement(rat);
+        	for (String displayName : UnitTableData.getAllRATNames()) {
+        		if (displayName.endsWith(rat)) {
+        			chosenRatModel.addElement(displayName);
+        			break;
+        		}
+        	}
         }
         chosenRats.setModel(chosenRatModel);
         chosenRats.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -3186,7 +3191,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 			}
         });
         availableRatModel = new DefaultListModel<String>();
-        for (String rat : UnitTableData.getInstance().getAllRATNames()) {
+        for (String rat : UnitTableData.getAllRATNames()) {
         	if (!chosenRatModel.contains(rat)) {
         		availableRatModel.addElement(rat);
         	}
@@ -4011,8 +4016,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setOpforUsesVTOLs(chkOpforUsesVTOLs.isSelected());
         options.setUseDropShips(chkUseDropShips.isSelected());
 
+        //Strip dates used in display name
         String[] ratList = new String[chosenRatModel.size()];
-        chosenRatModel.copyInto(ratList);
+        for (int i = 0; i < chosenRatModel.size(); i++) {
+        	ratList[i] = chosenRatModel.elementAt(i).replaceFirst("\\(.*?\\) ", "");
+        }
         options.setRATs(ratList);
         options.setSearchRadius((Integer)spnSearchRadius.getValue());
         options.setIntensity((Double)spnIntensity.getValue());

@@ -172,6 +172,31 @@ public class RandomFactionGenerator implements Serializable {
 		}
 	}
 	
+	public void dispose() {
+		if (initialized){
+			clear();
+		}
+	}
+
+	public void clear() {
+		rfg = null;
+		currentFactions.clear();
+		employers.clear();
+		borders.clear();
+		deepPeriphery.clear();
+		neutralFactions.clear();
+		majorPowers.clear();		
+		wars.clear();
+		alliances.clear();
+		rivals.clear();
+		neutralExceptions.clear();
+		containedFactions.clear();
+		
+		initialized = false;
+		initializing = false;
+	}	
+
+	
 	private void loadFactionHints() throws DOMException, ParseException {
 		MekHQ.logMessage("Starting load of faction hint data from XML...");
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
