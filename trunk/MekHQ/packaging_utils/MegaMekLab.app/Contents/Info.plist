@@ -34,7 +34,7 @@
         <string>$JAVAROOT/../../../../MekHQ.app/Contents/Resources/Java/lib/TinyXML.jar</string>
       </array>
       <key>VMOptions</key>
-      <string>-Xmx256m</string>
+      <string>-Xmx512m</string>
       <key>WorkingDirectory</key>
       <string>$APP_PACKAGE/../</string>
       <key>Properties</key>

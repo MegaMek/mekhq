@@ -54,7 +54,7 @@
         <string>$JAVAROOT/../../../../MekHQ.app/Contents/Resources/Java/lib/xstream-1.4.4.jar</string>
       </array>
       <key>VMOptions</key>
-      <string>-Xmx512m</string>
+      <string>-Xmx1024m</string>
       <key>WorkingDirectory</key>
       <string>$APP_PACKAGE/../</string>
       <key>Properties</key>

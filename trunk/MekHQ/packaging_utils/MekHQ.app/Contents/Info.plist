@@ -41,7 +41,7 @@
         <string>$JAVAROOT/../../../../MegaMekLab.app/Contents/Resources/Java/MegaMekLab.jar</string>
       </array>
       <key>VMOptions</key>
-      <string>-Xmx512m</string>
+      <string>-Xmx1200m</string>
       <key>WorkingDirectory</key>
       <string>$APP_PACKAGE/../</string>
       <key>Properties</key>
