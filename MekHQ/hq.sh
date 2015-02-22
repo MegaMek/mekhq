@@ -21,4 +21,4 @@ cd $(dirname 0)
 JAVA=/usr/bin/java
 test -x "$JAVA_HOME/bin/java" && JAVA="$JAVA_HOME/bin/java"
 
-$JAVA -Xmx512m -jar MekHQ.jar
+$JAVA -Xmx1200m -jar MekHQ.jar
