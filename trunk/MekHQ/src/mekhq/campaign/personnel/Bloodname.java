@@ -123,6 +123,20 @@ public class Bloodname implements Serializable {
 		return absorbed;
 	}
 
+	/**
+	 * 
+	 * @param warriorType A Person.PHENOTYPE_* constant
+	 * @param year The current year of the campaign setting
+	 * @return An adjustment to the frequency of this name for the phenotype.
+	 * 
+	 * A warrior is three times as likely to have a Bloodname associated with the
+	 * same phenotype as a general name (which is split among the three types).
+	 * Elemental names are treated as general prior to 2870. The names that later
+	 * became associated with ProtoMech pilots (identified in WoR) are assumed
+	 * to have been poor performers and have a lower frequency even before the
+	 * invention of the PM, though have a higher frequency for PM pilots than other
+	 * aerospace names. 
+	 */
 	public int phenotypeMultiplier(int warriorType, int year) {
 		switch (phenotype) {
 		case P_MECHWARRIOR:
@@ -223,6 +237,17 @@ public class Bloodname implements Serializable {
 		return randomBloodname(Clan.getClan(factionCode), phenotype, year);
 	}
 
+	/**
+	 * Determines a likely Bloodname based on Clan, phenotype, and year.
+	 * 
+	 * @param faction The faction code for the Clan; must exist in data/names/bloodnames/clans.xml
+	 * @param phenotype One of the Person.PHENOTYPE_* constants
+	 * @param year The current campaign year
+	 * @return An object representing the chosen Bloodname
+	 * 
+	 * Though based as much as possible on official sources, the method employed here involves a
+	 * considerable amount of speculation.
+	 */
 	public static Bloodname randomBloodname(Clan faction, int phenotype, int year) {
 	    if (null == faction) {
 	        MekHQ.logError("Random Bloodname attempted for a clan that does not exist."
@@ -231,17 +256,32 @@ public class Bloodname implements Serializable {
 	        return null;
 	    }
 		if (Compute.randomInt(20) == 0) {
+			/* 1 in 20 chance that warrior was taken as isorla from another Clan */
 			return randomBloodname(faction.getRivalClan(year), phenotype, year);
 		}
 		if (Compute.randomInt(20) == 0) {
+			/* Bloodnames that are predominantly used for a particular phenotype are not
+			 * exclusively used for that phenotype. A 5% chance of ignoring phenotype will
+			 * result in a very small chance (around 1%) of a Bloodname usually associated
+			 * with a different phenotype.
+			 */
 			phenotype = Bloodname.P_GENERAL;
 		}
 
+		/* The relative probability of the various Bloodnames that are original to this Clan */
 		HashMap<Bloodname, Fraction> weights = new HashMap<Bloodname, Fraction>();
+		/* A list of non-exclusive Bloodnames from other Clans */
 		ArrayList<Bloodname> nonExclusives = new ArrayList<Bloodname>();
+		/* The relative probability that a warrior in this Clan will have a non-exclusive
+		 * Bloodname that originally belonged to another Clan; the smaller the number
+		 * of exclusive Bloodnames of this Clan, the larger this chance.
+		 */
 		double nonExclusivesWeight = 0.0;
 
 		for (Bloodname name : bloodnames) {
+			/* Bloodnames exclusive to Clans that have been abjured (NC, WIE) continue
+			 * to be used by those Clans but not by others.
+			 */
 			if (name.isInactive(year) ||
 					(name.isAbjured(year) && !name.getOrigClan().equals(faction)) ||
 					0 == name.phenotypeMultiplier(phenotype, year)) {
@@ -250,6 +290,10 @@ public class Bloodname implements Serializable {
 
 			Fraction weight = null;
 
+			/* Effects of the Wars of Reaving would take a generation to show up
+			 * in the breeding programs, so the tables given in the WoR sourcebook
+			 * are in effect from about 3100 on.
+			 */
 			if (year < 3100) {
 				int numClans = 1;
 				for (Bloodname.NameAcquired a : name.getAcquiringClans()) {
@@ -257,6 +301,11 @@ public class Bloodname implements Serializable {
 						numClans++;
 					}
 				}
+				/* Non-exclusive names have a weight of 1 (equal to exclusives) up to 2900,
+				 * then decline 10% per 50 years to a minimum of 0.6 in 3050+. In the few
+				 * cases where the other Clans using the name are known, the weight is
+				 * 1/(number of Clans) instead.
+				 */
 				if (name.getOrigClan().equals(faction.getCode()) ||
 						(null != name.getAbsorbed() && faction.equals(name.getAbsorbed().clan) &&
 						name.getAbsorbed().year > year)) {
@@ -265,9 +314,18 @@ public class Bloodname implements Serializable {
 					} else {
 						weight = eraFraction(year);
 						nonExclusivesWeight += 1 - eraFraction(year).value();
-						weight.mul(eraFraction(year));
+						/* The fraction is squared to represent the combined effect
+						 * of increasing distribution among the Clans and the likelihood
+						 * that non-exclusive names would suffer
+						 * more reavings and have a lower Bloodcount.
+						 */
+					weight.mul(eraFraction(year));
 					}
 				} else {
+					/* Most non-exclusives have an unknown distribution and are estimated.
+					 * When the actual Clans sharing the Bloodname are known, it is divided
+					 * among those Clans.
+					 */
 					for (Bloodname.NameAcquired a : name.getAcquiringClans()) {
 						if (faction.equals(a.clan)) {
 							weight = new Fraction(1, numClans);
@@ -284,6 +342,9 @@ public class Bloodname implements Serializable {
 				if (name.getPostReavingClans().contains(faction)) {
 					weight = new Fraction(name.phenotypeMultiplier(phenotype, year),
 							name.getPostReavingClans().size());
+					/* Assume that Bloodnames that were exclusive before the Wars of Reaving
+					 * are more numerous (higher bloodcount).
+					 */
 					if (!name.isLimited()) {
 						if (name.isExclusive()) {
 							weight.mul(4);
@@ -324,6 +385,14 @@ public class Bloodname implements Serializable {
 		return nameList.get(roll);
 	}
 
+	/**
+	 * Represents the decreasing frequency of non-exclusive names within the original Clan
+	 * due to dispersal throughout the Clans and reavings.
+	 * 
+	 * @param year The current year of the campaign
+	 * @return A fraction that decreases by 10%/year
+	 */
+	
 	private static Fraction eraFraction(int year) {
 		if (year < 2900) {
 			return new Fraction(1);
