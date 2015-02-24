@@ -150,7 +150,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     			if (p.getPrimaryRole() >= Person.T_MECH_TECH) {
     				support++;
     			} else if (null == p.getUnitId() ||
-    					campaign.getUnit(p.getUnitId()).isCommander(p)) {
+    					(null != campaign.getUnit(p.getUnitId()) && campaign.getUnit(p.getUnitId()).isCommander(p))) {
     				/* The AtB rules do not state that crews count as a 
     				 * single person for leadership purposes, but to do otherwise
     				 * would tax all but the most exceptional commanders of
@@ -188,7 +188,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     			continue;
     		}
     		/* Infantry units retire or defect by platoon */
-    		if (null != p.getUnitId() && campaign.getUnit(p.getUnitId()).usesSoldiers() &&
+    		if (null != p.getUnitId() && null != campaign.getUnit(p.getUnitId()) && campaign.getUnit(p.getUnitId()).usesSoldiers() &&
     				!campaign.getUnit(p.getUnitId()).isCommander(p)) {
     			continue;
     		}
