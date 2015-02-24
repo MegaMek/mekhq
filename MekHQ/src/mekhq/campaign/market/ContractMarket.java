@@ -737,17 +737,18 @@ public class ContractMarket implements Serializable {
 
 	private void rollSalvageClause(AtBContract contract, int mod) {
 		contract.setSalvageExchange(false);
-		int roll = Compute.d6(2) + mod;
-		if (roll < 4) contract.setSalvagePct(0);
-		else if (roll < 4) {
+		int roll = Math.min(Compute.d6(2) + mod, 13);
+		if (roll < 2) {
+			contract.setSalvagePct(0);
+		} else if (roll < 4) {
 			contract.setSalvageExchange(true);
 			int r;
 			do {
 				r = Compute.d6(2);
 			} while (r < 4);
-			contract.setSalvagePct((roll - 3) * 10);
+			contract.setSalvagePct(Math.min((r - 3) * 10, 100));
 		} else {
-			contract.setSalvagePct((roll - 3) * 10);
+			contract.setSalvagePct(Math.min((roll - 3) * 10, 100));
 		}
 	}
 
@@ -762,7 +763,7 @@ public class ContractMarket implements Serializable {
 		} else if (roll == 8) {
 		    contract.setBattleLossComp(10);
 		} else {
-		    contract.setBattleLossComp((roll - 8) * 20);
+		    contract.setBattleLossComp(Math.min((roll - 8) * 20, 100));
 		}
 	}
 
