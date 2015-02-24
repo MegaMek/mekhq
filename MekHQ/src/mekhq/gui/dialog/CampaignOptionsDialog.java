@@ -4297,16 +4297,16 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     	if (btnUseAtBSkillCosts.isSelected()) {
     		final String[] combatSkills = {SkillType.S_PILOT_MECH,SkillType.S_GUN_MECH,SkillType.S_PILOT_AERO,SkillType.S_GUN_AERO,
     				SkillType.S_PILOT_GVEE,SkillType.S_PILOT_VTOL,SkillType.S_PILOT_NVEE,SkillType.S_GUN_VEE,
-    				SkillType.S_PILOT_JET,SkillType.S_GUN_JET,SkillType.S_PILOT_SPACE,SkillType.S_GUN_SPACE,SkillType.S_ARTILLERY,
-    				SkillType.S_GUN_BA,SkillType.S_GUN_PROTO,SkillType.S_SMALL_ARMS,SkillType.S_ANTI_MECH};
+    				SkillType.S_PILOT_JET,SkillType.S_GUN_JET,SkillType.S_PILOT_SPACE,SkillType.S_GUN_SPACE,SkillType.S_NAV,
+    				SkillType.S_ARTILLERY,SkillType.S_GUN_BA,SkillType.S_GUN_PROTO,SkillType.S_SMALL_ARMS,SkillType.S_ANTI_MECH};
     		final String[] supportSkills = {SkillType.S_TECH_MECH,SkillType.S_TECH_MECHANIC,SkillType.S_TECH_AERO,SkillType.S_TECH_BA,SkillType.S_TECH_VESSEL,SkillType.S_ASTECH,
-    				SkillType.S_DOCTOR,SkillType.S_MEDTECH,SkillType.S_NAV,
+    				SkillType.S_DOCTOR,SkillType.S_MEDTECH,
     				SkillType.S_ADMIN,SkillType.S_NEG,SkillType.S_SCROUNGE};
     		final String[] officerSkills = {SkillType.S_TACTICS,SkillType.S_STRATEGY,SkillType.S_LEADER};
 
     		final int[] combatXp = {5, 5, 5, 5, 10, 20, 40, 60, 100, -1, -1};
-    		final int[] supportXp = {1, 5, 0, 10, 20, 40, -1, -1, -1, -1, -1};
-    		final int[] officerXp = {10, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
+    		final int[] supportXp = {0, 5, 0, 10, 20, 40, -1, -1, -1, -1, -1};
+    		final int[] officerXp = {0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
 
             HashMap<String, Integer> skillIndices = new HashMap<String, Integer>();
     		for (int i = 0; i < SkillType.skillList.length; i++) {
