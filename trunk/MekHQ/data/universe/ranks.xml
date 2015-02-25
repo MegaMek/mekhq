@@ -2365,27 +2365,27 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E5 -->
 		<rank>
-			<rankNames>Point 1,--MW,--MW,-,-,-</rankNames>
+			<rankNames>Point 1,--MW,--MW,--MW,--MW,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E6 -->
 		<rank>
-			<rankNames>Point 2,--MW,--MW,-,-,-</rankNames>
+			<rankNames>Point 2,--MW,--MW,--MW,--MW,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E7 -->
 		<rank>
-			<rankNames>Point 3,--MW,--MW,-,-,-</rankNames>
+			<rankNames>Point 3,--MW,--MW,--MW,--MW,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E8 -->
 		<rank>
-			<rankNames>Point 4,--MW,--MW,-,-,-</rankNames>
+			<rankNames>Point 4,--MW,--MW,--MW,--MW,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E9 -->
 		<rank>
-			<rankNames>Point 5,--MW,--MW,-,-,-</rankNames>
+			<rankNames>Point 5,--MW,--MW,--MW,--MW,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E10 -->
@@ -2495,22 +2495,22 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O1 -->
 		<rank>
-			<rankNames>Star Commander,-,-,-,-,-</rankNames>
+			<rankNames>Star Commander,--MW,--MW,--MW,--MW,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O2 -->
 		<rank>
-			<rankNames>Nova Commander,-,-,-,-,-</rankNames>
+			<rankNames>Nova Commander,--MW,--MW,--MW,--MW,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O3 -->
 		<rank>
-			<rankNames>Star Captain,-,-,-,-,-</rankNames>
+			<rankNames>Star Captain,--MW,--MW,--MW,--MW,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O4 -->
 		<rank>
-			<rankNames>Nova Captain,-,-,-,-,-</rankNames>
+			<rankNames>Nova Captain,--MW,--MW,--MW,--MW,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O5 -->
@@ -2525,12 +2525,12 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O7 -->
 		<rank>
-			<rankNames>Star Colonel,-,-,Star Commodore,-,-</rankNames>
+			<rankNames>Star Colonel,--MW,--MW,Star Commodore,--MW,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O8 -->
 		<rank>
-			<rankNames>Galaxy Commander,-,-,Star Admiral,-,-</rankNames>
+			<rankNames>Galaxy Commander,--MW,--MW,Star Admiral,--MW,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O9 -->
@@ -2560,27 +2560,27 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O14 -->
 		<rank>
-			<rankNames>Oathmaster,-,-,--MW,-,-</rankNames>
+			<rankNames>Oathmaster,--MW,--MW,--MW,--MW,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O15 -->
 		<rank>
-			<rankNames>Loremaster,-,-,--MW,-,-</rankNames>
+			<rankNames>Loremaster,--MW,--MW,--MW,--MW,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O16 -->
 		<rank>
-			<rankNames>saKhan,-,-,--MW,-,-</rankNames>
+			<rankNames>saKhan,--MW,--MW,--MW,--MW,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O17 -->
 		<rank>
-			<rankNames>Khan,-,-,--MW,-,-</rankNames>
+			<rankNames>Khan,--MW,--MW,--MW,--MW,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O18 -->
 		<rank>
-			<rankNames>ilKhan,-,-,--MW,-,-</rankNames>
+			<rankNames>ilKhan,--MW,--MW,--MW,--MW,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O19 -->
