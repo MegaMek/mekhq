@@ -11,7 +11,8 @@ v0.3.13-dev (SVN)
 + Bug [#781]: AtB: Tech/Admin/Doctor XP costs are wrong when using "Use AtB Skills Option"
 + Bug [#825]: [ATB] Contract incorrectly generated with 110% salvage
 + Patch [patches:#44]: Hotfix for retirement screen not coming up
-	Fixes Bug [#817] Atb: Defection/retirement screen will not populate 
+	Fixes Bug [#817] Atb: Defection/retirement screen will not populate
++ Feature: [AtB] Contract fatigue rules from v2.30 
 
 v0.3.12 (2015-02-12 15:45 UTC)
 + Bug: OpFor personnel are captured, even when not selected as prisoner or bondsman
