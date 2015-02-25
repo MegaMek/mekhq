@@ -14,6 +14,7 @@ v0.3.13-dev (SVN)
 	Fixes Bug [#817] Atb: Defection/retirement screen will not populate
 + Feature: [AtB] Contract fatigue rules from v2.30
 + Bug: [#822]: [ATB] Base attack (defender) mission generated with no opfor due to a NPE
++ Bug: [#784] Clan Aerospace Pilot Ranks
 
 v0.3.12 (2015-02-12 15:45 UTC)
 + Bug: OpFor personnel are captured, even when not selected as prisoner or bondsman
