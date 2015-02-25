@@ -51,7 +51,6 @@ import megamek.common.MechSummaryCache;
 import megamek.common.PlanetaryConditions;
 import megamek.common.Player;
 import megamek.common.UnitType;
-import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
@@ -1814,7 +1813,7 @@ public class AtBScenario extends Scenario {
 
 		try {
 			en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
-		} catch (EntityLoadingException ex) {
+		} catch (Exception ex) {
 			en = null;
 			MekHQ.logError("Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage());
 			MekHQ.logError(ex);
@@ -1896,7 +1895,7 @@ public class AtBScenario extends Scenario {
         MechFileParser mechFileParser = null;
         try {
             mechFileParser = new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName());
-        } catch (EntityLoadingException ex) {
+        } catch (Exception ex) {
             MekHQ.logError(ex);
             MekHQ.logError("Unable to load unit: " + name);
         }
