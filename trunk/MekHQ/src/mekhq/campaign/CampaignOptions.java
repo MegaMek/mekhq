@@ -213,6 +213,7 @@ public class CampaignOptions implements Serializable {
     private boolean sharesExcludeLargeCraft;
     private boolean sharesForAll;
     private boolean retirementRolls;
+    private boolean trackUnitFatigue;
     private boolean customRetirementMods;
     private boolean trackOriginalUnit;
     private boolean mercSizeLimited;
@@ -400,6 +401,7 @@ public class CampaignOptions implements Serializable {
         sharesForAll = false;
         retirementRolls = true;
         customRetirementMods = false;
+        trackUnitFatigue = false;
         trackOriginalUnit = false;
         mercSizeLimited = false;
     	regionalMechVariations = false;
@@ -1440,6 +1442,14 @@ public class CampaignOptions implements Serializable {
 		return mercSizeLimited;
 	}
 
+	public boolean getTrackUnitFatigue() {
+		return trackUnitFatigue;
+	}
+	
+	public void setTrackUnitFatigue(boolean fatigue) {
+		trackUnitFatigue = fatigue;
+	}
+	
 	public void setMercSizeLimited(boolean limit) {
 		mercSizeLimited = limit;
 	}
@@ -1756,6 +1766,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "sharesForAll", sharesForAll);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "retirementRolls", retirementRolls);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "customRetirementMods", customRetirementMods);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trackUnitFatigue", trackUnitFatigue);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "mercSizeLimited", mercSizeLimited);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trackOriginalUnit", trackOriginalUnit);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "regionalMechVariations", regionalMechVariations);
@@ -2160,6 +2171,8 @@ public class CampaignOptions implements Serializable {
                 retVal.retirementRolls = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("customRetirementMods")) {
                 retVal.customRetirementMods = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("trackUnitFatigue")) {
+                retVal.trackUnitFatigue = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("trackOriginalUnit")) {
                 retVal.trackOriginalUnit = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("mercSizeLimited")) {

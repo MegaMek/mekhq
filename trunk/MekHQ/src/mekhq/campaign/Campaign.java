@@ -262,6 +262,7 @@ public class Campaign implements Serializable {
     private ContractMarket contractMarket; //AtB
     private UnitMarket unitMarket; //AtB
     private RetirementDefectionTracker retirementDefectionTracker; // AtB
+    private int fatigueLevel; //AtB
     private AtBConfiguration atbConfig; //AtB
 
     public Campaign() {
@@ -305,6 +306,7 @@ public class Campaign implements Serializable {
         contractMarket = new ContractMarket();
         unitMarket = new UnitMarket();
         retirementDefectionTracker = new RetirementDefectionTracker();
+        fatigueLevel = 0;
         atbConfig = null;
     }
 
@@ -436,6 +438,10 @@ public class Campaign implements Serializable {
     public RetirementDefectionTracker getRetirementDefectionTracker() {
     	return retirementDefectionTracker;
     }
+    
+    public int getFatigueLevel() {
+    	return fatigueLevel;
+    }    
 
     public AtBConfiguration getAtBConfig() {
     	if (atbConfig == null) {
@@ -1978,7 +1984,46 @@ public class Campaign implements Serializable {
     	    	}
             }
 
-        	for (Mission m : missions) {
+            // Account for fatigue
+            if (getCampaignOptions().getTrackUnitFatigue()
+            		&& calendar.get(Calendar.DAY_OF_MONTH) == 1) {
+            	boolean inContract = false;
+            	for (Mission m : missions) {
+            		if (!m.isActive() || !(m instanceof AtBContract) ||
+    						getDate().before(((Contract)m).getStartDate())) {
+            			continue;
+            		}
+            		switch (((AtBContract)m).getMissionType()) {
+            		case AtBContract.MT_GARRISONDUTY:
+            		case AtBContract.MT_SECURITYDUTY:
+            		case AtBContract.MT_CADREDUTY:
+            			fatigueLevel -= 1;
+            			break;
+            		case AtBContract.MT_RIOTDUTY:
+            		case AtBContract.MT_GUERRILLAWARFARE:
+            		case AtBContract.MT_PIRATEHUNTING:
+            			fatigueLevel += 1;
+            			break;
+            		case AtBContract.MT_RELIEFDUTY:
+            		case AtBContract.MT_PLANETARYASSAULT:
+            			fatigueLevel += 2;
+            			break;
+            		case AtBContract.MT_DIVERSIONARYRAID:
+            		case AtBContract.MT_EXTRACTIONRAID:
+            		case AtBContract.MT_RECONRAID:
+            		case AtBContract.MT_OBJECTIVERAID:
+            			fatigueLevel += 3;
+            			break;
+            		}
+            		inContract = true;
+            	}
+            	if (!inContract && location.isOnPlanet()) {
+            		fatigueLevel -= 2;
+            	}
+            	fatigueLevel = Math.max(fatigueLevel, 0);
+            }
+
+            for (Mission m : missions) {
         		if (!m.isActive() || !(m instanceof AtBContract) ||
 						getDate().before(((Contract)m).getStartDate())) {
         			continue;
@@ -3060,6 +3105,7 @@ public class Campaign implements Serializable {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "calendar",
                                        df.format(calendar.getTime()));
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "fatigueLevel", fatigueLevel);
         {
             pw1.println("\t\t<nameGen>");
             pw1.print("\t\t\t<faction>");
@@ -4507,6 +4553,8 @@ public class Campaign implements Serializable {
                     retVal.astechPoolOvertime = Integer.parseInt(wn.getTextContent().trim());
                 } else if (xn.equalsIgnoreCase("medicPool")) {
                     retVal.medicPool = Integer.parseInt(wn.getTextContent().trim());
+                } else if (xn.equalsIgnoreCase("fatigueLevel")) {
+                	retVal.fatigueLevel = Integer.parseInt(wn.getTextContent().trim());
                 }
             }
         }

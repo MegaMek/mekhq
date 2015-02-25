@@ -201,6 +201,10 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     				contract.getStatus() == Mission.S_BREACH)) {
     			target.addModifier(1, "Failed mission");
     		}
+    		if (campaign.getCampaignOptions().getTrackUnitFatigue()
+    				&& campaign.getFatigueLevel() >= 10) {
+    			target.addModifier(campaign.getFatigueLevel() / 10, "Fatigue");
+    		}
     		if (campaign.getFactionCode().equals("PIR")) {
     			target.addModifier(1, "Pirate");
     		}
