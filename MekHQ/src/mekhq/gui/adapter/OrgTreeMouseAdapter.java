@@ -21,6 +21,7 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.MenuScroller;
@@ -100,6 +101,34 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                     gui.refreshOrganization();
                 }
             }
+        }
+        if (command.contains("ADD_LANCE_TECH")) {
+           	if (null != singleForce) {
+            	Person tech = gui.getCampaign().getPerson(UUID.fromString(target));
+            	if (null != tech) {
+            		if (singleForce.getTechID() != null) {
+            			Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
+            			oldTech.clearTechUnitIDs();
+            			oldTech.addLogEntry(gui.getCampaign().getDate(), "Removed from " + singleForce.getName());
+            		}
+                	singleForce.setTechID(tech.getId());
+                	tech.addLogEntry(gui.getCampaign().getDate(), "Assigned to " + singleForce.getFullName());
+                	if (singleForce.getAllUnits() !=null) {
+                		for (UUID uuid : singleForce.getAllUnits()) {
+                			Unit u = gui.getCampaign().getUnit(uuid);
+                			if (u != null) {
+                				u.setTech(tech.getId());
+                				tech.addTechUnitID(u.getId());
+                			}
+                		}
+                	}
+                	gui.refreshOrganization();
+                	gui.refreshScenarioList();
+                	gui.refreshPersonnelList();
+                	gui.refreshUnitList();
+                	gui.refreshServicedUnitList();
+                }
+          	}
         }
         if (command.contains("ADD_UNIT")) {
             if (null != singleForce) {
@@ -197,13 +226,37 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
             gui.refreshScenarioList();
             gui.refreshUnitList();
             gui.refreshOverview();
+        } else if (command.contains("REMOVE_LANCE_TECH")) {
+           	if (singleForce.getTechID() != null) {            		
+    			Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
+    			oldTech.clearTechUnitIDs();
+    			oldTech.addLogEntry(gui.getCampaign().getDate(), "Removed from " + singleForce.getName());
+    			if (singleForce.getAllUnits() !=null) {
+           			for (UUID uuid : singleForce.getAllUnits()) {
+           				Unit u = gui.getCampaign().getUnit(uuid);
+           				if (u != null) {
+           					u.setTech((UUID)null);
+           				}
+           			}
+           		}
+    			singleForce.setTechID(null);
+    				
+    			gui.refreshOrganization();
+    			gui.refreshPersonnelList();
+                gui.refreshScenarioList();
+                gui.refreshUnitList();
+    		}
         } else if (command.contains("REMOVE_UNIT")) {
             for (Unit unit : units) {
                 if (null != unit) {
                     Force parentForce = gui.getCampaign().getForceFor(unit);
                     if (null != parentForce) {
                         gui.getCampaign().removeUnitFromForce(unit);
-
+                        if (null != parentForce.getTechID()) {
+                           	unit.removeTech();
+                           	Person forceTech = gui.getCampaign().getPerson(parentForce.getTechID());
+                            forceTech.removeTechUnitId(unit.getId());
+                        }
                     }
                 }
             }
@@ -393,6 +446,35 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
                     popup.add(menuItem);
+                    if (force.getTechID() == null) {
+                        menu = new JMenu("Add Tech to Force");
+                        menu.setEnabled(false);
+                        for (Person tech : gui.getCampaign().getTechs()) {
+                        	if (tech.getMaintenanceTimeUsing() == 0) {
+                        		String skillLvl = "Unknown";
+                        		skillLvl = SkillType.getExperienceLevelName(tech.getExperienceLevel(false));
+                        		menuItem = new JMenuItem(tech.getFullTitle() + " (" + skillLvl + ", " + tech.getRoleDesc() + ")");
+                        		menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                        		menuItem.addActionListener(this);
+                        		menuItem.setEnabled(true);
+                        		menu.add(menuItem);
+                        		menu.setEnabled(true);
+                        	}
+                        }
+                        if (menu.getItemCount() > 0) {
+                        	popup.add(menu);
+                        	if (menu.getItemCount() > 20) {
+                        		MenuScroller.setScrollerFor(menu, 20);
+                        	}
+                        }
+                    }
+                    if (force.getTechID() != null) {
+                       	menuItem = new JMenuItem("Remove Tech from Force");
+                       	menuItem.setActionCommand("REMOVE_LANCE_TECH|FORCE|" + force.getTechID() + "|" + forceIds);
+                        menuItem.addActionListener(this);
+                        menuItem.setEnabled(true);
+                        popup.add(menuItem);
+                    }
                     menu = new JMenu("Add Unit");
                     menu.setEnabled(false);
                     // only add units that have commanders

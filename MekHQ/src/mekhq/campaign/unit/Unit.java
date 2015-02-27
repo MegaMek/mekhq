@@ -2700,6 +2700,14 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
         p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
     }
 
+    public void setTech(UUID pid) {
+    	tech = pid;
+    }
+    
+    public void removeTech() {
+    	tech = null;
+    }
+    
     public void addPilotOrSoldier(Person p) {
     	drivers.add(p.getId());
     	gunners.add(p.getId());

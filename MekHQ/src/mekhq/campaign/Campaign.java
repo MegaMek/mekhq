@@ -565,12 +565,24 @@ public class Campaign implements Serializable {
         Force prevForce = forceIds.get(u.getForceId());
         if (null != prevForce) {
             prevForce.removeUnit(u.getId());
+            if (null != prevForce.getTechID()) {
+                u.removeTech();
+                Person forceTech = getPerson(prevForce.getTechID());
+                forceTech.removeTechUnitId(u.getId());
+            }
         }
         Force force = forceIds.get(id);
         if (null != force) {
             u.setForceId(id);
             force.addUnit(u.getId());
             u.setScenarioId(force.getScenarioId());
+            if (null != force.getTechID()) {
+            	Person forceTech = getPerson(force.getTechID());
+            	if (forceTech.canTech(u.getEntity())) {
+            	    u.setTech(force.getTechID());
+            	    forceTech.addTechUnitID(u.getId());
+            	}
+            }
         }
 
         if (campaignOptions.getUseAtB()) {
