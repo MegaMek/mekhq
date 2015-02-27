@@ -64,6 +64,8 @@ public class ForceViewPanel extends javax.swing.JPanel {
 	private javax.swing.JLabel lblTonnage2;
 	private javax.swing.JLabel lblCost1;
 	private javax.swing.JLabel lblCost2;
+	private javax.swing.JLabel lblTech1;
+	private javax.swing.JLabel lblTech2;
 	
 	
 	public ForceViewPanel(Force f, Campaign c, IconPackage icons) {
@@ -194,6 +196,8 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		lblCost2 = new javax.swing.JLabel();
 		lblTonnage1 = new javax.swing.JLabel();
 		lblTonnage2 = new javax.swing.JLabel();
+		lblTech1 = new javax.swing.JLabel();
+		lblTech2 = new javax.swing.JLabel();
 		java.awt.GridBagConstraints gridBagConstraints;
 		pnlStats.setLayout(new java.awt.GridBagLayout());
 		
@@ -201,6 +205,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
     	long cost = 0;
     	float ton = 0;
     	String commander = "";
+    	String LanceTech = "";
     	String assigned = "";
     	String type = null;
     	ArrayList<Person> people = new ArrayList<Person>();
@@ -231,6 +236,12 @@ public class ForceViewPanel extends javax.swing.JPanel {
     	if(people.size() > 0) {
     		commander = people.get(0).getFullTitle();
     	}
+    	
+    	if (null != force.getTechID()) {
+    		Person p = campaign.getPerson(force.getTechID());
+    		LanceTech = p.getName();
+    	}
+    	
     	if(null != force.getParentForce()) {
     		assigned = force.getParentForce().getName();
     	}
@@ -273,6 +284,30 @@ public class ForceViewPanel extends javax.swing.JPanel {
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 			pnlStats.add(lblCommander2, gridBagConstraints);
 			nexty++;
+    	}
+		if (null != force.getTechID()) {
+    		if (!LanceTech.equals("")) {
+    			lblTech1.setName("lblTech1"); // NOI18N
+    			lblTech1.setText(resourceMap.getString("lblTech1.text"));
+    			gridBagConstraints = new java.awt.GridBagConstraints();
+    			gridBagConstraints.gridx = 0;
+    			gridBagConstraints.gridy = nexty;
+    			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+    			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    			pnlStats.add(lblTech1, gridBagConstraints);
+    			
+    			lblTech2.setName("lblTech2"); // NOI18N
+    			lblTech2.setText(LanceTech);
+    			gridBagConstraints = new java.awt.GridBagConstraints();
+    			gridBagConstraints.gridx = 1;
+    			gridBagConstraints.gridy = nexty;
+    			gridBagConstraints.weightx = 0.5;
+    			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+    			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+    			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    			pnlStats.add(lblTech2, gridBagConstraints);
+    			nexty++;
+    			}
     	}
     	
     	if(!assigned.equals("")) {

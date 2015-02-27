@@ -7,14 +7,15 @@ v0.3.13-dev (SVN)
 + Improve memory usage by only loading data used by AtB contract and battle generators
         when AtB is enabled, dump when disabled
 	Implements:
-		+Feature [feature-requests:#264] ATB: Please add date ranges to the RAT descriptors 
+		+Feature [feature-requests:#264] ATB: Please add date ranges to the RAT descriptors
 + Bug [#781]: AtB: Tech/Admin/Doctor XP costs are wrong when using "Use AtB Skills Option"
 + Bug [#825]: [ATB] Contract incorrectly generated with 110% salvage
 + Patch [patches:#44]: Hotfix for retirement screen not coming up
 	Fixes Bug [#817] Atb: Defection/retirement screen will not populate
 + Feature: [AtB] Contract fatigue rules from v2.30
-+ Bug: [#822]: [ATB] Base attack (defender) mission generated with no opfor due to a NPE
-+ Bug: [#784] Clan Aerospace Pilot Ranks
++ Bug [#822]: [ATB] Base attack (defender) mission generated with no opfor due to a NPE
++ Bug [#784]: Clan Aerospace Pilot Ranks
++ Patch [patches:#39]: Assign Tech to Lance
 
 v0.3.12 (2015-02-12 15:45 UTC)
 + Bug: OpFor personnel are captured, even when not selected as prisoner or bondsman
