@@ -120,17 +120,15 @@ public class UnitMarket implements Serializable {
 				}
 			}
 
-			if (!campaign.getFaction().isClan()) {
-				addOffers(campaign, Compute.d6() - 2, MARKET_OPEN,
-						UnitTableData.UNIT_MECH, null,
-						UnitTableData.QUALITY_F, 7);
-				addOffers(campaign, Compute.d6() - 1, MARKET_OPEN,
-						UnitTableData.UNIT_VEHICLE, null,
-						UnitTableData.QUALITY_F, 7);
-				addOffers(campaign, Compute.d6() - 2, MARKET_OPEN,
-						UnitTableData.UNIT_AERO, null,
-						UnitTableData.QUALITY_F, 7);
-			}
+			addOffers(campaign, Compute.d6() - 2, MARKET_OPEN,
+					UnitTableData.UNIT_MECH, null,
+					UnitTableData.QUALITY_F, 7);
+			addOffers(campaign, Compute.d6() - 1, MARKET_OPEN,
+					UnitTableData.UNIT_VEHICLE, null,
+					UnitTableData.QUALITY_F, 7);
+			addOffers(campaign, Compute.d6() - 2, MARKET_OPEN,
+					UnitTableData.UNIT_AERO, null,
+					UnitTableData.QUALITY_F, 7);
 
 			if (contract != null) {
 				addOffers(campaign, Compute.d6() - 3,
@@ -185,18 +183,20 @@ public class UnitMarket implements Serializable {
 				}
 			}
 
-			addOffers(campaign, Compute.d6(2) - 6,
-					MARKET_BLACK,
-					UnitTableData.UNIT_MECH, null,
-					UnitTableData.QUALITY_C, 6);
-			addOffers(campaign, Compute.d6(2) - 4,
-					MARKET_BLACK,
-					UnitTableData.UNIT_VEHICLE, null,
-					UnitTableData.QUALITY_C, 6);
-			addOffers(campaign, Compute.d6(2) - 6,
-					MARKET_BLACK,
-					UnitTableData.UNIT_AERO, null,
-					UnitTableData.QUALITY_C, 6);
+			if (!campaign.getFaction().isClan()) {
+				addOffers(campaign, Compute.d6(2) - 6,
+						MARKET_BLACK,
+						UnitTableData.UNIT_MECH, null,
+						UnitTableData.QUALITY_C, 6);
+				addOffers(campaign, Compute.d6(2) - 4,
+						MARKET_BLACK,
+						UnitTableData.UNIT_VEHICLE, null,
+						UnitTableData.QUALITY_C, 6);
+				addOffers(campaign, Compute.d6(2) - 6,
+						MARKET_BLACK,
+						UnitTableData.UNIT_AERO, null,
+						UnitTableData.QUALITY_C, 6);
+			}
 
 			if (campaign.getCampaignOptions().getUnitMarketReportRefresh()) {
 				campaign.addReport("<a href='UNIT_MARKET'>Unit market updated</a>");
@@ -211,6 +211,7 @@ public class UnitMarket implements Serializable {
 		}
 		if (faction == null) {
 			faction = campaign.getFactionCode();
+			market = MARKET_EMPLOYER;
 		}
 		FactionTables ft = UnitTableData.getInstance().getBestRAT(campaign.getCampaignOptions().getRATs(),
 				campaign.getCalendar().get(Calendar.YEAR),
@@ -223,17 +224,25 @@ public class UnitMarket implements Serializable {
 			int weight = getRandomWeight(unitType, faction,
 					campaign.getCampaignOptions().getRegionalMechVariations());
 			String rat = ft.getTable(unitType, weight, quality);
+			if (rat == null) {
+				continue;
+			}
 			MechSummary ms = null;
-			if (null != rat) {
-				RandomUnitGenerator.getInstance().setChosenRAT(rat);
-				ArrayList<MechSummary> msl = RandomUnitGenerator.getInstance().generate(1);
-				if (msl.size() > 0) {
-					ms = msl.get(0);
+			RandomUnitGenerator.getInstance().setChosenRAT(rat);
+			ArrayList<MechSummary> msl = RandomUnitGenerator.getInstance().generate(1);
+			if (msl.size() > 0) {
+				ms = msl.get(0);
+				if (campaign.getCampaignOptions().limitByYear() &&
+						campaign.getCalendar().get(Calendar.YEAR) < ms.getYear()) {
+					continue;
+				}
+				if ((campaign.getCampaignOptions().allowClanPurchases() && ms.isClan())
+						|| (campaign.getCampaignOptions().allowISPurchases() && !ms.isClan())) {
+					int pct = 100 - (Compute.d6(2) - priceTarget) * 5;
+					offers.add(new MarketOffer(market, unitType, weight,
+							ms, pct));
 				}
 			}
-			int pct = 100 - (Compute.d6(2) - priceTarget) * 5;
-			offers.add(new MarketOffer(market, unitType, weight,
-					ms, pct));
 		}
 	}
 
