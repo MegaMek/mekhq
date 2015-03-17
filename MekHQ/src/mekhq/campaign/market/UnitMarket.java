@@ -120,15 +120,17 @@ public class UnitMarket implements Serializable {
 				}
 			}
 
-			addOffers(campaign, Compute.d6() - 2, MARKET_OPEN,
-					UnitTableData.UNIT_MECH, null,
-					UnitTableData.QUALITY_F, 7);
-			addOffers(campaign, Compute.d6() - 1, MARKET_OPEN,
-					UnitTableData.UNIT_VEHICLE, null,
-					UnitTableData.QUALITY_F, 7);
-			addOffers(campaign, Compute.d6() - 2, MARKET_OPEN,
-					UnitTableData.UNIT_AERO, null,
-					UnitTableData.QUALITY_F, 7);
+			if (!campaign.getFaction().isClan()) {
+				addOffers(campaign, Compute.d6() - 2, MARKET_OPEN,
+						UnitTableData.UNIT_MECH, null,
+						UnitTableData.QUALITY_F, 7);
+				addOffers(campaign, Compute.d6() - 1, MARKET_OPEN,
+						UnitTableData.UNIT_VEHICLE, null,
+						UnitTableData.QUALITY_F, 7);
+				addOffers(campaign, Compute.d6() - 2, MARKET_OPEN,
+						UnitTableData.UNIT_AERO, null,
+						UnitTableData.QUALITY_F, 7);
+			}
 
 			if (contract != null) {
 				addOffers(campaign, Compute.d6() - 3,
@@ -148,23 +150,25 @@ public class UnitMarket implements Serializable {
 						UnitTableData.QUALITY_D, 7);
 			}
 
-			addOffers(campaign, Compute.d6(3) - 9,
-					MARKET_MERCENARY,
-					UnitTableData.UNIT_MECH, "MERC",
-					UnitTableData.QUALITY_C, 5);
-			addOffers(campaign, Compute.d6(3) - 6,
-					MARKET_MERCENARY,
-					UnitTableData.UNIT_VEHICLE, "MERC",
-					UnitTableData.QUALITY_C, 5);
-			addOffers(campaign, Compute.d6(3) - 9,
-					MARKET_MERCENARY,
-					UnitTableData.UNIT_AERO, "MERC",
-					UnitTableData.QUALITY_C, 5);
+			if (!campaign.getFaction().isClan()) {
+				addOffers(campaign, Compute.d6(3) - 9,
+						MARKET_MERCENARY,
+						UnitTableData.UNIT_MECH, "MERC",
+						UnitTableData.QUALITY_C, 5);
+				addOffers(campaign, Compute.d6(3) - 6,
+						MARKET_MERCENARY,
+						UnitTableData.UNIT_VEHICLE, "MERC",
+						UnitTableData.QUALITY_C, 5);
+				addOffers(campaign, Compute.d6(3) - 9,
+						MARKET_MERCENARY,
+						UnitTableData.UNIT_AERO, "MERC",
+						UnitTableData.QUALITY_C, 5);
+			}
 
 			if (campaign.getUnitRatingMod() >= IUnitRating.DRAGOON_B) {
 				ArrayList<Faction> factions = campaign.getCurrentPlanet().getCurrentFactions(campaign.getDate());
 				String faction = factions.get(Compute.randomInt(factions.size())).getShortName();
-				if (Faction.getFaction(campaign.getFactionCode()).isClan() ||
+				if (campaign.getFaction().isClan() ||
 						!Faction.getFaction(faction).isClan()) {
 					addOffers(campaign, Compute.d6() - 3,
 							MARKET_FACTORY,
@@ -204,6 +208,9 @@ public class UnitMarket implements Serializable {
 			int unitType, String faction, int quality, int priceTarget) {
 		if (faction == null) {
 			faction = RandomFactionGenerator.getInstance().getEmployer();
+		}
+		if (faction == null) {
+			faction = campaign.getFactionCode();
 		}
 		FactionTables ft = UnitTableData.getInstance().getBestRAT(campaign.getCampaignOptions().getRATs(),
 				campaign.getCalendar().get(Calendar.YEAR),
