@@ -20,6 +20,7 @@ v0.3.13-dev (SVN)
 	is empty (likely when campaign is set in Clan space)
 + Bug [#788]: "Limit units/parts by year" does not work properly
 	+Also corrected failure to respect limits on tech base (IS/Clan)
++ Bug: Aeros don't have their velocity reset in Campaign.clearGameData
 
 v0.3.12 (2015-02-12 15:45 UTC)
 + Bug: OpFor personnel are captured, even when not selected as prisoner or bondsman
