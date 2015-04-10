@@ -59,6 +59,7 @@ import megamek.common.verifier.TestInfantry;
 import megamek.common.verifier.TestMech;
 import megamek.common.verifier.TestTank;
 import megameklab.com.MegaMekLab;
+import megameklab.com.ui.EntitySource;
 import megameklab.com.util.CConfig;
 import megameklab.com.util.RefreshListener;
 import megameklab.com.util.UnitUtil;
@@ -409,7 +410,7 @@ public class MekLabPanel extends JPanel {
 		return null;
 	}
 	
-	private abstract class EntityPanel extends JTabbedPane implements RefreshListener {
+	private abstract class EntityPanel extends JTabbedPane implements RefreshListener, EntitySource {
 		
 		/**
 		 * 
@@ -444,11 +445,11 @@ public class MekLabPanel extends JPanel {
 		public void reloadTabs() {
 			removeAll();
 
-			structureTab = new megameklab.com.ui.Aero.tabs.StructureTab((Aero) entity);
+			structureTab = new megameklab.com.ui.Aero.tabs.StructureTab(this);
 			structureTab.setAsCustomization();
-			previewTab = new megameklab.com.ui.Aero.tabs.PreviewTab((Aero) entity);
-			equipmentTab = new megameklab.com.ui.Aero.tabs.EquipmentTab((Aero) entity);
-	        buildTab = new megameklab.com.ui.Aero.tabs.BuildTab((Aero) entity, equipmentTab);
+			previewTab = new megameklab.com.ui.Aero.tabs.PreviewTab(this);
+			equipmentTab = new megameklab.com.ui.Aero.tabs.EquipmentTab(this);
+	        buildTab = new megameklab.com.ui.Aero.tabs.BuildTab(this, equipmentTab);
 			structureTab.addRefreshedListener(this);
 			equipmentTab.addRefreshedListener(this);
 			buildTab.addRefreshedListener(this);
@@ -531,11 +532,11 @@ public class MekLabPanel extends JPanel {
 		public void reloadTabs() {
 			removeAll();
 			    
-			structureTab = new megameklab.com.ui.Mek.tabs.StructureTab(entity);
+			structureTab = new megameklab.com.ui.Mek.tabs.StructureTab(this);
 			structureTab.setAsCustomization();
-			equipmentTab = new megameklab.com.ui.Mek.tabs.EquipmentTab(entity);
-	        previewTab = new megameklab.com.ui.Mek.tabs.PreviewTab(entity);
-			buildTab = new megameklab.com.ui.Mek.tabs.BuildTab(entity, equipmentTab);
+			equipmentTab = new megameklab.com.ui.Mek.tabs.EquipmentTab(this);
+	        previewTab = new megameklab.com.ui.Mek.tabs.PreviewTab(this);
+			buildTab = new megameklab.com.ui.Mek.tabs.BuildTab(this, equipmentTab);
 			structureTab.addRefreshedListener(this);
 			equipmentTab.addRefreshedListener(this);
 			buildTab.addRefreshedListener(this);
@@ -617,9 +618,9 @@ public class MekLabPanel extends JPanel {
 		public void reloadTabs() {
 			removeAll();
 			    
-			structureTab = new megameklab.com.ui.Vehicle.tabs.StructureTab(entity);
-			equipmentTab = new megameklab.com.ui.Vehicle.tabs.EquipmentTab(entity);
-			buildTab = new megameklab.com.ui.Vehicle.tabs.BuildTab(entity, equipmentTab);
+			structureTab = new megameklab.com.ui.Vehicle.tabs.StructureTab(this);
+			equipmentTab = new megameklab.com.ui.Vehicle.tabs.EquipmentTab(this);
+			buildTab = new megameklab.com.ui.Vehicle.tabs.BuildTab(this, equipmentTab);
 			structureTab.addRefreshedListener(this);
 			equipmentTab.addRefreshedListener(this);
 			buildTab.addRefreshedListener(this);
@@ -698,10 +699,10 @@ public class MekLabPanel extends JPanel {
 		public void reloadTabs() {
 			removeAll();
 			    
-			structureTab = new megameklab.com.ui.BattleArmor.tabs.StructureTab(entity);
+			structureTab = new megameklab.com.ui.BattleArmor.tabs.StructureTab(this);
 	        structureTab.setAsCustomization();
-			equipmentTab = new megameklab.com.ui.BattleArmor.tabs.EquipmentTab(entity);
-			buildTab = new megameklab.com.ui.BattleArmor.tabs.BuildTab(entity);
+			equipmentTab = new megameklab.com.ui.BattleArmor.tabs.EquipmentTab(this);
+			buildTab = new megameklab.com.ui.BattleArmor.tabs.BuildTab(this);
 	        structureTab.addRefreshedListener(this);
 			equipmentTab.addRefreshedListener(this);
 			buildTab.addRefreshedListener(this);
@@ -780,10 +781,10 @@ public class MekLabPanel extends JPanel {
 		public void reloadTabs() {
 			removeAll();
 			    
-			structureTab = new megameklab.com.ui.Infantry.tabs.StructureTab(entity);
+			structureTab = new megameklab.com.ui.Infantry.tabs.StructureTab(this);
 	        structureTab.setAsCustomization();
 			structureTab.addRefreshedListener(this);
-	        previewTab = new megameklab.com.ui.Infantry.tabs.PreviewTab(entity);
+	        previewTab = new megameklab.com.ui.Infantry.tabs.PreviewTab(this);
 
 			addTab("Build", structureTab);
 	        addTab("Preview", previewTab);
