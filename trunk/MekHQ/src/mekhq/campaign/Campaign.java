@@ -6200,6 +6200,8 @@ public class Campaign implements Serializable {
                 entity.setMovementMode(EntityMovementMode.AERODYNE);
             }
             a.setAltitude(5);
+            a.setCurrentVelocity(0);
+            a.setNextVelocity(0);
         }
         if(entity instanceof Tank) {
         	Tank t = (Tank)entity;
