@@ -1,6 +1,9 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.13-dev (SVN)
++v0.3.14-dev (SVN)
+
+
+v0.3.13 (2015-04-19 21:29 UTC)
 + Bug: Inappropriate mixing of string and integer in personnel table fields leads to class cast errors
 + Bug: Compiling with JDK 7 breaks Mac releases
 + Bug: MHQ doesn't save custom weapon sort orders when saving client settings
