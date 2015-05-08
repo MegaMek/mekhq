@@ -6182,6 +6182,8 @@ public class Campaign implements Serializable {
         entity.setDeployRound(0);
         entity.setSwarmAttackerId(Entity.NONE);
         entity.setSwarmTargetId(Entity.NONE);
+        entity.setLastTarget(Entity.NONE);
+        entity.setNextSensor(entity.getSensors().firstElement());
         if (entity instanceof Aero) {
             Aero a = (Aero) entity;
             int[] bombChoices = a.getBombChoices();
