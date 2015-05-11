@@ -215,22 +215,21 @@ public class ContractMarket implements Serializable {
 				numContracts++;
 			}
 
-			for (Faction f : Faction.factions.values()) {
+			/* If located on a faction's capital (interpreted as the starting planet for that faction),
+			 * generate one contract offer for that faction.
+			 */
+			for (Faction f : campaign.getCurrentPlanet().getCurrentFactions(campaign.getDate())) {
 				try {
-					if (f.getStartingPlanet(campaign.getEra()).equals(campaign.getCurrentPlanet().getName())) {
-						for (Faction currentFaction : campaign.getCurrentPlanet().getCurrentFactions(campaign.getDate())) {
-							if (f.equals(currentFaction) && RandomFactionGenerator.getInstance().getEmployerSet().contains(currentFaction)) {
-								AtBContract c = generateAtBContract(campaign, f.getShortName(), unitRatingMod);
-								if (c != null) {
-									contracts.add(c);
-								}
-								break;
-							}
+					if (f.getStartingPlanet(campaign.getEra()).equals(campaign.getCurrentPlanet().getName())
+							&& RandomFactionGenerator.getInstance().getEmployerSet().contains(f.getShortName())) {
+						AtBContract c = generateAtBContract(campaign, f.getShortName(), unitRatingMod);
+						if (c != null) {
+							contracts.add(c);
+							break;
 						}
-						break;
 					}
 				} catch (ArrayIndexOutOfBoundsException e) {
-					//no starting planet in current era; continue to next planet
+					//no starting planet in current era; continue to next faction
 				}
 			}
 
