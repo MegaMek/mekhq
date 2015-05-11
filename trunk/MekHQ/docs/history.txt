@@ -2,7 +2,7 @@ VERSION HISTORY
 ----------------------------------
 +v0.3.14-dev (SVN)
 + Entity last target and sensors now reset at end of game
-
++ Bug: AtB contract generator does not generate additional contract at faction capital
 
 v0.3.13 (2015-04-19 21:29 UTC)
 + Bug: Inappropriate mixing of string and integer in personnel table fields leads to class cast errors
