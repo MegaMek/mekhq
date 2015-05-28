@@ -76,6 +76,7 @@ public class CampaignOptions implements Serializable {
     private boolean useAbilities;
     private boolean useEdge;
     private boolean useImplants;
+	private boolean altQualityAveraging;
     private int healWaitingPeriod;
     private int naturalHealingWaitingPeriod;
     private boolean useAdvancedMedical; // Unofficial
@@ -257,6 +258,7 @@ public class CampaignOptions implements Serializable {
         useAbilities = false;
         useEdge = false;
         useImplants = false;
+		altQualityAveraging = true;
         useAdvancedMedical = false;
         useDylansRandomXp = false;
         useQuirks = false;
@@ -606,6 +608,14 @@ public class CampaignOptions implements Serializable {
     public void setImplants(boolean b) {
         this.useImplants = b;
     }
+	
+	public boolean useAltQualityAveraging() {
+		return altQualityAveraging;
+	}
+	
+	public void setAltQualityAveraging(boolean altQualityAveraging) {
+		this.altQualityAveraging = altQualityAveraging;
+	}
 
     public boolean useAdvancedMedical() {
         return useAdvancedMedical;
@@ -1667,6 +1677,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAbilities", useAbilities);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useEdge", useEdge);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useImplants", useImplants);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "altQualityAveraging", altQualityAveraging);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAdvancedMedical", useAdvancedMedical);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useDylansRandomXp", useDylansRandomXp);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useQuirks", useQuirks);
@@ -1890,6 +1901,8 @@ public class CampaignOptions implements Serializable {
                 retVal.useEdge = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useImplants")) {
                 retVal.useImplants = Boolean.parseBoolean(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("altQualityAveraging")) {
+            	retVal.altQualityAveraging = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useAdvancedMedical")) {
                 retVal.useAdvancedMedical = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useDylansRandomXp")) {

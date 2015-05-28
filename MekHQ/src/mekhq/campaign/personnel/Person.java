@@ -1862,7 +1862,20 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         switch (role) {
             case T_MECHWARRIOR:
                 if (hasSkill(SkillType.S_GUN_MECH) && hasSkill(SkillType.S_PILOT_MECH)) {
-                    return (int) Math.floor((getSkill(SkillType.S_GUN_MECH).getExperienceLevel()
+					/* Attempt to use higher precision averaging, but if it doesn't provide a clear result
+					due to non-standard experience thresholds then fall back on lower precision averaging
+					See Bug #140 */
+					if(campaign.getCampaignOptions().useAltQualityAveraging()) {
+						int rawScore = (int) Math.floor(
+							(getSkill(SkillType.S_GUN_MECH).getLevel() + getSkill(SkillType.S_PILOT_MECH).getLevel()) / 2.0
+						);
+						if(getSkill(SkillType.S_GUN_MECH).getType().getExperienceLevel(rawScore) ==
+							getSkill(SkillType.S_PILOT_MECH).getType().getExperienceLevel(rawScore)) {
+							return getSkill(SkillType.S_GUN_MECH).getType().getExperienceLevel(rawScore);
+						}
+					}
+					
+					return (int) Math.floor((getSkill(SkillType.S_GUN_MECH).getExperienceLevel()
                                              + getSkill(SkillType.S_PILOT_MECH).getExperienceLevel()) / 2.0);
                 } else {
                     return -1;
@@ -1893,21 +1906,51 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                 }
             case T_AERO_PILOT:
                 if (hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO)) {
-                    return (int) Math.floor((getSkill(SkillType.S_GUN_AERO).getExperienceLevel()
-                                             + getSkill(SkillType.S_PILOT_AERO).getExperienceLevel()) / 2.0);
+					if(campaign.getCampaignOptions().useAltQualityAveraging()) {
+						int rawScore = (int) Math.floor(
+							(getSkill(SkillType.S_GUN_AERO).getLevel() + getSkill(SkillType.S_PILOT_AERO).getLevel()) / 2.0
+						);
+						if(getSkill(SkillType.S_GUN_AERO).getType().getExperienceLevel(rawScore) ==
+							getSkill(SkillType.S_PILOT_AERO).getType().getExperienceLevel(rawScore)) {
+							return getSkill(SkillType.S_GUN_AERO).getType().getExperienceLevel(rawScore);
+						}
+					}
+					
+					return (int) Math.floor((getSkill(SkillType.S_GUN_AERO).getExperienceLevel()
+												 + getSkill(SkillType.S_PILOT_AERO).getExperienceLevel()) / 2.0);
                 } else {
                     return -1;
                 }
             case T_CONV_PILOT:
                 if (hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET)) {
-                    return (int) Math.floor((getSkill(SkillType.S_GUN_JET).getExperienceLevel()
+					if(campaign.getCampaignOptions().useAltQualityAveraging()) {
+						int rawScore = (int) Math.floor(
+							(getSkill(SkillType.S_GUN_JET).getLevel() + getSkill(SkillType.S_PILOT_JET).getLevel()) / 2.0
+						);
+						if(getSkill(SkillType.S_GUN_JET).getType().getExperienceLevel(rawScore) ==
+							getSkill(SkillType.S_PILOT_JET).getType().getExperienceLevel(rawScore)) {
+							return getSkill(SkillType.S_GUN_JET).getType().getExperienceLevel(rawScore);
+						}
+					}
+					
+					return (int) Math.floor((getSkill(SkillType.S_GUN_JET).getExperienceLevel()
                                              + getSkill(SkillType.S_PILOT_JET).getExperienceLevel()) / 2.0);
                 } else {
                     return -1;
                 }
             case T_BA:
                 if (hasSkill(SkillType.S_GUN_BA) && hasSkill(SkillType.S_ANTI_MECH)) {
-                    return (int) Math.floor((getSkill(SkillType.S_GUN_BA).getExperienceLevel()
+					if(campaign.getCampaignOptions().useAltQualityAveraging()) {
+						int rawScore = (int) Math.floor(
+							(getSkill(SkillType.S_GUN_BA).getLevel() + getSkill(SkillType.S_ANTI_MECH).getLevel()) / 2.0
+						);
+						if(getSkill(SkillType.S_GUN_BA).getType().getExperienceLevel(rawScore) ==
+							getSkill(SkillType.S_ANTI_MECH).getType().getExperienceLevel(rawScore)) {
+							return getSkill(SkillType.S_GUN_BA).getType().getExperienceLevel(rawScore);
+						}
+					}
+					
+					return (int) Math.floor((getSkill(SkillType.S_GUN_BA).getExperienceLevel()
                                              + getSkill(SkillType.S_ANTI_MECH).getExperienceLevel()) / 2.0);
                 } else {
                     return -1;
