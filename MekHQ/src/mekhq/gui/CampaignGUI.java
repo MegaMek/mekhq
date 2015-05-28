@@ -4576,16 +4576,29 @@ public class CampaignGUI extends JPanel {
         } else if (getCampaign().getTechs().size() > 0) {
             String name;
             HashMap<String, Person> techHash = new HashMap<String, Person>();
+            String skillLvl = "Unknown";
+            int TimePerDay = 0;
             for (Person tech : getCampaign().getTechs()) {
                 if (getCampaign().isWorkingOnRefit(tech)) {
                     continue;
                 }
+                if (tech.getSecondaryRole() == tech.T_MECH_TECH || tech.getSecondaryRole() == tech.T_MECHANIC || tech.getSecondaryRole() == tech.T_AERO_TECH) {
+                	TimePerDay = 240 - tech.getMaintenanceTimeUsing();
+                } else {
+                	TimePerDay = 480 - tech.getMaintenanceTimeUsing();
+                }
+                skillLvl = SkillType.getExperienceLevelName(tech.getExperienceLevel(false));
                 name = tech.getFullName()
                         + ", "
+                        + skillLvl
+                        + " "
                         + tech.getPrimaryRoleDesc()
                         + " ("
-                        + getCampaign().getTargetFor(r, tech)
-                                .getValueAsString() + "+)";
+                        + getCampaign().getTargetFor(r, tech).getValueAsString()
+                        + "+)"
+                        + ", "
+                        + tech.getMinutesLeft() + "/" + TimePerDay 
+                        + " minutes";
                 techHash.put(name, tech);
             }
             String[] techNames = new String[techHash.keySet().size()];
