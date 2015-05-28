@@ -871,7 +871,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
 	public Person birth() {
 		Person baby = campaign.newPerson(T_NONE);
-
+		baby.setDependent(true);
 		UUID tmpAncID = null;
 
 		// Find already existing ancestor set of these parents
@@ -1874,7 +1874,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 							return getSkill(SkillType.S_GUN_MECH).getType().getExperienceLevel(rawScore);
 						}
 					}
-					
+
 					return (int) Math.floor((getSkill(SkillType.S_GUN_MECH).getExperienceLevel()
                                              + getSkill(SkillType.S_PILOT_MECH).getExperienceLevel()) / 2.0);
                 } else {
@@ -1915,7 +1915,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 							return getSkill(SkillType.S_GUN_AERO).getType().getExperienceLevel(rawScore);
 						}
 					}
-					
+
 					return (int) Math.floor((getSkill(SkillType.S_GUN_AERO).getExperienceLevel()
 												 + getSkill(SkillType.S_PILOT_AERO).getExperienceLevel()) / 2.0);
                 } else {
@@ -1932,7 +1932,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 							return getSkill(SkillType.S_GUN_JET).getType().getExperienceLevel(rawScore);
 						}
 					}
-					
+
 					return (int) Math.floor((getSkill(SkillType.S_GUN_JET).getExperienceLevel()
                                              + getSkill(SkillType.S_PILOT_JET).getExperienceLevel()) / 2.0);
                 } else {
@@ -1949,7 +1949,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 							return getSkill(SkillType.S_GUN_BA).getType().getExperienceLevel(rawScore);
 						}
 					}
-					
+
 					return (int) Math.floor((getSkill(SkillType.S_GUN_BA).getExperienceLevel()
                                              + getSkill(SkillType.S_ANTI_MECH).getExperienceLevel()) / 2.0);
                 } else {
