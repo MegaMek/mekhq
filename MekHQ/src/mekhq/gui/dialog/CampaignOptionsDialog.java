@@ -275,6 +275,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JTextField txtMaxAcquisitions;
     private JCheckBox chkUseUnofficialProcreation;
     private JCheckBox chkUseUnofficialProcreationNoRelationship;
+    private JCheckBox chkUseTransfers;
 
 
     private JSpinner spnNDiceTransitTime;
@@ -1340,6 +1341,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         //chkUseUnofficialProcreationNoRelationship.setToolTipText(resourceMap.getString("chkUseUnofficialProcreationNoRelationship.toolTipText")); // NOI18N
         gridBagConstraints.gridy = 15;
         panPersonnel.add(chkUseUnofficialProcreationNoRelationship, gridBagConstraints);
+        
+        chkUseTransfers = new JCheckBox("Log Saver - Use Reassign instead of Remove/Assign"); // NOI18N
+        chkUseTransfers.setSelected(options.useTransfers());
+        gridBagConstraints.gridy = 16;
+        panPersonnel.add(chkUseTransfers, gridBagConstraints);
 
         JPanel panSalary = new JPanel(new GridBagLayout());
         panSalary.setBorder(BorderFactory.createTitledBorder("Salary"));
@@ -1443,7 +1449,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 16;
+        gridBagConstraints.gridheight = 17;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -3937,6 +3943,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setTougherHealing(useTougherHealing.isSelected());
         options.setUseUnofficialProcreation(chkUseUnofficialProcreation.isSelected());
         options.setUseUnofficialProcreationNoRelationship(chkUseUnofficialProcreationNoRelationship.isSelected());
+        options.setUseTransfers(chkUseTransfers.isSelected());
 
         rskillPrefs.setOverallRecruitBonus((Integer) spnOverallRecruitBonus.getModel().getValue());
         for (int i = 0; i < Person.T_NUM; i++) {

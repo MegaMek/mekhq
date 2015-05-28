@@ -2673,12 +2673,34 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	resetPilotAndEntity();
 		p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
     }
+    
+    public void addDriver(Person p, boolean useTransfers) {
+    	drivers.add(p.getId());
+    	p.setUnitId(getId());
+    	resetPilotAndEntity();
+    	if (useTransfers) {
+    		p.addLogEntry(campaign.getDate(), "Reassigned to " + getName());
+    	} else {
+    		p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
+    	}
+    }
 
     public void addGunner(Person p) {
     	gunners.add(p.getId());
     	p.setUnitId(getId());
     	resetPilotAndEntity();
 		p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
+    }
+    
+    public void addGunner(Person p, boolean useTransfers) {
+    	gunners.add(p.getId());
+    	p.setUnitId(getId());
+    	resetPilotAndEntity();
+    	if (useTransfers) {
+    		p.addLogEntry(campaign.getDate(), "Reassigned to " + getName());
+    	} else {
+    		p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
+    	}
     }
 
     public void addVesselCrew(Person p) {
@@ -2687,12 +2709,34 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	resetPilotAndEntity();
 		p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
     }
+    
+    public void addVesselCrew(Person p, boolean useTransfers) {
+    	vesselCrew.add(p.getId());
+    	p.setUnitId(getId());
+    	resetPilotAndEntity();
+    	if (useTransfers) {
+    		p.addLogEntry(campaign.getDate(), "Reassigned to " + getName());
+    	} else {
+    		p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
+    	}
+    }
 
     public void setNavigator(Person p) {
     	navigator = p.getId();
     	p.setUnitId(getId());
     	resetPilotAndEntity();
 		p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
+    }
+    
+    public void setNavigator(Person p, boolean useTransfers) {
+    	navigator = p.getId();
+    	p.setUnitId(getId());
+    	resetPilotAndEntity();
+    	if (useTransfers) {
+    		p.addLogEntry(campaign.getDate(), "Reassigned to " + getName());
+    	} else {
+    		p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
+    	}
     }
 
     public void setTech(Person p) {
@@ -2715,6 +2759,18 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	p.setUnitId(getId());
     	resetPilotAndEntity();
 		p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
+    }
+    
+    public void addPilotOrSoldier(Person p, boolean useTransfers) {
+    	drivers.add(p.getId());
+    	gunners.add(p.getId());
+    	p.setUnitId(getId());
+    	resetPilotAndEntity();
+    	if (useTransfers) {
+    		p.addLogEntry(campaign.getDate(), "Reassigned to " + getName());
+    	} else {
+    		p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
+    	}
     }
 
     public void remove(Person p, boolean log) {
