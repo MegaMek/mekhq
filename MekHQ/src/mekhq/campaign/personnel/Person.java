@@ -3645,4 +3645,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     	return shares;
     }
+    
+    public boolean isDeadOrMIA() {
+    	if ((status == S_KIA) || (status == S_MIA)) {
+    		return true;
+    	} else {
+    		return false;
+    	}
+    }
 }

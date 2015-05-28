@@ -5823,6 +5823,12 @@ public class Campaign implements Serializable {
         Unit u = getUnit(person.getUnitId());
         if (status == Person.S_KIA) {
             person.addLogEntry(getDate(), "Killed in action");
+            // Don't forget to tell the spouse
+            if (person.getSpouseID() != null) {
+            	Person spouse = person.getSpouse();
+            	spouse.addLogEntry(getDate(), "Spouse, " + person.getName() + ", killed in action");
+            	spouse.setSpouseID(null);
+            }
             // set the deathday
             person.setDeathday((GregorianCalendar) calendar.clone());
         } else if (person.getStatus() == Person.S_KIA) {

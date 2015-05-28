@@ -4582,7 +4582,7 @@ public class CampaignGUI extends JPanel {
                 if (getCampaign().isWorkingOnRefit(tech)) {
                     continue;
                 }
-                if (tech.getSecondaryRole() == tech.T_MECH_TECH || tech.getSecondaryRole() == tech.T_MECHANIC || tech.getSecondaryRole() == tech.T_AERO_TECH) {
+                if (tech.getSecondaryRole() == Person.T_MECH_TECH || tech.getSecondaryRole() == Person.T_MECHANIC || tech.getSecondaryRole() == Person.T_AERO_TECH) {
                 	TimePerDay = 240 - tech.getMaintenanceTimeUsing();
                 } else {
                 	TimePerDay = 480 - tech.getMaintenanceTimeUsing();
@@ -4597,7 +4597,7 @@ public class CampaignGUI extends JPanel {
                         + getCampaign().getTargetFor(r, tech).getValueAsString()
                         + "+)"
                         + ", "
-                        + tech.getMinutesLeft() + "/" + TimePerDay 
+                        + tech.getMinutesLeft() + "/" + TimePerDay
                         + " minutes";
                 techHash.put(name, tech);
             }
