@@ -3248,7 +3248,15 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     public boolean isSelfCrewed() {
         return (getEntity() instanceof Dropship || getEntity() instanceof Jumpship);
     }
-
+	
+	public boolean isUnderRepair() {
+		for(Part p : getParts()) {
+			if(null != p.getAssignedTeamId()) {
+				return true;
+			}
+		}
+		return false;
+	}
 
     /*MOTHBALL RELATED STUFF*/
 

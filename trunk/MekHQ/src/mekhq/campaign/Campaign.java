@@ -2222,14 +2222,28 @@ public class Campaign implements Serializable {
         				int forceId = ((AtBScenario)s).getLanceForceId();
         				if (null != lances.get(forceId)
         						&& !forceIds.get(forceId).isDeployed()) {
-        					forceIds.get(forceId).setScenarioId(s.getId());
-        					s.addForces(forceId);
-        					for (UUID uid : forceIds.get(forceId).getAllUnits()) {
+								
+							// If any unit in the force is under repair, don't deploy the force
+							// Merely removing the unit from deployment would break with user expectation
+							boolean forceUnderRepair = false;
+							for (UUID uid : forceIds.get(forceId).getAllUnits()) {
         						Unit u = getUnit(uid);
-        						if (null != u) {
-        							u.setScenarioId(s.getId());
+								if (null != u && u.isUnderRepair()) {
+        							forceUnderRepair = true;
+									break;
         						}
-        					}
+							}
+							
+							if(!forceUnderRepair) {
+								forceIds.get(forceId).setScenarioId(s.getId());
+								s.addForces(forceId);
+								for (UUID uid : forceIds.get(forceId).getAllUnits()) {
+									Unit u = getUnit(uid);
+									if (null != u) {
+										u.setScenarioId(s.getId());
+									}
+								}
+							}
         				}
         			}
         		}
