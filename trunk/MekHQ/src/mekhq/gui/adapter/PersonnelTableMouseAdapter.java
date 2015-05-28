@@ -397,11 +397,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             gui.refreshOrganization();
             gui.refreshOverview();
         } else if (command.contains("REMOVE_SPOUSE")) {
-            selectedPerson.getSpouse().addLogEntry(gui.getCampaign().getDate(),
-                    "Divorced from " + selectedPerson.getFullName());
-            selectedPerson.addLogEntry(gui.getCampaign().getDate(),
-                    "Divorced from "
-                            + selectedPerson.getSpouse().getFullName());
+        	if (!selectedPerson.getSpouse().isDeadOrMIA()) {
+        		selectedPerson.getSpouse().addLogEntry(gui.getCampaign().getDate(),
+            		"Divorced from " + selectedPerson.getFullName());
+        		selectedPerson.addLogEntry(gui.getCampaign().getDate(),
+                    "Divorced from " + selectedPerson.getSpouse().getFullName());
+        	}
             selectedPerson.getSpouse().setSpouseID(null);
             selectedPerson.setSpouseID(null);
             gui.refreshPersonnelList();
@@ -1503,13 +1504,21 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         && person.getSpouseID() == null) {
                     menu = new JMenu("Choose Spouse (Mate)");
                     for (Person ps : gui.getCampaign().getPersonnel()) {
-                        if (person.safeSpouse(ps)) {
+                        if (person.safeSpouse(ps) && !ps.isDeadOrMIA()) {
+                        	String pStatus = "";
+                        	if (ps.isPrisoner()) {
+                        		pStatus = "Prisoner ";
+                        	}
+                        	if (ps.isBondsman()) {
+                        		pStatus = "Bondsman ";
+                        	}
                             menuItem = new JMenuItem(
-                                    ps.getFullName()
-                                            + ", "
-                                            + ps.getAge(gui.getCampaign()
-                                                    .getCalendar()) + ", "
-                                            + ps.getRoleDesc());
+                            		pStatus
+                                + ps.getFullName()
+                                + ", "
+                                + ps.getAge(gui.getCampaign()
+                                    .getCalendar()) + ", "
+                                + ps.getRoleDesc());
                             menuItem.setActionCommand("SPOUSE|"
                                     + ps.getId().toString());
                             menuItem.addActionListener(this);
