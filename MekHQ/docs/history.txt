@@ -7,6 +7,7 @@ VERSION HISTORY
 + Patch [patches:#49]: Refit: Tech Time Management
 + Patch [patches:#45]: Marriage bugfix - Can marry the dead
 + Patch [patches:#43]: Higher-precision quality averaging
++ Patch [patches:#42]: Show required lances for AtB contracts in market
 
 v0.3.13 (2015-04-19 21:29 UTC)
 + Bug: Inappropriate mixing of string and integer in personnel table fields leads to class cast errors

@@ -95,7 +95,9 @@ public class ContractSummaryPanel extends JPanel {
 	private JLabel lblStraightSupport;
 	private JTextArea txtStraightSupport;
 	private JLabel lblBattleLossComp;
+	private JLabel lblRequiredLances;
 	private JTextArea txtBattleLossComp;
+	private JTextArea txtRequiredLances;
 	private JLabel lblSalvageRights;
 	private JTextArea txtSalvageRights;
 
@@ -192,6 +194,8 @@ public class ContractSummaryPanel extends JPanel {
 		txtStraightSupport = new JTextArea();
 		lblBattleLossComp = new JLabel();
 		txtBattleLossComp = new JTextArea();
+		lblRequiredLances = new JLabel();
+		txtRequiredLances = new JTextArea();
 		lblSalvageRights = new JLabel();
 		txtSalvageRights = new JTextArea();
 
@@ -657,6 +661,31 @@ public class ContractSummaryPanel extends JPanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		mainPanel.add(txtBattleLossComp, gridBagConstraints);
+		
+		if(contract instanceof AtBContract) {
+			lblRequiredLances.setName("lblRequiredLances"); // NOI18N
+			lblRequiredLances.setText(resourceMap.getString("lblRequiredLances.text"));
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.gridy = y;
+			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			mainPanel.add(lblRequiredLances, gridBagConstraints);
+			
+			txtRequiredLances.setName("txtRequiredLances"); // NOI18N
+			txtRequiredLances.setText(((AtBContract)contract).getRequiredLances() + " Lance(s)");
+			txtRequiredLances.setEditable(false);
+			txtRequiredLances.setLineWrap(true);
+			txtRequiredLances.setWrapStyleWord(true);
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 1;
+			gridBagConstraints.gridy = y++;
+			gridBagConstraints.weightx = 0.5;
+			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+			gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			mainPanel.add(txtRequiredLances, gridBagConstraints);
+		}
 
 		DecimalFormat formatter = new DecimalFormat();
 
