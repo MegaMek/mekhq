@@ -86,6 +86,7 @@ public class CampaignOptions implements Serializable {
     private int maxAcquisitions;
     private boolean useUnofficialProcreation;
     private boolean useUnofficialProcreationNoRelationship;
+    private boolean useTransfers;
 
     //personnel market related
     private boolean personnelMarketReportRefresh;
@@ -334,6 +335,7 @@ public class CampaignOptions implements Serializable {
         maxAcquisitions = 0;
         useUnofficialProcreation = false;
         useUnofficialProcreationNoRelationship = false;
+        useTransfers = true;
         personnelMarketReportRefresh = true;
         personnelMarketType = PersonnelMarket.TYPE_STRAT_OPS;
         personnelMarketRandomEliteRemoval = 10;
@@ -1213,6 +1215,14 @@ public class CampaignOptions implements Serializable {
     public void setUseUnofficialProcreationNoRelationship(boolean b) {
     	useUnofficialProcreationNoRelationship = b;
     }
+    
+    public boolean useTransfers() {
+    	return useTransfers;
+    }
+    
+    public void setUseTransfers(boolean b) {
+    	useTransfers = b;
+    }
 
     public int getMinimumHitsForVees() {
         return minimumHitsForVees;
@@ -1727,6 +1737,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maxAcquisitions", maxAcquisitions);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficialProcreation", useUnofficialProcreation);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficialProcreationNoRelationship", useUnofficialProcreationNoRelationship);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTransfers", useTransfers);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketType", personnelMarketType);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomEliteRemoval",
                                        personnelMarketRandomEliteRemoval);
@@ -2087,6 +2098,8 @@ public class CampaignOptions implements Serializable {
             	retVal.useUnofficialProcreation = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreationNoRelationship")) {
             	retVal.useUnofficialProcreationNoRelationship = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useTransfers")) {
+            	retVal.useTransfers = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVees")) {
                 if (wn2.getTextContent().equalsIgnoreCase("true")) {
                     retVal.useRandomHitsForVees = true;

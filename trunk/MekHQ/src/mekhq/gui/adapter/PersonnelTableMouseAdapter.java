@@ -224,11 +224,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             Unit u = gui.getCampaign().getUnit(selected);
             Unit oldUnit = gui.getCampaign()
                     .getUnit(selectedPerson.getUnitId());
+            boolean useTransfers = false;
+            boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
             if (null != oldUnit) {
-                oldUnit.remove(selectedPerson, true);
+                oldUnit.remove(selectedPerson, transferLog);
+                useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
             }
             if (null != u) {
-                u.addPilotOrSoldier(selectedPerson);
+                u.addPilotOrSoldier(selectedPerson, useTransfers);
             }
             u.resetPilotAndEntity();
             u.runDiagnostic();
@@ -244,10 +247,13 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 for (Person p : people) {
                     if (u.canTakeMoreGunners()) {
                         Unit oldUnit = gui.getCampaign().getUnit(p.getUnitId());
+                        boolean useTransfers = false;
+                        boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
                         if (null != oldUnit) {
-                            oldUnit.remove(p, true);
+                            oldUnit.remove(p, transferLog);
+                            useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
                         }
-                        u.addPilotOrSoldier(p);
+                        u.addPilotOrSoldier(p, useTransfers);
                     }
                 }
             }
@@ -263,11 +269,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             Unit u = gui.getCampaign().getUnit(selected);
             Unit oldUnit = gui.getCampaign()
                     .getUnit(selectedPerson.getUnitId());
+            boolean useTransfers = false;
+            boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
             if (null != oldUnit) {
-                oldUnit.remove(selectedPerson, true);
+                oldUnit.remove(selectedPerson, transferLog);
+                useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
             }
             if (null != u) {
-                u.addDriver(selectedPerson);
+                u.addDriver(selectedPerson, useTransfers);
             }
             u.resetPilotAndEntity();
             u.runDiagnostic();
@@ -283,10 +292,13 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 for (Person p : people) {
                     if (u.canTakeMoreDrivers()) {
                         Unit oldUnit = gui.getCampaign().getUnit(p.getUnitId());
+                        boolean useTransfers = false;
+                        boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
                         if (null != oldUnit) {
-                            oldUnit.remove(p, true);
+                            oldUnit.remove(p, transferLog);
+                            useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
                         }
-                        u.addDriver(p);
+                        u.addDriver(p, useTransfers);
                     }
                 }
             }
@@ -304,10 +316,13 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 for (Person p : people) {
                     if (u.canTakeMoreGunners()) {
                         Unit oldUnit = gui.getCampaign().getUnit(p.getUnitId());
+                        boolean useTransfers = false;
+                        boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
                         if (null != oldUnit) {
-                            oldUnit.remove(p, true);
+                            oldUnit.remove(p, transferLog);
+                            useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
                         }
-                        u.addGunner(p);
+                        u.addGunner(p, useTransfers);
                     }
                 }
             }
@@ -325,10 +340,13 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 for (Person p : people) {
                     if (u.canTakeMoreVesselCrew()) {
                         Unit oldUnit = gui.getCampaign().getUnit(p.getUnitId());
+                        boolean useTransfers = false;
+                        boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
                         if (null != oldUnit) {
-                            oldUnit.remove(p, true);
+                            oldUnit.remove(p, transferLog);
+                            useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
                         }
-                        u.addVesselCrew(p);
+                        u.addVesselCrew(p, useTransfers);
                     }
                 }
             }
@@ -346,10 +364,13 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 for (Person p : people) {
                     if (u.canTakeNavigator()) {
                         Unit oldUnit = gui.getCampaign().getUnit(p.getUnitId());
+                        boolean useTransfers = false;
+                        boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
                         if (null != oldUnit) {
-                            oldUnit.remove(p, true);
+                            oldUnit.remove(p, transferLog);
+                            useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
                         }
-                        u.setNavigator(p);
+                        u.setNavigator(p, useTransfers);
                     }
                 }
             }
