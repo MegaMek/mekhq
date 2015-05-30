@@ -25,7 +25,7 @@
 			<date>3067-04-24</date>
 			<faction>LA</faction>
 		</factionChange>
-		<desc>Despite A Place's poor soil makes agriculture nearly impossible, however the planet was settled to take advantage of its abundance of natural resources. For most of its history A Place has relied on its neighbor, Bountiful Harvest for food. Unfortunately, when there are disruptions in shipping, such as during the 1st Succession War, food shortages begin almost immediately. During the 1st Succession War the lack of food resulted in nearly 90% of the planet's million inhabitants starving.</desc>
+		<desc>Despite A Place's poor soil making agriculture nearly impossible the planet was settled to take advantage of its abundance of natural resources. For most of its history A Place has relied on its neighbor, Bountiful Harvest for food. Unfortunately, when there are disruptions in shipping, such as during the 1st Succession War, food shortages begin almost immediately. During the 1st Succession War the lack of food resulted in nearly 90% of the planet's million inhabitants starving.</desc>
 	</planet>
 	<planet>
 		<name>Abadan</name>
@@ -63,6 +63,10 @@
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3137-08-01</date>
+			<faction>MiC</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>1.03</gravity>
@@ -432,6 +436,10 @@ The three continents of Achernar are Agnetenar, Eridanus, and Zaurak; the capita
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3137-10-01</date>
+			<faction>CvW</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -1743,6 +1751,10 @@ Allabad, the planetary capital, was originally one such colony, nestled into the
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3136-02-01</date>
+			<faction>PC</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>All Dawn</name>
@@ -1972,6 +1984,10 @@ Marian Arms, Incorporated</desc>
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3137-10-01</date>
+			<faction>CvW</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -2637,7 +2653,11 @@ The capital city and commercial center of Alya, LeSabrea, is located on Paroasis
 		<name>An Ting</name>
 		<xcood>304.35</xcood>
 		<ycood>110.84</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2360-10-01</date>
+			<faction>DC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3062-12-26</date>
 			<faction>DC,FS</faction>
@@ -2654,6 +2674,42 @@ The capital city and commercial center of Alya, LeSabrea, is located on Paroasis
 			<date>3065-01-24</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-10-01</date>
+			<faction>ABN</faction>
+		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<satellite>Null</satellite>
+		<gravity>0.8</gravity>
+		<pressure>3</pressure>
+		<climate>4</climate>
+		<temperature>30</temperature>
+		<percentWater>26</percentWater>
+		<nadirCharge>True</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>7</lifeForm>
+		<socioIndustrial>D-C-C-B-D</socioIndustrial>
+		<landMass>(Tule Mod)</landMass>
+		<landMass>Hotei</landMass>
+		<landMass>Algonquin Island</landMass>
+		<desc>An Ting was colonized early, however, settlement was limited by the dry and barren landscape. The planet only gained prominence in the late 2600s due to the founding of the An Ting University, which primarily focused on mechanical and industrial arts, prior to the later addition of a DCMS BattleMech training program. Over time, the city of Tule Mod, which was created to support the nearby An Ting University, grew to be the planetary capital.
+
+Raids during the Second Succession War crippled the planet; farmlands were ruined, heavy industry was targeted by raids and destroyed. It wasn’t until 3039 that the planet was able to partially rebuild and begin producing enough agriculture and other simple goods to export and trade with nearby systems.
+
+The northern continent of Hotei is home to the city of Signpan. The city is alongside Lake Hails, the largest body of water on the continent. Signpan is the oldest surviving settlement and is a large mining community. Many of the recruits for the BattleMech training program come from this region due to the regular use of IndustrialMechs and exosuits used to expand mining tunnels beneath the lake.
+
+A raid in 3063 resulted in the destruction of an ancient refinery in Signpan that destroyed much of the city and caused the polluted Lake Hails to catch fire. It took more than two months for the fire to burnout.
+
+Aside from the An Ting University, the planet is widely known for the picturesque and peaceful Algonquin Island, a caldera in the Sea of Taiwan. It is a central breeding area for Ting whales. The treeless, rocky, island is home to a Buddhist temple that was built in 2530 and has hosted Kuritan nobles and Coordinators desiring hours, days, or even months of peace and contemplation.
+
+The An Ting Legions are based on the Hiroshima Plateau and based near the city of Kini-Mai and the AnTing DropPort. The plateau peaks at six-thousand kilometers above sea level, offers a wide view of Hotei’s interior.
+
+Throughout the planet’s history, the DropPort has been destroyed and rebuilt fifteen times.
+
+An Ting fell to the 'Curse of Galedon' plague that devastated Galedon V and was a dead or dying world by the mid 3070s.</desc>
 	</planet>
 	<planet>
 		<name>Anaheim</name>
@@ -2857,6 +2913,10 @@ Andurien Aerotech</desc>
 		<factionChange>
 			<date>3079-01-01</date>
 			<faction>MSC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3137-08-01</date>
+			<faction>MiC</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.98</gravity>
@@ -3298,6 +3358,10 @@ A few Stone Age tribes exist in the planet's deep deserts and jungles, far from 
 			<date>3140-01-01</date>
 			<faction>CJF</faction>
 		</factionChange>
+		<factionChange>
+			<date>3142-05-01</date>
+			<faction>ABN</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Apriki</name>
@@ -3361,6 +3425,10 @@ A few Stone Age tribes exist in the planet's deep deserts and jungles, far from 
 		<factionChange>
 			<date>3085-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3135-10-01</date>
+			<faction>CC</faction>
 		</factionChange>
 		<gravity>0.98</gravity>
 		<pressure>3</pressure>
@@ -3780,7 +3848,15 @@ Salvatore Incorporated</desc>
 		<name>As Samik</name>
 		<xcood>349.99</xcood>
 		<ycood>-289.23</ycood>
-		<faction>FS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2250-01-01</date>
+			<faction>UHC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2540-09-01</date>
+			<faction>FS</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -3850,6 +3926,10 @@ Though a major exporter of heavy metals and radioactive elements, as well as sma
 			<date>3015-03-15</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+			<date>3137-08-01</date>
+			<faction>MiC</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Asellus Borealis</name>
@@ -3863,6 +3943,10 @@ Though a major exporter of heavy metals and radioactive elements, as well as sma
 		<factionChange>
 			<date>3014-11-18</date>
 			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3137-08-01</date>
+			<faction>MiC</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -3905,6 +3989,14 @@ Though a major exporter of heavy metals and radioactive elements, as well as sma
 		<factionChange>
 			<date>3059-05-29</date>
 			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3099-06-14</date>
+			<faction>DC,CNC,CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3099-07-02</date>
+			<faction>CGB</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.94</gravity>
@@ -4505,6 +4597,10 @@ The capital and primary spaceport city of Atria Prime, located on the southern p
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3135-05-01</date>
+			<faction>SA</faction>
+		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>4</subtype>
 		<luminosity>II</luminosity>
@@ -4633,6 +4729,10 @@ Most of the wilds of Queensland, the planet’s largest continent, have remained
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3137-08-01</date>
+			<faction>MiC</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -5399,7 +5499,15 @@ During the Golden Age of Peace, Basalt‘s mining companies recovered enough to 
 		<name>Basantapur</name>
 		<xcood>367.73</xcood>
 		<ycood>-286.88</ycood>
-		<faction>FS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2250-01-01</date>
+			<faction>UHC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2540-09-01</date>
+			<faction>FS</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -6142,6 +6250,10 @@ During the Word of Blake Jihad, Benjamin was right on the edge of the Word of Bl
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3135-05-01</date>
+			<faction>SA</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Bergman's Planet</name>
@@ -6177,6 +6289,10 @@ During the Word of Blake Jihad, Benjamin was right on the edge of the Word of Bl
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3135-05-01</date>
+			<faction>SA</faction>
 		</factionChange>
 		<spectralClass>M</spectralClass>
 		<subtype>4</subtype>
@@ -7164,6 +7280,10 @@ Bermuda Combat Systems</desc>
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3137-10-01</date>
+			<faction>CvW</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -8551,6 +8671,10 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3135-11-01</date>
+			<faction>RR</faction>
+		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>5</subtype>
 		<luminosity>V</luminosity>
@@ -9175,6 +9299,14 @@ After the fall of the Star League, Caph became a bitter battle ground between th
 		<factionChange>
 			<date>3059-06-26</date>
 			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3099-07-28</date>
+			<faction>DC,CNC,CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3099-08-07</date>
+			<faction>CGB</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -9836,6 +9968,10 @@ Agriculture is an important industry on Cassias, though it rarely produces foods
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3135-11-01</date>
+			<faction>RR</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Castrovia</name>
@@ -10409,6 +10545,10 @@ During the Succession Wars, the exports from Starpad to agriculturally poorer ne
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3135-11-01</date>
+			<faction>RR</faction>
 		</factionChange>
 		<pressure>2</pressure>
 		<gravity>0.67</gravity>
@@ -11286,6 +11426,10 @@ This led to a very hostile environment by the mid 3020s with many residents just
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3137-10-01</date>
+			<faction>CvW</faction>
 		</factionChange>
 		<spectralClass>M</spectralClass>
 		<subtype>2</subtype>
@@ -14513,6 +14657,10 @@ Franchelco, the planetary capital city on the northern continent of Vijave, but 
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3135-11-01</date>
+			<faction>RR</faction>
+		</factionChange>
 		<pressure>3</pressure>
 		<gravity>1.05</gravity>
 		<lifeForm>4</lifeForm>
@@ -15582,7 +15730,36 @@ After the fall of Amaris, Engadine was one of the first non-industrial worlds ca
 		<name>Enif</name>
 		<xcood>432.93</xcood>
 		<ycood>291.31</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2600-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<satellite>Wold</satellite>
+		<gravity>1.45</gravity>
+		<pressure>3</pressure>
+		<climate>2</climate>
+		<temperature>20</temperature>
+		<percentWater>72</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<socioIndustrial>D-D-B-C-C</socioIndustrial>
+		<landMass>Cotswold</landMass>
+		<landMass>Scotswold</landMass>
+		<landMass>Potswold</landMass>
+		<desc>Enif was first settled in 2600 and the planet’s primary importance has been as a staging world for DCMS assaults into the Periphery. The planet’s only export for centuries were large shipments of grain to neighboring planets. In 2982, Luthien Armor Works built a smelter and armor sheeting facility.
+
+It wasn’t until after the Clan invasion that a mining expedition to the system’s distant astroid belt discovered large deposits of germanium, a vital component to building K-F drive cores. Within ten years, the planet’s population tripled and new factories and facilities from New Samarkand Metals, Stellar Trek, and LAW popped up.
+
+Planetary restrictions restricted these new developments to the Cotswold continent, while native Enivians were allowed to settle the isolated smaller continents of Scotswold and Potswold to maintain the ‘sleepy backwater’ identity the planet has cultivated over the centuries. Native Enivians fear that  ‘the Newcomers’ are a challenge to their slower pace of life, while the Newcomers often mock the natives for their simplistic lifestyles.
+
+Enif’s educational system is poor, even by lower-class standards in the Combine, and as a result, Enif citizens can rarely make it into military academies and citizens that make it into the DCMS rarely make it past the lowest ranks.
+
+The continent of Cotswold is home to large, rolling plains that great herds of wild Enivian mustangs roam.</desc>
 	</planet>
 	<planet>
 		<name>Enkoping</name>
@@ -17624,11 +17801,7 @@ Universal Air</desc>
 		<ycood>175.26</ycood>
 		<faction>UND</faction>
 		<factionChange>
-			<date>2172-08-01</date>
-			<faction>TA</faction>
-		</factionChange>
-		<factionChange>
-			<date>2242-01-01</date>
+			<date>2270-01-01</date>
 			<faction>IND</faction>
 		</factionChange>   
 		<factionChange>
@@ -17663,15 +17836,35 @@ Universal Air</desc>
 			<date>3069-06-16</date>
 			<faction>ABN</faction>
 		</factionChange>
-		<nadirCharge>True</nadirCharge>
-		<zenithCharge>True</zenithCharge>
-		<lifeForm>7</lifeForm>
 		<spectralClass>K</spectralClass>
 		<subtype>5</subtype>
 		<luminosity>III</luminosity>
 		<sysPos>5</sysPos>
+		<satellite>Shiro</satellite>
+		<gravity>1.2</gravity>
+		<pressure>3</pressure>
+		<climate>3</climate>
+		<temperature>25</temperature>
+		<percentWater>65</percentWater>
+		<nadirCharge>True</nadirCharge>
+		<zenithCharge>True</zenithCharge>
 		<hpg>A</hpg>
-		<desc>By the 31st century, Galedon V was a sparsely populated planet with limited industrial concerns after suffering from centuries of war. Despite this, the planet was a Military Distract capital. Most of the planet’s remaining industry was centered around the planet’s abundant high-grade industrial diamonds. These conditions were in stark contrast to the planet when it was originally settled in 2282, when the planet’s abundance of clean water and other natural resources attracted scores of settlers to Galedon.
+		<lifeForm>7</lifeForm>
+		<socioIndustrial>A-A-A-A-A</socioIndustrial>
+		<landMass>Crete</landMass>
+		<landMass>Luzon (Galedon City)</landMass>
+		<landMass>Paphos</landMass>
+		<desc>Galedon V is a garden world with abundant water, natural resources, and agriculture. It is one of the earliest members of the nascent Draconis Combine. Historically, it has been a prefecture and military district capital and was heavily garrisoned by the DCMS as a result.
+
+Galedon V was settled in the late 2200s and early colonists were attracted by the abundant, clean, water supplies, fertile plains, and abundant high-grade industrial diamonds and other natural resources. An early alliance with Shiro Kurita against the Ozawa Mercantile Association cemented Galedon V historically in the formation of the Draconis Combine. In 2332, the planet was wracked by revolts, the result of which left shattered cities and starving civilians. However, the Colonial Board put in place by Shiro Kurita and tasked with rebuilding the planet convinced the civilians of Shiro’s benevolence and charity. The people of Galedon have been staunch Kurita supporters ever since.
+
+Galedon V is an agricultural powerhouse and trades with other worlds in the region. The Galedon pear is the planet’s most valuable harvest; the difficult maintenance require and a three-year growth cycle mean that it remains an expensive commodity, often costing hundreds of K-bills for a single pear. The hills of the Paphos continent hold a renowned wine industry.
+
+The black and red diamonds that Galedon is famous for are mined from the ‘Steps of the Dragon’ mountain chain along the eastern coast of Paphos. Strict security on the mining, production, and export of these gems means they are the most rare and expensive in the Inner Sphere.
+
+Luzon, the southern continent of Galedon is home to the capital, Galedon City and the the sprawling Galedon Military Academy, covering over five thousand hectares of land, just outside of the city. The continent is also home to two dedicated military DropPorts, extensive garrison facilities, and expansive BattleMech repair and refit facilities.
+
+In orbit, is the Galedon Naval Warfare Station, which opened in 3037. The Galedon system is also home to the Galedon Ring, which services the planet’s aerospace defense units and resupplies visiting spacecraft.
 
 Unfortunately, during the Word of Blake Jihad, orbital strikes by Clan Snow Raven in 3068 unleashed an ancient virulent epidemic that came to be known as the Curse of Galedon. All that kept the deadly virus from spreading further beyond Galedon was the return of a Snow Raven fleet nearly a year later which systematically destroyed every city and military base on the planet, which along with the Curse of Galedon, reduced the once powerful world to a graveyard.</desc>
 	</planet>
@@ -18842,7 +19035,7 @@ Glenmora’s location on the Federated Suns and Draconis Combine border has made
 			<faction>OA</faction>
 		</factionChange>
 		<factionChange>
-			<date>3100-06-01</date>
+			<date>3093-06-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -19512,7 +19705,7 @@ In the 31st century Greeley gained some importance as the Federated Suns establi
 			<faction>KP</faction>
 		</factionChange>
 		<factionChange>
-			<date>30-02-01</date>
+			<date>3085-02-01</date>
 			<faction>CC</faction>
 		</factionChange>
 	</planet>
@@ -19606,17 +19799,29 @@ In the 31st century Greeley gained some importance as the Federated Suns establi
 		<xcood>255.06</xcood>
 		<ycood>153.61</ycood>
 		<faction>DC</faction>
-		<zenithCharge>True</zenithCharge>
-		<lifeForm>7</lifeForm>
 		<spectralClass>G</spectralClass>
 		<subtype>8</subtype>
 		<luminosity>IV</luminosity>
 		<sysPos>4</sysPos>
-		<hpg>A</hpg>
-		<satellite>Unknown</satellite>
+		<satellite>Benkei</satellite>
 		<satellite>Yoshitsune</satellite>
-		<landMass>(Masamori)</landMass>
-		<desc>Hachiman is a rare planet in that it has comfortable living conditions and is blessed with an abundance of natural resources, two attributes that have made the planet attractive to both settlers and corporations. As of the 31st century Hachiman was the center of the Draconis Combine’s computer and advanced electronics industry as the headquarters of Hachiman Taro Electronics and Tanadi Computers, which makes its home in the planetary capital of Masamori.</desc>
+		<satellite>Sorrow</satellite>
+		<gravity>1</gravity>
+		<pressure>3</pressure>
+		<climate>3</climate>
+		<temperature>25</temperature>
+		<percentWater>70</percentWater>
+		<zenithCharge>True</zenithCharge>
+		<hpg>A</hpg>
+		<lifeForm>7</lifeForm>
+		<socioIndustrial>A-A-A-A-B</socioIndustrial>
+		<landMass>Ōjin (Masamori)</landMass>
+		<landMass>Deolali</landMass>
+		<landMass>Jingū</landMass>
+		<landMass>Nashik</landMass>
+		<desc>Hachiman is a rare planet in that it has comfortable living conditions and is blessed with an abundance of natural resources, two attributes that have made the planet attractive to both settlers and corporations. As of the 31st century Hachiman was the center of the Draconis Combine’s computer and advanced electronics industry as the headquarters of Hachiman Taro Electronics and Tanadi Computers, which makes its home in the planetary capital of Masamori.
+		
+The planetary capital of Masamori is located on the continent of Ōjin. The planet has three other continents. Deolali is dominated by ancient forests and deep river canyons. Jingū is to the far north and is covered in virgin snowfields and home to the rare Bodhisattva violet, which is prized for its beauty and natural perfume. The final continent of Nashik is dominated by varied tropical terrains and host to annual DCMS war games and secretive ISF training operations. Nashik is also home to small, scattered Buddhist and Hindu villages, remainders of the planet’s Gujarati and Mahratta founding colonies. Hachiman is the last world to contain genetic relatives to refugees from the United Hindu Collective.</desc>
 	</planet>
 	<planet>
 		<name>Hadnall</name>
@@ -19849,6 +20054,14 @@ In the late 3070s Clan Diamond Shark was granted an enclave on the planet of Hal
 			<date>3085-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3112-10-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3113-05-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 		<pressure>3</pressure>
 		<gravity>1.1</gravity>
 		<lifeForm>2</lifeForm>
@@ -20047,6 +20260,10 @@ During their Holy War, the Blakists found ready converts among the technological
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3135-05-01</date>
+			<faction>SA</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -21723,6 +21940,10 @@ Housekarle is home to one of the Confederations many Duchy RTC facilities and tr
 			<date>3085-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3136-10-01</date>
+			<faction>TTU</faction>
+		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.74</gravity>
 		<zenithCharge>True</zenithCharge>
@@ -21827,6 +22048,14 @@ During the Star League-era, Hsien prospered as part of the Terran Hegemony, befo
 		</factionChange>
 		<factionChange>
 			<date>3085-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3111-10-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3113-05-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>F</spectralClass>
@@ -22166,8 +22395,12 @@ Huntress was the capital of Clan Smoke Jaguar and their primary holding. They ha
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3104-07-01</date>
-			<faction>RD</faction>
+			<date>3100-11-18</date>
+			<faction>DC,CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3100-12-02</date>
+			<faction>CGB</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -22740,6 +22973,14 @@ Ingress‘s temporary military weakness made it an easy target during the Blakis
 			<date>3059-06-02</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3100-06-21</date>
+			<faction>DC,CNC,CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3100-07-09</date>
+			<faction>DC</faction>
+		</factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>8</subtype>
 		<luminosity>III</luminosity>
@@ -22897,7 +23138,44 @@ Irian’s terrain is best described as bland. The planet’s terrain is dominate
 		<name>Isesaki</name>
 		<xcood>279.58</xcood>
 		<ycood>195.6</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2612-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
+		<spectralClass>M</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>1</sysPos>
+		<satellite>Hoshide</satellite>
+		<satellite>Yui</satellite>
+		<satellite>Furukawa</satellite>
+		<satellite>Onishi</satellite>
+		<satellite>Yamazaki</satellite>
+		<gravity>0.8</gravity>
+		<pressure>3</pressure>
+		<climate>3</climate>
+		<temperature>25</temperature>
+		<percentWater>80</percentWater>
+		<nadirCharge>True</nadirCharge>
+		<zenithCharge>True</zenithCharge>
+		<hpg>A</hpg>
+		<lifeForm>7</lifeForm>
+		<socioIndustrial>B-A-D-A-D</socioIndustrial>
+		<landMass>Uchiro (Ukonsoi)</landMass>
+		<landMass>Isoroku</landMass>
+		<landMass>Matsubushi</landMass>
+		<desc>Isesaki is a single world that orbits a close binary star system. The system was surveyed in 2281 and deemed of little value to the nascent Draconis Combine until the first colony was settled in 2612.
+
+The planet’s surface is primarily water, although the oceans are heavily contaminated by poisonous bacteria and alkaline components and the five moons caused extreme tide fluctuations and limited coastal construction. Most of the planet’s drinkable water comes from difficult to access underground springs. Despite the difficulties, Isesaki is a beautiful ocean world, dotted with verdant forest islands and atolls and stunning views of the binary suns and five moons.
+
+The planet was settled by Isesaki Shipping and within 200 years the corporation had built two JumpShip yards and several microgravity manufacturing facilities in orbit. Additionally an entire island had been converted into a small spacecraft manufacturing complex. As a result, the system became a major transportation hub for Combine traffic crossing the Draconis Rift and Isesaki Shipping became one of the largest commercial corporations in the realm.
+
+The planet’s population almost entirely resides on the continent of Uchio, while the smaller continents of Isoroku and Matsubushi have remained unsettled and are utilized as peaceful, wilderness retreats for Isesaki employees. Both smaller continents are located along the equator and are covered in rich forests, rolling hills, and are home to sparkling springs. The only settlement on the smaller continents are a small lodges, built to belnd into the natural beauty of the area.
+
+The Uchio continent is home to Toyohiro Akiyama Spacecraft Complex and the capital city of Ukonsoi, located on the central plains. The city’s architecture blends Rasalhagian, Shōwa, Buddhist, and neo-Qing design elements and the city center is dominated by the four towers of the Isesaki Shipping headquarters. The eastern end of the city is dominated by rows of massive warehouses, which hold products and shipments from across the Inner Sphere under heavy security. These bulk supplies are sorted and stored by Isesaki for futher shipment and transported around by the Roku Royal trains.
+
+There are several other Combine or corporate interests on planet, which dot the rest of the continent’s surface and each is surrounded by residential and commercial districts in concentric patterns. At night, the lights from these cities give the impression of perfectly placed scales.</desc>
 	</planet>
 	<planet>
 		<name>Ishtar</name>
@@ -22977,6 +23255,14 @@ Irian’s terrain is best described as bland. The planet’s terrain is dominate
 		</factionChange>
 		<factionChange>
 			<date>3065-06-26</date>
+			<faction>CDS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3099-04-09</date>
+			<faction>CDS,CNC,DC,CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3099-04-12</date>
 			<faction>CDS</faction>
 		</factionChange>
 		<pressure>3</pressure>
@@ -23247,6 +23533,22 @@ Taurus Territorial Industries</desc>
 		</factionChange>
 		<factionChange>
 			<date>3050-05-10</date>
+			<faction>CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3099-05-21</date>
+			<faction>CGB,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3099-06-23</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3100-09-18</date>
+			<faction>DC,CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3100-09-25</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -23866,6 +24168,10 @@ Jonathan has a 20 hour day and takes 745 standard days to orbit its sun.</desc>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3136-02-01</date>
+			<faction>PC</faction>
+		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>1</subtype>
 		<luminosity>Ia</luminosity>
@@ -24026,6 +24332,14 @@ Quikscell Company</desc>
 		</factionChange>
 		<factionChange>
 			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3112-11-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3113-05-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>M</spectralClass>
@@ -24352,6 +24666,8 @@ Even today, Kaus Australis maintains Kaus Media as its primary customer and sour
 		<landMass>Bellaria</landMass>
 		<landMass>Lucynda</landMass>
 		<landMass>Rashatta</landMass>
+		<hpg>X</hpg>
+		<socioIndustrial>F-F-F-D-F</socioIndustrial>
 		<desc>A hellish world of continuous volcanic activity that geologists are attributing to a severe tectonic shift of unparalleled magnitude, Kaus Borealis is a world that many feel is on death‘s door. Over 300 active volcanoes have formed in the last three centuries alone, erupting with increasing intensity that now has lava flowing freely and regularly over almost ten percent of the planet‘s surface at any given time. When first discovered, Kaus Borealis was a serene world of deep green oceans, fertile soil, hardy woodlands, abundant wildlife, and blue skies. The early colonists quickly made their paradise a home and established it as an agricultural world. Although, like most terrestrial planets, Kaus Borealis had its share of seismic disturbances, scientists thought little of them until three new volcanoes explosively emerged on the west coast of the northern continent of Lucynda in 2803, each within three months of the other. As more eruptions followed, and entire towns or farming regions were swallowed up by the earth or incinerated by tons of molten rock, a gradual exodus began, which stalled in the thirty-first century when the planet grew inexplicably silent. However, by that stage so much sulfur, methane, and ash had been thrown into the atmosphere that the ozone layer was compromised, breathing was impossible without respirators, and acid rain regularly fell from dark, yellow skies. Gone were the serene oceans, fertile soil, and hardy woodlands, and most of the native wildlife had perished. Turbulent, superheated seas and barren wastes of broken rock and charcoal now dominated the landscape, but began to give way to the first signs of rejuvenation by the time Kaus Borealis became a part of by the last 31st century.
 
 In 3102, all hell broke loose again. With renewed fury, five volcanoes scattered across all four of the planet‘s major landmasses blasted fire and hot gases into the skies and ran molten lava into the land and seas, prompting the start of another mass exodus that continues to this day. Geologists studying the ongoing phenomenon have claimed that the rate of eruptions suggests that the continuous turmoil may run its course, as the tectonic plates settle into new positions within another few centuries, but the less analytical inhabitants of this world may not wait around that long.
@@ -24946,6 +25262,7 @@ Wakazashi Industries</desc>
 		<sysPos>2</sysPos>
 		<satellite>Kiev</satellite>
 		<satellite>Svoboda</satellite>
+		<socioIndustrial>C-A-C-A-D</socioIndustrial>
 		<landMass>Gershtad</landMass>
 		<landMass>Lobopov</landMass>
 		<landMass>Novgorod (Sverdlovsk)</landMass>
@@ -26577,6 +26894,22 @@ La Blon‘s capital, Amadeus, is located at the foot of the Carbondale Mountains
 			<date>3059-06-29</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3099-01-18</date>
+			<faction>DC,CNC,CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3099-01-31</date>
+			<faction>CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3099-10-12</date>
+			<faction>CGB,CNC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3099-11-19</date>
+			<faction>CNC,DC</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Lackhove</name>
@@ -27446,6 +27779,10 @@ The primary industry on Les Halles is the extraction and refining of fuel used i
 		<factionChange>
 			<date>3085-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3134-07-01</date>
+			<faction>CC</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>1.05</gravity>
@@ -29445,6 +29782,10 @@ Alliance Aerospace Group</desc>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3135-11-01</date>
+			<faction>RR</faction>
+		</factionChange>
 		<pressure>4</pressure>
 		<gravity>1.12</gravity>
 		<lifeForm>7</lifeForm>
@@ -29615,6 +29956,10 @@ Unfortunately, the loss of the Star League–era atmospheric purifiers during th
 			<date>3079-01-01</date>
 			<faction>MSC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3137-08-01</date>
+			<faction>MiC</faction>
+		</factionChange>
 		<spectralClass>K</spectralClass>
 		<subtype>0</subtype>
 		<luminosity>V</luminosity>
@@ -29691,6 +30036,10 @@ Waytani Incorporated</desc>
 			<faction>IND</faction>
 		</factionChange>
 		<factionChange>
+			<date>3135-05-01</date>
+			<faction>SA</faction>
+		</factionChange>
+		<factionChange>
 			<date>3140-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
@@ -29762,6 +30111,14 @@ Peloran Motors</desc>
 		<xcood>236.81</xcood>
 		<ycood>88.67</ycood>
 		<faction>DC</faction>
+		<factionChange>
+			<date>3130-06-01</date>
+			<faction>FS,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3139-03-09</date>
+			<faction>DC</faction>
+		</factionChange>
 		<landMass>Faust</landMass>
 		<landMass>Kit (Ashoka)</landMass>
 	</planet>
@@ -29848,7 +30205,11 @@ Peloran Motors</desc>
 		<name>Matamoras</name>
 		<xcood>254.8</xcood>
 		<ycood>352.34</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2610-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3059-07-27</date>
 			<faction>DC,CSJ</faction>
@@ -29857,6 +30218,39 @@ Peloran Motors</desc>
 			<date>3059-08-13</date>
 			<faction>DC</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>1</sysPos>
+		<satellite>Anastasia</satellite>
+<satellite>Anatoly</satellite>
+		<gravity>1.46</gravity>
+		<pressure>3</pressure>
+		<climate>4</climate>
+		<temperature>50</temperature>
+		<percentWater>20</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>1</lifeForm>
+		<socioIndustrial>B-C-A-B-D</socioIndustrial>
+		<landMass>Siberia</landMass>
+		<landMass>(Vladivostok)</landMass>
+		<desc>Matamoras is historically a major source of resources for the Draconis Combine. The planet extracts, refines, and exports millions of tons of rare metals and materials that are critical to military production that feeds the DCMS.
+
+The planet was home to three major manufacturing centers that produced weapons and conventional vehicles for the Combine, however, by 2942 all three had been destroyed. The last of which was destroyed during the Third Succession War by a Lyran deep raid.
+
+Matamoras is battered by constant, and brutal, winds. Wind speeds can exceed four hundred kilometers per hour and Matamoras is the windiest planet in the entire Combine. The relentless winds of Matamoras have resulted in unique and impressive rock formations scattered across the desert terrain that dominates most of the planet. The unique terrain’s beauty appears in art and literature throughout the Combine and an inspiration for Azami artisans.
+
+Matamoras was founded in the 2600s solely for its natural resources. After hundreds of years, the planet only remains relevant because of its numerous mines and heavy industry. Despite its natural beauty, it attracts few visitors and even fewer settlers beyond miners and industrial workers and the minimal support to maintain employee living for both.
+
+The southern continent, Siberia, maintained a notorious prison complex until the mid-2700s. The administration abandoned the facility with the prisoners locked into their cells. Due to the harsh-climate of the world, the prisoners did not escape, however, when a shuttle was forced to perform an emergency landing in the area in 2913, they discovered a small but thriving community descended from the over three thousand prisoners that had been left behind.
+
+New Samarkand Metals is the main employer on Matamoras and owns more than fifty mines and processing sites scattered across the planet.
+
+The capital of Matamoras is Vladivostok. Due to the wind, more than 60% of the capital is built deep into natural caverns, carved by an ancient underground sea, of the twin peaked mountain, The Brothers. The Matamoras spaceport is located just outside of the city and away from the mountain. The city center is dominated by a massive formation of red stalagmites that resemble several ancient Terran Russian leaders, and are called the Bloody Tsars by the locals.
+
+Due to the winds and high gravity, most employees on Matamoras work on five or ten-year rotations. The DCMS regularly rotates units through annually, so that soldiers can receive high-gravity and high-wind combat training.
+
+In the 31st century, a fad known as ‘wind skirmishing’ emerged involving lightweight bodysuits with glider webbing and paint pellet guns. Teams glide along the strong winds and try to score more hits on their opponents.</desc>
 	</planet>
 	<planet>
 		<name>Matar</name>
@@ -30381,6 +30775,14 @@ The planetary capital, Worthentown and primary seat of power are located on the 
 		<xcood>60.51</xcood>
 		<ycood>221.68</ycood>
 		<faction>DC</faction>
+		<factionChange>
+			<date>3099-09-17</date>
+			<faction>DC,CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3099-09-30</date>
+			<faction>CGB</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Meinacos</name>
@@ -30588,6 +30990,10 @@ Grumman-Cri (Built late 3070s)</desc>
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3136-10-01</date>
+			<faction>TTU</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -30946,6 +31352,10 @@ Menkib has 25 hour days and orbits its sun every 37 standard days.</desc>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3137-10-01</date>
+			<faction>CvW</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Mica II</name>
@@ -31198,6 +31608,10 @@ Menkib has 25 hour days and orbits its sun every 37 standard days.</desc>
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3137-08-01</date>
+			<faction>MiC</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>1.04</gravity>
@@ -31461,6 +31875,14 @@ These episodic invasions kept Mirach from realizing its true potential, and the 
 		</factionChange>
 		<factionChange>
 			<date>2790-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3130-06-01</date>
+			<faction>FS,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3139-08-29</date>
 			<faction>DC</faction>
 		</factionChange>
 		<pressure>3</pressure>
@@ -32194,6 +32616,22 @@ Bagamoyo Aerospace Manufacturing</desc>
 			<date>3059-06-26</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3098-12-29</date>
+			<faction>DC,CNC,CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3099-02-02</date>
+			<faction>CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3100-08-01</date>
+			<faction>CGB,DC,CNC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3100-08-12</date>
+			<faction>CGB</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Multan</name>
@@ -32577,6 +33015,10 @@ Kallon Industries</desc>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3137-10-01</date>
+			<faction>CvW</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Necedah</name>
@@ -32748,6 +33190,14 @@ Neerabup is divided into provinces that are each ruled by a Publican. The Public
 			<date>3030-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3130-06-01</date>
+			<faction>FS,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3139-04-20</date>
+			<faction>DC</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>New Abilene</name>
@@ -32810,6 +33260,14 @@ Neerabup is divided into provinces that are each ruled by a Publican. The Public
 		</factionChange>
 		<factionChange>
 			<date>3085-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3112-04-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3113-05-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>K</spectralClass>
@@ -33372,6 +33830,10 @@ New Hessen was occupied several times during the Succession Wars. However, New H
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3136-02-01</date>
+			<faction>PC</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -35634,8 +36096,12 @@ Brigadier Corporation
 			<faction>CGB</faction>
 		</factionChange>
 		<factionChange>
-			<date>3103-03-13</date>
-			<faction>FRR</faction>
+			<date>3099-04-20</date>
+			<faction>CGB,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3099-04-31</date>
+			<faction>CGB</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.99</gravity>
@@ -36396,7 +36862,15 @@ Quickscell Company</desc>
 		<name>Panpour</name>
 		<xcood>345.56</xcood>
 		<ycood>-294.96</ycood>
-		<faction>FS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2310-01-01</date>
+			<faction>UHC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2540-09-01</date>
+			<faction>FS</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -36436,7 +36910,7 @@ Quickscell Company</desc>
 		<landMass>Valluvanadu</landMass>
 		<landMass>Venad</landMass>
 		<hpg>A</hpg>
-		<desc>Panpour was originally surveyed in the mid 23rd century but was not settled until the early 2300s. The planet was liveable but not the most comfortable planet for human life, however abundant ores attracted colonists. Early terraforming operations were able to make the land more arable and allowed the planet to eventually have enough agriculture to be self-sufficient. The planet remained a backwater until the Reunification War when the planet gained the interest of the Federated Suns and the Star League as a forward logistics center. Almost immediately Panpour was transformed into an industrial giant, fully able to support the war efforts in the Periphery.
+		<desc>Panpour was originally surveyed in the mid 23rd century but was not settled until the early 2300s by the United Hindu Collective and was the capital of the small realm. The planet was liveable but not the most comfortable planet for human life, however abundant ores attracted colonists. Early terraforming operations were able to make the land more arable and allowed the planet to eventually have enough agriculture to be self-sufficient. The planet remained a backwater until the Reunification War when the planet gained the interest of the Federated Suns and the Star League as a forward logistics center. Almost immediately Panpour was transformed into an industrial giant, fully able to support the war efforts in the Periphery.
 
 Manufacturing centers:
 Jalastar Aerospace
@@ -36541,6 +37015,14 @@ Challenge Systems</desc>
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3135-09-01</date>
+			<faction>SA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3137-01-01</date>
+			<faction>OP</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -37749,6 +38231,25 @@ Hadrian Mechanized Industries</desc>
 			<date>3059-06-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<satellite>Mordred</satellite>
+		<gravity>1.1</gravity>
+		<pressure>3</pressure>
+		<climate>2</climate>
+		<temperature>20</temperature>
+		<percentWater>50</percentWater>
+		<hpg>A</hpg>
+		<lifeForm>5</lifeForm>
+		<socioIndustrial>D-B-B-C-A</socioIndustrial>
+		<landMass>(Affendale)</landMass>
+		<desc>Port Arthur is a nearly idyllic breadbasket world that has been fundamental in feeding neighboring systems.  The planet remained relatively untouched throughout the Succession Wars, suffering only two raids by House Steiner forces. However, during the Clan Invasion, Port Arthur was captured by the Smoke Jaguars.
+
+The capital city is Affendale and is a sprawling metropolis, with no buildings taller than 30 meters, each avenue is filled with local foliage, and there are numerous parks. The greenery of the city belies its size and dense population. The city was heavily damaged during the Smoke Jaguar occupation but rebuilt quickly after the planet returned to Combine control. To combat the urban sprawl due to an expanding population and building height-restrictions limiting population density, city-planners began creating an expansive underground for Affendale, with most buildings expanding underground and numerous paths and tunnels connecting properties.
+
+During the Succession Wars, Port Arthur lost numerous water purification plants, which left the planet reliant on water from off-world due to being unable to clean the bacteria-contamination from its water. The purification systems were rebuilt based on technology in the Helm Memory Core.</desc>
 	</planet>
 	<planet>
 		<name>Port Moseby</name>
@@ -38592,6 +39093,9 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 		<subtype>9</subtype>
 		<luminosity>IV</luminosity>
 		<sysPos>7</sysPos>
+		<zenithCharge>True</zenithCharge>
+		<hpg>A</hpg>
+		<socioIndustrial>B-A-B-A-C</socioIndustrial>
 		<landMass>El Largo</landMass>
 		<landMass>El Minoro</landMass>
 		<landMass>Gladius</landMass>
@@ -39392,6 +39896,10 @@ Magna Metals Incorporated</desc>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3138-05-01</date>
+			<faction>CvW</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Renfield</name>
@@ -39531,7 +40039,7 @@ Magna Metals Incorporated</desc>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3116-01-01</date>
+			<date>3100-11-15</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -40008,6 +40516,10 @@ Valiant Systems</desc>
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3136-02-01</date>
+			<faction>PC</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.74</gravity>
@@ -41078,6 +41590,10 @@ As of the 32nd century, this world is little more than an outpost, with no agric
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3136-10-01</date>
+			<faction>TTU</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Sakai</name>
@@ -41691,6 +42207,10 @@ Tengo Aerospace</desc>
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3138-05-01</date>
+			<faction>CvW</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -42791,6 +43311,10 @@ Shiba is home to a Duchy RTC facility, which is located in the flatlands of Abbo
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3135-09-01</date>
+			<faction>ShA</faction>
+		</factionChange>
 		<spectralClass>A</spectralClass>
 		<subtype>8</subtype>
 		<luminosity>V</luminosity>
@@ -43676,6 +44200,10 @@ The capital of Skondia, Platinum City, is located on the southeastern continent 
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3135-10-01</date>
+			<faction>CJF</faction>
+		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>8</subtype>
 		<luminosity>V</luminosity>
@@ -44189,6 +44717,14 @@ The local population have a pragmatic political approach that can almost be mist
 			<date>3050-10-01</date>
 			<faction>CGB</faction>
 		</factionChange>
+		<factionChange>
+   		 <date>3098-11-29</date>
+   		 <faction>CGB,CNC</faction>
+   	 </factionChange>
+<factionChange>
+   		 <date>3098-12-10</date>
+   		 <faction>CGB</faction>
+   	 </factionChange>
 	</planet>
 	<planet>
 		<name>Sparrevohn</name>
@@ -44759,6 +45295,14 @@ Tengo Aerospace</desc>
 			<date>3052-01-15</date>
 			<faction>CGB</faction>
 		</factionChange>
+		<factionChange>
+			<date>3099-11-02</date>
+			<faction>CGB,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3099-11-14</date>
+			<faction>CGB</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Sterope</name>
@@ -44817,6 +45361,30 @@ Tengo Aerospace</desc>
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3134-09-22</date>
+			<faction>ROS,MSC,CDS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3134-09-22</date>
+			<faction>ROS,MSC,CDS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3134-11-01</date>
+			<faction>MSC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3138-06-05</date>
+			<faction>MSC,CW,LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3138-06-05</date>
+			<faction>LA</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>8</subtype>
@@ -45111,6 +45679,10 @@ J. B. BattleMechs Inc.</desc>
 		<factionChange>
 			<date>3085-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3134-08-01</date>
+			<faction>IND</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>1.1</gravity>
@@ -45962,6 +46534,10 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3136-10-01</date>
+			<faction>TTU</faction>
 		</factionChange>
 		<lifeForm>7</lifeForm>
 		<spectralClass>M</spectralClass>
@@ -47286,8 +47862,20 @@ Tharkad Aerospace Group</desc>
 			<faction>CGB</faction>
 		</factionChange>
 		<factionChange>
-			<date>3103-03-13</date>
-			<faction>RD</faction>
+			<date>3099-05-23</date>
+			<faction>CGB,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3099-06-14</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3100-09-22</date>
+			<faction>DC,CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3100-09-30</date>
+			<faction>CGB</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.97</gravity>
@@ -47548,6 +48136,18 @@ Earthwerks Incorporated</desc>
 		<factionChange>
 			<date>3085-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3136-05-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3145-04-08</date>
+			<faction>FS,CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3145-05-25</date>
+			<faction>CC</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>8</subtype>
@@ -48410,6 +49010,18 @@ Gutierrez Aerospace</desc>
 			<faction>CDS</faction>
 		</factionChange>
 		<factionChange>
+			<date>3099-07-15</date>
+			<faction>CDS,CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3100-03-18</date>
+			<faction>CDS,CGB,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3100-04-06</date>
+			<faction>CDS</faction>
+		</factionChange>
+		<factionChange>
 			<date>3132-07-01</date>
 			<faction>RD</faction>
 		</factionChange>
@@ -48658,6 +49270,14 @@ Tsinghai has repelled numerous Marik and bandit attacks that have decimated the 
 		<factionChange>
 			<date>3085-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3134-05-01</date>
+			<faction>ROS,CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3134-08-01</date>
+			<faction>CC</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>3</subtype>
@@ -49705,11 +50325,15 @@ In the centuries of the Succession Wars, Unukalhai was largely overlooked by inv
 			<faction>ROS</faction>
 		</factionChange>
 		<factionChange>
-			<date>3133-01-01</date>
-			<faction>IND</faction>
+			<date>3133-10-11</date>
+			<faction>ROS,DC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3136-01-01</date>
+			<date>3133-10-25</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3135-11-12</date>
 			<faction>RD</faction>
 		</factionChange>
 		<pressure>3</pressure>
@@ -50494,6 +51118,14 @@ Wealthy Walloons enjoy taking advantage of Vuzar, the 7th planet in the Wallis s
 			<date>3030-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3130-06-01</date>
+			<faction>FS,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3139-04-13</date>
+			<faction>DC</faction>
+		</factionChange>
 		<spectralClass>K</spectralClass>
 		<subtype>0</subtype>
 		<luminosity>V</luminosity>
@@ -50509,7 +51141,7 @@ Wealthy Walloons enjoy taking advantage of Vuzar, the 7th planet in the Wallis s
 		<lifeForm>7</lifeForm>
 		<socioIndustrial>C-C-D-C-B</socioIndustrial>
 		<landMass>Little Florida Island</landMass>
-		<landMass>New Wisconsin</landMass>
+		<landMass>New Wisconsin (Yaston)</landMass>
 		<desc>3028 - Wapakoneta is a planet almost entirely covered in water and is famous for its many small picturesque islands and resorts. The largest and warmest continent is New Wisconsin which is home to the planetary capital and most of Wapakoneta’s population. New Wisconsin is near the equator and much of its varied landmass is covered in thick forests. The smallest continent, Little Florida, is located far to the north and is almost entirely covered in glaciers and it is home to only one permanent settlement, the port city of Tassel. The remaining three continents are largely uninhabited due to the monstrous typhoons that regularly tear across them.
 
 Aside from the five continents, the planet is dotted with thousands of islands that range in size from a few square meters to a few thousand square kilometers. Palm Island is an example of one of the larger islands and is owned by the Palm family, who have been the rulers of Wapakoneta for over 200 years, in the name of house Davion.
@@ -50695,6 +51327,10 @@ Ceres Metals</desc>
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3135-05-01</date>
+			<faction>SA</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -50898,6 +51534,14 @@ Ceres Metals</desc>
 		<factionChange>
 			<date>3085-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3134-05-01</date>
+			<faction>ROS,CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3134-08-01</date>
+			<faction>CC</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>1.0</gravity>
@@ -51380,6 +52024,10 @@ Presently, aside from the Games and the Hiring Hall, Westerhand does not feature
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3135-11-01</date>
+			<faction>RR</faction>
+		</factionChange>
 		<pressure>4</pressure>
 		<gravity>0.99</gravity>
 		<lifeForm>6</lifeForm>
@@ -51854,6 +52502,14 @@ Woodstock‘s third continent, Essex, is the only blemish on this otherwise beau
 		<factionChange>
 			<date>3059-06-29</date>
 			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3099-02-13</date>
+			<faction>DC,CNC,CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3099-02-28</date>
+			<faction>CGB</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -52935,6 +53591,10 @@ Today, a trace of Zebeneschamali‘s founding decades can still be seen in the s
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3135-11-01</date>
+			<faction>RR</faction>
 		</factionChange>
 		<spectralClass>A</spectralClass>
 		<subtype>4</subtype>
