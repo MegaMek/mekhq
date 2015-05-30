@@ -2592,7 +2592,15 @@ The capital city and commercial center of Alya, LeSabrea, is located on Paroasis
 		<name>Amity</name>
 		<xcood>-130.14</xcood>
 		<ycood>-31.04</ycood>
-		<faction>FWL</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2250-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2271-01-01</date>
+			<faction>FWL</faction>
+		</factionChange>
 		<factionChange>
 			<date>2837-01-01</date>
 			<faction>LA</faction>
