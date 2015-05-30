@@ -23,6 +23,7 @@ import megamek.client.ui.swing.util.MegaMekController;
 import megamek.common.Entity;
 import megamek.common.IGame;
 import megamek.common.KeyBindParser;
+import megamek.common.QuirksHandler;
 import megamek.common.WeaponOrderHandler;
 import megamek.common.preference.PreferenceManager;
 import mekhq.campaign.Campaign;
@@ -155,6 +156,14 @@ class GameThread extends Thread implements CloseClientListener {
             System.out.println("Error saving custom weapon orders!");
             e.printStackTrace();
         }
+    	
+    	try {
+            QuirksHandler.saveCustomQuirksList();
+        } catch (IOException e) {
+            System.out.println("Error saving quirks override!");
+            e.printStackTrace();
+        }
+    	
     	stop = true;
     }
     
