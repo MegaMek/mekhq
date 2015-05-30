@@ -13,6 +13,7 @@ VERSION HISTORY
 + Bug [#804]: [ATB] Scheduled repair tasks automatically fail if the mech is auto deployed to a pending battle
 + Patch [patches:#38]: Procreation Birth correction
 + Quirks saved in MM now properly save when MM is closed
++ Bug: NoSuchElementException in Campaign.clearGameData
 
 v0.3.13 (2015-04-19 21:29 UTC)
 + Bug: Inappropriate mixing of string and integer in personnel table fields leads to class cast errors
