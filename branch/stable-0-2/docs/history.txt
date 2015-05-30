@@ -27,6 +27,7 @@ v0.2.1 (SVN)
 + Updated MM and MML jar files
 + Updated UnitSelectorDialog to be compatible with new MM jar
 + Minor planets.xml updates
++ Planetary Update 38
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method
