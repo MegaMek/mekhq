@@ -722,6 +722,7 @@ public class Utilities {
     		Person p = c.newPerson(Person.T_SPACE_CREW);
     		if (!nameset) {
     		    p.setName(commanderName);
+    		    nameset = true;
     		}
 			vesselCrew.add(p);
     	}
@@ -734,6 +735,7 @@ public class Utilities {
 		for (Person p : drivers) {
             if (!nameset) {
                 p.setName(commanderName);
+                nameset = true;
             }
 			if (!c.recruitPerson(p, log)) {
 				return null;
@@ -749,6 +751,7 @@ public class Utilities {
 		for (Person p : gunners) {
             if (!nameset) {
                 p.setName(commanderName);
+                nameset = true;
             }
 			if (!c.recruitPerson(p, log)) {
 				return null;
@@ -760,6 +763,10 @@ public class Utilities {
         newCrew.addAll(gunners);
 
 		for (Person p : vesselCrew) {
+            if (!nameset) {
+                p.setName(commanderName);
+                nameset = true;
+            }
 			if (!c.recruitPerson(p, log)) {
 				return null;
 			}
@@ -772,6 +779,7 @@ public class Utilities {
 		if (navigator != null & unit.canTakeNavigator()) {
             if (!nameset) {
                 navigator.setName(commanderName);
+                nameset = true;
             }
 			if (!c.recruitPerson(navigator, log)) {
 				return null;

@@ -16,6 +16,7 @@ VERSION HISTORY
 + Bug: NoSuchElementException in Campaign.clearGameData
 + Bug [#882]: Scenario resolution causes opfor recruitment
 + Bug [#880]: NPE: Loading a saved campaign - Lance.java
++ Bug [#874]: [ATB] Duplicate Prisoner Names
 
 v0.3.13 (2015-04-19 21:29 UTC)
 + Bug: Inappropriate mixing of string and integer in personnel table fields leads to class cast errors
