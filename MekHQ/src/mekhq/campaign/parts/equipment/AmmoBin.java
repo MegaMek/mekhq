@@ -22,6 +22,8 @@
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.HashSet;
 
 import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
@@ -57,6 +59,12 @@ import org.w3c.dom.NodeList;
  */
 public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	private static final long serialVersionUID = 2892728320891712304L;
+
+	public static final Integer[] ALLOWED_BY_TYPE_ARRAY = { AmmoType.T_LRM, AmmoType.T_LRM_PRIMITIVE, AmmoType.T_LRM_STREAK, AmmoType.T_LRM_TORPEDO,
+	    AmmoType.T_LRM_TORPEDO_COMBO, AmmoType.T_SRM, AmmoType.T_SRM_ADVANCED, AmmoType.T_SRM_PRIMITIVE, AmmoType.T_SRM_STREAK, AmmoType.T_SRM_TORPEDO,
+	    AmmoType.T_MRM, AmmoType.T_MRM_STREAK, AmmoType.T_ROCKET_LAUNCHER, AmmoType.T_EXLRM, AmmoType.T_PXLRM, AmmoType.T_HSRM, AmmoType.T_MML,
+	    AmmoType.T_NLRM };
+	public static final HashSet<Integer> ALLOWED_BY_TYPE = new HashSet<Integer>(Arrays.asList(ALLOWED_BY_TYPE_ARRAY));
 
 	protected long munition;
 	protected int shotsNeeded;
@@ -541,9 +549,10 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
             }
 			if(part instanceof AmmoStorage) {
 				aType = ((AmmoType)((AmmoStorage)part).getType());
-				if(aType.equals((Object)curType) && curType.getMunitionType() == aType.getMunitionType()) {
+				if(aType.equals(curType) && curType.getMunitionType() == aType.getMunitionType()) {
 					a = (AmmoStorage)part;
-					if (amount < 0 && campaign.getCampaignOptions().useAmmoByType() && a.getShots() < Math.abs(amount)) {
+					if (amount < 0 && campaign.getCampaignOptions().useAmmoByType()
+					        && a.getShots() < Math.abs(amount)) {
 						swapAmmoFromCompatible(Math.abs(amount) * aType.getRackSize(), a);
 					}
 					a.changeShots(amount);
@@ -555,7 +564,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 			campaign.removePart(a);
 		} else if(null == a && amount > 0) {
 			campaign.addPart(new AmmoStorage(1, curType, amount, campaign), 0);
-		} else if (a == null && amount < 0 && campaign.getCampaignOptions().useAmmoByType()) {
+		} else if (a == null && amount < 0
+		        && campaign.getCampaignOptions().useAmmoByType()
+		        && AmmoBin.ALLOWED_BY_TYPE.contains(curType)) {
 			campaign.addPart(new AmmoStorage(1 , curType ,0, campaign), 0);
 			changeAmountAvailable(amount, curType);
 		}
@@ -572,6 +583,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		if (a1 == null || a2 == null) {
 			return false;
 		}
+
+        // If it isn't an allowed type, then nope!
+        if (!AmmoBin.ALLOWED_BY_TYPE.contains(a1.getAmmoType()) || !AmmoBin.ALLOWED_BY_TYPE.contains(a2.getAmmoType())) {
+            return false;
+        }
 
 		// Now we begin to compare
 		boolean result = false;
