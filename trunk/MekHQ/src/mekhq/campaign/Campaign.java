@@ -438,10 +438,10 @@ public class Campaign implements Serializable {
     public RetirementDefectionTracker getRetirementDefectionTracker() {
     	return retirementDefectionTracker;
     }
-    
+
     public int getFatigueLevel() {
     	return fatigueLevel;
-    }    
+    }
 
     public AtBConfiguration getAtBConfig() {
     	if (atbConfig == null) {
@@ -786,6 +786,10 @@ public class Campaign implements Serializable {
     }
 
     public boolean recruitPerson(Person p, boolean prisoner, boolean bondsman, boolean log) {
+        return recruitPerson(p, prisoner, bondsman, log, false);
+    }
+
+    public boolean recruitPerson(Person p, boolean prisoner, boolean bondsman, boolean log, boolean nopay) {
         if (prisoner && bondsman) {
             addReport("<font color='red'><b>Cannot have someone who is both a prisoner and a bondsman, there is an error in the code.</b></font>");
             return false;
@@ -794,7 +798,7 @@ public class Campaign implements Serializable {
             return false;
         }
         // Only pay if option set and this isn't a prisoner or bondsman
-        if (getCampaignOptions().payForRecruitment() && !(prisoner || bondsman)) {
+        if (getCampaignOptions().payForRecruitment() && !(prisoner || bondsman) && !nopay) {
             if (!getFinances().debit(2 * p.getSalary(), Transaction.C_SALARY,
                                      "recruitment of " + p.getFullName(), getCalendar().getTime())) {
                 addReport("<font color='red'><b>Insufficient funds to recruit "
@@ -1948,7 +1952,7 @@ public class Campaign implements Serializable {
         if (calendar.get(Calendar.DAY_OF_YEAR) == 1) {
             reloadNews();
         }
-        
+
         // Ensure that the MegaMek year GameOption matches the campaign year
         if (gameOptions.intOption("year") != calendar.get(Calendar.YEAR)) {
             gameOptions.getOption("year").setValue(calendar.get(Calendar.YEAR));
@@ -2222,7 +2226,7 @@ public class Campaign implements Serializable {
         				int forceId = ((AtBScenario)s).getLanceForceId();
         				if (null != lances.get(forceId)
         						&& !forceIds.get(forceId).isDeployed()) {
-								
+
 							// If any unit in the force is under repair, don't deploy the force
 							// Merely removing the unit from deployment would break with user expectation
 							boolean forceUnderRepair = false;
@@ -2233,7 +2237,7 @@ public class Campaign implements Serializable {
 									break;
         						}
 							}
-							
+
 							if(!forceUnderRepair) {
 								forceIds.get(forceId).setScenarioId(s.getId());
 								s.addForces(forceId);

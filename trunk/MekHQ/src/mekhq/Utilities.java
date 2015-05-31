@@ -547,11 +547,15 @@ public class Utilities {
 		return newCrew;
 	}
 
-	public static ArrayList<Person> generateRandomCrewWithCombinedSkill(Unit unit, Campaign c) {
-	    return Utilities.generateRandomCrewWithCombinedSkill(unit, c, true);
-	}
+    public static ArrayList<Person> generateRandomCrewWithCombinedSkill(Unit unit, Campaign c) {
+        return Utilities.generateRandomCrewWithCombinedSkill(unit, c, true);
+    }
 
-	public static ArrayList<Person> generateRandomCrewWithCombinedSkill(Unit unit, Campaign c, boolean log) {
+    public static ArrayList<Person> generateRandomCrewWithCombinedSkill(Unit unit, Campaign c, boolean log) {
+        return Utilities.generateRandomCrewWithCombinedSkill(unit, c, log, false);
+    }
+
+	public static ArrayList<Person> generateRandomCrewWithCombinedSkill(Unit unit, Campaign c, boolean log, boolean nopay) {
         ArrayList<Person> newCrew = new ArrayList<Person>();
 		Crew oldCrew = unit.getEntity().getCrew();
 		String commanderName = oldCrew.getName();
