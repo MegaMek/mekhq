@@ -279,7 +279,7 @@ public class ResolveScenarioTracker {
                     UnitStatus us = new UnitStatus(nu);
                     salvageStatus.put(nu.getId(), us);
                     potentialSalvage.add(nu);
-                    ArrayList<Person> crewMembers = Utilities.generateRandomCrewWithCombinedSkill(nu, campaign, false);
+                    ArrayList<Person> crewMembers = Utilities.generateRandomCrewWithCombinedSkill(nu, campaign, false, true);
                     if (null != crewMembers) {
                         newPilots.addAll(crewMembers);
                     }
@@ -377,7 +377,7 @@ public class ResolveScenarioTracker {
                     UnitStatus us = new UnitStatus(nu);
                     salvageStatus.put(nu.getId(), us);
                     potentialSalvage.add(nu);
-                    ArrayList<Person> crewMembers = Utilities.generateRandomCrewWithCombinedSkill(nu, campaign, false);
+                    ArrayList<Person> crewMembers = Utilities.generateRandomCrewWithCombinedSkill(nu, campaign, false, true);
                     if (null != crewMembers) {
                         newPilots.addAll(crewMembers);
                     }
@@ -912,7 +912,7 @@ public class ResolveScenarioTracker {
                         UnitStatus us = new UnitStatus(nu);
                         salvageStatus.put(nu.getId(), us);
                         potentialSalvage.add(nu);
-                        ArrayList<Person> crewMembers = Utilities.generateRandomCrewWithCombinedSkill(nu, campaign, false);
+                        ArrayList<Person> crewMembers = Utilities.generateRandomCrewWithCombinedSkill(nu, campaign, false, true);
                         if (null != crewMembers) {
                             newPilots.addAll(crewMembers);
                         }
