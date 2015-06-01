@@ -321,23 +321,31 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         // Get the number of support hours this person contributes.
         int hours = getSupportHours(highestSkill);
         if (p.isTechSecondary()) {
-            hours = (int) Math.floor(hours / 2D);
+            hours = (int) Math.floor(hours / 2.0);
         }
         techSupportAvailable += hours;
     }
 
     private void updateMedicalSupportAvailable(Person p) {
-        int hours = getSupportHours(p.getSkill(SkillType.S_DOCTOR).getExperienceLevel());
+        Skill doctorSkill = p.getSkill(SkillType.S_DOCTOR);
+        if (doctorSkill == null) {
+            return;
+        }
+        int hours = getSupportHours(doctorSkill.getExperienceLevel());
         if (p.getSecondaryRole() == Person.T_DOCTOR) {
-            hours = (int) Math.floor(hours / 2D);
+            hours = (int) Math.floor(hours / 2.0);
         }
         medSupportAvailable += hours;
     }
 
     private void updateAdministrativeSupportAvailable(Person p) {
-        int hours = getSupportHours(p.getSkill(SkillType.S_ADMIN).getExperienceLevel());
+        Skill adminSkill = p.getSkill(SkillType.S_ADMIN);
+        if (adminSkill == null) {
+            return;
+        }
+        int hours = getSupportHours(adminSkill.getExperienceLevel());
         if (p.isAdminSecondary()) {
-            hours = (int) Math.floor(hours / 2D);
+            hours = (int) Math.floor(hours / 2.0);
         }
         adminSupportAvailable += hours;
     }
