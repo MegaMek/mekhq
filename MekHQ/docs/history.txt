@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-+v0.3.14-dev (SVN)
+v0.3.14 (2015-05-31 18:15 UTC)
 + Entity last target and sensors now reset at end of game
 + Bug: AtB contract generator does not generate additional contract at faction capital
 + Patch [patches:#50]: Log Saver - Use Reassign instead of Remove/Assign
