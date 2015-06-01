@@ -52,6 +52,7 @@ import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.VTOL;
+import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
@@ -2275,6 +2276,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         return null != skills.get(skillName);
     }
 
+    @Nullable
     public Skill getSkill(String skillName) {
         return skills.get(skillName);
     }
