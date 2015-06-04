@@ -735,7 +735,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubRepair.add(assignedTechFirstCheckBox, gridBagConstraints);
-		
+
 		resetToFirstTechCheckBox.setText(resourceMap.getString("resetToFirstTechCheckBox.text")); // NOI18N
         resetToFirstTechCheckBox.setToolTipText(resourceMap.getString("resetToFirstTechCheckBox.toolTipText")); // NOI18N
         resetToFirstTechCheckBox.setName("resetToFirstTechCheckBox"); // NOI18N
@@ -1247,8 +1247,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panPersonnel.add(useImplantsBox, gridBagConstraints);
-		
-				
+
+
 		altQualityAveragingCheckBox.setText(resourceMap.getString("altQualityAveragingCheckBox.text")); // NOI18N
         altQualityAveragingCheckBox.setToolTipText(resourceMap.getString("altQualityAveragingCheckBox.toolTipText")); // NOI18N
         altQualityAveragingCheckBox.setName("altQualityAveragingCheckBox"); // NOI18N
@@ -1354,12 +1354,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         chkUseUnofficialProcreationNoRelationship = new JCheckBox("Use procreation without a relationship (Unofficial)"); // NOI18N
         chkUseUnofficialProcreationNoRelationship.setSelected(options.useUnofficialProcreationNoRelationship());
         //chkUseUnofficialProcreationNoRelationship.setToolTipText(resourceMap.getString("chkUseUnofficialProcreationNoRelationship.toolTipText")); // NOI18N
-        gridBagConstraints.gridy = 15;
+        gridBagConstraints.gridy = 16;
         panPersonnel.add(chkUseUnofficialProcreationNoRelationship, gridBagConstraints);
-        
+
         chkUseTransfers = new JCheckBox("Log Saver - Use Reassign instead of Remove/Assign"); // NOI18N
         chkUseTransfers.setSelected(options.useTransfers());
-        gridBagConstraints.gridy = 16;
+        gridBagConstraints.gridy = 17;
         panPersonnel.add(chkUseTransfers, gridBagConstraints);
 
         JPanel panSalary = new JPanel(new GridBagLayout());
@@ -3146,7 +3146,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
         panSubAtBAdmin.add(chkTrackUnitFatigue, gridBagConstraints);
-        
+
         chkUseLeadership.setText(resourceMap.getString("chkUseLeadership.text"));
         chkUseLeadership.setToolTipText(resourceMap.getString("chkUseLeadership.toolTipText"));
         chkUseLeadership.setSelected(options.getUseLeadership());
@@ -3821,8 +3821,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         }
         campaign.calendar = date;
         // Ensure that the MegaMek year GameOption matches the campaign year
-        GameOptions gameOpts = campaign.getGameOptions();            
-        int campaignYear = campaign.getCalendar().get(Calendar.YEAR);     
+        GameOptions gameOpts = campaign.getGameOptions();
+        int campaignYear = campaign.getCalendar().get(Calendar.YEAR);
         if (gameOpts.intOption("year") != campaignYear) {
             gameOpts.getOption("year").setValue(campaignYear);
         }
