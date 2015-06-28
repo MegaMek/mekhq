@@ -22,6 +22,7 @@ v0.3.14 (2015-05-31 18:15 UTC)
 + Bug [#838]: "Use ammo by type" unofficial rule also works with ballistics
 + Bug [#865]: NPE Dragoon's rating after GM mode change admin skill
 + Bug [#883]: Missing procreation w/o relatioship option
++ Bug: Phantom MegaMek servers left running on Load Game failures
 
 v0.3.13 (2015-04-19 21:29 UTC)
 + Bug: Inappropriate mixing of string and integer in personnel table fields leads to class cast errors
