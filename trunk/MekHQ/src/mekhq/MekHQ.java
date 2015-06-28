@@ -299,11 +299,16 @@ public class MekHQ implements GameListener {
                 FileDialog f = new FileDialog(campaigngui.getFrame(), "Load Savegame");
                 f.setDirectory(System.getProperty("user.dir") + "/savegames");
                 f.setVisible(true);
-                myServer.loadGame(new File(f.getDirectory(), f.getFile()));
+                if (null != f.getFile()) {
+                    myServer.loadGame(new File(f.getDirectory(), f.getFile()));
+                } else {
+                    throw new FileNotFoundException();
+                }
             }
         } catch (Exception ex) {
         	MekHQ.logMessage("Failed to start up server properly");
 			MekHQ.logError(ex);
+			stopHost();
             return;
         }
 
