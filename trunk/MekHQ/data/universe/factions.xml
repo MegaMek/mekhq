@@ -357,6 +357,16 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<clan>true</clan>
 	</faction>
 	<faction>
+		<shortname>CWE</shortname>
+		<fullname>Wolf Empire</fullname>
+		<startingPlanet> , , , , , , , ,Gienah</startingPlanet>
+		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+		<nameGenerator>Clan</nameGenerator>
+		<colorRGB>207,114,58</colorRGB>
+		<periphery>false</periphery>
+		<clan>true</clan>
+	</faction>
+	<faction>
 		<shortname>CWIE</shortname>
 		<fullname>Clan Wolf In-Exile</fullname>
 		<startingPlanet>Tranquil,Tranquil,Tranquil,Tranquil,Tranquil,Tranquil,Tranquil,Arc-Royal,Arc-Royal</startingPlanet>
@@ -411,7 +421,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<startingPlanet>Loyalty,Loyalty,Loyalty,Loyalty,Loyalty,Loyalty,Loyalty,Loyalty,Loyalty,</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>165,94,160</colorRGB>
+		<colorRGB>143,190,192</colorRGB>
 		<periphery>false</periphery>
 		<clan>false</clan>
 	</faction>
@@ -421,7 +431,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<startingPlanet>Oriente,Oriente,Oriente,Oriente,Oriente,Oriente,Oriente,Oriente,Oriente,</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>165,94,160</colorRGB>
+		<colorRGB>163,112,120</colorRGB>
 		<periphery>false</periphery>
 		<clan>false</clan>
 	</faction>
@@ -431,7 +441,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<startingPlanet>Vanra,Vanra,Vanra,Vanra,Vanra,Vanra,Vanra,Vanra,Vanra,</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>165,94,160</colorRGB>
+		<colorRGB>164,94,126</colorRGB>
 		<periphery>false</periphery>
 		<clan>false</clan>
 	</faction>
@@ -451,7 +461,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<startingPlanet>Tamarind,Tamarind,Tamarind,Tamarind,Tamarind,Tamarind,Tamarind,Tamarind,Tamarind,</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>165,94,160</colorRGB>
+		<colorRGB>99,94,165</colorRGB>
 		<periphery>false</periphery>
 		<clan>false</clan>
 	</faction>
@@ -608,7 +618,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<fullname>Independent</fullname>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
-		<colorRGB>190,190,190</colorRGB>
+		<colorRGB>210,210,210</colorRGB>
 		<periphery>false</periphery>
 		<clan>false</clan>
 	</faction>
@@ -725,7 +735,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<startingPlanet>,,,,,,,Marik</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>165,94,160</colorRGB>
+		<colorRGB>117,65,113</colorRGB>
 		<periphery>false</periphery>
 		<clan>false</clan>
 	</faction>
@@ -814,7 +824,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<startingPlanet>,,,,,,,Ohrenson</startingPlanet>
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>CC</nameGenerator>
-		<colorRGB>165,94,160</colorRGB>
+		<colorRGB>160,165,94</colorRGB>
 		<periphery>false</periphery>
 		<clan>false</clan>
 	</faction>
@@ -824,7 +834,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<startingPlanet>,,,,,,,Oriente</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>165,94,160</colorRGB>
+		<colorRGB>163,112,120</colorRGB>
 		<periphery>false</periphery>
 		<clan>false</clan>
 	</faction>
@@ -845,7 +855,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<startingPlanet>,,,,,,,Gibson</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>165,94,160</colorRGB>
+		<colorRGB>250,250,250</colorRGB>
 		<periphery>false</periphery>
 		<clan>false</clan>
 	</faction>
@@ -855,7 +865,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<startingPlanet>,,,,,,,Regulas</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>165,94,160</colorRGB>
+		<colorRGB>192,143,189</colorRGB>
 		<periphery>false</periphery>
 		<clan>false</clan>
 	</faction>
@@ -894,7 +904,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<startingPlanet>,,,,,,,Regulas</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>165,94,160</colorRGB>
+		<colorRGB>255,51,51</colorRGB>
 		<periphery>false</periphery>
 		<clan>false</clan>
 	</faction>
@@ -944,16 +954,6 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>95,158,160</colorRGB>
-		<periphery>true</periphery>
-		<clan>false</clan>
-	</faction>
-	<faction>
-		<shortname>RC</shortname>
-		<fullname>Rim Collection</fullname>
-		<startingPlanet>,,,,,,Gillfillan's Gold,Gillfillan's Gold</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>72,209,204</colorRGB>
 		<periphery>true</periphery>
 		<clan>false</clan>
 	</faction>
@@ -1041,7 +1041,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<startingPlanet>,,,,,,Amity,</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>165,94,160</colorRGB>
+		<colorRGB>255,0,127</colorRGB>
 		<periphery>false</periphery>
 		<clan>false</clan>
 	</faction>
@@ -1090,7 +1090,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<startingPlanet>,,,,,,,Stewart</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>165,94,160</colorRGB>
+		<colorRGB>76,0,153</colorRGB>
 		<periphery>false</periphery>
 		<clan>false</clan>
 	</faction>
@@ -1188,7 +1188,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<startingPlanet>,,,,,,,New Delos</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>165,94,160</colorRGB>
+		<colorRGB>255,51,51</colorRGB>
 		<periphery>false</periphery>
 		<clan>false</clan>
 	</faction>
@@ -1293,6 +1293,16 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 	<faction>
 		<shortname>SA</shortname>
 		<fullname>Senatorial Alliance</fullname>
+		<startingPlanet>, , , , , , , ,Augustine</startingPlanet>
+		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>255,102,153</colorRGB>
+		<periphery>false</periphery>
+		<clan>false</clan>
+	</faction>
+	<faction>
+		<shortname>AA</shortname>
+		<fullname>Augustine Alliance</fullname>
 		<startingPlanet>, , , , , , , ,Augustine</startingPlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>General</nameGenerator>
@@ -1417,4 +1427,89 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<periphery>true</periphery>
 		<clan>false</clan>
 	</faction>
+	<faction>
+      <shortname>CCon</shortname>
+      <fullname>Coreward Confederacy</fullname>
+      <startingPlanet>RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27</startingPlanet>
+      <eraMods>3,3,1,3,3,3,3,3,3</eraMods>
+      <altNames>Autocracy of New Virginia, Virginian Union, Rim Worlds Republic Outpost #27, , , , , ,</altNames>
+      <nameGenerator>General</nameGenerator>
+      <colorRGB>255,0,0</colorRGB>
+      <periphery>true</periphery>
+      <clan>false</clan>
+   </faction>
+   <faction>
+      <shortname>GDL</shortname>
+      <fullname>Galatean Defense League</fullname>
+      <startingPlanet>,,,,,,,Galatea</startingPlanet>
+      <nameGenerator>General</nameGenerator>
+      <colorRGB>102,255,255</colorRGB>
+      <periphery>false</periphery>
+      <clan>false</clan>
+   </faction>
+   <faction>
+      <shortname>GL</shortname>
+      <fullname>Galatean League</fullname>
+      <startingPlanet>,,,,,,,Galatea</startingPlanet>
+      <nameGenerator>General</nameGenerator>
+      <colorRGB>102,255,255</colorRGB>
+      <periphery>false</periphery>
+      <clan>false</clan>
+   </faction>
+   <faction>
+      <shortname>IE</shortname>
+      <fullname>Interstellar Expeditions</fullname>
+      <startingPlanet>,,,,,,,</startingPlanet>
+      <nameGenerator>General</nameGenerator>
+      <colorRGB>255,255,102</colorRGB>
+      <periphery>true</periphery>
+      <clan>false</clan>
+   </faction>
+   <faction>
+      <shortname>ME</shortname>
+      <fullname>Muskegon Empire</fullname>
+      <startingPlanet>Muskegon,,,,,,,</startingPlanet>
+      <nameGenerator>General</nameGenerator>
+      <colorRGB>254,214,0</colorRGB>
+      <periphery>false</periphery>
+      <clan>false</clan>
+   </faction>
+   <faction>
+      <shortname>NDC</shortname>
+      <fullname>New Delphi Compact</fullname>
+      <startingPlanet>,,New Delphi,New Delphi,New Delphi,New Delphi,New Delphi,New Delphi</startingPlanet>
+      <nameGenerator>General</nameGenerator>
+      <colorRGB>127,151,139</colorRGB>
+      <periphery>true</periphery>
+      <clan>false</clan>
+   </faction>
+   <faction>
+      <shortname>CCon</shortname>
+      <fullname>Coreward Confederacy</fullname>
+      <startingPlanet>RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27</startingPlanet>
+      <eraMods>3,3,1,3,3,3,3,3,3</eraMods>
+      <altNames>Autocracy of New Virginia, Virginian Union, Rim Worlds Republic Outpost #27, , , , , ,</altNames>
+      <nameGenerator>General</nameGenerator>
+      <colorRGB>255,0,0</colorRGB>
+      <periphery>true</periphery>
+      <clan>false</clan>
+   </faction>
+   <faction>
+      <shortname>IE</shortname>
+      <fullname>Interstellar Expeditions</fullname>
+      <startingPlanet>,,,,,,,</startingPlanet>
+      <nameGenerator>General</nameGenerator>
+      <colorRGB>255,255,102</colorRGB>
+      <periphery>true</periphery>
+      <clan>false</clan>
+   </faction>
+   <faction>
+      <shortname>NDC</shortname>
+      <fullname>New Delphi Compact</fullname>
+      <startingPlanet>,,New Delphi,New Delphi,New Delphi,New Delphi,New Delphi,New Delphi</startingPlanet>
+      <nameGenerator>General</nameGenerator>
+      <colorRGB>127,151,139</colorRGB>
+      <periphery>true</periphery>
+      <clan>false</clan>
+   </faction>
 </factions>
