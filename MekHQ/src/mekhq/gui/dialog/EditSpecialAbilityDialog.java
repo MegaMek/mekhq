@@ -71,6 +71,10 @@ public class EditSpecialAbilityDialog extends JDialog {
     private JLabel lblPrereqAbil;
     private JLabel lblInvalidAbil;
     private JLabel lblRemoveAbil;
+    
+    private boolean cancelled;
+    private int currentXP;
+
 
     @SuppressWarnings("unchecked")
 	public EditSpecialAbilityDialog(Frame parent, SpecialAbility spa, Hashtable<String, SpecialAbility> hash) {
@@ -83,6 +87,8 @@ public class EditSpecialAbilityDialog extends JDialog {
         invalidAbilities = (Vector<String>)ability.getInvalidAbilities().clone();
         removeAbilities = (Vector<String>)ability.getRemovedAbilities().clone();
         prereqSkills = (Vector<SkillPrereq>)ability.getPrereqSkills().clone();
+        cancelled = false;
+        currentXP = ability.getCost();
         initComponents();
         setLocationRelativeTo(parent);
     }
@@ -94,7 +100,7 @@ public class EditSpecialAbilityDialog extends JDialog {
         btnClose = new javax.swing.JButton();
 
 
-        spnXP = new JSpinner(new SpinnerNumberModel(ability.getCost(), -1, 100, 1));
+        spnXP = new JSpinner(new SpinnerNumberModel(currentXP, -1, 100, 1));
 
         JPanel panXP = new JPanel(new GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -412,6 +418,7 @@ public class EditSpecialAbilityDialog extends JDialog {
     }
 
     private void cancel() {
+    	cancelled = true;
         this.setVisible(false);
     }
 
@@ -449,6 +456,7 @@ public class EditSpecialAbilityDialog extends JDialog {
     }
 
     private void refreshGUI() {
+    	currentXP = (Integer)spnXP.getModel().getValue();
     	getContentPane().removeAll();
     	initComponents();
     	getContentPane().revalidate();
@@ -466,6 +474,10 @@ public class EditSpecialAbilityDialog extends JDialog {
         	prereqSkills.set(i, nspd.getPrereq());
         	refreshGUI();
         }
+    }
+    
+    public boolean wasCancelled() {
+    	return cancelled;
     }
 
     private class RemoveSkillListener implements ActionListener {
