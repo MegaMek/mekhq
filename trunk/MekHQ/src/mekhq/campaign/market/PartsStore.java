@@ -127,9 +127,10 @@ public class PartsStore implements Serializable {
 			} else if(et instanceof MiscType && (et.hasFlag(MiscType.F_HEAT_SINK) || et.hasFlag(MiscType.F_DOUBLE_HEAT_SINK))) {
             	parts.add(new HeatSink(0, et, -1, c));
 			} else if(et instanceof MiscType && et.hasFlag(MiscType.F_JUMP_JET)) {
-				parts.add(new JumpJet(55, et, -1, c));
-				parts.add(new JumpJet(85, et, -1, c));
-				parts.add(new JumpJet(100, et, -1, c));
+				//need to do it by rating and unit tonnage
+				for(int ton = 10; ton <= 100; ton += 5) {
+					parts.add(new JumpJet(ton, et, -1, c));
+				}
 			} else if ((et instanceof MiscType && et.hasFlag(MiscType.F_BA_EQUIPMENT))
 					|| (et instanceof MiscType && et.hasFlag(MiscType.F_TANK_EQUIPMENT) && et.hasFlag(MiscType.F_CHASSIS_MODIFICATION))
 					|| et instanceof InfantryWeapon 
