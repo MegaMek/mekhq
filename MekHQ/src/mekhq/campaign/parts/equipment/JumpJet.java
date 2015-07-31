@@ -75,6 +75,11 @@ public class JumpJet extends EquipmentPart {
     public long getStickerPrice() {
     	return 200 * getUnitTonnage();	
     }
+    
+    @Override
+    public String getDetails() {
+    	return getUnitTonnage() + " ton unit";
+    }
 
 	@Override
 	public MissingPart getMissingPart() {
