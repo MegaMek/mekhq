@@ -167,10 +167,16 @@ public class MissingEquipmentPart extends MissingPart {
 	
 	@Override
 	public boolean isAcceptableReplacement(Part part, boolean refit) {
+		//According to official answer, if sticker prices are different then 
+		//they are not acceptable substitutes, so we need to check for that as
+		//well
+		//http://bg.battletech.com/forums/strategic-operations/(answered)-can-a-lance-for-a-35-ton-mech-be-used-on-a-40-ton-mech-and-so-on/
+		Part newPart = getNewPart();
+		newPart.setUnit(unit);
 		if(part instanceof EquipmentPart) {
 			EquipmentPart eqpart = (EquipmentPart)part;
 			EquipmentType et = eqpart.getType();
-			return type.equals(et) && getTonnage() == part.getTonnage();
+			return type.equals(et) && getTonnage() == part.getTonnage() && part.getStickerPrice() == newPart.getStickerPrice();
 		}
 		return false;
 	}
