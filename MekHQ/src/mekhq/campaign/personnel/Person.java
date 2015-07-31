@@ -2948,7 +2948,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         if (unit.getEntity() instanceof BattleArmor) {
             return hasSkill(SkillType.S_TECH_BA);
         }
-        if (unit.getEntity() instanceof Tank) {
+        if (unit.getEntity() instanceof Tank || unit.getEntity() instanceof Infantry) {
             return hasSkill(SkillType.S_TECH_MECHANIC);
         }
         if (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship) {
