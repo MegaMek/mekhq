@@ -335,9 +335,19 @@ public class MissingMekLocation extends MissingPart {
                 ((MekLocation)actualReplacement).setSensors(false);
                 ((MekLocation)actualReplacement).setLifeSupport(false);
             }
+            //fix shoulders and hips
+			if(loc == Mech.LOC_RARM || loc == Mech.LOC_LARM) {
+				if(forQuad) {
+					unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP, loc);
+				} else {
+					unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_SHOULDER, loc);
+				}
+			}
+			else if(loc == Mech.LOC_RLEG || loc == Mech.LOC_LLEG) {
+				unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP, loc);
+			}
 			remove(false);
-			actualReplacement.updateConditionFromPart();
-			
+			actualReplacement.updateConditionFromPart();			
 			u.runDiagnostic();
 		}
 	}

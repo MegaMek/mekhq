@@ -532,16 +532,6 @@ public class MekLocation extends Part {
 	public void updateConditionFromPart() {
 		if(null != unit) {
 			unit.getEntity().setInternal((int)Math.round(percent * unit.getEntity().getOInternal(loc)), loc);
-			if(loc == Mech.LOC_RARM || loc == Mech.LOC_LARM) {
-				if(forQuad) {
-					unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP, loc);
-				} else {
-					unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_SHOULDER, loc);
-				}
-			}
-			else if(loc == Mech.LOC_RLEG || loc == Mech.LOC_LLEG) {
-				unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP, loc);
-			}
 			//TODO: we need to cycle through slots and remove crits on non-hittable ones
 			//We shouldn't have to do this, these slots should not be hit in MM
 			for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
