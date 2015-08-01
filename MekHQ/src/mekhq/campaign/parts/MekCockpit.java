@@ -269,9 +269,7 @@ public class MekCockpit extends Part {
 			if(hits == 0) {
 				unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT);
 			} else {
-				for(int i = 0; i < hits; i++) {
-					unit.damageSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT, hits);
-				}
+				unit.damageSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT, hits);
 			}
 		}
 	}

@@ -760,14 +760,66 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 		}
 		return false;
 	}
+	
+	 /**
+     * Number of slots doomed, missing or destroyed in all locations
+     * @param type
+     * @param index
+     * @return
+     */
+    public int getHitCriticals(int type, int index) {
+		int hits = 0;
+		for (int loc = 0; loc < entity.locations(); loc++) {
+			hits += getHitCriticals(type, index, loc);
+		}
+		return hits;
+	}
+    
+    /**
+     * Number of slots doomed, missing or destroyed in a location
+     */
+    public int getHitCriticals(int type, int index, int loc) {
+        int hits = 0;
+        Mounted m = null;
+        if (type == CriticalSlot.TYPE_EQUIPMENT) {
+            m = entity.getEquipment(index);
+        }
+
+        int numberOfCriticals = entity.getNumberOfCriticals(loc);
+        for (int i = 0; i < numberOfCriticals; i++) {
+            CriticalSlot ccs = entity.getCritical(loc, i);
+
+            //  Check to see if this crit mounts the supplied item
+            //  For systems, we can compare the index, but for equipment we
+            //  need to get the Mounted that is mounted in that index and
+            //  compare types.  Superheavies may have two Mounted in each crit
+            if ((ccs != null) && (ccs.getType() == type)) {
+                if (ccs.isDestroyed()) {
+                    if ((type == CriticalSlot.TYPE_SYSTEM) && (ccs.getIndex() == index)) {
+                        hits++;
+                    } else if ((type == CriticalSlot.TYPE_EQUIPMENT) && (m.equals(ccs.getMount()) || m.equals(ccs
+                                                                                                                      .getMount2()))) {
+                        hits++;
+                    }
+                }
+            }
+        }
+        return hits;
+    }
 
 	public void damageSystem(int type, int equipmentNum, int hits) {
+		//make sure we take note of existing hits to start and as we cycle through locations
+		int existingHits = getHitCriticals(type, equipmentNum);
+		int neededHits = Math.max(0, hits - existingHits);
+		int usedHits = 0;
 		for (int loc = 0; loc < getEntity().locations(); loc++) {
-			damageSystem(type, equipmentNum, loc, hits);
+			if(neededHits > usedHits) {
+				usedHits += damageSystem(type, equipmentNum, loc, neededHits-usedHits);
+			}
 		}
 	}
 
-	public void damageSystem(int type, int equipmentNum, int loc, int hits) {
+	public int damageSystem(int type, int equipmentNum, int loc, int hits) {
 		int nhits = 0;
 		for (int i = 0; i < getEntity().getNumberOfCriticals(loc); i++) {
 			CriticalSlot cs = getEntity().getCritical(loc, i);
@@ -784,13 +836,10 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 					cs.setDestroyed(true);
 					cs.setRepairable(true);
 					nhits++;
-				} else {
-					cs.setHit(false);
-					cs.setDestroyed(false);
-					cs.setRepairable(true);
-				}
+				} 
 			}
 		}
+		return nhits;
 	}
 
 	public void destroySystem(int type, int equipmentNum) {
@@ -1833,7 +1882,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
             		aeroThrustersRight = ((Thrusters) part);
             	}
             }
-
+    		
     		part.updateConditionFromPart();
     	}
     	//now check to see what is null
