@@ -116,7 +116,10 @@ public class Faction {
 	}
 	
 	public String getFullName(int era) {
-		String alt = altNames[era];
+		String alt = "";
+		if(altNames.length > era) {
+			alt = altNames[era];
+		}
 		if(alt.trim().length() == 0) {
 			return fullname;
 		} else {
@@ -141,11 +144,19 @@ public class Faction {
 	}
 	
 	public String getStartingPlanet(int era) {
-		return startingPlanet[era];
+		if(startingPlanet.length > era) {
+			return startingPlanet[era];
+		} else if(startingPlanet.length > 0) {
+			return startingPlanet[startingPlanet.length-1];
+		}
+		return "Terra";
 	}
 	
 	public int getEraMod(int era) {
-		return eraMods[era];
+		if(eraMods.length > era) {
+			return eraMods[era];
+		}
+		return 0;
 	}
 	
 	public int getTechMod(Part part, Campaign campaign) {
@@ -300,11 +311,12 @@ public class Faction {
 				else
 					retVal.periphery = false;
 			} else if (wn2.getNodeName().equalsIgnoreCase("startingPlanet")) {
-				retVal.startingPlanet = wn2.getTextContent().split(",");
+				String[] temp = wn2.getTextContent().split(",", -2);
+				retVal.startingPlanet = wn2.getTextContent().split(",", -2);
 			} else if (wn2.getNodeName().equalsIgnoreCase("altNames")) {
-				retVal.altNames = wn2.getTextContent().split(",");
+				retVal.altNames = wn2.getTextContent().split(",", -2);
 			} else if (wn2.getNodeName().equalsIgnoreCase("eraMods")) {
-				String[] values = wn2.getTextContent().split(",");
+				String[] values = wn2.getTextContent().split(",", -2);
 				for(int i = 0; i < values.length; i++) {
 					retVal.eraMods[i] = Integer.parseInt(values[i]);
 				}
@@ -318,6 +330,17 @@ public class Faction {
 				}
 			} 
 		}
+		
+		if(retVal.altNames.length < Era.E_NUM) {
+			MekHQ.logMessage(retVal.fullname + " faction did not have a long enough altNames vector");
+		}
+		if(retVal.eraMods.length < Era.E_NUM) {
+			MekHQ.logMessage(retVal.fullname + " faction did not have a long enough eraMods vector");
+		}
+		if(retVal.startingPlanet.length < Era.E_NUM) {
+			MekHQ.logMessage(retVal.fullname + " faction did not have a long enough startingPlanet vector");
+		}
+		
 		return retVal;
 	}
     

@@ -9,6 +9,9 @@ v0.3.15-dev (SVN)
 + Bug [#881]: Cannot reload Field Artillery ammo
 + Bug [#873]: Right Torso location cannot be replaced without salvaging...
 + Bug [#854]: Engines take extra damage after saving/reloading
++ Bug: array index out of bounds on Faction.getFullName causing campaign option save fail
++ Bug: trailing empty cells not collected by split method in faction generation resulting in some arrays being too short
++ added array length safety check methods to Faction.getEraMods, Faction.getFullName, and Faction.getStartingPlanet and incorrect data reported to log
 
 v0.3.14 (2015-05-31 18:15 UTC)
 + Entity last target and sensors now reset at end of game
