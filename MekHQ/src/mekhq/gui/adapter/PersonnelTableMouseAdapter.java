@@ -689,8 +689,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             gui.refreshOverview();
         } else if (command.equalsIgnoreCase("XP_SET")) {
             PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
-                    gui.getFrame(), true, "XP", selectedPerson.getXp(), 0,
-                    Math.max(selectedPerson.getXp() + 10, 100));
+                    gui.getFrame(), true, "XP", selectedPerson.getXp(), 0);
             pvcd.setVisible(true);
             if (pvcd.getValue() < 0) {
                 return;
