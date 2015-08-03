@@ -53,6 +53,17 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener, C
 	 */
 	private static final long serialVersionUID = 8376874926997734492L;
 	/** Creates new form */
+	public PopupValueChoiceDialog(Frame parent, boolean modal, String title, int current, int min) {
+		super(parent, modal);
+        this.min = min;
+        model = new SpinnerNumberModel(current, min, null, 1);
+        setTitle(title);
+        initComponents();
+        setLocationRelativeTo(parent);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        addWindowListener(this);
+	}
+	
     public PopupValueChoiceDialog(Frame parent, boolean modal, String title, int current, int min, int max) {
         super(parent, modal);
         this.max = max;
@@ -184,7 +195,7 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener, C
     public void stateChanged(ChangeEvent arg0) {
         if (value != null) {
             Integer val = (Integer)((JSpinner)value).getModel().getValue();
-            if (val > max || val < min) {
+            if ((max > 0 && val > max) || val < min) {
                 validData = false;
             } else {
                 validData = true;
