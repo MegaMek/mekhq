@@ -961,9 +961,12 @@ public class Utilities {
             }
             EquipmentPart ep = ((EquipmentPart) part);
             Mounted m = unit.getEntity().getEquipment(ep.getEquipmentNum());
-            if (m.getType().getInternalName().equals(ep.getType().getInternalName())) {
+            //Taharqa: I am not sure what was supposed to go in here, but it doesn't actually
+            //do anything at this point and it is producing an NPE on some refits, so I am 
+            //commenting it out
+            //if (m.getType().getInternalName().equals(ep.getType().getInternalName())) {
 
-            }
+            //}
             if(part instanceof AmmoBin) {
                 AmmoBin bin = (AmmoBin)part;
                 int i = -1;
