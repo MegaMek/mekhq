@@ -23,11 +23,13 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
+import java.util.GregorianCalendar;
 
 import megamek.common.Aero;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
+import megamek.common.Mech;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
@@ -212,12 +214,20 @@ public class Armor extends Part implements IAcquisitionWork {
     public void setAmountNeeded(int needed) {
     	this.amountNeeded = needed;
     }
+    
+    public boolean isSameType(Armor armor) {
+    	if(getType() == EquipmentType.T_ARMOR_STANDARD 
+    			&& armor.getType() == EquipmentType.T_ARMOR_STANDARD) {
+    		//standard armor is compatible between clan and IS
+    		return true;
+    	}
+    	return getType() == armor.getType()  && isClanTechBase() == armor.isClanTechBase();
+    }
 
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof Armor
-                && getType() == ((Armor)part).getType() 
-                && isClanTechBase() == ((Armor)part).isClanTechBase()
+                && isSameType((Armor)part)
                 && getRefitId() == part.getRefitId();
     }
     
@@ -227,16 +237,17 @@ public class Armor extends Part implements IAcquisitionWork {
     }
     
     @Override
-    protected boolean isClanTechBase() {
-    	return clan;
-    }
-    
-    @Override
     public int getTechLevel() {
-        // Armor tech base is not used (Clan/IS can use each other's armor for now)
-        // TODO Set Tech base correctly for armor
-        // Clan FF and IS FF do not have the same armor points per ton
-        return TechConstants.T_INTRO_BOXSET;
+    	//just use what is already in equipment types to figure it out
+    	EquipmentType etype = EquipmentType.get(EquipmentType.getArmorTypeName(type, clan));
+    	if(null == etype) {
+    		return TechConstants.T_TECH_UNKNOWN;
+    	}
+    	int techLevel = etype.getTechLevel(campaign.getCalendar().get(GregorianCalendar.YEAR));
+        if ((techLevel != TechConstants.T_ALLOWED_ALL && techLevel < 0) || techLevel >= TechConstants.T_ALL)
+            return TechConstants.T_TECH_UNKNOWN;
+        else
+            return techLevel;
     }
 
     public double getArmorWeight(int points) {
@@ -621,7 +632,7 @@ public class Armor extends Part implements IAcquisitionWork {
 		for(Part part : campaign.getSpareParts()) {
 			if(part instanceof Armor) {
 				Armor a = (Armor)part;
-				if(a.getType() == type && a.isClanTechBase() == clan && !a.isReservedForRefit() && a.isPresent()) {
+				if(isSameType(a) && !a.isReservedForRefit() && a.isPresent()) {
 					return a.getAmount();
 				}
 			}
@@ -632,8 +643,7 @@ public class Armor extends Part implements IAcquisitionWork {
 	public void changeAmountAvailable(int amount) {
 		Armor a = null;
 		for(Part part : campaign.getSpareParts()) {
-			if(part instanceof Armor && ((Armor)part).getType() == type 
-					&& ((Armor)part).isClanTechBase() == clan 
+			if(part instanceof Armor && isSameType((Armor)part)
 					&& getRefitId() == part.getRefitId()
 					&& part.isPresent()) {
 				a = (Armor)part;				

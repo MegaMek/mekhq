@@ -260,7 +260,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 
 	protected long adjustCostsForCampaignOptions(long cost) {
-		if(isClanTechBase()) {
+		if(getTechBase() == T_CLAN) {
 			cost *= campaign.getCampaignOptions().getClanPriceModifier();
 		}
 		if(needsFixing() && !isPriceAdustedForAmount()) {
