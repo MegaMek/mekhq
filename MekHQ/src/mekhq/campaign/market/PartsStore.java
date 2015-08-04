@@ -332,8 +332,6 @@ public class PartsStore implements Serializable {
 		//Standard armor
 		int amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_STANDARD, false));
 		parts.add(new Armor(0, EquipmentType.T_ARMOR_STANDARD, amount, -1, false, false, c));
-		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_STANDARD, true));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_STANDARD, amount, -1, false, true, c));
 		//Ferro-Fibrous
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_FERRO_FIBROUS, false));
 		parts.add(new Armor(0, EquipmentType.T_ARMOR_FERRO_FIBROUS, amount, -1, false, false, c));
@@ -357,6 +355,8 @@ public class PartsStore implements Serializable {
 		//Light/Heavy FF
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_LIGHT_FERRO, false));
 		parts.add(new Armor(0, EquipmentType.T_ARMOR_LIGHT_FERRO, amount, -1, false, false, c));
+		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_LIGHT_FERRO, true));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_LIGHT_FERRO, amount, -1, false, true, c));
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_HEAVY_FERRO, false));
 		parts.add(new Armor(0, EquipmentType.T_ARMOR_HEAVY_FERRO, amount, -1, false, false, c));
 		//Stealth
@@ -402,10 +402,11 @@ public class PartsStore implements Serializable {
 		parts.add(new ProtomekArmor(0, 100, -1, true, c));
 		for(int i=0; i < TestBattleArmor.BAArmor.getNumBAArmors(); i++) {
 		    if(BaArmor.canBeIs(i)) {
-		        parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(i, false)), i, -1, false, c));
+		    	//FIXME: This is not working right yet
+		        //parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(i, false)), i, -1, false, c));
 		    }
 		    if(BaArmor.canBeClan(i)) {
-		        parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(i, true)), i, -1, true, c));
+		        //parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(i, true)), i, -1, true, c));
 		    }
 		}
 	}
