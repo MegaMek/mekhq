@@ -3652,10 +3652,17 @@ public class Campaign implements Serializable {
                 }
             }
             if (prt instanceof MissingPart) {
-                // run this to make sure that slots for missing parts are set as
-                // unrepairable
-                // because they will not be in missing locations
-                prt.updateConditionFromPart();
+            	//Missing Parts should only exist on units, but there have 
+            	//been cases where they continue to float around outside of units
+            	//so this should clean that up 
+            	if(null == u) {
+            		removeParts.add(prt);
+            	} else {
+            		// run this to make sure that slots for missing parts are set as
+            		// unrepairable
+            		// because they will not be in missing locations            	
+            		prt.updateConditionFromPart();
+            	}
             }
             // old versions didnt distinguish tank engines
             if (prt instanceof EnginePart && prt.getName().contains("Vehicle")) {
