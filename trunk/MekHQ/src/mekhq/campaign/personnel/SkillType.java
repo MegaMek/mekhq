@@ -153,8 +153,12 @@ public class SkillType implements Serializable {
 			return vetLvl;
 		case(EXP_ELITE):
 			return eliteLvl;
-		default:
+		case(EXP_GREEN):
 			return greenLvl;
+		default:
+			//for ultra-green we take the midpoint between green and 0, rounding down. 
+			//If the user has set green as zero, then this will be the same
+			return (int)Math.floor(greenLvl/2.0);
 		}
 	}
 	
