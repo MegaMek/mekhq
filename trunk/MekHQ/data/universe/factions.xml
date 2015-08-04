@@ -187,7 +187,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 	<faction>
 		<shortname>SOC</shortname>
 		<fullname>The Society</fullname>
-		<startingPlanet> , , , , , , , ,</startingPlanet>
+		<startingPlanet>, , , , , , , ,</startingPlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>147,112,219</colorRGB>
@@ -1087,7 +1087,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 	<faction>
 		<shortname>SC</shortname>
 		<fullname>Stewart Commonality</fullname>
-		<startingPlanet>,,,,,,,Stewart</startingPlanet>
+		<startingPlanet> , , , , , , ,Stewart</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>76,0,153</colorRGB>
@@ -1392,7 +1392,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
     <faction>
         <shortname>UC</shortname>
         <fullname>Umayyad Caliphate</fullname>
-		<startingPlanet>Granada,Granada,Granada,Granada,Granada,Granada,Granada,</startingPlanet>
+		<startingPlanet>,Granada,Granada,Granada,Granada,Granada,Granada,Granada, </startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>0,255,0</colorRGB>
@@ -1410,7 +1410,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
     <faction>
         <shortname>RON</shortname>
         <fullname>Ronin</fullname>
-		<startingPlanet>,,,,,,Predlitz,</startingPlanet>
+		<startingPlanet>, , , , , ,Predlitz, , </startingPlanet>
 		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
 		<nameGenerator>DC</nameGenerator>
 		<colorRGB>234,45,46</colorRGB>
@@ -1420,7 +1420,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
     <faction>
 		<shortname>AXP</shortname>
 		<fullname>Axumite Providence</fullname>
-		<startingPlanet>Thala,Thala,Thala,Thala,Thala,Thala,Thala,Thala</startingPlanet>
+		<startingPlanet>,Thala,Thala,Thala,Thala,Thala,Thala,Thala,Thala</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>153,50,204</colorRGB>
@@ -1430,7 +1430,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 	<faction>
       <shortname>CCon</shortname>
       <fullname>Coreward Confederacy</fullname>
-      <startingPlanet>RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27</startingPlanet>
+      <startingPlanet>, RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27</startingPlanet>
       <eraMods>3,3,1,3,3,3,3,3,3</eraMods>
       <altNames>Autocracy of New Virginia, Virginian Union, Rim Worlds Republic Outpost #27, , , , , ,</altNames>
       <nameGenerator>General</nameGenerator>
@@ -1441,7 +1441,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
    <faction>
       <shortname>GDL</shortname>
       <fullname>Galatean Defense League</fullname>
-      <startingPlanet>,,,,,,,Galatea</startingPlanet>
+      <startingPlanet>, , , , , , , ,Galatea</startingPlanet>
       <nameGenerator>General</nameGenerator>
       <colorRGB>102,255,255</colorRGB>
       <periphery>false</periphery>
@@ -1450,45 +1450,27 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
    <faction>
       <shortname>GL</shortname>
       <fullname>Galatean League</fullname>
-      <startingPlanet>,,,,,,,Galatea</startingPlanet>
+      <startingPlanet>, , , , , , , ,Galatea</startingPlanet>
       <nameGenerator>General</nameGenerator>
       <colorRGB>102,255,255</colorRGB>
       <periphery>false</periphery>
       <clan>false</clan>
    </faction>
    <faction>
-      <shortname>IE</shortname>
-      <fullname>Interstellar Expeditions</fullname>
-      <startingPlanet>,,,,,,,</startingPlanet>
-      <nameGenerator>General</nameGenerator>
-      <colorRGB>255,255,102</colorRGB>
-      <periphery>true</periphery>
-      <clan>false</clan>
-   </faction>
-   <faction>
       <shortname>ME</shortname>
       <fullname>Muskegon Empire</fullname>
-      <startingPlanet>Muskegon,,,,,,,</startingPlanet>
+      <startingPlanet>Muskegon, , , , , , , , </startingPlanet>
       <nameGenerator>General</nameGenerator>
       <colorRGB>254,214,0</colorRGB>
       <periphery>false</periphery>
       <clan>false</clan>
    </faction>
    <faction>
-      <shortname>NDC</shortname>
-      <fullname>New Delphi Compact</fullname>
-      <startingPlanet>,,New Delphi,New Delphi,New Delphi,New Delphi,New Delphi,New Delphi</startingPlanet>
-      <nameGenerator>General</nameGenerator>
-      <colorRGB>127,151,139</colorRGB>
-      <periphery>true</periphery>
-      <clan>false</clan>
-   </faction>
-   <faction>
       <shortname>CCon</shortname>
       <fullname>Coreward Confederacy</fullname>
-      <startingPlanet>RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27</startingPlanet>
+      <startingPlanet>RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27</startingPlanet>
       <eraMods>3,3,1,3,3,3,3,3,3</eraMods>
-      <altNames>Autocracy of New Virginia, Virginian Union, Rim Worlds Republic Outpost #27, , , , , ,</altNames>
+      <altNames>Autocracy of New Virginia, Virginian Union, Rim Worlds Republic Outpost #27, , , , , , </altNames>
       <nameGenerator>General</nameGenerator>
       <colorRGB>255,0,0</colorRGB>
       <periphery>true</periphery>
@@ -1497,7 +1479,6 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
    <faction>
       <shortname>IE</shortname>
       <fullname>Interstellar Expeditions</fullname>
-      <startingPlanet>,,,,,,,</startingPlanet>
       <nameGenerator>General</nameGenerator>
       <colorRGB>255,255,102</colorRGB>
       <periphery>true</periphery>
@@ -1506,7 +1487,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
    <faction>
       <shortname>NDC</shortname>
       <fullname>New Delphi Compact</fullname>
-      <startingPlanet>,,New Delphi,New Delphi,New Delphi,New Delphi,New Delphi,New Delphi</startingPlanet>
+      <startingPlanet> , , , New Delphi,New Delphi,New Delphi,New Delphi,New Delphi,New Delphi</startingPlanet>
       <nameGenerator>General</nameGenerator>
       <colorRGB>127,151,139</colorRGB>
       <periphery>true</periphery>
