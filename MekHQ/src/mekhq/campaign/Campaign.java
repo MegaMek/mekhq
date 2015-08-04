@@ -3795,6 +3795,14 @@ public class Campaign implements Serializable {
                     unit.getEntity().setInternal(0, loc);
                 }
             }
+            
+
+            // Some units have been incorrectly assigned a null C3UUID as a string. This should correct that by setting a new C3UUID
+            if ((unit.getEntity().hasC3() || unit.getEntity().hasC3i())
+            		&& (unit.getEntity().getC3UUIDAsString() == null || unit.getEntity().getC3UUIDAsString().equals("null"))) {
+                unit.getEntity().setC3UUID();
+                unit.getEntity().setC3NetIdSelf();
+            }
 
             retVal.refreshNetworks();
 
@@ -4347,7 +4355,7 @@ public class Campaign implements Serializable {
             }
 
             Unit u = Unit.generateInstanceFromXML(wn2, version);
-
+            
             if (u != null) {
                 retVal.addUnit(u);
             }
@@ -6384,7 +6392,16 @@ public class Campaign implements Serializable {
         Vector<String[]> networks = new Vector<String[]>();
         Vector<String> networkNames = new Vector<String>();
 
-        for (Entity en : getEntities()) {
+        for(Unit u : getUnits()) {
+        	
+        	if(u.getForceId() < 0) {
+        		//only units currently in the TO&E
+        		continue;
+        	}
+        	Entity en = u.getEntity();
+        	if(null == en) {
+        		continue;
+        	}
             if (en.hasC3i() && en.calculateFreeC3Nodes() < 5
                 && en.calculateFreeC3Nodes() > 0) {
                 String[] network = new String[2];
@@ -6403,7 +6420,16 @@ public class Campaign implements Serializable {
         Vector<String[]> networks = new Vector<String[]>();
         Vector<String> networkNames = new Vector<String>();
 
-        for (Entity en : getEntities()) {
+        for(Unit u : getUnits()) {
+        	
+        	if(u.getForceId() < 0) {
+        		//only units currently in the TO&E
+        		continue;
+        	}
+        	Entity en = u.getEntity();
+        	if(null == en) {
+        		continue;
+        	}
             // count of free c3 nodes for single company-level masters
             // will not be right so skip
             if (en.hasC3M() && !en.hasC3MM() && en.C3MasterIs(en)) {
@@ -6428,7 +6454,16 @@ public class Campaign implements Serializable {
         Vector<String[]> networks = new Vector<String[]>();
         Vector<String> networkNames = new Vector<String>();
 
-        for (Entity en : getEntities()) {
+        for(Unit u : getUnits()) {
+        	
+        	if(u.getForceId() < 0) {
+        		//only units currently in the TO&E
+        		continue;
+        	}
+        	Entity en = u.getEntity();
+        	if(null == en) {
+        		continue;
+        	}
             if (en.calculateFreeC3MNodes() > 0) {
                 String[] network = new String[3];
                 network[0] = en.getC3UUIDAsString();
