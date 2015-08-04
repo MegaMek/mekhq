@@ -14,6 +14,7 @@ v0.3.15-dev (SVN)
 + added array length safety check methods to Faction.getEraMods, Faction.getFullName, and Faction.getStartingPlanet and incorrect data reported to log
 + Bug [#829]: GM mode -> set XP for personnel does not work when attempting to set XP higher than 100 (IllegalArgumentException: setSelectedIndex: 0 out of bounds)
 + Bug [#867]: Custom Vehicles w/ C3Master unable to network
++ Bug [#348]: random skill error
 
 v0.3.14 (2015-05-31 18:15 UTC)
 + Entity last target and sensors now reset at end of game
