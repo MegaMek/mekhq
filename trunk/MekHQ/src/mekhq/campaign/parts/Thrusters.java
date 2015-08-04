@@ -24,8 +24,10 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.Aero;
+import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.Jumpship;
 import megamek.common.TechConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -149,12 +151,29 @@ public class Thrusters extends Part {
 
 	@Override
 	public boolean needsFixing() {
+		if(null != getUnit() && null != getUnit().getEntity() && 
+				(getUnit().getEntity() instanceof Aero 
+						&& !(getUnit().getEntity() instanceof Dropship 
+								|| getUnit().getEntity() instanceof Jumpship))) {
+			return false;
+		}
 		return hits > 0;
+	}
+	
+	@Override
+	public boolean isSalvaging() {
+		if(null != getUnit() && null != getUnit().getEntity() && 
+				(getUnit().getEntity() instanceof Aero 
+						&& !(getUnit().getEntity() instanceof Dropship 
+								|| getUnit().getEntity() instanceof Jumpship))) {
+			return false;
+		}
+		return super.isSalvaging();
 	}
 
 	@Override
 	public long getStickerPrice() {
-		return 25000;
+		return 12500;
 	}
 
 	@Override
