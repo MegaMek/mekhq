@@ -1,5 +1,7 @@
 VERSION HISTORY
 ----------------------------------
+v0.3.16-dev (SVN)
+
 v0.3.15 (2015-08-04 10:50 UTC)
 + Planetary faction updates
 + Bug [#716]: Add Another Special Ability not Cancelled
