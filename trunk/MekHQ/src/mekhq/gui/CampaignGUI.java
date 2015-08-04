@@ -6759,11 +6759,10 @@ public class CampaignGUI extends JPanel {
                             && part.getUnit().getEntity()
                                     .getLocationFromAbbr(loc) == Mech.LOC_CT) {
                         return true;
-                    } else {
-                        return false;
-                    }
+                    } 
+                    return false;
                 }
-                return true;
+                return false;
             }
         };
         taskSorter.setRowFilter(taskLocationFilter);
