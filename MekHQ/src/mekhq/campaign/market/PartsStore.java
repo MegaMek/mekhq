@@ -329,6 +329,9 @@ public class PartsStore implements Serializable {
 	}
 	
 	private void stockArmor(Campaign c) {
+		/*
+		 * Mech, Aero, and Vehicle armors
+		 */
 		//Standard armor
 		int amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_STANDARD, false));
 		parts.add(new Armor(0, EquipmentType.T_ARMOR_STANDARD, amount, -1, false, false, c));
@@ -388,7 +391,7 @@ public class PartsStore implements Serializable {
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_PRIMITIVE, false));
 		parts.add(new Armor(0, EquipmentType.T_ARMOR_PRIMITIVE, amount, -1, false, false, c));
 		/*
-		 * These are all warship armors
+		 * Warship armors
 		*/
 		//Ferro-Carbide
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_FERRO_CARBIDE, false));
@@ -399,16 +402,26 @@ public class PartsStore implements Serializable {
 		//Improved Ferro-Aluminum
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_FERRO_IMP, false));
 		parts.add(new Armor(0, EquipmentType.T_ARMOR_FERRO_IMP, amount, -1, false, false, c));
+		/*
+		 * Protomek Armor
+		 */
 		parts.add(new ProtomekArmor(0, 100, -1, true, c));
-		for(int i=0; i < TestBattleArmor.BAArmor.getNumBAArmors(); i++) {
-		    if(BaArmor.canBeIs(i)) {
-		    	//FIXME: This is not working right yet
-		        //parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(i, false)), i, -1, false, c));
-		    }
-		    if(BaArmor.canBeClan(i)) {
-		        //parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(i, true)), i, -1, true, c));
-		    }
-		}
+		/*
+		*BA ARMOR
+		*/
+		parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(EquipmentType.T_ARMOR_BA_STANDARD, false)), EquipmentType.T_ARMOR_BA_STANDARD, -1, false, c));
+		parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(EquipmentType.T_ARMOR_BA_STANDARD, true)), EquipmentType.T_ARMOR_BA_STANDARD, -1, true, c));
+		parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(EquipmentType.T_ARMOR_BA_STANDARD_ADVANCED, true)), EquipmentType.T_ARMOR_BA_STANDARD_ADVANCED, -1, true, c));
+		parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(EquipmentType.T_ARMOR_BA_STANDARD_PROTOTYPE, true)), EquipmentType.T_ARMOR_BA_STANDARD_PROTOTYPE, -1, true, c));
+		parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(EquipmentType.T_ARMOR_BA_STEALTH_BASIC, false)), EquipmentType.T_ARMOR_BA_STEALTH_BASIC, -1, false, c));
+		parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(EquipmentType.T_ARMOR_BA_STEALTH_BASIC, true)), EquipmentType.T_ARMOR_BA_STEALTH_BASIC, -1, true, c));
+		parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(EquipmentType.T_ARMOR_BA_STEALTH_IMP, false)), EquipmentType.T_ARMOR_BA_STEALTH_IMP, -1, false, c));
+		parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(EquipmentType.T_ARMOR_BA_STEALTH_IMP, true)), EquipmentType.T_ARMOR_BA_STEALTH_IMP, -1, true, c));
+		parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(EquipmentType.T_ARMOR_BA_STEALTH_PROTOTYPE, true)), EquipmentType.T_ARMOR_BA_STEALTH_PROTOTYPE, -1, true, c));
+		parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(EquipmentType.T_ARMOR_BA_STEALTH, false)), EquipmentType.T_ARMOR_BA_STEALTH, -1, false, c));
+		parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(EquipmentType.T_ARMOR_BA_STEALTH, true)), EquipmentType.T_ARMOR_BA_STEALTH, -1, true, c));
+		parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(EquipmentType.T_ARMOR_BA_FIRE_RESIST, true)), EquipmentType.T_ARMOR_BA_FIRE_RESIST, -1, true, c));
+		parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(EquipmentType.T_ARMOR_BA_MIMETIC, false)), EquipmentType.T_ARMOR_BA_MIMETIC, -1, false, c));
 	}
 	
 	private void stockMekLocations(Campaign c) {
