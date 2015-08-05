@@ -3783,13 +3783,15 @@ public class Campaign implements Serializable {
                     && version.getMajorVersion() == 0
                     && (version.getMinorVersion() <= 2 ||
                          (version.getMinorVersion() <= 3
-                         && version.getSnapshot() < 4))) {
+                         && version.getSnapshot() < 17))) {
                 for(Part p : unit.getParts()) {
                     retVal.removePart(p);
                 }
                 unit.resetParts();
-                for(int loc = 0; loc < unit.getEntity().locations(); loc++) {
-                    unit.getEntity().setInternal(0, loc);
+                if(version.getSnapshot() < 4) {
+	                for(int loc = 0; loc < unit.getEntity().locations(); loc++) {
+	                    unit.getEntity().setInternal(0, loc);
+	                }
                 }
             }
             
