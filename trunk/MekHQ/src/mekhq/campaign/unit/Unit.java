@@ -742,6 +742,19 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 				&& getActiveCrew().size() < getFullCrewSize()) {
 			return "This vehicle requires a crew of " + getFullCrewSize();
 		}
+		//Taharqa: I am not going to allow BattleArmor units with unmanned suits to deploy. It is 
+		//possible to hack this to work in MM, but it becomes a serious problem when the unit becomes 
+		//a total loss because the unmanned suits are also treated as destroyed. I tried hacking something
+		//together in ResolveScenarioTracker and decided that it was not right. If someone wants to deploy
+		//a non-full strength BA unit, they can salvage the suits that are unmanned and then they can deploy
+		//it
+		if(entity instanceof BattleArmor) {
+			for(int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor)entity).getTroopers(); i++) {
+			    if(entity.getInternal(i) == 0) {
+			    	return "This BattleArmor unit has empty suits. Fill them with pilots or salvage them.";
+			    }
+			}
+		}
 		return null;
 	}
 

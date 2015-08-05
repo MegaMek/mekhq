@@ -127,10 +127,10 @@ public class ResolveScenarioTracker {
 		killCredits = new Hashtable<String, String>();
 		for(UUID uid : scenario.getForces(campaign).getAllUnits()) {
 			Unit u = campaign.getUnit(uid);
-			if(null != u) {
+			if(null != u && null == u.checkDeployment()) {
 				units.add(u);
+				unitsStatus.put(uid, new UnitStatus(u));
 			}
-			unitsStatus.put(uid, new UnitStatus(u));
 		}
 		unitList = new JFileChooser(".");
 		unitList.setDialogTitle("Load Units");

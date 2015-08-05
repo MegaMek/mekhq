@@ -5953,9 +5953,6 @@ public class CampaignGUI extends JPanel {
 
         for (UUID uid : uids) {
             Unit u = getCampaign().getUnit(uid);
-            if (u.isUnmanned()) {
-                continue;
-            }
             if (null != u.getEntity()) {
                 if (null == u.checkDeployment()) {
                     chosen.add(u.getEntity());
@@ -5967,11 +5964,20 @@ public class CampaignGUI extends JPanel {
         }
 
         if (undeployed.length() > 0) {
-            JOptionPane.showMessageDialog(
-                    getFrame(),
-                    "The following units could not be deployed:"
-                            + undeployed.toString(),
-                    "Could not deploy some units", JOptionPane.WARNING_MESSAGE);
+        	Object[] options = {"Continue",
+            "Cancel"};
+        	int n = JOptionPane.showOptionDialog(getFrame(),
+        			"The following units could not be deployed:"
+        					+ undeployed.toString(),
+        					"Could not deploy some units",
+						JOptionPane.OK_CANCEL_OPTION,
+						JOptionPane.WARNING_MESSAGE,
+						null,
+						options,
+						options[1]);	
+        	if(n==1) {
+        		return;
+        	}
         }
 
         if (chosen.size() > 0) {
@@ -6010,9 +6016,6 @@ public class CampaignGUI extends JPanel {
 
         for (UUID uid : uids) {
             Unit u = getCampaign().getUnit(uid);
-            if (u.isUnmanned()) {
-                continue;
-            }
             if (null != u.getEntity()) {
                 if (null == u.checkDeployment()) {
                     chosen.add(u);
@@ -6031,11 +6034,21 @@ public class CampaignGUI extends JPanel {
         }
 
         if (undeployed.length() > 0) {
-            JOptionPane.showMessageDialog(
-                    getFrame(),
-                    "The following units could not be deployed:"
+        	Object[] options = {"Continue",
+                    "Cancel"};
+        	int n = JOptionPane.showOptionDialog(getFrame(),
+        			"The following units could not be deployed:"
                             + undeployed.toString(),
-                    "Could not deploy some units", JOptionPane.WARNING_MESSAGE);
+                    "Could not deploy some units",
+        					JOptionPane.OK_CANCEL_OPTION,
+        					JOptionPane.WARNING_MESSAGE,
+        					null,
+        					options,
+        					options[1]);
+        	
+        	if(n==1) {
+        		return;
+        	}
         }
 
         if (getCampaign().getCampaignOptions().getUseAtB()
@@ -6118,9 +6131,6 @@ public class CampaignGUI extends JPanel {
 
         for (UUID uid : uids) {
             Unit u = getCampaign().getUnit(uid);
-            if (u.isUnmanned()) {
-                continue;
-            }
             if (null != u.getEntity()) {
                 if (null == u.checkDeployment()) {
                     chosen.add(u);
@@ -6132,11 +6142,20 @@ public class CampaignGUI extends JPanel {
         }
 
         if (undeployed.length() > 0) {
-            JOptionPane.showMessageDialog(
-                    getFrame(),
-                    "The following units could not be deployed:"
-                            + undeployed.toString(),
-                    "Could not deploy some units", JOptionPane.WARNING_MESSAGE);
+        	Object[] options = {"Continue",
+            "Cancel"};
+        	int n = JOptionPane.showOptionDialog(getFrame(),
+        			"The following units could not be deployed:"
+        					+ undeployed.toString(),
+        					"Could not deploy some units",
+						JOptionPane.OK_CANCEL_OPTION,
+						JOptionPane.WARNING_MESSAGE,
+						null,
+						options,
+						options[1]);	
+        	if(n==1) {
+        		return;
+        	}
         }
 
         if (chosen.size() > 0) {
@@ -6163,10 +6182,6 @@ public class CampaignGUI extends JPanel {
 
         for (UUID uid : uids) {
             Unit u = getCampaign().getUnit(uid);
-            // TODO: Inoperable and Advanced Medical Checks
-            if (u.isUnmanned() || !u.isFunctional()) {
-                continue;
-            }
             if (null != u.getEntity()) {
                 if (null == u.checkDeployment()) {
                     chosen.add(u.getEntity());
@@ -6175,6 +6190,23 @@ public class CampaignGUI extends JPanel {
                             .append(u.checkDeployment()).append(")");
                 }
             }
+        }
+        
+        if (undeployed.length() > 0) {
+        	Object[] options = {"Continue",
+            "Cancel"};
+        	int n = JOptionPane.showOptionDialog(getFrame(),
+        			"The following units could not be deployed:"
+        					+ undeployed.toString(),
+        					"Could not deploy some units",
+						JOptionPane.OK_CANCEL_OPTION,
+						JOptionPane.WARNING_MESSAGE,
+						null,
+						options,
+						options[1]);	
+        	if(n==1) {
+        		return;
+        	}
         }
 
         JFileChooser saveList = new JFileChooser(".");
