@@ -2,8 +2,10 @@ VERSION HISTORY
 ----------------------------------
 v0.3.16-dev (SVN)
 + Bug [#823]: NPE during 'Auto Resolve'
++ Bug [#415]: Fighters and small craft have thrusters
 + Bug [#698]: All BA armor is incorrectly set to clan tech
 + Bug [#699]: BA armor may not be bought from the parts market
++ Bug [#277]: BattleArmor costs
 
 v0.3.15 (2015-08-04 10:50 UTC)
 + Planetary faction updates

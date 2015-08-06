@@ -1285,10 +1285,9 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 
 	public long getBuyCost() {
 		long cost = (long) Math.round(getEntity().getCost(false));
-		//Alternate cost has been replaced in MM with an accurate cost calculation for Infantry
-		//		if(entity instanceof Infantry) {
-		//			cost = (long) Math.round(getEntity().getAlternateCost());
-		//		}
+		if(entity instanceof Infantry) {
+			cost = (long) Math.round(getEntity().getAlternateCost());
+		}
 		if(entity.isClan()) {
 			cost *= campaign.getCampaignOptions().getClanPriceModifier();
 		}
