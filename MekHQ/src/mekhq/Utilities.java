@@ -35,9 +35,16 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -1221,4 +1228,37 @@ public class Utilities {
 
         return arabic-1;
     }
+    
+    public static Map<String, Integer> sortMapByValue(Map<String, Integer> unsortMap, boolean highFirst) {
+
+		// Convert Map to List
+		List<Map.Entry<String, Integer>> list = 
+			new LinkedList<Map.Entry<String, Integer>>(unsortMap.entrySet());
+
+		// Sort list with comparator, to compare the Map values
+		Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+			public int compare(Map.Entry<String, Integer> o1,
+                                           Map.Entry<String, Integer> o2) {
+				return (o1.getValue()).compareTo(o2.getValue());
+			}
+		});
+
+		// Convert sorted map back to a Map
+		Map<String, Integer> sortedMap = new LinkedHashMap<String, Integer>();
+		if(highFirst) {
+			ListIterator<Map.Entry<String, Integer>> li = list.listIterator(list.size());
+			while(li.hasPrevious()) {
+				Map.Entry<String, Integer> entry = li.previous();
+				sortedMap.put(entry.getKey(), entry.getValue());
+			}
+		} else {
+			for (Iterator<Map.Entry<String, Integer>> it = list.iterator(); it.hasNext();) {
+				Map.Entry<String, Integer> entry = it.next();
+				sortedMap.put(entry.getKey(), entry.getValue());
+			}
+		}
+		
+		return sortedMap;
+	}
+    
 }

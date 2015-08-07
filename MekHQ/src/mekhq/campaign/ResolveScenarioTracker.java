@@ -404,6 +404,19 @@ public class ResolveScenarioTracker {
 				en.setArmor(IArmorState.ARMOR_DESTROYED, loc);
 				en.setInternal(IArmorState.ARMOR_DESTROYED, loc);
 			}
+			if(en instanceof BattleArmor) {
+				//"Destroyed" BA Suits survive on a 10+ regardless of whether occupant is dead
+				//or not
+				if(loc >= BattleArmor.LOC_TROOPER_1 && loc <= ((BattleArmor)en).getTroopers()
+					&& (null == u || u.getEntity().getInternal(loc) > 0)
+					&& en.getInternal(loc) < 0) {
+					if(Compute.d6(2) < 2) {
+						en.setInternal(IArmorState.ARMOR_DESTROYED, loc);
+					} else {
+						en.setInternal(0, loc);
+					}
+				}
+			}
 			for (int i = 0; i < en.getNumberOfCriticals(loc); i++) {
 				final CriticalSlot cs = en.getCritical(loc, i);
 				if(null == cs || !cs.isEverHittable()) {

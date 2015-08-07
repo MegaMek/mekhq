@@ -25,7 +25,9 @@ import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.UUID;
 
 import megamek.common.ASFBay;
@@ -46,6 +48,7 @@ import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;
 import megamek.common.EquipmentType;
 import megamek.common.HeavyVehicleBay;
+import megamek.common.IArmorState;
 import megamek.common.ILocationExposureStatus;
 import megamek.common.IPlayer;
 import megamek.common.Infantry;
@@ -84,6 +87,7 @@ import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
+import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AeroHeatSink;
@@ -164,6 +168,7 @@ import mekhq.campaign.parts.equipment.MissingHeatSink;
 import mekhq.campaign.parts.equipment.MissingJumpJet;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IMothballWork;
 import mekhq.campaign.work.Modes;
@@ -2512,7 +2517,20 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	if(entity instanceof Infantry) {
     		if(entity instanceof BattleArmor) {
     		    int ntroopers = 0;
-    			for(int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor)entity).getTroopers(); i++) {
+    		    //ok, we want to reorder the way we move through suits, so that we always put BA
+    		    //in the suits with more armor. Otherwise, we may put a soldier in a suit with no
+    		    //armor when a perfectly good suit is waiting further down the line. 
+    		    Map<String, Integer> bestSuits = new HashMap<String, Integer>();
+    		    for(int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor)entity).getTroopers(); i++) {
+    		    	bestSuits.put(Integer.toString(i), entity.getArmorForReal(i));
+    		    	if(entity.getInternal(i)<0) {
+        		    	bestSuits.put(Integer.toString(i), IArmorState.ARMOR_DESTROYED);
+    		    	}
+    		    	bestSuits = Utilities.sortMapByValue(bestSuits, true);
+    		    }
+    		    bestSuits.keySet();
+    		    for(String key : bestSuits.keySet()) {
+    		    	int i = Integer.parseInt(key);
     			    if(entity.getInternal(i) < 0) {
     			        //no suit here move along
     			        continue;
