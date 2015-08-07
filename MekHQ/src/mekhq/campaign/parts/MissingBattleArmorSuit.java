@@ -80,7 +80,9 @@ public class MissingBattleArmorSuit extends MissingPart {
 
     @Override
     public void updateConditionFromPart() {
-        unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, trooper);
+    	if(null != unit) {
+    		unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, trooper);
+    	}
     }
 
     @Override

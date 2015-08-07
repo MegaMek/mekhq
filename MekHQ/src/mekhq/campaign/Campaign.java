@@ -145,6 +145,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingFactory;
+import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
@@ -946,6 +947,14 @@ public class Campaign implements Serializable {
     }
 
     public void addPart(Part p, int transitDays) {
+    	int bob;
+    	if(p instanceof MissingBattleArmorSuit) {
+    		bob = 1;
+    	}
+    	if(null != p.getUnit() && p.getUnit() instanceof TestUnit) {
+    		//if this is a test unit, then we won't add the part, so there
+    		return;
+    	}
         p.setDaysToArrival(transitDays);
         p.setBrandNew(false);
         // dont add missing parts if they dont have units or units with not id
@@ -2703,6 +2712,10 @@ public class Campaign implements Serializable {
     }
 
     public void removePart(Part part) {
+    	if(null == part.getUnit() && part.getUnit() instanceof TestUnit) {
+    		//if this is a test unit, then we won't remove the part because its not there
+    		return;
+    	}
         parts.remove(part);
         partIds.remove(new Integer(part.getId()));
     }
@@ -4426,7 +4439,7 @@ public class Campaign implements Serializable {
                 // repaired parts were not getting experience properly reset
                 p.setSkillMin(SkillType.EXP_GREEN);
             }
-
+  
             //if for some reason we couldn't find a type for equipment part, then remove it
             if((p instanceof EquipmentPart && null == ((EquipmentPart)p).getType())
             		|| (p instanceof MissingEquipmentPart && null == ((MissingEquipmentPart)p).getType())) {

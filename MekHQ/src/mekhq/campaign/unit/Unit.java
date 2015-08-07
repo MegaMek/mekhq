@@ -240,7 +240,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 
 	//for delivery
     protected int daysToArrival;
-
+    
 	public Unit() {
 		this(null, null);
 	}
@@ -389,7 +389,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	public void setSalvage(boolean b) {
 		this.salvaged = b;
 	}
-
+	
 	public String getHistory() {
 		return history;
 	}
