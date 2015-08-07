@@ -67,6 +67,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -83,10 +84,10 @@ public class ResolveScenarioTracker {
     Hashtable<UUID, Crew> pilots;
 	Hashtable<UUID, Crew> mia;
 	ArrayList<Person> newPilots;
-	ArrayList<Unit> potentialSalvage;
-	ArrayList<Unit> alliedUnits;
-	ArrayList<Unit> actualSalvage;
-	ArrayList<Unit> leftoverSalvage;
+	ArrayList<TestUnit> potentialSalvage;
+	ArrayList<TestUnit> alliedUnits;
+	ArrayList<TestUnit> actualSalvage;
+	ArrayList<TestUnit> leftoverSalvage;
 	ArrayList<Unit> units;
 	ArrayList<Loot> potentialLoot;
 	ArrayList<Loot> actualLoot;
@@ -112,10 +113,10 @@ public class ResolveScenarioTracker {
 		this.control = ctrl;
 		unitsStatus = new Hashtable<UUID, UnitStatus>();
 		salvageStatus = new Hashtable<UUID, UnitStatus>();
-		potentialSalvage = new ArrayList<Unit>();
-		alliedUnits = new ArrayList<Unit>(); // TODO: Make some use of this?
-		actualSalvage = new ArrayList<Unit>();
-		leftoverSalvage = new ArrayList<Unit>();
+		potentialSalvage = new ArrayList<TestUnit>();
+		alliedUnits = new ArrayList<TestUnit>(); // TODO: Make some use of this?
+		actualSalvage = new ArrayList<TestUnit>();
+		leftoverSalvage = new ArrayList<TestUnit>();
 		pilots = new Hashtable<UUID, Crew>();
 		mia = new Hashtable<UUID, Crew>();
 		newPilots = new ArrayList<Person>();
@@ -221,11 +222,11 @@ public class ResolveScenarioTracker {
 		checkStatusOfPersonnel();
 	}
 
-	private Unit generateNewUnit(Entity e) {
-	 // Do some hoops here so that the new mech gets it's old individual paint job!
+	private TestUnit generateNewTestUnit(Entity e) {
+		// Do some hoops here so that the new mech gets it's old individual paint job!
         String cat = e.getCamoCategory();
         String fn = e.getCamoFileName();
-        Unit nu = new Unit(e, campaign);
+        TestUnit nu = new TestUnit(e, campaign);
         nu.getEntity().setCamoCategory(cat);
         nu.getEntity().setCamoFileName(fn);
         UUID id = UUID.randomUUID();
@@ -248,7 +249,7 @@ public class ResolveScenarioTracker {
 						if(null != status) {
 						    status.assignFoundEntity(e);
 						} else {
-						    Unit nu = generateNewUnit(e);
+						    TestUnit nu = generateNewTestUnit(e);
 						    UnitStatus us = new UnitStatus(nu);
 						    unitsStatus.put(nu.getId(), us);
 							alliedUnits.add(nu);
@@ -275,7 +276,7 @@ public class ResolveScenarioTracker {
 					if(e instanceof Infantry && !(e instanceof BattleArmor)) {
 						continue;
 					}
-					Unit nu = generateNewUnit(e);
+					TestUnit nu = generateNewTestUnit(e);
                     UnitStatus us = new UnitStatus(nu);
                     salvageStatus.put(nu.getId(), us);
                     potentialSalvage.add(nu);
@@ -295,7 +296,7 @@ public class ResolveScenarioTracker {
 		            if(null != status) {
 		                status.assignFoundEntity(e);
 		            } else {
-		                Unit nu = generateNewUnit(e);
+		                TestUnit nu = generateNewTestUnit(e);
 		                UnitStatus us = new UnitStatus(nu);
 		                unitsStatus.put(nu.getId(), us);
 		                alliedUnits.add(nu);
@@ -309,7 +310,7 @@ public class ResolveScenarioTracker {
                 } else {
                     killCredits.put(e.getDisplayName(), "None");
                 }
-                Unit nu = generateNewUnit(e);
+                TestUnit nu = generateNewTestUnit(e);
                 UnitStatus us = new UnitStatus(nu);
                 salvageStatus.put(nu.getId(), us);
                 potentialSalvage.add(nu);
@@ -324,7 +325,7 @@ public class ResolveScenarioTracker {
                     if(null != status) {
                         status.assignFoundEntity(e);
 					} else {
-					    Unit nu = generateNewUnit(e);
+					    TestUnit nu = generateNewTestUnit(e);
 	                    UnitStatus us = new UnitStatus(nu);
 	                    unitsStatus.put(nu.getId(), us);
 	                    alliedUnits.add(nu);
@@ -348,7 +349,7 @@ public class ResolveScenarioTracker {
                     if(null != status) {
                         status.assignFoundEntity(e);
 					} else {
-					    Unit nu = generateNewUnit(e);
+					    TestUnit nu = generateNewTestUnit(e);
 	                    UnitStatus us = new UnitStatus(nu);
 	                    unitsStatus.put(nu.getId(), us);
 	                    alliedUnits.add(nu);
@@ -373,7 +374,7 @@ public class ResolveScenarioTracker {
         			if(e instanceof Infantry && !(e instanceof BattleArmor)) {
 						continue;
 					}
-        			Unit nu = generateNewUnit(e);
+        			TestUnit nu = generateNewTestUnit(e);
                     UnitStatus us = new UnitStatus(nu);
                     salvageStatus.put(nu.getId(), us);
                     potentialSalvage.add(nu);
@@ -908,7 +909,7 @@ public class ResolveScenarioTracker {
     						pilots.put(UUID.fromString(entity.getCrew().getExternalIdAsString()), entity.getCrew());
     					}
     				} else {
-    				    Unit nu = generateNewUnit(entity);
+    				    TestUnit nu = generateNewTestUnit(entity);
                         UnitStatus us = new UnitStatus(nu);
                         salvageStatus.put(nu.getId(), us);
                         potentialSalvage.add(nu);
@@ -974,20 +975,20 @@ public class ResolveScenarioTracker {
 		return false;
 	}
 
-	public ArrayList<Unit> getAlliedUnits() {
+	public ArrayList<TestUnit> getAlliedUnits() {
 		return alliedUnits;
 	}
 
-	public ArrayList<Unit> getPotentialSalvage() {
+	public ArrayList<TestUnit> getPotentialSalvage() {
 		return potentialSalvage;
 	}
 
-	public ArrayList<Unit> getActualSalvage() {
+	public ArrayList<TestUnit> getActualSalvage() {
 		return actualSalvage;
 	}
 
 	public void salvageUnit(int i) {
-	    Unit salvageUnit = potentialSalvage.get(i);
+	    TestUnit salvageUnit = potentialSalvage.get(i);
 		actualSalvage.add(salvageUnit);
 	}
 
@@ -1191,7 +1192,7 @@ public class ResolveScenarioTracker {
 		}
 
 		//now lets take care of salvage
-		for(Unit salvageUnit : actualSalvage) {
+		for(TestUnit salvageUnit : actualSalvage) {
 			UnitStatus salstatus = new UnitStatus(salvageUnit);
 			// FIXME: Need to implement a "fuel" part just like the "armor" part
 			if (salvageUnit.getEntity() instanceof Aero) {
@@ -1200,8 +1201,6 @@ public class ResolveScenarioTracker {
 		    checkForEquipmentStatus(salvageUnit.getEntity(), control);
 			campaign.clearGameData(salvageUnit.getEntity());
 			campaign.addUnit(salvageUnit.getEntity(), false, 0);
-			salvageUnit.initializeParts(false);
-			salvageUnit.runDiagnostic();
 			//if this is a contract, add to the salvaged value
 			if(getMission() instanceof Contract) {
 				((Contract)getMission()).addSalvageByUnit(salvageUnit.getSellValue());
@@ -1210,8 +1209,6 @@ public class ResolveScenarioTracker {
 		if(getMission() instanceof Contract) {
 			long value = 0;
 			for(Unit salvageUnit : leftoverSalvage) {
-				salvageUnit.initializeParts(false);
-				salvageUnit.runDiagnostic();
 				value += salvageUnit.getSellValue();
 			}
 			if(((Contract)getMission()).isSalvageExchange()) {

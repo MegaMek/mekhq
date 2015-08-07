@@ -65,6 +65,7 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -662,10 +663,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         JCheckBox escaped;
         JButton btnSalvageViewUnit;
         JButton btnSalvageEditUnit;
-        for(Unit u : tracker.getPotentialSalvage()) {
+        for(TestUnit u : tracker.getPotentialSalvage()) {
         	j++;
-        	u.initializeParts(false);
-        	u.runDiagnostic();
         	salvageables.add(u);
         	UnitStatus status = tracker.getSalvageStatus().get(u.getId());
         	String txtBoxString = status.getDesc().replace(u.getName(), u.getName() + " (" + formatter.format(u.getSellValue()) + " C-Bills)");
