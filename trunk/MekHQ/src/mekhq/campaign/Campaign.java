@@ -947,10 +947,6 @@ public class Campaign implements Serializable {
     }
 
     public void addPart(Part p, int transitDays) {
-    	int bob;
-    	if(p instanceof MissingBattleArmorSuit) {
-    		bob = 1;
-    	}
     	if(null != p.getUnit() && p.getUnit() instanceof TestUnit) {
     		//if this is a test unit, then we won't add the part, so there
     		return;
@@ -3796,7 +3792,7 @@ public class Campaign implements Serializable {
                     && version.getMajorVersion() == 0
                     && (version.getMinorVersion() <= 2 ||
                          (version.getMinorVersion() <= 3
-                         && version.getSnapshot() < 17))) {
+                         && version.getSnapshot() < 16))) {
                 for(Part p : unit.getParts()) {
                     retVal.removePart(p);
                 }
