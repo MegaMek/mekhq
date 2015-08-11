@@ -801,4 +801,49 @@ public class MekLocation extends Part {
 		return Entity.LOC_NONE;
 	}
 	
+	@Override
+	public int getIntroDate() {
+		//TODO: I need a clan tag in order to distinguish some of these
+		//I believe there is also a bug about differences between IS/Clan IS
+		int currentDate;
+		switch(structureType) {
+		case EquipmentType.T_STRUCTURE_ENDO_COMPOSITE:
+			currentDate = 3067;
+			break;
+		case EquipmentType.T_STRUCTURE_REINFORCED:
+			currentDate = 3057;
+			break;
+		case EquipmentType.T_STRUCTURE_COMPOSITE:
+			currentDate = 3061;
+			break;
+		case EquipmentType.T_STRUCTURE_INDUSTRIAL:
+			currentDate = 2350;
+			break;
+		case EquipmentType.T_STRUCTURE_STANDARD:
+			currentDate = 2439;
+			break;
+		case EquipmentType.T_STRUCTURE_ENDO_PROTOTYPE:
+		case EquipmentType.T_STRUCTURE_ENDO_STEEL:
+			currentDate = 2487;
+			break;
+		default:
+			currentDate = EquipmentType.DATE_NONE;
+		}
+		if(tsm && currentDate < 3050) {
+			currentDate = 3050;
+		}
+		return currentDate;
+	}
+
+	@Override
+	public int getExtinctDate() {
+		//TOD: endo steel should go extinct for IS, but I have no way to distinguish
+		return EquipmentType.DATE_NONE;
+	}
+
+	@Override
+	public int getReIntroDate() {
+		return EquipmentType.DATE_NONE;
+	}
+	
 }

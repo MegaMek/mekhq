@@ -121,4 +121,28 @@ public class MissingAeroHeatSink extends MissingPart {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
+	
+	@Override
+	public int getIntroDate() {
+		if(type == Aero.HEAT_DOUBLE) {
+			return 2567;
+		}
+		return EquipmentType.DATE_NONE;
+	}
+
+	@Override
+	public int getExtinctDate() {
+		//TODO: we should distinguish clan and IS here for extinction purposes
+		/*if(type == Aero.HEAT_DOUBLE) {
+		 * if(!isClan()) {
+				return 2865;
+			}
+		}*/
+		return EquipmentType.DATE_NONE;
+	}
+
+	@Override
+	public int getReIntroDate() {
+		return 3040;
+	}
 }

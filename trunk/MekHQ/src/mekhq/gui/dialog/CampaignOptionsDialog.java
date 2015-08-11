@@ -26,9 +26,15 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.EventObject;
@@ -51,6 +57,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -76,8 +83,16 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import megamek.client.ui.swing.util.PlayerColors;
+import megamek.common.MechSummaryCache;
 import megamek.common.Player;
 import megamek.common.options.GameOptions;
 import megamek.common.options.IOption;
@@ -85,8 +100,12 @@ import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import mekhq.MekHQ;
+import mekhq.NullEntityException;
+import mekhq.Utilities;
+import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.GamePreset;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.parts.Part;
@@ -98,6 +117,7 @@ import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.UnitTableData;
+import mekhq.gui.CampaignFileFilter;
 import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.model.RankTableModel;
 import mekhq.gui.model.SortedComboBoxModel;
@@ -129,6 +149,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JButton btnCancel;
     private JButton btnDate;
     private JButton btnOkay;
+    private JButton btnSave;
+    private JButton btnLoad;
     private JSpinner spnClanPriceModifier;
     private JSpinner spnUsedPartsValue[];
     private JSpinner spnDamagedPartsValue;
@@ -288,6 +310,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JComboBox<String> choiceAcquireMinimumUnit;
 
     private JCheckBox limitByYearBox;
+    private JCheckBox disallowExtinctStuffBox;
     private JCheckBox allowClanPurchasesBox;
     private JCheckBox allowISPurchasesBox;
     private JCheckBox allowCanonOnlyBox;
@@ -463,6 +486,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         sellPartsBox.setSelected(options.canSellParts());
 
         limitByYearBox.setSelected(options.limitByYear());
+        disallowExtinctStuffBox.setSelected(options.disallowExtinctStuff());
         allowClanPurchasesBox.setSelected(options.allowClanPurchases());
         allowISPurchasesBox.setSelected(options.allowISPurchases());
         allowCanonOnlyBox.setSelected(options.allowCanonOnly());
@@ -544,12 +568,15 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         sellPartsBox = new JCheckBox();
         useQuirksBox = new JCheckBox();
         limitByYearBox = new JCheckBox();
+        disallowExtinctStuffBox = new JCheckBox();
         allowClanPurchasesBox = new JCheckBox();
         allowISPurchasesBox = new JCheckBox();
         allowCanonOnlyBox = new JCheckBox();
         useAmmoByTypeBox = new JCheckBox();
         choiceTechLevel = new JComboBox<String>();
         btnOkay = new JButton();
+        btnSave = new JButton();
+        btnLoad = new JButton();
         btnCancel = new JButton();
         scrRanks = new JScrollPane();
 
@@ -1095,13 +1122,24 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panTech.add(limitByYearBox, gridBagConstraints);
+        
+        disallowExtinctStuffBox.setText(resourceMap.getString("disallowExtinctStuffBox.text")); // NOI18N
+        disallowExtinctStuffBox.setToolTipText(resourceMap.getString("disallowExtinctStuffBox.toolTipText")); // NOI18N
+        disallowExtinctStuffBox.setName("disallowExtinctStuffBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panTech.add(disallowExtinctStuffBox, gridBagConstraints);
 
         allowClanPurchasesBox.setText(resourceMap.getString("allowClanPurchasesBox.text")); // NOI18N
         allowClanPurchasesBox.setToolTipText(resourceMap.getString("allowClanPurchasesBox.toolTipText")); // NOI18N
         allowClanPurchasesBox.setName("allowClanPurchasesBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1112,7 +1150,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         allowISPurchasesBox.setName("allowISPurchasesBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1123,7 +1161,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         allowCanonOnlyBox.setName("allowCanonOnlyBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -3688,7 +3726,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
@@ -3699,16 +3737,45 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         btnOkay.setName("btnOkay"); // NOI18N
         btnOkay.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOkayActionPerformed(evt);
+                btnOkayActionPerformed();
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.weightx = 0.25;
         getContentPane().add(btnOkay, gridBagConstraints);
 
+        btnSave.setText(resourceMap.getString("btnSave.text")); // NOI18N
+        btnSave.setName("btnSave"); // NOI18N
+        btnSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveActionPerformed();
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
+        gridBagConstraints.weightx = 0.25;
+        getContentPane().add(btnSave, gridBagConstraints);
+
+        btnLoad.setText(resourceMap.getString("btnLoad.text")); // NOI18N
+        btnLoad.setName("btnLoad"); // NOI18N
+        btnLoad.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLoadActionPerformed();
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
+        gridBagConstraints.weightx = 0.25;
+        getContentPane().add(btnLoad, gridBagConstraints);
+
+        
         btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
@@ -3717,10 +3784,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.weightx = 0.25;
         getContentPane().add(btnCancel, gridBagConstraints);
 
         pack();
@@ -3814,12 +3881,102 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         }
     }
 
-    private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkayActionPerformed
-        if (txtName.getText().length() > 0) {
-            campaign.setName(txtName.getText());
-            this.setVisible(false);
+    private void btnLoadActionPerformed() {
+    	ArrayList<GamePreset> presets = GamePreset.getGamePresetsIn(MekHQ.PRESET_DIR);   	
+    	
+		if(!presets.isEmpty()) {
+			ChooseGamePresetDialog cgpd = new ChooseGamePresetDialog(null, true, presets);
+			cgpd.setVisible(true);
+			if(!cgpd.wasCancelled() && null != cgpd.getSelectedPreset()) {
+				cgpd.getSelectedPreset().apply(campaign);
+				////TODO: it would be nice if we could just update the choices in this dialog now
+				//rather than closing it, but that is currently not possible given how 
+				//this dialog is set up
+				this.setVisible(false);
+			}
+		}
+    }
+    
+    private void btnSaveActionPerformed() {
+    	if (txtName.getText().length() == 0) {
+    		return;	
+    	}
+    	GamePresetDescriptionDialog gpdd = new GamePresetDescriptionDialog(null, true, "Enter a title", "Enter description of preset");
+        gpdd.setVisible(true);
+        if(!gpdd.wasChanged()) {
+        	return;
         }
-        campaign.calendar = date;
+        
+    	MekHQ.logMessage("Saving campaign options...");
+        // Choose a file...
+        JFileChooser saveOptions = new JFileChooser(MekHQ.PRESET_DIR);
+        saveOptions.setDialogTitle("Save Campaign Options as Presets");
+        //saveCpgn.setFileFilter(new CampaignFileFilter());
+        saveOptions.setSelectedFile(new File("myoptions.xml")); //$NON-NLS-1$
+        int returnVal = saveOptions.showSaveDialog(getParent());
+
+        if ((returnVal != JFileChooser.APPROVE_OPTION)
+                || (saveOptions.getSelectedFile() == null)) {
+            // I want a file, y'know!
+            return;
+        }
+
+        File file = saveOptions.getSelectedFile();
+        if (file == null) {
+            // I want a file, y'know!
+            return;
+        }
+        String path = file.getPath();
+        if (!path.endsWith(".xml")) {
+            path += ".xml";
+            file = new File(path);
+        }
+
+        // check for existing file and make a back-up if found
+        String path2 = path + "_backup";
+        File backupFile = new File(path2);
+        if (file.exists()) {
+            Utilities.copyfile(file, backupFile);
+        }
+    	
+        updateOptions();
+        GamePreset preset = new GamePreset(gpdd.getTitle(), gpdd.getDesc(), options, rskillPrefs, SkillType.lookupHash, SpecialAbility.getAllSpecialAbilities());
+        
+        // Then save it out to that file.
+        FileOutputStream fos = null;
+        PrintWriter pw = null;
+
+        try {
+            fos = new FileOutputStream(file);
+            pw = new PrintWriter(new OutputStreamWriter(fos, "UTF-8"));
+            preset.writeToXml(pw, 0);
+            pw.flush();
+            pw.close();
+            fos.close();
+            // delete the backup file because we didn't need it
+            if (backupFile.exists()) {
+                backupFile.delete();
+            }
+            MekHQ.logMessage("Campaign options saved to " + file);
+        } catch (Exception ex) {
+            MekHQ.logError(ex);
+            JOptionPane
+                    .showMessageDialog(
+                            null,
+                            "Whoops, for some reason the game presets could not be saved", "Could not save presets",
+                            JOptionPane.ERROR_MESSAGE);
+            file.delete();
+            if (backupFile.exists()) {
+                Utilities.copyfile(backupFile, file);
+                backupFile.delete();
+            }
+        }
+    	this.setVisible(false);
+    }
+    
+    private void updateOptions() {
+    	campaign.setName(txtName.getText());
+    	campaign.calendar = date;
         // Ensure that the MegaMek year GameOption matches the campaign year
         GameOptions gameOpts = campaign.getGameOptions();
         int campaignYear = campaign.getCalendar().get(Calendar.YEAR);
@@ -3940,6 +4097,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         options.setLimitByYear(limitByYearBox.isSelected());
         campaign.getGameOptions().getOption("is_eq_limits").setValue(limitByYearBox.isSelected());
+        options.setDisallowExtinctStuff(disallowExtinctStuffBox.isSelected());
         options.setAllowClanPurchases(allowClanPurchasesBox.isSelected());
         options.setAllowISPurchases(allowISPurchasesBox.isSelected());
         options.setAllowCanonOnly(allowCanonOnlyBox.isSelected());
@@ -4074,6 +4232,13 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setContractMarketReportRefresh(chkUnitMarketReportRefresh.isSelected());
 
         // End Against the Bot
+    }
+    
+    private void btnOkayActionPerformed() {
+        if (txtName.getText().length() > 0) {
+        	updateOptions();
+            this.setVisible(false);
+        }    
     }
 
     private void updateXPCosts() {

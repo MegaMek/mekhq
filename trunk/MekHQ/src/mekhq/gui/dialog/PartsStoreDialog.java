@@ -30,6 +30,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.ResourceBundle;
 
@@ -50,6 +51,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import megamek.common.AmmoType;
+import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
@@ -62,6 +64,7 @@ import mekhq.campaign.parts.AeroSensor;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Avionics;
 import mekhq.campaign.parts.BaArmor;
+import mekhq.campaign.parts.BattleArmorSuit;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.FireControlSystem;
 import mekhq.campaign.parts.LandingGear;
@@ -107,7 +110,8 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	private static final int SG_GYRO     = 9;
 	private static final int SG_ACT      = 10;
 	private static final int SG_COCKPIT  = 11;
-	private static final int SG_NUM      = 12;
+	private static final int SG_BA_SUIT  = 12;
+	private static final int SG_NUM      = 13;
 
     @SuppressWarnings("unused")
 	private Frame frame; // FIXME: Unused? Do we need it?
@@ -342,6 +346,13 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     			if(campaign.getCampaignOptions().getTechLevel() < Utilities.getSimpleTechLevel(part.getTechLevel())) {
     				return false;
     			}
+    			if(campaign.getCampaignOptions().limitByYear() && !part.isIntroducedBy(campaign.getCalendar().get(Calendar.YEAR))) {
+    				return false;
+    			}
+    			if(campaign.getCampaignOptions().disallowExtinctStuff() &&
+    	        		(part.isExtinctIn(campaign.getCalendar().get(Calendar.YEAR)) || part.getAvailability(campaign.getEra()) == EquipmentType.RATING_X)) {
+    	        	return false;
+    	        }
     			//TODO: limit by year
         		if(nGroup == SG_ALL) {
         			return true;
@@ -375,6 +386,8 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         			return part instanceof MekActuator || part instanceof ProtomekArmActuator || part instanceof ProtomekLegActuator;
         		} else if(nGroup == SG_COCKPIT) {
         			return part instanceof MekCockpit;
+        		} else if(nGroup == SG_BA_SUIT) {
+        			return part instanceof BattleArmorSuit;
         		}
         		return false;
         	}
@@ -470,6 +483,8 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     		return "Actuators";
     	case SG_COCKPIT:
     		return "Cockpits";
+    	case SG_BA_SUIT:
+    		return "Battle Armor Suits";
     	default:
     		return "?";
     	}

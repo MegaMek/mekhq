@@ -220,6 +220,12 @@ public class Utilities {
         }
         return choice;
     }
+	
+	public static File[] getAllFiles(String dir, FilenameFilter filter) {
+		File fl = new File(dir);
+        File[] files = fl.listFiles(filter);
+        return files;
+	}
 
 	public static ArrayList<String> getAllVariants(Entity en, int year, CampaignOptions options) {
 		ArrayList<String> variants = new ArrayList<String>();

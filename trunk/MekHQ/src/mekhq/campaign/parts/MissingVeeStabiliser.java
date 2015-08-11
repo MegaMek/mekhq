@@ -139,4 +139,20 @@ public class MissingVeeStabiliser extends MissingPart {
 		return unit.getEntity().getLocationName(loc);
 	}
 	
+	@Override
+	public int getIntroDate() {
+		return EquipmentType.DATE_NONE;
+	}
+
+	@Override
+	public int getExtinctDate() {
+		return EquipmentType.DATE_NONE;
+	}
+
+	@Override
+	public int getReIntroDate() {
+		return EquipmentType.DATE_NONE;
+	}
+	
+	
 }

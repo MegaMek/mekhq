@@ -131,14 +131,18 @@ public class MissingMekCockpit extends MissingPart {
 
 	@Override
 	public int getTechRating() {
-		switch (type) {
-        case Mech.COCKPIT_SMALL: 	
-        case Mech.COCKPIT_TORSO_MOUNTED:
+		switch(type) {
+		case Mech.COCKPIT_SMALL:
+		case Mech.COCKPIT_INTERFACE:
+		case Mech.COCKPIT_SUPERHEAVY:
+		case Mech.COCKPIT_SUPERHEAVY_TRIPOD:
+		case Mech.COCKPIT_TRIPOD:
             return EquipmentType.RATING_E;
-        case Mech.COCKPIT_INDUSTRIAL:
-            return EquipmentType.RATING_C;
-        default:
-            return EquipmentType.RATING_D;
+		case Mech.COCKPIT_INDUSTRIAL:
+		case Mech.COCKPIT_PRIMITIVE_INDUSTRIAL:
+            return EquipmentType.RATING_C;		
+		default:
+			return EquipmentType.RATING_D;
 		}
 	}
 
@@ -187,5 +191,62 @@ public class MissingMekCockpit extends MissingPart {
 	@Override
 	public int getLocation() {
 		return Entity.LOC_NONE;
+	}
+	
+	@Override
+	public int getIntroDate() {
+    	//TODO: where are aerospace cockpits
+    	//TODO: differentiate clan for some designs
+		switch(type) {
+		case Mech.COCKPIT_STANDARD:
+			return 2468;
+		case Mech.COCKPIT_SMALL:
+			return 3060;
+		case Mech.COCKPIT_COMMAND_CONSOLE:
+			return 2625;
+		case Mech.COCKPIT_TORSO_MOUNTED:
+		case Mech.COCKPIT_DUAL:
+			return 3053;
+		case Mech.COCKPIT_INDUSTRIAL:
+			return 2469;
+		case Mech.COCKPIT_PRIMITIVE:
+			return 2430;
+		case Mech.COCKPIT_PRIMITIVE_INDUSTRIAL:
+			return 2300;
+		case Mech.COCKPIT_SUPERHEAVY:
+			return 3060;
+		case Mech.COCKPIT_SUPERHEAVY_TRIPOD:
+			return 3130;
+		case Mech.COCKPIT_TRIPOD:
+			return 2590;
+		case Mech.COCKPIT_INTERFACE:
+			return 3074;
+		default:
+			return EquipmentType.DATE_NONE;
+		}
+	}
+
+	@Override
+	public int getExtinctDate() {
+		switch(type) {
+		case Mech.COCKPIT_PRIMITIVE:
+			return 2520;
+		case Mech.COCKPIT_PRIMITIVE_INDUSTRIAL:
+			return 2520;
+		case Mech.COCKPIT_COMMAND_CONSOLE:
+			return 2850;
+		default:
+			return EquipmentType.DATE_NONE;
+		}
+	}
+
+	@Override
+	public int getReIntroDate() {
+		switch(type) {
+		case Mech.COCKPIT_COMMAND_CONSOLE:
+			return 3030;
+		default:
+			return EquipmentType.DATE_NONE;
+		}
 	}
 }

@@ -27,6 +27,7 @@ import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.ILocationExposureStatus;
+import megamek.common.Mech;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.TargetRoll;
@@ -619,5 +620,20 @@ public class ProtomekLocation extends Part {
 	@Override
 	public int getLocation() {
 		return loc;
+	}
+	
+	@Override
+	public int getIntroDate() {
+		return 3055;
+	}
+
+	@Override
+	public int getExtinctDate() {
+		return EquipmentType.DATE_NONE;
+	}
+
+	@Override
+	public int getReIntroDate() {
+		return EquipmentType.DATE_NONE;
 	}
 }

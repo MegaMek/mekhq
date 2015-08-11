@@ -24,6 +24,8 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.GregorianCalendar;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import megamek.common.Aero;
 import megamek.common.Entity;
@@ -248,7 +250,7 @@ public class BaArmor extends Part implements IAcquisitionWork {
     
     @Override
     public boolean isSameStatus(Part part) {
-        return this.getDaysToArrival() == part.getDaysToArrival();
+        return !hasParentPart() && !part.hasParentPart() && this.getDaysToArrival() == part.getDaysToArrival();
     }
 
     @Override
@@ -259,6 +261,12 @@ public class BaArmor extends Part implements IAcquisitionWork {
     		return TechConstants.T_TECH_UNKNOWN;
     	}
     	int techLevel = etype.getTechLevel(campaign.getCalendar().get(GregorianCalendar.YEAR));
+    	if(techLevel == TechConstants.T_TECH_UNKNOWN && !etype.getTechLevels().isEmpty()) {
+        	//If this is tech unknown we are probably using a part before its date of introduction
+        	//in this case, try to give it the date of the earliest entry if it exists
+        	SortedSet<Integer> keys = new TreeSet<Integer>(etype.getTechLevels().keySet());
+        	techLevel = etype.getTechLevels().get(keys.first());
+        }
         if ((techLevel != TechConstants.T_ALLOWED_ALL && techLevel < 0) || techLevel >= TechConstants.T_ALL)
             return TechConstants.T_TECH_UNKNOWN;
         else
@@ -346,11 +354,41 @@ public class BaArmor extends Part implements IAcquisitionWork {
         }
         
     }
-
+    
     @Override
-    public int getTechRating() {
-        return EquipmentType.RATING_E;
+    public int getIntroDate() {
+    	EquipmentType etype = EquipmentType.get(EquipmentType.getArmorTypeName(type, clan));
+    	if(null == etype) {
+    		return TechConstants.T_TECH_UNKNOWN;
+    	}
+    	return etype.getIntroductionDate();
     }
+    
+    @Override
+    public int getExtinctDate() {
+    	EquipmentType etype = EquipmentType.get(EquipmentType.getArmorTypeName(type, clan));
+    	if(null == etype) {
+    		return TechConstants.T_TECH_UNKNOWN;
+    	}
+    	return etype.getExtinctionDate();
+    }
+    
+    @Override
+    public int getReIntroDate() {
+    	EquipmentType etype = EquipmentType.get(EquipmentType.getArmorTypeName(type, clan));
+    	if(null == etype) {
+    		return TechConstants.T_TECH_UNKNOWN;
+    	}
+    	return etype.getReintruductionDate();
+    }
+    
+    public int getTechRating() {
+		EquipmentType etype = EquipmentType.get(EquipmentType.getArmorTypeName(type, clan));
+    	if(null == etype) {
+    		return EquipmentType.RATING_E;
+    	}
+    	return etype.getTechRating();
+	}
 
     @Override
     public void fix() {
@@ -402,7 +440,7 @@ public class BaArmor extends Part implements IAcquisitionWork {
 
     @Override
     public void remove(boolean salvage) {
-        unit.getEntity().setArmor(IArmorState.ARMOR_DESTROYED, location, false);
+    	unit.getEntity().setArmor(IArmorState.ARMOR_DESTROYED, location, false);
         if(salvage) {
             changeAmountAvailable(amountNeeded);
         }

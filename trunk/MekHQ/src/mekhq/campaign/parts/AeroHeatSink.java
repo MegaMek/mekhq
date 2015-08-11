@@ -196,12 +196,7 @@ public class AeroHeatSink extends Part {
 	
 	@Override
 	public int getTechLevel() {
-		return TechConstants.T_IS_TW_ALL;
-	}
-	
-	@Override 
-	public int getTechBase() {
-		return T_BOTH;	
+		return TechConstants.T_ALLOWED_ALL;
 	}
 
 	@Override
@@ -253,5 +248,29 @@ public class AeroHeatSink extends Part {
 	@Override
 	public int getLocation() {
 		return Entity.LOC_NONE;
+	}
+
+	@Override
+	public int getIntroDate() {
+		if(type == Aero.HEAT_DOUBLE) {
+			return 2567;
+		}
+		return EquipmentType.DATE_NONE;
+	}
+
+	@Override
+	public int getExtinctDate() {
+		//TODO: we should distinguish clan and IS here for extinction purposes
+		/*if(type == Aero.HEAT_DOUBLE) {
+		 * if(!isClan()) {
+				return 2865;
+			}
+		}*/
+		return EquipmentType.DATE_NONE;
+	}
+
+	@Override
+	public int getReIntroDate() {
+		return 3040;
 	}
 }

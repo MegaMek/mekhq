@@ -24,6 +24,9 @@ package mekhq.campaign.parts.equipment;
 import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
+import megamek.common.MiscType;
+import megamek.common.Mounted;
+import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
@@ -51,6 +54,8 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
     public MissingBattleArmorEquipmentPart(int tonnage, EquipmentType et, int equipNum, int trooper, Campaign c, double etonnage) {
         super(tonnage, et, equipNum, c, etonnage);
         this.trooper = trooper;
+        this.time = 30;
+        this.difficulty = -2;
     }
     
     @Override
@@ -97,9 +102,44 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
         restore();
     }
     
+    public int getBaMountLocation() {
+    	if(null != unit) {
+    		Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+			if(null != mounted) {
+				return mounted.getBaMountLoc();
+			}
+    	}
+    	return -1;
+    }
+    
+    
+    
+    private boolean isModular() {
+    	if(null == unit) {
+    		return false;
+    	}
+    	for (Mounted m : unit.getEntity().getEquipment()){
+    		if (m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_BA_MEA) &&
+    				type instanceof MiscType && type.hasFlag(MiscType.F_BA_MANIPULATOR)
+    				&& this.getBaMountLocation()== m.getBaMountLoc()){
+    			return true;
+    		}
+    		//this is not quite right, they must be linked somehow
+    		/*if (type instanceof InfantryWeapon &&
+    				m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_AP_MOUNT)
+    				&& this.getBaMountLocation()== m.getBaMountLoc()){
+    			return true;
+    		}*/
+    	}
+    	return false;
+    }
+    
     @Override
     public boolean needsFixing() {
-        //cant be replaced the normal way
+        //can only be replaced the normal way if modular and suit exists
+    	if(null != unit && unit.getEntity().getInternal(trooper)>=0 && isModular()) {
+    		return true;
+    	}
         return false;
     }
 
@@ -147,6 +187,21 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
     @Override
     public void updateConditionFromPart() {
         //you cant crit BA equipment, so do nothing
+    }
+    
+    @Override
+	public int getLocation() {
+		return trooper;
+	}
+    
+    @Override
+    public String getDetails() {
+    	if(null == unit) {      
+    		return super.getDetails();
+
+        }
+    	String toReturn = unit.getEntity().getLocationName(trooper) + "<br>";
+		return toReturn + super.getDetails();
     }
     
     

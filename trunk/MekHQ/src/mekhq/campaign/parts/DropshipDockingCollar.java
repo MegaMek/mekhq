@@ -165,12 +165,7 @@ public class DropshipDockingCollar extends Part {
 	
 	@Override
 	public int getTechLevel() {
-		return TechConstants.T_IS_TW_ALL;
-	}
-	
-	@Override 
-	public int getTechBase() {
-		return T_BOTH;	
+		return TechConstants.T_ALLOWED_ALL;
 	}
 
 	@Override
@@ -204,5 +199,21 @@ public class DropshipDockingCollar extends Part {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
+	
+	@Override
+	public int getIntroDate() {
+		return 2304;
+	}
+
+	@Override
+	public int getExtinctDate() {
+		return EquipmentType.DATE_NONE;
+	}
+
+	@Override
+	public int getReIntroDate() {
+		return EquipmentType.DATE_NONE;
+	}
+	
 	
 }

@@ -24,6 +24,8 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.GregorianCalendar;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import megamek.common.Aero;
 import megamek.common.Entity;
@@ -236,6 +238,33 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     @Override
+    public int getIntroDate() {
+    	EquipmentType etype = EquipmentType.get(EquipmentType.getArmorTypeName(type, clan));
+    	if(null == etype) {
+    		return TechConstants.T_TECH_UNKNOWN;
+    	}
+    	return etype.getIntroductionDate();
+    }
+    
+    @Override
+    public int getExtinctDate() {
+    	EquipmentType etype = EquipmentType.get(EquipmentType.getArmorTypeName(type, clan));
+    	if(null == etype) {
+    		return TechConstants.T_TECH_UNKNOWN;
+    	}
+    	return etype.getExtinctionDate();
+    }
+    
+    @Override
+    public int getReIntroDate() {
+    	EquipmentType etype = EquipmentType.get(EquipmentType.getArmorTypeName(type, clan));
+    	if(null == etype) {
+    		return TechConstants.T_TECH_UNKNOWN;
+    	}
+    	return etype.getReintruductionDate();
+    }
+    
+    @Override
     public int getTechLevel() {
     	//just use what is already in equipment types to figure it out
     	EquipmentType etype = EquipmentType.get(EquipmentType.getArmorTypeName(type, clan));
@@ -243,6 +272,12 @@ public class Armor extends Part implements IAcquisitionWork {
     		return TechConstants.T_TECH_UNKNOWN;
     	}
     	int techLevel = etype.getTechLevel(campaign.getCalendar().get(GregorianCalendar.YEAR));
+    	if(techLevel == TechConstants.T_TECH_UNKNOWN && !etype.getTechLevels().isEmpty()) {
+        	//If this is tech unknown we are probably using a part before its date of introduction
+        	//in this case, try to give it the date of the earliest entry if it exists
+        	SortedSet<Integer> keys = new TreeSet<Integer>(etype.getTechLevels().keySet());
+        	techLevel = etype.getTechLevels().get(keys.first());
+        }
         if ((techLevel != TechConstants.T_ALLOWED_ALL && techLevel < 0) || techLevel >= TechConstants.T_ALL)
             return TechConstants.T_TECH_UNKNOWN;
         else
@@ -386,31 +421,11 @@ public class Armor extends Part implements IAcquisitionWork {
 
 	@Override
 	public int getTechRating() {
-		switch(type) {
-		case EquipmentType.T_ARMOR_INDUSTRIAL:
-			return EquipmentType.RATING_C;
-		case EquipmentType.T_ARMOR_COMMERCIAL:
-			return EquipmentType.RATING_B;
-		case EquipmentType.T_ARMOR_FERRO_FIBROUS:
-		case EquipmentType.T_ARMOR_FERRO_FIBROUS_PROTO:
-		case EquipmentType.T_ARMOR_LIGHT_FERRO:
-		case EquipmentType.T_ARMOR_HEAVY_FERRO:
-		case EquipmentType.T_ARMOR_STEALTH:
-			return EquipmentType.RATING_E;
-		case EquipmentType.T_ARMOR_HARDENED:
-			return EquipmentType.RATING_D;
-		case EquipmentType.T_ARMOR_REACTIVE:
-		case EquipmentType.T_ARMOR_REFLECTIVE:
-			return EquipmentType.RATING_E;
-		case EquipmentType.T_ARMOR_PATCHWORK:
-		case EquipmentType.T_ARMOR_FERRO_IMP:
-		case EquipmentType.T_ARMOR_FERRO_CARBIDE:
-		case EquipmentType.T_ARMOR_LAMELLOR_FERRO_CARBIDE:
-		case EquipmentType.T_ARMOR_FERRO_LAMELLOR:
-			return EquipmentType.RATING_F;
-		default:
-			return EquipmentType.RATING_D;
-		}
+		EquipmentType etype = EquipmentType.get(EquipmentType.getArmorTypeName(type, clan));
+    	if(null == etype) {
+    		return EquipmentType.RATING_D;
+    	}
+    	return etype.getTechRating();
 	}
 
 	@Override

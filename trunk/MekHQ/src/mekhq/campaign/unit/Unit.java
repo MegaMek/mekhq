@@ -24,6 +24,7 @@ package mekhq.campaign.unit;
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -163,6 +164,7 @@ import mekhq.campaign.parts.equipment.InfantryWeaponPart;
 import mekhq.campaign.parts.equipment.JumpJet;
 import mekhq.campaign.parts.equipment.MASC;
 import mekhq.campaign.parts.equipment.MissingAmmoBin;
+import mekhq.campaign.parts.equipment.MissingBattleArmorEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingHeatSink;
 import mekhq.campaign.parts.equipment.MissingJumpJet;
@@ -561,7 +563,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 		}
 		boolean armorFound = false;
 		for(Part part: parts) {
-			if(part instanceof MissingPart && null == ((MissingPart)part).findReplacement(false)) {
+			if(part instanceof MissingPart && part.needsFixing() && null == ((MissingPart)part).findReplacement(false)) {
 				missingParts.add((MissingPart)part);
 			}
 			//we need to check for armor as well, but this one is funny because we dont want to
@@ -1692,6 +1694,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	Hashtable<Integer,Part> ammoParts = new Hashtable<Integer,Part>();
     	Hashtable<Integer,Part> heatSinks = new Hashtable<Integer,Part>();
     	Hashtable<Integer,Part> jumpJets = new Hashtable<Integer,Part>();
+    	Hashtable<Integer,Part[]> baEquipParts = new Hashtable<Integer, Part[]>();
     	Part motiveSystem = null;
     	Part avionics = null;
     	Part fcs = null;
@@ -1792,7 +1795,21 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     			jumpJets.put(((JumpJet)part).getEquipmentNum(), part);
     		} else if(part instanceof MissingJumpJet) {
     			jumpJets.put(((MissingJumpJet)part).getEquipmentNum(), part);
-    		}  else if(part instanceof EquipmentPart) {
+    		}  else if(part instanceof BattleArmorEquipmentPart) {
+    			Part[] parts = baEquipParts.get(((BattleArmorEquipmentPart)part).getEquipmentNum());
+    			if(null == parts) {
+    				parts = new Part[((BattleArmor)entity).getSquadSize()];
+    			}
+    			parts[((BattleArmorEquipmentPart)part).getTrooper()-BattleArmor.LOC_TROOPER_1] = part;
+    			baEquipParts.put(((BattleArmorEquipmentPart)part).getEquipmentNum(), parts);
+    		} else if(part instanceof MissingBattleArmorEquipmentPart) {
+    			Part[] parts = baEquipParts.get(((MissingBattleArmorEquipmentPart)part).getEquipmentNum());
+    			if(null == parts) {
+    				parts = new Part[((BattleArmor)entity).getSquadSize()];
+    			}
+    			parts[((MissingBattleArmorEquipmentPart)part).getTrooper()-BattleArmor.LOC_TROOPER_1] = part;
+    			baEquipParts.put(((MissingBattleArmorEquipmentPart)part).getEquipmentNum(), parts);
+    		} else if(part instanceof EquipmentPart) {   		
     			equipParts.put(((EquipmentPart)part).getEquipmentNum(), part);
     		} else if(part instanceof MissingEquipmentPart) {
     			equipParts.put(((MissingEquipmentPart)part).getEquipmentNum(), part);
@@ -1998,12 +2015,15 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	    }
     	    if(!m.getType().isHittable()) {
     	        //there are some kind of non-hittable parts we might want to include for cost calculations
-    	        if(!(m.getType() instanceof MiscType
-    	                && ((MiscType)m.getType()).hasFlag(MiscType.F_BA_MANIPULATOR))) {
+    	    	if(!(m.getType() instanceof MiscType)) {
+    	    		continue;
+    	    	}
+    	        if(!(((MiscType)m.getType()).hasFlag(MiscType.F_BA_MANIPULATOR) ||
+    	                		((MiscType)m.getType()).hasFlag(MiscType.F_BA_MEA) ||
+    	                		((MiscType)m.getType()).hasFlag(MiscType.F_AP_MOUNT))) {
     	               continue;
     	        }
     	    }
-
     	    if(m.getType() instanceof AmmoType) {
     	        int eqnum = entity.getEquipmentNum(m);
     	        Part apart = ammoParts.get(eqnum);
@@ -2045,32 +2065,35 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	        }
     	    } else {
     	        int eqnum = entity.getEquipmentNum(m);
-    	        Part epart = equipParts.get(eqnum);
-    	        if(null == epart) {
-    	            EquipmentType type = m.getType();
-    	            if(type instanceof InfantryAttack) {
-    	                continue;
-    	            }
-    	            if(entity instanceof Infantry && !(entity instanceof BattleArmor)
-    	                    && m.getLocation() != Infantry.LOC_FIELD_GUNS) {
-    	                //don't add weapons here for infantry, unless field guns
-    	                continue;
-    	            }
-    	            if(entity instanceof BattleArmor) {
-    	                //assign equipment to each individual trooper
-    	                for(int i = 1; i <= ((BattleArmor)entity).getSquadSize(); i++) {
-    	                    epart = new BattleArmorEquipmentPart((int)entity.getWeight(), type, eqnum, i, campaign);
-    	                    addPart(epart);
-    	                    partsToAdd.add(epart);
-    	                }
-    	            } else {
-    	                epart = new EquipmentPart((int)entity.getWeight(), type, eqnum, campaign);
-    	                if(type instanceof MiscType && type.hasFlag(MiscType.F_MASC)) {
-    	                    epart = new MASC((int)entity.getWeight(), type, eqnum, campaign, erating);
-    	                }
-    	                addPart(epart);
-    	                partsToAdd.add(epart);
-    	            }
+	            EquipmentType type = m.getType();
+    	        if(entity instanceof BattleArmor) {
+    	        	//for BattleArmor we have multiple parts per mount, one for each trooper
+        	        Part[] eparts = baEquipParts.get(eqnum);
+	                for(int i = 0; i < ((BattleArmor)entity).getSquadSize(); i++) {
+	                	if(null == eparts || null == eparts[i]) {
+	                		Part epart = new BattleArmorEquipmentPart((int)entity.getWeight(), type, eqnum, i+BattleArmor.LOC_TROOPER_1, campaign);
+		                    addPart(epart);
+		                    partsToAdd.add(epart);
+	                	} 
+	                }
+    	        } else {
+    	        	Part epart = equipParts.get(eqnum);
+    	        	if(null == epart) {
+    	        		if(type instanceof InfantryAttack) {
+    	        			continue;
+    	        		}
+    	        		if(entity instanceof Infantry && !(entity instanceof BattleArmor)
+    	        				&& m.getLocation() != Infantry.LOC_FIELD_GUNS) {
+    	        			//don't add weapons here for infantry, unless field guns
+    	        			continue;
+    	        		}   	            
+    	        		epart = new EquipmentPart((int)entity.getWeight(), type, eqnum, campaign);
+    	        		if(type instanceof MiscType && type.hasFlag(MiscType.F_MASC)) {
+    	        			epart = new MASC((int)entity.getWeight(), type, eqnum, campaign, erating);
+    	        		}
+    	        		addPart(epart);
+    	        		partsToAdd.add(epart);
+    	        	}
     	        }
     	    }
     	}
@@ -2531,7 +2554,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     		    bestSuits.keySet();
     		    for(String key : bestSuits.keySet()) {
     		    	int i = Integer.parseInt(key);
-    			    if(entity.getInternal(i) < 0) {
+    			    if(!isBattleArmorSuitOperable(i)) {
     			        //no suit here move along
     			        continue;
     			    }
@@ -2746,6 +2769,10 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 
     public boolean canTakeMoreGunners() {
     	int nGunners = gunners.size();
+    	int bob;
+    	if(nGunners == 3) {
+    		bob = 1;
+    	}
     	return nGunners < getTotalGunnerNeeds();
     }
 
@@ -3164,9 +3191,18 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     public int getAvailability(int era) {
         //take the highest availability of all parts
         int availability = EquipmentType.RATING_A;
-        for(Part p : parts) {
-            if(p.getAvailability(era) > availability) {
-                availability = p.getAvailability(era);
+        for(Part p : parts) {        	
+        	int newAvailability = p.getAvailability(era);
+        	//Taharqa: its not clear whether a unit should really be considered extinct 
+        	//when its parts are extinct as many probably outlive the production of parts
+        	//it would be better to just use the unit extinction date itself, but given
+        	//that there are no canon extinction/reintro dates for units, we will use this 
+        	//instead
+        	if(p.isExtinctIn(campaign.getCalendar().get(Calendar.YEAR))) {
+            	newAvailability = EquipmentType.RATING_X;
+            }
+            if(newAvailability > availability) {
+                availability = newAvailability;
             }
         }
         return availability;
@@ -3430,6 +3466,36 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	 */
 	public void setFluffName(String name) {
 		this.fluffName = name;
+	}
+	
+	/**
+	 * Checks to see if a particular BA suit on BA is currently operable
+	 * This requires the suit to not be destroyed and to have not missing equipment parts
+	 */
+	public boolean isBattleArmorSuitOperable(int trooper) {
+		if(null == getEntity() || !(getEntity() instanceof BattleArmor)) {
+			return false;
+		}
+		if(getEntity().getInternal(trooper) < 0) {
+			return false;
+		}
+		for(Part part : getParts()) {
+			if(part instanceof MissingBattleArmorEquipmentPart &&
+					((MissingBattleArmorEquipmentPart)part).getTrooper() == trooper) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public boolean isIntroducedBy(int year) {
+		return null != entity && entity.getYear() >= year;
+	}
+
+	public boolean isExtinctIn(int year) {
+		//TODO: currently we do not track this in MM (and I don't think it really exists, 
+		//but I am adding the code elsewhere to take advantage of this method if we do code it.
+		return false;
 	}
 
 }

@@ -8,6 +8,11 @@ v0.3.16-dev (SVN)
 + Bug [#277]: BattleArmor costs
 + Bug [#862]: Battle Armor Breaks Save Files
 + Bug [#898]: BA suits not getting roll to avoid destruction
++ re-added infantry weapons
++ Major overhaul of BattleArmorSuit replacement to allow for sub-parts to follow main part
++ fixed TechRating values for parts with IS_TW_ALL that should be ALLOWED_ALL
++ Bug [#893]: can't get parts before year introduction from parts store
++ added the ability to save and load campaign option presets
 
 v0.3.15 (2015-08-04 10:50 UTC)
 + Planetary faction updates

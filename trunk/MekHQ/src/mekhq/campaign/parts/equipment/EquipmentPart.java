@@ -22,6 +22,8 @@ package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 import java.util.GregorianCalendar;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
@@ -160,6 +162,12 @@ public class EquipmentPart extends Part {
     @Override
     public int getTechLevel() {
         int techLevel = getType().getTechLevel(campaign.getCalendar().get(GregorianCalendar.YEAR));
+        if(techLevel == TechConstants.T_TECH_UNKNOWN && !getType().getTechLevels().isEmpty()) {
+        	//If this is tech unknown we are probably using a part before its date of introduction
+        	//in this case, try to give it the date of the earliest entry if it exists
+        	SortedSet<Integer> keys = new TreeSet<Integer>(getType().getTechLevels().keySet());
+        	techLevel = getType().getTechLevels().get(keys.first());
+        }
         if ((techLevel != TechConstants.T_ALLOWED_ALL && techLevel < 0) || techLevel >= TechConstants.T_ALL)
             return TechConstants.T_TECH_UNKNOWN;
         else
@@ -207,6 +215,21 @@ public class EquipmentPart extends Part {
 	public int getAvailability(int era) {
 		return type.getAvailability(Era.convertEra(era));
 	}
+	
+	@Override
+    public int getIntroDate() {
+    	return getType().getIntroductionDate();
+    }
+    
+    @Override
+    public int getExtinctDate() {
+    	return getType().getExtinctionDate();
+    }
+    
+    @Override
+    public int getReIntroDate() {
+    	return getType().getReintruductionDate();
+    }
 
 	@Override
 	public int getTechRating() {

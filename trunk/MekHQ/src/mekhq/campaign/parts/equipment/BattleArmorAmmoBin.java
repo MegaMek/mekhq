@@ -184,4 +184,8 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
         toReturn += "</font></html>";
         return toReturn;
     }
+    
+    public boolean needsMaintenance() {
+        return false;
+    }
 }

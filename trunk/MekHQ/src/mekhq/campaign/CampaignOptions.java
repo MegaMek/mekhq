@@ -104,6 +104,7 @@ public class CampaignOptions implements Serializable {
 
     //tech and unit limits
     private boolean limitByYear;
+    private boolean disallowExtinctStuff;
     private boolean allowClanPurchases;
     private boolean allowISPurchases;
     private boolean allowCanonOnly;
@@ -258,7 +259,7 @@ public class CampaignOptions implements Serializable {
         useAbilities = false;
         useEdge = false;
         useImplants = false;
-		altQualityAveraging = true;
+		altQualityAveraging = false;
         useAdvancedMedical = false;
         useDylansRandomXp = false;
         useQuirks = false;
@@ -269,10 +270,11 @@ public class CampaignOptions implements Serializable {
         payForOverhead = false;
         payForMaintain = false;
         payForTransport = false;
-        useLoanLimits = true;
+        useLoanLimits = false;
         sellUnits = false;
         sellParts = false;
         limitByYear = true;
+        disallowExtinctStuff = false;
         allowClanPurchases = true;
         allowISPurchases = true;
         allowCanonOnly = false;
@@ -304,8 +306,8 @@ public class CampaignOptions implements Serializable {
         idleXP = 0;
         targetIdleXP = 10;
         monthsIdleXP = 2;
-        contractNegotiationXP = 1;
-        adminWeeklyXP = 1;
+        contractNegotiationXP = 0;
+        adminWeeklyXP = 0;
         unitRatingMethod = UnitRatingMethod.INTERSTELLAR_OPS;
         waitingPeriod = 7;
         acquisitionSkill = S_TECH;
@@ -849,6 +851,14 @@ public class CampaignOptions implements Serializable {
 
     public void setLimitByYear(boolean b) {
         limitByYear = b;
+    }
+    
+    public boolean disallowExtinctStuff() {
+        return disallowExtinctStuff;
+    }
+
+    public void setDisallowExtinctStuff(boolean b) {
+    	disallowExtinctStuff = b;
     }
 
     public boolean allowClanPurchases() {
@@ -1710,6 +1720,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "contractNegotiationXP", contractNegotiationXP);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "adminWeeklyXP", adminWeeklyXP);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "limitByYear", limitByYear);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "disallowExtinctStuff", disallowExtinctStuff);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowClanPurchases", allowClanPurchases);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowISPurchases", allowISPurchases);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowCanonOnly", allowCanonOnly);
@@ -2026,6 +2037,12 @@ public class CampaignOptions implements Serializable {
                     retVal.limitByYear = true;
                 } else {
                     retVal.limitByYear = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("disallowExtinctStuff")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.disallowExtinctStuff = true;
+                } else {
+                    retVal.disallowExtinctStuff = false;
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("allowClanPurchases")) {
                 if (wn2.getTextContent().equalsIgnoreCase("true")) {

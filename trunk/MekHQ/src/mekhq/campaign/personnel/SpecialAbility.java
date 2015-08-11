@@ -323,6 +323,64 @@ public class SpecialAbility implements MekHqXmlSerializable {
         }
         specialAbilities.put(retVal.lookupName, retVal);
     }
+    
+    @SuppressWarnings("unchecked")
+    public static void generateSeparateInstanceFromXML(Node wn, Hashtable<String, SpecialAbility> spHash, PilotOptions options) {
+        SpecialAbility retVal = null;
+
+        try {
+            retVal = new SpecialAbility();
+            NodeList nl = wn.getChildNodes();
+
+            for (int x=0; x<nl.getLength(); x++) {
+                Node wn2 = nl.item(x);
+                if (wn2.getNodeName().equalsIgnoreCase("displayName")) {
+                    retVal.displayName = wn2.getTextContent();
+                }
+                else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
+                    retVal.desc = wn2.getTextContent();
+                }
+                else if (wn2.getNodeName().equalsIgnoreCase("lookupName")) {
+                    retVal.lookupName = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("xpCost")) {
+                    retVal.xpCost = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("weight")) {
+                    retVal.weight = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("prereqAbilities")) {
+                    retVal.prereqAbilities = Utilities.splitString(wn2.getTextContent(), "::");
+                } else if (wn2.getNodeName().equalsIgnoreCase("invalidAbilities")) {
+                    retVal.invalidAbilities = Utilities.splitString(wn2.getTextContent(), "::");
+                } else if (wn2.getNodeName().equalsIgnoreCase("removeAbilities")) {
+                    retVal.removeAbilities = Utilities.splitString(wn2.getTextContent(), "::");
+                } else if (wn2.getNodeName().equalsIgnoreCase("skillPrereq")) {
+                    SkillPrereq skill = SkillPrereq.generateInstanceFromXML(wn2);
+                    if(!skill.isEmpty()) {
+                        retVal.prereqSkills.add(skill);
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            // Errrr, apparently either the class name was invalid...
+            // Or the listed name doesn't exist.
+            // Doh!
+            MekHQ.logError(ex);
+        }
+
+        if(retVal.displayName.isEmpty()) {
+            IOption option = options.getOption(retVal.lookupName);
+            if(null != option) {
+                retVal.displayName = option.getDisplayableName();
+            }
+        }
+
+        if(retVal.desc.isEmpty()) {
+            IOption option = options.getOption(retVal.lookupName);
+            if(null != option) {
+                retVal.desc = option.getDescription();
+            }
+        }
+        spHash.put(retVal.lookupName, retVal);
+    }
 
     public static void initializeSPA() {
         specialAbilities = new Hashtable<String, SpecialAbility>();
@@ -517,6 +575,10 @@ public class SpecialAbility implements MekHqXmlSerializable {
 
     public static void nullifyDefaultSPA() {
         defaultSpecialAbilities = null;
+    }
+    
+    public static void setSpecialAbilities(Hashtable<String, SpecialAbility> spHash) {
+    	specialAbilities = spHash;
     }
 
     //TODO: also put some static methods here that return the available options for a given SPA, so
