@@ -24,8 +24,6 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-import megamek.common.BattleArmor;
-import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;
 import megamek.common.EquipmentType;
@@ -123,7 +121,7 @@ public class MissingBattleArmorSuit extends MissingPart {
                 && chassis.equals(((BattleArmorSuit)part).getChassis())
                 && model.equals(((BattleArmorSuit)part).getModel());
     }
-    
+
     @Override
     public Part getNewPart() {
         BattleArmorSuit suit = new BattleArmorSuit(chassis, model, getUnitTonnage(), -1, weightClass, groundMP, jumpMP, quad, clan, jumpType, campaign);
@@ -311,20 +309,20 @@ public class MissingBattleArmorSuit extends MissingPart {
 	public int getLocation() {
 		return trooper;
 	}
-	
+
 	@Override
     public String getDetails() {
-    	if(null == unit) {      
+    	if(null == unit) {
     		return super.getDetails();
 
         }
     	String toReturn = unit.getEntity().getLocationName(trooper) + "<br>";
 		return toReturn + super.getDetails();
     }
-	
+
 	@Override
 	public Part findReplacement(boolean refit) {
-		Part bestPart = null;	
+		Part bestPart = null;
 
 		//check to see if we already have a replacement assigned
 		if(replacementId > -1) {
@@ -338,7 +336,7 @@ public class MissingBattleArmorSuit extends MissingPart {
 			if(part.isReservedForRefit() || part.isBeingWorkedOn() || part.isReservedForReplacement() || !part.isPresent() || part.hasParentPart()) {
 				continue;
 			}
-			
+
 			if(isAcceptableReplacement(part, refit)) {
 				if(null == bestPart) {
 					bestPart = part;
@@ -371,13 +369,13 @@ public class MissingBattleArmorSuit extends MissingPart {
 						bestPart = part;
 					} else if(currentPartArmor > bestPartArmor) {
 						bestPart = part;
-					}				
+					}
 				}
 			}
 		}
 		return bestPart;
 	}
-	
+
 	@Override
 	public int getIntroDate() {
     	return ((BattleArmorSuit)getNewPart()).getIntroDate();

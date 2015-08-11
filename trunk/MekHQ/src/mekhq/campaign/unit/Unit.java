@@ -170,7 +170,6 @@ import mekhq.campaign.parts.equipment.MissingHeatSink;
 import mekhq.campaign.parts.equipment.MissingJumpJet;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IMothballWork;
 import mekhq.campaign.work.Modes;
@@ -247,7 +246,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 
 	//for delivery
     protected int daysToArrival;
-    
+
 	public Unit() {
 		this(null, null);
 	}
@@ -396,7 +395,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	public void setSalvage(boolean b) {
 		this.salvaged = b;
 	}
-	
+
 	public String getHistory() {
 		return history;
 	}
@@ -749,8 +748,8 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 				&& getActiveCrew().size() < getFullCrewSize()) {
 			return "This vehicle requires a crew of " + getFullCrewSize();
 		}
-		//Taharqa: I am not going to allow BattleArmor units with unmanned suits to deploy. It is 
-		//possible to hack this to work in MM, but it becomes a serious problem when the unit becomes 
+		//Taharqa: I am not going to allow BattleArmor units with unmanned suits to deploy. It is
+		//possible to hack this to work in MM, but it becomes a serious problem when the unit becomes
 		//a total loss because the unmanned suits are also treated as destroyed. I tried hacking something
 		//together in ResolveScenarioTracker and decided that it was not right. If someone wants to deploy
 		//a non-full strength BA unit, they can salvage the suits that are unmanned and then they can deploy
@@ -780,7 +779,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 		}
 		return false;
 	}
-	
+
 	 /**
      * Number of slots doomed, missing or destroyed in all locations
      * @param type
@@ -794,7 +793,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 		}
 		return hits;
 	}
-    
+
     /**
      * Number of slots doomed, missing or destroyed in a location
      */
@@ -856,7 +855,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 					cs.setDestroyed(true);
 					cs.setRepairable(true);
 					nhits++;
-				} 
+				}
 			}
 		}
 		return nhits;
@@ -1809,7 +1808,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     			}
     			parts[((MissingBattleArmorEquipmentPart)part).getTrooper()-BattleArmor.LOC_TROOPER_1] = part;
     			baEquipParts.put(((MissingBattleArmorEquipmentPart)part).getEquipmentNum(), parts);
-    		} else if(part instanceof EquipmentPart) {   		
+    		} else if(part instanceof EquipmentPart) {
     			equipParts.put(((EquipmentPart)part).getEquipmentNum(), part);
     		} else if(part instanceof MissingEquipmentPart) {
     			equipParts.put(((MissingEquipmentPart)part).getEquipmentNum(), part);
@@ -1916,7 +1915,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
             		aeroThrustersRight = ((Thrusters) part);
             	}
             }
-    		
+
     		part.updateConditionFromPart();
     	}
     	//now check to see what is null
@@ -2074,7 +2073,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	                		Part epart = new BattleArmorEquipmentPart((int)entity.getWeight(), type, eqnum, i+BattleArmor.LOC_TROOPER_1, campaign);
 		                    addPart(epart);
 		                    partsToAdd.add(epart);
-	                	} 
+	                	}
 	                }
     	        } else {
     	        	Part epart = equipParts.get(eqnum);
@@ -2086,7 +2085,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	        				&& m.getLocation() != Infantry.LOC_FIELD_GUNS) {
     	        			//don't add weapons here for infantry, unless field guns
     	        			continue;
-    	        		}   	            
+    	        		}
     	        		epart = new EquipmentPart((int)entity.getWeight(), type, eqnum, campaign);
     	        		if(type instanceof MiscType && type.hasFlag(MiscType.F_MASC)) {
     	        			epart = new MASC((int)entity.getWeight(), type, eqnum, campaign, erating);
@@ -2542,7 +2541,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     		    int ntroopers = 0;
     		    //ok, we want to reorder the way we move through suits, so that we always put BA
     		    //in the suits with more armor. Otherwise, we may put a soldier in a suit with no
-    		    //armor when a perfectly good suit is waiting further down the line. 
+    		    //armor when a perfectly good suit is waiting further down the line.
     		    Map<String, Integer> bestSuits = new HashMap<String, Integer>();
     		    for(int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor)entity).getTroopers(); i++) {
     		    	bestSuits.put(Integer.toString(i), entity.getArmorForReal(i));
@@ -2657,10 +2656,10 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
                     engineer.setOvertimeLeft(overtimeLeft);
                     engineer.setId(getCommander().getId());
                     engineer.setPrimaryRole(Person.T_MECHANIC);
-                    engineer.setRankNumeric(getCommander().getRankNumeric());                   
+                    engineer.setRankNumeric(getCommander().getRankNumeric());
                     //will only be reloading ammo, so doesn't really matter what skill level we give them - set to regular
                     engineer.addSkill(SkillType.S_TECH_MECHANIC, SkillType.getType(SkillType.S_TECH_MECHANIC).getRegularLevel(), 0);
-        		} else { 
+        		} else {
 	                engineer = null;
 	            }
         	} else {
@@ -2769,9 +2768,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 
     public boolean canTakeMoreGunners() {
     	int nGunners = gunners.size();
-    	int bob;
     	if(nGunners == 3) {
-    		bob = 1;
     	}
     	return nGunners < getTotalGunnerNeeds();
     }
@@ -2794,7 +2791,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	resetPilotAndEntity();
 		p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
     }
-    
+
     public void addDriver(Person p, boolean useTransfers) {
     	drivers.add(p.getId());
     	p.setUnitId(getId());
@@ -2812,7 +2809,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	resetPilotAndEntity();
 		p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
     }
-    
+
     public void addGunner(Person p, boolean useTransfers) {
     	gunners.add(p.getId());
     	p.setUnitId(getId());
@@ -2830,7 +2827,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	resetPilotAndEntity();
 		p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
     }
-    
+
     public void addVesselCrew(Person p, boolean useTransfers) {
     	vesselCrew.add(p.getId());
     	p.setUnitId(getId());
@@ -2848,7 +2845,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	resetPilotAndEntity();
 		p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
     }
-    
+
     public void setNavigator(Person p, boolean useTransfers) {
     	navigator = p.getId();
     	p.setUnitId(getId());
@@ -2869,11 +2866,11 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     public void setTech(UUID pid) {
     	tech = pid;
     }
-    
+
     public void removeTech() {
     	tech = null;
     }
-    
+
     public void addPilotOrSoldier(Person p) {
     	drivers.add(p.getId());
     	gunners.add(p.getId());
@@ -2881,7 +2878,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	resetPilotAndEntity();
 		p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
     }
-    
+
     public void addPilotOrSoldier(Person p, boolean useTransfers) {
     	drivers.add(p.getId());
     	gunners.add(p.getId());
@@ -3191,12 +3188,12 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     public int getAvailability(int era) {
         //take the highest availability of all parts
         int availability = EquipmentType.RATING_A;
-        for(Part p : parts) {        	
+        for(Part p : parts) {
         	int newAvailability = p.getAvailability(era);
-        	//Taharqa: its not clear whether a unit should really be considered extinct 
+        	//Taharqa: its not clear whether a unit should really be considered extinct
         	//when its parts are extinct as many probably outlive the production of parts
         	//it would be better to just use the unit extinction date itself, but given
-        	//that there are no canon extinction/reintro dates for units, we will use this 
+        	//that there are no canon extinction/reintro dates for units, we will use this
         	//instead
         	if(p.isExtinctIn(campaign.getCalendar().get(Calendar.YEAR))) {
             	newAvailability = EquipmentType.RATING_X;
@@ -3376,10 +3373,10 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     }
 
     public boolean isSelfCrewed() {
-        return (getEntity() instanceof Dropship || getEntity() instanceof Jumpship 
+        return (getEntity() instanceof Dropship || getEntity() instanceof Jumpship
         		|| getEntity() instanceof Infantry && !(getEntity() instanceof BattleArmor));
     }
-	
+
 	public boolean isUnderRepair() {
 		for(Part p : getParts()) {
 			if(null != p.getAssignedTeamId()) {
@@ -3467,7 +3464,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	public void setFluffName(String name) {
 		this.fluffName = name;
 	}
-	
+
 	/**
 	 * Checks to see if a particular BA suit on BA is currently operable
 	 * This requires the suit to not be destroyed and to have not missing equipment parts
@@ -3487,13 +3484,13 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 		}
 		return true;
 	}
-	
+
 	public boolean isIntroducedBy(int year) {
 		return null != entity && entity.getYear() >= year;
 	}
 
 	public boolean isExtinctIn(int year) {
-		//TODO: currently we do not track this in MM (and I don't think it really exists, 
+		//TODO: currently we do not track this in MM (and I don't think it really exists,
 		//but I am adding the code elsewhere to take advantage of this method if we do code it.
 		return false;
 	}

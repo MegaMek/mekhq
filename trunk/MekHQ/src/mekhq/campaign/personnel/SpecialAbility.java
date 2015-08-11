@@ -323,8 +323,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
         }
         specialAbilities.put(retVal.lookupName, retVal);
     }
-    
-    @SuppressWarnings("unchecked")
+
     public static void generateSeparateInstanceFromXML(Node wn, Hashtable<String, SpecialAbility> spHash, PilotOptions options) {
         SpecialAbility retVal = null;
 
@@ -576,7 +575,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     public static void nullifyDefaultSPA() {
         defaultSpecialAbilities = null;
     }
-    
+
     public static void setSpecialAbilities(Hashtable<String, SpecialAbility> spHash) {
     	specialAbilities = spHash;
     }

@@ -1,20 +1,20 @@
 /*
  * GamePreset.java
- * 
+ *
  * Copyright (c) 2015 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -29,15 +29,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-import javax.swing.JFileChooser;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.common.options.PilotOptions;
 import mekhq.MekHQ;
@@ -48,6 +41,12 @@ import mekhq.Utilities;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 /**
  * This is an object which holds a set of objects that collectively define the game options
  * for a campaign. This includes the campaign options, the skill types, the random skill preferences,
@@ -57,7 +56,7 @@ import mekhq.campaign.personnel.SpecialAbility;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class GamePreset implements MekHqXmlSerializable {
-	
+
 	String title;
 	String description;
 	CampaignOptions options;
@@ -65,7 +64,7 @@ public class GamePreset implements MekHqXmlSerializable {
     Hashtable<String, SkillType> skillHash;
     Hashtable<String, SpecialAbility> specialAbilities;
 
-    
+
     public GamePreset() {
     	title = "Title missing";
     	description = "Description missing";
@@ -74,7 +73,7 @@ public class GamePreset implements MekHqXmlSerializable {
     	skillHash = new Hashtable<String, SkillType>();
     	specialAbilities = new Hashtable<String, SpecialAbility>();
     }
-    
+
     public GamePreset(String t, String d, CampaignOptions o, RandomSkillPreferences r, Hashtable<String, SkillType> sk, Hashtable<String, SpecialAbility> sp) {
     	title = t;
     	description = d;
@@ -83,23 +82,23 @@ public class GamePreset implements MekHqXmlSerializable {
     	skillHash = sk;
     	specialAbilities = sp;
     }
-    
+
     public String getTitle() {
     	return title;
     }
-    
+
     public void setTitle(String s) {
     	title = s;
     }
-    
+
     public String getDescription() {
     	return description;
     }
-    
+
     public void setDescription(String s) {
     	description = s;
     }
-    
+
     public void apply(Campaign campaign) {
     	if(null != options) {
     		campaign.setCampaignOptions(options);
@@ -114,12 +113,12 @@ public class GamePreset implements MekHqXmlSerializable {
     		SpecialAbility.setSpecialAbilities(specialAbilities);
     	}
     }
-    
+
     public boolean isValid() {
     	//could be used to disqualify bad presets
     	return true;
     }
-	
+
 	public void writeToXml(PrintWriter pw, int indent) {
 		pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         pw.println("<gamePreset>");
@@ -154,9 +153,9 @@ public class GamePreset implements MekHqXmlSerializable {
 	public static GamePreset createGamePresetFromXMLFileInputStream(
             FileInputStream fis) throws DOMException, ParseException,
                                         NullEntityException {
-		
+
 		GamePreset preset = new GamePreset();
-		
+
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         Document xmlDoc = null;
         try {
@@ -176,7 +175,7 @@ public class GamePreset implements MekHqXmlSerializable {
         // Get rid of empty text nodes and adjacent text nodes...
         // Stupid weird parsing of XML. At least this cleans it up.
         optionsEle.normalize();
-        
+
         // Okay, lets iterate through the children, eh?
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn = nl.item(x);
@@ -237,14 +236,14 @@ public class GamePreset implements MekHqXmlSerializable {
 
                         SpecialAbility.generateSeparateInstanceFromXML(wn2, preset.specialAbilities, options);
                     }
-                } 
+                }
             }
         }
-		return preset;		
+		return preset;
 	}
-	
+
 	/**
-	 * Collect and load all the Game Presets in files in a given directory and 
+	 * Collect and load all the Game Presets in files in a given directory and
 	 * return an ArrayList of them
 	 * @param directory
 	 * @return
@@ -252,17 +251,17 @@ public class GamePreset implements MekHqXmlSerializable {
 	public static ArrayList<GamePreset> getGamePresetsIn(String directory) {
 
 		ArrayList<GamePreset> presets = new ArrayList<GamePreset>();
-		
+
 		File[] files = Utilities.getAllFiles(MekHQ.PRESET_DIR, new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return name.toLowerCase().endsWith(".xml");
             }
-        });    	
-    	for(File file : files) {    	
+        });
+    	for(File file : files) {
     		// And then load the campaign object from it.
     		FileInputStream fis = null;
     		GamePreset preset = null;
-		
+
     		try {
     			fis = new FileInputStream(file);
     			preset = GamePreset.createGamePresetFromXMLFileInputStream(fis);
@@ -276,11 +275,11 @@ public class GamePreset implements MekHqXmlSerializable {
 					"The campaign file could not be loaded.\nPlease check the log file for details.",
 					"Campaign Loading Error",
 				    JOptionPane.ERROR_MESSAGE);*/
-    		} 
+    		}
     	}
     	return presets;
 	}
-    
-    
-	
+
+
+
 }
