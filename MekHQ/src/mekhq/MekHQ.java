@@ -81,6 +81,8 @@ public class MekHQ implements GameListener {
 	public static int VERBOSITY_LEVEL = 5;
 	public static String CAMPAIGN_DIRECTORY = "./campaigns/";
 	public static String PROPERTIES_FILE = "mmconf/mekhq.properties";
+	public static String PRESET_DIR = "./mmconf/mhqPresets/";
+
 
 	//stuff related to MM games
     private Server myServer = null;

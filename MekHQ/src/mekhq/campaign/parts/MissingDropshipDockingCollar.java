@@ -131,4 +131,20 @@ public class MissingDropshipDockingCollar extends MissingPart {
 		return Entity.LOC_NONE;
 	}
 	
+	@Override
+	public int getIntroDate() {
+		return 2304;
+	}
+
+	@Override
+	public int getExtinctDate() {
+		return EquipmentType.DATE_NONE;
+	}
+
+	@Override
+	public int getReIntroDate() {
+		return EquipmentType.DATE_NONE;
+	}
+	
+	
 }

@@ -28,10 +28,16 @@ import java.util.Enumeration;
 import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.Engine;
+import megamek.common.Entity;
+import megamek.common.EntityMovementMode;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
+import megamek.common.MechFileParser;
+import megamek.common.MechSummary;
+import megamek.common.MechSummaryCache;
 import megamek.common.MiscType;
 import megamek.common.Protomech;
+import megamek.common.loaders.EntityLoadingException;
 import megamek.common.verifier.TestBattleArmor;
 import megamek.common.verifier.TestEntity;
 import megamek.common.weapons.BayWeapon;
@@ -44,6 +50,7 @@ import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Avionics;
 import mekhq.campaign.parts.BaArmor;
+import mekhq.campaign.parts.BattleArmorSuit;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.FireControlSystem;
 import mekhq.campaign.parts.LandingGear;
@@ -110,34 +117,60 @@ public class PartsStore implements Serializable {
 		stockMekLocations(c);
 		stockProtomekLocations(c);
 		stockProtomekComponents(c);
+		stockBattleArmorSuits(c);
 		for(Part p : parts) {
 			p.setBrandNew(true);
+		}
+	}
+	
+	private void stockBattleArmorSuits(Campaign c) {
+		//this is just a test
+		for(MechSummary summary : MechSummaryCache.getInstance().getAllMechs()) {
+			if(!summary.getUnitType().equals("BattleArmor")) {
+				continue;
+			}
+			//FIXME: I can't pull entity movement mode and quad shape off of mechsummary
+			//try loading the full entity, but this might take too long
+			if(null != summary) {			
+		 		Entity newEntity = null;
+		 		try {
+		 			newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+				} catch (EntityLoadingException e) {
+					e.printStackTrace();
+				}
+		 		if(null != newEntity) {
+		 			BattleArmorSuit ba = new BattleArmorSuit(summary.getChassis(), summary.getModel(), (int)summary.getTons(), 1, summary.getWeightClass(), summary.getWalkMp(), summary.getJumpMp(), newEntity.entityIsQuad(), summary.isClan(), newEntity.getMovementMode(), c);
+		 			parts.add(ba);
+		 		}
+			}
 		}
 	}
 	
 	private void stockWeaponsAmmoAndEquipment(Campaign c) {
         for (Enumeration<EquipmentType> e = EquipmentType.getAllTypes(); e.hasMoreElements();) {
             EquipmentType et = e.nextElement();
-            if(!et.isHittable()) {
+            if(!et.isHittable() &&
+            		!(et instanceof MiscType && ((MiscType)et).hasFlag(MiscType.F_BA_MANIPULATOR))) {
             	continue;
             }
             //TODO: we are still adding a lot of non-hittable equipment
 			if(et instanceof AmmoType) {
 				parts.add(new AmmoStorage(0, et, ((AmmoType)et).getShots(), c));
-			} else if(et instanceof MiscType && (et.hasFlag(MiscType.F_HEAT_SINK) || et.hasFlag(MiscType.F_DOUBLE_HEAT_SINK))) {
+			} else if(et instanceof MiscType && (((MiscType)et).hasFlag(MiscType.F_HEAT_SINK) || ((MiscType)et).hasFlag(MiscType.F_DOUBLE_HEAT_SINK))) {
             	parts.add(new HeatSink(0, et, -1, c));
-			} else if(et instanceof MiscType && et.hasFlag(MiscType.F_JUMP_JET)) {
+			} else if(et instanceof MiscType && ((MiscType)et).hasFlag(MiscType.F_JUMP_JET)) {
 				//need to do it by rating and unit tonnage
 				for(int ton = 10; ton <= 100; ton += 5) {
 					parts.add(new JumpJet(ton, et, -1, c));
 				}
-			} else if ((et instanceof MiscType && et.hasFlag(MiscType.F_BA_EQUIPMENT))
-					|| (et instanceof MiscType && et.hasFlag(MiscType.F_TANK_EQUIPMENT) && et.hasFlag(MiscType.F_CHASSIS_MODIFICATION))
-					|| et instanceof InfantryWeapon 
+			} else if ((et instanceof MiscType && ((MiscType)et).hasFlag(MiscType.F_TANK_EQUIPMENT) && ((MiscType)et).hasFlag(MiscType.F_CHASSIS_MODIFICATION))
 					|| et instanceof BayWeapon
 					|| et instanceof InfantryAttack) {
 				continue;
-			} else if(et instanceof MiscType && et.hasFlag(MiscType.F_MASC)) {
+			} else if(et instanceof MiscType && ((MiscType)et).hasFlag(MiscType.F_BA_EQUIPMENT)
+						&& !((MiscType)et).hasFlag(MiscType.F_BA_MANIPULATOR)) {
+				continue;
+			} else if(et instanceof MiscType && ((MiscType)et).hasFlag(MiscType.F_MASC)) {
 				if(et.hasSubType(MiscType.S_SUPERCHARGER)) {
 					for(int rating = 10; rating <= 400; rating += 5) {
 						for(double eton = 0.5; eton <= 10.5; eton += 0.5) {

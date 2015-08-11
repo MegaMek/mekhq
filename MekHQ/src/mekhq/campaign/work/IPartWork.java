@@ -70,4 +70,6 @@ public interface IPartWork extends IWork {
 	
 	public String checkFixable();
 	
+	public void reservePart();
+	public void cancelReservation();
 }

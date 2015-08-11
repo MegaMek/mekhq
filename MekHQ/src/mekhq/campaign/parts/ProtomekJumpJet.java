@@ -296,5 +296,20 @@ public class ProtomekJumpJet extends Part {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
+	
+	@Override
+	public int getIntroDate() {
+		return 3055;
+	}
+
+	@Override
+	public int getExtinctDate() {
+		return EquipmentType.DATE_NONE;
+	}
+
+	@Override
+	public int getReIntroDate() {
+		return EquipmentType.DATE_NONE;
+	}
     
 }

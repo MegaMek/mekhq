@@ -23,6 +23,7 @@ package mekhq.campaign.unit;
 
 
 import java.io.PrintWriter;
+import java.util.Calendar;
 import java.util.UUID;
 
 import megamek.common.Aero;
@@ -279,6 +280,9 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
         }
         //parts need to be initialized for this to work
         int avail = getAvailability(campaign.getEra());
+        if(this.isExtinctIn(campaign.getCalendar().get(Calendar.YEAR))) {
+        	avail = EquipmentType.RATING_X;
+        }
         int availabilityMod = Availability.getAvailabilityModifier(avail);
         target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");      
         return target;

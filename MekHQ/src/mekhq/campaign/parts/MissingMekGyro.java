@@ -169,4 +169,27 @@ public class MissingMekGyro extends MissingPart {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
+	
+	@Override
+	public int getIntroDate() {
+		switch(type) {
+		case Mech.GYRO_COMPACT:
+			return 3068;
+		case Mech.GYRO_HEAVY_DUTY:
+		case Mech.GYRO_XL:
+			return 3067;
+		default:
+			return EquipmentType.DATE_NONE;	
+		}
+	}
+
+	@Override
+	public int getExtinctDate() {
+		return EquipmentType.DATE_NONE;
+	}
+
+	@Override
+	public int getReIntroDate() {
+		return EquipmentType.DATE_NONE;
+	}
 }

@@ -99,7 +99,7 @@ public class SkillType implements Serializable {
 						                      S_TACTICS,S_STRATEGY,
 						                      S_NEG,S_LEADER,S_SCROUNGE};
 	
-    private static Hashtable<String, SkillType> lookupHash;	
+    public static Hashtable<String, SkillType> lookupHash;	
 
     public static final int EXP_ULTRA_GREEN = 0;
     public static final int EXP_GREEN = 1;
@@ -115,6 +115,16 @@ public class SkillType implements Serializable {
 	private int vetLvl;
 	private int eliteLvl;	
 	private Integer[] costs;
+	
+	public static void setSkillTypes(Hashtable<String, SkillType> skills) {
+		//we are going to cycle through all skills in case ones have been added since this hash
+		//was created
+		for(String name : skillList) {
+			if(null != skills.get(name)) {
+				lookupHash.put(name, skills.get(name));
+			}
+		}
+	}
 	
 	public static String[] getSkillList() {
 		return skillList;
@@ -477,6 +487,49 @@ public class SkillType implements Serializable {
 		    }
 		}
 		lookupHash.put(retVal.name, retVal);
+	}
+	
+	public static void generateSeparateInstanceFromXML(Node wn, Hashtable<String, SkillType> hash) {
+		SkillType retVal = null;
+			
+		try {		
+			retVal = new SkillType();
+			NodeList nl = wn.getChildNodes();
+				
+			for (int x=0; x<nl.getLength(); x++) {
+				Node wn2 = nl.item(x);
+				if (wn2.getNodeName().equalsIgnoreCase("name")) {
+					retVal.name = wn2.getTextContent();
+				} else if (wn2.getNodeName().equalsIgnoreCase("target")) {
+					retVal.target = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("greenLvl")) {
+					retVal.greenLvl = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("regLvl")) {
+					retVal.regLvl = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("vetLvl")) {
+					retVal.vetLvl = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("eliteLvl")) {
+					retVal.eliteLvl = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("countUp")) {
+					if(wn2.getTextContent().equalsIgnoreCase(("true"))) {
+						retVal.countUp = true;
+					} else {
+						retVal.countUp = false;
+					}
+				} else if (wn2.getNodeName().equalsIgnoreCase("costs")) {
+					String[] values = wn2.getTextContent().split(",");
+					for(int i = 0; i < values.length; i++) {
+						retVal.costs[i] = Integer.parseInt(values[i]);
+					}
+				} 
+			}		
+		} catch (Exception ex) {
+			// Errrr, apparently either the class name was invalid...
+			// Or the listed name doesn't exist.
+			// Doh!
+			MekHQ.logError(ex);
+		}
+		hash.put(retVal.name, retVal);
 	}
 	
 	private String printCosts() {

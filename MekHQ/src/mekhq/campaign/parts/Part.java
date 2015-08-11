@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.UUID;
 
@@ -143,6 +144,15 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
 	//all parts need a reference to campaign
 	protected Campaign campaign;
+	
+	/*
+	 * This will be unusual but in some circumstances certain parts will be linked to other parts.
+	 * These linked parts will be considered integral and subsidary to those other parts and will
+	 * not show up independently. Currently (8/8/2015), we are only using this for BA suits 
+	 * We need a parent part id and a vector of children parts to represent this.
+	 */
+	protected int parentPartId; 
+	protected ArrayList<Integer> childPartIds;
 
 	/**
 	 * The number of parts in exactly the same condition,
@@ -183,6 +193,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.quantity = 1;
 		this.replacementId = -1;
 		this.quality = QUALITY_D;
+		this.parentPartId = -1;
+		this.childPartIds = new ArrayList<Integer>();
 	}
 
 	public static String getQualityName(int quality) {
@@ -425,7 +437,36 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 
 	abstract public int getTechLevel();
+	
+	abstract public int getIntroDate();
+	
+	abstract public int getExtinctDate();
+	
+	abstract public int getReIntroDate();
+	
+	/**
+	 * We are going to only limit parts by year if they totally haven't been produced
+	 * otherwise, we will just replace the existing availability code with X
+	 */
+	public boolean isIntroducedBy(int year) {
+        if (year < getIntroDate()) {
+            return false;
+        }
+        
+        return true;
+    }
 
+	public boolean isExtinctIn(int year) {
+		if ((getExtinctDate() == EquipmentType.DATE_NONE)) {
+			return false;
+		}
+		if (year >= getExtinctDate() && year < getReIntroDate()) {
+            return true;
+        }
+        return false;
+	}
+	
+	
 	/**
 	 * Checks if the current part is exactly the "same kind" of part as the part
 	 * given in argument. This is used to determine whether we need to add new spare
@@ -442,8 +483,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
 	public boolean isSameStatus(Part part) {
 		//parts that are reserved for refit or being worked on are never the same status
-		if(isReservedForRefit() || isBeingWorkedOn() || isReservedForReplacement()
-				|| part.isReservedForRefit() || part.isBeingWorkedOn() || part.isReservedForReplacement()) {
+		if(isReservedForRefit() || isBeingWorkedOn() || isReservedForReplacement() || hasParentPart()
+				|| part.isReservedForRefit() || part.isBeingWorkedOn() || part.isReservedForReplacement() || part.hasParentPart()) {
     		return false;
     	}
 		return hits == part.getHits() && part.getSkillMin() == this.getSkillMin() && this.getDaysToArrival() == part.getDaysToArrival();
@@ -549,6 +590,14 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                 +"<quality>"
                 +quality
                 +"</quality>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<parentPartId>"
+                +parentPartId
+                +"</parentPartId>");
+        for(int childId : childPartIds) {
+			pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<childPartId>"
+					+ childId + "</childPartId>");
+		}
 	}
 
 	protected void writeToXmlEnd(PrintWriter pw1, int indent) {
@@ -677,6 +726,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 					retVal.replacementId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("quality")) {
                     retVal.quality = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("parentPartId")) {
+                    retVal.parentPartId = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("childPartId")) {
+                    retVal.childPartIds.add(Integer.parseInt(wn2.getTextContent()));
                 }
 			}
 		} catch (Exception ex) {
@@ -1052,12 +1105,18 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     public void decrementQuantity() {
     	quantity--;
     	if(quantity <= 0) {
+    		for(int childId : childPartIds) {
+    			Part p = campaign.getPart(childId);
+    			if(null != p) {
+    				campaign.removePart(p);
+    			}
+    		}
     		campaign.removePart(this);
     	}
     }
 
     public boolean isSpare() {
-    	return null == unitId;
+    	return null == unitId && parentPartId == -1;
     }
 
     public boolean isRightTechType(String skillType) {
@@ -1142,5 +1201,72 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     public abstract String getLocationName();
 
     public abstract int getLocation();
+    
+    public void setParentPartId(int id) {
+    	parentPartId = id;
+    }
+    
+    public int getParentPartId() {
+    	return parentPartId;
+    }
+    
+    public boolean hasParentPart() {
+    	return parentPartId != -1;
+    }
+    
+    public ArrayList<Integer> getChildPartIds() {
+    	return childPartIds;
+    }
+    
+    public void addChildPart(Part child) {
+    	childPartIds.add(child.getId());
+    	child.setParentPartId(id);
+    }
+
+    public void removeChildPart(int childId) {
+    	ArrayList<Integer> tempArray = new ArrayList<Integer>();
+    	for(int cid : childPartIds) {
+    		if(cid == childId) {
+    			Part part = campaign.getPart(childId);
+        		if(null != part) {
+        			part.setParentPartId(-1);
+        		}
+    		} else {
+    			tempArray.add(cid);
+    		}
+    	}
+    	childPartIds = tempArray;
+    }
+     
+    public void removeAllChildParts() {
+    	for(int childId : childPartIds) {
+    		Part part = campaign.getPart(childId);
+    		if(null != part) {
+    			part.setParentPartId(-1);
+    		}
+    	}
+    	childPartIds = new ArrayList<Integer>();
+    }
+    
+    /**
+     * Reserve a part for overnight work
+     */
+    @Override
+    public void reservePart() {
+    	//nothing goes here for real parts. Only missing parts need to reserve a replacement
+    }
+    
+    @Override
+    public void cancelReservation() {
+    	//nothing goes here for real parts. Only missing parts need to reserve a replacement
+    }
+    
+    /**
+     * Make any changes to the part needed for adding to the campaign
+     */
+    public void postProcessCampaignAddition() {
+    	//do nothing
+    }
+    
 }
 

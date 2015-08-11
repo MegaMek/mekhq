@@ -67,7 +67,7 @@ public class TurretLock extends Part {
 	
     @Override
 	public int getTechLevel() {
-		return TechConstants.T_INTRO_BOXSET;
+		return TechConstants.T_ALLOWED_ALL;
 	}
 
 	@Override
@@ -166,6 +166,22 @@ public class TurretLock extends Part {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
+	
+	@Override
+	public int getIntroDate() {
+		return EquipmentType.DATE_NONE;
+	}
+
+	@Override
+	public int getExtinctDate() {
+		return EquipmentType.DATE_NONE;
+	}
+
+	@Override
+	public int getReIntroDate() {
+		return EquipmentType.DATE_NONE;
+	}
+	
 			
 	
 }

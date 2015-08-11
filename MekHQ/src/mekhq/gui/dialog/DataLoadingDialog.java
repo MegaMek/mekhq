@@ -27,6 +27,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.ResourceBundle;
 
@@ -45,6 +46,7 @@ import megamek.common.options.GameOptions;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.GamePreset;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planets;
@@ -222,6 +224,19 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                     if (gameOpts.intOption("year") != campaignYear) {
                         gameOpts.getOption("year").setValue(campaignYear);
                     }
+                }
+                ArrayList<GamePreset> presets = GamePreset.getGamePresetsIn(MekHQ.PRESET_DIR);
+                if(!presets.isEmpty()) {
+                	ChooseGamePresetDialog cgpd = new ChooseGamePresetDialog(frame, true, presets);
+                	cgpd.setVisible(true);
+                	if(cgpd.wasCancelled()) {
+                		//FIXME: why is this not working?
+                		cancelled = true;
+                		cancel(true);
+                	}
+                	else if(null != cgpd.getSelectedPreset()) {
+        				cgpd.getSelectedPreset().apply(campaign);
+        			}
                 }
             	CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(frame, true, campaign, app.getIconPackage().getCamos());
             	optionsDialog.setVisible(true);

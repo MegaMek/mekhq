@@ -558,12 +558,16 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             gui.refreshPersonnelView();
             gui.refreshOverview();
         } else if (command.equalsIgnoreCase("REMOVE")) {
-            for (Person person : people) {
-                if (0 == JOptionPane.showConfirmDialog(
-                        null,
-                        "Do you really want to remove "
-                                + person.getFullTitle() + "?", "Remove?",
-                        JOptionPane.YES_NO_OPTION)) {
+        	String title = people.length + " personnel";
+        	if(people.length == 1) {
+        		title = people[0].getFullTitle();
+        	}
+        	if (0 == JOptionPane.showConfirmDialog(
+                    null,
+                    "Do you really want to remove "
+                            + title + "?", "Remove?",
+                    JOptionPane.YES_NO_OPTION)) {
+        		for (Person person : people) {     
                     gui.getCampaign().removePerson(person.getId());
                 }
             }

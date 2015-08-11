@@ -410,7 +410,7 @@ public class ResolveScenarioTracker {
 				if(loc >= BattleArmor.LOC_TROOPER_1 && loc <= ((BattleArmor)en).getTroopers()
 					&& (null == u || u.getEntity().getInternal(loc) > 0)
 					&& en.getInternal(loc) < 0) {
-					if(Compute.d6(2) < 2) {
+					if(Compute.d6(2) < 10) {
 						en.setInternal(IArmorState.ARMOR_DESTROYED, loc);
 					} else {
 						en.setInternal(0, loc);

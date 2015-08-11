@@ -144,6 +144,21 @@ public class MissingEquipmentPart extends MissingPart {
 	public int getAvailability(int era) {		
 		return type.getAvailability(Era.convertEra(era));
 	}
+	
+	@Override
+    public int getIntroDate() {
+    	return getType().getIntroductionDate();
+    }
+    
+    @Override
+    public int getExtinctDate() {
+    	return getType().getExtinctionDate();
+    }
+    
+    @Override
+    public int getReIntroDate() {
+    	return getType().getReintruductionDate();
+    }
 
 	@Override
 	public int getTechRating() {

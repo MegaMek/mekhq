@@ -116,6 +116,7 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.BaArmor;
+import mekhq.campaign.parts.BattleArmorSuit;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekLocation;
@@ -953,9 +954,17 @@ public class Campaign implements Serializable {
     	}
         p.setDaysToArrival(transitDays);
         p.setBrandNew(false);
+        //need to add ID here in case post-processing part stuff needs it
+        //we will set the id back one if we don't end up adding this part
+        int id = lastPartId + 1;
+        p.setId(id);
+        lastPartId = id;
+        //be careful in using this next line
+        p.postProcessCampaignAddition();
         // dont add missing parts if they dont have units or units with not id
         if (p instanceof MissingPart
             && (null == p.getUnit() || null == p.getUnitId())) {
+            lastPartId = lastPartId - 1;
             return;
         }
         Part spare = checkForExistingSparePart(p);
@@ -965,6 +974,7 @@ public class Campaign implements Serializable {
                     ((Armor) spare).setAmount(((Armor) spare).getAmount()
                                               + ((Armor) p).getAmount());
                     updateAllArmorForNewSpares();
+                    lastPartId = lastPartId - 1;
                     return;
                 }
             }
@@ -973,6 +983,7 @@ public class Campaign implements Serializable {
                     ((ProtomekArmor) spare).setAmount(((ProtomekArmor) spare)
                                                               .getAmount() + ((ProtomekArmor) p).getAmount());
                     updateAllArmorForNewSpares();
+                    lastPartId = lastPartId - 1;
                     return;
                 }
             }
@@ -981,24 +992,24 @@ public class Campaign implements Serializable {
                     ((BaArmor) spare).setAmount(((BaArmor) spare).getAmount()
                                                 + ((BaArmor) p).getAmount());
                     updateAllArmorForNewSpares();
+                    lastPartId = lastPartId - 1;
                     return;
                 }
             } else if (p instanceof AmmoStorage) {
                 if (spare instanceof AmmoStorage) {
                     ((AmmoStorage) spare).changeShots(((AmmoStorage) p)
                                                               .getShots());
+                    lastPartId = lastPartId - 1;
                     return;
                 }
             } else {
                 spare.incrementQuantity();
+                lastPartId = lastPartId - 1;
                 return;
             }
-        }
-        int id = lastPartId + 1;
-        p.setId(id);
+        }        
         parts.add(p);
         partIds.put(new Integer(id), p);
-        lastPartId = id;
         if (p instanceof Armor || p instanceof ProtomekArmor
             || p instanceof BaArmor) {
             updateAllArmorForNewSpares();
@@ -1852,6 +1863,7 @@ public class Campaign implements Serializable {
                     partWork.setShorthandedMod(helpMod);
                 }
                 partWork.setTeamId(tech.getId());
+                partWork.reservePart();
                 report += " - <b>Not enough time, the remainder of the task will be finished tomorrow.</b>";
                 addReport(report);
                 return;
@@ -1923,6 +1935,7 @@ public class Campaign implements Serializable {
         partWork.resetOvertime();
         partWork.setTeamId(null);
         partWork.resetRepairStatus();
+        partWork.cancelReservation();
         addReport(report);
     }
 
@@ -2714,6 +2727,13 @@ public class Campaign implements Serializable {
     	}
         parts.remove(part);
         partIds.remove(new Integer(part.getId()));
+        //remove child parts as well
+        for(int childId : part.getChildPartIds()) {
+        	Part childPart = getPart(childId);
+        	if(null != childPart) {
+        		removePart(childPart);
+        	}
+        }
     }
 
     public void removeKill(Kill k) {
@@ -5543,6 +5563,15 @@ public class Campaign implements Serializable {
                 .getSimpleTechLevel(acquisition.getTechLevel())) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                                   "You cannot acquire parts of this tech level");
+        }
+        if(getCampaignOptions().limitByYear() && !acquisition.isIntroducedBy(getCalendar().get(Calendar.YEAR))) {
+        	return new TargetRoll(TargetRoll.IMPOSSIBLE,
+                    "It has not been invented yet!");
+        }
+        if(getCampaignOptions().disallowExtinctStuff() &&
+        		(acquisition.isExtinctIn(getCalendar().get(Calendar.YEAR)) || acquisition.getAvailability(getEra()) == EquipmentType.RATING_X)) {
+        	return new TargetRoll(TargetRoll.IMPOSSIBLE,
+                    "It is extinct!");
         }
         if (getCampaignOptions().getUseAtB() &&
         		getCampaignOptions().getRestrictPartsByMission() &&

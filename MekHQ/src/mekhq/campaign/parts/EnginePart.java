@@ -214,6 +214,7 @@ public class EnginePart extends Part {
 
 	@Override
 	public int getAvailability(int era) {
+		//TODO: this needs to be updated once we get DA era in
 		switch(engine.getTechType()) {
 		case Engine.COMBUSTION_ENGINE:
 			if(era == EquipmentType.ERA_SL) {
@@ -278,19 +279,30 @@ public class EnginePart extends Part {
 	@Override
 	public int getTechRating() {
 		switch(engine.getTechType()) {
-		case Engine.COMBUSTION_ENGINE:
-			return EquipmentType.RATING_C;
-		case Engine.FUEL_CELL:
-		case Engine.FISSION:
-			return EquipmentType.RATING_D;
 		case Engine.XL_ENGINE:
+			if(engine.hasFlag(Engine.CLAN_ENGINE)) {
+				return EquipmentType.RATING_F;
+			}
 		case Engine.LIGHT_ENGINE:
 		case Engine.COMPACT_ENGINE:
 			return EquipmentType.RATING_E;
 		case Engine.XXL_ENGINE:
 			return EquipmentType.RATING_F;
-		default:
+		case Engine.FUEL_CELL:
+		case Engine.FISSION:
+			if(engine.hasFlag(Engine.SUPPORT_VEE_ENGINE)) {
+				return EquipmentType.RATING_C;
+			}
+		case Engine.NORMAL_ENGINE:
 			return EquipmentType.RATING_D;
+		case Engine.STEAM:
+			return EquipmentType.RATING_A;
+		case Engine.COMBUSTION_ENGINE:
+			if(engine.hasFlag(Engine.SUPPORT_VEE_ENGINE)) {
+				return EquipmentType.RATING_B;
+			}
+		default:
+			return EquipmentType.RATING_C;
 		}
 	}
 
@@ -519,4 +531,98 @@ public class EnginePart extends Part {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
+	
+	@Override
+	public int getIntroDate() {
+		switch(engine.getEngineType()) {
+		case Engine.XL_ENGINE:
+			if(engine.hasFlag(Engine.CLAN_ENGINE)) {
+				if(engine.hasFlag(Engine.LARGE_ENGINE)) {
+					return 2850;
+				} else {
+					return 2824;
+				}
+			} else {
+				if(engine.hasFlag(Engine.LARGE_ENGINE)) {
+					return 2635;
+				} else {
+					return 2556;
+				}
+			}
+		case Engine.XXL_ENGINE:
+			if(engine.hasFlag(Engine.CLAN_ENGINE)) {
+				if(engine.hasFlag(Engine.LARGE_ENGINE)) {
+					return 3055;
+				} else {
+					return 2954;
+				}
+			} else {
+				if(engine.hasFlag(Engine.LARGE_ENGINE)) {
+					return 3058;
+				} else {
+					return 3055;
+				}
+			}
+		case Engine.LIGHT_ENGINE:
+			if(engine.hasFlag(Engine.LARGE_ENGINE)) {
+				return 3064;
+			} else {
+				return 3055;
+			}
+		case Engine.COMPACT_ENGINE:
+			return 3065;
+		case Engine.FUEL_CELL:
+			if(!engine.hasFlag(Engine.SUPPORT_VEE_ENGINE)) {
+				return 2300;
+			}
+		case Engine.FISSION:
+			if(!engine.hasFlag(Engine.SUPPORT_VEE_ENGINE)) {
+				return 2470;
+			}
+		case Engine.MAGLEV:
+		case Engine.BATTERY:
+		case Engine.SOLAR:
+		case Engine.NORMAL_ENGINE:
+		case Engine.COMBUSTION_ENGINE:
+			if(engine.hasFlag(Engine.LARGE_ENGINE)) {
+				return 2630;
+			}
+		case Engine.STEAM:
+		default:
+			return EquipmentType.DATE_NONE; 
+		}		
+	}
+
+	@Override
+	public int getExtinctDate() {
+		switch(engine.getEngineType()) {
+		case Engine.XL_ENGINE:
+			if(!engine.hasFlag(Engine.CLAN_ENGINE)) {
+				if(engine.hasFlag(Engine.LARGE_ENGINE)) {
+					return 2822;
+				} else {
+					return 2865;
+				}
+			}
+		default:
+			return EquipmentType.DATE_NONE;
+		}
+	}
+
+	@Override
+	public int getReIntroDate() {
+		switch(engine.getEngineType()) {
+		case Engine.XL_ENGINE:
+			if(!engine.hasFlag(Engine.CLAN_ENGINE)) {
+				if(engine.hasFlag(Engine.LARGE_ENGINE)) {
+					return 3054;
+				} else {
+					return 3035;
+				}
+			}
+		default:
+			return EquipmentType.DATE_NONE;
+		}
+	}
+	
 }

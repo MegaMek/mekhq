@@ -189,19 +189,10 @@ public class MekGyro extends Part {
 	
 	@Override
 	public int getTechLevel() {
-		return TechConstants.T_IS_TW_ALL;
-	}
-	
-	@Override 
-	public int getTechBase() {
-		switch(type) {
-		case Mech.GYRO_COMPACT:
-		case Mech.GYRO_HEAVY_DUTY:
-		case Mech.GYRO_XL:
-			return T_IS;
-		default:
-			return T_BOTH;	
+		if(type == Mech.GYRO_STANDARD) {
+			return TechConstants.T_ALLOWED_ALL;
 		}
+		return TechConstants.T_IS_TW_ALL;
 	}
 
 	@Override
@@ -306,8 +297,40 @@ public class MekGyro extends Part {
 		return null;
 	}
 
+	public static final int GYRO_STANDARD = 0;
+
+    public static final int GYRO_XL = 1;
+
+    public static final int GYRO_COMPACT = 2;
+
+    public static final int GYRO_HEAVY_DUTY = 3;
+
+	
 	@Override
 	public int getLocation() {
 		return Entity.LOC_NONE;
+	}
+	
+	@Override
+	public int getIntroDate() {
+		switch(type) {
+		case Mech.GYRO_COMPACT:
+			return 3068;
+		case Mech.GYRO_HEAVY_DUTY:
+		case Mech.GYRO_XL:
+			return 3067;
+		default:
+			return EquipmentType.DATE_NONE;	
+		}
+	}
+
+	@Override
+	public int getExtinctDate() {
+		return EquipmentType.DATE_NONE;
+	}
+
+	@Override
+	public int getReIntroDate() {
+		return EquipmentType.DATE_NONE;
 	}
 }

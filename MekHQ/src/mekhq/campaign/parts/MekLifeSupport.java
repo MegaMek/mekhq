@@ -71,11 +71,6 @@ public class MekLifeSupport extends Part {
 
         return part instanceof MekLifeSupport;
     }
-    
-    @Override
-	public int getTechBase() {
-		return T_BOTH;
-	}
 
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
@@ -100,7 +95,7 @@ public class MekLifeSupport extends Part {
 
 	@Override
 	public int getTechLevel() {
-		return TechConstants.T_INTRO_BOXSET;
+		return TechConstants.T_ALLOWED_ALL;
 	}
 	
 	@Override
@@ -240,4 +235,20 @@ public class MekLifeSupport extends Part {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
+	
+	@Override
+	public int getIntroDate() {
+		return EquipmentType.DATE_NONE;
+	}
+
+	@Override
+	public int getExtinctDate() {
+		return EquipmentType.DATE_NONE;
+	}
+
+	@Override
+	public int getReIntroDate() {
+		return EquipmentType.DATE_NONE;
+	}
+	
 }
