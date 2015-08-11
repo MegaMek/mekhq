@@ -116,7 +116,6 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.BaArmor;
-import mekhq.campaign.parts.BattleArmorSuit;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekLocation;
@@ -1007,7 +1006,7 @@ public class Campaign implements Serializable {
                 lastPartId = lastPartId - 1;
                 return;
             }
-        }        
+        }
         parts.add(p);
         partIds.put(new Integer(id), p);
         if (p instanceof Armor || p instanceof ProtomekArmor
@@ -3681,15 +3680,15 @@ public class Campaign implements Serializable {
                 }
             }
             if (prt instanceof MissingPart) {
-            	//Missing Parts should only exist on units, but there have 
+            	//Missing Parts should only exist on units, but there have
             	//been cases where they continue to float around outside of units
-            	//so this should clean that up 
+            	//so this should clean that up
             	if(null == u) {
             		removeParts.add(prt);
             	} else {
             		// run this to make sure that slots for missing parts are set as
             		// unrepairable
-            		// because they will not be in missing locations            	
+            		// because they will not be in missing locations
             		prt.updateConditionFromPart();
             	}
             }
@@ -3823,7 +3822,7 @@ public class Campaign implements Serializable {
 	                }
                 }
             }
-            
+
 
             // Some units have been incorrectly assigned a null C3UUID as a string. This should correct that by setting a new C3UUID
             if ((unit.getEntity().hasC3() || unit.getEntity().hasC3i())
@@ -4383,7 +4382,7 @@ public class Campaign implements Serializable {
             }
 
             Unit u = Unit.generateInstanceFromXML(wn2, version);
-            
+
             if (u != null) {
                 retVal.addUnit(u);
             }
@@ -4455,7 +4454,7 @@ public class Campaign implements Serializable {
                 // repaired parts were not getting experience properly reset
                 p.setSkillMin(SkillType.EXP_GREEN);
             }
-  
+
             //if for some reason we couldn't find a type for equipment part, then remove it
             if((p instanceof EquipmentPart && null == ((EquipmentPart)p).getType())
             		|| (p instanceof MissingEquipmentPart && null == ((MissingEquipmentPart)p).getType())) {
@@ -6430,7 +6429,7 @@ public class Campaign implements Serializable {
         Vector<String> networkNames = new Vector<String>();
 
         for(Unit u : getUnits()) {
-        	
+
         	if(u.getForceId() < 0) {
         		//only units currently in the TO&E
         		continue;
@@ -6458,7 +6457,7 @@ public class Campaign implements Serializable {
         Vector<String> networkNames = new Vector<String>();
 
         for(Unit u : getUnits()) {
-        	
+
         	if(u.getForceId() < 0) {
         		//only units currently in the TO&E
         		continue;
@@ -6492,7 +6491,7 @@ public class Campaign implements Serializable {
         Vector<String> networkNames = new Vector<String>();
 
         for(Unit u : getUnits()) {
-        	
+
         	if(u.getForceId() < 0) {
         		//only units currently in the TO&E
         		continue;

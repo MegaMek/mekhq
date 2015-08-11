@@ -1,20 +1,20 @@
 /*
  * ProtomekLocation.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -27,7 +27,6 @@ import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.ILocationExposureStatus;
-import megamek.common.Mech;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.TargetRoll;
@@ -54,7 +53,7 @@ public class ProtomekLocation extends Part {
     boolean breached;
     boolean blownOff;
     boolean forQuad;
-    
+
     //system components for head
     //protected boolean sensors;
     //protected boolean lifeSupport;
@@ -62,7 +61,7 @@ public class ProtomekLocation extends Part {
     public ProtomekLocation() {
         this(0, 0, 0, false, false, null);
     }
-    
+
     public ProtomekLocation(int loc, int tonnage, int structureType, boolean hasBooster, boolean quad, Campaign c) {
         super(tonnage, c);
         this.loc = loc;
@@ -99,7 +98,7 @@ public class ProtomekLocation extends Part {
             this.name += " (Myomer Booster)";
         }
     }
-    
+
     public ProtomekLocation clone() {
         ProtomekLocation clone = new ProtomekLocation(loc, getUnitTonnage(), structureType, booster, forQuad, campaign);
         clone.copyBaseData(this);
@@ -108,7 +107,7 @@ public class ProtomekLocation extends Part {
         clone.blownOff = this.blownOff;
         return clone;
     }
-    
+
     public int getLoc() {
         return loc;
     }
@@ -120,13 +119,13 @@ public class ProtomekLocation extends Part {
     public int getStructureType() {
         return structureType;
     }
-    
-   
-    
+
+
+
     public double getTonnage() {
         return 0;
     }
-    
+
     @Override
     public long getStickerPrice() {
         double nloc = 7.0;
@@ -148,11 +147,11 @@ public class ProtomekLocation extends Part {
         }
         return (long) Math.round(cost);
     }
-    
+
     public boolean forQuad() {
         return forQuad;
     }
-    
+
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof ProtomekLocation
@@ -162,11 +161,11 @@ public class ProtomekLocation extends Part {
                 && (!isLegs() || forQuad == ((MekLocation)part).forQuad);
                // && getStructureType() == ((ProtomekLocation) part).getStructureType();
     }
-    
+
     private boolean isLegs() {
         return loc == Protomech.LOC_LEG;
     }
-    
+
     @Override
     public boolean isSameStatus(Part part) {
         return super.isSameStatus(part) && this.getPercent() == ((ProtomekLocation)part).getPercent();
@@ -209,10 +208,10 @@ public class ProtomekLocation extends Part {
     @Override
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
-        
+
         for (int x=0; x<nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            
+
             if (wn2.getNodeName().equalsIgnoreCase("loc")) {
                 loc = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("structureType")) {
@@ -234,7 +233,7 @@ public class ProtomekLocation extends Part {
                     breached = true;
                 else
                     breached = false;
-            } 
+            }
         }
     }
 
@@ -249,17 +248,17 @@ public class ProtomekLocation extends Part {
 
     @Override
     public int getTechRating() {
-       return EquipmentType.RATING_E;      
+       return EquipmentType.RATING_E;
     }
-    
+
     @Override
     public int getTechLevel() {
         return TechConstants.T_CLAN_TW;
     }
-    
+
     @Override
     public int getTechBase() {
-        return T_CLAN;        
+        return T_CLAN;
     }
 
     @Override
@@ -332,7 +331,7 @@ public class ProtomekLocation extends Part {
                 final CriticalSlot cs = unit.getEntity().getCritical(loc, i);
                 if(null == cs || !cs.isEverHittable()) {
                     continue;
-                }        
+                }
                 cs.setHit(true);
                 cs.setDestroyed(true);
                 cs.setRepairable(false);
@@ -356,7 +355,7 @@ public class ProtomekLocation extends Part {
         setUnit(null);
         updateConditionFromEntity();
     }
-    
+
     @Override
     public void updateConditionFromEntity() {
         if(null != unit) {
@@ -366,9 +365,9 @@ public class ProtomekLocation extends Part {
             if(percent <= 0.0) {
                 remove(false);
                 return;
-            } 
+            }
         }
-        if(blownOff) {        
+        if(blownOff) {
             this.time = 200;
             this.difficulty = 3;
         } else if(breached) {
@@ -396,22 +395,22 @@ public class ProtomekLocation extends Part {
                 this.time = 240;
                 this.difficulty = 3;
             }
-        }       
+        }
     }
 
     public boolean isBreached() {
         return breached;
     }
-    
+
     public boolean isBlownOff() {
         return blownOff;
     }
-    
+
     @Override
     public boolean needsFixing() {
         return percent < 1.0 || breached || blownOff;
     }
-    
+
     @Override
     public String getDetails() {
         String toReturn = "";
@@ -434,7 +433,7 @@ public class ProtomekLocation extends Part {
     public void updateConditionFromPart() {
         if(null != unit) {
             unit.getEntity().setInternal((int)Math.round(percent * unit.getEntity().getOInternal(loc)), loc);
-            //Because the last crit for protomechs is always location destruction we need to 
+            //Because the last crit for protomechs is always location destruction we need to
             //clear the first system crit we find
             for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
                 CriticalSlot slot = unit.getEntity().getCritical(loc, i);
@@ -448,7 +447,7 @@ public class ProtomekLocation extends Part {
             }
         }
     }
-    
+
     @Override
     public String checkFixable() {
         if(isSalvaging()) {
@@ -478,7 +477,7 @@ public class ProtomekLocation extends Part {
                 }
                 else if (slot.isRepairable()) {
                     return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
-                } 
+                }
             }
             //protomechs only have system stuff in the crits, so we need to also
             //check for mounted equipment separately
@@ -487,10 +486,10 @@ public class ProtomekLocation extends Part {
                     return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first." + m.getName();
                 }
             }
-        } 
+        }
         return null;
     }
-    
+
     @Override
     public boolean isSalvaging() {
         //cant salvage a center torso
@@ -499,7 +498,7 @@ public class ProtomekLocation extends Part {
         }
         return super.isSalvaging();
     }
-    
+
     @Override
     public String checkScrappable() {
         //cant scrap a center torso
@@ -532,7 +531,7 @@ public class ProtomekLocation extends Part {
             }
             else if (slot.isRepairable()) {
                 return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
-            } 
+            }
         }
         //protomechs only have system stuff in the crits, so we need to also
         //check for mounted equipment separately
@@ -543,7 +542,7 @@ public class ProtomekLocation extends Part {
         }
         return null;
     }
-    
+
     @Override
     public TargetRoll getAllMods() {
         if(isBreached() && !isSalvaging()) {
@@ -554,7 +553,7 @@ public class ProtomekLocation extends Part {
         }
         return super.getAllMods();
     }
-    
+
     public String getDesc() {
         if((!isBreached() && !isBlownOff()) || isSalvaging()) {
             return super.getDesc();
@@ -564,7 +563,7 @@ public class ProtomekLocation extends Part {
         if (getAssignedTeamId() != null) {
             scheduled = " (scheduled) ";
         }
-    
+
         toReturn += ">";
         if(isBlownOff()) {
             toReturn += "<b>Re-attach " + getName() + "</b><br/>";
@@ -594,17 +593,17 @@ public class ProtomekLocation extends Part {
         toReturn += "</font></html>";
         return toReturn;
     }
-    
+
     @Override
     public boolean onBadHipOrShoulder() {
         return false;
     }
-    
+
     @Override
     public boolean isRightTechType(String skillType) {
         return skillType.equals(SkillType.S_TECH_MECH);
     }
-    
+
     public void doMaintenanceDamage(int d) {
         int points = unit.getEntity().getInternal(loc);
         points = Math.max(points -d, 1);
@@ -621,7 +620,7 @@ public class ProtomekLocation extends Part {
 	public int getLocation() {
 		return loc;
 	}
-	
+
 	@Override
 	public int getIntroDate() {
 		return 3055;

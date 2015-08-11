@@ -27,7 +27,6 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -83,16 +82,8 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.client.ui.swing.util.PlayerColors;
-import megamek.common.MechSummaryCache;
 import megamek.common.Player;
 import megamek.common.options.GameOptions;
 import megamek.common.options.IOption;
@@ -100,9 +91,7 @@ import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import mekhq.MekHQ;
-import mekhq.NullEntityException;
 import mekhq.Utilities;
-import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.GamePreset;
@@ -117,7 +106,6 @@ import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.UnitTableData;
-import mekhq.gui.CampaignFileFilter;
 import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.model.RankTableModel;
 import mekhq.gui.model.SortedComboBoxModel;
@@ -1122,7 +1110,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panTech.add(limitByYearBox, gridBagConstraints);
-        
+
         disallowExtinctStuffBox.setText(resourceMap.getString("disallowExtinctStuffBox.text")); // NOI18N
         disallowExtinctStuffBox.setToolTipText(resourceMap.getString("disallowExtinctStuffBox.toolTipText")); // NOI18N
         disallowExtinctStuffBox.setName("disallowExtinctStuffBox"); // NOI18N
@@ -3775,7 +3763,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.weightx = 0.25;
         getContentPane().add(btnLoad, gridBagConstraints);
 
-        
+
         btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
@@ -3882,31 +3870,31 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     }
 
     private void btnLoadActionPerformed() {
-    	ArrayList<GamePreset> presets = GamePreset.getGamePresetsIn(MekHQ.PRESET_DIR);   	
-    	
+    	ArrayList<GamePreset> presets = GamePreset.getGamePresetsIn(MekHQ.PRESET_DIR);
+
 		if(!presets.isEmpty()) {
 			ChooseGamePresetDialog cgpd = new ChooseGamePresetDialog(null, true, presets);
 			cgpd.setVisible(true);
 			if(!cgpd.wasCancelled() && null != cgpd.getSelectedPreset()) {
 				cgpd.getSelectedPreset().apply(campaign);
 				////TODO: it would be nice if we could just update the choices in this dialog now
-				//rather than closing it, but that is currently not possible given how 
+				//rather than closing it, but that is currently not possible given how
 				//this dialog is set up
 				this.setVisible(false);
 			}
 		}
     }
-    
+
     private void btnSaveActionPerformed() {
     	if (txtName.getText().length() == 0) {
-    		return;	
+    		return;
     	}
     	GamePresetDescriptionDialog gpdd = new GamePresetDescriptionDialog(null, true, "Enter a title", "Enter description of preset");
         gpdd.setVisible(true);
         if(!gpdd.wasChanged()) {
         	return;
         }
-        
+
     	MekHQ.logMessage("Saving campaign options...");
         // Choose a file...
         JFileChooser saveOptions = new JFileChooser(MekHQ.PRESET_DIR);
@@ -3938,10 +3926,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         if (file.exists()) {
             Utilities.copyfile(file, backupFile);
         }
-    	
+
         updateOptions();
         GamePreset preset = new GamePreset(gpdd.getTitle(), gpdd.getDesc(), options, rskillPrefs, SkillType.lookupHash, SpecialAbility.getAllSpecialAbilities());
-        
+
         // Then save it out to that file.
         FileOutputStream fos = null;
         PrintWriter pw = null;
@@ -3973,7 +3961,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         }
     	this.setVisible(false);
     }
-    
+
     private void updateOptions() {
     	campaign.setName(txtName.getText());
     	campaign.calendar = date;
@@ -4233,12 +4221,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         // End Against the Bot
     }
-    
+
     private void btnOkayActionPerformed() {
         if (txtName.getText().length() > 0) {
         	updateOptions();
             this.setVisible(false);
-        }    
+        }
     }
 
     private void updateXPCosts() {

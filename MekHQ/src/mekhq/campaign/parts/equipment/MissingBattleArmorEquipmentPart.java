@@ -1,20 +1,20 @@
 /*
  * BattleArmorEquipmentPart.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -26,7 +26,6 @@ import java.io.PrintWriter;
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
-import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
@@ -39,28 +38,28 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
-    
+
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -5675111120455420391L;
-    
+
     private int trooper;
-    
+
     public MissingBattleArmorEquipmentPart() {
         this(0, null, -1, -1, null, 0.0);
     }
-    
+
     public MissingBattleArmorEquipmentPart(int tonnage, EquipmentType et, int equipNum, int trooper, Campaign c, double etonnage) {
         super(tonnage, et, equipNum, c, etonnage);
         this.trooper = trooper;
         this.time = 30;
         this.difficulty = -2;
     }
-    
+
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);       
+        writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<equipmentNum>"
                 +equipmentNum
@@ -79,11 +78,11 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
                 +"</trooper>");
         writeToXmlEnd(pw1, indent);
     }
-    
+
     @Override
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
-        
+
         for (int x=0; x<nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
@@ -101,7 +100,7 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
         }
         restore();
     }
-    
+
     public int getBaMountLocation() {
     	if(null != unit) {
     		Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
@@ -111,9 +110,9 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
     	}
     	return -1;
     }
-    
-    
-    
+
+
+
     private boolean isModular() {
     	if(null == unit) {
     		return false;
@@ -133,7 +132,7 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
     	}
     	return false;
     }
-    
+
     @Override
     public boolean needsFixing() {
         //can only be replaced the normal way if modular and suit exists
@@ -146,12 +145,12 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
     public int getTrooper() {
         return trooper;
     }
-    
+
     public void setTrooper(int t) {
         trooper = t;
     }
-    
-    @Override 
+
+    @Override
     public void fix() {
         Part replacement = findReplacement(false);
         if(null != replacement) {
@@ -162,11 +161,11 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
             ((EquipmentPart)actualReplacement).setEquipmentNum(equipmentNum);
             ((BattleArmorEquipmentPart)actualReplacement).setTrooper(trooper);
             remove(false);
-            //assign the replacement part to the unit           
+            //assign the replacement part to the unit
             actualReplacement.updateConditionFromPart();
         }
     }
-    
+
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         if(part instanceof BattleArmorEquipmentPart) {
@@ -176,7 +175,7 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
         }
         return false;
     }
-    
+
     @Override
     public Part getNewPart() {
         BattleArmorEquipmentPart epart = new BattleArmorEquipmentPart(getUnitTonnage(), type, -1, -1, campaign);
@@ -188,21 +187,21 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
     public void updateConditionFromPart() {
         //you cant crit BA equipment, so do nothing
     }
-    
+
     @Override
 	public int getLocation() {
 		return trooper;
 	}
-    
+
     @Override
     public String getDetails() {
-    	if(null == unit) {      
+    	if(null == unit) {
     		return super.getDetails();
 
         }
     	String toReturn = unit.getEntity().getLocationName(trooper) + "<br>";
 		return toReturn + super.getDetails();
     }
-    
-    
+
+
 }
