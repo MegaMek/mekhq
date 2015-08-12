@@ -53,6 +53,7 @@ import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.MechWarrior;
 import megamek.common.Mounted;
+import megamek.common.Protomech;
 import megamek.common.Tank;
 import megamek.common.event.GameVictoryEvent;
 import megamek.common.loaders.EntityLoadingException;
@@ -454,9 +455,7 @@ public class ResolveScenarioTracker {
 							((en.getBadCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO,
                 			Mech.LOC_CT) < 3) && (en.getGyroType() == Mech.GYRO_HEAVY_DUTY)))) {
 						continue;
-					}
-					//we have to do this little hack-y thing to account for actuators which are not
-					//uniquely identified without location
+					}					
 					String strIndex = Integer.toString(cs.getIndex());
 					//check to make sure this equipment wasnt already damaged
 					if(null != u) {
@@ -465,7 +464,10 @@ public class ResolveScenarioTracker {
 							continue;
 						}
 					}
-					if(cs.getIndex() >= Mech.ACTUATOR_UPPER_ARM && cs.getIndex() <= Mech.ACTUATOR_FOOT) {
+					//we have to do this little hack-y thing to account for actuators which are not
+					//uniquely identified without location
+					if((en instanceof Mech && cs.getIndex() >= Mech.ACTUATOR_UPPER_ARM && cs.getIndex() <= Mech.ACTUATOR_FOOT)
+							|| (en instanceof Protomech && cs.getIndex() == Protomech.SYSTEM_ARMCRIT)) {
 						strIndex += ":" + loc;
 					}
 					if(!brokenParts.contains(strIndex) && Compute.d6(2) < 10) {
@@ -482,7 +484,10 @@ public class ResolveScenarioTracker {
 			            //we dont care that we wont flag all the critical slots. Flagging one
 			            //and the mounted should do the trick
 					}
-
+					//TODO: we are not handling Aero or Tank system components here because they have no crit slots
+					//In thinking about this I wonder if we could not handle this in an entirely different manner. 
+					//Just put in a boolean on part.updateConditionFromEntity, where if true it checks for part 
+					//destruction from within the function if it detects that the part is more damaged than before
 				}
 			}
 		}

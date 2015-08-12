@@ -237,33 +237,28 @@ public class MissingProtomekLocation extends MissingPart {
         return new ProtomekLocation(loc, getUnitTonnage(), structureType, booster, forQuad, campaign);
     }
     
+    private int getAppropriateSystemIndex() {
+    	switch(loc) {
+    	case(Protomech.LOC_LEG):
+    		return Protomech.SYSTEM_LEGCRIT;
+    	case(Protomech.LOC_LARM):
+    	case(Protomech.LOC_RARM):
+    		return Protomech.SYSTEM_ARMCRIT;
+    	case(Protomech.LOC_HEAD):
+    		return Protomech.SYSTEM_HEADCRIT;
+    	case(Protomech.LOC_TORSO):
+    		return Protomech.SYSTEM_TORSOCRIT;
+    	default:
+    		return -1;    		
+    	}
+    }
+    
     @Override
     public void updateConditionFromPart() {
         if(null != unit) {
             unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
-            //According to StratOps, this always destroys all equipment in that location as well
-            for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
-                final CriticalSlot cs = unit.getEntity().getCritical(loc, i);
-                if(null == cs || !cs.isEverHittable()) {
-                    continue;
-                }        
-                cs.setHit(true);
-                cs.setDestroyed(true);
-                cs.setRepairable(false);
-                Mounted m = cs.getMount();
-                if(null != m) {
-                    m.setHit(true);
-                    m.setDestroyed(true);
-                    m.setRepairable(false);
-                }
-            }
-            for(Mounted m : unit.getEntity().getEquipment()) {
-                if(m.getLocation() == loc || m.getSecondLocation() == loc) {
-                    m.setHit(true);
-                    m.setDestroyed(true);
-                    m.setRepairable(false);
-                }
-            }
+            //need to assign all possible crits to the appropriate system 
+            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, getAppropriateSystemIndex(), loc);
         }
     }
     
@@ -278,7 +273,6 @@ public class MissingProtomekLocation extends MissingPart {
             replacement.decrementQuantity();
             remove(false);
             actualReplacement.updateConditionFromPart();
-            //TODO: we need to remove some of the critical damage
             u.runDiagnostic();
         }
     }

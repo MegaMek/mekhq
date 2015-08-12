@@ -429,22 +429,43 @@ public class ProtomekLocation extends Part {
         return toReturn;
     }
 
+    private int getAppropriateSystemIndex() {
+    	switch(loc) {
+    	case(Protomech.LOC_LEG):
+    		return Protomech.SYSTEM_LEGCRIT;
+    	case(Protomech.LOC_LARM):
+    	case(Protomech.LOC_RARM):
+    		return Protomech.SYSTEM_ARMCRIT;
+    	case(Protomech.LOC_HEAD):
+    		return Protomech.SYSTEM_HEADCRIT;
+    	case(Protomech.LOC_TORSO):
+    		return Protomech.SYSTEM_TORSOCRIT;
+    	default:
+    		return -1;    		
+    	}
+    }
+    
     @Override
     public void updateConditionFromPart() {
         if(null != unit) {
             unit.getEntity().setInternal((int)Math.round(percent * unit.getEntity().getOInternal(loc)), loc);
-            //Because the last crit for protomechs is always location destruction we need to
-            //clear the first system crit we find
-            for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
-                CriticalSlot slot = unit.getEntity().getCritical(loc, i);
-                if ((slot != null) && slot.getType() == CriticalSlot.TYPE_SYSTEM) {
-                    slot.setDestroyed(false);
-                    slot.setHit(false);
-                    slot.setRepairable(true);
-                    slot.setMissing(false);
-                    break;
+            //if all the system crits are marked off on the entity in this location, then we need to
+            //fix one of them, because the last crit on protomechs is always location destruction
+            int systemIndx = getAppropriateSystemIndex();
+            if(loc != -1 && unit.getEntity().getGoodCriticals(CriticalSlot.TYPE_SYSTEM, systemIndx, loc) <= 0) {
+            	//Because the last crit for protomechs is always location destruction we need to
+                //clear the first system crit we find
+                for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+                    CriticalSlot slot = unit.getEntity().getCritical(loc, i);
+                    if ((slot != null) && slot.getType() == CriticalSlot.TYPE_SYSTEM) {
+                        slot.setDestroyed(false);
+                        slot.setHit(false);
+                        slot.setRepairable(true);
+                        slot.setMissing(false);
+                        break;
+                    }
                 }
-            }
+            }        
         }
     }
 
