@@ -13,6 +13,7 @@ v0.3.16-dev (SVN)
 + fixed TechRating values for parts with IS_TW_ALL that should be ALLOWED_ALL
 + Bug [#893]: can't get parts before year introduction from parts store
 + added the ability to save and load campaign option presets
++ Bug [#901]: mekhq.campaign.Campaign.newDay Error
 
 v0.3.15 (2015-08-04 10:50 UTC)
 + Planetary faction updates

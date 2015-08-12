@@ -2067,7 +2067,7 @@ public class Campaign implements Serializable {
         		 * unit is actually on route to the planet in case the user is using a custom system
         		 * for transport or splitting the unit, etc.
         		 */
-        		if (!getLocation().isOnPlanet() &&
+        		if (!getLocation().isOnPlanet() && //null != getLocation().getJumpPath() &&
         				getLocation().getJumpPath().getLastPlanet().getName().equals(m.getPlanetName())) {
         			/*transitTime is measured in days; round up to the next
         			 * whole day, then convert to milliseconds */
