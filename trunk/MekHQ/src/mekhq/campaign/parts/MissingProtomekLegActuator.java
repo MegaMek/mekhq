@@ -135,15 +135,14 @@ public class MissingProtomekLegActuator extends MissingPart {
         return new ProtomekLegActuator(getUnitTonnage(), campaign);
     }
 
-	@Override
-	public String getLocationName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+   	public String getLocationName() {
+   		return unit.getEntity().getLocationName(getLocation());
+   	}
 
 	@Override
 	public int getLocation() {
-		return Entity.LOC_NONE;
+		return Protomech.LOC_LEG;
 	}
 	
 	@Override

@@ -158,7 +158,7 @@ public class ProtomekLocation extends Part {
                 && getLoc() == ((ProtomekLocation)part).getLoc()
                 && getUnitTonnage() == ((ProtomekLocation)part).getUnitTonnage()
                 && hasBooster() == ((ProtomekLocation)part).hasBooster()
-                && (!isLegs() || forQuad == ((MekLocation)part).forQuad);
+                && (!isLegs() || forQuad == ((ProtomekLocation)part).forQuad);
                // && getStructureType() == ((ProtomekLocation) part).getStructureType();
     }
 
