@@ -390,6 +390,8 @@ public class EnginePart extends Part {
 			    engineCrits = 1;
 			    if(unit.getEntity().getInternal(Protomech.LOC_TORSO) == IArmorState.ARMOR_DESTROYED) {
 			        engineHits = 1;
+			    } else {
+			    	engineHits = ((Protomech)unit.getEntity()).getEngineHits();
 			    }
 			}
 			if(engineHits >= engineCrits) {
