@@ -231,15 +231,14 @@ public class ProtomekSensor extends Part {
         
     }
 
-	@Override
+    @Override
 	public String getLocationName() {
-		// TODO Auto-generated method stub
-		return null;
+		return unit.getEntity().getLocationName(getLocation());
 	}
 
 	@Override
 	public int getLocation() {
-		return Entity.LOC_NONE;
+		return Protomech.LOC_HEAD;
 	}
 	
 	@Override

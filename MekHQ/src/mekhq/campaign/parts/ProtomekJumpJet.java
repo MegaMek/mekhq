@@ -286,15 +286,14 @@ public class ProtomekJumpJet extends Part {
         return damagedJJ;
     }
 
-	@Override
-	public String getLocationName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+   	public String getLocationName() {
+   		return unit.getEntity().getLocationName(getLocation());
+   	}
 
 	@Override
 	public int getLocation() {
-		return Entity.LOC_NONE;
+		return Protomech.LOC_TORSO;
 	}
 	
 	@Override
