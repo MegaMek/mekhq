@@ -1920,6 +1920,10 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	}
     	//now check to see what is null
     	for(int i = 0; i<locations.length; i++) {
+    		if(entity.getOInternal(i) == IArmorState.ARMOR_NA) {
+    			//this is not a valid location, so we should skip it
+    			continue;
+    		}
     		if(null == locations[i]) {
     			if(entity instanceof Mech) {
     				MekLocation mekLocation = new MekLocation(i, (int) getEntity().getWeight(), getEntity().getStructureType(), hasTSM(), entity instanceof QuadMech, false, false, campaign);
@@ -2295,16 +2299,18 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     		}
     	}
     	if(entity instanceof Protomech) {
-    	    if(null == protoLeftArmActuator) {
-    	        protoLeftArmActuator = new ProtomekArmActuator((int)entity.getWeight(),Protomech.LOC_LARM, campaign);
-    	        addPart(protoLeftArmActuator);
-    	        partsToAdd.add(protoLeftArmActuator);
+    	    if(!entity.entityIsQuad()) {
+	    	    if(null == protoLeftArmActuator) {
+	    	        protoLeftArmActuator = new ProtomekArmActuator((int)entity.getWeight(),Protomech.LOC_LARM, campaign);
+	    	        addPart(protoLeftArmActuator);
+	    	        partsToAdd.add(protoLeftArmActuator);
+	    	    }
+	    	    if(null == protoRightArmActuator) {
+	    	        protoRightArmActuator = new ProtomekArmActuator((int)entity.getWeight(),Protomech.LOC_RARM, campaign);
+	                addPart(protoRightArmActuator);
+	                partsToAdd.add(protoRightArmActuator);
+	            }
     	    }
-    	    if(null == protoRightArmActuator) {
-    	        protoRightArmActuator = new ProtomekArmActuator((int)entity.getWeight(),Protomech.LOC_RARM, campaign);
-                addPart(protoRightArmActuator);
-                partsToAdd.add(protoRightArmActuator);
-            }
     	    if(null == protoLegsActuator) {
     	        protoLegsActuator = new ProtomekLegActuator((int)entity.getWeight(), campaign);
                 addPart(protoLegsActuator);
