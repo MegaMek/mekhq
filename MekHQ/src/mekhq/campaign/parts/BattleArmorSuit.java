@@ -594,11 +594,11 @@ public class BattleArmorSuit extends Part {
     }
 
     @Override
-    public TargetRoll getAllMods() {
+    public TargetRoll getAllMods(Person tech) {
         if(isSalvaging()) {
             return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "BA suit removal");
         }
-        return super.getAllMods();
+        return super.getAllMods(tech);
 
     }
 

@@ -8400,7 +8400,7 @@ public class CampaignGUI extends JPanel {
                 JCheckBoxMenuItem cbMenuItem = null;
                 // Mode (extra time, rush job, ...
                 // dont allow automatic success jobs to change mode
-                if (part.getAllMods().getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
+                if (part.getAllMods(null).getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
                     menu = new JMenu("Mode");
                     for (int i = 0; i < Modes.MODE_N; i++) {
                         cbMenuItem = new JCheckBoxMenuItem(Modes.getModeName(i));

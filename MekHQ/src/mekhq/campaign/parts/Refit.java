@@ -1133,7 +1133,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	}
 
 	@Override
-	public TargetRoll getAllMods() {
+	public TargetRoll getAllMods(Person tech) {
 		TargetRoll mods = new TargetRoll(getDifficulty(), "difficulty");
 		mods.append(oldUnit.getSiteMod());
 		if(oldUnit.getEntity().hasQuirk("easy_maintain")) {

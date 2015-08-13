@@ -118,8 +118,8 @@ public class Armor extends Part implements IAcquisitionWork {
     	if(isSalvaging()) {
     		return super.getDesc();
     	}
-		String bonus = getAllMods().getValueAsString();
-		if (getAllMods().getValue() > -1) {
+		String bonus = getAllMods(null).getValueAsString();
+		if (getAllMods(null).getValue() > -1) {
 			bonus = "+" + bonus;
 		}
 		bonus = "(" + bonus + ")";

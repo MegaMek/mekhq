@@ -3421,7 +3421,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     }
 
     @Override
-    public TargetRoll getAllMods() {
+    public TargetRoll getAllMods(Person admin) {
         TargetRoll mods = new TargetRoll(getDifficulty(), "difficulty");
         return mods;
     }

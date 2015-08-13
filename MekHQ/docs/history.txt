@@ -30,6 +30,7 @@ v0.3.16-dev (SVN)
 + Bug: units not showing up in repair bay when set to salvage
 + removed salvaging variable from Part, Part.isSalvaging() now determined by characteristics of unit
 + reclassified BaArmor and ProtomekArmor as sub-classes of armor
++ Bug: previous change made it possible for overnight tasks to do the wrong thing if unit repair/salvage status was switched
 
 v0.3.15 (2015-08-04 10:50 UTC)
 + Planetary faction updates

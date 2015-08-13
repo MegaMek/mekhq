@@ -34,6 +34,7 @@ import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.Modes;
 
@@ -583,14 +584,14 @@ public class ProtomekLocation extends Part {
     }
 
     @Override
-    public TargetRoll getAllMods() {
+    public TargetRoll getAllMods(Person tech) {
         if(isBreached() && !isSalvaging()) {
             return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "fixing breach");
         }
         if(isBlownOff() && isSalvaging()) {
             return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "salvaging blown-off location");
         }
-        return super.getAllMods();
+        return super.getAllMods(tech);
     }
 
     public String getDesc() {
@@ -615,8 +616,8 @@ public class ProtomekLocation extends Part {
         } else {
             toReturn += "" + getTimeLeft() + " minutes" + scheduled;
             if(isBlownOff()) {
-                String bonus = getAllMods().getValueAsString();
-                if (getAllMods().getValue() > -1) {
+                String bonus = getAllMods(null).getValueAsString();
+                if (getAllMods(null).getValue() > -1) {
                     bonus = "+" + bonus;
                 }
                 bonus = "(" + bonus + ")";

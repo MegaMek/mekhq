@@ -33,6 +33,7 @@ import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 
 import org.w3c.dom.Node;
@@ -290,11 +291,11 @@ public class TankLocation extends Part {
 	}
 	
 	@Override
-	public TargetRoll getAllMods() {
+	public TargetRoll getAllMods(Person tech) {
 		if(isBreached() && !isSalvaging()) {
 			return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "fixing breach");
 		}
-		return super.getAllMods();
+		return super.getAllMods(tech);
 	}
 	
 	@Override

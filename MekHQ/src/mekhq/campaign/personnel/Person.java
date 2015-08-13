@@ -2257,7 +2257,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
 
     @Override
-    public TargetRoll getAllMods() {
+    public TargetRoll getAllMods(Person doctor) {
         TargetRoll mods = new TargetRoll(getDifficulty(), "difficulty");
         return mods;
     }
