@@ -125,7 +125,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	protected int skillMin;
 	//current repair mode for part
 	protected int mode;
+	
 	protected UUID teamId;
+	private boolean isTeamSalvaging;
+
 	//null is valid. It indicates parts that are not attached to units.
 	protected Unit unit;
 	protected UUID unitId;
@@ -196,6 +199,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.quality = QUALITY_D;
 		this.parentPartId = -1;
 		this.childPartIds = new ArrayList<Integer>();
+		this.isTeamSalvaging = false;
 	}
 
 	public static String getQualityName(int quality) {
@@ -343,8 +347,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 
 	public String getDesc() {
-		String bonus = getAllMods().getValueAsString();
-		if (getAllMods().getValue() > -1) {
+		String bonus = getAllMods(null).getValueAsString();
+		if (getAllMods(null).getValue() > -1) {
 			bonus = "+" + bonus;
 		}
 		bonus = "(" + bonus + ")";
@@ -384,8 +388,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 			if (getAssignedTeamId() != null) {
 				scheduled = " (scheduled) ";
 			}
-			String bonus = getAllMods().getValueAsString();
-			if (getAllMods().getValue() > -1) {
+			String bonus = getAllMods(null).getValueAsString();
+			if (getAllMods(null).getValue() > -1) {
 				bonus = "+" + bonus;
 			}
 			bonus = "(" + bonus + ")";
@@ -580,6 +584,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                 +quality
                 +"</quality>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<isTeamSalvaging>"
+                +isTeamSalvaging
+                +"</isTeamSalvaging>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<parentPartId>"
                 +parentPartId
                 +"</parentPartId>");
@@ -694,6 +702,12 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 					} else {
 						retVal.workingOvertime = false;
 					}
+				} else if (wn2.getNodeName().equalsIgnoreCase("isTeamSalvaging")) {
+					if(wn2.getTextContent().equalsIgnoreCase("true")) {
+						retVal.isTeamSalvaging = true;
+					} else {
+						retVal.isTeamSalvaging = false;
+					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("brandNew")) {
 					if(wn2.getTextContent().equalsIgnoreCase("true")) {
 						retVal.brandNew = true;
@@ -788,7 +802,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 
 	@Override
-	public TargetRoll getAllMods() {
+	public TargetRoll getAllMods(Person tech) {
 		TargetRoll mods = new TargetRoll(getDifficulty(), "difficulty");
 		if (Modes.getModeMod(mode,campaign.getCampaignOptions().isDestroyByMargin()) != 0) {
 			mods.addModifier(Modes.getModeMod(mode,campaign.getCampaignOptions().isDestroyByMargin()), getCurrentModeName());
@@ -802,11 +816,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	            mods.addModifier(1, "difficult to maintain");
 	        }
 		}
-		Person tech = campaign.getPerson(getAssignedTeamId());
 		if(isClanTechBase() || (this instanceof MekLocation && this.getUnit() != null && this.getUnit().getEntity().isClan())) {
-			if (tech == null) {
-				mods.addModifier(2, "clan tech");
-			} else if (!tech.isClanner()) {
+			if (null != tech && !tech.isClanner()) {
 				mods.addModifier(2, "clan tech");
 			}
 		}
@@ -895,7 +906,18 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
 	@Override
 	public void setTeamId(UUID i) {
-		this.teamId = i;
+		//keep track of whether this was a salvage operation
+		//because the entity may change
+		if(null == i) {
+			this.isTeamSalvaging = false;
+		} else if(null == teamId) {
+			this.isTeamSalvaging = isSalvaging();
+		}
+		this.teamId = i;		
+	}
+	
+	public boolean isTeamSalvaging() {
+		return null != getAssignedTeamId() && isTeamSalvaging;
 	}
 
 	public void setReserveId(UUID i) {
@@ -942,7 +964,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	@Override
 	public boolean isSalvaging() {
 		if(null != unit) {
-			return unit.isSalvage() || isMountedOnDestroyedLocation();
+			return unit.isSalvage() || isMountedOnDestroyedLocation() || isTeamSalvaging();
 		}
 		return false;
 	}

@@ -34,6 +34,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.equipment.BattleArmorEquipmentPart;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingBattleArmorEquipmentPart;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
 import org.w3c.dom.Node;
@@ -139,7 +140,7 @@ public class MissingBattleArmorSuit extends MissingPart {
     }
 
     @Override
-    public TargetRoll getAllMods() {
+    public TargetRoll getAllMods(Person tech) {
         return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "BA suit removal");
     }
 

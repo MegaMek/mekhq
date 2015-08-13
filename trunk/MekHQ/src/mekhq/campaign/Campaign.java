@@ -1551,7 +1551,7 @@ public class Campaign implements Serializable {
         if (helpMod > 0) {
             target.addModifier(helpMod, "shorthanded");
         }
-        target.append(medWork.getAllMods());
+        target.append(medWork.getAllMods(doctor));
         return target;
     }
 
@@ -1750,9 +1750,7 @@ public class Campaign implements Serializable {
     }
 
     public void fixPart(IPartWork partWork, Person tech) {
-        partWork.setTeamId(tech.getId());
         TargetRoll target = getTargetFor(partWork, tech);
-        partWork.setTeamId(null);
         String report = "";
         String action = " fix ";
         // TODO: this should really be a method on the part
@@ -5365,7 +5363,7 @@ public class Campaign implements Serializable {
             return target;
         }
 
-        target.append(partWork.getAllMods());
+        target.append(partWork.getAllMods(tech));
 
         if (getCampaignOptions().useEraMods()) {
             target.addModifier(getFaction().getEraMod(getEra()), "era");

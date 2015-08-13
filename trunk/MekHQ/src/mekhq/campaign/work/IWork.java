@@ -23,6 +23,7 @@ package mekhq.campaign.work;
 import java.util.UUID;
 
 import megamek.common.TargetRoll;
+import mekhq.campaign.personnel.Person;
 
 
 /**
@@ -35,7 +36,7 @@ public abstract interface IWork {
 	
 	public abstract int getDifficulty();
 	
-	public abstract TargetRoll getAllMods();
+	public abstract TargetRoll getAllMods(Person p);
 	
 	public abstract String succeed();
 	

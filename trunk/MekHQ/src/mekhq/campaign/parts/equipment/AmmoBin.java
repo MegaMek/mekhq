@@ -47,6 +47,7 @@ import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.work.IAcquisitionWork;
 
@@ -392,9 +393,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	}
 
 	@Override
-	public TargetRoll getAllMods() {
+	public TargetRoll getAllMods(Person tech) {
 		if(isSalvaging()) {
-			return super.getAllMods();
+			return super.getAllMods(tech);
 		}
 		return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "ammo loading");
 	}

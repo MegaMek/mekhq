@@ -86,8 +86,8 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	}
 	
 	public String getDesc() {
-		String bonus = getAllMods().getValueAsString();
-		if (getAllMods().getValue() > -1) {
+		String bonus = getAllMods(null).getValueAsString();
+		if (getAllMods(null).getValue() > -1) {
 			bonus = "+" + bonus;
 		}
 		bonus = "(" + bonus + ")";
@@ -196,7 +196,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	public boolean needsFixing() {
 		//missing parts always need fixing
 		if(null != unit) {
-			return !unit.isSalvage() && unit.isRepairable();
+			return (!unit.isSalvage() || null != getAssignedTeamId()) && unit.isRepairable();
 		}
 		return false;
 	}

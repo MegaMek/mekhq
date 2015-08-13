@@ -48,6 +48,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Availability;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
 
 import org.w3c.dom.Node;
@@ -87,7 +88,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
     }
 
     @Override
-    public TargetRoll getAllMods() {
+    public TargetRoll getAllMods(Person admin) {
         // TODO Auto-generated method stub
         return null;
     }
