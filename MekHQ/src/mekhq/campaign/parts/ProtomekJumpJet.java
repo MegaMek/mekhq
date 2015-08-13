@@ -155,11 +155,12 @@ public class ProtomekJumpJet extends Part {
         }   
         setSalvaging(false);
         setUnit(null);
-        updateConditionFromEntity();
+        updateConditionFromEntity(false);
     }
 
     @Override
-    public void updateConditionFromEntity() {
+    public void updateConditionFromEntity(boolean checkForDestruction) {
+    	//FIXME: implement check for destruction
         if(null != unit) {           
             hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_TORSOCRIT, Protomech.LOC_TORSO);
             if(hits > 2) {
@@ -180,20 +181,20 @@ public class ProtomekJumpJet extends Part {
                 hits = 0;
             }
         }
-        //Use mech jump jet repair/salvage times
-        if(hits == 0) {
-            time = 0;
-            difficulty = 0;
-        } 
-        else {
-            time = 90;
-            difficulty = 0;
-        }
-        if(isSalvaging()) {
-            time = 60;
-            difficulty = 0;
-        }
     }
+    
+    @Override 
+	public int getBaseTime() {
+		if(isSalvaging()) {
+			return 60;
+		}
+		return 90;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return 0;
+	}
 
     @Override
     public boolean needsFixing() {

@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.Aero;
+import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
@@ -67,7 +68,8 @@ public class AeroHeatSink extends Part {
     }
         
 	@Override
-	public void updateConditionFromEntity() {
+	public void updateConditionFromEntity(boolean checkForDestruction) {
+		int priorHits = hits;
 		if(null != unit && unit.getEntity() instanceof Aero && hits == 0) {
 			//ok this is really ugly, but we don't track individual heat sinks, so I have no idea of
 			//a better way to do it
@@ -85,18 +87,26 @@ public class AeroHeatSink extends Part {
 			} else {
 				hits = 0;
 			}
+			if(checkForDestruction 
+					&& hits > priorHits 
+					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+				remove(false);
+				return;
+			}
 		}
-		if(hits > 0) {
-			time = 90;
-			difficulty = -1;
-		} else {
-			time = 0;
-			difficulty = 0;
-		}
+	}
+	
+	@Override 
+	public int getBaseTime() {
+		return 90;
+	}
+	
+	@Override
+	public int getDifficulty() {
 		if(isSalvaging()) {
-			time = 90;
-			difficulty = -2;
+			return -2;
 		}
+		return -1;
 	}
 
 	@Override
@@ -138,7 +148,7 @@ public class AeroHeatSink extends Part {
 		}
 		setSalvaging(false);
 		setUnit(null);
-		updateConditionFromEntity();
+		updateConditionFromEntity(false);
 	}
 
 	@Override

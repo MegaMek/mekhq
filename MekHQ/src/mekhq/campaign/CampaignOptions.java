@@ -170,6 +170,7 @@ public class CampaignOptions implements Serializable {
     private boolean useEraMods;
 	private boolean assignedTechFirst;
 	private boolean resetToFirstTech;
+	private int destroyPartTarget;
 
     //maintenance related
     private boolean checkMaintenance;
@@ -329,6 +330,7 @@ public class CampaignOptions implements Serializable {
         naturalHealingWaitingPeriod = 15;
         destroyByMargin = false;
         destroyMargin = 4;
+        destroyPartTarget = 10;
         maintenanceCycleDays = 7;
         maintenanceBonus = -1;
         useQualityMaintenance = true;
@@ -1203,6 +1205,14 @@ public class CampaignOptions implements Serializable {
     public void setDestroyMargin(int d) {
         destroyMargin = d;
     }
+    
+    public int getDestroyPartTarget() {
+        return destroyPartTarget;
+    }
+
+    public void setDestroyPartTarget(int d) {
+        destroyPartTarget = d;
+    }
 
     public boolean useRandomHitsForVees() {
         return useRandomHitsForVees;
@@ -1749,6 +1759,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "naturalHealingWaitingPeriod", naturalHealingWaitingPeriod);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "destroyByMargin", destroyByMargin);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "destroyMargin", destroyMargin);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "destroyPartTarget", destroyPartTarget);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maintenanceCycleDays", maintenanceCycleDays);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maintenanceBonus", maintenanceBonus);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useQualityMaintenance", useQualityMaintenance);
@@ -2106,7 +2117,9 @@ public class CampaignOptions implements Serializable {
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("destroyMargin")) {
                 retVal.destroyMargin = Integer.parseInt(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceCycleDays")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("destroyPartTarget")) {
+                retVal.destroyPartTarget = Integer.parseInt(wn2.getTextContent().trim());
+            }else if (wn2.getNodeName().equalsIgnoreCase("maintenanceCycleDays")) {
                 retVal.maintenanceCycleDays = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceBonus")) {
                 retVal.maintenanceBonus = Integer.parseInt(wn2.getTextContent().trim());

@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.Compute;
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.Protomech;
@@ -168,32 +169,55 @@ public class ProtomekArmActuator extends Part {
         }   
         setSalvaging(false);
         setUnit(null);
-        updateConditionFromEntity();
+        updateConditionFromEntity(false);
         location = -1;
     }
 
     @Override
-    public void updateConditionFromEntity() {
-        if(null != unit) {           
+    public void updateConditionFromEntity(boolean checkForDestruction) {
+        if(null != unit) {      
+        	int priorHits = hits;
             hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_ARMCRIT, location);
-            if(hits > 1) {
-                remove(false);
-                return;
-            }
-        }
-        if(hits == 0) {
-            time = 0;
-            difficulty = 0;
-        } 
-        else if(hits >= 1) {
-            time = 100;
-            difficulty = 0;
-        }
-        if(isSalvaging()) {
-            time = 120;
-            difficulty = 0;
+            if(checkForDestruction 
+					&& hits > priorHits 
+					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+				remove(false);
+				return;
+			}
         }
     }
+    
+    @Override 
+	public int getBaseTime() {
+		if(isSalvaging()) {
+			return 120;
+		}
+        if(hits <= 1) {
+            return 100;
+        } 
+        else if(hits == 2) {
+            return 150;
+        }
+        else {
+        	return 200;
+        }
+	}
+	
+	@Override
+	public int getDifficulty() {
+		if(isSalvaging()) {
+			return 0;
+		}
+		if(hits <= 1) {
+            return 0;
+        } 
+        else if(hits == 2) {
+            return 1;
+        }
+        else {
+        	return 3;
+        }
+	}
 
     @Override
     public boolean needsFixing() {

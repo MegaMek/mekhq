@@ -206,7 +206,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     			break;
     		}
     	}
-    	updateConditionFromEntity();
+    	updateConditionFromEntity(false);
     }
 
 	@Override
@@ -398,30 +398,46 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	}
 
 	@Override
-	public void updateConditionFromEntity() {
+	public void updateConditionFromEntity(boolean checkForDestruction) {
 		if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted) {
-				if(!mounted.isRepairable() || mounted.isDestroyed()) {
+				if(mounted.isMissing() || mounted.isDestroyed()) {
 					remove(false);
 					return;
 				}
 				if(type.equals(mounted.getType())) {
 					shotsNeeded = getFullShots() - mounted.getBaseShotsLeft();
-					time = 15;
-					difficulty = 0;
 				} else {
 					//we have a change of munitions
 					shotsNeeded = getFullShots();
-					time = 30;
-					difficulty = 0;
-				}
-				if(isSalvaging()) {
-					time = 120;
-					difficulty = -2;
 				}
 			}
 		}
+	}
+	
+	@Override 
+	public int getBaseTime() {
+		if(isSalvaging()) {
+			return 120;
+		}
+		if(null != unit) {
+			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+			if(null != mounted) {
+				if(!type.equals(mounted.getType())) {
+					return 30;
+				}
+			}
+		}
+		return 15;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		if(isSalvaging()) {
+			return -2;
+		}
+		return 0;
 	}
 
 	@Override

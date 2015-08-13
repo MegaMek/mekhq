@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.Compute;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
@@ -229,16 +230,18 @@ public class MekCockpit extends Part {
 		}
 		setSalvaging(false);
 		setUnit(null);
-		updateConditionFromEntity();
+		updateConditionFromEntity(false);
 	}
 
 	@Override
-	public void updateConditionFromEntity() {
+	public void updateConditionFromEntity(boolean checkForDestruction) {
+		int priorHits = hits;
 		if(null != unit) {
 			Entity entity = unit.getEntity();
 			for (int i = 0; i < entity.locations(); i++) {
 				if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT, i) > 0) {
-					if (entity.isSystemRepairable(Mech.SYSTEM_COCKPIT, i)) {					
+					//check for missing equipment as well
+					if (!unit.isSystemMissing(Mech.SYSTEM_COCKPIT, i)) {					
 						hits = entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT, i);	
 						break;
 					} else {
@@ -247,20 +250,31 @@ public class MekCockpit extends Part {
 					}
 				}
 			}
+			if(checkForDestruction 
+					&& hits > priorHits 
+					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+				remove(false);
+				return;
+			}
 		}
-		if(hits == 0) {
-			time = 0;
-			difficulty = 0;
-		} 
-		else {
-			//TODO: These are made up values until the errata establish them
-			time = 200;
-			difficulty = 3;
-		}
+	}
+	
+	@Override 
+	public int getBaseTime() {
 		if(isSalvaging()) {
-			this.time = 300;
-			this.difficulty = 0;
+			return 300;
 		}
+		//TODO: These are made up values until the errata establish them
+		return 200;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		if(isSalvaging()) {
+			return 0;
+		}
+		//TODO: These are made up values until the errata establish them
+		return 3;
 	}
 
 	@Override

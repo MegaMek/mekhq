@@ -36,10 +36,10 @@ public class TestUnit extends Unit  {
         super(null, null);       
     }
     
-    public TestUnit(Entity en, Campaign c) {
+    public TestUnit(Entity en, Campaign c, boolean checkForDestruction) {
         super(en, c);
         initializeParts(false);
-        runDiagnostic();
+        runDiagnostic(checkForDestruction);
     }
     
     @Override

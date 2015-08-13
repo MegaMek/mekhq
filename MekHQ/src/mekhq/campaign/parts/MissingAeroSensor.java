@@ -51,11 +51,19 @@ public class MissingAeroSensor extends MissingPart {
     
     public MissingAeroSensor(int tonnage, boolean drop, Campaign c) {
     	super(0, c);
-    	this.time = 1200;
-    	this.difficulty = -2;
     	this.name = "Aero Sensors";
     	this.dropship = drop;
     }
+    
+    @Override 
+	public int getBaseTime() {
+		return 1200;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return -2;
+	}
     
 	@Override
 	public String checkFixable() {

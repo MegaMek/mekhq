@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
@@ -116,25 +117,34 @@ public class VeeSensor extends Part {
 		}
 		setSalvaging(false);
 		setUnit(null);
-		updateConditionFromEntity();
+		updateConditionFromEntity(false);
 	}
 
 	@Override
-	public void updateConditionFromEntity() {
+	public void updateConditionFromEntity(boolean checkForDestruction) {
 		if(null != unit && unit.getEntity() instanceof Tank) {
+			int priorHits = hits;
 			hits = ((Tank)unit.getEntity()).getSensorHits();
+			if(checkForDestruction 
+					&& hits > priorHits 
+					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+				remove(false);
+				return;
+			}
 		}
-		if(hits > 0) {
-			time = 75;
-			difficulty = 0;
-		} else {
-			time = 0;
-			difficulty = 0;
-		}
+	}
+	
+	@Override 
+	public int getBaseTime() {
 		if(isSalvaging()) {
-			time = 260;
-			difficulty = 0;
+			return 260;
 		}
+		return 75;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return 0;
 	}
 
 	@Override

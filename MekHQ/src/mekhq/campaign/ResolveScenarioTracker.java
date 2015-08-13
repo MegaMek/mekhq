@@ -66,7 +66,6 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
@@ -227,7 +226,7 @@ public class ResolveScenarioTracker {
 		// Do some hoops here so that the new mech gets it's old individual paint job!
         String cat = e.getCamoCategory();
         String fn = e.getCamoFileName();
-        TestUnit nu = new TestUnit(e, campaign);
+        TestUnit nu = new TestUnit(e, campaign, true);
         nu.getEntity().setCamoCategory(cat);
         nu.getEntity().setCamoFileName(fn);
         UUID id = UUID.randomUUID();
@@ -243,6 +242,7 @@ public class ResolveScenarioTracker {
 
 		for (Enumeration<Entity> iter = victoryEvent.getEntities(); iter.hasMoreElements();) {
 			Entity e = iter.nextElement();
+			checkForLostLimbs(e, control);
 			if(e.getOwnerId() == pid || e.getOwner().getTeam() == team) {
 				if(e.canEscape() || control) {
 					if(!e.getExternalIdAsString().equals("-1")) {
@@ -320,6 +320,7 @@ public class ResolveScenarioTracker {
 		//add retreated units
 		for (Enumeration<Entity> iter = victoryEvent.getRetreatedEntities(); iter.hasMoreElements();) {
             Entity e = iter.nextElement();
+			checkForLostLimbs(e, control);
             if(e.getOwnerId() == pid || e.getOwner().getTeam() == team) {
             	if(!e.getExternalIdAsString().equals("-1")) {
             	    UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
@@ -344,6 +345,7 @@ public class ResolveScenarioTracker {
         Enumeration<Entity> wrecks = victoryEvent.getWreckedEntities();
         while (wrecks.hasMoreElements()) {
         	Entity e = wrecks.nextElement();
+			checkForLostLimbs(e, control);
         	if(e.getOwnerId() == pid || e.getOwner().getTeam() == team) {
         		if(!e.getExternalIdAsString().equals("-1") && control && e.isSalvage()) {
         		    UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
@@ -389,15 +391,17 @@ public class ResolveScenarioTracker {
         checkStatusOfPersonnel();
 	}
 
-	private void checkForEquipmentStatus(Entity en, boolean controlsField) {
-		Unit u = null;
-		if(!en.getExternalIdAsString().equals("-1")) {
-			UUID id = UUID.fromString(en.getExternalIdAsString());
-			if(null != id) {
-				u = campaign.getUnit(id);
-			}
-		}
-		ArrayList<String> brokenParts = new ArrayList<String>();
+	/**
+	 * This checks whether an entity has any blown off limbs. If the battlefield
+	 * was not controlled it marks the limb as destroyed. if the battlefield was
+	 * controlled it clears the missing status from any equipment.
+	 * 
+	 * This method should be run the first time an entity is loaded into the tracker, 
+	 * either from the game or from a MUL file. 
+	 * @param en
+	 * @param controlsField
+	 */
+	private void checkForLostLimbs(Entity en, boolean controlsField) {
 		for(int loc = 0; loc < en.locations(); loc++) {
 			if(en.isLocationBlownOff(loc) && !controlsField) {
 				//sorry dude, we cant find your arm
@@ -405,108 +409,28 @@ public class ResolveScenarioTracker {
 				en.setArmor(IArmorState.ARMOR_DESTROYED, loc);
 				en.setInternal(IArmorState.ARMOR_DESTROYED, loc);
 			}
-			if(en instanceof BattleArmor) {
-				//"Destroyed" BA Suits survive on a 10+ regardless of whether occupant is dead
-				//or not
-				if(loc >= BattleArmor.LOC_TROOPER_1 && loc <= ((BattleArmor)en).getTroopers()
-					&& (null == u || u.getEntity().getInternal(loc) > 0)
-					&& en.getInternal(loc) < 0) {
-					if(Compute.d6(2) < 10) {
-						en.setInternal(IArmorState.ARMOR_DESTROYED, loc);
-					} else {
-						en.setInternal(0, loc);
-					}
-				}
-			}
+			//check for mounted and critical slot missingness as well
 			for (int i = 0; i < en.getNumberOfCriticals(loc); i++) {
 				final CriticalSlot cs = en.getCritical(loc, i);
 				if(null == cs || !cs.isEverHittable()) {
 					continue;
 				}
-				if(cs.isMissing() && !controlsField) {
-					//equipment in this location got left with the
-					//limb
-					cs.setRepairable(false);
-					cs.setDestroyed(true);
-					cs.setMissing(false);
-					Mounted m = cs.getMount();
-		            if(null != m) {
-		            	m.setMissing(false);
-		            	m.setDestroyed(true);
-		            	m.setRepairable(false);
-		            }
-				}
-				if(cs.isDamaged()) {
-					if(cs.getIndex() == Mech.ACTUATOR_SHOULDER
-							|| cs.getIndex() == Mech.ACTUATOR_HIP) {
-						continue;
-					}
-					// Check that Engine isn't already known to be just damaged.
-					if(cs.getIndex() == Mech.SYSTEM_ENGINE &&
-							(en.getBadCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, Mech.LOC_LT)
-							+ en.getBadCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, Mech.LOC_CT)
-							+ en.getBadCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, Mech.LOC_RT)) < 3) {
-						continue;
-					}
-					// Check that Gyro isn't already known to be just damaged.
-					if(cs.getIndex() == Mech.SYSTEM_GYRO &&
-					   		(((en.getBadCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO,
-                			Mech.LOC_CT) < 2) && (en.getGyroType() != Mech.GYRO_HEAVY_DUTY)) ||
-							((en.getBadCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO,
-                			Mech.LOC_CT) < 3) && (en.getGyroType() == Mech.GYRO_HEAVY_DUTY)))) {
-						continue;
-					}					
-					String strIndex = Integer.toString(cs.getIndex());
-					//check to make sure this equipment wasnt already damaged
-					if(null != u) {
-						Part p = u.getPartForEquipmentNum(cs.getIndex(), loc);
-						if(null != p && p.getHits() > 0) {
-							continue;
+				Mounted m = cs.getMount();
+				if(cs.isMissing()) {
+					if(controlsField) {
+						cs.setMissing(false);
+						if(null != m) {
+			            	m.setMissing(false);
+						}
+					} else {
+						if(null != m) {
+							m.setMissing(true);
 						}
 					}
-					//we have to do this little hack-y thing to account for actuators which are not
-					//uniquely identified without location
-					if((en instanceof Mech && cs.getIndex() >= Mech.ACTUATOR_UPPER_ARM && cs.getIndex() <= Mech.ACTUATOR_FOOT)
-							|| (en instanceof Protomech && cs.getIndex() == Protomech.SYSTEM_ARMCRIT)) {
-						strIndex += ":" + loc;
-					}
-					if(!brokenParts.contains(strIndex) && Compute.d6(2) < 10) {
-						cs.setRepairable(false);
-						cs.setDestroyed(true);
-						cs.setMissing(false);
-						Mounted m = cs.getMount();
-			            if(null != m) {
-			            	m.setMissing(false);
-			            	m.setDestroyed(true);
-			            	m.setRepairable(false);
-			            }
-			            brokenParts.add(strIndex);
-			            //we dont care that we wont flag all the critical slots. Flagging one
-			            //and the mounted should do the trick
-					}
-					//TODO: we are not handling Aero or Tank system components here because they have no crit slots
-					//In thinking about this I wonder if we could not handle this in an entirely different manner. 
-					//Just put in a boolean on part.updateConditionFromEntity, where if true it checks for part 
-					//destruction from within the function if it detects that the part is more damaged than before
-				}
+				} 
 			}
 		}
 	}
-
-	/*
-	 * FIXME: This should happen in the resolve scenario section after all damage has been entered
-	public void postProcessEntities(boolean controlsField) {
-		for(UUID id : entities.keySet()) {
-			Entity en = entities.get(id);
-			if(null == en) {
-				continue;
-			}
-			checkForEquipmentStatus(en, controlsField);
-		}
-		for(Entity en : potentialSalvage) {
-			checkForEquipmentStatus(en, controlsField);
-		}
-	}*/
 
 	private ArrayList<Person> shuffleCrew(ArrayList<Person> source) {
 	    ArrayList<Person> sortedList = new ArrayList<Person>();
@@ -864,6 +788,7 @@ public class ResolveScenarioTracker {
 
 			// Add the units from the file.
 			for (Entity entity : parser.getEntities()) {
+				checkForLostLimbs(entity, control);
 				if(!entity.getExternalIdAsString().equals("-1")) {
 				    UnitStatus status = unitsStatus.get(UUID.fromString(entity.getExternalIdAsString()));
                     if(null != status) {
@@ -910,6 +835,7 @@ public class ResolveScenarioTracker {
 			if(controlsField) {
     			// Add the units from the file.
     			for (Entity entity : parser.getEntities()) {
+    				checkForLostLimbs(entity, control);
     				//dont allow the salvaging of conventional infantry
     			    //However, we do need to check for ejected mechwarriors
     				if(entity instanceof Infantry && !(entity instanceof BattleArmor)) {
@@ -1184,7 +1110,6 @@ public class ResolveScenarioTracker {
 				campaign.removeUnit(unit.getId());
 			} else {
 			    en.setDeployed(false);
-			    checkForEquipmentStatus(en, control);
 				long currentValue = unit.getValueOfAllMissingParts();
 				campaign.clearGameData(en);
 				// FIXME: Need to implement a "fuel" part just like the "armor" part
@@ -1192,7 +1117,7 @@ public class ResolveScenarioTracker {
 					((Aero)en).setFuelTonnage(((Aero)ustatus.getBaseEntity()).getFuelTonnage());
 				}
 				unit.setEntity(en);
-				unit.runDiagnostic();
+				unit.runDiagnostic(true);
 				unit.resetPilotAndEntity();
 				if(!unit.isRepairable()) {
 					unit.setSalvage(true);
@@ -1216,9 +1141,9 @@ public class ResolveScenarioTracker {
 			if (salvageUnit.getEntity() instanceof Aero) {
 				((Aero)salvageUnit.getEntity()).setFuelTonnage(((Aero)salstatus.getBaseEntity()).getFuelTonnage());
 			}
-		    checkForEquipmentStatus(salvageUnit.getEntity(), control);
 			campaign.clearGameData(salvageUnit.getEntity());
-			campaign.addUnit(salvageUnit.getEntity(), false, 0);
+			//campaign.addUnit(salvageUnit.getEntity(), false, 0);
+			campaign.addTestUnit(salvageUnit);
 			//if this is a contract, add to the salvaged value
 			if(getMission() instanceof Contract) {
 				((Contract)getMission()).addSalvageByUnit(salvageUnit.getSellValue());

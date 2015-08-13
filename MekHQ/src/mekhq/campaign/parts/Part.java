@@ -106,12 +106,19 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	//getTonnage() method
 	protected int unitTonnage;
 
+	
 	//hits to this part
 	protected int hits;
+	
+	//Taharqa: as of 8/12/2015, we are no longer going to track difficulty and time
+	//as hard coded numbers but rather use abstract methods that get them from each part
+	//depending on the dynamic characteristics of the part
 	// the skill modifier for difficulty
-	protected int difficulty;
+	//protected int difficulty;
 	// the amount of time for the repair (this is the base time)
-	protected int time;
+	//protected int time;
+	
+	
 	// time spent on the task so far for tasks that span days
 	protected int timeSpent;
 	// the minimum skill level in order to attempt
@@ -180,8 +187,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.skillMin = SkillType.EXP_GREEN;
 		this.mode = Modes.MODE_NORMAL;
 		this.timeSpent = 0;
-		this.time = 0;
-		this.difficulty = 0;
 		this.salvaging = false;
 		this.unitId = null;
 		this.workingOvertime = false;
@@ -519,14 +524,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				+hits
 				+"</hits>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<difficulty>"
-				+difficulty
-				+"</difficulty>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<time>"
-				+time
-				+"</time>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<timeSpent>"
 				+timeSpent
 				+"</timeSpent>");
@@ -663,10 +660,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 					retVal.quantity = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
 					retVal.hits = Integer.parseInt(wn2.getTextContent());
-				} else if (wn2.getNodeName().equalsIgnoreCase("difficulty")) {
-					retVal.difficulty = Integer.parseInt(wn2.getTextContent());
-				} else if (wn2.getNodeName().equalsIgnoreCase("time")) {
-					retVal.time = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("timeSpent")) {
 					retVal.timeSpent = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("skillMin")) {
@@ -750,32 +743,22 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	protected abstract void loadFieldsFromXmlNode(Node wn);
 
 	@Override
-	public int getDifficulty() {
-		return difficulty;
-	}
-
-	@Override
-	public int getBaseTime() {
-		return time;
-	}
-
-	@Override
 	public int getActualTime() {
 		switch (mode) {
 		case Modes.MODE_EXTRA_DOUBLE:
-			return 2 * time;
+			return 2 * getBaseTime();
 		case Modes.MODE_EXTRA_TRIPLE:
-			return 3 * time;
+			return 3 * getBaseTime();
 		case Modes.MODE_EXTRA_QUAD:
-			return 4 * time;
+			return 4 * getBaseTime();
 		case Modes.MODE_RUSH_ONE:
-			return (int) Math.ceil(time / 2.0);
+			return (int) Math.ceil(getBaseTime() / 2.0);
 		case Modes.MODE_RUSH_TWO:
-			return (int) Math.ceil(time / 4.0);
+			return (int) Math.ceil(getBaseTime() / 4.0);
 		case Modes.MODE_RUSH_THREE:
-			return (int) Math.ceil(time / 8.0);
+			return (int) Math.ceil(getBaseTime() / 8.0);
 		default:
-			return time;
+			return getBaseTime();
 		}
 	}
 
@@ -1017,10 +1000,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	public abstract Part clone();
 
     protected void copyBaseData(Part part) {
-        this.time = part.time;
         this.mode = part.mode;
         this.hits = part.hits;
-        this.difficulty = part.difficulty;
         this.salvaging = part.salvaging;
         this.brandNew = part.brandNew;
     }
@@ -1074,7 +1055,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	public void resetRepairStatus() {
 		if(null != unit) {
 			setSalvaging(unit.isSalvage());
-			updateConditionFromEntity();
+			updateConditionFromEntity(false);
 		}
 	}
 
@@ -1168,7 +1149,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     public void doMaintenanceDamage(int d) {
         hits += d;
         updateConditionFromPart();
-        updateConditionFromEntity();
+        updateConditionFromEntity(false);
     }
 
     public int getQuality() {

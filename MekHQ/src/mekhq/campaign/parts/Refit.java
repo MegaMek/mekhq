@@ -311,7 +311,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				if(movedPart instanceof EquipmentPart) {
 					boolean isSalvaging = movedPart.isSalvaging();
 					movedPart.setSalvaging(true);
-					movedPart.updateConditionFromEntity();
+					movedPart.updateConditionFromEntity(false);
 					time += movedPart.getBaseTime();
 					movedPart.setSalvaging(isSalvaging);
 				}
@@ -542,10 +542,10 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			}
 			boolean isSalvaging = oPart.isSalvaging();
 			oPart.setSalvaging(true);
-			oPart.updateConditionFromEntity();
+			oPart.updateConditionFromEntity(false);
 			time += oPart.getBaseTime();
 			oPart.setSalvaging(isSalvaging);
-			oPart.updateConditionFromEntity();
+			oPart.updateConditionFromEntity(false);
 		}
 
 		if(sameArmorType) {
@@ -1248,7 +1248,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	}
 
 	@Override
-	public void updateConditionFromEntity() {
+	public void updateConditionFromEntity(boolean checkForDestruction) {
 		//do nothing
 	}
 

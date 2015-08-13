@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.Compute;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
@@ -227,34 +228,43 @@ public class MekGyro extends Part {
 		}	
 		setSalvaging(false);
 		setUnit(null);
-		updateConditionFromEntity();
+		updateConditionFromEntity(false);
 	}
 
 	@Override
-	public void updateConditionFromEntity() {
+	public void updateConditionFromEntity(boolean checkForDestruction) {
 		if(null != unit) {
+			int priorHits = hits;
 			hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM,Mech.SYSTEM_GYRO, Mech.LOC_CT);
-			if(!unit.getEntity().isSystemRepairable(Mech.SYSTEM_GYRO, Mech.LOC_CT)) {
+			if(checkForDestruction 
+					&& hits > priorHits && hits >= 3
+					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
 				return;
 			}
 		}
-		if(hits == 0) {
-			time = 0;
-			difficulty = 0;
-		}
-		else if(hits == 1) {
-			time = 120;
-			difficulty = 1;
-		} 
-		else if(hits >= 2) {
-			time = 240;
-			difficulty = 4;
-		}
+	}
+	
+	@Override 
+	public int getBaseTime() {
 		if(isSalvaging()) {
-			this.time = 200;
-			this.difficulty = 0;
+			return 200;
 		}
+		if(hits >= 2) {
+			return 240;
+		}
+		return 120;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		if(isSalvaging()) {
+			return 0;
+		}
+		if(hits >= 2) {
+			return 4;
+		}
+		return 1;
 	}
 
 	@Override

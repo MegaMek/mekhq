@@ -54,11 +54,19 @@ public class MissingThrusters extends MissingPart {
     
     public MissingThrusters(int tonnage, Campaign c, boolean left) {
     	super(0, c);
-    	this.time = 4800;
-    	this.difficulty = 1;
     	this.name = "Thrusters";
     	isLeftThrusters = left;
     }
+    
+    @Override 
+	public int getBaseTime() {
+		return 4800;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return 1;
+	}
     
 	@Override
 	public String checkFixable() {

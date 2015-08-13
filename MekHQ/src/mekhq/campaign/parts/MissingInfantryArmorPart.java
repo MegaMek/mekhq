@@ -66,6 +66,16 @@ public class MissingInfantryArmorPart extends MissingPart {
     	assignName();
     }
     
+    @Override 
+	public int getBaseTime() {
+		return 0;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return 0;
+	}
+    
     private void assignName() {
     	String heavyString = "";
     	if(damageDivisor > 1) {

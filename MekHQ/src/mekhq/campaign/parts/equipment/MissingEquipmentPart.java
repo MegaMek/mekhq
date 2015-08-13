@@ -78,10 +78,18 @@ public class MissingEquipmentPart extends MissingPart {
         	this.typeName = type.getInternalName();
         }
         this.equipmentNum = equipNum;
-        this.time = 120;
-        this.difficulty = 0;
         this.equipTonnage = eTonnage;
     }
+    
+    @Override 
+	public int getBaseTime() {
+		return 120;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return 0;
+	}
     
     /**
      * Restores the equipment from the name

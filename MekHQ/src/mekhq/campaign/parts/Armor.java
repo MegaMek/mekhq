@@ -437,7 +437,7 @@ public class Armor extends Part implements IAcquisitionWork {
 		}
 		unit.getEntity().setArmor(amount + curAmount, location, rear);
 		changeAmountAvailable(-1 * amount);
-		updateConditionFromEntity();
+		updateConditionFromEntity(false);
 		skillMin = SkillType.EXP_GREEN;
 		shorthandedMod = 0;
 	}
@@ -482,7 +482,7 @@ public class Armor extends Part implements IAcquisitionWork {
 		if(salvage) {
 			changeAmountAvailable(amountNeeded);
 		}
-		updateConditionFromEntity();
+		updateConditionFromEntity(false);
 	}
 
 	public int getBaseTimeFor(Entity entity) {
@@ -497,7 +497,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
 
 	@Override
-	public void updateConditionFromEntity() {
+	public void updateConditionFromEntity(boolean checkForDestruction) {
 		if(isReservedForRefit()) {
 			return;
 		}
@@ -515,13 +515,19 @@ public class Armor extends Part implements IAcquisitionWork {
 			amountNeeded = unit.getEntity().getOArmor(location, rear) - currentArmor;
 			amount = currentArmor;
 		}
-		//time should be based on amount available if less than amount needed
-		if(salvaging) {
-			time = getBaseTimeFor(unit.getEntity()) * amountNeeded;
-		} else {
-			time = getBaseTimeFor(unit.getEntity()) * Math.min(amountNeeded, getAmountAvailable());
+	}
+	
+	@Override 
+	public int getBaseTime() {
+		if(isSalvaging()) {
+			return getBaseTimeFor(unit.getEntity()) * amountNeeded;
 		}
-		difficulty = -2;
+		return getBaseTimeFor(unit.getEntity()) * Math.min(amountNeeded, getAmountAvailable());
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return -2;
 	}
 
 	@Override
@@ -535,7 +541,7 @@ public class Armor extends Part implements IAcquisitionWork {
 		String toReturn = super.succeed();
 		if(tmpSalvaging) {
 			salvaging = true;
-			updateConditionFromEntity();
+			updateConditionFromEntity(false);
 		}
 		return toReturn;
 	}
@@ -738,7 +744,7 @@ public class Armor extends Part implements IAcquisitionWork {
             unit.getEntity().setArmor(current - d, location, rear);
 
        }
-       updateConditionFromEntity();
+       updateConditionFromEntity(false);
     }
 
     @Override

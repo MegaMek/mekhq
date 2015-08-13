@@ -79,23 +79,37 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
     }
     
     @Override
-    public void updateConditionFromEntity() {
+    public void updateConditionFromEntity(boolean checkForDestruction) {
         if(null != unit) {
             Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
             if(null != mounted) {
                 if(type.equals(mounted.getType())) {
                     shotsNeeded = (getFullShots() - mounted.getBaseShotsLeft()) * getNumTroopers();
-                    time = 15;
-                    difficulty = 0;
                 } else {
                     //we have a change of munitions
                     shotsNeeded = getFullShots() * getNumTroopers();
-                    time = 30;
-                    difficulty = 0;
                 }
             }
         }
     }
+    
+    @Override 
+	public int getBaseTime() {
+		if(null != unit) {
+			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+			if(null != mounted) {
+				if(!type.equals(mounted.getType())) {
+					return 30;
+				}
+			}
+		}
+		return 15;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return 0;
+	}
     
     @Override
     public void updateConditionFromPart() {

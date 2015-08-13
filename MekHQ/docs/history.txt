@@ -19,6 +19,10 @@ v0.3.16-dev (SVN)
 + Bug: quad protos getting arm parts
 + Bug: engine-less protos still have running MP
 + Bug: updateConditions in ProtomekLocation not critting/uncritting things correctly
++ Bug [#902]: Tank and Aero system parts not getting check for destruction
++ Moved all equipment checks for destruction into Part.updateConditionFromEntity
++ removed time and difficulty variables from Part, now tracked by specific methods in each part, 
+	no need to always updateConditionFromEntity to switch
 
 v0.3.15 (2015-08-04 10:50 UTC)
 + Planetary faction updates

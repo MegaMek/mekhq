@@ -703,6 +703,54 @@ public class Campaign implements Serializable {
     }
 
     /**
+     * This is for adding a TestUnit that was previously created and had parts added to
+     * it. We need to do the normal stuff, but we also need to take the existing parts and 
+     * add them to the campaign.
+     * @param unit
+     */
+    public void addTestUnit(TestUnit tu) {
+    	//we really just want the entity and the parts so lets just wrap that around a new 
+    	//unit.
+    	Unit unit = new Unit(tu.getEntity(), this);
+    	
+    	//we decided we like the test unit so much we are going to keep it
+    	unit.getEntity().setOwner(player);
+    	unit.getEntity().setGame(game);
+
+        UUID id = UUID.randomUUID();
+        // check for the very rare chance of getting same id
+        while (null != unitIds.get(id)) {
+            id = UUID.randomUUID();
+        }
+        unit.getEntity().setExternalIdAsString(id.toString());
+        unit.setId(id);
+        units.add(unit);
+        unitIds.put(id, unit);
+    
+    	//now lets grab the parts from the test unit and set them up with this unit
+        for(Part p : tu.getParts()) {
+        	unit.addPart(p);
+        	addPart(p, 0);
+        }
+        
+        unit.resetPilotAndEntity();
+
+        if (!unit.isRepairable()) {
+            unit.setSalvage(true);
+        }
+   
+        // Assign an entity ID to our new unit
+        if (Entity.NONE == unit.getEntity().getId()) {
+        	unit.getEntity().setId(game.getNextEntityId());
+        }
+        game.addEntity(unit.getEntity().getId(), unit.getEntity());
+
+        checkDuplicateNamesDuringAdd(unit.getEntity());
+        addReport(unit.getHyperlinkedName() + " has been added to the unit roster.");
+        
+    }
+    
+    /**
      * Add a unit to the campaign. This is only for new units
      *
      * @param en An <code>Entity</code> object that the new unit will be wrapped around
@@ -726,7 +774,7 @@ public class Campaign implements Serializable {
         // when calculating cargo
 
         unit.initializeParts(true);
-        unit.runDiagnostic();
+        unit.runDiagnostic(false);
         if (!unit.isRepairable()) {
             unit.setSalvage(true);
         }
@@ -1094,7 +1142,7 @@ public class Campaign implements Serializable {
             if (part instanceof Armor || part instanceof ProtomekArmor
                 || part instanceof BaArmor) {
                 if (null != part.getUnit() && part.needsFixing()) {
-                    part.updateConditionFromEntity();
+                    part.updateConditionFromEntity(false);
                 }
             }
         }
@@ -3665,7 +3713,7 @@ public class Campaign implements Serializable {
                 prt.setSalvaging(false);
                 // this seems weird but we need to get difficulty and time
                 // updated for non-salvage
-                prt.updateConditionFromEntity();
+                prt.updateConditionFromEntity(false);
                 boolean found = false;
                 for (Part spare : spareParts) {
                     if (spare.isSamePartTypeAndStatus(prt)) {
@@ -3843,7 +3891,7 @@ public class Campaign implements Serializable {
             // just in case parts are missing (i.e. because they weren't tracked
             // in previous versions)
             unit.initializeParts(true);
-            unit.runDiagnostic();
+            unit.runDiagnostic(false);
             if (!unit.isRepairable()) {
                 if (unit.getSalvageableParts().isEmpty()) {
                     // we shouldnt get here but some units seem to stick around
@@ -6128,7 +6176,7 @@ public class Campaign implements Serializable {
             unit.setNavigator(p);
         }
         unit.resetPilotAndEntity();
-        unit.runDiagnostic();
+        unit.runDiagnostic(false);
     }
 
     public String getUnitRating() {

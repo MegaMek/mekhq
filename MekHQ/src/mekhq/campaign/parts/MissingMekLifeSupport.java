@@ -43,9 +43,17 @@ public class MissingMekLifeSupport extends MissingPart {
 	public MissingMekLifeSupport(int tonnage, Campaign c) {
         super(tonnage, c);
         this.name = "Mech Life Support System";
-        this.time = 180;
-        this.difficulty = -1;
     }
+	
+	@Override 
+	public int getBaseTime() {
+		return 180;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return -1;
+	}
 
 	@Override
 	public double getTonnage() {

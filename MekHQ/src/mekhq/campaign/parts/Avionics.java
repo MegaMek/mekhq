@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.Aero;
+import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
@@ -59,21 +60,33 @@ public class Avionics extends Part {
     }
         
 	@Override
-	public void updateConditionFromEntity() {
+	public void updateConditionFromEntity(boolean checkForDestruction) {
+		int priorHits = hits;
 		if(null != unit && unit.getEntity() instanceof Aero) {
 			hits = ((Aero)unit.getEntity()).getAvionicsHits();
+			if(checkForDestruction 
+					&& hits > priorHits 
+					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+				remove(false);
+				return;
+			}
 		}
-		if(hits > 0) {
-			time = 480;
-			difficulty = 0;
-		} else {
-			time = 0;
-			difficulty = 0;
-		}
+	}
+	
+	@Override 
+	public int getBaseTime() {
 		if(isSalvaging()) {
-			time = 4800;
-			difficulty = 1;
+			return 4800;
 		}
+		return 480;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		if(isSalvaging()) {
+			return 1;
+		}
+		return 0;
 	}
 
 	@Override
@@ -110,7 +123,7 @@ public class Avionics extends Part {
 		}
 		setSalvaging(false);
 		setUnit(null);
-		updateConditionFromEntity();
+		updateConditionFromEntity(false);
 	}
 
 	@Override

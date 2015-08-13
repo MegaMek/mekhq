@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.Aero;
+import megamek.common.Compute;
 import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
@@ -69,25 +70,37 @@ public class Thrusters extends Part {
     }
         
 	@Override
-	public void updateConditionFromEntity() {
+	public void updateConditionFromEntity(boolean checkForDestruction) {
 		if(null != unit && unit.getEntity() instanceof Aero) {
+			int priorHits = hits;
 			if (isLeftThrusters) {
 				hits = ((Aero)unit.getEntity()).getLeftThrustHits();
 			} else {
 				hits = ((Aero)unit.getEntity()).getRightThrustHits();
 			}
+			if(checkForDestruction 
+					&& hits > priorHits 
+					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+				remove(false);
+				return;
+			}
 		}
-		if(hits > 0) {
-			time = 90;
-			difficulty = -1;
-		} else {
-			time = 0;
-			difficulty = 0;
-		}
+	}
+	
+	@Override 
+	public int getBaseTime() {
 		if(isSalvaging()) {
-			time = 600;
-			difficulty = -2;
+			return 600;
 		}
+		return 90;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		if(isSalvaging()) {
+			return -2;
+		}
+		return -1;
 	}
 
 	@Override
@@ -136,7 +149,7 @@ public class Thrusters extends Part {
 		}
 		setSalvaging(false);
 		setUnit(null);
-		updateConditionFromEntity();
+		updateConditionFromEntity(false);
 	}
 
 	@Override

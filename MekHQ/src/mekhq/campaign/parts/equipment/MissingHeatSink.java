@@ -38,9 +38,17 @@ public class MissingHeatSink extends MissingEquipmentPart {
     
     public MissingHeatSink(int tonnage, EquipmentType et, int equipNum, Campaign c) {
         super(tonnage, et, equipNum, c, 1);
-        this.time = 90;
-        this.difficulty = -2;
     }
+    
+    @Override 
+	public int getBaseTime() {
+		return 90;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return -2;
+	}
     
 
 	@Override

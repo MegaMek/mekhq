@@ -51,8 +51,16 @@ public class MissingSpacecraftEngine extends MissingPart {
 		this.engineTonnage = etonnage;
 		this.clan = clan;
 		this.name = "Spacecraft Engine";
-		this.time = 43200;
-    	this.difficulty = 1;
+	}
+	
+	@Override 
+	public int getBaseTime() {
+		return 43200;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return 1;
 	}
 	
 	@Override

@@ -45,8 +45,16 @@ public class TurretLock extends Part {
 	public TurretLock(Campaign c) {
 		super(0, c);
 		this.name = "Turret Lock";
-		this.time = 90;
-		this.difficulty = -1;
+	}
+	
+	@Override 
+	public int getBaseTime() {
+		return 90;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return -1;
 	}
 	
 	public TurretLock clone() {
@@ -123,7 +131,7 @@ public class TurretLock extends Part {
 	}
 
 	@Override
-	public void updateConditionFromEntity() {
+	public void updateConditionFromEntity(boolean checkForDestruction) {
 		//nothing to do here because we are just going to check directly in needsFixing()
 		//since this "part" can never be removed
 	}

@@ -210,7 +210,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             for (Unit unit : units) {
                 if (!unit.isDeployed()) {
                     unit.setSalvage(true);
-                    unit.runDiagnostic();
                 }
             }
             gui.refreshServicedUnitList();
@@ -220,7 +219,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             for (Unit unit : units) {
                 if (!unit.isDeployed() && unit.isRepairable()) {
                     unit.setSalvage(false);
-                    unit.runDiagnostic();
                 }
             }
             gui.refreshServicedUnitList();
@@ -501,7 +499,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 Entity entity = selectedUnit.getEntity();
                 UnitEditorDialog med = new UnitEditorDialog(gui.getFrame(), entity);
                 med.setVisible(true);
-                selectedUnit.runDiagnostic();
+                selectedUnit.runDiagnostic(false);
                 gui.refreshServicedUnitList();
                 gui.refreshUnitList();
                 gui.refreshTaskList();
@@ -517,7 +515,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                         selectedUnit.getFluffName() == null ? ""
                                 : selectedUnit.getFluffName());
                 selectedUnit.setFluffName(fluffName);
-                selectedUnit.runDiagnostic();
                 gui.refreshServicedUnitList();
                 gui.refreshUnitList();
                 gui.refreshTaskList();

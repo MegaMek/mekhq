@@ -60,8 +60,16 @@ public class MissingEnginePart extends MissingPart {
 			this.name = engine.getEngineName() + " Engine";
 		}
 		this.engine = e;
-		this.time = 360;
-		this.difficulty = -1;
+	}
+	
+	@Override 
+	public int getBaseTime() {
+		return 360;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return -1;
 	}
 
 	public Engine getEngine() {

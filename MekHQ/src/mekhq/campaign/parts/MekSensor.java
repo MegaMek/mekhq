@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.Compute;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
@@ -132,16 +133,17 @@ public class MekSensor extends Part {
 		}
 		setSalvaging(false);
 		setUnit(null);
-		updateConditionFromEntity();
+		updateConditionFromEntity(false);
 	}
 
 	@Override
-	public void updateConditionFromEntity() {
+	public void updateConditionFromEntity(boolean checkForDestruction) {
 		if(null != unit) {
+			int priorHits = hits;
 			Entity entity = unit.getEntity();
 			for (int i = 0; i < entity.locations(); i++) {
 				if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i) > 0) {
-					if (entity.isSystemRepairable(Mech.SYSTEM_SENSORS, i)) {					
+					if (!unit.isSystemMissing(Mech.SYSTEM_SENSORS, i)) {					
 						hits = entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i);	
 						break;
 					} else {
@@ -150,25 +152,37 @@ public class MekSensor extends Part {
 					}
 				}
 			}
+			if(checkForDestruction 
+					&& hits > priorHits && hits >= 2
+					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+				remove(false);
+				return;
+			}
 		}
-		if(hits == 0) {
-			time = 0;
-			difficulty = 0;
-		} 
-		else if(hits == 1) {
-			time = 75;
-			difficulty = 0;
-		}
-		else if(hits > 1) {
-			time = 150;
-			difficulty = 3;
-		}
-		if(isSalvaging()) {
-			this.time = 260;
-			this.difficulty = 0;
-		}		
 	}
-
+	
+	@Override 
+	public int getBaseTime() {
+		if(isSalvaging()) {
+			return 260;
+		}
+		if(hits > 1) {
+			return 150;
+		}
+		return 75;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		if(isSalvaging()) {
+			return 0;
+		}
+		if(hits > 1) {
+			return 3;
+		}
+		return 0;
+	}
+		
 	@Override
 	public boolean needsFixing() {
 		return hits > 0;

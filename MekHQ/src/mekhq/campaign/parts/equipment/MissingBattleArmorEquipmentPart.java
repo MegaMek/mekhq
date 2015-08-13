@@ -53,9 +53,17 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
     public MissingBattleArmorEquipmentPart(int tonnage, EquipmentType et, int equipNum, int trooper, Campaign c, double etonnage) {
         super(tonnage, et, equipNum, c, etonnage);
         this.trooper = trooper;
-        this.time = 30;
-        this.difficulty = -2;
     }
+    
+    @Override 
+	public int getBaseTime() {
+		return 30;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return -2;
+	}
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {

@@ -79,6 +79,16 @@ public class MissingBattleArmorSuit extends MissingPart {
         this.name = chassis + " " + model + " Suit";
     }
 
+    @Override 
+	public int getBaseTime() {
+		return 0;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return 0;
+	}
+    
     @Override
     public void updateConditionFromPart() {
     	if(null != unit) {
@@ -274,7 +284,7 @@ public class MissingBattleArmorSuit extends MissingPart {
         		Part childPart = campaign.getPart(childId);
         		if(childPart instanceof BaArmor && null != origArmor) {
         			unit.getEntity().setArmor(((BaArmor)childPart).getActualAmount(), trooper);
-        			origArmor.updateConditionFromEntity();
+        			origArmor.updateConditionFromEntity(false);
         		} else if(childPart instanceof BattleArmorEquipmentPart) {
         			for(MissingBattleArmorEquipmentPart p : missingStuff) {
 	            		if(null != childPart && null != p.getUnit() && p.isAcceptableReplacement(childPart, false)) {
@@ -293,7 +303,6 @@ public class MissingBattleArmorSuit extends MissingPart {
             replacement.decrementQuantity();
             unit.getEntity().setInternal(0, trooper);
             remove(false);
-            u.runDiagnostic();
         }
     }
 

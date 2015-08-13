@@ -51,9 +51,17 @@ public class MissingMekGyro extends MissingPart {
         this.type = type;
         this.name = Mech.getGyroTypeString(type);
         this.gyroTonnage = gyroTonnage;
-        this.time = 200;
-        this.difficulty = 0;
     }
+    
+    @Override 
+	public int getBaseTime() {
+		return 200;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return 0;
+	}
     
     public int getType() {
         return type;

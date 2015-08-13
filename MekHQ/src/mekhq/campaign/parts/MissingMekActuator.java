@@ -60,9 +60,17 @@ public class MissingMekActuator extends MissingPart {
         Mech m = new BipedMech();
         this.name = m.getSystemName(type) + " Actuator" ;
         this.location = loc;
-        this.time = 90;
-        this.difficulty = -3;
     }
+    
+    @Override 
+	public int getBaseTime() {
+		return 90;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return -3;
+	}
 
     @Override
     public double getTonnage() {

@@ -56,8 +56,16 @@ public class MotiveSystem extends Part {
 		this.name = "Motive System";
 		this.damage = 0;
 		this.penalty = 0;
-		this.time = 60;
-		this.difficulty = -1;
+	}
+	
+	@Override 
+	public int getBaseTime() {
+		return 60;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return -1;
 	}
 	
 	public MotiveSystem clone() {
@@ -159,7 +167,9 @@ public class MotiveSystem extends Part {
 	}
 
 	@Override
-	public void updateConditionFromEntity() {
+	public void updateConditionFromEntity(boolean checkForDestruction) {
+		//motive systems don't have to check for destruction since they 
+		//cannot be removed
 		if(null != unit && unit.getEntity() instanceof Tank) {
 			Tank t = (Tank)unit.getEntity();
 			damage = t.getMotiveDamage();

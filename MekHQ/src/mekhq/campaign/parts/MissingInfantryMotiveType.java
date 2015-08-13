@@ -56,6 +56,16 @@ public class MissingInfantryMotiveType extends MissingPart {
 		}
 	}
 	
+	@Override 
+	public int getBaseTime() {
+		return 0;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return 0;
+	}
+	
 	private void assignName() {
 		switch (mode) {
         case INF_UMU:

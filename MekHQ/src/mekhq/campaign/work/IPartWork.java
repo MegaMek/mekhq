@@ -55,7 +55,7 @@ public interface IPartWork extends IWork {
 	public int getShorthandedMod();
 	public void setShorthandedMod(int i);
 	
-	public void updateConditionFromEntity();
+	public void updateConditionFromEntity(boolean checkForDestruction);
 	public void updateConditionFromPart();
 	public void fix();
 	public void remove(boolean salvage);
