@@ -228,6 +228,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     private JCheckBox useDamageMargin;
     private JSpinner spnDamageMargin;
+    private JSpinner spnDestroyPartTarget;
+
 
     private JCheckBox checkMaintenance;
     private JCheckBox logMaintenance;
@@ -808,11 +810,30 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.weighty = 0.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubRepair.add(pnlDamageMargin, gridBagConstraints);
 
+        spnDestroyPartTarget = new JSpinner(new SpinnerNumberModel(options.getDestroyPartTarget(), 2, 13, 1));
+        ((JSpinner.DefaultEditor) spnDestroyPartTarget.getEditor()).getTextField().setEditable(false);
+
+        JPanel pnlDestroyPartTarget = new JPanel();
+        pnlDestroyPartTarget.add(new JLabel("Equipment hit in combat survives on a roll of"));
+        pnlDestroyPartTarget.add(spnDestroyPartTarget);
+        pnlDestroyPartTarget.add(new JLabel("or better"));
+
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubRepair.add(pnlDestroyPartTarget, gridBagConstraints);
+
+        
         checkMaintenance.setText(resourceMap.getString("checkMaintenance.text")); // NOI18N
         checkMaintenance.setToolTipText(resourceMap.getString("checkMaintenance.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -4011,6 +4032,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         campaign.getGameOptions().getOption("command_init").setValue(useTacticsBox.isSelected());
         options.setDestroyByMargin(useDamageMargin.isSelected());
         options.setDestroyMargin((Integer) spnDamageMargin.getModel().getValue());
+        options.setDestroyPartTarget((Integer) spnDestroyPartTarget.getModel().getValue());
         options.setCheckMaintenance(checkMaintenance.isSelected());
         options.setUseQualityMaintenance(useQualityMaintenance.isSelected());
         options.setUseUnofficalMaintenance(useUnofficalMaintenance.isSelected());
