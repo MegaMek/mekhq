@@ -326,7 +326,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		if(null != unit && changeEntity) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted) {
-				if(mounted.getType().equals(type)) {
+				if(mounted.getType().equals(type) 
+						&& mounted.getType() instanceof AmmoType
+						&& ((AmmoType)mounted.getType()).getMunitionType() == getMunitionType()) {
 					//just a simple reload
 					mounted.setShotsLeft(mounted.getBaseShotsLeft() + shots);
 				} else {
@@ -403,7 +405,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted) {
 				if(mounted.isMissing() || mounted.isDestroyed()) {
-					unload(true);
+					mounted.setShotsLeft(0);
 					remove(false);
 					return;
 				}
