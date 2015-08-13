@@ -403,10 +403,15 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted) {
 				if(mounted.isMissing() || mounted.isDestroyed()) {
+					unload(true);
 					remove(false);
 					return;
 				}
-				if(type.equals(mounted.getType())) {
+				long currentMuniType = 0;			
+				if(mounted.getType() instanceof AmmoType) {
+					currentMuniType = ((AmmoType)mounted.getType()).getMunitionType();
+				}
+				if(currentMuniType == getMunitionType()) {
 					shotsNeeded = getFullShots() - mounted.getBaseShotsLeft();
 				} else {
 					//we have a change of munitions
@@ -424,7 +429,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted) {
-				if(!type.equals(mounted.getType())) {
+				long currentMuniType = 0;			
+				if(mounted.getType() instanceof AmmoType) {
+					currentMuniType = ((AmmoType)mounted.getType()).getMunitionType();
+				}
+				if(getMunitionType() != currentMuniType) {
 					return 30;
 				}
 			}
