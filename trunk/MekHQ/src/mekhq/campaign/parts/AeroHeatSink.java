@@ -146,7 +146,6 @@ public class AeroHeatSink extends Part {
 			unit.addPart(missing);
 			campaign.addPart(missing, 0);
 		}
-		setSalvaging(false);
 		setUnit(null);
 		updateConditionFromEntity(false);
 	}

@@ -187,12 +187,7 @@ public class Turret extends TankLocation {
 			unit.getEntity().setInternal(unit.getEntity().getOInternal(loc) - damage, loc);
 		}
 	}
-	
-	@Override
-	public boolean isSalvaging() {
-		return salvaging;
-	}
-	
+
 	@Override 
 	public String checkFixable() {
 		if(isSalvaging()) {

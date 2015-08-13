@@ -53,9 +53,9 @@ public class Armor extends Part implements IAcquisitionWork {
 	protected int type;
     protected int amount;
     protected int amountNeeded;
-    private int location;
+    protected int location;
     private boolean rear;
-    private boolean clan;
+    protected boolean clan;
 
     public Armor() {
     	this(0, 0, 0, -1, false, false, null);
@@ -83,7 +83,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public double getTonnage() {
-    	return getActualAmount() / getArmorPointsPerTon();
+    	return amount / getArmorPointsPerTon();
     }
 
     @Override
@@ -171,17 +171,6 @@ public class Armor extends Part implements IAcquisitionWork {
 
     public int getType() {
         return type;
-    }
-
-    public int getActualAmount() {
-        if(null != unit) {
-            int currentArmor = unit.getEntity().getArmorForReal(location, rear);
-            if(currentArmor < 0) {
-                currentArmor = 0;
-            }
-            return currentArmor;
-        }
-        return amount;
     }
 
     public int getAmount() {
@@ -430,13 +419,10 @@ public class Armor extends Part implements IAcquisitionWork {
 
 	@Override
 	public void fix() {
-		int amount = Math.min(getAmountAvailable(), amountNeeded);
-		int curAmount = unit.getEntity().getArmorForReal(location, rear);
-		if(curAmount < 0) {
-			curAmount = 0;
-		}
-		unit.getEntity().setArmor(amount + curAmount, location, rear);
-		changeAmountAvailable(-1 * amount);
+		int amountFound = Math.min(getAmountAvailable(), amountNeeded);
+		int fixAmount = Math.min(amount + amountFound, unit.getEntity().getOArmor(location, rear));
+		unit.getEntity().setArmor(fixAmount, location, rear);
+		changeAmountAvailable(-1 * amountFound);
 		updateConditionFromEntity(false);
 		skillMin = SkillType.EXP_GREEN;
 		shorthandedMod = 0;
@@ -480,7 +466,7 @@ public class Armor extends Part implements IAcquisitionWork {
 	public void remove(boolean salvage) {
 		unit.getEntity().setArmor(IArmorState.ARMOR_DESTROYED, location, rear);
 		if(salvage) {
-			changeAmountAvailable(amountNeeded);
+			changeAmountAvailable(amount);
 		}
 		updateConditionFromEntity(false);
 	}
@@ -504,23 +490,17 @@ public class Armor extends Part implements IAcquisitionWork {
 		if(null == unit) {
 			return;
 		}
-		int currentArmor = unit.getEntity().getArmorForReal(location, rear);
-		if(currentArmor < 0) {
-			currentArmor = 0;
+		amount = unit.getEntity().getArmorForReal(location, rear);
+		if(amount < 0) {
+			amount = 0;
 		}
-		if(salvaging) {
-			amountNeeded = currentArmor;
-			amount = unit.getEntity().getOArmor(location, rear) - amountNeeded;
-		} else {
-			amountNeeded = unit.getEntity().getOArmor(location, rear) - currentArmor;
-			amount = currentArmor;
-		}
+		amountNeeded = unit.getEntity().getOArmor(location, rear) - amount;
 	}
 	
 	@Override 
 	public int getBaseTime() {
 		if(isSalvaging()) {
-			return getBaseTimeFor(unit.getEntity()) * amountNeeded;
+			return getBaseTimeFor(unit.getEntity()) * amount;
 		}
 		return getBaseTimeFor(unit.getEntity()) * Math.min(amountNeeded, getAmountAvailable());
 	}
@@ -532,18 +512,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
 	@Override
 	public boolean isSalvaging() {
-		return salvaging && amountNeeded > 0;
-	}
-
-	@Override
-	public String succeed() {
-		boolean tmpSalvaging = salvaging;
-		String toReturn = super.succeed();
-		if(tmpSalvaging) {
-			salvaging = true;
-			updateConditionFromEntity(false);
-		}
-		return toReturn;
+		return super.isSalvaging() && amount > 0;
 	}
 
 	@Override
@@ -554,9 +523,9 @@ public class Armor extends Part implements IAcquisitionWork {
 	@Override
 	public void updateConditionFromPart() {
 		if(null != unit) {
-			int armor = amount;
-			if(salvaging) {
-				armor = amountNeeded;
+			int armor = Math.min(amount, unit.getEntity().getOArmor(location, rear));
+			if(armor == 0) {
+				armor = IArmorState.ARMOR_DESTROYED;
 			}
 			unit.getEntity().setArmor(armor, location, rear);
 		}
@@ -676,7 +645,6 @@ public class Armor extends Part implements IAcquisitionWork {
 		} else if(null == a && amount > 0) {
 			campaign.addPart(new Armor(getUnitTonnage(), type, amount, -1, false, isClanTechBase(), campaign), 0);
 		}
-		campaign.updateAllArmorForNewSpares();
 	}
 
 	@Override
@@ -708,10 +676,10 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public boolean isInSupply() {
-        int currentArmor = Math.max(0, unit.getEntity().getArmorForReal(location, rear));
-        int fullArmor = unit.getEntity().getOArmor(location, rear);
-        int neededArmor = fullArmor - currentArmor;
-        return neededArmor <= getAmountAvailable();
+        //int currentArmor = Math.max(0, unit.getEntity().getArmorForReal(location, rear));
+        //int fullArmor = unit.getEntity().getOArmor(location, rear);
+        //int neededArmor = fullArmor - currentArmor;
+        return amountNeeded <= getAmountAvailable();
     }
 
     @Override

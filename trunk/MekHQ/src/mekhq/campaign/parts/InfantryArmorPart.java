@@ -146,7 +146,6 @@ public class InfantryArmorPart extends Part {
 			}
 			unit.removePart(this);
 		}	
-		setSalvaging(false);
 		setUnit(null);
 	}
 

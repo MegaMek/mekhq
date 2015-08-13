@@ -148,7 +148,6 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
     	if(!salvage) {
     		campaign.removePart(this);
     	}
-        setSalvaging(false);
         setUnit(null);
         equipmentNum = -1;
         trooper = -1;

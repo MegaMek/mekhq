@@ -429,7 +429,6 @@ public class MekLocation extends Part {
 				campaign.addPart(missing, 0);
 			}
 		}
-		setSalvaging(false);
 		setUnit(null);
 		updateConditionFromEntity(false);
 	}

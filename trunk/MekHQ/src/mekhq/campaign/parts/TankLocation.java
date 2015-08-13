@@ -206,7 +206,6 @@ public class TankLocation extends Part {
 			}
 			unit.removePart(this);
 		}
-		setSalvaging(false);
 		setUnit(null);
 		updateConditionFromEntity(false);
 	}

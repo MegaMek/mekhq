@@ -351,7 +351,6 @@ public class ProtomekLocation extends Part {
                 }
             }
         }
-        setSalvaging(false);
         setUnit(null);
         updateConditionFromEntity(false);
     }
