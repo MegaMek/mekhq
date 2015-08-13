@@ -512,8 +512,12 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 
 	/**
 	 * Run a diagnostic on this unit
+	 * TODO: This is being called in the PersonnelTableModel after changes to the personnel
+	 * attached to a unit, but I am not sure it needs to be. I don't think any parts check
+	 * attached personnel. I think it could b removed, but I am going to leave it for the 
+	 * moment because I have made so many other changes in this version.
 	 */
-	public void runDiagnostic() {
+	public void runDiagnostic(boolean checkForDestruction) {
 
 		//need to set up an array of part ids to avoid concurrent modification
 		//problems because some updateCondition methods will remove the part and put
@@ -531,7 +535,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 					part.setSalvaging(false);
 				}
 			}
-			part.updateConditionFromEntity();
+			part.updateConditionFromEntity(checkForDestruction);
 		}
 	}
 
@@ -779,6 +783,22 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 		}
 		return false;
 	}
+	
+
+    /**
+     * Returns true if there is at least one missing critical slot for
+     * this system in the given location
+     */
+    public boolean isSystemMissing(int system, int loc) {
+        for (int i = 0; i < entity.getNumberOfCriticals(loc); i++) {
+            CriticalSlot ccs = entity.getCritical(loc, i);
+            if ((ccs != null) && (ccs.getType() == CriticalSlot.TYPE_SYSTEM)
+                && (ccs.getIndex() == system) && ccs.isMissing()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 	 /**
      * Number of slots doomed, missing or destroyed in all locations
@@ -854,6 +874,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 					cs.setHit(true);
 					cs.setDestroyed(true);
 					cs.setRepairable(true);
+                    cs.setMissing(false);
 					nhits++;
 				}
 			}
@@ -881,6 +902,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 				cs.setHit(true);
 				cs.setDestroyed(true);
 				cs.setRepairable(false);
+                cs.setMissing(false);
 			}
 		}
 	}
@@ -901,11 +923,13 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
                     cs.setHit(true);
                     cs.setDestroyed(true);
                     cs.setRepairable(false);
+                    cs.setMissing(false);
                     nhits++;
                 } else {
                     cs.setHit(false);
                     cs.setDestroyed(false);
                     cs.setRepairable(true);
+                    cs.setMissing(false);
                 }
             }
         }

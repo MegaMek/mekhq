@@ -111,8 +111,18 @@ public class InfantryArmorPart extends Part {
     }
     
 	@Override
-	public void updateConditionFromEntity() {
+	public void updateConditionFromEntity(boolean checkForDestruction) {
 		//do nothing
+	}
+	
+	@Override 
+	public int getBaseTime() {
+		return 0;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return 0;
 	}
 
 	@Override

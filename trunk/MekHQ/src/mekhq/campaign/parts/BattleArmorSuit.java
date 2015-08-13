@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import megamek.common.BattleArmor;
+import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;
@@ -507,7 +508,13 @@ public class BattleArmorSuit extends Part {
             campaign.addPart(missing, 0);
             trooper = -1;
             unit.removePart(this);
-            unit.runDiagnostic();
+            //Taharqa: I am not sure why this runDiagnostic is here and I think its problematic
+			//I know for certain it causes problems when we are trying to figure out damage
+			//to salvage unit because it can sometimes update parts before it checks for destruction
+			//so that they then appear to be the same and aren't checked. In general it seems 
+			//bad form. Looking through the code, I couldnt see any obvious reason for its
+			//existence. I am going to remove it and see if it causes problems. 
+			//unit.runDiagnostic(false);
         }
         for(Part p : trooperParts) {
             p.remove(salvage);
@@ -521,22 +528,39 @@ public class BattleArmorSuit extends Part {
 		}
         setSalvaging(false);
         setUnit(null);
-        updateConditionFromEntity();
+        updateConditionFromEntity(false);
     }
 
     @Override
-    public void updateConditionFromEntity() {
+    public void updateConditionFromEntity(boolean checkForDestruction) {
         if(null != unit) {
             if(unit.getEntity().getInternal(trooper) == IArmorState.ARMOR_DESTROYED) {
-                remove(false);
-                return;
+            	if(!checkForDestruction) {
+            		remove(false);
+            		return;
+            	} else {
+            		if(Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+            			remove(false);
+                		return;
+            		} else {
+            			//it seems a little weird to change the entity here, but no other
+            			//way to guarantee this happens
+            			unit.getEntity().setInternal(0, trooper);
+            		}
+            	}
             }
         }
-        if(isSalvaging()) {
-            this.time = 0;
-            this.difficulty = 0;
-        }
     }
+    
+    @Override 
+	public int getBaseTime() {
+		return 0;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return 0;
+	}
 
     @Override
     public String getDetails() {
@@ -638,7 +662,7 @@ public class BattleArmorSuit extends Part {
 		}
  		Unit newUnit = null;
     	if (null != newEntity) {
-    		newUnit = new TestUnit(newEntity, campaign);
+    		newUnit = new TestUnit(newEntity, campaign, false);
     	}
     	if(null != newUnit) {
 			//This now works, except when GM Mode is used to procure which must not be using the

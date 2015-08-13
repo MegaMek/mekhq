@@ -21,6 +21,7 @@
 
 package mekhq.campaign.parts.equipment;
 
+import megamek.common.Compute;
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
@@ -87,30 +88,42 @@ public class JumpJet extends EquipmentPart {
 	}
 
 	@Override
-	public void updateConditionFromEntity() {
+	public void updateConditionFromEntity(boolean checkForDestruction) {
 		if(null != unit) {
+			int priorHits = hits;
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted) {
-				if(!mounted.isRepairable()) {
+				if(mounted.isMissing()) {
 					remove(false);
 					return;
 				} 
 				hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum, mounted.getLocation());
 			}
-		}
-		if(hits == 0) {
-			time = 0;
-			difficulty = 0;
-		} else if(hits > 0) {
-			time = 100;
-			difficulty = -3;
-		}
-		if(isSalvaging()) {
-			this.time = 60;
-			this.difficulty = 0;
+			if(checkForDestruction 
+					&& hits > priorHits 
+					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+				remove(false);
+				return;
+			}
 		}
 	}
-
+	
+	@Override 
+	public int getBaseTime() {
+		if(isSalvaging()) {
+			return 60;
+		}
+		return 100;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		if(isSalvaging()) {
+			return 0;
+		}
+		return -3;
+	}
+	
 	@Override
 	public boolean needsFixing() {
 		return hits > 0;

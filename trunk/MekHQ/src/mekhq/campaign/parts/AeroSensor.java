@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.Aero;
+import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
@@ -64,22 +65,35 @@ public class AeroSensor extends Part {
     }
         
 	@Override
-	public void updateConditionFromEntity() {
+	public void updateConditionFromEntity(boolean checkForDestruction) {
+		int priorHits = hits;
 		if(null != unit && unit.getEntity() instanceof Aero) {
 			hits = ((Aero)unit.getEntity()).getSensorHits();
-		}
-		if(hits > 0) {
-			time = 120;
-			difficulty = -1;
-		} else {
-			time = 0;
-			difficulty = 0;
-		}
-		if(isSalvaging()) {
-			time = 1200;
-			difficulty = -2;
+			if(checkForDestruction 
+					&& hits > priorHits 
+					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+				remove(false);
+				return;
+			}
 		}
 	}
+	
+	@Override 
+	public int getBaseTime() {
+		if(isSalvaging()) {
+			return 1200;
+		}
+		return 120;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		if(isSalvaging()) {
+			return -2;
+		}
+		return -1;
+	}
+
 
 	@Override
 	public void updateConditionFromPart() {
@@ -115,7 +129,7 @@ public class AeroSensor extends Part {
 		}
 		setSalvaging(false);
 		setUnit(null);
-		updateConditionFromEntity();
+		updateConditionFromEntity(false);
 	}
 
 	@Override

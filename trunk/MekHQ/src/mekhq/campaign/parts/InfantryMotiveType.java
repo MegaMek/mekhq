@@ -84,10 +84,20 @@ public class InfantryMotiveType extends Part {
 	}
 	
 	@Override
-	public void updateConditionFromEntity() {
+	public void updateConditionFromEntity(boolean checkForDestruction) {
 		//nothing to do here
 	}
 
+	@Override 
+	public int getBaseTime() {
+		return 0;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return 0;
+	}
+	
 	@Override
 	public void updateConditionFromPart() {
 		//nothing to do here

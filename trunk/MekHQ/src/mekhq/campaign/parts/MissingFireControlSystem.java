@@ -52,10 +52,18 @@ public class MissingFireControlSystem extends MissingPart {
     public MissingFireControlSystem(int tonnage, long cost, Campaign c) {
     	super(0, c);
     	this.cost = cost;
-    	this.time = 4320;
-    	this.difficulty = 0;
     	this.name = "Fire Control System";
     }
+    
+    @Override 
+	public int getBaseTime() {
+		return 4320;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return 0;
+	}
     
 	@Override
 	public String checkFixable() {

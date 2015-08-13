@@ -194,7 +194,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 if (null != u) {
                     u.remove(person, true);
                     u.resetEngineerOrTech();
-                    u.runDiagnostic();
+                    u.runDiagnostic(false);
                 }
                 // check for tech unit assignments
                 if (!person.getTechUnitIDs().isEmpty()) {
@@ -209,7 +209,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         if (null != u) {
                             u.remove(person, true);
                             u.resetEngineerOrTech();
-                            u.runDiagnostic();
+                            u.runDiagnostic(false);
                         }
                     }
                 }
@@ -234,7 +234,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 u.addPilotOrSoldier(selectedPerson, useTransfers);
             }
             u.resetPilotAndEntity();
-            u.runDiagnostic();
+            u.runDiagnostic(false);
             gui.refreshServicedUnitList();
             gui.refreshUnitList();
             gui.refreshPersonnelList();
@@ -258,7 +258,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
             }
             u.resetPilotAndEntity();
-            u.runDiagnostic();
+            u.runDiagnostic(false);
             gui.refreshServicedUnitList();
             gui.refreshUnitList();
             gui.refreshPersonnelList();
@@ -279,7 +279,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 u.addDriver(selectedPerson, useTransfers);
             }
             u.resetPilotAndEntity();
-            u.runDiagnostic();
+            u.runDiagnostic(false);
             gui.refreshServicedUnitList();
             gui.refreshUnitList();
             gui.refreshPersonnelList();
@@ -303,7 +303,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
             }
             u.resetPilotAndEntity();
-            u.runDiagnostic();
+            u.runDiagnostic(false);
             gui.refreshServicedUnitList();
             gui.refreshUnitList();
             gui.refreshPersonnelList();
@@ -327,7 +327,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
             }
             u.resetPilotAndEntity();
-            u.runDiagnostic();
+            u.runDiagnostic(false);
             gui.refreshServicedUnitList();
             gui.refreshUnitList();
             gui.refreshPersonnelList();
@@ -351,7 +351,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
             }
             u.resetPilotAndEntity();
-            u.runDiagnostic();
+            u.runDiagnostic(false);
             gui.refreshServicedUnitList();
             gui.refreshUnitList();
             gui.refreshPersonnelList();
@@ -375,7 +375,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
             }
             u.resetPilotAndEntity();
-            u.runDiagnostic();
+            u.runDiagnostic(false);
             gui.refreshServicedUnitList();
             gui.refreshUnitList();
             gui.refreshPersonnelList();
@@ -390,7 +390,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
             }
             u.resetPilotAndEntity();
-            u.runDiagnostic();
+            u.runDiagnostic(false);
             gui.refreshServicedUnitList();
             gui.refreshUnitList();
             gui.refreshPersonnelList();

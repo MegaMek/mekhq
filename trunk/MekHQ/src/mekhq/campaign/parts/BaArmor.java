@@ -399,7 +399,7 @@ public class BaArmor extends Part implements IAcquisitionWork {
         }
         unit.getEntity().setArmor(amount + curAmount, location, false);
         changeAmountAvailable(-1 * amount);
-        updateConditionFromEntity();
+        updateConditionFromEntity(false);
         skillMin = SkillType.EXP_GREEN;
         shorthandedMod = 0;
     }
@@ -444,7 +444,7 @@ public class BaArmor extends Part implements IAcquisitionWork {
         if(salvage) {
             changeAmountAvailable(amountNeeded);
         }
-        updateConditionFromEntity();
+        updateConditionFromEntity(false);
     }
 
     public int getBaseTimeFor(Entity entity) {
@@ -458,7 +458,7 @@ public class BaArmor extends Part implements IAcquisitionWork {
     }
     
     @Override
-    public void updateConditionFromEntity() {
+    public void updateConditionFromEntity(boolean checkForDestruction) {
         if(isReservedForRefit()) {
             return;
         }
@@ -476,14 +476,20 @@ public class BaArmor extends Part implements IAcquisitionWork {
             amountNeeded = unit.getEntity().getOArmor(location, false) - currentArmor;
             amount = currentArmor;
         }
-        //time should be based on amount available if less than amount needed
-        if(salvaging || isMountedOnDestroyedLocation()) {
-            time = getBaseTimeFor(unit.getEntity()) * amountNeeded;
-        } else {
-            time = getBaseTimeFor(unit.getEntity()) * Math.min(amountNeeded, getAmountAvailable());
-        }
-        difficulty = -2;
     }
+    
+    @Override 
+	public int getBaseTime() {
+		if(isSalvaging()) {
+			return getBaseTimeFor(unit.getEntity()) * amountNeeded;
+		}
+		return getBaseTimeFor(unit.getEntity()) * Math.min(amountNeeded, getAmountAvailable());
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return -2;
+	}
     
     @Override
     public boolean isSalvaging() {
@@ -496,7 +502,7 @@ public class BaArmor extends Part implements IAcquisitionWork {
         String toReturn = super.succeed();
         if(tmpSalvaging) {
             salvaging = true;
-            updateConditionFromEntity();
+            updateConditionFromEntity(false);
         }
         return toReturn;
     }
@@ -685,7 +691,7 @@ public class BaArmor extends Part implements IAcquisitionWork {
     public void doMaintenanceDamage(int d) {
         d = Math.min(d, amount);
         unit.getEntity().setArmor(d, location);
-        updateConditionFromEntity();
+        updateConditionFromEntity(false);
     }
     
     public void setLocation(int l) {

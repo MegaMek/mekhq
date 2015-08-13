@@ -164,14 +164,21 @@ public class Turret extends TankLocation {
 		}
 		setUnit(null);
 	}
-
-	@Override
-	public void updateConditionFromEntity() {
-		super.updateConditionFromEntity();
+	
+	@Override 
+	public int getBaseTime() {
 		if(isSalvaging()) {
-			this.time = 160;
-			this.difficulty = -1;
+			return 160;
 		}
+		return 60;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		if(isSalvaging()) {
+			return 1;
+		}
+		return 0;
 	}
 
 	@Override

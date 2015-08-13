@@ -200,11 +200,11 @@ public class SpacecraftEngine extends Part {
 		}
 		setSalvaging(false);
 		setUnit(null);
-		updateConditionFromEntity();
+		updateConditionFromEntity(false);
 	}
 
 	@Override
-	public void updateConditionFromEntity() {
+	public void updateConditionFromEntity(boolean checkForDestruction) {
 		if(null != unit) {
 			int engineHits = 0;
 			int engineCrits = 0;
@@ -222,16 +222,19 @@ public class SpacecraftEngine extends Part {
 				hits = 0;
 			}
 		}
-		this.time = 0;
-		this.difficulty = 0;
-		if (hits > 0) {
-			this.time = 300;
-			this.difficulty = 1;
-		}
+	}
+	
+	@Override 
+	public int getBaseTime() {
 		if(isSalvaging()) {
-			this.time = 43200;
-			this.difficulty = 1;
-		}	
+			return 43200;
+		}
+		return 300;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return 1;
 	}
 
 	@Override

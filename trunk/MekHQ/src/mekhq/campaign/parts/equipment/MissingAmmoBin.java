@@ -48,11 +48,15 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     public MissingAmmoBin(int tonnage, EquipmentType et, int equipNum, boolean singleShot, Campaign c) {
         super(tonnage, et, equipNum, c, 1);
         this.oneShot = singleShot;
-        this.difficulty = -2;
         if(null != name) {
         	this.name += " Bin";
         }
     }
+	
+	@Override
+	public int getDifficulty() {
+		return -2;
+	}
 
 	@Override 
 	public void fix() {

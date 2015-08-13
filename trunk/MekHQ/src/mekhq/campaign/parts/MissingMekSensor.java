@@ -43,9 +43,17 @@ public class MissingMekSensor extends MissingPart {
 	public MissingMekSensor(int tonnage, Campaign c) {
         super(tonnage, c);
         this.name = "Mech Sensors";
-        this.time = 260;
-        this.difficulty = 0;
     }
+	
+	@Override 
+	public int getBaseTime() {
+		return 260;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return 0;
+	}
 	
 	@Override
 	public double getTonnage() {

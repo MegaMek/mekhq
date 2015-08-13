@@ -46,9 +46,17 @@ public class MissingProtomekJumpJet extends MissingPart {
     public MissingProtomekJumpJet(int tonnage, Campaign c) {
         super(tonnage, c);
         this.name = "Protomech Jump Jet";
-        this.time = 60;
-        this.difficulty = 0;
     }
+    
+    @Override 
+	public int getBaseTime() {
+		return 60;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return 0;
+	}
    
     @Override
     public double getTonnage() {

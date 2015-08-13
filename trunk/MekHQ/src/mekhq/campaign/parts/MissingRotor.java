@@ -43,9 +43,17 @@ public class MissingRotor extends MissingPart {
 	public MissingRotor(int tonnage, Campaign c) {
         super(tonnage, c);
         this.name = "Rotor";
-        this.time = 300;
-        this.difficulty = 0;
     }
+	
+	@Override 
+	public int getBaseTime() {
+		return 300;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return 0;
+	}
 
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {

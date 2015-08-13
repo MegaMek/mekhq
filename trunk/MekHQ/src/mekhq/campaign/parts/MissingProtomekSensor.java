@@ -46,9 +46,17 @@ public class MissingProtomekSensor extends MissingPart {
     public MissingProtomekSensor(int tonnage, Campaign c) {
         super(tonnage, c);
         this.name = "Protomech Sensors";
-        this.time = 120;
-        this.difficulty = 0;
     }
+    
+    @Override 
+	public int getBaseTime() {
+		return 120;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return 0;
+	}
    
     @Override
     public double getTonnage() {

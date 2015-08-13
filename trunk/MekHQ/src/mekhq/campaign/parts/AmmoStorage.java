@@ -207,7 +207,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 	}
 
 	@Override
-	public void updateConditionFromEntity() {
+	public void updateConditionFromEntity(boolean checkForDestruction) {
 		//nothing to do here
 		return;
 	}

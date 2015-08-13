@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.Aero;
+import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
@@ -59,23 +60,37 @@ public class LandingGear extends Part {
     }
     
 	@Override
-	public void updateConditionFromEntity() {
-		if(null != unit && unit.getEntity() instanceof Aero && ((Aero)unit.getEntity()).isGearHit()) {
-			hits = 1;
-		} else {
-			hits = 0;
+	public void updateConditionFromEntity(boolean checkForDestruction) {
+		int priorHits = hits;
+		if(null != unit && unit.getEntity() instanceof Aero) {
+			if(((Aero)unit.getEntity()).isGearHit()) {
+				hits = 1;
+			} else {
+				hits = 0;
+			}
+			if(checkForDestruction 
+					&& hits > priorHits 
+					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+				remove(false);
+				return;
+			}
 		}
-		if(hits > 0) {
-			time = 120;
-			difficulty = 3;
-		} else {
-			time = 0;
-			difficulty = 0;
-		}
+	}
+	
+	@Override 
+	public int getBaseTime() {
 		if(isSalvaging()) {
-			time = 1200;
-			difficulty = 2;
+			return 1200;
 		}
+		return 120;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		if(isSalvaging()) {
+			return 3;
+		}
+		return 2;
 	}
 
 	@Override
@@ -112,7 +127,7 @@ public class LandingGear extends Part {
 		}
 		setSalvaging(false);
 		setUnit(null);
-		updateConditionFromEntity();
+		updateConditionFromEntity(false);
 	}
 
 	@Override

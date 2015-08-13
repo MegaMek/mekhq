@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.BipedMech;
+import megamek.common.Compute;
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
@@ -209,31 +210,43 @@ public class MekActuator extends Part {
 		}	
 		setSalvaging(false);
 		setUnit(null);
-		updateConditionFromEntity();
+		updateConditionFromEntity(false);
 		location = -1;
 	}
 
 	@Override
-	public void updateConditionFromEntity() {
+	public void updateConditionFromEntity(boolean checkForDestruction) {
+		int priorHits = hits;
 		if(null != unit) {
-			if(!unit.getEntity().isSystemRepairable(type, location)) {
+			//check for missing equipment
+			if(unit.isSystemMissing(type, location)) {
 				remove(false);
 				return;
 			}
 			hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, type, location);
+			if(checkForDestruction 
+					&& hits > priorHits 
+					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+				remove(false);
+				return;
+			}
 		}
-		if(hits == 0) {
-			time = 0;
-			difficulty = 0;
-		} 
-		else if(hits >= 1) {
-			time = 120;
-			difficulty = 0;
-		}
+	}
+	
+	@Override 
+	public int getBaseTime() {
 		if(isSalvaging()) {
-			this.time = 90;
-			this.difficulty = -3;
+			return 90;
 		}
+		return 120;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		if(isSalvaging()) {
+			return -3;
+		}
+		return 0;
 	}
 
 	@Override

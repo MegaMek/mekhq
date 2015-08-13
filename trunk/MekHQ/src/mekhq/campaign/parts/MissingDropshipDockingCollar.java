@@ -50,9 +50,17 @@ public class MissingDropshipDockingCollar extends MissingPart {
     public MissingDropshipDockingCollar(int tonnage, Campaign c) {
         super(tonnage, c);
         this.name = "Dropship Docking Collar";
-        time = 2880;
-		difficulty = -2;
     }
+    
+    @Override 
+	public int getBaseTime() {
+		return 2880;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return -2;
+	}
 
 	@Override
 	public void updateConditionFromPart() {

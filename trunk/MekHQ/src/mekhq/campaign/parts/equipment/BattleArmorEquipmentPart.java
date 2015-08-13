@@ -155,7 +155,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
     }
 
     @Override
-    public void updateConditionFromEntity() {
+    public void updateConditionFromEntity(boolean checkForDestruction) {
     	if(null != unit && isModular()) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted) {
@@ -165,11 +165,23 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
 				}
 			}
 		}
-    	if(isSalvaging()) {
-			this.time = 30;
-			this.difficulty = -2;
-		}
     }
+    
+    @Override 
+	public int getBaseTime() {
+		if(isSalvaging()) {
+			return 30;
+		}
+		return super.getBaseTime();
+	}
+	
+	@Override
+	public int getDifficulty() {
+		if(isSalvaging()) {
+			return -2;
+		}
+		return super.getBaseTime();
+	}
 
     @Override
     public boolean needsFixing() {

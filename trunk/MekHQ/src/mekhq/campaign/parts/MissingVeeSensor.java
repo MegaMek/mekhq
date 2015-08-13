@@ -45,10 +45,18 @@ public class MissingVeeSensor extends MissingPart {
     
     public MissingVeeSensor(int tonnage, Campaign c) {
     	super(0, c);
-    	this.time = 260;
-    	this.difficulty = 0;
     	this.name = "Vehicle Sensors";
     }
+    
+    @Override 
+	public int getBaseTime() {
+		return 260;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return 0;
+	}
     
 	@Override
 	public String checkFixable() {

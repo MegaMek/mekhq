@@ -69,8 +69,6 @@ public class TankLocation extends Part {
         super(tonnage, c);
         this.loc = loc;
         this.damage = 0;
-        this.time = 60;
-        this.difficulty = 0;
         this.breached = false;
         this.name = "Tank Location";
         switch(loc) {
@@ -210,11 +208,11 @@ public class TankLocation extends Part {
 		}
 		setSalvaging(false);
 		setUnit(null);
-		updateConditionFromEntity();
+		updateConditionFromEntity(false);
 	}
 
 	@Override
-	public void updateConditionFromEntity() {
+	public void updateConditionFromEntity(boolean checkForDestruction) {
 		if(null != unit) {
 			if(IArmorState.ARMOR_DESTROYED == unit.getEntity().getInternal(loc)) {
 				remove(false);
@@ -225,8 +223,16 @@ public class TankLocation extends Part {
 				} 
 			}
 		}
-		time = 60;
-		difficulty = 0;
+	}
+	
+	@Override 
+	public int getBaseTime() {
+		return 60;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return 0;
 	}
 
 	public boolean isBreached() {
@@ -320,7 +326,7 @@ public class TankLocation extends Part {
          int points = unit.getEntity().getInternal(loc);
          points = Math.max(points -d, 1);
          unit.getEntity().setInternal(points, loc);
-         updateConditionFromEntity();
+         updateConditionFromEntity(false);
      }
 
 	@Override

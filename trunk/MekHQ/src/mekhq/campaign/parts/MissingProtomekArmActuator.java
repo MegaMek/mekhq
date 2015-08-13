@@ -53,9 +53,17 @@ public class MissingProtomekArmActuator extends MissingPart {
         super(tonnage, c);
         this.name = "Protomech Arm Actuator";
         this.location = loc;
-        this.time = 120;
-        this.difficulty = 0;
     }
+    
+    @Override 
+	public int getBaseTime() {
+		return 120;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return 0;
+	}
     
     public void setLocation(int loc) {
         this.location = loc;

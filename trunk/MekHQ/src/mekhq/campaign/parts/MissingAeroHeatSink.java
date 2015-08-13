@@ -47,11 +47,19 @@ public class MissingAeroHeatSink extends MissingPart {
 
     public MissingAeroHeatSink(int tonnage, int type, Campaign c) {
     	super(tonnage, c);
-    	this.time = 90;
-    	this.difficulty = -2;
     	this.type = type;
     	this.name = "Aero Heat Sink";
     }
+    
+    @Override 
+	public int getBaseTime() {
+		return 90;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return -2;
+	}
 
 	@Override
 	public String checkFixable() {

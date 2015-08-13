@@ -116,9 +116,17 @@ public class MissingMekLocation extends MissingPart {
         if(tsm) {
             this.name += " (TSM)";
         }
-        this.time = 240;
-        this.difficulty = 3;
     }
+    
+    @Override 
+	public int getBaseTime() {
+		return 240;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return 3;
+	}
     
     public double getTonnage() {
     	//TODO: how much should this weigh?
@@ -347,7 +355,6 @@ public class MissingMekLocation extends MissingPart {
 			}
 			remove(false);
 			actualReplacement.updateConditionFromPart();			
-			u.runDiagnostic();
 		}
 	}
 	

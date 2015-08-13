@@ -428,15 +428,14 @@ public class MekLocation extends Part {
 				unit.addPart(missing);
 				campaign.addPart(missing, 0);
 			}
-			unit.runDiagnostic();
 		}
 		setSalvaging(false);
 		setUnit(null);
-		updateConditionFromEntity();
+		updateConditionFromEntity(false);
 	}
 	
 	@Override
-	public void updateConditionFromEntity() {
+	public void updateConditionFromEntity(boolean checkForDestruction) {
 		if(null != unit) {
 			blownOff = unit.getEntity().isLocationBlownOff(loc);
 			breached = unit.isLocationBreached(loc);
@@ -446,39 +445,64 @@ public class MekLocation extends Part {
 				return;
 			} 
 		}
-		if(blownOff) {
-			if(loc == Mech.LOC_HEAD) {
-				this.time = 200;
-				this.difficulty = 2;
-			} else {
-				this.time = 180;
-				this.difficulty = 1;
-			}
-		} else if(breached) {
-			this.time = 60;
-			this.difficulty = 0;
-		} else if (percent < 0.25) {
-			this.time = 270;
-			this.difficulty = 2;
-		} else if (percent < 0.5) {
-			this.time = 180;
-			this.difficulty = 1;
-		} else if (percent < 0.75) {
-			this.time = 135;
-			this.difficulty = 0;
-		} else {
-			this.time = 90;
-			this.difficulty = -1;
-		}
+	}
+	
+	@Override 
+	public int getBaseTime() {
 		if(isSalvaging()) {
 			if(isBlownOff()) {
-				this.time = 0;
-				this.difficulty = 0;
+				return 0;
 			} else {
-				this.time = 240;
-				this.difficulty = 3;
+				return 240;
 			}
-		}		
+		}
+		if(blownOff) {
+			if(loc == Mech.LOC_HEAD) {
+				return 200;
+			} else {
+				return 180;
+			}
+		} 
+		if(breached) {
+			return 60;
+		}
+		if (percent < 0.25) {
+			return 270;
+		} else if (percent < 0.5) {
+			return 180;
+		} else if (percent < 0.75) {
+			return 135;
+		}
+		return 90;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		if(isSalvaging()) {
+			if(isBlownOff()) {
+				return 0;
+			} else {
+				return 3;
+			}
+		}
+		if(blownOff) {
+			if(loc == Mech.LOC_HEAD) {
+				return 2;
+			} else {
+				return 1;
+			}
+		} 
+		if(breached) {
+			return 0;
+		}
+		if (percent < 0.25) {
+			return 2;
+		} else if (percent < 0.5) {
+			return 1;
+		} else if (percent < 0.75) {
+			return 0;
+		}
+		return -1;
 	}
 
 	public boolean isBreached() {
@@ -787,7 +811,7 @@ public class MekLocation extends Part {
 	     int points = unit.getEntity().getInternal(loc);
          points = Math.max(points -d, 1);
          unit.getEntity().setInternal(points, loc);
-         updateConditionFromEntity();
+         updateConditionFromEntity(false);
 	 }
 
 	@Override

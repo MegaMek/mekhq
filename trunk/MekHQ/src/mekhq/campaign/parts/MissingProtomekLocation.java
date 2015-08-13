@@ -90,9 +90,17 @@ public class MissingProtomekLocation extends MissingPart {
         if(booster) {
             this.name += " (Myomer Booster)";
         }
-        this.time = 240;
-        this.difficulty = 3;
     }
+    
+    @Override 
+	public int getBaseTime() {
+		return 240;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return 3;
+	}
     
     public int getLoc() {
         return loc;
@@ -273,7 +281,6 @@ public class MissingProtomekLocation extends MissingPart {
             replacement.decrementQuantity();
             remove(false);
             actualReplacement.updateConditionFromPart();
-            u.runDiagnostic();
         }
     }
 

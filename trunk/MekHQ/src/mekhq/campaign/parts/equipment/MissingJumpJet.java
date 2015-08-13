@@ -39,9 +39,17 @@ public class MissingJumpJet extends MissingEquipmentPart {
     
     public MissingJumpJet(int tonnage, EquipmentType et, int equipNum, Campaign c) {
         super(tonnage, et, equipNum, c, 1);
-        this.time = 60;
-        this.difficulty = 0;
     }
+    
+    @Override 
+	public int getBaseTime() {
+		return 60;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		return 0;
+	}
     
     @Override
 	public Part getNewPart() {

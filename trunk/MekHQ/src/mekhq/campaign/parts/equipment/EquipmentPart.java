@@ -25,6 +25,7 @@ import java.util.GregorianCalendar;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import megamek.common.Compute;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
@@ -283,16 +284,17 @@ public class EquipmentPart extends Part {
 		}
 		setSalvaging(false);
 		setUnit(null);
-		updateConditionFromEntity();
+		updateConditionFromEntity(false);
 		equipmentNum = -1;
 	}
 
 	@Override
-	public void updateConditionFromEntity() {
+	public void updateConditionFromEntity(boolean checkForDestruction) {
 		if(null != unit) {
+			int priorHits = hits;
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted) {
-				if(!mounted.isRepairable()) {
+				if(mounted.isMissing()) {
 					remove(false);
 					return;
 				}
@@ -301,27 +303,47 @@ public class EquipmentPart extends Part {
 				hits += unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum, mounted.getSecondLocation());
 				}
 			}
+			if(checkForDestruction 
+					&& hits > priorHits 
+					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+				remove(false);
+				return;
+			}
 		}
-		if(hits == 0) {
-			time = 0;
-			difficulty = 0;
-		} else if(hits == 1) {
-			time = 100;
-			difficulty = -3;
-		} else if(hits == 2) {
-			time = 150;
-			difficulty = -2;
-		} else if(hits == 3) {
-			time = 200;
-			difficulty = 0;
-		} else if(hits > 3) {
-			time = 250;
-			difficulty = 2;
-		}
+	}
+	
+	@Override 
+	public int getBaseTime() {
 		if(isSalvaging()) {
-			this.time = 120;
-			this.difficulty = 0;
+			return 120;
 		}
+		if(hits == 1) {
+			return 100;
+		} else if(hits == 2) {
+			return 150;
+		} else if(hits == 3) {
+			return 200;
+		} else if(hits > 3) {
+			return 250;
+		}
+		return 0;
+	}
+	
+	@Override
+	public int getDifficulty() {
+		if(isSalvaging()) {
+			return 0;
+		}
+		if(hits == 1) {
+			return -3;
+		} else if(hits == 2) {
+			return -2;
+		} else if(hits == 3) {
+			return 0;
+		} else if(hits > 3) {
+			return 2;
+		}
+		return 0;
 	}
 
 	@Override

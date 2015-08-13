@@ -92,7 +92,6 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
             for (Unit unit : units) {
                 if (!unit.isDeployed()) {
                     unit.setSalvage(true);
-                    unit.runDiagnostic();
                 }
             }
             gui.refreshServicedUnitList();
@@ -102,7 +101,6 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
             for (Unit unit : units) {
                 if (!unit.isDeployed() && unit.isRepairable()) {
                     unit.setSalvage(false);
-                    unit.runDiagnostic();
                 }
             }
             gui.refreshServicedUnitList();

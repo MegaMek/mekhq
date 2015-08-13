@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.Compute;
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
 import megamek.common.TechConstants;
@@ -132,29 +133,38 @@ public class VeeStabiliser extends Part {
 		}
 		setSalvaging(false);
 		setUnit(null);
-		updateConditionFromEntity();
+		updateConditionFromEntity(false);
 	}
 
 	@Override
-	public void updateConditionFromEntity() {
+	public void updateConditionFromEntity(boolean checkForDestruction) {
 		if(null != unit && unit.getEntity() instanceof Tank) {
+			int priorHits = hits;
 			if(((Tank)unit.getEntity()).isStabiliserHit(loc)) {
 				hits = 1;
 			} else {
 				hits = 0;
 			}
+			if(checkForDestruction 
+					&& hits > priorHits 
+					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+				remove(false);
+				return;
+			}
 		}
-		if(hits > 0) {
-			time = 60;
-			difficulty = 1;
-		} else {
-			time = 0;
-			difficulty = 0;
-		}
+	}
+	
+	@Override 
+	public int getBaseTime() {
+		return 60;
+	}
+	
+	@Override
+	public int getDifficulty() {
 		if(isSalvaging()) {
-			time = 60;
-			difficulty = 0;
+			return 0;
 		}
+		return 1;
 	}
 
 	@Override

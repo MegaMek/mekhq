@@ -359,11 +359,10 @@ public class EnginePart extends Part {
 		}
 		setSalvaging(false);
 		setUnit(null);
-		updateConditionFromEntity();
 	}
 
 	@Override
-	public void updateConditionFromEntity() {
+	public void updateConditionFromEntity(boolean checkForDestruction) {
 		if(null != unit) {
 			int engineHits = 0;
 			int engineCrits = 0;
@@ -404,28 +403,46 @@ public class EnginePart extends Part {
 				hits = 0;
 			}
 		}
-		this.time = 0;
-		this.difficulty = 0;
-		if (hits == 1) {
-			this.time = 100;
-			this.difficulty = -1;
-		} else if (hits == 2) {
-			this.time = 200;
-			this.difficulty = 0;
-		} else if (hits > 2) {
-			this.time = 300;
-			this.difficulty = 2;
-		}
+	}
+	
+	@Override 
+	public int getBaseTime() {
 		//TODO: keep an aero flag here, so we dont need the unit
 		if(null != unit && unit.getEntity() instanceof Aero && hits > 0) {
-			this.time = 300;
-			this.difficulty = 1;
+			return 300;
 		}
 		if(isSalvaging()) {
-			this.time = 360;
-			this.difficulty = -1;
+			return 360;
 		}
+		if (hits == 1) {
+			return 100;
+		} else if (hits == 2) {
+			return 200;
+		} else if (hits > 2) {
+			return 300;
+		}
+		return 0;
 	}
+	
+	@Override
+	public int getDifficulty() {
+		//TODO: keep an aero flag here, so we dont need the unit
+		if(null != unit && unit.getEntity() instanceof Aero && hits > 0) {
+			return 1;
+		}
+		if(isSalvaging()) {
+			return -1;
+		}
+		if (hits == 1) {
+			return -1;
+		} else if (hits == 2) {
+			return 0;
+		} else if (hits > 2) {
+			return 2;
+		}
+		return 0;
+	}
+
 
 	@Override
 	public boolean needsFixing() {
