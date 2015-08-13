@@ -119,7 +119,6 @@ public class InfantryMotiveType extends Part {
 			}
 			unit.removePart(this);
 		}	
-		setSalvaging(false);
 		setUnit(null);
 	}
 

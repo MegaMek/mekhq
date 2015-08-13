@@ -1020,25 +1020,6 @@ public class Campaign implements Serializable {
                 if (spare instanceof Armor) {
                     ((Armor) spare).setAmount(((Armor) spare).getAmount()
                                               + ((Armor) p).getAmount());
-                    updateAllArmorForNewSpares();
-                    lastPartId = lastPartId - 1;
-                    return;
-                }
-            }
-            if (p instanceof ProtomekArmor) {
-                if (spare instanceof ProtomekArmor) {
-                    ((ProtomekArmor) spare).setAmount(((ProtomekArmor) spare)
-                                                              .getAmount() + ((ProtomekArmor) p).getAmount());
-                    updateAllArmorForNewSpares();
-                    lastPartId = lastPartId - 1;
-                    return;
-                }
-            }
-            if (p instanceof BaArmor) {
-                if (spare instanceof BaArmor) {
-                    ((BaArmor) spare).setAmount(((BaArmor) spare).getAmount()
-                                                + ((BaArmor) p).getAmount());
-                    updateAllArmorForNewSpares();
                     lastPartId = lastPartId - 1;
                     return;
                 }
@@ -1057,10 +1038,6 @@ public class Campaign implements Serializable {
         }
         parts.add(p);
         partIds.put(new Integer(id), p);
-        if (p instanceof Armor || p instanceof ProtomekArmor
-            || p instanceof BaArmor) {
-            updateAllArmorForNewSpares();
-        }
     }
 
     /**
@@ -1086,31 +1063,7 @@ public class Campaign implements Serializable {
                                                   + ((Armor) p).getAmount());
                         quantity--;
                     }
-                    updateAllArmorForNewSpares();
                     removePart(p);
-                }
-            }
-            if (p instanceof ProtomekArmor) {
-                if (spare instanceof ProtomekArmor) {
-                    while (quantity > 0) {
-                        ((ProtomekArmor) spare)
-                                .setAmount(((ProtomekArmor) spare).getAmount()
-                                           + ((ProtomekArmor) p).getAmount());
-                        quantity--;
-                    }
-                    updateAllArmorForNewSpares();
-                    return;
-                }
-            }
-            if (p instanceof BaArmor) {
-                if (spare instanceof BaArmor) {
-                    while (quantity > 0) {
-                        ((BaArmor) spare).setAmount(((BaArmor) spare)
-                                                            .getAmount() + ((BaArmor) p).getAmount());
-                        quantity--;
-                    }
-                    updateAllArmorForNewSpares();
-                    return;
                 }
             } else if (p instanceof AmmoStorage) {
                 if (spare instanceof AmmoStorage) {
@@ -1127,23 +1080,6 @@ public class Campaign implements Serializable {
                     quantity--;
                 }
                 removePart(p);
-            }
-        } else if (p instanceof Armor || p instanceof ProtomekArmor
-                   || p instanceof BaArmor) {
-            updateAllArmorForNewSpares();
-        }
-    }
-
-    /**
-     * call this whenever armor spare parts are changed so that armor knows whether it gets partial repairs or not
-     */
-    public void updateAllArmorForNewSpares() {
-        for (Part part : getParts()) {
-            if (part instanceof Armor || part instanceof ProtomekArmor
-                || part instanceof BaArmor) {
-                if (null != part.getUnit() && part.needsFixing()) {
-                    part.updateConditionFromEntity(false);
-                }
             }
         }
     }
@@ -1163,24 +1099,6 @@ public class Campaign implements Serializable {
                     if (spare instanceof Armor) {
                         ((Armor) spare).setAmount(((Armor) spare).getAmount()
                                                   + ((Armor) p).getAmount());
-                        updateAllArmorForNewSpares();
-                        return;
-                    }
-                }
-                if (p instanceof ProtomekArmor) {
-                    if (spare instanceof ProtomekArmor) {
-                        ((ProtomekArmor) spare)
-                                .setAmount(((ProtomekArmor) spare).getAmount()
-                                           + ((ProtomekArmor) p).getAmount());
-                        updateAllArmorForNewSpares();
-                        return;
-                    }
-                }
-                if (p instanceof BaArmor) {
-                    if (spare instanceof BaArmor) {
-                        ((BaArmor) spare).setAmount(((BaArmor) spare)
-                                                            .getAmount() + ((BaArmor) p).getAmount());
-                        updateAllArmorForNewSpares();
                         return;
                     }
                 } else if (p instanceof AmmoStorage) {
@@ -1981,7 +1899,6 @@ public class Campaign implements Serializable {
         partWork.resetTimeSpent();
         partWork.resetOvertime();
         partWork.setTeamId(null);
-        partWork.resetRepairStatus();
         partWork.cancelReservation();
         addReport(report);
     }
@@ -3710,10 +3627,6 @@ public class Campaign implements Serializable {
             } else if (version.getMajorVersion() == 0
                        && version.getMinorVersion() < 2
                        && version.getSnapshot() < 16) {
-                prt.setSalvaging(false);
-                // this seems weird but we need to get difficulty and time
-                // updated for non-salvage
-                prt.updateConditionFromEntity(false);
                 boolean found = false;
                 for (Part spare : spareParts) {
                     if (spare.isSamePartTypeAndStatus(prt)) {

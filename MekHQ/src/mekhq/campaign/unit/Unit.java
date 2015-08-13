@@ -527,14 +527,6 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 			tempParts.add(p);
 		}
 		for(Part part : tempParts) {
-			//dont change status for pending assignments
-			if(null == part.getAssignedTeamId()) {
-				if(!isRepairable() || isSalvage()) {
-					part.setSalvaging(true);
-				} else {
-					part.setSalvaging(false);
-				}
-			}
 			part.updateConditionFromEntity(checkForDestruction);
 		}
 	}

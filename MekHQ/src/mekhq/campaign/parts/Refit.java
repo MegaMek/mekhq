@@ -309,11 +309,11 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 					updateRefitClass(CLASS_C);
 				}
 				if(movedPart instanceof EquipmentPart) {
-					boolean isSalvaging = movedPart.isSalvaging();
-					movedPart.setSalvaging(true);
-					movedPart.updateConditionFromEntity(false);
+					//boolean isSalvaging = movedPart.isSalvaging();
+					//movedPart.setSalvaging(true);
+					//movedPart.updateConditionFromEntity(false);
 					time += movedPart.getBaseTime();
-					movedPart.setSalvaging(isSalvaging);
+					//movedPart.setSalvaging(isSalvaging);
 				}
 			} else {
 				//its a new part
@@ -540,12 +540,13 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				recycledArmorPoints += ((BaArmor)oPart).getAmount();
 				continue;
 			}
-			boolean isSalvaging = oPart.isSalvaging();
-			oPart.setSalvaging(true);
-			oPart.updateConditionFromEntity(false);
+			//TODO: need to set unit as salvaging
+			//boolean isSalvaging = oPart.isSalvaging();
+			//oPart.setSalvaging(true);
+			//oPart.updateConditionFromEntity(false);
 			time += oPart.getBaseTime();
-			oPart.setSalvaging(isSalvaging);
-			oPart.updateConditionFromEntity(false);
+			//oPart.setSalvaging(isSalvaging);
+			//oPart.updateConditionFromEntity(false);
 		}
 
 		if(sameArmorType) {
@@ -815,7 +816,6 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			if(newArmorSupplies.getId() <= 0) {
 	             oldUnit.campaign.addPart(newArmorSupplies, 0);
 			}
-			oldUnit.campaign.updateAllArmorForNewSpares();
 		}
 	}
 
@@ -1648,12 +1648,6 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		for(Part p : shoppingList) {
 			p.fixIdReferences(uHash, pHash);
 		}
-	}
-
-	@Override
-	public void resetRepairStatus() {
-		// do nothing
-
 	}
 
 	@Override

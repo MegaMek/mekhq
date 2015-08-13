@@ -143,11 +143,6 @@ public class Rotor extends TankLocation {
 		}
 	}
 	
-	@Override
-	public boolean isSalvaging() {
-		return salvaging;
-	}
-	
 	@Override 
 	public String checkFixable() {
 		if(isSalvaging()) {

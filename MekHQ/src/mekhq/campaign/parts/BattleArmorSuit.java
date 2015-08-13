@@ -491,7 +491,7 @@ public class BattleArmorSuit extends Part {
                 }
                 if(part instanceof BaArmor && ((BaArmor)part).getLocation() == trooper) {
                     BaArmor armorClone = (BaArmor)part.clone();
-                    armorClone.setAmount(((BaArmor)part).getActualAmount());
+                    armorClone.setAmount(((BaArmor)part).getAmount());
 	                armorClone.setParentPartId(getId());
                     campaign.addPart(armorClone, 0);
                     addChildPart(armorClone);
@@ -526,7 +526,6 @@ public class BattleArmorSuit extends Part {
 			spare.incrementQuantity();
 			campaign.removePart(this);
 		}
-        setSalvaging(false);
         setUnit(null);
         updateConditionFromEntity(false);
     }
@@ -574,7 +573,7 @@ public class BattleArmorSuit extends Part {
 	            	Part p = campaign.getPart(childId);
 	            	if(null != p) {
 	            		if(p instanceof BaArmor) {
-	            			armor = ((BaArmor)p).getActualAmount();
+	            			armor = ((BaArmor)p).getAmount();
 	            		} else {
 	            			nEquip++;
 	            		}
@@ -649,7 +648,6 @@ public class BattleArmorSuit extends Part {
 	 */
     private void addSubParts() {
     	//first get a copy of the entity so we can create a test unit
-    	MechSummaryCache.getInstance().loadMechData();
  	    MechSummary summary = MechSummaryCache.getInstance().getMech(getChassis() + " " + getModel());
  		if(null == summary) {
  		    return;

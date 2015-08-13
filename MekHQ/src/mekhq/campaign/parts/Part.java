@@ -129,9 +129,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	//null is valid. It indicates parts that are not attached to units.
 	protected Unit unit;
 	protected UUID unitId;
-	//boolean to indicate whether the repair status on this part is set to salvage or
-	//to repair
-	protected boolean salvaging;
 
 	protected int quality;
 
@@ -187,7 +184,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.skillMin = SkillType.EXP_GREEN;
 		this.mode = Modes.MODE_NORMAL;
 		this.timeSpent = 0;
-		this.salvaging = false;
 		this.unitId = null;
 		this.workingOvertime = false;
 		this.shorthandedMod = 0;
@@ -548,10 +544,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 					+"</unitId>");
 		}
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<salvaging>"
-				+salvaging
-				+"</salvaging>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<workingOvertime>"
 				+workingOvertime
 				+"</workingOvertime>");
@@ -701,12 +693,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 						retVal.workingOvertime = true;
 					} else {
 						retVal.workingOvertime = false;
-					}
-				} else if (wn2.getNodeName().equalsIgnoreCase("salvaging")) {
-					if(wn2.getTextContent().equalsIgnoreCase("true")) {
-						retVal.salvaging = true;
-					} else {
-						retVal.salvaging = false;
 					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("brandNew")) {
 					if(wn2.getTextContent().equalsIgnoreCase("true")) {
@@ -941,7 +927,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	public String succeed() {
 		if(isSalvaging()) {
 			remove(true);
-			salvaging = false;
 			return " <font color='green'><b> salvaged.</b></font>";
 		} else {
 			fix();
@@ -956,11 +941,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
 	@Override
 	public boolean isSalvaging() {
-		return salvaging || isMountedOnDestroyedLocation();
-	}
-
-	public void setSalvaging(boolean b) {
-		this.salvaging = b;
+		if(null != unit) {
+			return unit.isSalvage() || isMountedOnDestroyedLocation();
+		}
+		return false;
 	}
 
 	public String checkScrappable() {
@@ -1002,7 +986,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     protected void copyBaseData(Part part) {
         this.mode = part.mode;
         this.hits = part.hits;
-        this.salvaging = part.salvaging;
         this.brandNew = part.brandNew;
     }
 
@@ -1052,12 +1035,14 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     	teamId = pHash.get(oldTeamId);
     }
 
+	/*
 	public void resetRepairStatus() {
 		if(null != unit) {
 			setSalvaging(unit.isSalvage());
 			updateConditionFromEntity(false);
 		}
 	}
+	*/
 
 	public boolean onBadHipOrShoulder() {
 		return false;
