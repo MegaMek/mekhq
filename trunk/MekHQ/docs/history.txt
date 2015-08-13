@@ -23,6 +23,7 @@ v0.3.16-dev (SVN)
 + Moved all equipment checks for destruction into Part.updateConditionFromEntity
 + removed time and difficulty variables from Part, now tracked by specific methods in each part, 
 	no need to always updateConditionFromEntity to switch
++ target for equipment destruction from combat is now a customizable option
 
 v0.3.15 (2015-08-04 10:50 UTC)
 + Planetary faction updates
