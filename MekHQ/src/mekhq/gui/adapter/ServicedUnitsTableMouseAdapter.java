@@ -212,7 +212,8 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
                             .getEntity(), curType, gui.getCampaign()
                             .getCampaignOptions().getTechLevel())) {
                         cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
-                        if (atype.equals(curType)) {
+                        if (atype.equals(curType)
+                        		&& atype.getMunitionType() == curType.getMunitionType()) {
                             cbMenuItem.setSelected(true);
                         } else {
                             cbMenuItem.setActionCommand("SWAP_AMMO:"
