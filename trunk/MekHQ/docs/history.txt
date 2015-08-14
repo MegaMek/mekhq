@@ -38,6 +38,7 @@ v0.3.16-dev (SVN)
 + Bug [#849]: Removing ammo from a design does not cause the corresponding ammo to appear in your warehouse
 + Bug: cancel customization not available in unit context menu
 + Bug [#857]: Refit kit does not remove parts from the warehouse when the refit is completed
++ Bug [#602]: 0.3.6 warehouse graphical glitch
 
 v0.3.15 (2015-08-04 10:50 UTC)
 + Planetary faction updates
