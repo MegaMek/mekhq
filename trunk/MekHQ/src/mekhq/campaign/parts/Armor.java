@@ -722,4 +722,13 @@ public class Armor extends Part implements IAcquisitionWork {
     public boolean isPriceAdustedForAmount() {
         return true;
     }
+
+	public void changeType(int ty, boolean cl) {
+		this.type = ty;
+		this.clan = cl;
+		this.name = "Armor";
+        if(type > -1) {
+        	this.name += " (" + EquipmentType.armorNames[type] + ")";
+        }
+	}
 }

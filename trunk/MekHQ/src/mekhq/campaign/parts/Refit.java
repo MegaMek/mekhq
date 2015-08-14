@@ -186,7 +186,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		Hashtable<String,Integer> tally = new Hashtable<String,Integer>();
 	    Hashtable<String,String> desc = new Hashtable<String,String>();
 		for(Part p : shoppingList) {
-		    if(p instanceof Armor || p instanceof ProtomekArmor || p instanceof BaArmor) {
+		    if(p instanceof Armor) {
 		        continue;
 		    }
 			if(null != tally.get(p.getName())) {
@@ -369,7 +369,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				atype = ((Armor)nPart).getType();
 				aclan = ((Armor)nPart).isClanTechBase();
 				//armor always gets added to the shopping list - it will be checked for differently
-				shoppingList.add(nPart);
+				//NOT ANYMORE - I think this is overkill, lets just reuse existing armor parts
+				//shoppingList.add(nPart);
 			}
 			else if(nPart instanceof AmmoBin) {
 				EquipmentType type = ((AmmoBin)nPart).getType();
@@ -510,21 +511,10 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				recycledArmorPoints += ((Armor)oPart).getAmount();
 				continue;
 			}
-			if(oPart instanceof ProtomekArmor && sameArmorType) {
-				recycledArmorPoints += ((ProtomekArmor)oPart).getAmount();
-				continue;
-			}
-			if(oPart instanceof BaArmor && sameArmorType) {
-				recycledArmorPoints += ((BaArmor)oPart).getAmount();
-				continue;
-			}
-			//TODO: need to set unit as salvaging
-			//boolean isSalvaging = oPart.isSalvaging();
-			//oPart.setSalvaging(true);
-			//oPart.updateConditionFromEntity(false);
+			boolean isSalvaging = oldUnit.isSalvage();
+			oldUnit.setSalvage(true);
 			time += oPart.getBaseTime();
-			//oPart.setSalvaging(isSalvaging);
-			//oPart.updateConditionFromEntity(false);
+			oldUnit.setSalvage(isSalvaging);
 		}
 
 		if(sameArmorType) {
@@ -634,11 +624,12 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
     		for(Part part : shoppingList) {
     			part.setUnit(null);
     			if(part instanceof Armor) {
-                    //automatically add armor by location, we will check for the lump sum of
-                    //armor using newArmorSupplies
-                    oldUnit.campaign.addPart(part, 0);
-                    part.setRefitId(oldUnit.getId());
-                    newUnitParts.add(part.getId());
+                    //Taharqa: WE shouldn't be here anymore, given that I am no longer adding
+    				//armor by location to the shopping list but instead changing it all via
+    				//the newArmorSupplies object, but commented out for completeness
+                    //oldUnit.campaign.addPart(part, 0);
+                    //part.setRefitId(oldUnit.getId());
+                    //newUnitParts.add(part.getId());
                 }
                 else if(part instanceof AmmoBin) {
                     //ammo bins are free - bleh
@@ -896,13 +887,15 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			}
 			else if(part instanceof Armor) {
 				Armor a = (Armor)part;
+				//lets just re-use this armor part
 				if(!sameArmorType) {
+					//give the amount back to the warehouse since we are switching types
 					a.changeAmountAvailable(a.getAmount());
-				} else {
-					atype = a.getType();
-					aclan = a.isClanTechBase();
-				}
-				oldUnit.campaign.removePart(part);
+					if(null != newArmorSupplies) {
+						a.changeType(newArmorSupplies.getType(), newArmorSupplies.isClanTechBase());
+					}
+				} 
+				newUnitParts.add(pid);
 			}
 			else if(part instanceof AmmoBin) {
 				((AmmoBin) part).unload();
@@ -931,6 +924,10 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			part.setUnit(oldUnit);
 			part.setRefitId(null);
 			newParts.add(part);
+			if(part instanceof Armor) {
+				//get amounts correct for armor
+				part.updateConditionFromEntity(false);
+			}
 		}
 		oldUnit.setParts(newParts);
 		Utilities.unscrambleEquipmentNumbers(oldUnit);
@@ -1501,10 +1498,13 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	    //TODO: check somewhere before this if they can afford it
 		for(Part part : shoppingList) {
 			if(part instanceof Armor) {
-				oldUnit.campaign.addPart(part, transitDays);
-				part.setUnit(oldUnit);
-				part.setRefitId(oldUnit.getId());
-				newUnitParts.add(part.getId());
+				//Taharqa: WE shouldn't be here anymore, given that I am no longer adding
+				//armor by location to the shopping list but instead changing it all via
+				//the newArmorSupplies object, but commented out for completeness
+				//oldUnit.campaign.addPart(part, transitDays);
+				//part.setUnit(oldUnit);
+				//part.setRefitId(oldUnit.getId());
+				//newUnitParts.add(part.getId());
 			}
 			else if(part instanceof AmmoBin) {
 				oldUnit.campaign.addPart(part, 0);
