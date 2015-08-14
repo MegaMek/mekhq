@@ -393,6 +393,7 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
             // not both - if both are selected then default to
             // unit and deselect all forces
             Vector<Force> forces = new Vector<Force>();
+            Vector<Unit> unitsInForces = new Vector<Unit>();
             Vector<Unit> units = new Vector<Unit>();
             Vector<TreePath> uPath = new Vector<TreePath>();
             for (TreePath path : tree.getSelectionPaths()) {
@@ -404,6 +405,14 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                     units.add((Unit) node);
                     uPath.add(path);
                 }
+            }
+            for(Force force: forces) {
+            	for(UUID id : force.getAllUnits()) {
+            		Unit u = gui.getCampaign().getUnit(id);
+            		if(null != u) {
+            			unitsInForces.add(u);
+            		}
+            	}
             }
             boolean forcesSelected = !forces.isEmpty();
             boolean unitsSelected = !units.isEmpty();
@@ -562,7 +571,7 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 menuItem.setActionCommand("REMOVE_FORCE|FORCE|empty|"
                         + forceIds);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(true);
+                menuItem.setEnabled(!StaticChecks.areAnyForcesDeployed(forces) && !StaticChecks.areAnyUnitsDeployed(unitsInForces));
                 popup.add(menuItem);
             } else if (unitsSelected) {
                 Unit unit = units.get(0);
@@ -685,9 +694,9 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 }
                 menuItem = new JMenuItem("Remove Unit from TO&E");
                 menuItem.setActionCommand("REMOVE_UNIT|UNIT|empty|"
-                        + unitIds);
+                		+ unitIds);
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(true);
+                menuItem.setEnabled(!StaticChecks.areAnyUnitsDeployed(units));
                 popup.add(menuItem);
                 if (StaticChecks.areAllUnitsAvailable(units)) {
                     menu = new JMenu("Deploy Unit");

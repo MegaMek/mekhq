@@ -37,6 +37,15 @@ public class StaticChecks {
         }
         return true;
     }
+    
+    public static boolean areAnyForcesDeployed(Vector<Force> forces) {
+        for (Force force : forces) {
+            if (force.isDeployed()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public static boolean areAllUnitsDeployed(Vector<Unit> units) {
         for (Unit unit : units) {
@@ -45,6 +54,15 @@ public class StaticChecks {
             }
         }
         return true;
+    }
+    
+    public static boolean areAnyUnitsDeployed(Vector<Unit> units) {
+        for (Unit unit : units) {
+            if (unit.isDeployed()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean doAllUnitsHaveC3i(Vector<Unit> units) {
