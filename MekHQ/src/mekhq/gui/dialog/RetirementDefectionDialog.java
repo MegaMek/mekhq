@@ -1,19 +1,16 @@
 /**
- * 
+ *
  */
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ResourceBundle;
@@ -47,62 +44,55 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import megamek.common.Compute;
 import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.Jumpship;
-import megamek.common.SmallCraft;
-import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.UnitType;
-import mekhq.IconPackage;
 import mekhq.Utilities;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.RetirementDefectionTracker;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.BasicInfo;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.model.PersonnelTableModel;
+import mekhq.gui.model.RetirementTableModel;
+import mekhq.gui.model.UnitAssignmentTableModel;
 import mekhq.gui.model.XTableColumnModel;
+import mekhq.gui.sorter.BonusSorter;
+import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.RankSorter;
 import mekhq.gui.sorter.WeightClassSorter;
 
 /**
  * @author Neoancient
- * 
+ *
  */
 public class RetirementDefectionDialog extends JDialog {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -5551772461081092679L;
-	
+
 	private static final String PAN_OVERVIEW = "PanOverview";
 	private static final String PAN_RESULTS = "PanResults";
-	
+
 	private String currentPanel;
-	
+
 	private CampaignGUI hqView;
 	private AtBContract contract;
 	private RetirementDefectionTracker rdTracker;
-	
+
 	private HashMap<UUID, TargetRoll> targetRolls;
 	private HashMap<UUID, UUID> unitAssignments;
-	
+
 	private JPanel panMain;
 	private JTextArea txtInstructions;
 	private CardLayout cardLayout;
-	
+
 	/* Overview Panel components */
 	private JComboBox<String> cbGroupOverview;
 	private JSpinner spnGeneralMod;
@@ -111,7 +101,7 @@ public class RetirementDefectionDialog extends JDialog {
     private TableRowSorter<RetirementTableModel> personnelSorter;
     private TableRowSorter<RetirementTableModel> retireeSorter;
     private JTextArea txtTargetDetails;
-    
+
     /* Results Panel components */
 	private JComboBox<String> cbGroupResults;
     private JLabel lblPayment;
@@ -122,7 +112,7 @@ public class RetirementDefectionDialog extends JDialog {
 	private JCheckBox chkShowAllUnits;
     private JTable unitAssignmentTable;
     private TableRowSorter<UnitAssignmentTableModel> unitSorter;
-    
+
     /* Button Panel components */
 	private JButton btnCancel;
 	private JToggleButton btnEdit;
@@ -144,17 +134,17 @@ public class RetirementDefectionDialog extends JDialog {
 					hqView.getCampaign());
 		}
 		currentPanel = doRetirement?PAN_OVERVIEW:PAN_RESULTS;
-        setSize(new Dimension(800, 600));	
+        setSize(new Dimension(800, 600));
 		initComponents(doRetirement);
 		if (!doRetirement) {
 			initResults();
 			btnDone.setEnabled(unitAssignmentsComplete());
 		}
-	
-	    setLocationRelativeTo(gui.getFrame());		
+
+	    setLocationRelativeTo(gui.getFrame());
 	}
-	
-	private void initComponents(boolean doRetirement) {		
+
+	private void initComponents(boolean doRetirement) {
 		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.RetirementDefectionDialog");
         setTitle(resourceMap.getString("title.text"));
 
@@ -233,12 +223,16 @@ public class RetirementDefectionDialog extends JDialog {
         	personnelTable = new RetirementTable(model, hqView);
 
         	personnelSorter = new TableRowSorter<RetirementTableModel>(model);
-        	personnelSorter.setComparator(RetirementTableModel.COL_PERSON, new RankSorter(hqView.getCampaign()));
+            personnelSorter.setComparator(RetirementTableModel.COL_PERSON, new RankSorter(hqView.getCampaign()));
+            personnelSorter.setComparator(RetirementTableModel.COL_PAYOUT, new FormattedNumberSorter());
+            personnelSorter.setComparator(RetirementTableModel.COL_BONUS_COST, new BonusSorter());
+            personnelSorter.setComparator(RetirementTableModel.COL_PAY_BONUS, new BonusSorter());
+            personnelSorter.setComparator(RetirementTableModel.COL_SHARES, new FormattedNumberSorter());
         	personnelTable.setRowSorter(personnelSorter);
         	ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
         	sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_RANK, SortOrder.DESCENDING));
         	personnelSorter.setSortKeys(sortKeys);
-        	
+
         	cbGroupOverview.addActionListener(new ActionListener() {
         		public void actionPerformed(ActionEvent evt) {
         			filterPersonnel(personnelSorter, cbGroupOverview.getSelectedIndex(), false);
@@ -284,7 +278,7 @@ public class RetirementDefectionDialog extends JDialog {
 
         	JScrollPane scroll = new JScrollPane();
         	scroll.setViewportView(personnelTable);
-        	scroll.setPreferredSize(new Dimension(500, 500));        
+        	scroll.setPreferredSize(new Dimension(500, 500));
         	panOverview.add(scroll, BorderLayout.CENTER);
 
         	txtTargetDetails = new JTextArea();
@@ -292,11 +286,11 @@ public class RetirementDefectionDialog extends JDialog {
 
         	panMain.add(panOverview, PAN_OVERVIEW);
 		}
-        
+
         /* Results Panel */
-		
+
         JPanel panRetirees = new JPanel(new BorderLayout());
-        
+
 		cbGroupResults = new JComboBox<String>();
 		cbGroupResults.addItem("All Personnel");
         for (int i = 1; i < CampaignGUI.PG_NUM; i++) {
@@ -306,7 +300,7 @@ public class RetirementDefectionDialog extends JDialog {
         panTop.setLayout(new BoxLayout(panTop, BoxLayout.X_AXIS));
         panTop.add(cbGroupResults);
         panTop.add(Box.createHorizontalGlue());
-        
+
         JLabel lblFinalPayout = new JLabel(resourceMap.getString("lblFinalPayout.text"));
         lblPayment = new JLabel();
         lblPayment.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -338,9 +332,9 @@ public class RetirementDefectionDialog extends JDialog {
         });
         panTop.add(Box.createHorizontalGlue());
         panTop.add(chkShowAllUnits);
-        
+
         panRetirees.add(panTop, BorderLayout.PAGE_START);
-        
+
 		RetirementTableModel model = new RetirementTableModel(hqView.getCampaign());
 		retireeTable = new RetirementTable(model, hqView);
         retireeSorter = new TableRowSorter<RetirementTableModel>(model);
@@ -354,7 +348,7 @@ public class RetirementDefectionDialog extends JDialog {
                 filterPersonnel(retireeSorter, cbGroupResults.getSelectedIndex(), true);
             }
         });
-       
+
         retireeTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent ev) {
 				enableAddRemoveButtons();
@@ -376,14 +370,14 @@ public class RetirementDefectionDialog extends JDialog {
         columnModel.setColumnVisible(columnModel.getColumn(retireeTable.convertColumnIndexToView(RetirementTableModel.COL_PAY_BONUS)), false);
         columnModel.setColumnVisible(columnModel.getColumn(retireeTable.convertColumnIndexToView(RetirementTableModel.COL_MISC_MOD)), false);
         columnModel.setColumnVisible(columnModel.getColumn(retireeTable.convertColumnIndexToView(RetirementTableModel.COL_SHARES)), false);
-        
+
 
         UnitAssignmentTableModel unitModel = new UnitAssignmentTableModel(hqView.getCampaign());
         unitAssignmentTable = new JTable(unitModel);
         unitAssignmentTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         unitAssignmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         columnModel = new XTableColumnModel();
-        unitAssignmentTable.setColumnModel(columnModel);		
+        unitAssignmentTable.setColumnModel(columnModel);
         unitAssignmentTable.createDefaultColumnsFromModel();
         unitSorter = new TableRowSorter<UnitAssignmentTableModel>(unitModel);
         unitSorter.setComparator(UnitAssignmentTableModel.COL_UNIT, new WeightClassSorter());
@@ -397,7 +391,7 @@ public class RetirementDefectionDialog extends JDialog {
             column.setPreferredWidth(model.getColumnWidth(i));
             	column.setCellRenderer(unitModel.getRenderer(i, hqView.getIconPackage()));
         }
-        
+
         unitAssignmentTable.setRowHeight(80);
         unitAssignmentTable.setIntercellSpacing(new Dimension(0, 0));
         unitAssignmentTable.setShowGrid(false);
@@ -433,16 +427,16 @@ public class RetirementDefectionDialog extends JDialog {
         });
         panAddRemoveBtns.add(btnRemoveUnit);
 		panResults.add(panAddRemoveBtns);
-        
+
         scroll = new JScrollPane();
 		scroll.setViewportView(unitAssignmentTable);
 		panResults.add(scroll);
-        
+
         panRetirees.add(panResults, BorderLayout.CENTER);
         panMain.add(panRetirees, PAN_RESULTS);
-        
+
         cardLayout.show(panMain, currentPanel);
-		
+
 		JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 2, 2));
 		btnCancel = new JButton(resourceMap.getString("btnCancel.text"));
 		btnCancel.addActionListener(buttonListener);
@@ -542,9 +536,9 @@ public class RetirementDefectionDialog extends JDialog {
 		for (UUID id : rdTracker.getRetirees(contract)) {
 			Person p = hqView.getCampaign().getPerson(id);
 			if (rdTracker.getPayout(id).hasStolenUnit()) {
-				boolean unassignedAvailable = (unassignedMechs.size() > 0 && 
+				boolean unassignedAvailable = (unassignedMechs.size() > 0 &&
 						p.getPrimaryRole() == Person.T_MECHWARRIOR) ||
-						(unassignedASF.size() > 0 && 
+						(unassignedASF.size() > 0 &&
 								p.getPrimaryRole() == Person.T_AERO_PILOT);
 				/* If a unit has previously been assigned, check that it is still available
 				 * and either assigned to the current player or unassigned. If so, keep
@@ -586,8 +580,8 @@ public class RetirementDefectionDialog extends JDialog {
 				unitAssignments.put(id, p.getOriginalUnitId());
 				if (hqView.getCampaign().getCampaignOptions().getUseShareSystem()) {
 					rdTracker.
-					getPayout(id).setCbills(Math.max(0, 
-							rdTracker.getPayout(id).getCbills() - 
+					getPayout(id).setCbills(Math.max(0,
+							rdTracker.getPayout(id).getCbills() -
 							hqView.getCampaign().getUnit(p.getOriginalUnitId()).getBuyCost()));
 				}
 			}
@@ -655,9 +649,9 @@ public class RetirementDefectionDialog extends JDialog {
                 return false;
             }
         };
-        sorter.setRowFilter(personTypeFilter);		
+        sorter.setRowFilter(personTypeFilter);
 	}
-	
+
     public void filterUnits() {
         RowFilter<UnitAssignmentTableModel, Integer> unitTypeFilter = null;
         final int nGroup = cbUnitCategory.getSelectedIndex() - 1;
@@ -696,8 +690,8 @@ public class RetirementDefectionDialog extends JDialog {
             }
         };
         unitSorter.setRowFilter(unitTypeFilter);
-    }	
-	
+    }
+
 	public static int weightClassIndex(Unit u) {
 		int retVal = u.getEntity().getWeightClass();
 		if (u.getEntity().isClan() || u.getEntity().getTechLevel() > megamek.common.TechConstants.T_INTRO_BOXSET) {
@@ -708,7 +702,7 @@ public class RetirementDefectionDialog extends JDialog {
 		}
 		return Math.max(0, retVal);
 	}
-	
+
 	public long totalPayout() {
 		if (null == rdTracker.getRetirees(contract)) {
 			return 0;
@@ -761,16 +755,16 @@ public class RetirementDefectionDialog extends JDialog {
 		}
 		return retVal;
 	}
-	
+
 	public boolean payBonus(UUID id) {
 		return ((RetirementTableModel)personnelTable.getModel()).getPayBonus(id);
 	}
-	
+
 	public int miscModifier(UUID id) {
 		return ((RetirementTableModel)personnelTable.getModel()).getMiscModifier(id) +
 				(Integer)spnGeneralMod.getValue();
 	}
-	
+
 	private int getTotalShares() {
 		int retVal = 0;
 		for (UUID id : targetRolls.keySet()) {
@@ -778,7 +772,7 @@ public class RetirementDefectionDialog extends JDialog {
 		}
 		return retVal;
 	}
-	
+
 	private long getTotalBonus() {
 		long retVal = 0;
 		for (UUID id : targetRolls.keySet()) {
@@ -788,7 +782,7 @@ public class RetirementDefectionDialog extends JDialog {
 		}
 		return retVal;
 	}
-	
+
 	/* It is possible that there may not be enough units of the required
 	 * weight/tech level for all retirees. This is not address by the AtB
 	 * rules, so I have improvised by allowing smaller units to be given,
@@ -801,11 +795,11 @@ public class RetirementDefectionDialog extends JDialog {
 		}
 		return (required - actual) * 3000000;
 	}
-	
+
 	public UUID getUnitId(UUID pid) {
 		return unitAssignments.get(pid);
 	}
-	
+
 	public HashMap<UUID, UUID> getUnitAssignments() {
 		return unitAssignments;
 	}
@@ -813,7 +807,7 @@ public class RetirementDefectionDialog extends JDialog {
 	public boolean wasAborted() {
 		return aborted;
 	}
-	
+
 	private boolean unitAssignmentsComplete() {
 		for (UUID id : rdTracker.getRetirees(contract)) {
 			if (rdTracker.getPayout(id).getWeightClass() > 0 &&
@@ -844,7 +838,7 @@ public class RetirementDefectionDialog extends JDialog {
 				btnAddUnit.setEnabled(false);
 				if ((hqView.getCampaign().getCampaignOptions().getTrackOriginalUnit() &&
 						unitAssignments.get(pid) == hqView.getCampaign().getPerson(pid).getOriginalUnitId()) &&
-						!btnEdit.isSelected()) {						
+						!btnEdit.isSelected()) {
 					btnRemoveUnit.setEnabled(false);
 				} else {
 					btnRemoveUnit.setEnabled(true);
@@ -863,10 +857,10 @@ public class RetirementDefectionDialog extends JDialog {
 			} else {
 				btnAddUnit.setEnabled(unitAssignmentTable.getSelectedRow() >= 0);
 				btnRemoveUnit.setEnabled(false);
-			}						
+			}
 		}
 	}
-	
+
 	private void addUnit() {
 		Person person = ((RetirementTableModel)retireeTable.getModel()).getPerson(retireeTable.convertRowIndexToModel(retireeTable.getSelectedRow()));
 		Unit unit = ((UnitAssignmentTableModel)unitAssignmentTable.getModel()).getUnit(unitAssignmentTable.convertRowIndexToModel(unitAssignmentTable.getSelectedRow()));
@@ -925,16 +919,16 @@ public class RetirementDefectionDialog extends JDialog {
 }
 
 class RetirementTable extends JTable {
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -2839165270046226216L;
-	
+
 	private class SpinnerEditor extends AbstractCellEditor implements TableCellEditor {
 		private static final long serialVersionUID = 7956499745127048276L;
 		private JSpinner spinner;
-		
+
 		public SpinnerEditor() {
 			spinner = new JSpinner(new SpinnerNumberModel(0, -10, 10, 1));
 			((JSpinner.DefaultEditor)spinner.getEditor()).getTextField().setEditable(false);
@@ -952,13 +946,13 @@ class RetirementTable extends JTable {
 			return spinner;
 		}
 	}
-	
+
 	public RetirementTable(RetirementTableModel model, CampaignGUI hqView) {
 		super(model);
         setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         this.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         XTableColumnModel columnModel = new XTableColumnModel();
-        setColumnModel(columnModel);		
+        setColumnModel(columnModel);
         createDefaultColumnsFromModel();
         TableColumn column = null;
         for (int i = 0; i < RetirementTableModel.N_COL; i++) {
@@ -969,17 +963,17 @@ class RetirementTable extends JTable {
             	column.setCellRenderer(model.getRenderer(i, hqView.getIconPackage()));
             }
         }
-        
+
         setRowHeight(80);
         setIntercellSpacing(new Dimension(0, 0));
         setShowGrid(false);
 
         getColumnModel().getColumn(convertColumnIndexToView(RetirementTableModel.COL_PAY_BONUS)).
 			setCellEditor(new DefaultCellEditor(new JCheckBox()));
-        
+
         getColumnModel().getColumn(convertColumnIndexToView(RetirementTableModel.COL_MISC_MOD)).
         	setCellEditor(new SpinnerEditor());
-        
+
         JComboBox<String> cbRecruitType = new JComboBox<String>();
         for (int i = Person.T_NONE; i < Person.T_NUM; i++) {
         	cbRecruitType.addItem(Person.getRoleDesc(i, hqView.getCampaign().getFaction().isClan()));
@@ -991,681 +985,5 @@ class RetirementTable extends JTable {
 	public void setGeneralMod(int mod) {
 		((RetirementTableModel)getModel()).setGeneralMod(mod);
 	}
-	
+
 }
-
-class RetirementTableModel extends AbstractTableModel {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7461821036790309952L;
-
-	public final static int COL_PERSON = 0;
-	public final static int COL_ASSIGN = 1;
-	public final static int COL_FORCE = 2;
-	public final static int COL_TARGET = 3;
-	public final static int COL_SHARES = 4;
-	public final static int COL_BONUS_COST = 5;
-	public final static int COL_PAY_BONUS = 6;
-	public final static int COL_MISC_MOD = 7;
-	public final static int COL_PAYOUT = 8;
-	public final static int COL_RECRUIT = 9;
-	public final static int COL_UNIT = 10;
-	public final static int N_COL = 11;
-
-	private final static String[] colNames = {
-		"Person", "Assignment", "Force", "Target",
-		"Shares", "Bonus Cost", "Pay Bonus", "Misc Modifier",
-		"Payout", "Recruit", "Unit"
-	};
-
-	private Campaign campaign;
-	private ArrayList<UUID> data;
-	private HashMap<UUID, TargetRoll> targets;
-	private HashMap<UUID, Boolean> payBonus;
-	private HashMap<UUID, Integer> miscMods;
-	private int generalMod;
-	private HashMap<UUID, UUID> unitAssignments;
-	private HashMap<UUID, Integer> altPayout;
-	boolean editPayout;
-	private DecimalFormat formatter;
-
-	public RetirementTableModel(Campaign c) {
-		this.campaign = c;
-		data = new ArrayList<UUID>();
-		payBonus = new HashMap<UUID, Boolean>();
-		miscMods = new HashMap<UUID, Integer>();
-		generalMod = 0;
-		unitAssignments = new HashMap<UUID, UUID>();
-		altPayout = new HashMap<UUID, Integer>();
-		editPayout = false;
-		formatter = new DecimalFormat();
-	}
-	
-	public void setData(ArrayList<UUID> list,
-			HashMap<UUID, UUID> unitAssignments) {
-		this.unitAssignments = unitAssignments;
-		data = list;
-		fireTableDataChanged();
-	}
-	
-	public void setData(HashMap<UUID, TargetRoll> targets) {
-		this.targets = targets;
-		data.clear();
-		for (UUID id : targets.keySet()) {
-			data.add(id);
-			payBonus.put(id, false);
-			miscMods.put(id, 0);
-		}
-		fireTableDataChanged();
-	}
-
-	@Override
-	public int getRowCount() {
-		return data.size();
-	}
-
-	@Override
-	public int getColumnCount() {
-		return N_COL;
-	}
-
-	@Override
-	public String getColumnName(int column) {
-		return colNames[column];
-	}
-
-	public int getColumnWidth(int c) {
-		switch(c) {
-		case COL_PERSON:
-		case COL_ASSIGN:
-		case COL_FORCE:
-		case COL_UNIT:
-		case COL_RECRUIT:
-			return 125;
-		case COL_BONUS_COST:
-		case COL_PAYOUT:
-			return 70;
-		case COL_TARGET:
-		case COL_SHARES:
-		case COL_MISC_MOD:
-			return 50;
-		case COL_PAY_BONUS:
-		default:
-			return 20;
-		}
-	}
-
-	public int getAlignment(int col) {
-		switch(col) {
-		case COL_PERSON:
-		case COL_ASSIGN:
-		case COL_FORCE:
-		case COL_UNIT:
-		case COL_RECRUIT:
-			return SwingConstants.LEFT;
-		case COL_BONUS_COST:
-		case COL_PAYOUT:
-			return SwingConstants.RIGHT;
-		case COL_TARGET:
-		case COL_PAY_BONUS:
-		case COL_SHARES:
-		case COL_MISC_MOD:
-		default:
-			return SwingConstants.CENTER;
-		}
-	}
-
-	@Override
-	public boolean isCellEditable(int row, int col) {
-		switch (col) {
-		case COL_PAYOUT:
-			return editPayout;
-		case COL_PAY_BONUS:
-		case COL_MISC_MOD:
-			return true;
-		case COL_RECRUIT:
-			return campaign.getRetirementDefectionTracker().getPayout(data.get(row)).hasRecruit();
-		default:
-			return false;
-		}
-	}
-
-	@Override
-	public Class<?> getColumnClass(int col) {
-		Class<?> retVal = Object.class;
-		try {
-			retVal = getValueAt(0, col).getClass();
-		} catch (NullPointerException e) {
-			System.out.println("NPE at column " + colNames[col]);
-		}
-		return retVal;
-	}
-
-	@Override
-	public Object getValueAt(int row, int col) {
-		Person p;
-		if(data.isEmpty()) {
-			return "";
-		} else {
-			p = campaign.getPerson(data.get(row));
-		}
-		switch (col) {
-		case COL_PERSON:
-			return p.makeHTMLRank();
-		case COL_ASSIGN:
-			Unit u = campaign.getUnit(p.getUnitId());
-			if(null != u) {
-				String name = u.getName();
-				if(u.getEntity() instanceof Tank) {
-					if(u.isDriver(p)) {
-						name = name + " [Driver]";
-					} else {
-						name = name + " [Gunner]";
-					}
-				}
-				if(u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
-					if(u.isNavigator(p)) {
-						name = name + " [Navigator]";
-					}
-					else if(u.isDriver(p)) {
-						name =  name + " [Pilot]";
-					}
-					else if(u.isGunner(p)) {
-						name = name + " [Gunner]";
-					} else {
-						name = name + " [Crew]";
-					}
-				}
-				return name;
-			}
-			//check for tech
-			if(!p.getTechUnitIDs().isEmpty()) {
-				if(p.getTechUnitIDs().size() == 1) {
-					u = campaign.getUnit(p.getTechUnitIDs().get(0));
-					if(null != u) {
-						return u.getName() + " (" + p.getMaintenanceTimeUsing() + "m)";
-					}
-				} else {
-					return "" + p.getTechUnitIDs().size() + " units (" + p.getMaintenanceTimeUsing() + "m)";
-				}
-			}             
-			return "-";
-		case COL_FORCE:
-			Force force = campaign.getForceFor(p);
-			if(null != force) {
-				return force.getName();
-			} else {
-				return "None";
-			}	        	
-		case COL_TARGET:
-			if (null == targets) {
-				return 0;
-			}
-			return targets.get(p.getId()).getValue() -
-					(payBonus.get(p.getId())?1:0) +
-					miscMods.get(p.getId()) + generalMod;
-		case COL_BONUS_COST:
-			return formatter.format(RetirementDefectionTracker.getBonusCost(p));
-		case COL_PAY_BONUS:
-			if (null == payBonus.get(p.getId())) {
-				return false;
-			}
-			return payBonus.get(p.getId());
-		case COL_MISC_MOD:
-			if (null == miscMods.get(p.getId())) {
-				return false;
-			}
-			return miscMods.get(p.getId());
-		case COL_SHARES:
-			return p.getNumShares(campaign.getCampaignOptions().getSharesForAll());
-		case COL_PAYOUT:
-			if (null == campaign.getRetirementDefectionTracker().getPayout(p.getId())) {
-            	return "";
-            }
-			if (altPayout.keySet().contains(p.getId())) {
-				return formatter.format(altPayout.get(p.getId()));
-			}
-			long payout = campaign.getRetirementDefectionTracker().getPayout(p.getId()).getCbills();
-			/* If no unit is required as part of the payout, the unit is part or all of the
-			 * final payout. If using the share system and tracking the original unit,
-			 * the payout is also reduced by the value of the unit.
-			 */
-			if ((campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() == 0 &&
-					null != unitAssignments.get(p.getId())) ||
-					(campaign.getCampaignOptions().getUseShareSystem() &&
-							campaign.getCampaignOptions().getTrackOriginalUnit() &&
-							p.getOriginalUnitId() == unitAssignments.get(p.getId()) &&
-									null != campaign.getUnit(unitAssignments.get(p.getId())))) {
-				payout -= campaign.getUnit(unitAssignments.get(p.getId())).getBuyCost();
-			}
-			if (null != unitAssignments.get(p.getId())) {
-				payout += RetirementDefectionDialog.getShortfallAdjustment(campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass(),
-						RetirementDefectionDialog.weightClassIndex(campaign.getUnit(unitAssignments.get(p.getId()))));
-			}
-			/* No payout if the pilot stole a unit */
-			if (campaign.getRetirementDefectionTracker().getPayout(p.getId()).hasStolenUnit() &&
-					null != unitAssignments.get(p.getId())) {
-				payout = 0;
-			}
-			return formatter.format(Math.max(payout, 0));
-		case COL_UNIT:
-			if (null == campaign.getRetirementDefectionTracker().getPayout(p.getId()) ||
-					null == unitAssignments) {
-            	return "";
-            }
-			if (null != unitAssignments.get(p.getId())) {
-				return campaign.getUnit(unitAssignments.get(p.getId())).getName();
-			} else if (campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() < EntityWeightClass.WEIGHT_LIGHT) {
-				return "";
-			} else {
-				return "Class " + campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass();
-			}
-		case COL_RECRUIT:
-			RetirementDefectionTracker.Payout pay =
-				campaign.getRetirementDefectionTracker().getPayout(data.get(row));
-			if (null == pay) {
-				return "";
-			}
-			if (pay.getDependents() > 0) {
-				return pay.getDependents() + " Dependents";
-			} else if (pay.hasRecruit()) {
-				return Person.getRoleDesc(pay.getRecruitType(),
-						campaign.getFaction().isClan());
-			} else if (pay.hasHeir()) {
-				return "Heir";
-			} else {
-				return "";
-			}
-		default:
-			return "?";
-		}
-	}
-
-	@Override
-	public void setValueAt(Object value, int row, int col) {
-		if (col == COL_PAYOUT) {
-			Number payout;
-			try {
-				payout = formatter.parse((String)value);
-			} catch (ParseException e1) {
-				return;
-			}
-			if (null != payout) {
-				altPayout.put(data.get(row), payout.intValue());
-			}
-		} else if (col == COL_PAY_BONUS) {
-			payBonus.put(data.get(row), (Boolean)value);
-		} else if (col == COL_MISC_MOD) {
-			miscMods.put(data.get(row), (Integer)value);
-		} else if (col == COL_UNIT) {
-			if (null != value) {
-				unitAssignments.put(getPerson(row).getId(), (UUID)value);
-			}
-		} else if (col == COL_RECRUIT) {
-			for (int i = 0; i < Person.T_NUM; i++) {
-				if (Person.getRoleDesc(i, campaign.getFaction().isClan()).equals((String)value)) {
-					campaign.getRetirementDefectionTracker().getPayout(data.get(row)).setRecruitType(i);					
-					break;
-				}
-			}
-		}
-		fireTableDataChanged();
-	}
-
-	public Person getPerson(int row) {
-		return campaign.getPerson(data.get(row));
-	}
-
-	public boolean getPayBonus(UUID id) {
-		return payBonus.get(id);
-	}
-	
-	public int getMiscModifier(UUID id) {
-		return miscMods.get(id);
-	}
-	
-	public void setGeneralMod(int mod) {
-		generalMod = mod;
-		fireTableDataChanged();
-	}
-	
-	public HashMap<UUID, Integer> getAltPayout() {
-		return altPayout;
-	}
-	
-	public void setEditPayout(boolean edit) {
-		editPayout = edit;
-	}
-
-	public TableCellRenderer getRenderer(int col, IconPackage icons) {
-		if (col < COL_TARGET) {
-			return new VisualRenderer(icons);
-		} else return new TextRenderer();
-	}
-
-	public class TextRenderer extends DefaultTableCellRenderer {
-		/**
-		 * 
-		 */
-		 private static final long serialVersionUID = 770305943352316265L;
-
-		public Component getTableCellRendererComponent(JTable table,
-				Object value, boolean isSelected, boolean hasFocus,
-				int row, int column) {
-			super.getTableCellRendererComponent(table, value, isSelected,
-					hasFocus, row, column);
-			int actualRow = table.convertRowIndexToModel(row);
-			int actualCol = table.convertColumnIndexToModel(column);
-			Person p = getPerson(actualRow);
-			setHorizontalAlignment(getAlignment(actualCol));
-			setForeground(isSelected?Color.WHITE:Color.BLACK);
-			if (isSelected) {
-				setBackground(Color.DARK_GRAY);
-			} else if (null != campaign.getRetirementDefectionTracker().getPayout(p.getId()) &&
-					campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0) {
-				setBackground(Color.LIGHT_GRAY);
-			} else {
-				// tiger stripes
-				if ((row % 2) == 0) {
-					setBackground(new Color(220, 220, 220));
-				} else {
-					setBackground(Color.WHITE);
-				}
-			}
-			return this;
-		}
-	}
-
-	public class VisualRenderer extends BasicInfo implements TableCellRenderer {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 7261885081786958754L;
-
-		public VisualRenderer(IconPackage icons) {
-			super(icons);
-		}
-
-		public Component getTableCellRendererComponent(JTable table,
-				Object value, boolean isSelected, boolean hasFocus,
-				int row, int column) {
-			Component c = this;
-			int actualCol = table.convertColumnIndexToModel(column);
-			int actualRow = table.convertRowIndexToModel(row);
-			Person p = getPerson(actualRow);
-			String color = "black";
-			if(isSelected) {
-				color = "white";
-			}
-			setText(getValueAt(actualRow, actualCol).toString(), color);
-			if (actualCol == COL_PERSON) {
-				setPortrait(p);
-				setText(p.getFullDesc(), color);
-			}
-			if(actualCol == COL_ASSIGN) {
-				Unit u = campaign.getUnit(p.getUnitId());
-				if(!p.getTechUnitIDs().isEmpty()) {
-					u = campaign.getUnit(p.getTechUnitIDs().get(0));
-				}
-				if(null != u) {
-					String desc = "<b>" + u.getName() + "</b><br>";
-					desc += u.getEntity().getWeightClassName();
-					if(!(u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship)) {
-						desc += " " + UnitType.getTypeDisplayableName(UnitType.determineUnitTypeCode(u.getEntity()));
-					}
-					desc += "<br>" + u.getStatus() + "";
-					setText(desc, color);
-					Image mekImage = getImageFor(u);
-					if(null != mekImage) {
-						setImage(mekImage);
-					} else {
-						clearImage();
-					}
-				} else {
-					clearImage();
-				}
-			}
-			if(actualCol == COL_FORCE) {
-				Force force = campaign.getForceFor(p);
-				if(null != force) {
-					String desc = "<html><b>" + force.getName() + "</b>";
-					Force parent = force.getParentForce();
-					//cut off after three lines and don't include the top level
-					int lines = 1;
-					while(parent != null && null != parent.getParentForce() && lines < 4) {
-						desc += "<br>" + parent.getName();
-						lines++;
-						parent = parent.getParentForce();
-					}
-					desc += "</html>";
-					setText(desc, color);
-					Image forceImage = getImageFor(force);
-					if(null != forceImage) {
-						setImage(forceImage);
-					} else {
-						clearImage();
-					}
-				} else {
-					clearImage();
-				}
-			}
-
-			if (isSelected) {
-				c.setBackground(Color.DARK_GRAY);
-			} else if (null != campaign.getRetirementDefectionTracker().getPayout(p.getId()) &&
-						campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0) {
-				c.setBackground(Color.LIGHT_GRAY);
-			} else {
-				// tiger stripes
-				if ((row % 2) == 0) {
-					c.setBackground(new Color(220, 220, 220));
-				} else {
-					c.setBackground(Color.WHITE);
-				}
-			}
-			return c;
-		}
-	}
-}
-
-class UnitAssignmentTableModel extends AbstractTableModel {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7740627991191879456L;
-	
-	public final static int COL_UNIT = 0;
-	public final static int COL_CLASS = 1;
-	public final static int COL_COST = 2;
-	public final static int N_COL = 3;
-
-	private final static String[] colNames = {
-		"Unit", "Class", "Cost"
-	};
-
-	private Campaign campaign;
-	ArrayList<UUID> data;
-
-	public UnitAssignmentTableModel(Campaign c) {
-		this.campaign = c;
-		data = new ArrayList<UUID>();
-	}
-	
-	public void setData(ArrayList<UUID> data) {
-		this.data = data;
-		fireTableDataChanged();
-	}
-
-	@Override
-	public int getRowCount() {
-		return data.size();
-	}
-
-	@Override
-	public int getColumnCount() {
-		return N_COL;
-	}
-
-	@Override
-	public String getColumnName(int column) {
-		return colNames[column];
-	}
-
-	public int getColumnWidth(int c) {
-		switch(c) {
-		case COL_UNIT:
-			return 125;
-		case COL_COST:
-			return 70;
-		case COL_CLASS:
-		default:
-			return 20;
-		}
-	}
-
-	public int getAlignment(int col) {
-		switch(col) {
-		case COL_UNIT:
-			return SwingConstants.LEFT;
-		case COL_COST:
-			return SwingConstants.RIGHT;
-		case COL_CLASS:
-		default:
-			return SwingConstants.CENTER;
-		}
-	}
-
-	@Override
-	public boolean isCellEditable(int row, int col) {
-		return false;
-	}
-
-	@Override
-	public Class<?> getColumnClass(int col) {
-		return getValueAt(0, col).getClass();
-	}
-
-	@Override
-	public Object getValueAt(int row, int col) {
-		Unit u;
-		DecimalFormat formatter = new DecimalFormat();
-		if(data.isEmpty()) {
-			return "";
-		} else {
-			u = campaign.getUnit(data.get(row));
-		}
-		switch (col) {
-		case COL_UNIT:
-			if(null != u) {
-				return u.getName();
-			}
-			return "-";
-		case COL_CLASS:
-			return RetirementDefectionDialog.weightClassIndex(u);
-		case COL_COST:
-			return formatter.format(u.getBuyCost());
-		default:
-			return "?";
-		}
-	}
-
-	public Unit getUnit(int row) {
-		return campaign.getUnit(data.get(row));
-	}
-
-	public TableCellRenderer getRenderer(int col, IconPackage icons) {
-		if (col == COL_UNIT) {
-			return new VisualRenderer(icons);
-		} else return new TextRenderer();
-	}
-
-	public class TextRenderer extends DefaultTableCellRenderer {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -3368335772600192895L;
-
-		public Component getTableCellRendererComponent(JTable table,
-				Object value, boolean isSelected, boolean hasFocus,
-				int row, int column) {
-			super.getTableCellRendererComponent(table, value, isSelected,
-					hasFocus, row, column);
-			int actualCol = table.convertColumnIndexToModel(column);
-			setHorizontalAlignment(getAlignment(actualCol));
-			setForeground(isSelected?Color.WHITE:Color.BLACK);
-			if (isSelected) {
-				setBackground(Color.DARK_GRAY);
-			} else {
-				// tiger stripes
-				if ((row % 2) == 0) {
-					setBackground(new Color(220, 220, 220));
-				} else {
-					setBackground(Color.WHITE);
-				}
-			}
-			return this;
-		}
-	}
-
-	public class VisualRenderer extends BasicInfo implements TableCellRenderer {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 7261885081786958754L;
-
-		public VisualRenderer(IconPackage icons) {
-			super(icons);
-		}
-
-		public Component getTableCellRendererComponent(JTable table,
-				Object value, boolean isSelected, boolean hasFocus,
-				int row, int column) {
-			Component c = this;
-			int actualCol = table.convertColumnIndexToModel(column);
-			int actualRow = table.convertRowIndexToModel(row);
-			Unit u = getUnit(actualRow);
-			String color = "black";
-			if(isSelected) {
-				color = "white";
-			}
-			setText(getValueAt(actualRow, actualCol).toString(), color);
-			if (actualCol == COL_UNIT) {
-				if(null != u) {
-					String desc = "<b>" + u.getName() + "</b><br>";
-					desc += u.getEntity().getWeightClassName();
-					if(!(u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship)) {
-						desc += " " + UnitType.getTypeDisplayableName(UnitType.determineUnitTypeCode(u.getEntity()));
-					}
-					desc += "<br>" + u.getStatus() + "";
-					setText(desc, color);
-					Image mekImage = getImageFor(u);
-					if(null != mekImage) {
-						setImage(mekImage);
-					} else {
-						clearImage();
-					}
-				} else {
-					clearImage();
-				}
-			}
-
-			if (isSelected) {
-				c.setBackground(Color.DARK_GRAY);
-			} else {
-				// tiger stripes
-				if ((row % 2) == 0) {
-					c.setBackground(new Color(220, 220, 220));
-				} else {
-					c.setBackground(Color.WHITE);
-				}
-			}
-			return c;
-		}
-	}
-}
-
