@@ -47,13 +47,11 @@ import megamek.common.IArmorState;
 import megamek.common.IEntityRemovalConditions;
 import megamek.common.Infantry;
 import megamek.common.MULParser;
-import megamek.common.Mech;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.MechWarrior;
 import megamek.common.Mounted;
-import megamek.common.Protomech;
 import megamek.common.Tank;
 import megamek.common.event.GameVictoryEvent;
 import megamek.common.loaders.EntityLoadingException;
@@ -395,9 +393,9 @@ public class ResolveScenarioTracker {
 	 * This checks whether an entity has any blown off limbs. If the battlefield
 	 * was not controlled it marks the limb as destroyed. if the battlefield was
 	 * controlled it clears the missing status from any equipment.
-	 * 
-	 * This method should be run the first time an entity is loaded into the tracker, 
-	 * either from the game or from a MUL file. 
+	 *
+	 * This method should be run the first time an entity is loaded into the tracker,
+	 * either from the game or from a MUL file.
 	 * @param en
 	 * @param controlsField
 	 */
@@ -427,7 +425,7 @@ public class ResolveScenarioTracker {
 							m.setMissing(true);
 						}
 					}
-				} 
+				}
 			}
 		}
 	}

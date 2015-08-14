@@ -1,20 +1,20 @@
 /*
  * MissingMekLocation.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -26,12 +26,10 @@ import java.io.PrintWriter;
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
-import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.TechConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.unit.Unit;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -51,8 +49,8 @@ public class MissingProtomekLocation extends MissingPart {
     public MissingProtomekLocation() {
         this(0, 0, 0, false, false, null);
     }
-    
-    
+
+
     public MissingProtomekLocation(int loc, int tonnage, int structureType, boolean hasBooster, boolean quad, Campaign c) {
         super(tonnage, c);
         this.loc = loc;
@@ -91,17 +89,17 @@ public class MissingProtomekLocation extends MissingPart {
             this.name += " (Myomer Booster)";
         }
     }
-    
-    @Override 
+
+    @Override
 	public int getBaseTime() {
 		return 240;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		return 3;
 	}
-    
+
     public int getLoc() {
         return loc;
     }
@@ -113,8 +111,8 @@ public class MissingProtomekLocation extends MissingPart {
     public int getStructureType() {
         return structureType;
     }
-  
-    
+
+
     public double getTonnage() {
         //TODO: how much should this weigh?
         return 0;
@@ -149,10 +147,10 @@ public class MissingProtomekLocation extends MissingPart {
     @Override
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
-        
+
         for (int x=0; x<nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            
+
             if (wn2.getNodeName().equalsIgnoreCase("loc")) {
                 loc = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("structureType")) {
@@ -169,7 +167,7 @@ public class MissingProtomekLocation extends MissingPart {
                     forQuad = true;
                 else
                     forQuad = false;
-            } 
+            }
         }
     }
 
@@ -184,23 +182,23 @@ public class MissingProtomekLocation extends MissingPart {
 
     @Override
     public int getTechRating() {
-       return EquipmentType.RATING_E;      
+       return EquipmentType.RATING_E;
     }
-    
+
     @Override
     public int getTechLevel() {
         return TechConstants.T_CLAN_TW;
     }
-    
+
     @Override
     public int getTechBase() {
-        return T_CLAN;        
+        return T_CLAN;
     }
 
     public boolean forQuad() {
         return forQuad;
     }
-    
+
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         if(loc == Protomech.LOC_TORSO && !refit) {
@@ -217,14 +215,14 @@ public class MissingProtomekLocation extends MissingPart {
         }
         return false;
     }
-    
+
     private boolean isLeg() {
         return loc == Protomech.LOC_LEG;
     }
-    
+
     @Override
     public String checkFixable() {
-      
+
         //there must be no usable equipment currently in the location
         //you can only salvage a location that has nothing left on it
         for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
@@ -235,7 +233,7 @@ public class MissingProtomekLocation extends MissingPart {
             }
             if (slot.isRepairable()) {
                 return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first. They can then be re-installed.";
-            } 
+            }
         }
         return null;
     }
@@ -244,7 +242,7 @@ public class MissingProtomekLocation extends MissingPart {
     public Part getNewPart() {
         return new ProtomekLocation(loc, getUnitTonnage(), structureType, booster, forQuad, campaign);
     }
-    
+
     private int getAppropriateSystemIndex() {
     	switch(loc) {
     	case(Protomech.LOC_LEG):
@@ -257,24 +255,23 @@ public class MissingProtomekLocation extends MissingPart {
     	case(Protomech.LOC_TORSO):
     		return Protomech.SYSTEM_TORSOCRIT;
     	default:
-    		return -1;    		
+    		return -1;
     	}
     }
-    
+
     @Override
     public void updateConditionFromPart() {
         if(null != unit) {
             unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
-            //need to assign all possible crits to the appropriate system 
+            //need to assign all possible crits to the appropriate system
             unit.destroySystem(CriticalSlot.TYPE_SYSTEM, getAppropriateSystemIndex(), loc);
         }
     }
-    
+
     @Override
     public void fix() {
         Part replacement = findReplacement(false);
         if(null != replacement) {
-            Unit u = unit;
             Part actualReplacement = replacement.clone();
             unit.addPart(actualReplacement);
             campaign.addPart(actualReplacement, 0);
@@ -294,7 +291,7 @@ public class MissingProtomekLocation extends MissingPart {
 	public int getLocation() {
 		return Protomech.LOC_TORSO;
 	}
-	
+
 	@Override
 	public int getIntroDate() {
 		return 3055;
