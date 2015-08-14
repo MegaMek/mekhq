@@ -319,22 +319,21 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
 	@Override
 	public void fix() {
-		loadBin(true);
+		loadBin();
 	}
 
-	public void loadBin(boolean changeEntity) {
+	public void loadBin() {
 		int shots = Math.min(getAmountAvailable(), shotsNeeded);
-		if(null != unit && changeEntity) {
+		if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-			if(null != mounted) {
-				if(mounted.getType().equals(type) 
-						&& mounted.getType() instanceof AmmoType
+			if(null != mounted && mounted.getType() instanceof AmmoType) {
+				if(mounted.getType().equals(type) 						
 						&& ((AmmoType)mounted.getType()).getMunitionType() == getMunitionType()) {
 					//just a simple reload
 					mounted.setShotsLeft(mounted.getBaseShotsLeft() + shots);
 				} else {
 					//loading a new type of ammo
-					unload(true);
+					unload();
 					mounted.changeAmmoType((AmmoType)type);
 					mounted.setShotsLeft(shots);
 				}
@@ -358,12 +357,17 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		return "<font color='red'> You shouldn't be here (AmmoBin.failToFind()).</font>";
 	}
 
-	public void unload(boolean changeEntity) {
-		int shots = 0;
+	public void unload() {
+		//FIXME: the following won't work for proto and Dropper bins if they 
+		//are not attached to a unit. Currently the only place AmmoBins are loaded
+		//off of units is for refits, which neither of those units can do, but we
+		//may want to think about not having refits load ammo bins but rather reserve
+		//some AmmoStorage instead if we implement customization of these units
+		int shots = getFullShots() - shotsNeeded;
 		AmmoType curType = (AmmoType)type;
-		if(null != unit && changeEntity) {
+		if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-			if(null != mounted) {
+			if(null != mounted && mounted.getType() instanceof AmmoType) {
 				shots = mounted.getBaseShotsLeft();
 				mounted.setShotsLeft(0);
 				curType = (AmmoType)mounted.getType();
@@ -378,7 +382,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	@Override
 	public void remove(boolean salvage) {
 		if(salvage) {
-			unload(true);
+			unload();
 		}
 		super.remove(salvage);
 	}

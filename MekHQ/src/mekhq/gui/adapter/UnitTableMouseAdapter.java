@@ -775,7 +775,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     menuItem.setEnabled(true);
                     menu.add(menuItem);
                 }
-                menu.setEnabled(unit.isAvailable() && unit.isRepairable());
+                menu.setEnabled(unit.isAvailable(true) && unit.isRepairable());
                 popup.add(menu);
             }
             // fill with personnel

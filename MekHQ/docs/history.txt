@@ -35,6 +35,8 @@ v0.3.16-dev (SVN)
 + Bug [#903]: [ATB] Retirement Sort by Cost Incorrect
 + Splitting Models out of RetirementDefectionDialog
 + Changed FormattedNumberSorter to use long instead of int
++ Bug [#849]: Removing ammo from a design does not cause the corresponding ammo to appear in your warehouse
++ Bug: cancel customization not available in unit context menu
 
 v0.3.15 (2015-08-04 10:50 UTC)
 + Planetary faction updates
