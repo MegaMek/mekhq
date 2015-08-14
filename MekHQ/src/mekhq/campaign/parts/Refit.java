@@ -338,7 +338,10 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		boolean aclan = false;
 		HashMap<Integer,Integer> partQuantity = new HashMap<Integer,Integer>();
 		for(Part nPart : newPartList) {
+			//TODO: I don't think we need this here anymore 
 			nPart.setUnit(oldUnit);
+			
+			/*ADD TIMES AND COSTS*/
 			if(nPart instanceof MissingPart) {
 				time += nPart.getBaseTime();
 				Part replacement = ((MissingPart)nPart).findReplacement(true);
@@ -378,6 +381,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				time += 120;
 				shoppingList.add(nPart);
 			}
+			
+			/*CHECK REFIT CLASS*/
 			if(nPart instanceof MissingEnginePart) {
 				if(oldUnit.getEntity().getEngine().getRating() != newUnit.getEntity().getEngine().getRating()) {
 					updateRefitClass(CLASS_D);
@@ -627,6 +632,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		    //add the stuff on the shopping list to the master shopping list
 		    ArrayList<Part> newShoppingList = new ArrayList<Part>();
     		for(Part part : shoppingList) {
+    			part.setUnit(null);
     			if(part instanceof Armor) {
                     //automatically add armor by location, we will check for the lump sum of
                     //armor using newArmorSupplies
@@ -667,6 +673,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 }
             }
 		} else {
+			for(Part part : shoppingList) {
+    			part.setUnit(null);
+			}
 		    checkForArmorSupplies();
 		    oldUnit.campaign.getShoppingList().addShoppingItem(this, 1, oldUnit.campaign);
 		}
@@ -836,9 +845,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				oldUnit.campaign.removePart(part);
 			}
 			else if(part instanceof AmmoBin) {
-				part.setUnit(oldUnit);
 				((AmmoBin) part).unload();
-				part.setUnit(null);
 				oldUnit.campaign.removePart(part);
 			} else {
 				Part spare = oldUnit.campaign.checkForExistingSparePart(part);
@@ -1492,7 +1499,6 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	@Override
 	public String find(int transitDays) {
 	    //TODO: check somewhere before this if they can afford it
-        ArrayList<Part> newShoppingList = new ArrayList<Part>();
 		for(Part part : shoppingList) {
 			if(part instanceof Armor) {
 				oldUnit.campaign.addPart(part, transitDays);
@@ -1503,8 +1509,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			else if(part instanceof AmmoBin) {
 				oldUnit.campaign.addPart(part, 0);
 				newUnitParts.add(part.getId());
-				AmmoBin bin = (AmmoBin)part;
                 part.setRefitId(oldUnit.getId());
+				AmmoBin bin = (AmmoBin)part;
 				bin.setShotsNeeded(bin.getFullShots());
 				bin.loadBin();
 				if(bin.needsFixing()) {
@@ -1513,11 +1519,12 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				}
 			}
 			else if(part instanceof MissingPart) {
-				oldUnit.campaign.buyPart((Part)((IAcquisitionWork)part).getNewEquipment(), 1.1, transitDays);
-				newShoppingList.add((MissingPart)part);
+				Part newPart = (Part)((IAcquisitionWork)part).getNewEquipment();
+				newPart.setRefitId(oldUnit.getId());
+				oldUnit.campaign.buyPart(newPart, 1.1, transitDays);
+				newUnitParts.add(newPart.getId());
 			}
 		}
-		shoppingList = newShoppingList;
 		if(null != newArmorSupplies) {
 		    int amount = armorNeeded - newArmorSupplies.getAmount();
 		    if(amount > 0) {
