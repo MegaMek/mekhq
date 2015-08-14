@@ -1,20 +1,20 @@
 /*
  * ProtomekActuator.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -25,7 +25,6 @@ import java.io.PrintWriter;
 
 import megamek.common.Compute;
 import megamek.common.CriticalSlot;
-import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Protomech;
 import megamek.common.TechConstants;
@@ -44,26 +43,26 @@ public class ProtomekLegActuator extends Part {
     public ProtomekLegActuator() {
         this(0, null);
     }
-    
+
     public ProtomekLegActuator clone() {
         ProtomekLegActuator clone = new ProtomekLegActuator(getUnitTonnage(), campaign);
         clone.copyBaseData(this);
         return clone;
     }
-   
-    
+
+
     public ProtomekLegActuator(int tonnage, Campaign c) {
         super(tonnage, c);
         this.name = "Protomech Leg Actuator";
     }
-   
+
     @Override
     public double getTonnage() {
         //TODO: how much do actuators weight?
         //apparently nothing
         return 0;
     }
-    
+
     @Override
     public long getStickerPrice() {
         return getUnitTonnage() * 540;
@@ -74,7 +73,7 @@ public class ProtomekLegActuator extends Part {
         return part instanceof ProtomekLegActuator
                 && getUnitTonnage() == ((ProtomekLegActuator)part).getUnitTonnage();
     }
-    
+
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
@@ -94,7 +93,7 @@ public class ProtomekLegActuator extends Part {
     public int getTechRating() {
         return EquipmentType.RATING_D;
     }
-    
+
     @Override
     public void fix() {
         super.fix();
@@ -102,12 +101,12 @@ public class ProtomekLegActuator extends Part {
             unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_LEGCRIT, Protomech.LOC_LEG);
         }
     }
-    
+
     @Override
     public int getTechBase() {
         return T_CLAN;
     }
-    
+
     @Override
     public int getTechLevel() {
         return TechConstants.T_CLAN_TW;
@@ -134,34 +133,34 @@ public class ProtomekLegActuator extends Part {
             Part missing = getMissingPart();
             unit.addPart(missing);
             campaign.addPart(missing, 0);
-        }   
+        }
         setUnit(null);
         updateConditionFromEntity(false);
     }
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        if(null != unit) {     
+        if(null != unit) {
         	int priorHits = hits;
             hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_LEGCRIT, Protomech.LOC_LEG);
-            if(checkForDestruction 
-					&& hits > priorHits 
+            if(checkForDestruction
+					&& hits > priorHits
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
 				return;
 			}
         }
-        
+
     }
-    
-    @Override 
+
+    @Override
 	public int getBaseTime() {
 		if(isSalvaging()) {
 			return 120;
 		}
         if(hits <= 1) {
             return 100;
-        } 
+        }
         else if(hits == 2) {
             return 150;
         }
@@ -169,7 +168,7 @@ public class ProtomekLegActuator extends Part {
         	return 200;
         }
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		if(isSalvaging()) {
@@ -177,7 +176,7 @@ public class ProtomekLegActuator extends Part {
 		}
 		if(hits <= 1) {
             return 0;
-        } 
+        }
         else if(hits == 2) {
             return 1;
         }
@@ -190,7 +189,7 @@ public class ProtomekLegActuator extends Part {
     public boolean needsFixing() {
         return hits > 0;
     }
-    
+
     @Override
     public String getDetails() {
         if(null != unit) {
@@ -207,9 +206,9 @@ public class ProtomekLegActuator extends Part {
             } else {
                 unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_LEGCRIT, Protomech.LOC_LEG);
             }
-        }   
+        }
     }
-    
+
     @Override
     public String checkFixable() {
         if(isSalvaging()) {
@@ -223,27 +222,27 @@ public class ProtomekLegActuator extends Part {
         }
         return null;
     }
-    
+
     @Override
     public boolean isMountedOnDestroyedLocation() {
         return null != unit && unit.isLocationDestroyed(Protomech.LOC_LEG);
     }
-    
+
     @Override
     public boolean onBadHipOrShoulder() {
         return false;
     }
-    
+
     @Override
     public boolean isPartForEquipmentNum(int index, int loc) {
         return false;//index == type && loc == location;
     }
-    
+
     @Override
     public boolean isRightTechType(String skillType) {
         return skillType.equals(SkillType.S_TECH_MECH);
     }
-    
+
     @Override
     public boolean isOmniPoddable() {
         return false;
@@ -252,7 +251,7 @@ public class ProtomekLegActuator extends Part {
     @Override
     protected void loadFieldsFromXmlNode(Node wn) {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
@@ -264,7 +263,7 @@ public class ProtomekLegActuator extends Part {
 	public int getLocation() {
 		return Protomech.LOC_LEG;
 	}
-	
+
 	@Override
 	public int getIntroDate() {
 		return 3055;

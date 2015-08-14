@@ -27,7 +27,6 @@ import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.ILocationExposureStatus;
-import megamek.common.Mech;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.TargetRoll;
@@ -368,8 +367,8 @@ public class ProtomekLocation extends Part {
             }
         }
     }
-    
-    @Override 
+
+    @Override
 	public int getBaseTime() {
 		if(isSalvaging()) {
 			if(blownOff) {
@@ -379,7 +378,7 @@ public class ProtomekLocation extends Part {
 		}
 		if(blownOff) {
 			return 200;
-		} 
+		}
 		if(breached) {
 			return 60;
 		}
@@ -392,18 +391,18 @@ public class ProtomekLocation extends Part {
 		}
 		return 90;
 	}
-    
+
     @Override
 	public int getDifficulty() {
 		if(isSalvaging()) {
 			if(isBlownOff()) {
 				return 0;
-			} 
+			}
 			return 3;
 		}
 		if(blownOff) {
 			return 1;
-		} 
+		}
 		if(breached) {
 			return 0;
 		}
@@ -460,10 +459,10 @@ public class ProtomekLocation extends Part {
     	case(Protomech.LOC_TORSO):
     		return Protomech.SYSTEM_TORSOCRIT;
     	default:
-    		return -1;    		
+    		return -1;
     	}
     }
-    
+
     @Override
     public void updateConditionFromPart() {
         if(null != unit) {
@@ -484,7 +483,7 @@ public class ProtomekLocation extends Part {
                         break;
                     }
                 }
-            }        
+            }
         }
     }
 

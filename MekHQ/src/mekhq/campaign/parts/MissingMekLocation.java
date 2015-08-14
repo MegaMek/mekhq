@@ -1,20 +1,20 @@
 /*
  * MissingMekLocation.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -29,7 +29,6 @@ import megamek.common.IArmorState;
 import megamek.common.Mech;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.unit.Unit;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -49,7 +48,7 @@ public class MissingMekLocation extends MissingPart {
     public MissingMekLocation() {
     	this(0, 0, 0, false, false, null);
     }
-    
+
     public int getLoc() {
         return loc;
     }
@@ -61,7 +60,7 @@ public class MissingMekLocation extends MissingPart {
     public int getStructureType() {
         return structureType;
     }
-    
+
     public MissingMekLocation(int loc, int tonnage, int structureType, boolean hasTSM, boolean quad, Campaign c) {
         super(tonnage, c);
         this.loc = loc;
@@ -117,17 +116,17 @@ public class MissingMekLocation extends MissingPart {
             this.name += " (TSM)";
         }
     }
-    
-    @Override 
+
+    @Override
 	public int getBaseTime() {
 		return 240;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		return 3;
 	}
-    
+
     public double getTonnage() {
     	//TODO: how much should this weigh?
     	return 0;
@@ -162,10 +161,10 @@ public class MissingMekLocation extends MissingPart {
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		NodeList nl = wn.getChildNodes();
-		
+
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
-			
+
 			if (wn2.getNodeName().equalsIgnoreCase("loc")) {
 				loc = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("structureType")) {
@@ -182,7 +181,7 @@ public class MissingMekLocation extends MissingPart {
 					forQuad = true;
 				else
 					forQuad = false;
-			} 
+			}
 		}
 	}
 
@@ -217,7 +216,7 @@ public class MissingMekLocation extends MissingPart {
 			}
 		case EquipmentType.T_STRUCTURE_INDUSTRIAL:
 		default:
-			return EquipmentType.RATING_C;	
+			return EquipmentType.RATING_C;
 		}
 	}
 
@@ -235,9 +234,9 @@ public class MissingMekLocation extends MissingPart {
 			return EquipmentType.RATING_C;
 		default:
 			return EquipmentType.RATING_D;
-		}		
+		}
 	}
-	
+
 	@Override
 	public int getTechBase() {
 		return T_BOTH;
@@ -246,11 +245,11 @@ public class MissingMekLocation extends MissingPart {
 	private boolean isArm() {
 		return loc == Mech.LOC_RARM || loc == Mech.LOC_LARM;
 	}
-	
+
 	public boolean forQuad() {
 		return forQuad;
 	}
-	
+
 	@Override
 	public boolean isAcceptableReplacement(Part part, boolean refit) {
 		if(loc == Mech.LOC_CT && !refit) {
@@ -273,7 +272,7 @@ public class MissingMekLocation extends MissingPart {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public String checkFixable() {
 		if (unit.getEntity() instanceof Mech) {
@@ -294,16 +293,16 @@ public class MissingMekLocation extends MissingPart {
             if ((slot == null) || !slot.isEverHittable()) {
                 continue;
             }
- 
+
             //certain other specific crits need to be left out (uggh, must be a better way to do this!)
-            if(slot.getType() == CriticalSlot.TYPE_SYSTEM 
+            if(slot.getType() == CriticalSlot.TYPE_SYSTEM
                     && (slot.getIndex() == Mech.ACTUATOR_HIP
                           || slot.getIndex() == Mech.ACTUATOR_SHOULDER)) {
                 continue;
             }
             if (slot.isRepairable()) {
                 return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first. They can then be re-installed.";
-            } 
+            }
         }
 		return null;
 	}
@@ -319,25 +318,24 @@ public class MissingMekLocation extends MissingPart {
 	    Part nPart = new MekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad, sensors, lifeSupport, campaign);
 		return nPart;
 	}
-	
+
 	@Override
 	public void updateConditionFromPart() {
 		if(null != unit) {
 			unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
 		}
 	}
-	
+
 	@Override
 	public void fix() {
 		Part replacement = findReplacement(false);
 		if(null != replacement) {
-			Unit u = unit;
 			Part actualReplacement = replacement.clone();
 			unit.addPart(actualReplacement);
 			campaign.addPart(actualReplacement, 0);
 			replacement.decrementQuantity();
 			//TODO: if this is a mech head, check to see if it had components
-            if(loc == Mech.LOC_HEAD && actualReplacement instanceof MekLocation) { 
+            if(loc == Mech.LOC_HEAD && actualReplacement instanceof MekLocation) {
                 updateHeadComponents((MekLocation)actualReplacement);
                 ((MekLocation)actualReplacement).setSensors(false);
                 ((MekLocation)actualReplacement).setLifeSupport(false);
@@ -354,10 +352,10 @@ public class MissingMekLocation extends MissingPart {
 				unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP, loc);
 			}
 			remove(false);
-			actualReplacement.updateConditionFromPart();			
+			actualReplacement.updateConditionFromPart();
 		}
 	}
-	
+
 	private void updateHeadComponents(MekLocation part) {
 	    MissingMekSensor missingSensor = null;
 	    MissingMekLifeSupport missingLifeSupport = null;
@@ -378,21 +376,21 @@ public class MissingMekLocation extends MissingPart {
 	        unit.addPart(newPart);
 	        campaign.addPart(newPart, 0);
 	        missingSensor.remove(false);
-	        newPart.updateConditionFromPart(); 
+	        newPart.updateConditionFromPart();
 	    }
 	    /*if(part.hasCockpit() && null != missingCockpit) {
             newPart = missingCockpit.getNewPart();
             unit.addPart(newPart);
             campaign.addPart(newPart);
             missingCockpit.remove(false);
-            newPart.updateConditionFromPart(); 
+            newPart.updateConditionFromPart();
         }*/
 	    if(part.hasLifeSupport() && null != missingLifeSupport) {
             newPart = missingLifeSupport.getNewPart();
             unit.addPart(newPart);
             campaign.addPart(newPart, 0);
             missingLifeSupport.remove(false);
-            newPart.updateConditionFromPart(); 
+            newPart.updateConditionFromPart();
         }
 	}
 
@@ -405,7 +403,7 @@ public class MissingMekLocation extends MissingPart {
 	public int getLocation() {
 		return loc;
 	}
-	
+
 	@Override
 	public int getIntroDate() {
 		//TODO: I need a clan tag in order to distinguish some of these
@@ -449,5 +447,5 @@ public class MissingMekLocation extends MissingPart {
 	@Override
 	public int getReIntroDate() {
 		return EquipmentType.DATE_NONE;
-	}	
+	}
 }

@@ -35,7 +35,6 @@ import mekhq.campaign.parts.equipment.BattleArmorEquipmentPart;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingBattleArmorEquipmentPart;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.unit.Unit;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -80,16 +79,16 @@ public class MissingBattleArmorSuit extends MissingPart {
         this.name = chassis + " " + model + " Suit";
     }
 
-    @Override 
+    @Override
 	public int getBaseTime() {
 		return 0;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		return 0;
 	}
-    
+
     @Override
     public void updateConditionFromPart() {
     	if(null != unit) {
@@ -254,8 +253,7 @@ public class MissingBattleArmorSuit extends MissingPart {
     public void fix() {
         Part replacement = findReplacement(false);
         if(null != replacement) {
-        	Unit u = unit;
-            BattleArmorSuit newSuit = (BattleArmorSuit)replacement.clone();
+        	BattleArmorSuit newSuit = (BattleArmorSuit)replacement.clone();
             //lets also clone the subparts
             unit.addPart(newSuit);
             //this is admittedly hacky, but lets go ahead and add something to the newSuit
