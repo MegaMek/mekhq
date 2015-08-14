@@ -16,20 +16,20 @@ import java.util.Comparator;
         public int compare(String s0, String s1) {
             //lets find the weight class integer for each name
             DecimalFormat format = new DecimalFormat();
-            int l0 = 0;
+            long l0 = 0;
             try {
-                l0 = format.parse(s0).intValue();
+                l0 = format.parse(s0).longValue();
             } catch (java.text.ParseException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            int l1 = 0;
+            long l1 = 0;
             try {
-                l1 = format.parse(s1).intValue();
+                l1 = format.parse(s1).longValue();
             } catch (java.text.ParseException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            return ((Comparable<Integer>)l0).compareTo(l1);
+            return ((Comparable<Long>)l0).compareTo(l1);
         }
     }

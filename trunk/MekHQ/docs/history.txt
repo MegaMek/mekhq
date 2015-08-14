@@ -21,7 +21,7 @@ v0.3.16-dev (SVN)
 + Bug: updateConditions in ProtomekLocation not critting/uncritting things correctly
 + Bug [#902]: Tank and Aero system parts not getting check for destruction
 + Moved all equipment checks for destruction into Part.updateConditionFromEntity
-+ removed time and difficulty variables from Part, now tracked by specific methods in each part, 
++ removed time and difficulty variables from Part, now tracked by specific methods in each part,
 	no need to always updateConditionFromEntity to switch
 + target for equipment destruction from combat is now a customizable option
 + Bug [#618]: Ammo bins cannot be replaced on mechs
@@ -32,6 +32,9 @@ v0.3.16-dev (SVN)
 + reclassified BaArmor and ProtomekArmor as sub-classes of armor
 + Bug: previous change made it possible for overnight tasks to do the wrong thing if unit repair/salvage status was switched
 + Bug [#896]: Removing units from TO&E does not remove them from deployment
++ Bug [#903]: [ATB] Retirement Sort by Cost Incorrect
++ Splitting Models out of RetirementDefectionDialog
++ Changed FormattedNumberSorter to use long instead of int
 
 v0.3.15 (2015-08-04 10:50 UTC)
 + Planetary faction updates
