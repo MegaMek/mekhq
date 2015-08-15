@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.16-dev (2015-08-15 19:40 UTC)
+v0.3.17-dev (SVN)
+
+v0.3.16 (2015-08-15 19:40 UTC)
 + Bug [#823]: NPE during 'Auto Resolve'
 + Bug [#415]: Fighters and small craft have thrusters
 + Bug [#698]: All BA armor is incorrectly set to clan tech
