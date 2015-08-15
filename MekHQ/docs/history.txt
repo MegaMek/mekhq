@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.16-dev (SVN)
+v0.3.16-dev (2015-08-15 19:40 UTC)
 + Bug [#823]: NPE during 'Auto Resolve'
 + Bug [#415]: Fighters and small craft have thrusters
 + Bug [#698]: All BA armor is incorrectly set to clan tech
@@ -43,6 +43,7 @@ v0.3.16-dev (SVN)
 + Bug [#906]: Location specific armor parts showing up for refit after save and load
 + Bug [#905]: Refit parts are reserved a day too late
 + Bug [#843]: Ammo bin repair
++ MegaMek.jar updated to 0.41.6 and MegaMekLab.jar updated to 0.1.42
 
 v0.3.15 (2015-08-04 10:50 UTC)
 + Planetary faction updates
