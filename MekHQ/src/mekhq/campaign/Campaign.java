@@ -2338,21 +2338,8 @@ public class Campaign implements Serializable {
 
             // do maintenance checks
             doMaintenance(u);
-
         }
-
-        for (Unit u : getUnits()) {
-            if (u.isRefitting()) {
-                refit(u.getRefit());
-            }
-            if (u.isMothballing()) {
-                mothball(u);
-            }
-            if (!u.isPresent()) {
-                u.checkArrival();
-            }
-        }
-
+        
         // need to check for assigned tasks in two steps to avoid
         // concurrent mod problems
         ArrayList<Integer> assignedPartIds = new ArrayList<Integer>();
@@ -2368,12 +2355,16 @@ public class Campaign implements Serializable {
                 arrivedPartIds.add(part.getId());
             }
         }
+        
+        //arrive parts before attempting refit or parts will not get reserved that day
         for (int pid : arrivedPartIds) {
             Part part = getPart(pid);
             if (null != part) {
                 arrivePart(part);
             }
         }
+        
+        //finish up any overnight assigned tasks
         for (int pid : assignedPartIds) {
             Part part = getPart(pid);
             if (null != part) {
@@ -2397,6 +2388,19 @@ public class Campaign implements Serializable {
                         removePart(part);
                     }
                 }
+            }
+        }
+
+        //ok now we can check for other stuff we might need to do to units
+        for (Unit u : getUnits()) {
+            if (u.isRefitting()) {
+                refit(u.getRefit());
+            }
+            if (u.isMothballing()) {
+                mothball(u);
+            }
+            if (!u.isPresent()) {
+                u.checkArrival();
             }
         }
 
