@@ -41,6 +41,7 @@ v0.3.16-dev (SVN)
 + Bug [#602]: 0.3.6 warehouse graphical glitch
 + Bug [#904]: Armor parts showing up as zero amount on refits
 + Bug [#906]: Location specific armor parts showing up for refit after save and load
++ Bug [#905]: Refit parts are reserved a day too late
 
 v0.3.15 (2015-08-04 10:50 UTC)
 + Planetary faction updates
