@@ -471,15 +471,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		}
 	}
 
-	@Override
-    public boolean isSamePartTypeAndStatus (Part part) {
-		if(isReservedForRefit()) {
-    		return false;
-    	}
+	@Override	
+	public boolean isSamePartType(Part part) {
     	return  part instanceof AmmoBin
                         && getType().equals( ((AmmoBin)part).getType() )
-                        && ((AmmoBin)part).isOneShot() == oneShot
-                        && this.getDaysToArrival() == part.getDaysToArrival();
+                        && ((AmmoBin)part).isOneShot() == oneShot;
     }
 
 	@Override
