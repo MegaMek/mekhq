@@ -480,7 +480,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
 	@Override
 	public boolean needsFixing() {
-		return shotsNeeded > 0 && null != unit;
+		return shotsNeeded > 0;// && null != unit;
 	}
 
 	public String getDesc() {
