@@ -2687,7 +2687,7 @@ public class Campaign implements Serializable {
     }
 
     public void removePart(Part part) {
-    	if(null == part.getUnit() && part.getUnit() instanceof TestUnit) {
+    	if(null != part.getUnit() && part.getUnit() instanceof TestUnit) {
     		//if this is a test unit, then we won't remove the part because its not there
     		return;
     	}
@@ -2794,13 +2794,31 @@ public class Campaign implements Serializable {
     }
 
     public void restore() {
+    	//if we fail to restore equipment parts then remove them 
+    	//and possibly re-initialize and diagnose unit
+    	ArrayList<Part> partsToRemove = new ArrayList<Part>();
+    	ArrayList<UUID> unitsToCheck = new ArrayList<UUID>();
+    	
         for (Part part : getParts()) {
             if (part instanceof EquipmentPart) {
                 ((EquipmentPart) part).restore();
+                if(null == ((EquipmentPart) part).getType()) {
+                	partsToRemove.add(part);
+                }
             }
             if (part instanceof MissingEquipmentPart) {
                 ((MissingEquipmentPart) part).restore();
+                if(null == ((MissingEquipmentPart) part).getType()) {
+                	partsToRemove.add(part);
+                }
             }
+        }
+        
+        for(Part remove : partsToRemove) {
+        	if(null != remove.getUnitId() && !unitsToCheck.contains(remove.getUnitId())) {
+        		unitsToCheck.add(remove.getUnitId());
+        	}
+        	removePart(remove);
         }
 
         for (Unit unit : getUnits()) {
@@ -2809,6 +2827,14 @@ public class Campaign implements Serializable {
                 unit.getEntity().setGame(game);
                 unit.getEntity().restore();
             }
+        }
+        
+        for(UUID uid : unitsToCheck) {
+        	Unit u = getUnit(uid);
+        	if(null != u) {
+        		u.initializeParts(true);
+        		u.runDiagnostic(false);
+        	}
         }
 
         shoppingList.restore();

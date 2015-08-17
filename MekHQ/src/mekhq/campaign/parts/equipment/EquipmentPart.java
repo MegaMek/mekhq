@@ -154,7 +154,7 @@ public class EquipmentPart extends Part {
     	//they are not acceptable substitutes, so we need to check for that as
     	//well
     	//http://bg.battletech.com/forums/strategic-operations/(answered)-can-a-lance-for-a-35-ton-mech-be-used-on-a-40-ton-mech-and-so-on/
-        return part instanceof EquipmentPart
+    	return part instanceof EquipmentPart
         		&& getType().equals(((EquipmentPart)part).getType())
         		&& getTonnage() == part.getTonnage()
         		&& getStickerPrice() == part.getStickerPrice();
