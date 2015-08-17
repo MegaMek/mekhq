@@ -635,8 +635,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                     //ammo bins are free - bleh
                     AmmoBin bin = (AmmoBin)part;
                     bin.setShotsNeeded(bin.getFullShots());
-                    oldUnit.campaign.addPart(part, 0);
                     part.setRefitId(oldUnit.getId());
+                    oldUnit.campaign.addPart(part, 0);
                     newUnitParts.add(part.getId());
                     bin.loadBin();
                     if(bin.needsFixing()) {
@@ -1507,9 +1507,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				//newUnitParts.add(part.getId());
 			}
 			else if(part instanceof AmmoBin) {
+                part.setRefitId(oldUnit.getId());
 				oldUnit.campaign.addPart(part, 0);
 				newUnitParts.add(part.getId());
-                part.setRefitId(oldUnit.getId());
 				AmmoBin bin = (AmmoBin)part;
 				bin.setShotsNeeded(bin.getFullShots());
 				bin.loadBin();
