@@ -3723,7 +3723,7 @@ public class Campaign implements Serializable {
         for (Part prt : removeParts) {
             retVal.removePart(prt);
         }
-
+        
         // All personnel need the rank reference fixed
         for (int x = 0; x < retVal.personnel.size(); x++) {
             Person psn = retVal.personnel.get(x);
@@ -3855,6 +3855,14 @@ public class Campaign implements Serializable {
                     unit.setSalvage(true);
                 }
             }
+        }
+               
+        //unload any ammo bins in the warehouse
+        for(Part prt : retVal.getSpareParts()) {
+        	if(prt instanceof AmmoBin && !prt.isReservedForRefit()
+        		&& ((AmmoBin)prt).getShotsNeeded() == 0) {
+        			((AmmoBin)prt).unload();
+        		}
         }
 
         retVal.reloadNews();
