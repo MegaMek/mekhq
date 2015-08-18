@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 
 import megamek.common.Compute;
 import megamek.common.CriticalSlot;
+import megamek.common.Engine;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
@@ -271,5 +272,21 @@ public class MekSensor extends Part {
 	public int getReIntroDate() {
 		return EquipmentType.DATE_NONE;
 	}
+	
+	@Override
+    public boolean isInLocation(String loc) {
+		 if(null == unit || null == unit.getEntity() || !(unit.getEntity() instanceof Mech)) {
+			 return false;
+		 }
+		 if (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_HEAD) {
+             return true;
+         }
+		 if(((Mech)unit.getEntity()).getCockpitType() == Mech.COCKPIT_TORSO_MOUNTED) {
+     		if(unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_CT) {
+     			return true;
+     		}
+		 }
+		 return false;	
+    }
 	
 }

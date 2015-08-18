@@ -1256,5 +1256,11 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     	//do nothing
     }
     
+    public boolean isInLocation(String loc) {
+    	return null != unit 
+    		&& null != unit.getEntity() 
+    		&& getLocation() == getUnit().getEntity().getLocationFromAbbr(loc);
+    }
+    
 }
 

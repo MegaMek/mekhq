@@ -29,6 +29,7 @@ import megamek.common.Compute;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.Mech;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.TechConstants;
@@ -666,4 +667,19 @@ public class EquipmentPart extends Part {
     	}
 		return null;
 	}
+	
+	@Override
+    public boolean isInLocation(String loc) {
+		if(null == unit || null == unit.getEntity() || null == unit.getEntity().getEquipment(equipmentNum)) {
+			return false;
+		}	
+		Mounted mounted = unit.getEntity().getEquipment(equipmentNum);	
+		if(mounted.getLocation() == unit.getEntity().getLocationFromAbbr(loc)) {
+			return true;
+		}
+		if(mounted.getSecondLocation() == unit.getEntity().getLocationFromAbbr(loc)) {
+			return true;
+		}
+		return false;	
+    }
 }

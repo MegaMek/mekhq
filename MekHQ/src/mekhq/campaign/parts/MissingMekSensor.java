@@ -117,6 +117,14 @@ public class MissingMekSensor extends MissingPart {
 
 	@Override
 	public int getLocation() {
+		if(null != unit) {
+			Entity entity = unit.getEntity();
+			for (int i = 0; i < entity.locations(); i++) {
+				if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i) > 0) {
+					return i;
+				}
+			}
+		}
 		return Entity.LOC_NONE;
 	}
 	
@@ -135,5 +143,20 @@ public class MissingMekSensor extends MissingPart {
 		return EquipmentType.DATE_NONE;
 	}
 	
+	@Override
+    public boolean isInLocation(String loc) {
+		 if(null == unit || null == unit.getEntity() || !(unit.getEntity() instanceof Mech)) {
+			 return false;
+		 }
+		 if (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_HEAD) {
+             return true;
+         }
+		 if(((Mech)unit.getEntity()).getCockpitType() == Mech.COCKPIT_TORSO_MOUNTED) {
+     		if(unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_CT) {
+     			return true;
+     		}
+		 }
+		 return false;	
+    }
 
 }

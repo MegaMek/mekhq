@@ -245,6 +245,14 @@ public class MekLifeSupport extends Part {
 
 	@Override
 	public int getLocation() {
+		if(null != unit) {
+			Entity entity = unit.getEntity();
+			for (int i = 0; i < entity.locations(); i++) {
+				if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT, i) > 0) {
+					return i;
+				}
+			}
+		}
 		return Entity.LOC_NONE;
 	}
 	
@@ -262,5 +270,21 @@ public class MekLifeSupport extends Part {
 	public int getReIntroDate() {
 		return EquipmentType.DATE_NONE;
 	}
+	
+	@Override
+    public boolean isInLocation(String loc) {
+		 if(null == unit || null == unit.getEntity() || !(unit.getEntity() instanceof Mech)) {
+			 return false;
+		 }
+		 if(((Mech)unit.getEntity()).getCockpitType() == Mech.COCKPIT_TORSO_MOUNTED) {
+			 if(unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_LT
+					 || unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_RT) {
+				 return true;
+			 }
+		 } else if (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_HEAD) {
+             return true;
+         }
+		 return false;	
+    }
 	
 }

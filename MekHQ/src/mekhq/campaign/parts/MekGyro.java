@@ -317,7 +317,7 @@ public class MekGyro extends Part {
 	
 	@Override
 	public int getLocation() {
-		return Entity.LOC_NONE;
+		return Mech.LOC_CT;
 	}
 	
 	@Override

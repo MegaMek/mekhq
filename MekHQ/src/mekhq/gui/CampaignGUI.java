@@ -155,6 +155,7 @@ import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.MissingEnginePart;
+import mekhq.campaign.parts.MissingMekSensor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.ProtomekArmor;
 import mekhq.campaign.parts.Refit;
@@ -6747,12 +6748,42 @@ public class CampaignGUI extends JPanel {
                 if (part == null) {
                     return false;
                 }
+                //TODO: it would be better to feed loc into a part-specific method than to hack this
+                //out in the GUI
                 if (loc != null && !loc.isEmpty()) {
                     if (loc.equals("All")) {
                         return true;
-                    } else if (part.getLocation() == part.getUnit().getEntity()
+                    } 
+                    return part.isInLocation(loc);
+                }
+                    /*
+                    else if (part.getLocation() == part.getUnit().getEntity()
                             .getLocationFromAbbr(loc)) {
                         return true;
+                    } else if((part instanceof MekSensor || part instanceof MissingMekSensor)
+                    		&& part.getUnit() != null
+                            && part.getUnit().getEntity() != null
+                            && part.getUnit().getEntity() instanceof Mech) {	
+                    	if(part.getUnit().getEntity().getLocationFromAbbr(loc) == Mech.LOC_HEAD) {
+                    		return true;
+                    	}
+                    	if(((Mech)part.getUnit().getEntity()).getCockpitType() == Mech.COCKPIT_TORSO_MOUNTED) {
+                    		if(part.getUnit().getEntity().getLocationFromAbbr(loc) == Mech.LOC_CT) {
+                    			return true;
+                    		}
+                    	}
+                    } else if((part instanceof MekLifeSupport || part instanceof MissingMekLifeSupport)
+                    		&& part.getUnit() != null
+                            && part.getUnit().getEntity() != null
+                            && part.getUnit().getEntity() instanceof Mech) {	
+                    	if(part.getUnit().getEntity().getLocationFromAbbr(loc) == Mech.LOC_HEAD) {
+                    		return true;
+                    	}
+                    	if(((Mech)part.getUnit().getEntity()).getCockpitType() == Mech.COCKPIT_TORSO_MOUNTED) {
+                    		if(part.getUnit().getEntity().getLocationFromAbbr(loc) == Mech.LOC_CT) {
+                    			return true;
+                    		}
+                    	}
                     } else if ((part instanceof EnginePart || part instanceof MissingEnginePart)
                             && part.getUnit() != null
                             && part.getUnit().getEntity() != null
@@ -6787,14 +6818,11 @@ public class CampaignGUI extends JPanel {
                                         .getLocationFromAbbr(loc) == Mech.LOC_RT)) {
                             return true;
                         }
-                    } else if (part instanceof MekGyro
-                            && part.getUnit().getEntity()
-                                    .getLocationFromAbbr(loc) == Mech.LOC_CT) {
-                        return true;
                     } 
                     return false;
-                }
+                }*/
                 return false;
+                
             }
         };
         taskSorter.setRowFilter(taskLocationFilter);

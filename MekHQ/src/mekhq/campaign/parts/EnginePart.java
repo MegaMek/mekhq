@@ -646,4 +646,28 @@ public class EnginePart extends Part {
 		}
 	}
 	
+	@Override
+    public boolean isInLocation(String loc) {
+		 if(null == unit || null == unit.getEntity()) {
+			 return false;
+		 }
+		 if (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_CT) {
+             return true;
+         }
+         boolean needsSideTorso = false;
+         switch (getEngine().getEngineType()) {
+             case Engine.XL_ENGINE:
+             case Engine.LIGHT_ENGINE:
+             case Engine.XXL_ENGINE:
+                 needsSideTorso = true;
+                 break;
+         }
+         if (needsSideTorso
+                 && (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_LT 
+                         || unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_RT)) {
+             return true;
+         }
+         return false;	
+    }
+	
 }
