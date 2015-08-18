@@ -1,0 +1,10 @@
+/bin/
+/logs/
+/data/mechfiles/units.cache
+/data/mechfiles/customs/
+/savegames/
+/mmconf/clientsettings.xml
+/mmconf/gameoptions.xml
+/mmconf/megameklab.properties
+/campaigns/*.cpnx
+/*.mul
