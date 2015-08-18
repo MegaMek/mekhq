@@ -3633,6 +3633,19 @@ public class Campaign implements Serializable {
                         continue;
                     }
                 }
+                if (prt instanceof MissingEquipmentPart) {
+                    Mounted m = u.getEntity().getEquipment(
+                            ((MissingEquipmentPart) prt).getEquipmentNum());
+                    if (null == m || m.getLocation() == Entity.LOC_NONE) {
+                        removeParts.add(prt);
+                        continue;
+                    }
+                    // Remove existing duplicate parts.
+                    if (u.getPartForEquipmentNum(((MissingEquipmentPart) prt).getEquipmentNum(), ((MissingEquipmentPart) prt).getLocation()) != null) {
+                        removeParts.add(prt);
+                        continue;
+                    }
+                }
                 // if actuators on units have no location (on version 1.23 and
                 // earlier) then remove them and let initializeParts (called
                 // later) create new ones

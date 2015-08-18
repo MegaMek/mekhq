@@ -212,6 +212,10 @@ public class MissingEquipmentPart extends MissingPart {
             Mounted m = unit.getEntity().getEquipment(equipmentNum);
             if(null != m) {
                 int loc = m.getLocation();
+                int bob;
+                if(loc == -1) {
+                	bob = 1;
+                }
                 if (unit.isLocationBreached(loc)) {
                     return unit.getEntity().getLocationName(loc) + " is breached.";
                 }
