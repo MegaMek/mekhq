@@ -8,6 +8,7 @@ v0.3.17-dev (SVN)
 + Bug [#647]: Incorrect mech component locations in the repair bay
 + Bug [#678]: End of battle screen -> finish -> program hangs, array index out of bounds
 + Bug [#682]: Omni pod refits are not working correctly
++ Bug [#689]: Unable to select multiple contracts of the same name
 
 v0.3.16 (2015-08-15 19:40 UTC)
 + Bug [#823]: NPE during 'Auto Resolve'

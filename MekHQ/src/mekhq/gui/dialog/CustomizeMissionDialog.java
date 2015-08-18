@@ -26,6 +26,7 @@ import java.awt.Frame;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
+import javax.swing.JOptionPane;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
@@ -205,6 +206,16 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
 
     
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
+    	String chosenName = txtName.getText();
+    	for(Mission m : campaign.getMissions()) {
+    		if(m.getName().equals(chosenName)) {
+    			JOptionPane.showMessageDialog(frame,
+    				    "There is already a missiong with the name " + chosenName,
+    				    "Duplicate Mission Name",
+    				    JOptionPane.ERROR_MESSAGE);
+    			return;
+    		}
+    	}   	
     	mission.setName(txtName.getText());
     	mission.setType(txtType.getText());
     	mission.setPlanetName(suggestPlanet.getText());
