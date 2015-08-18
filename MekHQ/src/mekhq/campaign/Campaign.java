@@ -3858,12 +3858,17 @@ public class Campaign implements Serializable {
         }
                
         //unload any ammo bins in the warehouse
+        ArrayList<AmmoBin> binsToUnload = new ArrayList<AmmoBin>();
         for(Part prt : retVal.getSpareParts()) {
         	if(prt instanceof AmmoBin && !prt.isReservedForRefit()
-        		&& ((AmmoBin)prt).getShotsNeeded() == 0) {
-        			((AmmoBin)prt).unload();
-        		}
+        			&& ((AmmoBin)prt).getShotsNeeded() == 0) {
+        		binsToUnload.add((AmmoBin)prt);
+        	}
         }
+        for(AmmoBin bin : binsToUnload) {
+        	bin.unload();
+        }
+        
 
         retVal.reloadNews();
 
