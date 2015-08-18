@@ -36,6 +36,7 @@ import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.MiscType;
 import megamek.common.Protomech;
+import megamek.common.TechConstants;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.verifier.TestEntity;
 import megamek.common.weapons.BayWeapon;
@@ -275,9 +276,11 @@ public class PartsStore implements Serializable {
 						if(engine.engineValid) {
 							parts.add(new EnginePart(ton, engine, c, false));
 						}
-						engine = new Engine(rating, i, Engine.CLAN_ENGINE);
-						if(engine.engineValid) {
-							parts.add(new EnginePart(ton, engine, c, false));
+						if(engine.getTechType() != TechConstants.T_ALLOWED_ALL) {
+							engine = new Engine(rating, i, Engine.CLAN_ENGINE);
+							if(engine.engineValid) {
+								parts.add(new EnginePart(ton, engine, c, false));
+							}
 						}
 					}
 					engine = new Engine(rating, i, Engine.TANK_ENGINE);
@@ -291,13 +294,15 @@ public class PartsStore implements Serializable {
 						}
 					}
 					engine = new Engine(rating, i, Engine.TANK_ENGINE | Engine.CLAN_ENGINE);
-					if(engine.engineValid) {
-						parts.add(new EnginePart(ton, engine, c, false));
-					}
-					if((ton/5) > getEngineTonnage(engine)) {
-						engine = new Engine(rating, i, Engine.TANK_ENGINE | Engine.CLAN_ENGINE);
+					if(engine.getTechType() != TechConstants.T_ALLOWED_ALL) {
 						if(engine.engineValid) {
-							parts.add(new EnginePart(ton, engine, c, true));
+							parts.add(new EnginePart(ton, engine, c, false));
+						}
+						if((ton/5) > getEngineTonnage(engine)) {
+							engine = new Engine(rating, i, Engine.TANK_ENGINE | Engine.CLAN_ENGINE);
+							if(engine.engineValid) {
+								parts.add(new EnginePart(ton, engine, c, true));
+							}
 						}
 					}
 				}

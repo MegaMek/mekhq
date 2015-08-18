@@ -22,6 +22,9 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
+import java.util.GregorianCalendar;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import megamek.common.Aero;
 import megamek.common.CriticalSlot;
@@ -156,11 +159,11 @@ public class EnginePart extends Part {
 
 	@Override
 	public int getTechLevel() {
-		if (getEngine().getTechType() < 0
-				|| getEngine().getTechType() >= TechConstants.SIZE)
-			return TechConstants.T_TECH_UNKNOWN;
-		else
-			return getEngine().getTechType();
+		int techLevel = getEngine().getTechType();
+        if ((techLevel != TechConstants.T_ALLOWED_ALL && techLevel < 0) || techLevel >= TechConstants.T_ALL)
+            return TechConstants.T_TECH_UNKNOWN;
+        else
+            return techLevel;
 	}
 
 	@Override
