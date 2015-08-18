@@ -1,5 +1,4 @@
 /bin/
-<<<<<<< HEAD
 /logs/
 /data/mechfiles/units.cache
 /data/mechfiles/customs/
@@ -9,5 +8,3 @@
 /mmconf/megameklab.properties
 /campaigns/*.cpnx
 /*.mul
-=======
->>>>>>> 160d3fdad79f6a360c0f0012ef59c86553390e9e
