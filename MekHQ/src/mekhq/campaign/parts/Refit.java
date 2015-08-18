@@ -55,6 +55,7 @@ import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.equipment.MissingAmmoBin;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -380,7 +381,21 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 					ammoNeeded.put(type,ammoNeeded.get(type) + ((AmmoType)((AmmoBin)nPart).getType()).getShots());
 				}
 				time += 120;
-				shoppingList.add(nPart);
+				//check for ammo bins in storage to avoid the proliferation of infinite ammo bins
+				MissingAmmoBin mab = (MissingAmmoBin)nPart.getMissingPart();
+				Part replacement = mab.findReplacement(true);
+				//check quantity
+				//TODO: the one weakness here is that we will not pick up damaged parts
+				if(null != replacement && null == partQuantity.get(replacement.getId())) {
+					partQuantity.put(replacement.getId(), replacement.getQuantity());
+				}
+				if(null != replacement && partQuantity.get(replacement.getId()) > 0) {
+					newUnitParts.add(replacement.getId());
+					//adjust quantity
+					partQuantity.put(replacement.getId(), partQuantity.get(replacement.getId())-1);
+				} else {
+					shoppingList.add(nPart);
+				}
 			}
 			
 			/*CHECK REFIT CLASS*/
@@ -897,10 +912,10 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				} 
 				newUnitParts.add(pid);
 			}
-			else if(part instanceof AmmoBin) {
-				((AmmoBin) part).unload();
-			}
 			else {
+				if(part instanceof AmmoBin) {
+					((AmmoBin) part).unload();
+				}
 				Part spare = oldUnit.campaign.checkForExistingSparePart(part);
 				if(null != spare) {
 					spare.incrementQuantity();
