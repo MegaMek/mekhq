@@ -6748,79 +6748,12 @@ public class CampaignGUI extends JPanel {
                 if (part == null) {
                     return false;
                 }
-                //TODO: it would be better to feed loc into a part-specific method than to hack this
-                //out in the GUI
                 if (loc != null && !loc.isEmpty()) {
                     if (loc.equals("All")) {
                         return true;
                     } 
                     return part.isInLocation(loc);
                 }
-                    /*
-                    else if (part.getLocation() == part.getUnit().getEntity()
-                            .getLocationFromAbbr(loc)) {
-                        return true;
-                    } else if((part instanceof MekSensor || part instanceof MissingMekSensor)
-                    		&& part.getUnit() != null
-                            && part.getUnit().getEntity() != null
-                            && part.getUnit().getEntity() instanceof Mech) {	
-                    	if(part.getUnit().getEntity().getLocationFromAbbr(loc) == Mech.LOC_HEAD) {
-                    		return true;
-                    	}
-                    	if(((Mech)part.getUnit().getEntity()).getCockpitType() == Mech.COCKPIT_TORSO_MOUNTED) {
-                    		if(part.getUnit().getEntity().getLocationFromAbbr(loc) == Mech.LOC_CT) {
-                    			return true;
-                    		}
-                    	}
-                    } else if((part instanceof MekLifeSupport || part instanceof MissingMekLifeSupport)
-                    		&& part.getUnit() != null
-                            && part.getUnit().getEntity() != null
-                            && part.getUnit().getEntity() instanceof Mech) {	
-                    	if(part.getUnit().getEntity().getLocationFromAbbr(loc) == Mech.LOC_HEAD) {
-                    		return true;
-                    	}
-                    	if(((Mech)part.getUnit().getEntity()).getCockpitType() == Mech.COCKPIT_TORSO_MOUNTED) {
-                    		if(part.getUnit().getEntity().getLocationFromAbbr(loc) == Mech.LOC_CT) {
-                    			return true;
-                    		}
-                    	}
-                    } else if ((part instanceof EnginePart || part instanceof MissingEnginePart)
-                            && part.getUnit() != null
-                            && part.getUnit().getEntity() != null
-                            && part.getUnit().getEntity() instanceof Mech) {
-                        if (part.getUnit().getEntity().getLocationFromAbbr(loc) == Mech.LOC_CT) {
-                            return true;
-                        }
-                        boolean needsSideTorso = false;
-                        if (part instanceof EnginePart) {
-                            switch (((EnginePart) part).getEngine()
-                                    .getEngineType()) {
-                                case Engine.XL_ENGINE:
-                                case Engine.LIGHT_ENGINE:
-                                case Engine.XXL_ENGINE:
-                                    needsSideTorso = true;
-                                    break;
-                            }
-                        } else if (part instanceof MissingEnginePart) {
-                            switch (((EnginePart) part).getEngine()
-                                    .getEngineType()) {
-                                case Engine.XL_ENGINE:
-                                case Engine.LIGHT_ENGINE:
-                                case Engine.XXL_ENGINE:
-                                    needsSideTorso = true;
-                                    break;
-                            }
-                        }
-                        if (needsSideTorso
-                                && (part.getUnit().getEntity()
-                                        .getLocationFromAbbr(loc) == Mech.LOC_LT || part
-                                        .getUnit().getEntity()
-                                        .getLocationFromAbbr(loc) == Mech.LOC_RT)) {
-                            return true;
-                        }
-                    } 
-                    return false;
-                }*/
                 return false;
                 
             }
