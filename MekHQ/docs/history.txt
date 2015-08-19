@@ -14,6 +14,7 @@ v0.3.17-dev (SVN)
 + some fixes to parts reservations in Refit
 + Bug [#673]: GM mode -> procure single refit kit does not work
 + Bug [#672]: GM mode -> procure all refit kits causes HQ to hang
++ Bug [#912]: Costs of refits kits don't seem right, armor not prorated
 
 v0.3.16 (2015-08-15 19:40 UTC)
 + Bug [#823]: NPE during 'Auto Resolve'

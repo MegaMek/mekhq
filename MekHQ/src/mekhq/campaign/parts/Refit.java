@@ -546,12 +546,12 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			newArmorSupplies.setRefitId(oldUnit.getId());
 			//check existing supplies before determining cost
 			Armor existingArmorSupplies = getExistingArmorSupplies();
-			int amountNeeded = armorNeeded;
+			double tonnageNeeded = newArmorSupplies.getTonnageNeeded();
 			if(null != existingArmorSupplies) {
-				amountNeeded = Math.max(0, armorNeeded - existingArmorSupplies.getAmount());
+				tonnageNeeded = Math.max(0, tonnageNeeded - existingArmorSupplies.getTonnage());
 			}
 			newArmorSupplies.setUnit(oldUnit);
-			cost += (long)(Math.ceil(((double)amountNeeded)/(5*newArmorSupplies.getArmorPointsPerTon())) * 5 * EquipmentType.getArmorCost(atype));
+			cost += newArmorSupplies.getStickerPrice() * (tonnageNeeded / 5.0);
 			newArmorSupplies.setUnit(null);
 		}
 
