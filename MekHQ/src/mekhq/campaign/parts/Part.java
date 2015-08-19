@@ -492,7 +492,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				|| part.isReservedForRefit() || part.isBeingWorkedOn() || part.isReservedForReplacement() || part.hasParentPart()) {
     		return false;
     	}
-		return hits == part.getHits() && part.getSkillMin() == this.getSkillMin() && this.getDaysToArrival() == part.getDaysToArrival();
+		return quality == part.getQuality() && hits == part.getHits() && part.getSkillMin() == this.getSkillMin() && this.getDaysToArrival() == part.getDaysToArrival();
 	}
 
     protected boolean isClanTechBase() {
