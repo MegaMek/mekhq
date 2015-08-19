@@ -3056,10 +3056,14 @@ public class Campaign implements Serializable {
 
     public boolean buyPart(Part part, double multiplier, int transitDays) {
         if (getCampaignOptions().payForParts()) {
-            if (finances.debit((long) (multiplier * part.getActualValue()),
+            if (finances.debit((long) (multiplier * part.getStickerPrice()),
                                Transaction.C_EQUIP, "Purchase of " + part.getName(),
                                calendar.getTime())) {
-                addPart(part, transitDays);
+            	if(part instanceof Refit) {
+            		((Refit)part).addRefitKitParts(transitDays);
+            	} else {
+            		addPart(part, transitDays);
+            	}
                 return true;
             } else {
                 return false;

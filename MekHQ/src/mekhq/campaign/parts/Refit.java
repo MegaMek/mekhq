@@ -53,6 +53,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.MhqFileUtil;
 import mekhq.Utilities;
 import mekhq.Version;
+import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingAmmoBin;
@@ -262,6 +263,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			for(int pid : oldUnitParts) {
 				Part oPart = oldUnit.campaign.getPart(pid);
 				i++;
+				//FIXME: There have been instances of null oParts here. Save/load will fix these, but
+				//I would like to figure out the source. From experimentation, I think it has to do with
+				//cancelling a prior refit.
 				if(((oPart instanceof MissingPart && ((MissingPart)oPart).isAcceptableReplacement(part, true))
 						|| oPart.isSamePartType(part))) {
 					//need a special check for location and armor amount for armor
@@ -715,7 +719,6 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	}
 
 	public boolean partsInTransit() {
-		boolean retVal = false;
 		for (int pid : newUnitParts) {
 			Part part = oldUnit.campaign.getPart(pid);
 			if (part == null) {
@@ -725,16 +728,19 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				}
 			}
 			if (!part.isPresent()) {
-				retVal = true;
-				break;
+				return true;
 			}
 		}
-		return retVal;
+		if(null != newArmorSupplies && !newArmorSupplies.isPresent()) {
+			return true;
+		}
+		return false;
 	}
 
 	public boolean acquireParts() {
-	    if(!customJob && !kitFound) {
-	        return false;
+	    if(!customJob) {
+        	checkForArmorSupplies();
+        	return kitFound && !partsInTransit();
 	    }
 		ArrayList<Part> newShoppingList = new ArrayList<Part>();
 		for(Part part : shoppingList) {
@@ -1160,6 +1166,11 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	public String getAcquisitionName() {
 		return getPartName();
 	}
+	
+	@Override
+	public String getName() {
+		return getPartName();
+	}
 
 	@Override
 	public int getSkillMin() {
@@ -1491,7 +1502,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	@Override
 	public Part getNewEquipment() {
 		// TODO Auto-generated method stub
-		return null;
+		return this;
 	}
 
 	@Override
@@ -1508,9 +1519,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	    return getStickerPrice();
 	}
 
-	@Override
-	public String find(int transitDays) {
-	    //TODO: check somewhere before this if they can afford it
+	public void addRefitKitParts(int transitDays) {
 		for(Part part : shoppingList) {
 			if(part instanceof Armor) {
 				//Taharqa: WE shouldn't be here anymore, given that I am no longer adding
@@ -1529,14 +1538,14 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				bin.setShotsNeeded(bin.getFullShots());
 				bin.loadBin();
 				if(bin.needsFixing()) {
-	                oldUnit.campaign.buyPart(bin.getNewPart(), 1.1, transitDays);
+	                oldUnit.campaign.addPart(bin.getNewPart(), transitDays);
 					bin.loadBin();
 				}
 			}
 			else if(part instanceof MissingPart) {
 				Part newPart = (Part)((IAcquisitionWork)part).getNewEquipment();
 				newPart.setRefitId(oldUnit.getId());
-				oldUnit.campaign.buyPart(newPart, 1.1, transitDays);
+				oldUnit.campaign.addPart(newPart, transitDays);
 				newUnitParts.add(newPart.getId());
 			}
 		}
@@ -1545,12 +1554,21 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		    if(amount > 0) {
     		    Armor a = (Armor)newArmorSupplies.getNewPart();
     		    a.setAmount(amount);
-    			oldUnit.campaign.buyPart(a, 1.1, transitDays);
+    			oldUnit.campaign.addPart(a, transitDays);
 		    }
+		    checkForArmorSupplies();
 		}
 		shoppingList = new ArrayList<Part>();
 		kitFound = true;
-		return "<font color='green'><b> refit kit found.</b> Kit will arrive in " + transitDays + " days.</font>";
+	}
+	
+	@Override
+	public String find(int transitDays) {
+		if(campaign.buyPart(this, transitDays)) {
+			return "<font color='green'><b> refit kit found.</b> Kit will arrive in " + transitDays + " days.</font>";
+		} else {
+		    return "<font color='red'><b> You cannot afford this refit kit. Transaction cancelled</b>.</font>";
+		}
 	}
 
 	@Override

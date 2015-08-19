@@ -11,6 +11,9 @@ v0.3.17-dev (SVN)
 + Bug [#689]: Unable to select multiple contracts of the same name
 + Bug [#693]: Unable to repair heatsink ; array index out of bounds
 + Campaign loading routine unloads ammo bins that are not reserved for refit
++ some fixes to parts reservations in Refit
++ Bug [#673]: GM mode -> procure single refit kit does not work
++ Bug [#672]: GM mode -> procure all refit kits causes HQ to hang
 
 v0.3.16 (2015-08-15 19:40 UTC)
 + Bug [#823]: NPE during 'Auto Resolve'
