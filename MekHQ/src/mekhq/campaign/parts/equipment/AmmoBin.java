@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import megamek.common.AmmoType;
+import megamek.common.BattleArmor;
 import megamek.common.CriticalSlot;
 import megamek.common.Dropship;
 import megamek.common.Entity;
@@ -104,11 +105,18 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     public int getFullShots() {
     	int fullShots = ((AmmoType)type).getShots();
+    	if(unit != null) {
+			Mounted m = unit.getEntity().getEquipment(equipmentNum);
+            if(null != m && m.getOriginalShots() > 0) {
+                fullShots = m.getOriginalShots();
+            }
+		}
 		if(oneShot) {
 			fullShots = 1;
 		}
 		//Protomechs: Its a hack, but we probably need to load a fresh entity in and check what its shots are
 		//for the same equipnum
+		//FIXME: figure out how to set original shots in Proto loaders so we don't have to do this
 		if(null != unit && unit.getEntity() instanceof Protomech) {
 		    String lookupName = unit.getEntity().getChassis() + " " + unit.getEntity().getModel();
 		    lookupName = lookupName.trim();
@@ -131,7 +139,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	        }
 		}
 		// Another hack because Dropships, Warships, Jumpships, etc... have their ammo done quite weirdly.
-		if (unit != null && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship || unit.getEntity() instanceof Warship)) {
+		//this should now be taken care of above
+		/*if (unit != null && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship || unit.getEntity() instanceof Warship)) {
 			String lookupName = unit.getEntity().getChassis() + " " + unit.getEntity().getModel();
 		    lookupName = lookupName.trim();
 	        MechSummary summary = MechSummaryCache.getInstance().getMech(lookupName);
@@ -147,7 +156,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	        } catch (EntityLoadingException e) {
                 return fullShots;
             }
-		}
+		}*/
+		
 		return fullShots;
     }
 

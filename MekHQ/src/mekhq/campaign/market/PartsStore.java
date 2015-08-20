@@ -153,7 +153,18 @@ public class PartsStore implements Serializable {
             }
             //TODO: we are still adding a lot of non-hittable equipment
 			if(et instanceof AmmoType) {
-				parts.add(new AmmoStorage(0, et, ((AmmoType)et).getShots(), c));
+				if(((AmmoType)et).hasFlag(AmmoType.F_BATTLEARMOR)) {
+					//BA ammo has one shot listed as the amount. Do it as 1 ton blocks
+					int shots = (int) Math.floor(1000/((AmmoType)et).getKgPerShot());
+					if(shots <= 0) {
+						//FIXME: no idea what to do here, these really should be fixed on the MM side
+						//because presumably this is happening because KgperShot is -1 or 0
+						shots = 20;
+					}
+					parts.add(new AmmoStorage(0, et, shots, c));
+				} else {
+					parts.add(new AmmoStorage(0, et, ((AmmoType)et).getShots(), c));
+				}
 			} else if(et instanceof MiscType && (((MiscType)et).hasFlag(MiscType.F_HEAT_SINK) || ((MiscType)et).hasFlag(MiscType.F_DOUBLE_HEAT_SINK))) {
             	parts.add(new HeatSink(0, et, -1, c));
 			} else if(et instanceof MiscType && ((MiscType)et).hasFlag(MiscType.F_JUMP_JET)) {
