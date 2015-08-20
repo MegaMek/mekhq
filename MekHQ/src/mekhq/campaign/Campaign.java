@@ -3865,6 +3865,10 @@ public class Campaign implements Serializable {
             }
         }
                
+        retVal.reloadNews();
+        
+        //**EVERYTHING HAS BEEN LOADED. NOW FOR SANITY CHECKS**//
+        
         //unload any ammo bins in the warehouse
         ArrayList<AmmoBin> binsToUnload = new ArrayList<AmmoBin>();
         for(Part prt : retVal.getSpareParts()) {
@@ -3877,9 +3881,57 @@ public class Campaign implements Serializable {
         	bin.unload();
         }
         
-
-        retVal.reloadNews();
-
+        //Check all parts that are reserved for refit and if the refit id unit
+        //is not refitting or is gone then unreserve
+        for(Part part : retVal.getParts()) {
+        	if(part.isReservedForRefit()) {
+        		Unit u = retVal.getUnit(part.getRefitId());
+        		if(null == u || !u.isRefitting()) {
+        			part.setRefitId(null);
+        		}
+        	}
+        }
+       
+        //try to stack as much as possible the parts in the warehouse that may be unstacked
+        //for a variety of reasons
+        ArrayList<Part> partsToRemove = new ArrayList<Part>();
+        ArrayList<Part> partsToKeep = new ArrayList<Part>();
+        for(Part part : retVal.getParts()) {
+        	if(part.isSpare() && part.isPresent()) {
+        		for(Part oPart : partsToKeep) {
+	        		if (part.isSamePartTypeAndStatus(oPart)) {
+	        			if (part instanceof Armor) {
+	                        if (oPart instanceof Armor) {
+	                            ((Armor) oPart).setAmount(((Armor) oPart).getAmount()
+	                                                      + ((Armor) part).getAmount());
+	                            partsToRemove.add(part);
+	                            break;
+	                        }
+	                    } else if (part instanceof AmmoStorage) {
+	                        if (oPart instanceof AmmoStorage) {
+	                            ((AmmoStorage) oPart).changeShots(((AmmoStorage) part)
+	                                                                      .getShots());
+	                            partsToRemove.add(part);
+	                            break;
+	                        }
+	                    } else {
+	                    	int q = part.getQuantity();
+	                    	while(q > 0) {
+	                    		oPart.incrementQuantity();
+	                    		q--;
+	                    	}
+	                        partsToRemove.add(part);
+                            break;
+	                    }
+	        		}
+        		}
+        		partsToKeep.add(part);
+        	}
+        }
+        for(Part toRemove : partsToRemove) {
+        	retVal.removePart(toRemove);
+        }
+        
         MekHQ.logMessage("Load of campaign file complete!");
 
         return retVal;

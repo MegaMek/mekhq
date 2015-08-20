@@ -21,6 +21,8 @@ v0.3.17-dev (SVN)
 + improvements to AmmoBin.getFullShots to avoid loading protomech entity from units.cache
 + Bug [#915]: Must salvage parts in location before replacing bug
 + Bug [#766]: Refit Kits still serached/ordered when all parts are present in warehouse
++ new campaigns will remove reservation from refits where the unit is not there or is not refitting
++ check on campaign loading for unstacked parts in warehouse that could be stacked and do so
 
 v0.3.16 (2015-08-15 19:40 UTC)
 + Bug [#823]: NPE during 'Auto Resolve'
