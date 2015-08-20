@@ -265,7 +265,7 @@ public class EquipmentPart extends Part {
 				mounted.setHit(true);
 		        mounted.setDestroyed(true);
 		        mounted.setRepairable(false);
-		        unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum, mounted.getLocation());
+		        unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum);
 			}
 			Part spare = campaign.checkForExistingSparePart(this);
 			if(!salvage) {
@@ -673,11 +673,28 @@ public class EquipmentPart extends Part {
 		if(null == unit || null == unit.getEntity() || null == unit.getEntity().getEquipment(equipmentNum)) {
 			return false;
 		}	
+		
 		Mounted mounted = unit.getEntity().getEquipment(equipmentNum);	
-		if(mounted.getLocation() == unit.getEntity().getLocationFromAbbr(loc)) {
+		if(null == mounted) {
+			return false;
+		}
+		int location = unit.getEntity().getLocationFromAbbr(loc);
+		for (int i = 0; i < unit.getEntity().getNumberOfCriticals(location); i++) {
+	            CriticalSlot slot = unit.getEntity().getCritical(location, i);
+	            // ignore empty & non-hittable slots
+	            if ((slot == null) || !slot.isEverHittable() || slot.getType()!=CriticalSlot.TYPE_EQUIPMENT
+	            		|| null == slot.getMount()) {
+	                continue;
+	            }
+	            if(unit.getEntity().getEquipmentNum(slot.getMount()) == equipmentNum) {
+	            	return true;
+	            }
+		}
+		//if we are still here, lets just double check by the mounted's location and secondary location
+		if(mounted.getLocation() == location) {
 			return true;
 		}
-		if(mounted.getSecondLocation() == unit.getEntity().getLocationFromAbbr(loc)) {
+		if(mounted.getSecondLocation() == location) {
 			return true;
 		}
 		return false;	
