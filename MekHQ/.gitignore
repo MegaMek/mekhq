@@ -6,5 +6,6 @@
 /mmconf/clientsettings.xml
 /mmconf/gameoptions.xml
 /mmconf/megameklab.properties
+/mmconf/mekhq.properties
 /campaigns/*.cpnx
 /*.mul
