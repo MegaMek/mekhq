@@ -3069,7 +3069,11 @@ public class Campaign implements Serializable {
                 return false;
             }
         } else {
-            addPart(part, transitDays);
+        	if(part instanceof Refit) {
+        		((Refit)part).addRefitKitParts(transitDays);
+        	} else {
+        		addPart(part, transitDays);
+        	}
             return true;
         }
     }

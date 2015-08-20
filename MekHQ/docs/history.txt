@@ -20,6 +20,7 @@ v0.3.17-dev (SVN)
 + Bug [#732]: MekHQ unable to handle custom dropship with a lot of weapons
 + improvements to AmmoBin.getFullShots to avoid loading protomech entity from units.cache
 + Bug [#915]: Must salvage parts in location before replacing bug
++ Bug [#766]: Refit Kits still serached/ordered when all parts are present in warehouse
 
 v0.3.16 (2015-08-15 19:40 UTC)
 + Bug [#823]: NPE during 'Auto Resolve'

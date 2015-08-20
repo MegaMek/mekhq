@@ -687,7 +687,11 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
     			part.setUnit(null);
 			}
 		    checkForArmorSupplies();
-		    oldUnit.campaign.getShoppingList().addShoppingItem(this, 1, oldUnit.campaign);
+		    if(shoppingList.isEmpty() && (null == newArmorSupplies || newArmorSupplies.getAmountNeeded() == 0)) {
+		    	kitFound = true;
+		    } else {
+		    	oldUnit.campaign.getShoppingList().addShoppingItem(this, 1, oldUnit.campaign);
+		    }
 		}
 
 	}
@@ -740,7 +744,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	public boolean acquireParts() {
 	    if(!customJob) {
         	checkForArmorSupplies();
-        	return kitFound && !partsInTransit();
+        	return kitFound && !partsInTransit() && (null == newArmorSupplies || (armorNeeded - newArmorSupplies.getAmount()) <= 0);
 	    }
 		ArrayList<Part> newShoppingList = new ArrayList<Part>();
 		for(Part part : shoppingList) {
