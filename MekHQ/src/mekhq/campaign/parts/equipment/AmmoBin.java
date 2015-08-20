@@ -111,53 +111,15 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                 fullShots = m.getOriginalShots();
             }
 		}
-		if(oneShot) {
-			fullShots = 1;
-		}
-		//Protomechs: Its a hack, but we probably need to load a fresh entity in and check what its shots are
-		//for the same equipnum
-		//FIXME: figure out how to set original shots in Proto loaders so we don't have to do this
-		if(null != unit && unit.getEntity() instanceof Protomech) {
-		    String lookupName = unit.getEntity().getChassis() + " " + unit.getEntity().getModel();
-		    lookupName = lookupName.trim();
-	        MechSummary summary = MechSummaryCache.getInstance().getMech(lookupName);
-	        if(null == summary) {
-	            return fullShots;
-	        }
-	        try {
-                Entity newProto = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
-                Mounted m = newProto.getEquipment(equipmentNum);
-                if(null != m) {
-                    fullShots = m.getBaseShotsLeft();
-                }
-	        } catch (EntityLoadingException e) {
-                return fullShots;
-            }
+    	if(null != unit && unit.getEntity() instanceof Protomech) {
 	        //if protomechs are using alternate munitions then cut in half
 	        if(((AmmoType)type).getMunitionType() != AmmoType.M_STANDARD) {
 	            fullShots = fullShots / 2;
 	        }
 		}
-		// Another hack because Dropships, Warships, Jumpships, etc... have their ammo done quite weirdly.
-		//this should now be taken care of above
-		/*if (unit != null && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship || unit.getEntity() instanceof Warship)) {
-			String lookupName = unit.getEntity().getChassis() + " " + unit.getEntity().getModel();
-		    lookupName = lookupName.trim();
-	        MechSummary summary = MechSummaryCache.getInstance().getMech(lookupName);
-	        if(null == summary) {
-	            return fullShots;
-	        }
-	        try {
-                Entity newShip = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
-                Mounted m = newShip.getEquipment(equipmentNum);
-                if(null != m) {
-                	fullShots = m.getOriginalShots();
-                }
-	        } catch (EntityLoadingException e) {
-                return fullShots;
-            }
-		}*/
-		
+		if(oneShot) {
+			fullShots = 1;
+		}	
 		return fullShots;
     }
 
