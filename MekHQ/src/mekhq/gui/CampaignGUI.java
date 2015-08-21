@@ -115,12 +115,10 @@ import megamek.client.RandomUnitGenerator;
 import megamek.common.AmmoType;
 import megamek.common.Crew;
 import megamek.common.Dropship;
-import megamek.common.Engine;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import megamek.common.Jumpship;
 import megamek.common.MULParser;
-import megamek.common.Mech;
 import megamek.common.MechView;
 import megamek.common.MiscType;
 import megamek.common.TargetRoll;
@@ -154,8 +152,6 @@ import mekhq.campaign.parts.MekGyro;
 import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
-import mekhq.campaign.parts.MissingEnginePart;
-import mekhq.campaign.parts.MissingMekSensor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.ProtomekArmor;
 import mekhq.campaign.parts.Refit;
@@ -5975,7 +5971,7 @@ public class CampaignGUI extends JPanel {
 						JOptionPane.WARNING_MESSAGE,
 						null,
 						options,
-						options[1]);	
+						options[1]);
         	if(n==1) {
         		return;
         	}
@@ -6046,7 +6042,7 @@ public class CampaignGUI extends JPanel {
         					null,
         					options,
         					options[1]);
-        	
+
         	if(n==1) {
         		return;
         	}
@@ -6153,7 +6149,7 @@ public class CampaignGUI extends JPanel {
 						JOptionPane.WARNING_MESSAGE,
 						null,
 						options,
-						options[1]);	
+						options[1]);
         	if(n==1) {
         		return;
         	}
@@ -6192,7 +6188,7 @@ public class CampaignGUI extends JPanel {
                 }
             }
         }
-        
+
         if (undeployed.length() > 0) {
         	Object[] options = {"Continue",
             "Cancel"};
@@ -6204,7 +6200,7 @@ public class CampaignGUI extends JPanel {
 						JOptionPane.WARNING_MESSAGE,
 						null,
 						options,
-						options[1]);	
+						options[1]);
         	if(n==1) {
         		return;
         	}
@@ -6751,11 +6747,11 @@ public class CampaignGUI extends JPanel {
                 if (loc != null && !loc.isEmpty()) {
                     if (loc.equals("All")) {
                         return true;
-                    } 
+                    }
                     return part.isInLocation(loc);
                 }
                 return false;
-                
+
             }
         };
         taskSorter.setRowFilter(taskLocationFilter);

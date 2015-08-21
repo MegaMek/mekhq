@@ -26,20 +26,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import megamek.common.AmmoType;
-import megamek.common.BattleArmor;
 import megamek.common.CriticalSlot;
-import megamek.common.Dropship;
-import megamek.common.Entity;
 import megamek.common.EquipmentType;
-import megamek.common.Jumpship;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.TargetRoll;
-import megamek.common.Warship;
-import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -119,7 +110,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		}
 		if(oneShot) {
 			fullShots = 1;
-		}	
+		}
 		return fullShots;
     }
 
@@ -299,7 +290,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted && mounted.getType() instanceof AmmoType) {
-				if(mounted.getType().equals(type) 						
+				if(mounted.getType().equals(type)
 						&& ((AmmoType)mounted.getType()).getMunitionType() == getMunitionType()) {
 					//just a simple reload
 					mounted.setShotsLeft(mounted.getBaseShotsLeft() + shots);
@@ -330,7 +321,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	}
 
 	public void unload() {
-		//FIXME: the following won't work for proto and Dropper bins if they 
+		//FIXME: the following won't work for proto and Dropper bins if they
 		//are not attached to a unit. Currently the only place AmmoBins are loaded
 		//off of units is for refits, which neither of those units can do, but we
 		//may want to think about not having refits load ammo bins but rather reserve
@@ -386,7 +377,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 					remove(false);
 					return;
 				}
-				long currentMuniType = 0;			
+				long currentMuniType = 0;
 				if(mounted.getType() instanceof AmmoType) {
 					currentMuniType = ((AmmoType)mounted.getType()).getMunitionType();
 				}
@@ -399,8 +390,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 			}
 		}
 	}
-	
-	@Override 
+
+	@Override
 	public int getBaseTime() {
 		if(isSalvaging()) {
 			return 120;
@@ -408,7 +399,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted) {
-				long currentMuniType = 0;			
+				long currentMuniType = 0;
 				if(mounted.getType() instanceof AmmoType) {
 					currentMuniType = ((AmmoType)mounted.getType()).getMunitionType();
 				}
@@ -419,7 +410,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		}
 		return 15;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		if(isSalvaging()) {
@@ -443,7 +434,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		}
 	}
 
-	@Override	
+	@Override
 	public boolean isSamePartType(Part part) {
     	return  part instanceof AmmoBin
                         && getType().equals( ((AmmoBin)part).getType() )
@@ -724,7 +715,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		int shots = 1;
 		if(type instanceof AmmoType) {
 			shots = ((AmmoType)type).getShots();
-		}	
+		}
         return new AmmoStorage(1,type,shots,campaign);
     }
 
