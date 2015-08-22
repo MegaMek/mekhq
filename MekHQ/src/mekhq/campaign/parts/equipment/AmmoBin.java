@@ -100,7 +100,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public double getTonnage() {
-    	return 1.0;
+    	return (1.0 * getFullShots())/((AmmoType)type).getShots();
     }
 
     public int getFullShots() {
@@ -122,44 +122,44 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		}	
 		return fullShots;
     }
-
-    @Override
-    public long getCurrentValue() {
-    	//multiply full value of ammo ton by the percent of shots remaining
-    	return (long)(getStickerPrice() * (1.0 - (double)shotsNeeded / getFullShots()));
+    
+    protected int getCurrentShots() {
+    	int shots = getFullShots() - shotsNeeded;
+    	//replace with actual entity values if entity not null because the previous number will not
+    	//be correct for ammo swaps
+    	if(null != unit && null != unit.getEntity()) {
+    		Mounted m = unit.getEntity().getEquipment(equipmentNum);
+    		if(null != m) {
+    			shots = m.getBaseShotsLeft();
+    		}
+    	}
+    	return shots;
     }
 
     public long getValueNeeded() {
-    	return adjustCostsForCampaignOptions((long)(getStickerPrice() * ((double)shotsNeeded / getFullShots())));
+    	return adjustCostsForCampaignOptions((long)(getPricePerTon() * ((double)shotsNeeded / getShotsPerTon())));
     }
 
+    protected long getPricePerTon() {
+    	//if on a unit, then use the ammo type on the existing entity, to avoid getting it wrong due to 
+    	//ammo swaps
+    	EquipmentType curType = type;
+    	if(null != unit && null != unit.getEntity()) {
+			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+			if(null != mounted && (mounted.getType() instanceof AmmoType)) {
+				curType = mounted.getType();
+			}
+    	}
+    	return (long)curType.getRawCost();
+    }
+    
+    protected int getShotsPerTon() {
+    	return ((AmmoType)type).getShots();
+    }
+    
     @Override
     public long getStickerPrice() {
-    	//costs are a total nightmare
-        //some costs depend on entity, but we can't do it that way
-        //because spare parts don't have entities. If parts start on an entity
-        //thats fine, but this will become problematic when we set up a parts
-        //store. For now I am just going to pass in a null entity and attempt
-    	//to catch any resulting NPEs
-    	/*Entity en = null;
-    	boolean isArmored = false;
-    	if (unit != null) {
-            en = unit.getEntity();
-            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-            if(null != mounted) {
-            	isArmored = mounted.isArmored();
-            }
-    	}
-
-        int itemCost = 0;
-        try {
-        	itemCost = (int) type.getCost(en, isArmored, -1);
-        } catch(NullPointerException ex) {
-        	System.out.println("Found a null entity while calculating cost for " + name);
-        }
-        return itemCost;
-        */
-        return 0;
+    	return (long)(getPricePerTon() * (1.0 * getCurrentShots()/getShotsPerTon()));
     }
 
     @Override

@@ -24,6 +24,7 @@ v0.3.17-dev (SVN)
 + new campaigns will remove reservation from refits where the unit is not there or is not refitting
 + check on campaign loading for unstacked parts in warehouse that could be stacked and do so
 + Bug [#853]: Battle Loss Compensation not being calculated correctly for destroyed units
++ Bug: Ammo bins were reporting zero value regardless of ammo level (not yet working for BA ammo)
 
 v0.3.16 (2015-08-15 19:40 UTC)
 + Bug [#823]: NPE during 'Auto Resolve'

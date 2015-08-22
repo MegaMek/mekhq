@@ -597,6 +597,10 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	public long getValueOfAllMissingParts() {
 		long value = 0;
 		for(Part part : parts) {
+			if(part instanceof MissingAmmoBin) {
+				AmmoBin newBin = (AmmoBin) ((MissingAmmoBin)part).getNewEquipment();
+				value += newBin.getValueNeeded();
+			}
 			if(part instanceof MissingPart) {
 			    Part newPart = (Part)((MissingPart)part).getNewEquipment();
 			    newPart.setBrandNew(!campaign.getCampaignOptions().useBLCSaleValue());

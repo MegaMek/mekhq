@@ -67,11 +67,6 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
         return 0;
     }
     
-    @Override
-    public double getTonnage() {
-        return 0;
-    }
-    
     //no salvaging of BA parts
     @Override
     public boolean isSalvaging() {
@@ -82,6 +77,20 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
     public int getFullShots() {
     	return super.getFullShots() * getNumTroopers();
     }*/
+    
+    @Override
+    protected int getCurrentShots() {
+    	int shots = getFullShots() * getNumTroopers() - shotsNeeded;
+    	//replace with actual entity values if entity not null because the previous number will not
+    	//be correct for ammo swaps
+    	if(null != unit && null != unit.getEntity()) {
+    		Mounted m = unit.getEntity().getEquipment(equipmentNum);
+    		if(null != m) {
+    			shots = m.getBaseShotsLeft() * getNumTroopers();
+    		}
+    	}
+    	return shots;
+    }
     
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
