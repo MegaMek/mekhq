@@ -3566,6 +3566,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public void addInjury(Injury i) {
         injuries.add(i);
+        if (null != getUnitId()) {
+            campaign.getUnit(getUnitId()).resetPilotAndEntity();
+        }
     }
 
     public int getProfession() {

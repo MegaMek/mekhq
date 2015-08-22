@@ -6015,6 +6015,10 @@ public class CampaignGUI extends JPanel {
             Unit u = getCampaign().getUnit(uid);
             if (null != u.getEntity()) {
                 if (null == u.checkDeployment()) {
+                    // Make sure the unit's entity and pilot are fully up to date!
+                    u.resetPilotAndEntity();
+
+                    // Add and run
                     chosen.add(u);
                     u.getEntity().getCrew().setSize(u.getActiveCrew().size()); // So
                                                                                // MegaMek

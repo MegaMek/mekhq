@@ -514,7 +514,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	 * Run a diagnostic on this unit
 	 * TODO: This is being called in the PersonnelTableModel after changes to the personnel
 	 * attached to a unit, but I am not sure it needs to be. I don't think any parts check
-	 * attached personnel. I think it could b removed, but I am going to leave it for the 
+	 * attached personnel. I think it could b removed, but I am going to leave it for the
 	 * moment because I have made so many other changes in this version.
 	 */
 	public void runDiagnostic(boolean checkForDestruction) {
@@ -730,6 +730,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 		scenarioId = -1;
 	}
 
+	// TODO: Add support for advanced medical
 	public String checkDeployment() {
 		if (!isFunctional()) {
 			return "unit is not functional";
@@ -775,7 +776,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 		}
 		return false;
 	}
-	
+
 
     /**
      * Returns true if there is at least one missing critical slot for
