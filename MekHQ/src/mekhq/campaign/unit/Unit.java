@@ -602,17 +602,11 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 			    newPart.setBrandNew(!campaign.getCampaignOptions().useBLCSaleValue());
 				value += newPart.getActualValue();
 			}
-			else if(part instanceof Armor) {
-				value += ((Armor)part).getValueNeeded();
-			}
-			else if(part instanceof ProtomekArmor) {
-				value += ((ProtomekArmor)part).getValueNeeded();
-			}
-			else if(part instanceof BaArmor) {
-				value += ((BaArmor)part).getValueNeeded();
-			}
 			else if(part instanceof AmmoBin) {
 				value += ((AmmoBin)part).getValueNeeded();
+			}
+			else if(part instanceof Armor) {
+				value += ((Armor)part).getValueNeeded();
 			}
 		}
 		return value;
