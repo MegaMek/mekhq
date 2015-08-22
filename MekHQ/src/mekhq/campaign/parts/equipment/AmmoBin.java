@@ -26,20 +26,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import megamek.common.AmmoType;
-import megamek.common.BattleArmor;
 import megamek.common.CriticalSlot;
-import megamek.common.Dropship;
-import megamek.common.Entity;
 import megamek.common.EquipmentType;
-import megamek.common.Jumpship;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.TargetRoll;
-import megamek.common.Warship;
-import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -154,6 +145,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
     
     protected int getShotsPerTon() {
+    	AmmoType atype = (AmmoType)type;
+    	if(atype.getKgPerShot() > 0) {
+    		return (int)Math.floor(1000.0/atype.getKgPerShot());
+    	}
+    	//if not listed by kg per shot, we assume this is a single ton increment
     	return ((AmmoType)type).getShots();
     }
     
