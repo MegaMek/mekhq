@@ -1,20 +1,20 @@
 /*
  * MissingMekGyro.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -24,7 +24,6 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.CriticalSlot;
-import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import mekhq.MekHqXmlUtil;
@@ -45,28 +44,28 @@ public class MissingMekGyro extends MissingPart {
     public MissingMekGyro() {
     	this(0, 0, 0, null);
     }
-    
+
     public MissingMekGyro(int tonnage, int type, double gyroTonnage, Campaign c) {
         super(tonnage, c);
         this.type = type;
         this.name = Mech.getGyroTypeString(type);
         this.gyroTonnage = gyroTonnage;
     }
-    
-    @Override 
+
+    @Override
 	public int getBaseTime() {
 		return 200;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		return 0;
 	}
-    
+
     public int getType() {
         return type;
     }
-  
+
     @Override
     public double getTonnage() {
     	return gyroTonnage;
@@ -89,10 +88,10 @@ public class MissingMekGyro extends MissingPart {
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		NodeList nl = wn.getChildNodes();
-		
+
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
-			
+
 			int walkMP = -1;
 			if (wn2.getNodeName().equalsIgnoreCase("type")) {
 				type = Integer.parseInt(wn2.getTextContent());
@@ -100,7 +99,7 @@ public class MissingMekGyro extends MissingPart {
 				gyroTonnage = Double.parseDouble(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("walkMP")) {
 				walkMP = Integer.parseInt(wn2.getTextContent());
-			} 
+			}
 			if(walkMP > -1) {
 				//need to calculate gyroTonnage for reverse compatability
 		        gyroTonnage = MekGyro.getGyroTonnage(walkMP, type, getUnitTonnage());
@@ -122,7 +121,7 @@ public class MissingMekGyro extends MissingPart {
 				return EquipmentType.RATING_E;
 			}
 		default:
-			return EquipmentType.RATING_C;	
+			return EquipmentType.RATING_C;
 		}
 	}
 
@@ -134,7 +133,7 @@ public class MissingMekGyro extends MissingPart {
 		case Mech.GYRO_XL:
 			return EquipmentType.RATING_E;
 		default:
-			return EquipmentType.RATING_D;	
+			return EquipmentType.RATING_D;
 		}
 	}
 
@@ -146,7 +145,7 @@ public class MissingMekGyro extends MissingPart {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public String checkFixable() {
 		if(unit.isLocationBreached(Mech.LOC_CT)) {
@@ -177,7 +176,7 @@ public class MissingMekGyro extends MissingPart {
 	public int getLocation() {
 		return Mech.LOC_CT;
 	}
-	
+
 	@Override
 	public int getIntroDate() {
 		switch(type) {
@@ -187,7 +186,7 @@ public class MissingMekGyro extends MissingPart {
 		case Mech.GYRO_XL:
 			return 3067;
 		default:
-			return EquipmentType.DATE_NONE;	
+			return EquipmentType.DATE_NONE;
 		}
 	}
 

@@ -22,9 +22,6 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
-import java.util.GregorianCalendar;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import megamek.common.Aero;
 import megamek.common.CriticalSlot;
@@ -406,8 +403,8 @@ public class EnginePart extends Part {
 			}
 		}
 	}
-	
-	@Override 
+
+	@Override
 	public int getBaseTime() {
 		//TODO: keep an aero flag here, so we dont need the unit
 		if(null != unit && unit.getEntity() instanceof Aero && hits > 0) {
@@ -425,7 +422,7 @@ public class EnginePart extends Part {
 		}
 		return 0;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		//TODO: keep an aero flag here, so we dont need the unit
@@ -552,7 +549,7 @@ public class EnginePart extends Part {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
-	
+
 	@Override
 	public int getIntroDate() {
 		switch(engine.getEngineType()) {
@@ -610,8 +607,8 @@ public class EnginePart extends Part {
 			}
 		case Engine.STEAM:
 		default:
-			return EquipmentType.DATE_NONE; 
-		}		
+			return EquipmentType.DATE_NONE;
+		}
 	}
 
 	@Override
@@ -645,7 +642,7 @@ public class EnginePart extends Part {
 			return EquipmentType.DATE_NONE;
 		}
 	}
-	
+
 	@Override
     public boolean isInLocation(String loc) {
 		 if(null == unit || null == unit.getEntity()) {
@@ -663,11 +660,11 @@ public class EnginePart extends Part {
                  break;
          }
          if (needsSideTorso
-                 && (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_LT 
+                 && (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_LT
                          || unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_RT)) {
              return true;
          }
-         return false;	
+         return false;
     }
-	
+
 }

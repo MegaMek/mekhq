@@ -53,7 +53,6 @@ import mekhq.MekHqXmlUtil;
 import mekhq.MhqFileUtil;
 import mekhq.Utilities;
 import mekhq.Version;
-import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingAmmoBin;
@@ -343,9 +342,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		boolean aclan = false;
 		HashMap<Integer,Integer> partQuantity = new HashMap<Integer,Integer>();
 		for(Part nPart : newPartList) {
-			//TODO: I don't think we need this here anymore 
+			//TODO: I don't think we need this here anymore
 			nPart.setUnit(oldUnit);
-			
+
 			/*ADD TIMES AND COSTS*/
 			if(nPart instanceof MissingPart) {
 				time += nPart.getBaseTime();
@@ -401,7 +400,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 					shoppingList.add(nPart);
 				}
 			}
-			
+
 			/*CHECK REFIT CLASS*/
 			if(nPart instanceof MissingEnginePart) {
 				if(oldUnit.getEntity().getEngine().getRating() != newUnit.getEntity().getEngine().getRating()) {
@@ -919,7 +918,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 					if(null != newArmorSupplies) {
 						a.changeType(newArmorSupplies.getType(), newArmorSupplies.isClanTechBase());
 					}
-				} 
+				}
 				newUnitParts.add(pid);
 			}
 			else {
@@ -934,7 +933,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			}
 			part.setUnit(null);
 		}
-		
+
 		//dont forget to switch entities!
 		oldUnit.setEntity(newEntity);
 
@@ -1170,7 +1169,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	public String getAcquisitionName() {
 		return getPartName();
 	}
-	
+
 	@Override
 	public String getName() {
 		return getPartName();
@@ -1565,7 +1564,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		shoppingList = new ArrayList<Part>();
 		kitFound = true;
 	}
-	
+
 	@Override
 	public String find(int transitDays) {
 		if(campaign.buyPart(this, transitDays)) {
@@ -1845,7 +1844,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
-	
+
 	@Override
 	public int getIntroDate() {
 		return EquipmentType.DATE_NONE;
@@ -1860,5 +1859,5 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	public int getReIntroDate() {
 		return EquipmentType.DATE_NONE;
 	}
-	
+
 }

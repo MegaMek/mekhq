@@ -1,20 +1,20 @@
 /*
  * MissingMekCockpit.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -24,7 +24,6 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.CriticalSlot;
-import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import mekhq.MekHqXmlUtil;
@@ -41,22 +40,22 @@ public class MissingMekCockpit extends MissingPart {
 	private static final long serialVersionUID = -1989526319692474127L;
 
 	private int type;
-	
+
 	public MissingMekCockpit() {
 		this(0, Mech.COCKPIT_STANDARD, null);
 	}
-	
+
 	public MissingMekCockpit(int tonnage, int t, Campaign c) {
         super(tonnage, c);
         this.type = t;
         this.name = Mech.getCockpitDisplayString(type);
     }
-	
-	@Override 
+
+	@Override
 	public int getBaseTime() {
 		return 300;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		return 0;
@@ -87,10 +86,10 @@ public class MissingMekCockpit extends MissingPart {
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		NodeList nl = wn.getChildNodes();
-		
+
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
-			
+
 			if (wn2.getNodeName().equalsIgnoreCase("small")) {
 				type = Integer.parseInt(wn2.getTextContent());
 			}
@@ -148,7 +147,7 @@ public class MissingMekCockpit extends MissingPart {
             return EquipmentType.RATING_E;
 		case Mech.COCKPIT_INDUSTRIAL:
 		case Mech.COCKPIT_PRIMITIVE_INDUSTRIAL:
-            return EquipmentType.RATING_C;		
+            return EquipmentType.RATING_C;
 		default:
 			return EquipmentType.RATING_D;
 		}
@@ -158,11 +157,11 @@ public class MissingMekCockpit extends MissingPart {
 	public boolean isAcceptableReplacement(Part part, boolean refit) {
 		return part instanceof MekCockpit && ((MekCockpit)part).getType() == type;
 	}
-	
+
 	public int getType() {
 		return type;
 	}
-	 
+
     @Override
     public String checkFixable() {
         for(int i = 0; i < unit.getEntity().locations(); i++) {
@@ -204,7 +203,7 @@ public class MissingMekCockpit extends MissingPart {
 			return Mech.LOC_HEAD;
 		}
 	}
-	
+
 	@Override
 	public int getIntroDate() {
     	//TODO: where are aerospace cockpits
