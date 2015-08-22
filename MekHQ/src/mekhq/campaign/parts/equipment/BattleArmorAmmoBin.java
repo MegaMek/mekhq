@@ -67,11 +67,6 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
         return 0;
     }
     
-    @Override
-    public double getTonnage() {
-        return 0;
-    }
-    
     //no salvaging of BA parts
     @Override
     public boolean isSalvaging() {
@@ -82,6 +77,20 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
     public int getFullShots() {
     	return super.getFullShots() * getNumTroopers();
     }*/
+    
+    @Override
+    protected int getCurrentShots() {
+    	int shots = getFullShots() * getNumTroopers() - shotsNeeded;
+    	//replace with actual entity values if entity not null because the previous number will not
+    	//be correct for ammo swaps
+    	if(null != unit && null != unit.getEntity()) {
+    		Mounted m = unit.getEntity().getEquipment(equipmentNum);
+    		if(null != m) {
+    			shots = m.getBaseShotsLeft() * getNumTroopers();
+    		}
+    	}
+    	return shots;
+    }
     
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
@@ -246,4 +255,43 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
     public boolean canNeverScrap() {
     	return true;
 	}
+    
+    /**
+     * Restores the equipment from the name
+     */
+    public void restore() {
+        if (typeName == null) {
+        	typeName = type.getName();
+        } else {
+            type = EquipmentType.get(typeName);
+        }
+        
+        
+        //fIXME, this is a crappy hack, but we want something along these lines
+        //to make sure that BA ammo gets removed from all parts - It might be better to run
+        //a check on the XML loading after restore - we also will need to to the same for proto
+        //ammo but we can only do this if we have all the correct ammo rack sizes for the 
+        //generics (e.g. LRM1, LRM2, LRM3, etc)
+        /*if(typeName.contains("BA-")) {
+        	String newTypeName = "IS" + typeName.split("BA-")[1];
+        	EquipmentType newType = EquipmentType.get(newTypeName);
+        	if(null != newType) {
+        		typeName = newTypeName;
+        		type = newType;
+        	}
+        }*/
+        
+
+        if (type == null) {
+            System.err
+            .println("Mounted.restore: could not restore equipment type \""
+                    + typeName + "\"");
+            return;
+        }
+        try {
+        	equipTonnage = type.getTonnage(null);
+        } catch(NullPointerException ex) {
+        	//System.out.println("Found a null entity while calculating tonnage for " + name);
+        }
+    }
 }
