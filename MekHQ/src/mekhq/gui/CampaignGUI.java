@@ -6020,13 +6020,9 @@ public class CampaignGUI extends JPanel {
 
                     // Add and run
                     chosen.add(u);
-                    u.getEntity().getCrew().setSize(u.getActiveCrew().size()); // So
-                                                                               // MegaMek
-                                                                               // has
-                                                                               // correct
-                                                                               // crew
-                                                                               // sizes
-                                                                               // set
+
+                    // So MegaMek has correct crew sizes
+                    u.getEntity().getCrew().setSize(u.getActiveCrew().size());
                 } else {
                     undeployed.append("\n").append(u.getName()).append(" (")
                             .append(u.checkDeployment()).append(")");
@@ -6134,7 +6130,14 @@ public class CampaignGUI extends JPanel {
             Unit u = getCampaign().getUnit(uid);
             if (null != u.getEntity()) {
                 if (null == u.checkDeployment()) {
+                 // Make sure the unit's entity and pilot are fully up to date!
+                    u.resetPilotAndEntity();
+
+                    // Add and run
                     chosen.add(u);
+
+                    // So MegaMek has correct crew sizes
+                    u.getEntity().getCrew().setSize(u.getActiveCrew().size());
                 } else {
                     undeployed.append("\n").append(u.getName()).append(" (")
                             .append(u.checkDeployment()).append(")");
