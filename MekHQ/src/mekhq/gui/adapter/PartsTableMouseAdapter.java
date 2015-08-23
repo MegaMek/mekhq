@@ -62,7 +62,11 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements
                     if (p instanceof AmmoStorage) {
                         gui.getCampaign().sellAmmo((AmmoStorage) p,
                                 ((AmmoStorage) p).getShots());
-                    } else {
+                    } 
+                    else if(p instanceof Armor) {
+                    	gui.getCampaign().sellArmor((Armor)p, ((Armor)p).getAmount());
+                    }
+                    else {
                         gui.getCampaign().sellPart(p, p.getQuantity());
                     }
                 }

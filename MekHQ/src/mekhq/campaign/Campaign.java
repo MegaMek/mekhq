@@ -3040,7 +3040,12 @@ public class Campaign implements Serializable {
     public void sellArmor(Armor armor, int points) {
         points = Math.min(points, armor.getAmount());
         boolean sellingAllArmor = points == armor.getAmount();
-        long cost = (long) (armor.getStickerPrice() * ((double) points / armor.getArmorPointsPerTon()));
+        double proportion = ((double) points / armor.getAmount());
+        if(sellingAllArmor) {
+        	//to avoid rounding error
+        	proportion = 1.0;
+        }
+        long cost = (long) (armor.getActualValue() * proportion);
         finances.credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + points
                                                         + " " + armor.getName(), calendar.getTime());
         if (sellingAllArmor) {
