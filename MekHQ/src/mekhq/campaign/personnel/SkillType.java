@@ -89,6 +89,8 @@ public class SkillType implements Serializable {
 	public static final String S_SCROUNGE      = "Scrounge";
 	public static final String S_STRATEGY      = "Strategy";
 	
+	public static final int NUM_LEVELS = 11;
+	
 	public static final String[] skillList = {S_PILOT_MECH,S_GUN_MECH,S_PILOT_AERO,S_GUN_AERO,
 											  S_PILOT_GVEE,S_PILOT_VTOL,S_PILOT_NVEE,S_GUN_VEE,
 						                      S_PILOT_JET,S_GUN_JET,S_PILOT_SPACE,S_GUN_SPACE,S_ARTILLERY,
