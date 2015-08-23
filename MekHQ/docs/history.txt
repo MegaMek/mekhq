@@ -26,6 +26,7 @@ v0.3.17-dev (SVN)
 + Bug [#853]: Battle Loss Compensation not being calculated correctly for destroyed units
 + Bug: Ammo bins were reporting zero value regardless of ammo level (not yet working for BA ammo)
 + Bug: get BA Ammo tons per shot correct
++ Bug [#712]: Inconsistent infantry unit pricing
 
 v0.3.16 (2015-08-15 19:40 UTC)
 + Bug [#823]: NPE during 'Auto Resolve'

@@ -124,7 +124,7 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		add(pnlStats, gridBagConstraints);
 		
 		
-		MechView mview = new MechView(entity, true);
+		MechView mview = new MechView(entity, true, true);
 		txtReadout.setName("txtReadout");
 		txtReadout.setContentType(resourceMap.getString("txtReadout.contentType")); // NOI18N
 		txtReadout.setEditable(false);

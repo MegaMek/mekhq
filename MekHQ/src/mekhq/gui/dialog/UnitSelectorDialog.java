@@ -558,14 +558,14 @@ public class UnitSelectorDialog extends JDialog {
         }
         MechView mechView = null;
         try {
-            mechView = new MechView(selectedUnit.getEntity(), false);
+            mechView = new MechView(selectedUnit.getEntity(), false, true);
         } catch (Exception e) {
             e.printStackTrace();
             // error unit didn't load right. this is bad news.
             populateTextFields = false;
         }
         if (populateTextFields && (mechView != null)) {
-            panelMekView.setMech(selectedUnit.getEntity());
+            panelMekView.setMech(selectedUnit.getEntity(), true);
         } else {
             panelMekView.reset();
         }

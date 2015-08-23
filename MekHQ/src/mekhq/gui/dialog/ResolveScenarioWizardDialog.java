@@ -1502,7 +1502,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         Entity entity = ustatus.getEntity();
         final JDialog dialog = new JDialog(frame, "Unit View", true); //$NON-NLS-1$
         MechViewPanel mvp = new MechViewPanel();
-        mvp.setMech(entity);
+        mvp.setMech(entity, true);
         JButton btn = new JButton(Messages.getString("Okay")); //$NON-NLS-1$
         btn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
