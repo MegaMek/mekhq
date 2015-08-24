@@ -1,20 +1,20 @@
 /*
  * MekGyro.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -25,7 +25,6 @@ import java.io.PrintWriter;
 
 import megamek.common.Compute;
 import megamek.common.CriticalSlot;
-import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import megamek.common.TechConstants;
@@ -48,27 +47,27 @@ public class MekGyro extends Part {
     public MekGyro() {
     	this(0, 0, 0, null);
     }
-    
+
     public MekGyro(int tonnage, int type, int walkMP, Campaign c) {
         super(tonnage, c);
         this.type = type;
         this.name = Mech.getGyroTypeString(type);
         this.gyroTonnage = MekGyro.getGyroTonnage(walkMP, type, getUnitTonnage());
     }
-    
+
     public MekGyro(int tonnage, int type, double gyroTonnage, Campaign c) {
     	super(tonnage, c);
         this.type = type;
         this.name = Mech.getGyroTypeString(type);
         this.gyroTonnage = gyroTonnage;
     }
-    
+
     public MekGyro clone() {
     	MekGyro clone = new MekGyro(getUnitTonnage(), type, gyroTonnage, campaign);
         clone.copyBaseData(this);
     	return clone;
     }
-    
+
     public int getType() {
         return type;
     }
@@ -76,7 +75,7 @@ public class MekGyro extends Part {
     public static int getGyroBaseTonnage(int walkMP, int unitTonnage) {
     	return (int) Math.ceil(walkMP * unitTonnage / 100f);
     }
-    
+
     public static double getGyroTonnage(int walkMP, int gyroType, int unitTonnage) {
     	int gyroBaseTonnage = MekGyro.getGyroBaseTonnage(walkMP, unitTonnage);
         if (gyroType == Mech.GYRO_XL) {
@@ -86,19 +85,19 @@ public class MekGyro extends Part {
         } else if (gyroType == Mech.GYRO_HEAVY_DUTY) {
         	return gyroBaseTonnage * 2;
         }
-    	
+
         return gyroBaseTonnage;
     }
-    
+
     @Override
     public double getTonnage() {
     	return gyroTonnage;
     }
-    
+
     @Override
     public long getStickerPrice() {
         double c = 0;
-        
+
         if (getType() == Mech.GYRO_XL) {
             c = 750000 * getTonnage();
         } else if (getType() == Mech.GYRO_COMPACT) {
@@ -108,10 +107,10 @@ public class MekGyro extends Part {
         } else {
             c = 300000 * getTonnage();
         }
-        
+
         return (long) Math.round(c);
     }
- 
+
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof MekGyro
@@ -136,12 +135,12 @@ public class MekGyro extends Part {
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		NodeList nl = wn.getChildNodes();
-		
+
 		int walkMP = -1;
 		int uTonnage = 0;
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
-					
+
 			if (wn2.getNodeName().equalsIgnoreCase("type")) {
 				type = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("gyroTonnage")) {
@@ -172,7 +171,7 @@ public class MekGyro extends Part {
 				return EquipmentType.RATING_E;
 			}
 		default:
-			return EquipmentType.RATING_C;	
+			return EquipmentType.RATING_C;
 		}
 	}
 
@@ -184,10 +183,10 @@ public class MekGyro extends Part {
 		case Mech.GYRO_XL:
 			return EquipmentType.RATING_E;
 		default:
-			return EquipmentType.RATING_D;	
+			return EquipmentType.RATING_D;
 		}
 	}
-	
+
 	@Override
 	public int getTechLevel() {
 		if(type == Mech.GYRO_STANDARD) {
@@ -225,7 +224,7 @@ public class MekGyro extends Part {
 			Part missing = getMissingPart();
 			unit.addPart(missing);
 			campaign.addPart(missing, 0);
-		}	
+		}
 		setUnit(null);
 		updateConditionFromEntity(false);
 	}
@@ -235,7 +234,7 @@ public class MekGyro extends Part {
 		if(null != unit) {
 			int priorHits = hits;
 			hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM,Mech.SYSTEM_GYRO, Mech.LOC_CT);
-			if(checkForDestruction 
+			if(checkForDestruction
 					&& hits > priorHits && hits >= 3
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
@@ -243,8 +242,8 @@ public class MekGyro extends Part {
 			}
 		}
 	}
-	
-	@Override 
+
+	@Override
 	public int getBaseTime() {
 		if(isSalvaging()) {
 			return 200;
@@ -254,7 +253,7 @@ public class MekGyro extends Part {
 		}
 		return 120;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		if(isSalvaging()) {
@@ -281,7 +280,7 @@ public class MekGyro extends Part {
 			}
 		}
 	}
-	
+
 	@Override
 	public String checkFixable() {
 		if(!isSalvaging() && unit.isLocationBreached(Mech.LOC_CT)) {
@@ -289,12 +288,12 @@ public class MekGyro extends Part {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public boolean isPartForEquipmentNum(int index, int loc) {
 		return Mech.SYSTEM_GYRO == index;
 	}
-	
+
 	 @Override
 	 public boolean isRightTechType(String skillType) {
 		 return skillType.equals(SkillType.S_TECH_MECH);
@@ -314,12 +313,12 @@ public class MekGyro extends Part {
 
     public static final int GYRO_HEAVY_DUTY = 3;
 
-	
+
 	@Override
 	public int getLocation() {
-		return Entity.LOC_NONE;
+		return Mech.LOC_CT;
 	}
-	
+
 	@Override
 	public int getIntroDate() {
 		switch(type) {
@@ -329,7 +328,7 @@ public class MekGyro extends Part {
 		case Mech.GYRO_XL:
 			return 3067;
 		default:
-			return EquipmentType.DATE_NONE;	
+			return EquipmentType.DATE_NONE;
 		}
 	}
 

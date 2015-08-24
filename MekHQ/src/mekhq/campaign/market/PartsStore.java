@@ -36,6 +36,7 @@ import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.MiscType;
 import megamek.common.Protomech;
+import megamek.common.TechConstants;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.verifier.TestEntity;
 import megamek.common.weapons.BayWeapon;
@@ -152,7 +153,18 @@ public class PartsStore implements Serializable {
             }
             //TODO: we are still adding a lot of non-hittable equipment
 			if(et instanceof AmmoType) {
-				parts.add(new AmmoStorage(0, et, ((AmmoType)et).getShots(), c));
+				if(((AmmoType)et).hasFlag(AmmoType.F_BATTLEARMOR)) {
+					//BA ammo has one shot listed as the amount. Do it as 1 ton blocks
+					int shots = (int) Math.floor(1000/((AmmoType)et).getKgPerShot());
+					if(shots <= 0) {
+						//FIXME: no idea what to do here, these really should be fixed on the MM side
+						//because presumably this is happening because KgperShot is -1 or 0
+						shots = 20;
+					}
+					parts.add(new AmmoStorage(0, et, shots, c));
+				} else {
+					parts.add(new AmmoStorage(0, et, ((AmmoType)et).getShots(), c));
+				}
 			} else if(et instanceof MiscType && (((MiscType)et).hasFlag(MiscType.F_HEAT_SINK) || ((MiscType)et).hasFlag(MiscType.F_DOUBLE_HEAT_SINK))) {
             	parts.add(new HeatSink(0, et, -1, c));
 			} else if(et instanceof MiscType && ((MiscType)et).hasFlag(MiscType.F_JUMP_JET)) {
@@ -275,9 +287,11 @@ public class PartsStore implements Serializable {
 						if(engine.engineValid) {
 							parts.add(new EnginePart(ton, engine, c, false));
 						}
-						engine = new Engine(rating, i, Engine.CLAN_ENGINE);
-						if(engine.engineValid) {
-							parts.add(new EnginePart(ton, engine, c, false));
+						if(engine.getTechType() != TechConstants.T_ALLOWED_ALL) {
+							engine = new Engine(rating, i, Engine.CLAN_ENGINE);
+							if(engine.engineValid) {
+								parts.add(new EnginePart(ton, engine, c, false));
+							}
 						}
 					}
 					engine = new Engine(rating, i, Engine.TANK_ENGINE);
@@ -291,13 +305,15 @@ public class PartsStore implements Serializable {
 						}
 					}
 					engine = new Engine(rating, i, Engine.TANK_ENGINE | Engine.CLAN_ENGINE);
-					if(engine.engineValid) {
-						parts.add(new EnginePart(ton, engine, c, false));
-					}
-					if((ton/5) > getEngineTonnage(engine)) {
-						engine = new Engine(rating, i, Engine.TANK_ENGINE | Engine.CLAN_ENGINE);
+					if(engine.getTechType() != TechConstants.T_ALLOWED_ALL) {
 						if(engine.engineValid) {
-							parts.add(new EnginePart(ton, engine, c, true));
+							parts.add(new EnginePart(ton, engine, c, false));
+						}
+						if((ton/5) > getEngineTonnage(engine)) {
+							engine = new Engine(rating, i, Engine.TANK_ENGINE | Engine.CLAN_ENGINE);
+							if(engine.engineValid) {
+								parts.add(new EnginePart(ton, engine, c, true));
+							}
 						}
 					}
 				}

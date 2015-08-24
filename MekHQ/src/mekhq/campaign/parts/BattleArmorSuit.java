@@ -506,7 +506,7 @@ public class BattleArmorSuit extends Part {
             Part missing = getMissingPart();
             unit.addPart(missing);
             campaign.addPart(missing, 0);
-            trooper = -1;
+            trooper = 0;
             unit.removePart(this);
             //Taharqa: I am not sure why this runDiagnostic is here and I think its problematic
 			//I know for certain it causes problems when we are trying to figure out damage
@@ -533,6 +533,10 @@ public class BattleArmorSuit extends Part {
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         if(null != unit) {
+        	if(trooper < 0) {
+                System.err.println("Trooper location -1 found on BattleArmorSuit attached to unit");
+                return;
+        	}
             if(unit.getEntity().getInternal(trooper) == IArmorState.ARMOR_DESTROYED) {
             	if(!checkForDestruction) {
             		remove(false);

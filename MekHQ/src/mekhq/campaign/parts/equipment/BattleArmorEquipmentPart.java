@@ -272,4 +272,8 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
     public boolean needsMaintenance() {
         return false;
     }
+    
+    public boolean canNeverScrap() {
+    	return isModular();
+	}
 }

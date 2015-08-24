@@ -150,11 +150,11 @@ public class EquipmentPart extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
-    	//According to official answer, if sticker prices are different then 
+    	//According to official answer, if sticker prices are different then
     	//they are not acceptable substitutes, so we need to check for that as
     	//well
     	//http://bg.battletech.com/forums/strategic-operations/(answered)-can-a-lance-for-a-35-ton-mech-be-used-on-a-40-ton-mech-and-so-on/
-        return part instanceof EquipmentPart
+    	return part instanceof EquipmentPart
         		&& getType().equals(((EquipmentPart)part).getType())
         		&& getTonnage() == part.getTonnage()
         		&& getStickerPrice() == part.getStickerPrice();
@@ -216,17 +216,17 @@ public class EquipmentPart extends Part {
 	public int getAvailability(int era) {
 		return type.getAvailability(Era.convertEra(era));
 	}
-	
+
 	@Override
     public int getIntroDate() {
     	return getType().getIntroductionDate();
     }
-    
+
     @Override
     public int getExtinctDate() {
     	return getType().getExtinctionDate();
     }
-    
+
     @Override
     public int getReIntroDate() {
     	return getType().getReintruductionDate();
@@ -264,7 +264,7 @@ public class EquipmentPart extends Part {
 				mounted.setHit(true);
 		        mounted.setDestroyed(true);
 		        mounted.setRepairable(false);
-		        unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum, mounted.getLocation());
+		        unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum);
 			}
 			Part spare = campaign.checkForExistingSparePart(this);
 			if(!salvage) {
@@ -302,16 +302,16 @@ public class EquipmentPart extends Part {
 				hits += unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum, mounted.getSecondLocation());
 				}
 			}
-			if(checkForDestruction 
-					&& hits > priorHits 
+			if(checkForDestruction
+					&& hits > priorHits
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
 				return;
 			}
 		}
 	}
-	
-	@Override 
+
+	@Override
 	public int getBaseTime() {
 		if(isSalvaging()) {
 			return 120;
@@ -327,7 +327,7 @@ public class EquipmentPart extends Part {
 		}
 		return 0;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		if(isSalvaging()) {
@@ -666,4 +666,36 @@ public class EquipmentPart extends Part {
     	}
 		return null;
 	}
+
+	@Override
+    public boolean isInLocation(String loc) {
+		if(null == unit || null == unit.getEntity() || null == unit.getEntity().getEquipment(equipmentNum)) {
+			return false;
+		}
+
+		Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+		if(null == mounted) {
+			return false;
+		}
+		int location = unit.getEntity().getLocationFromAbbr(loc);
+		for (int i = 0; i < unit.getEntity().getNumberOfCriticals(location); i++) {
+	            CriticalSlot slot = unit.getEntity().getCritical(location, i);
+	            // ignore empty & non-hittable slots
+	            if ((slot == null) || !slot.isEverHittable() || slot.getType()!=CriticalSlot.TYPE_EQUIPMENT
+	            		|| null == slot.getMount()) {
+	                continue;
+	            }
+	            if(unit.getEntity().getEquipmentNum(slot.getMount()) == equipmentNum) {
+	            	return true;
+	            }
+		}
+		//if we are still here, lets just double check by the mounted's location and secondary location
+		if(mounted.getLocation() == location) {
+			return true;
+		}
+		if(mounted.getSecondLocation() == location) {
+			return true;
+		}
+		return false;
+    }
 }

@@ -514,7 +514,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	 * Run a diagnostic on this unit
 	 * TODO: This is being called in the PersonnelTableModel after changes to the personnel
 	 * attached to a unit, but I am not sure it needs to be. I don't think any parts check
-	 * attached personnel. I think it could b removed, but I am going to leave it for the 
+	 * attached personnel. I think it could b removed, but I am going to leave it for the
 	 * moment because I have made so many other changes in this version.
 	 */
 	public void runDiagnostic(boolean checkForDestruction) {
@@ -597,22 +597,20 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	public long getValueOfAllMissingParts() {
 		long value = 0;
 		for(Part part : parts) {
+			if(part instanceof MissingAmmoBin) {
+				AmmoBin newBin = (AmmoBin) ((MissingAmmoBin)part).getNewEquipment();
+				value += newBin.getValueNeeded();
+			}
 			if(part instanceof MissingPart) {
 			    Part newPart = (Part)((MissingPart)part).getNewEquipment();
 			    newPart.setBrandNew(!campaign.getCampaignOptions().useBLCSaleValue());
 				value += newPart.getActualValue();
 			}
-			else if(part instanceof Armor) {
-				value += ((Armor)part).getValueNeeded();
-			}
-			else if(part instanceof ProtomekArmor) {
-				value += ((ProtomekArmor)part).getValueNeeded();
-			}
-			else if(part instanceof BaArmor) {
-				value += ((BaArmor)part).getValueNeeded();
-			}
 			else if(part instanceof AmmoBin) {
 				value += ((AmmoBin)part).getValueNeeded();
+			}
+			else if(part instanceof Armor) {
+				value += ((Armor)part).getValueNeeded();
 			}
 		}
 		return value;
@@ -730,6 +728,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 		scenarioId = -1;
 	}
 
+	// TODO: Add support for advanced medical
 	public String checkDeployment() {
 		if (!isFunctional()) {
 			return "unit is not functional";
@@ -775,7 +774,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 		}
 		return false;
 	}
-	
+
 
     /**
      * Returns true if there is at least one missing critical slot for

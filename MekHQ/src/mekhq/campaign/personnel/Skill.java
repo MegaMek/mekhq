@@ -126,9 +126,9 @@ public class Skill implements Serializable, MekHqXmlSerializable {
 	
 	public void improve() {	
 		level = level + 1;
-		//if the cost for the next level is zero, then 
+		//if the cost for the next level is zero (or less than zero), then 
 		//keep improve until you hit a non-zero cost
-		if(type.getCost(level)==0) {
+		if(type.getCost(level)<=0) {
 			improve();
 		}
 	}
@@ -136,7 +136,7 @@ public class Skill implements Serializable, MekHqXmlSerializable {
 	public int getCostToImprove() {
 		int cost = 0;
 		int i = 1;
-		while(cost == 0) {
+		while(cost <= 0 && (level+i) < SkillType.NUM_LEVELS) {
 			cost = type.getCost(level+i);
 			++i;
 		}

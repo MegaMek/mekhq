@@ -211,11 +211,20 @@ public class ShoppingList implements MekHqXmlSerializable {
     }
 
     public void restore() {
+    	ArrayList<IAcquisitionWork> newShoppingList = new ArrayList<IAcquisitionWork>();;
+    	
+
         for(IAcquisitionWork shoppingItem : shoppingList) {
             if(shoppingItem instanceof MissingEquipmentPart) {
                 ((MissingEquipmentPart)shoppingItem).restore();
+                if(null != ((MissingEquipmentPart)shoppingItem).getType()) {
+                	newShoppingList.add(shoppingItem);
+                }
+            } else {
+            	newShoppingList.add(shoppingItem);
             }
         }
+        shoppingList = newShoppingList;
     }
 
     public void removeZeroQuantityFromList() {

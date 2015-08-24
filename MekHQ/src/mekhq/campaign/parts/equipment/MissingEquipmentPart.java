@@ -1,20 +1,20 @@
 /*
  * MissingEquipmentPart.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -53,19 +53,19 @@ public class MissingEquipmentPart extends MissingPart {
     public EquipmentType getType() {
         return type;
     }
-    
+
     public int getEquipmentNum() {
     	return equipmentNum;
     }
-    
+
     public void setEquipmentNum(int num) {
     	equipmentNum = num;
     }
-    
+
     public MissingEquipmentPart() {
     	this(0, null, -1, null, 0);
     }
-    
+
     public MissingEquipmentPart(int tonnage, EquipmentType et, int equipNum, Campaign c, double eTonnage) {
         // TODO Memorize all entity attributes needed to calculate cost
         // As it is a part bought with one entity can be used on another entity
@@ -80,17 +80,17 @@ public class MissingEquipmentPart extends MissingPart {
         this.equipmentNum = equipNum;
         this.equipTonnage = eTonnage;
     }
-    
-    @Override 
+
+    @Override
 	public int getBaseTime() {
 		return 120;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		return 0;
 	}
-    
+
     /**
      * Restores the equipment from the name
      */
@@ -107,7 +107,7 @@ public class MissingEquipmentPart extends MissingPart {
                     + name + "\"");
         }
     }
-    
+
     @Override
     public double getTonnage() {
     	return equipTonnage;
@@ -115,7 +115,7 @@ public class MissingEquipmentPart extends MissingPart {
 
     @Override
 	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);		
+		writeToXmlBegin(pw1, indent);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<typeName>"
 				+MekHqXmlUtil.escape(typeName)
@@ -134,7 +134,7 @@ public class MissingEquipmentPart extends MissingPart {
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		NodeList nl = wn.getChildNodes();
-		
+
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
 			if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
@@ -143,26 +143,26 @@ public class MissingEquipmentPart extends MissingPart {
 				typeName = wn2.getTextContent();
 			} else if (wn2.getNodeName().equalsIgnoreCase("equipTonnage")) {
 				equipTonnage = Double.parseDouble(wn2.getTextContent());
-			} 
+			}
 		}
 		restore();
 	}
 
 	@Override
-	public int getAvailability(int era) {		
+	public int getAvailability(int era) {
 		return type.getAvailability(Era.convertEra(era));
 	}
-	
+
 	@Override
     public int getIntroDate() {
     	return getType().getIntroductionDate();
     }
-    
+
     @Override
     public int getExtinctDate() {
     	return getType().getExtinctionDate();
     }
-    
+
     @Override
     public int getReIntroDate() {
     	return getType().getReintruductionDate();
@@ -173,7 +173,7 @@ public class MissingEquipmentPart extends MissingPart {
 		return type.getTechRating();
 	}
 
-	@Override 
+	@Override
 	public void fix() {
 		Part replacement = findReplacement(false);
 		if(null != replacement) {
@@ -183,14 +183,14 @@ public class MissingEquipmentPart extends MissingPart {
 			replacement.decrementQuantity();
 			((EquipmentPart)actualReplacement).setEquipmentNum(equipmentNum);
 			remove(false);
-			//assign the replacement part to the unit			
+			//assign the replacement part to the unit
 			actualReplacement.updateConditionFromPart();
 		}
 	}
-	
+
 	@Override
 	public boolean isAcceptableReplacement(Part part, boolean refit) {
-		//According to official answer, if sticker prices are different then 
+		//According to official answer, if sticker prices are different then
 		//they are not acceptable substitutes, so we need to check for that as
 		//well
 		//http://bg.battletech.com/forums/strategic-operations/(answered)-can-a-lance-for-a-35-ton-mech-be-used-on-a-40-ton-mech-and-so-on/
@@ -212,6 +212,8 @@ public class MissingEquipmentPart extends MissingPart {
             Mounted m = unit.getEntity().getEquipment(equipmentNum);
             if(null != m) {
                 int loc = m.getLocation();
+                if(loc == -1) {
+                }
                 if (unit.isLocationBreached(loc)) {
                     return unit.getEntity().getLocationName(loc) + " is breached.";
                 }
@@ -228,17 +230,17 @@ public class MissingEquipmentPart extends MissingPart {
                     }
                 }
             }
-        }    
+        }
         return null;
     }
-	
+
 	@Override
 	public boolean onBadHipOrShoulder() {
 		if(null != unit) {
 			for(int loc = 0; loc < unit.getEntity().locations(); loc++) {
 	            for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
 	                CriticalSlot slot = unit.getEntity().getCritical(loc, i);
-	                
+
 	                // ignore empty & system slots
 	                if ((slot == null) || (slot.getType() != CriticalSlot.TYPE_EQUIPMENT)) {
 	                    continue;
@@ -255,7 +257,7 @@ public class MissingEquipmentPart extends MissingPart {
 	                    }
 	                }
 	            }
-	        }    
+	        }
 		}
 		return false;
 	}
@@ -267,18 +269,18 @@ public class MissingEquipmentPart extends MissingPart {
     		equipTonnage = type.getTonnage(unit.getEntity());
     	}
     }
-	
+
 	@Override
 	public Part getNewPart() {
 		EquipmentPart epart = new EquipmentPart(getUnitTonnage(), type, -1, campaign);
 		epart.setEquipTonnage(equipTonnage);
 		return epart;
 	}
-/*	
+/*
 	private boolean hasReallyCheckedToday() {
 		return checkedToday;
 	}
-	
+
 	@Override
 	public boolean hasCheckedToday() {
 		//if this unit has been checked for any other equipment of this same type
@@ -288,8 +290,8 @@ public class MissingEquipmentPart extends MissingPart {
 				if(part.getId() == getId()) {
 					continue;
 				}
-				if(part instanceof MissingEquipmentPart 
-						&& ((MissingEquipmentPart)part).getType().equals(type) 
+				if(part instanceof MissingEquipmentPart
+						&& ((MissingEquipmentPart)part).getType().equals(type)
 						&& ((MissingEquipmentPart)part).hasReallyCheckedToday()) {
 					return true;
 				}
@@ -298,7 +300,7 @@ public class MissingEquipmentPart extends MissingPart {
 		return super.hasCheckedToday();
 	}
 */
-	
+
 	public int getLocation() {
     	if(null != unit) {
     		Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
@@ -308,7 +310,7 @@ public class MissingEquipmentPart extends MissingPart {
     	}
     	return -1;
     }
-	
+
 
     public boolean isRearFacing() {
     	if(null != unit) {
@@ -328,11 +330,11 @@ public class MissingEquipmentPart extends MissingPart {
 				mounted.setHit(true);
 		        mounted.setDestroyed(true);
 		        mounted.setRepairable(false);
-		        unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, unit.getEntity().getEquipmentNum(mounted));	
+		        unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, unit.getEntity().getEquipmentNum(mounted));
 			}
 		}
 	}
-	
+
 	@Override
     public boolean isOmniPoddable() {
     	//TODO: is this on equipment type?
@@ -349,4 +351,36 @@ public class MissingEquipmentPart extends MissingPart {
     	}
 		return null;
 	}
+
+	@Override
+    public boolean isInLocation(String loc) {
+		if(null == unit || null == unit.getEntity() || null == unit.getEntity().getEquipment(equipmentNum)) {
+			return false;
+		}
+
+		Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+		if(null == mounted) {
+			return false;
+		}
+		int location = unit.getEntity().getLocationFromAbbr(loc);
+		for (int i = 0; i < unit.getEntity().getNumberOfCriticals(location); i++) {
+	            CriticalSlot slot = unit.getEntity().getCritical(location, i);
+	            // ignore empty & non-hittable slots
+	            if ((slot == null) || !slot.isEverHittable() || slot.getType()!=CriticalSlot.TYPE_EQUIPMENT
+	            		|| null == slot.getMount()) {
+	                continue;
+	            }
+	            if(unit.getEntity().getEquipmentNum(slot.getMount()) == equipmentNum) {
+	            	return true;
+	            }
+		}
+		//if we are still here, lets just double check by the mounted's location and secondary location
+		if(mounted.getLocation() == location) {
+			return true;
+		}
+		if(mounted.getSecondLocation() == location) {
+			return true;
+		}
+		return false;
+    }
 }

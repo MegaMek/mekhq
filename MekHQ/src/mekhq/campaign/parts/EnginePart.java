@@ -156,11 +156,11 @@ public class EnginePart extends Part {
 
 	@Override
 	public int getTechLevel() {
-		if (getEngine().getTechType() < 0
-				|| getEngine().getTechType() >= TechConstants.SIZE)
-			return TechConstants.T_TECH_UNKNOWN;
-		else
-			return getEngine().getTechType();
+		int techLevel = getEngine().getTechType();
+        if ((techLevel != TechConstants.T_ALLOWED_ALL && techLevel < 0) || techLevel >= TechConstants.T_ALL)
+            return TechConstants.T_TECH_UNKNOWN;
+        else
+            return techLevel;
 	}
 
 	@Override
@@ -403,8 +403,8 @@ public class EnginePart extends Part {
 			}
 		}
 	}
-	
-	@Override 
+
+	@Override
 	public int getBaseTime() {
 		//TODO: keep an aero flag here, so we dont need the unit
 		if(null != unit && unit.getEntity() instanceof Aero && hits > 0) {
@@ -422,7 +422,7 @@ public class EnginePart extends Part {
 		}
 		return 0;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		//TODO: keep an aero flag here, so we dont need the unit
@@ -549,7 +549,7 @@ public class EnginePart extends Part {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
-	
+
 	@Override
 	public int getIntroDate() {
 		switch(engine.getEngineType()) {
@@ -607,8 +607,8 @@ public class EnginePart extends Part {
 			}
 		case Engine.STEAM:
 		default:
-			return EquipmentType.DATE_NONE; 
-		}		
+			return EquipmentType.DATE_NONE;
+		}
 	}
 
 	@Override
@@ -642,5 +642,29 @@ public class EnginePart extends Part {
 			return EquipmentType.DATE_NONE;
 		}
 	}
-	
+
+	@Override
+    public boolean isInLocation(String loc) {
+		 if(null == unit || null == unit.getEntity()) {
+			 return false;
+		 }
+		 if (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_CT) {
+             return true;
+         }
+         boolean needsSideTorso = false;
+         switch (getEngine().getEngineType()) {
+             case Engine.XL_ENGINE:
+             case Engine.LIGHT_ENGINE:
+             case Engine.XXL_ENGINE:
+                 needsSideTorso = true;
+                 break;
+         }
+         if (needsSideTorso
+                 && (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_LT
+                         || unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_RT)) {
+             return true;
+         }
+         return false;
+    }
+
 }

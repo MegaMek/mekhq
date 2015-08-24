@@ -447,7 +447,7 @@ public class UnitMarketDialog extends JDialog {
          if(row < 0 || selectedEntity == null) {
              mechViewPanel.reset();
          } else {
-	    	 mechViewPanel.setMech(selectedEntity);
+	    	 mechViewPanel.setMech(selectedEntity, true);
 	 		//This odd code is to make sure that the scrollbar stays at the top
 	 		//I cant just call it here, because it ends up getting reset somewhere later
 	 		javax.swing.SwingUtilities.invokeLater(new Runnable() {

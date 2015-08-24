@@ -1,20 +1,20 @@
 /*
  * NewMissionDialog.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -26,6 +26,7 @@ import java.awt.Frame;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
+import javax.swing.JOptionPane;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
@@ -37,12 +38,11 @@ import mekhq.gui.JSuggestField;
  */
 public class CustomizeMissionDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
-    @SuppressWarnings("unused") // FIXME
-	private Frame frame;
+    private Frame frame;
     private Mission mission;
     private Campaign campaign;
     private boolean newMission;
-    
+
     /** Creates new form NewTeamDialog */
     public CustomizeMissionDialog(java.awt.Frame parent, boolean modal, Mission m, Campaign c) {
         super(parent, modal);
@@ -71,7 +71,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         scrDesc = new javax.swing.JScrollPane();
         txtDesc = new javax.swing.JTextArea();
         lblPlanetName = new javax.swing.JLabel();
-     
+
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeMissionDialog");
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
@@ -80,9 +80,9 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
             setTitle(resourceMap.getString("title.new"));
 
         }
-        
+
         getContentPane().setLayout(new java.awt.GridBagLayout());
-        
+
         lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
         lblName.setName("lblName"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -92,7 +92,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(lblName, gridBagConstraints);
-        
+
         txtName.setText(mission.getName());
         txtName.setName("txtName"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -103,7 +103,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(txtName, gridBagConstraints);
- 
+
         lblType.setText(resourceMap.getString("lblType.text")); // NOI18N
         lblType.setName("lblType"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -113,7 +113,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(lblType, gridBagConstraints);
-        
+
         txtType.setText(mission.getType());
         txtType.setName("txtType"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -123,8 +123,8 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        getContentPane().add(txtType, gridBagConstraints);       
-        
+        getContentPane().add(txtType, gridBagConstraints);
+
         lblPlanetName.setText(resourceMap.getString("lblPlanetName.text")); // NOI18N
         lblPlanetName.setName("lblPlanetName"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -134,7 +134,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(lblPlanetName, gridBagConstraints);
-        
+
         suggestPlanet = new JSuggestField(this, campaign.getPlanetNames());
         if(!newMission) {
         	suggestPlanet.setText(mission.getPlanetName());
@@ -147,7 +147,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(suggestPlanet, gridBagConstraints);
-        
+
         txtDesc.setText(mission.getDescription());
         txtDesc.setName("txtDesc");
         txtDesc.setEditable(true);
@@ -169,7 +169,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         getContentPane().add(scrDesc, gridBagConstraints);
-        
+
         btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
         btnOK.addActionListener(new java.awt.event.ActionListener() {
@@ -203,8 +203,18 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         pack();
     }
 
-    
+
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
+    	String chosenName = txtName.getText();
+    	for(Mission m : campaign.getMissions()) {
+    		if(m.getName().equals(chosenName)) {
+    			JOptionPane.showMessageDialog(frame,
+    				    "There is already a missiong with the name " + chosenName,
+    				    "Duplicate Mission Name",
+    				    JOptionPane.ERROR_MESSAGE);
+    			return;
+    		}
+    	}
     	mission.setName(txtName.getText());
     	mission.setType(txtType.getText());
     	mission.setPlanetName(suggestPlanet.getText());
@@ -214,7 +224,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
     	}
     	this.setVisible(false);
     }
-    
+
     public int getMissionId() {
     	return mission.getId();
     }

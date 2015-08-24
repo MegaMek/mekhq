@@ -542,7 +542,7 @@ public class PersonnelMarketDialog extends JDialog {
              }
              tabUnit.add(name, new PersonViewPanel(selectedPerson, campaign, portraits));
              MechViewPanel mvp = new MechViewPanel();
-             mvp.setMech(en);
+             mvp.setMech(en, true);
              tabUnit.add("Unit", mvp);
              scrollPersonnelView.setViewportView(tabUnit);
          } else {

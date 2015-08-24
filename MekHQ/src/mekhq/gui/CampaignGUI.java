@@ -115,12 +115,10 @@ import megamek.client.RandomUnitGenerator;
 import megamek.common.AmmoType;
 import megamek.common.Crew;
 import megamek.common.Dropship;
-import megamek.common.Engine;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import megamek.common.Jumpship;
 import megamek.common.MULParser;
-import megamek.common.Mech;
 import megamek.common.MechView;
 import megamek.common.MiscType;
 import megamek.common.TargetRoll;
@@ -154,7 +152,6 @@ import mekhq.campaign.parts.MekGyro;
 import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
-import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.ProtomekArmor;
 import mekhq.campaign.parts.Refit;
@@ -3769,7 +3766,7 @@ public class CampaignGUI extends JPanel {
             Unit unit = servicedUnitModel.getUnit(servicedUnitTable
                     .convertRowIndexToModel(selected));
             if (null != unit) {
-                MechView mv = new MechView(unit.getEntity(), false);
+                MechView mv = new MechView(unit.getEntity(), false, true);
                 txtServicedUnitView
                         .setText("<div style='font: 12pt monospaced'>"
                                 + mv.getMechReadoutBasic() + "<br>"
@@ -5974,7 +5971,7 @@ public class CampaignGUI extends JPanel {
 						JOptionPane.WARNING_MESSAGE,
 						null,
 						options,
-						options[1]);	
+						options[1]);
         	if(n==1) {
         		return;
         	}
@@ -6018,14 +6015,14 @@ public class CampaignGUI extends JPanel {
             Unit u = getCampaign().getUnit(uid);
             if (null != u.getEntity()) {
                 if (null == u.checkDeployment()) {
+                    // Make sure the unit's entity and pilot are fully up to date!
+                    u.resetPilotAndEntity();
+
+                    // Add and run
                     chosen.add(u);
-                    u.getEntity().getCrew().setSize(u.getActiveCrew().size()); // So
-                                                                               // MegaMek
-                                                                               // has
-                                                                               // correct
-                                                                               // crew
-                                                                               // sizes
-                                                                               // set
+
+                    // So MegaMek has correct crew sizes
+                    u.getEntity().getCrew().setSize(u.getActiveCrew().size());
                 } else {
                     undeployed.append("\n").append(u.getName()).append(" (")
                             .append(u.checkDeployment()).append(")");
@@ -6045,7 +6042,7 @@ public class CampaignGUI extends JPanel {
         					null,
         					options,
         					options[1]);
-        	
+
         	if(n==1) {
         		return;
         	}
@@ -6133,7 +6130,14 @@ public class CampaignGUI extends JPanel {
             Unit u = getCampaign().getUnit(uid);
             if (null != u.getEntity()) {
                 if (null == u.checkDeployment()) {
+                 // Make sure the unit's entity and pilot are fully up to date!
+                    u.resetPilotAndEntity();
+
+                    // Add and run
                     chosen.add(u);
+
+                    // So MegaMek has correct crew sizes
+                    u.getEntity().getCrew().setSize(u.getActiveCrew().size());
                 } else {
                     undeployed.append("\n").append(u.getName()).append(" (")
                             .append(u.checkDeployment()).append(")");
@@ -6152,7 +6156,7 @@ public class CampaignGUI extends JPanel {
 						JOptionPane.WARNING_MESSAGE,
 						null,
 						options,
-						options[1]);	
+						options[1]);
         	if(n==1) {
         		return;
         	}
@@ -6191,7 +6195,7 @@ public class CampaignGUI extends JPanel {
                 }
             }
         }
-        
+
         if (undeployed.length() > 0) {
         	Object[] options = {"Continue",
             "Cancel"};
@@ -6203,7 +6207,7 @@ public class CampaignGUI extends JPanel {
 						JOptionPane.WARNING_MESSAGE,
 						null,
 						options,
-						options[1]);	
+						options[1]);
         	if(n==1) {
         		return;
         	}
@@ -6750,51 +6754,11 @@ public class CampaignGUI extends JPanel {
                 if (loc != null && !loc.isEmpty()) {
                     if (loc.equals("All")) {
                         return true;
-                    } else if (part.getLocation() == part.getUnit().getEntity()
-                            .getLocationFromAbbr(loc)) {
-                        return true;
-                    } else if ((part instanceof EnginePart || part instanceof MissingEnginePart)
-                            && part.getUnit() != null
-                            && part.getUnit().getEntity() != null
-                            && part.getUnit().getEntity() instanceof Mech) {
-                        if (part.getUnit().getEntity().getLocationFromAbbr(loc) == Mech.LOC_CT) {
-                            return true;
-                        }
-                        boolean needsSideTorso = false;
-                        if (part instanceof EnginePart) {
-                            switch (((EnginePart) part).getEngine()
-                                    .getEngineType()) {
-                                case Engine.XL_ENGINE:
-                                case Engine.LIGHT_ENGINE:
-                                case Engine.XXL_ENGINE:
-                                    needsSideTorso = true;
-                                    break;
-                            }
-                        } else if (part instanceof MissingEnginePart) {
-                            switch (((EnginePart) part).getEngine()
-                                    .getEngineType()) {
-                                case Engine.XL_ENGINE:
-                                case Engine.LIGHT_ENGINE:
-                                case Engine.XXL_ENGINE:
-                                    needsSideTorso = true;
-                                    break;
-                            }
-                        }
-                        if (needsSideTorso
-                                && (part.getUnit().getEntity()
-                                        .getLocationFromAbbr(loc) == Mech.LOC_LT || part
-                                        .getUnit().getEntity()
-                                        .getLocationFromAbbr(loc) == Mech.LOC_RT)) {
-                            return true;
-                        }
-                    } else if (part instanceof MekGyro
-                            && part.getUnit().getEntity()
-                                    .getLocationFromAbbr(loc) == Mech.LOC_CT) {
-                        return true;
-                    } 
-                    return false;
+                    }
+                    return part.isInLocation(loc);
                 }
                 return false;
+
             }
         };
         taskSorter.setRowFilter(taskLocationFilter);

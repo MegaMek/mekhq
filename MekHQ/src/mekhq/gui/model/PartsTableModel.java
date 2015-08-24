@@ -20,11 +20,12 @@ public class PartsTableModel extends DataTableModel {
     public final static int COL_NAME    =    1;
     public final static int COL_DETAIL   =   2;
     public final static int COL_TECH_BASE  = 3;
-    public final static int COL_STATUS   =   4;
-    public final static int COL_REPAIR   =   5;
-    public final static int COL_COST     =   6;
-    public final static int COL_TON       =  7;
-    public final static int N_COL          = 8;
+    public final static int COL_QUALITY    = 4;
+    public final static int COL_STATUS   =   5;
+    public final static int COL_REPAIR   =   6;
+    public final static int COL_COST     =   7;
+    public final static int COL_TON       =  8;
+    public final static int N_COL          = 9;
 
     public PartsTableModel() {
         data = new ArrayList<Part>();
@@ -48,6 +49,8 @@ public class PartsTableModel extends DataTableModel {
             return "Value";
         case COL_QUANTITY:
             return "#";
+        case COL_QUALITY:
+            return "Quality";
         case COL_TON:
             return "Tonnage";
         case COL_STATUS:
@@ -82,6 +85,9 @@ public class PartsTableModel extends DataTableModel {
         }
         if(col == COL_QUANTITY) {
             return part.getQuantity();
+        }
+        if(col == COL_QUALITY) {
+            return Part.getQualityName(part.getQuality());
         }
         if(col == COL_TON) {
             return Math.round(part.getTonnage() * 100) / 100.0;
@@ -123,6 +129,8 @@ public class PartsTableModel extends DataTableModel {
 
     public int getAlignment(int col) {
         switch(col) {
+        case COL_QUALITY:
+        	return SwingConstants.CENTER;
         case COL_COST:
         case COL_TON:
             return SwingConstants.RIGHT;

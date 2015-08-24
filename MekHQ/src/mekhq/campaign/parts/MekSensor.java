@@ -1,20 +1,20 @@
 /*
  * MekSensor.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -44,24 +44,24 @@ public class MekSensor extends Part {
 	public MekSensor() {
 		this(0, null);
 	}
-	
+
 	public MekSensor(int tonnage, Campaign c) {
         super(tonnage, c);
         this.name = "Mech Sensors";
     }
-	
+
 	public MekSensor clone() {
 		MekSensor clone = new MekSensor(getUnitTonnage(), campaign);
         clone.copyBaseData(this);
 		return clone;
 	}
-	
+
 	@Override
 	public double getTonnage() {
 		//TODO: what should this tonnage be?
 		return 0;
 	}
-	
+
 	@Override
 	public long getStickerPrice() {
 		return 2000 * getUnitTonnage();
@@ -75,7 +75,7 @@ public class MekSensor extends Part {
         return part instanceof MekSensor
                 && getUnitTonnage() == part.getUnitTonnage();
     }
-    
+
     @Override
 	public int getTechLevel() {
 		return TechConstants.T_ALLOWED_ALL;
@@ -101,7 +101,7 @@ public class MekSensor extends Part {
 	public int getTechRating() {
 		return EquipmentType.RATING_C;
 	}
-	
+
 	@Override
 	public void fix() {
 		super.fix();
@@ -142,8 +142,8 @@ public class MekSensor extends Part {
 			Entity entity = unit.getEntity();
 			for (int i = 0; i < entity.locations(); i++) {
 				if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i) > 0) {
-					if (!unit.isSystemMissing(Mech.SYSTEM_SENSORS, i)) {					
-						hits = entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i);	
+					if (!unit.isSystemMissing(Mech.SYSTEM_SENSORS, i)) {
+						hits = entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i);
 						break;
 					} else {
 						remove(false);
@@ -151,7 +151,7 @@ public class MekSensor extends Part {
 					}
 				}
 			}
-			if(checkForDestruction 
+			if(checkForDestruction
 					&& hits > priorHits && hits >= 2
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
@@ -159,8 +159,8 @@ public class MekSensor extends Part {
 			}
 		}
 	}
-	
-	@Override 
+
+	@Override
 	public int getBaseTime() {
 		if(isSalvaging()) {
 			return 260;
@@ -170,7 +170,7 @@ public class MekSensor extends Part {
 		}
 		return 75;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		if(isSalvaging()) {
@@ -181,12 +181,12 @@ public class MekSensor extends Part {
 		}
 		return 0;
 	}
-		
+
 	@Override
 	public boolean needsFixing() {
 		return hits > 0;
 	}
-	
+
 	@Override
 	public void updateConditionFromPart() {
 		if(null != unit) {
@@ -197,7 +197,7 @@ public class MekSensor extends Part {
 			}
 		}
 	}
-	
+
 	@Override
     public String checkFixable() {
 		if(isSalvaging()) {
@@ -211,12 +211,12 @@ public class MekSensor extends Part {
             	if(unit.isLocationDestroyed(i)) {
             		return unit.getEntity().getLocationName(i) + " is destroyed.";
             	}
-            	
+
             }
         }
         return null;
     }
-	
+
 	@Override
 	public boolean isMountedOnDestroyedLocation() {
 		if(null == unit) {
@@ -230,17 +230,17 @@ public class MekSensor extends Part {
 		 }
 		return false;
 	}
-	
+
 	@Override
     public String getDetails() {
 		return super.getDetails() + ", " + getUnitTonnage() + " tons";
     }
-	
+
 	@Override
 	public boolean isPartForEquipmentNum(int index, int loc) {
 		return Mech.SYSTEM_SENSORS == index;
 	}
-	
+
 	@Override
 	public boolean isRightTechType(String skillType) {
 		return skillType.equals(SkillType.S_TECH_MECH);
@@ -256,7 +256,7 @@ public class MekSensor extends Part {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
-	
+
 	@Override
 	public int getIntroDate() {
 		return EquipmentType.DATE_NONE;
@@ -271,5 +271,21 @@ public class MekSensor extends Part {
 	public int getReIntroDate() {
 		return EquipmentType.DATE_NONE;
 	}
-	
+
+	@Override
+    public boolean isInLocation(String loc) {
+		 if(null == unit || null == unit.getEntity() || !(unit.getEntity() instanceof Mech)) {
+			 return false;
+		 }
+		 if (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_HEAD) {
+             return true;
+         }
+		 if(((Mech)unit.getEntity()).getCockpitType() == Mech.COCKPIT_TORSO_MOUNTED) {
+     		if(unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_CT) {
+     			return true;
+     		}
+		 }
+		 return false;
+    }
+
 }

@@ -342,7 +342,11 @@ public class MekCockpit extends Part {
 
 	@Override
 	public int getLocation() {
-		return Entity.LOC_NONE;
+		if(type == Mech.COCKPIT_TORSO_MOUNTED) {
+			return Mech.LOC_CT;
+		} else {
+			return Mech.LOC_HEAD;
+		}
 	}
 
     @Override

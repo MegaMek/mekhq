@@ -2687,7 +2687,7 @@ public class Campaign implements Serializable {
     }
 
     public void removePart(Part part) {
-    	if(null == part.getUnit() && part.getUnit() instanceof TestUnit) {
+    	if(null != part.getUnit() && part.getUnit() instanceof TestUnit) {
     		//if this is a test unit, then we won't remove the part because its not there
     		return;
     	}
@@ -2794,13 +2794,31 @@ public class Campaign implements Serializable {
     }
 
     public void restore() {
+    	//if we fail to restore equipment parts then remove them 
+    	//and possibly re-initialize and diagnose unit
+    	ArrayList<Part> partsToRemove = new ArrayList<Part>();
+    	ArrayList<UUID> unitsToCheck = new ArrayList<UUID>();
+    	
         for (Part part : getParts()) {
             if (part instanceof EquipmentPart) {
                 ((EquipmentPart) part).restore();
+                if(null == ((EquipmentPart) part).getType()) {
+                	partsToRemove.add(part);
+                }
             }
             if (part instanceof MissingEquipmentPart) {
                 ((MissingEquipmentPart) part).restore();
+                if(null == ((MissingEquipmentPart) part).getType()) {
+                	partsToRemove.add(part);
+                }
             }
+        }
+        
+        for(Part remove : partsToRemove) {
+        	if(null != remove.getUnitId() && !unitsToCheck.contains(remove.getUnitId())) {
+        		unitsToCheck.add(remove.getUnitId());
+        	}
+        	removePart(remove);
         }
 
         for (Unit unit : getUnits()) {
@@ -2809,6 +2827,14 @@ public class Campaign implements Serializable {
                 unit.getEntity().setGame(game);
                 unit.getEntity().restore();
             }
+        }
+        
+        for(UUID uid : unitsToCheck) {
+        	Unit u = getUnit(uid);
+        	if(null != u) {
+        		u.initializeParts(true);
+        		u.runDiagnostic(false);
+        	}
         }
 
         shoppingList.restore();
@@ -3014,7 +3040,12 @@ public class Campaign implements Serializable {
     public void sellArmor(Armor armor, int points) {
         points = Math.min(points, armor.getAmount());
         boolean sellingAllArmor = points == armor.getAmount();
-        long cost = (long) (armor.getStickerPrice() * ((double) points / armor.getArmorPointsPerTon()));
+        double proportion = ((double) points / armor.getAmount());
+        if(sellingAllArmor) {
+        	//to avoid rounding error
+        	proportion = 1.0;
+        }
+        long cost = (long) (armor.getActualValue() * proportion);
         finances.credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + points
                                                         + " " + armor.getName(), calendar.getTime());
         if (sellingAllArmor) {
@@ -3030,16 +3061,24 @@ public class Campaign implements Serializable {
 
     public boolean buyPart(Part part, double multiplier, int transitDays) {
         if (getCampaignOptions().payForParts()) {
-            if (finances.debit((long) (multiplier * part.getActualValue()),
+            if (finances.debit((long) (multiplier * part.getStickerPrice()),
                                Transaction.C_EQUIP, "Purchase of " + part.getName(),
                                calendar.getTime())) {
-                addPart(part, transitDays);
+            	if(part instanceof Refit) {
+            		((Refit)part).addRefitKitParts(transitDays);
+            	} else {
+            		addPart(part, transitDays);
+            	}
                 return true;
             } else {
                 return false;
             }
         } else {
-            addPart(part, transitDays);
+        	if(part instanceof Refit) {
+        		((Refit)part).addRefitKitParts(transitDays);
+        	} else {
+        		addPart(part, transitDays);
+        	}
             return true;
         }
     }
@@ -3607,6 +3646,19 @@ public class Campaign implements Serializable {
                         continue;
                     }
                 }
+                if (prt instanceof MissingEquipmentPart) {
+                    Mounted m = u.getEntity().getEquipment(
+                            ((MissingEquipmentPart) prt).getEquipmentNum());
+                    if (null == m || m.getLocation() == Entity.LOC_NONE) {
+                        removeParts.add(prt);
+                        continue;
+                    }
+                    // Remove existing duplicate parts.
+                    if (u.getPartForEquipmentNum(((MissingEquipmentPart) prt).getEquipmentNum(), ((MissingEquipmentPart) prt).getLocation()) != null) {
+                        removeParts.add(prt);
+                        continue;
+                    }
+                }
                 // if actuators on units have no location (on version 1.23 and
                 // earlier) then remove them and let initializeParts (called
                 // later) create new ones
@@ -3684,7 +3736,7 @@ public class Campaign implements Serializable {
         for (Part prt : removeParts) {
             retVal.removePart(prt);
         }
-
+        
         // All personnel need the rank reference fixed
         for (int x = 0; x < retVal.personnel.size(); x++) {
             Person psn = retVal.personnel.get(x);
@@ -3817,9 +3869,74 @@ public class Campaign implements Serializable {
                 }
             }
         }
-
+               
         retVal.reloadNews();
-
+        
+        //**EVERYTHING HAS BEEN LOADED. NOW FOR SANITY CHECKS**//
+        
+        //unload any ammo bins in the warehouse
+        ArrayList<AmmoBin> binsToUnload = new ArrayList<AmmoBin>();
+        for(Part prt : retVal.getSpareParts()) {
+        	if(prt instanceof AmmoBin && !prt.isReservedForRefit()
+        			&& ((AmmoBin)prt).getShotsNeeded() == 0) {
+        		binsToUnload.add((AmmoBin)prt);
+        	}
+        }
+        for(AmmoBin bin : binsToUnload) {
+        	bin.unload();
+        }
+        
+        //Check all parts that are reserved for refit and if the refit id unit
+        //is not refitting or is gone then unreserve
+        for(Part part : retVal.getParts()) {
+        	if(part.isReservedForRefit()) {
+        		Unit u = retVal.getUnit(part.getRefitId());
+        		if(null == u || !u.isRefitting()) {
+        			part.setRefitId(null);
+        		}
+        	}
+        }
+       
+        //try to stack as much as possible the parts in the warehouse that may be unstacked
+        //for a variety of reasons
+        ArrayList<Part> partsToRemove = new ArrayList<Part>();
+        ArrayList<Part> partsToKeep = new ArrayList<Part>();
+        for(Part part : retVal.getParts()) {
+        	if(part.isSpare() && part.isPresent()) {
+        		for(Part oPart : partsToKeep) {
+	        		if (part.isSamePartTypeAndStatus(oPart)) {
+	        			if (part instanceof Armor) {
+	                        if (oPart instanceof Armor) {
+	                            ((Armor) oPart).setAmount(((Armor) oPart).getAmount()
+	                                                      + ((Armor) part).getAmount());
+	                            partsToRemove.add(part);
+	                            break;
+	                        }
+	                    } else if (part instanceof AmmoStorage) {
+	                        if (oPart instanceof AmmoStorage) {
+	                            ((AmmoStorage) oPart).changeShots(((AmmoStorage) part)
+	                                                                      .getShots());
+	                            partsToRemove.add(part);
+	                            break;
+	                        }
+	                    } else {
+	                    	int q = part.getQuantity();
+	                    	while(q > 0) {
+	                    		oPart.incrementQuantity();
+	                    		q--;
+	                    	}
+	                        partsToRemove.add(part);
+                            break;
+	                    }
+	        		}
+        		}
+        		partsToKeep.add(part);
+        	}
+        }
+        for(Part toRemove : partsToRemove) {
+        	retVal.removePart(toRemove);
+        }
+        
         MekHQ.logMessage("Load of campaign file complete!");
 
         return retVal;

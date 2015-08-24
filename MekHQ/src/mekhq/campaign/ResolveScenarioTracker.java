@@ -1091,15 +1091,13 @@ public class ResolveScenarioTracker {
 		        continue;
 		    }
 		    Entity en = ustatus.getEntity();
+		    long unitValue = unit.getBuyCost();
+		    if(campaign.getCampaignOptions().useBLCSaleValue()) {
+		        unitValue = unit.getSellValue();
+		    } 
 			if(ustatus.isTotalLoss()) {
 				//missing unit
 				if(blc > 0) {
-				    long unitValue = 0;
-				    if(campaign.getCampaignOptions().useBLCSaleValue()) {
-				        unitValue = unit.getSellValue();
-				    } else {
-				        unitValue = unit.getBuyCost();
-				    }
 					long value = (long)(blc * unitValue);
 					campaign.getFinances().credit(value, Transaction.C_BLC, "Battle loss compensation for " + unit.getName(), campaign.getCalendar().getTime());
 					DecimalFormat formatter = new DecimalFormat();
@@ -1120,14 +1118,22 @@ public class ResolveScenarioTracker {
 				if(!unit.isRepairable()) {
 					unit.setSalvage(true);
 				}
+				campaign.addReport(unit.getHyperlinkedName() + " has been recovered.");
 				//check for BLC
 				long newValue = unit.getValueOfAllMissingParts();
-				campaign.addReport(unit.getHyperlinkedName() + " has been recovered.");
-				if(blc > 0 && newValue > currentValue) {
-					long finalValue = (long)(blc * (newValue - currentValue));
-					campaign.getFinances().credit(finalValue, Transaction.C_BLC, "Battle loss compensation (parts) for " + unit.getName(), campaign.getCalendar().getTime());
+				long blcValue = newValue - currentValue;
+				String blcString = "attle loss compensation (parts) for " + unit.getName();
+				if(!unit.isRepairable()) {
+					//if the unit is not repairable, you should get BLC for it but we should subtract 
+					//the value of salvageable parts
+					blcValue = unitValue - unit.getSellValue();			
+					blcString = "attle loss compensation for " + unit.getName();
+				}
+				if(blc > 0 && blcValue > 0) {
+					long finalValue = (long)(blc * blcValue);
+					campaign.getFinances().credit(finalValue, Transaction.C_BLC, "B" + blcString, campaign.getCalendar().getTime());
 					DecimalFormat formatter = new DecimalFormat();
-					campaign.addReport(formatter.format(finalValue) + " in battle loss compensation for parts for " + unit.getName() + " has been credited to your account.");
+					campaign.addReport(formatter.format(finalValue) + " in b" + blcString + " has been credited to your account.");
 				}
 			}
 		}

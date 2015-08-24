@@ -160,7 +160,7 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
         txtOldUnit.setBorder(BorderFactory.createCompoundBorder(
 	   			 BorderFactory.createTitledBorder(resourceMap.getString("txtOldUnit.title")),
 	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
-        MechView mv = new MechView(unit.getEntity(), false);
+        MechView mv = new MechView(unit.getEntity(), false, true);
 		txtOldUnit.setText("<div style='font: 12pt monospaced'>" + mv.getMechReadout() + "</div>");
         scrOldUnit = new JScrollPane(txtOldUnit);
         scrOldUnit.setMinimumSize(new java.awt.Dimension(300, 400));
@@ -267,7 +267,7 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
     	btnOK.setEnabled(true);
     	lstShopping = new JList<String>(r.getShoppingListDescription());
     	scrShoppingList.setViewportView(lstShopping);
-        MechView mv = new MechView(r.getNewEntity(), false);
+        MechView mv = new MechView(r.getNewEntity(), false, true);
 		txtNewUnit.setText("<div style='font: 12pt monospaced'>" + mv.getMechReadout() + "</div>");
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() { 

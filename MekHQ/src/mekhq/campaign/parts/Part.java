@@ -492,7 +492,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				|| part.isReservedForRefit() || part.isBeingWorkedOn() || part.isReservedForReplacement() || part.hasParentPart()) {
     		return false;
     	}
-		return hits == part.getHits() && part.getSkillMin() == this.getSkillMin() && this.getDaysToArrival() == part.getDaysToArrival();
+		return quality == part.getQuality() && hits == part.getHits() && part.getSkillMin() == this.getSkillMin() && this.getDaysToArrival() == part.getDaysToArrival();
 	}
 
     protected boolean isClanTechBase() {
@@ -1254,6 +1254,12 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
      */
     public void postProcessCampaignAddition() {
     	//do nothing
+    }
+    
+    public boolean isInLocation(String loc) {
+    	return null != unit 
+    		&& null != unit.getEntity() 
+    		&& getLocation() == getUnit().getEntity().getLocationFromAbbr(loc);
     }
     
 }

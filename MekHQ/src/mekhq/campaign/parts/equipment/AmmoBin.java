@@ -27,18 +27,10 @@ import java.util.HashSet;
 
 import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
-import megamek.common.Dropship;
-import megamek.common.Entity;
 import megamek.common.EquipmentType;
-import megamek.common.Jumpship;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.TargetRoll;
-import megamek.common.Warship;
-import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -99,95 +91,71 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public double getTonnage() {
-    	return 1.0;
+    	return (1.0 * getFullShots())/((AmmoType)type).getShots();
     }
 
     public int getFullShots() {
     	int fullShots = ((AmmoType)type).getShots();
-		if(oneShot) {
-			fullShots = 1;
-		}
-		//Protomechs: Its a hack, but we probably need to load a fresh entity in and check what its shots are
-		//for the same equipnum
-		if(null != unit && unit.getEntity() instanceof Protomech) {
-		    String lookupName = unit.getEntity().getChassis() + " " + unit.getEntity().getModel();
-		    lookupName = lookupName.trim();
-	        MechSummary summary = MechSummaryCache.getInstance().getMech(lookupName);
-	        if(null == summary) {
-	            return fullShots;
-	        }
-	        try {
-                Entity newProto = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
-                Mounted m = newProto.getEquipment(equipmentNum);
-                if(null != m) {
-                    fullShots = m.getBaseShotsLeft();
-                }
-	        } catch (EntityLoadingException e) {
-                return fullShots;
+    	if(unit != null) {
+			Mounted m = unit.getEntity().getEquipment(equipmentNum);
+            if(null != m && m.getOriginalShots() > 0) {
+                fullShots = m.getOriginalShots();
             }
+		}
+    	if(null != unit && unit.getEntity() instanceof Protomech) {
 	        //if protomechs are using alternate munitions then cut in half
 	        if(((AmmoType)type).getMunitionType() != AmmoType.M_STANDARD) {
 	            fullShots = fullShots / 2;
 	        }
 		}
-		// Another hack because Dropships, Warships, Jumpships, etc... have their ammo done quite weirdly.
-		if (unit != null && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship || unit.getEntity() instanceof Warship)) {
-			String lookupName = unit.getEntity().getChassis() + " " + unit.getEntity().getModel();
-		    lookupName = lookupName.trim();
-	        MechSummary summary = MechSummaryCache.getInstance().getMech(lookupName);
-	        if(null == summary) {
-	            return fullShots;
-	        }
-	        try {
-                Entity newShip = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
-                Mounted m = newShip.getEquipment(equipmentNum);
-                if(null != m) {
-                	fullShots = m.getOriginalShots();
-                }
-	        } catch (EntityLoadingException e) {
-                return fullShots;
-            }
+		if(oneShot) {
+			fullShots = 1;
 		}
 		return fullShots;
     }
-
-    @Override
-    public long getCurrentValue() {
-    	//multiply full value of ammo ton by the percent of shots remaining
-    	return (long)(getStickerPrice() * (1.0 - (double)shotsNeeded / getFullShots()));
+    
+    protected int getCurrentShots() {
+    	int shots = getFullShots() - shotsNeeded;
+    	//replace with actual entity values if entity not null because the previous number will not
+    	//be correct for ammo swaps
+    	if(null != unit && null != unit.getEntity()) {
+    		Mounted m = unit.getEntity().getEquipment(equipmentNum);
+    		if(null != m) {
+    			shots = m.getBaseShotsLeft();
+    		}
+    	}
+    	return shots;
     }
 
     public long getValueNeeded() {
-    	return adjustCostsForCampaignOptions((long)(getStickerPrice() * ((double)shotsNeeded / getFullShots())));
+    	return adjustCostsForCampaignOptions((long)(getPricePerTon() * ((double)shotsNeeded / getShotsPerTon())));
     }
 
+    protected long getPricePerTon() {
+    	//if on a unit, then use the ammo type on the existing entity, to avoid getting it wrong due to 
+    	//ammo swaps
+    	EquipmentType curType = type;
+    	if(null != unit && null != unit.getEntity()) {
+			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+			if(null != mounted && (mounted.getType() instanceof AmmoType)) {
+				curType = mounted.getType();
+			}
+    	}
+    	return (long)curType.getRawCost();
+    }
+    
+    protected int getShotsPerTon() {
+    	AmmoType atype = (AmmoType)type;
+    	if(atype.getKgPerShot() > 0) {
+    		return (int)Math.floor(1000.0/atype.getKgPerShot());
+    	}
+    	//if not listed by kg per shot, we assume this is a single ton increment
+    	return ((AmmoType)type).getShots();
+    }
+    
     @Override
     public long getStickerPrice() {
-    	//costs are a total nightmare
-        //some costs depend on entity, but we can't do it that way
-        //because spare parts don't have entities. If parts start on an entity
-        //thats fine, but this will become problematic when we set up a parts
-        //store. For now I am just going to pass in a null entity and attempt
-    	//to catch any resulting NPEs
-    	/*Entity en = null;
-    	boolean isArmored = false;
-    	if (unit != null) {
-            en = unit.getEntity();
-            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-            if(null != mounted) {
-            	isArmored = mounted.isArmored();
-            }
-    	}
-
-        int itemCost = 0;
-        try {
-        	itemCost = (int) type.getCost(en, isArmored, -1);
-        } catch(NullPointerException ex) {
-        	System.out.println("Found a null entity while calculating cost for " + name);
-        }
-        return itemCost;
-        */
-        return 0;
+    	return (long)(getPricePerTon() * (1.0 * getCurrentShots()/getShotsPerTon()));
     }
 
     @Override
@@ -327,7 +295,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted && mounted.getType() instanceof AmmoType) {
-				if(mounted.getType().equals(type) 						
+				if(mounted.getType().equals(type)
 						&& ((AmmoType)mounted.getType()).getMunitionType() == getMunitionType()) {
 					//just a simple reload
 					mounted.setShotsLeft(mounted.getBaseShotsLeft() + shots);
@@ -358,7 +326,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	}
 
 	public void unload() {
-		//FIXME: the following won't work for proto and Dropper bins if they 
+		//FIXME: the following won't work for proto and Dropper bins if they
 		//are not attached to a unit. Currently the only place AmmoBins are loaded
 		//off of units is for refits, which neither of those units can do, but we
 		//may want to think about not having refits load ammo bins but rather reserve
@@ -414,7 +382,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 					remove(false);
 					return;
 				}
-				long currentMuniType = 0;			
+				long currentMuniType = 0;
 				if(mounted.getType() instanceof AmmoType) {
 					currentMuniType = ((AmmoType)mounted.getType()).getMunitionType();
 				}
@@ -427,8 +395,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 			}
 		}
 	}
-	
-	@Override 
+
+	@Override
 	public int getBaseTime() {
 		if(isSalvaging()) {
 			return 120;
@@ -436,7 +404,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted) {
-				long currentMuniType = 0;			
+				long currentMuniType = 0;
 				if(mounted.getType() instanceof AmmoType) {
 					currentMuniType = ((AmmoType)mounted.getType()).getMunitionType();
 				}
@@ -447,7 +415,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		}
 		return 15;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		if(isSalvaging()) {
@@ -471,7 +439,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		}
 	}
 
-	@Override	
+	@Override
 	public boolean isSamePartType(Part part) {
     	return  part instanceof AmmoBin
                         && getType().equals( ((AmmoBin)part).getType() )
@@ -480,7 +448,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
 	@Override
 	public boolean needsFixing() {
-		return shotsNeeded > 0 && null != unit;
+		return shotsNeeded > 0;// && null != unit;
 	}
 
 	public String getDesc() {
@@ -752,7 +720,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		int shots = 1;
 		if(type instanceof AmmoType) {
 			shots = ((AmmoType)type).getShots();
-		}	
+		}
         return new AmmoStorage(1,type,shots,campaign);
     }
 
