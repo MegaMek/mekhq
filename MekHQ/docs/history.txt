@@ -35,6 +35,7 @@ v0.3.17-dev (SVN)
 + Bug [#808]: Warehouse : "Sell all parts of this type" only sells 1 point of standard armor
 + Allow underweight units to be refit
 + Bug [#811]: Bug in Editing Potential rewards in Scenario
++ Bug [#836]: Cannot Repair Jumbo's AC Bay
 
 v0.3.16 (2015-08-15 19:40 UTC)
 + Bug [#823]: NPE during 'Auto Resolve'
