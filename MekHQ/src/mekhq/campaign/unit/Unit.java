@@ -83,6 +83,7 @@ import megamek.common.WeaponType;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
+import megamek.common.weapons.BayWeapon;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.MekHQ;
@@ -2104,6 +2105,10 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	        				&& m.getLocation() != Infantry.LOC_FIELD_GUNS) {
     	        			//don't add weapons here for infantry, unless field guns
     	        			continue;
+    	        		}
+    	        		if(type instanceof BayWeapon) {
+    	        			//weapon bays aren't real parts
+        	        		continue;
     	        		}
     	        		epart = new EquipmentPart((int)entity.getWeight(), type, eqnum, campaign);
     	        		if(type instanceof MiscType && type.hasFlag(MiscType.F_MASC)) {

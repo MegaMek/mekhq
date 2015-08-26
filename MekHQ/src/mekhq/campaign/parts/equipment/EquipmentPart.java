@@ -32,6 +32,8 @@ import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.TechConstants;
+import megamek.common.WeaponType;
+import megamek.common.weapons.BayWeapon;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -248,6 +250,7 @@ public class EquipmentPart extends Part {
 		        mounted.setDestroyed(false);
 		        unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum);
 			}
+			checkWeaponBay();
 		}
 	}
 
@@ -282,6 +285,7 @@ public class EquipmentPart extends Part {
 			unit.addPart(missing);
 			campaign.addPart(missing, 0);
 		}
+		checkWeaponBay();
 		setUnit(null);
 		updateConditionFromEntity(false);
 		equipmentNum = -1;
@@ -296,7 +300,7 @@ public class EquipmentPart extends Part {
 				if(mounted.isMissing()) {
 					remove(false);
 					return;
-				}
+				}				
 				hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum, mounted.getLocation());
 				if(mounted.isSplit()) {
 				hits += unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum, mounted.getSecondLocation());
@@ -400,6 +404,7 @@ public class EquipmentPart extends Part {
 			        unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum);
 				}
 			}
+			checkWeaponBay();
 		}
 	}
 
@@ -698,4 +703,66 @@ public class EquipmentPart extends Part {
 		}
 		return false;
     }
+	
+	/**
+	 * This method will check for an existing weapon bay that this equipment belongs to
+	 * and if there is one it will check the status of that weapon bay based on the equipment.
+	 * If this equipment is functional, then it will clear any hits from the bay. If not, then it will
+	 * check all the other equipment in the bay and if they are all damaged, then it will mark the bay
+	 * as destroyed. This is designed to be used only by the fix and remove methods contained here in
+	 * order to properly update weapon bay mounts on the entity
+	 */
+	private void checkWeaponBay() {
+		
+		if(type instanceof WeaponType && null != unit 
+				&& null != unit.getEntity()
+				&& unit.getEntity().usesWeaponBays()) {
+			Mounted weapon = unit.getEntity().getEquipment(equipmentNum);
+			if(null == weapon) {
+				return;
+			}
+			Mounted weaponBay = null;
+			for(Mounted m : unit.getEntity().getWeaponBayList()) {
+				if(m.getLocation() != weapon.getLocation()) {
+					continue;
+				}
+				if(m.getType() instanceof BayWeapon && m.getBayWeapons().contains(equipmentNum)) {
+					weaponBay = m;
+					break;
+				}
+			}
+			if(null == weaponBay) {
+				return;
+			}
+			int wBayIndex = unit.getEntity().getEquipmentNum(weaponBay);
+			//ok we found the weapons bay, now lets check first to see if the current weapon is fixed
+			if(!weapon.isDestroyed()) {
+				weaponBay.setHit(false);
+				weaponBay.setMissing(false);
+				weaponBay.setDestroyed(false);
+		        unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, wBayIndex);
+				return;
+			}
+			//if we are still here then we need to check the other weapons, if any of them are usable
+			//then we should do the same thing. Otherwise all weapons are destroyed and we should mark
+			//the bay as unusuable
+			for(int wId : weaponBay.getBayWeapons()) {
+				Mounted m = unit.getEntity().getEquipment(wId);
+				if(null == m) {
+					continue;
+				}
+				if(!m.isDestroyed()) {
+					weaponBay.setHit(false);
+					weaponBay.setMissing(false);
+					weaponBay.setDestroyed(false);
+			        unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, wBayIndex);
+					return;
+				}
+			}
+			weaponBay.setHit(true);
+			weaponBay.setDestroyed(true);
+			weaponBay.setRepairable(true);
+	        unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, wBayIndex);		
+		}
+	}
 }
