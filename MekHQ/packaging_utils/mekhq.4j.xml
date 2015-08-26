@@ -1,7 +1,7 @@
 <launch4jConfig>
   <headerType>gui</headerType>
-  <jar>../svndev/MekHQ.jar</jar>
-  <outfile>../svndev/MekHQ.exe</outfile>
+  <jar>../pkgdir/MekHQ.jar</jar>
+  <outfile>../pkgdir/MekHQ.exe</outfile>
   <dontWrapJar>false</dontWrapJar>
   <errTitle></errTitle>
   <cmdLine></cmdLine>

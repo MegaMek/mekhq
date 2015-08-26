@@ -1,13 +1,13 @@
 <launch4jConfig>
   <headerType>gui</headerType>
-  <outfile>../svndev/MegaMek.exe</outfile>
+  <outfile>../pkgdir/MegaMek.exe</outfile>
   <dontWrapJar>true</dontWrapJar>
   <classPath>
   	<mainClass>megamek.MegaMek</mainClass>
     <cp>lib/MegaMek.jar</cp>
     <cp>lib/TinyXML.jar</cp>
     <cp>lib/vecmath.jar</cp>
-    <cp>lib/Ostermiller.jar</cp>    
+    <cp>lib/Ostermiller.jar</cp>
     <cp>lib/TabPanel.jar</cp>
     <cp>lib/PngEncoder.jar</cp>
     <cp>lib/cglib-nodep-2.2.jar</cp>
