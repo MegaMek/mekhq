@@ -2519,10 +2519,11 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	int nDrivers = 0;
     	int sumGunnery = 0;
     	int nGunners = 0;
+    	int nCrew = 0;
 
     	for(UUID pid : drivers) {
     		Person p = campaign.getPerson(pid);
-    		if(p.getHits() > 0 && !(entity instanceof Mech || entity instanceof Aero || entity instanceof Protomech)) {
+    		if(p.getHits() > 0 && !usesSoloPilot()) {
     			continue;
     		}
     		if(p.hasSkill(driveType)) {
@@ -2541,7 +2542,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	}
     	for(UUID pid : gunners) {
     		Person p = campaign.getPerson(pid);
-    		if(p.getHits() > 0 && !(entity instanceof Mech || entity instanceof Aero || entity instanceof Protomech)) {
+    		if(p.getHits() > 0 && !usesSoloPilot()) {
     			continue;
     		}
     		if(p.hasSkill(gunType)) {
@@ -2556,6 +2557,20 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
         		sumGunnery += p.getGunneryInjuryMod();
         	}
     	}
+    	
+    	for(UUID pid : vesselCrew) {
+    		Person p = campaign.getPerson(pid);
+    		if(null !=p && p.getHits() == 0) {
+    			nCrew++;
+    		}
+    	}
+    	if(null != navigator) {
+    		Person p = campaign.getPerson(navigator);
+    		if(null !=p && p.getHits() == 0) {
+    			nCrew++;
+    		}
+    	}
+    	
     	if(nDrivers > 0) {
     		piloting = (int)Math.round(((double)sumPiloting)/nDrivers);
     	}
@@ -2662,12 +2677,24 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     			return;
     		}
     	}
+    	else if(entity instanceof SmallCraft || entity instanceof Jumpship) {
+    		//assign crew hits based on what percent of the crew is present
+    		int currentSize = nDrivers + nGunners + nCrew;
+    		double percent = Math.max(0.0, 1.0 - (1.0 * currentSize)/getFullCrewSize());
+    		int hits = (int)Math.floor(percent * 6);
+    		if(percent > 0.0 && hits==0) {
+    			//at least one hit if less than full staffed
+    			hits = 1;
+    		}
+    		pilot.setHits(hits);
+    	}
     	resetEngineerOrTech();
     	pilot.setToughness(commander.getToughness());
     	//TODO: game option to use tactics as command and ind init bonus
     	if(commander.hasSkill(SkillType.S_TACTICS)) {
     		pilot.setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getFinalSkillValue());
     	}
+    	    	
     	entity.setCrew(pilot);
     }
 

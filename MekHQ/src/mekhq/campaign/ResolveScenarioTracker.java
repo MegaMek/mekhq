@@ -494,6 +494,20 @@ public class ResolveScenarioTracker {
                     casualties = crew.size();
                 }
             }
+            if(en instanceof Aero && !u.usesSoldiers()) {
+            	//need to check for existing hits because you can fly aeros with less than full
+            	//crew
+            	int existingHits = 0;
+            	int currentHits = 0;
+            	if(null != u.getEntity().getCrew()) {
+            		existingHits = u.getEntity().getCrew().getHits();
+            	}
+            	if(null != en.getCrew()) {
+            		currentHits = en.getCrew().getHits();
+            	}
+            	int newHits = Math.max(0,currentHits - existingHits);
+            	casualties = (int)Math.ceil(Compute.getFullCrewSize(en) * (newHits/6.0));
+            }
             for(Person p : crew) {
                 status = new PersonStatus(p.getFullName(), u.getEntity().getDisplayName(), p.getHits(), p.getId());
                 if(u.usesSoloPilot()) {
@@ -549,7 +563,7 @@ public class ResolveScenarioTracker {
                             }
                         }
                     }
-                    else if(en instanceof Infantry) {
+                    else if(en instanceof Infantry || en instanceof Aero) {
                         if(casualtiesAssigned < casualties) {
                             casualtiesAssigned++;
                             if(Compute.d6(2) >= 7) {
