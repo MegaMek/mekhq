@@ -1,6 +1,6 @@
 <launch4jConfig>
   <headerType>gui</headerType>
-  <outfile>../svndev/MegaMekLab.exe</outfile>
+  <outfile>../pkgdir/MegaMekLab.exe</outfile>
   <dontWrapJar>true</dontWrapJar>
   <classPath>
   	<mainClass>megameklab.com.MegaMekLab</mainClass>

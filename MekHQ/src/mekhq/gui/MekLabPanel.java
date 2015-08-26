@@ -34,6 +34,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
@@ -110,6 +111,17 @@ public class MekLabPanel extends JPanel {
         btnRefit = new JButton("Begin Refit");
         btnRefit.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				Entity entity = labPanel.getEntity();
+				if (null != entity && entity.getWeight() > testEntity.calculateWeight()) {
+					int response = JOptionPane.showConfirmDialog(
+						    null,
+						    "This unit is underweight. Do you want to continue?",
+						    "Underweight Unit",
+						    JOptionPane.YES_NO_OPTION);
+					if(response == JOptionPane.NO_OPTION) {
+						return;
+					}
+				}
 				campaignGUI.refitUnit(refit, true);
 			}
 		});
@@ -233,16 +245,18 @@ public class MekLabPanel extends JPanel {
         if(entity.getWeight() < testEntity.calculateWeight()) {
 			btnRefit.setEnabled(false);
 			btnRefit.setToolTipText("Unit is overweight.");
-		} else if (entity.getWeight() > testEntity.calculateWeight()) {
-			btnRefit.setEnabled(false);
-			btnRefit.setToolTipText("Unit is underweight.");	
+		//} else if (entity.getWeight() > testEntity.calculateWeight()) {
+			//Taharqa: We are now going to allow users to build underweight units, we will just give
+			//them an are you sure warning pop up
+			//btnRefit.setEnabled(false);
+			//btnRefit.setToolTipText("Unit is underweight.");	
 		} else if(sb.length() > 0) {
 			btnRefit.setEnabled(false);
 			btnRefit.setToolTipText(sb.toString());	
 		} else if(null != refit.checkFixable()) {
 			btnRefit.setEnabled(false);
 			btnRefit.setToolTipText(refit.checkFixable());	
-		} else if(refit.getRefitClass() == Refit.NO_CHANGE) {
+		} else if(refit.getRefitClass() == Refit.NO_CHANGE && entity.getWeight() == testEntity.calculateWeight()) {
         	btnRefit.setEnabled(false);
 			btnRefit.setToolTipText("Nothing to change.");
         } else {

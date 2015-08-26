@@ -294,6 +294,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     		scenario.setStatus(choiceStatus.getSelectedIndex()+1);
     		scenario.setDate(date);
     	}
+    	scenario.resetLoot();
     	for(Loot loot : lootModel.getAllLoot()) {
     	    scenario.addLoot(loot);
     	}

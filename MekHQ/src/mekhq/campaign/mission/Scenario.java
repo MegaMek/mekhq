@@ -383,4 +383,8 @@ public class Scenario implements Serializable {
 	    loots.add(l);
 	}
 	
+	public void resetLoot() {
+		loots = new ArrayList<Loot>();
+	}
+	
 }

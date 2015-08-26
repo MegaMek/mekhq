@@ -3766,7 +3766,7 @@ public class CampaignGUI extends JPanel {
             Unit unit = servicedUnitModel.getUnit(servicedUnitTable
                     .convertRowIndexToModel(selected));
             if (null != unit) {
-                MechView mv = new MechView(unit.getEntity(), false, true);
+                MechView mv = new MechView(unit.getEntity(), true, true);
                 txtServicedUnitView
                         .setText("<div style='font: 12pt monospaced'>"
                                 + mv.getMechReadoutBasic() + "<br>"

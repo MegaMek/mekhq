@@ -91,6 +91,7 @@ import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.BuildingBlock;
 import megamek.common.util.DirectoryItems;
+import megamek.common.weapons.BayWeapon;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
@@ -3659,6 +3660,19 @@ public class Campaign implements Serializable {
                         continue;
                     }
                 }
+                //if the type is a BayWeapon, remove
+                if(prt instanceof EquipmentPart 
+                		&& ((EquipmentPart)prt).getType() instanceof BayWeapon) {
+                	removeParts.add(prt);
+                	continue;
+                }
+                
+                if(prt instanceof MissingEquipmentPart
+                		&& ((MissingEquipmentPart)prt).getType() instanceof BayWeapon) {
+                	removeParts.add(prt);
+                	continue;
+                }
+                
                 // if actuators on units have no location (on version 1.23 and
                 // earlier) then remove them and let initializeParts (called
                 // later) create new ones

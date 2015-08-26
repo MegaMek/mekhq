@@ -511,7 +511,13 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				}
 			}
 		}
-
+		
+		//if oldUnitParts is not empty we are removing some stuff and so this should
+		//be at least a Class A refit
+		if(!oldUnitParts.isEmpty()) {
+			updateRefitClass(CLASS_A);
+		}
+		
 		//Step 4: loop through remaining equipment on oldunit parts and add time for removing.
 		for(int pid : oldUnitParts) {
 			Part oPart = oldUnit.campaign.getPart(pid);

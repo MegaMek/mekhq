@@ -457,7 +457,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
  			lblPerson = new JLabel();
 			lblUnit = new JLabel();
 			if(null != p) {
-				lblPerson.setText(getSummaryFor(p));
+				lblPerson.setText(getSummaryFor(p, u));
 				setPortrait(p, lblPerson);
 			}
 			nexty++;
@@ -546,9 +546,13 @@ public class ForceViewPanel extends javax.swing.JPanel {
         return camo;
     }
     
-    public String getSummaryFor(Person person) {
+    public String getSummaryFor(Person person, Unit unit) {
         String toReturn = "<html><font size='2'><b>" + person.getFullTitle() + "</b><br/>";
         toReturn += person.getSkillSummary() + " " + person.getRoleDesc();
+        if(null != unit && null != unit.getEntity()
+        		&& null != unit.getEntity().getCrew() && unit.getEntity().getCrew().getHits() > 0) {
+        	toReturn += "<br><font color='red' size='2'>" + unit.getEntity().getCrew().getHits() + " hit(s)";
+        }
         toReturn += "</font></html>";
         return toReturn;
     }

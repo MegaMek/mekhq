@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.17-dev (SVN)
+v0.3.18-dev (SVN)
+
+v0.3.17 (2015-08-26 21:30 UTC)
 + Bug: Ammo bins not reserving for refit if other ammo bins of same type in warehouse
 + Bug [#909]: Refits not shopping for ammo
 + Bug [#502]: MekHQ Freezes
@@ -33,6 +35,12 @@ v0.3.17-dev (SVN)
 + Bug [#712]: Inconsistent infantry unit pricing
 + Bug [#885]: Spend XP Not Working Correctly
 + Bug [#808]: Warehouse : "Sell all parts of this type" only sells 1 point of standard armor
++ Allow underweight units to be refit
++ Bug [#811]: Bug in Editing Potential rewards in Scenario
++ Bug [#836]: Cannot Repair Jumbo's AC Bay
++ Bug: crew hits to large craft not affecting personnel
++ Updated MegaMek.jar to 0.41.7
++ Updated MegaMekLab.jar to 0.1.43
 
 v0.3.16 (2015-08-15 19:40 UTC)
 + Bug [#823]: NPE during 'Auto Resolve'

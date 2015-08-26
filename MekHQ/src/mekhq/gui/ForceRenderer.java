@@ -61,7 +61,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             if(null != pp) {
                 name = pp.getFullTitle();
                 name += " (" + u.getEntity().getCrew().getGunnery() + "/" + u.getEntity().getCrew().getPiloting() + ")";
-                if(pp.needsFixing()) {
+                if(pp.needsFixing() || u.getEntity().getCrew().getHits() > 0) {
                     name = "<font color='red'>" + name + "</font>";
                 }
             }
