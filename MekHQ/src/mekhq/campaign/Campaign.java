@@ -5464,11 +5464,9 @@ public class Campaign implements Serializable {
             && (!isOvertimeAllowed() || tech.getOvertimeLeft() <= 0)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "No time left.");
         }
-        if (null != partWork.getUnit()) {
-            String notFixable = partWork.checkFixable();
-            if (null != notFixable) {
-                return new TargetRoll(TargetRoll.IMPOSSIBLE, notFixable);
-            }
+        String notFixable = partWork.checkFixable();
+        if (null != notFixable) {
+        	return new TargetRoll(TargetRoll.IMPOSSIBLE, notFixable);
         }
         // if this is an infantry refit, then automatic success
         if (partWork instanceof Refit && null != partWork.getUnit()

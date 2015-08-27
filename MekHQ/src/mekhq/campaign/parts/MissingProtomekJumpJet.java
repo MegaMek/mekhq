@@ -120,6 +120,9 @@ public class MissingProtomekJumpJet extends MissingPart {
 
     @Override
     public String checkFixable() {
+    	if(null == unit) {
+    		return null;
+    	}
         if(unit.isLocationBreached(Protomech.LOC_TORSO)) {
             return unit.getEntity().getLocationName(Protomech.LOC_TORSO) + " is breached.";
         }

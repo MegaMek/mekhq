@@ -108,6 +108,9 @@ public class MissingProtomekLegActuator extends MissingPart {
 
     @Override
     public String checkFixable() {
+    	if(null == unit) {
+    		return null;
+    	}
         if(unit.isLocationBreached(Protomech.LOC_LEG)) {
             return unit.getEntity().getLocationName(Protomech.LOC_LEG) + " is breached.";
         }

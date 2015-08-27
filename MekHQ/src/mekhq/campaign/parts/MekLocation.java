@@ -577,6 +577,9 @@ public class MekLocation extends Part {
 	
 	@Override
     public String checkFixable() {
+		if(null == unit) {
+			return null;
+		}
 		if(isBlownOff() && !isSalvaging()) {
 			if(loc == Mech.LOC_LARM && unit.isLocationDestroyed(Mech.LOC_LT)) {
 				return "must replace left torso first";

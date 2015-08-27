@@ -108,6 +108,9 @@ public class MissingProtomekSensor extends MissingPart {
 
     @Override
     public String checkFixable() {
+    	if(null == unit) {
+    		return null;
+    	}
         if(unit.isLocationBreached(Protomech.LOC_HEAD)) {
             return unit.getEntity().getLocationName(Protomech.LOC_HEAD) + " is breached.";
         }

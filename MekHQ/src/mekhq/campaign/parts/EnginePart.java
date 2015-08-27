@@ -483,19 +483,22 @@ public class EnginePart extends Part {
 
 	@Override
 	 public String checkFixable() {
+		if(null == unit) {
+			return null;
+		}
 		if(isSalvaging()) {
 			return null;
 		}
-		 for(int i = 0; i < unit.getEntity().locations(); i++) {
-			 if(unit.isLocationBreached(i)) {
-				 return unit.getEntity().getLocationName(i) + " is breached.";
-			 }
-			 if(unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i) > 0
-					 && unit.isLocationDestroyed(i)) {
-				 return unit.getEntity().getLocationName(i) + " is destroyed.";
-			 }
-		 }
-		 return null;
+		for(int i = 0; i < unit.getEntity().locations(); i++) {
+			if(unit.isLocationBreached(i)) {
+				return unit.getEntity().getLocationName(i) + " is breached.";
+			}
+			if(unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i) > 0
+					&& unit.isLocationDestroyed(i)) {
+				return unit.getEntity().getLocationName(i) + " is destroyed.";
+			}
+		}
+		return null;
 	 }
 
 	@Override
