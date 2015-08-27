@@ -3539,7 +3539,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	}
 
 	public boolean isIntroducedBy(int year) {
-		return null != entity && entity.getYear() >= year;
+		return null != entity && entity.getYear() <= year;
 	}
 
 	public boolean isExtinctIn(int year) {
