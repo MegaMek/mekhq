@@ -3,6 +3,8 @@ VERSION HISTORY
 v0.3.18-dev (SVN)
 + Bug: units listed as not invented when they have been
 + Bug: ammo bins should not be loadable in warehouse
++ various improvements to ResolveScenarioTracker including tracking actual damage to total loss units
++ partial fix of Bug [#830], not yet working for manual resolution
 
 v0.3.17 (2015-08-26 21:30 UTC)
 + Bug: Ammo bins not reserving for refit if other ammo bins of same type in warehouse
