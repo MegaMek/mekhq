@@ -177,7 +177,7 @@
         <move file="${pkgdir}/${confdir}" tofile="${pkgdir}/${confdir}-OLD"/>
         <copy todir="${pkgdir}">
             <fileset dir="${mm-pkgdir}/megamek" >
-                <include name="{confdir}/" />
+                <include name="${confdir}/" />
             </fileset>
         </copy>
         <!-- ok now move some stuff back into mmconf that needs to be there-->
