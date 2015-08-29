@@ -323,12 +323,12 @@ public class ResolveScenarioTracker {
         }
 
 
-        Enumeration<Entity> wrecks = victoryEvent.getWreckedEntities();
+        Enumeration<Entity> wrecks = victoryEvent.getGraveyardEntities();
         while (wrecks.hasMoreElements()) {
         	Entity e = wrecks.nextElement();
 			checkForLostLimbs(e, control);
         	if(e.getOwnerId() == pid || e.getOwner().getTeam() == team) {
-        		if(!e.getExternalIdAsString().equals("-1") && e.isSalvage()) {
+        		if(!e.getExternalIdAsString().equals("-1")) {
         		    UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
                     if(null != status) {
                         status.assignFoundEntity(e, !control);
@@ -362,7 +362,7 @@ public class ResolveScenarioTracker {
         		} else {
         			killCredits.put(e.getDisplayName(), "None");
         		}
-        		if(e.isSalvage() && control && !(e instanceof EjectedCrew)) {
+        		if(control && !(e instanceof EjectedCrew)) {
         			TestUnit nu = generateNewTestUnit(e);
                     UnitStatus us = new UnitStatus(nu);
                     salvageStatus.put(nu.getId(), us);
@@ -841,13 +841,6 @@ public class ResolveScenarioTracker {
 						status.assignFoundEntity(e, true);
 					}
 			    } else {
-	                /*Entity killer = victoryEvent.getEntity(e.getKillerId());
-	                if(null != killer && killer.getOwnerId() == pid) {
-	                    //the killer is one of your units, congrats!
-	                    killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
-	                } else {
-	                    killCredits.put(e.getDisplayName(), "None");
-	                }*/
 	                //why are we doing this, aren't they utterly destroyed?
 	                //Taharqa: I am commenting this out
 	                /*TestUnit nu = generateNewTestUnit(e);
@@ -877,14 +870,7 @@ public class ResolveScenarioTracker {
 						}
 					}
 	        	} else {
-	        		/*Entity killer = victoryEvent.getEntity(e.getKillerId());
-	        		if(null != killer && killer.getOwnerId() == pid) {
-	        			//the killer is one of your units, congrats!
-	        			killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
-	        		} else {
-	        			killCredits.put(e.getDisplayName(), "None");
-	        		}*/
-	        		if(e.isSalvage() && control && !(e instanceof EjectedCrew)) {
+	        		if(control && !(e instanceof EjectedCrew)) {
 	        			TestUnit nu = generateNewTestUnit(e);
 	                    UnitStatus us = new UnitStatus(nu);
 	                    salvageStatus.put(nu.getId(), us);
