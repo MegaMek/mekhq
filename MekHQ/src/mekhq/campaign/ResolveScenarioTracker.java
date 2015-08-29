@@ -812,6 +812,8 @@ public class ResolveScenarioTracker {
 				MekHQ.logMessage(parser.getWarningMessage());
 			}
 			
+			killCredits = parser.getKills();
+			
 			for (Entity e : parser.getSurvivors()) {
 				checkForLostLimbs(e, control);
 				if(!e.getExternalIdAsString().equals("-1")) {
