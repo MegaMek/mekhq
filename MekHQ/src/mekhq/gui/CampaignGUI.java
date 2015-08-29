@@ -5894,7 +5894,7 @@ public class CampaignGUI extends JPanel {
         ResolveScenarioTracker tracker = new ResolveScenarioTracker(scenario,
                 getCampaign(), control);
         ChooseMulFilesDialog chooseFilesDialog = new ChooseMulFilesDialog(
-                getFrame(), true, tracker, control);
+                getFrame(), true, tracker);
         chooseFilesDialog.setVisible(true);
         if (chooseFilesDialog.wasCancelled()) {
             return;

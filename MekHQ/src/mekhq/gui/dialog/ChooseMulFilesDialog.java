@@ -50,11 +50,10 @@ public class ChooseMulFilesDialog extends javax.swing.JDialog {
     private boolean cancelled;
 	
     /** Creates new form NewTeamDialog */
-    public ChooseMulFilesDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t, boolean ctrl) {
+    public ChooseMulFilesDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
         super(parent, modal);
         this.tracker = t;
         cancelled = false;
-        control = ctrl;
         initComponents();
         setLocationRelativeTo(parent);
     }
@@ -130,37 +129,6 @@ public class ChooseMulFilesDialog extends javax.swing.JDialog {
     	 gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
     	 getContentPane().add(txtUnitFile, gridBagConstraints);
 	        
-    	 btnSalvageFile.setText(resourceMap.getString("btnSalvageFile.text")); // NOI18N
-    	 btnSalvageFile.setName("btnSalvageFile"); // NOI18N
-    	 btnSalvageFile.addActionListener(new java.awt.event.ActionListener() {
-    		 public void actionPerformed(java.awt.event.ActionEvent evt) {
-    			 tracker.findSalvageFile();
-    			 txtSalvageFile.setText(tracker.getSalvageFilePath());
-    		 }
-    	 });
-    	 gridBagConstraints = new java.awt.GridBagConstraints();
-    	 gridBagConstraints.gridx = 0;
-    	 gridBagConstraints.gridy = 2;
-    	 gridBagConstraints.gridwidth = 1;
-    	 gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-    	 gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-    	 gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-    	 getContentPane().add(btnSalvageFile, gridBagConstraints);
-	        
-    	 txtSalvageFile.setText(tracker.getSalvageFilePath());
-    	 txtSalvageFile.setName("txtSalvageFile");
-    	 txtSalvageFile.setEditable(false);
-    	 txtSalvageFile.setOpaque(false);
-    	 gridBagConstraints = new java.awt.GridBagConstraints();
-    	 gridBagConstraints.gridx = 1;
-    	 gridBagConstraints.gridy = 2;
-    	 gridBagConstraints.gridwidth = 1;
-    	 gridBagConstraints.weightx = 1.0;
-    	 gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-    	 gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-    	 gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-    	 getContentPane().add(txtSalvageFile, gridBagConstraints);
-	   
     	 panButtons.setName("panButtons");
     	 panButtons.setLayout(new GridBagLayout());
 	        
@@ -198,7 +166,7 @@ public class ChooseMulFilesDialog extends javax.swing.JDialog {
 	
     	 gridBagConstraints = new java.awt.GridBagConstraints();
     	 gridBagConstraints.gridx = 0;
-    	 gridBagConstraints.gridy = 3;
+    	 gridBagConstraints.gridy = 2;
     	 gridBagConstraints.gridwidth = 2;
     	 gridBagConstraints.weightx = 1.0;
     	 gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -211,7 +179,7 @@ public class ChooseMulFilesDialog extends javax.swing.JDialog {
 
     
     private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
-    	tracker.processMulFiles(control);
+    	tracker.processMulFiles();
     	this.setVisible(false);
     }
 

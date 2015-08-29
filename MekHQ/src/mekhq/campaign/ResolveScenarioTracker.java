@@ -105,7 +105,6 @@ public class ResolveScenarioTracker {
 	Campaign campaign;
 	Scenario scenario;
 	JFileChooser unitList;
-	JFileChooser salvageList;
 	Client client;
 	Boolean control;
     private GameVictoryEvent victoryEvent;
@@ -126,10 +125,10 @@ public class ResolveScenarioTracker {
 		units = new ArrayList<Unit>();
 		potentialLoot = scenario.getLoot();
 		actualLoot = new ArrayList<Loot>();
-        peopleStatus = new Hashtable<UUID, PersonStatus>();
-        prisonerStatus = new Hashtable<UUID, PersonStatus>();
+		peopleStatus = new Hashtable<UUID, PersonStatus>();
+		prisonerStatus = new Hashtable<UUID, PersonStatus>();
 		killCredits = new Hashtable<String, String>();
-        ejections = new Hashtable<UUID, EjectedCrew>();
+		ejections = new Hashtable<UUID, EjectedCrew>();
 		for(UUID uid : scenario.getForces(campaign).getAllUnits()) {
 			Unit u = campaign.getUnit(uid);
 			if(null != u && null == u.checkDeployment()) {
@@ -156,23 +155,6 @@ public class ResolveScenarioTracker {
 			}
 		});
 
-		salvageList = new JFileChooser(".");
-		salvageList.setDialogTitle("Load Units");
-
-		salvageList.setFileFilter(new FileFilter() {
-			@Override
-			public boolean accept(File dir) {
-				if (dir.isDirectory()) {
-					return true;
-				}
-				return dir.getName().endsWith(".mul");
-			}
-
-			@Override
-			public String getDescription() {
-				return "MUL file";
-			}
-		});
 	}
 
 	public void findUnitFile() {
@@ -188,26 +170,13 @@ public class ResolveScenarioTracker {
 		}
 	}
 
-	public void findSalvageFile() {
-		salvageList.showOpenDialog(null);
-	}
-
-	public String getSalvageFilePath() {
-		File salvageFile = salvageList.getSelectedFile();
-		if(null == salvageFile) {
-			return "No file selected";
-		} else {
-			return salvageFile.getAbsolutePath();
-		}
-	}
-
 	public void setClient(Client c) {
 		client = c;
 	}
 
-	public void processMulFiles(boolean controlsField) {
+	public void processMulFiles() {
 		File unitFile = unitList.getSelectedFile();
-		File salvageFile = salvageList.getSelectedFile();
+		//File salvageFile = salvageList.getSelectedFile();
 		if(null != unitFile) {
 			try {
 				loadUnitsAndPilots(unitFile);
@@ -216,14 +185,14 @@ public class ResolveScenarioTracker {
 				e.printStackTrace();
 			}
 		}
-		if(null != salvageFile) {
+		/*if(null != salvageFile) {
 			try {
 				loadSalvage(salvageFile, controlsField);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
+		}*/
 		checkStatusOfPersonnel();
 	}
 
@@ -280,6 +249,9 @@ public class ResolveScenarioTracker {
 		                } else {
 		                    killCredits.put(e.getDisplayName(), "None");
 		                }
+					}
+					if(e instanceof EjectedCrew) {
+						continue;
 					}
 					TestUnit nu = generateNewTestUnit(e);
                     UnitStatus us = new UnitStatus(nu);
@@ -390,7 +362,7 @@ public class ResolveScenarioTracker {
         		} else {
         			killCredits.put(e.getDisplayName(), "None");
         		}
-        		if(e.isSalvage() && control) {
+        		if(e.isSalvage() && control && !(e instanceof EjectedCrew)) {
         			TestUnit nu = generateNewTestUnit(e);
                     UnitStatus us = new UnitStatus(nu);
                     salvageStatus.put(nu.getId(), us);
@@ -839,129 +811,91 @@ public class ResolveScenarioTracker {
 			if (parser.hasWarningMessage()) {
 				MekHQ.logMessage(parser.getWarningMessage());
 			}
-
-			// Add the units from the file.
-			for (Entity entity : parser.getEntities()) {
-				checkForLostLimbs(entity, control);
-				if(!entity.getExternalIdAsString().equals("-1")) {
-				    UnitStatus status = unitsStatus.get(UUID.fromString(entity.getExternalIdAsString()));
-                    if(null != status) {
-                        status.assignFoundEntity(entity, false);
-                    }
-				}
-			}
-
-			// add pilots
-			for (Crew pilot : parser.getPilots()) {
-				if(!pilot.getExternalIdAsString().equals("-1")) {
-					pilots.put(UUID.fromString(pilot.getExternalIdAsString()), pilot);
-				} else { // We can currently only add crews if we have an entity associated with them.
-					//newPilots.addAll(Utilities.generateRandomCrewWithCombinedSkill(e, campaign));
-				}
-			}
-		}
-	}
-
-	private void loadSalvage(File salvageFile, boolean controlsField) throws IOException {
-		if (salvageFile != null) {
-			// I need to get the parser myself, because I want to pull both
-			// entities and pilots from it
-			// Create an empty parser.
-			MULParser parser = new MULParser();
-
-			// Open up the file.
-			InputStream listStream = new FileInputStream(salvageFile);
-			// Read a Vector from the file.
-			try {
-				parser.parse(listStream);
-				listStream.close();
-			} catch (Exception excep) {
-				excep.printStackTrace(System.err);
-				// throw new IOException("Unable to read from: " +
-				// unitFile.getName());
-			}
-
-			// Was there any error in parsing?
-			if (parser.hasWarningMessage()) {
-				MekHQ.logMessage(parser.getWarningMessage());
-			}
-
-    			// Add the units from the file.
-			for (Entity entity : parser.getEntities()) {
-				checkForLostLimbs(entity, control);
-				//some of the players units may be in the salvage pile, so
-				//lets check for these first
-				if(!entity.getExternalIdAsString().equals("-1") && foundMatch(entity, units)) {
-					UnitStatus status = unitsStatus.get(UUID.fromString(entity.getExternalIdAsString()));
+			
+			for (Entity e : parser.getSurvivors()) {
+				checkForLostLimbs(e, control);
+				if(!e.getExternalIdAsString().equals("-1")) {
+					UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
 					if(null != status) {
-						status.assignFoundEntity(entity, !controlsField);
+						boolean lost = (!e.canEscape() && !control) || e.getRemovalCondition() == IEntityRemovalConditions.REMOVE_DEVASTATED;
+						status.assignFoundEntity(e, lost);						
 					}
-				} else if(controlsField) {
-					TestUnit nu = generateNewTestUnit(entity);
-					UnitStatus us = new UnitStatus(nu);
-					salvageStatus.put(nu.getId(), us);
-					potentialSalvage.add(nu);
-					ArrayList<Person> crewMembers = Utilities.generateRandomCrewWithCombinedSkill(nu, campaign, false, true);
-					if (null != crewMembers) {
-						newPilots.addAll(crewMembers);
+				}
+				if(null != e.getCrew()) {
+					if(!e.getCrew().getExternalIdAsString().equals("-1")) {
+						pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
+					}
+					if(e instanceof EjectedCrew) {
+						ejections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
 					}
 				}
 			}
-
-			//look for pilots. There are a couple of things to keep in mind here.
-			//First, we should be able to safely add all pilots without checking for
-			//a match, because even if the other side has UUIDs, the likelihood of a duplicate
-			//is tiny. Nonetheless, it might be good to add this in the future.
-			//Second, its possible to have duplicate pilots if a pilot ejected and then
-			//was killed later. We don't want the unhurt pilot to trump the hurt pilot,
-			//so only replace if the hits are greater.
-			//TODO: we need another way of handling this for multi-crewed units
-			for(Crew crew : parser.getPilots()) {
-				if(!crew.getExternalIdAsString().equals("-1")) {
-					Crew existingPilot = pilots.get(UUID.fromString(crew.getExternalIdAsString()));
-					if(null == existingPilot) {
-						 existingPilot = mia.get(UUID.fromString(crew.getExternalIdAsString()));
+			
+			// Utterly destroyed entities
+			for (Entity e : parser.getDevastated()) {
+				if(!e.getExternalIdAsString().equals("-1")) {
+					UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
+					if(null != status) {
+						status.assignFoundEntity(e, true);
 					}
-					if(null != existingPilot && existingPilot.getHits() >= crew.getHits()) {
-						continue;
+			    } else {
+	                /*Entity killer = victoryEvent.getEntity(e.getKillerId());
+	                if(null != killer && killer.getOwnerId() == pid) {
+	                    //the killer is one of your units, congrats!
+	                    killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
+	                } else {
+	                    killCredits.put(e.getDisplayName(), "None");
+	                }*/
+	                //why are we doing this, aren't they utterly destroyed?
+	                //Taharqa: I am commenting this out
+	                /*TestUnit nu = generateNewTestUnit(e);
+	                UnitStatus us = new UnitStatus(nu);
+	                salvageStatus.put(nu.getId(), us);
+	                potentialSalvage.add(nu);*/
+			    }
+			}
+			
+	        for(Entity e : parser.getSalvage()) {
+				checkForLostLimbs(e, control);
+				if(!e.getExternalIdAsString().equals("-1") && e.isSalvage()) {
+					UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
+					if(null != status) {
+						status.assignFoundEntity(e, !control);	
+					} 
+					if(null != e.getCrew()) {
+						if(!e.getCrew().getExternalIdAsString().equals("-1")) {
+							if(e instanceof EjectedCrew) {
+								ejections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
+							}
+							if(control) {
+								pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
+							} else {
+								mia.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
+							}
+						}
 					}
-					if(!controlsField) {
-						mia.put(UUID.fromString(crew.getExternalIdAsString()), crew);
-					} else {
-						pilots.put(UUID.fromString(crew.getExternalIdAsString()), crew);
-					}
-				}
-			    //FIXME: if we should never get to the !found part, then this script is not actually doing anything, remove?
-			    /*if(crew.getExternalIdAsString().equals("-1")) {
-			    	MechWarrior mw = new MechWarrior(crew, campaign.getPlayer(), campaign.getGame());
-			    	boolean found = false;
-			    	for (Unit u : potentialSalvage) {
-			    		if (u.getEntity().getCrew().getName().equals(crew.getName())) {
-			    			found = true;
-			    			break;
-			    		}
-			    	}
-			    	if (!found) {
-			    	    // In theory we should no longer EVER  reach here with the changes in this commit, but just in case...
-			    		ArrayList<Person> crewMembers = Utilities.generateRandomCrewWithCombinedSkill(mw, campaign);
+	        	} else {
+	        		/*Entity killer = victoryEvent.getEntity(e.getKillerId());
+	        		if(null != killer && killer.getOwnerId() == pid) {
+	        			//the killer is one of your units, congrats!
+	        			killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
+	        		} else {
+	        			killCredits.put(e.getDisplayName(), "None");
+	        		}*/
+	        		if(e.isSalvage() && control && !(e instanceof EjectedCrew)) {
+	        			TestUnit nu = generateNewTestUnit(e);
+	                    UnitStatus us = new UnitStatus(nu);
+	                    salvageStatus.put(nu.getId(), us);
+	                    potentialSalvage.add(nu);
+	                    ArrayList<Person> crewMembers = Utilities.generateRandomCrewWithCombinedSkill(nu, campaign, false, true);
 	                    if (null != crewMembers) {
 	                        newPilots.addAll(crewMembers);
 	                    }
-			    	}
-			        continue;
-			    }*/
-			    
-			}
+	        		}
+	        	}
+	        }
+	        checkStatusOfPersonnel();			
 		}
-	}
-
-	private boolean foundMatch(Entity en, ArrayList<Unit> units) {
-		for(Unit u : units) {
-			if(u.getId().equals(UUID.fromString(en.getExternalIdAsString()))) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	public ArrayList<TestUnit> getAlliedUnits() {
