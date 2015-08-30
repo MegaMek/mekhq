@@ -10,6 +10,7 @@ v0.3.18-dev (SVN)
 + process kills from manual resolve
 + Bug: some items on ResolveScenarioWizardDialog are not laying out correctly
 + Bug: contracts not being checked for duplicate names
++ Bug: NPE when trying to assign prisoners for BA
 
 v0.3.17 (2015-08-26 21:30 UTC)
 + Bug: Ammo bins not reserving for refit if other ammo bins of same type in warehouse
