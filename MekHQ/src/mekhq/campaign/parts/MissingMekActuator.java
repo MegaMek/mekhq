@@ -148,6 +148,9 @@ public class MissingMekActuator extends MissingPart {
 	
 	@Override
 	public String checkFixable() {
+		if(null == unit) {
+			 return null;
+		}
 		if(unit.isLocationBreached(location)) {
 			return unit.getEntity().getLocationName(location) + " is breached.";
 		}

@@ -275,6 +275,9 @@ public class MissingMekLocation extends MissingPart {
 
 	@Override
 	public String checkFixable() {
+		if(null == unit) {
+			return null;
+		}
 		if (unit.getEntity() instanceof Mech) {
 			// cant replace appendages when corresponding torso is gone
 			if (loc == Mech.LOC_LARM

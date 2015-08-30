@@ -226,6 +226,9 @@ public class ProtomekJumpJet extends Part {
 
     @Override
     public String checkFixable() {
+    	if(null == unit) {
+    		return null;
+    	}
         if(isSalvaging()) {
             return null;
         }

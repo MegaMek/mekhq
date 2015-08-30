@@ -50,6 +50,7 @@ import javax.swing.event.ChangeListener;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.gui.JSuggestField;
@@ -891,6 +892,17 @@ public class NewContractDialog extends javax.swing.JDialog {
         if (!btnOK.equals(evt.getSource())) {
             return;
         }
+        
+        String chosenName = txtName.getText();
+    	for(Mission m : campaign.getMissions()) {
+    		if(m.getName().equals(chosenName)) {
+    			JOptionPane.showMessageDialog(frame,
+    				    "There is already a mission with the name " + chosenName,
+    				    "Duplicate Mission Name",
+    				    JOptionPane.ERROR_MESSAGE);
+    			return;
+    		}
+    	}
 
     	contract.setName(txtName.getText());
     	//contract.setPlanetName(suggestPlanet.getText());

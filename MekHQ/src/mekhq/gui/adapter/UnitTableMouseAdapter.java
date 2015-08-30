@@ -376,6 +376,16 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             gui.refreshOrganization();
             gui.refreshPartsList();
             gui.refreshOverview();
+        } else if (command.contains("REFIT_GM_COMPLETE")) {
+            if (selectedUnit.isRefitting()) {
+                gui.getCampaign().addReport(selectedUnit.getRefit().succeed());
+            }
+            gui.refreshServicedUnitList();
+            gui.refreshUnitList();
+            gui.refreshForceView();
+            gui.refreshOrganization();
+            gui.refreshPartsList();
+            gui.refreshOverview();
         } else if (command.contains("REFIT_KIT")) {
             ChooseRefitDialog crd = new ChooseRefitDialog(gui.getFrame(), true,
                     gui.getCampaign(), selectedUnit, gui);
@@ -613,7 +623,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                             .getEntity(), curType, gui.getCampaign()
                             .getCampaignOptions().getTechLevel())) {
                         cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
-                        if (atype.equals(curType) 
+                        if (atype.equals(curType)
                         		&& atype.getMunitionType() == curType.getMunitionType()) {
                             cbMenuItem.setSelected(true);
                         } else {
@@ -773,6 +783,11 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     menuItem.setActionCommand("CANCEL_CUSTOMIZE");
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
+                    menu.add(menuItem);
+                    menuItem = new JMenuItem("Complete Refit (GM)");
+                    menuItem.setActionCommand("REFIT_GM_COMPLETE");
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(gui.getCampaign().isGM() && unit.isRefitting());
                     menu.add(menuItem);
                 }
                 menu.setEnabled(unit.isAvailable(true) && unit.isRepairable());

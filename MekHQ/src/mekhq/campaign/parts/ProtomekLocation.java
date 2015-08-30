@@ -489,6 +489,9 @@ public class ProtomekLocation extends Part {
 
     @Override
     public String checkFixable() {
+    	if(null == unit) {
+    		return null;
+    	}
         if(isSalvaging()) {
             //check for armor
             if(unit.getEntity().getArmorForReal(loc, false) > 0

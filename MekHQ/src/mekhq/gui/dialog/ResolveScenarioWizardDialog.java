@@ -240,8 +240,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtInstructions.setBorder(BorderFactory.createCompoundBorder(
 	   			 BorderFactory.createTitledBorder(resourceMap.getString("txtInstructions.title")),
 	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
-        txtInstructions.setMinimumSize(new Dimension(590,100));
-        txtInstructions.setPreferredSize(new Dimension(590,100));
+        txtInstructions.setMinimumSize(new Dimension(590,120));
+        txtInstructions.setPreferredSize(new Dimension(590,120));
         getContentPane().add(txtInstructions, BorderLayout.PAGE_START);
 
         /*
@@ -465,6 +465,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.gridx = 1;
             pnlPilotStatus.add(hitSlider, gridBagConstraints);
             gridBagConstraints.gridx = 2;
+            gridBagConstraints.weightx = 1.0;
             pnlPilotStatus.add(miaCheck, gridBagConstraints);
             i++;
         }
@@ -649,7 +650,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 0;
-            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.gridwidth = 4;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -708,7 +709,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 0.0;
             if(j == tracker.getPotentialSalvage().size()) {
             	gridBagConstraints.weighty = 1.0;
@@ -738,15 +738,16 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         pnlKills.add(new JLabel(resourceMap.getString("kill")), gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        gridBagConstraints.weightx = 1.0;
         pnlKills.add(new JLabel(resourceMap.getString("claim")), gridBagConstraints);
 
         i = 2;
@@ -1177,8 +1178,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtInstructions.setBorder(BorderFactory.createCompoundBorder(
 	   			 BorderFactory.createTitledBorder(resourceMap.getString("txtInstructions.title")),
 	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
-        txtInstructions.setMinimumSize(new Dimension(590,100));
-        txtInstructions.setPreferredSize(new Dimension(590,100));
+        txtInstructions.setMinimumSize(new Dimension(590,150));
+        txtInstructions.setPreferredSize(new Dimension(590,150));
         getContentPane().add(txtInstructions, BorderLayout.PAGE_START);
     }
 

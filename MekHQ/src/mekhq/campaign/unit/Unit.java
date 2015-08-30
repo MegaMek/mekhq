@@ -2831,7 +2831,13 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     }
 
     public boolean usesSoloPilot() {
-    	return Compute.getFullCrewSize(entity) == 1;
+    	//return Compute.getFullCrewSize(entity) == 1;
+    	//Taharqa: I dont think we should do it based on computed size, but whether the unit logically
+    	//is the type of unit that has only one pilot. This is partly because there may be some vees 
+    	//that only have one pilot and this is also a problem for BA units with only one active suit
+    	return (entity instanceof Mech) 
+    			|| (entity instanceof Protomech) 
+    			|| (entity instanceof Aero && !(entity instanceof SmallCraft) && !(entity instanceof Jumpship));
     }
 
     public boolean usesSoldiers() {
@@ -3539,7 +3545,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	}
 
 	public boolean isIntroducedBy(int year) {
-		return null != entity && entity.getYear() >= year;
+		return null != entity && entity.getYear() <= year;
 	}
 
 	public boolean isExtinctIn(int year) {

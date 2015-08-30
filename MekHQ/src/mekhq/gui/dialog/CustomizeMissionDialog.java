@@ -209,7 +209,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
     	for(Mission m : campaign.getMissions()) {
     		if(m.getName().equals(chosenName)) {
     			JOptionPane.showMessageDialog(frame,
-    				    "There is already a missiong with the name " + chosenName,
+    				    "There is already a mission with the name " + chosenName,
     				    "Duplicate Mission Name",
     				    JOptionPane.ERROR_MESSAGE);
     			return;

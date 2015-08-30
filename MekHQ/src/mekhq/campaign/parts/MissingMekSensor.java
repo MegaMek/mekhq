@@ -83,6 +83,9 @@ public class MissingMekSensor extends MissingPart {
 	
 	@Override
     public String checkFixable() {
+		if(null == unit) {
+			return null;
+		}
         for(int i = 0; i < unit.getEntity().locations(); i++) {
         	if(unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i) > 0) {
             	if(unit.isLocationBreached(i)) {

@@ -164,6 +164,9 @@ public class MissingMekCockpit extends MissingPart {
 
     @Override
     public String checkFixable() {
+    	if(null == unit) {
+    		return null;
+    	}
         for(int i = 0; i < unit.getEntity().locations(); i++) {
         	if(unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT, i) > 0) {
             	if(unit.isLocationBreached(i)) {

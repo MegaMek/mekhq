@@ -618,7 +618,8 @@ public class Utilities {
     			p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(), 0);
     			p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
     		}
-    		else if(unit.getEntity() instanceof Tank) {
+    		else {
+    			//assume tanker if we got here
     			p = c.newPerson(Person.T_GVEE_DRIVER);
     			p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(), 0);
     			p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
@@ -648,7 +649,8 @@ public class Utilities {
 	    			p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(), 0);
 	    			p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
 	    		}
-	    		else if(unit.getEntity() instanceof Tank) {
+	    		else {
+	    			//assume tanker if we got here
 	    			p = c.newPerson(Person.T_GVEE_DRIVER);
 	    			p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(), 0);
 	    			p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
@@ -693,15 +695,16 @@ public class Utilities {
 			// Generate gunners for multi-crew vehicles
 	    	while(gunners.size() < unit.getTotalGunnerNeeds()) {
 	    		Person p = null;
-	    		if (unit.getEntity() instanceof Tank) {
-	    			p = c.newPerson(Person.T_VEE_GUNNER);
-	    			p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery()), 0);
-	    			totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
-	    		} else if (unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
+	    		if (unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
 	    			p = c.newPerson(Person.T_SPACE_GUNNER);
 	    			p.addSkill(SkillType.S_GUN_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_SPACE).getTarget() - oldCrew.getGunnery()), 0);
 	    			totalGunnery += p.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue();
-	    		}
+	    		} else {
+	    			//assume tanker if we got here
+	    			p = c.newPerson(Person.T_VEE_GUNNER);
+	    			p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery()), 0);
+	    			totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
+	    		} 
 	    		gunners.add(p);
 	    	}
 

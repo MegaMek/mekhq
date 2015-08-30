@@ -222,7 +222,9 @@ public class MissingProtomekLocation extends MissingPart {
 
     @Override
     public String checkFixable() {
-
+    	if(null == unit) {
+			 return null;
+		 }
         //there must be no usable equipment currently in the location
         //you can only salvage a location that has nothing left on it
         for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {

@@ -494,6 +494,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		if(!isSalvaging() && getAmountAvailable() == 0) {
 			return "No ammo of this type is available";
 		}
+		if(null == unit) {
+			return "Ammo bins can only be loaded when installed on units";
+		}
         return null;
     }
 
