@@ -1,5 +1,7 @@
 VERSION HISTORY
 ----------------------------------
+v0.3.19 (git)
+
 v0.3.18 (2015-09-01 12:10 UTC)
 + Bug: units listed as not invented when they have been
 + Bug: ammo bins should not be loadable in warehouse
