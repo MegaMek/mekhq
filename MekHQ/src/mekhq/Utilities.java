@@ -220,7 +220,7 @@ public class Utilities {
         }
         return choice;
     }
-	
+
 	public static File[] getAllFiles(String dir, FilenameFilter filter) {
 		File fl = new File(dir);
         File[] files = fl.listFiles(filter);
@@ -704,7 +704,7 @@ public class Utilities {
 	    			p = c.newPerson(Person.T_VEE_GUNNER);
 	    			p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery()), 0);
 	    			totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
-	    		} 
+	    		}
 	    		gunners.add(p);
 	    	}
 
@@ -753,7 +753,7 @@ public class Utilities {
                 p.setName(commanderName);
                 nameset = true;
             }
-			if (!c.recruitPerson(p, log)) {
+			if (!c.recruitPerson(p, log, nopay)) {
 				return null;
 			}
 			if(unit.usesSoloPilot() || unit.usesSoldiers()) {
@@ -769,7 +769,7 @@ public class Utilities {
                 p.setName(commanderName);
                 nameset = true;
             }
-			if (!c.recruitPerson(p, log)) {
+			if (!c.recruitPerson(p, log, nopay)) {
 				return null;
 			}
 			if (!(unit.usesSoloPilot() || unit.usesSoldiers()) && unit.canTakeMoreGunners()) {
@@ -783,7 +783,7 @@ public class Utilities {
                 p.setName(commanderName);
                 nameset = true;
             }
-			if (!c.recruitPerson(p, log)) {
+			if (!c.recruitPerson(p, log, nopay)) {
 				return null;
 			}
 			if (!(unit.usesSoloPilot() || unit.usesSoldiers()) && unit.canTakeMoreVesselCrew()) {
@@ -797,7 +797,7 @@ public class Utilities {
                 navigator.setName(commanderName);
                 nameset = true;
             }
-			if (!c.recruitPerson(navigator, log)) {
+			if (!c.recruitPerson(navigator, log, nopay)) {
 				return null;
 			}
 			unit.setNavigator(navigator);
@@ -978,7 +978,7 @@ public class Utilities {
             EquipmentPart ep = ((EquipmentPart) part);
             Mounted m = unit.getEntity().getEquipment(ep.getEquipmentNum());
             //Taharqa: I am not sure what was supposed to go in here, but it doesn't actually
-            //do anything at this point and it is producing an NPE on some refits, so I am 
+            //do anything at this point and it is producing an NPE on some refits, so I am
             //commenting it out
             //if (m.getType().getInternalName().equals(ep.getType().getInternalName())) {
 
@@ -1237,11 +1237,11 @@ public class Utilities {
 
         return arabic-1;
     }
-    
+
     public static Map<String, Integer> sortMapByValue(Map<String, Integer> unsortMap, boolean highFirst) {
 
 		// Convert Map to List
-		List<Map.Entry<String, Integer>> list = 
+		List<Map.Entry<String, Integer>> list =
 			new LinkedList<Map.Entry<String, Integer>>(unsortMap.entrySet());
 
 		// Sort list with comparator, to compare the Map values
@@ -1266,8 +1266,8 @@ public class Utilities {
 				sortedMap.put(entry.getKey(), entry.getValue());
 			}
 		}
-		
+
 		return sortedMap;
 	}
-    
+
 }
