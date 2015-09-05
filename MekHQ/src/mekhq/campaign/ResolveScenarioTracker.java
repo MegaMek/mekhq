@@ -631,25 +631,21 @@ public class ResolveScenarioTracker {
             }
             for(Person p : crew) {
                 status = new PersonStatus(p.getFullName(), u.getEntity().getDisplayName(), p.getHits(), p.getId());
-                if(null != ustatus && ustatus.isTotalLoss()) {
-                	status.setMissing(true);
+                if(null != ustatus && null != en) {
+                	//I dont think this should happen for prisoners, but if it does
+                	//then skip
+                	continue;
                 }
-                if(u.usesSoloPilot()) {
-                    Crew pilot = null;
-                    if (null != u.getEntity()) {
-                        pilot = u.getEntity().getCrew();
-                    }
-                    if(null == pilot) {
-                        Crew missingPilot = mia.get(p.getId());
-                        if (missingPilot != null) {
-                            status.setHits(missingPilot.getHits());
-                        }
-                        status.setMissing(true);
-                    } else {
-                        status.setHits(pilot.getHits());
-                    }
-                    if (pickedUpPilots.contains(u.getEntity().getId())
-                            || (null != pilot && pilot.isUnconscious())
+                if(en instanceof Mech 
+                		|| en instanceof Protomech 
+                		|| (en instanceof Aero && !(en instanceof SmallCraft || en instanceof Jumpship))) {
+                	Crew pilot = en.getCrew();
+                	if(null == pilot) {
+                		continue;
+                	}
+                	status.setHits(pilot.getHits());
+                	if (pickedUpPilots.contains(u.getEntity().getId())
+                            || (pilot.isUnconscious())
                             || u.getEntity().isStalled()
                             || u.getEntity().isStuck()
                             || u.getEntity().isShutDown()) {
@@ -835,12 +831,13 @@ public class ResolveScenarioTracker {
 			
 			// Utterly destroyed entities
 			for (Entity e : parser.getDevastated()) {
+				UnitStatus status = null;
 				if(!e.getExternalIdAsString().equals("-1")) {
-					UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
-					if(null != status) {
-						status.assignFoundEntity(e, true);
-					}
-			    } else {
+					status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
+				}
+				if(null != status) {
+					status.assignFoundEntity(e, true);
+				} else {
 	                //why are we doing this, aren't they utterly destroyed?
 	                //Taharqa: I am commenting this out
 	                /*TestUnit nu = generateNewTestUnit(e);
@@ -852,11 +849,12 @@ public class ResolveScenarioTracker {
 			
 	        for(Entity e : parser.getSalvage()) {
 				checkForLostLimbs(e, control);
+				UnitStatus status = null;
 				if(!e.getExternalIdAsString().equals("-1") && e.isSalvage()) {
-					UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
-					if(null != status) {
-						status.assignFoundEntity(e, !control);	
-					} 
+					status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
+				}
+				if(null != status) {
+					status.assignFoundEntity(e, !control);	
 					if(null != e.getCrew()) {
 						if(!e.getCrew().getExternalIdAsString().equals("-1")) {
 							if(e instanceof EjectedCrew) {

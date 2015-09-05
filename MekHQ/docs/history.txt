@@ -3,6 +3,7 @@ VERSION HISTORY
 v0.3.19 (git)
 + Bug [#922]: Location of Jump Jets is not shown in repair tab
 + Bug [#908]: Pay for Recruitment Pays for All Enemy Pilots
++ Bug: enemy salvage not identified via manual resolution when it has a UUID
 
 v0.3.18 (2015-09-01 12:10 UTC)
 + Bug: units listed as not invented when they have been
