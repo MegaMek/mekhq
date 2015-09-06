@@ -144,8 +144,14 @@
         </copy>
         <!-- grab the megameklab misc images -->
         <copy todir="${pkgdir}/${datadir}/images/misc">
-            <fileset dir="${mm-pkgdir}/megamek/${datadir}/images/misc">
+            <fileset dir="${mml-pkgdir}/${datadir}/images/misc">
                 <include name="megameklab.png" />
+            </fileset>
+        </copy>
+        <!-- grab the megameklab recordsheets files -->
+        <copy todir="${pkgdir}/${datadir}/images/misc">
+            <fileset dir="${mml-pkgdir}/${datadir}/images">
+                <include name="recordsheets/" />
             </fileset>
         </copy>
         <!-- ok now move some stuff back into data that needs to be there-->

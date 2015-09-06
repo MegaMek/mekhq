@@ -163,6 +163,12 @@
             <fileset dir="${mmldir}/${datadir}/images/misc" >
             </fileset>
         </copy>
+        <!-- grab the megameklab recordsheet files -->
+        <copy todir="${localdir}/${datadir}/images">
+            <fileset dir="${mmldir}/${datadir}/images" >
+                <include name="recordsheets/" />
+            </fileset>
+        </copy>
         <delete dir="${localdir}/${datadir}-OLD" />
         <!--now we need to replace our mmconf with the latest from the MM svn
             but first we need to back it up because we will need to keep a few
