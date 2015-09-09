@@ -363,214 +363,10 @@ public class Utilities {
 
 		return false;
     }
-
-    // TODO: There is a lot of code duplication between these 2 methods.
-    // Time to split out the duplicated code and have both of these methods reference it.
-	public static ArrayList<Person> generateRandomCrewWithCombinedSkill(Entity e, Campaign c) {
-		ArrayList<Person> newCrew = new ArrayList<Person>();
-		Unit unit = new Unit(e, c);
-		Crew oldCrew = unit.getEntity().getCrew();
-		String commanderName = oldCrew.getName();
-		int averageGunnery = 0;
-		int averagePiloting = 0;
-		ArrayList<Person> drivers = new ArrayList<Person>();
-		ArrayList<Person> gunners = new ArrayList<Person>();
-		ArrayList<Person> vesselCrew = new ArrayList<Person>();
-		Person navigator = null;
-		int totalGunnery = 0;
-		int totalPiloting = 0;
-		drivers.clear();
-		gunners.clear();
-		vesselCrew.clear();
-		navigator = null;
-
-		// If the entire crew is dead, we don't want to generate them.
-		if (isDeadCrew(e)) {
-			return newCrew;
-		}
-
-		// Generate solo crews
-		if (unit.usesSoloPilot()) {
-			Person p = null;
-			if(unit.getEntity() instanceof Mech) {
-    			p = c.newPerson(Person.T_MECHWARRIOR);
-    			p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(), 0);
-    			p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget() - oldCrew.getGunnery(), 0);
-    		}
-    		else if(unit.getEntity() instanceof Aero) {
-    			p = c.newPerson(Person.T_AERO_PILOT);
-    			p.addSkill(SkillType.S_PILOT_AERO, SkillType.getType(SkillType.S_PILOT_AERO).getTarget() - oldCrew.getPiloting(), 0);
-    			p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget() - oldCrew.getGunnery(), 0);
-    		}
-    		else if(unit.getEntity() instanceof ConvFighter) {
-    			p = c.newPerson(Person.T_CONV_PILOT);
-    			p.addSkill(SkillType.S_PILOT_JET, SkillType.getType(SkillType.S_PILOT_JET).getTarget() - oldCrew.getPiloting(), 0);
-    			p.addSkill(SkillType.S_GUN_JET, SkillType.getType(SkillType.S_GUN_JET).getTarget() - oldCrew.getPiloting(), 0);
-    		}
-    		else if(unit.getEntity() instanceof Protomech) {
-    			p = c.newPerson(Person.T_PROTO_PILOT);
-    			//p.addSkill(SkillType.S_PILOT_PROTO, SkillType.getType(SkillType.S_PILOT_PROTO).getTarget() - oldCrew.getPiloting(), 0);
-    			p.addSkill(SkillType.S_GUN_PROTO, SkillType.getType(SkillType.S_GUN_PROTO).getTarget() - oldCrew.getGunnery(), 0);
-    		}
-    		else if(unit.getEntity() instanceof VTOL) {
-    			p = c.newPerson(Person.T_VTOL_PILOT);
-    			p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(), 0);
-    			p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
-    		}
-    		else if(unit.getEntity() instanceof Tank) {
-    			p = c.newPerson(Person.T_GVEE_DRIVER);
-    			p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(), 0);
-    			p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
-    		}
-			p.setHits(e.getCrew().getHits());
-			drivers.add(p);
-		} else {
-			// Generate drivers for multi-crewed vehicles.
-			while(drivers.size() < unit.getTotalDriverNeeds()) {
-	    		Person p = null;
-	    		if(unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
-	    			p = c.newPerson(Person.T_SPACE_PILOT);
-	    			p.addSkill(SkillType.S_PILOT_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_PILOT_SPACE).getTarget() - oldCrew.getPiloting()), 0);
-	    			totalPiloting += p.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue();
-	    		}
-	    		else if(unit.getEntity() instanceof BattleArmor) {
-	    			p = c.newPerson(Person.T_BA);
-	    			p.addSkill(SkillType.S_GUN_BA, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_BA).getTarget() - oldCrew.getGunnery()), 0);
-	    			totalGunnery += p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue();
-	    		}
-	    		else if(unit.getEntity() instanceof Infantry) {
-	    			p = c.newPerson(Person.T_INFANTRY);
-	    			p.addSkill(SkillType.S_SMALL_ARMS, randomSkillFromTarget(SkillType.getType(SkillType.S_SMALL_ARMS).getTarget() - oldCrew.getGunnery()), 0);
-	    			totalGunnery += p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue();
-	    		}
-	    		else if(unit.getEntity() instanceof VTOL) {
-	    			p = c.newPerson(Person.T_VTOL_PILOT);
-	    			p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(), 0);
-	    		}
-	    		else if(unit.getEntity() instanceof Tank) {
-	    			p = c.newPerson(Person.T_GVEE_DRIVER);
-	    			p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(), 0);
-	    		}
-	    		drivers.add(p);
-	    	}
-
-			// Regenerate as needed to balance
-			if (drivers.size() != 0) {
-				averageGunnery = (int)Math.round(((double)totalGunnery)/drivers.size());
-				averagePiloting = (int)Math.round(((double)totalPiloting)/drivers.size());
-				if (unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
-					while (averagePiloting != oldCrew.getPiloting()) {
-						totalPiloting = 0;
-						for (Person p : drivers) {
-							p.addSkill(SkillType.S_PILOT_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_PILOT_SPACE).getTarget() - oldCrew.getPiloting()), 0);
-							totalPiloting += p.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue();
-						}
-						averagePiloting = (int)Math.round(((double)totalPiloting)/drivers.size());
-					}
-				} else if (unit.getEntity() instanceof BattleArmor) {
-					while (averageGunnery != oldCrew.getGunnery()) {
-						totalGunnery = 0;
-						for (Person p : drivers) {
-							p.addSkill(SkillType.S_GUN_BA, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_BA).getTarget() - oldCrew.getGunnery()), 0);
-							totalGunnery += p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue();
-						}
-						averageGunnery = (int)Math.round(((double)totalGunnery)/drivers.size());
-					}
-				} else if (unit.getEntity() instanceof Infantry) {
-					while (averageGunnery != oldCrew.getGunnery()) {
-						totalGunnery = 0;
-						for (Person p : drivers) {
-							p.addSkill(SkillType.S_SMALL_ARMS, randomSkillFromTarget(SkillType.getType(SkillType.S_SMALL_ARMS).getTarget() - oldCrew.getGunnery()), 0);
-							totalGunnery += p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue();
-						}
-						averageGunnery = (int)Math.round(((double)totalGunnery)/drivers.size());
-					}
-				}
-			}
-
-			// Generate gunners for multi-crew vehicles
-	    	while(gunners.size() < unit.getTotalGunnerNeeds()) {
-	    		Person p = null;
-	    		if (unit.getEntity() instanceof Tank) {
-	    			p = c.newPerson(Person.T_VEE_GUNNER);
-	    			p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery()), 0);
-	    			totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
-	    		} else if (unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
-	    			p = c.newPerson(Person.T_SPACE_GUNNER);
-	    			p.addSkill(SkillType.S_GUN_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_SPACE).getTarget() - oldCrew.getGunnery()), 0);
-	    			totalGunnery += p.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue();
-	    		}
-	    		gunners.add(p);
-	    	}
-
-	    	// Regenerate gunners as needed to balance
-	    	if (gunners.size() != 0) {
-	    		averageGunnery = (int)Math.round(((double)totalGunnery)/gunners.size());
-	    		if (unit.getEntity() instanceof Tank) {
-					while (averageGunnery != oldCrew.getGunnery()) {
-						totalGunnery = 0;
-						for (Person p : gunners) {
-							p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery()), 0);
-							totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
-						}
-						averageGunnery = (int)Math.round(((double)totalGunnery)/gunners.size());
-					}
-	    		} else if (unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
-					while (averageGunnery != oldCrew.getGunnery()) {
-						totalGunnery = 0;
-						for (Person p : gunners) {
-							p.addSkill(SkillType.S_GUN_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_SPACE).getTarget() - oldCrew.getGunnery()), 0);
-							totalGunnery += p.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue();
-						}
-						averageGunnery = (int)Math.round(((double)totalGunnery)/gunners.size());
-					}
-	    		}
-	    	}
-		}
-
-    	while(vesselCrew.size() < unit.getTotalCrewNeeds()) {
-    		Person p = c.newPerson(Person.T_SPACE_CREW);
-			vesselCrew.add(p);
-    	}
-
-    	if(unit.canTakeNavigator()) {
-    		Person p = c.newPerson(Person.T_NAVIGATOR);
-    		navigator = p;
-    	}
-
-    	findCommander(e, vesselCrew, gunners, drivers, navigator).setName(commanderName);
-
-    	// Add everyone to the crew
-    	if (!drivers.isEmpty()) {
-    		newCrew.addAll(drivers);
-    	}
-    	if (!gunners.isEmpty()) {
-    		newCrew.addAll(gunners);
-    	}
-    	if (!vesselCrew.isEmpty()) {
-    		newCrew.addAll(vesselCrew);
-    	}
-    	if (navigator != null) {
-    		newCrew.add(navigator);
-    	}
-
-		// We need to be able to handle incoming captured personnel
-		newCrew = doCrewInjuries(e, c, newCrew);
-
-		return newCrew;
-	}
-
-    public static ArrayList<Person> generateRandomCrewWithCombinedSkill(Unit unit, Campaign c) {
-        return Utilities.generateRandomCrewWithCombinedSkill(unit, c, true);
-    }
-
-    public static ArrayList<Person> generateRandomCrewWithCombinedSkill(Unit unit, Campaign c, boolean log) {
-        return Utilities.generateRandomCrewWithCombinedSkill(unit, c, log, false);
-    }
-
-	public static ArrayList<Person> generateRandomCrewWithCombinedSkill(Unit unit, Campaign c, boolean log, boolean nopay) {
+    
+	public static ArrayList<Person> generateRandomCrewWithCombinedSkill(Unit unit, Campaign c, boolean addToUnit) {
         ArrayList<Person> newCrew = new ArrayList<Person>();
-		Crew oldCrew = unit.getEntity().getCrew();
+        Crew oldCrew = unit.getEntity().getCrew();
 		String commanderName = oldCrew.getName();
 		int averageGunnery = 0;
 		int averagePiloting = 0;
@@ -753,14 +549,13 @@ public class Utilities {
                 p.setName(commanderName);
                 nameset = true;
             }
-			if (!c.recruitPerson(p, log, nopay)) {
-				return null;
-			}
-			if(unit.usesSoloPilot() || unit.usesSoldiers()) {
-				unit.addPilotOrSoldier(p);
-			} else {
-				unit.addDriver(p);
-			}
+            if(addToUnit) {
+				if(unit.usesSoloPilot() || unit.usesSoldiers()) {
+					unit.addPilotOrSoldier(p);
+				} else {
+					unit.addDriver(p);
+				}
+            }
 		}
 		newCrew.addAll(drivers);
 
@@ -769,12 +564,11 @@ public class Utilities {
                 p.setName(commanderName);
                 nameset = true;
             }
-			if (!c.recruitPerson(p, log, nopay)) {
-				return null;
-			}
-			if (!(unit.usesSoloPilot() || unit.usesSoldiers()) && unit.canTakeMoreGunners()) {
-				unit.addGunner(p);
-			}
+            if(addToUnit) {
+				if (!(unit.usesSoloPilot() || unit.usesSoldiers()) && unit.canTakeMoreGunners()) {
+					unit.addGunner(p);
+				}
+            }
 		}
         newCrew.addAll(gunners);
 
@@ -783,12 +577,11 @@ public class Utilities {
                 p.setName(commanderName);
                 nameset = true;
             }
-			if (!c.recruitPerson(p, log, nopay)) {
-				return null;
-			}
-			if (!(unit.usesSoloPilot() || unit.usesSoldiers()) && unit.canTakeMoreVesselCrew()) {
-				unit.addVesselCrew(p);
-			}
+            if(addToUnit) {
+				if (!(unit.usesSoloPilot() || unit.usesSoldiers()) && unit.canTakeMoreVesselCrew()) {
+					unit.addVesselCrew(p);
+				}
+            }
 		}
         newCrew.addAll(vesselCrew);
 
@@ -797,12 +590,11 @@ public class Utilities {
                 navigator.setName(commanderName);
                 nameset = true;
             }
-			if (!c.recruitPerson(navigator, log, nopay)) {
-				return null;
+			if(addToUnit) {
+				unit.setNavigator(navigator);
 			}
-			unit.setNavigator(navigator);
+	        newCrew.add(navigator);
 		}
-        newCrew.add(navigator);
 
 		unit.resetPilotAndEntity();
 		return newCrew;

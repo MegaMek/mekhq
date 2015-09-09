@@ -782,7 +782,7 @@ public class Campaign implements Serializable {
         unit.setDaysToArrival(days);
 
         if (allowNewPilots) {
-            Utilities.generateRandomCrewWithCombinedSkill(unit, this);
+            Utilities.generateRandomCrewWithCombinedSkill(unit, this, true);
         }
         unit.resetPilotAndEntity();
 
@@ -815,40 +815,20 @@ public class Campaign implements Serializable {
         return unitIds.get(id);
     }
 
-    public boolean makePrisoner(Person p) {
-        return recruitPerson(p, true, false);
-    }
-
-    public boolean makeBondsman(Person p) {
+    public boolean recruitPerson(Person p) {
         return recruitPerson(p, false, true);
     }
 
-    public boolean recruitPerson(Person p) {
-        return recruitPerson(p, false, false);
-    }
-
     public boolean recruitPerson(Person p, boolean log) {
-        return recruitPerson(p, false, false, log);
+        return recruitPerson(p, false, log);
     }
 
-    public boolean recruitPerson(Person p, boolean prisoner, boolean bondsman) {
-        return recruitPerson(p, prisoner, bondsman, true);
-    }
-
-    public boolean recruitPerson(Person p, boolean prisoner, boolean bondsman, boolean log) {
-        return recruitPerson(p, prisoner, bondsman, log, false);
-    }
-
-    public boolean recruitPerson(Person p, boolean prisoner, boolean bondsman, boolean log, boolean nopay) {
-        if (prisoner && bondsman) {
-            addReport("<font color='red'><b>Cannot have someone who is both a prisoner and a bondsman, there is an error in the code.</b></font>");
-            return false;
-        }
+    public boolean recruitPerson(Person p, boolean prisoner, boolean log) {
         if (p == null) {
             return false;
         }
         // Only pay if option set and this isn't a prisoner or bondsman
-        if (getCampaignOptions().payForRecruitment() && !(prisoner || bondsman) && !nopay) {
+        if (getCampaignOptions().payForRecruitment() && !prisoner) {
             if (!getFinances().debit(2 * p.getSalary(), Transaction.C_SALARY,
                                      "recruitment of " + p.getFullName(), getCalendar().getTime())) {
                 addReport("<font color='red'><b>Insufficient funds to recruit "
@@ -863,6 +843,8 @@ public class Campaign implements Serializable {
         p.setId(id);
         personnel.add(p);
         personnelIds.put(id, p);
+        //TODO: implement a boolean check based on campaign options
+        boolean bondsman = false;
         String add = prisoner == true ? " as a prisoner" : bondsman == true ? " as a bondsman" : "";
         if (log) {
             addReport(p.getHyperlinkedName() + " has been added to the personnel roster"+add+".");
@@ -883,11 +865,6 @@ public class Campaign implements Serializable {
             p.setPrisoner();
             if (log) {
                 p.addLogEntry(getDate(), "Made Prisoner " + getName() + rankEntry);
-            }
-        } else if (bondsman) {
-            p.setBondsman();
-            if (log) {
-                p.addLogEntry(getDate(), "Made Bondsman " + getName() + rankEntry);
             }
         } else {
             p.setFreeMan();

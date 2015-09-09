@@ -85,7 +85,6 @@ public class ResolveScenarioTracker {
     Hashtable<UUID, UnitStatus> salvageStatus;
     Hashtable<UUID, Crew> pilots;
 	Hashtable<UUID, Crew> mia;
-	ArrayList<Person> newPilots;
 	ArrayList<TestUnit> potentialSalvage;
 	ArrayList<TestUnit> alliedUnits;
 	ArrayList<TestUnit> actualSalvage;
@@ -94,7 +93,7 @@ public class ResolveScenarioTracker {
 	ArrayList<Loot> potentialLoot;
 	ArrayList<Loot> actualLoot;
     Hashtable<UUID, PersonStatus> peopleStatus;
-    Hashtable<UUID, PersonStatus> prisonerStatus;
+    Hashtable<UUID, PrisonerStatus> prisonerStatus;
 	Hashtable<String, String> killCredits;
 	Hashtable<UUID, EjectedCrew> ejections;
 
@@ -121,12 +120,11 @@ public class ResolveScenarioTracker {
 		leftoverSalvage = new ArrayList<TestUnit>();
 		pilots = new Hashtable<UUID, Crew>();
 		mia = new Hashtable<UUID, Crew>();
-		newPilots = new ArrayList<Person>();
 		units = new ArrayList<Unit>();
 		potentialLoot = scenario.getLoot();
 		actualLoot = new ArrayList<Loot>();
 		peopleStatus = new Hashtable<UUID, PersonStatus>();
-		prisonerStatus = new Hashtable<UUID, PersonStatus>();
+		prisonerStatus = new Hashtable<UUID, PrisonerStatus>();
 		killCredits = new Hashtable<String, String>();
 		ejections = new Hashtable<UUID, EjectedCrew>();
 		for(UUID uid : scenario.getForces(campaign).getAllUnits()) {
@@ -185,15 +183,6 @@ public class ResolveScenarioTracker {
 				e.printStackTrace();
 			}
 		}
-		/*if(null != salvageFile) {
-			try {
-				loadSalvage(salvageFile, controlsField);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}*/
-		checkStatusOfPersonnel();
 	}
 
 	private TestUnit generateNewTestUnit(Entity e) {
@@ -257,10 +246,6 @@ public class ResolveScenarioTracker {
                     UnitStatus us = new UnitStatus(nu);
                     salvageStatus.put(nu.getId(), us);
                     potentialSalvage.add(nu);
-                    ArrayList<Person> crewMembers = Utilities.generateRandomCrewWithCombinedSkill(nu, campaign, false, true);
-                    if (null != crewMembers) {
-                        newPilots.addAll(crewMembers);
-                    }
 				}
 			}
 		}
@@ -367,10 +352,6 @@ public class ResolveScenarioTracker {
                     UnitStatus us = new UnitStatus(nu);
                     salvageStatus.put(nu.getId(), us);
                     potentialSalvage.add(nu);
-                    ArrayList<Person> crewMembers = Utilities.generateRandomCrewWithCombinedSkill(nu, campaign, false, true);
-                    if (null != crewMembers) {
-                        newPilots.addAll(crewMembers);
-                    }
         		}
         	}
         }
@@ -450,7 +431,6 @@ public class ResolveScenarioTracker {
 	}
 
 	public void checkStatusOfPersonnel() {
-		PersonStatus status;
 		java.util.HashSet<Integer> pickedUpPilots = new java.util.HashSet<Integer>();
 
 		for(Unit u : units) {
@@ -508,7 +488,7 @@ public class ResolveScenarioTracker {
             	missingCrew = true;
             }
             for(Person p : crew) {
-                status = new PersonStatus(p.getFullName(), u.getEntity().getDisplayName(), p.getHits(), p.getId());
+                PersonStatus status = new PersonStatus(p.getFullName(), u.getEntity().getDisplayName(), p.getHits(), p.getId());
                 status.setMissing(missingCrew);
                 //if the pilot was not found in either the pilot or mia vector
                 //then the unit was devastated and no one ejected, so they should be dead, really dead
@@ -599,15 +579,18 @@ public class ResolveScenarioTracker {
                 continue; // Shouldn't happen... but well... ya know
             }
             //shuffling the crew ensures that casualties are randomly assigned in multi-crew units
-            ArrayList<Person> crew = shuffleCrew(getActiveCrewFromPrisoners(u));
+            ArrayList<Person> crew = shuffleCrew(Utilities.generateRandomCrewWithCombinedSkill(u, campaign, false));
             Entity en = null;
             UnitStatus ustatus = salvageStatus.get(u.getId());
             if(null != ustatus) {
                 en = ustatus.getEntity();
             }
+            if(null == en) {
+            	continue;
+            }
             int casualties = 0;
             int casualtiesAssigned = 0;
-            if(null != en && en instanceof Infantry && u.getEntity() instanceof Infantry) {
+            if(en instanceof Infantry && u.getEntity() instanceof Infantry) {
                 en.applyDamage();
                 int strength = ((Infantry)en).getShootingStrength();
                 casualties = crew.size() - strength;
@@ -615,7 +598,7 @@ public class ResolveScenarioTracker {
                     casualties = crew.size();
                 }
             }
-            if(null != en && en instanceof Aero && !u.usesSoloPilot()) {
+            if(en instanceof Aero && !u.usesSoloPilot()) {
             	//need to check for existing hits because you can fly aeros with less than full
             	//crew
             	int existingHits = 0;
@@ -630,12 +613,14 @@ public class ResolveScenarioTracker {
             	casualties = (int)Math.ceil(Compute.getFullCrewSize(en) * (newHits/6.0));
             }
             for(Person p : crew) {
-                status = new PersonStatus(p.getFullName(), u.getEntity().getDisplayName(), p.getHits(), p.getId());
-                if(null != ustatus && null != en) {
-                	//I dont think this should happen for prisoners, but if it does
-                	//then skip
-                	continue;
+            	// Give them a UUID. We won't actually use this for the campaign, but to 
+                //identify them in the prisonerStatus hash           
+                UUID id = UUID.randomUUID();
+                while (prisonerStatus.get(id) != null) {
+                    id = UUID.randomUUID();
                 }
+                p.setId(id);
+                PrisonerStatus status = new PrisonerStatus(p.getFullName(), u.getEntity().getDisplayName(), p);
                 if(en instanceof Mech 
                 		|| en instanceof Protomech 
                 		|| (en instanceof Aero && !(en instanceof SmallCraft || en instanceof Jumpship))) {
@@ -644,11 +629,13 @@ public class ResolveScenarioTracker {
                 		continue;
                 	}
                 	status.setHits(pilot.getHits());
-                	if (pickedUpPilots.contains(u.getEntity().getId())
+                	if (pickedUpPilots.contains(en.getId())
                             || (pilot.isUnconscious())
-                            || u.getEntity().isStalled()
-                            || u.getEntity().isStuck()
-                            || u.getEntity().isShutDown()) {
+                            || en.isStalled()
+                            || en.isStuck()
+                            || en.isShutDown()
+                            || en.isDestroyed()
+                            || en.isPermanentlyImmobilized(false)) {
                         if (!status.isMissing() && !status.isDead()) {
                             status.setPickedUp(true);
                             status.setCaptured(true);
@@ -708,12 +695,14 @@ public class ResolveScenarioTracker {
                         }
                         status.setHits(hits);
                     }
-                    if (pickedUpPilots.contains(u.getEntity().getId())
-                            || (null != u.getEntity().getCrew()
-                            && u.getEntity().getCrew().isUnconscious())
-                            || u.getEntity().isStalled()
-                            || u.getEntity().isStuck()
-                            || u.getEntity().isShutDown()) {
+                    if (pickedUpPilots.contains(en.getId())
+                            || (null != en.getCrew()
+                            && en.getCrew().isUnconscious())
+                            || en.isStalled()
+                            || en.isStuck()
+                            || en.isShutDown()
+                            || en.isDestroyed()
+                            || en.isPermanentlyImmobilized(false)) {
                         if (!status.isMissing() && !status.isDead()) {
                             status.setPickedUp(true);
                             status.setCaptured(true);
@@ -726,61 +715,10 @@ public class ResolveScenarioTracker {
                  */
                 if (en == null || !en.wasNeverDeployed()) {
                     status.setXP(campaign.getCampaignOptions().getScenarioXP());
-                }
-
-                // Fix up the UUID as needed
-                UUID id = null;
-                if (p.getId() != null) {
-                    id = p.getId();
-                }
-                if (id == null) {
-                    id = UUID.randomUUID();
-                }
-                while (campaign.getPerson(id) != null && !campaign.getPerson(id).equals(p)) {
-                    id = UUID.randomUUID();
-                }
-                p.setId(id);
-
+                }          
                 prisonerStatus.put(id, status);
             }
         }
-
-        // And now we have potential prisoners that didn't have a unit...
-        for (Person p : newPilots) {
-            // Can we have NULL pilots in this stupid list?
-            if (p == null) {
-                continue;
-            }
-            // Fix up the UUID as needed
-            UUID id = null;
-            if (p.getId() != null) {
-                id = p.getId();
-            }
-            if (id == null) {
-                id = UUID.randomUUID();
-            }
-            while (campaign.getPerson(id) != null && !campaign.getPerson(id).equals(p)) {
-                id = UUID.randomUUID();
-            }
-            p.setId(id);
-
-            // Create a status for them
-            status = new PersonStatus(p.getFullName(), "None", p.getHits(), p.getId());
-            status.setCaptured(true);
-            prisonerStatus.put(id, status);
-        }
-	}
-
-	private ArrayList<Person> getActiveCrewFromPrisoners(Unit u) {
-	    ArrayList<Person> crew = new ArrayList<Person>();
-	    for (Iterator<Person> i = newPilots.iterator(); i.hasNext(); ) {
-	        Person p = i.next();
-	        if (null != p && null != p.getUnitId() && p.getUnitId().equals(u.getId())) {
-	            crew.add(p);
-	            i.remove();
-	        }
-	    }
-	    return crew;
 	}
 
 	private void loadUnitsAndPilots(File unitFile) throws IOException {
@@ -873,10 +811,6 @@ public class ResolveScenarioTracker {
 	                    UnitStatus us = new UnitStatus(nu);
 	                    salvageStatus.put(nu.getId(), us);
 	                    potentialSalvage.add(nu);
-	                    ArrayList<Person> crewMembers = Utilities.generateRandomCrewWithCombinedSkill(nu, campaign, false, true);
-	                    if (null != crewMembers) {
-	                        newPilots.addAll(crewMembers);
-	                    }
 	        		}
 	        	}
 	        }
@@ -954,7 +888,7 @@ public class ResolveScenarioTracker {
             if(null == person || null == status) {
                 continue;
             }
-            person.setXp(person.getXp() + status.xp);
+            person.setXp(person.getXp() + status.getXP());
             if(status.getHits() > person.getHits()) {
                 person.setHits(status.getHits());
             }
@@ -983,26 +917,20 @@ public class ResolveScenarioTracker {
         }
         // update prisoners
         for(UUID pid : prisonerStatus.keySet()) {
-            Person person = campaign.getPerson(pid);
-            campaign.removePerson(pid, false);
-            if (person == null) {
-                for (Person p : newPilots) {
-                    if (p != null && p.getId() == pid) {
-                        person = p;
-                        break;
-                    }
-                }
-            }
-            PersonStatus status = prisonerStatus.get(pid);
+            PrisonerStatus status = prisonerStatus.get(pid);
+            Person person = status.getPerson();
             if(null == person || null == status) {
                 continue;
             }
-            if (status.isPrisoner() || status.isBondsman()) {
-                getCampaign().recruitPerson(person, status.isPrisoner(), status.isBondsman());
+            if(status.isDead()) {
+            	continue;
+            }
+            if (status.isCaptured()) {
+                getCampaign().recruitPerson(person, true, true);
                 if (getCampaign().getCampaignOptions().getUseAtB() &&
                         getCampaign().getCampaignOptions().getUseAtBCapture() &&
                         m instanceof AtBContract &&
-                        status.isPrisoner()) {
+                        status.isCaptured()) {
                     getCampaign().getFinances().credit(50000, Transaction.C_MISC,
                             "Bonus for prisoner capture", getCampaign().getDate());
                     if (Compute.d6(2) >= 10 + ((AtBContract)m).getEnemySkill() - getCampaign().getUnitRatingMod()) {
@@ -1013,7 +941,7 @@ public class ResolveScenarioTracker {
             } else {
                 continue;
             }
-            person.setXp(person.getXp() + status.xp);
+            person.setXp(person.getXp() + status.getXP());
             if(status.getHits() > person.getHits()) {
                 person.setHits(status.getHits());
             }
@@ -1021,9 +949,9 @@ public class ResolveScenarioTracker {
             for(Kill k : status.getKills()) {
                 campaign.addKill(k);
             }
-            if(status.isMissing()) {
-                campaign.changeStatus(person, Person.S_MIA);
-            }
+            //if(status.isMissing()) {
+              //  campaign.changeStatus(person, Person.S_MIA);
+            //}
             if(status.isDead()) {
                 campaign.changeStatus(person, Person.S_KIA);
                 if (campaign.getCampaignOptions().getUseAtB() &&
@@ -1035,18 +963,6 @@ public class ResolveScenarioTracker {
             }
             if (campaign.getCampaignOptions().useAdvancedMedical()) {
                 person.diagnose(status.getHits());
-            }
-            if (status.isBondsman()) {
-                person.setBondsman();
-            }
-            if (status.isPrisoner()) {
-                person.setPrisoner();
-            }
-            if (!status.isBondsman() && !status.isPrisoner() && status.isCaptured()) {
-                person.setFreeMan();
-            }
-            if (status.toRemove()) {
-                campaign.removePerson(pid, false);
             }
         }
 
@@ -1207,7 +1123,7 @@ public class ResolveScenarioTracker {
         return peopleStatus;
     }
 
-    public Hashtable<UUID, PersonStatus> getPrisonerStatus() {
+    public Hashtable<UUID, PrisonerStatus> getPrisonerStatus() {
         return prisonerStatus;
     }
 
@@ -1241,9 +1157,6 @@ public class ResolveScenarioTracker {
 		private boolean missing;
 		private int xp;
 		private ArrayList<Kill> kills;
-		private boolean captured;
-		private boolean prisoner;
-		private boolean bondsman;
 		private boolean remove;
 		private boolean pickedUp;
 		private UUID personId;
@@ -1255,9 +1168,6 @@ public class ResolveScenarioTracker {
 			missing = false;
 			xp = 0;
 			kills = new ArrayList<Kill>();
-			captured = false;
-			prisoner = false;
-			bondsman = false;
 			remove = false;
 			pickedUp = false;
 			personId = id;
@@ -1278,30 +1188,6 @@ public class ResolveScenarioTracker {
         public void setRemove(boolean set) {
             remove = set;
         }
-
-		public boolean isCaptured() {
-			return captured;
-		}
-
-		public void setCaptured(boolean set) {
-			captured = set;
-		}
-
-		public boolean isPrisoner() {
-			return prisoner;
-		}
-
-		public void setPrisoner(boolean set) {
-			prisoner = set;
-		}
-
-		public boolean isBondsman() {
-			return bondsman;
-		}
-
-		public void setBondsman(boolean set) {
-			bondsman = set;
-		}
 
 		public String getName() {
 			return name;
@@ -1359,6 +1245,37 @@ public class ResolveScenarioTracker {
 		}
 	}
 
+	/**
+	 * This object is used to track the status of a prisoners. At the present,
+	 * we track the person's missing status, hits, and XP
+	 * @author Jay Lawson
+	 *
+	 */
+	public class PrisonerStatus extends PersonStatus {
+		
+		//for prisoners we have to track a whole person
+		Person person;
+		private boolean captured;
+
+		public PrisonerStatus(String n, String u, Person p) {
+			super(n, u, 0, p.getId());
+			person = p;
+		}
+	
+		public Person getPerson() {
+			return person;
+		}
+
+		public boolean isCaptured() {
+			return captured;
+		}
+
+		public void setCaptured(boolean set) {
+			captured = set;
+		}
+		
+	}
+	
 	/**
      * This object is used to track the status of a particular unit.
      * @author Jay Lawson
@@ -1464,11 +1381,5 @@ public class ResolveScenarioTracker {
 
     public void setEvent(GameVictoryEvent gve) {
         victoryEvent = gve;
-    }
-
-    public void clearNewPersonnel() {
-        for(UUID pid : prisonerStatus.keySet()) {
-            campaign.removePerson(pid, false);
-        }
     }
 }
