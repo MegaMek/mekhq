@@ -40,7 +40,6 @@ import java.util.ResourceBundle;
 import java.util.UUID;
 
 import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -139,11 +138,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
     /*
      * Prisoner status panel components
      */
-    //private ArrayList<JCheckBox> pr_miaBtns = new ArrayList<JCheckBox>();
     private ArrayList<JCheckBox> prisonerBtns = new ArrayList<JCheckBox>();
     private ArrayList<JSlider> pr_hitSliders = new ArrayList<JSlider>();
     private ArrayList<PrisonerStatus> prstatuses = new ArrayList<PrisonerStatus>();
-    //private ArrayList<JCheckBox> escapeBtns = new ArrayList<JCheckBox>();
 
     /*
      * Salvage panel components
@@ -436,9 +433,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         labelTable.put( new Integer( 5 ), new JLabel("5") );
         labelTable.put( new Integer( 6 ), new JLabel(resourceMap.getString("dead")) );
         j = 0;
-        for(UUID pid : tracker.getPeopleStatus().keySet()) {
-            j++;
-            PersonStatus status = tracker.getPeopleStatus().get(pid);
+        for(PersonStatus status : tracker.getSortedPeople()) {
+        	j++;
             pstatuses.add(status);
             nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
             miaCheck = new JCheckBox("");
@@ -497,13 +493,11 @@ public class ResolveScenarioWizardDialog extends JDialog {
         i = 2;
         JCheckBox prisonerCheck;
         j = 0;
-        for(UUID pid : tracker.getPrisonerStatus().keySet()) {
+        for(PrisonerStatus status : tracker.getSortedPrisoners()) {
             j++;
-            PrisonerStatus status = tracker.getPrisonerStatus().get(pid);
             prstatuses.add(status);
             nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
             miaCheck = new JCheckBox("");
-            //pr_miaBtns.add(miaCheck);
             hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 6, status.getHits());
             hitSlider.setMajorTickSpacing(1);
             hitSlider.setPaintTicks(true);
@@ -527,7 +521,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.gridx = 1;
             pnlPrisonerStatus.add(hitSlider, gridBagConstraints);
             gridBagConstraints.gridx = 2;
-            //pnlPrisonerStatus.add(miaCheck, gridBagConstraints);
             prisonerCheck = new JCheckBox("");
             prisonerBtns.add(prisonerCheck);
             prisonerCheck.setSelected(status.isCaptured());

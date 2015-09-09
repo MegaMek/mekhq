@@ -27,10 +27,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Random;
+import java.util.TreeMap;
 import java.util.UUID;
 
 import javax.swing.JFileChooser;
@@ -1156,13 +1158,41 @@ public class ResolveScenarioTracker {
 	    actualLoot.add(loot);
 	}
 
+	public ArrayList<PersonStatus> getSortedPeople() {
+		//put all the PersonStatuses in an ArrayList and sort by the unit name
+		ArrayList<PersonStatus> toReturn = new ArrayList<PersonStatus>();
+		for(UUID id : getPeopleStatus().keySet()) {
+			PersonStatus status = peopleStatus.get(id);
+			if(null != status) {
+				toReturn.add(status);
+			}
+		}
+		//now sort
+		Collections.sort(toReturn);
+		return toReturn;
+	}
+	
+	public ArrayList<PrisonerStatus> getSortedPrisoners() {
+		//put all the PersonStatuses in an ArrayList and sort by the unit name
+		ArrayList<PrisonerStatus> toReturn = new ArrayList<PrisonerStatus>();
+		for(UUID id : getPrisonerStatus().keySet()) {
+			PrisonerStatus status = prisonerStatus.get(id);
+			if(null != status) {
+				toReturn.add(status);
+			}
+		}
+		//now sort
+		Collections.sort(toReturn);
+		return toReturn;
+	}
+	
 	/**
 	 * This object is used to track the status of a particular personnel. At the present,
 	 * we track the person's missing status, hits, and XP
 	 * @author Jay Lawson
 	 *
 	 */
-	public class PersonStatus {
+	public class PersonStatus implements Comparable<PersonStatus> {
 
 		private String name;
 		private String unitName;
@@ -1266,6 +1296,17 @@ public class ResolveScenarioTracker {
 		public boolean wasDeployed() {
 			return deployed;
 		}
+		
+		@Override
+		public String toString() {
+			return unitName;
+		}
+		
+		@Override
+	    public int compareTo(PersonStatus ostatus) {
+	    	return unitName.compareTo(ostatus.getUnitName());
+	   }
+		
 	}
 
 	/**
