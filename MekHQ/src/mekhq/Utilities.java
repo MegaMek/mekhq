@@ -383,7 +383,7 @@ public class Utilities {
 
 		// If the entire crew is dead, we don't want to generate them.
 		if (isDeadCrew(unit.getEntity())) {
-			return null;
+			return new ArrayList<Person>();
 		}
 
 		// Generate solo crews
@@ -595,8 +595,9 @@ public class Utilities {
 			}
 	        newCrew.add(navigator);
 		}
-
-		unit.resetPilotAndEntity();
+		if(addToUnit) {
+			unit.resetPilotAndEntity();
+		}
 		return newCrew;
 	}
 

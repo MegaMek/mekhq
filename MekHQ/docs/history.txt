@@ -7,6 +7,7 @@ v0.3.19 (git)
 + Adapt packaging to support MML svg files
 + improvements to prisoner tracking in ResolveScenarioTracker (prisoners from ejected units not yet correct)
 + simplified prisoner interface in ResolveScenarioWizardDialog
++ Bug: totally dead crews generating an NPE when shuffled in ResolveScenarioTracker
 
 v0.3.18 (2015-09-01 12:10 UTC)
 + Bug: units listed as not invented when they have been
