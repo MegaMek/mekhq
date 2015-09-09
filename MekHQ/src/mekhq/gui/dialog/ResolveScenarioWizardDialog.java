@@ -496,8 +496,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
         pnlPrisonerStatus.add(new JLabel(resourceMap.getString("prisoner")), gridBagConstraints);
         i = 2;
         JCheckBox prisonerCheck;
-        JCheckBox escapeCheck;
-        ButtonGroup captured;
         j = 0;
         for(UUID pid : tracker.getPrisonerStatus().keySet()) {
             j++;

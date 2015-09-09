@@ -8,6 +8,7 @@ v0.3.19 (git)
 + improvements to prisoner tracking in ResolveScenarioTracker (prisoners from ejected units not yet correct)
 + simplified prisoner interface in ResolveScenarioWizardDialog
 + Bug: totally dead crews generating an NPE when shuffled in ResolveScenarioTracker
++ Bug [#932]: BA prisoner problems
 
 v0.3.18 (2015-09-01 12:10 UTC)
 + Bug: units listed as not invented when they have been
