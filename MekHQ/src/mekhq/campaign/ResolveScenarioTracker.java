@@ -422,6 +422,11 @@ public class ResolveScenarioTracker {
 				if(u.getId().toString().equals(killCredits.get(killed))) {
 					for(Person p : u.getActiveCrew()) {
 						PersonStatus status = peopleStatus.get(p.getId());
+						if(null == status) {
+							//this shouldnt happen so report
+							MekHQ.logError("A null person status was found for person id " + p.getId().toString() + " when trying to assign kills");
+							continue;
+						}
 						status.addKill(new Kill(p.getId(), killed, u.getEntity().getShortNameRaw(), campaign.getCalendar().getTime()));
 					}
 				}
@@ -494,10 +499,9 @@ public class ResolveScenarioTracker {
                 //then the unit was devastated and no one ejected, so they should be dead, really dead
                 if(null == pilot) {                    
                 	status.setHits(6);
-                	continue;
                 }
                 //cant do the following by u.usesSoloPilot because entity may be different if ejected
-                if(en instanceof Mech 
+                else if(en instanceof Mech 
                 		|| en instanceof Protomech 
                 		|| (en instanceof Aero && !(en instanceof SmallCraft || en instanceof Jumpship))) {
                 	status.setHits(pilot.getHits());
