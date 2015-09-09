@@ -652,7 +652,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         	j++;
         	salvageables.add(u);
         	UnitStatus status = tracker.getSalvageStatus().get(u.getId());
-        	String txtBoxString = status.getDesc().replace(u.getName(), u.getName() + " (" + formatter.format(u.getSellValue()) + " C-Bills)");
+        	String txtBoxString = status.getDesc(formatter);
         	box = new JCheckBox(txtBoxString);
         	box.setSelected(false);
         	box.addItemListener(new ItemListener() {

@@ -1371,6 +1371,10 @@ public class ResolveScenarioTracker {
         }
 
         public String getDesc() {
+        	return getDesc(null);
+        }
+        
+        public String getDesc(DecimalFormat formatter) {
             // Commenting out since I can't remember why I added it... and it's weird to create a new unit when we have a unit!
             // It's also causing bugs with individual camos - ralgith
             // Unit unit = new Unit(entity, this.unit.campaign);
@@ -1396,6 +1400,9 @@ public class ResolveScenarioTracker {
                 }
             }
             String s = "<html><b>" + getName() + "</b><br><font color='" + color + "'>"+ unit.getStatus() + "</font></html>";
+        	if(null != formatter) {
+                s = "<html><b>" + getName() + "</b><br> (" + formatter.format(unit.getSellValue()) + "C-bills) <font color='" + color + "'>"+ unit.getStatus() + "</font></html>";
+        	}
             return s;
         }
         
