@@ -404,22 +404,22 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	public void setHistory(String s) {
 		this.history = s;
 	}
-
-	public boolean isFunctional() {
-		if (entity instanceof Mech) {
+	
+	public static boolean isFunctional(Entity en) {
+		if (en instanceof Mech) {
 			// center torso bad?? head bad?
-			if (entity.isLocationBad(Mech.LOC_CT)
-					|| entity.isLocationBad(Mech.LOC_HEAD)) {
+			if (en.isLocationBad(Mech.LOC_CT)
+					|| en.isLocationBad(Mech.LOC_HEAD)) {
 				return false;
 			}
 			// engine destruction?
 			//cockpit hits
 			int engineHits = 0;
 			int cockpitHits = 0;
-			for (int i = 0; i < entity.locations(); i++) {
-				engineHits += entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
+			for (int i = 0; i < en.locations(); i++) {
+				engineHits += en.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
 						Mech.SYSTEM_ENGINE, i);
-				cockpitHits += entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
+				cockpitHits += en.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
 						Mech.SYSTEM_COCKPIT, i);
 			}
 			if (engineHits > 2) {
@@ -429,26 +429,56 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 				return false;
 			}
 		}
-		if (entity instanceof Tank) {
-			for (int i = 0; i < entity.locations(); i++) {
+		if (en instanceof Tank) {
+			for (int i = 0; i < en.locations(); i++) {
 				if(i == Tank.LOC_TURRET || i == Tank.LOC_TURRET_2) {
 					continue;
 				}
-				if (entity.isLocationBad(i)) {
+				if (en.isLocationBad(i)) {
 					return false;
 				}
 			}
-			if(entity instanceof VTOL) {
-				if(entity.getWalkMP() <= 0) {
+			if(en instanceof VTOL) {
+				if(en.getWalkMP() <= 0) {
 					return false;
 				}
 			}
 		}
-		if(entity instanceof Aero) {
-			if(entity.getWalkMP() <= 0 && !(entity instanceof Jumpship)) {
+		if(en instanceof Aero) {
+			if(en.getWalkMP() <= 0 && !(en instanceof Jumpship)) {
 				return false;
 			}
-			if(((Aero)entity).getSI() <= 0) {
+			if(((Aero)en).getSI() <= 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public boolean isFunctional() {
+		return isFunctional(entity);
+	}
+	
+	public static boolean isRepairable(Entity en) {
+		if (en instanceof Mech) {
+			// you can repair anything so long as one point of CT is left
+			if (en.getInternal(Mech.LOC_CT) <= 0) {
+				return false;
+			}
+		}
+		if (en instanceof Tank) {
+			// can't repair a tank with a destroyed location
+			for (int i = 0; i < en.locations(); i++) {
+				if(i == Tank.LOC_TURRET || i == Tank.LOC_TURRET_2 || i == Tank.LOC_BODY) {
+					continue;
+				}
+				if (en.getInternal(i) <= 0) {
+					return false;
+				}
+			}
+		}
+		if(en instanceof Aero) {
+			if(((Aero)en).getSI() <= 0) {
 				return false;
 			}
 		}
@@ -456,29 +486,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	}
 
 	public boolean isRepairable() {
-		if (entity instanceof Mech) {
-			// you can repair anything so long as one point of CT is left
-			if (entity.getInternal(Mech.LOC_CT) <= 0) {
-				return false;
-			}
-		}
-		if (entity instanceof Tank) {
-			// can't repair a tank with a destroyed location
-			for (int i = 0; i < entity.locations(); i++) {
-				if(i == Tank.LOC_TURRET || i == Tank.LOC_TURRET_2 || i == Tank.LOC_BODY) {
-					continue;
-				}
-				if (entity.getInternal(i) <= 0) {
-					return false;
-				}
-			}
-		}
-		if(entity instanceof Aero) {
-			if(((Aero)entity).getSI() <= 0) {
-				return false;
-			}
-		}
-		return true;
+		return isRepairable(entity);
 	}
 
 	/**

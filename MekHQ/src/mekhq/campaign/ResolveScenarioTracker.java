@@ -1375,16 +1375,19 @@ public class ResolveScenarioTracker {
         }
         
         public String getDesc(DecimalFormat formatter) {
-            // Commenting out since I can't remember why I added it... and it's weird to create a new unit when we have a unit!
-            // It's also causing bugs with individual camos - ralgith
-            // Unit unit = new Unit(entity, this.unit.campaign);
+        	if(null == entity) {
+        		return "Whoops, No Entity";
+        	}
             String color = "black";
-            if (!unit.isRepairable()) {
+            String status = Unit.getDamageStateName(entity.getDamageLevel(false));
+            if (!Unit.isRepairable(entity)) {
                 color = "rgb(190, 150, 55)";
-            } else if (!unit.isFunctional()) {
+                status = "Salvage";
+            } else if (!Unit.isFunctional(entity)) {
                 color = "rgb(205, 92, 92)";
+                status = "Inoperable";
             } else {
-                switch(unit.getDamageState()) {
+                switch(entity.getDamageLevel(false)) {
                     case Entity.DMG_LIGHT:
                         color = "green";
                         break;
@@ -1399,9 +1402,9 @@ public class ResolveScenarioTracker {
                         break;
                 }
             }
-            String s = "<html><b>" + getName() + "</b><br><font color='" + color + "'>"+ unit.getStatus() + "</font></html>";
+            String s = "<html><b>" + getName() + "</b><br><font color='" + color + "'>"+ status + "</font></html>";
         	if(null != formatter) {
-                s = "<html><b>" + getName() + "</b><br> (" + formatter.format(unit.getSellValue()) + "C-bills) <font color='" + color + "'>"+ unit.getStatus() + "</font></html>";
+                s = "<html><b>" + getName() + "</b><br> (" + formatter.format(unit.getSellValue()) + "C-bills) <font color='" + color + "'>"+ status + "</font></html>";
         	}
             return s;
         }
