@@ -862,10 +862,17 @@ public class Campaign implements Serializable {
             rankEntry = " as a " + p.getRankName();
         }
         if (prisoner) {
-            p.setPrisoner();
-            if (log) {
-                p.addLogEntry(getDate(), "Made Prisoner " + getName() + rankEntry);
-            }
+        	if(getCampaignOptions().getDefaultPrisonerStatus() == CampaignOptions.BONDSMAN_RANK) {
+        		p.setBondsman();
+	            if (log) {
+	                p.addLogEntry(getDate(), "Made Bondsman " + getName() + rankEntry);
+	            }
+        	} else {
+	            p.setPrisoner();
+	            if (log) {
+	                p.addLogEntry(getDate(), "Made Prisoner " + getName() + rankEntry);
+	            }
+        	}
         } else {
             p.setFreeMan();
             if (log) {

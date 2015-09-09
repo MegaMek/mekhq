@@ -578,150 +578,152 @@ public class ResolveScenarioTracker {
         }
 
         // And now we have potential prisoners that are crewing a unit...
-        for(Unit u : potentialSalvage) {
-            if (null == u) {
-                continue; // Shouldn't happen... but well... ya know
-            }
-            //shuffling the crew ensures that casualties are randomly assigned in multi-crew units
-            ArrayList<Person> crew = shuffleCrew(Utilities.generateRandomCrewWithCombinedSkill(u, campaign, false));
-            Entity en = null;
-            UnitStatus ustatus = salvageStatus.get(u.getId());
-            if(null != ustatus) {
-                en = ustatus.getEntity();
-            }
-            if(null == en) {
-            	continue;
-            }
-            int casualties = 0;
-            int casualtiesAssigned = 0;
-            if(en instanceof Infantry && u.getEntity() instanceof Infantry) {
-                en.applyDamage();
-                int strength = ((Infantry)en).getShootingStrength();
-                casualties = crew.size() - strength;
-                if (ustatus.isTotalLoss()) {
-                    casualties = crew.size();
-                }
-            }
-            if(en instanceof Aero && !u.usesSoloPilot()) {
-            	//need to check for existing hits because you can fly aeros with less than full
-            	//crew
-            	int existingHits = 0;
-            	int currentHits = 0;
-            	if(null != u.getEntity().getCrew()) {
-            		existingHits = u.getEntity().getCrew().getHits();
-            	}
-            	if(null != en && null != en.getCrew()) {
-            		currentHits = en.getCrew().getHits();
-            	}
-            	int newHits = Math.max(0,currentHits - existingHits);
-            	casualties = (int)Math.ceil(Compute.getFullCrewSize(en) * (newHits/6.0));
-            }
-            for(Person p : crew) {
-            	// Give them a UUID. We won't actually use this for the campaign, but to 
-                //identify them in the prisonerStatus hash           
-                UUID id = UUID.randomUUID();
-                while (prisonerStatus.get(id) != null) {
-                    id = UUID.randomUUID();
-                }
-                p.setId(id);
-                PrisonerStatus status = new PrisonerStatus(p.getFullName(), u.getEntity().getDisplayName(), p);
-                if(en instanceof Mech 
-                		|| en instanceof Protomech 
-                		|| (en instanceof Aero && !(en instanceof SmallCraft || en instanceof Jumpship))) {
-                	Crew pilot = en.getCrew();
-                	if(null == pilot) {
-                		continue;
-                	}
-                	status.setHits(pilot.getHits());
-                	if (pickedUpPilots.contains(en.getId())
-                            || (pilot.isUnconscious())
-                            || en.isStalled()
-                            || en.isStuck()
-                            || en.isShutDown()
-                            || en.isDestroyed()
-                            || en.isPermanentlyImmobilized(false)) {
-                        if (!status.isMissing() && !status.isDead()) {
-                            status.setPickedUp(true);
-                            status.setCaptured(true);
-                        }
-                    }
-                } else {
-                    //we have a multi-crewed vee
-                    boolean wounded = false;
-                    if(en instanceof Tank) {
-                        boolean destroyed = false;
-                        for(int loc = 0; loc < en.locations(); loc++) {
-                            if(loc == Tank.LOC_TURRET || loc == Tank.LOC_TURRET_2 || loc == Tank.LOC_BODY) {
-                                continue;
-                            }
-                            if(en.getInternal(loc) <= 0) {
-                                destroyed = true;
-                                break;
-                            }
-                        }
-                        if(destroyed || null == en.getCrew() || en.getCrew().isDead()) {
-                            if(Compute.d6(2) >= 7) {
-                                wounded = true;
-                            } else {
-                                status.setHits(6);
-                            }
-                        }
-                        else if(((Tank)en).isDriverHit() && u.isDriver(p)) {
-                            if(Compute.d6(2) >= 7) {
-                                wounded = true;
-                            } else {
-                                status.setHits(6);
-                            }
-                        }
-                        else if(((Tank)en).isCommanderHit() && u.isCommander(p)) {
-                            if(Compute.d6(2) >= 7) {
-                                wounded = true;
-                            } else {
-                                status.setHits(6);
-                            }
-                        }
-                    }
-                    else if(en instanceof Infantry || en instanceof Aero) {
-                        if(casualtiesAssigned < casualties) {
-                            casualtiesAssigned++;
-                            if(Compute.d6(2) >= 7) {
-                                wounded = true;
-                            } else {
-                                status.setHits(6);
-                            }
-                        }
-                    }
-                    if(wounded) {
-                        int hits = campaign.getCampaignOptions().getMinimumHitsForVees();
-                        if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVees()) {
-                            int range = 6 - hits;
-                            hits = hits + Compute.randomInt(range);
-                        }
-                        status.setHits(hits);
-                    }
-                    if (pickedUpPilots.contains(en.getId())
-                            || (null != en.getCrew()
-                            && en.getCrew().isUnconscious())
-                            || en.isStalled()
-                            || en.isStuck()
-                            || en.isShutDown()
-                            || en.isDestroyed()
-                            || en.isPermanentlyImmobilized(false)) {
-                        if (!status.isMissing() && !status.isDead()) {
-                            status.setPickedUp(true);
-                            status.setCaptured(true);
-                        }
-                    }
-                }
-                /**
-                 * If the entity cannot be found, or it was deployed at least once during the scenario
-                 * Then the pilot gets XP
-                 */
-                if (en == null || !en.wasNeverDeployed()) {
-                    status.setXP(campaign.getCampaignOptions().getScenarioXP());
-                }          
-                prisonerStatus.put(id, status);
-            }
+        if(campaign.getCampaignOptions().capturePrisoners()) {
+	        for(Unit u : potentialSalvage) {
+	            if (null == u) {
+	                continue; // Shouldn't happen... but well... ya know
+	            }
+	            //shuffling the crew ensures that casualties are randomly assigned in multi-crew units
+	            ArrayList<Person> crew = shuffleCrew(Utilities.generateRandomCrewWithCombinedSkill(u, campaign, false));
+	            Entity en = null;
+	            UnitStatus ustatus = salvageStatus.get(u.getId());
+	            if(null != ustatus) {
+	                en = ustatus.getEntity();
+	            }
+	            if(null == en) {
+	            	continue;
+	            }
+	            int casualties = 0;
+	            int casualtiesAssigned = 0;
+	            if(en instanceof Infantry && u.getEntity() instanceof Infantry) {
+	                en.applyDamage();
+	                int strength = ((Infantry)en).getShootingStrength();
+	                casualties = crew.size() - strength;
+	                if (ustatus.isTotalLoss()) {
+	                    casualties = crew.size();
+	                }
+	            }
+	            if(en instanceof Aero && !u.usesSoloPilot()) {
+	            	//need to check for existing hits because you can fly aeros with less than full
+	            	//crew
+	            	int existingHits = 0;
+	            	int currentHits = 0;
+	            	if(null != u.getEntity().getCrew()) {
+	            		existingHits = u.getEntity().getCrew().getHits();
+	            	}
+	            	if(null != en && null != en.getCrew()) {
+	            		currentHits = en.getCrew().getHits();
+	            	}
+	            	int newHits = Math.max(0,currentHits - existingHits);
+	            	casualties = (int)Math.ceil(Compute.getFullCrewSize(en) * (newHits/6.0));
+	            }
+	            for(Person p : crew) {
+	            	// Give them a UUID. We won't actually use this for the campaign, but to 
+	                //identify them in the prisonerStatus hash           
+	                UUID id = UUID.randomUUID();
+	                while (prisonerStatus.get(id) != null) {
+	                    id = UUID.randomUUID();
+	                }
+	                p.setId(id);
+	                PrisonerStatus status = new PrisonerStatus(p.getFullName(), u.getEntity().getDisplayName(), p);
+	                if(en instanceof Mech 
+	                		|| en instanceof Protomech 
+	                		|| (en instanceof Aero && !(en instanceof SmallCraft || en instanceof Jumpship))) {
+	                	Crew pilot = en.getCrew();
+	                	if(null == pilot) {
+	                		continue;
+	                	}
+	                	status.setHits(pilot.getHits());
+	                	if (pickedUpPilots.contains(en.getId())
+	                            || (pilot.isUnconscious())
+	                            || en.isStalled()
+	                            || en.isStuck()
+	                            || en.isShutDown()
+	                            || en.isDestroyed()
+	                            || en.isPermanentlyImmobilized(false)) {
+	                        if (!status.isMissing() && !status.isDead()) {
+	                            status.setPickedUp(true);
+	                            status.setCaptured(true);
+	                        }
+	                    }
+	                } else {
+	                    //we have a multi-crewed vee
+	                    boolean wounded = false;
+	                    if(en instanceof Tank) {
+	                        boolean destroyed = false;
+	                        for(int loc = 0; loc < en.locations(); loc++) {
+	                            if(loc == Tank.LOC_TURRET || loc == Tank.LOC_TURRET_2 || loc == Tank.LOC_BODY) {
+	                                continue;
+	                            }
+	                            if(en.getInternal(loc) <= 0) {
+	                                destroyed = true;
+	                                break;
+	                            }
+	                        }
+	                        if(destroyed || null == en.getCrew() || en.getCrew().isDead()) {
+	                            if(Compute.d6(2) >= 7) {
+	                                wounded = true;
+	                            } else {
+	                                status.setHits(6);
+	                            }
+	                        }
+	                        else if(((Tank)en).isDriverHit() && u.isDriver(p)) {
+	                            if(Compute.d6(2) >= 7) {
+	                                wounded = true;
+	                            } else {
+	                                status.setHits(6);
+	                            }
+	                        }
+	                        else if(((Tank)en).isCommanderHit() && u.isCommander(p)) {
+	                            if(Compute.d6(2) >= 7) {
+	                                wounded = true;
+	                            } else {
+	                                status.setHits(6);
+	                            }
+	                        }
+	                    }
+	                    else if(en instanceof Infantry || en instanceof Aero) {
+	                        if(casualtiesAssigned < casualties) {
+	                            casualtiesAssigned++;
+	                            if(Compute.d6(2) >= 7) {
+	                                wounded = true;
+	                            } else {
+	                                status.setHits(6);
+	                            }
+	                        }
+	                    }
+	                    if(wounded) {
+	                        int hits = campaign.getCampaignOptions().getMinimumHitsForVees();
+	                        if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVees()) {
+	                            int range = 6 - hits;
+	                            hits = hits + Compute.randomInt(range);
+	                        }
+	                        status.setHits(hits);
+	                    }
+	                    if (pickedUpPilots.contains(en.getId())
+	                            || (null != en.getCrew()
+	                            && en.getCrew().isUnconscious())
+	                            || en.isStalled()
+	                            || en.isStuck()
+	                            || en.isShutDown()
+	                            || en.isDestroyed()
+	                            || en.isPermanentlyImmobilized(false)) {
+	                        if (!status.isMissing() && !status.isDead()) {
+	                            status.setPickedUp(true);
+	                            status.setCaptured(true);
+	                        }
+	                    }
+	                }
+	                /**
+	                 * If the entity cannot be found, or it was deployed at least once during the scenario
+	                 * Then the pilot gets XP
+	                 */
+	                if (en == null || !en.wasNeverDeployed()) {
+	                    status.setXP(campaign.getCampaignOptions().getScenarioXP());
+	                }          
+	                prisonerStatus.put(id, status);
+	            }
+	        }
         }
 	}
 

@@ -58,6 +58,9 @@ public class CampaignOptions implements Serializable {
 
     public final static String S_TECH = "Tech";
     public final static String S_AUTO = "Automatic Success";
+    
+    public final static int PRISONER_RANK = 0;
+    public final static int BONDSMAN_RANK = 1;
 
     public final static int REPAIR_SYSTEM_STRATOPS = 0;
     public final static int REPAIR_SYSTEM_WARCHEST_CUSTOM = 1;
@@ -88,6 +91,8 @@ public class CampaignOptions implements Serializable {
     private boolean useUnofficialProcreation;
     private boolean useUnofficialProcreationNoRelationship;
     private boolean useTransfers;
+    private boolean capturePrisoners;
+    private int defaultPrisonerStatus;
 
     //personnel market related
     private boolean personnelMarketReportRefresh;
@@ -342,6 +347,8 @@ public class CampaignOptions implements Serializable {
         useUnofficialProcreation = false;
         useUnofficialProcreationNoRelationship = false;
         useTransfers = true;
+        capturePrisoners = true;
+        defaultPrisonerStatus = PRISONER_RANK;
         personnelMarketReportRefresh = true;
         personnelMarketType = PersonnelMarket.TYPE_STRAT_OPS;
         personnelMarketRandomEliteRemoval = 10;
@@ -1253,6 +1260,22 @@ public class CampaignOptions implements Serializable {
     public void setUseTransfers(boolean b) {
     	useTransfers = b;
     }
+    
+    public boolean capturePrisoners() {
+    	return capturePrisoners;
+    }
+    
+    public void setCapturePrisoners(boolean b) {
+    	capturePrisoners = b;
+    }
+    
+    public int getDefaultPrisonerStatus() {
+        return defaultPrisonerStatus;
+    }
+
+    public void setDefaultPrisonerStatus(int d) {
+    	defaultPrisonerStatus = d;
+    }
 
     public int getMinimumHitsForVees() {
         return minimumHitsForVees;
@@ -1771,6 +1794,8 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficialProcreation", useUnofficialProcreation);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficialProcreationNoRelationship", useUnofficialProcreationNoRelationship);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTransfers", useTransfers);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "capturePrisoners", capturePrisoners);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "defaultPrisonerStatus", defaultPrisonerStatus);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketType", personnelMarketType);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomEliteRemoval",
                                        personnelMarketRandomEliteRemoval);
@@ -2143,6 +2168,10 @@ public class CampaignOptions implements Serializable {
             	retVal.useUnofficialProcreationNoRelationship = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useTransfers")) {
             	retVal.useTransfers = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) {
+            	retVal.capturePrisoners = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("defaultPrisonerStatus")) {
+                retVal.defaultPrisonerStatus = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVees")) {
                 if (wn2.getTextContent().equalsIgnoreCase("true")) {
                     retVal.useRandomHitsForVees = true;
