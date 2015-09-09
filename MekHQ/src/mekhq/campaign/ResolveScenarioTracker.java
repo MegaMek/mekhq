@@ -252,6 +252,7 @@ public class ResolveScenarioTracker {
 					}
 					TestUnit nu = generateNewTestUnit(e);
                     UnitStatus us = new UnitStatus(nu);
+                    us.setTotalLoss(false);
                     salvageStatus.put(nu.getId(), us);
                     potentialSalvage.add(nu);
 				}
@@ -372,6 +373,7 @@ public class ResolveScenarioTracker {
         		if(control) {
         			TestUnit nu = generateNewTestUnit(e);
                     UnitStatus us = new UnitStatus(nu);
+                    us.setTotalLoss(false);
                     salvageStatus.put(nu.getId(), us);
                     potentialSalvage.add(nu);
         		}
@@ -642,9 +644,6 @@ public class ResolveScenarioTracker {
 	                en.applyDamage();
 	                int strength = ((Infantry)en).getShootingStrength();
 	                casualties = crew.size() - strength;
-	                if (ustatus.isTotalLoss()) {
-	                    casualties = crew.size();
-	                }
 	            }
 	            if(en instanceof Aero && !u.usesSoloPilot()) {
 	            	//need to check for existing hits because you can fly aeros with less than full
@@ -677,18 +676,6 @@ public class ResolveScenarioTracker {
 	                		continue;
 	                	}
 	                	status.setHits(pilot.getHits());
-	                	if (pickedUpPilots.contains(en.getId())
-	                            || (pilot.isUnconscious())
-	                            || en.isStalled()
-	                            || en.isStuck()
-	                            || en.isShutDown()
-	                            || en.isDestroyed()
-	                            || en.isPermanentlyImmobilized(false)) {
-	                        if (!status.isMissing() && !status.isDead()) {
-	                            status.setPickedUp(true);
-	                            status.setCaptured(true);
-	                        }
-	                    }
 	                } else {
 	                    //we have a multi-crewed vee
 	                    boolean wounded = false;
@@ -742,21 +729,10 @@ public class ResolveScenarioTracker {
 	                            hits = hits + Compute.randomInt(range);
 	                        }
 	                        status.setHits(hits);
-	                    }
-	                    if (pickedUpPilots.contains(en.getId())
-	                            || (null != en.getCrew()
-	                            && en.getCrew().isUnconscious())
-	                            || en.isStalled()
-	                            || en.isStuck()
-	                            || en.isShutDown()
-	                            || en.isDestroyed()
-	                            || en.isPermanentlyImmobilized(false)) {
-	                        if (!status.isMissing() && !status.isDead()) {
-	                            status.setPickedUp(true);
-	                            status.setCaptured(true);
-	                        }
-	                    }
+	                    }	                    
 	                }
+	                status.setCaptured(Utilities.isLikelyCapture(en));
+	                
 	                /**
 	                 * If the entity cannot be found, or it was deployed at least once during the scenario
 	                 * Then the pilot gets XP
@@ -866,6 +842,7 @@ public class ResolveScenarioTracker {
 	        		if(control) {
 	        			TestUnit nu = generateNewTestUnit(e);
 	                    UnitStatus us = new UnitStatus(nu);
+	                    us.setTotalLoss(false);
 	                    salvageStatus.put(nu.getId(), us);
 	                    potentialSalvage.add(nu);
 	        		}
@@ -1432,7 +1409,13 @@ public class ResolveScenarioTracker {
             }
             String s = "<html><b>" + getName() + "</b><br><font color='" + color + "'>"+ unit.getStatus() + "</font></html>";
             return s;
-
+        }
+        
+        public boolean isLikelyCaptured() {
+        	if(null == entity) {
+        		return false;
+        	}
+        	return Utilities.isLikelyCapture(entity);
         }
     }
 

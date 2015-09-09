@@ -13,6 +13,8 @@ v0.3.19 (git)
 + option to capture prisoners
 + option to set prisoners as bondsman by default
 + prisoners are tracked correctly from ejected units
++ added Utilities.isLikelyCapture for the logic of what/who gets captured in ResolveScenarioTracker
++ Bug: all salvage is considered total loss
 
 v0.3.18 (2015-09-01 12:10 UTC)
 + Bug: units listed as not invented when they have been

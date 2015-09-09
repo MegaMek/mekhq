@@ -57,6 +57,7 @@ import megamek.common.BattleArmor;
 import megamek.common.Compute;
 import megamek.common.ConvFighter;
 import megamek.common.Crew;
+import megamek.common.EjectedCrew;
 import megamek.common.Entity;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
@@ -1074,5 +1075,26 @@ public class Utilities {
 
 		return sortedMap;
 	}
+    
+    public static boolean isLikelyCapture(Entity en) {
+    	if(null == en.getCrew()) {
+    		return true;
+    	}
+    	if(en.getCrew().isUnconscious() 
+    			|| en.getCrew().isDead() 
+    			|| (en.getCrew().isEjected() && !(en instanceof EjectedCrew))) {
+    		return true;
+    	}
+    	if(!en.canEscape()) {
+    		return true;
+    	}
+    	return en.isDestroyed()
+    	        || en.isDoomed()
+    	        || (en.isCrippled() && !(en instanceof Infantry))
+    	        || en.isShutDown()
+    	        || en.isStalled()
+    	        || en.isStuck()
+    	        || en.isPermanentlyImmobilized(false);
+    }
 
 }
