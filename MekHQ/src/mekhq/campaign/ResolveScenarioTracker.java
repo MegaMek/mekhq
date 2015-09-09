@@ -186,7 +186,8 @@ public class ResolveScenarioTracker {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
+		} 
+        checkStatusOfPersonnel();
 	}
 
 	private TestUnit generateNewTestUnit(Entity e) {
@@ -827,7 +828,6 @@ public class ResolveScenarioTracker {
 	        		}
 	        	}
 	        }
-	        checkStatusOfPersonnel();			
 		}
 	}
 

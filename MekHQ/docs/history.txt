@@ -19,6 +19,7 @@ v0.3.19 (git)
 + Bug: ResolveScenarioWizardDialog not showing correct damage status of player's own units
 + Bug [#571]: Experience Error With Late Deployment
 + sort personnel and prisoners in ResolveScenarioWizard by unit name
++ Bug: when no mul file is loaded, pilot resolution is skipped
 
 v0.3.18 (2015-09-01 12:10 UTC)
 + Bug: units listed as not invented when they have been
