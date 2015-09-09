@@ -208,21 +208,13 @@ public class ResolveScenarioTracker {
 		for (Enumeration<Entity> iter = victoryEvent.getEntities(); iter.hasMoreElements();) {
 			Entity e = iter.nextElement();
 			checkForLostLimbs(e, control);
-			if(e.getOwnerId() == pid || e.getOwner().getTeam() == team) {
+			if(e.getOwnerId() == pid) {
 				if(!e.getExternalIdAsString().equals("-1")) {
 					UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
 					if(null != status) {
 						boolean lost = (!e.canEscape() && !control) || e.getRemovalCondition() == IEntityRemovalConditions.REMOVE_DEVASTATED;
 						status.assignFoundEntity(e, lost);						
 					}
-					//FIXME: this will no longer work correctly since we are assigning external Ids to all
-					//units in MM
-					/*else {
-						TestUnit nu = generateNewTestUnit(e);
-						UnitStatus us = new UnitStatus(nu);
-						unitsStatus.put(nu.getId(), us);
-						alliedUnits.add(nu);
-					}*/
 				}
 				if(null != e.getCrew()) {
 					if(!e.getCrew().getExternalIdAsString().equals("-1")) {
@@ -234,6 +226,11 @@ public class ResolveScenarioTracker {
 						}
 					}
 				}
+			} else if(e.getOwner().getTeam() == team) {
+				TestUnit nu = generateNewTestUnit(e);
+				UnitStatus us = new UnitStatus(nu);
+				unitsStatus.put(nu.getId(), us);
+				alliedUnits.add(nu);
 			} else if(e.getOwner().isEnemyOf(client.getLocalPlayer())) {
 				if(control) {
 					// Kill credit automatically assigned only if they can't escape
@@ -261,21 +258,18 @@ public class ResolveScenarioTracker {
 		// Utterly destroyed entities
 		for (Enumeration<Entity> iter = victoryEvent.getDevastatedEntities(); iter.hasMoreElements();) {
 		    Entity e = iter.nextElement();
-		    if(e.getOwnerId() == pid || e.getOwner().getTeam() == team) {
+		    if(e.getOwnerId() == pid) {
 		        if(!e.getExternalIdAsString().equals("-1")) {
 		            UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
 		            if(null != status) {
 		                status.assignFoundEntity(e, true);
 		            }
-		            //FIXME: this will no longer work correctly since we are assigning external Ids to all
-					//units in MM
-		            /*else {
-		                TestUnit nu = generateNewTestUnit(e);
-		                UnitStatus us = new UnitStatus(nu);
-		                unitsStatus.put(nu.getId(), us);
-		                alliedUnits.add(nu);
-		            }*/
 		        }
+		    } else if(e.getOwner().getTeam() == team) {
+		    	TestUnit nu = generateNewTestUnit(e);
+                UnitStatus us = new UnitStatus(nu);
+                unitsStatus.put(nu.getId(), us);
+                alliedUnits.add(nu);
 		    } else {
                 Entity killer = victoryEvent.getEntity(e.getKillerId());
                 if(null != killer && killer.getOwnerId() == pid) {
@@ -296,20 +290,12 @@ public class ResolveScenarioTracker {
 		for (Enumeration<Entity> iter = victoryEvent.getRetreatedEntities(); iter.hasMoreElements();) {
             Entity e = iter.nextElement();
 			checkForLostLimbs(e, control);
-            if(e.getOwnerId() == pid || e.getOwner().getTeam() == team) {
+            if(e.getOwnerId() == pid) {
             	if(!e.getExternalIdAsString().equals("-1")) {
             	    UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
                     if(null != status) {
                         status.assignFoundEntity(e, false);
 					}
-                    //FIXME: this will no longer work correctly since we are assigning external Ids to all
-					//units in MM
-                    /*else {
-					    TestUnit nu = generateNewTestUnit(e);
-	                    UnitStatus us = new UnitStatus(nu);
-	                    unitsStatus.put(nu.getId(), us);
-	                    alliedUnits.add(nu);
-					}*/
 				}
 				if(null != e.getCrew()) {
 					if(!e.getCrew().getExternalIdAsString().equals("-1")) {
@@ -319,6 +305,11 @@ public class ResolveScenarioTracker {
 						}
 					}
 				}
+            } else if(e.getOwner().getTeam() == team) {
+            	TestUnit nu = generateNewTestUnit(e);
+                UnitStatus us = new UnitStatus(nu);
+                unitsStatus.put(nu.getId(), us);
+                alliedUnits.add(nu);
             }
         }
 
@@ -326,7 +317,7 @@ public class ResolveScenarioTracker {
         while (wrecks.hasMoreElements()) {
         	Entity e = wrecks.nextElement();
 			checkForLostLimbs(e, control);
-        	if(e.getOwnerId() == pid || e.getOwner().getTeam() == team) {
+        	if(e.getOwnerId() == pid) {
         		if(!e.getExternalIdAsString().equals("-1")) {
         		    UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
                     if(null != status) {
@@ -335,14 +326,6 @@ public class ResolveScenarioTracker {
 							ejections.put(UUID.fromString(e.getExternalIdAsString()), (EjectedCrew)e);
 						}
 					}
-                    //FIXME: this will no longer work correctly since we are assigning external Ids to all
-					//units in MM
-                    /*else {
-					    TestUnit nu = generateNewTestUnit(e);
-	                    UnitStatus us = new UnitStatus(nu);
-	                    unitsStatus.put(nu.getId(), us);
-	                    alliedUnits.add(nu);
-					}*/
 				}
 				if(null != e.getCrew()) {
 					if(!e.getCrew().getExternalIdAsString().equals("-1")) {
@@ -358,6 +341,11 @@ public class ResolveScenarioTracker {
 						}
 					}
 				}
+        	} else if(e.getOwner().getTeam() == team) {
+        		TestUnit nu = generateNewTestUnit(e);
+                UnitStatus us = new UnitStatus(nu);
+                unitsStatus.put(nu.getId(), us);
+                alliedUnits.add(nu);
         	} else if(e.getOwner().isEnemyOf(client.getLocalPlayer())) {
         		Entity killer = victoryEvent.getEntity(e.getKillerId());
         		if(null != killer && killer.getOwnerId() == pid) {
