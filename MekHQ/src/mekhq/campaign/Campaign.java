@@ -6327,6 +6327,7 @@ public class Campaign implements Serializable {
         entity.setSwarmAttackerId(Entity.NONE);
         entity.setSwarmTargetId(Entity.NONE);
         entity.setLastTarget(Entity.NONE);
+        entity.setNeverDeployed(true);
         if (!entity.getSensors().isEmpty()) {
             entity.setNextSensor(entity.getSensors().firstElement());
         }

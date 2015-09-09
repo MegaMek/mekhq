@@ -586,13 +586,8 @@ public class ResolveScenarioTracker {
                         status.setHits(hits);
                     }
                 }
-                /**
-                 * If the entity cannot be found, or it was deployed at least once during the scenario
-                 * Then the pilot gets XP
-                 */
-                if (!en.wasNeverDeployed()) {
-                    status.setXP(campaign.getCampaignOptions().getScenarioXP());
-                }
+                status.setXP(campaign.getCampaignOptions().getScenarioXP());
+                status.setDeployed(!en.wasNeverDeployed());
                 peopleStatus.put(p.getId(), status);
             }
         }
@@ -719,15 +714,9 @@ public class ResolveScenarioTracker {
 	                        status.setHits(hits);
 	                    }	                    
 	                }
-	                status.setCaptured(Utilities.isLikelyCapture(en));
+	                status.setCaptured(Utilities.isLikelyCapture(en));                
+	                status.setXP(campaign.getCampaignOptions().getScenarioXP());     
 	                
-	                /**
-	                 * If the entity cannot be found, or it was deployed at least once during the scenario
-	                 * Then the pilot gets XP
-	                 */
-	                if (!en.wasNeverDeployed()) {
-	                    status.setXP(campaign.getCampaignOptions().getScenarioXP());
-	                }          
 	                prisonerStatus.put(id, status);
 	            }
 	        }
@@ -910,11 +899,13 @@ public class ResolveScenarioTracker {
             if(null == person || null == status) {
                 continue;
             }
-            person.setXp(person.getXp() + status.getXP());
             if(status.getHits() > person.getHits()) {
                 person.setHits(status.getHits());
             }
-            person.addLogEntry(campaign.getDate(), "Participated in " + scenario.getName() + " during mission " + m.getName());
+            if(status.wasDeployed()) {
+            	person.setXp(person.getXp() + status.getXP());
+            	person.addLogEntry(campaign.getDate(), "Participated in " + scenario.getName() + " during mission " + m.getName());
+            }
             for(Kill k : status.getKills()) {
                 campaign.addKill(k);
             }
@@ -1182,6 +1173,7 @@ public class ResolveScenarioTracker {
 		private boolean remove;
 		private boolean pickedUp;
 		private UUID personId;
+		private boolean deployed;
 
 		public PersonStatus(String n, String u, int h, UUID id) {
 			name = n;
@@ -1193,6 +1185,7 @@ public class ResolveScenarioTracker {
 			remove = false;
 			pickedUp = false;
 			personId = id;
+			deployed = true;
 		}
 
         public UUID getId() {
@@ -1264,6 +1257,14 @@ public class ResolveScenarioTracker {
 
 		public ArrayList<Kill> getKills() {
 			return kills;
+		}
+		
+		public void setDeployed(boolean b) {
+			deployed = b;
+		}
+		
+		public boolean wasDeployed() {
+			return deployed;
 		}
 	}
 
