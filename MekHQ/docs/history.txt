@@ -12,6 +12,7 @@ v0.3.19 (git)
 + Bug [#944]: Assign Kills Error
 + option to capture prisoners
 + option to set prisoners as bondsman by default
++ prisoners are tracked correctly from ejected units
 
 v0.3.18 (2015-09-01 12:10 UTC)
 + Bug: units listed as not invented when they have been
