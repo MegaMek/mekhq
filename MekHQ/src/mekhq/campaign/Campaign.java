@@ -5527,11 +5527,6 @@ public class Campaign implements Serializable {
                 target.addModifier(3, "overtime astechs");
             }
         }
-        if (null != partWork.getUnit()
-            && (partWork.getUnit().getEntity() instanceof Dropship || partWork
-                .getUnit().getEntity() instanceof Jumpship)) {
-            helpMod = 0;
-        }
         if (partWork.getShorthandedMod() > helpMod) {
             helpMod = partWork.getShorthandedMod();
         }
