@@ -171,7 +171,12 @@ public class JumpPath implements Serializable {
 			for (int x=0; x<nl.getLength(); x++) {
 				Node wn2 = nl.item(x);
 				if (wn2.getNodeName().equalsIgnoreCase("planetName")) {
-					retVal.addPlanet(c.getPlanet(wn2.getTextContent()));
+					Planet p = c.getPlanet(wn2.getTextContent());
+					if(null != p) {
+						retVal.addPlanet(p);
+					} else {
+						MekHQ.logError("Couldn't find planet named " + wn2.getTextContent());
+					}
 				}
 			}
 		} catch (Exception ex) {
