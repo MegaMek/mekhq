@@ -148,32 +148,21 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements
             gui.refreshOverview();
         } else if (command.contains("SET_QUALITY")) {
             int q = -1;
-            Object[] possibilities = { "F", "E", "D", "C", "B", "A" };
+            boolean reverse = gui.getCampaign().getCampaignOptions().reverseQualityNames();
+            Object[] possibilities = { Part.getQualityName(Part.QUALITY_A, reverse), 
+            		Part.getQualityName(Part.QUALITY_B, reverse), 
+            		Part.getQualityName(Part.QUALITY_C, reverse),
+            		Part.getQualityName(Part.QUALITY_D, reverse),
+            		Part.getQualityName(Part.QUALITY_E, reverse),
+            		Part.getQualityName(Part.QUALITY_F, reverse) };
             String quality = (String) JOptionPane.showInputDialog(gui.getFrame(),
                     "Choose the new quality level", "Set Quality",
-                    JOptionPane.PLAIN_MESSAGE, null, possibilities, "F");
-            switch (quality) {
-                case "A":
-                    q = 0;
-                    break;
-                case "B":
-                    q = 1;
-                    break;
-                case "C":
-                    q = 2;
-                    break;
-                case "D":
-                    q = 3;
-                    break;
-                case "E":
-                    q = 4;
-                    break;
-                case "F":
-                    q = 5;
-                    break;
-                default:
-                    q = -1;
-                    break;
+                    JOptionPane.PLAIN_MESSAGE, null, possibilities, Part.getQualityName(Part.QUALITY_D, reverse));
+            for(int i = 0; i < possibilities.length; i++) {
+            	if(possibilities[i].equals(quality)) {
+            		q = i;
+            		break;
+            	}
             }
             if (q != -1) {
                 for (Part p : parts) {
