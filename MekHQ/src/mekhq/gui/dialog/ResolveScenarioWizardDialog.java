@@ -563,7 +563,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         btnsSalvageEditUnit = new ArrayList<JButton>();
         JPanel pnlSalvageValue = new JPanel(new GridBagLayout());
         i = 0;
-        if(tracker.getMission() instanceof Contract) {
+        if((tracker.getMission() instanceof Contract) && !tracker.usesSalvageExchange()) {
         	lblSalvageValueUnit1 = new JLabel(resourceMap.getString("lblSalvageValueUnit1.text"));
         	gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -648,6 +648,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         	String txtBoxString = status.getDesc(formatter);
         	box = new JCheckBox(txtBoxString);
         	box.setSelected(false);
+        	box.setEnabled(!tracker.usesSalvageExchange());
         	box.addItemListener(new ItemListener() {
         		@Override
         		public void itemStateChanged(ItemEvent evt) {
@@ -1346,11 +1347,13 @@ public class ResolveScenarioWizardDialog extends JDialog {
 				escaped.setSelected(false);
 				escaped.setEnabled(false);
 			} else {
-				box.setEnabled(true);
+				if(!tracker.usesSalvageExchange()) {
+					box.setEnabled(true);
+				}
 				escaped.setEnabled(true);
 			}
     	}
-    	if(!(tracker.getMission() instanceof Contract)) {
+    	if(!(tracker.getMission() instanceof Contract) || tracker.usesSalvageExchange()) {
     		return;
     	}
     	salvageEmployer = ((Contract)tracker.getMission()).getSalvagedByEmployer();

@@ -1170,6 +1170,10 @@ public class ResolveScenarioTracker {
 		return toReturn;
 	}
 
+	public boolean usesSalvageExchange() {
+		return (getMission() instanceof Contract) && ((Contract)getMission()).isSalvageExchange();
+	}
+	
 	/**
 	 * This object is used to track the status of a particular personnel. At the present,
 	 * we track the person's missing status, hits, and XP

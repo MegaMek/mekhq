@@ -29,6 +29,7 @@ v0.3.19 (git)
 + Bug [#934]: Unlimited Repairs for Dropships and Warships
 + Bug: shorthanded mod not showing for large craft
 + Bug [#910]: sorting problem in parts store dialog
++ Bug [#897]: Can't Determine Salvage In Exchange
 
 v0.3.18 (2015-09-01 12:10 UTC)
 + Bug: units listed as not invented when they have been

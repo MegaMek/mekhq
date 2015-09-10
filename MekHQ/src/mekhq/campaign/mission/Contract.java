@@ -240,7 +240,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 	}
 
 	public boolean canSalvage() {
-		return salvagePct > 0 && !salvageExchange;
+		return salvagePct > 0;
 	}
 
 	public long getSalvagedByUnit() {
