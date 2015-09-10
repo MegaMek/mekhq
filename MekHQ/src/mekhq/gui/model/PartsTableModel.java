@@ -87,7 +87,7 @@ public class PartsTableModel extends DataTableModel {
             return part.getQuantity();
         }
         if(col == COL_QUALITY) {
-            return Part.getQualityName(part.getQuality());
+            return part.getQualityName();
         }
         if(col == COL_TON) {
             return Math.round(part.getTonnage() * 100) / 100.0;

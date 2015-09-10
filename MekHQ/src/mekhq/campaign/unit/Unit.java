@@ -3426,7 +3426,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     }
 
     public String getQualityName() {
-        return Part.getQualityName(getQuality());
+        return Part.getQualityName(getQuality(), campaign.getCampaignOptions().reverseQualityNames());
     }
 
     public boolean requiresMaintenance() {

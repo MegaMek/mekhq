@@ -183,6 +183,7 @@ public class CampaignOptions implements Serializable {
     private int maintenanceBonus;
     private boolean useQualityMaintenance;
 	private boolean useUnofficalMaintenance;
+	private boolean reverseQualityNames;
 
     //Dragoon's Rating
     private UnitRatingMethod unitRatingMethod;
@@ -340,6 +341,7 @@ public class CampaignOptions implements Serializable {
         maintenanceBonus = -1;
         useQualityMaintenance = true;
         useUnofficalMaintenance = false;
+        reverseQualityNames = false;
         checkMaintenance = true;
         useRandomHitsForVees = false;
         minimumHitsForVees = 1;
@@ -1188,6 +1190,14 @@ public class CampaignOptions implements Serializable {
     public void setUseUnofficalMaintenance(boolean b) {
     	useUnofficalMaintenance = b;
     }
+    
+    public boolean reverseQualityNames() {
+        return reverseQualityNames;
+    }
+
+    public void setReverseQualityNames(boolean b) {
+    	reverseQualityNames = b;
+    }
 
     public boolean checkMaintenance() {
         return checkMaintenance;
@@ -1786,6 +1796,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maintenanceCycleDays", maintenanceCycleDays);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maintenanceBonus", maintenanceBonus);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useQualityMaintenance", useQualityMaintenance);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "reverseQualityNames", reverseQualityNames);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficalMaintenance", useUnofficalMaintenance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "checkMaintenance", checkMaintenance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomHitsForVees", useRandomHitsForVees);
@@ -2150,6 +2161,8 @@ public class CampaignOptions implements Serializable {
                 retVal.maintenanceBonus = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useQualityMaintenance")) {
                 retVal.useQualityMaintenance = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("reverseQualityNames")) {
+                retVal.reverseQualityNames = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficalMaintenance")) {
                 retVal.useUnofficalMaintenance = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {

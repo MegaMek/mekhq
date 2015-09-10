@@ -7888,19 +7888,20 @@ public class Campaign implements Serializable {
 	            u.setLastMaintenanceReport(maintenanceReport);
 	            int quality = u.getQuality();
 	            String qualityString = "";
+	            boolean reverse = getCampaignOptions().reverseQualityNames();
 	            if (quality > qualityOrig) {
 	                qualityString = "<font color='green'>Overall quality improves from "
-	                                + Part.getQualityName(qualityOrig)
+	                                + Part.getQualityName(qualityOrig, reverse)
 	                                + " to "
-	                                + Part.getQualityName(quality) + "</font>";
+	                                + Part.getQualityName(quality, reverse) + "</font>";
 	            } else if (quality < qualityOrig) {
 	                qualityString = "<font color='red'>Overall quality declines from "
-	                                + Part.getQualityName(qualityOrig)
+	                                + Part.getQualityName(qualityOrig, reverse)
 	                                + " to "
-	                                + Part.getQualityName(quality) + "</font>";
+	                                + Part.getQualityName(quality, reverse) + "</font>";
 	            } else {
 	                qualityString = "Overall quality remains "
-	                                + Part.getQualityName(quality);
+	                                + Part.getQualityName(quality, reverse);
 	            }
 	            String damageString = "";
 	            if (nDamage > 0) {

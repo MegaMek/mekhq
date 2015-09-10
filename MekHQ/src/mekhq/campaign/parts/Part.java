@@ -202,19 +202,37 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.isTeamSalvaging = false;
 	}
 
-	public static String getQualityName(int quality) {
+	public static String getQualityName(int quality, boolean reverse) {
         switch(quality) {
         case QUALITY_A:
+        	if(reverse) {
+        		return "F";
+        	}
             return "A";
         case QUALITY_B:
+        	if(reverse) {
+        		return "E";
+        	}
             return "B";
         case QUALITY_C:
+        	if(reverse) {
+        		return "D";
+        	}
             return "C";
         case QUALITY_D:
+        	if(reverse) {
+        		return "C";
+        	}
             return "D";
         case QUALITY_E:
+        	if(reverse) {
+        		return "B";
+        	}
             return "E";
         case QUALITY_F:
+        	if(reverse) {
+        		return "A";
+        	}
             return "F";
         default:
             return "?";
@@ -222,7 +240,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
 
     public String getQualityName() {
-        return getQualityName(getQuality());
+        return getQualityName(getQuality(), campaign.getCampaignOptions().reverseQualityNames());
     }
 
 	public void setId(int id) {
