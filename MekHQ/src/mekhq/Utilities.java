@@ -57,7 +57,6 @@ import megamek.common.BattleArmor;
 import megamek.common.Compute;
 import megamek.common.ConvFighter;
 import megamek.common.Crew;
-import megamek.common.EjectedCrew;
 import megamek.common.Entity;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
@@ -364,7 +363,7 @@ public class Utilities {
 
 		return false;
     }
-    
+
 	public static ArrayList<Person> generateRandomCrewWithCombinedSkill(Unit unit, Campaign c, boolean addToUnit) {
         ArrayList<Person> newCrew = new ArrayList<Person>();
         Crew oldCrew = unit.getEntity().getCrew();
@@ -427,7 +426,7 @@ public class Utilities {
 			drivers.add(p);
 		} else {
 			// Generate drivers for multi-crewed vehicles.
-			
+
 			//Uggh, BA are a nightmare. The getTotalDriverNeeds will adjust for missing/destroyed suits
 			//but we cant change that because lots of other stuff needs that to be right, so we will hack
 			//it here to make it the starting squad size
@@ -515,7 +514,7 @@ public class Utilities {
 		    		}
 		    		gunners.add(p);
 		    	}
-	
+
 		    	// Regenerate gunners as needed to balance
 		    	if (gunners.size() != 0) {
 		    		averageGunnery = (int)Math.round(((double)totalGunnery)/gunners.size());
@@ -1075,7 +1074,7 @@ public class Utilities {
 
 		return sortedMap;
 	}
-    
+
     public static boolean isLikelyCapture(Entity en) {
     	//most of these conditions are now controlled better in en.canEscape, but there
     	//are some additional ones we want to add
