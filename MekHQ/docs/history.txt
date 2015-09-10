@@ -23,6 +23,7 @@ v0.3.19 (git)
 + Bug [#928]: Picked up MechWarriors are not shown in Post Battle Resolution
 + Bug [#657]: Units incorrectly listed as escaped at end of the battle
 + Bug [#945]: Peronnel tab, Fluff Information view - cannot sort by kills
++ Bug [#930]: Name of Tab different between MHQ and MML
 
 v0.3.18 (2015-09-01 12:10 UTC)
 + Bug: units listed as not invented when they have been
