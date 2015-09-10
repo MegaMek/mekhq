@@ -451,7 +451,7 @@ public class ResolveScenarioTracker {
 	}
 
 	public void checkStatusOfPersonnel() {
-		java.util.HashSet<Integer> pickedUpPilots = new java.util.HashSet<Integer>();
+		//java.util.HashSet<Integer> pickedUpPilots = new java.util.HashSet<Integer>();
 
 		//FIXME: This won't work because it is using the entity on unit which is not the same
 		//one that was used in the game and it is also a no-no because it is using the victoryEvent
@@ -459,12 +459,12 @@ public class ResolveScenarioTracker {
 		//put some more info in the MUL. I am also not sure what the ultimate goal of this is, as 
 		//it doesn't do anything. Optimally, we should use information about who did the picking up
 		//in order to determine whether the pilot was retreated, captured, or whatever. 
-		for(Unit u : units) {
+		/*for(Unit u : units) {
 			for (int mwid : u.getEntity().getPickedUpMechWarriors()) {
 				MechWarrior mw = (MechWarrior)victoryEvent.getEntity(mwid);
 				pickedUpPilots.add(mw.getOriginalRideId());
 			}
-		}
+		}*/
 
 		//lets cycle through units and get their crew
         for(Unit u : units) {
@@ -529,9 +529,6 @@ public class ResolveScenarioTracker {
                 		|| en instanceof Protomech 
                 		|| (en instanceof Aero && !(en instanceof SmallCraft || en instanceof Jumpship))) {
                 	status.setHits(pilot.getHits());
-                    if (pickedUpPilots.contains(u.getEntity().getId())) {
-                        status.setPickedUp(true);
-                    }
                 } else {
                 	//we have a multi-crewed vee/Aero/Infantry
                     boolean wounded = false;
@@ -611,10 +608,14 @@ public class ResolveScenarioTracker {
 	            }
 	            //check for an ejected entity and if we find one then assign it instead to switch vees
 	            //over to infantry checks for casualties
-	            Entity ejected = enemyEjections.get(UUID.fromString(en.getCrew().getExternalIdAsString()));
+	            Entity ejected = enemyEjections.get(UUID.fromString(en.getCrew().getExternalIdAsString()));	            
 	            if(null != ejected) {
-	            	en = ejected;
+	            	en = ejected;      	
 	            }
+	            //check if this ejection was picked up by a player's unit
+            	boolean pickedUp = en instanceof MechWarrior 
+            			&& !((MechWarrior)en).getPickedUpByExternalIdAsString().equals("-1")
+            			&& null != unitsStatus.get(UUID.fromString(((MechWarrior)en).getPickedUpByExternalIdAsString()));
 	            //if the crew ejected from this unit, then skip it because we should find them elsewhere
 	            //if they are alive
 	            if(!(en instanceof EjectedCrew) 
@@ -717,7 +718,7 @@ public class ResolveScenarioTracker {
 	                        status.setHits(hits);
 	                    }	                    
 	                }
-	                status.setCaptured(Utilities.isLikelyCapture(en));                
+	                status.setCaptured(Utilities.isLikelyCapture(en) || pickedUp);                
 	                status.setXP(campaign.getCampaignOptions().getScenarioXP());     
 	                
 	                prisonerStatus.put(id, status);
