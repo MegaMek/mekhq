@@ -6475,9 +6475,10 @@ public class CampaignGUI extends JPanel {
 
     public void refreshTechsList() {
         int selected = techTable.getSelectedRow();
-        techsModel.setData(getCampaign().getTechs(true, null));
+        ArrayList<Person> techs = getCampaign().getTechs(true, null);
+        techsModel.setData(techs);
         if ((selected > -1)
-                && (selected < getCampaign().getTechs(true, null).size())) {
+                && (selected < techs.size())) {
             techTable.setRowSelectionInterval(selected, selected);
         }
         String astechString = "<html><b>Astech Pool Minutes:</> "
@@ -6902,6 +6903,7 @@ public class CampaignGUI extends JPanel {
     public void filterTechs(boolean warehouse) {
         RowFilter<TechTableModel, Integer> techTypeFilter = null;
         final Part part = getSelectedTask();
+        final Unit unit = getSelectedServicedUnit();
         techTypeFilter = new RowFilter<TechTableModel, Integer>() {
             @Override
             public boolean include(
@@ -6917,6 +6919,16 @@ public class CampaignGUI extends JPanel {
                 }
                 TechTableModel techModel = entry.getModel();
                 Person tech = techModel.getTechAt(entry.getIdentifier());
+                if(unit.isSelfCrewed()) {
+                	if(tech.getPrimaryRole() != Person.T_SPACE_CREW) {
+                		return false;
+                	}
+                	//check whether the engineer is assigned to the correct unit
+                	return unit.getId().equals(tech.getUnitId());
+                }
+                if(tech.getPrimaryRole() == Person.T_SPACE_CREW && !unit.isSelfCrewed()) {
+                	return false;
+                }
                 if (!onWarehouseTab() && !tech.isRightTechTypeFor(part)
                         && !btnShowAllTechs.isSelected()) {
                     return false;

@@ -239,6 +239,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     protected int minutesLeft;
     protected int overtimeLeft;
     protected int nTasks;
+    protected boolean engineer;
 
     /**
      * * Start Advanced Medical ***
@@ -2675,6 +2676,15 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public void setMinutesLeft(int m) {
         this.minutesLeft = m;
+        if(engineer && null != getUnitId()) {
+        	//set minutes for all crewmembers
+        	Unit u = campaign.getUnit(getUnitId());
+        	if(null != u) {
+        		for(Person p : u.getActiveCrew()) {
+        			p.setMinutesLeft(m);
+        		}
+        	}
+        }
     }
 
     public int getOvertimeLeft() {
@@ -2683,6 +2693,15 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public void setOvertimeLeft(int m) {
         this.overtimeLeft = m;
+        if(engineer && null != getUnitId()) {
+        	//set minutes for all crewmembers
+        	Unit u = campaign.getUnit(getUnitId());
+        	if(null != u) {
+        		for(Person p : u.getActiveCrew()) {
+        			p.setMinutesLeft(m);
+        		}
+        	}
+        }
     }
 
     public void resetMinutesLeft() {
@@ -2892,6 +2911,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         Skill mechanicSkill = getSkill(SkillType.S_TECH_MECHANIC);
         Skill baSkill = getSkill(SkillType.S_TECH_BA);
         Skill aeroSkill = getSkill(SkillType.S_TECH_AERO);
+        Skill vesselSkill = getSkill(SkillType.S_TECH_VESSEL);
         boolean first = true;
         if (null != mechSkill) {
             if (!first) {
@@ -2919,6 +2939,13 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                 toReturn += "; ";
             }
             toReturn += SkillType.getExperienceLevelName(aeroSkill.getExperienceLevel()) + " " + SkillType.S_TECH_AERO;
+            first = false;
+        }
+        if (null != vesselSkill) {
+            if (!first) {
+                toReturn += "; ";
+            }
+            toReturn += SkillType.getExperienceLevelName(vesselSkill.getExperienceLevel()) + " " + SkillType.S_TECH_VESSEL;
             first = false;
         }
         toReturn += "<br/>";
@@ -3696,5 +3723,13 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public boolean isDeadOrMIA() {
     	return (status == S_KIA) || (status == S_MIA);
+    }
+    
+    public boolean isEngineer() {
+    	return engineer;
+    }
+    
+    public void setEngineer(boolean b) {
+    	engineer = b;
     }
 }

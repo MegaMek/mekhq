@@ -1241,6 +1241,12 @@ public class Campaign implements Serializable {
                 techs.add(p);
             }
         }
+        //also need to loop through and collect engineers on self-crewed vessels
+        for(Unit u : getUnits()) {
+        	if(u.isSelfCrewed() && !(u.getEntity() instanceof Infantry) && null != u.getEngineer()) {
+        		techs.add(u.getEngineer());
+        	}
+        }
         return techs;
     }
 

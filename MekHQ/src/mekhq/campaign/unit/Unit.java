@@ -1328,27 +1328,6 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	    return getDamageState(getEntity());
 	}
 
-	public int getFullBaseValueOfParts() {
-		//Entity undamagedEntity = Campaign
-			//	.getBrandNewUndamagedEntity(getEntity().getShortName());
-
-		//if (undamagedEntity == null)
-			//return -1;
-
-		//Unit undamagedUnit = new Unit(undamagedEntity, campaign);
-		//undamagedUnit.runDiagnosticStratOps();
-
-		int cost = 0;
-		/*
-		for (WorkItem task : campaign.getAllTasksForUnit(undamagedUnit.getId())) {
-			if (task instanceof SalvageItem) {
-				cost += ((SalvageItem) task).getPart().getCost();
-			}
-		}*/
-
-		return cost;
-	}
-
 	public void writeToXml(PrintWriter pw1, int indentLvl) {
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "<unit id=\"" + id.toString()
 				+ "\" type=\"" + this.getClass().getName() + "\">");
@@ -2707,75 +2686,98 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     }
 
     public void resetEngineerOrTech() {
+    	if(!isSelfCrewed()) {
+    		return;
+    	}
         int minutesLeft = 480;
         int overtimeLeft = 240;
-        if(isSelfCrewed()) {
-        	if(getEntity() instanceof Infantry) {
-        		if(!isUnmanned()) {
-        			engineer = new Person(getCommander().getName(), campaign);
-                    engineer.setMinutesLeft(minutesLeft);
-                    engineer.setOvertimeLeft(overtimeLeft);
-                    engineer.setId(getCommander().getId());
-                    engineer.setPrimaryRole(Person.T_MECHANIC);
-                    engineer.setRankNumeric(getCommander().getRankNumeric());
-                    //will only be reloading ammo, so doesn't really matter what skill level we give them - set to regular
-                    engineer.addSkill(SkillType.S_TECH_MECHANIC, SkillType.getType(SkillType.S_TECH_MECHANIC).getRegularLevel(), 0);
-        		} else {
-	                engineer = null;
-	            }
+        if(null != engineer) {
+        	minutesLeft = engineer.getMinutesLeft();
+        	overtimeLeft = engineer.getOvertimeLeft();
+        } else {
+        	//then get the number based on the least amount of time available to crew members
+        	for(Person p : getActiveCrew()) {
+        		if(p.getMinutesLeft() < minutesLeft) {
+        			minutesLeft = p.getMinutesLeft();
+        		}
+        		if(p.getOvertimeLeft() < overtimeLeft) {
+        			overtimeLeft = p.getOvertimeLeft();
+        		}
+        	}
+        }
+        if(getEntity() instanceof Infantry) {
+        	if(!isUnmanned()) {
+        		engineer = new Person(getCommander().getName(), campaign);
+        		engineer.setEngineer(true);
+        		engineer.setMinutesLeft(minutesLeft);
+        		engineer.setOvertimeLeft(overtimeLeft);
+        		engineer.setId(getCommander().getId());
+        		engineer.setPrimaryRole(Person.T_MECHANIC);
+        		engineer.setRankNumeric(getCommander().getRankNumeric());
+        		//will only be reloading ammo, so doesn't really matter what skill level we give them - set to regular
+        		engineer.addSkill(SkillType.S_TECH_MECHANIC, SkillType.getType(SkillType.S_TECH_MECHANIC).getRegularLevel(), 0);
         	} else {
-	            if (vesselCrew.size() > 0) {
-	                int nCrew = 0;
-	                int sumSkill = 0;
-	                int sumBonus = 0;
-	                String engineerName = "Nobody";
-	                int bestRank = -1;
-	                for(UUID pid : vesselCrew) {
-	                    Person p = campaign.getPerson(pid);
-	                    if(null == p) {
-	                        continue;
-	                    }
-	                    if(p.hasSkill(SkillType.S_TECH_VESSEL)) {
-	                        sumSkill += p.getSkill(SkillType.S_TECH_VESSEL).getLevel();
-	                        sumBonus += p.getSkill(SkillType.S_TECH_VESSEL).getBonus();
-	                        nCrew++;
-	                    }
-	                    if(p.getRankNumeric() > bestRank) {
-	                        engineerName = p.getFullName();
-	                        bestRank = p.getRankNumeric();
-	                    }
-	                }
-	                if(nCrew > 0) {
-	                    engineer = new Person(engineerName, campaign);
-	                    engineer.setMinutesLeft(minutesLeft);
-	                    engineer.setOvertimeLeft(overtimeLeft);
-	                    engineer.setId(getCommander().getId());
-	                    engineer.setPrimaryRole(Person.T_SPACE_CREW);
-	                    if(bestRank > -1) {
-	                        engineer.setRankNumeric(bestRank);
-	                    }
-	                    engineer.addSkill(SkillType.S_TECH_VESSEL, sumSkill/nCrew, sumBonus/nCrew);
-	                } else {
-	                    engineer = null;
-	                    //cancel any mothballing if this happens
-	                    if(isMothballing()) {
-	                        mothballTime = 0;
-	                    }
-	                    //remove any scheduled tasks
-	                    for(Part p : getParts()) {
-	                        if(null != p.getAssignedTeamId()) {
-	                            p.cancelAssignment();
-	                        }
-	                    }
-	                }
-	            } else { // Needed to fix bug where removed crew doesn't remove engineer
-	                engineer = null;
-	            }
+        		engineer = null;
+        	}
+        } else {
+        	if (vesselCrew.size() > 0) {
+        		int nCrew = 0;
+        		int sumSkill = 0;
+        		int sumBonus = 0;
+        		String engineerName = "Nobody";
+        		int bestRank = -1;
+        		for(UUID pid : vesselCrew) {
+        			Person p = campaign.getPerson(pid);
+        			if(null == p) {
+        				continue;
+        			}
+        			if(p.hasSkill(SkillType.S_TECH_VESSEL)) {
+        				sumSkill += p.getSkill(SkillType.S_TECH_VESSEL).getLevel();
+        				sumBonus += p.getSkill(SkillType.S_TECH_VESSEL).getBonus();
+        				nCrew++;
+        			}
+        			if(p.getRankNumeric() > bestRank) {
+        				engineerName = p.getFullName();
+        				bestRank = p.getRankNumeric();
+        			}
+        		}
+        		if(nCrew > 0) {
+        			engineer = new Person(engineerName, campaign);
+            		engineer.setEngineer(true);
+        			engineer.setMinutesLeft(minutesLeft);
+        			engineer.setOvertimeLeft(overtimeLeft);
+        			engineer.setId(getCommander().getId());
+        			engineer.setPrimaryRole(Person.T_SPACE_CREW);
+        			if(bestRank > -1) {
+        				engineer.setRankNumeric(bestRank);
+        			}
+        			engineer.addSkill(SkillType.S_TECH_VESSEL, sumSkill/nCrew, sumBonus/nCrew);
+        			engineer.setUnitId(this.getId());
+        		} else {
+        			engineer = null;
+        		}
+        	} else { // Needed to fix bug where removed crew doesn't remove engineer
+        		engineer = null;
         	}
         }
         if(null != engineer) {
-            minutesLeft = engineer.getMinutesLeft();
-            overtimeLeft = engineer.getOvertimeLeft();
+        	//change reference for any scheduled tasks
+        	for(Part p : getParts()) {
+        		if(p.isBeingWorkedOn()) {
+        			p.setTeamId(engineer.getId());
+        		}
+        	}
+        } else {
+        	//cancel any mothballing if this happens
+        	if(isMothballing()) {
+        		mothballTime = 0;
+        	}
+        	//cancel any scheduled tasks
+        	for(Part p : getParts()) {
+        		if(p.isBeingWorkedOn()) {
+        			p.cancelAssignment();
+        		}
+        	}
         }
     }
 
@@ -3317,7 +3319,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
         if(getEntity() instanceof ConvFighter) {
             return 45;
         }
-        if(getEntity() instanceof SmallCraft) {
+        if(getEntity() instanceof SmallCraft && !(getEntity() instanceof Dropship)) {
             return 90;
         }
         if(getEntity() instanceof Aero

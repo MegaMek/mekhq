@@ -839,25 +839,25 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				mods.addModifier(2, "clan tech");
 			}
 		}
-
+		String qualityName = getQualityName(quality, campaign.getCampaignOptions().reverseQualityNames());
 		switch(quality) {
 		case QUALITY_A:
-            mods.addModifier(3, "Quality A");
+            mods.addModifier(3, qualityName);
             break;
 		case QUALITY_B:
-            mods.addModifier(2, "Quality B");
+            mods.addModifier(2, qualityName);
             break;
 		case QUALITY_C:
-            mods.addModifier(1, "Quality C");
+            mods.addModifier(1, qualityName);
             break;
 		case QUALITY_D:
-            mods.addModifier(0, "Quality D");
+            mods.addModifier(0, qualityName);
             break;
 		case QUALITY_E:
-            mods.addModifier(-1, "Quality E");
+            mods.addModifier(-1, qualityName);
             break;
 		case QUALITY_F:
-            mods.addModifier(-2, "Quality F");
+            mods.addModifier(-2, qualityName);
             break;
 		}
 
