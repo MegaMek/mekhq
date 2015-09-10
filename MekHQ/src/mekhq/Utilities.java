@@ -1077,24 +1077,15 @@ public class Utilities {
 	}
     
     public static boolean isLikelyCapture(Entity en) {
-    	if(null == en.getCrew()) {
-    		return true;
-    	}
-    	if(en.getCrew().isUnconscious() 
-    			|| en.getCrew().isDead() 
-    			|| (en.getCrew().isEjected() && !(en instanceof EjectedCrew))) {
-    		return true;
-    	}
+    	//most of these conditions are now controlled better in en.canEscape, but there
+    	//are some additional ones we want to add
     	if(!en.canEscape()) {
     		return true;
     	}
     	return en.isDestroyed()
     	        || en.isDoomed()
-    	        || (en.isCrippled() && !(en instanceof Infantry))
-    	        || en.isShutDown()
     	        || en.isStalled()
-    	        || en.isStuck()
-    	        || en.isPermanentlyImmobilized(false);
+    	        || en.isStuck();
     }
 
 }

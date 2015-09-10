@@ -21,6 +21,7 @@ v0.3.19 (git)
 + sort personnel and prisoners in ResolveScenarioWizard by unit name
 + Bug: when no mul file is loaded, pilot resolution is skipped
 + Bug [#928]: Picked up MechWarriors are not shown in Post Battle Resolution
++ Bug [#657]: Units incorrectly listed as escaped at end of the battle
 
 v0.3.18 (2015-09-01 12:10 UTC)
 + Bug: units listed as not invented when they have been
