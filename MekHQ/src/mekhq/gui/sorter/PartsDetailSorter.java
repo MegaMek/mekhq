@@ -16,10 +16,18 @@ public class PartsDetailSorter implements Comparator<String> {
         String[] ss0 = s0.replace("<html>", "").replace("</html>", "").replace("<nobr>", "").replace("</nobr>", "").split(" ");
         String[] ss1 = s1.replace("<html>", "").replace("</html>", "").replace("<nobr>", "").replace("</nobr>", "").split(" ");
         if(!ss0[0].isEmpty()) {
-            l0 = Double.parseDouble(ss0[0]);
+        	try {
+        		l0 = Double.parseDouble(ss0[0]);
+        	} catch(NumberFormatException e) {
+        		//do nothing
+        	}
         }
         if(!ss1[0].isEmpty()) {
-        	l1 = Double.parseDouble(ss1[0]);
+        	try {
+        		l1 = Double.parseDouble(ss1[0]);
+        	} catch(NumberFormatException e) {
+        		//do nothing
+        	}
         }
         s0 = "";
         s1 = "";
