@@ -212,19 +212,23 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             }
             setProgress(4);
             if(newCampaign) {
-            	setVisible(false);
             	// show the date chooser
                 DateChooser dc = new DateChooser(frame, campaign.calendar);
-                // user can eiter choose a date or cancel by closing
+                // user can either choose a date or cancel by closing
                 if (dc.showDateChooser() == DateChooser.OK_OPTION) {
                 	campaign.calendar = dc.getDate();
                 	// Ensure that the MegaMek year GameOption matches the campaign year
-                    GameOptions gameOpts = campaign.getGameOptions();            
-                    int campaignYear = campaign.getCalendar().get(Calendar.YEAR);     
+                    GameOptions gameOpts = campaign.getGameOptions();
+                    int campaignYear = campaign.getCalendar().get(Calendar.YEAR);
                     if (gameOpts.intOption("year") != campaignYear) {
                         gameOpts.getOption("year").setValue(campaignYear);
                     }
                 }
+
+                // This must be after the date chooser to enable correct functionality.
+                setVisible(false);
+
+                // Game Presets
                 ArrayList<GamePreset> presets = GamePreset.getGamePresetsIn(MekHQ.PRESET_DIR);
                 if(!presets.isEmpty()) {
                 	ChooseGamePresetDialog cgpd = new ChooseGamePresetDialog(frame, true, presets);

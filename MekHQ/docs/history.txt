@@ -32,6 +32,7 @@ v0.3.19 (git)
 + Bug [#897]: Can't Determine Salvage In Exchange
 + Bug [#899]: MHQ Version Upgrade Causing Jump Path Error
 + Bug [#929]: Warehouse Tab - sorting issues
++ Bug [#920]: Start a New Campaign and the Date Chooser
 
 v0.3.18 (2015-09-01 12:10 UTC)
 + Bug: units listed as not invented when they have been

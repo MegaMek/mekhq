@@ -478,7 +478,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         checkMaintenance.setSelected(options.checkMaintenance());
         reverseQualityNames.setSelected(options.reverseQualityNames());
 
-        
+
         sellUnitsBox.setSelected(options.canSellUnits());
         sellPartsBox.setSelected(options.canSellParts());
 
@@ -842,7 +842,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubRepair.add(pnlDestroyPartTarget, gridBagConstraints);
 
-        
+
         checkMaintenance.setText(resourceMap.getString("checkMaintenance.text")); // NOI18N
         checkMaintenance.setToolTipText(resourceMap.getString("checkMaintenance.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -930,7 +930,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubMaintenance.add(reverseQualityNames, gridBagConstraints);
 
-        
+
         useUnofficalMaintenance.setText(resourceMap.getString("useUnofficalMaintenance.text")); // NOI18N
         useUnofficalMaintenance.setToolTipText(resourceMap.getString("useUnofficalMaintenance.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -4176,7 +4176,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUseUnofficialProcreationNoRelationship(chkUseUnofficialProcreationNoRelationship.isSelected());
         options.setUseTransfers(chkUseTransfers.isSelected());
         options.setDefaultPrisonerStatus(comboPrisonerStatus.getSelectedIndex());
-        
+
         rskillPrefs.setOverallRecruitBonus((Integer) spnOverallRecruitBonus.getModel().getValue());
         for (int i = 0; i < Person.T_NUM; i++) {
             rskillPrefs.setRecruitBonus(i, (Integer) spnTypeRecruitBonus[i].getModel().getValue());
@@ -4351,7 +4351,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private void btnDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDateActionPerformed
         // show the date chooser
         DateChooser dc = new DateChooser(frame, date);
-        // user can eiter choose a date or cancel by closing
+        // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             date = dc.getDate();
             btnDate.setText(getDateAsString());
