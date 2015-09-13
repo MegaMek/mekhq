@@ -404,7 +404,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	public void setHistory(String s) {
 		this.history = s;
 	}
-	
+
 	public static boolean isFunctional(Entity en) {
 		if (en instanceof Mech) {
 			// center torso bad?? head bad?
@@ -458,7 +458,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	public boolean isFunctional() {
 		return isFunctional(entity);
 	}
-	
+
 	public static boolean isRepairable(Entity en) {
 		if (en instanceof Mech) {
 			// you can repair anything so long as one point of CT is left
@@ -2544,7 +2544,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
         		sumGunnery += p.getGunneryInjuryMod();
         	}
     	}
-    	
+
     	for(UUID pid : vesselCrew) {
     		Person p = campaign.getPerson(pid);
     		if(null !=p && p.getHits() == 0) {
@@ -2557,7 +2557,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     			nCrew++;
     		}
     	}
-    	
+
     	if(nDrivers > 0) {
     		piloting = (int)Math.round(((double)sumPiloting)/nDrivers);
     	}
@@ -2567,7 +2567,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	if(entity instanceof Infantry) {
     		if(entity instanceof BattleArmor) {
     		    int ntroopers = 0;
-    		    //ok, we want to reorder the way we move through suits, so that we always put BA
+    		    //OK, we want to reorder the way we move through suits, so that we always put BA
     		    //in the suits with more armor. Otherwise, we may put a soldier in a suit with no
     		    //armor when a perfectly good suit is waiting further down the line.
     		    Map<String, Integer> bestSuits = new HashMap<String, Integer>();
@@ -2612,9 +2612,9 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	//TODO: For the moment we need to max these out at 8 so people don't get errors
     	//when they customize in MM but we should put an option in MM to ignore those limits
     	//and set it to true when we start up through MHQ
-    	gunnery = Math.min(gunnery, 7);
-    	piloting = Math.min(piloting, 8);
-    	artillery = Math.min(artillery, 7);
+    	gunnery = Math.min(Math.max(gunnery, 0), 7);
+    	piloting = Math.min(Math.max(piloting, 0), 8);
+    	artillery = Math.min(Math.max(artillery, 0), 7);
     	Crew pilot = new Crew(commander.getFullTitle(), 1, gunnery, piloting);
     	pilot.setPortraitCategory(commander.getPortraitCategory());
     	pilot.setPortraitFileName(commander.getPortraitFileName());
@@ -2675,17 +2675,17 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     		}
     		pilot.setHits(hits);
     	}
-    	resetEngineerOrTech();
+    	resetEngineer();
     	pilot.setToughness(commander.getToughness());
     	//TODO: game option to use tactics as command and ind init bonus
     	if(commander.hasSkill(SkillType.S_TACTICS)) {
     		pilot.setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getFinalSkillValue());
     	}
-    	    	
+
     	entity.setCrew(pilot);
     }
 
-    public void resetEngineerOrTech() {
+    public void resetEngineer() {
     	if(!isSelfCrewed()) {
     		return;
     	}
@@ -2843,10 +2843,10 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     public boolean usesSoloPilot() {
     	//return Compute.getFullCrewSize(entity) == 1;
     	//Taharqa: I dont think we should do it based on computed size, but whether the unit logically
-    	//is the type of unit that has only one pilot. This is partly because there may be some vees 
+    	//is the type of unit that has only one pilot. This is partly because there may be some vees
     	//that only have one pilot and this is also a problem for BA units with only one active suit
-    	return (entity instanceof Mech) 
-    			|| (entity instanceof Protomech) 
+    	return (entity instanceof Mech)
+    			|| (entity instanceof Protomech)
     			|| (entity instanceof Aero && !(entity instanceof SmallCraft) && !(entity instanceof Jumpship));
     }
 
