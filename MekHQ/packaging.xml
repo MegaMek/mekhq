@@ -135,6 +135,9 @@
         <copy todir="${pkgdir}/${libdir}">
             <fileset dir="${mm-pkgdir}/megamek/${libdir}" />
         </copy>
+        <copy todir="${pkgdir}/${libdir}">
+            <fileset dir="${mml-pkgdir}/${libdir}" />
+        </copy>
         <!-- now add in MM and MML doc files -->
         <copy todir="${pkgdir}/${docdir}/${docmmdir}">
             <fileset dir="${mm-pkgdir}/megamek/${docdir}" />

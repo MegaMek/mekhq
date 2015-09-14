@@ -122,8 +122,10 @@
         </copy>
         <!-- now add in lib files -->
         <copy todir="${localdir}/${libdir}">
-            <fileset dir="${mmdir}/${libdir}">
-            </fileset>
+            <fileset dir="${mmdir}/${libdir}" />
+        </copy>
+        <copy todir="${localdir}/${libdir}">
+            <fileset dir="${mmldir}/${libdir}" />
         </copy>
         <!-- now add in doc files from mm and mml -->
 		<mkdir dir="${localdir}/${docdir}/${docmmdir}" />
