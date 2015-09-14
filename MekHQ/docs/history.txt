@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.19 (git)
+v0.3.19 (2014-09-14 01:25 UTC)
 + Bug [#922]: Location of Jump Jets is not shown in repair tab
 + Bug [#908]: Pay for Recruitment Pays for All Enemy Pilots
 + Bug: enemy salvage not identified via manual resolution when it has a UUID
@@ -36,6 +36,8 @@ v0.3.19 (git)
 + Bug [#813]: Mek HQ pilots/crews with -1 and below skills do not function correctly in the MM lobby
 + Bug [#816]: Injury handling for MIA pilots doesn't work correctly
 + WIP Bug [#900]:  Daily Log overwhelmed by Injury Reports
++ Updated MegaMek.jar to 0.41.9
++ Updated MegaMekLab.jar to 0.1.45
 
 v0.3.18 (2015-09-01 12:10 UTC)
 + Bug: units listed as not invented when they have been
