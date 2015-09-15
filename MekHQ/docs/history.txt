@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.3.20 (git)
++ Bug: NPE on warehouse tech filter
 
 v0.3.19 (2014-09-14 01:25 UTC)
 + Bug [#922]: Location of Jump Jets is not shown in repair tab

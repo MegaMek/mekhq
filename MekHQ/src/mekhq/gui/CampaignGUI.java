@@ -6919,7 +6919,7 @@ public class CampaignGUI extends JPanel {
                 }
                 TechTableModel techModel = entry.getModel();
                 Person tech = techModel.getTechAt(entry.getIdentifier());
-                if(unit.isSelfCrewed()) {
+                if(null != unit && unit.isSelfCrewed()) {
                 	if(tech.getPrimaryRole() != Person.T_SPACE_CREW) {
                 		return false;
                 	}
