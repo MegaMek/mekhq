@@ -799,7 +799,7 @@ public class ResolveScenarioTracker {
 						}
 					}
 	        	} else {
-	        		if(e instanceof EjectedCrew) {
+	        		if(e instanceof EjectedCrew & null != e.getCrew() && !e.getCrew().getExternalIdAsString().equals("-1")) {
 						enemyEjections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
 						continue;
 					}
