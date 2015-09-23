@@ -2484,6 +2484,9 @@ public class AtBScenario extends Scenario {
 		crew += "\" ejected=\""
 				 + String.valueOf(tgtEnt.getCrew().isEjected());
 
+		crew += "\" externalId=\""
+				 + tgtEnt.getCrew().getExternalIdAsString();
+		
 		if (tgtEnt instanceof Mech) {
 			if (((Mech) tgtEnt).isAutoEject()) {
 				crew += "\" autoeject=\"true";
