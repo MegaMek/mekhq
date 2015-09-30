@@ -2082,6 +2082,7 @@ public class Campaign implements Serializable {
         			}
         			if (s.getDate().before(calendar.getTime())) {
         				s.setStatus(Scenario.S_DEFEAT);
+        				s.clearAllForcesAndPersonnel(this);
         				((AtBContract)m).addPlayerMinorBreach();
         				addReport("Failure to deploy for " + s.getName() +
         						" resulted in defeat and a minor contract breach.");
