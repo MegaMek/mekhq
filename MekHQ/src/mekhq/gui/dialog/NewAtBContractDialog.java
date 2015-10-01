@@ -43,7 +43,6 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.gui.FactionComboBox;
@@ -107,8 +106,11 @@ public class NewAtBContractDialog extends NewContractDialog {
         if (getCurrentEnemyCode() != null) {
         	((AtBContract)contract).setEnemyCode(getCurrentEnemyCode());
         }
+        ((AtBContract)contract).setPlanetName((String)cbPlanets.getSelectedItem());
         spnMultiplier.setModel(new SpinnerNumberModel(contract.getMultiplier(), 0.1, 10.0, 0.1));
         updatePaymentMultiplier();
+        contract.calculateContract(campaign);
+        this.doUpdateContract(cbPlanets);
         
         addAllListeners();
 	}
@@ -395,6 +397,8 @@ public class NewAtBContractDialog extends NewContractDialog {
         cbAllyQuality.addActionListener(contractUpdateActionListener);
         cbEnemySkill.addActionListener(contractUpdateActionListener);
         cbEnemyQuality.addActionListener(contractUpdateActionListener);
+        suggestPlanet.addFocusListener(contractUpdateFocusListener);
+        suggestPlanet.addActionListener(contractUpdateActionListener);
 	}
 	
 	private void removeAllListeners() {
@@ -406,6 +410,8 @@ public class NewAtBContractDialog extends NewContractDialog {
         cbAllyQuality.removeActionListener(contractUpdateActionListener);
         cbEnemySkill.removeActionListener(contractUpdateActionListener);
         cbEnemyQuality.removeActionListener(contractUpdateActionListener);
+        suggestPlanet.removeFocusListener(contractUpdateFocusListener);
+        suggestPlanet.removeActionListener(contractUpdateActionListener);
 	}
 	
 	private String getCurrentEmployerCode() {
