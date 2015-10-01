@@ -9,7 +9,8 @@ v0.3.20 (git)
 + Bug [#891]: [ATB] Contracts Change Value On Reload 
 + Bug [#889]: [ATB] Non-Special Battles Generated Despite Rout
 + Bug [#879]: [ATB] minimum <= value <= maximum Error 
-+ Bug [#852]: [ATB] Manual contracts : Employer/Enemy units always generates as "Independent" 
++ Bug [#852]: [ATB] Manual contracts : Employer/Enemy units always generates as "Independent"
++ Bug [#946]: AtB: Edit mission causes enemy faction to change  
 
 v0.3.19 (2014-09-14 01:25 UTC)
 + Bug [#922]: Location of Jump Jets is not shown in repair tab

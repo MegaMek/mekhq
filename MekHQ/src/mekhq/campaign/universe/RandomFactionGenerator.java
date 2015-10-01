@@ -459,6 +459,10 @@ public class RandomFactionGenerator implements Serializable {
 				}
 			}
 		}
+		
+		//Add rebels and pirates
+		currentFactions.add("REB");
+		currentFactions.add("PIR");
 	}
 	
 	private void updateBorders(Faction f, Planet p) {
