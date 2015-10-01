@@ -185,7 +185,8 @@ public class CustomizeAtBContractDialog extends JDialog {
     	btnEnemyCamo = new JButton();
         JLabel lblEnemyRating = new JLabel();
     	JLabel lblRequiredLances = new JLabel();
-    	spnRequiredLances = new JSpinner(new SpinnerNumberModel(contract.getRequiredLances(), 1, 20	, 1));
+    	spnRequiredLances = new JSpinner(new SpinnerNumberModel(contract.getRequiredLances(), 1,
+    			null, 1));
     	JLabel lblEnemyMorale = new JLabel();
     	cbEnemyMorale = new JComboBox<String>(AtBContract.moraleLevelNames);
    	
