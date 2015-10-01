@@ -7,6 +7,7 @@ v0.3.20 (git)
 + Bug [#951]: Auto-resolve fails even with new mul method
 + Bug [#950]: Autofailing battle by advancing day does not undeploy lance
 + Bug [#891]: [ATB] Contracts Change Value On Reload 
++ Bug [#889]" [ATB] Non-Special Battles Generated Despite Rout 
 
 v0.3.19 (2014-09-14 01:25 UTC)
 + Bug [#922]: Location of Jump Jets is not shown in repair tab

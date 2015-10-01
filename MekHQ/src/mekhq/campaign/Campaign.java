@@ -1995,43 +1995,63 @@ public class Campaign implements Serializable {
     	    	}
             }
 
-            // Account for fatigue
-            if (getCampaignOptions().getTrackUnitFatigue()
-            		&& calendar.get(Calendar.DAY_OF_MONTH) == 1) {
-            	boolean inContract = false;
-            	for (Mission m : missions) {
-            		if (!m.isActive() || !(m instanceof AtBContract) ||
-    						getDate().before(((Contract)m).getStartDate())) {
-            			continue;
+            if (calendar.get(Calendar.DAY_OF_MONTH) == 1) {
+            	/*First of the month; update employer/enemy tables,
+            	 * roll morale, track unit fatigue.
+            	 */
+
+            	RandomFactionGenerator.getInstance().updateTables(calendar.getTime(),
+            			location.getCurrentPlanet(), campaignOptions);
+                IUnitRating rating = UnitRatingFactory.getUnitRating(this);
+                rating.reInitialize();
+
+                for (Mission m : missions) {
+            		if (m.isActive() && m instanceof AtBContract &&
+            				!((AtBContract)m).getStartDate().after(getDate())) {
+            			((AtBContract)m).checkMorale(calendar, getUnitRatingMod());
+            			addReport("Enemy morale is now " +
+            					((AtBContract)m).getMoraleLevelName() + " on contract " +
+            					m.getName());
             		}
-            		switch (((AtBContract)m).getMissionType()) {
-            		case AtBContract.MT_GARRISONDUTY:
-            		case AtBContract.MT_SECURITYDUTY:
-            		case AtBContract.MT_CADREDUTY:
-            			fatigueLevel -= 1;
-            			break;
-            		case AtBContract.MT_RIOTDUTY:
-            		case AtBContract.MT_GUERRILLAWARFARE:
-            		case AtBContract.MT_PIRATEHUNTING:
-            			fatigueLevel += 1;
-            			break;
-            		case AtBContract.MT_RELIEFDUTY:
-            		case AtBContract.MT_PLANETARYASSAULT:
-            			fatigueLevel += 2;
-            			break;
-            		case AtBContract.MT_DIVERSIONARYRAID:
-            		case AtBContract.MT_EXTRACTIONRAID:
-            		case AtBContract.MT_RECONRAID:
-            		case AtBContract.MT_OBJECTIVERAID:
-            			fatigueLevel += 3;
-            			break;
-            		}
-            		inContract = true;
             	}
-            	if (!inContract && location.isOnPlanet()) {
-            		fatigueLevel -= 2;
-            	}
-            	fatigueLevel = Math.max(fatigueLevel, 0);
+
+	            // Account for fatigue
+	            if (getCampaignOptions().getTrackUnitFatigue()) {
+	            	boolean inContract = false;
+	            	for (Mission m : missions) {
+	            		if (!m.isActive() || !(m instanceof AtBContract) ||
+	    						getDate().before(((Contract)m).getStartDate())) {
+	            			continue;
+	            		}
+	            		switch (((AtBContract)m).getMissionType()) {
+	            		case AtBContract.MT_GARRISONDUTY:
+	            		case AtBContract.MT_SECURITYDUTY:
+	            		case AtBContract.MT_CADREDUTY:
+	            			fatigueLevel -= 1;
+	            			break;
+	            		case AtBContract.MT_RIOTDUTY:
+	            		case AtBContract.MT_GUERRILLAWARFARE:
+	            		case AtBContract.MT_PIRATEHUNTING:
+	            			fatigueLevel += 1;
+	            			break;
+	            		case AtBContract.MT_RELIEFDUTY:
+	            		case AtBContract.MT_PLANETARYASSAULT:
+	            			fatigueLevel += 2;
+	            			break;
+	            		case AtBContract.MT_DIVERSIONARYRAID:
+	            		case AtBContract.MT_EXTRACTIONRAID:
+	            		case AtBContract.MT_RECONRAID:
+	            		case AtBContract.MT_OBJECTIVERAID:
+	            			fatigueLevel += 3;
+	            			break;
+	            		}
+	            		inContract = true;
+	            	}
+	            	if (!inContract && location.isOnPlanet()) {
+	            		fatigueLevel -= 2;
+	            	}
+	            	fatigueLevel = Math.max(fatigueLevel, 0);
+	            }
             }
 
             for (Mission m : missions) {
@@ -2473,24 +2493,6 @@ public class Campaign implements Serializable {
                 } else {
                     addReport("<font color='red'><b>You cannot afford to pay overhead costs!</b></font> Lucky for you that this does not appear to have any effect.");
                 }
-            }
-            if (campaignOptions.getUseAtB()) {
-
-            	RandomFactionGenerator.getInstance().updateTables(calendar.getTime(),
-            			location.getCurrentPlanet(), campaignOptions);
-                IUnitRating rating = UnitRatingFactory.getUnitRating(this);
-                rating.reInitialize();
-
-                for (Mission m : missions) {
-            		if (m.isActive() && m instanceof AtBContract &&
-            				!((AtBContract)m).getStartDate().after(getDate())) {
-            			((AtBContract)m).checkMorale(calendar, getUnitRatingMod());
-            			addReport("Enemy morale is now " +
-            					((AtBContract)m).getMoraleLevelName() + " on contract " +
-            					m.getName());
-            		}
-            	}
-            	//generate market
             }
         }
         // check for anything else in finances
