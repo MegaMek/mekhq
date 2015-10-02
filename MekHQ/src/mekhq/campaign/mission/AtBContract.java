@@ -873,7 +873,9 @@ public class AtBContract extends Contract implements Serializable {
 						specialEventScenarioType, false,
 						specialEventScenarioDate);
 				c.addScenario(s, this);
-				s.setPlanetaryConditions(this);
+				if (c.getCampaignOptions().getUsePlanetaryConditions()) {
+					s.setPlanetaryConditions(this);
+				}
     			s.setForces(c);
 				specialEventScenarioDate = null;
 			}
