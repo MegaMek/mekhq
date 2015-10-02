@@ -781,7 +781,7 @@ public class ContractMarket implements Serializable {
             c.writeToXml(pw1, indent + 1);
         }
         for (Integer key : clauseMods.keySet()) {
-        	if (!contracts.contains(key)) {
+        	if (!contractIds.containsKey(key)) {
         		continue;
         	}
         	pw1.println(MekHqXmlUtil.indentStr(indent+1)

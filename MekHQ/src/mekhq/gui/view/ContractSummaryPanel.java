@@ -515,6 +515,9 @@ public class ContractSummaryPanel extends JPanel {
 						((JButton)ev.getSource()).setText("Renegotiate (" +
 								(cmdRerolls - campaign.getContractMarket().getRerollsUsed(contract, ContractMarket.CLAUSE_COMMAND)) + ")");
 						txtCommand.setText(Contract.getCommandRightsName(contract.getCommandRights()));
+						if (campaign.getContractMarket().getRerollsUsed(contract, ContractMarket.CLAUSE_COMMAND) >= cmdRerolls) {
+							btnCommand.setEnabled(false);
+						}
 						refreshAmounts();
 					}
 				}
@@ -561,6 +564,9 @@ public class ContractSummaryPanel extends JPanel {
 						((JButton)ev.getSource()).setText("Renegotiate (" +
 								(tranRerolls - campaign.getContractMarket().getRerollsUsed(contract, ContractMarket.CLAUSE_TRANSPORT)) + ")");
 						txtTransport.setText(contract.getTransportComp() + "%");
+						if (campaign.getContractMarket().getRerollsUsed(contract, ContractMarket.CLAUSE_TRANSPORT) >= tranRerolls) {
+							btnTransport.setEnabled(false);
+						}
 						refreshAmounts();
 					}
 				}
@@ -632,6 +638,9 @@ public class ContractSummaryPanel extends JPanel {
 								(logRerolls - campaign.getContractMarket().getRerollsUsed(contract, ContractMarket.CLAUSE_SUPPORT)) + ")");
 						txtStraightSupport.setText(contract.getStraightSupport() + "%");
 						txtBattleLossComp.setText(contract.getBattleLossComp() + "%");
+						if (campaign.getContractMarket().getRerollsUsed(contract, ContractMarket.CLAUSE_SUPPORT) >= logRerolls) {
+							btnSupport.setEnabled(false);
+						}
 						refreshAmounts();
 					}
 				}
