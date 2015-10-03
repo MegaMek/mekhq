@@ -19,6 +19,7 @@ v0.3.20 (git)
 + Bug [#845]: [ATB] Employer offers follow up contract, but follow up contract has incorrect employer
 + Bug [#860]: [ATB] Special missions still generating gravity even if "use planetary conditions" is turned off
 + Bug [#861]: [ATB] 100 ton ASF being classified as "Medium" in the unit market
++ Bug [#858]: Personnel market : Mechwarrior's unit is a tank 
 
 v0.3.19 (2014-09-14 01:25 UTC)
 + Bug [#922]: Location of Jump Jets is not shown in repair tab

@@ -568,10 +568,10 @@ After the <rat> nodes there are a series of <altTable> nodes which give addition
 		<mech weight="medium">3062 House Steiner - Medium Mechs</mech>
 		<mech weight="heavy">3062 House Steiner - Heavy Mechs</mech>
 		<mech weight="assault">3062 House Steiner - Assault Mechs</mech>
-		<vehicle weight="light">3062 House Steiner - Light</vehicle>
-		<vehicle weight="medium">3062 House Steiner - Medium</vehicle>
-		<vehicle weight="heavy">3062 House Steiner - Heavy</vehicle>
-		<vehicle weight="assault">3062 House Steiner - Assault</vehicle>
+		<vehicle weight="light">3062 House Steiner - Light Vehicles</vehicle>
+		<vehicle weight="medium">3062 House Steiner - Medium Vehicles</vehicle>
+		<vehicle weight="heavy">3062 House Steiner - Heavy Vehicles</vehicle>
+		<vehicle weight="assault">3062 House Steiner - Assault Vehicles</vehicle>
 		<aerospace>3062 House Steiner - Aerospace</aerospace>
 	</faction>
 	<faction code="MERC">
