@@ -6059,6 +6059,15 @@ public class CampaignGUI extends JPanel {
             if (null != ((AtBScenario) scenario).getLance(getCampaign())) {
                 int assignedForceId = ((AtBScenario) scenario).getLance(
                         getCampaign()).getForceId();
+                int cmdrStrategy = 0;
+                Person commander = getCampaign().getPerson(
+                        Lance.findCommander(assignedForceId, getCampaign()));
+                if (null != commander
+                        && null != commander
+                                .getSkill(SkillType.S_STRATEGY)) {
+                    cmdrStrategy = commander.getSkill(
+                            SkillType.S_STRATEGY).getLevel();
+                }
                 for (Force f : scenario.getForces(getCampaign()).getSubForces()) {
                     if (f.getId() != assignedForceId) {
                         Vector<UUID> units = f.getAllUnits();
@@ -6076,16 +6085,7 @@ public class CampaignGUI extends JPanel {
                                 slowest = Math.min(slowest, speed);
                             }
                         }
-                        int deployRound = 12 - slowest;
-                        Person commander = getCampaign().getPerson(
-                                Lance.findCommander(f.getId(), getCampaign()));
-                        if (null != commander
-                                && null != commander
-                                        .getSkill(SkillType.S_STRATEGY)) {
-                            deployRound -= commander.getSkill(
-                                    SkillType.S_STRATEGY).getLevel();
-                        }
-                        deployRound = Math.max(deployRound, 0);
+                        int deployRound = Math.max(0, 12 - slowest - cmdrStrategy);
 
                         for (UUID id : units) {
                             if (chosen.contains(getCampaign().getUnit(id))) {
