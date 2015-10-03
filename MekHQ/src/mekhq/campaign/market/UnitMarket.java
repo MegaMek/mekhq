@@ -239,7 +239,10 @@ public class UnitMarket implements Serializable {
 				if ((campaign.getCampaignOptions().allowClanPurchases() && ms.isClan())
 						|| (campaign.getCampaignOptions().allowISPurchases() && !ms.isClan())) {
 					int pct = 100 - (Compute.d6(2) - priceTarget) * 5;
-					offers.add(new MarketOffer(market, unitType, weight,
+					/*Some RATs, particularly ASF, group multiple weight classes together
+					 * so we need to get the actual weight class from the generated unit
+					 * (-1 because EntityWeightClass starts with ultra-light).*/
+					offers.add(new MarketOffer(market, unitType, ms.getWeightClass() - 1,
 							ms, pct));
 				}
 			}
