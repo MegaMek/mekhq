@@ -35,6 +35,7 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.Infantry;
+import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
@@ -276,19 +277,23 @@ public class Lance implements Serializable, MekHqXmlSerializable {
 			return false;
 		}
 
+		boolean hasGround = false;
 		for (UUID id : c.getForce(forceId).getUnits()) {
 		    Unit unit = c.getUnit(id);
 		    if (null != unit) {
     		    Entity entity = unit.getEntity();
     		    if (null != entity) {
+    		    	if (UnitType.determineUnitTypeCode(entity) >= UnitType.JUMPSHIP) {
+    		    		return false;
+    		    	}
         			if ((entity.getEntityType() & ETYPE_GROUND) != 0) {
-        				return true;
+        				hasGround = true;
         			}
     		    }
 		    }
 		}
 
-		return false;
+		return hasGround;
 	}
 
 	/* Code to find unit commander from ForceViewPanel */

@@ -21,6 +21,7 @@ v0.3.20 (git)
 + Bug [#861]: [ATB] 100 ton ASF being classified as "Medium" in the unit market
 + Bug [#858]: Personnel market : Mechwarrior's unit is a tank
 + Bug [#864]: [ATB] Uses Highest Strategy not "Deployed" Strategy
++ Bug [#870]: Jumpships getting assigned to battles in AtB
 
 v0.3.19 (2014-09-14 01:25 UTC)
 + Bug [#922]: Location of Jump Jets is not shown in repair tab
