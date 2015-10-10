@@ -226,7 +226,7 @@ public class MekLabPanel extends JPanel {
 			return;
 		}
         StringBuffer sb = new StringBuffer();
-        testEntity.correctEntity(sb, true);
+        testEntity.correctEntity(sb);
 		
         int walk = entity.getOriginalWalkMP();
         int run = entity.getRunMP();
