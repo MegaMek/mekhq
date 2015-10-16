@@ -4153,7 +4153,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setTargetIdleXP((Integer) spnTargetIdleXP.getModel().getValue());
 
         options.setLimitByYear(limitByYearBox.isSelected());
-        campaign.getGameOptions().getOption("is_eq_limits").setValue(limitByYearBox.isSelected());
         options.setDisallowExtinctStuff(disallowExtinctStuffBox.isSelected());
         options.setAllowClanPurchases(allowClanPurchasesBox.isSelected());
         options.setAllowISPurchases(allowISPurchasesBox.isSelected());
@@ -4161,8 +4160,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         campaign.getGameOptions().getOption("canon_only").setValue(allowCanonOnlyBox.isSelected());
         options.setUseAmmoByType(useAmmoByTypeBox.isSelected());
         options.setTechLevel(choiceTechLevel.getSelectedIndex());
-        campaign.getGameOptions().getOption("allow_advanced_units").setValue(choiceTechLevel.getSelectedIndex() > 0);
-        campaign.getGameOptions().getOption("allow_advanced_ammo").setValue(choiceTechLevel.getSelectedIndex() > 0);
+        campaign.getGameOptions().getOption("techlevel").setValue((String)choiceTechLevel.getSelectedItem());
 
         //we need to reset healing time options through the campaign because we may need to
         //loop through personnel to make adjustments
