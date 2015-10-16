@@ -24,6 +24,7 @@ package mekhq.campaign;
 import java.io.PrintWriter;
 import java.io.Serializable;
 
+import megamek.common.TechConstants;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -459,15 +460,15 @@ public class CampaignOptions implements Serializable {
     public static String getTechLevelName(int lvl) {
         switch (lvl) {
             case TECH_INTRO:
-                return "Introductory";
+                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_INTRO];
             case TECH_STANDARD:
-                return "Standard";
+                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_STANDARD];
             case TECH_ADVANCED:
-                return "Advanced";
+                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_ADVANCED];
             case TECH_EXPERIMENTAL:
-                return "Experimental";
+                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_EXPERIMENTAL];
             case TECH_UNOFFICIAL:
-                return "Unofficial";
+                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_UNOFFICIAL];
             default:
                 return "Unknown";
         }
