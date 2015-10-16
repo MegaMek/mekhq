@@ -188,7 +188,7 @@ public class AtBGameThread extends GameThread {
                 			&& !useDropship) {
                 		deploymentRound = Math.max(deploymentRound, 6 - speed);
                 	}
-                	entity.setDeployRound(deploymentRound);
+                	entity.setDeployRound(Math.max(0, deploymentRound));
                 	// Add Mek to game
                 	client.sendAddEntity(entity);
                 	// Wait a few secs to not overuse bandwith
