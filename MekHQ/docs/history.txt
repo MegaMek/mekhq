@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.20 (git)
+v0.3.21-git
+
+v0.3.20 (2015-10-12 00:11 UTC)
 + Bug: NPE on warehouse tech filter
 + Bug: check for missing external id on ejected enemy pilots
 + Bug [#888]: Briefing Room: Cancel load saved game causes NPE
@@ -22,6 +24,8 @@ v0.3.20 (git)
 + Bug [#858]: Personnel market : Mechwarrior's unit is a tank
 + Bug [#864]: [ATB] Uses Highest Strategy not "Deployed" Strategy
 + Bug [#870]: Jumpships getting assigned to battles in AtB
++ Updated MegaMek.jar to 0.41.10
++ Updated MegaMekLab.jar to 0.1.46
 
 v0.3.19 (2014-09-14 01:25 UTC)
 + Bug [#922]: Location of Jump Jets is not shown in repair tab
