@@ -22,6 +22,7 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
+import java.util.GregorianCalendar;
 
 import megamek.common.Aero;
 import megamek.common.CriticalSlot;
@@ -141,14 +142,15 @@ public class EnginePart extends Part {
 
 	@Override
 	public boolean isSamePartType(Part part) {
+	    int year = campaign.getCalendar().get(GregorianCalendar.YEAR);
 		return part instanceof EnginePart
 				&& getName().equals(part.getName())
 				&& getEngine().getEngineType() == ((EnginePart) part)
 						.getEngine().getEngineType()
 				&& getEngine().getRating() == ((EnginePart) part).getEngine()
 						.getRating()
-				&& getEngine().getTechType() == ((EnginePart) part).getEngine()
-						.getTechType()
+				&& getEngine().getTechType(year) == ((EnginePart) part).getEngine()
+						.getTechType(year)
 				&& getEngine().hasFlag(Engine.TANK_ENGINE) == ((EnginePart) part).getEngine().hasFlag(Engine.TANK_ENGINE)
 				&& getUnitTonnage() == ((EnginePart) part).getUnitTonnage()
 				&& getTonnage() == ((EnginePart)part).getTonnage();
@@ -156,7 +158,7 @@ public class EnginePart extends Part {
 
 	@Override
 	public int getTechLevel() {
-		int techLevel = getEngine().getTechType();
+		int techLevel = getEngine().getTechType(campaign.getCalendar().get(GregorianCalendar.YEAR));
         if ((techLevel != TechConstants.T_ALLOWED_ALL && techLevel < 0) || techLevel >= TechConstants.T_ALL)
             return TechConstants.T_TECH_UNKNOWN;
         else
@@ -215,7 +217,8 @@ public class EnginePart extends Part {
 	@Override
 	public int getAvailability(int era) {
 		//TODO: this needs to be updated once we get DA era in
-		switch(engine.getTechType()) {
+	    int year = campaign.getCalendar().get(GregorianCalendar.YEAR);
+		switch(engine.getTechType(year)) {
 		case Engine.COMBUSTION_ENGINE:
 			if(era == EquipmentType.ERA_SL) {
 				return EquipmentType.RATING_A;
@@ -278,7 +281,8 @@ public class EnginePart extends Part {
 
 	@Override
 	public int getTechRating() {
-		switch(engine.getTechType()) {
+	    int year = campaign.getCalendar().get(GregorianCalendar.YEAR);
+		switch(engine.getTechType(year)) {
 		case Engine.XL_ENGINE:
 			if(engine.hasFlag(Engine.CLAN_ENGINE)) {
 				return EquipmentType.RATING_F;

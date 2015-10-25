@@ -44,19 +44,21 @@ public class MekCockpit extends Part {
 	private static final long serialVersionUID = -1989526319692474127L;
 
 	private int type;
+	private boolean isClan;
 	
 	public MekCockpit() {
-		this(0, Mech.COCKPIT_STANDARD, null);
+		this(0, Mech.COCKPIT_STANDARD, false, null);
 	}
 	
-	public MekCockpit(int tonnage, int t, Campaign c) {
+	public MekCockpit(int tonnage, int t, boolean isClan, Campaign c) {
         super(tonnage, c);
         this.type = t;
         this.name = Mech.getCockpitDisplayString(type);
+        this.isClan = isClan;
     }
 	
 	public MekCockpit clone() {
-		MekCockpit clone = new MekCockpit(getUnitTonnage(), type, campaign);
+		MekCockpit clone = new MekCockpit(getUnitTonnage(), type, isClan, campaign);
         clone.copyBaseData(this);
 		return clone;
 	}

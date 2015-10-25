@@ -159,7 +159,7 @@ public class MissingMekGyro extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new MekGyro(getUnitTonnage(), getType(), getTonnage(), campaign);
+		return new MekGyro(getUnitTonnage(), getType(), getTonnage(), getUnit().getEntity().isClan(), campaign);
 	}
 
 	@Override

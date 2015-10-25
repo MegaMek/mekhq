@@ -182,7 +182,7 @@ public class MissingMekCockpit extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new MekCockpit(getUnitTonnage(), type, campaign);
+		return new MekCockpit(getUnitTonnage(), type, getUnit().getEntity().isClan(), campaign);
 	}
 
 	@Override
