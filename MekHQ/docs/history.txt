@@ -1,5 +1,7 @@
 VERSION HISTORY
 ----------------------------------
+v0.3.22-git
+
 v0.3.21 (2015-11-15 16:50 UTC)
 + Bug [#963]: CampaignOptionDialog crashes with NPE when "Confirm" button is pressed
 + Bug: [AtB] MM game launched from MHQ using AtB does not enter deployment phase.
