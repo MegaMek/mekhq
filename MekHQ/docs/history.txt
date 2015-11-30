@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.3.22-git
++ Bug [#980]: AtB UnitMarket weight class ArrayOutOfBounds exception
 
 v0.3.21 (2015-11-15 16:50 UTC)
 + Bug [#963]: CampaignOptionDialog crashes with NPE when "Confirm" button is pressed
@@ -1148,6 +1149,7 @@ v0.2.0 (2013-03-16)
 v0.1.24 Release Candidate 3 (2013-03-12)
 + added version number to log file
 + confirmation dialog on deleting mission
+
 + Bug 317: New Force when canceled
 + confirmation dialog on deleting scenario
 + Bug 318: Dragoon's Rating error FMM:R method
