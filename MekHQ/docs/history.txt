@@ -1,8 +1,14 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.21-git
+v0.3.22-git
++ Bug [#980]: AtB UnitMarket weight class ArrayOutOfBounds exception
+
+v0.3.21 (2015-11-15 16:50 UTC)
 + Bug [#963]: CampaignOptionDialog crashes with NPE when "Confirm" button is pressed
 + Bug: [AtB] MM game launched from MHQ using AtB does not enter deployment phase.
++ Bug [#968]: GameOptionsDialog throws IllegalArgumentException
++ Updated MegaMek.jar to 0.41.11
++ Updated MegaMekLab.jar to 0.1.47
 
 v0.3.20 (2015-10-12 00:11 UTC)
 + Bug: NPE on warehouse tech filter
@@ -1143,6 +1149,7 @@ v0.2.0 (2013-03-16)
 v0.1.24 Release Candidate 3 (2013-03-12)
 + added version number to log file
 + confirmation dialog on deleting mission
+
 + Bug 317: New Force when canceled
 + confirmation dialog on deleting scenario
 + Bug 318: Dragoon's Rating error FMM:R method

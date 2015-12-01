@@ -43,6 +43,7 @@ import megamek.client.ui.GBC;
 import megamek.client.ui.Messages;
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
+import megamek.common.TechConstants;
 import megamek.common.options.GameOptions;
 import megamek.common.options.IBasicOption;
 import megamek.common.options.IOption;
@@ -193,7 +194,7 @@ public class GameOptionsDialog extends JDialog implements ActionListener,
 
     private void addOption(IOption option) {
         DialogOptionComponent optionComp = new DialogOptionComponent(this,
-                option);
+                option, true, true);
 
         groupPanel.add(optionComp);
         maxOptionWidth = Math.max(maxOptionWidth,
@@ -270,6 +271,14 @@ public class GameOptionsDialog extends JDialog implements ActionListener,
                     || !editable) {
                 optionComp.setEditable(false);
             }
+        } else if (option.getName().equals("techlevel")) {
+            for (String tlName : TechConstants.T_SIMPLE_NAMES) {
+                optionComp.addValue(tlName);
+            }
+            option.setValue(TechConstants.getSimpleLevelName(campaign
+                    .getCampaignOptions().getTechLevel()));
+            optionComp.setSelected(option.stringValue());
+            optionComp.setEditable(editable);
         } else {
             optionComp.setEditable(editable);
         }
@@ -510,10 +519,8 @@ public class GameOptionsDialog extends JDialog implements ActionListener,
             if ("canon_only".equals(optionComp.getOption().getName())) { //$NON-NLS-1$
                 campaign.getCampaignOptions().setAllowCanonOnly(optionComp.getOption().booleanValue());
             }
-            if (("allow_advanced_units".equals(optionComp.getOption().getName())
-                    || "allow_advanced_ammo".equals(optionComp.getOption().getName()))
-                    && !optionComp.getOption().booleanValue()) { //$NON-NLS-1$
-                campaign.getCampaignOptions().setTechLevel(0);
+            if ("techlevel".equals(optionComp.getOption().getName())) { //$NON-NLS-1$
+                campaign.getCampaignOptions().setTechLevel(TechConstants.getSimpleLevel(optionComp.getOption().stringValue()));
             }
         }
     }
