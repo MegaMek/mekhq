@@ -2,6 +2,7 @@ VERSION HISTORY
 ----------------------------------
 v0.3.22-git
 + Bug [#980]: AtB UnitMarket weight class ArrayOutOfBounds exception
++ Updates to use game year based Tech Levels for Engine/Gyro/Cockpit parts
 
 v0.3.21 (2015-11-15 16:50 UTC)
 + Bug [#963]: CampaignOptionDialog crashes with NPE when "Confirm" button is pressed
@@ -139,6 +140,7 @@ v0.3.16 (2015-08-15 19:40 UTC)
 + re-added infantry weapons
 + Major overhaul of BattleArmorSuit replacement to allow for sub-parts to follow main part
 + fixed TechRating values for parts with IS_TW_ALL that should be ALLOWED_ALL
+
 + Bug [#893]: can't get parts before year introduction from parts store
 + added the ability to save and load campaign option presets
 + Bug [#901]: mekhq.campaign.Campaign.newDay Error
@@ -1454,6 +1456,7 @@ v0.1.14 (2012-02-08)
 + Bug: salvaged units have no value in resolveScenarioWizard
 + Bug 3477265: Salvaging MASC leads to campaign corruption
 + finished random skills and special abilities (need to allow user customization)
+
 + random portrait selection
 + NewRecruitDialog and HireBulkPersonnelDialog
 + warning dialog when game is not saved correctly
