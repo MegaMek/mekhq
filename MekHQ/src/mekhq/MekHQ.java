@@ -304,9 +304,15 @@ public class MekHQ implements GameListener {
                 if (null != f.getFile()) {
                     myServer.loadGame(new File(f.getDirectory(), f.getFile()));
                 } else {
+                    stopHost();
                     throw new FileNotFoundException();
                 }
             }
+    	} catch (FileNotFoundException ex) {
+    	    // The dialog was cancelled or the file not found
+    	    // Return to the UI
+    	    stopHost();
+    	    return;
         } catch (Exception ex) {
         	MekHQ.logMessage("Failed to start up server properly");
 			MekHQ.logError(ex);

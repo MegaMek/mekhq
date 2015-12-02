@@ -193,7 +193,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 Unit u = gui.getCampaign().getUnit(person.getUnitId());
                 if (null != u) {
                     u.remove(person, true);
-                    u.resetEngineerOrTech();
+                    u.resetEngineer();
                     u.runDiagnostic(false);
                 }
                 // check for tech unit assignments
@@ -208,7 +208,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         u = gui.getCampaign().getUnit(i);
                         if (null != u) {
                             u.remove(person, true);
-                            u.resetEngineerOrTech();
+                            u.resetEngineer();
                             u.runDiagnostic(false);
                         }
                     }
@@ -218,6 +218,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             gui.refreshUnitList();
             gui.refreshPersonnelList();
             gui.refreshOrganization();
+            gui.refreshTechsList();
             gui.refreshOverview();
         } else if (command.contains("ADD_PILOT")) {
             UUID selected = UUID.fromString(st.nextToken());
@@ -309,6 +310,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             gui.refreshPersonnelList();
             gui.refreshOrganization();
             gui.refreshOverview();
+            gui.refreshTechsList();
         } else if (command.contains("ADD_GUNNER")) {
             UUID selected = UUID.fromString(st.nextToken());
             Unit u = gui.getCampaign().getUnit(selected);
@@ -333,6 +335,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             gui.refreshPersonnelList();
             gui.refreshOrganization();
             gui.refreshOverview();
+            gui.refreshTechsList();
         } else if (command.contains("ADD_CREW")) {
             UUID selected = UUID.fromString(st.nextToken());
             Unit u = gui.getCampaign().getUnit(selected);
@@ -357,6 +360,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             gui.refreshPersonnelList();
             gui.refreshOrganization();
             gui.refreshOverview();
+            gui.refreshTechsList();
         } else if (command.contains("ADD_NAV")) {
             UUID selected = UUID.fromString(st.nextToken());
             Unit u = gui.getCampaign().getUnit(selected);
@@ -381,6 +385,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             gui.refreshPersonnelList();
             gui.refreshOrganization();
             gui.refreshOverview();
+            gui.refreshTechsList();
         } else if (command.contains("ADD_TECH")) {
             UUID selected = UUID.fromString(st.nextToken());
             Unit u = gui.getCampaign().getUnit(selected);

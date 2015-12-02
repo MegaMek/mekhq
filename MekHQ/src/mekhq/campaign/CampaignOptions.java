@@ -24,6 +24,7 @@ package mekhq.campaign;
 import java.io.PrintWriter;
 import java.io.Serializable;
 
+import megamek.common.TechConstants;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -58,6 +59,9 @@ public class CampaignOptions implements Serializable {
 
     public final static String S_TECH = "Tech";
     public final static String S_AUTO = "Automatic Success";
+    
+    public final static int PRISONER_RANK = 0;
+    public final static int BONDSMAN_RANK = 1;
 
     public final static int REPAIR_SYSTEM_STRATOPS = 0;
     public final static int REPAIR_SYSTEM_WARCHEST_CUSTOM = 1;
@@ -88,6 +92,8 @@ public class CampaignOptions implements Serializable {
     private boolean useUnofficialProcreation;
     private boolean useUnofficialProcreationNoRelationship;
     private boolean useTransfers;
+    private boolean capturePrisoners;
+    private int defaultPrisonerStatus;
 
     //personnel market related
     private boolean personnelMarketReportRefresh;
@@ -178,6 +184,7 @@ public class CampaignOptions implements Serializable {
     private int maintenanceBonus;
     private boolean useQualityMaintenance;
 	private boolean useUnofficalMaintenance;
+	private boolean reverseQualityNames;
 
     //Dragoon's Rating
     private UnitRatingMethod unitRatingMethod;
@@ -335,6 +342,7 @@ public class CampaignOptions implements Serializable {
         maintenanceBonus = -1;
         useQualityMaintenance = true;
         useUnofficalMaintenance = false;
+        reverseQualityNames = false;
         checkMaintenance = true;
         useRandomHitsForVees = false;
         minimumHitsForVees = 1;
@@ -342,6 +350,8 @@ public class CampaignOptions implements Serializable {
         useUnofficialProcreation = false;
         useUnofficialProcreationNoRelationship = false;
         useTransfers = true;
+        capturePrisoners = true;
+        defaultPrisonerStatus = PRISONER_RANK;
         personnelMarketReportRefresh = true;
         personnelMarketType = PersonnelMarket.TYPE_STRAT_OPS;
         personnelMarketRandomEliteRemoval = 10;
@@ -450,15 +460,15 @@ public class CampaignOptions implements Serializable {
     public static String getTechLevelName(int lvl) {
         switch (lvl) {
             case TECH_INTRO:
-                return "Introductory";
+                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_INTRO];
             case TECH_STANDARD:
-                return "Standard";
+                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_STANDARD];
             case TECH_ADVANCED:
-                return "Advanced";
+                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_ADVANCED];
             case TECH_EXPERIMENTAL:
-                return "Experimental";
+                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_EXPERIMENTAL];
             case TECH_UNOFFICIAL:
-                return "Unofficial";
+                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_UNOFFICIAL];
             default:
                 return "Unknown";
         }
@@ -1181,6 +1191,14 @@ public class CampaignOptions implements Serializable {
     public void setUseUnofficalMaintenance(boolean b) {
     	useUnofficalMaintenance = b;
     }
+    
+    public boolean reverseQualityNames() {
+        return reverseQualityNames;
+    }
+
+    public void setReverseQualityNames(boolean b) {
+    	reverseQualityNames = b;
+    }
 
     public boolean checkMaintenance() {
         return checkMaintenance;
@@ -1252,6 +1270,22 @@ public class CampaignOptions implements Serializable {
     
     public void setUseTransfers(boolean b) {
     	useTransfers = b;
+    }
+    
+    public boolean capturePrisoners() {
+    	return capturePrisoners;
+    }
+    
+    public void setCapturePrisoners(boolean b) {
+    	capturePrisoners = b;
+    }
+    
+    public int getDefaultPrisonerStatus() {
+        return defaultPrisonerStatus;
+    }
+
+    public void setDefaultPrisonerStatus(int d) {
+    	defaultPrisonerStatus = d;
     }
 
     public int getMinimumHitsForVees() {
@@ -1763,6 +1797,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maintenanceCycleDays", maintenanceCycleDays);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maintenanceBonus", maintenanceBonus);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useQualityMaintenance", useQualityMaintenance);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "reverseQualityNames", reverseQualityNames);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficalMaintenance", useUnofficalMaintenance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "checkMaintenance", checkMaintenance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRandomHitsForVees", useRandomHitsForVees);
@@ -1771,6 +1806,8 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficialProcreation", useUnofficialProcreation);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficialProcreationNoRelationship", useUnofficialProcreationNoRelationship);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTransfers", useTransfers);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "capturePrisoners", capturePrisoners);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "defaultPrisonerStatus", defaultPrisonerStatus);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketType", personnelMarketType);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomEliteRemoval",
                                        personnelMarketRandomEliteRemoval);
@@ -2125,6 +2162,8 @@ public class CampaignOptions implements Serializable {
                 retVal.maintenanceBonus = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useQualityMaintenance")) {
                 retVal.useQualityMaintenance = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("reverseQualityNames")) {
+                retVal.reverseQualityNames = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficalMaintenance")) {
                 retVal.useUnofficalMaintenance = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {
@@ -2143,6 +2182,10 @@ public class CampaignOptions implements Serializable {
             	retVal.useUnofficialProcreationNoRelationship = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useTransfers")) {
             	retVal.useTransfers = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) {
+            	retVal.capturePrisoners = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("defaultPrisonerStatus")) {
+                retVal.defaultPrisonerStatus = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVees")) {
                 if (wn2.getTextContent().equalsIgnoreCase("true")) {
                     retVal.useRandomHitsForVees = true;

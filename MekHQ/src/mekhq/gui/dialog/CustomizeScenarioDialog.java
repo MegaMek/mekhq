@@ -28,6 +28,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
@@ -289,7 +290,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
     	scenario.setName(txtName.getText());
     	scenario.setDesc(txtDesc.getText());
-    	if(!scenario.isCurrent()) {
+    	if(!scenario.isCurrent() || (campaign.getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario)) {
     		scenario.setReport(txtReport.getText());
     		scenario.setStatus(choiceStatus.getSelectedIndex()+1);
     		scenario.setDate(date);
@@ -319,7 +320,31 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         DateChooser dc = new DateChooser(frame, cal);
         // user can eiter choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-        	if(campaign.getCalendar().getTime().after(campaign.getCalendar().getTime())) {
+        	if (scenario.isCurrent()) {
+        		if (dc.getDate().getTime().before(campaign.getCalendar().getTime())) {
+            		JOptionPane.showMessageDialog(frame,
+            			    "You cannot choose a date before the current date for a pending battle.",
+            			    "Invalid date",
+            			    JOptionPane.ERROR_MESSAGE);
+            		return;        			
+        		} else {
+        			//Calendar math necessitated by variations in locales
+        			GregorianCalendar nextMonday = new GregorianCalendar();
+        			nextMonday.setTime(campaign.getDate());
+        			nextMonday.add(Calendar.DAY_OF_MONTH, 1);
+        			while (nextMonday.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY) {
+        				nextMonday.add(Calendar.DAY_OF_MONTH, 1);
+        			}
+        			//
+        			if (!dc.getDate().getTime().before(nextMonday.getTime())) {
+                		JOptionPane.showMessageDialog(frame,
+                			    "You cannot choose a date beyond the current week.",
+                			    "Invalid date",
+                			    JOptionPane.ERROR_MESSAGE);
+                		return;        			        				
+        			}
+        		}
+        	} else if (dc.getDate().getTime().after(campaign.getCalendar().getTime())) {
         		JOptionPane.showMessageDialog(frame,
         			    "You cannot choose a date after the current date.",
         			    "Invalid date",

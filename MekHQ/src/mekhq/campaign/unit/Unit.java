@@ -405,21 +405,21 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 		this.history = s;
 	}
 
-	public boolean isFunctional() {
-		if (entity instanceof Mech) {
+	public static boolean isFunctional(Entity en) {
+		if (en instanceof Mech) {
 			// center torso bad?? head bad?
-			if (entity.isLocationBad(Mech.LOC_CT)
-					|| entity.isLocationBad(Mech.LOC_HEAD)) {
+			if (en.isLocationBad(Mech.LOC_CT)
+					|| en.isLocationBad(Mech.LOC_HEAD)) {
 				return false;
 			}
 			// engine destruction?
 			//cockpit hits
 			int engineHits = 0;
 			int cockpitHits = 0;
-			for (int i = 0; i < entity.locations(); i++) {
-				engineHits += entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
+			for (int i = 0; i < en.locations(); i++) {
+				engineHits += en.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
 						Mech.SYSTEM_ENGINE, i);
-				cockpitHits += entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
+				cockpitHits += en.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
 						Mech.SYSTEM_COCKPIT, i);
 			}
 			if (engineHits > 2) {
@@ -429,26 +429,56 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 				return false;
 			}
 		}
-		if (entity instanceof Tank) {
-			for (int i = 0; i < entity.locations(); i++) {
+		if (en instanceof Tank) {
+			for (int i = 0; i < en.locations(); i++) {
 				if(i == Tank.LOC_TURRET || i == Tank.LOC_TURRET_2) {
 					continue;
 				}
-				if (entity.isLocationBad(i)) {
+				if (en.isLocationBad(i)) {
 					return false;
 				}
 			}
-			if(entity instanceof VTOL) {
-				if(entity.getWalkMP() <= 0) {
+			if(en instanceof VTOL) {
+				if(en.getWalkMP() <= 0) {
 					return false;
 				}
 			}
 		}
-		if(entity instanceof Aero) {
-			if(entity.getWalkMP() <= 0 && !(entity instanceof Jumpship)) {
+		if(en instanceof Aero) {
+			if(en.getWalkMP() <= 0 && !(en instanceof Jumpship)) {
 				return false;
 			}
-			if(((Aero)entity).getSI() <= 0) {
+			if(((Aero)en).getSI() <= 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public boolean isFunctional() {
+		return isFunctional(entity);
+	}
+
+	public static boolean isRepairable(Entity en) {
+		if (en instanceof Mech) {
+			// you can repair anything so long as one point of CT is left
+			if (en.getInternal(Mech.LOC_CT) <= 0) {
+				return false;
+			}
+		}
+		if (en instanceof Tank) {
+			// can't repair a tank with a destroyed location
+			for (int i = 0; i < en.locations(); i++) {
+				if(i == Tank.LOC_TURRET || i == Tank.LOC_TURRET_2 || i == Tank.LOC_BODY) {
+					continue;
+				}
+				if (en.getInternal(i) <= 0) {
+					return false;
+				}
+			}
+		}
+		if(en instanceof Aero) {
+			if(((Aero)en).getSI() <= 0) {
 				return false;
 			}
 		}
@@ -456,29 +486,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 	}
 
 	public boolean isRepairable() {
-		if (entity instanceof Mech) {
-			// you can repair anything so long as one point of CT is left
-			if (entity.getInternal(Mech.LOC_CT) <= 0) {
-				return false;
-			}
-		}
-		if (entity instanceof Tank) {
-			// can't repair a tank with a destroyed location
-			for (int i = 0; i < entity.locations(); i++) {
-				if(i == Tank.LOC_TURRET || i == Tank.LOC_TURRET_2 || i == Tank.LOC_BODY) {
-					continue;
-				}
-				if (entity.getInternal(i) <= 0) {
-					return false;
-				}
-			}
-		}
-		if(entity instanceof Aero) {
-			if(((Aero)entity).getSI() <= 0) {
-				return false;
-			}
-		}
-		return true;
+		return isRepairable(entity);
 	}
 
 	/**
@@ -1318,27 +1326,6 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 
 	public int getDamageState() {
 	    return getDamageState(getEntity());
-	}
-
-	public int getFullBaseValueOfParts() {
-		//Entity undamagedEntity = Campaign
-			//	.getBrandNewUndamagedEntity(getEntity().getShortName());
-
-		//if (undamagedEntity == null)
-			//return -1;
-
-		//Unit undamagedUnit = new Unit(undamagedEntity, campaign);
-		//undamagedUnit.runDiagnosticStratOps();
-
-		int cost = 0;
-		/*
-		for (WorkItem task : campaign.getAllTasksForUnit(undamagedUnit.getId())) {
-			if (task instanceof SalvageItem) {
-				cost += ((SalvageItem) task).getPart().getCost();
-			}
-		}*/
-
-		return cost;
 	}
 
 	public void writeToXml(PrintWriter pw1, int indentLvl) {
@@ -2557,7 +2544,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
         		sumGunnery += p.getGunneryInjuryMod();
         	}
     	}
-    	
+
     	for(UUID pid : vesselCrew) {
     		Person p = campaign.getPerson(pid);
     		if(null !=p && p.getHits() == 0) {
@@ -2570,7 +2557,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     			nCrew++;
     		}
     	}
-    	
+
     	if(nDrivers > 0) {
     		piloting = (int)Math.round(((double)sumPiloting)/nDrivers);
     	}
@@ -2580,7 +2567,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	if(entity instanceof Infantry) {
     		if(entity instanceof BattleArmor) {
     		    int ntroopers = 0;
-    		    //ok, we want to reorder the way we move through suits, so that we always put BA
+    		    //OK, we want to reorder the way we move through suits, so that we always put BA
     		    //in the suits with more armor. Otherwise, we may put a soldier in a suit with no
     		    //armor when a perfectly good suit is waiting further down the line.
     		    Map<String, Integer> bestSuits = new HashMap<String, Integer>();
@@ -2625,9 +2612,9 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	//TODO: For the moment we need to max these out at 8 so people don't get errors
     	//when they customize in MM but we should put an option in MM to ignore those limits
     	//and set it to true when we start up through MHQ
-    	gunnery = Math.min(gunnery, 7);
-    	piloting = Math.min(piloting, 8);
-    	artillery = Math.min(artillery, 7);
+    	gunnery = Math.min(Math.max(gunnery, 0), 7);
+    	piloting = Math.min(Math.max(piloting, 0), 8);
+    	artillery = Math.min(Math.max(artillery, 0), 7);
     	Crew pilot = new Crew(commander.getFullTitle(), 1, gunnery, piloting);
     	pilot.setPortraitCategory(commander.getPortraitCategory());
     	pilot.setPortraitFileName(commander.getPortraitFileName());
@@ -2688,86 +2675,109 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     		}
     		pilot.setHits(hits);
     	}
-    	resetEngineerOrTech();
+    	resetEngineer();
     	pilot.setToughness(commander.getToughness());
     	//TODO: game option to use tactics as command and ind init bonus
     	if(commander.hasSkill(SkillType.S_TACTICS)) {
     		pilot.setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getFinalSkillValue());
     	}
-    	    	
+
     	entity.setCrew(pilot);
     }
 
-    public void resetEngineerOrTech() {
+    public void resetEngineer() {
+    	if(!isSelfCrewed()) {
+    		return;
+    	}
         int minutesLeft = 480;
         int overtimeLeft = 240;
-        if(isSelfCrewed()) {
-        	if(getEntity() instanceof Infantry) {
-        		if(!isUnmanned()) {
-        			engineer = new Person(getCommander().getName(), campaign);
-                    engineer.setMinutesLeft(minutesLeft);
-                    engineer.setOvertimeLeft(overtimeLeft);
-                    engineer.setId(getCommander().getId());
-                    engineer.setPrimaryRole(Person.T_MECHANIC);
-                    engineer.setRankNumeric(getCommander().getRankNumeric());
-                    //will only be reloading ammo, so doesn't really matter what skill level we give them - set to regular
-                    engineer.addSkill(SkillType.S_TECH_MECHANIC, SkillType.getType(SkillType.S_TECH_MECHANIC).getRegularLevel(), 0);
-        		} else {
-	                engineer = null;
-	            }
+        if(null != engineer) {
+        	minutesLeft = engineer.getMinutesLeft();
+        	overtimeLeft = engineer.getOvertimeLeft();
+        } else {
+        	//then get the number based on the least amount of time available to crew members
+        	for(Person p : getActiveCrew()) {
+        		if(p.getMinutesLeft() < minutesLeft) {
+        			minutesLeft = p.getMinutesLeft();
+        		}
+        		if(p.getOvertimeLeft() < overtimeLeft) {
+        			overtimeLeft = p.getOvertimeLeft();
+        		}
+        	}
+        }
+        if(getEntity() instanceof Infantry) {
+        	if(!isUnmanned()) {
+        		engineer = new Person(getCommander().getName(), campaign);
+        		engineer.setEngineer(true);
+        		engineer.setMinutesLeft(minutesLeft);
+        		engineer.setOvertimeLeft(overtimeLeft);
+        		engineer.setId(getCommander().getId());
+        		engineer.setPrimaryRole(Person.T_MECHANIC);
+        		engineer.setRankNumeric(getCommander().getRankNumeric());
+        		//will only be reloading ammo, so doesn't really matter what skill level we give them - set to regular
+        		engineer.addSkill(SkillType.S_TECH_MECHANIC, SkillType.getType(SkillType.S_TECH_MECHANIC).getRegularLevel(), 0);
         	} else {
-	            if (vesselCrew.size() > 0) {
-	                int nCrew = 0;
-	                int sumSkill = 0;
-	                int sumBonus = 0;
-	                String engineerName = "Nobody";
-	                int bestRank = -1;
-	                for(UUID pid : vesselCrew) {
-	                    Person p = campaign.getPerson(pid);
-	                    if(null == p) {
-	                        continue;
-	                    }
-	                    if(p.hasSkill(SkillType.S_TECH_VESSEL)) {
-	                        sumSkill += p.getSkill(SkillType.S_TECH_VESSEL).getLevel();
-	                        sumBonus += p.getSkill(SkillType.S_TECH_VESSEL).getBonus();
-	                        nCrew++;
-	                    }
-	                    if(p.getRankNumeric() > bestRank) {
-	                        engineerName = p.getFullName();
-	                        bestRank = p.getRankNumeric();
-	                    }
-	                }
-	                if(nCrew > 0) {
-	                    engineer = new Person(engineerName, campaign);
-	                    engineer.setMinutesLeft(minutesLeft);
-	                    engineer.setOvertimeLeft(overtimeLeft);
-	                    engineer.setId(getCommander().getId());
-	                    engineer.setPrimaryRole(Person.T_SPACE_CREW);
-	                    if(bestRank > -1) {
-	                        engineer.setRankNumeric(bestRank);
-	                    }
-	                    engineer.addSkill(SkillType.S_TECH_VESSEL, sumSkill/nCrew, sumBonus/nCrew);
-	                } else {
-	                    engineer = null;
-	                    //cancel any mothballing if this happens
-	                    if(isMothballing()) {
-	                        mothballTime = 0;
-	                    }
-	                    //remove any scheduled tasks
-	                    for(Part p : getParts()) {
-	                        if(null != p.getAssignedTeamId()) {
-	                            p.cancelAssignment();
-	                        }
-	                    }
-	                }
-	            } else { // Needed to fix bug where removed crew doesn't remove engineer
-	                engineer = null;
-	            }
+        		engineer = null;
+        	}
+        } else {
+        	if (vesselCrew.size() > 0) {
+        		int nCrew = 0;
+        		int sumSkill = 0;
+        		int sumBonus = 0;
+        		String engineerName = "Nobody";
+        		int bestRank = -1;
+        		for(UUID pid : vesselCrew) {
+        			Person p = campaign.getPerson(pid);
+        			if(null == p) {
+        				continue;
+        			}
+        			if(p.hasSkill(SkillType.S_TECH_VESSEL)) {
+        				sumSkill += p.getSkill(SkillType.S_TECH_VESSEL).getLevel();
+        				sumBonus += p.getSkill(SkillType.S_TECH_VESSEL).getBonus();
+        				nCrew++;
+        			}
+        			if(p.getRankNumeric() > bestRank) {
+        				engineerName = p.getFullName();
+        				bestRank = p.getRankNumeric();
+        			}
+        		}
+        		if(nCrew > 0) {
+        			engineer = new Person(engineerName, campaign);
+            		engineer.setEngineer(true);
+        			engineer.setMinutesLeft(minutesLeft);
+        			engineer.setOvertimeLeft(overtimeLeft);
+        			engineer.setId(getCommander().getId());
+        			engineer.setPrimaryRole(Person.T_SPACE_CREW);
+        			if(bestRank > -1) {
+        				engineer.setRankNumeric(bestRank);
+        			}
+        			engineer.addSkill(SkillType.S_TECH_VESSEL, sumSkill/nCrew, sumBonus/nCrew);
+        			engineer.setUnitId(this.getId());
+        		} else {
+        			engineer = null;
+        		}
+        	} else { // Needed to fix bug where removed crew doesn't remove engineer
+        		engineer = null;
         	}
         }
         if(null != engineer) {
-            minutesLeft = engineer.getMinutesLeft();
-            overtimeLeft = engineer.getOvertimeLeft();
+        	//change reference for any scheduled tasks
+        	for(Part p : getParts()) {
+        		if(p.isBeingWorkedOn()) {
+        			p.setTeamId(engineer.getId());
+        		}
+        	}
+        } else {
+        	//cancel any mothballing if this happens
+        	if(isMothballing()) {
+        		mothballTime = 0;
+        	}
+        	//cancel any scheduled tasks
+        	for(Part p : getParts()) {
+        		if(p.isBeingWorkedOn()) {
+        			p.cancelAssignment();
+        		}
+        	}
         }
     }
 
@@ -2833,10 +2843,10 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     public boolean usesSoloPilot() {
     	//return Compute.getFullCrewSize(entity) == 1;
     	//Taharqa: I dont think we should do it based on computed size, but whether the unit logically
-    	//is the type of unit that has only one pilot. This is partly because there may be some vees 
+    	//is the type of unit that has only one pilot. This is partly because there may be some vees
     	//that only have one pilot and this is also a problem for BA units with only one active suit
-    	return (entity instanceof Mech) 
-    			|| (entity instanceof Protomech) 
+    	return (entity instanceof Mech)
+    			|| (entity instanceof Protomech)
     			|| (entity instanceof Aero && !(entity instanceof SmallCraft) && !(entity instanceof Jumpship));
     }
 
@@ -3309,7 +3319,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
         if(getEntity() instanceof ConvFighter) {
             return 45;
         }
-        if(getEntity() instanceof SmallCraft) {
+        if(getEntity() instanceof SmallCraft && !(getEntity() instanceof Dropship)) {
             return 90;
         }
         if(getEntity() instanceof Aero
@@ -3418,7 +3428,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     }
 
     public String getQualityName() {
-        return Part.getQualityName(getQuality());
+        return Part.getQualityName(getQuality(), campaign.getCampaignOptions().reverseQualityNames());
     }
 
     public boolean requiresMaintenance() {

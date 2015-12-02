@@ -6059,6 +6059,15 @@ public class CampaignGUI extends JPanel {
             if (null != ((AtBScenario) scenario).getLance(getCampaign())) {
                 int assignedForceId = ((AtBScenario) scenario).getLance(
                         getCampaign()).getForceId();
+                int cmdrStrategy = 0;
+                Person commander = getCampaign().getPerson(
+                        Lance.findCommander(assignedForceId, getCampaign()));
+                if (null != commander
+                        && null != commander
+                                .getSkill(SkillType.S_STRATEGY)) {
+                    cmdrStrategy = commander.getSkill(
+                            SkillType.S_STRATEGY).getLevel();
+                }
                 for (Force f : scenario.getForces(getCampaign()).getSubForces()) {
                     if (f.getId() != assignedForceId) {
                         Vector<UUID> units = f.getAllUnits();
@@ -6076,16 +6085,7 @@ public class CampaignGUI extends JPanel {
                                 slowest = Math.min(slowest, speed);
                             }
                         }
-                        int deployRound = 12 - slowest;
-                        Person commander = getCampaign().getPerson(
-                                Lance.findCommander(f.getId(), getCampaign()));
-                        if (null != commander
-                                && null != commander
-                                        .getSkill(SkillType.S_STRATEGY)) {
-                            deployRound -= commander.getSkill(
-                                    SkillType.S_STRATEGY).getLevel();
-                        }
-                        deployRound = Math.max(deployRound, 0);
+                        int deployRound = Math.max(0, 12 - slowest - cmdrStrategy);
 
                         for (UUID id : units) {
                             if (chosen.contains(getCampaign().getUnit(id))) {
@@ -6475,9 +6475,10 @@ public class CampaignGUI extends JPanel {
 
     public void refreshTechsList() {
         int selected = techTable.getSelectedRow();
-        techsModel.setData(getCampaign().getTechs(true, null));
+        ArrayList<Person> techs = getCampaign().getTechs(true, null);
+        techsModel.setData(techs);
         if ((selected > -1)
-                && (selected < getCampaign().getTechs(true, null).size())) {
+                && (selected < techs.size())) {
             techTable.setRowSelectionInterval(selected, selected);
         }
         String astechString = "<html><b>Astech Pool Minutes:</> "
@@ -6902,6 +6903,7 @@ public class CampaignGUI extends JPanel {
     public void filterTechs(boolean warehouse) {
         RowFilter<TechTableModel, Integer> techTypeFilter = null;
         final Part part = getSelectedTask();
+        final Unit unit = getSelectedServicedUnit();
         techTypeFilter = new RowFilter<TechTableModel, Integer>() {
             @Override
             public boolean include(
@@ -6917,6 +6919,16 @@ public class CampaignGUI extends JPanel {
                 }
                 TechTableModel techModel = entry.getModel();
                 Person tech = techModel.getTechAt(entry.getIdentifier());
+                if(null != unit && unit.isSelfCrewed()) {
+                	if(tech.getPrimaryRole() != Person.T_SPACE_CREW) {
+                		return false;
+                	}
+                	//check whether the engineer is assigned to the correct unit
+                	return unit.getId().equals(tech.getUnitId());
+                }
+                if(tech.getPrimaryRole() == Person.T_SPACE_CREW && !unit.isSelfCrewed()) {
+                	return false;
+                }
                 if (!onWarehouseTab() && !tech.isRightTechTypeFor(part)
                         && !btnShowAllTechs.isSelected()) {
                     return false;

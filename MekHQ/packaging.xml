@@ -20,7 +20,7 @@
     <!-- Global properties for this build -->
     <!-- Version and packaging properties -->
     <property name="project.name" value="mekhq" />
-    <property name="version" value="0.3.18-dev"/>
+    <property name="version" value="0.3.22-git"/>
     <property name="osxdist" value="${project.name}-${version}-mac" />
     <property name="windist" value="${project.name}-${version}-windows" />
     <property name="nixdist" value="${project.name}-${version}" />
@@ -135,6 +135,9 @@
         <copy todir="${pkgdir}/${libdir}">
             <fileset dir="${mm-pkgdir}/megamek/${libdir}" />
         </copy>
+        <copy todir="${pkgdir}/${libdir}">
+            <fileset dir="${mml-pkgdir}/${libdir}" />
+        </copy>
         <!-- now add in MM and MML doc files -->
         <copy todir="${pkgdir}/${docdir}/${docmmdir}">
             <fileset dir="${mm-pkgdir}/megamek/${docdir}" />
@@ -144,8 +147,14 @@
         </copy>
         <!-- grab the megameklab misc images -->
         <copy todir="${pkgdir}/${datadir}/images/misc">
-            <fileset dir="${mm-pkgdir}/megamek/${datadir}/images/misc">
+            <fileset dir="${mml-pkgdir}/${datadir}/images/misc">
                 <include name="megameklab.png" />
+            </fileset>
+        </copy>
+        <!-- grab the megameklab recordsheets files -->
+        <copy todir="${pkgdir}/${datadir}/images/misc">
+            <fileset dir="${mml-pkgdir}/${datadir}/images">
+                <include name="recordsheets/" />
             </fileset>
         </copy>
         <!-- ok now move some stuff back into data that needs to be there-->

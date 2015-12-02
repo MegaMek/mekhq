@@ -18,8 +18,7 @@
         </pathelement>
         <fileset dir="${basedir}">
             <include
-                    name="MegaMek.jar"
-                    >
+                    name="MegaMek.jar" >
             </include>
             <include
                     name="MegaMekLab.jar">

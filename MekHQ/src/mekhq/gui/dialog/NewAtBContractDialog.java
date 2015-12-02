@@ -106,8 +106,11 @@ public class NewAtBContractDialog extends NewContractDialog {
         if (getCurrentEnemyCode() != null) {
         	((AtBContract)contract).setEnemyCode(getCurrentEnemyCode());
         }
+        ((AtBContract)contract).setPlanetName((String)cbPlanets.getSelectedItem());
         spnMultiplier.setModel(new SpinnerNumberModel(contract.getMultiplier(), 0.1, 10.0, 0.1));
         updatePaymentMultiplier();
+        contract.calculateContract(campaign);
+        this.doUpdateContract(cbPlanets);
         
         addAllListeners();
 	}
@@ -394,6 +397,8 @@ public class NewAtBContractDialog extends NewContractDialog {
         cbAllyQuality.addActionListener(contractUpdateActionListener);
         cbEnemySkill.addActionListener(contractUpdateActionListener);
         cbEnemyQuality.addActionListener(contractUpdateActionListener);
+        suggestPlanet.addFocusListener(contractUpdateFocusListener);
+        suggestPlanet.addActionListener(contractUpdateActionListener);
 	}
 	
 	private void removeAllListeners() {
@@ -405,6 +410,8 @@ public class NewAtBContractDialog extends NewContractDialog {
         cbAllyQuality.removeActionListener(contractUpdateActionListener);
         cbEnemySkill.removeActionListener(contractUpdateActionListener);
         cbEnemyQuality.removeActionListener(contractUpdateActionListener);
+        suggestPlanet.removeFocusListener(contractUpdateFocusListener);
+        suggestPlanet.removeActionListener(contractUpdateActionListener);
 	}
 	
 	private String getCurrentEmployerCode() {
@@ -523,6 +530,8 @@ public class NewAtBContractDialog extends NewContractDialog {
     	contract.setAllyQuality(cbAllyQuality.getSelectedIndex());
     	contract.setEnemySkill(cbEnemySkill.getSelectedIndex());
     	contract.setEnemyQuality(cbEnemyQuality.getSelectedIndex());
+    	contract.setAllyBotName(contract.getEmployerName(campaign.getEra()));
+    	contract.setEnemyBotName(contract.getEnemyName(campaign.getEra()));
     	contract.setSharesPct((Integer)spnShares.getValue());
     	
     	contract.calculatePartsAvailabilityLevel(campaign);

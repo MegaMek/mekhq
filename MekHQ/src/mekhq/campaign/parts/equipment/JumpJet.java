@@ -79,6 +79,9 @@ public class JumpJet extends EquipmentPart {
     
     @Override
     public String getDetails() {
+    	if(null != unit) {
+			return super.getDetails();
+    	}
     	return getUnitTonnage() + " ton unit";
     }
 

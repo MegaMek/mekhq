@@ -487,7 +487,7 @@ public class ContractMarket implements Serializable {
 			return;
 		}
 		AtBContract followup = new AtBContract("Followup Contract");
-		contract.setEmployerCode(contract.getEmployerCode(), campaign.getEra());
+		followup.setEmployerCode(contract.getEmployerCode(), campaign.getEra());
 		followup.setEnemyCode(contract.getEnemyCode());
 		followup.setPlanetName(contract.getPlanetName());
 		switch (contract.getMissionType()) {
@@ -781,7 +781,7 @@ public class ContractMarket implements Serializable {
             c.writeToXml(pw1, indent + 1);
         }
         for (Integer key : clauseMods.keySet()) {
-        	if (!contracts.contains(key)) {
+        	if (!contractIds.containsKey(key)) {
         		continue;
         	}
         	pw1.println(MekHqXmlUtil.indentStr(indent+1)

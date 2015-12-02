@@ -1303,17 +1303,25 @@ public class AtBScenario extends Scenario {
 				 * the options include Star League tables, the point of this mission
 				 * is thwarted.
 				 */
-				UnitTableData.FactionTables ft = UnitTableData.getInstance().getRAT("Xotl", 2750, "SL");
+				UnitTableData.FactionTables ft = null;
+				rat = null;
+				try {
+					ft = UnitTableData.getInstance().getRAT("Xotl", 2750, "SL");
+				} catch (NullPointerException ex) {
+					// missing file; try to find the best alternative next
+				}
 				if (null == ft) {
 					ft = UnitTableData.getInstance().getBestRAT(campaign.getCampaignOptions().getRATs(),
-						2780, "SL", UnitTableData.UNIT_MECH);
+							2780, "SL", UnitTableData.UNIT_MECH);
 				}
-				rat = ft.getTable(UnitTableData.UNIT_MECH, UnitMarket.getRandomMechWeight(),
-						(roll == 6)?IUnitRating.DRAGOON_A:IUnitRating.DRAGOON_D);
+				if (null != ft) {
+					rat = ft.getTable(UnitTableData.UNIT_MECH, UnitMarket.getRandomMechWeight(),
+							(roll == 6)?IUnitRating.DRAGOON_A:IUnitRating.DRAGOON_D);
+				}
 			}
 
 			otherForce = new ArrayList<Entity>();
-			Entity e = getUnitFromRat(rat, campaign.getFactionCode(),
+			Entity e = (rat == null)?null:getUnitFromRat(rat, campaign.getFactionCode(),
 					RandomSkillsGenerator.L_REG, campaign);
 			otherForce.add(e);
 			//TODO: During SW offer a choice between an employer exchange or a contract breach
@@ -1328,20 +1336,27 @@ public class AtBScenario extends Scenario {
 			start = Board.START_N;
 			enemyStart = Board.START_S;
 
-			UnitTableData.FactionTables ft = UnitTableData.getInstance().getRAT("Xotl", 2750, "SL");
+			UnitTableData.FactionTables ft = null;
+			try {
+				ft = UnitTableData.getInstance().getRAT("Xotl", 2750, "SL");
+			} catch (NullPointerException ex) {
+				// missing file; try to find the best alternative next
+			}
 			if (null == ft) {
 				ft = UnitTableData.getInstance().getBestRAT(campaign.getCampaignOptions().getRATs(),
 						2780, "SL", UnitTableData.UNIT_MECH);
 			}
-
 			for (weight = UnitTableData.WT_LIGHT; weight <= UnitTableData.WT_ASSAULT; weight++) {
 				enemy = new ArrayList<Entity>();
-				rat = ft.getTable(UnitTableData.UNIT_MECH,
-						(battleType == STARLEAGUECACHE1)?UnitMarket.getRandomMechWeight():weight,
-								(Compute.d6() == 6)?IUnitRating.DRAGOON_A:IUnitRating.DRAGOON_D);
-
-				enemy.add(getUnitFromRat(rat, getContract(campaign).getEnemyCode(),
-							getContract(campaign).getEnemySkill(), campaign));
+				if (ft != null) {
+					rat = ft.getTable(UnitTableData.UNIT_MECH,
+							weight, (Compute.d6() == 6)?IUnitRating.DRAGOON_A:IUnitRating.DRAGOON_D);
+	
+					enemy.add(getUnitFromRat(rat, getContract(campaign).getEnemyCode(),
+								getContract(campaign).getEnemySkill(), campaign));
+				} else {
+					enemy.add(null);
+				}
 				specMissionEnemies.add(enemy);
 			}
 			botForces.add(getEnemyBotForce(getContract(campaign), enemyStart, specMissionEnemies.get(0)));
@@ -2484,6 +2499,9 @@ public class AtBScenario extends Scenario {
 		crew += "\" ejected=\""
 				 + String.valueOf(tgtEnt.getCrew().isEjected());
 
+		crew += "\" externalId=\""
+				 + tgtEnt.getCrew().getExternalIdAsString();
+		
 		if (tgtEnt instanceof Mech) {
 			if (((Mech) tgtEnt).isAutoEject()) {
 				crew += "\" autoeject=\"true";

@@ -224,7 +224,17 @@ public class CurrentLocation implements Serializable {
 			for (int x=0; x<nl.getLength(); x++) {
 				Node wn2 = nl.item(x);
 				if (wn2.getNodeName().equalsIgnoreCase("currentPlanetName")) {
-					retVal.currentPlanet = c.getPlanet(wn2.getTextContent());
+					Planet p = c.getPlanet(wn2.getTextContent());
+					if(null == p) {
+						//whoops we cant find your planet man, back to Earth
+						MekHQ.logError("Couldn't find planet named " + wn2.getTextContent());
+						p = c.getPlanet("Terra");
+						if(null == p) {
+							//if that doesnt work then give the first planet we have
+							p = c.getPlanets().get(0);
+						}
+					}
+					retVal.currentPlanet = p;
 				} else if (wn2.getNodeName().equalsIgnoreCase("transitTime")) {
 					retVal.transitTime = Double.parseDouble(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("rechargeTime")) {
@@ -239,7 +249,7 @@ public class CurrentLocation implements Serializable {
 			// Doh!
 			MekHQ.logError(ex);
 		}
-		
+
 		return retVal;
 	}
 }

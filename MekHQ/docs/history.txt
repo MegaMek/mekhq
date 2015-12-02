@@ -1,6 +1,79 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.18-dev (git)
+v0.3.22-git
+
+v0.3.21 (2015-11-15 16:50 UTC)
++ Bug [#963]: CampaignOptionDialog crashes with NPE when "Confirm" button is pressed
++ Bug: [AtB] MM game launched from MHQ using AtB does not enter deployment phase.
++ Bug [#968]: GameOptionsDialog throws IllegalArgumentException
++ Updated MegaMek.jar to 0.41.11
++ Updated MegaMekLab.jar to 0.1.47
+
+v0.3.20 (2015-10-12 00:11 UTC)
++ Bug: NPE on warehouse tech filter
++ Bug: check for missing external id on ejected enemy pilots
++ Bug [#888]: Briefing Room: Cancel load saved game causes NPE
++ Bug [#951]: Auto-resolve fails even with new mul method
++ Bug [#950]: Autofailing battle by advancing day does not undeploy lance
++ Bug [#891]: [ATB] Contracts Change Value On Reload
++ Bug [#889]: [ATB] Non-Special Battles Generated Despite Rout
++ Bug [#879]: [ATB] minimum <= value <= maximum Error
++ Bug [#852]: [ATB] Manual contracts : Employer/Enemy units always generates as "Independent"
++ Bug [#946]: AtB: Edit mission causes enemy faction to change
++ Bug [#847]: Manually adding contracts : transportation amount is incorrectly calculated
++ Bug: [AtB] Star League Cache special missions can cause NPE if SL-era RATs are missing.
++ Bug [#943]: File ratinfo.xml not updated correctly
++ Bug [#623]: 0.3.6. : Unable to edit scenario start date even in GM mode
++ Bug [#807]: [ATB] Contract renegotiate buttons no longer work
++ Bug [#845]: [ATB] Employer offers follow up contract, but follow up contract has incorrect employer
++ Bug [#860]: [ATB] Special missions still generating gravity even if "use planetary conditions" is turned off
++ Bug [#861]: [ATB] 100 ton ASF being classified as "Medium" in the unit market
++ Bug [#858]: Personnel market : Mechwarrior's unit is a tank
++ Bug [#864]: [ATB] Uses Highest Strategy not "Deployed" Strategy
++ Bug [#870]: Jumpships getting assigned to battles in AtB
++ Updated MegaMek.jar to 0.41.10
++ Updated MegaMekLab.jar to 0.1.46
+
+v0.3.19 (2014-09-14 01:25 UTC)
++ Bug [#922]: Location of Jump Jets is not shown in repair tab
++ Bug [#908]: Pay for Recruitment Pays for All Enemy Pilots
++ Bug: enemy salvage not identified via manual resolution when it has a UUID
++ Adapt packaging to support MML svg files
++ improvements to prisoner tracking in ResolveScenarioTracker (prisoners from ejected units not yet correct)
++ simplified prisoner interface in ResolveScenarioWizardDialog
++ Bug: totally dead crews generating an NPE when shuffled in ResolveScenarioTracker
++ Bug [#932]: BA prisoner problems
++ Bug [#944]: Assign Kills Error
++ option to capture prisoners
++ option to set prisoners as bondsman by default
++ prisoners are tracked correctly from ejected units
++ added Utilities.isLikelyCapture for the logic of what/who gets captured in ResolveScenarioTracker
++ Bug: all salvage is considered total loss
++ show salvage value below to reduce width in ResolveScenarioWizardDialog
++ Bug: ResolveScenarioWizardDialog not showing correct damage status of player's own units
++ Bug [#571]: Experience Error With Late Deployment
++ sort personnel and prisoners in ResolveScenarioWizard by unit name
++ Bug: when no mul file is loaded, pilot resolution is skipped
++ Bug [#928]: Picked up MechWarriors are not shown in Post Battle Resolution
++ Bug [#657]: Units incorrectly listed as escaped at end of the battle
++ Bug [#945]: Peronnel tab, Fluff Information view - cannot sort by kills
++ Bug [#930]: Name of Tab different between MHQ and MML
++ option to reverse quality name reporting (e.g. F becomes A)
++ Show vessel engineers in repair bay with time
++ Bug [#934]: Unlimited Repairs for Dropships and Warships
++ Bug: shorthanded mod not showing for large craft
++ Bug [#910]: sorting problem in parts store dialog
++ Bug [#897]: Can't Determine Salvage In Exchange
++ Bug [#899]: MHQ Version Upgrade Causing Jump Path Error
++ Bug [#929]: Warehouse Tab - sorting issues
++ Bug [#920]: Start a New Campaign and the Date Chooser
++ Bug [#813]: Mek HQ pilots/crews with -1 and below skills do not function correctly in the MM lobby
++ Bug [#816]: Injury handling for MIA pilots doesn't work correctly
++ WIP Bug [#900]:  Daily Log overwhelmed by Injury Reports
++ Updated MegaMek.jar to 0.41.9
++ Updated MegaMekLab.jar to 0.1.45
+
+v0.3.18 (2015-09-01 12:10 UTC)
 + Bug: units listed as not invented when they have been
 + Bug: ammo bins should not be loadable in warehouse
 + various improvements to ResolveScenarioTracker including tracking actual damage to total loss units
@@ -11,7 +84,8 @@ v0.3.18-dev (git)
 + Bug: some items on ResolveScenarioWizardDialog are not laying out correctly
 + Bug: contracts not being checked for duplicate names
 + Bug: NPE when trying to assign prisoners for BA
-+ Updated MegaMek.jar to 0.41.8-dev
++ Updated MegaMek.jar to 0.41.8
++ Updated MegaMekLab.jar to 0.1.44
 
 v0.3.17 (2015-08-26 21:30 UTC)
 + Bug: Ammo bins not reserving for refit if other ammo bins of same type in warehouse

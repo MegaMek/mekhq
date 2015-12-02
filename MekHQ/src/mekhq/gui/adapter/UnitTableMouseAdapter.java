@@ -362,6 +362,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             gui.refreshFinancialTransactions();
             gui.refreshReport();
             gui.refreshOverview();
+            gui.refreshTechsList();
         } else if (command.contains("CUSTOMIZE")
                 && !command.contains("CANCEL")) {
             gui.getPanMekLab().loadUnit(selectedUnit);

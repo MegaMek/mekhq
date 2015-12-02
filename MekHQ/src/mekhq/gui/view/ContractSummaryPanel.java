@@ -509,12 +509,22 @@ public class ContractSummaryPanel extends JPanel {
 			btnCommand.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent ev) {
+					JButton btn = null;
+					if(ev.getSource() instanceof JButton) {
+						btn = (JButton)ev.getSource();
+					}
+					if(null == btn) {
+						return;
+					}
 					if (contract instanceof AtBContract) {
 						campaign.getContractMarket().rerollClause((AtBContract)contract,
 								ContractMarket.CLAUSE_COMMAND, campaign);
 						((JButton)ev.getSource()).setText("Renegotiate (" +
 								(cmdRerolls - campaign.getContractMarket().getRerollsUsed(contract, ContractMarket.CLAUSE_COMMAND)) + ")");
 						txtCommand.setText(Contract.getCommandRightsName(contract.getCommandRights()));
+						if (campaign.getContractMarket().getRerollsUsed(contract, ContractMarket.CLAUSE_COMMAND) >= cmdRerolls) {
+							btn.setEnabled(false);
+						}
 						refreshAmounts();
 					}
 				}
@@ -555,12 +565,22 @@ public class ContractSummaryPanel extends JPanel {
 			btnTransport.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent ev) {
+					JButton btn = null;
+					if(ev.getSource() instanceof JButton) {
+						btn = (JButton)ev.getSource();
+					}
+					if(null == btn) {
+						return;
+					}
 					if (contract instanceof AtBContract) {
 						campaign.getContractMarket().rerollClause((AtBContract)contract,
 								ContractMarket.CLAUSE_TRANSPORT, campaign);
 						((JButton)ev.getSource()).setText("Renegotiate (" +
 								(tranRerolls - campaign.getContractMarket().getRerollsUsed(contract, ContractMarket.CLAUSE_TRANSPORT)) + ")");
 						txtTransport.setText(contract.getTransportComp() + "%");
+						if (campaign.getContractMarket().getRerollsUsed(contract, ContractMarket.CLAUSE_TRANSPORT) >= tranRerolls) {
+							btn.setEnabled(false);
+						}
 						refreshAmounts();
 					}
 				}
@@ -625,6 +645,13 @@ public class ContractSummaryPanel extends JPanel {
 			btnSupport.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent ev) {
+					JButton btn = null;
+					if(ev.getSource() instanceof JButton) {
+						btn = (JButton)ev.getSource();
+					}
+					if(null == btn) {
+						return;
+					}
 					if (contract instanceof AtBContract) {
 						campaign.getContractMarket().rerollClause((AtBContract)contract,
 								ContractMarket.CLAUSE_SUPPORT, campaign);
@@ -632,6 +659,9 @@ public class ContractSummaryPanel extends JPanel {
 								(logRerolls - campaign.getContractMarket().getRerollsUsed(contract, ContractMarket.CLAUSE_SUPPORT)) + ")");
 						txtStraightSupport.setText(contract.getStraightSupport() + "%");
 						txtBattleLossComp.setText(contract.getBattleLossComp() + "%");
+						if (campaign.getContractMarket().getRerollsUsed(contract, ContractMarket.CLAUSE_SUPPORT) >= logRerolls) {
+							btn.setEnabled(false);
+						}
 						refreshAmounts();
 					}
 				}

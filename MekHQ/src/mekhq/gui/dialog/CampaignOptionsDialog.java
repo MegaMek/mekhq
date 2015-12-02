@@ -206,6 +206,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox useRandomHitsForVees;
     private JSpinner spnMinimumHitsForVees;
     private JCheckBox useTougherHealing;
+    private JComboBox<String> comboPrisonerStatus;
+
 
     // Start Personnel Market
     private JPanel panPersonnelMarket;
@@ -237,6 +239,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JSpinner spnMaintenanceBonus;
     private JCheckBox useQualityMaintenance;
     private JCheckBox useUnofficalMaintenance;
+    private JCheckBox reverseQualityNames;
 
 
     private JRadioButton btnContractEquipment;
@@ -285,6 +288,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JComboBox<String> choiceAcquireSkill;
     private JSpinner spnAcquireClanPenalty;
     private JSpinner spnAcquireIsPenalty;
+    private JCheckBox chkCapturePrisoners;
     private JTextField txtMaxAcquisitions;
     private JCheckBox chkUseUnofficialProcreation;
     private JCheckBox chkUseUnofficialProcreationNoRelationship;
@@ -453,6 +457,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useAbilitiesBox.setSelected(options.useAbilities());
         useEdgeBox.setSelected(options.useEdge());
         useImplantsBox.setSelected(options.useImplants());
+        chkCapturePrisoners.setSelected(options.capturePrisoners());
 		altQualityAveragingCheckBox.setSelected(options.useAltQualityAveraging());
         useAdvancedMedicalBox.setSelected(options.useAdvancedMedical());
         useDylansRandomXpBox.setSelected(options.useDylansRandomXp());
@@ -471,6 +476,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useQualityMaintenance.setSelected(options.useQualityMaintenance());
         useUnofficalMaintenance.setSelected(options.useUnofficalMaintenance());
         checkMaintenance.setSelected(options.checkMaintenance());
+        reverseQualityNames.setSelected(options.reverseQualityNames());
+
 
         sellUnitsBox.setSelected(options.canSellUnits());
         sellPartsBox.setSelected(options.canSellParts());
@@ -543,6 +550,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useAbilitiesBox = new JCheckBox();
         useEdgeBox = new JCheckBox();
         useImplantsBox = new JCheckBox();
+        chkCapturePrisoners = new JCheckBox();
 		altQualityAveragingCheckBox = new JCheckBox();
         useAdvancedMedicalBox = new JCheckBox();
         useDylansRandomXpBox = new JCheckBox();
@@ -575,6 +583,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useUnofficalMaintenance = new JCheckBox();
         checkMaintenance = new JCheckBox();
         logMaintenance = new JCheckBox();
+        reverseQualityNames = new JCheckBox();
 
         chkSupportStaffOnly = new JCheckBox();
 
@@ -833,7 +842,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubRepair.add(pnlDestroyPartTarget, gridBagConstraints);
 
-        
+
         checkMaintenance.setText(resourceMap.getString("checkMaintenance.text")); // NOI18N
         checkMaintenance.setToolTipText(resourceMap.getString("checkMaintenance.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -910,11 +919,23 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubMaintenance.add(useQualityMaintenance, gridBagConstraints);
 
+        reverseQualityNames.setText(resourceMap.getString("reverseQualityNames.text")); // NOI18N
+        reverseQualityNames.setToolTipText(resourceMap.getString("reverseQualityNames.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubMaintenance.add(reverseQualityNames, gridBagConstraints);
+
+
         useUnofficalMaintenance.setText(resourceMap.getString("useUnofficalMaintenance.text")); // NOI18N
         useUnofficalMaintenance.setToolTipText(resourceMap.getString("useUnofficalMaintenance.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
@@ -925,7 +946,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         logMaintenance.setToolTipText(resourceMap.getString("logMaintenance.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -1295,13 +1316,37 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panPersonnel.add(useImplantsBox, gridBagConstraints);
 
+        chkCapturePrisoners.setText(resourceMap.getString("chkCapturePrisoners.text")); // NOI18N
+        chkCapturePrisoners.setToolTipText(resourceMap.getString("chkCapturePrisoners.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panPersonnel.add(chkCapturePrisoners, gridBagConstraints);
+
+        DefaultComboBoxModel<String> prisonerStatusModel = new DefaultComboBoxModel<String>();
+        prisonerStatusModel.addElement("Prisoner");
+        prisonerStatusModel.addElement("Bondsman");
+        comboPrisonerStatus = new JComboBox<String>(prisonerStatusModel);
+        comboPrisonerStatus.setSelectedIndex(options.getDefaultPrisonerStatus());
+        JPanel pnlPrisonerStatus = new JPanel();
+        pnlPrisonerStatus.add(new JLabel("Default Prisoner Status:"));
+        pnlPrisonerStatus.add(comboPrisonerStatus);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panPersonnel.add(pnlPrisonerStatus, gridBagConstraints);
 
 		altQualityAveragingCheckBox.setText(resourceMap.getString("altQualityAveragingCheckBox.text")); // NOI18N
         altQualityAveragingCheckBox.setToolTipText(resourceMap.getString("altQualityAveragingCheckBox.toolTipText")); // NOI18N
         altQualityAveragingCheckBox.setName("altQualityAveragingCheckBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 9;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1312,7 +1357,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useAdvancedMedicalBox.setName("useAdvancedMedicalBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = 10;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1323,7 +1368,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useDylansRandomXpBox.setName("useDylansRandomXpBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridy = 11;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1336,7 +1381,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         pnlHealWaitingPeriod.add(new JLabel("Days to wait between healing checks by doctors"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridy = 12;
         gridBagConstraints.gridwidth = 2;
         //gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1350,7 +1395,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         pnlNaturalHealWaitingPeriod.add(new JLabel("Days to wait for natural healing"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 11;
+        gridBagConstraints.gridy = 13;
         gridBagConstraints.gridwidth = 2;
         //gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1363,7 +1408,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panMinimumHitsForVees.add(new JLabel("Minimum number of hits for wounded crews and infantry"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 12;
+        gridBagConstraints.gridy = 14;
         gridBagConstraints.gridwidth = 2;
         //gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1375,7 +1420,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useRandomHitsForVees.setToolTipText(resourceMap.getString("useRandomHitsForVees.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 13;
+        gridBagConstraints.gridy = 15;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1386,7 +1431,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useTougherHealing.setToolTipText(resourceMap.getString("useTougherHealing.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 14;
+        gridBagConstraints.gridy = 16;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1395,18 +1440,18 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         chkUseUnofficialProcreation = new JCheckBox("Use procreation (Unofficial)"); // NOI18N
         chkUseUnofficialProcreation.setSelected(options.useUnofficialProcreation());
         //chkUseUnofficialProcreation.setToolTipText(resourceMap.getString("chkUseUnofficialProcreation.toolTipText")); // NOI18N
-        gridBagConstraints.gridy = 15;
+        gridBagConstraints.gridy = 17;
         panPersonnel.add(chkUseUnofficialProcreation, gridBagConstraints);
 
         chkUseUnofficialProcreationNoRelationship = new JCheckBox("Use procreation without a relationship (Unofficial)"); // NOI18N
         chkUseUnofficialProcreationNoRelationship.setSelected(options.useUnofficialProcreationNoRelationship());
         //chkUseUnofficialProcreationNoRelationship.setToolTipText(resourceMap.getString("chkUseUnofficialProcreationNoRelationship.toolTipText")); // NOI18N
-        gridBagConstraints.gridy = 16;
+        gridBagConstraints.gridy = 18;
         panPersonnel.add(chkUseUnofficialProcreationNoRelationship, gridBagConstraints);
 
         chkUseTransfers = new JCheckBox("Log Saver - Use Reassign instead of Remove/Assign"); // NOI18N
         chkUseTransfers.setSelected(options.useTransfers());
-        gridBagConstraints.gridy = 17;
+        gridBagConstraints.gridy = 19;
         panPersonnel.add(chkUseTransfers, gridBagConstraints);
 
         JPanel panSalary = new JPanel(new GridBagLayout());
@@ -1511,7 +1556,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 17;
+        gridBagConstraints.gridheight = 20;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -1694,7 +1739,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             gridBagConstraints.gridy++;
             gridBagConstraints.gridx = 3;
             gridBagConstraints.insets = new Insets(0, 20, 0, 0);
-            panFinances.add(new JLabel(Part.getQualityName(i) + " Quality"), gridBagConstraints);
+            panFinances.add(new JLabel(Part.getQualityName(i, options.reverseQualityNames()) + " Quality"), gridBagConstraints);
             gridBagConstraints.gridx = 2;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             spnUsedPartsValue[i] = new JSpinner(new SpinnerNumberModel(options.getUsedPartsValue(i), 0.00, 1.00, 0.05));
@@ -4035,6 +4080,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setDestroyPartTarget((Integer) spnDestroyPartTarget.getModel().getValue());
         options.setCheckMaintenance(checkMaintenance.isSelected());
         options.setUseQualityMaintenance(useQualityMaintenance.isSelected());
+        options.setReverseQualityNames(reverseQualityNames.isSelected());
         options.setUseUnofficalMaintenance(useUnofficalMaintenance.isSelected());
         options.setMaintenanceBonus((Integer) spnMaintenanceBonus.getModel().getValue());
         options.setMaintenanceCycleDays((Integer) spnMaintenanceDays.getModel().getValue());
@@ -4049,6 +4095,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setEdge(useEdgeBox.isSelected());
         campaign.getGameOptions().getOption("edge").setValue(useEdgeBox.isSelected());
         options.setImplants(useImplantsBox.isSelected());
+        options.setCapturePrisoners(chkCapturePrisoners.isSelected());
         campaign.getGameOptions().getOption("manei_domini").setValue(useImplantsBox.isSelected());
 		options.setAltQualityAveraging(altQualityAveragingCheckBox.isSelected());
         options.setAdvancedMedical(useAdvancedMedicalBox.isSelected());
@@ -4106,7 +4153,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setTargetIdleXP((Integer) spnTargetIdleXP.getModel().getValue());
 
         options.setLimitByYear(limitByYearBox.isSelected());
-        campaign.getGameOptions().getOption("is_eq_limits").setValue(limitByYearBox.isSelected());
         options.setDisallowExtinctStuff(disallowExtinctStuffBox.isSelected());
         options.setAllowClanPurchases(allowClanPurchasesBox.isSelected());
         options.setAllowISPurchases(allowISPurchasesBox.isSelected());
@@ -4114,8 +4160,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         campaign.getGameOptions().getOption("canon_only").setValue(allowCanonOnlyBox.isSelected());
         options.setUseAmmoByType(useAmmoByTypeBox.isSelected());
         options.setTechLevel(choiceTechLevel.getSelectedIndex());
-        campaign.getGameOptions().getOption("allow_advanced_units").setValue(choiceTechLevel.getSelectedIndex() > 0);
-        campaign.getGameOptions().getOption("allow_advanced_ammo").setValue(choiceTechLevel.getSelectedIndex() > 0);
+        campaign.getGameOptions().getOption("techlevel").setValue((String)choiceTechLevel.getSelectedItem());
 
         //we need to reset healing time options through the campaign because we may need to
         //loop through personnel to make adjustments
@@ -4128,6 +4173,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUseUnofficialProcreation(chkUseUnofficialProcreation.isSelected());
         options.setUseUnofficialProcreationNoRelationship(chkUseUnofficialProcreationNoRelationship.isSelected());
         options.setUseTransfers(chkUseTransfers.isSelected());
+        options.setDefaultPrisonerStatus(comboPrisonerStatus.getSelectedIndex());
 
         rskillPrefs.setOverallRecruitBonus((Integer) spnOverallRecruitBonus.getModel().getValue());
         for (int i = 0; i < Person.T_NUM; i++) {
@@ -4303,7 +4349,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private void btnDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDateActionPerformed
         // show the date chooser
         DateChooser dc = new DateChooser(frame, date);
-        // user can eiter choose a date or cancel by closing
+        // user can either choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             date = dc.getDate();
             btnDate.setText(getDateAsString());

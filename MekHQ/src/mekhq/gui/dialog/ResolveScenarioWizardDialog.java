@@ -40,7 +40,6 @@ import java.util.ResourceBundle;
 import java.util.UUID;
 
 import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -51,6 +50,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import megamek.client.ui.Messages;
 import megamek.client.ui.swing.UnitEditorDialog;
@@ -60,6 +61,7 @@ import megamek.common.GunEmplacement;
 import mekhq.Utilities;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
+import mekhq.campaign.ResolveScenarioTracker.PrisonerStatus;
 import mekhq.campaign.ResolveScenarioTracker.UnitStatus;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
@@ -136,12 +138,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
     /*
      * Prisoner status panel components
      */
-    private ArrayList<JCheckBox> pr_miaBtns = new ArrayList<JCheckBox>();
     private ArrayList<JCheckBox> prisonerBtns = new ArrayList<JCheckBox>();
-    private ArrayList<JCheckBox> bondsmanBtns = new ArrayList<JCheckBox>();
     private ArrayList<JSlider> pr_hitSliders = new ArrayList<JSlider>();
-    private ArrayList<PersonStatus> prstatuses = new ArrayList<PersonStatus>();
-    private ArrayList<JCheckBox> escapeBtns = new ArrayList<JCheckBox>();
+    private ArrayList<PrisonerStatus> prstatuses = new ArrayList<PrisonerStatus>();
 
     /*
      * Salvage panel components
@@ -434,9 +433,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         labelTable.put( new Integer( 5 ), new JLabel("5") );
         labelTable.put( new Integer( 6 ), new JLabel(resourceMap.getString("dead")) );
         j = 0;
-        for(UUID pid : tracker.getPeopleStatus().keySet()) {
-            j++;
-            PersonStatus status = tracker.getPeopleStatus().get(pid);
+        for(PersonStatus status : tracker.getSortedPeople()) {
+        	j++;
             pstatuses.add(status);
             nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
             miaCheck = new JCheckBox("");
@@ -489,33 +487,24 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        pnlPrisonerStatus.add(new JLabel(resourceMap.getString("mia")), gridBagConstraints);
-        gridBagConstraints.gridx = 3;
+        /*pnlPrisonerStatus.add(new JLabel(resourceMap.getString("mia")), gridBagConstraints);*/
+        //gridBagConstraints.gridx = 2;
         pnlPrisonerStatus.add(new JLabel(resourceMap.getString("prisoner")), gridBagConstraints);
-        gridBagConstraints.gridx = 4;
-        pnlPrisonerStatus.add(new JLabel(resourceMap.getString("bondsman")), gridBagConstraints);
-        gridBagConstraints.gridx = 5;
-        gridBagConstraints.weightx = 1.0;
-        pnlPrisonerStatus.add(new JLabel(resourceMap.getString("escaped")), gridBagConstraints);
         i = 2;
         JCheckBox prisonerCheck;
-        JCheckBox bondsmanCheck;
-        JCheckBox escapeCheck;
-        ButtonGroup captured;
         j = 0;
-        for(UUID pid : tracker.getPrisonerStatus().keySet()) {
+        for(PrisonerStatus status : tracker.getSortedPrisoners()) {
             j++;
-            PersonStatus status = tracker.getPrisonerStatus().get(pid);
             prstatuses.add(status);
             nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
             miaCheck = new JCheckBox("");
-            pr_miaBtns.add(miaCheck);
             hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 6, status.getHits());
             hitSlider.setMajorTickSpacing(1);
             hitSlider.setPaintTicks(true);
             hitSlider.setLabelTable(labelTable);
             hitSlider.setPaintLabels(true);
             hitSlider.setSnapToTicks(true);
+            hitSlider.setName(Integer.toString(j-1));
             pr_hitSliders.add(hitSlider);
             miaCheck.setSelected(status.isMissing());
             gridBagConstraints = new java.awt.GridBagConstraints();
@@ -532,27 +521,11 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.gridx = 1;
             pnlPrisonerStatus.add(hitSlider, gridBagConstraints);
             gridBagConstraints.gridx = 2;
-            pnlPrisonerStatus.add(miaCheck, gridBagConstraints);
             prisonerCheck = new JCheckBox("");
             prisonerBtns.add(prisonerCheck);
-            gridBagConstraints.gridx = 3;
-            prisonerCheck.setSelected(status.isCaptured() && !tracker.getCampaign().getFaction().isClan());
-            pnlPrisonerStatus.add(prisonerCheck, gridBagConstraints);
-            bondsmanCheck = new JCheckBox("");
-            bondsmanBtns.add(bondsmanCheck);
-            gridBagConstraints.gridx = 4;
-            bondsmanCheck.setSelected(status.isCaptured() && tracker.getCampaign().getFaction().isClan());
-            pnlPrisonerStatus.add(bondsmanCheck, gridBagConstraints);
-            escapeCheck = new JCheckBox("");
-            escapeBtns.add(escapeCheck);
-            gridBagConstraints.gridx = 5;
+            prisonerCheck.setSelected(status.isCaptured());
             gridBagConstraints.weightx = 1.0;
-            escapeCheck.setEnabled(!status.isCaptured());
-            pnlPrisonerStatus.add(escapeCheck, gridBagConstraints);
-            captured = new ButtonGroup();
-            captured.add(prisonerCheck);
-            captured.add(bondsmanCheck);
-            captured.add(escapeCheck);
+            pnlPrisonerStatus.add(prisonerCheck, gridBagConstraints);
             i++;
             if (status.isCaptured() &&
                     tracker.getCampaign().getCampaignOptions().getUseAtB() &&
@@ -568,10 +541,14 @@ public class ResolveScenarioWizardDialog extends JDialog {
                         }
                     }
                 }
-                bondsmanCheck.setSelected(wasCaptured && tracker.getCampaign().getFaction().isClan());
-                prisonerCheck.setSelected(wasCaptured && !tracker.getCampaign().getFaction().isClan());
-                escapeCheck.setSelected(!wasCaptured);
+                prisonerCheck.setSelected(wasCaptured);
             }
+            //if the person is dead then ignore them
+            if(status.isDead()) {
+            	prisonerCheck.setSelected(false);
+            	prisonerCheck.setEnabled(false);
+            }
+            hitSlider.addChangeListener(new CheckDeadPrisonerListener());
         }
         pnlMain.add(pnlPrisonerStatus, PRISONERPANEL);
 
@@ -586,7 +563,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         btnsSalvageEditUnit = new ArrayList<JButton>();
         JPanel pnlSalvageValue = new JPanel(new GridBagLayout());
         i = 0;
-        if(tracker.getMission() instanceof Contract) {
+        if((tracker.getMission() instanceof Contract) && !tracker.usesSalvageExchange()) {
         	lblSalvageValueUnit1 = new JLabel(resourceMap.getString("lblSalvageValueUnit1.text"));
         	gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -668,9 +645,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
         	j++;
         	salvageables.add(u);
         	UnitStatus status = tracker.getSalvageStatus().get(u.getId());
-        	String txtBoxString = status.getDesc().replace(u.getName(), u.getName() + " (" + formatter.format(u.getSellValue()) + " C-Bills)");
+        	String txtBoxString = status.getDesc(formatter);
         	box = new JCheckBox(txtBoxString);
         	box.setSelected(false);
+        	box.setEnabled(!tracker.usesSalvageExchange());
         	box.addItemListener(new ItemListener() {
         		@Override
         		public void itemStateChanged(ItemEvent evt) {
@@ -679,13 +657,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         	});
         	salvageBoxes.add(box);
         	escaped = new JCheckBox("Escapes");
-        	escaped.setSelected(!(u.getEntity().isDestroyed()
-        	        || u.getEntity().isDoomed()
-        	        || u.getEntity().isCrippled()
-        	        || u.getEntity().isShutDown()
-        	        || u.getEntity().isStalled()
-        	        || u.getEntity().isStuck())
-        	        && u.getEntity().canEscape());
+        	escaped.setSelected(!status.isLikelyCaptured());
         	escaped.setEnabled(!(u.getEntity().isDestroyed() || u.getEntity().isDoomed()));
         	escaped.addItemListener(new ItemListener() {
         		@Override
@@ -1286,12 +1258,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         //now prisoners
         for(int i = 0; i < prstatuses.size(); i++) {
-            PersonStatus status = prstatuses.get(i);
-            status.setMissing(pr_miaBtns.get(i).isSelected());
+            PrisonerStatus status = prstatuses.get(i);
+            //status.setMissing(pr_miaBtns.get(i).isSelected());
             status.setHits(pr_hitSliders.get(i).getValue());
-            status.setPrisoner(prisonerBtns.get(i).isSelected());
-            status.setBondsman(bondsmanBtns.get(i).isSelected());
-            status.setRemove(escapeBtns.get(i).isSelected() && !(prisonerBtns.get(i).isSelected() || bondsmanBtns.get(i).isSelected()));
+            status.setCaptured(prisonerBtns.get(i).isSelected());
         }
 
     	//now salvage
@@ -1331,7 +1301,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
     }
 
     private void cancel() {
-        tracker.clearNewPersonnel();
     	setVisible(false);
     }
 
@@ -1349,14 +1318,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
             return tracker.getPeopleStatus().keySet().size() > 0;
         }
         else if(panelName.equals(PRISONERPANEL)) {
-            for(int i = 0; i < prstatuses.size(); i++) {
-                PersonStatus status = prstatuses.get(i);
-                status.setMissing(pr_miaBtns.get(i).isSelected());
-                status.setHits(pr_hitSliders.get(i).getValue());
-                status.setPrisoner(prisonerBtns.get(i).isSelected());
-                status.setBondsman(bondsmanBtns.get(i).isSelected());
-                status.setRemove(escapeBtns.get(i).isSelected());
-            }
             return tracker.getPrisonerStatus().keySet().size() > 0;
         }
     	else if(panelName.equals(SALVAGEPANEL)) {
@@ -1386,11 +1347,13 @@ public class ResolveScenarioWizardDialog extends JDialog {
 				escaped.setSelected(false);
 				escaped.setEnabled(false);
 			} else {
-				box.setEnabled(true);
+				if(!tracker.usesSalvageExchange()) {
+					box.setEnabled(true);
+				}
 				escaped.setEnabled(true);
 			}
     	}
-    	if(!(tracker.getMission() instanceof Contract)) {
+    	if(!(tracker.getMission() instanceof Contract) || tracker.usesSalvageExchange()) {
     		return;
     	}
     	salvageEmployer = ((Contract)tracker.getMission()).getSalvagedByEmployer();
@@ -1562,6 +1525,29 @@ public class ResolveScenarioWizardDialog extends JDialog {
             btnsViewUnit.get(idx).setEnabled(!chksTotaled.get(idx).isSelected());
             btnsEditUnit.get(idx).setEnabled(!chksTotaled.get(idx).isSelected());
         }
+    }
+    
+    private class CheckDeadPrisonerListener implements ChangeListener {
+
+		@Override
+		public void stateChanged(ChangeEvent evt) {
+			JSlider hitslider = (JSlider)evt.getSource();
+			if(hitslider.getValueIsAdjusting()) {
+				return;
+			}
+			int idx = Integer.parseInt(hitslider.getName());
+            JCheckBox captured = prisonerBtns.get(idx);
+            if(null == captured) {
+            	return;
+            }
+            int hits = hitslider.getValue();
+            if(hits >= 6) {
+            	captured.setSelected(false);
+            	captured.setEnabled(false);
+            } else if(!captured.isEnabled()) {
+            	captured.setEnabled(true);
+            }
+		}
     }
 
     private class ViewUnitListener implements ActionListener {

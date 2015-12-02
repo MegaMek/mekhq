@@ -240,7 +240,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 	}
 
 	public boolean canSalvage() {
-		return salvagePct > 0 && !salvageExchange;
+		return salvagePct > 0;
 	}
 
 	public long getSalvagedByUnit() {
@@ -580,7 +580,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 			}
 			else if (wn2.getNodeName().equalsIgnoreCase("nMonths")) {
 				nMonths = Integer.parseInt(wn2.getTextContent().trim());
-			} else if (wn2.getNodeName().equalsIgnoreCase("paymentMuliplier")) {
+			} else if (wn2.getNodeName().equalsIgnoreCase("paymentMultiplier")) {
 				paymentMultiplier = Double.parseDouble(wn2.getTextContent().trim());
 			} else if (wn2.getNodeName().equalsIgnoreCase("commandRights")) {
 				commandRights = Integer.parseInt(wn2.getTextContent().trim());

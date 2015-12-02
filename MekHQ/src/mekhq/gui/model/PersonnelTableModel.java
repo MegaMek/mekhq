@@ -574,7 +574,7 @@ import mekhq.gui.BasicInfo;
                 return formatter.format(p.getSalary());
             }
             if(col == COL_KILLS) {
-                return getCampaign().getKillsFor(p.getId()).size();
+                return Integer.toString(getCampaign().getKillsFor(p.getId()).size());
             }
             return "?";
         }

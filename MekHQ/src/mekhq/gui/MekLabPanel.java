@@ -226,7 +226,7 @@ public class MekLabPanel extends JPanel {
 			return;
 		}
         StringBuffer sb = new StringBuffer();
-        testEntity.correctEntity(sb, true);
+        testEntity.correctEntity(sb);
 		
         int walk = entity.getOriginalWalkMP();
         int run = entity.getRunMP();
@@ -470,7 +470,7 @@ public class MekLabPanel extends JPanel {
 
 			addTab("Structure/Armor", structureTab);
 			addTab("Equipment", equipmentTab);
-			addTab("Build", buildTab);
+			addTab("Assign Criticals", buildTab);
 	        addTab("Preview", previewTab);
 	        this.repaint();
 		}
@@ -557,7 +557,7 @@ public class MekLabPanel extends JPanel {
 
 			addTab("Structure/Armor", structureTab);
 			addTab("Equipment", equipmentTab);
-			addTab("Build", buildTab);
+			addTab("Assign Critical", buildTab);
 	        addTab("Preview", previewTab);
 	        this.repaint();
 		}
