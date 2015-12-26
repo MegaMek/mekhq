@@ -22,6 +22,7 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
+import java.util.GregorianCalendar;
 
 import megamek.common.Aero;
 import megamek.common.CriticalSlot;
@@ -164,7 +165,8 @@ public class MissingEnginePart extends MissingPart {
 
 	@Override
 	public int getAvailability(int era) {
-		switch(engine.getTechType()) {
+	    int year = campaign.getCalendar().get(GregorianCalendar.YEAR);
+		switch(engine.getTechType(year)) {
 		case Engine.COMBUSTION_ENGINE:
 			if(era == EquipmentType.ERA_SL) {
 				return EquipmentType.RATING_A;
@@ -227,7 +229,8 @@ public class MissingEnginePart extends MissingPart {
 
 	@Override
 	public int getTechRating() {
-		switch(engine.getTechType()) {
+	    int year = campaign.getCalendar().get(GregorianCalendar.YEAR);
+		switch(engine.getTechType(year)) {
 		case Engine.XL_ENGINE:
 			if(engine.hasFlag(Engine.CLAN_ENGINE)) {
 				return EquipmentType.RATING_F;
@@ -257,12 +260,13 @@ public class MissingEnginePart extends MissingPart {
 
 	@Override
 	public boolean isAcceptableReplacement(Part part, boolean refit) {
+	    int year = campaign.getCalendar().get(GregorianCalendar.YEAR);
 		if(part instanceof EnginePart) {
 			Engine eng = ((EnginePart)part).getEngine();
 			if (null != eng) {
 				return getEngine().getEngineType() == eng.getEngineType()
 						&& getEngine().getRating() == eng.getRating()
-						&& getEngine().getTechType() == eng.getTechType()
+						&& getEngine().getTechType(year) == eng.getTechType(year)
 						&& getUnitTonnage() == ((EnginePart)part).getUnitTonnage()
 						&& getTonnage() == ((EnginePart)part).getTonnage();				
 			}

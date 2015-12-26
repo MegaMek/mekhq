@@ -22,6 +22,7 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
+import java.util.GregorianCalendar;
 
 import megamek.common.Compute;
 import megamek.common.CriticalSlot;
@@ -43,27 +44,28 @@ public class MekGyro extends Part {
 	private static final long serialVersionUID = 3420475726506139139L;
 	protected int type;
 	protected double gyroTonnage;
+	protected boolean isClan = false;
 
     public MekGyro() {
-    	this(0, 0, 0, null);
+    	this(0, 0, 0, false, null);
     }
 
-    public MekGyro(int tonnage, int type, int walkMP, Campaign c) {
-        super(tonnage, c);
-        this.type = type;
-        this.name = Mech.getGyroTypeString(type);
-        this.gyroTonnage = MekGyro.getGyroTonnage(walkMP, type, getUnitTonnage());
+    public MekGyro(int tonnage, int type, int walkMP, boolean isClan, Campaign c) {
+        this(tonnage, type, MekGyro.getGyroTonnage(walkMP, type, tonnage),
+                isClan, c);
     }
 
-    public MekGyro(int tonnage, int type, double gyroTonnage, Campaign c) {
+    public MekGyro(int tonnage, int type, double gyroTonnage, boolean isClan,
+            Campaign c) {
     	super(tonnage, c);
         this.type = type;
         this.name = Mech.getGyroTypeString(type);
         this.gyroTonnage = gyroTonnage;
+        this.isClan = isClan;
     }
 
     public MekGyro clone() {
-    	MekGyro clone = new MekGyro(getUnitTonnage(), type, gyroTonnage, campaign);
+    	MekGyro clone = new MekGyro(getUnitTonnage(), type, gyroTonnage, isClan, campaign);
         clone.copyBaseData(this);
     	return clone;
     }
@@ -189,10 +191,8 @@ public class MekGyro extends Part {
 
 	@Override
 	public int getTechLevel() {
-		if(type == Mech.GYRO_STANDARD) {
-			return TechConstants.T_ALLOWED_ALL;
-		}
-		return TechConstants.T_IS_TW_ALL;
+	    int year  = campaign.getCalendar().get(GregorianCalendar.YEAR);
+	    return TechConstants.getGyroTechLevel(type, isClan, year);
 	}
 
 	@Override
@@ -308,13 +308,13 @@ public class MekGyro extends Part {
 		return null;
 	}
 
-	public static final int GYRO_STANDARD = 0;
+	public static final int GYRO_STANDARD = Mech.GYRO_STANDARD;
 
-    public static final int GYRO_XL = 1;
+    public static final int GYRO_XL = Mech.GYRO_XL;
 
-    public static final int GYRO_COMPACT = 2;
+    public static final int GYRO_COMPACT = Mech.GYRO_COMPACT;
 
-    public static final int GYRO_HEAVY_DUTY = 3;
+    public static final int GYRO_HEAVY_DUTY = Mech.GYRO_HEAVY_DUTY;
 
 
 	@Override

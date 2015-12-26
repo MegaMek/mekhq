@@ -96,11 +96,6 @@ public class UnitTableData implements Serializable, ActionListener {
 		"Mek", "Vehicle", "Aero", "Dropship", "Infantry",
 		"Battle Armor", "ProtoMek"
 	};
-
-	public static final String[] unitTypeNames = {
-		"'Mech", "Vehicle", "Aero", "Dropship", "Infantry", "Battle armor",
-		"ProtoMech"
-	};
 	
 	public static final int QUALITY_F = 0;
 	public static final int QUALITY_D = 1;

@@ -24,6 +24,7 @@ package mekhq.campaign.market;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.GregorianCalendar;
 
 import megamek.common.Aero;
 import megamek.common.AmmoType;
@@ -279,6 +280,7 @@ public class PartsStore implements Serializable {
 
 	private void stockEngines(Campaign c) {
 		Engine engine;
+		int year = c.getCalendar().get(GregorianCalendar.YEAR);
 		for(int rating = 10; rating <= 400; rating += 5) {
 			for(int ton = 5; ton <= 100; ton += 5) {
 				for(int i = 0; i <= Engine.FISSION; i++) {
@@ -287,7 +289,7 @@ public class PartsStore implements Serializable {
 						if(engine.engineValid) {
 							parts.add(new EnginePart(ton, engine, c, false));
 						}
-						if(engine.getTechType() != TechConstants.T_ALLOWED_ALL) {
+						if(engine.getTechType(year) != TechConstants.T_ALLOWED_ALL) {
 							engine = new Engine(rating, i, Engine.CLAN_ENGINE);
 							if(engine.engineValid) {
 								parts.add(new EnginePart(ton, engine, c, false));
@@ -305,7 +307,7 @@ public class PartsStore implements Serializable {
 						}
 					}
 					engine = new Engine(rating, i, Engine.TANK_ENGINE | Engine.CLAN_ENGINE);
-					if(engine.getTechType() != TechConstants.T_ALLOWED_ALL) {
+					if(engine.getTechType(year) != TechConstants.T_ALLOWED_ALL) {
 						if(engine.engineValid) {
 							parts.add(new EnginePart(ton, engine, c, false));
 						}
@@ -325,19 +327,20 @@ public class PartsStore implements Serializable {
 		for(double i = 0.5; i <= 8.0; i += 0.5) {
 			//standard at intervals of 1.0, up to 4
 			if(i % 1.0 == 0 && i <= 4.0) {
-				parts.add(new MekGyro(0, Mech.GYRO_STANDARD, i, c));
+				parts.add(new MekGyro(0, Mech.GYRO_STANDARD, i, false, c));
+				parts.add(new MekGyro(0, Mech.GYRO_STANDARD, i, true, c));
 			}
 			//compact at intervals of 1.5, up to 6
 			if(i % 1.5 == 0 && i <= 6.0) {
-				parts.add(new MekGyro(0, Mech.GYRO_COMPACT, i, c));
+				parts.add(new MekGyro(0, Mech.GYRO_COMPACT, i, false, c));
 			}
 			//XL at 0.5 intervals up to 2
 			if(i % 0.5 == 0 && i <= 2.0) {
-				parts.add(new MekGyro(0, Mech.GYRO_XL, i, c));
+				parts.add(new MekGyro(0, Mech.GYRO_XL, i, false, c));
 			}
 			//Heavy duty at 2.0 intervals
 			if(i % 2.0 == 0) {
-				parts.add(new MekGyro(0, Mech.GYRO_HEAVY_DUTY, i, c));
+				parts.add(new MekGyro(0, Mech.GYRO_HEAVY_DUTY, i, false, c));
 			}
 
 		}
@@ -349,7 +352,10 @@ public class PartsStore implements Serializable {
 			parts.add(new MekSensor(ton, c));
 		}
 		for(int type = Mech.COCKPIT_STANDARD; type < Mech.COCKPIT_STRING.length; type++) {
-			parts.add(new MekCockpit(0, type, c));
+		    parts.add(new MekCockpit(0, type, false, c));
+		    if (type != Mech.COCKPIT_SMALL) {
+		        parts.add(new MekCockpit(0, type, true, c));
+		    }
 		}
 	}
 

@@ -2122,7 +2122,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     	}
     	if(entity instanceof Mech) {
     		if(null == gyro) {
-    			gyro =  new MekGyro((int) entity.getWeight(), entity.getGyroType(), entity.getOriginalWalkMP(), campaign);
+    			gyro =  new MekGyro((int) entity.getWeight(), entity.getGyroType(), entity.getOriginalWalkMP(), entity.isClan(), campaign);
     			addPart(gyro);
     			partsToAdd.add(gyro);
     		}
@@ -2137,7 +2137,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     			partsToAdd.add(sensor);
     		}
     		if(null == cockpit) {
-    			cockpit = new MekCockpit((int) entity.getWeight(), ((Mech)entity).getCockpitType(), campaign);
+    			cockpit = new MekCockpit((int) entity.getWeight(), ((Mech)entity).getCockpitType(), entity.isClan(), campaign);
     			addPart(cockpit);
     			partsToAdd.add(cockpit);
     		}

@@ -242,7 +242,7 @@ public class UnitMarket implements Serializable {
 					/*Some RATs, particularly ASF, group multiple weight classes together
 					 * so we need to get the actual weight class from the generated unit
 					 * (-1 because EntityWeightClass starts with ultra-light).*/
-					offers.add(new MarketOffer(market, unitType, ms.getWeightClass() - 1,
+					offers.add(new MarketOffer(market, unitType, ms.getWeightClass(),
 							ms, pct));
 				}
 			}
