@@ -240,6 +240,7 @@
                 <include name="*README.html" />
                 <include name="SubmitBug.html" />
                 <include name="license.txt" />
+                <exclude name="**/*.psd"/>
             </fileset>
         </copy>
         <mkdir dir="${osxdist}/MegaMek.app" />
@@ -319,6 +320,7 @@
                 <include name="SubmitBug.html" />
                 <include name="license.txt" />
                 <include name="*.sh" />
+                <exclude name="**/*.psd"/>
             </fileset>
         </copy>
     </target>
@@ -363,6 +365,7 @@
                 <include name="*README.html" />
                 <include name="SubmitBug.html" />
                 <include name="license.txt" />
+                <exclude name="**/*.psd"/>
             </fileset>
         </copy>
         <copy file="${util}/mekhq.l4j.ini" todir="${windist}"/>
