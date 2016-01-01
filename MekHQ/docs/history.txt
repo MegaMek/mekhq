@@ -1,5 +1,7 @@
 VERSION HISTORY
 ----------------------------------
+v0.3.24-git
+
 v0.3.23 (2016-01-01 03:35 UTC)
 + Updated MegaMek.jar to 0.41.13
 + Updated MegaMekLab.jar to 0.1.49
