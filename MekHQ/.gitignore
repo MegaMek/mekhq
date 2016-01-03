@@ -10,3 +10,5 @@
 /campaigns/*.cpnx
 /*.mul
 /.settings/
+/classes
+MekHQ.jar

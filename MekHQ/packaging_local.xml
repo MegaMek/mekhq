@@ -20,7 +20,7 @@
 	<!-- Global properties for this build -->
 	<!-- Version and packaging properties -->
 	<property name="project.name" value="mekhq" />
-	<property name="version" value="0.3.22-git"/>
+	<property name="version" value="0.3.24-git"/>
 	<property name="osxdist" value="${project.name}-${version}-mac" />
 	<property name="windist" value="${project.name}-${version}-windows" />
 	<property name="nixdist" value="${project.name}-${version}" />
@@ -234,6 +234,7 @@
 				<include name="*README.html" />
 				<include name="SubmitBug.html" />
 				<include name="license.txt" />
+                <exclude name="**/*.psd"/>
 			</fileset>
 		</copy>
 		<mkdir dir="${osxdist}/MegaMek.app" />
@@ -315,6 +316,7 @@
 				<include name="SubmitBug.html" />
 				<include name="license.txt" />
 				<include name="*.sh" />
+                <exclude name="**/*.psd"/>
 			</fileset>
 		</copy>
 	</target>
@@ -359,6 +361,7 @@
 				<include name="*README.html" />
 				<include name="SubmitBug.html" />
 				<include name="license.txt" />
+                <exclude name="**/*.psd"/>
 			</fileset>
 		</copy>
 		<copy file="${util}/mekhq.l4j.ini" todir="${windist}"/>
