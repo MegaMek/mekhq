@@ -1080,7 +1080,7 @@ public class AtBScenario extends Scenario {
 				botForces.add(getAllyBotForce(getContract(campaign), start, playerHome, allyBot));
 			}
 			addEnemyForce(enemy, getLance(campaign).getWeightClass(campaign), campaign);
-			botForces.add(getEnemyBotForce(getContract(campaign), enemyStart, enemyHome, enemy));
+			botForces.add(getEnemyBotForce(getContract(campaign), enemyHome, enemyHome, enemy));
 			break;
 		}
 		/* Possible enemy reinforcements */
@@ -1096,7 +1096,12 @@ public class AtBScenario extends Scenario {
 						getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
 						UnitTableData.WT_LIGHT, UnitTableData.WT_ASSAULT, campaign, 6);
 			}
-			BotForce bf = getEnemyBotForce(getContract(campaign), enemyStart, enemyHome, reinforcements);
+			/* Must set per-entity start pos for units after start of scenarios. Reinforcements
+			 * arrive from the enemy home edge, which is not necessarily the start pos. */
+			for (Entity en : reinforcements) {
+				en.setStartingPos(enemyHome);
+			}
+			BotForce bf = getEnemyBotForce(getContract(campaign), enemyHome, enemyHome, reinforcements);
 			bf.setName(bf.getName() + " (Reinforcements)");
 			botForces.add(bf);
 		}

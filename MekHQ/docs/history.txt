@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.3.24-git
++ Bug [#841]: [ATB] Hold the line : Enemy reinforcements may start in any location
 
 v0.3.23 (2016-01-01 03:35 UTC)
 + Updated MegaMek.jar to 0.41.13
