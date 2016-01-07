@@ -221,7 +221,7 @@ public class AtBScenario extends Scenario {
 	/* Units that need to be tracked for possible contract breaches
 	 * (for destruction), or bonus rolls (for survival).
 	 */
-	ArrayList<UUID> attachedUnits;
+	ArrayList<UUID> attachedUnitIds;
 	ArrayList<UUID> survivalBonus;
 
 	HashMap<UUID, Entity> entityIds;
@@ -234,7 +234,7 @@ public class AtBScenario extends Scenario {
 		botForces = new ArrayList<BotForce>();
 		alliesPlayerStub = new ArrayList<String>();
 		botForceStubs = new ArrayList<BotForceStub>();
-		attachedUnits = new ArrayList<UUID>();
+		attachedUnitIds = new ArrayList<UUID>();
 		survivalBonus = new ArrayList<UUID>();
 		entityIds = new HashMap<UUID, Entity>();
 
@@ -260,7 +260,7 @@ public class AtBScenario extends Scenario {
 		botForces = new ArrayList<BotForce>();
 		alliesPlayerStub = new ArrayList<String>();
 		botForceStubs = new ArrayList<BotForceStub>();
-		attachedUnits = new ArrayList<UUID>();
+		attachedUnitIds = new ArrayList<UUID>();
 		survivalBonus = new ArrayList<UUID>();
 		entityIds = new HashMap<UUID, Entity>();
 
@@ -782,7 +782,7 @@ public class AtBScenario extends Scenario {
 					UnitTableData.UNIT_MECH, attachedUnitWeight, campaign);
 			if (null != en) {
 				alliesPlayer.add(en);
-				attachedUnits.add(UUID.fromString(en.getExternalIdAsString()));
+				attachedUnitIds.add(UUID.fromString(en.getExternalIdAsString()));
 			} else {
 				System.out.println("Entity for player-controlled allies is null");
 			}
@@ -796,7 +796,7 @@ public class AtBScenario extends Scenario {
 					UnitTableData.UNIT_MECH, attachedUnitWeight, campaign);
 			if (null != en) {
 				allyBot.add(en);
-				attachedUnits.add(UUID.fromString(en.getExternalIdAsString()));
+				attachedUnitIds.add(UUID.fromString(en.getExternalIdAsString()));
 			} else {
 				System.err.println("Entity for ally bot is null");
 			}
@@ -1126,13 +1126,14 @@ public class AtBScenario extends Scenario {
 					Entity dropship = getEntityByName("Leopard (2537)",
 							getContract(campaign).getEmployerCode(), campaign);
 					alliesPlayer.add(dropship);
+					attachedUnitIds.add(UUID.fromString(dropship.getExternalIdAsString()));
 				}
 				for (int i = 0; i < Compute.d6() - 3; i++) {
 					addLance(enemy, getContract(campaign).getEnemyCode(),
 							getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
 							UnitMarket.getRandomWeight(UnitTableData.UNIT_MECH, getContract(campaign).getEnemyCode(),
 								campaign.getCampaignOptions().getRegionalMechVariations()),
-							UnitTableData.WT_ASSAULT, campaign, 6);
+							UnitTableData.WT_ASSAULT, campaign);
 				}
 			} else if (getLanceRole() == Lance.ROLE_SCOUT) {
 				/* Set allied forces to deploy in (6 - speed) turns just as player's units,
@@ -2439,8 +2440,8 @@ public class AtBScenario extends Scenario {
 					+ "</botForceStub>");
 		}
 
-		if (attachedUnits.size() > 0) {
-			MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "attachedUnits", getCsvFromList(attachedUnits));
+		if (attachedUnitIds.size() > 0) {
+			MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "attachedUnits", getCsvFromList(attachedUnitIds));
 		}
 		if (survivalBonus.size() > 0) {
 			MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "survivalBonus", getCsvFromList(survivalBonus));
@@ -2651,7 +2652,7 @@ public class AtBScenario extends Scenario {
 			} else if (wn2.getNodeName().equalsIgnoreCase("attachedUnits")) {
 				String ids[] = wn2.getTextContent().split(",");
 				for (String s : ids) {
-					attachedUnits.add(UUID.fromString(s));
+					attachedUnitIds.add(UUID.fromString(s));
 				}
 			} else if (wn2.getNodeName().equalsIgnoreCase("survivalBonus")) {
 				String ids[] = wn2.getTextContent().split(",");
@@ -2736,11 +2737,11 @@ public class AtBScenario extends Scenario {
 		return alliesPlayer;
 	}
 
-	public ArrayList<UUID> getAttachedUnits() {
-		return attachedUnits;
+	public ArrayList<UUID> getAttachedUnitIds() {
+		return attachedUnitIds;
 	}
 
-	public ArrayList<UUID> getSurvivalBonus() {
+	public ArrayList<UUID> getSurvivalBonusIds() {
 		return survivalBonus;
 	}
 

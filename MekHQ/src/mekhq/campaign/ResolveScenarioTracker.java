@@ -195,9 +195,14 @@ public class ResolveScenarioTracker {
         TestUnit nu = new TestUnit(e, campaign, true);
         nu.getEntity().setCamoCategory(cat);
         nu.getEntity().setCamoFileName(fn);
-        UUID id = UUID.randomUUID();
-        nu.getEntity().setExternalIdAsString(id.toString());
-        nu.setId(id);
+        /* AtB uses id to track status of allied units */
+        if (e.getExternalIdAsString().equals("-1")) {
+	        UUID id = UUID.randomUUID();
+	        nu.getEntity().setExternalIdAsString(id.toString());
+	        nu.setId(id);
+        } else {
+        	nu.setId(UUID.fromString(e.getExternalIdAsString()));
+        }
         return nu;
 	}
 
