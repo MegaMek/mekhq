@@ -5957,6 +5957,9 @@ public class Campaign implements Serializable {
             case Person.PRISONER_NOT:
                 p.setFreeMan();
                 p.addLogEntry(getDate(), "Freed");
+                if (getCampaignOptions().getUseTimeInService()) {
+                    p.setRecruitment((GregorianCalendar) getCalendar().clone());
+                }
                 break;
             case Person.PRISONER_YES:
                 if (p.getRankNumeric() > 0) {
@@ -5964,6 +5967,9 @@ public class Campaign implements Serializable {
                     // rank is Prisoner or Bondsman.
                 }
                 p.setPrisoner();
+                if (getCampaignOptions().getUseTimeInService()) {
+                    p.setRecruitment(null);
+                }
                 p.addLogEntry(getDate(), "Made Prisoner");
                 break;
             case Person.PRISONER_BONDSMAN:
@@ -5972,6 +5978,9 @@ public class Campaign implements Serializable {
                     // rank is Prisoner or Bondsman.
                 }
                 p.setBondsman();
+                if (getCampaignOptions().getUseTimeInService()) {
+                    p.setRecruitment(null);
+                }
                 p.addLogEntry(getDate(), "Made Bondsman");
                 break;
             default:
@@ -7953,6 +7962,34 @@ public class Campaign implements Serializable {
         }
     }
 
+    public void initTimeInService() {
+    	for (Person p : personnel) {
+    		Date join = null;
+    		for (LogEntry e : p.getPersonnelLog()) {
+    			if (join == null){
+    				// If by some nightmare there is no Joined date just use the first entry.
+    				join = e.getDate();
+    			}
+    			if (e.getDesc().startsWith("Joined ")) {
+    				join = e.getDate();
+    				break;
+    			}
+    		}
+    		if (!p.isDependent() && !p.isPrisoner() && !p.isBondsman()) {
+    			GregorianCalendar cal = (GregorianCalendar) GregorianCalendar.getInstance();
+    			// For that one in a billion chance the log is empty. Clone todays date and subtract a year
+    			if (join == null) {
+    				cal = (GregorianCalendar)calendar.clone();
+    				cal.add(Calendar.YEAR, -1);
+    				p.setRecruitment(cal);
+    			} else {
+  			        cal.setTime(join);
+    			    p.setRecruitment(cal);
+    			}
+    		}
+    	}
+    }
+    
     public void initAtB() {
     	retirementDefectionTracker.setLastRetirementRoll(calendar);
     	for (int i = 0; i < missions.size(); i++) {

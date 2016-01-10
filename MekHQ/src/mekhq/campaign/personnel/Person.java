@@ -174,6 +174,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     protected String biography;
     protected GregorianCalendar birthday;
     protected GregorianCalendar deathday;
+    protected GregorianCalendar recruitment;
     protected ArrayList<LogEntry> personnelLog;
 
     private Hashtable<String, Skill> skills;
@@ -360,6 +361,11 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public void setDependent(boolean tf) {
         dependent = tf;
+        if (dependent) {
+        	recruitment = null;
+        } else {
+        	recruitment = (GregorianCalendar) campaign.getCalendar().clone();
+        }
     }
 
     public boolean isPrisoner() {
@@ -799,6 +805,23 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         this.deathday = date;
     }
 
+    public void setRecruitment(GregorianCalendar date) {
+        this.recruitment = date;
+    }
+
+    public GregorianCalendar getRecruitment() {
+        return recruitment;
+    } 
+
+    public String getRecruitmentAsString() {
+    	if (recruitment == null) {
+    		return null;
+    	}
+    	SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+    	String recruitdate = df.format(recruitment.getTime());
+        return recruitdate;
+    }
+
     public int getAge(GregorianCalendar today) {
         // Get age based on year
         if (null != deathday) {
@@ -818,6 +841,25 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         }
         return age;
     }
+    
+    public int getTimeInService(GregorianCalendar today) {
+        // Get time in service based on year
+        if (null == recruitment) {
+            //use zero if hasn't been recruited yet
+            return -1;
+        }
+
+        int timeinservice = today.get(Calendar.YEAR) - recruitment.get(Calendar.YEAR);
+
+        // Add the tentative time in service to the date of recruitment to get this year's service history
+        GregorianCalendar tmpDate = (GregorianCalendar) recruitment.clone();
+        tmpDate.add(Calendar.YEAR, timeinservice);
+
+        if (today.before(tmpDate)) {
+        	timeinservice--;
+        }
+        return timeinservice;
+     }
 
     public void setId(UUID id) {
         this.id = id;
@@ -1211,6 +1253,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                         + df.format(deathday.getTime())
                         + "</deathday>");
         }
+        if (null != recruitment) {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                        + "<recruitment>"
+                        + df.format(recruitment.getTime())
+                        + "</recruitment>");
+        }
         for (String skName : skills.keySet()) {
             Skill skill = skills.get(skName);
             skill.writeToXml(pw1, indent + 1);
@@ -1419,6 +1467,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                     retVal.deathday = (GregorianCalendar) GregorianCalendar.getInstance();
                     retVal.deathday.setTime(df.parse(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("recruitment")) {
+                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                    retVal.recruitment = (GregorianCalendar) GregorianCalendar.getInstance();
+                    retVal.recruitment.setTime(df.parse(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
                     advantages = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {

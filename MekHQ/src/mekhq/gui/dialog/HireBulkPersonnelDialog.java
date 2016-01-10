@@ -7,6 +7,7 @@
 package mekhq.gui.dialog;
 
 import java.awt.GridBagLayout;
+import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
 import javax.swing.DefaultComboBoxModel;
@@ -183,6 +184,10 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
     	int number = (Integer)spnNumber.getModel().getValue();
     	while(number > 0) {
     		Person p = campaign.newPerson(choiceType.getSelectedIndex() + 1);
+            if (campaign.getCampaignOptions().getUseTimeInService()) {
+    			GregorianCalendar rawrecruit = (GregorianCalendar) campaign.getCalendar().clone();
+    			p.setRecruitment(rawrecruit);
+            }
     		p.setRankNumeric(campaign.getRanks().getRankNumericFromNameAndProfession(p.getProfession(), (String)choiceRanks.getSelectedItem()));
     		if(!campaign.recruitPerson(p)) {
     		    number = 0;
