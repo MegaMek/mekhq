@@ -4,6 +4,7 @@ v0.3.24-git
 + Bug [#841]: [ATB] Hold the line : Enemy reinforcements may start in any location
 + Bug [#779]: Lost employers dropship
 + Bug [#991]: 3.23 Headshot mechs cause NPE in Resolution
++ Bug [#973]: Unable to repair warehouse items due to null pointer exception
  
 v0.3.23 (2016-01-01 03:35 UTC)
 + Updated MegaMek.jar to 0.41.13
