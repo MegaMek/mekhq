@@ -3,6 +3,7 @@ VERSION HISTORY
 v0.3.24-git
 + Bug [#841]: [ATB] Hold the line : Enemy reinforcements may start in any location
 + Bug [#779]: Lost employers dropship
++ Bug [#991]: 3.23 Headshot mechs cause NPE in Resolution
  
 v0.3.23 (2016-01-01 03:35 UTC)
 + Updated MegaMek.jar to 0.41.13
@@ -1321,6 +1322,7 @@ v0.1.17 (2012-09-28)
 + Planetary data update 20
 + RAT and mechfiles update to stay current with MegaMek
 + Planetary data update 21
+
 + Bug 3545347: Units names were not being made xml safe on save.
 + Bug 3547739: megamek disconnect during deploy phase
 + Patch 3547373/Bug 3547371: C-Bill cost truncated by int limit

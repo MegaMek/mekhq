@@ -206,7 +206,7 @@ public class MekGyro extends Part {
 
 	@Override
 	public MissingPart getMissingPart() {
-		return new MissingMekGyro(getUnitTonnage(), getType(), getTonnage(), campaign);
+		return new MissingMekGyro(getUnitTonnage(), getType(), getTonnage(), isClan, campaign);
 	}
 
 	@Override
