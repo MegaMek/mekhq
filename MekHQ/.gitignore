@@ -12,3 +12,7 @@
 /.settings/
 /classes
 MekHQ.jar
+/*.zip
+/*.tar.gz
+/*.tar.bz2
+
