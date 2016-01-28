@@ -6926,7 +6926,8 @@ public class CampaignGUI extends JPanel {
                 	//check whether the engineer is assigned to the correct unit
                 	return unit.getId().equals(tech.getUnitId());
                 }
-                if(tech.getPrimaryRole() == Person.T_SPACE_CREW && !unit.isSelfCrewed()) {
+                if (tech.getPrimaryRole() == Person.T_SPACE_CREW
+                        && (null != unit) && !unit.isSelfCrewed()) {
                 	return false;
                 }
                 if (!onWarehouseTab() && !tech.isRightTechTypeFor(part)
