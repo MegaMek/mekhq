@@ -30,6 +30,7 @@ import megamek.common.loaders.BLKFile;
 import mekhq.Utilities;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -387,6 +388,9 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             gui.refreshOrganization();
             gui.refreshPartsList();
             gui.refreshOverview();
+        } else if (command.contains("REFURBISH")) {
+            Refit r = new Refit(selectedUnit, selectedUnit.getEntity(),false, true);
+            gui.refitUnit(r, false);
         } else if (command.contains("REFIT_KIT")) {
             ChooseRefitDialog crd = new ChooseRefitDialog(gui.getFrame(), true,
                     gui.getCampaign(), selectedUnit, gui);
@@ -768,6 +772,16 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                                 || unit.getEntity() instanceof megamek.common.Tank
                                 || unit.getEntity() instanceof megamek.common.Aero || (unit
                                     .getEntity() instanceof Infantry)));
+                menu.add(menuItem);
+                menuItem = new JMenuItem("Refurbish Unit");
+                menuItem.setActionCommand("REFURBISH");
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(unit.isAvailable()
+                        && (unit.getEntity() instanceof megamek.common.Mech
+                                || unit.getEntity() instanceof megamek.common.Tank
+                                || unit.getEntity() instanceof megamek.common.Aero 
+                                || unit.getEntity() instanceof BattleArmor
+                                || unit.getEntity() instanceof megamek.common.Protomech));
                 menu.add(menuItem);
                 menuItem = new JMenuItem("Customize in Mek Lab...");
                 menuItem.setActionCommand("CUSTOMIZE");
