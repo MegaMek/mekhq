@@ -40,14 +40,16 @@ public class MissingMekCockpit extends MissingPart {
 	private static final long serialVersionUID = -1989526319692474127L;
 
 	private int type;
+	protected boolean isClan;
 
 	public MissingMekCockpit() {
-		this(0, Mech.COCKPIT_STANDARD, null);
+		this(0, Mech.COCKPIT_STANDARD, false, null);
 	}
 
-	public MissingMekCockpit(int tonnage, int t, Campaign c) {
+	public MissingMekCockpit(int tonnage, int t, boolean isClan,Campaign c) {
         super(tonnage, c);
         this.type = t;
+        this.isClan = isClan;
         this.name = Mech.getCockpitDisplayString(type);
     }
 
@@ -161,6 +163,10 @@ public class MissingMekCockpit extends MissingPart {
 	public int getType() {
 		return type;
 	}
+	
+	public boolean isClan() {
+	    return isClan;
+	}
 
     @Override
     public String checkFixable() {
@@ -182,7 +188,7 @@ public class MissingMekCockpit extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new MekCockpit(getUnitTonnage(), type, getUnit().getEntity().isClan(), campaign);
+		return new MekCockpit(getUnitTonnage(), type, isClan, campaign);
 	}
 
 	@Override
@@ -194,7 +200,6 @@ public class MissingMekCockpit extends MissingPart {
 
 	@Override
 	public String getLocationName() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

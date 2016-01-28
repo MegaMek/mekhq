@@ -40,16 +40,18 @@ public class MissingMekGyro extends MissingPart {
 	private static final long serialVersionUID = 3420475726506139139L;
 	protected int type;
     protected double gyroTonnage;
+    protected boolean isClan;
 
     public MissingMekGyro() {
-    	this(0, 0, 0, null);
+    	this(0, 0, 0, false, null);
     }
 
-    public MissingMekGyro(int tonnage, int type, double gyroTonnage, Campaign c) {
+    public MissingMekGyro(int tonnage, int type, double gyroTonnage, boolean isClan, Campaign c) {
         super(tonnage, c);
         this.type = type;
         this.name = Mech.getGyroTypeString(type);
         this.gyroTonnage = gyroTonnage;
+        this.isClan = isClan;
     }
 
     @Override
@@ -159,7 +161,7 @@ public class MissingMekGyro extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new MekGyro(getUnitTonnage(), getType(), getTonnage(), getUnit().getEntity().isClan(), campaign);
+		return new MekGyro(getUnitTonnage(), getType(), getTonnage(), isClan, campaign);
 	}
 
 	@Override

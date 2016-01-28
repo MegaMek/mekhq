@@ -339,7 +339,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         	for (Unit unit : tracker.getAlliedUnits()) {
         		allies.put(unit.getId(), unit);
         	}
-        	for (UUID id : ((AtBScenario)tracker.getScenario()).getAttachedUnits()) {
+        	for (UUID id : ((AtBScenario)tracker.getScenario()).getAttachedUnitIds()) {
         	    Unit unit = allies.get(id);
         		j++;
         		chkAllyLost = new JCheckBox();
@@ -364,8 +364,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
         		gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         		gridBagConstraints.weightx = 0.0;
-        		if (((AtBScenario)tracker.getScenario()).getSurvivalBonus().size() == 0 &&
-        				j == ((AtBScenario)tracker.getScenario()).getAttachedUnits().size()) {
+        		if (((AtBScenario)tracker.getScenario()).getSurvivalBonusIds().size() == 0 &&
+        				j == ((AtBScenario)tracker.getScenario()).getAttachedUnitIds().size()) {
         			gridBagConstraints.weighty = 1.0;
         		}
         		pnlAllyStatus.add(chkAllyLost, gridBagConstraints);
@@ -374,7 +374,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         		i++;
         	}
         	j = 0;
-        	for (UUID id : ((AtBScenario)tracker.getScenario()).getSurvivalBonus()) {
+        	for (UUID id : ((AtBScenario)tracker.getScenario()).getSurvivalBonusIds()) {
            		Unit unit = allies.get(id);
         		j++;
         		chkAllyLost = new JCheckBox();
@@ -391,7 +391,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
         		gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         		gridBagConstraints.weightx = 0.0;
-        		if (j == ((AtBScenario)tracker.getScenario()).getSurvivalBonus().size()) {
+        		if (j == ((AtBScenario)tracker.getScenario()).getSurvivalBonusIds().size()) {
         			gridBagConstraints.weighty = 1.0;
         		}
         		pnlAllyStatus.add(chkAllyLost, gridBagConstraints);
@@ -1231,10 +1231,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
 	    	int breaches = 0;
 	    	int bonuses = 0;
 	    	for (int i = 0; i < chksAllyLost.size(); i++) {
-	    		if (i < scenario.getAttachedUnits().size()) {
+	    		if (i < scenario.getAttachedUnitIds().size()) {
 	    			if (chksAllyLost.get(i).isSelected()) {
 	    				breaches++;
-	    				long etype = scenario.getEntity(scenario.getAttachedUnits().get(i)).getEntityType();
+	    				long etype = scenario.getEntity(scenario.getAttachedUnitIds().get(i)).getEntityType();
 	    				if ((etype & megamek.common.Entity.ETYPE_DROPSHIP) != 0) {
 	    					breaches += 4;
 	    				}
@@ -1311,8 +1311,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
     	else if (panelName.equals(ALLYPANEL)) {
     		return tracker.getCampaign().getCampaignOptions().getUseAtB() &&
     				tracker.getScenario() instanceof AtBScenario &&
-    				(((AtBScenario)tracker.getScenario()).getAttachedUnits().size() +
-    				((AtBScenario)tracker.getScenario()).getSurvivalBonus().size() > 0);
+    				(((AtBScenario)tracker.getScenario()).getAttachedUnitIds().size() +
+    				((AtBScenario)tracker.getScenario()).getSurvivalBonusIds().size() > 0);
     	}
         else if(panelName.equals(PILOTPANEL)) {
             return tracker.getPeopleStatus().keySet().size() > 0;
