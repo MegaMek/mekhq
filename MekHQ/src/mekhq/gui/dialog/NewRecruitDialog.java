@@ -8,6 +8,7 @@ package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
+import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
 import javax.swing.DefaultComboBoxModel;
@@ -208,6 +209,10 @@ public class NewRecruitDialog extends javax.swing.JDialog {
 
     private void hire() {
     	if(campaign.recruitPerson(person)) {
+            if (campaign.getCampaignOptions().getUseTimeInService()) {
+        		GregorianCalendar rawrecruit = (GregorianCalendar) campaign.getCalendar().clone();
+    			person.setRecruitment(rawrecruit);
+            }
         	person = campaign.newPerson(person.getPrimaryRole());
         	refreshRanksCombo();
         	campaign.changeRank(person, campaign.getRanks().getRankNumericFromNameAndProfession(person.getProfession(), (String)choiceRanks.getSelectedItem()), false);
