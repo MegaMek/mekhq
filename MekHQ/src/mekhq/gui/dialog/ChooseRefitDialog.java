@@ -287,7 +287,7 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
 			try {
                 Entity refitEn = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
 				if(null != refitEn) {
-					Refit r = new Refit(unit, refitEn, false);
+					Refit r = new Refit(unit, refitEn, false, false);
 					if(null == r.checkFixable()) {
 						refits.add(r);
 					}
