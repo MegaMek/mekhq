@@ -73,6 +73,8 @@ public class PersonViewPanel extends javax.swing.JPanel {
 	private javax.swing.JLabel lblImplants2;
 	private javax.swing.JLabel lblAdvancedMedical1;
 	private javax.swing.JLabel lblAdvancedMedical2;
+	private javax.swing.JLabel lblSpouse1;
+    private javax.swing.JLabel lblSpouse2;
 	
 	
 	public PersonViewPanel(Person p, Campaign c, DirectoryItems portraits) {
@@ -269,6 +271,8 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		lblImplants2 = new JLabel();
 		lblAdvancedMedical1 = new JLabel();
 		lblAdvancedMedical2 = new JLabel();
+		lblSpouse1 = new JLabel();
+        lblSpouse2 = new JLabel();
     	
     	java.awt.GridBagConstraints gridBagConstraints;
 		pnlStats.setLayout(new GridBagLayout());
@@ -451,6 +455,30 @@ public class PersonViewPanel extends javax.swing.JPanel {
 			secondy = firsty;
 		}
 			
+		if (null != person.getSpouseID()) {
+            secondy++;
+            lblSpouse1.setName("lblSpouse1"); // NOI18N
+            lblSpouse1.setText(resourceMap.getString("lblSpouse1.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = secondy;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblSpouse1, gridBagConstraints);
+               
+            lblSpouse2.setName("lblSpouse2"); // NOI18N
+            lblSpouse2.setText(person.getSpouse().getFullName());
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = secondy;
+            gridBagConstraints.gridwidth = 3;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblSpouse2, gridBagConstraints);
+        }
+		
 		if(campaign.getCampaignOptions().useAbilities() && person.countOptions(PilotOptions.LVL3_ADVANTAGES) > 0) {
 			secondy++;
 			lblAbility1.setName("lblAbility1"); // NOI18N
