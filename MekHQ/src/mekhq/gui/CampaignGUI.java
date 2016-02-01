@@ -293,10 +293,11 @@ public class CampaignGUI extends JPanel {
     public static final int PG_TECH = 11;
     public static final int PG_DOC = 12;
     public static final int PG_ADMIN = 13;
-    public static final int PG_RETIRE = 14;
-    public static final int PG_MIA = 15;
-    public static final int PG_KIA = 16;
-    public static final int PG_NUM = 17;
+    public static final int PG_DEPENDENT = 14;
+    public static final int PG_RETIRE = 15;
+    public static final int PG_MIA = 16;
+    public static final int PG_KIA = 17;
+    public static final int PG_NUM = 18;
 
     // parts filter groups
     private static final int SG_ALL = 0;
@@ -4266,6 +4267,8 @@ public class CampaignGUI extends JPanel {
                 return "Medical Staff";
             case PG_ADMIN:
                 return "Administrators";
+            case PG_DEPENDENT:
+                return "Dependents";
             case PG_RETIRE:
                 return "Retired Personnel";
             case PG_MIA:
@@ -6794,6 +6797,8 @@ public class CampaignGUI extends JPanel {
                         || (nGroup == PG_DOC && ((type == Person.T_DOCTOR) || (type == Person.T_MEDIC)))
                         || (nGroup == PG_ADMIN && type > Person.T_MEDIC)) {
                     return person.isActive();
+                } else if (nGroup == PG_DEPENDENT) {
+                    return person.isDependent() == true;
                 } else if (nGroup == PG_RETIRE) {
                     return person.getStatus() == Person.S_RETIRED;
                 } else if (nGroup == PG_MIA) {
