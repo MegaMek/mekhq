@@ -1,5 +1,7 @@
 VERSION HISTORY
 ----------------------------------
+v0.3.25-git
+
 v0.3.24 (2016-02-02 13:10 UTC)
 + Bug [#841]: [ATB] Hold the line : Enemy reinforcements may start in any location
 + Bug [#779]: Lost employers dropship
