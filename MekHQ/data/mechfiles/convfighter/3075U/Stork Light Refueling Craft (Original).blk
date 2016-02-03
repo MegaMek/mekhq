@@ -39,6 +39,10 @@ Stork Light Refueling Craft
 10
 </barrating>
 
+<structural_tech_rating>
+4
+</structural_tech_rating>
+
 <Nose Equipment>
 ISSRM4
 </Nose Equipment>
@@ -78,11 +82,11 @@ IS Level 2
 </type>
 
 <year>
-2677
+2623
 </year>
 
 <source>
-RS 3075U
+TRO 3075 - Star League
 </source>
 
 <internal_type>

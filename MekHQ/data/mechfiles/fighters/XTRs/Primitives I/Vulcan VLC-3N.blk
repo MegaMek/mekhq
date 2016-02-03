@@ -3,7 +3,6 @@
 </BlockVersion>
 
 #Write the version number just in case...
-
 <Version>
 MAM0
 </Version>
@@ -102,3 +101,6 @@ aerodyne
 3
 </cockpit_type>
 
+<source>
+XTRO Primitives I - Age of War
+</source>

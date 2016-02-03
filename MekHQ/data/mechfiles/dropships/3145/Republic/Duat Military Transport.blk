@@ -1,11 +1,9 @@
 #building block data file
-
 <BlockVersion>
 1
 </BlockVersion>
 
 #Write the version number just in case...
-
 <Version>
 MAM0
 </Version>
@@ -135,8 +133,18 @@ ISMML9
 ISArtemisIV
 ISMML9
 ISArtemisIV
-ISMML9 LRM Ammo Artemis-Capable:78
-ISMML9 SRM Ammo Artemis-Capable:66
+ISMML9 LRM Ammo Artemis-Capable
+ISMML9 LRM Ammo Artemis-Capable
+ISMML9 LRM Ammo Artemis-Capable
+ISMML9 LRM Ammo Artemis-Capable
+ISMML9 LRM Ammo Artemis-Capable
+ISMML9 LRM Ammo Artemis-Capable
+ISMML9 SRM Ammo Artemis-Capable
+ISMML9 SRM Ammo Artemis-Capable
+ISMML9 SRM Ammo Artemis-Capable
+ISMML9 SRM Ammo Artemis-Capable
+ISMML9 SRM Ammo Artemis-Capable
+ISMML9 SRM Ammo Artemis-Capable
 ISLargeVSP
 ISLargeVSP
 ISLargeVSP
@@ -220,5 +228,6 @@ ISLaserAMS
 ISLaserAMS
 </Aft Equipment>
 
-
-
+<source>
+TRO 3145 Republic of the Sphere - Dark Ages
+</source>

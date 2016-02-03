@@ -36,6 +36,10 @@ Aerodyne
 7
 </SafeThrust>
 
+<cockpit_type>
+0
+</cockpit_type>
+
 <heatsinks>
 15
 </heatsinks>
@@ -84,9 +88,14 @@ ISERMediumLaser
 </Right Wing Equipment>
 
 <Aft Equipment>
+IS Vehicular Stealth
 ISMediumPulseLaser
 ISAngelECMSuite
 </Aft Equipment>
+
+<source>
+XTRO Kurita - Jihad
+</source>
 
 <tonnage>
 55.0

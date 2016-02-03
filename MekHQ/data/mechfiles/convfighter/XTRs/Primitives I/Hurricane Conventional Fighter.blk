@@ -80,7 +80,7 @@ IS Level 5
 </year>
 
 <source>
-XTR Primitives I
+XTRO Primitives I - Age of War
 </source>
 
 <internal_type>
@@ -94,6 +94,10 @@ XTR Primitives I
 <barrating>
 5
 </barrating>
+
+<structural_tech_rating>
+3
+</structural_tech_rating>
 
 <engine_type>				
 1

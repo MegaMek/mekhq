@@ -1,11 +1,9 @@
 #building block data file
-
 <BlockVersion>
 1
 </BlockVersion>
 
 #Write the version number just in case...
-
 <Version>
 MAM0
 </Version>
@@ -126,7 +124,7 @@ IS Level 2
 </type>
 
 <year>
-3113
+3100
 </year>
 
 <internal_type>
@@ -168,5 +166,5 @@ CargoBay:217:1
 </passengers>
 
 <source>
-TRO 3145 FWL
+TRO 3145 Free Worlds League - Early Republic
 </source>

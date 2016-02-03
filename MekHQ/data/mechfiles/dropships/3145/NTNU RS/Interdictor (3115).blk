@@ -1,11 +1,9 @@
 #building block data file
-
 <BlockVersion>
 1
 </BlockVersion>
 
 #Write the version number just in case...
-
 <Version>
 MAM0
 </Version>
@@ -51,7 +49,7 @@ ISArtemisIV
 ISMML9
 ISArtemisIV
 ISMML9 LRM Ammo Artemis-Capable:78
-ISMML9 LRM Ammo Artemis-Capable:66
+ISMML9 SRM Ammo Artemis-Capable:66
 AMS
 AMS
 ISAMS Ammo:48
@@ -202,5 +200,5 @@ CargoBay:470:2
 </passengers>
 
 <source>
-RS 3145 NTNU
+RS 3145 NTNU - Late Republic
 </source>

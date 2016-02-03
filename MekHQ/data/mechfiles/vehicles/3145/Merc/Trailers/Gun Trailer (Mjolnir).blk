@@ -56,7 +56,6 @@ Wheeled
 </armor>
 
 <Body Equipment>
-IS Vehicular Stealth
 ISGuardianECMSuite
 ISImprovedHeavyGauss Ammo
 </Body Equipment>
@@ -78,7 +77,7 @@ ISVehicularGrenadeLauncher (R)
 </Rear Equipment>
 
 <source>
-TRO 3145 Merc
+TRO 3145 Mercenaries - Late Republic
 </source>
 
 <tonnage>

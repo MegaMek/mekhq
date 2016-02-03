@@ -1,11 +1,9 @@
 #building block data file
-
 <BlockVersion>
 1
 </BlockVersion>
 
 #Write the version number just in case...
-
 <Version>
 MAM0
 </Version>
@@ -169,6 +167,10 @@ IS Level 4
 <year>
 3077
 </year>
+
+<source>
+XTRO Kurita - Jihad
+</source>
 
 <internal_type>
 0

@@ -9,7 +9,7 @@ MAM0
 </Version>
 
 <UnitType>
-Tank
+SupportTank
 </UnitType>
 
 <Name>
@@ -45,12 +45,16 @@ Tracked
 26
 26
 25
-27
+26
 </armor>
 
 <barrating>
 7
 </barrating>
+
+<structural_tech_rating>
+2
+</structural_tech_rating>
 
 <Body Equipment>
 Armored Chassis
@@ -79,7 +83,7 @@ Machine Gun
 </Turret Equipment>
 
 <source>
-ED:Age of War
+Era Digest: Age of War
 </source>
 
 <tonnage>

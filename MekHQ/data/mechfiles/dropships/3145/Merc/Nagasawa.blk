@@ -1,18 +1,11 @@
-
 #building block data file
-
 <BlockVersion>
-
 1
-
 </BlockVersion>
 
 #Write the version number just in case...
-
 <Version>
-
 MAM0
-
 </Version>
 
 <UnitType>
@@ -62,12 +55,12 @@ CLERLargeLaser
 CLERLargeLaser
 CLERLargeLaser
 CLLRM20
-CLArtemisIV
+CLArtemisV
 CLLRM20
-CLArtemisIV
+CLArtemisV
 CLLRM20
-CLArtemisIV
-CLLRM20 Ammo:60
+CLArtemisV
+Clan Ammo LRM-20 (Clan) Artemis V-capable:60
 Clan Laser AMS
 Clan Laser AMS
 Clan Laser AMS
@@ -81,12 +74,12 @@ CLERLargeLaser
 CLERLargeLaser
 CLERLargeLaser
 CLLRM20
-CLArtemisIV
+CLArtemisV
 CLLRM20
-CLArtemisIV
+CLArtemisV
 CLLRM20
-CLArtemisIV
-CLLRM20 Ammo:60
+CLArtemisV
+Clan Ammo LRM-20 (Clan) Artemis V-capable:60
 Clan Laser AMS
 Clan Laser AMS
 Clan Laser AMS
@@ -170,5 +163,5 @@ CargoBay:207:1
 </passengers>
 
 <source>
-TRO 3145 Merc
+TRO 3145 Mercenaries - Late Republic
 </source>

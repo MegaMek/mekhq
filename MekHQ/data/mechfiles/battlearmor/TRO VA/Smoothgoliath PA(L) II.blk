@@ -52,7 +52,6 @@ SwarmWeaponMek
 StopSwarm
 LegAttack
 BACuttingTorch:RA
-ISBAHeatSensor:LA
 BASearchlight:Body
 </Squad Equipment>
 
@@ -69,7 +68,7 @@ BASearchlight:Body
 </Trooper 4 Equipment>
 
 <source>
-TRO VA
+TRO Vehicle Annex (r) - Civil War
 </source>
 
 <chassis>

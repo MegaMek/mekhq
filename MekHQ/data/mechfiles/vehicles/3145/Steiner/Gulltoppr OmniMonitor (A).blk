@@ -52,7 +52,6 @@ Tracked
 </armor>
 
 <Body Equipment>
-IS Hardened
 CLTargeting Computer
 CLECMSuite
 Clan Gauss Ammo
@@ -103,7 +102,7 @@ CLArtemisV
 </Front Turret Equipment>
 
 <source>
-TRO 3145 LC
+TRO 3145 Lyran Commonwealth - Late Republic
 </source>
 
 <tonnage>

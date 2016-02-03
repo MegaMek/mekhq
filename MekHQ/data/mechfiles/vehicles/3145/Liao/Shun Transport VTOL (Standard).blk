@@ -61,7 +61,6 @@ troopspace:12.0
 </armor>
 
 <Body Equipment>
-IS Vehicular Stealth
 ISGuardianECMSuite
 ISTargeting Computer
 ISMagshotGR Ammo
@@ -86,7 +85,7 @@ ISTAG
 </Rotor Equipment>
 
 <source>
-TRO 3145 CC
+TRO 3145 Capellan Confederation - Late Republic
 </source>
 
 <tonnage>

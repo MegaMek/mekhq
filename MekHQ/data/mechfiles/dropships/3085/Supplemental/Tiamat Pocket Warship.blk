@@ -23,7 +23,7 @@ Tiamat Pocket Warship
 </Model>
 
 <motion_type>
-Spheroid
+spheroid
 </motion_type>
 
 <type>
@@ -246,5 +246,6 @@ Screen Launcher
 ScreenLauncher Ammo:20
 </Aft Equipment>
 
-
-
+<source>
+Jihad Hot Spots: Terra - Jihad
+</source>
