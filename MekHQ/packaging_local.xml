@@ -184,6 +184,7 @@
         <copy todir="${localdir}/${confdir}">
             <fileset dir="${localdir}/${confdir}-OLD" >
                 <include name="mekhq.properties" />
+                <include name="mhqPresets" />
             </fileset>
         </copy>
         <copy todir="${localdir}/${confdir}">

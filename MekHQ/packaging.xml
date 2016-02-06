@@ -193,6 +193,7 @@
         <copy todir="${pkgdir}/${confdir}">
             <fileset dir="${pkgdir}/${confdir}-OLD" >
                 <include name="mekhq.properties" />
+                <include name="mhqPresets" />
             </fileset>
         </copy>
         <delete dir="${pkgdir}/${confdir}-OLD" />
