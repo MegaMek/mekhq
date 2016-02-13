@@ -46,9 +46,9 @@
     <property name="pkgbuilddir" value="${pkgdir}/${builddir}" />
 
     <!-- gitroot used for git authentification -->
-    <property name="gitroot" value="http://git.code.sf.net/p/mekhq/git" />
-    <property name="mm-gitroot" value="http://git.code.sf.net/p/megamek/git" />
-    <property name="mml-gitroot" value="http://git.code.sf.net/p/megameklab/git" />
+    <property name="gitroot" value="https://github.com/MegaMek/mekhq.git" />
+    <property name="mm-gitroot" value="https://github.com/MegaMek/megamek.git" />
+    <property name="mml-gitroot" value="https://github.com/MegaMek/megameklab.git" />
 
 
     <property name="timestampfile" value="${logdir}/timestamp" />
