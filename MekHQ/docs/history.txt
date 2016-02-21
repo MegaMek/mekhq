@@ -1,9 +1,11 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.25-git
+v0.3.25 (2016-02-21 14:15 UTC)
 + Updating MHQ Data files to be in line with MM 41.14 (Multi-commits)
 + Bug [#959]: MekHQ Start New Campaign Bug
 + Updated Campaign.clearGameData to reset isStuck state
++ Updated MegaMek.jar to 0.41.15
++ Updated MegaMekLab.jar to 0.1.51
 
 v0.3.24 (2016-02-02 13:10 UTC)
 + Bug [#841]: [ATB] Hold the line : Enemy reinforcements may start in any location
