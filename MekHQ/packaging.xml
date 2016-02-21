@@ -20,7 +20,7 @@
     <!-- Global properties for this build -->
     <!-- Version and packaging properties -->
     <property name="project.name" value="mekhq" />
-    <property name="version" value="0.3.25"/>
+    <property name="version" value="0.3.26-git"/>
     <property name="osxdist" value="${project.name}-${version}-mac" />
     <property name="windist" value="${project.name}-${version}-windows" />
     <property name="nixdist" value="${project.name}-${version}" />
@@ -110,7 +110,7 @@
     <!-- following pkgdir-* tasks get, build & package the current version from git -->
     <target name="pkgdir-get" depends="pkgdir-init" description="get the latest source from git">
         <exec executable="git">
-            <arg line="clone ${gitroot}" />
+            <arg line="clone --single-branch ${gitroot}" />
         </exec>
     	<move file="mekhq/MekHQ" tofile="${pkgdir}"/>
     	<delete dir="mekhq" />
@@ -120,11 +120,11 @@
         <move file="${pkgdir}/${datadir}" tofile="${pkgdir}/${datadir}-OLD"/>
     	<!-- bring in some megamek data -->
         <exec executable="git">
-            <arg line="clone ${mm-gitroot} ${mm-pkgdir}" />
+            <arg line="clone --single-branch ${mm-gitroot} ${mm-pkgdir}" />
         </exec>
         <!-- now bring in some mml data -->
         <exec executable="git">
-            <arg line="clone ${mml-gitroot} ${mml-pkgdir}" />
+            <arg line="clone --single-branch ${mml-gitroot} ${mml-pkgdir}" />
         </exec>
         <copy todir="${pkgdir}">
             <fileset dir="${mm-pkgdir}/megamek">
