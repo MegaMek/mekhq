@@ -112,6 +112,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import megamek.client.RandomNameGenerator;
 import megamek.client.RandomUnitGenerator;
+import megamek.client.ui.swing.GameOptionsDialog;
 import megamek.common.AmmoType;
 import megamek.common.Crew;
 import megamek.common.Dropship;
@@ -122,6 +123,7 @@ import megamek.common.MULParser;
 import megamek.common.MechView;
 import megamek.common.MiscType;
 import megamek.common.TargetRoll;
+import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import megamek.common.WeaponType;
 import megamek.common.loaders.EntityLoadingException;
@@ -199,7 +201,6 @@ import mekhq.gui.dialog.CustomizeScenarioDialog;
 import mekhq.gui.dialog.DailyReportLogDialog;
 import mekhq.gui.dialog.DataLoadingDialog;
 import mekhq.gui.dialog.GMToolsDialog;
-import mekhq.gui.dialog.GameOptionsDialog;
 import mekhq.gui.dialog.HireBulkPersonnelDialog;
 import mekhq.gui.dialog.MaintenanceReportDialog;
 import mekhq.gui.dialog.ManageAssetsDialog;
@@ -4444,12 +4445,12 @@ public class CampaignGUI extends JPanel {
     }// GEN-LAST:event_menuOptionsActionPerformed
 
     private void menuOptionsMMActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuOptionsActionPerformed
-        GameOptionsDialog god = new GameOptionsDialog(getFrame(), getCampaign());
+        GameOptionsDialog god = new GameOptionsDialog(getFrame(), getCampaign().getGameOptions(), false);
         god.refreshOptions();
         god.setVisible(true);
         if (!god.wasCancelled()) {
             getCampaign().setGameOptions(god.getOptions());
-            god.setCampaignOptionsFromGameOptions();
+            setCampaignOptionsFromGameOptions();
             refreshCalendar();
             changePersonnelView();
             refreshPersonnelList();
@@ -8668,5 +8669,19 @@ public class CampaignGUI extends JPanel {
      */
     public UnitTableModel getServicedUnitModel() {
         return servicedUnitModel;
+    }
+
+    private void setCampaignOptionsFromGameOptions() {
+        getCampaign().getCampaignOptions().setUseTactics(getCampaign().getGameOptions().getOption("command_init").booleanValue());
+        getCampaign().getCampaignOptions().setInitBonus(getCampaign().getGameOptions().getOption("individual_initiative").booleanValue());
+        getCampaign().getCampaignOptions().setToughness(getCampaign().getGameOptions().getOption("toughness").booleanValue());
+        getCampaign().getCampaignOptions().setArtillery(getCampaign().getGameOptions().getOption("artillery_skill").booleanValue());
+        getCampaign().getCampaignOptions().setAbilities(getCampaign().getGameOptions().getOption("pilot_advantages").booleanValue());
+        getCampaign().getCampaignOptions().setEdge(getCampaign().getGameOptions().getOption("edge").booleanValue());
+        getCampaign().getCampaignOptions().setImplants(getCampaign().getGameOptions().getOption("manei_domini").booleanValue());
+        getCampaign().getCampaignOptions().setQuirks(getCampaign().getGameOptions().getOption("stratops_quirks").booleanValue());
+        getCampaign().getCampaignOptions().setLimitByYear(getCampaign().getGameOptions().getOption("is_eq_limits").booleanValue());
+        getCampaign().getCampaignOptions().setAllowCanonOnly(getCampaign().getGameOptions().getOption("canon_only").booleanValue());
+        getCampaign().getCampaignOptions().setTechLevel(TechConstants.getSimpleLevel(getCampaign().getGameOptions().getOption("techlevel").stringValue()));
     }
 }

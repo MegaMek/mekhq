@@ -1,6 +1,11 @@
 VERSION HISTORY
 ----------------------------------
 v0.3.26-git
++ Bug: GameOptionsDialog does not match MegaMek's GameOptionsDialog
+    This bug was caused by duplicating G.O.D. rather than just implementing MM's
+    version of it. I added the one minor thing the MM version needed added to support
+    MHQ and other external programs, and then switched to using it. I also removed the
+    MHQ included version to avoid mistakes in the future.
 
 v0.3.25 (2016-02-21 14:15 UTC)
 + Updating MHQ Data files to be in line with MM 41.14 (Multi-commits)
