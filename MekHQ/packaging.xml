@@ -112,8 +112,8 @@
         <exec executable="git">
             <arg line="clone ${gitroot}" />
         </exec>
-    	<move file="git/MekHQ" tofile="${pkgdir}"/>
-    	<delete dir="git" />
+    	<move file="mekhq/MekHQ" tofile="${pkgdir}"/>
+    	<delete dir="mekhq" />
         <!--now we need to replace our data with the latest from the MM git
             but first we need to back it up because we will need to keep a few
             things-->
