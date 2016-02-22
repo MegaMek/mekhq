@@ -184,7 +184,7 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 PortraitChoiceDialog pcd = new PortraitChoiceDialog(
                         gui.getFrame(), true, singleForce.getIconCategory(),
                         singleForce.getIconFileName(), gui.getIconPackage()
-                                .getForceIcons());
+                                .getForceIcons(), true);
                 pcd.setVisible(true);
                 singleForce.setIconCategory(pcd.getCategory());
                 singleForce.setIconFileName(pcd.getFileName());
@@ -231,7 +231,7 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
             gui.refreshUnitList();
             gui.refreshOverview();
         } else if (command.contains("REMOVE_LANCE_TECH")) {
-           	if (singleForce.getTechID() != null) {            		
+           	if (singleForce.getTechID() != null) {
     			Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
     			oldTech.clearTechUnitIDs();
     			oldTech.addLogEntry(gui.getCampaign().getDate(), "Removed from " + singleForce.getName());
@@ -244,7 +244,7 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
            			}
            		}
     			singleForce.setTechID(null);
-    				
+
     			gui.refreshOrganization();
     			gui.refreshPersonnelList();
                 gui.refreshScenarioList();

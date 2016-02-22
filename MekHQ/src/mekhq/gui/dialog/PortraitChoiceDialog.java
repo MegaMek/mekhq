@@ -8,8 +8,14 @@ package mekhq.gui.dialog;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -17,7 +23,15 @@ import java.util.ResourceBundle;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.WindowConstants;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -33,7 +47,7 @@ import megamek.common.util.EncodeControl;
 public class PortraitChoiceDialog extends javax.swing.JDialog {
 
      /**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 	/**
@@ -44,15 +58,23 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
     private String category;
     private String filename;
     private PortraitTableMouseAdapter portraitMouseAdapter;
+    private boolean force = false;
 
 
     /** Creates new form CamoChoiceDialog */
-    public PortraitChoiceDialog(java.awt.Frame parent, boolean modal, String category, String file, DirectoryItems portraits) {
+    public PortraitChoiceDialog(Frame parent, boolean modal, String category, String file, DirectoryItems portraits) {
+        this(parent, modal, category, file, portraits, false);
+    }
+
+
+    /** Creates new form CamoChoiceDialog */
+    public PortraitChoiceDialog(java.awt.Frame parent, boolean modal, String category, String file, DirectoryItems portraits, boolean force) {
         super(parent, modal);
         this.category = category;
         filename = file;
         portraitMouseAdapter = new PortraitTableMouseAdapter();
         this.portraits = portraits;
+        this.force = force;
         initComponents();
         fillTable((String) comboCategories.getSelectedItem());
         int rowIndex = 0;
@@ -67,39 +89,40 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
     }
 
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
+        GridBagConstraints gridBagConstraints;
 
-        scrPortrait = new javax.swing.JScrollPane();
-        tablePortrait = new javax.swing.JTable();
-        comboCategories = new javax.swing.JComboBox<String>();
-        btnSelect = new javax.swing.JButton();
-        btnCancel = new javax.swing.JButton();
+        scrPortrait = new JScrollPane();
+        tablePortrait = new JTable();
+        comboCategories = new JComboBox<String>();
+        btnSelect = new JButton();
+        btnCancel = new JButton();
+        JPanel portraitPanel = new JPanel();
 
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PortraitChoiceDialog", new EncodeControl()); //$NON-NLS-1$
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("Form.title"));
-        getContentPane().setLayout(new java.awt.GridBagLayout());
+        portraitPanel.setLayout(new GridBagLayout());
 
         scrPortrait.setName("jScrollPane1"); // NOI18N
 
         tablePortrait.setModel(portraitModel);
         tablePortrait.setName("tablePortrait"); // NOI18N
-        tablePortrait.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        tablePortrait.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tablePortrait.setRowHeight(76);
         tablePortrait.getColumnModel().getColumn(0).setCellRenderer(portraitModel.getRenderer());
         tablePortrait.addMouseListener(portraitMouseAdapter);
         scrPortrait.setViewportView(tablePortrait);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        getContentPane().add(scrPortrait, gridBagConstraints);
+        portraitPanel.add(scrPortrait, gridBagConstraints);
 
         DefaultComboBoxModel<String> categoryModel = new DefaultComboBoxModel<String>();
         String match = null;
@@ -123,53 +146,63 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
         }
         comboCategories.setModel(categoryModel);
         comboCategories.setName("comboCategories"); // NOI18N
-        comboCategories.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+        comboCategories.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent evt) {
                 comboCategoriesItemStateChanged(evt);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
-        getContentPane().add(comboCategories, gridBagConstraints);
+        portraitPanel.add(comboCategories, gridBagConstraints);
 
         btnSelect.setText(resourceMap.getString("btnSelect.text")); // NOI18N
         btnSelect.setName("btnSelect"); // NOI18N
-        btnSelect.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnSelect.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 btnSelectActionPerformed(evt);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.weightx = 0.5;
-        getContentPane().add(btnSelect, gridBagConstraints);
+        portraitPanel.add(btnSelect, gridBagConstraints);
 
         btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnCancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 btnCancelActionPerformed(evt);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.weightx = 0.5;
-        getContentPane().add(btnCancel, gridBagConstraints);
+        portraitPanel.add(btnCancel, gridBagConstraints);
+
+        if (force) {
+            JTabbedPane tabbedPane = new JTabbedPane();
+            JPanel layeredPanel = new JPanel();
+            // TODO: Coming Soon!
+            tabbedPane.addTab("Single Portrait", portraitPanel);
+            tabbedPane.addTab("Layered Portrait", layeredPanel);
+        } else {
+            getContentPane().add(portraitPanel);
+        }
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }
 
-	private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+	private void btnCancelActionPerformed(ActionEvent evt) {
 	    setVisible(false);
-	}//GEN-LAST:event_btnCancelActionPerformed
-	
-	private void btnSelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectActionPerformed
+	}
+
+	private void btnSelectActionPerformed(ActionEvent evt) {
 	    category = portraitModel.getCategory();
 	    if(tablePortrait.getSelectedRow() != -1) {
 	        filename = (String) portraitModel.getValueAt(tablePortrait.getSelectedRow(), 0);
@@ -177,9 +210,9 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
 	        filename = Crew.PORTRAIT_NONE;
 	    }
 	    setVisible(false);
-	}//GEN-LAST:event_btnSelectActionPerformed
+	}
 
-	private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboCategoriesItemStateChanged
+	private void comboCategoriesItemStateChanged(ItemEvent evt) {
 	    if (evt.getStateChange() == ItemEvent.SELECTED) {
 	        fillTable((String) evt.getItem());
 	    }
@@ -220,7 +253,7 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
     public class PortraitTableModel extends AbstractTableModel {
 
         /**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = 1L;
 		private String[] columnNames;
@@ -291,7 +324,7 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
 
 
         public class Renderer extends PortraitPanel implements TableCellRenderer {
-			
+
         	public Renderer(DirectoryItems portraits) {
 				super(portraits);
 			}
@@ -330,15 +363,15 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
             }
         }
     }
-    
-    public class PortraitPanel extends javax.swing.JPanel {
+
+    public class PortraitPanel extends JPanel {
 
         /**
-    	 * 
+    	 *
     	 */
     	private static final long serialVersionUID = -3724175393116586310L;
     	private DirectoryItems portraits;
-        
+
         /** Creates new form CamoPanel */
         public PortraitPanel(DirectoryItems portraits) {
             this.portraits = portraits;
@@ -346,19 +379,19 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
         }
 
         private void initComponents() {
-            java.awt.GridBagConstraints gridBagConstraints;
+            GridBagConstraints gridBagConstraints;
 
-            lblImage = new javax.swing.JLabel();
+            lblImage = new JLabel();
 
             setName("Form"); // NOI18N
-            setLayout(new java.awt.GridBagLayout());
+            setLayout(new GridBagLayout());
 
             lblImage.setText(""); // NOI18N
             lblImage.setName("lblImage"); // NOI18N
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 0;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.weighty = 1.0;
             add(lblImage, gridBagConstraints);
@@ -367,7 +400,7 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
         public void setText(String text) {
             lblImage.setText(text);
         }
-        
+
         public void setImage(String category, String name) {
 
             if (null == category
@@ -382,7 +415,7 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
                     category = ""; //$NON-NLS-1$
                 Image portrait = (Image) portraits.getItem(category, name);
                 if(null != portrait) {
-                    portrait = portrait.getScaledInstance(-1, 76, Image.SCALE_DEFAULT);               
+                    portrait = portrait.getScaledInstance(-1, 76, Image.SCALE_DEFAULT);
                 }
                 lblImage.setIcon(new ImageIcon(portrait));
             } catch (Exception err) {
@@ -390,18 +423,18 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
             }
         }
         // Variables declaration - do not modify//GEN-BEGIN:variables
-        private javax.swing.JLabel lblImage;
+        private JLabel lblImage;
         // End of variables declaration//GEN-END:variables
 
     }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnCancel;
-    private javax.swing.JButton btnSelect;
-    private javax.swing.JComboBox<String> comboCategories;
-    private javax.swing.JScrollPane scrPortrait;
-    private javax.swing.JTable tablePortrait;
+    private JButton btnCancel;
+    private JButton btnSelect;
+    private JComboBox<String> comboCategories;
+    private JScrollPane scrPortrait;
+    private JTable tablePortrait;
     // End of variables declaration//GEN-END:variables
 
 }

@@ -1,20 +1,20 @@
 /*
  * Force.java
- * 
+ *
  * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -27,8 +27,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Objects;
+import java.util.Map;
 import java.util.UUID;
 import java.util.Vector;
 
@@ -50,7 +51,7 @@ import mekhq.campaign.unit.Unit;
  * is that any time TOE is refreshed in MekHQView, the force object can be traversed
  * to generate a set of TreeNodes that can be applied to the JTree showing the force
  * TO&E.
- * 
+ *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Force implements Serializable {
@@ -58,11 +59,12 @@ public class Force implements Serializable {
 
     // pathway to force icon
     public static final String ROOT_ICON = "-- General --";
+    public static final String ROOT_LAYERED = "Layered";
     public static final String ICON_NONE = "None";
     public static final int FORCE_NONE = -1;
     private String iconCategory = ROOT_ICON;
     private String iconFileName = ICON_NONE;
-
+    private HashMap<String, String> iconMap = new HashMap<String, String>();
     
     private String name;
     private String desc;
@@ -333,6 +335,10 @@ public class Force implements Serializable {
     public void setIconFileName(String s) {
         this.iconFileName = s;
     }
+    
+    public HashMap<String, String> getIconMap() {
+        return iconMap;
+    }
 
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<force id=\""
@@ -352,6 +358,16 @@ public class Force implements Serializable {
                 +"<iconCategory>"
                 +MekHqXmlUtil.escape(iconCategory)
                 +"</iconCategory>");
+        if (iconCategory.equals(ROOT_LAYERED)) {
+            pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                    +"<iconHashMap>");
+            for (Map.Entry<String, String> entry : iconMap.entrySet()) {
+                pw1.println(MekHqXmlUtil.indentStr(indent+2)
+                        +"<iconentry key=\"" + MekHqXmlUtil.escape(entry.getKey()) + "\" val=\""+ MekHqXmlUtil.escape(entry.getValue()) +"\"/>");
+            }
+            pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                    +"</iconHashMap>");
+        }
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<iconFileName>"
                 +MekHqXmlUtil.escape(iconFileName)
@@ -408,6 +424,8 @@ public class Force implements Serializable {
                     retVal.desc = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("iconCategory")) {
                     retVal.iconCategory = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("iconHashMap")) {
+                    processIconMapNodes(retVal, wn2, version);
                 } else if (wn2.getNodeName().equalsIgnoreCase("iconFileName")) {
                     retVal.iconFileName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
@@ -463,6 +481,35 @@ public class Force implements Serializable {
             }
         }
     }
+
+    private static void processIconMapNodes(Force retVal, Node wn, Version version) {
+        NodeList nl = wn.getChildNodes();
+        for (int x=0; x<nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+
+            // If it's not an element node, we ignore it.
+            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            NamedNodeMap attrs = wn2.getAttributes();
+            Node keyNode = attrs.getNamedItem("key");
+            String key = keyNode.getTextContent();
+            Node valNode = attrs.getNamedItem("val");
+            String val = valNode.getTextContent();
+            retVal.iconMap.put(key, val);
+        }
+    /*if (iconCategory.equals(ROOT_LAYERED)) {
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<iconHashMap>");
+        for(Map.Entry<String, String> entry : iconMap.entrySet()) {
+            pw1.println(MekHqXmlUtil.indentStr(indent+2)
+                    +"<iconentry key=\"" + MekHqXmlUtil.escape(entry.getKey()) + "\" val=\""+ MekHqXmlUtil.escape(entry.getValue()) +"\"/>");
+        }
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"</iconHashMap>");
+    }*/
+    }
     
     public Vector<Object> getAllChildren(Campaign campaign) {
         Vector<Object> children = new Vector<Object>();
@@ -487,38 +534,27 @@ public class Force implements Serializable {
                return ((Comparable<Integer>)u2.getCommander().getRankNumeric()).compareTo(u1.getCommander().getRankNumeric());
             }
         });
-        children.addAll(units);
-        children.addAll(unmannedUnits);
-        return children;
+
+		children.addAll(units);
+		children.addAll(unmannedUnits);
+		return children;
+	}
+
+	@Override
+    public boolean equals(Object o) {
+    	return o instanceof Force && ((Force)o).getId() == id && ((Force)o).getFullName().equals(getFullName());
     }
-    
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, getFullName());
-    }
-    
-    @Override
-    public boolean equals(Object obj) {
-        if(this == obj) {
-            return true;
-        }
-        if((null == obj) || (getClass() != obj.getClass())) {
-            return false;
-        }
-        final Force other = (Force) obj;
-        return (id == other.id) && Objects.equals(getFullName(), other.getFullName());
-    }
-    
-    public void fixIdReferences(Hashtable<Integer, UUID> uHash) {
-        for(int oid : oldUnits) {
-            UUID nid = uHash.get(oid);
-            if(null != nid) {
-                units.add(nid);
-            }
-        }
-        for(Force sub : subForces) {
-            sub.fixIdReferences(uHash);
-        }
-    }
-    
+
+	public void fixIdReferences(Hashtable<Integer, UUID> uHash) {
+		for(int oid : oldUnits) {
+			UUID nid = uHash.get(oid);
+			if(null != nid) {
+				units.add(nid);
+			}
+		}
+		for(Force sub : subForces) {
+			sub.fixIdReferences(uHash);
+		}
+	}
+
 }

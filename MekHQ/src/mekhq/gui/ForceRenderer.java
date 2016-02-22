@@ -2,7 +2,10 @@ package mekhq.gui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.util.Map;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -23,7 +26,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
     private static final long serialVersionUID = -553191867660269247L;
 
     private IconPackage icons;
-    
+
     public ForceRenderer(IconPackage i) {
         icons = i;
     }
@@ -125,7 +128,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
 
         return this;
     }
-    
+
     private IconPackage getIconPackage() {
         return icons;
     }
@@ -153,11 +156,11 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             category = "";
         }
 
-        // Return a null if the player has selected no portrait file.
+        // Return a null if the unit has no selected portrait file.
         if ((null == category) || (null == file) || Crew.PORTRAIT_NONE.equals(file)) {
             file = "default.gif";
         }
-        // Try to get the player's portrait file.
+        // Try to get the unit's portrait file.
         Image portrait = null;
         try {
             portrait = (Image) getIconPackage().getPortraits().getItem(category, file);
@@ -179,32 +182,65 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
     protected Icon getIconFrom(Force force) {
         String category = force.getIconCategory();
         String file = force.getIconFileName();
+        ImageIcon forceIcon = null;
 
         if(Crew.ROOT_PORTRAIT.equals(category)) {
             category = "";
         }
 
-        // Return a null if the player has selected no portrait file.
-        if ((null == category) || (null == file) || Crew.PORTRAIT_NONE.equals(file)) {
+        // Return a null if the player has selected no force icon file.
+        if ((null == category) || (null == file) || (Crew.PORTRAIT_NONE.equals(file) && !Force.ROOT_LAYERED.equals(category))) {
             file = "empty.png";
         }
 
-        // Try to get the player's portrait file.
-        Image portrait = null;
-        try {
-            portrait = (Image) getIconPackage().getForceIcons().getItem(category, file);
-            if(null != portrait) {
-                portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
-            } else {
-                portrait = (Image) getIconPackage().getForceIcons().getItem("", "empty.png");
-                if(null != portrait) {
-                    portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
+        // Layered force icon
+        if (Force.ROOT_LAYERED.equals(category)) {
+            BufferedImage base = null;
+            Graphics2D g2d = null;
+            for (Map.Entry<String, String> entry : force.getIconMap().entrySet()) {
+                try {
+                    // Load up the image piece
+                    BufferedImage tmp = (BufferedImage) getIconPackage().getForceIcons().getItem(entry.getKey(), entry.getValue());
+
+                    // Create the new base if it isn't already
+                    if (null == base) {
+                        base = new BufferedImage(tmp.getWidth(), tmp.getHeight(), BufferedImage.TYPE_INT_ARGB);
+
+                        // Get our Graphics to draw on
+                        g2d = base.createGraphics();
+                    }
+
+                    // Draw the current buffered image onto the base, aligning bottom and right side
+                    g2d.drawImage(base, base.getWidth() - tmp.getWidth(), base.getHeight() - tmp.getHeight(), null);
+                } catch (Exception err) {
+                    err.printStackTrace();
+                } finally {
+                    if (null != g2d)
+                        g2d.dispose();
+                    if (null != base) {
+                        forceIcon = new ImageIcon(base);
+                    }
                 }
             }
-            return new ImageIcon(portrait);
-        } catch (Exception err) {
-            err.printStackTrace();
-            return null;
+        } else { // Standard force icon
+            // Try to get the player's force icon file.
+            Image portrait = null;
+            try {
+                portrait = (Image) getIconPackage().getForceIcons().getItem(category, file);
+                if(null != portrait) {
+                    portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
+                } else {
+                    portrait = (Image) getIconPackage().getForceIcons().getItem("", "empty.png");
+                    if(null != portrait) {
+                        portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
+                    }
+                }
+                forceIcon = new ImageIcon(portrait);
+            } catch (Exception err) {
+                err.printStackTrace();
+            }
         }
+
+        return forceIcon;
     }
 }
