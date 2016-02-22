@@ -6,6 +6,7 @@ v0.3.26-git
     version of it. I added the one minor thing the MM version needed added to support
     MHQ and other external programs, and then switched to using it. I also removed the
     MHQ included version to avoid mistakes in the future.
++ Updated MegaMek.jar to 894609a to avoid build errors when not pointing at other projects
 
 v0.3.25 (2016-02-21 14:15 UTC)
 + Updating MHQ Data files to be in line with MM 41.14 (Multi-commits)
