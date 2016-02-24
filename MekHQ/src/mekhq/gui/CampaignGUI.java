@@ -2588,10 +2588,7 @@ public class CampaignGUI extends JPanel {
         JMenu menuExport = new JMenu(resourceMap.getString("menuExport.text")); // NOI18N
 
         /*
-         * Taharqa: I think it is confusing and bad gui feng-shui to put this in
-         * the menu even though it is driven by user selections that might not
-         * even be in the visible tab at the moment. If we keep this it should
-         * be for all personnel and parts and be clearly labeled as such
+         * TODO: Implement these as "Export All" versions
          *
          * miExportPerson.setText(resourceMap.getString("miExportPerson.text"));
          * // NOI18N miExportPerson.addActionListener(new ActionListener() {
@@ -4448,6 +4445,7 @@ public class CampaignGUI extends JPanel {
     private void menuOptionsMMActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuOptionsActionPerformed
         GameOptionsDialog god = new GameOptionsDialog(getFrame(), getCampaign().getGameOptions(), false);
         god.refreshOptions();
+        god.setEditable(true);
         god.setVisible(true);
         if (!god.wasCancelled()) {
             getCampaign().setGameOptions(god.getOptions());
