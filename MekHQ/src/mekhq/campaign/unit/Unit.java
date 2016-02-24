@@ -1404,7 +1404,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 		if(null != refit) {
 			refit.writeToXml(pw1, indentLvl+1);
 		}
-		if(null != lastMaintenanceReport) {
+		if(null != lastMaintenanceReport && campaign.getCampaignOptions().checkMaintenance()) {
 		    pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
 		            +"<lastMaintenanceReport><![CDATA["
 	                +lastMaintenanceReport

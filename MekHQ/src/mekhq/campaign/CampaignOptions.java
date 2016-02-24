@@ -59,7 +59,7 @@ public class CampaignOptions implements Serializable {
 
     public final static String S_TECH = "Tech";
     public final static String S_AUTO = "Automatic Success";
-    
+
     public final static int PRISONER_RANK = 0;
     public final static int BONDSMAN_RANK = 1;
 
@@ -502,11 +502,11 @@ public class CampaignOptions implements Serializable {
 	public void setAssignedTechFirst(boolean assignedTechFirst) {
 		this.assignedTechFirst = assignedTechFirst;
 	}
-	
+
 	public boolean useResetToFirstTech() {
 		return resetToFirstTech;
 	}
-	
+
 	public void setResetToFirstTech(boolean resetToFirstTech) {
 		this.resetToFirstTech = resetToFirstTech;
 	}
@@ -622,11 +622,11 @@ public class CampaignOptions implements Serializable {
     public void setImplants(boolean b) {
         this.useImplants = b;
     }
-	
+
 	public boolean useAltQualityAveraging() {
 		return altQualityAveraging;
 	}
-	
+
 	public void setAltQualityAveraging(boolean altQualityAveraging) {
 		this.altQualityAveraging = altQualityAveraging;
 	}
@@ -864,7 +864,7 @@ public class CampaignOptions implements Serializable {
     public void setLimitByYear(boolean b) {
         limitByYear = b;
     }
-    
+
     public boolean disallowExtinctStuff() {
         return disallowExtinctStuff;
     }
@@ -1191,7 +1191,7 @@ public class CampaignOptions implements Serializable {
     public void setUseUnofficalMaintenance(boolean b) {
     	useUnofficalMaintenance = b;
     }
-    
+
     public boolean reverseQualityNames() {
         return reverseQualityNames;
     }
@@ -1223,7 +1223,7 @@ public class CampaignOptions implements Serializable {
     public void setDestroyMargin(int d) {
         destroyMargin = d;
     }
-    
+
     public int getDestroyPartTarget() {
         return destroyPartTarget;
     }
@@ -1263,23 +1263,23 @@ public class CampaignOptions implements Serializable {
     public void setUseUnofficialProcreationNoRelationship(boolean b) {
     	useUnofficialProcreationNoRelationship = b;
     }
-    
+
     public boolean useTransfers() {
     	return useTransfers;
     }
-    
+
     public void setUseTransfers(boolean b) {
     	useTransfers = b;
     }
-    
+
     public boolean capturePrisoners() {
     	return capturePrisoners;
     }
-    
+
     public void setCapturePrisoners(boolean b) {
     	capturePrisoners = b;
     }
-    
+
     public int getDefaultPrisonerStatus() {
         return defaultPrisonerStatus;
     }
@@ -1519,11 +1519,11 @@ public class CampaignOptions implements Serializable {
 	public boolean getTrackUnitFatigue() {
 		return trackUnitFatigue;
 	}
-	
+
 	public void setTrackUnitFatigue(boolean fatigue) {
 		trackUnitFatigue = fatigue;
 	}
-	
+
 	public void setMercSizeLimited(boolean limit) {
 		mercSizeLimited = limit;
 	}
@@ -2057,23 +2057,11 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractPercent")) {
                 retVal.equipmentContractPercent = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractBase")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.equipmentContractBase = true;
-                } else {
-                    retVal.equipmentContractBase = false;
-                }
+                retVal.equipmentContractBase = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractSaleValue")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.equipmentContractSaleValue = true;
-                } else {
-                    retVal.equipmentContractSaleValue = false;
-                }
+                retVal.equipmentContractSaleValue = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("blcSaleValue")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.blcSaleValue = true;
-                } else {
-                    retVal.blcSaleValue = false;
-                }
+                retVal.blcSaleValue = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionSupportStaffOnly")) {
                 if (wn2.getTextContent().equalsIgnoreCase("true")) {
                     retVal.acquisitionSupportStaffOnly = true;
@@ -2140,18 +2128,10 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("usePortraitForType")) {
                 String[] values = wn2.getTextContent().split(",");
                 for (int i = 0; i < values.length; i++) {
-                    if (values[i].equalsIgnoreCase("true")) {
-                        retVal.usePortraitForType[i] = true;
-                    } else {
-                        retVal.usePortraitForType[i] = false;
-                    }
+                    retVal.usePortraitForType[i] = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("destroyByMargin")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.destroyByMargin = true;
-                } else {
-                    retVal.destroyByMargin = false;
-                }
+                retVal.destroyByMargin = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("destroyMargin")) {
                 retVal.destroyMargin = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("destroyPartTarget")) {
@@ -2167,11 +2147,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficalMaintenance")) {
                 retVal.useUnofficalMaintenance = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.checkMaintenance = true;
-                } else {
-                    retVal.checkMaintenance = false;
-                }
+                retVal.checkMaintenance = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("minimumHitsForVees")) {
                 retVal.minimumHitsForVees = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("maxAcquisitions")) {
@@ -2187,11 +2163,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("defaultPrisonerStatus")) {
                 retVal.defaultPrisonerStatus = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVees")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.useRandomHitsForVees = true;
-                } else {
-                    retVal.useRandomHitsForVees = false;
-                }
+                retVal.useRandomHitsForVees = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) {
                 retVal.personnelMarketType = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomEliteRemoval")) {
