@@ -1,4 +1,4 @@
-package mekhq.gui;
+package mekhq.gui.utilities;
 
 import java.awt.Dimension;
 import java.awt.Font;

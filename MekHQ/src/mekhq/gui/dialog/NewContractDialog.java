@@ -53,7 +53,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.gui.JSuggestField;
+import mekhq.gui.utilities.JSuggestField;
 
 /**
  *

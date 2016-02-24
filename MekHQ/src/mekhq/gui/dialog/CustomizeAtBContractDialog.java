@@ -58,7 +58,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.gui.FactionComboBox;
-import mekhq.gui.JSuggestField;
+import mekhq.gui.utilities.JSuggestField;
 
 /**
  * @author Neoancient

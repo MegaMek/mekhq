@@ -35,7 +35,6 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.MenuScroller;
 import mekhq.gui.dialog.CustomizePersonDialog;
 import mekhq.gui.dialog.EditKillLogDialog;
 import mekhq.gui.dialog.EditLogEntryDialog;
@@ -46,6 +45,7 @@ import mekhq.gui.dialog.PopupValueChoiceDialog;
 import mekhq.gui.dialog.PortraitChoiceDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.TextAreaDialog;
+import mekhq.gui.utilities.MenuScroller;
 import mekhq.gui.utilities.StaticChecks;
 
 public class PersonnelTableMouseAdapter extends MouseInputAdapter implements

@@ -30,7 +30,7 @@ import javax.swing.JOptionPane;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
-import mekhq.gui.JSuggestField;
+import mekhq.gui.utilities.JSuggestField;
 
 /**
  *

@@ -24,9 +24,9 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.MenuScroller;
 import mekhq.gui.dialog.PortraitChoiceDialog;
 import mekhq.gui.dialog.TextAreaDialog;
+import mekhq.gui.utilities.MenuScroller;
 import mekhq.gui.utilities.StaticChecks;
 
 public class OrgTreeMouseAdapter extends MouseInputAdapter implements

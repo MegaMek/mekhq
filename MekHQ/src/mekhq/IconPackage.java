@@ -7,7 +7,7 @@ import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.util.ImageFileFactory;
 import megamek.common.Configuration;
 import megamek.common.util.DirectoryItems;
-import mekhq.gui.PortraitFileFactory;
+import mekhq.gui.utilities.PortraitFileFactory;
 
 /**
  * This is a convenience class that will keep all the various directories and tilesets 

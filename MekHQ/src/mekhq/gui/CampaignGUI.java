@@ -245,6 +245,7 @@ import mekhq.gui.sorter.TechSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
 import mekhq.gui.sorter.WeightClassSorter;
+import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.view.AtBContractViewPanel;
 import mekhq.gui.view.AtBScenarioViewPanel;
 import mekhq.gui.view.ContractViewPanel;

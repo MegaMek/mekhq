@@ -46,8 +46,8 @@ import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.gui.FactionComboBox;
-import mekhq.gui.JSuggestField;
 import mekhq.gui.model.SortedComboBoxModel;
+import mekhq.gui.utilities.JSuggestField;
 
 /**
  * @author Neoancient
