@@ -16,3 +16,4 @@ MekHQ.jar
 /*.tar.gz
 /*.tar.bz2
 /*.blame
+/.classpath
