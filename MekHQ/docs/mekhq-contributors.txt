@@ -1,11 +1,16 @@
-    
   Current maintainer:
+     MegaMek GitHub Organization <https://github.com/MegaMek>
+
+  Original maintainer:
      Jay Lawson <jaylawson39@yahoo.com>
 
-  Developers:
+  Lead Developers:
+     Dylan Myers <https://github.com/Dylan-M>
+     Nicholas Walczak <arlith@users.sourceforge.net>
      Sebastian Brocks <beerockxs@users.sourceforge.net>
+
+  Developers:
   	 Frederic Morel <natitf@users.sourceforge.net>
-  	 Dylan Myers <ralgith-erian@users.sourceforge.net>
   	 Deric Page
   	 Robin Toll <fastsammy@users.sourceforge.net>
 
@@ -14,33 +19,33 @@
      Longinus00
      Josh Street
      Neyah Peterson
-     
+
   Data
       Unit Updates:
          DarkISI
          Dave Nawton <hammer-gs@users.sourceforge.net>
-    
+
       Splash Screen Images:
       	 Anthony Scroggins (http://shimmering-sword.deviantart.com)
-      	 
+
       Starterbook Campaign Files:
          Dave Nawton <hammer-gs@users.sourceforge.net>
-      
+
       Inner Sphere Map Data
         Alex Yokel
       	The data for the maps used here come from the Pryde Rock Stellar Cartography datafiles
       	produced by Medron Pryde (http://www.pryderockindustries.com/dl_game_aids.php#ISM)
       	These files are in turn based on Mike Flynn's Inner Sphere Cartography Society data
       	at http://iscs.teamspam.net/
-      	
+
       Force Images
-        Dylan Myers <ralgith-erian@users.sourceforge.net>
+        Dylan Myers <https://github.com/Dylan-M>
         Peter Farland <pfarland@live.com>
         CarnageINC
         krazzyharry
-  	  
+
   And Of Course...
-     FASA, WizKids, FanPro and Catalyst Game Labs for creating and publishing the original game of 
+     FASA, WizKids, FanPro and Catalyst Game Labs for creating and publishing the original game of
      BattleTech, a source of fun and inspiration to us all.
 
 
