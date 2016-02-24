@@ -12,6 +12,7 @@ v0.3.26-git
 + Issue #19: Presets folder gets packaged without the actual preset files
 + Issue #14: Logging Maintenance Rolls Option
 + Cleaned replaced a lot of old manual boolean checks with parseBoolean, more needs done
++ Issue #22: Classpath fix for MM/MML jar files broken by commit ec84325
 
 v0.3.25 (2016-02-21 14:15 UTC)
 + Updating MHQ Data files to be in line with MM 41.14 (Multi-commits)
