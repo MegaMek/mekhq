@@ -9,6 +9,7 @@ v0.3.26-git
 + Updated MegaMek.jar to 894609a to avoid build errors when not pointing at other projects
 + Issue #20: GameOptions Dialog Okay button shows as disabled after recent code changes
 + Issue #21: Incorrect passing of MegaMek options from MekHQ
++ Issue #19: Presets folder gets packaged without the actual preset files
 
 v0.3.25 (2016-02-21 14:15 UTC)
 + Updating MHQ Data files to be in line with MM 41.14 (Multi-commits)
