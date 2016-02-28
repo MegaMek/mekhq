@@ -408,6 +408,17 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             		"Divorced from " + selectedPerson.getFullName());
         		selectedPerson.addLogEntry(gui.getCampaign().getDate(),
                     "Divorced from " + selectedPerson.getSpouse().getFullName());
+        		if (selectedPerson.getMaidenName() != null) {
+        		    selectedPerson.setName(selectedPerson.getName().split(" ", 2)[0] 
+        		            + " " 
+        		            + selectedPerson.getMaidenName());
+        		}
+        		if (selectedPerson.getSpouse().getMaidenName() != null) {
+        		    Person spouse = selectedPerson.getSpouse();
+        		    spouse.setName(spouse.getName().split(" ", 2)[0]
+        		            + " "
+        		            + spouse.getMaidenName());
+        		}
         	}
             selectedPerson.getSpouse().setSpouseID(null);
             selectedPerson.setSpouseID(null);
@@ -425,15 +436,19 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     break;
                 case "Spouse takes your surname":
                     spouse.setName(spouse.getName().split(" ", 2)[0] + " " + selectedSurname);
+                    spouse.setMaidenName(spouseSurname);
                     break;
                 case "Take spouses surname":
                     selectedPerson.setName(selectedPerson.getName().split(" ", 2)[0] + " " + spouseSurname);
+                    selectedPerson.setMaidenName(selectedSurname);
                     break;
                 case "Hyphenate your surname with spouses":
                     selectedPerson.setName(selectedPerson.getName().split(" ", 2)[0] + " " + selectedSurname + "-" + spouseSurname);
+                    selectedPerson.setMaidenName(selectedSurname);
                     break;
                 case "Spouse hyphenates surname with yours":
                     spouse.setName(spouse.getName().split(" ", 2)[0] + " " + spouseSurname+ "-" + selectedSurname);
+                    spouse.setMaidenName(spouseSurname);
                     break;
                 default:
                     spouse.setName(spouse.getName().split(" ", 2)[0] + " " + "ImaError");

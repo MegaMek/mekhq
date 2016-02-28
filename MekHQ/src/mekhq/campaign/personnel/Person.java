@@ -162,6 +162,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     protected GregorianCalendar dueDate;
 
     private String name;
+    private String maidenname;
+
     private String callsign;
     private int gender;
 
@@ -548,6 +550,14 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public void setName(String n) {
         this.name = n;
+    }
+
+    public String getMaidenName() {
+        return maidenname;
+    }
+
+    public void setMaidenName(String n) {
+        this.maidenname = n;
     }
 
     public String getFullName() {
@@ -1047,6 +1057,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     + "<name>"
                     + MekHqXmlUtil.escape(name)
                     + "</name>");
+        if (maidenname != null) {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                    + "<maidenname>"
+                    + MekHqXmlUtil.escape(maidenname)
+                    + "</maidenname>");
+        }
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<callsign>"
                     + MekHqXmlUtil.escape(callsign)
@@ -1309,6 +1325,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.name = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("maidenname")) {
+                    retVal.maidenname = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("callsign")) {
                     retVal.callsign = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("commander")) {
