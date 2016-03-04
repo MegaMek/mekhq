@@ -104,7 +104,7 @@ public class MekLabPanel extends JPanel {
     
     public MekLabPanel(CampaignGUI gui) {
     	campaignGUI = gui;
-		entityVerifier = new EntityVerifier(new File("data/mechfiles/UnitVerifierOptions.xml"));
+		entityVerifier = EntityVerifier.getInstance(new File("data/mechfiles/UnitVerifierOptions.xml"));
         UnitUtil.loadFonts();
         new CConfig();
         MekHQ.logMessage("Staring MegaMekLab version: " + MegaMekLab.VERSION);
