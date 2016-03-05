@@ -33,7 +33,6 @@
         <string>$JAVAROOT/lib/Ostermiller.jar</string>
         <string>$JAVAROOT/lib/PngEncoder.jar</string>
         <string>$JAVAROOT/lib/TabPanel.jar</string>
-        <string>$JAVAROOT/lib/TinyXML.jar</string>
         <string>$JAVAROOT/lib/j3dcore.jar</string>
         <string>$JAVAROOT/lib/j3dutils.jar</string>
         <string>$JAVAROOT/lib/vecmath.jar</string>

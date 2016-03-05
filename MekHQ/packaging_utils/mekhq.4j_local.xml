@@ -10,7 +10,6 @@
   	<mainClass>mekhq.MekHQ</mainClass>
   	<cp>lib/MegaMek.jar</cp>
   	<cp>lib/MegaMekLab.jar</cp>
-  	<cp>lib/TinyXML.jar</cp>
   	<cp>lib/vecmath.jar</cp>
   	<cp>lib/Ostermiller.jar</cp>
   	<cp>lib/TabPanel.jar</cp>
