@@ -108,7 +108,7 @@ public class AtBGameThread extends GameThread {
     				Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
                 }
 
-                MapSettings mapSettings = new MapSettings();
+                MapSettings mapSettings = MapSettings.getInstance();
                 File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml");
                 if (campaign.getCampaignOptions().getUseAltMapgen()) {
                 	File alt = new File("data/mapgen/" + scenario.getMap() + " - Jazz.xml");
@@ -117,7 +117,7 @@ public class AtBGameThread extends GameThread {
                 	}
                 }
                  try {
-                	mapSettings.load(new FileInputStream(mapgenFile));
+                	mapSettings = MapSettings.getInstance(new FileInputStream(mapgenFile));
                 } catch (FileNotFoundException ex) {
                 	MekHQ.logError("Could not load map file data/mapgen/" + scenario.getMap() + ".xml");
                 	MekHQ.logError(ex);
