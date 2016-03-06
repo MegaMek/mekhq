@@ -1,7 +1,5 @@
 package mekhq;
 
-import gd.xml.ParseException;
-
 import java.io.ByteArrayInputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -441,15 +439,14 @@ public class MekHqXmlUtil {
 	}
 
 	public static Entity getEntityFromXmlString(Node xml)
-			throws UnsupportedEncodingException, ParseException,
-			TransformerException {
+			throws UnsupportedEncodingException, TransformerException {
 		MekHQ.logMessage("Executing getEntityFromXmlString(Node)...", 4);
 
 		return getEntityFromXmlString(MekHqXmlUtil.xmlToString(xml));
 	}
 
 	public static Entity getEntityFromXmlString(String xml)
-			throws UnsupportedEncodingException, ParseException {
+			throws UnsupportedEncodingException {
 		MekHQ.logMessage("Executing getEntityFromXmlString(String)...", 4);
 
 		Entity retVal = null;

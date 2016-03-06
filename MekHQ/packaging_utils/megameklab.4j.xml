@@ -6,7 +6,6 @@
   	<mainClass>megameklab.com.MegaMekLab</mainClass>
   	<cp>lib/MegaMek.jar</cp>
   	<cp>lib/MegaMekLab.jar</cp>
-  	<cp>lib/TinyXML.jar</cp>
   </classPath>
   <errTitle></errTitle>
   <cmdLine></cmdLine>

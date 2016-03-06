@@ -43,7 +43,6 @@
         <string>$JAVAROOT/../../../../MekHQ.app/Contents/Resources/Java/lib/TabPanel.jar</string>
         <string>$JAVAROOT/../../../../MekHQ.app/Contents/Resources/Java/lib/stax-1.2.0.jar</string>
         <string>$JAVAROOT/../../../../MekHQ.app/Contents/Resources/Java/lib/stax-api-1.0.1.jar</string>
-        <string>$JAVAROOT/../../../../MekHQ.app/Contents/Resources/Java/lib/TinyXML.jar</string>
         <string>$JAVAROOT/../../../../MekHQ.app/Contents/Resources/Java/lib/j3dcore.jar</string>
         <string>$JAVAROOT/../../../../MekHQ.app/Contents/Resources/Java/lib/j3dutils.jar</string>
         <string>$JAVAROOT/../../../../MekHQ.app/Contents/Resources/Java/lib/vecmath.jar</string>
