@@ -1984,7 +1984,7 @@ public class Campaign implements Serializable {
             	if (roll > 12) roll = 12;
             	int change = numPersonnel * (roll - 5) / 100;
             	while (change < 0 && dependents.size() > 0) {
-            		removePerson(dependents.get(Compute.randomInt(dependents.size())).getId());
+            		removePerson(Utilities.getRandomItem(dependents).getId());
             		change++;
             	}
     			for (int i = 0; i < change; i++) {
@@ -2197,7 +2197,7 @@ public class Campaign implements Serializable {
 	        					}
 	        				}
 	        				if (lList.size() > 0) {
-	        					Lance lance = lList.get(Compute.randomInt(lList.size()));
+	        					Lance lance = Utilities.getRandomItem(lList);
 	        					AtBScenario scenario = new AtBScenario(this, lance, AtBScenario.BASEATTACK, false,
 	        							Lance.getBattleDate(calendar));
 	        					for (int i = 0; i < sList.size(); i++) {
@@ -5169,8 +5169,7 @@ public class Campaign implements Serializable {
 		        weight--;
 		    }
 		}
-		String name = weightedList.get(Compute.randomInt(weightedList
-		                                                         .size()));
+		String name = Utilities.getRandomItem(weightedList);
 		if (name.equals("specialist")) {
 		    String special = Crew.SPECIAL_NONE;
 		    switch (Compute.randomInt(2)) {

@@ -504,7 +504,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
         if(candidates.isEmpty()) {
             return "??";
         }
-        return candidates.get(Compute.randomInt(candidates.size()));
+        return Utilities.getRandomItem(candidates);
     }
 
     public String getAllPrereqDesc() {

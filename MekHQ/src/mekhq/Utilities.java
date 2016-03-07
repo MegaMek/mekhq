@@ -34,10 +34,10 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -115,6 +115,107 @@ public class Utilities {
         }
 
     	return result;
+    }
+
+    /**
+     * Get a random element out of a collection, with equal probability.
+     * <p>
+     * This is the same as calling the following code, only plays nicely with
+     * all collections (including ones like Set which don't implement RandomAccess)
+     * and deals gracefully with empty collections.
+     * <pre>
+     * collection.get(Compute.randomInt(collection.size());
+     * </pre>
+     * 
+     * @return <i>null</i> if the collection itself is null or empty;
+     * can return <i>null</i> if the collection contains <i>null</i> items.
+     * 
+     */
+    public static <T> T getRandomItem(Collection<? extends T> collection) {
+        if((null == collection) || collection.isEmpty()) {
+            return null;
+        }
+        int index = Compute.randomInt(collection.size());
+        Iterator<? extends T> iterator = collection.iterator();
+        for(int i = 0; i < index; ++ i) {
+            iterator.next();
+        }
+        return iterator.next();
+    }
+
+    /**
+     * Get a random element out of a list, with equal probability.
+     * <p>
+     * This is the same as calling the following code,
+     * only deals gracefully with empty lists.
+     * <pre>
+     * list.get(Compute.randomInt(list.size());
+     * </pre>
+     * 
+     * @return <i>null</i> if the list itself is null or empty;
+     * can return <i>null</i> if the list contains <i>null</i> items.
+     * 
+     */
+    public static <T> T getRandomItem(List<? extends T> list) {
+        if((null == list) || list.isEmpty() ) {
+            return null;
+        }
+        int index = Compute.randomInt(list.size());
+        return list.get(index);
+    }
+    
+    /**
+     * @return linear interpolation value between min and max
+     */
+    public static double lerp(double min, double max, double f) {
+        // The order of operations is important here, to not lose precision
+        return min * (1.0 - f) + max * f;
+    }
+    /**
+     * @return linear interpolation value between min and max, rounded to the nearest integer
+     */
+    public static int lerp(int min, int max, double f) {
+        // The order of operations is important here, to not lose precision
+        return (int)Math.round(min * (1.0 - f) + max * f);
+    }
+
+    /**
+     * The method is returns the same as a call to the following code:
+     * <pre>T result = (null != getFirst()) ? getFirst() : getSecond();</pre>
+     * ... with the major difference that getFirst() and getSecond() get evaluated exactly once.
+     * <p>
+     * This means that it doesn't matter if getFirst() is relatively expensive to evaluate
+     * or has side effects. It also means that getSecond() gets evaluated <i>regardless</i> if
+     * it is needed or not. Since Java guarantees the order of evaluation for arguments to be
+     * the same as the order in which they appear (JSR 15.7.4), this makes it more suitable
+     * for re-playable procedural generation and similar method calls with side effects.
+     * 
+     * @return the first argument if it's not <i>null</i>, else the second argument
+     */
+    public static <T> T nonNull(T first, T second) {
+        return (null != first) ? first : second;
+    }
+    
+    /**
+     * For details and caveats, see the two-argument method.
+     * 
+     * @return the first non-<i>null</i> argument, else <i>null</i> if all are <i>null</i>
+     */
+    @SafeVarargs
+    public static <T> T nonNull(T first, T second, T ... others) {
+        if(null != first) {
+            return first;
+        }
+        if(null != second) {
+            return second;
+        }
+        T result = others[0];
+        int index = 1;
+        while((null == result) && (index < others.length)) {
+            result = others[index];
+            ++ index;
+        }
+        return result;
     }
 
     public static ArrayList<AmmoType> getMunitionsFor(Entity entity, AmmoType cur_atype, int techLvl) {
@@ -983,16 +1084,21 @@ public class Utilities {
         return output;
     }
 
-    public static String combineString(Vector<String> vec, String sep) {
-        String output = "";
-        Enumeration<String> eVec = vec.elements();
-        while(eVec.hasMoreElements()) {
-            output += eVec.nextElement();
-            if(eVec.hasMoreElements()) {
-                output += sep;
-            }
+    public static String combineString(Collection<String> vec, String sep) {
+        if((null == vec) || (null == sep)) {
+            return null;
         }
-        return output;
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for( String part : vec ) {
+            if( first ) {
+                first = false;
+            } else {
+                sb.append(sep);
+            }
+            sb.append(part);
+        }
+        return sb.toString();
     }
 
     public static String getRomanNumeralsFromArabicNumber(int level, boolean checkZero) {

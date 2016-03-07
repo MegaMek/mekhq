@@ -39,6 +39,7 @@ import megamek.common.TargetRoll;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
@@ -1128,7 +1129,7 @@ public class PersonnelMarket {
     				clans.add(f);
     			}
     		}
-    		return clans.get(Compute.randomInt(clans.size()));
+    		return Utilities.getRandomItem(clans);
     	}
     	return RandomFactionGenerator.getInstance().getEmployer();
     }

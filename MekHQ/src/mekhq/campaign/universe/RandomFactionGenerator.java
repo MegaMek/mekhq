@@ -39,6 +39,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import megamek.common.Compute;
 import mekhq.MekHQ;
+import mekhq.Utilities;
 import mekhq.campaign.CampaignOptions;
 
 import org.w3c.dom.DOMException;
@@ -563,10 +564,7 @@ public class RandomFactionGenerator implements Serializable {
 	}
 	
 	public String getEmployer() {
-		if (employers.size() > 0) {
-			return employers.get(Compute.randomInt(employers.size()));
-		}
-		return null;
+		return Utilities.getRandomItem(employers);
 	}
 	
 	public String getEnemy(String fName, boolean useRebels) {
@@ -614,7 +612,7 @@ public class RandomFactionGenerator implements Serializable {
 				}
 			}
 			if (enemiesList.size() > 0) {
-				return enemiesList.get(Compute.randomInt(enemiesList.size()));
+				return Utilities.getRandomItem(enemiesList);
 			}
 		}
 		MekHQ.logMessage("Could not find enemy for " + fName);
@@ -674,7 +672,7 @@ public class RandomFactionGenerator implements Serializable {
 	public String getMissionTarget(String attacker, String defender, Date date) {
 		ArrayList<Planet> planetList = getMissionTargetList(attacker, defender, date);
 		if (planetList.size() > 0) {
-			return planetList.get(Compute.randomInt(planetList.size())).getName();
+			return Utilities.getRandomItem(planetList).getName();
 		}
 		return null;
 	}
