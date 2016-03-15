@@ -89,10 +89,8 @@ public class Utilities {
 	private static final int MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24;
 
 	// A couple of arrays for use in the getLevelName() method
-    private static int[]    arabicNumbers = { 1000,  900,  500,  400,  100,   90,
-        50,   40,   10,    9,    5,    4,    1 };
-    private static String[] romanNumerals = { "M",  "CM",  "D",  "CD", "C",  "XC",
-      "L",  "XL",  "X",  "IX", "V",  "IV", "I" };
+    private static int[]    arabicNumbers = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+    private static String[] romanNumerals = "M,CM,D,CD,C,XC,L,XL,X,IX,V,IV,I".split(","); //$NON-NLS-1$ //$NON-NLS-2$
 
     public static int roll3d6() {
         Vector<Integer> rolls = new Vector<Integer>();
@@ -778,41 +776,41 @@ public class Utilities {
 
 	public static String getOptionDisplayName(IOption option) {
 		String name = option.getDisplayableNameWithValue();
-		name = name.replaceAll("\\(.+?\\)", "");
+		name = name.replaceAll("\\(.+?\\)", ""); //$NON-NLS-1$ //$NON-NLS-2$
 		if(option.getType() == IOption.CHOICE) {
-			name += " - " + option.getValue();
+			name += " - " + option.getValue(); //$NON-NLS-1$
 		}
 		return name;
 	}
 
 	public static String printIntegerArray(int[] array) {
-		String values = "";
+		String values = ""; //$NON-NLS-1$
 		for(int i = 0; i < array.length; i++) {
 			values += Integer.toString(array[i]);
 			if(i < (array.length-1)) {
-				values += ",";
+				values += ","; //$NON-NLS-1$
 			}
 		}
 		return values;
 	}
 
 	public static String printDoubleArray(double[] array) {
-        String values = "";
+        String values = ""; //$NON-NLS-1$
         for(int i = 0; i < array.length; i++) {
             values += Double.toString(array[i]);
             if(i < (array.length-1)) {
-                values += ",";
+                values += ","; //$NON-NLS-1$
             }
         }
         return values;
     }
 
 	public static String printBooleanArray(boolean[] array) {
-		String values = "";
+		String values = ""; //$NON-NLS-1$
 		for(int i = 0; i < array.length; i++) {
 			values += Boolean.toString(array[i]);
 			if(i < (array.length-1)) {
-				values += ",";
+				values += ","; //$NON-NLS-1$
 			}
 		}
 		return values;
@@ -862,10 +860,10 @@ public class Utilities {
 			}
 			in.close();
 			out.close();
-			System.out.println("File copied.");
+			System.out.println("File copied."); //$NON-NLS-1$
 		}
 		catch(FileNotFoundException ex){
-			System.out.println(ex.getMessage() + " in the specified directory.");
+			System.out.println(ex.getMessage() + " in the specified directory."); //$NON-NLS-1$
 		}
 		catch(IOException e){
 			System.out.println(e.getMessage());
@@ -1046,29 +1044,29 @@ public class Utilities {
 	        for(int i = 0; i < model.getColumnCount(); i++) {
 	            String s = model.getColumnName(i);
 	            if(null == s) {
-                    s = "";
+                    s = ""; //$NON-NLS-1$
                 }
-                if (s.contains("\"")) {
-                    s = s.replace("\"", "\"\"");
+                if (s.contains("\"")) { //$NON-NLS-1$
+                    s = s.replace("\"", "\"\""); //$NON-NLS-1$ //$NON-NLS-2$
                 }
-                s = "\"" + s + "\"";
-                csv.write(s+",");
+                s = "\"" + s + "\""; //$NON-NLS-1$ //$NON-NLS-2$
+                csv.write(s+","); //$NON-NLS-1$
 	        }
-	        csv.write("\n");
+	        csv.write("\n"); //$NON-NLS-1$
 
 	        for(int i=0; i< model.getRowCount(); i++) {
 	            for(int j=0; j < model.getColumnCount(); j++) {
 	                String s = model.getValueAt(i,j).toString();
 	                if(null == s) {
-	                    s = "";
+	                    s = ""; //$NON-NLS-1$
 	                }
-	                if (s.contains("\"")) {
-	                    s = s.replace("\"", "\"\"");
+	                if (s.contains("\"")) { //$NON-NLS-1$
+	                    s = s.replace("\"", "\"\""); //$NON-NLS-1$ //$NON-NLS-2$
 	                }
-	                s = "\"" + s + "\"";
-	                csv.write(s+",");
+	                s = "\"" + s + "\""; //$NON-NLS-1$ //$NON-NLS-2$
+	                csv.write(s+","); //$NON-NLS-1$
 	            }
-	            csv.write("\n");
+	            csv.write("\n"); //$NON-NLS-1$
 	        }
 	        csv.close();
 
@@ -1104,11 +1102,11 @@ public class Utilities {
     public static String getRomanNumeralsFromArabicNumber(int level, boolean checkZero) {
     	// If we're 0, then we just return an empty string
     	if (checkZero && level == 0) {
-    		return "";
+    		return ""; //$NON-NLS-1$
     	}
 
     	// Roman numeral, prepended with a space for display purposes
-    	String roman = " ";
+    	String roman = " "; //$NON-NLS-1$
         int num = level+1;
 
         for (int i = 0; i < arabicNumbers.length; i++) {
@@ -1124,7 +1122,7 @@ public class Utilities {
     // TODO: Optionize this to allow user to choose roman or arabic numerals
     public static int getArabicNumberFromRomanNumerals(String name) {
     	// If we're 0, then we just return an empty string
-    	if (name.equals("")) {
+    	if (name.equals("")) { //$NON-NLS-1$
     		return 0;
     	}
 
@@ -1157,6 +1155,7 @@ public class Utilities {
 
 		// Sort list with comparator, to compare the Map values
 		Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+			@Override
 			public int compare(Map.Entry<String, Integer> o1,
                                            Map.Entry<String, Integer> o2) {
 				return (o1.getValue()).compareTo(o2.getValue());
