@@ -6,16 +6,27 @@
 
 package mekhq.gui.dialog;
 
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.JSpinner;
+import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.WindowConstants;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -28,28 +39,32 @@ import mekhq.gui.CampaignGUI;
  *
  * @author Jay Lawson
  */
-public class HireBulkPersonnelDialog extends javax.swing.JDialog {
+public class HireBulkPersonnelDialog extends JDialog {
 	private static final long serialVersionUID = -6946480787293179307L;
 
+	private static final Insets ZERO_INSETS = new Insets(0, 0, 0, 0);
+	private static final Insets DEFAULT_INSETS = new Insets(5, 5, 5, 5);
+	
 	private Campaign campaign;
 	
-    private JComboBox<String> choiceType;
+    private JComboBox<PersonTypeItem> choiceType;
     private JComboBox<String> choiceRanks;
     private DefaultComboBoxModel<String> rankModel;
     private JSpinner spnNumber;
     
-    private JLabel lblType;
-    private JLabel lblRank;
-    private JLabel lblNumber;
     private JButton btnHire;
     private JButton btnClose;
     private JPanel panButtons;
-    
+
+	private JCheckBox ageRangeCheck;
+	private JTextField minAge;
+	private JTextField maxAge;
+
     private CampaignGUI hqView;
     
-    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.HireBulkPersonnelDialog");
+    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.HireBulkPersonnelDialog"); //$NON-NLS-1$
 
-    public HireBulkPersonnelDialog(java.awt.Frame parent, boolean modal, Campaign c, CampaignGUI view) {
+    public HireBulkPersonnelDialog(Frame parent, boolean modal, Campaign c, CampaignGUI view) {
         super(parent, modal);
         this.campaign = c;
         this.hqView = view;
@@ -57,127 +72,146 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
         setLocationRelativeTo(getParent());
     }
 
+    private static GridBagConstraints newConstraints(int xPos, int yPos) {
+    	return newConstraints(xPos, yPos, GridBagConstraints.NONE);
+    }
+    
+    private static GridBagConstraints newConstraints(int xPos, int yPos, int fill) {
+    	GridBagConstraints result = new GridBagConstraints();
+    	result.gridx = xPos;
+    	result.gridy = yPos;
+    	result.fill = fill;
+    	result.anchor = GridBagConstraints.WEST;
+    	result.insets = DEFAULT_INSETS;
+    	return result;
+    }
+    
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
+        GridBagConstraints gridBagConstraints;
         
-        choiceType = new javax.swing.JComboBox<String>();
-        choiceRanks = new javax.swing.JComboBox<String>();
+        choiceType = new JComboBox<PersonTypeItem>();
+        choiceRanks = new JComboBox<String>();
 
-        lblType = new javax.swing.JLabel(resourceMap.getString("lblType.text"));
-        lblRank = new javax.swing.JLabel(resourceMap.getString("lblRank.text"));
-        lblNumber = new javax.swing.JLabel(resourceMap.getString("lblNumber.text"));
-        btnHire = new JButton(resourceMap.getString("btnHire.text"));
-        btnClose = new JButton(resourceMap.getString("btnClose.text"));
+        btnHire = new JButton(resourceMap.getString("btnHire.text")); //$NON-NLS-1$
+        btnClose = new JButton(resourceMap.getString("btnClose.text")); //$NON-NLS-1$
         panButtons = new JPanel(new GridBagLayout());
         
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 
-        setTitle(resourceMap.getString("Form.title"));
+        setTitle(resourceMap.getString("Form.title")); //$NON-NLS-1$
         getContentPane().setLayout(new GridBagLayout());
         
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        getContentPane().add(lblType, gridBagConstraints);
+        getContentPane().add(new JLabel(resourceMap.getString("lblType.text")), newConstraints(0, 0)); //$NON-NLS-1$
         
-        DefaultComboBoxModel<String> personTypeModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<PersonTypeItem> personTypeModel = new DefaultComboBoxModel<PersonTypeItem>();
         for(int i = 1; i < Person.T_NUM; i++) {
-        	personTypeModel.addElement(Person.getRoleDesc(i,campaign.getFaction().isClan()));
+        	personTypeModel.addElement(new PersonTypeItem(Person.getRoleDesc(i,campaign.getFaction().isClan()), i));
         }
+        // Add "none" for generic AsTechs
+        personTypeModel.addElement(new PersonTypeItem(Person.getRoleDesc(0, campaign.getFaction().isClan()), 0));
         choiceType.setModel(personTypeModel);
         choiceType.setName("choiceType"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints = newConstraints(1, 0, GridBagConstraints.HORIZONTAL);
         gridBagConstraints.weightx = 1.0;
         choiceType.setSelectedIndex(0);
-        choiceType.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        choiceType.addActionListener(new ActionListener() {
+            @Override
+			public void actionPerformed(ActionEvent evt) {
             	// If we change the type, we need to setup the ranks for that type
             	refreshRanksCombo();
             }
         });
         getContentPane().add(choiceType, gridBagConstraints);
         
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        getContentPane().add(lblRank, gridBagConstraints);
+        getContentPane().add(new JLabel(resourceMap.getString("lblRank.text")), newConstraints(0, 1));
         
         rankModel = new DefaultComboBoxModel<String>();
         choiceRanks.setModel(rankModel);
         choiceRanks.setName("choiceRanks"); // NOI18N
         refreshRanksCombo();
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        
+        gridBagConstraints = newConstraints(1, 1, GridBagConstraints.HORIZONTAL);
         gridBagConstraints.weightx = 1.0;
         getContentPane().add(choiceRanks, gridBagConstraints);
         
         spnNumber = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        getContentPane().add(lblNumber, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        getContentPane().add(new JLabel(resourceMap.getString("lblNumber.text")), newConstraints(0, 2)); //$NON-NLS-1$
         
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints = newConstraints(1, 2);
         gridBagConstraints.weightx = 1.0;
         getContentPane().add(spnNumber, gridBagConstraints);
         
-        btnHire.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        int mainGridPos = 3;
+        
+        if(campaign.isGM()) {
+        	// GM tools
+        	JSeparator sep = new JSeparator();
+        	
+            gridBagConstraints = newConstraints(0, mainGridPos, GridBagConstraints.HORIZONTAL);
+            gridBagConstraints.gridwidth = 2;
+            getContentPane().add(sep, gridBagConstraints);
+            ++ mainGridPos;
+            
+            gridBagConstraints = newConstraints(0, mainGridPos);
+            gridBagConstraints.weightx = 1.0;
+            
+            ageRangeCheck = new JCheckBox("Age range");
+            getContentPane().add(ageRangeCheck, gridBagConstraints);
+            
+            gridBagConstraints = newConstraints(1, mainGridPos);
+            gridBagConstraints.weightx = 1.0;
+
+            JPanel ageRangePanel = new JPanel(new GridBagLayout());
+            getContentPane().add(ageRangePanel, gridBagConstraints);
+            
+            minAge = new JTextField("19", 5); //$NON-NLS-1$
+            minAge.setHorizontalAlignment(JTextField.CENTER);
+            ageRangePanel.add(minAge, newConstraints(0, 0));
+            
+            ageRangePanel.add(new JLabel("↔"), newConstraints(1, 0));
+            
+            maxAge = new JTextField("99", 5); //$NON-NLS-1$
+            maxAge.setHorizontalAlignment(JTextField.CENTER);
+            ageRangePanel.add(maxAge, newConstraints(2, 0));
+            
+            ++ mainGridPos;
+        }
+        
+        btnHire.addActionListener(new ActionListener() {
+            @Override
+			public void actionPerformed(ActionEvent evt) {
                 hire();
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints = newConstraints(0, 0);
+        gridBagConstraints.insets = ZERO_INSETS;
 
         panButtons.add(btnHire, gridBagConstraints);
         gridBagConstraints.gridx++;
 
-        btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnClose.addActionListener(new ActionListener() {
+            @Override
+			public void actionPerformed(ActionEvent evt) {
                 setVisible(false);
             }
         });
         panButtons.add(btnClose, gridBagConstraints);
 
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints = newConstraints(0, mainGridPos, GridBagConstraints.HORIZONTAL);
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         getContentPane().add(panButtons, gridBagConstraints);
         
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }
 
     
     private void hire() {
     	int number = (Integer)spnNumber.getModel().getValue();
     	while(number > 0) {
-    		Person p = campaign.newPerson(choiceType.getSelectedIndex() + 1);
+    		Person p = campaign.newPerson(((PersonTypeItem)choiceType.getSelectedItem()).id);
     		p.setRankNumeric(campaign.getRanks().getRankNumericFromNameAndProfession(p.getProfession(), (String)choiceRanks.getSelectedItem()));
     		if(!campaign.recruitPerson(p)) {
     		    number = 0;
@@ -199,7 +233,16 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
     	rankModel.removeAllElements();
     	
     	// Determine correct profession to pass into the loop
-    	int profession = Person.getProfessionFromPrimaryRole((choiceType.getSelectedIndex() + 1));
+    	int primaryRoleId = ((PersonTypeItem) choiceType.getSelectedItem()).id;
+    	if( 0 == primaryRoleId ) {
+    		// "Nobody" selected
+    		rankModel.addElement(campaign.getRanks().getRank(0).getName(0));
+            choiceRanks.setModel(rankModel);
+            choiceRanks.setSelectedIndex(0);
+            return;
+    	}
+    	
+    	int profession = Person.getProfessionFromPrimaryRole((primaryRoleId));
     	while (campaign.getRanks().isEmptyProfession(profession) && profession != Ranks.RPROF_MW) {
     		profession = campaign.getRanks().getAlternateProfession(profession);
     	}
@@ -222,5 +265,20 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
         }
         choiceRanks.setModel(rankModel);
         choiceRanks.setSelectedIndex(0);
+    }
+    
+    private static class PersonTypeItem {
+    	public String name;
+    	public int id;
+    	
+    	public PersonTypeItem(String name, int id) {
+    		this.name = Objects.requireNonNull(name);
+    		this.id = id;
+    	}
+    	
+    	@Override
+    	public String toString() {
+    		return name;
+    	}
     }
 }
