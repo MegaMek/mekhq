@@ -135,7 +135,7 @@ public class HireBulkPersonnelDialog extends JDialog {
         });
         getContentPane().add(choiceType, gridBagConstraints);
         
-        getContentPane().add(new JLabel(resourceMap.getString("lblRank.text")), newConstraints(0, 1));
+        getContentPane().add(new JLabel(resourceMap.getString("lblRank.text")), newConstraints(0, 1)); //$NON-NLS-1$
         
         rankModel = new DefaultComboBoxModel<String>();
         choiceRanks.setModel(rankModel);
@@ -168,7 +168,7 @@ public class HireBulkPersonnelDialog extends JDialog {
             gridBagConstraints = newConstraints(0, mainGridPos);
             gridBagConstraints.weightx = 1.0;
             
-            JCheckBox ageRangeCheck = new JCheckBox("Age range");
+            JCheckBox ageRangeCheck = new JCheckBox(resourceMap.getString("lblAgeRange.text")); //$NON-NLS-1$
             ageRangeCheck.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -200,7 +200,7 @@ public class HireBulkPersonnelDialog extends JDialog {
             });
             ageRangePanel.add(minAge, newConstraints(0, 0));
             
-            ageRangePanel.add(new JLabel("↔"), newConstraints(1, 0));
+            ageRangePanel.add(new JLabel(resourceMap.getString("lblAgeRangeSeparator.text")), newConstraints(1, 0)); //$NON-NLS-1$
             
             maxAge = new JSpinner(new SpinnerNumberModel(99, 0, 99, 1));
             ((JSpinner.DefaultEditor)maxAge.getEditor()).getTextField().setHorizontalAlignment(JTextField.CENTER);
@@ -308,14 +308,14 @@ public class HireBulkPersonnelDialog extends JDialog {
         for(Rank rank : campaign.getRanks().getAllRanks()) {
             int p = profession;
             // Grab rank from correct profession as needed
-            while (rank.getName(p).startsWith("--") && p != Ranks.RPROF_MW) {
-                if (rank.getName(p).equals("--")) {
+            while (rank.getName(p).startsWith("--") && p != Ranks.RPROF_MW) { //$NON-NLS-1$
+                if (rank.getName(p).equals("--")) { //$NON-NLS-1$
                     p = campaign.getRanks().getAlternateProfession(p);
-                } else if (rank.getName(p).startsWith("--")) {
+                } else if (rank.getName(p).startsWith("--")) { //$NON-NLS-1$
                     p = campaign.getRanks().getAlternateProfession(rank.getName(p));
                 }
             }
-            if (rank.getName(p).equals("-")) {
+            if (rank.getName(p).equals("-")) { //$NON-NLS-1$
                 continue;
             }
             
