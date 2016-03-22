@@ -992,7 +992,6 @@ public class ResolveScenarioTracker {
 				}
 				campaign.removeUnit(unit.getId());
 			} else {
-			    en.setDeployed(false);
 				long currentValue = unit.getValueOfAllMissingParts();
 				campaign.clearGameData(en);
 				// FIXME: Need to implement a "fuel" part just like the "armor" part

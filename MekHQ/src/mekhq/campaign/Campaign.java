@@ -6337,6 +6337,7 @@ public class Campaign implements Serializable {
             m.setUsedThisRound(false);
             m.resetJam();
         }
+        entity.setDeployed(false);
         entity.setPassedThrough(new Vector<Coords>());
         entity.resetFiringArcs();
         entity.resetBays();
