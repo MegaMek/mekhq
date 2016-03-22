@@ -598,7 +598,7 @@ public class Utilities {
             if(addToUnit) {
 				if (!(unit.usesSoloPilot() || unit.usesSoldiers()) && unit.canTakeMoreVesselCrew()) {
 	            	if(null == c.getPerson(p.getId())) {
-	            		c.recruitPerson(p, true);
+	            		c.recruitPerson(p);
 	            	}
 					unit.addVesselCrew(p);
 				}
@@ -613,7 +613,7 @@ public class Utilities {
             }
 			if(addToUnit) {
             	if(null == c.getPerson(navigator.getId())) {
-            		c.recruitPerson(navigator, true);
+            		c.recruitPerson(navigator);
             	}
 				unit.setNavigator(navigator);
 			}
