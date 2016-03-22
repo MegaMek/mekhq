@@ -46,7 +46,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.UUID;
 import java.util.Vector;
 
 import javax.swing.JTable;
@@ -424,7 +423,6 @@ public class Utilities {
     			p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(), 0);
     			p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
     		}
-			p.setId(UUID.randomUUID());
 			drivers.add(p);
 		} else {
 			// Generate drivers for multi-crewed vehicles.
@@ -464,7 +462,6 @@ public class Utilities {
 	    			p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(), 0);
 	    			p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
 	    		}
-				p.setId(UUID.randomUUID());
 	    		drivers.add(p);
 	    	}
 
@@ -515,7 +512,6 @@ public class Utilities {
 		    			p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery()), 0);
 		    			totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
 		    		}
-					p.setId(UUID.randomUUID());
 		    		gunners.add(p);
 		    	}
 
@@ -552,13 +548,11 @@ public class Utilities {
     		    p.setName(commanderName);
     		    nameset = true;
     		}
-			p.setId(UUID.randomUUID());
 			vesselCrew.add(p);
     	}
 
     	if(unit.canTakeNavigator()) {
     		Person p = c.newPerson(Person.T_NAVIGATOR);
-			p.setId(UUID.randomUUID());
     		navigator = p;
     	}
 
@@ -569,7 +563,7 @@ public class Utilities {
             }
             if(addToUnit) {
             	if(null == c.getPerson(p.getId())) {
-            		c.addPersonWithoutId(p, true);
+            		c.recruitPerson(p);
             	}
 				if(unit.usesSoloPilot() || unit.usesSoldiers()) {
 					unit.addPilotOrSoldier(p);
@@ -588,7 +582,7 @@ public class Utilities {
             if(addToUnit) {
 				if (!(unit.usesSoloPilot() || unit.usesSoldiers()) && unit.canTakeMoreGunners()) {
 	            	if(null == c.getPerson(p.getId())) {
-	            		c.addPersonWithoutId(p, true);
+	            		c.recruitPerson(p);
 	            	}
 					unit.addGunner(p);
 				}
@@ -604,7 +598,7 @@ public class Utilities {
             if(addToUnit) {
 				if (!(unit.usesSoloPilot() || unit.usesSoldiers()) && unit.canTakeMoreVesselCrew()) {
 	            	if(null == c.getPerson(p.getId())) {
-	            		c.addPersonWithoutId(p, true);
+	            		c.recruitPerson(p, true);
 	            	}
 					unit.addVesselCrew(p);
 				}
@@ -619,7 +613,7 @@ public class Utilities {
             }
 			if(addToUnit) {
             	if(null == c.getPerson(navigator.getId())) {
-            		c.addPersonWithoutId(navigator, true);
+            		c.recruitPerson(navigator, true);
             	}
 				unit.setNavigator(navigator);
 			}
