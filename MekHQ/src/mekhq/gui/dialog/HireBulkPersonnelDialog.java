@@ -12,6 +12,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.GregorianCalendar;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -27,7 +28,14 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.WindowConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
+import org.joda.time.DateTime;
+import org.joda.time.Days;
+import org.joda.time.Years;
+
+import megamek.common.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Rank;
@@ -40,13 +48,13 @@ import mekhq.gui.CampaignGUI;
  * @author Jay Lawson
  */
 public class HireBulkPersonnelDialog extends JDialog {
-	private static final long serialVersionUID = -6946480787293179307L;
+    private static final long serialVersionUID = -6946480787293179307L;
 
-	private static final Insets ZERO_INSETS = new Insets(0, 0, 0, 0);
-	private static final Insets DEFAULT_INSETS = new Insets(5, 5, 5, 5);
-	
-	private Campaign campaign;
-	
+    private static final Insets ZERO_INSETS = new Insets(0, 0, 0, 0);
+    private static final Insets DEFAULT_INSETS = new Insets(5, 5, 5, 5);
+    
+    private Campaign campaign;
+    
     private JComboBox<PersonTypeItem> choiceType;
     private JComboBox<String> choiceRanks;
     private DefaultComboBoxModel<String> rankModel;
@@ -56,11 +64,14 @@ public class HireBulkPersonnelDialog extends JDialog {
     private JButton btnClose;
     private JPanel panButtons;
 
-	private JCheckBox ageRangeCheck;
-	private JTextField minAge;
-	private JTextField maxAge;
+    private JSpinner minAge;
+    private JSpinner maxAge;
 
     private CampaignGUI hqView;
+    
+    private boolean useAge = false;
+    private int minAgeVal = 19;
+    private int maxAgeVal = 99;
     
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.HireBulkPersonnelDialog"); //$NON-NLS-1$
 
@@ -73,17 +84,17 @@ public class HireBulkPersonnelDialog extends JDialog {
     }
 
     private static GridBagConstraints newConstraints(int xPos, int yPos) {
-    	return newConstraints(xPos, yPos, GridBagConstraints.NONE);
+        return newConstraints(xPos, yPos, GridBagConstraints.NONE);
     }
     
     private static GridBagConstraints newConstraints(int xPos, int yPos, int fill) {
-    	GridBagConstraints result = new GridBagConstraints();
-    	result.gridx = xPos;
-    	result.gridy = yPos;
-    	result.fill = fill;
-    	result.anchor = GridBagConstraints.WEST;
-    	result.insets = DEFAULT_INSETS;
-    	return result;
+        GridBagConstraints result = new GridBagConstraints();
+        result.gridx = xPos;
+        result.gridy = yPos;
+        result.fill = fill;
+        result.anchor = GridBagConstraints.WEST;
+        result.insets = DEFAULT_INSETS;
+        return result;
     }
     
     private void initComponents() {
@@ -106,7 +117,7 @@ public class HireBulkPersonnelDialog extends JDialog {
         
         DefaultComboBoxModel<PersonTypeItem> personTypeModel = new DefaultComboBoxModel<PersonTypeItem>();
         for(int i = 1; i < Person.T_NUM; i++) {
-        	personTypeModel.addElement(new PersonTypeItem(Person.getRoleDesc(i,campaign.getFaction().isClan()), i));
+            personTypeModel.addElement(new PersonTypeItem(Person.getRoleDesc(i,campaign.getFaction().isClan()), i));
         }
         // Add "none" for generic AsTechs
         personTypeModel.addElement(new PersonTypeItem(Person.getRoleDesc(0, campaign.getFaction().isClan()), 0));
@@ -117,9 +128,9 @@ public class HireBulkPersonnelDialog extends JDialog {
         choiceType.setSelectedIndex(0);
         choiceType.addActionListener(new ActionListener() {
             @Override
-			public void actionPerformed(ActionEvent evt) {
-            	// If we change the type, we need to setup the ranks for that type
-            	refreshRanksCombo();
+            public void actionPerformed(ActionEvent evt) {
+                // If we change the type, we need to setup the ranks for that type
+                refreshRanksCombo();
             }
         });
         getContentPane().add(choiceType, gridBagConstraints);
@@ -146,9 +157,9 @@ public class HireBulkPersonnelDialog extends JDialog {
         int mainGridPos = 3;
         
         if(campaign.isGM()) {
-        	// GM tools
-        	JSeparator sep = new JSeparator();
-        	
+            // GM tools
+            JSeparator sep = new JSeparator();
+            
             gridBagConstraints = newConstraints(0, mainGridPos, GridBagConstraints.HORIZONTAL);
             gridBagConstraints.gridwidth = 2;
             getContentPane().add(sep, gridBagConstraints);
@@ -157,7 +168,15 @@ public class HireBulkPersonnelDialog extends JDialog {
             gridBagConstraints = newConstraints(0, mainGridPos);
             gridBagConstraints.weightx = 1.0;
             
-            ageRangeCheck = new JCheckBox("Age range");
+            JCheckBox ageRangeCheck = new JCheckBox("Age range");
+            ageRangeCheck.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    useAge = ((JCheckBox)e.getSource()).isSelected();
+                    minAge.setEnabled(useAge);
+                    maxAge.setEnabled(useAge);
+                }
+            });
             getContentPane().add(ageRangeCheck, gridBagConstraints);
             
             gridBagConstraints = newConstraints(1, mainGridPos);
@@ -166,14 +185,37 @@ public class HireBulkPersonnelDialog extends JDialog {
             JPanel ageRangePanel = new JPanel(new GridBagLayout());
             getContentPane().add(ageRangePanel, gridBagConstraints);
             
-            minAge = new JTextField("19", 5); //$NON-NLS-1$
-            minAge.setHorizontalAlignment(JTextField.CENTER);
+            minAge = new JSpinner(new SpinnerNumberModel(19, 0, 99, 1));
+            ((JSpinner.DefaultEditor)minAge.getEditor()).getTextField().setHorizontalAlignment(JTextField.CENTER);
+            ((JSpinner.DefaultEditor)minAge.getEditor()).getTextField().setColumns(3);
+            minAge.setEnabled(false);
+            minAge.addChangeListener(new ChangeListener() {
+                @Override
+                public void stateChanged(ChangeEvent e) {
+                    minAgeVal = (Integer)minAge.getModel().getValue();
+                    if(minAgeVal > maxAgeVal) {
+                        maxAge.setValue(minAgeVal);
+                    }
+                }
+            });
             ageRangePanel.add(minAge, newConstraints(0, 0));
             
             ageRangePanel.add(new JLabel("↔"), newConstraints(1, 0));
             
-            maxAge = new JTextField("99", 5); //$NON-NLS-1$
-            maxAge.setHorizontalAlignment(JTextField.CENTER);
+            maxAge = new JSpinner(new SpinnerNumberModel(99, 0, 99, 1));
+            ((JSpinner.DefaultEditor)maxAge.getEditor()).getTextField().setHorizontalAlignment(JTextField.CENTER);
+            ((JSpinner.DefaultEditor)maxAge.getEditor()).getTextField().setColumns(3);
+            maxAge.setEnabled(false);
+            maxAge.addChangeListener(new ChangeListener() {
+                @Override
+                public void stateChanged(ChangeEvent e) {
+                    maxAgeVal = (Integer)maxAge.getModel().getValue();
+                    if(maxAgeVal < minAgeVal) {
+                        minAge.setValue(maxAgeVal);
+                    }
+                }
+            });
+            //maxAge.setAlignmentY(CENTER_ALIGNMENT);
             ageRangePanel.add(maxAge, newConstraints(2, 0));
             
             ++ mainGridPos;
@@ -181,7 +223,7 @@ public class HireBulkPersonnelDialog extends JDialog {
         
         btnHire.addActionListener(new ActionListener() {
             @Override
-			public void actionPerformed(ActionEvent evt) {
+            public void actionPerformed(ActionEvent evt) {
                 hire();
             }
         });
@@ -193,7 +235,7 @@ public class HireBulkPersonnelDialog extends JDialog {
 
         btnClose.addActionListener(new ActionListener() {
             @Override
-			public void actionPerformed(ActionEvent evt) {
+            public void actionPerformed(ActionEvent evt) {
                 setVisible(false);
             }
         });
@@ -207,19 +249,35 @@ public class HireBulkPersonnelDialog extends JDialog {
         pack();
     }
 
-    
     private void hire() {
-    	int number = (Integer)spnNumber.getModel().getValue();
-    	while(number > 0) {
-    		Person p = campaign.newPerson(((PersonTypeItem)choiceType.getSelectedItem()).id);
-    		p.setRankNumeric(campaign.getRanks().getRankNumericFromNameAndProfession(p.getProfession(), (String)choiceRanks.getSelectedItem()));
-    		if(!campaign.recruitPerson(p)) {
-    		    number = 0;
-    		} else {
-    		    number--;
-    		}
-    	}
-    	hqView.refreshPersonnelList();
+        int number = (Integer)spnNumber.getModel().getValue();
+        GregorianCalendar today = campaign.getCalendar();
+        DateTime earliestBirthDate = null;
+        DateTime latestBirthDate = null;
+        if(useAge) {
+            // One day before birthday
+            earliestBirthDate = new DateTime(today).minus(Years.years(maxAgeVal + 1)).plus(Days.ONE);
+            // Just the birthday
+            latestBirthDate = new DateTime(today).minus(Years.years(minAgeVal));
+        } 
+        while(number > 0) {
+            Person p = campaign.newPerson(((PersonTypeItem)choiceType.getSelectedItem()).id);
+            p.setRankNumeric(campaign.getRanks().getRankNumericFromNameAndProfession(p.getProfession(), (String)choiceRanks.getSelectedItem()));
+            if(useAge) {
+                int age = p.getAge(today);
+                if((age > maxAgeVal) || (age < minAgeVal)) {
+                    int days = Days.daysBetween(earliestBirthDate, latestBirthDate).getDays();
+                    DateTime birthDay = earliestBirthDate.plus(Days.days(Compute.randomInt(days)));
+                    p.setBirthday(birthDay.toGregorianCalendar());
+                }
+            }
+            if(!campaign.recruitPerson(p)) {
+                number = 0;
+            } else {
+                number--;
+            }
+        }
+        hqView.refreshPersonnelList();
         hqView.refreshPatientList();
         hqView.refreshTechsList();
         hqView.refreshDoctorsList();
@@ -229,56 +287,56 @@ public class HireBulkPersonnelDialog extends JDialog {
     }
    
     private void refreshRanksCombo() {
-    	// Clear everything and start over! Wee!
-    	rankModel.removeAllElements();
-    	
-    	// Determine correct profession to pass into the loop
-    	int primaryRoleId = ((PersonTypeItem) choiceType.getSelectedItem()).id;
-    	if( 0 == primaryRoleId ) {
-    		// "Nobody" selected
-    		rankModel.addElement(campaign.getRanks().getRank(0).getName(0));
+        // Clear everything and start over! Wee!
+        rankModel.removeAllElements();
+        
+        // Determine correct profession to pass into the loop
+        int primaryRoleId = ((PersonTypeItem) choiceType.getSelectedItem()).id;
+        if(0 == primaryRoleId) {
+            // "Nobody" selected
+            rankModel.addElement(campaign.getRanks().getRank(0).getName(0));
             choiceRanks.setModel(rankModel);
             choiceRanks.setSelectedIndex(0);
             return;
-    	}
-    	
-    	int profession = Person.getProfessionFromPrimaryRole((primaryRoleId));
-    	while (campaign.getRanks().isEmptyProfession(profession) && profession != Ranks.RPROF_MW) {
-    		profession = campaign.getRanks().getAlternateProfession(profession);
-    	}
-    	
+        }
+        
+        int profession = Person.getProfessionFromPrimaryRole((primaryRoleId));
+        while (campaign.getRanks().isEmptyProfession(profession) && profession != Ranks.RPROF_MW) {
+            profession = campaign.getRanks().getAlternateProfession(profession);
+        }
+        
         for(Rank rank : campaign.getRanks().getAllRanks()) {
-        	int p = profession;
-        	// Grab rank from correct profession as needed
-        	while (rank.getName(p).startsWith("--") && p != Ranks.RPROF_MW) {
-            	if (rank.getName(p).equals("--")) {
-            		p = campaign.getRanks().getAlternateProfession(p);
-            	} else if (rank.getName(p).startsWith("--")) {
-            		p = campaign.getRanks().getAlternateProfession(rank.getName(p));
-            	}
-        	}
-        	if (rank.getName(p).equals("-")) {
-        		continue;
-        	}
-        	
-        	rankModel.addElement(rank.getName(p));
+            int p = profession;
+            // Grab rank from correct profession as needed
+            while (rank.getName(p).startsWith("--") && p != Ranks.RPROF_MW) {
+                if (rank.getName(p).equals("--")) {
+                    p = campaign.getRanks().getAlternateProfession(p);
+                } else if (rank.getName(p).startsWith("--")) {
+                    p = campaign.getRanks().getAlternateProfession(rank.getName(p));
+                }
+            }
+            if (rank.getName(p).equals("-")) {
+                continue;
+            }
+            
+            rankModel.addElement(rank.getName(p));
         }
         choiceRanks.setModel(rankModel);
         choiceRanks.setSelectedIndex(0);
     }
     
     private static class PersonTypeItem {
-    	public String name;
-    	public int id;
-    	
-    	public PersonTypeItem(String name, int id) {
-    		this.name = Objects.requireNonNull(name);
-    		this.id = id;
-    	}
-    	
-    	@Override
-    	public String toString() {
-    		return name;
-    	}
+        public String name;
+        public int id;
+        
+        public PersonTypeItem(String name, int id) {
+            this.name = Objects.requireNonNull(name);
+            this.id = id;
+        }
+        
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 }
