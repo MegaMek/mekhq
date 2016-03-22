@@ -562,6 +562,9 @@ public class Utilities {
                 nameset = true;
             }
             if(addToUnit) {
+            	if(null == c.getPerson(p.getId())) {
+            		c.recruitPerson(p);
+            	}
 				if(unit.usesSoloPilot() || unit.usesSoldiers()) {
 					unit.addPilotOrSoldier(p);
 				} else {
@@ -578,6 +581,9 @@ public class Utilities {
             }
             if(addToUnit) {
 				if (!(unit.usesSoloPilot() || unit.usesSoldiers()) && unit.canTakeMoreGunners()) {
+	            	if(null == c.getPerson(p.getId())) {
+	            		c.recruitPerson(p);
+	            	}
 					unit.addGunner(p);
 				}
             }
@@ -591,6 +597,9 @@ public class Utilities {
             }
             if(addToUnit) {
 				if (!(unit.usesSoloPilot() || unit.usesSoldiers()) && unit.canTakeMoreVesselCrew()) {
+	            	if(null == c.getPerson(p.getId())) {
+	            		c.recruitPerson(p);
+	            	}
 					unit.addVesselCrew(p);
 				}
             }
@@ -603,6 +612,9 @@ public class Utilities {
                 nameset = true;
             }
 			if(addToUnit) {
+            	if(null == c.getPerson(navigator.getId())) {
+            		c.recruitPerson(navigator);
+            	}
 				unit.setNavigator(navigator);
 			}
 	        newCrew.add(navigator);
