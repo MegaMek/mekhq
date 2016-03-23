@@ -24,6 +24,7 @@ import megamek.common.Mounted;
 import megamek.common.Tank;
 import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
+import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Kill;
 import mekhq.campaign.LogEntry;
@@ -407,6 +408,17 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             		"Divorced from " + selectedPerson.getFullName());
         		selectedPerson.addLogEntry(gui.getCampaign().getDate(),
                     "Divorced from " + selectedPerson.getSpouse().getFullName());
+        		if (selectedPerson.getMaidenName() != null) {
+        		    selectedPerson.setName(selectedPerson.getName().split(" ", 2)[0] 
+        		            + " " 
+        		            + selectedPerson.getMaidenName());
+        		}
+        		if (selectedPerson.getSpouse().getMaidenName() != null) {
+        		    Person spouse = selectedPerson.getSpouse();
+        		    spouse.setName(spouse.getName().split(" ", 2)[0]
+        		            + " "
+        		            + spouse.getMaidenName());
+        		}
         	}
             selectedPerson.getSpouse().setSpouseID(null);
             selectedPerson.setSpouseID(null);
@@ -414,6 +426,38 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
         } else if (command.contains("SPOUSE")) {
             Person spouse = gui.getCampaign().getPerson(
                     UUID.fromString(st.nextToken()));
+            String surnameOption = st.nextToken();
+            
+            String selectedSurname = selectedPerson.getName().split(" ", 2)[1];
+            String spouseSurname = spouse.getName().split(" ", 2)[1];
+            
+            switch (surnameOption) {
+                case "No Change":
+                    break;
+                case "Spouse takes your surname":
+                    spouse.setName(spouse.getName().split(" ", 2)[0] + " " + selectedSurname);
+                    spouse.setMaidenName(spouseSurname);
+                    break;
+                case "Take spouses surname":
+                    selectedPerson.setName(selectedPerson.getName().split(" ", 2)[0] + " " + spouseSurname);
+                    selectedPerson.setMaidenName(selectedSurname);
+                    break;
+                case "Hyphenate your surname with spouses":
+                    selectedPerson.setName(selectedPerson.getName().split(" ", 2)[0] + " " + selectedSurname + "-" + spouseSurname);
+                    selectedPerson.setMaidenName(selectedSurname);
+                    break;
+                case "Spouse hyphenates surname with yours":
+                    spouse.setName(spouse.getName().split(" ", 2)[0] + " " + spouseSurname+ "-" + selectedSurname);
+                    spouse.setMaidenName(spouseSurname);
+                    break;
+                default:
+                    spouse.setName(spouse.getName().split(" ", 2)[0] + " " + "ImaError");
+                    MekHQ.logMessage("Unknown error in Surname chooser between " 
+                                    + selectedPerson.getFullName() + " and "
+                                    + spouse.getFullName());
+                    break;                
+            }
+            
             spouse.setSpouseID(selectedPerson.getId());
             spouse.addLogEntry(gui.getCampaign().getDate(), "Marries "
                     + selectedPerson.getFullName());
@@ -1511,6 +1555,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 if (person.getAge(gui.getCampaign().getCalendar()) > 13
                         && person.getSpouseID() == null) {
                     menu = new JMenu("Choose Spouse (Mate)");
+                    JMenuItem surnameMenu;
+                    JMenu spouseMenu;
+                    String type;
+                    String baldy;
                     for (Person ps : gui.getCampaign().getPersonnel()) {
                         if (person.safeSpouse(ps) && !ps.isDeadOrMIA()) {
                         	String pStatus = "";
@@ -1520,17 +1568,50 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         	if (ps.isBondsman()) {
                         		pStatus = "Bondsman ";
                         	}
-                            menuItem = new JMenuItem(
+                        	spouseMenu = new JMenu(
                             		pStatus
                                 + ps.getFullName()
                                 + ", "
                                 + ps.getAge(gui.getCampaign()
                                     .getCalendar()) + ", "
                                 + ps.getRoleDesc());
-                            menuItem.setActionCommand("SPOUSE|"
-                                    + ps.getId().toString());
-                            menuItem.addActionListener(this);
-                            menu.add(menuItem);
+                            
+                            type = "No Change";
+                            surnameMenu = new JMenuItem(type);
+                            surnameMenu.setActionCommand("SPOUSE|" + ps.getId().toString()
+                                    + "|" + type);
+                            surnameMenu.addActionListener(this);
+                            spouseMenu.add(surnameMenu);
+                            if (!ps.isClanner() && !person.isClanner()) {
+                                type = "Spouse takes your surname";
+                                surnameMenu = new JMenuItem(type);
+                                surnameMenu.setActionCommand("SPOUSE|" + ps.getId().toString()
+                                        + "|" + type);
+                                surnameMenu.addActionListener(this);
+                                spouseMenu.add(surnameMenu);
+                                type = "Take spouses surname";
+                                surnameMenu = new JMenuItem(type);
+                                surnameMenu.setActionCommand("SPOUSE|" + ps.getId().toString()
+                                        + "|" + type);
+                                surnameMenu.addActionListener(this);
+                                spouseMenu.add(surnameMenu);
+                                type = "Hyphenate your surname with spouses";
+                                surnameMenu = new JMenuItem(type);
+                                surnameMenu.setActionCommand("SPOUSE|" + ps.getId().toString()
+                                        + "|" + type);
+                                surnameMenu.addActionListener(this);
+                                spouseMenu.add(surnameMenu);
+                                type = "Spouse hyphenates surname with yours";
+                                surnameMenu = new JMenuItem(type);
+                                surnameMenu.setActionCommand("SPOUSE|" + ps.getId().toString()
+                                        + "|" + type);
+                                surnameMenu.addActionListener(this);
+                                spouseMenu.add(surnameMenu);
+                            }
+                            //menuItem.setActionCommand("SPOUSE|"
+                            //        + ps.getId().toString());
+                            //menuItem.addActionListener(this);
+                            menu.add(spouseMenu);
                         }
                     }
                     if (menu.getItemCount() > 30) {
