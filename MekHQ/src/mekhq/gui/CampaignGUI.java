@@ -4719,20 +4719,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public Part getPartByNameAndDetails(String pnd) {
-    	ArrayList<Part> store = getCampaign().getPartsStore().getInventory();
-    	for (Part p : store) {
-    		String pname = p.getName();
-			String details = p.getDetails();
-			details = details.replaceFirst("\\d+\\shit\\(s\\),\\s", "");
-		    details = details.replaceFirst("\\d+\\shit\\(s\\)", "");
-		    if (details.length() > 0 && !(p instanceof Armor || p instanceof BaArmor || p instanceof ProtomekArmor)) {
-		    	pname +=  " (" + details + ")";
-		    }
-		    if (pname.equals(pnd)) {
-		    	return p;
-		    }
-    	}
-    	return null;
+    	return getCampaign().getPartsStore().getByNameAndDetails(pnd);
     }
 
     public void refreshOverview() {
@@ -4812,7 +4799,7 @@ public class CampaignGUI extends JPanel {
 	        		refreshAcquireList();
 	        		refreshPartsList();
 	        		refreshFinancialTransactions();
-	                refreshOverview();
+	                //refreshOverview();
 	            }
 	        });
     		gbc.gridx = 2;
@@ -4830,7 +4817,7 @@ public class CampaignGUI extends JPanel {
 	        		refreshAcquireList();
 	        		refreshPartsList();
 	        		refreshFinancialTransactions();
-	                refreshOverview();
+	                //refreshOverview();
 	            }
 	        });
     		gbc.gridx = 3;
@@ -4845,7 +4832,7 @@ public class CampaignGUI extends JPanel {
 	        		refreshAcquireList();
 	        		refreshPartsList();
 	        		refreshFinancialTransactions();
-	                refreshOverview();
+	                //refreshOverview();
 	            }
 	        });
     		gbc.gridx = 4;
@@ -4867,7 +4854,7 @@ public class CampaignGUI extends JPanel {
 	        		refreshAcquireList();
 	        		refreshPartsList();
 	        		refreshFinancialTransactions();
-	                refreshOverview();
+	                //refreshOverview();
 	            }
 	        });
     		gbc.gridx = 5;

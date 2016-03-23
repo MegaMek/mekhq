@@ -25,6 +25,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 import megamek.common.Aero;
 import megamek.common.AmmoType;
@@ -93,15 +96,23 @@ public class PartsStore implements Serializable {
 	 */
 	private static final long serialVersionUID = 1686222527383868364L;
 
+	private static int EXPECTED_SIZE = 50000;
+	
 	private ArrayList<Part> parts;
+	private Map<String, Part> nameAndDetailMap;
 
 	public PartsStore(Campaign c) {
-		parts = new ArrayList<Part>();
+		parts = new ArrayList<Part>(EXPECTED_SIZE);
+		nameAndDetailMap = new HashMap<String, Part>(EXPECTED_SIZE);
 		stock(c);
 	}
 
 	public ArrayList<Part> getInventory() {
 		return parts;
+	}
+	
+	public Part getByNameAndDetails(String nameAndDetails) {
+		return nameAndDetailMap.get(nameAndDetails);
 	}
 
 	public void stock(Campaign c) {
@@ -117,8 +128,22 @@ public class PartsStore implements Serializable {
 		stockProtomekLocations(c);
 		stockProtomekComponents(c);
 		stockBattleArmorSuits(c);
+		
+		Pattern cleanUp1 = Pattern.compile("\\d+\\shit\\(s\\),\\s"); //$NON-NLS-1$
+		Pattern cleanUp2 = Pattern.compile("\\d+\\shit\\(s\\)"); //$NON-NLS-1$
+		StringBuilder sb = new StringBuilder();
 		for(Part p : parts) {
 			p.setBrandNew(true);
+			sb.setLength(0);
+			sb.append(p.getName());
+			if(!(p instanceof Armor || p instanceof BaArmor || p instanceof ProtomekArmor)) {
+				String details = p.getDetails();
+				details = cleanUp2.matcher(cleanUp1.matcher(details).replaceFirst("")).replaceFirst(""); //$NON-NLS-1$ //$NON-NLS-2$
+				if (details.length() > 0) {
+					sb.append(" (").append(details).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+		    }
+			nameAndDetailMap.put(sb.toString(), p);
 		}
 	}
 
