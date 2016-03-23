@@ -720,6 +720,17 @@ public class CampaignGUI extends JPanel {
                 resourceMap.getString("panOverview.TabConstraints.tabTitle"),
                 panOverview); // NOI18N
 
+        // The finance tab can be a pain to update when dealing with large units.
+        // Refresh it on tab change to that panel instead.
+        tabMain.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if(tabMain.getSelectedComponent() == panFinances) { // Yes, identity check
+					refreshFinancialReport();
+				}
+				
+			}
+		});
         initMain();
         initTopButtons();
         initStatusBar();
@@ -4798,7 +4809,7 @@ public class CampaignGUI extends JPanel {
 	            	refreshReport();
 	        		refreshAcquireList();
 	        		refreshPartsList();
-	        		refreshFinancialTransactions();
+	        		//refreshFinancialTransactions();
 	                //refreshOverview();
 	            }
 	        });
@@ -4816,7 +4827,7 @@ public class CampaignGUI extends JPanel {
 	            	refreshReport();
 	        		refreshAcquireList();
 	        		refreshPartsList();
-	        		refreshFinancialTransactions();
+	        		//refreshFinancialTransactions();
 	                //refreshOverview();
 	            }
 	        });
@@ -4828,10 +4839,10 @@ public class CampaignGUI extends JPanel {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {
 	            	Part p = getPartByNameAndDetails(pn);
 	            	getCampaign().addPart(p.clone(), 0);
-	            	refreshReport();
+	            	//refreshReport();
 	        		refreshAcquireList();
 	        		refreshPartsList();
-	        		refreshFinancialTransactions();
+	        		//refreshFinancialTransactions();
 	                //refreshOverview();
 	            }
 	        });
@@ -4850,10 +4861,10 @@ public class CampaignGUI extends JPanel {
 	    				getCampaign().addPart(p.clone(), 0);
 	    		        quantity--;
 	    		    }
-	            	refreshReport();
+	            	//refreshReport();
 	        		refreshAcquireList();
 	        		refreshPartsList();
-	        		refreshFinancialTransactions();
+	        		//refreshFinancialTransactions();
 	                //refreshOverview();
 	            }
 	        });
@@ -6560,8 +6571,6 @@ public class CampaignGUI extends JPanel {
 
     public void refreshReport() {
         panLog.refreshLog(getCampaign().getCurrentReportHTML());
-        // scrLog.setViewportView(panLog);
-        logDialog.refreshLog();
     }
 
     public void refreshOrganization() {

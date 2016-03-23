@@ -23,13 +23,21 @@ package mekhq.gui;
 
 
 import java.awt.BorderLayout;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.Document;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
 
 /**
  * This is a panel for displaying the reporting log for each day. We are putting it into
@@ -77,7 +85,16 @@ public class DailyReportLogPanel extends JPanel {
 
     public void refreshLog(String s) {
         logText = s;
-        txtLog.setText(logText);
+        //txtLog.setText(logText); -- NO. BAD. DON'T DO THIS.
+        Reader stringReader = new StringReader(logText);
+        HTMLEditorKit htmlKit = new HTMLEditorKit();
+        HTMLDocument blank = (HTMLDocument) htmlKit.createDefaultDocument();
+        try {
+			htmlKit.read(stringReader, blank, 0);
+		} catch (Exception e) {
+			// Ignore
+		}
+        txtLog.setDocument(blank);
     }
 
     public String getLogText() {

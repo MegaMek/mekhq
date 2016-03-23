@@ -235,6 +235,7 @@ public class Campaign implements Serializable {
     private Ranks ranks;
 
     private ArrayList<String> currentReport;
+    private transient String currentReportHTML;
 
     private boolean overtime;
     private boolean gmMode;
@@ -272,6 +273,7 @@ public class Campaign implements Serializable {
         player = new Player(0, "self");
         game.addPlayer(0, player);
         currentReport = new ArrayList<String>();
+        currentReportHTML = "";
         calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
         dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");
         shortDateFormat = new SimpleDateFormat("yyyyMMdd");
@@ -1176,12 +1178,7 @@ public class Campaign implements Serializable {
     }
 
     public String getCurrentReportHTML() {
-        String toReturn = "";
-        // lets do the report backwards
-        for (String s : currentReport) {
-            toReturn += s + "<br/><br/>";
-        }
-        return toReturn;
+    	return currentReportHTML;
     }
 
 	/**
@@ -1946,6 +1943,7 @@ public class Campaign implements Serializable {
     public void newDay() {
         calendar.add(Calendar.DAY_OF_MONTH, 1);
         currentReport.clear();
+        currentReportHTML = "";
         addReport("<b>" + getDateAsString() + "</b>");
 
         if (calendar.get(Calendar.DAY_OF_YEAR) == 1) {
@@ -2937,6 +2935,11 @@ public class Campaign implements Serializable {
 
     public void addReport(String r) {
         currentReport.add(r);
+        if( currentReportHTML.length() > 0 ) {
+        	currentReportHTML = currentReportHTML + "<br/><br/>" + r;
+        } else {
+        	currentReportHTML = r;
+        }
     }
 
     public void addReports(ArrayList<String> reports) {
@@ -4746,6 +4749,7 @@ public class Campaign implements Serializable {
             retVal.ranks = new Ranks(rankSystem);
             retVal.ranks.setOldRankSystem(rankSystem);
         }
+        retVal.currentReportHTML = Utilities.combineString(retVal.currentReport, "<br/><br/>");
     }
 
     private static void processLanceNodes(Campaign retVal, Node wn) {
