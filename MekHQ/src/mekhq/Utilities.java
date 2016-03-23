@@ -56,6 +56,7 @@ import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
 import megamek.common.Compute;
 import megamek.common.ConvFighter;
+import megamek.common.Coords;
 import megamek.common.Crew;
 import megamek.common.Entity;
 import megamek.common.Infantry;
@@ -169,12 +170,44 @@ public class Utilities {
         // The order of operations is important here, to not lose precision
         return min * (1.0 - f) + max * f;
     }
+    
     /**
      * @return linear interpolation value between min and max, rounded to the nearest integer
      */
     public static int lerp(int min, int max, double f) {
         // The order of operations is important here, to not lose precision
         return (int)Math.round(min * (1.0 - f) + max * f);
+    }
+    
+    /**
+     * @return linear interpolation value between min and max, rounded to the nearest coordinate
+     * <p>
+     * For theory behind the method used, see: http://www.redblobgames.com/grids/hexagons/
+     */
+    public static Coords lerp(Coords min, Coords max, double f) {
+    	int minX = min.getX();
+    	int minZ = min.getY() - (min.getX() - (min.getX() & 1)) / 2;
+    	int minY = - minX - minZ;
+    	int maxX = max.getX();
+    	int maxZ = max.getY() - (max.getX() - (max.getX() & 1)) / 2;
+    	int maxY = - maxX - maxZ;
+    	double lerpX = lerp((double)minX, (double)maxX, f);
+    	double lerpY = lerp((double)minY, (double)maxY, f);
+    	double lerpZ = lerp((double)minZ, (double)maxZ, f);
+    	int resultX = (int) Math.round(lerpX);
+    	int resultY = (int) Math.round(lerpY);
+    	int resultZ = (int) Math.round(lerpZ);
+    	double diffX = Math.abs(resultX * 1.0 - lerpX);
+    	double diffY = Math.abs(resultY * 1.0 - lerpY);
+    	double diffZ = Math.abs(resultZ * 1.0 - lerpZ);
+    	if((diffX > diffY) && (diffX > diffZ)) {
+    		resultX = - resultY - resultZ;
+    	} else if(diffY > diffZ) {
+    		resultY = - resultX - resultZ;
+    	} else {
+    		resultZ = - resultX - resultY;
+    	}
+    	return new Coords(resultX, resultZ + (resultX - (resultX & 1)) / 2);
     }
 
     /**
