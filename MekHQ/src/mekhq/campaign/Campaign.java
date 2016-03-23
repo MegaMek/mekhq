@@ -1120,7 +1120,11 @@ public class Campaign implements Serializable {
     		if (p instanceof StructuralIntegrity) {
     			continue;
     		}
-
+			// Replace a "missing" part with a corresponding "new" one.
+			boolean missingPart = (p instanceof MissingPart);
+    		if(missingPart) {
+    			p = ((MissingPart) p).getNewPart();
+    		}
     		String pname = p.getName();
 			Unit u = p.getUnit();
 			if (!(p instanceof MissingBattleArmorSuit)) {
@@ -1146,7 +1150,7 @@ public class Campaign implements Serializable {
     			ProtomekArmor a = (ProtomekArmor) p;
     			q = a.getAmount();
     		}
-    		if (p.getUnit() != null || p.getUnitId() != null) {
+    		if ((p.getUnit() != null) || (p.getUnitId() != null) || missingPart) {
     			if (inUse.containsKey(pname)) {
     				int temp = inUse.get(pname);
     				temp += q;
