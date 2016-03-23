@@ -62,6 +62,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
         super();
     }
 
+    private static final String OPT_SURNAME_NO_CHANGE = "no_change"; //$NON-NLS-1$
+    private static final String OPT_SURNAME_YOURS = "yours"; //$NON-NLS-1$
+    private static final String OPT_SURNAME_SPOUSE = "spouse"; //$NON-NLS-1$
+    private static final String OPT_SURNAME_HYP_YOURS = "hyp_yours"; //$NON-NLS-1$
+    private static final String OPT_SURNAME_HYP_SPOUSE = "hyp_spouse"; //$NON-NLS-1$
+    
     public void actionPerformed(ActionEvent action) {
         StringTokenizer st = new StringTokenizer(action.getActionCommand(),
                 "|");
@@ -432,21 +438,21 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             String spouseSurname = spouse.getName().split(" ", 2)[1];
             
             switch (surnameOption) {
-                case "No Change":
+                case OPT_SURNAME_NO_CHANGE:
                     break;
-                case "Spouse takes your surname":
+                case OPT_SURNAME_YOURS:
                     spouse.setName(spouse.getName().split(" ", 2)[0] + " " + selectedSurname);
                     spouse.setMaidenName(spouseSurname);
                     break;
-                case "Take spouses surname":
+                case OPT_SURNAME_SPOUSE:
                     selectedPerson.setName(selectedPerson.getName().split(" ", 2)[0] + " " + spouseSurname);
                     selectedPerson.setMaidenName(selectedSurname);
                     break;
-                case "Hyphenate your surname with spouses":
+                case OPT_SURNAME_HYP_YOURS:
                     selectedPerson.setName(selectedPerson.getName().split(" ", 2)[0] + " " + selectedSurname + "-" + spouseSurname);
                     selectedPerson.setMaidenName(selectedSurname);
                     break;
-                case "Spouse hyphenates surname with yours":
+                case OPT_SURNAME_HYP_SPOUSE:
                     spouse.setName(spouse.getName().split(" ", 2)[0] + " " + spouseSurname+ "-" + selectedSurname);
                     spouse.setMaidenName(spouseSurname);
                     break;
@@ -1579,32 +1585,32 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             type = "No Change";
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand("SPOUSE|" + ps.getId().toString()
-                                    + "|" + type);
+                                    + "|" + OPT_SURNAME_NO_CHANGE);
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
                             if (!ps.isClanner() && !person.isClanner()) {
                                 type = "Spouse takes your surname";
                                 surnameMenu = new JMenuItem(type);
                                 surnameMenu.setActionCommand("SPOUSE|" + ps.getId().toString()
-                                        + "|" + type);
+                                        + "|" + OPT_SURNAME_YOURS);
                                 surnameMenu.addActionListener(this);
                                 spouseMenu.add(surnameMenu);
-                                type = "Take spouses surname";
+                                type = "Take spouse's surname";
                                 surnameMenu = new JMenuItem(type);
                                 surnameMenu.setActionCommand("SPOUSE|" + ps.getId().toString()
-                                        + "|" + type);
+                                        + "|" + OPT_SURNAME_SPOUSE);
                                 surnameMenu.addActionListener(this);
                                 spouseMenu.add(surnameMenu);
-                                type = "Hyphenate your surname with spouses";
+                                type = "Hyphenate your surname with spouse's";
                                 surnameMenu = new JMenuItem(type);
                                 surnameMenu.setActionCommand("SPOUSE|" + ps.getId().toString()
-                                        + "|" + type);
+                                        + "|" + OPT_SURNAME_HYP_YOURS);
                                 surnameMenu.addActionListener(this);
                                 spouseMenu.add(surnameMenu);
                                 type = "Spouse hyphenates surname with yours";
                                 surnameMenu = new JMenuItem(type);
                                 surnameMenu.setActionCommand("SPOUSE|" + ps.getId().toString()
-                                        + "|" + type);
+                                        + "|" + OPT_SURNAME_HYP_SPOUSE);
                                 surnameMenu.addActionListener(this);
                                 spouseMenu.add(surnameMenu);
                             }
