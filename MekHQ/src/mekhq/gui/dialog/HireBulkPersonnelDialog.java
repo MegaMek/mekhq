@@ -263,14 +263,25 @@ public class HireBulkPersonnelDialog extends JDialog {
         while(number > 0) {
             Person p = campaign.newPerson(((PersonTypeItem)choiceType.getSelectedItem()).id);
             p.setRankNumeric(campaign.getRanks().getRankNumericFromNameAndProfession(p.getProfession(), (String)choiceRanks.getSelectedItem()));
+            int age = p.getAge(today);
             if(useAge) {
-                int age = p.getAge(today);
                 if((age > maxAgeVal) || (age < minAgeVal)) {
                     int days = Days.daysBetween(earliestBirthDate, latestBirthDate).getDays();
                     DateTime birthDay = earliestBirthDate.plus(Days.days(Compute.randomInt(days)));
                     p.setBirthday(birthDay.toGregorianCalendar());
+                    age = p.getAge(today);
                 }
             }
+            
+            // Limit skills by age for children and adolescents
+            if(age < 12) {
+                p.removeAllSkills();
+            } else if(age < 14) {
+                p.limitSkills(0);
+            } else if(age < 18) {
+                p.limitSkills(age - 13);
+            }
+            
             if(!campaign.recruitPerson(p)) {
                 number = 0;
             } else {
