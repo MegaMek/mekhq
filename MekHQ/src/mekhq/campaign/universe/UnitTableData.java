@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -42,6 +43,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import megamek.client.RandomUnitGenerator;
 import megamek.common.Compute;
 import mekhq.MekHQ;
+import mekhq.Utilities;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -207,10 +209,8 @@ public class UnitTableData implements Serializable, ActionListener {
 					return getFirstRAT("War of 39", f, unitType);
 				}
 			}
-			String[] successorStates = {"CC", "DC", "FS", "FWL", "LA"};
-			return getFirstRAT("War of 39",
-					successorStates[Compute.randomInt(successorStates.length)],
-					unitType);
+			List<String> successorStates = Arrays.asList("CC", "DC", "FS", "FWL", "LA");
+			return getFirstRAT("War of 39", Utilities.getRandomItem(successorStates), unitType);
 		}
 		/* Sort the sources according to the earliest year that appears
 		 * in each; may miss some overlap but should be accurate in

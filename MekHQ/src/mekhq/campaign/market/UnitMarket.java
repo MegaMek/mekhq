@@ -32,6 +32,7 @@ import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
@@ -165,7 +166,7 @@ public class UnitMarket implements Serializable {
 
 			if (campaign.getUnitRatingMod() >= IUnitRating.DRAGOON_B) {
 				ArrayList<Faction> factions = campaign.getCurrentPlanet().getCurrentFactions(campaign.getDate());
-				String faction = factions.get(Compute.randomInt(factions.size())).getShortName();
+				String faction = Utilities.getRandomItem(factions).getShortName();
 				if (campaign.getFaction().isClan() ||
 						!Faction.getFaction(faction).isClan()) {
 					addOffers(campaign, Compute.d6() - 3,

@@ -24,13 +24,16 @@ package mekhq.campaign.finances;
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import megamek.common.Compute;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
+import mekhq.Utilities;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
@@ -44,13 +47,13 @@ public class Loan implements MekHqXmlSerializable {
     
     // If you add more Canon institutions, please add them at the beginning and change the next line.
     // The first four of these are Canon, the rest are made up.
-    private static final String[] madeUpInstitutions = {"Southern Bank and Trust" /* Canon */, "The Alliance Reserve Bank" /* Canon */,
+    private static final List<String> madeUpInstitutions = Arrays.asList("Southern Bank and Trust" /* Canon */, "The Alliance Reserve Bank" /* Canon */,
     	"Capellan Commonality Bank" /* Canon */, "Potwin Bank and Trust" /* Canon */, "Comstar Reserve", "Federated Employees Union",
     	"Bank of Oriente", "New Avalon Interstellar Bank", "Federated Boeing Credit Union", "First Commonwealth Bank",
     	"Donegal Bank and Trust", "Defiance Industries Credit Union", "Superior Bank of Sarna", "St. Ives Bank and Trust",
     	"Luthien Bank of the Dragon", "Golden Bank of Sian", "Rasalhauge National Bank", "Canopus Federal Reserve",
     	"Concordat Bank and Trust", "Outworlds Alliance National Bank", "Hegemony Bank and Trust",
-    	"Andurien First National Bank"};
+    	"Andurien First National Bank");
     
     private String institution;
     private String refNumber;
@@ -71,7 +74,7 @@ public class Loan implements MekHqXmlSerializable {
     }
     
     public Loan(long p, int r, int c, int y, int s, GregorianCalendar today) {
-        this(p, r, c, y, s, today, madeUpInstitutions[Compute.randomInt(madeUpInstitutions.length)], randomRefNumber());
+        this(p, r, c, y, s, today, Utilities.getRandomItem(madeUpInstitutions), randomRefNumber());
     }
     
     public Loan(long p, int r, int c, int y, int s, GregorianCalendar today, String i, String ref) {
@@ -326,7 +329,7 @@ public class Loan implements MekHqXmlSerializable {
 		this.collateralValue = collateralValue;
 	}
 
-	public static String[] getMadeupinstitutions() {
+	public static List<String> getMadeupinstitutions() {
 		return madeUpInstitutions;
 	}
     
