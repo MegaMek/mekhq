@@ -509,6 +509,8 @@ public class PartsStore implements Serializable {
 					    //for(int ctype = Mech.COCKPIT_STANDARD; ctype < Mech.COCKPIT_STRING.length; ctype++) {
 					        parts.add(new MekLocation(loc, ton, type, false, false, true, true, c));
 	                        parts.add(new MekLocation(loc, ton, type, true, false, true, true, c));
+					        parts.add(new MekLocation(loc, ton, type, false, false, false, false, c));
+	                        parts.add(new MekLocation(loc, ton, type, true, false, false, false, c));
 				        //}
 					} else {
     				    parts.add(new MekLocation(loc, ton, type, false, false, false, false, c));
