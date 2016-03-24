@@ -39,10 +39,13 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -125,6 +128,7 @@ import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.MissingMekActuator;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.parts.ProtomekArmor;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.StructuralIntegrity;
@@ -1119,8 +1123,9 @@ public class Campaign implements Serializable {
         return parts;
     }
 
-    public Hashtable<String, Integer> getPartsInUse() {
-    	Hashtable<String, Integer> inUse = new Hashtable<String, Integer>();
+    public Set<PartInUse> getPartsInUse() {
+    	// java.util.Set doesn't supply a get(Object) method, so we have to use a java.util.Map
+    	Map<PartInUse, PartInUse> inUse = new HashMap<PartInUse, PartInUse>();
     	for (Part p : parts) {
     		// SI isn't a proper "part"
     		if (p instanceof StructuralIntegrity) {
@@ -1131,42 +1136,20 @@ public class Campaign implements Serializable {
     		if(missingPart) {
     			p = ((MissingPart) p).getNewPart();
     		}
-    		String pname = p.getName();
-			Unit u = p.getUnit();
-			if (!(p instanceof MissingBattleArmorSuit)) {
-				p.setUnit(null);
-			}
-			String details = p.getDetails();
-			p.setUnit(u);
-		    details = details.replaceFirst("\\d+\\shit\\(s\\),\\s", "");
-		    details = details.replaceFirst("\\d+\\shit\\(s\\)", "");
-		    if (details.length() > 0 && !(p instanceof Armor || p instanceof BaArmor || p instanceof ProtomekArmor)) {
-		    	pname +=  " (" + details + ")";
-		    }
-    		int q = 1;
-    		if (p instanceof Armor) {
-    			Armor a = (Armor) p;
-    			q = a.getAmount();
+    		PartInUse piu = new PartInUse(p);
+    		if( inUse.containsKey(piu) ) {
+    			piu = inUse.get(piu);
+    		} else {
+    			inUse.put(piu, piu);
     		}
-    		if (p instanceof BaArmor) {
-    			BaArmor a = (BaArmor) p;
-    			q = a.getAmount();
-    		}
-    		if (p instanceof ProtomekArmor) {
-    			ProtomekArmor a = (ProtomekArmor) p;
-    			q = a.getAmount();
-    		}
+    		int quantity = (p instanceof Armor) ? ((Armor)p).getAmount() : 1;
     		if ((p.getUnit() != null) || (p.getUnitId() != null) || missingPart) {
-    			if (inUse.containsKey(pname)) {
-    				int temp = inUse.get(pname);
-    				temp += q;
-    				inUse.put(pname, temp);
-    			} else {
-    				inUse.put(pname, q);
-    			}
+    			piu.setUseCount(piu.getUseCount() + quantity);
+    		} else {
+    			piu.setStoreCount(piu.getStoreCount() + p.getQuantity());
     		}
     	}
-    	return inUse;
+    	return inUse.keySet();
     }
 
     public Part getPart(int id) {
