@@ -103,7 +103,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     
     private static final String SEPARATOR = "@"; //$NON-NLS-1$
     private static final String SPACE = " "; //$NON-NLS-1$
-    private static final String HYPHEN = "-";
+    private static final String HYPHEN = "-"; //$NON-NLS-1$
+    private static final String QUESTION_MARK = "?"; //$NON-NLS-1$
     private static final String TRUE = String.valueOf(true);
     private static final String FALSE = String.valueOf(false);
     
@@ -145,6 +146,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
         gui.refreshDoctorsList();
     }
     
+    @Override
     public void actionPerformed(ActionEvent action) {
         int row = gui.getPersonnelTable().getSelectedRow();
         if (row < 0) {
@@ -409,9 +411,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             {
                 if (!selectedPerson.getSpouse().isDeadOrMIA()) {
                     selectedPerson.getSpouse().addLogEntry(gui.getCampaign().getDate(),
-                        String.format("Divorced from %s", selectedPerson.getFullName()));
+                        String.format(resourceMap.getString("divorcedFrom.format"), selectedPerson.getFullName())); //$NON-NLS-1$
                     selectedPerson.addLogEntry(gui.getCampaign().getDate(),
-                        String.format("Divorced from %s", selectedPerson.getSpouse().getFullName()));
+                        String.format(resourceMap.getString("divorcedFrom.format"), selectedPerson.getSpouse().getFullName())); //$NON-NLS-1$
                     if (selectedPerson.getMaidenName() != null) {
                         selectedPerson.setName(selectedPerson.getName().split(SPACE, 2)[0] 
                                 + SPACE  
@@ -458,19 +460,16 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         spouse.setMaidenName(spouseSurname);
                         break;
                     default:
-                        spouse.setName(spouse.getName().split(SPACE, 2)[0] + SPACE + "ImaError");
-                        MekHQ.logMessage("Unknown error in Surname chooser between "
-                                        + selectedPerson.getFullName() + " and "
-                                        + spouse.getFullName());
+                        spouse.setName(spouseGivenname + SPACE + "ImaError"); //$NON-NLS-1$
+                        MekHQ.logMessage(String.format("Unknown error in Surname chooser between \"%s\" and \"%s\"", //$NON-NLS-1$
+                            selectedPerson.getFullName(), spouse.getFullName()));
                         break;                
                 }
                 
                 spouse.setSpouseID(selectedPerson.getId());
-                spouse.addLogEntry(gui.getCampaign().getDate(), "Marries "
-                        + selectedPerson.getFullName());
+                spouse.addLogEntry(gui.getCampaign().getDate(), String.format(resourceMap.getString("marries.format"), selectedPerson.getFullName())); //$NON-NLS-1$
                 selectedPerson.setSpouseID(spouse.getId());
-                selectedPerson.addLogEntry(gui.getCampaign().getDate(), "Marries "
-                        + spouse.getFullName());
+                selectedPerson.addLogEntry(gui.getCampaign().getDate(), String.format(resourceMap.getString("marries.format"), spouse.getFullName())); //$NON-NLS-1$
                 break;
             }
             case CMD_IMPROVE:
@@ -481,9 +480,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 selectedPerson.improveSkill(type);
                 gui.getCampaign().personUpdated(selectedPerson);
                 selectedPerson.setXp(selectedPerson.getXp() - cost);
-                gui.getCampaign().addReport(
-                        selectedPerson.getHyperlinkedName() + " improved "
-                                + type + "!"); //$NON-NLS-1$
+                gui.getCampaign().addReport(String.format(resourceMap.getString("improved.format"), selectedPerson.getHyperlinkedName(), type)); //$NON-NLS-1$
                 if (gui.getCampaign().getCampaignOptions().getUseAtB()) {
                     if (selectedPerson.getPrimaryRole() > Person.T_NONE
                             && selectedPerson.getPrimaryRole() <= Person.T_CONV_PILOT
@@ -495,18 +492,13 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         if (null == spa) {
                             if (gui.getCampaign().getCampaignOptions().useEdge()) {
                                 selectedPerson.acquireAbility(
-                                        PilotOptions.EDGE_ADVANTAGES, "edge",
+                                        PilotOptions.EDGE_ADVANTAGES, "edge", //$NON-NLS-1$
                                         selectedPerson.getEdge() + 1);
-                                gui.getCampaign().addReport(
-                                        selectedPerson.getHyperlinkedName()
-                                                + " gained edge point!");
+                                gui.getCampaign().addReport(String.format(resourceMap.getString("gainedEdge.format"), selectedPerson.getHyperlinkedName())); //$NON-NLS-1$
                             }
                         } else {
-                            gui.getCampaign().addReport(
-                                    selectedPerson.getHyperlinkedName()
-                                            + " gained "
-                                            + SpecialAbility
-                                                    .getDisplayName(spa) + "!");
+                            gui.getCampaign().addReport(String.format(resourceMap.getString("gained.format"), //$NON-NLS-1$
+                                selectedPerson.getHyperlinkedName(), SpecialAbility.getDisplayName(spa)));
                         }
                     }
                 }
@@ -549,12 +541,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             {
                 int selected = Integer.parseInt(data[1]);
                 for (Person person : people) {
-                    if (selected == Person.S_ACTIVE
-                            || (0 == JOptionPane.showConfirmDialog(null,
-                                    "Do you really want to change the status of "
-                                            + person.getFullTitle()
-                                            + " to a non-active status?",
-                                    resourceMap.getString("kiaQ.text"), JOptionPane.YES_NO_OPTION))) { //$NON-NLS-1$
+                    if ((selected == Person.S_ACTIVE) || (0 == JOptionPane.showConfirmDialog(null,
+                        String.format(resourceMap.getString("confirmRetireQ.format"), person.getFullTitle()), //$NON-NLS-1$
+                        resourceMap.getString("kiaQ.text"), JOptionPane.YES_NO_OPTION))) { //$NON-NLS-1$
                         gui.getCampaign().changeStatus(person, selected);
                     }
                 }
@@ -583,14 +572,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_REMOVE:
             {
-                String title = people.length + " personnel";
+                String title = String.format(resourceMap.getString("numPersonnel.text"), people.length); //$NON-NLS-1$
                 if(people.length == 1) {
                     title = people[0].getFullTitle();
                 }
                 if (0 == JOptionPane.showConfirmDialog(
                         null,
-                        "Do you really want to remove "
-                                + title + "?", resourceMap.getString("removeQ.text"), //$NON-NLS-2$
+                        String.format(resourceMap.getString("confirmRemove.format"), title), //$NON-NLS-1$
+                        resourceMap.getString("removeQ.text"), //$NON-NLS-1$
                         JOptionPane.YES_NO_OPTION)) {
                     for (Person person : people) {     
                         gui.getCampaign().removePerson(person.getId());
@@ -635,12 +624,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         }
                     }
                 } else {
+                    String question;
+                    if(people.length > 1) {
+                        question = resourceMap.getString("confirmRemoveMultiple.text"); //$NON-NLS-1$
+                    } else {
+                        question = String.format(resourceMap.getString("confirmRemove.text"), people[0].getFullTitle()); //$NON-NLS-1$
+                    }
                     if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(
-                            null,
-                            "Do you really want to remove " +
-                                    ((people.length > 1)?"personnel?":
-                                    people[0].getFullTitle() + "?"),
-                            resourceMap.getString("removeQ.text"), //$NON-NLS-1$
+                            null, question, resourceMap.getString("removeQ.text"), //$NON-NLS-1$
                             JOptionPane.YES_NO_OPTION)) {
                         for (Person person : people) {
                             gui.getCampaign().removePerson(person.getId());
@@ -719,33 +710,13 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             case CMD_KILL:
             {
                 KillDialog nkd;
+                Unit unit = gui.getCampaign().getUnit(selectedPerson.getUnitId());
                 if (people.length > 1) {
-                    nkd = new KillDialog(
-                            gui.getFrame(),
-                            true,
-                            new Kill(
-                                    null,
-                                    "?",
-                                    gui.getCampaign().getUnit(
-                                            selectedPerson.getUnitId()) != null ? gui.getCampaign()
-                                            .getUnit(selectedPerson.getUnitId())
-                                            .getName()
-                                            : "Bare Hands", gui.getCampaign()
-                                            .getDate()), "Crew");
+                    nkd = new KillDialog(gui.getFrame(), true, new Kill(null, QUESTION_MARK,
+                        unit != null ? unit.getName() : resourceMap.getString("bareHands.text"), gui.getCampaign().getDate()), resourceMap.getString("crew.text")); //$NON-NLS-1$ //$NON-NLS-2$
                 } else {
-                    nkd = new KillDialog(
-                            gui.getFrame(),
-                            true,
-                            new Kill(
-                                    selectedPerson.getId(),
-                                    "?",
-                                    gui.getCampaign().getUnit(
-                                            selectedPerson.getUnitId()) != null ? gui.getCampaign()
-                                            .getUnit(selectedPerson.getUnitId())
-                                            .getName()
-                                            : "Bare Hands", gui.getCampaign()
-                                            .getDate()),
-                            selectedPerson.getFullName());
+                    nkd = new KillDialog(gui.getFrame(), true, new Kill(selectedPerson.getId(), QUESTION_MARK,
+                        unit != null ? unit.getName() : resourceMap.getString("bareHands.text"), gui.getCampaign().getDate()), selectedPerson.getFullName()); //$NON-NLS-1$
                 }
                 nkd.setVisible(true);
                 if (!nkd.wasCancelled()) {
@@ -763,18 +734,15 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 break;
             }
             case CMD_EDIT_KILL_LOG:
-                EditKillLogDialog ekld = new EditKillLogDialog(gui.getFrame(),
-                        true, gui.getCampaign(), selectedPerson);
+                EditKillLogDialog ekld = new EditKillLogDialog(gui.getFrame(), true, gui.getCampaign(), selectedPerson);
                 ekld.setVisible(true);
                 break;
             case CMD_EDIT_PERSONNEL_LOG:
-                EditPersonnelLogDialog epld = new EditPersonnelLogDialog(
-                        gui.getFrame(), true, gui.getCampaign(), selectedPerson);
+                EditPersonnelLogDialog epld = new EditPersonnelLogDialog(gui.getFrame(), true, gui.getCampaign(), selectedPerson);
                 epld.setVisible(true);
                 break;
             case CMD_EDIT_LOG_ENTRY:
-                EditLogEntryDialog eeld = new EditLogEntryDialog(gui.getFrame(), true,
-                        new LogEntry(gui.getCampaign().getDate(), "")); //$NON-NLS-1$
+                EditLogEntryDialog eeld = new EditLogEntryDialog(gui.getFrame(), true, new LogEntry(gui.getCampaign().getDate(), "")); //$NON-NLS-1$
                 eeld.setVisible(true);
                 LogEntry entry = eeld.getEntry();
                 if (null != entry) {
@@ -788,20 +756,13 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 selectedPerson.setCommander(!selectedPerson.isCommander());
                 if (selectedPerson.isCommander()) {
                     for (Person p : gui.getCampaign().getPersonnel()) {
-                        if (p.isCommander()
-                                && !p.getId().equals(selectedPerson.getId())) {
+                        if (p.isCommander() && !p.getId().equals(selectedPerson.getId())) {
                             p.setCommander(false);
-                            gui.getCampaign()
-                                    .addReport(
-                                            p.getHyperlinkedFullTitle()
-                                                    + " has been removed as the overall unit commander.");
+                            gui.getCampaign().addReport(String.format(resourceMap.getString("removedCommander.format"), p.getHyperlinkedFullTitle())); //$NON-NLS-1$
                             gui.getCampaign().personUpdated(p);
                         }
                     }
-                    gui.getCampaign()
-                            .addReport(
-                                    selectedPerson.getHyperlinkedFullTitle()
-                                            + " has been set as the overall unit commander.");
+                    gui.getCampaign().addReport(String.format(resourceMap.getString("setAsCommander.format"), selectedPerson.getHyperlinkedFullTitle())); //$NON-NLS-1$
                     gui.getCampaign().personUpdated(selectedPerson);
                 }
                 break;
@@ -888,6 +849,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
                 break;
             }
+        default:
+            break;
         }
         refreshLists();
     }
@@ -1272,13 +1235,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             navMenu.add(cbMenuItem);
                         }
                     }
-                    if (unit.canTakeTech()
-                            && person.canTech(unit.getEntity())
-                            && (person.getMaintenanceTimeUsing() + unit
-                                    .getMaintenanceTime()) <= 480) {
-                        cbMenuItem = new JCheckBoxMenuItem(unit.getName()
-                                + " (" + unit.getMaintenanceTime()
-                                + " minutes/day)");
+                    if (unit.canTakeTech() && person.canTech(unit.getEntity())
+                            && (person.getMaintenanceTimeUsing() + unit.getMaintenanceTime() <= 480)) {
+                        cbMenuItem = new JCheckBoxMenuItem(String.format(resourceMap.getString("maintenanceTimeDesc.format"), //$NON-NLS-1$
+                            unit.getName(), unit.getMaintenanceTime()));
                         // TODO: check the box
                         cbMenuItem.setActionCommand(makeCommand(CMD_ADD_TECH, unit.getId().toString()));
                         cbMenuItem.addActionListener(this);
@@ -1335,12 +1295,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         continue;
                     }
                     if (StaticChecks.areAllInfantry(selected)) {
-                        if (!(unit.getEntity() instanceof Infantry)
-                                || unit.getEntity() instanceof BattleArmor) {
+                        if (!(unit.getEntity() instanceof Infantry) || unit.getEntity() instanceof BattleArmor) {
                             continue;
                         }
-                        if (unit.canTakeMoreGunners()
-                                && person.canGun(unit.getEntity())) {
+                        if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
                             cbMenuItem = new JCheckBoxMenuItem(
                                     unit.getName());
                             // TODO: check the box
@@ -1352,8 +1310,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         if (!(unit.getEntity() instanceof BattleArmor)) {
                             continue;
                         }
-                        if (unit.canTakeMoreGunners()
-                                && person.canGun(unit.getEntity())) {
+                        if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
                             cbMenuItem = new JCheckBoxMenuItem(
                                     unit.getName());
                             // TODO: check the box
@@ -1365,8 +1322,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         if (!(unit.getEntity() instanceof Tank)) {
                             continue;
                         }
-                        if (unit.canTakeMoreGunners()
-                                && person.canGun(unit.getEntity())) {
+                        if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
                             cbMenuItem = new JCheckBoxMenuItem(
                                     unit.getName());
                             // TODO: check the box
@@ -1378,8 +1334,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         if (!(unit.getEntity() instanceof Aero)) {
                             continue;
                         }
-                        if (unit.canTakeMoreGunners()
-                                && person.canGun(unit.getEntity())) {
+                        if (unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
                             cbMenuItem = new JCheckBoxMenuItem(
                                     unit.getName());
                             // TODO: check the box
@@ -1478,55 +1433,51 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             cbMenuItem.addActionListener(this);
             menu.add(cbMenuItem);
             if (oneSelected && person.isActive()) {
-                if (person.getAge(gui.getCampaign().getCalendar()) > 13
-                        && person.getSpouseID() == null) {
+                if ((person.getAge(gui.getCampaign().getCalendar()) > 13) && (person.getSpouseID() == null)) {
                     menu = new JMenu(resourceMap.getString("changeSpouse.text")); //$NON-NLS-1$
                     JMenuItem surnameMenu;
                     JMenu spouseMenu;
                     String type;
                     for (Person ps : gui.getCampaign().getPersonnel()) {
                         if (person.safeSpouse(ps) && !ps.isDeadOrMIA()) {
-                            String pStatus = "";
-                            if (ps.isPrisoner()) {
-                                pStatus = "Prisoner ";
-                            }
+                            String pStatus;
                             if (ps.isBondsman()) {
-                                pStatus = "Bondsman ";
+                                pStatus = String.format(resourceMap.getString("marriageBondsmanDesc.format"), //$NON-NLS-1$
+                                    ps.getFullName(), ps.getAge(gui.getCampaign().getCalendar()), ps.getRoleDesc());
+                            } else if (ps.isPrisoner()) {
+                                pStatus = String.format(resourceMap.getString("marriagePrisonerDesc.format"), //$NON-NLS-1$
+                                    ps.getFullName(), ps.getAge(gui.getCampaign().getCalendar()), ps.getRoleDesc());
+                            } else {
+                                pStatus = String.format(resourceMap.getString("marriagePartnerDesc.format"), //$NON-NLS-1$
+                                    ps.getFullName(), ps.getAge(gui.getCampaign().getCalendar()), ps.getRoleDesc());
                             }
-                            spouseMenu = new JMenu(
-                                    pStatus
-                                + ps.getFullName()
-                                + ", " //$NON-NLS-1$
-                                + ps.getAge(gui.getCampaign()
-                                    .getCalendar()) + ", "
-                                + ps.getRoleDesc());
-                            
-                            type = "No Change"; //$NON-NLS-1$
+                            spouseMenu = new JMenu(pStatus);                            
+                            type = resourceMap.getString("marriageNoNameChange.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
                                 makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), OPT_SURNAME_NO_CHANGE));
                             surnameMenu.addActionListener(this);
                             spouseMenu.add(surnameMenu);
                             if (!ps.isClanner() && !person.isClanner()) {
-                                type = "Spouse takes your surname";
+                                type = resourceMap.getString("marriageRenameSpouse.text"); //$NON-NLS-1$
                                 surnameMenu = new JMenuItem(type);
                                 surnameMenu.setActionCommand(
                                        makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), OPT_SURNAME_YOURS));
                                 surnameMenu.addActionListener(this);
                                 spouseMenu.add(surnameMenu);
-                                type = "Take spouse's surname";
+                                type = resourceMap.getString("marriageRenameYourself.text"); //$NON-NLS-1$
                                 surnameMenu = new JMenuItem(type);
                                 surnameMenu.setActionCommand(
                                       makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), OPT_SURNAME_SPOUSE));
                                 surnameMenu.addActionListener(this);
                                 spouseMenu.add(surnameMenu);
-                                type = "Hyphenate your surname with spouse's";
+                                type = resourceMap.getString("marriageHyphenateYourself.text"); //$NON-NLS-1$
                                 surnameMenu = new JMenuItem(type);
                                 surnameMenu.setActionCommand(
                                     makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), OPT_SURNAME_HYP_YOURS));
                                 surnameMenu.addActionListener(this);
                                 spouseMenu.add(surnameMenu);
-                                type = "Spouse hyphenates surname with yours";
+                                type = resourceMap.getString("marriageHyphenateSpouse.text"); //$NON-NLS-1$
                                 surnameMenu = new JMenuItem(type);
                                 surnameMenu.setActionCommand(
                                     makeCommand(CMD_ADD_SPOUSE, ps.getId().toString(), OPT_SURNAME_HYP_SPOUSE));
@@ -1552,26 +1503,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 JMenu newMenu = new JMenu(resourceMap.getString("spendOnNewSkills.text")); //$NON-NLS-1$
                 for (int i = 0; i < SkillType.getSkillList().length; i++) {
                     String type = SkillType.getSkillList()[i];
-                    if (person.hasSkill(type)) {
-                        int cost = person.getSkill(type).getCostToImprove();
-                        if (cost >= 0) {
-                            String costDesc = " (" + cost + "XP)";
-                            menuItem = new JMenuItem(type + costDesc);
-                            menuItem.setActionCommand(makeCommand(CMD_IMPROVE, type, String.valueOf(cost)));
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(person.getXp() >= cost);
-                            currentMenu.add(menuItem);
-                        }
-                    } else {
-                        int cost = SkillType.getType(type).getCost(0);
-                        if (cost >= 0) {
-                            String costDesc = " (" + cost + "XP)";
-                            menuItem = new JMenuItem(type + costDesc);
-                            menuItem.setActionCommand(makeCommand(CMD_IMPROVE, type, String.valueOf(cost)));
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(person.getXp() >= cost);
-                            newMenu.add(menuItem);
-                        }
+                    int cost = person.hasSkill(type) ? person.getSkill(type).getCostToImprove() : SkillType.getType(type).getCost(0);
+                    if( cost > 0 ) {
+                        String desc = String.format(resourceMap.getString("skillDesc.format"), type, cost); //$NON-NLS-1$
+                        menuItem = new JMenuItem(desc);
+                        menuItem.setActionCommand(makeCommand(CMD_IMPROVE, type, String.valueOf(cost)));
+                        menuItem.addActionListener(this);
+                        menuItem.setEnabled(person.getXp() >= cost);
+                        currentMenu.add(menuItem);
                     }
                 }
                 menu.add(currentMenu);
@@ -1579,10 +1518,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 if (gui.getCampaign().getCampaignOptions().useAbilities()) {
                     JMenu abMenu = new JMenu(resourceMap.getString("spendOnSpecialAbilities.text")); //$NON-NLS-1$
                     int cost = -1;
-                    String costDesc = "";
-                    for (Enumeration<IOption> i = person
-                            .getOptions(PilotOptions.LVL3_ADVANTAGES); i
-                            .hasMoreElements();) {
+                    for (Enumeration<IOption> i = person.getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements(); ) {
                         IOption ability = i.nextElement();
                         if (!ability.booleanValue()) {
                             SpecialAbility spa = SpecialAbility
@@ -1594,74 +1530,54 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                                 continue;
                             }
                             cost = spa.getCost();
-                            costDesc = " (" + cost + "XP)";
-                            if (cost < 0) {
-                                costDesc = " (Not Possible)";
+                            String costDesc;
+                            if(cost < 0) {
+                                costDesc = resourceMap.getString("costNotPossible.text"); //$NON-NLS-1$
+                            } else {
+                                costDesc = String.format(resourceMap.getString("costValue.format"), cost); //$NON-NLS-1$
                             }
-                            if (ability.getName().equals(
-                                    "weapon_specialist")) { //$NON-NLS-1$
-                                Unit u = gui.getCampaign().getUnit(
-                                        person.getUnitId());
+                            boolean available = (cost >= 0) && (person.getXp() >= cost);
+                            if (ability.getName().equals("weapon_specialist")) { //$NON-NLS-1$
+                                Unit u = gui.getCampaign().getUnit(person.getUnitId());
                                 if (null != u) {
-                                    JMenu specialistMenu = new JMenu(
-                                            resourceMap.getString("weaponSpecialist.text")); //$NON-NLS-1$
+                                    JMenu specialistMenu = new JMenu(resourceMap.getString("weaponSpecialist.text")); //$NON-NLS-1$
                                     TreeSet<String> uniqueWeapons = new TreeSet<String>();
-                                    for (int j = 0; j < u.getEntity()
-                                            .getWeaponList().size(); j++) {
-                                        Mounted m = u.getEntity()
-                                                .getWeaponList().get(j);
+                                    for (int j = 0; j < u.getEntity().getWeaponList().size(); j++) {
+                                        Mounted m = u.getEntity().getWeaponList().get(j);
                                         uniqueWeapons.add(m.getName());
                                     }
                                     for (String name : uniqueWeapons) {
-                                        menuItem = new JMenuItem(name
-                                                + costDesc);
-                                        menuItem.setActionCommand(
-                                            makeCommand(CMD_ACQUIRE_WEAPON_SPECIALIST, name, String.valueOf(cost)));
+                                        menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), name, costDesc)); //$NON-NLS-1$
+                                        menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_WEAPON_SPECIALIST, name, String.valueOf(cost)));
                                         menuItem.addActionListener(this);
-                                        menuItem.setEnabled(cost >= 0
-                                                && person.getXp() >= cost);
+                                        menuItem.setEnabled(available);
                                         specialistMenu.add(menuItem);
                                     }
                                     abMenu.add(specialistMenu);
                                 }
-                            } else if (ability.getName().equals(
-                                    "specialist")) { //$NON-NLS-1$
-                                JMenu specialistMenu = new JMenu(
-                                        resourceMap.getString("specialist.text")); //$NON-NLS-1$
-                                menuItem = new JMenuItem("Laser Specialist"
-                                        + costDesc);
-                                menuItem.setActionCommand(
-                                    makeCommand(CMD_ACQUIRE_SPECIALIST, Crew.SPECIAL_LASER, String.valueOf(cost)));
+                            } else if (ability.getName().equals("specialist")) { //$NON-NLS-1$
+                                JMenu specialistMenu = new JMenu(resourceMap.getString("specialist.text")); //$NON-NLS-1$
+                                menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("laserSpecialist.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
+                                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_SPECIALIST, Crew.SPECIAL_LASER, String.valueOf(cost)));
                                 menuItem.addActionListener(this);
-                                menuItem.setEnabled(cost >= 0
-                                        && person.getXp() >= cost);
+                                menuItem.setEnabled(available);
                                 specialistMenu.add(menuItem);
-                                menuItem = new JMenuItem(
-                                        "Missile Specialist" + costDesc);
-                                menuItem.setActionCommand(
-                                    makeCommand(CMD_ACQUIRE_SPECIALIST, Crew.SPECIAL_MISSILE, String.valueOf(cost)));
+                                menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("missileSpecialist.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
+                                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_SPECIALIST, Crew.SPECIAL_MISSILE, String.valueOf(cost)));
                                 menuItem.addActionListener(this);
-                                menuItem.setEnabled(cost >= 0
-                                        && person.getXp() >= cost);
+                                menuItem.setEnabled(available);
                                 specialistMenu.add(menuItem);
-                                menuItem = new JMenuItem(
-                                        "Ballistic Specialist" + costDesc);
-                                menuItem.setActionCommand(
-                                    makeCommand(CMD_ACQUIRE_SPECIALIST, Crew.SPECIAL_BALLISTIC, String.valueOf(cost)));
+                                menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("ballisticSpecialist.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
+                                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_SPECIALIST, Crew.SPECIAL_BALLISTIC, String.valueOf(cost)));
                                 menuItem.addActionListener(this);
-                                menuItem.setEnabled(cost >= 0
-                                        && person.getXp() >= cost);
+                                menuItem.setEnabled(available);
                                 specialistMenu.add(menuItem);
                                 abMenu.add(specialistMenu);
                             } else {
-                                menuItem = new JMenuItem(
-                                        ability.getDisplayableName()
-                                                + costDesc);
-                                menuItem.setActionCommand(
-                                    makeCommand(CMD_ACQUIRE_ABILITY, ability.getName(), String.valueOf(cost)));
+                                menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), ability.getDisplayableName(), costDesc)); //$NON-NLS-1$
+                                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ABILITY, ability.getName(), String.valueOf(cost)));
                                 menuItem.addActionListener(this);
-                                menuItem.setEnabled(cost >= 0
-                                        && person.getXp() >= cost);
+                                menuItem.setEnabled(available);
                                 abMenu.add(menuItem);
                             }
                         }
@@ -1829,6 +1745,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             menuItem = new JMenuItem(resourceMap.getString("exportPersonnel.text")); //$NON-NLS-1$
             menuItem.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     gui.miExportPersonActionPerformed(evt);
                 }
@@ -1887,8 +1804,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 menu.add(menuItem);
                 if (oneSelected) {
                     for (Injury i : person.getInjuries()) {
-                        menuItem = new JMenuItem("Remove Injury: "
-                                + i.getName());
+                        menuItem = new JMenuItem(String.format(resourceMap.getString("removeInjury.format"), i.getName())); //$NON-NLS-1$
                         menuItem.setActionCommand(makeCommand(CMD_REMOVE_INJURY, i.getUUIDAsString()));
                         menuItem.addActionListener(this);
                         menuItem.setEnabled(gui.getCampaign().isGM());
