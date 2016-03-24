@@ -84,11 +84,11 @@ public class PartsInUseTableModel extends DataTableModel {
             case COL_STORED:
                 return (piu.getStoreCount() > 0) ? FORMATTER.format(piu.getStoreCount()) : EMPTY_CELL;
             case COL_IN_TRANSFER:
-                if( piu.getTransferCount() > 0 || piu.getPlannedCount() > 0 ) {
+                if( piu.getTransferCount() > 0 && piu.getPlannedCount() <= 0 ) {
+                    return FORMATTER.format(piu.getTransferCount());
+                } else if( piu.getPlannedCount() > 0 ) {
                     return String.format("%s (%s)", //$NON-NLS-1$
                         FORMATTER.format(piu.getTransferCount()), FORMATTER.format(piu.getPlannedCount()));
-                } else if( piu.getTransferCount() > 0 ) {
-                    return FORMATTER.format(piu.getTransferCount());
                 } else {
                     return EMPTY_CELL;
                 }

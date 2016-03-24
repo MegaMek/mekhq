@@ -1126,7 +1126,7 @@ public class Campaign implements Serializable {
     public Set<PartInUse> getPartsInUse() {
         // java.util.Set doesn't supply a get(Object) method, so we have to use a java.util.Map
         Map<PartInUse, PartInUse> inUse = new HashMap<PartInUse, PartInUse>();
-        for (Part p : parts) {
+        for(Part p : parts) {
             // SI isn't a proper "part"
             if (p instanceof StructuralIntegrity) {
                 continue;
@@ -1149,6 +1149,24 @@ public class Campaign implements Serializable {
                 int quantity = (p instanceof Armor) ? ((Armor)p).getAmount() : p.getQuantity();
                 piu.setStoreCount(piu.getStoreCount() + quantity);
             }
+        }
+        for(IAcquisitionWork maybePart : shoppingList.getPartList()) {
+            if(!(maybePart instanceof Part)) {
+                continue;
+            }
+            Part p = (Part) maybePart;
+            if(p instanceof MissingPart) {
+                p = ((MissingPart) p).getNewPart();
+            }
+            PartInUse piu = new PartInUse(p);
+            if( inUse.containsKey(piu) ) {
+                piu = inUse.get(piu);
+            } else {
+                inUse.put(piu, piu);
+            }
+            int quantity = ((p instanceof Armor) ? ((Armor)p).getAmount() : 1) * maybePart.getQuantity();
+            piu.setTransferCount(piu.getTransferCount() + quantity);
+            
         }
         return inUse.keySet();
     }
