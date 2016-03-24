@@ -1510,7 +1510,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         menuItem.setActionCommand(makeCommand(CMD_IMPROVE, type, String.valueOf(cost)));
                         menuItem.addActionListener(this);
                         menuItem.setEnabled(person.getXp() >= cost);
-                        currentMenu.add(menuItem);
+                        if(person.hasSkill(type)) {
+                            currentMenu.add(menuItem);
+                        } else {
+                            newMenu.add(menuItem);
+                        }
                     }
                 }
                 menu.add(currentMenu);
