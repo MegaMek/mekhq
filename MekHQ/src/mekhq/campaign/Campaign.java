@@ -5955,6 +5955,9 @@ public class Campaign implements Serializable {
         switch (status) {
             case Person.PRISONER_NOT:
                 p.setFreeMan();
+                if (p.getRankNumeric() < 0) {
+                    changeRank(p, 0, false);
+                }
                 p.addLogEntry(getDate(), "Freed");
                 break;
             case Person.PRISONER_YES:
