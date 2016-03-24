@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
@@ -2311,6 +2312,24 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public void removeSkill(String skillName) {
         if (hasSkill(skillName)) {
             skills.remove(skillName);
+        }
+    }
+    
+    /**
+     * Remove all skills
+     */
+    public void removeAllSkills() {
+        skills.clear();
+    }
+    
+    /**
+     * Limit skills to the maximum of the given level
+     */
+    public void limitSkills(int maxLvl) {
+        for(Map.Entry<String, Skill> skill : skills.entrySet()) {
+            if(skill.getValue().getLevel() > maxLvl) {
+                skill.getValue().setLevel(maxLvl);
+            }
         }
     }
 
