@@ -87,7 +87,7 @@ public class PartsInUseTableModel extends DataTableModel {
                 if( piu.getTransferCount() > 0 && piu.getPlannedCount() <= 0 ) {
                     return FORMATTER.format(piu.getTransferCount());
                 } else if( piu.getPlannedCount() > 0 ) {
-                    return String.format("%s (%s)", //$NON-NLS-1$
+                    return String.format("%s [+%s]", //$NON-NLS-1$
                         FORMATTER.format(piu.getTransferCount()), FORMATTER.format(piu.getPlannedCount()));
                 } else {
                     return EMPTY_CELL;

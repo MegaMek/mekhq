@@ -24,7 +24,7 @@ public class PartInUse {
         if(!(part instanceof MissingBattleArmorSuit)) {
             part.setUnit(null);
         }
-        if(!(part instanceof Armor)) {
+        if(!(part instanceof Armor) && !(part instanceof AmmoStorage)) {
             String details = part.getDetails();
             details = cleanUp1.matcher(details).replaceFirst(""); //$NON-NLS-1$
             details = cleanUp2.matcher(details).replaceFirst(""); //$NON-NLS-1$
@@ -35,7 +35,11 @@ public class PartInUse {
         part.setUnit(u);
         this.description = sb.toString();
         this.partToBuy = part.getAcquisitionWork();
-        this.cost = partToBuy.getBuyCost();
+        if(null == partToBuy) {
+            System.err.println(String.format("Registeing part without a corresponding acquisition work: %s", part.getPartName())); //$NON-NLS-1$
+        } else {
+            this.cost = partToBuy.getBuyCost();
+        }
     }
     
     public PartInUse(String description, IAcquisitionWork partToBuy, long cost) {

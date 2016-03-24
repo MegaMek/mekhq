@@ -21,7 +21,6 @@
 package mekhq.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -52,7 +51,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.Vector;
@@ -93,7 +91,6 @@ import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SortOrder;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -112,6 +109,12 @@ import javax.swing.tree.TreeSelectionModel;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import chat.ChatClient;
 import megamek.client.RandomNameGenerator;
 import megamek.client.RandomUnitGenerator;
 import megamek.client.ui.swing.GameOptionsDialog;
@@ -262,13 +265,6 @@ import mekhq.gui.view.PersonViewPanel;
 import mekhq.gui.view.PlanetViewPanel;
 import mekhq.gui.view.ScenarioViewPanel;
 import mekhq.gui.view.UnitViewPanel;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import chat.ChatClient;
 
 /**
  * The application's main frame.
@@ -4763,7 +4759,7 @@ public class CampaignGUI extends JPanel {
         refreshOverviewPartsInUse();
     }
 
-    public void initOverviewPartsInUse() {
+    private void initOverviewPartsInUse() {
         overviewPartsPanel = new JPanel(new GridBagLayout());
         
         overviewPartsModel = new PartsInUseTableModel();
@@ -4794,7 +4790,7 @@ public class CampaignGUI extends JPanel {
         partsInUseSorter.setSortKeys(Arrays.asList(new RowSorter.SortKey(0, SortOrder.ASCENDING)));
         overviewPartsInUseTable.setRowSorter(partsInUseSorter);
         
-        // Add buttons and actions
+        // Add buttons and actions. TODO: Only refresh the row we are working on, not the whole table
         @SuppressWarnings("serial")
         Action buy = new AbstractAction() {
             @Override

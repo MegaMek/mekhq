@@ -1123,6 +1123,16 @@ public class Campaign implements Serializable {
         return parts;
     }
 
+    private int getQuantity(Part p) {
+        if(p instanceof Armor) {
+            return ((Armor) p).getAmount();
+        }
+        if(p instanceof AmmoStorage) {
+            return ((AmmoStorage) p).getShots();
+        }
+        return ((p.getUnit() != null) || (p.getUnitId() != null)) ? 1 : p.getQuantity();
+    }
+    
     public Set<PartInUse> getPartsInUse() {
         // java.util.Set doesn't supply a get(Object) method, so we have to use a java.util.Map
         Map<PartInUse, PartInUse> inUse = new HashMap<PartInUse, PartInUse>();
@@ -1143,11 +1153,13 @@ public class Campaign implements Serializable {
                 inUse.put(piu, piu);
             }
             if ((p.getUnit() != null) || (p.getUnitId() != null) || missingPart) {
-                int quantity = (p instanceof Armor) ? ((Armor)p).getAmount() : 1;
-                piu.setUseCount(piu.getUseCount() + quantity);
+                piu.setUseCount(piu.getUseCount() + getQuantity(p));
             } else {
-                int quantity = (p instanceof Armor) ? ((Armor)p).getAmount() : p.getQuantity();
-                piu.setStoreCount(piu.getStoreCount() + quantity);
+                if(p.isPresent()) {
+                    piu.setStoreCount(piu.getStoreCount() + getQuantity(p));
+                } else {
+                    piu.setTransferCount(piu.getTransferCount() + getQuantity(p));
+                }
             }
         }
         for(IAcquisitionWork maybePart : shoppingList.getPartList()) {
@@ -1164,8 +1176,7 @@ public class Campaign implements Serializable {
             } else {
                 inUse.put(piu, piu);
             }
-            int quantity = ((p instanceof Armor) ? ((Armor)p).getAmount() : 1) * maybePart.getQuantity();
-            piu.setTransferCount(piu.getTransferCount() + quantity);
+            piu.setPlannedCount(piu.getPlannedCount() + getQuantity(p) * maybePart.getQuantity());
             
         }
         return inUse.keySet();
