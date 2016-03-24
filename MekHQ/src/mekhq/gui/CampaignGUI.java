@@ -752,7 +752,7 @@ public class CampaignGUI extends JPanel {
         refreshDoctorsList();
         refreshPartsList();
         refreshCalendar();
-        refreshReport();
+        initReport();
         refreshFunds();
         refreshRating();
         refreshFinancialTransactions();
@@ -3977,7 +3977,7 @@ public class CampaignGUI extends JPanel {
         refreshCalendar();
         refreshLocation();
         refreshOrganization();
-        refreshReport();
+        initReport();
         refreshFunds();
         refreshFinancialTransactions();
         refreshOverview();
@@ -6570,7 +6570,13 @@ public class CampaignGUI extends JPanel {
     }
 
     public void refreshReport() {
-        panLog.refreshLog(getCampaign().getCurrentReportHTML());
+        //panLog.refreshLog(getCampaign().getCurrentReportHTML());
+    	panLog.appendLog(getCampaign().fetchAndClearNewReports());
+    }
+    
+    public void initReport() {
+    	panLog.refreshLog(getCampaign().getCurrentReportHTML());
+    	getCampaign().fetchAndClearNewReports();
     }
 
     public void refreshOrganization() {

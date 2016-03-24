@@ -172,7 +172,9 @@ import org.w3c.dom.NodeList;
  * @author Taharqa The main campaign class, keeps track of teams and units
  */
 public class Campaign implements Serializable {
-    private static final long serialVersionUID = -6312434701389973056L;
+    private static final String REPORT_LINEBREAK = "<br/><br/>"; //$NON-NLS-1$
+
+	private static final long serialVersionUID = -6312434701389973056L;
 
     // we have three things to track: (1) teams, (2) units, (3) repair tasks
     // we will use the same basic system (borrowed from MegaMek) for tracking
@@ -236,6 +238,7 @@ public class Campaign implements Serializable {
 
     private ArrayList<String> currentReport;
     private transient String currentReportHTML;
+    private transient List<String> newReports;
 
     private boolean overtime;
     private boolean gmMode;
@@ -274,6 +277,7 @@ public class Campaign implements Serializable {
         game.addPlayer(0, player);
         currentReport = new ArrayList<String>();
         currentReportHTML = "";
+        newReports = new ArrayList<String>();
         calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
         dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");
         shortDateFormat = new SimpleDateFormat("yyyyMMdd");
@@ -1181,6 +1185,12 @@ public class Campaign implements Serializable {
     	return currentReportHTML;
     }
 
+    public List<String> fetchAndClearNewReports() {
+    	List<String> oldReports = newReports;
+    	newReports = new ArrayList<String>();
+    	return oldReports;
+    }
+    
 	/**
 	 * Finds the active person in a particular role with the highest level
 	 * in a given, with an optional secondary skill to break ties.
@@ -1944,6 +1954,7 @@ public class Campaign implements Serializable {
         calendar.add(Calendar.DAY_OF_MONTH, 1);
         currentReport.clear();
         currentReportHTML = "";
+        newReports.clear();
         addReport("<b>" + getDateAsString() + "</b>");
 
         if (calendar.get(Calendar.DAY_OF_YEAR) == 1) {
@@ -2936,9 +2947,12 @@ public class Campaign implements Serializable {
     public void addReport(String r) {
         currentReport.add(r);
         if( currentReportHTML.length() > 0 ) {
-        	currentReportHTML = currentReportHTML + "<br/><br/>" + r;
+        	currentReportHTML = currentReportHTML + REPORT_LINEBREAK + r;
+            newReports.add(REPORT_LINEBREAK);
+            newReports.add(r);
         } else {
         	currentReportHTML = r;
+            newReports.add(r);
         }
     }
 
@@ -4749,7 +4763,18 @@ public class Campaign implements Serializable {
             retVal.ranks = new Ranks(rankSystem);
             retVal.ranks.setOldRankSystem(rankSystem);
         }
-        retVal.currentReportHTML = Utilities.combineString(retVal.currentReport, "<br/><br/>");
+        retVal.currentReportHTML = Utilities.combineString(retVal.currentReport, REPORT_LINEBREAK);
+        // Everything's new
+        retVal.newReports = new ArrayList<String>(retVal.currentReport.size() * 2);
+        boolean firstReport = true;
+        for(String report : retVal.currentReport) {
+        	if(firstReport) {
+        		firstReport = false;
+        	} else {
+        		retVal.newReports.add(REPORT_LINEBREAK);
+        	}
+        	retVal.newReports.add(report);
+        }
     }
 
     private static void processLanceNodes(Campaign retVal, Node wn) {

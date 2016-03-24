@@ -26,6 +26,7 @@ import java.awt.BorderLayout;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -36,8 +37,11 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Document;
+import javax.swing.text.Element;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
+
+import mekhq.Utilities;
 
 /**
  * This is a panel for displaying the reporting log for each day. We are putting it into
@@ -84,6 +88,9 @@ public class DailyReportLogPanel extends JPanel {
     }
 
     public void refreshLog(String s) {
+    	if(logText.equals(s)) {
+    		return;
+    	}
         logText = s;
         //txtLog.setText(logText); -- NO. BAD. DON'T DO THIS.
         Reader stringReader = new StringReader(logText);
@@ -95,7 +102,22 @@ public class DailyReportLogPanel extends JPanel {
 			// Ignore
 		}
         txtLog.setDocument(blank);
+		txtLog.setCaretPosition(blank.getLength());
     }
+
+	public void appendLog(List<String> newReports) {
+		String addedText = Utilities.combineString(newReports, ""); //$NON-NLS-1$
+		if((null != addedText) && (addedText.length() > 0)) {
+			HTMLDocument doc = (HTMLDocument) txtLog.getDocument();
+			try {
+				// Element 0 is <head>, Element 1 is <body>
+				doc.insertBeforeEnd(doc.getDefaultRootElement().getElement(1), addedText);
+			} catch (BadLocationException | IOException e) {
+				// Shouldn't happen
+			}
+			txtLog.setCaretPosition(doc.getLength());
+		}
+	}
 
     public String getLogText() {
         return logText;
