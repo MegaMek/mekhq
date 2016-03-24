@@ -4779,6 +4779,19 @@ public class CampaignGUI extends JPanel {
         overviewPartsInUseTable.setIntercellSpacing(new Dimension(0, 0));
         overviewPartsInUseTable.setShowGrid(false);
         partsInUseSorter = new TableRowSorter<PartsInUseTableModel>(overviewPartsModel);
+        // Don't sort the buttons
+        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_BUY, false);
+        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_BUY_BULK, false);
+        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_GMADD, false);
+        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_GMADD_BULK, false);
+        // Numeric columns
+        partsInUseSorter.setComparator(PartsInUseTableModel.COL_IN_USE, new FormattedNumberSorter());
+        partsInUseSorter.setComparator(PartsInUseTableModel.COL_STORED, new FormattedNumberSorter());
+        // Needs a special sorter for the parentheses
+        // partsInUseSorter.setComparator(PartsInUseTableModel.COL_IN_TRANSFER, new FormattedNumberSorter());
+        partsInUseSorter.setComparator(PartsInUseTableModel.COL_COST, new FormattedNumberSorter());
+        // Default starting sort
+        partsInUseSorter.setSortKeys(Arrays.asList(new RowSorter.SortKey(0, SortOrder.ASCENDING)));
         overviewPartsInUseTable.setRowSorter(partsInUseSorter);
         
         // Add buttons and actions
