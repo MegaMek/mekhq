@@ -106,6 +106,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.tree.TreeSelectionModel;
 import javax.xml.parsers.DocumentBuilder;
@@ -228,6 +229,7 @@ import mekhq.gui.model.FinanceTableModel;
 import mekhq.gui.model.LoanTableModel;
 import mekhq.gui.model.OrgTreeModel;
 import mekhq.gui.model.PartsInUseTableModel;
+import mekhq.gui.model.PartsInUseTableModel.ButtonColumn;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.PatientTableModel;
 import mekhq.gui.model.PersonnelTableModel;
@@ -4762,8 +4764,8 @@ public class CampaignGUI extends JPanel {
     }
 
     public void initOverviewPartsInUse() {
-		overviewPartsPanel = new JPanel(new GridBagLayout());
-		
+        overviewPartsPanel = new JPanel(new GridBagLayout());
+        
         overviewPartsModel = new PartsInUseTableModel();
         overviewPartsInUseTable = new JTable(overviewPartsModel);
         overviewPartsInUseTable.setRowSelectionAllowed(false);
@@ -4781,75 +4783,75 @@ public class CampaignGUI extends JPanel {
         
         // Add buttons and actions
         @SuppressWarnings("serial")
-		Action buy = new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				int row = Integer.valueOf(e.getActionCommand());
-				PartInUse piu = overviewPartsModel.getPartInUse(row);
-            	getCampaign().getShoppingList().addShoppingItem(piu.getPartToBuy(), 1, getCampaign());
-            	refreshReport();
-        		refreshAcquireList();
-        		refreshPartsList();
-        		refreshOverviewPartsInUse();
-			}
-		};
-		@SuppressWarnings("serial")
-		Action buyInBulk = new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				int row = Integer.valueOf(e.getActionCommand());
-				PartInUse piu = overviewPartsModel.getPartInUse(row);
-            	int quantity = 1;
-            	PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true, "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, 100);
-    			pcd.setVisible(true);
-    			quantity = pcd.getValue();
-            	getCampaign().getShoppingList().addShoppingItem(piu.getPartToBuy(), quantity, getCampaign());
-            	refreshReport();
-        		refreshAcquireList();
-        		refreshPartsList();
-        		refreshOverviewPartsInUse();
-			}
-		};
+        Action buy = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = Integer.valueOf(e.getActionCommand());
+                PartInUse piu = overviewPartsModel.getPartInUse(row);
+                getCampaign().getShoppingList().addShoppingItem(piu.getPartToBuy(), 1, getCampaign());
+                refreshReport();
+                refreshAcquireList();
+                refreshPartsList();
+                refreshOverviewPartsInUse();
+            }
+        };
         @SuppressWarnings("serial")
-		Action add = new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				int row = Integer.valueOf(e.getActionCommand());
-				PartInUse piu = overviewPartsModel.getPartInUse(row);
-            	getCampaign().addPart((Part) piu.getPartToBuy().getNewEquipment(), 0);
-        		refreshAcquireList();
-        		refreshPartsList();
-        		refreshOverviewPartsInUse();
-			}
-		};
+        Action buyInBulk = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = Integer.valueOf(e.getActionCommand());
+                PartInUse piu = overviewPartsModel.getPartInUse(row);
+                int quantity = 1;
+                PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true, "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, 100);
+                pcd.setVisible(true);
+                quantity = pcd.getValue();
+                getCampaign().getShoppingList().addShoppingItem(piu.getPartToBuy(), quantity, getCampaign());
+                refreshReport();
+                refreshAcquireList();
+                refreshPartsList();
+                refreshOverviewPartsInUse();
+            }
+        };
         @SuppressWarnings("serial")
-		Action addInBulk = new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				int row = Integer.valueOf(e.getActionCommand());
-				PartInUse piu = overviewPartsModel.getPartInUse(row);
-            	int quantity = 1;
-            	PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true, "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, 100);
-    			pcd.setVisible(true);
-    			quantity = pcd.getValue();
-    			while(quantity > 0) {
-                	getCampaign().addPart((Part) piu.getPartToBuy().getNewEquipment(), 0);
-    		        -- quantity;
-    		    }
-        		refreshAcquireList();
-        		refreshPartsList();
-        		refreshOverviewPartsInUse();
-			}
-		};
+        Action add = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = Integer.valueOf(e.getActionCommand());
+                PartInUse piu = overviewPartsModel.getPartInUse(row);
+                getCampaign().addPart((Part) piu.getPartToBuy().getNewEquipment(), 0);
+                refreshAcquireList();
+                refreshPartsList();
+                refreshOverviewPartsInUse();
+            }
+        };
+        @SuppressWarnings("serial")
+        Action addInBulk = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = Integer.valueOf(e.getActionCommand());
+                PartInUse piu = overviewPartsModel.getPartInUse(row);
+                int quantity = 1;
+                PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true, "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, 100);
+                pcd.setVisible(true);
+                quantity = pcd.getValue();
+                while(quantity > 0) {
+                    getCampaign().addPart((Part) piu.getPartToBuy().getNewEquipment(), 0);
+                    -- quantity;
+                }
+                refreshAcquireList();
+                refreshPartsList();
+                refreshOverviewPartsInUse();
+            }
+        };
 
         new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable,
-        	buy, PartsInUseTableModel.COL_BUTTON_BUY);
+            buy, PartsInUseTableModel.COL_BUTTON_BUY);
         new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable,
-        	buyInBulk, PartsInUseTableModel.COL_BUTTON_BUY_BULK);
+            buyInBulk, PartsInUseTableModel.COL_BUTTON_BUY_BULK);
         new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable,
             add, PartsInUseTableModel.COL_BUTTON_GMADD);
         new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable,
-        	addInBulk, PartsInUseTableModel.COL_BUTTON_GMADD_BULK);
+            addInBulk, PartsInUseTableModel.COL_BUTTON_GMADD_BULK);
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
 
@@ -4864,12 +4866,12 @@ public class CampaignGUI extends JPanel {
     }
     
     public void refreshOverviewPartsInUse() {
-    	overviewPartsModel.setData(getCampaign().getPartsInUse());
-    	if( getCampaign().isGM() ) {
-    		// TODO
-    	} else {
-    		// TODO
-    	}
+        overviewPartsModel.setData(getCampaign().getPartsInUse());
+        TableColumnModel tcm = overviewPartsInUseTable.getColumnModel();
+        PartsInUseTableModel.ButtonColumn column = (ButtonColumn)tcm.getColumn(PartsInUseTableModel.COL_BUTTON_GMADD).getCellRenderer();
+        column.setEnabled(getCampaign().isGM());
+        column = (ButtonColumn)tcm.getColumn(PartsInUseTableModel.COL_BUTTON_GMADD_BULK).getCellRenderer();
+        column.setEnabled(getCampaign().isGM());
     }
 
     public void refreshPersonnelView() {
