@@ -1,6 +1,11 @@
 VERSION HISTORY
 ----------------------------------
 v0.3.26-git
++ PR #35: Adding age limiting options to the "Hire in bulk" dialogue
++ Feature: Choose Surname on Marriage
++ PR #9: UI Enhancement - Added Dependents group to Personnel Type menu
++ PR #8: UI Enhancement - Add Spouse to Person Panel
++ PR #34: Make generateRandomCrewWithCombinedSkill() also generate and register the crew's unique IDs
 + Bug: GameOptionsDialog does not match MegaMek's GameOptionsDialog
     This bug was caused by duplicating G.O.D. rather than just implementing MM's
     version of it. I added the one minor thing the MM version needed added to support
