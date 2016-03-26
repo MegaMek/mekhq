@@ -22,12 +22,12 @@ import mekhq.campaign.personnel.Person;
         public RankSorter(Campaign c) {
             campaign = c;
             c.getRanks();
+            pattern = Pattern.compile("id=\"([^\"]+)\""); //$NON-NLS-1$
         }
 
         @Override
         public int compare(String s0, String s1) {
         	// get the numbers associated with each rank string, and compare
-        	pattern = Pattern.compile("id=\"([^\"]+)\"");
         	matcher = pattern.matcher(s0);
         	matcher.find();
         	String s00 = matcher.group(1);
@@ -41,13 +41,16 @@ import mekhq.campaign.personnel.Person;
 	        	if (p0.getRankNumeric() == p1.getRankNumeric()) {
 	        		// the levels match too, try comparing MD rank
 	        		if (p0.getRankLevel() == p1.getRankLevel()) {
-	        			return ((Comparable<Integer>)p0.getManeiDominiRank()).compareTo(p1.getManeiDominiRank());
+	        		    if(p0.getManeiDominiRank() == p1.getManeiDominiRank()) {
+	        		        return s0.compareTo(s1);
+	        		    }
+	        		    return Integer.compare(p0.getManeiDominiRank(), p1.getManeiDominiRank());
 	        		}
-	            	return ((Comparable<Integer>)p0.getRankLevel()).compareTo(p1.getRankLevel());
+	        		return Integer.compare(p0.getRankLevel(), p1.getRankLevel());
 	        	}
-	            return ((Comparable<Integer>)p0.getRankNumeric()).compareTo(p1.getRankNumeric());
+	        	return Integer.compare(p0.getRankNumeric(), p1.getRankNumeric());
         	} catch (Exception e) {
-        		MekHQ.logError("[DEBUG] RankSorter Exception, s0: "+s00+", s1: "+s11);
+        		MekHQ.logError(String.format("[DEBUG] RankSorter Exception, s0: %s, s1: %s", s00, s11)); //$NON-NLS-1$
         		e.printStackTrace();
         		return 0;
         	}
