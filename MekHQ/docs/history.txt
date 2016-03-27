@@ -1,6 +1,9 @@
 VERSION HISTORY
 ----------------------------------
 v0.3.26-git
++ PR #38: Recording "willing to defect" prisoner status,
+          allow to recruit them without resorting to GM tools,
+          allow to easily find them by sorting by rank
 + PR #35: Adding age limiting options to the "Hire in bulk" dialogue
 + Feature: Choose Surname on Marriage
 + PR #9: UI Enhancement - Added Dependents group to Personnel Type menu
