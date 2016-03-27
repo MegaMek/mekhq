@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.3.26-git
++ Raising XP limits for gained XP and abilities, as per SF feature request 354
 + PR #38: Recording "willing to defect" prisoner status,
           allow to recruit them without resorting to GM tools,
           allow to easily find them by sorting by rank
