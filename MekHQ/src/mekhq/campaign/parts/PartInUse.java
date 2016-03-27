@@ -18,6 +18,15 @@ public class PartInUse {
     private int plannedCount;
     private long cost;
     
+    private void appendDetails(StringBuilder sb, Part part) {
+        String details = part.getDetails();
+        details = cleanUp1.matcher(details).replaceFirst(""); //$NON-NLS-1$
+        details = cleanUp2.matcher(details).replaceFirst(""); //$NON-NLS-1$
+        if(details.length() > 0) {
+            sb.append(" (").append(details).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+    }
+    
     public PartInUse(Part part) {
         StringBuilder sb = new StringBuilder(part.getName());
         Unit u = part.getUnit();
@@ -25,16 +34,19 @@ public class PartInUse {
             part.setUnit(null);
         }
         if(!(part instanceof Armor) && !(part instanceof AmmoStorage)) {
-            String details = part.getDetails();
-            details = cleanUp1.matcher(details).replaceFirst(""); //$NON-NLS-1$
-            details = cleanUp2.matcher(details).replaceFirst(""); //$NON-NLS-1$
-            if(details.length() > 0) {
-                sb.append(" (").append(details).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
-            }
+            appendDetails(sb, part);
         }
         part.setUnit(u);
         this.description = sb.toString();
         this.partToBuy = part.getAcquisitionWork();
+        // AmmoBin are special: They aren't buyable (yet?), but instead buy you the ammo inside
+        // We redo the description based on that
+        if(partToBuy instanceof AmmoStorage) {
+            sb.setLength(0);
+            sb.append(((AmmoStorage) partToBuy).getName());
+            appendDetails(sb, (Part) ((AmmoStorage) partToBuy).getAcquisitionWork());
+            this.description = sb.toString();
+        }
         if(null == partToBuy) {
             System.err.println(String.format("Registeing part without a corresponding acquisition work: %s", part.getPartName())); //$NON-NLS-1$
         } else {

@@ -39,7 +39,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -54,6 +53,12 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import megamek.client.RandomNameGenerator;
 import megamek.client.RandomUnitGenerator;
@@ -123,7 +128,6 @@ import mekhq.campaign.parts.BaArmor;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekLocation;
-import mekhq.campaign.parts.MissingBattleArmorSuit;
 import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.MissingMekActuator;
 import mekhq.campaign.parts.MissingPart;
@@ -165,12 +169,6 @@ import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.Modes;
 import mekhq.gui.utilities.PortraitFileFactory;
-
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * @author Taharqa The main campaign class, keeps track of teams and units

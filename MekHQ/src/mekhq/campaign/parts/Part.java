@@ -1280,5 +1280,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     		&& getLocation() == getUnit().getEntity().getLocationFromAbbr(loc);
     }
     
+    @Override
+    public String toString() {
+        return getName() + " " + getDetails();
+    }
 }
 
