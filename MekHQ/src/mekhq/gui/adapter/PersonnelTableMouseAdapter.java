@@ -101,6 +101,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_REMOVE_SPOUSE = "REMOVE_SPOUSE"; //$NON-NLS-1$
     private static final String CMD_ADD_TECH = "ADD_TECH"; //$NON-NLS-1$
     
+    private static final String CMD_IMPRISON = "IMPRISON"; //$NON-NLS-1$
+    private static final String CMD_FREE = "FREE"; //$NON-NLS-1$
+    private static final String CMD_RECRUIT = "RECRUIT"; //$NON-NLS-1$
+    
     private static final String SEPARATOR = "@"; //$NON-NLS-1$
     private static final String SPACE = " "; //$NON-NLS-1$
     private static final String HYPHEN = "-"; //$NON-NLS-1$
@@ -132,6 +136,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String OPT_EDGE_KO = "edge_when_ko"; //$NON-NLS-1$
     private static final String OPT_EDGE_TAC = "edge_when_tac"; //$NON-NLS-1$
     private static final String OPT_EDGE_HEADHIT = "edge_when_headhit"; //$NON-NLS-1$
+    
+    private static final String OPT_PRISONER_FREE = "free"; //$NON-NLS-1$
+    private static final String OPT_PRISONER_IMPRISONED = "imprisoned"; //$NON-NLS-1$
+    private static final String OPT_PRISONER_IMPRISONED_DEFECTING = "imprisoned_defecting"; //$NON-NLS-1$
+    private static final String OPT_PRISONER_BONDSMAN = "bondsman"; //$NON-NLS-1$
 
     private String makeCommand(String ... parts) {
         return Utilities.combineString(Arrays.asList(parts), SEPARATOR);
@@ -550,10 +559,44 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 break;
             }
             case CMD_CHANGE_PRISONER_STATUS:
-                int selected = Integer.parseInt(data[1]);
+                String selected = data[1];
                 for (Person person : people) {
-                    gui.getCampaign().changePrisonerStatus(person, selected);
+                switch(selected) {
+                    case OPT_PRISONER_FREE:
+                        gui.getCampaign().changePrisonerStatus(person, Person.PRISONER_NOT);
+                        break;
+                    case OPT_PRISONER_IMPRISONED:
+                        gui.getCampaign().changePrisonerStatus(person, Person.PRISONER_YES);
+                        break;
+                    case OPT_PRISONER_IMPRISONED_DEFECTING:
+                        gui.getCampaign().changePrisonerStatus(person, Person.PRISONER_YES);
+                        person.setWillingToDefect(true);
+                        break;
+                    case OPT_PRISONER_BONDSMAN:
+                        gui.getCampaign().changePrisonerStatus(person, Person.PRISONER_BONDSMAN);
+                        break;
+                    default:
+                        // U WOT M8?
+                        break;
+                    }
                 }
+                break;
+            case CMD_IMPRISON:
+                gui.getCampaign().changePrisonerStatus(selectedPerson, Person.PRISONER_YES);
+                break;
+            case CMD_FREE:
+                // TODO: Warn in particular for "freeing" in deep space, leading to Geneva Conventions violation
+                // TODO: Record the people into some NPC pool, if still alive
+                if(0 == JOptionPane.showConfirmDialog(
+                        null,
+                        String.format(resourceMap.getString("confirmFree.format"), selectedPerson.getFullTitle()), //$NON-NLS-1$
+                        resourceMap.getString("freeQ.text"), //$NON-NLS-1$
+                        JOptionPane.YES_NO_OPTION)) {
+                    gui.getCampaign().removePerson(selectedPerson.getId());
+                }
+                break;
+            case CMD_RECRUIT:
+                gui.getCampaign().changePrisonerStatus(selectedPerson, Person.PRISONER_NOT);
                 break;
             case CMD_EDGE_TRIGGER:
             {
@@ -1077,19 +1120,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 menu.add(cbMenuItem);
             }
             popup.add(menu);
-            menu = new JMenu(resourceMap.getString("changePrisonerStatus.text")); //$NON-NLS-1$
-            for (int s = 0; s < Person.PRISONER_NUM; s++) {
-                cbMenuItem = new JCheckBoxMenuItem(
-                        Person.getPrisonerStatusName(s));
-                if (person.getPrisonerStatus() == s) {
-                    cbMenuItem.setSelected(true);
-                }
-                cbMenuItem.setActionCommand(makeCommand(CMD_CHANGE_PRISONER_STATUS, String.valueOf(s)));
-                cbMenuItem.addActionListener(this);
-                cbMenuItem.setEnabled(true);
-                menu.add(cbMenuItem);
+            
+            if(oneSelected) {
+                popup.add(newMenuItem(resourceMap.getString("imprison.text"), CMD_IMPRISON, person.isFree())); //$NON-NLS-1$
+                popup.add(newMenuItem(resourceMap.getString("free.text"), CMD_FREE, !person.isFree())); //$NON-NLS-1$
+                popup.add(newMenuItem(resourceMap.getString("recruit.text"), CMD_RECRUIT, //$NON-NLS-1$
+                        person.isBondsman() || person.isWillingToDefect()));
             }
-            popup.add(menu);
+            
             menu = new JMenu(resourceMap.getString("changePrimaryRole.text")); //$NON-NLS-1$
             for (int i = Person.T_MECHWARRIOR; i < Person.T_NUM; i++) {
                 if (person.canPerformRole(i)
@@ -1764,6 +1802,27 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 popup.add(menuItem);
             }
             menu = new JMenu(resourceMap.getString("gmMode.text")); //$NON-NLS-1$
+
+            menuItem = new JMenu(resourceMap.getString("changePrisonerStatus.text")); //$NON-NLS-1$
+            menuItem.add(newCheckboxMenu(
+                    Person.getPrisonerStatusName(Person.PRISONER_NOT),
+                    makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_FREE),
+                    person.getPrisonerStatus() == Person.PRISONER_NOT));
+            menuItem.add(newCheckboxMenu(
+                    Person.getPrisonerStatusName(Person.PRISONER_YES),
+                    makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_IMPRISONED),
+                    (person.getPrisonerStatus() == Person.PRISONER_YES) && !person.isWillingToDefect()));
+            menuItem.add(newCheckboxMenu(
+                    resourceMap.getString("prisonerWillingToDefect.text"), //$NON-NLS-1$
+                    makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_IMPRISONED_DEFECTING),
+                    (person.getPrisonerStatus() == Person.PRISONER_YES) && person.isWillingToDefect()));
+            menuItem.add(newCheckboxMenu(
+                    Person.getPrisonerStatusName(Person.PRISONER_BONDSMAN),
+                    makeCommand(CMD_CHANGE_PRISONER_STATUS, OPT_PRISONER_BONDSMAN),
+                    person.getPrisonerStatus() == Person.PRISONER_BONDSMAN));
+            menuItem.setEnabled(gui.getCampaign().isGM());
+            menu.add(menuItem);
+            
             menuItem = new JMenuItem(resourceMap.getString("removePerson.text")); //$NON-NLS-1$
             menuItem.setActionCommand(CMD_REMOVE);
             menuItem.addActionListener(this);
@@ -1826,5 +1885,30 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             popup.add(menu);
             popup.show(e.getComponent(), e.getX(), e.getY());
         }
+    }
+
+    private JMenuItem newMenuItem(String text, String command) {
+        return newMenuItem(text, command, true);
+    }
+
+    private JMenuItem newMenuItem(String text, String command, boolean enabled) {
+        JMenuItem result = new JMenuItem(text);
+        result.setActionCommand(command);
+        result.addActionListener(this);
+        result.setEnabled(enabled);
+        return result;
+    }
+
+    private JCheckBoxMenuItem newCheckboxMenu(String text, String command, boolean selected) {
+        return newCheckboxMenu(text, command, selected, true);
+    }
+
+    private JCheckBoxMenuItem newCheckboxMenu(String text, String command, boolean selected, boolean enabled) {
+        JCheckBoxMenuItem result = new JCheckBoxMenuItem(text);
+        result.setSelected(selected);
+        result.setActionCommand(command);
+        result.addActionListener(this);
+        result.setEnabled(true);
+        return result;
     }
 }

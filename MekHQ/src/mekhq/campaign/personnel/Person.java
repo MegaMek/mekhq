@@ -189,6 +189,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     protected int salary;
     private int hits;
     private int prisonerStatus;
+    // Is this person willing to defect? Only for prisoners ...
+    private boolean willingToDefect;
 
     boolean dependent;
     boolean commander;
@@ -386,11 +388,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public void setBondsman() {
         prisonerStatus = PRISONER_BONDSMAN;
+        willingToDefect = false;
         setRankNumeric(Ranks.RANK_BONDSMAN);
     }
 
     public boolean isFree() {
-        return (isPrisoner() || isBondsman());
+        return (!isPrisoner() && !isBondsman());
     }
 
     public void setFreeMan() {
@@ -399,10 +402,21 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public void setPrisonerStatus(int status) {
         prisonerStatus = status;
+        if( prisonerStatus != PRISONER_YES ) {
+            willingToDefect = false;
+        }
     }
 
     public int getPrisonerStatus() {
         return prisonerStatus;
+    }
+    
+    public boolean isWillingToDefect() {
+        return willingToDefect;
+    }
+    
+    public void setWillingToDefect(boolean willingToDefect) {
+        this.willingToDefect = willingToDefect && (prisonerStatus == PRISONER_YES);
     }
 
     public String getGenderName() {
@@ -1203,6 +1217,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     + prisonerStatus
                     + "</prisonerstatus>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                    + "<willingToDefect>"
+                    + willingToDefect
+                    + "</willingToDefect>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<hits>"
                     + hits
                     + "</hits>");
@@ -1424,6 +1442,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     retVal.status = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("prisonerstatus")) {
                     retVal.prisonerStatus = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("willingToDefect")) {
+                    retVal.willingToDefect = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("salary")) {
                     retVal.salary = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("minutesLeft")) {
@@ -2120,7 +2140,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
 
     public String makeHTMLRankDiv() {
-    	return "<div id=\""+getId()+"\">"+getRankName()+"</div>";
+    	return "<div id=\""+getId()+"\">"+getRankName()+ (isWillingToDefect() ? "*" : "") + "</div>";
     }
 
     public String getHyperlinkedFullTitle() {
