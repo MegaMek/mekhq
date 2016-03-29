@@ -61,7 +61,7 @@ public class PartInUse {
             this.tonnagePerItem = 1.0 / ((Armor) part).getArmorPointsPerTon();
         }
         if(null == partToBuy) {
-            System.err.println(String.format("Registeing part without a corresponding acquisition work: %s", part.getPartName())); //$NON-NLS-1$
+            System.err.println(String.format("Registering part without a corresponding acquisition work: %s", part.getPartName())); //$NON-NLS-1$
         } else {
             this.cost = partToBuy.getBuyCost();
         }

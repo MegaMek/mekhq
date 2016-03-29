@@ -1136,11 +1136,18 @@ public class Campaign implements Serializable {
         if (p instanceof StructuralIntegrity) {
             return null;
         }
+        // Makes no sense buying those separately from the chasis
+        if((p instanceof EquipmentPart)
+            && (((EquipmentPart) p).getType().hasFlag(MiscType.F_CHASSIS_MODIFICATION)))
+        {
+            return null;
+        }
         // Replace a "missing" part with a corresponding "new" one.
         if(p instanceof MissingPart) {
             p = ((MissingPart) p).getNewPart();
         }
-        return new PartInUse(p);
+        PartInUse result = new PartInUse(p);
+        return (null != result.getPartToBuy()) ? result : null;
     }
     
     private void updatePartInUseData(PartInUse piu, Part p) {

@@ -151,7 +151,12 @@ public class PartsInUseTableModel extends DataTableModel {
         if((row < 0) || (row >= data.size())) {
             return null;
         }
-        return (PartInUse)data.get(row);
+        return (PartInUse) data.get(row);
+    }
+    
+    public boolean isBuyable(int row) {
+        return (row >= 0) && (row < data.size())
+            && (null != ((PartInUse) data.get(row)).getPartToBuy());
     }
 
     public int getAlignment(int column) {
@@ -332,6 +337,8 @@ public class PartsInUseTableModel extends DataTableModel {
 
         @Override
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+            boolean buyable = ((PartsInUseTableModel) table.getModel()).isBuyable(table.getRowSorter().convertRowIndexToModel(row));
+            
             if(value == null) {
                 editButton.setText(EMPTY_CELL);
                 editButton.setIcon(null);
@@ -342,14 +349,17 @@ public class PartsInUseTableModel extends DataTableModel {
                 editButton.setText(value.toString());
                 editButton.setIcon(null);
             }
-
+            editButton.setEnabled(enabled && buyable);
+            
             this.editorValue = value;
             return editButton;
         }
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            if(isSelected && enabled) {
+            boolean buyable = ((PartsInUseTableModel) table.getModel()).isBuyable(table.getRowSorter().convertRowIndexToModel(row));
+            
+            if(isSelected && enabled && buyable) {
                 renderButton.setForeground(table.getSelectionForeground());
                  renderButton.setBackground(table.getSelectionBackground());
             } else {
@@ -357,7 +367,7 @@ public class PartsInUseTableModel extends DataTableModel {
                 renderButton.setBackground(UIManager.getColor("Button.background")); //$NON-NLS-1$
             }
 
-            if(hasFocus && enabled) {
+            if(hasFocus && enabled && buyable) {
                 renderButton.setBorder(focusBorder);
             } else {
                 renderButton.setBorder(originalBorder);
@@ -374,7 +384,8 @@ public class PartsInUseTableModel extends DataTableModel {
                 renderButton.setText(value.toString());
                 renderButton.setIcon(null);
             }
-
+            renderButton.setEnabled(enabled && buyable);
+            
             return renderButton;
         }
     }
