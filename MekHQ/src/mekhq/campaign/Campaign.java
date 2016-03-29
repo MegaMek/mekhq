@@ -1171,7 +1171,8 @@ public class Campaign implements Serializable {
             PartInUse newPiu = getPartInUse((Part) maybePart);
             if(piu.equals(newPiu)) {
                 piu.setPlannedCount(piu.getPlannedCount()
-                    + getQuantity((Part) maybePart) * maybePart.getQuantity());
+                    + getQuantity((maybePart instanceof MissingPart) ? ((MissingPart) maybePart).getNewPart() : (Part) maybePart)
+                    * maybePart.getQuantity());
             }
         }
     }
@@ -1202,7 +1203,8 @@ public class Campaign implements Serializable {
                 inUse.put(piu, piu);
             }
             piu.setPlannedCount(piu.getPlannedCount()
-                + getQuantity((Part) maybePart) * maybePart.getQuantity());
+                + getQuantity((maybePart instanceof MissingPart) ? ((MissingPart) maybePart).getNewPart() : (Part) maybePart)
+                * maybePart.getQuantity());
             
         }
         return inUse.keySet();

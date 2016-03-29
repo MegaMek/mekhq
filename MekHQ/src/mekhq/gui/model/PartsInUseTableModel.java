@@ -140,6 +140,12 @@ public class PartsInUseTableModel extends DataTableModel {
     public void setData(Set<PartInUse> data) {
         setData(new ArrayList<PartInUse>(data));
     }
+    
+    @SuppressWarnings("unchecked")
+    public void updateRow(int row, PartInUse piu) {
+        ((ArrayList<PartInUse>) data).set(row, piu);
+        fireTableRowsUpdated(row, row);
+    }
 
     public PartInUse getPartInUse(int row) {
         if((row < 0) || (row >= data.size())) {

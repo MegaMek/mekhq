@@ -4781,6 +4781,7 @@ public class CampaignGUI extends JPanel {
         overviewPartsInUseTable.setIntercellSpacing(new Dimension(0, 0));
         overviewPartsInUseTable.setShowGrid(false);
         partsInUseSorter = new TableRowSorter<PartsInUseTableModel>(overviewPartsModel);
+        partsInUseSorter.setSortsOnUpdates(true);
         // Don't sort the buttons
         partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_BUY, false);
         partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_BUY_BULK, false);
@@ -4803,11 +4804,12 @@ public class CampaignGUI extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 int row = Integer.valueOf(e.getActionCommand());
                 PartInUse piu = overviewPartsModel.getPartInUse(row);
-                getCampaign().getShoppingList().addShoppingItem(piu.getPartToBuy(), 1, getCampaign());
+                IAcquisitionWork partToBuy = piu.getPartToBuy();
+                getCampaign().getShoppingList().addShoppingItem(partToBuy, 1, getCampaign());
                 refreshReport();
                 refreshAcquireList();
                 refreshPartsList();
-                refreshOverviewPartsInUse();
+                refreshOverviewSpecificPart(row, piu, partToBuy);
             }
         };
         @SuppressWarnings("serial")
@@ -4820,11 +4822,12 @@ public class CampaignGUI extends JPanel {
                 PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true, "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, 100);
                 pcd.setVisible(true);
                 quantity = pcd.getValue();
-                getCampaign().getShoppingList().addShoppingItem(piu.getPartToBuy(), quantity, getCampaign());
+                IAcquisitionWork partToBuy = piu.getPartToBuy();
+                getCampaign().getShoppingList().addShoppingItem(partToBuy, quantity, getCampaign());
                 refreshReport();
                 refreshAcquireList();
                 refreshPartsList();
-                refreshOverviewPartsInUse();
+                refreshOverviewSpecificPart(row, piu, partToBuy);
             }
         };
         @SuppressWarnings("serial")
@@ -4833,10 +4836,11 @@ public class CampaignGUI extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 int row = Integer.valueOf(e.getActionCommand());
                 PartInUse piu = overviewPartsModel.getPartInUse(row);
-                getCampaign().addPart((Part) piu.getPartToBuy().getNewEquipment(), 0);
+                IAcquisitionWork partToBuy = piu.getPartToBuy();
+                getCampaign().addPart((Part) partToBuy.getNewEquipment(), 0);
                 refreshAcquireList();
                 refreshPartsList();
-                refreshOverviewPartsInUse();
+                refreshOverviewSpecificPart(row, piu, partToBuy);
             }
         };
         @SuppressWarnings("serial")
@@ -4849,13 +4853,14 @@ public class CampaignGUI extends JPanel {
                 PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true, "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, 100);
                 pcd.setVisible(true);
                 quantity = pcd.getValue();
+                IAcquisitionWork partToBuy = piu.getPartToBuy();
                 while(quantity > 0) {
-                    getCampaign().addPart((Part) piu.getPartToBuy().getNewEquipment(), 0);
+                    getCampaign().addPart((Part) partToBuy.getNewEquipment(), 0);
                     -- quantity;
                 }
                 refreshAcquireList();
                 refreshPartsList();
-                refreshOverviewPartsInUse();
+                refreshOverviewSpecificPart(row, piu, partToBuy);
             }
         };
 
@@ -4880,6 +4885,16 @@ public class CampaignGUI extends JPanel {
         overviewPartsPanel.add(new JScrollPane(overviewPartsInUseTable), gridBagConstraints);
     }
     
+    private void refreshOverviewSpecificPart(int row, PartInUse piu, IAcquisitionWork newPart) {
+        if(piu.equals(new PartInUse((Part) newPart))) {
+            // Simple update
+            getCampaign().updatePartInUse(piu);
+            overviewPartsModel.fireTableRowsUpdated(row, row);
+        } else {
+            // Some other part changed; fire a full refresh to be sure
+            refreshOverviewPartsInUse();
+        }
+    }
     public void refreshOverviewPartsInUse() {
         overviewPartsModel.setData(getCampaign().getPartsInUse());
         TableColumnModel tcm = overviewPartsInUseTable.getColumnModel();
