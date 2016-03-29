@@ -29,6 +29,9 @@ public class PartsInUseTableModel extends DataTableModel {
     private static final long serialVersionUID = -7166100476703184175L;
     
     private static final DecimalFormat FORMATTER = new DecimalFormat();
+    static {
+        FORMATTER.setMaximumFractionDigits(3);
+    }
     private static final String EMPTY_CELL = ""; //$NON-NLS-1$
 
     public final static int COL_PART = 0;
