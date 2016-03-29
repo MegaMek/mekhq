@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.swing.AbstractCellEditor;
@@ -45,7 +46,10 @@ public class PartsInUseTableModel extends DataTableModel {
     public final static int COL_BUTTON_GMADD  = 8;
     public final static int COL_BUTTON_GMADD_BULK  = 9;
 
+    private ResourceBundle resourceMap;
+
     public PartsInUseTableModel () {
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsInUseTableModel"); //$NON-NLS-1$
         data = new ArrayList<PartInUse>();
     }
     
@@ -63,17 +67,17 @@ public class PartsInUseTableModel extends DataTableModel {
     public String getColumnName(int column) {
         switch(column) {
         case COL_PART:
-            return "Part";
+            return resourceMap.getString("part.heading"); //$NON-NLS-1$
         case COL_IN_USE:
-            return "In use";
+            return resourceMap.getString("inUse.heading"); //$NON-NLS-1$
         case COL_STORED:
-            return "Stored";
+            return resourceMap.getString("stored.heading"); //$NON-NLS-1$
         case COL_TONNAGE:
-            return "Tonnage";
+            return resourceMap.getString("storedTonnage.heading"); //$NON-NLS-1$
         case COL_IN_TRANSFER:
-            return "Ordered";
+            return resourceMap.getString("ordered.heading"); //$NON-NLS-1$
         case COL_COST:
-            return "Cost";
+            return resourceMap.getString("cost.heading"); //$NON-NLS-1$
         default:
             return EMPTY_CELL;
         }
@@ -103,13 +107,13 @@ public class PartsInUseTableModel extends DataTableModel {
             case COL_COST:
                 return FORMATTER.format(piu.getCost());
             case COL_BUTTON_BUY:
-                return "Buy";
+                return resourceMap.getString("buy.text"); //$NON-NLS-1$
             case COL_BUTTON_BUY_BULK:
-                return "Buy in Bulk";
+                return resourceMap.getString("buyInBulk.text"); //$NON-NLS-1$
             case COL_BUTTON_GMADD:
-                return "Add (GM)";
+                return resourceMap.getString("add.text"); //$NON-NLS-1$
             case COL_BUTTON_GMADD_BULK:
-                return "Add in Bulk (GM)";
+                return resourceMap.getString("addInBulk.text"); //$NON-NLS-1$
             default:
                 return EMPTY_CELL;
         }

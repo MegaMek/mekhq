@@ -4,7 +4,6 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 import megamek.common.AmmoType;
-import megamek.common.EquipmentType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 
