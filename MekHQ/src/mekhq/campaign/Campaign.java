@@ -1131,50 +1131,78 @@ public class Campaign implements Serializable {
         return ((p.getUnit() != null) || (p.getUnitId() != null)) ? 1 : p.getQuantity();
     }
     
+    private PartInUse getPartInUse(Part p) {
+        // SI isn't a proper "part"
+        if (p instanceof StructuralIntegrity) {
+            return null;
+        }
+        // Replace a "missing" part with a corresponding "new" one.
+        if(p instanceof MissingPart) {
+            p = ((MissingPart) p).getNewPart();
+        }
+        return new PartInUse(p);
+    }
+    
+    private void updatePartInUseData(PartInUse piu, Part p) {
+        if ((p.getUnit() != null) || (p.getUnitId() != null) || (p instanceof MissingPart)) {
+            piu.setUseCount(piu.getUseCount() + getQuantity(p));
+        } else {
+            if(p.isPresent()) {
+                piu.setStoreCount(piu.getStoreCount() + getQuantity(p));
+            } else {
+                piu.setTransferCount(piu.getTransferCount() + getQuantity(p));
+            }
+        }
+    }
+    
+    /** Update the piu with the current campaign data */
+    public void updatePartInUse(PartInUse piu) {
+        piu.setUseCount(0);
+        piu.setStoreCount(0);
+        piu.setTransferCount(0);
+        piu.setPlannedCount(0);
+        for(Part p : parts) {
+            PartInUse newPiu = getPartInUse(p);
+            if(piu.equals(newPiu)) {
+                updatePartInUseData(piu, p);
+            }
+        }
+        for(IAcquisitionWork maybePart : shoppingList.getPartList()) {
+            PartInUse newPiu = getPartInUse((Part) maybePart);
+            if(piu.equals(newPiu)) {
+                piu.setPlannedCount(piu.getPlannedCount()
+                    + getQuantity((Part) maybePart) * maybePart.getQuantity());
+            }
+        }
+    }
+    
     public Set<PartInUse> getPartsInUse() {
         // java.util.Set doesn't supply a get(Object) method, so we have to use a java.util.Map
         Map<PartInUse, PartInUse> inUse = new HashMap<PartInUse, PartInUse>();
         for(Part p : parts) {
-            // SI isn't a proper "part"
-            if (p instanceof StructuralIntegrity) {
+            PartInUse piu = getPartInUse(p);
+            if(null == piu) {
                 continue;
             }
-            // Replace a "missing" part with a corresponding "new" one.
-            boolean missingPart = (p instanceof MissingPart);
-            if(missingPart) {
-                p = ((MissingPart) p).getNewPart();
-            }
-            PartInUse piu = new PartInUse(p);
             if( inUse.containsKey(piu) ) {
                 piu = inUse.get(piu);
             } else {
                 inUse.put(piu, piu);
             }
-            if ((p.getUnit() != null) || (p.getUnitId() != null) || missingPart) {
-                piu.setUseCount(piu.getUseCount() + getQuantity(p));
-            } else {
-                if(p.isPresent()) {
-                    piu.setStoreCount(piu.getStoreCount() + getQuantity(p));
-                } else {
-                    piu.setTransferCount(piu.getTransferCount() + getQuantity(p));
-                }
-            }
+            updatePartInUseData(piu, p);
         }
         for(IAcquisitionWork maybePart : shoppingList.getPartList()) {
             if(!(maybePart instanceof Part)) {
                 continue;
             }
-            Part p = (Part) maybePart;
-            if(p instanceof MissingPart) {
-                p = ((MissingPart) p).getNewPart();
-            }
-            PartInUse piu = new PartInUse(p);
+            PartInUse piu = getPartInUse((Part) maybePart);
             if( inUse.containsKey(piu) ) {
                 piu = inUse.get(piu);
             } else {
                 inUse.put(piu, piu);
             }
-            piu.setPlannedCount(piu.getPlannedCount() + getQuantity(p) * maybePart.getQuantity());
+            piu.setPlannedCount(piu.getPlannedCount()
+                + getQuantity((Part) maybePart) * maybePart.getQuantity());
             
         }
         return inUse.keySet();
