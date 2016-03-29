@@ -250,6 +250,7 @@ import mekhq.gui.sorter.RankSorter;
 import mekhq.gui.sorter.TargetSorter;
 import mekhq.gui.sorter.TaskSorter;
 import mekhq.gui.sorter.TechSorter;
+import mekhq.gui.sorter.TwoNumbersSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
 import mekhq.gui.sorter.WeightClassSorter;
@@ -4783,8 +4784,7 @@ public class CampaignGUI extends JPanel {
         // Numeric columns
         partsInUseSorter.setComparator(PartsInUseTableModel.COL_IN_USE, new FormattedNumberSorter());
         partsInUseSorter.setComparator(PartsInUseTableModel.COL_STORED, new FormattedNumberSorter());
-        // Needs a special sorter for the parentheses
-        // partsInUseSorter.setComparator(PartsInUseTableModel.COL_IN_TRANSFER, new FormattedNumberSorter());
+        partsInUseSorter.setComparator(PartsInUseTableModel.COL_IN_TRANSFER, new TwoNumbersSorter());
         partsInUseSorter.setComparator(PartsInUseTableModel.COL_COST, new FormattedNumberSorter());
         // Default starting sort
         partsInUseSorter.setSortKeys(Arrays.asList(new RowSorter.SortKey(0, SortOrder.ASCENDING)));
