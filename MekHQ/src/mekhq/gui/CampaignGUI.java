@@ -4771,7 +4771,12 @@ public class CampaignGUI extends JPanel {
         for(int i = 0; i < overviewPartsModel.getColumnCount(); ++ i) {
             column = overviewPartsInUseTable.getColumnModel().getColumn(i);
             column.setCellRenderer(overviewPartsModel.getRenderer());
-            column.setPreferredWidth(overviewPartsModel.getPreferredWidth(i));
+            if(overviewPartsModel.hasConstantWidth(i)) {
+                column.setMinWidth(overviewPartsModel.getWidth(i));
+                column.setMaxWidth(overviewPartsModel.getWidth(i));
+            } else {
+                column.setPreferredWidth(overviewPartsModel.getPreferredWidth(i));
+            }
         }
         overviewPartsInUseTable.setIntercellSpacing(new Dimension(0, 0));
         overviewPartsInUseTable.setShowGrid(false);
@@ -4784,6 +4789,7 @@ public class CampaignGUI extends JPanel {
         // Numeric columns
         partsInUseSorter.setComparator(PartsInUseTableModel.COL_IN_USE, new FormattedNumberSorter());
         partsInUseSorter.setComparator(PartsInUseTableModel.COL_STORED, new FormattedNumberSorter());
+        partsInUseSorter.setComparator(PartsInUseTableModel.COL_TONNAGE, new FormattedNumberSorter());
         partsInUseSorter.setComparator(PartsInUseTableModel.COL_IN_TRANSFER, new TwoNumbersSorter());
         partsInUseSorter.setComparator(PartsInUseTableModel.COL_COST, new FormattedNumberSorter());
         // Default starting sort

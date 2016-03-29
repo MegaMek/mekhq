@@ -34,12 +34,13 @@ public class PartsInUseTableModel extends DataTableModel {
     public final static int COL_PART = 0;
     public final static int COL_IN_USE = 1;
     public final static int COL_STORED = 2;
-    public final static int COL_IN_TRANSFER  = 3;
-    public final static int COL_COST = 4;
-    public final static int COL_BUTTON_BUY  = 5;
-    public final static int COL_BUTTON_BUY_BULK  = 6;
-    public final static int COL_BUTTON_GMADD  = 7;
-    public final static int COL_BUTTON_GMADD_BULK  = 8;
+    public final static int COL_TONNAGE = 3;
+    public final static int COL_IN_TRANSFER  = 4;
+    public final static int COL_COST = 5;
+    public final static int COL_BUTTON_BUY  = 6;
+    public final static int COL_BUTTON_BUY_BULK  = 7;
+    public final static int COL_BUTTON_GMADD  = 8;
+    public final static int COL_BUTTON_GMADD_BULK  = 9;
 
     public PartsInUseTableModel () {
         data = new ArrayList<PartInUse>();
@@ -64,6 +65,8 @@ public class PartsInUseTableModel extends DataTableModel {
             return "In use";
         case COL_STORED:
             return "Stored";
+        case COL_TONNAGE:
+            return "Tonnage";
         case COL_IN_TRANSFER:
             return "Ordered";
         case COL_COST:
@@ -83,6 +86,8 @@ public class PartsInUseTableModel extends DataTableModel {
                 return FORMATTER.format(piu.getUseCount());
             case COL_STORED:
                 return (piu.getStoreCount() > 0) ? FORMATTER.format(piu.getStoreCount()) : EMPTY_CELL;
+            case COL_TONNAGE:
+                return (piu.getStoreTonnage() > 0) ? FORMATTER.format(piu.getStoreTonnage()) : EMPTY_CELL;
             case COL_IN_TRANSFER:
                 if( piu.getTransferCount() > 0 && piu.getPlannedCount() <= 0 ) {
                     return FORMATTER.format(piu.getTransferCount());
@@ -130,6 +135,9 @@ public class PartsInUseTableModel extends DataTableModel {
     }
 
     public PartInUse getPartInUse(int row) {
+        if((row < 0) || (row >= data.size())) {
+            return null;
+        }
         return (PartInUse)data.get(row);
     }
 
@@ -139,6 +147,7 @@ public class PartsInUseTableModel extends DataTableModel {
                 return SwingConstants.LEFT;
             case COL_IN_USE:
             case COL_STORED:
+            case COL_TONNAGE:
             case COL_IN_TRANSFER:
             case COL_COST:
                 return SwingConstants.RIGHT;
@@ -153,6 +162,7 @@ public class PartsInUseTableModel extends DataTableModel {
                 return 300;
             case COL_IN_USE:
             case COL_STORED:
+            case COL_TONNAGE:
             case COL_IN_TRANSFER:
             case COL_COST:
                 return 20;
@@ -164,6 +174,32 @@ public class PartsInUseTableModel extends DataTableModel {
                 return 80;
             default:
                 return 100;
+        }
+    }
+    
+    public boolean hasConstantWidth(int col) {
+        switch(col) {
+            case COL_BUTTON_BUY:
+            case COL_BUTTON_BUY_BULK:
+            case COL_BUTTON_GMADD:
+            case COL_BUTTON_GMADD_BULK:
+                return true;
+            default:
+                return false;
+        }
+    }
+    
+    public int getWidth(int col) {
+        switch(col) {
+            case COL_BUTTON_BUY:
+            case COL_BUTTON_BUY_BULK:
+            case COL_BUTTON_GMADD:
+            case COL_BUTTON_GMADD_BULK:
+                // Calculate from button width, respecting style
+                JButton btn = new JButton(getValueAt(0, col).toString());
+                return btn.getPreferredSize().width;
+            default:
+                return Integer.MAX_VALUE;
         }
     }
     

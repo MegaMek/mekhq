@@ -3,6 +3,8 @@ package mekhq.campaign.parts;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import megamek.common.AmmoType;
+import megamek.common.EquipmentType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 
@@ -14,6 +16,7 @@ public class PartInUse {
     private IAcquisitionWork partToBuy;
     private int useCount;
     private int storeCount;
+    private double tonnagePerItem;
     private int transferCount;
     private int plannedCount;
     private long cost;
@@ -39,6 +42,7 @@ public class PartInUse {
         part.setUnit(u);
         this.description = sb.toString();
         this.partToBuy = part.getAcquisitionWork();
+        this.tonnagePerItem = part.getTonnage();
         // AmmoBin are special: They aren't buyable (yet?), but instead buy you the ammo inside
         // We redo the description based on that
         if(partToBuy instanceof AmmoStorage) {
@@ -46,6 +50,16 @@ public class PartInUse {
             sb.append(((AmmoStorage) partToBuy).getName());
             appendDetails(sb, (Part) ((AmmoStorage) partToBuy).getAcquisitionWork());
             this.description = sb.toString();
+            AmmoType ammoType = (AmmoType) ((AmmoStorage) partToBuy).getType();
+            if(ammoType.getKgPerShot() > 0) {
+                this.tonnagePerItem = ammoType.getKgPerShot() / 1000.0;
+            } else {
+                this.tonnagePerItem = 1.0 / ammoType.getShots();
+            }
+        }
+        if(part instanceof Armor) {
+            // Armor needs different tonnage values
+            this.tonnagePerItem = 1.0 / ((Armor) part).getArmorPointsPerTon();
         }
         if(null == partToBuy) {
             System.err.println(String.format("Registeing part without a corresponding acquisition work: %s", part.getPartName())); //$NON-NLS-1$
@@ -86,6 +100,10 @@ public class PartInUse {
     
     public int getStoreCount() {
         return storeCount;
+    }
+    
+    public double getStoreTonnage() {
+        return storeCount * tonnagePerItem;
     }
     
     public void setStoreCount(int storeCount) {
