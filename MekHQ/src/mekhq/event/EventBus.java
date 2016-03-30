@@ -9,10 +9,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class EventBus {
     private static final Object INSTANCE_LOCK = new Object[0];
-    private static final Object REGISTER_LOCK = new Object[0];
     
     private static EventBus instance;
     private static final EventSorter EVENT_SORTER = new EventSorter();
+    
+    private final Object REGISTER_LOCK = new Object[0];
     
     private ConcurrentHashMap<Object, List<EventListener>> handlerMap
         = new ConcurrentHashMap<Object, List<EventListener>>();
@@ -36,7 +37,11 @@ public final class EventBus {
         getInstance().unregister(handler);
     }
     
-    private EventBus() {}
+    public static boolean triggerEvent(HQEvent<?> event) {
+        return getInstance().trigger(event);
+    }
+    
+    public EventBus() {}
     
     private List<Class<?>> getClasses(Class<?> leaf) {
         List<Class<?>> result = new ArrayList<Class<?>>();
