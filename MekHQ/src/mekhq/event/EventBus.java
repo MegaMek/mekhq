@@ -81,6 +81,7 @@ public final class EventBus {
 
     private void internalRegister(Object handler, Method method, Class<? extends HQEvent<?>> eventType) {
         synchronized(REGISTER_LOCK) {
+            method.setAccessible(true);
             EventListener listener = new EventListener(handler, method, eventType);
             List<EventListener> handlerListeners = handlerMap.get(handler);
             if(null == handlerListeners) {
