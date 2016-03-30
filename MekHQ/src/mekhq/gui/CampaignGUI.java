@@ -21,7 +21,6 @@
 package mekhq.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -52,7 +51,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.Vector;
@@ -60,6 +58,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DropMode;
@@ -92,7 +91,6 @@ import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SortOrder;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -105,11 +103,18 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.tree.TreeSelectionModel;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import chat.ChatClient;
 import megamek.client.RandomNameGenerator;
 import megamek.client.RandomUnitGenerator;
 import megamek.client.ui.swing.GameOptionsDialog;
@@ -155,6 +160,7 @@ import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.parts.ProtomekArmor;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.TankLocation;
@@ -225,6 +231,8 @@ import mekhq.gui.model.DocTableModel;
 import mekhq.gui.model.FinanceTableModel;
 import mekhq.gui.model.LoanTableModel;
 import mekhq.gui.model.OrgTreeModel;
+import mekhq.gui.model.PartsInUseTableModel;
+import mekhq.gui.model.PartsInUseTableModel.ButtonColumn;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.PatientTableModel;
 import mekhq.gui.model.PersonnelTableModel;
@@ -242,6 +250,7 @@ import mekhq.gui.sorter.RankSorter;
 import mekhq.gui.sorter.TargetSorter;
 import mekhq.gui.sorter.TaskSorter;
 import mekhq.gui.sorter.TechSorter;
+import mekhq.gui.sorter.TwoNumbersSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
 import mekhq.gui.sorter.WeightClassSorter;
@@ -257,13 +266,6 @@ import mekhq.gui.view.PersonViewPanel;
 import mekhq.gui.view.PlanetViewPanel;
 import mekhq.gui.view.ScenarioViewPanel;
 import mekhq.gui.view.UnitViewPanel;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import chat.ChatClient;
 
 /**
  * The application's main frame.
@@ -506,6 +508,8 @@ public class CampaignGUI extends JPanel {
     private LoanTableModel loanModel;
     private ScenarioTableModel scenarioModel;
     private OrgTreeModel orgModel;
+	private PartsInUseTableModel overviewPartsModel;
+
 
     /* table sorters for tables that can be filtered */
     private TableRowSorter<PersonnelTableModel> personnelSorter;
@@ -516,6 +520,7 @@ public class CampaignGUI extends JPanel {
     private TableRowSorter<TaskTableModel> taskSorter;
     private TableRowSorter<TechTableModel> techSorter;
     private TableRowSorter<TechTableModel> whTechSorter;
+    private TableRowSorter<PartsInUseTableModel> partsInUseSorter;
 
     // Start Overview Tab
     private JPanel panOverview;
@@ -523,6 +528,7 @@ public class CampaignGUI extends JPanel {
     // Overview Parts In Use
     private JScrollPane scrollOverviewParts;
     private JPanel overviewPartsPanel;
+	private JTable overviewPartsInUseTable;
     // Overview Transport
     private JScrollPane scrollOverviewTransport;
     // Overview Personnel
@@ -721,6 +727,17 @@ public class CampaignGUI extends JPanel {
                 resourceMap.getString("panOverview.TabConstraints.tabTitle"),
                 panOverview); // NOI18N
 
+        // The finance tab can be a pain to update when dealing with large units.
+        // Refresh it on tab change to that panel instead.
+        tabMain.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if(tabMain.getSelectedComponent() == panFinances) { // Yes, identity check
+					refreshFinancialReport();
+				}
+				
+			}
+		});
         initMain();
         initTopButtons();
         initStatusBar();
@@ -742,7 +759,7 @@ public class CampaignGUI extends JPanel {
         refreshDoctorsList();
         refreshPartsList();
         refreshCalendar();
-        refreshReport();
+        initReport();
         refreshFunds();
         refreshRating();
         refreshFinancialTransactions();
@@ -1214,7 +1231,7 @@ public class CampaignGUI extends JPanel {
 		panOverview = new JPanel();
 		setTabOverview(new JTabbedPane());
 		scrollOverviewParts = new JScrollPane();
-		overviewPartsPanel = new JPanel(new GridBagLayout());
+		initOverviewPartsInUse();
 		scrollOverviewTransport = new JScrollPane();
 		scrollOverviewCombatPersonnel = new JScrollPane();
 		scrollOverviewSupportPersonnel = new JScrollPane();
@@ -3967,7 +3984,7 @@ public class CampaignGUI extends JPanel {
         refreshCalendar();
         refreshLocation();
         refreshOrganization();
-        refreshReport();
+        initReport();
         refreshFunds();
         refreshFinancialTransactions();
         refreshOverview();
@@ -4722,20 +4739,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public Part getPartByNameAndDetails(String pnd) {
-    	ArrayList<Part> store = getCampaign().getPartsStore().getInventory();
-    	for (Part p : store) {
-    		String pname = p.getName();
-			String details = p.getDetails();
-			details = details.replaceFirst("\\d+\\shit\\(s\\),\\s", "");
-		    details = details.replaceFirst("\\d+\\shit\\(s\\)", "");
-		    if (details.length() > 0 && !(p instanceof Armor || p instanceof BaArmor || p instanceof ProtomekArmor)) {
-		    	pname +=  " (" + details + ")";
-		    }
-		    if (pname.equals(pnd)) {
-		    	return p;
-		    }
-    	}
-    	return null;
+    	return getCampaign().getPartsStore().getByNameAndDetails(pnd);
     }
 
     public void refreshOverview() {
@@ -4759,124 +4763,148 @@ public class CampaignGUI extends JPanel {
         refreshOverviewPartsInUse();
     }
 
-    public void refreshOverviewPartsInUse() {
-    	overviewPartsPanel.removeAll();
-    	int i = 0;
-    	int j = 0;
-    	GridBagConstraints gbc;
-    	JLabel partName;
-    	JLabel partNum;
-    	JButton partBuy;
-    	JButton partBuyInBulk;
-    	JButton partAddGM;
-    	JButton partAddBulkGM;
-    	Color bgc = new Color(255, 255, 255);
-    	boolean opaque;
-    	Hashtable<String, Integer> pinu = getCampaign().getPartsInUse();
-    	String[] keys = (String[]) pinu.keySet().toArray(new String[0]);
-    	Arrays.sort(keys);
-    	for (String pname : keys) {
-    		final String pn = pname;
-    		j++;
-    		if (i % 2 == 0) {
-    			opaque = false;
-    		} else {
-    			opaque = true;
-    		}
-    		int pnum = pinu.get(pname);
-    		partName = new JLabel("<html>&nbsp;&nbsp;&nbsp;"+pname+"&nbsp;&nbsp;&nbsp;</html>");
-    		partName.setBackground(bgc);
-    		partName.setOpaque(opaque);
-    		partName.setVerticalAlignment(SwingConstants.CENTER);
-    		gbc = new java.awt.GridBagConstraints();
-    		gbc.gridx = 0;
-    		gbc.gridy = i;
-    		gbc.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    		gbc.fill = GridBagConstraints.BOTH;
-    		gbc.weightx = 1.0;
-            if(j == pinu.size()) {
-            	gbc.weighty = 1.0;
+    private void initOverviewPartsInUse() {
+        overviewPartsPanel = new JPanel(new GridBagLayout());
+        
+        overviewPartsModel = new PartsInUseTableModel();
+        overviewPartsInUseTable = new JTable(overviewPartsModel);
+        overviewPartsInUseTable.setRowSelectionAllowed(false);
+        overviewPartsInUseTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        TableColumn column = null;
+        for(int i = 0; i < overviewPartsModel.getColumnCount(); ++ i) {
+            column = overviewPartsInUseTable.getColumnModel().getColumn(i);
+            column.setCellRenderer(overviewPartsModel.getRenderer());
+            if(overviewPartsModel.hasConstantWidth(i)) {
+                column.setMinWidth(overviewPartsModel.getWidth(i));
+                column.setMaxWidth(overviewPartsModel.getWidth(i));
+            } else {
+                column.setPreferredWidth(overviewPartsModel.getPreferredWidth(i));
             }
-            overviewPartsPanel.add(partName, gbc);
-    		partNum = new JLabel("  "+Integer.toString(pnum)+"  ");
-    		partNum.setBackground(bgc);
-    		partNum.setOpaque(opaque);
-    		partNum.setVerticalAlignment(SwingConstants.CENTER);
-    		partNum.setHorizontalAlignment(SwingConstants.TRAILING);
-    		gbc.gridx = 1;
-    		gbc.weightx = 0.0;
-    		overviewPartsPanel.add(partNum, gbc);
-    		partBuy = new JButton("Buy");
-    		partBuy.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	            	Part p = getPartByNameAndDetails(pn);
-	            	getCampaign().getShoppingList().addShoppingItem(p.getAcquisitionWork(), 1, getCampaign());
-	            	refreshReport();
-	        		refreshAcquireList();
-	        		refreshPartsList();
-	        		refreshFinancialTransactions();
-	                refreshOverview();
-	            }
-	        });
-    		gbc.gridx = 2;
-    		overviewPartsPanel.add(partBuy, gbc);
-    		partBuyInBulk = new JButton("Buy in Bulk");
-    		partBuyInBulk.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	            	Part p = getPartByNameAndDetails(pn);
-	            	int quantity = 1;
-	            	PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true, "How Many " + p.getName(), quantity, 1, 100);
-	    			pcd.setVisible(true);
-	    			quantity = pcd.getValue();
-	            	getCampaign().getShoppingList().addShoppingItem(p.getAcquisitionWork(), quantity, getCampaign());
-	            	refreshReport();
-	        		refreshAcquireList();
-	        		refreshPartsList();
-	        		refreshFinancialTransactions();
-	                refreshOverview();
-	            }
-	        });
-    		gbc.gridx = 3;
-    		overviewPartsPanel.add(partBuyInBulk, gbc);
-    		partAddGM = new JButton("Add (GM)");
-    		partAddGM.setEnabled(getCampaign().isGM());
-    		partAddGM.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	            	Part p = getPartByNameAndDetails(pn);
-	            	getCampaign().addPart(p.clone(), 0);
-	            	refreshReport();
-	        		refreshAcquireList();
-	        		refreshPartsList();
-	        		refreshFinancialTransactions();
-	                refreshOverview();
-	            }
-	        });
-    		gbc.gridx = 4;
-    		overviewPartsPanel.add(partAddGM, gbc);
-    		partAddBulkGM = new JButton("Add in Bulk (GM)");
-    		partAddBulkGM.setEnabled(getCampaign().isGM());
-    		partAddBulkGM.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	            	Part p = getPartByNameAndDetails(pn);
-	            	int quantity = 1;
-	            	PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true, "How Many " + p.getName(), quantity, 1, 100);
-	    			pcd.setVisible(true);
-	    			quantity = pcd.getValue();
-	    			while(quantity > 0) {
-	    				getCampaign().addPart(p.clone(), 0);
-	    		        quantity--;
-	    		    }
-	            	refreshReport();
-	        		refreshAcquireList();
-	        		refreshPartsList();
-	        		refreshFinancialTransactions();
-	                refreshOverview();
-	            }
-	        });
-    		gbc.gridx = 5;
-    		overviewPartsPanel.add(partAddBulkGM, gbc);
-            i++;
-    	}
+        }
+        overviewPartsInUseTable.setIntercellSpacing(new Dimension(0, 0));
+        overviewPartsInUseTable.setShowGrid(false);
+        partsInUseSorter = new TableRowSorter<PartsInUseTableModel>(overviewPartsModel);
+        partsInUseSorter.setSortsOnUpdates(true);
+        // Don't sort the buttons
+        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_BUY, false);
+        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_BUY_BULK, false);
+        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_GMADD, false);
+        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_GMADD_BULK, false);
+        // Numeric columns
+        partsInUseSorter.setComparator(PartsInUseTableModel.COL_IN_USE, new FormattedNumberSorter());
+        partsInUseSorter.setComparator(PartsInUseTableModel.COL_STORED, new FormattedNumberSorter());
+        partsInUseSorter.setComparator(PartsInUseTableModel.COL_TONNAGE, new FormattedNumberSorter());
+        partsInUseSorter.setComparator(PartsInUseTableModel.COL_IN_TRANSFER, new TwoNumbersSorter());
+        partsInUseSorter.setComparator(PartsInUseTableModel.COL_COST, new FormattedNumberSorter());
+        // Default starting sort
+        partsInUseSorter.setSortKeys(Arrays.asList(new RowSorter.SortKey(0, SortOrder.ASCENDING)));
+        overviewPartsInUseTable.setRowSorter(partsInUseSorter);
+        
+        // Add buttons and actions. TODO: Only refresh the row we are working on, not the whole table
+        @SuppressWarnings("serial")
+        Action buy = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = Integer.valueOf(e.getActionCommand());
+                PartInUse piu = overviewPartsModel.getPartInUse(row);
+                IAcquisitionWork partToBuy = piu.getPartToBuy();
+                getCampaign().getShoppingList().addShoppingItem(partToBuy, 1, getCampaign());
+                refreshReport();
+                refreshAcquireList();
+                refreshPartsList();
+                refreshOverviewSpecificPart(row, piu, partToBuy);
+            }
+        };
+        @SuppressWarnings("serial")
+        Action buyInBulk = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = Integer.valueOf(e.getActionCommand());
+                PartInUse piu = overviewPartsModel.getPartInUse(row);
+                int quantity = 1;
+                PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true, "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, 100);
+                pcd.setVisible(true);
+                quantity = pcd.getValue();
+                IAcquisitionWork partToBuy = piu.getPartToBuy();
+                getCampaign().getShoppingList().addShoppingItem(partToBuy, quantity, getCampaign());
+                refreshReport();
+                refreshAcquireList();
+                refreshPartsList();
+                refreshOverviewSpecificPart(row, piu, partToBuy);
+            }
+        };
+        @SuppressWarnings("serial")
+        Action add = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = Integer.valueOf(e.getActionCommand());
+                PartInUse piu = overviewPartsModel.getPartInUse(row);
+                IAcquisitionWork partToBuy = piu.getPartToBuy();
+                getCampaign().addPart((Part) partToBuy.getNewEquipment(), 0);
+                refreshAcquireList();
+                refreshPartsList();
+                refreshOverviewSpecificPart(row, piu, partToBuy);
+            }
+        };
+        @SuppressWarnings("serial")
+        Action addInBulk = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = Integer.valueOf(e.getActionCommand());
+                PartInUse piu = overviewPartsModel.getPartInUse(row);
+                int quantity = 1;
+                PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true, "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, 100);
+                pcd.setVisible(true);
+                quantity = pcd.getValue();
+                IAcquisitionWork partToBuy = piu.getPartToBuy();
+                while(quantity > 0) {
+                    getCampaign().addPart((Part) partToBuy.getNewEquipment(), 0);
+                    -- quantity;
+                }
+                refreshAcquireList();
+                refreshPartsList();
+                refreshOverviewSpecificPart(row, piu, partToBuy);
+            }
+        };
+
+        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable,
+            buy, PartsInUseTableModel.COL_BUTTON_BUY);
+        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable,
+            buyInBulk, PartsInUseTableModel.COL_BUTTON_BUY_BULK);
+        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable,
+            add, PartsInUseTableModel.COL_BUTTON_GMADD);
+        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable,
+            addInBulk, PartsInUseTableModel.COL_BUTTON_GMADD_BULK);
+
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+
+        overviewPartsPanel.add(new JScrollPane(overviewPartsInUseTable), gridBagConstraints);
+    }
+    
+    private void refreshOverviewSpecificPart(int row, PartInUse piu, IAcquisitionWork newPart) {
+        if(piu.equals(new PartInUse((Part) newPart))) {
+            // Simple update
+            getCampaign().updatePartInUse(piu);
+            overviewPartsModel.fireTableRowsUpdated(row, row);
+        } else {
+            // Some other part changed; fire a full refresh to be sure
+            refreshOverviewPartsInUse();
+        }
+    }
+    public void refreshOverviewPartsInUse() {
+        overviewPartsModel.setData(getCampaign().getPartsInUse());
+        TableColumnModel tcm = overviewPartsInUseTable.getColumnModel();
+        PartsInUseTableModel.ButtonColumn column = (ButtonColumn)tcm.getColumn(PartsInUseTableModel.COL_BUTTON_GMADD).getCellRenderer();
+        column.setEnabled(getCampaign().isGM());
+        column = (ButtonColumn)tcm.getColumn(PartsInUseTableModel.COL_BUTTON_GMADD_BULK).getCellRenderer();
+        column.setEnabled(getCampaign().isGM());
     }
 
     public void refreshPersonnelView() {
@@ -6575,9 +6603,13 @@ public class CampaignGUI extends JPanel {
     }
 
     public void refreshReport() {
-        panLog.refreshLog(getCampaign().getCurrentReportHTML());
-        // scrLog.setViewportView(panLog);
-        logDialog.refreshLog();
+        //panLog.refreshLog(getCampaign().getCurrentReportHTML());
+    	panLog.appendLog(getCampaign().fetchAndClearNewReports());
+    }
+    
+    public void initReport() {
+    	panLog.refreshLog(getCampaign().getCurrentReportHTML());
+    	getCampaign().fetchAndClearNewReports();
     }
 
     public void refreshOrganization() {

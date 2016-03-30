@@ -42,7 +42,9 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -51,6 +53,12 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import megamek.client.RandomNameGenerator;
 import megamek.client.RandomUnitGenerator;
@@ -120,11 +128,11 @@ import mekhq.campaign.parts.BaArmor;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekLocation;
-import mekhq.campaign.parts.MissingBattleArmorSuit;
 import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.MissingMekActuator;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.parts.ProtomekArmor;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.StructuralIntegrity;
@@ -162,17 +170,13 @@ import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.Modes;
 import mekhq.gui.utilities.PortraitFileFactory;
 
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 /**
  * @author Taharqa The main campaign class, keeps track of teams and units
  */
 public class Campaign implements Serializable {
-    private static final long serialVersionUID = -6312434701389973056L;
+    private static final String REPORT_LINEBREAK = "<br/><br/>"; //$NON-NLS-1$
+
+	private static final long serialVersionUID = -6312434701389973056L;
 
     // we have three things to track: (1) teams, (2) units, (3) repair tasks
     // we will use the same basic system (borrowed from MegaMek) for tracking
@@ -235,6 +239,8 @@ public class Campaign implements Serializable {
     private Ranks ranks;
 
     private ArrayList<String> currentReport;
+    private transient String currentReportHTML;
+    private transient List<String> newReports;
 
     private boolean overtime;
     private boolean gmMode;
@@ -272,6 +278,8 @@ public class Campaign implements Serializable {
         player = new Player(0, "self");
         game.addPlayer(0, player);
         currentReport = new ArrayList<String>();
+        currentReportHTML = "";
+        newReports = new ArrayList<String>();
         calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
         dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");
         shortDateFormat = new SimpleDateFormat("yyyyMMdd");
@@ -1113,50 +1121,100 @@ public class Campaign implements Serializable {
         return parts;
     }
 
-    public Hashtable<String, Integer> getPartsInUse() {
-    	Hashtable<String, Integer> inUse = new Hashtable<String, Integer>();
-    	for (Part p : parts) {
-    		// SI isn't a proper "part"
-    		if (p instanceof StructuralIntegrity) {
-    			continue;
-    		}
-
-    		String pname = p.getName();
-			Unit u = p.getUnit();
-			if (!(p instanceof MissingBattleArmorSuit)) {
-				p.setUnit(null);
-			}
-			String details = p.getDetails();
-			p.setUnit(u);
-		    details = details.replaceFirst("\\d+\\shit\\(s\\),\\s", "");
-		    details = details.replaceFirst("\\d+\\shit\\(s\\)", "");
-		    if (details.length() > 0 && !(p instanceof Armor || p instanceof BaArmor || p instanceof ProtomekArmor)) {
-		    	pname +=  " (" + details + ")";
-		    }
-    		int q = 1;
-    		if (p instanceof Armor) {
-    			Armor a = (Armor) p;
-    			q = a.getAmount();
-    		}
-    		if (p instanceof BaArmor) {
-    			BaArmor a = (BaArmor) p;
-    			q = a.getAmount();
-    		}
-    		if (p instanceof ProtomekArmor) {
-    			ProtomekArmor a = (ProtomekArmor) p;
-    			q = a.getAmount();
-    		}
-    		if (p.getUnit() != null || p.getUnitId() != null) {
-    			if (inUse.containsKey(pname)) {
-    				int temp = inUse.get(pname);
-    				temp += q;
-    				inUse.put(pname, temp);
-    			} else {
-    				inUse.put(pname, q);
-    			}
-    		}
-    	}
-    	return inUse;
+    private int getQuantity(Part p) {
+        if(p instanceof Armor) {
+            return ((Armor) p).getAmount();
+        }
+        if(p instanceof AmmoStorage) {
+            return ((AmmoStorage) p).getShots();
+        }
+        return ((p.getUnit() != null) || (p.getUnitId() != null)) ? 1 : p.getQuantity();
+    }
+    
+    private PartInUse getPartInUse(Part p) {
+        // SI isn't a proper "part"
+        if (p instanceof StructuralIntegrity) {
+            return null;
+        }
+        // Makes no sense buying those separately from the chasis
+        if((p instanceof EquipmentPart)
+            && (((EquipmentPart) p).getType().hasFlag(MiscType.F_CHASSIS_MODIFICATION)))
+        {
+            return null;
+        }
+        // Replace a "missing" part with a corresponding "new" one.
+        if(p instanceof MissingPart) {
+            p = ((MissingPart) p).getNewPart();
+        }
+        PartInUse result = new PartInUse(p);
+        return (null != result.getPartToBuy()) ? result : null;
+    }
+    
+    private void updatePartInUseData(PartInUse piu, Part p) {
+        if ((p.getUnit() != null) || (p.getUnitId() != null) || (p instanceof MissingPart)) {
+            piu.setUseCount(piu.getUseCount() + getQuantity(p));
+        } else {
+            if(p.isPresent()) {
+                piu.setStoreCount(piu.getStoreCount() + getQuantity(p));
+            } else {
+                piu.setTransferCount(piu.getTransferCount() + getQuantity(p));
+            }
+        }
+    }
+    
+    /** Update the piu with the current campaign data */
+    public void updatePartInUse(PartInUse piu) {
+        piu.setUseCount(0);
+        piu.setStoreCount(0);
+        piu.setTransferCount(0);
+        piu.setPlannedCount(0);
+        for(Part p : parts) {
+            PartInUse newPiu = getPartInUse(p);
+            if(piu.equals(newPiu)) {
+                updatePartInUseData(piu, p);
+            }
+        }
+        for(IAcquisitionWork maybePart : shoppingList.getPartList()) {
+            PartInUse newPiu = getPartInUse((Part) maybePart);
+            if(piu.equals(newPiu)) {
+                piu.setPlannedCount(piu.getPlannedCount()
+                    + getQuantity((maybePart instanceof MissingPart) ? ((MissingPart) maybePart).getNewPart() : (Part) maybePart)
+                    * maybePart.getQuantity());
+            }
+        }
+    }
+    
+    public Set<PartInUse> getPartsInUse() {
+        // java.util.Set doesn't supply a get(Object) method, so we have to use a java.util.Map
+        Map<PartInUse, PartInUse> inUse = new HashMap<PartInUse, PartInUse>();
+        for(Part p : parts) {
+            PartInUse piu = getPartInUse(p);
+            if(null == piu) {
+                continue;
+            }
+            if( inUse.containsKey(piu) ) {
+                piu = inUse.get(piu);
+            } else {
+                inUse.put(piu, piu);
+            }
+            updatePartInUseData(piu, p);
+        }
+        for(IAcquisitionWork maybePart : shoppingList.getPartList()) {
+            if(!(maybePart instanceof Part)) {
+                continue;
+            }
+            PartInUse piu = getPartInUse((Part) maybePart);
+            if( inUse.containsKey(piu) ) {
+                piu = inUse.get(piu);
+            } else {
+                inUse.put(piu, piu);
+            }
+            piu.setPlannedCount(piu.getPlannedCount()
+                + getQuantity((maybePart instanceof MissingPart) ? ((MissingPart) maybePart).getNewPart() : (Part) maybePart)
+                * maybePart.getQuantity());
+            
+        }
+        return inUse.keySet();
     }
 
     public Part getPart(int id) {
@@ -1172,14 +1230,15 @@ public class Campaign implements Serializable {
     }
 
     public String getCurrentReportHTML() {
-        String toReturn = "";
-        // lets do the report backwards
-        for (String s : currentReport) {
-            toReturn += s + "<br/><br/>";
-        }
-        return toReturn;
+    	return currentReportHTML;
     }
 
+    public List<String> fetchAndClearNewReports() {
+    	List<String> oldReports = newReports;
+    	newReports = new ArrayList<String>();
+    	return oldReports;
+    }
+    
 	/**
 	 * Finds the active person in a particular role with the highest level
 	 * in a given, with an optional secondary skill to break ties.
@@ -1942,6 +2001,8 @@ public class Campaign implements Serializable {
     public void newDay() {
         calendar.add(Calendar.DAY_OF_MONTH, 1);
         currentReport.clear();
+        currentReportHTML = "";
+        newReports.clear();
         addReport("<b>" + getDateAsString() + "</b>");
 
         if (calendar.get(Calendar.DAY_OF_YEAR) == 1) {
@@ -2933,6 +2994,14 @@ public class Campaign implements Serializable {
 
     public void addReport(String r) {
         currentReport.add(r);
+        if( currentReportHTML.length() > 0 ) {
+        	currentReportHTML = currentReportHTML + REPORT_LINEBREAK + r;
+            newReports.add(REPORT_LINEBREAK);
+            newReports.add(r);
+        } else {
+        	currentReportHTML = r;
+            newReports.add(r);
+        }
     }
 
     public void addReports(ArrayList<String> reports) {
@@ -4741,6 +4810,18 @@ public class Campaign implements Serializable {
         if (rankSystem != -1) {
             retVal.ranks = new Ranks(rankSystem);
             retVal.ranks.setOldRankSystem(rankSystem);
+        }
+        retVal.currentReportHTML = Utilities.combineString(retVal.currentReport, REPORT_LINEBREAK);
+        // Everything's new
+        retVal.newReports = new ArrayList<String>(retVal.currentReport.size() * 2);
+        boolean firstReport = true;
+        for(String report : retVal.currentReport) {
+        	if(firstReport) {
+        		firstReport = false;
+        	} else {
+        		retVal.newReports.add(REPORT_LINEBREAK);
+        	}
+        	retVal.newReports.add(report);
         }
     }
 
