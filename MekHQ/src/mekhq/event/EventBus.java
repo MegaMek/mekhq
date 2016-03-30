@@ -17,8 +17,8 @@ public final class EventBus {
     
     private ConcurrentHashMap<Object, List<EventListener>> handlerMap
         = new ConcurrentHashMap<Object, List<EventListener>>();
-    private ConcurrentHashMap<Class<? extends HQEvent<?>>, List<EventListener>> eventMap
-        = new ConcurrentHashMap<Class<? extends HQEvent<?>>, List<EventListener>>();
+    private ConcurrentHashMap<Class<? extends HQEvent>, List<EventListener>> eventMap
+        = new ConcurrentHashMap<Class<? extends HQEvent>, List<EventListener>>();
     
     public static EventBus getInstance() {
         synchronized(INSTANCE_LOCK) {
@@ -37,7 +37,7 @@ public final class EventBus {
         getInstance().unregister(handler);
     }
     
-    public static boolean triggerEvent(HQEvent<?> event) {
+    public static boolean triggerEvent(HQEvent event) {
         return getInstance().trigger(event);
     }
     
@@ -75,7 +75,7 @@ public final class EventBus {
                                 String.format("@Subscribe annotation of %s requires the argument type to be some subtype of HQEvent, not %s", //$NON-NLS-1$
                                     method, eventType));
                         }
-                        internalRegister(handler, realMethod, (Class<? extends HQEvent<?>>) eventType);
+                        internalRegister(handler, realMethod, (Class<? extends HQEvent>) eventType);
                     }
                 } catch (NoSuchMethodException e) {
                     // ignore
@@ -84,7 +84,7 @@ public final class EventBus {
         }
     }
 
-    private void internalRegister(Object handler, Method method, Class<? extends HQEvent<?>> eventType) {
+    private void internalRegister(Object handler, Method method, Class<? extends HQEvent> eventType) {
         synchronized(REGISTER_LOCK) {
             method.setAccessible(true);
             EventListener listener = new EventListener(handler, method, eventType);
@@ -118,7 +118,7 @@ public final class EventBus {
     }
     
     /** @return true if the event was cancelled along the way */
-    public boolean trigger(HQEvent<?> event) {
+    public boolean trigger(HQEvent event) {
         List<EventListener> eventListeners = eventMap.get(event.getClass());
         if(null != eventListeners) {
             Collections.sort(eventListeners, EVENT_SORTER);

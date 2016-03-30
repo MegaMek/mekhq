@@ -1,16 +1,12 @@
 package mekhq.event;
 
-import java.util.Objects;
-
 /**
  * Base class for all events
  */
-public abstract class HQEvent<T> {
-    protected T source;
+public abstract class HQEvent {
     protected boolean cancelled = false;
     
-    public HQEvent(T source) {
-        this.source = Objects.requireNonNull(source);
+    public HQEvent() {
     }
     
     /** @return true if the event can be cancelled (aborted) */
