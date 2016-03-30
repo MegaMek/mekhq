@@ -2472,7 +2472,13 @@ public class Campaign implements Serializable {
                     tech = getPerson(part.getAssignedTeamId());
                 }
                 if (null != tech) {
-                    fixPart(part, tech);
+                    if(null != tech.getSkillForWorkingOn(part)) {
+                        fixPart(part, tech);
+                    } else {
+                        addReport(String.format("%s looks at %s, recalls his total lack of skill for working with such technology, then slowly puts the tools down before anybody gets hurt.",
+                            tech.getHyperlinkedFullTitle(), part.getName()));
+                        part.setTeamId(null);
+                    }
                 } else {
                     JOptionPane.showMessageDialog(null, "Could not find tech for part: "+part.getName()+" on unit: "+part.getUnit().getHyperlinkedName(), "Invalid Auto-continue", JOptionPane.ERROR_MESSAGE);
                 }

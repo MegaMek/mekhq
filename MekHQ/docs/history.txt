@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.3.26-git
++ Bug #31: NPE when advancing a day due to people without tech skills having assigned a repair job
 + PR #37: Redesigning the "Parts in use" dialogue to 1. work and 2. have some more useful data to display
 + Raising XP limits for gained XP and abilities, as per SF feature request 354
 + PR #38: Recording "willing to defect" prisoner status,
