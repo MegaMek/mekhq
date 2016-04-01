@@ -86,7 +86,6 @@ public final class EventBus {
 
     private void internalRegister(Object handler, Method method, Class<? extends HQEvent> eventType) {
         synchronized(REGISTER_LOCK) {
-            method.setAccessible(true);
             EventListener listener = new EventListener(handler, method, eventType);
             List<EventListener> handlerListeners = handlerMap.get(handler);
             if(null == handlerListeners) {
@@ -118,15 +117,25 @@ public final class EventBus {
     }
     
     /** @return true if the event was cancelled along the way */
+    @SuppressWarnings("unchecked")
     public boolean trigger(HQEvent event) {
-        List<EventListener> eventListeners = eventMap.get(event.getClass());
+        for(Class<?> cls : getClasses(event.getClass())) {
+            if(HQEvent.class.isAssignableFrom(cls)) {
+                // Run through the triggers for each superclass up to HQEvent itself
+                internalTrigger((Class<? extends HQEvent>) cls, event);
+            }
+        }
+        return event.isCancellable() ? event.isCancelled() : false;
+    }
+    
+    private void internalTrigger(Class<? extends HQEvent> eventClass, HQEvent event) {
+        List<EventListener> eventListeners = eventMap.get(eventClass);
         if(null != eventListeners) {
             Collections.sort(eventListeners, EVENT_SORTER);
             for(EventListener listener : eventListeners) {
                 listener.trigger(event);
             }
         }
-        return event.isCancellable() ? event.isCancelled() : false;
     }
     
     private static class EventSorter implements Comparator<EventListener> {
