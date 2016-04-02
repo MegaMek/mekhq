@@ -85,6 +85,15 @@ public class UnitTableData implements Serializable, ActionListener {
 	public static final String[] weightNames = {
 		"Light", "Medium", "Heavy", "Assault"
 	};
+	
+	public static int getWeightIndex(String weight){
+		weight = weight.toLowerCase();
+		if(weight.matches("light")) return WT_LIGHT;
+		else if(weight.matches("medium")) return WT_MEDIUM;
+		else if(weight.matches("heavy")) return WT_HEAVY;
+		else if(weight.matches("assault")) return WT_ASSAULT;
+		else return -1;
+	}
 
 	public static final int UNIT_MECH = 0;
 	public static final int UNIT_VEHICLE = 1;
@@ -99,12 +108,38 @@ public class UnitTableData implements Serializable, ActionListener {
 		"Battle Armor", "ProtoMek"
 	};
 	
+	public static int getUnitTypeIndex(String type){
+		type = type.toLowerCase();
+		if(type.matches("mek") || type.matches("mech")) return UNIT_MECH;
+		else if(type.matches("vehicle")) return UNIT_VEHICLE;
+		else if(type.matches("aero")) return UNIT_AERO;
+		else if(type.matches("dropship")) return UNIT_DROPSHIP;
+		else if(type.matches("infantry")) return UNIT_INFANTRY;
+		else if(type.matches("battle armor") || type.matches("battle armour")) return UNIT_BATTLEARMOR;
+		else if(type.matches("protomek") || type.matches("protomech")) return UNIT_PROTOMECH;
+		else return -1;
+	}
+	
 	public static final int QUALITY_F = 0;
 	public static final int QUALITY_D = 1;
 	public static final int QUALITY_C = 2;
 	public static final int QUALITY_B = 3;
 	public static final int QUALITY_A = 4;
 	public static final int QUALITY_AA = 5;
+	public static final String[] qualityNames = {
+			"F", "D", "C", "B", "A", "AA"
+	};
+	
+	public static int getQualityIndex(String quality){
+		quality = quality.toLowerCase();
+		if(quality.matches("f")) return QUALITY_F;
+		else if(quality.matches("d")) return QUALITY_D;
+		else if(quality.matches("c")) return QUALITY_C;
+		else if(quality.matches("b")) return QUALITY_B;
+		else if(quality.matches("a")) return QUALITY_A;
+		else if(quality.matches("aa")) return QUALITY_AA;
+		else return -1;
+	}
 
 	public static ArrayList<String> getAllRATNames() {
 		if (allRatNames == null) {
@@ -143,6 +178,7 @@ public class UnitTableData implements Serializable, ActionListener {
 	 * returns true if the collection has tables for the faction/unitType
 	 * not later than year
 	 */
+	
 	public boolean hasRAT(String collection, int year, String faction, int unitType) {
 		if (ratTree.get(collection) == null) {
 			return false;
