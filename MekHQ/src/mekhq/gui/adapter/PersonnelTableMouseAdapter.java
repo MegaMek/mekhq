@@ -100,18 +100,18 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_ADD_SPOUSE = "SPOUSE"; //$NON-NLS-1$
     private static final String CMD_REMOVE_SPOUSE = "REMOVE_SPOUSE"; //$NON-NLS-1$
     private static final String CMD_ADD_TECH = "ADD_TECH"; //$NON-NLS-1$
-    
+
     private static final String CMD_IMPRISON = "IMPRISON"; //$NON-NLS-1$
     private static final String CMD_FREE = "FREE"; //$NON-NLS-1$
     private static final String CMD_RECRUIT = "RECRUIT"; //$NON-NLS-1$
-    
+
     private static final String SEPARATOR = "@"; //$NON-NLS-1$
     private static final String SPACE = " "; //$NON-NLS-1$
     private static final String HYPHEN = "-"; //$NON-NLS-1$
     private static final String QUESTION_MARK = "?"; //$NON-NLS-1$
     private static final String TRUE = String.valueOf(true);
     private static final String FALSE = String.valueOf(false);
-    
+
     private CampaignGUI gui;
     private ResourceBundle resourceMap = null;
 
@@ -130,13 +130,13 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String OPT_SURNAME_SPOUSE = "spouse"; //$NON-NLS-1$
     private static final String OPT_SURNAME_HYP_YOURS = "hyp_yours"; //$NON-NLS-1$
     private static final String OPT_SURNAME_HYP_SPOUSE = "hyp_spouse"; //$NON-NLS-1$
-    
+
     private static final String OPT_EDGE_MASC_FAILURE = "edge_when_masc_fails"; //$NON-NLS-1$
     private static final String OPT_EDGE_EXPLOSION = "edge_when_explosion"; //$NON-NLS-1$
     private static final String OPT_EDGE_KO = "edge_when_ko"; //$NON-NLS-1$
     private static final String OPT_EDGE_TAC = "edge_when_tac"; //$NON-NLS-1$
     private static final String OPT_EDGE_HEADHIT = "edge_when_headhit"; //$NON-NLS-1$
-    
+
     private static final String OPT_PRISONER_FREE = "free"; //$NON-NLS-1$
     private static final String OPT_PRISONER_IMPRISONED = "imprisoned"; //$NON-NLS-1$
     private static final String OPT_PRISONER_IMPRISONED_DEFECTING = "imprisoned_defecting"; //$NON-NLS-1$
@@ -145,7 +145,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private String makeCommand(String ... parts) {
         return Utilities.combineString(Arrays.asList(parts), SEPARATOR);
     }
-    
+
     private void refreshLists() {
         gui.refreshServicedUnitList();
         gui.refreshUnitList();
@@ -154,7 +154,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
         gui.refreshTechsList();
         gui.refreshDoctorsList();
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent action) {
         int row = gui.getPersonnelTable().getSelectedRow();
@@ -169,10 +169,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             people[i] = gui.getPersonnelModel().getPerson(gui.getPersonnelTable()
                     .convertRowIndexToModel(rows[i]));
         }
-        
+
         String[] data = action.getActionCommand().split(SEPARATOR, -1);
         String command = data[0];
-        
+
         switch(command) {
             case CMD_RANKSYSTEM:
                 int system = Integer.parseInt(data[1]);
@@ -424,14 +424,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     selectedPerson.addLogEntry(gui.getCampaign().getDate(),
                         String.format(resourceMap.getString("divorcedFrom.format"), selectedPerson.getSpouse().getFullName())); //$NON-NLS-1$
                     if (selectedPerson.getMaidenName() != null) {
-                        selectedPerson.setName(selectedPerson.getName().split(SPACE, 2)[0] 
-                                + SPACE  
+                        selectedPerson.setName(selectedPerson.getName().split(SPACE, 2)[0]
+                                + SPACE
                                 + selectedPerson.getMaidenName());
                     }
                     if (selectedPerson.getSpouse().getMaidenName() != null) {
                         Person spouse = selectedPerson.getSpouse();
                         spouse.setName(spouse.getName().split(SPACE, 2)[0]
-                                + SPACE 
+                                + SPACE
                                 + spouse.getMaidenName());
                     }
                 }
@@ -443,12 +443,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             {
                 Person spouse = gui.getCampaign().getPerson(UUID.fromString(data[1]));
                 String surnameOption = data[2];
-                
-                String selectedSurname = selectedPerson.getName().split(SPACE, 2)[1]; 
-                String spouseSurname = spouse.getName().split(SPACE, 2)[1]; 
-                String selectedGivenname = selectedPerson.getName().split(SPACE, 2)[0]; 
-                String spouseGivenname = spouse.getName().split(SPACE, 2)[0]; 
-                
+
+                String selectedSurname = selectedPerson.getName().split(SPACE, 2)[1];
+                String spouseSurname = spouse.getName().split(SPACE, 2)[1];
+                String selectedGivenname = selectedPerson.getName().split(SPACE, 2)[0];
+                String spouseGivenname = spouse.getName().split(SPACE, 2)[0];
+
                 switch (surnameOption) {
                     case OPT_SURNAME_NO_CHANGE:
                         break;
@@ -461,20 +461,20 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         selectedPerson.setMaidenName(selectedSurname);
                         break;
                     case OPT_SURNAME_HYP_YOURS:
-                        selectedPerson.setName(selectedGivenname + SPACE + selectedSurname + HYPHEN + spouseSurname); 
+                        selectedPerson.setName(selectedGivenname + SPACE + selectedSurname + HYPHEN + spouseSurname);
                         selectedPerson.setMaidenName(selectedSurname);
                         break;
                     case OPT_SURNAME_HYP_SPOUSE:
-                        spouse.setName(spouseGivenname + SPACE + spouseSurname+ HYPHEN + selectedSurname); 
+                        spouse.setName(spouseGivenname + SPACE + spouseSurname+ HYPHEN + selectedSurname);
                         spouse.setMaidenName(spouseSurname);
                         break;
                     default:
                         spouse.setName(spouseGivenname + SPACE + "ImaError"); //$NON-NLS-1$
                         MekHQ.logMessage(String.format("Unknown error in Surname chooser between \"%s\" and \"%s\"", //$NON-NLS-1$
                             selectedPerson.getFullName(), spouse.getFullName()));
-                        break;                
+                        break;
                 }
-                
+
                 spouse.setSpouseID(selectedPerson.getId());
                 spouse.addLogEntry(gui.getCampaign().getDate(), String.format(resourceMap.getString("marries.format"), selectedPerson.getFullName())); //$NON-NLS-1$
                 selectedPerson.setSpouseID(spouse.getId());
@@ -624,7 +624,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         String.format(resourceMap.getString("confirmRemove.format"), title), //$NON-NLS-1$
                         resourceMap.getString("removeQ.text"), //$NON-NLS-1$
                         JOptionPane.YES_NO_OPTION)) {
-                    for (Person person : people) {     
+                    for (Person person : people) {
                         gui.getCampaign().removePerson(person.getId());
                     }
                 }
@@ -956,7 +956,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                                 .getAlternateProfession(profession);
                     }
 
-                    if (rank.getName(profession).equals(HYPHEN)) { 
+                    if (rank.getName(profession).equals(HYPHEN)) {
                         continue;
                     }
 
@@ -1120,14 +1120,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 menu.add(cbMenuItem);
             }
             popup.add(menu);
-            
+
             if(oneSelected) {
                 popup.add(newMenuItem(resourceMap.getString("imprison.text"), CMD_IMPRISON, person.isFree())); //$NON-NLS-1$
                 popup.add(newMenuItem(resourceMap.getString("free.text"), CMD_FREE, !person.isFree())); //$NON-NLS-1$
                 popup.add(newMenuItem(resourceMap.getString("recruit.text"), CMD_RECRUIT, //$NON-NLS-1$
                         person.isBondsman() || person.isWillingToDefect()));
             }
-            
+
             menu = new JMenu(resourceMap.getString("changePrimaryRole.text")); //$NON-NLS-1$
             for (int i = Person.T_MECHWARRIOR; i < Person.T_NUM; i++) {
                 if (person.canPerformRole(i)
@@ -1489,7 +1489,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                                 pStatus = String.format(resourceMap.getString("marriagePartnerDesc.format"), //$NON-NLS-1$
                                     ps.getFullName(), ps.getAge(gui.getCampaign().getCalendar()), ps.getRoleDesc());
                             }
-                            spouseMenu = new JMenu(pStatus);                            
+                            spouseMenu = new JMenu(pStatus);
                             type = resourceMap.getString("marriageNoNameChange.text"); //$NON-NLS-1$
                             surnameMenu = new JMenuItem(type);
                             surnameMenu.setActionCommand(
@@ -1822,7 +1822,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     person.getPrisonerStatus() == Person.PRISONER_BONDSMAN));
             menuItem.setEnabled(gui.getCampaign().isGM());
             menu.add(menuItem);
-            
+
             menuItem = new JMenuItem(resourceMap.getString("removePerson.text")); //$NON-NLS-1$
             menuItem.setActionCommand(CMD_REMOVE);
             menuItem.addActionListener(this);
@@ -1887,6 +1887,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
         }
     }
 
+    @SuppressWarnings("unused")
     private JMenuItem newMenuItem(String text, String command) {
         return newMenuItem(text, command, true);
     }
