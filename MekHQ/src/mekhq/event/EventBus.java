@@ -4,7 +4,9 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class EventBus {
@@ -15,10 +17,10 @@ public final class EventBus {
     
     private final Object REGISTER_LOCK = new Object[0];
     
-    private ConcurrentHashMap<Object, List<EventListener>> handlerMap
-        = new ConcurrentHashMap<Object, List<EventListener>>();
-    private ConcurrentHashMap<Class<? extends HQEvent>, List<EventListener>> eventMap
-        = new ConcurrentHashMap<Class<? extends HQEvent>, List<EventListener>>();
+    private ConcurrentHashMap<Object, List<EventListener>> handlerMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Class<? extends HQEvent>, List<EventListener>> eventMap = new ConcurrentHashMap<>();
+    // There is no Java-supplied IdentityHashSet ...
+    private Map<Object, Object> unregisterQueue = new IdentityHashMap<>();
     
     public static EventBus getInstance() {
         synchronized(INSTANCE_LOCK) {
@@ -44,7 +46,7 @@ public final class EventBus {
     public EventBus() {}
     
     private List<Class<?>> getClasses(Class<?> leaf) {
-        List<Class<?>> result = new ArrayList<Class<?>>();
+        List<Class<?>> result = new ArrayList<>();
         while(null != leaf) {
             result.add(leaf);
             leaf = leaf.getSuperclass();
@@ -89,13 +91,13 @@ public final class EventBus {
             EventListener listener = new EventListener(handler, method, eventType);
             List<EventListener> handlerListeners = handlerMap.get(handler);
             if(null == handlerListeners) {
-                handlerListeners = new ArrayList<EventListener>();
+                handlerListeners = new ArrayList<>();
                 handlerMap.put(handler, handlerListeners);
             }
             handlerListeners.add(listener);
             List<EventListener> eventListeners = eventMap.get(eventType);
             if(null == eventListeners) {
-                eventListeners = new ArrayList<EventListener>();
+                eventListeners = new ArrayList<>();
                 eventMap.put(eventType, eventListeners);
             }
             eventListeners.add(listener);
@@ -104,21 +106,31 @@ public final class EventBus {
     
     public void unregister(Object handler) {
         synchronized(REGISTER_LOCK) {
-            List<EventListener> listenerList = handlerMap.remove(handler);
-            if(null != listenerList) {
-                for(EventListener listener : listenerList) {
-                    List<EventListener> eventListeners = eventMap.get(listener.getEventType());
-                    if(null != eventListeners) {
-                        eventListeners.remove(listener);
+            unregisterQueue.put(handler, handler);
+        }
+    }
+    
+    private void internalUnregister() {
+        synchronized(REGISTER_LOCK) {
+            for(Object handler : unregisterQueue.keySet()) {
+                List<EventListener> listenerList = handlerMap.remove(handler);
+                if(null != listenerList) {
+                    for(EventListener listener : listenerList) {
+                        List<EventListener> eventListeners = eventMap.get(listener.getEventType());
+                        if(null != eventListeners) {
+                            eventListeners.remove(listener);
+                        }
                     }
                 }
             }
+            unregisterQueue.clear();
         }
     }
     
     /** @return true if the event was cancelled along the way */
     @SuppressWarnings("unchecked")
     public boolean trigger(HQEvent event) {
+        internalUnregister(); // Clean up unregister queue
         for(Class<?> cls : getClasses(event.getClass())) {
             if(HQEvent.class.isAssignableFrom(cls)) {
                 // Run through the triggers for each superclass up to HQEvent itself
