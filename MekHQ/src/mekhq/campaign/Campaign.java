@@ -1204,6 +1204,9 @@ public class Campaign implements Serializable {
                 continue;
             }
             PartInUse piu = getPartInUse((Part) maybePart);
+            if(null == piu) {
+                continue;
+            }
             if( inUse.containsKey(piu) ) {
                 piu = inUse.get(piu);
             } else {
