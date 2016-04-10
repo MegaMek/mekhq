@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.26-git
+v0.3.26 (2016-04-10 21:53 UTC)
 + Bug #31: NPE when advancing a day due to people without tech skills having assigned a repair job
 + PR #37: Redesigning the "Parts in use" dialogue to 1. work and 2. have some more useful data to display
 + Raising XP limits for gained XP and abilities, as per SF feature request 354
@@ -25,6 +25,8 @@ v0.3.26-git
 + Cleaned replaced a lot of old manual boolean checks with parseBoolean, more needs done
 + Issue #22: Classpath fix for MM/MML jar files broken by commit ec84325
 + Bug: Added entity.setDeployed(false) to Campaign.clearGameData(Entity)
++ Updated MegaMek.jar to 0.41.16
++ Updated MegaMekLab.jar to 0.1.52
 
 v0.3.25 (2016-02-21 14:15 UTC)
 + Updating MHQ Data files to be in line with MM 41.14 (Multi-commits)
