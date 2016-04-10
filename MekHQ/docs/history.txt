@@ -1,5 +1,7 @@
 VERSION HISTORY
 ----------------------------------
+v0.3.27-git
+
 v0.3.26 (2016-04-10 21:53 UTC)
 + Bug #31: NPE when advancing a day due to people without tech skills having assigned a repair job
 + PR #37: Redesigning the "Parts in use" dialogue to 1. work and 2. have some more useful data to display
