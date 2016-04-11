@@ -563,14 +563,18 @@ public class PersonViewPanel extends javax.swing.JPanel {
         eventModel.setData(logs);
         JTable eventTable = new JTable(eventModel);
         eventTable.setRowSelectionAllowed(false);
-        eventTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        eventTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         TableColumn column = null;
         for(int i = 0; i < eventModel.getColumnCount(); ++ i) {
             column = eventTable.getColumnModel().getColumn(i);
             column.setCellRenderer(eventModel.getRenderer());
             column.setPreferredWidth(eventModel.getPreferredWidth(i));
+            if(eventModel.hasConstantWidth(i)) {
+                column.setMinWidth(eventModel.getPreferredWidth(i));
+                column.setMaxWidth(eventModel.getPreferredWidth(i));
+            }
         }
-        eventTable.setIntercellSpacing(new Dimension(10, 0));
+        eventTable.setIntercellSpacing(new Dimension(0, 0));
         eventTable.setShowGrid(false);
         eventTable.setTableHeader(null);
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -643,14 +647,18 @@ public class PersonViewPanel extends javax.swing.JPanel {
         killModel.setData(kills);
         JTable killTable = new JTable(killModel);
         killTable.setRowSelectionAllowed(false);
-        killTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        killTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         TableColumn column = null;
         for(int i = 0; i < killModel.getColumnCount(); ++ i) {
             column = killTable.getColumnModel().getColumn(i);
             column.setCellRenderer(killModel.getRenderer());
             column.setPreferredWidth(killModel.getPreferredWidth(i));
+            if(killModel.hasConstantWidth(i)) {
+                column.setMinWidth(killModel.getPreferredWidth(i));
+                column.setMaxWidth(killModel.getPreferredWidth(i));
+            }
         }
-        killTable.setIntercellSpacing(new Dimension(10, 0));
+        killTable.setIntercellSpacing(new Dimension(0, 0));
         killTable.setShowGrid(false);
         killTable.setTableHeader(null);
         gridBagConstraints = new GridBagConstraints();

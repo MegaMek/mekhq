@@ -2,13 +2,18 @@ package mekhq.gui.model;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.FontMetrics;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
+import javax.swing.BorderFactory;
 import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.JTextPane;
+import javax.swing.UIManager;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 
 import mekhq.campaign.Kill;
 import mekhq.campaign.LogEntry;
@@ -85,11 +90,11 @@ public class PersonnelEventLogModel extends DataTableModel {
     public int getAlignment(int column) {
         switch(column) {
             case COL_DATE:
-                return SwingConstants.RIGHT;
+                return StyleConstants.ALIGN_RIGHT;
             case COL_TEXT:
-                return SwingConstants.LEFT;
+                return StyleConstants.ALIGN_LEFT;
             default:
-                return SwingConstants.CENTER;
+                return StyleConstants.ALIGN_CENTER;
         }
     }
     
@@ -104,19 +109,49 @@ public class PersonnelEventLogModel extends DataTableModel {
         }
     }
     
+    public boolean hasConstantWidth(int col) {
+        switch(col) {
+            case COL_DATE:
+                return true;
+            default:
+                return false;
+        }
+    }
+    
     public PersonnelEventLogModel.Renderer getRenderer() {
         return new PersonnelEventLogModel.Renderer();
     }
     
-    public static class Renderer extends DefaultTableCellRenderer {
+    public static class Renderer extends JTextPane implements TableCellRenderer {
         private static final long serialVersionUID = -2201201114822098877L;
+
+        private final SimpleAttributeSet attribs = new SimpleAttributeSet();
+        private final FontMetrics metrics;
+
+        public Renderer() {
+            super();
+            setOpaque(true);
+            setFont(UIManager.getDefaults().getFont("TabbedPane.font")); //$NON-NLS-1$
+            metrics = getFontMetrics(getFont());
+            setBorder(BorderFactory.createEmptyBorder(2, 10, 2, 0));
+        }
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
                 boolean isSelected, boolean hasFocus, int row, int column) {
-            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            setOpaque(true);
-            setHorizontalAlignment(((PersonnelEventLogModel)table.getModel()).getAlignment(column));
+            setText((String) value);
+            StyleConstants.setAlignment(attribs, ((PersonnelEventLogModel)table.getModel()).getAlignment(column));
+            setParagraphAttributes(attribs, false);
+
+            int fontHeight = metrics.getHeight();
+            int textLength = metrics.stringWidth(getText());
+            int lines = (int) Math.ceil(1.0 * textLength / table.getColumnModel().getColumn(column).getWidth());
+            if (lines == 0) {
+                lines = 1;
+            }
+
+            int height = fontHeight * lines + 4;
+            table.setRowHeight(row, height);
 
             setForeground(Color.BLACK);
             // tiger stripes
