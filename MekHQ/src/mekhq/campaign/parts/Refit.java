@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.UUID;
 
 import megamek.common.AmmoType;
@@ -77,10 +78,6 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Refit extends Part implements IPartWork, IAcquisitionWork {
-
-	/**
-     *
-     */
     private static final long serialVersionUID = -1765098410743713570L;
     public static final int NO_CHANGE = 0;
 	public static final int CLASS_OMNI = 1;
@@ -90,6 +87,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	public static final int CLASS_D = 5;
 	public static final int CLASS_E = 6;
 	public static final int CLASS_F = 7;
+
+	private static final String WORKPART_FORMAT = "[%4d h] %s"; //$NON-NLS-1$
 
 	private Unit oldUnit;
 	private Entity newEntity;
@@ -114,11 +113,14 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 
 	private UUID assignedTechId;
 	private int oldTechId = -1;
+	
+	private List<String> workDesc;
 
 	public Refit() {
 		oldUnitParts = new ArrayList<Integer>();
 		newUnitParts = new ArrayList<Integer>();
 		shoppingList = new ArrayList<Part>();
+		workDesc = new ArrayList<>();
 		fixableString = null;
 	}
 
@@ -131,6 +133,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		oldUnitParts = new ArrayList<Integer>();
 		newUnitParts = new ArrayList<Integer>();
 		shoppingList = new ArrayList<Part>();
+        workDesc = new ArrayList<>();
 		failedCheck = false;
 		timeSpent = 0;
 		fixableString = null;
@@ -176,6 +179,10 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 
 	public long getCost() {
 		return cost;
+	}
+	
+	public String getWorkDesc() {
+	    return Utilities.combineString(workDesc, "\n"); //$NON-NLS-1$
 	}
 
 	public ArrayList<Part> getShoppingList() {
@@ -306,6 +313,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				//movedPart.setSalvaging(true);
 				//movedPart.updateConditionFromEntity(false);
 				time += movedPart.getBaseTime();
+				workDesc.add(String.format(WORKPART_FORMAT, movedPart.getBaseTime(), "Moving " + movedPart.getName() + " to " + movedPart.getLocationName()));
 				//movedPart.setSalvaging(isSalvaging);
 			} else {
 				//its a new part
@@ -346,6 +354,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			if(nPart instanceof MissingPart) {
 				time += nPart.getBaseTime();
 				Part replacement = ((MissingPart)nPart).findReplacement(true);
+                workDesc.add(String.format(WORKPART_FORMAT, nPart.getBaseTime(), "Installing " + nPart.getName() + " in " + nPart.getLocationName()));
 				//check quantity
 				//TODO: the one weakness here is that we will not pick up damaged parts
 				if(null != replacement && null == partQuantity.get(replacement.getId())) {
@@ -366,6 +375,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			else if(nPart instanceof Armor) {
 				int totalAmount = ((Armor)nPart).getTotalAmount();
 				time += totalAmount * ((Armor)nPart).getBaseTimeFor(newEntity);
+                workDesc.add(String.format(WORKPART_FORMAT, totalAmount * ((Armor)nPart).getBaseTimeFor(newEntity),
+                        "Installing " + totalAmount + " points of " + nPart.getName() + " in " + nPart.getLocationName()));
 				armorNeeded += totalAmount;
 				atype = ((Armor)nPart).getType();
 				aclan = ((Armor)nPart).isClanTechBase();
@@ -380,6 +391,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 					ammoNeeded.put(type,ammoNeeded.get(type) + ((AmmoType)((AmmoBin)nPart).getType()).getShots());
 				}
 				time += 120;
+                workDesc.add(String.format(WORKPART_FORMAT, 120, "Installing " + nPart.getName() + " in " + nPart.getLocationName()));
 				//check for ammo bins in storage to avoid the proliferation of infinite ammo bins
 				MissingAmmoBin mab = (MissingAmmoBin)nPart.getMissingPart();
 				Part replacement = mab.findReplacement(true);
@@ -524,6 +536,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			if(oPart instanceof AmmoBin) {
 				if(((AmmoBin)oPart).getShotsNeeded() < ((AmmoBin)oPart).getFullShots()) {
 					time += 120;
+	                workDesc.add(String.format(WORKPART_FORMAT, 120, "Removing " + oPart.getName() + " from " + oPart.getLocationName()));
 				}
 				continue;
 			}
@@ -534,6 +547,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			boolean isSalvaging = oldUnit.isSalvage();
 			oldUnit.setSalvage(true);
 			time += oPart.getBaseTime();
+            workDesc.add(String.format(WORKPART_FORMAT, oPart.getBaseTime(), "Removing " + oPart.getName() + " from " + oPart.getLocationName()));
 			oldUnit.setSalvage(isSalvaging);
 		}
 
@@ -570,6 +584,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			time += newEntity.getEngine().integralHeatSinkCapacity(((Mech)newEntity).hasCompactHeatSinks()) * 90;
 			time += oldUnit.getEntity().getEngine().integralHeatSinkCapacity(((Mech)newEntity).hasCompactHeatSinks()) * 90;
 			updateRefitClass(CLASS_D);
+            workDesc.add(String.format(WORKPART_FORMAT, oldUnit.getEntity().getEngine().integralHeatSinkCapacity(((Mech)newEntity).hasCompactHeatSinks()) * 90, "Removing old internal heat sinks"));
+            workDesc.add(String.format(WORKPART_FORMAT, newEntity.getEngine().integralHeatSinkCapacity(((Mech)newEntity).hasCompactHeatSinks()) * 90, "Installing new internal heat sinks"));
 		}
 
 		//check for CASE
@@ -583,6 +599,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 					updateRefitClass(CLASS_OMNI);
 				} else {
 					time += 60;
+		            workDesc.add(String.format(WORKPART_FORMAT, 60, "Installing CASE in location " + loc));
 					updateRefitClass(CLASS_E);
 				}
 			}
@@ -900,6 +917,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				MekHQ.logMessage("old part with id " + pid + " not found for refit of " + getDesc());
 				continue;
 			}
+			MekHQ.logMessage("Using up part " + part);
 			if(part instanceof MekLocation && ((MekLocation)part).getLoc() == Mech.LOC_CT) {
 				part.setUnit(null);
 				oldUnit.campaign.removePart(part);
@@ -926,6 +944,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				} else {
 				    // Use it up (it was calculated as being free to use in calculate())
 				    a.setAmount(0);
+				    campaign.removePart(a);
 				}
 			}
 			else {
