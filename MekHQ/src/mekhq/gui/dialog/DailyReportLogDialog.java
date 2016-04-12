@@ -52,8 +52,8 @@ public class DailyReportLogDialog extends JDialog {
         add(panLog, BorderLayout.CENTER);
     }
     
-    public void refreshLog() {
-        panLog.refreshLog(gui.getCampaign().getCurrentReportHTML());
+    public void refreshLog(String report) {
+        panLog.refreshLog(report);
     }
     
     public void appendLog(List<String> newReports) {

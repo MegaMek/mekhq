@@ -51,6 +51,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.Vector;
@@ -6603,12 +6604,15 @@ public class CampaignGUI extends JPanel {
     }
 
     public void refreshReport() {
-        //panLog.refreshLog(getCampaign().getCurrentReportHTML());
-    	panLog.appendLog(getCampaign().fetchAndClearNewReports());
+        List<String> newLogEntries = getCampaign().fetchAndClearNewReports();
+    	panLog.appendLog(newLogEntries);
+    	logDialog.appendLog(newLogEntries);
     }
     
     public void initReport() {
-    	panLog.refreshLog(getCampaign().getCurrentReportHTML());
+        String report = getCampaign().getCurrentReportHTML();
+    	panLog.refreshLog(report);
+    	logDialog.refreshLog(report);
     	getCampaign().fetchAndClearNewReports();
     }
 
