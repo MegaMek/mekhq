@@ -1542,7 +1542,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 for (int i = 0; i < SkillType.getSkillList().length; i++) {
                     String type = SkillType.getSkillList()[i];
                     int cost = person.hasSkill(type) ? person.getSkill(type).getCostToImprove() : SkillType.getType(type).getCost(0);
-                    if( cost > 0 ) {
+                    if( cost >= 0 ) {
                         String desc = String.format(resourceMap.getString("skillDesc.format"), type, cost); //$NON-NLS-1$
                         menuItem = new JMenuItem(desc);
                         menuItem.setActionCommand(makeCommand(CMD_IMPROVE, type, String.valueOf(cost)));
@@ -1563,8 +1563,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     for (Enumeration<IOption> i = person.getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements(); ) {
                         IOption ability = i.nextElement();
                         if (!ability.booleanValue()) {
-                            SpecialAbility spa = SpecialAbility
-                                    .getAbility(ability.getName());
+                            SpecialAbility spa = SpecialAbility.getAbility(ability.getName());
                             if (null == spa) {
                                 continue;
                             }
