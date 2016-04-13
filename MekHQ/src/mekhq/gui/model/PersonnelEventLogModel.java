@@ -145,11 +145,14 @@ public class PersonnelEventLogModel extends DataTableModel {
             setParagraphAttributes(attribs, false);
 
             int fontHeight = metrics.getHeight();
-            int textLength = metrics.stringWidth(getText());
+            int textLength = metrics.stringWidth(getText()) + 10;
             int lines = (int) Math.ceil(1.0 * textLength / table.getColumnModel().getColumn(column).getWidth());
             if (lines == 0) {
                 lines = 1;
             }
+            // check for new lines
+            int newLines = getText().split("\r\n|\r|\n").length; //$NON-NLS-1$
+            lines = Math.max(lines, newLines);
 
             int height = fontHeight * lines + 4;
             table.setRowHeight(row, height);
