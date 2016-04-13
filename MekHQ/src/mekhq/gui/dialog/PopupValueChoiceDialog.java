@@ -26,6 +26,8 @@ import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import megamek.common.util.EncodeControl;
+
 /**
  *
  * @author natit
@@ -86,7 +88,7 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener, C
         // Verifier so people get limited to the 1-100 range when using manual input
         value.addChangeListener(this);
 
-		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PopupValueChoiceDialog");
+		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PopupValueChoiceDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 

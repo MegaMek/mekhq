@@ -12,6 +12,7 @@ import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.universe.Planet;
@@ -118,7 +119,7 @@ public class JumpPathViewPanel extends javax.swing.JPanel {
 	
     private void fillStats() {
     	
-    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.JumpPathViewPanel");
+    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.JumpPathViewPanel", new EncodeControl()); //$NON-NLS-1$
     	
     	lblJumps = new javax.swing.JLabel();
     	txtJumps = new javax.swing.JTextArea();

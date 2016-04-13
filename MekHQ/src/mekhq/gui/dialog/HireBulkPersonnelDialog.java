@@ -36,6 +36,7 @@ import org.joda.time.Days;
 import org.joda.time.Years;
 
 import megamek.common.Compute;
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Rank;
@@ -73,7 +74,7 @@ public class HireBulkPersonnelDialog extends JDialog {
     private int minAgeVal = 19;
     private int maxAgeVal = 99;
     
-    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.HireBulkPersonnelDialog"); //$NON-NLS-1$
+    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.HireBulkPersonnelDialog", new EncodeControl()); //$NON-NLS-1$
 
     public HireBulkPersonnelDialog(Frame parent, boolean modal, Campaign c, CampaignGUI view) {
         super(parent, modal);

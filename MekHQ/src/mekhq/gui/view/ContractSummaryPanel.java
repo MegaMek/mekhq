@@ -35,6 +35,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.market.ContractMarket;
@@ -199,7 +200,7 @@ public class ContractSummaryPanel extends JPanel {
 		lblSalvageRights = new JLabel();
 		txtSalvageRights = new JTextArea();
 
-		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractMarketDialog");
+		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractMarketDialog", new EncodeControl()); //$NON-NLS-1$
 
 		java.awt.GridBagConstraints gridBagConstraints;
 		mainPanel.setLayout(new java.awt.GridBagLayout());

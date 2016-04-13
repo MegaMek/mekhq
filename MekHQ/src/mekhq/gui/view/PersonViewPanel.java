@@ -26,6 +26,7 @@ import javax.swing.table.TableColumn;
 import megamek.common.Crew;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.LogEntry;
@@ -86,7 +87,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
         this.person = p;
         this.campaign = c;
         this.portraits = portraits;
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel"); //$NON-NLS-1$
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel", new EncodeControl()); //$NON-NLS-1$
         initComponents();
     }
 

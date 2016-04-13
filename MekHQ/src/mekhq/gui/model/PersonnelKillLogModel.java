@@ -15,6 +15,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.Kill;
 
 public class PersonnelKillLogModel extends DataTableModel {
@@ -29,7 +30,7 @@ public class PersonnelKillLogModel extends DataTableModel {
     private SimpleDateFormat shortDateFormat;
 
     public PersonnelKillLogModel() {
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelKillLogModel"); //$NON-NLS-1$
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelKillLogModel", new EncodeControl()); //$NON-NLS-1$
         shortDateFormat = new SimpleDateFormat(resourceMap.getString("date.format")); //$NON-NLS-1$
         data = new ArrayList<Kill>();
     }

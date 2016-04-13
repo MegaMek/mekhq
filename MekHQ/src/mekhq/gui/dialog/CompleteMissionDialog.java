@@ -10,6 +10,7 @@ import java.util.ResourceBundle;
 
 import javax.swing.DefaultComboBoxModel;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.mission.Mission;
 
 /**
@@ -39,7 +40,7 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
         choiceOutcome = new javax.swing.JComboBox<String>();
         lblOutcome = new javax.swing.JLabel();
         
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CompleteMissionDialog");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CompleteMissionDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("title.text"));

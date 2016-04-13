@@ -9,6 +9,7 @@ package mekhq.gui.dialog;
 import java.awt.Frame;
 import java.util.ResourceBundle;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.gui.CampaignGUI;
 
@@ -35,7 +36,7 @@ public class MissionTypeDialog extends javax.swing.JDialog {
 
     private void initComponents() {
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MissionTypeDialog");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MissionTypeDialog", new EncodeControl()); //$NON-NLS-1$
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N

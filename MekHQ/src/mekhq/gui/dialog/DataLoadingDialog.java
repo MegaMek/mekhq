@@ -43,6 +43,7 @@ import megamek.client.RandomNameGenerator;
 import megamek.common.MechSummaryCache;
 import megamek.common.QuirksHandler;
 import megamek.common.options.GameOptions;
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
@@ -73,7 +74,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         this.app = app;
         this.fileCampaign = f;
 
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.DataLoadingDialog");
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.DataLoadingDialog", new EncodeControl()); //$NON-NLS-1$
 
         setUndecorated(true);
         progressBar = new JProgressBar(0, 4);

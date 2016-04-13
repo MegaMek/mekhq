@@ -55,6 +55,7 @@ import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -159,7 +160,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 
     private void initComponents() {
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsStoreDialog");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsStoreDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("Form.title"));

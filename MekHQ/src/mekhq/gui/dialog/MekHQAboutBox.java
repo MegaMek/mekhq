@@ -27,6 +27,7 @@ import java.util.ResourceBundle;
 import javax.swing.JFrame;
 
 import megamek.MegaMek;
+import megamek.common.util.EncodeControl;
 import megameklab.com.MegaMekLab;
 
 public class MekHQAboutBox extends javax.swing.JDialog {
@@ -51,8 +52,8 @@ public class MekHQAboutBox extends javax.swing.JDialog {
         javax.swing.JLabel appHomepageLabel = new javax.swing.JLabel();
         javax.swing.JLabel appDescLabel = new javax.swing.JLabel();
 
-        ResourceBundle mekhqProperties = ResourceBundle.getBundle("mekhq.resources.MekHQ");
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQAboutBox");
+        ResourceBundle mekhqProperties = ResourceBundle.getBundle("mekhq.resources.MekHQ", new EncodeControl()); //$NON-NLS-1$
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQAboutBox", new EncodeControl()); //$NON-NLS-1$
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("MekHQ"); // NOI18N

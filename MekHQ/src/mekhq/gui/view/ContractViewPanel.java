@@ -14,6 +14,7 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.mission.Contract;
 
 /**
@@ -107,7 +108,7 @@ public class ContractViewPanel extends javax.swing.JPanel {
 		txtCommand = new javax.swing.JTextArea();
 		lblBLC = new javax.swing.JLabel();
 		txtBLC = new javax.swing.JTextArea();
-    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel");
+    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel", new EncodeControl()); //$NON-NLS-1$
 
     	java.awt.GridBagConstraints gridBagConstraints;
 		pnlStats.setLayout(new java.awt.GridBagLayout());

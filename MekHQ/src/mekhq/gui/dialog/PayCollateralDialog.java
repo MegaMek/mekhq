@@ -45,6 +45,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Loan;
@@ -91,7 +92,7 @@ public class PayCollateralDialog extends JDialog {
 
     private void initComponents() {
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PayCollateralDialog");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PayCollateralDialog", new EncodeControl()); //$NON-NLS-1$
         java.awt.GridBagConstraints gridBagConstraints;
         
         JTabbedPane panMain = new JTabbedPane();

@@ -135,6 +135,7 @@ import megamek.common.WeaponType;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.GameOptions;
 import megamek.common.options.PilotOptions;
+import megamek.common.util.EncodeControl;
 import megameklab.com.util.UnitPrintManager;
 import mekhq.IconPackage;
 import mekhq.MekHQ;
@@ -664,7 +665,7 @@ public class CampaignGUI extends JPanel {
 
     private void initComponents() {
 
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI");
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl()); //$NON-NLS-1$
 
         frame = new JFrame("MekHQ"); //$NON-NLS-1$
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);

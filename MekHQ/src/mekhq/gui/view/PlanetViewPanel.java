@@ -11,6 +11,7 @@ import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Planet;
 
@@ -156,7 +157,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 	
     private void fillStats() {
     	
-    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PlanetViewPanel");
+    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PlanetViewPanel", new EncodeControl()); //$NON-NLS-1$
     	
     	lblOwner = new javax.swing.JLabel();
     	lblStarType = new javax.swing.JLabel();

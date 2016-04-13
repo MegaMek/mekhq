@@ -27,6 +27,7 @@ import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.ResolveScenarioTracker;
 
 /**
@@ -67,7 +68,7 @@ public class ChooseMulFilesDialog extends javax.swing.JDialog {
     	 new javax.swing.JTextField();
     	 txtInstructions = new javax.swing.JTextArea();
 
-    	 ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseMulFilesDialog");
+    	 ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseMulFilesDialog", new EncodeControl()); //$NON-NLS-1$
     	 setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     	 setName("Form"); // NOI18N
 

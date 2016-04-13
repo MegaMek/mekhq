@@ -27,6 +27,7 @@ import javax.swing.table.TableCellRenderer;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Player;
 import megamek.common.util.DirectoryItems;
+import megamek.common.util.EncodeControl;
 
 /**
  *
@@ -76,7 +77,7 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
         btnSelect = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CamoChoiceDialog");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CamoChoiceDialog", new EncodeControl()); //$NON-NLS-1$
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N

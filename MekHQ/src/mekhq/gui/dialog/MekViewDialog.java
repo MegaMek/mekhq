@@ -11,6 +11,7 @@ import java.awt.Font;
 import java.util.ResourceBundle;
 
 import megamek.common.MechView;
+import megamek.common.util.EncodeControl;
 
 /**
  *
@@ -37,7 +38,7 @@ public class MekViewDialog extends javax.swing.JDialog {
         txtMek = new javax.swing.JTextPane();
         btnOkay = new javax.swing.JButton();
         
-		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekViewDialog");
+		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekViewDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Unit View"); // NOI18N
 

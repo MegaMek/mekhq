@@ -58,6 +58,7 @@ import megamek.common.event.GameReportEvent;
 import megamek.common.event.GameSettingsChangeEvent;
 import megamek.common.event.GameTurnChangeEvent;
 import megamek.common.event.GameVictoryEvent;
+import megamek.common.util.EncodeControl;
 import megamek.server.Server;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
@@ -137,7 +138,7 @@ public class MekHQ implements GameListener {
      * At startup create and show the main frame of the application.
      */
     protected void startup() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ", new EncodeControl()); //$NON-NLS-1$
         MekHQ.logMessage(resourceMap.getString("Application.name") + " " + resourceMap.getString("Application.version"));
         //read in preferences
     	readPreferences();

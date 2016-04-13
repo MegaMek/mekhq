@@ -25,6 +25,7 @@ import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Crew;
 import megamek.common.Entity;
 import megamek.common.UnitType;
+import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -183,7 +184,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 	
 	private void fillStats() {
 		
-    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ForceViewPanel");
+    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ForceViewPanel", new EncodeControl()); //$NON-NLS-1$
 
     	lblType = new javax.swing.JLabel();
     	lblAssign1 = new javax.swing.JLabel();

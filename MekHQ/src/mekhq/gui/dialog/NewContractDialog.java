@@ -47,6 +47,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Contract;
@@ -85,7 +86,7 @@ public class NewContractDialog extends javax.swing.JDialog {
     protected void initComponents() {
     	java.awt.GridBagConstraints gridBagConstraints;
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewContractDialog");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewContractDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("Form.title"));

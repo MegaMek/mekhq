@@ -24,6 +24,7 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.parts.PartInUse;
 
 public class PartsInUseTableModel extends DataTableModel {
@@ -49,7 +50,7 @@ public class PartsInUseTableModel extends DataTableModel {
     private ResourceBundle resourceMap;
 
     public PartsInUseTableModel () {
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsInUseTableModel"); //$NON-NLS-1$
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsInUseTableModel", new EncodeControl()); //$NON-NLS-1$
         data = new ArrayList<PartInUse>();
     }
     

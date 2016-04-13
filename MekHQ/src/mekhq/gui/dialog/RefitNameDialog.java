@@ -33,6 +33,7 @@ import javax.swing.JTextField;
 import megamek.common.BattleArmor;
 import megamek.common.Infantry;
 import megamek.common.MechSummaryCache;
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.parts.Refit;
 
 /**
@@ -76,7 +77,7 @@ public class RefitNameDialog extends JDialog {
         btnOK = new JButton();
         btnCancel = new JButton();
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.RefitNameDialog");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.RefitNameDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("Form.title"));

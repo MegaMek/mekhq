@@ -24,6 +24,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.ProgressMonitor;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MercRosterAccess;
 
@@ -59,7 +60,7 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
 
     private void initComponents() {
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MercRosterDialog");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MercRosterDialog", new EncodeControl()); //$NON-NLS-1$
 
         txtAddress = new JTextField("localhost");
         txtPort = new JTextField("3306");

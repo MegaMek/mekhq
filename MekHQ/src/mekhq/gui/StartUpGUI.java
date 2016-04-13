@@ -23,6 +23,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.gui.dialog.DataLoadingDialog;
@@ -53,7 +54,7 @@ public class StartUpGUI extends javax.swing.JPanel {
 
     	frame = new JFrame("MekHQ");
         
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.StartUpDialog");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.StartUpDialog", new EncodeControl()); //$NON-NLS-1$
         
         btnNewGame = new javax.swing.JButton(resourceMap.getString("btnNewGame.text"));
         btnNewGame.setMinimumSize(new Dimension(200, 25));

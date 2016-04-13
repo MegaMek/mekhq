@@ -33,6 +33,7 @@ import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.LogEntry;
 
 /**
@@ -72,7 +73,7 @@ public class EditLogEntryDialog extends javax.swing.JDialog {
         panBtn = new javax.swing.JPanel();
         panMain = new javax.swing.JPanel();
         
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditLogEntryDialog");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditLogEntryDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("Form.title"));

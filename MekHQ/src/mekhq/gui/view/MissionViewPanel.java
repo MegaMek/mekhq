@@ -11,6 +11,7 @@ import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.mission.Mission;
 
 /**
@@ -69,7 +70,7 @@ public class MissionViewPanel extends javax.swing.JPanel {
 
     private void fillStats() {
     	
-    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel");
+    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel", new EncodeControl()); //$NON-NLS-1$
     	
     	lblStatus = new javax.swing.JLabel();
     	lblLocation = new javax.swing.JLabel();

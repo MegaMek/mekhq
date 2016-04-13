@@ -60,6 +60,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.ContractMarket;
@@ -242,7 +243,7 @@ public class ContractMarketDialog extends JDialog {
 		cbRetainerEmployer = new FactionComboBox();
 		btnStartRetainer = new JButton();
 
-		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractMarketDialog");
+		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractMarketDialog", new EncodeControl()); //$NON-NLS-1$
 		setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 		setTitle(resourceMap.getString("Form.title")); // NOI18N
 		setName("Form"); // NOI18N

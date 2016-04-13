@@ -25,6 +25,7 @@ import megamek.common.Mounted;
 import megamek.common.Tank;
 import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Kill;
@@ -118,7 +119,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     public PersonnelTableMouseAdapter(CampaignGUI gui) {
         super();
         this.gui = gui;
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelTableMouseAdapter"); //$NON-NLS-1$
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelTableMouseAdapter", new EncodeControl()); //$NON-NLS-1$
     }
 
     public PersonnelTableMouseAdapter() {

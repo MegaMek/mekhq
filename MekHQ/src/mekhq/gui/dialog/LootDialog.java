@@ -35,6 +35,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 
 import megamek.common.Entity;
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.parts.Part;
@@ -97,7 +98,7 @@ public class LootDialog extends javax.swing.JDialog {
         listUnits = new JList<String>(new DefaultListModel<String>());
         listParts = new JList<String>(new DefaultListModel<String>());
 
-        //ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.KillDialog");
+        //ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.KillDialog", new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Potential Rewards");
         getContentPane().setLayout(new java.awt.GridBagLayout());

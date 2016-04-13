@@ -15,6 +15,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
 import megamek.common.util.DirectoryItems;
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Rank;
@@ -93,7 +94,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
         btnRegenerate = new javax.swing.JButton();
         choiceRanks = new javax.swing.JComboBox<String>();
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewRecruitDialog");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewRecruitDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         setTitle(resourceMap.getString("Form.title")); // NOI18N

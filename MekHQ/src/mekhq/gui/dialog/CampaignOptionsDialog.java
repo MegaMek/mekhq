@@ -90,6 +90,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -587,7 +588,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         chkSupportStaffOnly = new JCheckBox();
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("title.text"));
@@ -4547,7 +4548,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     }
 
     private void setAtBSkillCosts() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl()); //$NON-NLS-1$
     	if (btnUseAtBSkillCosts.isSelected()) {
     		final String[] combatSkills = {SkillType.S_PILOT_MECH,SkillType.S_GUN_MECH,SkillType.S_PILOT_AERO,SkillType.S_GUN_AERO,
     				SkillType.S_PILOT_GVEE,SkillType.S_PILOT_VTOL,SkillType.S_PILOT_NVEE,SkillType.S_GUN_VEE,
@@ -4604,7 +4605,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     }
 
     private void setAtBSPACosts() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl()); //$NON-NLS-1$
 
     	if (btnUseAtBSPACosts.isSelected()) {
     		tempSPA = atbSPA;
