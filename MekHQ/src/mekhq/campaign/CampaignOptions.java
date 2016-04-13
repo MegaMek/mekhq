@@ -2126,9 +2126,11 @@ public class CampaignOptions implements Serializable {
                     retVal.setUnitRatingMethod((method != null) ? method : UnitRatingMethod.INTERSTELLAR_OPS);
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("usePortraitForType")) {
-                String[] values = wn2.getTextContent().split(",");
+                String[] values = wn2.getTextContent().split(","); //$NON-NLS-1$
                 for (int i = 0; i < values.length; i++) {
-                    retVal.usePortraitForType[i] = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    if(i < retVal.usePortraitForType.length) {
+                        retVal.usePortraitForType[i] = Boolean.parseBoolean(values[i].trim());
+                    }
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("destroyByMargin")) {
                 retVal.destroyByMargin = Boolean.parseBoolean(wn2.getTextContent().trim());
