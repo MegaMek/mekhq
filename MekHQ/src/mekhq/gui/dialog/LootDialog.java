@@ -1,20 +1,20 @@
 /*
  * LootDialog.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -35,7 +35,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 
 import megamek.common.Entity;
-import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.parts.Part;
@@ -52,7 +51,7 @@ public class LootDialog extends javax.swing.JDialog {
     private ArrayList<Entity> units;
     private ArrayList<Part> parts;
     private Campaign campaign;
-       
+
     private JButton btnOK;
     private JButton btnCancel;
     private JTextField txtName;
@@ -102,7 +101,7 @@ public class LootDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Potential Rewards");
         getContentPane().setLayout(new java.awt.GridBagLayout());
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -111,7 +110,7 @@ public class LootDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel("Name:"), gridBagConstraints);
-        
+
         txtName.setText(loot.getName());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -123,7 +122,7 @@ public class LootDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(txtName, gridBagConstraints);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -132,7 +131,7 @@ public class LootDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel("Cash"), gridBagConstraints);
-        
+
         spnCash = new JSpinner(new SpinnerNumberModel(loot.getCash(), 0, 300000000, 10000));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -143,7 +142,7 @@ public class LootDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(spnCash, gridBagConstraints);
- 
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -152,13 +151,13 @@ public class LootDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel("Units"), gridBagConstraints);
-        
+
         btnAddUnit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addUnit();
             }
         });
- 
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
@@ -166,7 +165,7 @@ public class LootDialog extends javax.swing.JDialog {
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         getContentPane().add(btnAddUnit, gridBagConstraints);
-        
+
         btnRemoveUnit.setEnabled(false);
         btnRemoveUnit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -180,7 +179,7 @@ public class LootDialog extends javax.swing.JDialog {
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         getContentPane().add(btnRemoveUnit, gridBagConstraints);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -201,7 +200,7 @@ public class LootDialog extends javax.swing.JDialog {
                 });
         refreshUnitList();
         getContentPane().add(scrUnits, gridBagConstraints);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
@@ -210,7 +209,7 @@ public class LootDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel("Parts"), gridBagConstraints);
-        
+
         btnAddPart.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addPart();
@@ -223,7 +222,7 @@ public class LootDialog extends javax.swing.JDialog {
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         getContentPane().add(btnAddPart, gridBagConstraints);
-        
+
         btnRemovePart.setEnabled(false);
         btnRemovePart.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -237,7 +236,7 @@ public class LootDialog extends javax.swing.JDialog {
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         getContentPane().add(btnRemovePart, gridBagConstraints);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
@@ -258,7 +257,7 @@ public class LootDialog extends javax.swing.JDialog {
                 });
         refreshPartList();
         getContentPane().add(scrParts, gridBagConstraints);
-        
+
         btnOK.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 done();
@@ -272,7 +271,7 @@ public class LootDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(btnOK, gridBagConstraints);
-        
+
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 setVisible(false);
@@ -289,14 +288,14 @@ public class LootDialog extends javax.swing.JDialog {
 
         pack();
     }
-    
+
     public Loot getLoot() {
         if(cancelled) {
             return null;
         }
         return loot;
     }
-    
+
     private void addUnit() {
         UnitSelectorDialog usd = new UnitSelectorDialog(frame, null, campaign, false);
         usd.setVisible(true);
@@ -306,7 +305,7 @@ public class LootDialog extends javax.swing.JDialog {
         }
         refreshUnitList();
     }
-    
+
     private void removeUnit() {
         int row = listUnits.getSelectedIndex();
         if(-1 != row) {
@@ -314,7 +313,7 @@ public class LootDialog extends javax.swing.JDialog {
         }
         refreshUnitList();
     }
-    
+
     private void addPart() {
         PartsStoreDialog psd = new PartsStoreDialog(frame, true, null, campaign, false);
         psd.setVisible(true);
@@ -324,7 +323,7 @@ public class LootDialog extends javax.swing.JDialog {
         }
         refreshPartList();
     }
-    
+
     private void removePart() {
         int row = listParts.getSelectedIndex();
         if(-1 != row) {
@@ -332,7 +331,7 @@ public class LootDialog extends javax.swing.JDialog {
         }
         refreshPartList();
     }
- 
+
     private void done() {
         loot.setName(txtName.getText());
         loot.setCash((int)Math.ceil((Double)spnCash.getModel().getValue()));
@@ -347,7 +346,7 @@ public class LootDialog extends javax.swing.JDialog {
         }
         this.setVisible(false);
     }
- 
+
     private void refreshUnitList() {
         int selectedRow = listUnits.getSelectedIndex();
         DefaultListModel<String> model = (DefaultListModel<String>)listUnits.getModel();
@@ -368,7 +367,7 @@ public class LootDialog extends javax.swing.JDialog {
             }
         }
     }
- 
+
     private void refreshPartList() {
         int selectedRow = listParts.getSelectedIndex();
         DefaultListModel<String> model = (DefaultListModel<String>)listParts.getModel();
@@ -389,12 +388,12 @@ public class LootDialog extends javax.swing.JDialog {
             }
         }
     }
-    
+
     private void listUnitsValueChanged() {
         int row = listUnits.getSelectedIndex();
         btnRemoveUnit.setEnabled(row != -1);
     }
-    
+
     private void listPartsValueChanged() {
         int row = listParts.getSelectedIndex();
         btnRemovePart.setEnabled(row != -1);
