@@ -17,29 +17,27 @@ import mekhq.campaign.unit.Unit;
  * but it will never move more. Thus, asking for <code>Integer.MAX_VALUE</code> ammo
  * count is valid and means "as much as possible".
  */
-public class AmmoWorkUnit extends WorkUnit {
+public abstract class AmmoWorkUnit extends WorkUnit {
     public static WorkUnit newLoad(AmmoType type, int shots) {
         if(shots < 0) {
             throw new IllegalArgumentException("Amount of shots has to be positive"); //$NON-NLS-1$
         }
-        return new AmmoWorkUnit(Objects.requireNonNull(type), shots, true);
+        return new Load(Objects.requireNonNull(type), shots);
     }
     
     public static WorkUnit newUnload(AmmoType type, int shots) {
         if(shots < 0) {
             throw new IllegalArgumentException("Amount of shots has to be positive"); //$NON-NLS-1$
         }
-        return new AmmoWorkUnit(Objects.requireNonNull(type), shots, false);
+        return new Unload(Objects.requireNonNull(type), shots);
     }
 
-    private final AmmoType type;
-    private final int shots;
-    private final boolean load;
+    protected final AmmoType type;
+    protected final int shots;
     
-    private AmmoWorkUnit(AmmoType type, int shots, boolean load) {
+    private AmmoWorkUnit(AmmoType type, int shots) {
         this.type = type;
         this.shots = shots;
-        this.load = load;
     }
     
     @Override
@@ -57,46 +55,53 @@ public class AmmoWorkUnit extends WorkUnit {
             // Not enough items in inventory
             return false;
         }
-        for(AmmoBin bin : unit.getWorkingAmmoBins()) {
-            if(load) {
-                // See if we have any bins which could accept this ammo type
-                if(bin.getShotsNeeded() > 0) {
-                    if(bin.getMunitionType() == type.getMunitionType()) {
-                        // Same munition
-                        return true;
-                    }
-                    if(bin.getShotsNeeded() == bin.getFullShots()) {
-                        // Bin is empty, see if we can use this munition in there
-                        for (AmmoType atype :
-                            Utilities.getMunitionsFor(unit.getEntity(),
-                                (AmmoType) bin.getType(), CampaignOptions.TECH_EXPERIMENTAL)) {
-                            if (atype.getMunitionType() == type.getMunitionType()) {
-                                return true;
+        // Let the subclasses deal with any other requirements
+        return true;
+    }
+
+    private static class Load extends AmmoWorkUnit {
+        private Load(AmmoType ammoType, int shots) {
+            super(ammoType, shots);
+        }
+        
+        @Override
+        protected boolean canWork(Unit unit, Inventory inv) {
+            if(super.canWork(unit, inv)) {
+                for(AmmoBin bin : unit.getWorkingAmmoBins()) {
+                    // See if we have any bins which could accept this ammo type
+                    if(bin.getShotsNeeded() > 0) {
+                        if(bin.getMunitionType() == type.getMunitionType()) {
+                            // Same munition
+                            return true;
+                        }
+                        if(bin.getShotsNeeded() == bin.getFullShots()) {
+                            // Bin is empty, see if we can use this munition in there
+                            for (AmmoType atype :
+                                Utilities.getMunitionsFor(unit.getEntity(),
+                                    (AmmoType) bin.getType(), CampaignOptions.TECH_EXPERIMENTAL)) {
+                                if (atype.getMunitionType() == type.getMunitionType()) {
+                                    return true;
+                                }
                             }
                         }
                     }
                 }
-            } else {
-                // See if we have any non-empty bins with that ammo type
-                if((bin.getMunitionType() == type.getMunitionType())
-                    && (bin.getShotsNeeded() < bin.getFullShots())) {
-                    return true;
-                }
             }
+            return false;
         }
-        // No place to load anything or unload anything from
-        return false;
-    }
-
-    @Override
-    protected int doWork(Unit unit, Inventory inv) throws WorkException {
-        int movedShots = 0;
-        for(AmmoBin bin : unit.getWorkingAmmoBins()) {
-            if(movedShots >= shots) {
-                // We're done, nothing more to move
-                break;
+        
+        @Override
+        protected int doWork(Unit unit, Inventory inv) throws WorkException {
+            if(shots == 0) {
+                // Easy "work"
+                return 0;
             }
-            if(load) {
+            int movedShots = 0;
+            for(AmmoBin bin : unit.getWorkingAmmoBins()) {
+                if(movedShots >= shots) {
+                    // We're done, nothing more to move
+                    break;
+                }
                 if(bin.getShotsNeeded() > 0) {
                     if(bin.getMunitionType() == type.getMunitionType()) {
                         int shotsToMove = Math.min(bin.getShotsNeeded(), shots - movedShots);
@@ -122,7 +127,42 @@ public class AmmoWorkUnit extends WorkUnit {
                         }
                     }
                 }
-            } else {
+            }
+            return 0;
+        }
+    }
+    
+    private static class Unload extends AmmoWorkUnit {
+        private Unload(AmmoType ammoType, int shots) {
+            super(ammoType, shots);
+        }
+        
+        @Override
+        protected boolean canWork(Unit unit, Inventory inv) {
+            if(super.canWork(unit, inv)) {
+                for(AmmoBin bin : unit.getWorkingAmmoBins()) {
+                    // See if we have any non-empty bins with that ammo type
+                    if((bin.getMunitionType() == type.getMunitionType())
+                        && (bin.getShotsNeeded() < bin.getFullShots())) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        
+        @Override
+        protected int doWork(Unit unit, Inventory inv) throws WorkException {
+            if(shots == 0) {
+                // Easy "work"
+                return 0;
+            }
+            int movedShots = 0;
+            for(AmmoBin bin : unit.getWorkingAmmoBins()) {
+                if(movedShots >= shots) {
+                    // We're done, nothing more to move
+                    break;
+                }
                 if((bin.getMunitionType() == type.getMunitionType())
                     && (bin.getShotsNeeded() < bin.getFullShots())) {
                     int shotsToMove = Math.min(bin.getFullShots() - bin.getShotsNeeded(), shots - movedShots);
@@ -131,8 +171,7 @@ public class AmmoWorkUnit extends WorkUnit {
                     continue;
                 }
             }
+            return 0; // TODO: Work time
         }
-        return 0; // TODO: Work time
     }
-
 }
