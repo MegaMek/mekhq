@@ -37,6 +37,9 @@ import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
 import megamek.common.Compute;
@@ -71,9 +74,6 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.Modes;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -219,6 +219,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     //portrait
     protected String portraitCategory;
     protected String portraitFile;
+    // runtime override (not saved)
+    protected transient String portraitCategoryOverride;
+    protected transient String portraitFileOverride;
 
     // Our rank
     private int rank;
@@ -284,6 +287,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         callsign = "";
         portraitCategory = Crew.ROOT_PORTRAIT;
         portraitFile = Crew.PORTRAIT_NONE;
+        portraitCategoryOverride = null;
+        portraitFileOverride = null;
         xp = 0;
         acquisitions = 0;
         gender = G_MALE;
@@ -595,11 +600,11 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
 
     public String getPortraitCategory() {
-        return portraitCategory;
+        return Utilities.nonNull(portraitCategoryOverride, portraitCategory);
     }
 
     public String getPortraitFileName() {
-        return portraitFile;
+        return Utilities.nonNull(portraitFileOverride, portraitFile);
     }
 
     public void setPortraitCategory(String s) {
@@ -609,6 +614,15 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public void setPortraitFileName(String s) {
         this.portraitFile = s;
     }
+
+    public void setPortraitCategoryOverride(String s) {
+        this.portraitCategoryOverride = s;
+    }
+
+    public void setPortraitFileNameOverride(String s) {
+        this.portraitFileOverride = s;
+    }
+
 
     public int getPrimaryRole() {
         return primaryRole;

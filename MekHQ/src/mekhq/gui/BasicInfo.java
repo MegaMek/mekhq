@@ -155,9 +155,9 @@ public class BasicInfo extends JPanel {
                 portrait = (Image) icons.getPortraits().getItem(category, file);
                 if (null == portrait) {
                     // the image could not be found so switch to default one
-                    p.setPortraitCategory(Crew.ROOT_PORTRAIT);
+                    p.setPortraitCategoryOverride(Crew.ROOT_PORTRAIT);
                     category = "";
-                    p.setPortraitFileName(Crew.PORTRAIT_NONE);
+                    p.setPortraitFileNameOverride(Crew.PORTRAIT_NONE);
                     file = "default.gif";
                     portrait = (Image) icons.getPortraits().getItem(category, file);
                 }
