@@ -86,5 +86,8 @@ public class Item {
         return tonnage == other.tonnage && Objects.equals(partClone, other.partClone);
     }
     
-    
+    @Override
+    public String toString() {
+        return "[ITEM:" + partClone + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+    }
 }

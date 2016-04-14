@@ -109,4 +109,13 @@ public abstract class Inventory {
         }
         return sum;
     }
+    
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer("[INVENTORY]\n"); //$NON-NLS-1$
+        for(Item item : getItemTypes()) {
+            sb.append(String.format("* %4d %s\n", getAmount(item), item)); //$NON-NLS-1$
+        }
+        return sb.toString();
+    }
 }
