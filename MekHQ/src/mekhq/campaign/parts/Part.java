@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.w3c.dom.NamedNodeMap;
@@ -202,6 +203,25 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.isTeamSalvaging = false;
 	}
 
+	@Override
+	public int hashCode() {
+	    return Objects.hash(name, unitTonnage, hits, skillMin, brandNew, quality, childPartIds);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+	    if(this == obj) {
+	        return true;
+	    }
+	    if((null == obj) || (getClass() != obj.getClass())) {
+	        return false;
+	    }
+	    final Part other = (Part) obj;
+	    return Objects.equals(name, other.name) && (unitTonnage == other.unitTonnage)
+	        && (hits == other.hits) && (skillMin == other.skillMin) && (brandNew == other.brandNew)
+	        && (quality == other.quality) && Objects.equals(childPartIds, other.childPartIds);
+	}
+	
 	public static String getQualityName(int quality, boolean reverse) {
         switch(quality) {
         case QUALITY_A:

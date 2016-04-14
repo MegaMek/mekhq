@@ -53,6 +53,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.MhqFileUtil;
 import mekhq.Utilities;
 import mekhq.Version;
+import mekhq.campaign.inventory.CampaignWarehouse;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingAmmoBin;
@@ -1162,7 +1163,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	@Override
 	public String succeed() {
 	    MekHQ.logMessage("Refitting according to work plan:\n" + getWorkDesc());
+	    MekHQ.logMessage("Campaign inventory at start:\n" + new CampaignWarehouse(campaign));
 		complete();
+        MekHQ.logMessage("Campaign inventory at end:\n" + new CampaignWarehouse(campaign));
 		return "The customization of "+ oldUnit.getEntity().getShortName() + " is complete.";
 	}
 

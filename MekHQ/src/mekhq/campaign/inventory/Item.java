@@ -88,6 +88,6 @@ public class Item {
     
     @Override
     public String toString() {
-        return "[ITEM:" + partClone + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+        return "[ITEM:" + partClone.getName() + "]"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 }

@@ -7,6 +7,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.AmmoStorage;
+import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 
 /**
@@ -25,10 +27,18 @@ public class CampaignWarehouse extends Inventory {
             Item item = Item.newItem(part);
             if(null != item) {
                 Integer currentAmount = result.get(item);
+                int partQuantity = part.getQuantity();
+                // Ammo and armour break the Part contract. Obviously.
+                if(part instanceof AmmoStorage) {
+                    partQuantity = ((AmmoStorage) part).getShots();
+                }
+                if(part instanceof Armor) {
+                    partQuantity = ((Armor) part).getAmount();
+                }
                 if(null == currentAmount) {
-                    result.put(item, Integer.valueOf(1));
+                    result.put(item, Integer.valueOf(partQuantity));
                 } else {
-                    result.put(item, Integer.valueOf(currentAmount.intValue() + 1));
+                    result.put(item, Integer.valueOf(currentAmount.intValue() + partQuantity));
                 }
             }
         }
