@@ -108,7 +108,8 @@ public class DailyReportLogPanel extends JPanel {
 			HTMLDocument doc = (HTMLDocument) txtLog.getDocument();
 			try {
 				// Element 0 is <head>, Element 1 is <body>
-				doc.insertBeforeEnd(doc.getDefaultRootElement().getElement(1), addedText);
+				doc.insertBeforeEnd(doc.getDefaultRootElement().getElement(1).getElement(0), addedText);
+				logText = logText + addedText;
 			} catch (BadLocationException | IOException e) {
 				// Shouldn't happen
 			}
