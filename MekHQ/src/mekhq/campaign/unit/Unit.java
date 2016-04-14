@@ -3564,4 +3564,8 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 		return false;
 	}
 
+	@Override
+	public String toString() {
+	    return "[UNIT:" + id + "] " + getName();
+	}
 }
