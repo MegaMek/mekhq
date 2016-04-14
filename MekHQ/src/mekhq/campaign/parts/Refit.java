@@ -1161,6 +1161,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 
 	@Override
 	public String succeed() {
+	    MekHQ.logMessage("Refitting according to work plan:\n" + getWorkDesc());
 		complete();
 		return "The customization of "+ oldUnit.getEntity().getShortName() + " is complete.";
 	}
