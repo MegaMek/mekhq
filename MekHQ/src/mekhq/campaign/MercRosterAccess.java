@@ -547,7 +547,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 } else {
                     preparedStatement.setInt(4, 0);
                 }
-                preparedStatement.setInt(5, Math.round(u.getEntity().getWeight()));
+                preparedStatement.setInt(5, (int) Math.round(u.getEntity().getWeight()));
                 preparedStatement.setInt(6, 1);
                 preparedStatement.setString(7, u.getHistory());
                 preparedStatement.setString(8, u.getId().toString());
@@ -562,7 +562,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                     } else {
                         preparedStatement.setInt(4, 0);
                     }
-                    preparedStatement.setInt(5, Math.round(u.getEntity().getWeight()));
+                    preparedStatement.setInt(5, (int) Math.round(u.getEntity().getWeight()));
                     preparedStatement.setInt(6, 1);
                     preparedStatement.setString(7, u.getHistory());
                     preparedStatement.setString(8, u.getId().toString());

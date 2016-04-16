@@ -238,9 +238,9 @@ public class MekLabPanel extends JPanel {
 
         double totalHeat = calculateTotalHeat();
 		int bvDiff = entity.calculateBattleValue(true, true) - unit.getEntity().calculateBattleValue(true, true);
-		float currentTonnage = testEntity.calculateWeight();
+		double currentTonnage = testEntity.calculateWeight();
         currentTonnage += UnitUtil.getUnallocatedAmmoTonnage(entity);
-        float tonnage = entity.getWeight();
+        double tonnage = entity.getWeight();
 
         if(entity.getWeight() < testEntity.calculateWeight()) {
 			btnRefit.setEnabled(false);
