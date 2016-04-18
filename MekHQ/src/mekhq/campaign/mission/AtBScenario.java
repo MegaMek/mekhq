@@ -2573,6 +2573,10 @@ public class AtBScenario extends Scenario {
 						Entity en = null;
 						try {
 							en = MekHqXmlUtil.getEntityFromXmlString(wn3);
+							if (wn3.getAttributes().getNamedItem("deployment") != null) {
+								en.setDeployRound(Math.max(0,
+										Integer.parseInt(wn3.getAttributes().getNamedItem("deployment").getTextContent())));
+							}
 						} catch (Exception e) {
 							MekHQ.logError("Error loading allied unit in scenario");
 							MekHQ.logError(e);
@@ -2592,6 +2596,10 @@ public class AtBScenario extends Scenario {
 						Entity en = null;
 						try {
 							en = MekHqXmlUtil.getEntityFromXmlString(wn3);
+							if (wn3.getAttributes().getNamedItem("deployment") != null) {
+								en.setDeployRound(Math.max(0,
+										Integer.parseInt(wn3.getAttributes().getNamedItem("deployment").getTextContent())));
+							}
 						} catch (Exception e) {
 							MekHQ.logError("Error loading allied unit in scenario");
 							MekHQ.logError(e);
@@ -2619,6 +2627,10 @@ public class AtBScenario extends Scenario {
 								Entity en = null;
 								try {
 									en = MekHqXmlUtil.getEntityFromXmlString(wn4);
+									if (wn4.getAttributes().getNamedItem("deployment") != null) {
+										en.setDeployRound(Math.max(0,
+												Integer.parseInt(wn4.getAttributes().getNamedItem("deployment").getTextContent())));
+									}
 								} catch (Exception e) {
 									MekHQ.logError("Error loading allied unit in scenario");
 									MekHQ.logError(e);
@@ -3061,6 +3073,10 @@ public class AtBScenario extends Scenario {
 							Entity en = null;
 							try {
 								en = MekHqXmlUtil.getEntityFromXmlString(wn3);
+								if (wn3.getAttributes().getNamedItem("deployment") != null) {
+									en.setDeployRound(Math.max(0,
+											Integer.parseInt(wn3.getAttributes().getNamedItem("deployment").getTextContent())));
+								}
 							} catch (Exception e) {
 								MekHQ.logError("Error loading allied unit in scenario");
 								MekHQ.logError(e);
