@@ -2170,6 +2170,7 @@ public class Campaign implements Serializable {
         				((AtBContract)m).addPlayerMinorBreach();
         				addReport("Failure to deploy for " + s.getName() +
         						" resulted in defeat and a minor contract breach.");
+        				((AtBScenario)s).generateStub(this);
         			}
         		}
         	}

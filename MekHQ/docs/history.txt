@@ -2,6 +2,7 @@ VERSION HISTORY
 ----------------------------------
 v0.3.28-git
 + Bug [#925]: Issues with reload of MHQ and Settings
++ [AtB] When failure to deploy results in defeat, replace generated entities with stubs.
 
 v0.3.27 (2016-04-16 00:30 UTC)
 + Updated MegaMek.jar to 0.41.17
