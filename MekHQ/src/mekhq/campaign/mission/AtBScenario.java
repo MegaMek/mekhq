@@ -3024,19 +3024,17 @@ public class AtBScenario extends Scenario {
 			}
 			pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</entities>");
 
-			if (!behaviorSettings.isDefault()) {
-				pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<behaviorSettings>");
-				MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "forcedWithdrawal", behaviorSettings.isForcedWithdrawal());
-				MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "goHome", behaviorSettings.shouldGoHome());
-				MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "autoFlee", behaviorSettings.shouldAutoFlee());
-				MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "selfPreservationIndex", behaviorSettings.getSelfPreservationIndex());
-				MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "fallShameIndex", behaviorSettings.getFallShameIndex());
-				MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "hyperAggressionIndex", behaviorSettings.getHyperAggressionIndex());
-				MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "homeEdge", behaviorSettings.getHomeEdge().ordinal());
-				MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "herdMentalityIndex", behaviorSettings.getHerdMentalityIndex());
-				MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "braveryIndex", behaviorSettings.getBraveryIndex());
-				pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</behaviorSettings>");
-			}
+			pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<behaviorSettings>");
+			MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "forcedWithdrawal", behaviorSettings.isForcedWithdrawal());
+			MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "goHome", behaviorSettings.shouldGoHome());
+			MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "autoFlee", behaviorSettings.shouldAutoFlee());
+			MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "selfPreservationIndex", behaviorSettings.getSelfPreservationIndex());
+			MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "fallShameIndex", behaviorSettings.getFallShameIndex());
+			MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "hyperAggressionIndex", behaviorSettings.getHyperAggressionIndex());
+			MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "homeEdge", behaviorSettings.getHomeEdge().ordinal());
+			MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "herdMentalityIndex", behaviorSettings.getHerdMentalityIndex());
+			MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "braveryIndex", behaviorSettings.getBraveryIndex());
+			pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</behaviorSettings>");
 		}
 
 		public void setFieldsFromXmlNode(Node wn) {
