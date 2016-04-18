@@ -12,6 +12,7 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
@@ -366,6 +367,10 @@ public class PersonnelMarketDialog extends JDialog {
 	    		UUID pid = selectedPerson.getId();
 	    		if(campaign.recruitPerson(selectedPerson)) {
 	    			Entity en = personnelMarket.getAttachedEntity(pid);
+	    			if (campaign.getCampaignOptions().getUseTimeInService()) {
+	    			    GregorianCalendar rawrecruit = (GregorianCalendar) campaign.getCalendar().clone();
+	    			    selectedPerson.setRecruitment(rawrecruit);
+	    			}
 	    			if (null != en) {
 	    				addUnit(en, true);
 	    				personnelMarket.removeAttachedEntity(pid);
@@ -385,6 +390,10 @@ public class PersonnelMarketDialog extends JDialog {
 	    if(null != selectedPerson) {
 	    	campaign.addPersonWithoutId(selectedPerson, true);
 			addUnit(en, false);
+			if (campaign.getCampaignOptions().getUseTimeInService()) {
+			    GregorianCalendar rawrecruit = (GregorianCalendar) campaign.getCalendar().clone();
+			    selectedPerson.setRecruitment(rawrecruit);
+			}
 	    	personnelMarket.removePerson(selectedPerson);
     		personnelModel.setData(personnelMarket.getPersonnel());
 			personnelMarket.removeAttachedEntity(pid);

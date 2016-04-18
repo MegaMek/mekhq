@@ -68,6 +68,10 @@ public class PersonViewPanel extends javax.swing.JPanel {
     private javax.swing.JLabel lblGender2;
     private javax.swing.JLabel lblStatus1;
     private javax.swing.JLabel lblStatus2;
+    private javax.swing.JLabel lblRecruited1;
+    private javax.swing.JLabel lblRecruited2;
+    private javax.swing.JLabel lblTimeServed1;
+    private javax.swing.JLabel lblTimeServed2;
     private javax.swing.JLabel lblTough1;
     private javax.swing.JLabel lblTough2;
     private javax.swing.JLabel lblEdge1;
@@ -265,6 +269,10 @@ public class PersonViewPanel extends javax.swing.JPanel {
         lblGender2 = new JLabel();
         lblStatus1 = new JLabel();
         lblStatus2 = new JLabel();
+        lblRecruited1 = new JLabel();
+        lblRecruited2 = new JLabel();
+        lblTimeServed1 = new JLabel();
+        lblTimeServed2 = new JLabel();
         lblTough1 = new JLabel();
         lblTough2 = new JLabel();
         lblEdge1 = new JLabel();
@@ -381,6 +389,52 @@ public class PersonViewPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblStatus2, gridBagConstraints);
+
+        if (campaign.getCampaignOptions().getUseTimeInService()) {
+            if (null != person.getRecruitmentAsString() && !person.isDependent() && !person.isPrisoner() && !person.isBondsman()) {
+                firsty++;
+                lblRecruited1.setName("lblRecruited1"); // NOI18N
+                lblRecruited1.setText(resourceMap.getString("lblRecruited1.text"));
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlStats.add(lblRecruited1, gridBagConstraints);
+
+                lblRecruited2.setName("lblRecruited2"); // NOI18N
+                lblRecruited2.setText(person.getRecruitmentAsString());
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 1;
+                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.weightx = 0.5;
+                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlStats.add(lblRecruited2, gridBagConstraints);
+
+                firsty++;
+                lblTimeServed1.setName("lblTimeServed1"); // NOI18N
+                lblTimeServed1.setText(resourceMap.getString("lblTimeServed1.text"));
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlStats.add(lblTimeServed1, gridBagConstraints);
+
+                lblTimeServed2.setName("lblTimeServed2"); // NOI18N
+                lblTimeServed2.setText(Integer.toString(person.getTimeInService(campaign.getCalendar())) + "yrs");
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 1;
+                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.weightx = 0.5;
+                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlStats.add(lblTimeServed2, gridBagConstraints);
+            }
+        }
 
         int secondy = 0;
         JLabel lblName;
