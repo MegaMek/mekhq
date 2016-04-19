@@ -8064,7 +8064,7 @@ public class Campaign implements Serializable {
                     // If by some nightmare there is no Joined date just use the first entry.
                     join = e.getDate();
                 }
-                if (e.getDesc().startsWith("Joined ")) {
+                if (e.getDesc().startsWith("Joined ") || e.getDesc().startsWith("Freed ")) {
                     join = e.getDate();
                     break;
                 }
