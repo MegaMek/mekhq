@@ -263,6 +263,10 @@ public class HireBulkPersonnelDialog extends JDialog {
         } 
         while(number > 0) {
             Person p = campaign.newPerson(((PersonTypeItem)choiceType.getSelectedItem()).id);
+
+            GregorianCalendar rawrecruit = (GregorianCalendar) campaign.getCalendar().clone();
+            p.setRecruitment(rawrecruit);
+
             p.setRankNumeric(campaign.getRanks().getRankNumericFromNameAndProfession(p.getProfession(), (String)choiceRanks.getSelectedItem()));
             int age = p.getAge(today);
             if(useAge) {
