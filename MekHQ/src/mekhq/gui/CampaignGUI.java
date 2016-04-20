@@ -3990,6 +3990,7 @@ public class CampaignGUI extends JPanel {
         refreshFunds();
         refreshFinancialTransactions();
         refreshOverview();
+        refreshPlanetView();
         panMap.repaint();
     }// GEN-LAST:event_btnAdvanceDayActionPerformed
 

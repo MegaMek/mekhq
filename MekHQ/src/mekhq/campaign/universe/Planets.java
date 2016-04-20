@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.transform.stream.StreamSource;
 
+import org.joda.time.DateTime;
 import org.w3c.dom.DOMException;
 
 import mekhq.FileParser;
@@ -130,6 +131,23 @@ public class Planets {
     
     public Planet getPlanetById(String id) {
         return( null != id ? planetList.get(id) : null);
+    }
+    
+    public List<NewsItem> getPlanetaryNews(DateTime when) {
+        List<NewsItem> news = new ArrayList<>();
+        for(Planet planet : planetList.values()) {
+            if(null != planet) {
+                Planet.PlanetaryEvent event = planet.getEvent(when);
+                if((null != event) && (null != event.message)) {
+                    NewsItem item = new NewsItem();
+                    item.setHeadline(event.message);
+                    item.setDate(event.date.toDate());
+                    item.setLocation(planet.getPrintableName(when));
+                    news.add(item);
+                }
+            }
+        }
+        return news;
     }
     
     private void done() {

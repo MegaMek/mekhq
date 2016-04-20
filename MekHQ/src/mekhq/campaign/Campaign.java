@@ -2019,7 +2019,10 @@ public class Campaign implements Serializable {
         }
 
         //read the news
-        for (NewsItem article : news.fetchNewsFor(calendar.getTime())) {
+        for(NewsItem article : news.fetchNewsFor(calendar.getTime())) {
+            addReport(article.getHeadlineForReport());
+        }
+        for(NewsItem article : Planets.getInstance().getPlanetaryNews(new DateTime(calendar))) {
             addReport(article.getHeadlineForReport());
         }
 

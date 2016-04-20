@@ -108,9 +108,9 @@ public class Planet implements Serializable {
     public static final String LUM_VII         = "VII"; //$NON-NLS-1$
     
     @XmlElement(name = "xcood")
-    private double x;
+    private Double x;
     @XmlElement(name = "ycood")
-    private double y;
+    private Double y;
 
     // Base data
     private String id;
@@ -364,19 +364,26 @@ public class Planet implements Serializable {
     
     @SuppressWarnings("unchecked")
     private PlanetaryEvent getOrCreateEvent(DateTime when) {
-        if( null == when ) {
+        if(null == when) {
             return null;
         }
-        if( null == events ) {
+        if(null == events) {
             events = new TreeMap<DateTime, PlanetaryEvent>(DateTimeComparator.getDateOnlyInstance());
         }
         PlanetaryEvent event = events.get(when);
-        if( null == event ) {
+        if(null == event) {
             event = new PlanetaryEvent();
             event.date = when;
             events.put(when, event);
         }
         return event;
+    }
+    
+    public PlanetaryEvent getEvent(DateTime when) {
+        if((null == when) || (null == events)) {
+            return null;
+        }
+        return events.get(when);
     }
     
     public List<PlanetaryEvent> getEvents() {
