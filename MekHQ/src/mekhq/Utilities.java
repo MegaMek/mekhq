@@ -33,6 +33,7 @@ import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -44,6 +45,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -1237,4 +1239,72 @@ public class Utilities {
     	        || en.isStuck();
     }
 
+    /**
+     * Run through the directory and call parser.parse(fis) for each XML file found. Don't recurse.
+     */
+    public static void parseXMLFiles(String string, FileParser fileParser) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /**
+     * Run through the directory and call parser.parse(fis) for each XML file found.
+     */
+    public static void parseXMLFiles(String dirName, FileParser parser, boolean recurse) {
+        if( null == dirName || null == parser ) {
+            throw new NullPointerException();
+        }
+        File dir = new File(dirName);
+        if( dir.isDirectory() ) {
+            File[] files = dir.listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    return name.toLowerCase(Locale.ROOT).endsWith(".xml"); //$NON-NLS-1$
+                }
+            });
+            if( null != files && files.length > 0 ) {
+                // Case-insensitive sorting. Yes, even on Windows. Deal with it.
+                Arrays.sort(files, new Comparator<File>() {
+                    @Override
+                    public int compare(File f1, File f2) {
+                        return f1.getPath().compareTo(f2.getPath());
+                    }
+                });
+                // Try parsing and updating the main list, one by one
+                for( File file : files ) {
+                    if( file.isFile() ) {
+                        try(FileInputStream fis = new FileInputStream(file)) {
+                            parser.parse(fis);
+                        } catch(Exception ex) {
+                            // Ignore this file then
+                            MekHQ.logError("Exception trying to parse " + file.getPath() + " - ignoring."); //$NON-NLS-1$ //$NON-NLS-2$
+                            MekHQ.logError(ex);
+                        }
+                    }
+                }
+            }
+            
+            if( !recurse ) {
+                // We're done
+                return;
+            }
+            
+            // Get subdirectories too
+            File[] dirs = dir.listFiles();
+            if( null != dirs && dirs.length > 0 ) {
+                Arrays.sort(dirs, new Comparator<File>() {
+                    @Override
+                    public int compare(File f1, File f2) {
+                        return f1.getPath().compareTo(f2.getPath());
+                    }
+                });
+                for( File subDirectory : dirs ) {
+                    if( subDirectory.isDirectory() ) {
+                        parseXMLFiles(subDirectory.getPath(), parser, recurse);
+                    }
+                }
+            }
+
+        }
+    }
 }

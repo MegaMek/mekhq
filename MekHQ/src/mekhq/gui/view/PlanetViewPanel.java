@@ -7,9 +7,13 @@
 package mekhq.gui.view;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
+
+import org.joda.time.DateTime;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
@@ -80,7 +84,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		setBackground(Color.WHITE);
 
 		pnlStats.setName("pnlStats");
-		pnlStats.setBorder(BorderFactory.createTitledBorder(planet.getShortName()));
+		pnlStats.setBorder(BorderFactory.createTitledBorder(planet.getPrintableName(new DateTime(campaign.getCalendar()))));
 		pnlStats.setBackground(Color.WHITE);
 		fillStats();
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -134,25 +138,36 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		pnlNeighbors.setLayout(new java.awt.GridBagLayout());
 		int i = 0;
 		javax.swing.JLabel lblNeighbor;
-		for(String neighborKey : campaign.getAllReachablePlanetsFrom(planet)) {
-			Planet neighbor = campaign.getPlanet(neighborKey);
-			if(neighbor.equals(planet)) {
-				continue;
-			}
-			lblNeighbor = new javax.swing.JLabel(neighbor.getShortName() + " (" + neighbor.getFactionDesc(campaign.getCalendar().getTime()) + ")");
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = i;
-			gridBagConstraints.gridwidth = 1;
-			gridBagConstraints.weightx = 1.0;
-			gridBagConstraints.weighty = 1.0;
-			gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-			pnlNeighbors.add(lblNeighbor, gridBagConstraints);
-			i++;
-		}
-		
+        javax.swing.JLabel lblDistance;
+		DateTime currentDate = new DateTime(campaign.getCalendar());
+        for(Planet neighbor : campaign.getAllReachablePlanetsFrom(planet)) {
+            if(neighbor.equals(planet)) {
+                continue;
+            }
+            lblNeighbor = new javax.swing.JLabel(neighbor.getPrintableName(currentDate) + " (" + neighbor.getFactionDesc(currentDate) + ")");
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = i;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
+            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            pnlNeighbors.add(lblNeighbor, gridBagConstraints);
+            
+            lblDistance = new javax.swing.JLabel(String.format(Locale.ROOT, "%.2f ly", planet.getDistanceTo(neighbor)));
+            lblDistance.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = i;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            pnlNeighbors.add(lblDistance, gridBagConstraints);
+
+            ++ i;
+        }		
 	}
 	
     private void fillStats() {
@@ -189,9 +204,10 @@ public class PlanetViewPanel extends javax.swing.JPanel {
     	
     	java.awt.GridBagConstraints gridBagConstraints;
 		pnlStats.setLayout(new java.awt.GridBagLayout());
-		
+		DateTime currentDate = new DateTime(campaign.getCalendar());
+
 		lblOwner.setName("lblOwner"); // NOI18N
-		lblOwner.setText("<html><i>" + planet.getFactionDesc(campaign.getCalendar().getTime()) + "</i></html>");
+		lblOwner.setText("<html><i>" + planet.getFactionDesc(currentDate) + "</i></html>");
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
@@ -213,7 +229,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		pnlStats.add(lblStarType, gridBagConstraints);
 		
 		txtStarType.setName("lblStarType2"); // NOI18N
-		txtStarType.setText(planet.getStarType() + " (" + planet.getRechargeTime() + " hours)");
+		txtStarType.setText(planet.getSpectralType() + " (" + planet.getRechargeTime(currentDate) + " hours)");
 		txtStarType.setEditable(false);
 		txtStarType.setLineWrap(true);
 		txtStarType.setWrapStyleWord(true);
@@ -226,34 +242,39 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		pnlStats.add(txtStarType, gridBagConstraints);
 		
-		lblPosition.setName("lblPosition"); // NOI18N
-		lblPosition.setText(resourceMap.getString("lblPosition.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 2;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		pnlStats.add(lblPosition, gridBagConstraints);
-		
-		txtPosition.setName("txtPosition"); // NOI18N
-		txtPosition.setText(Integer.toString(planet.getSystemPosition()));
-		txtPosition.setEditable(false);
-		txtPosition.setLineWrap(true);
-		txtPosition.setWrapStyleWord(true);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 2;
-		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-		pnlStats.add(txtPosition, gridBagConstraints);
+		int infoRow = 2;
+		if(null != planet.getSystemPosition()) {
+    		lblPosition.setName("lblPosition"); // NOI18N
+    		lblPosition.setText(resourceMap.getString("lblPosition.text"));
+    		gridBagConstraints = new java.awt.GridBagConstraints();
+    		gridBagConstraints.gridx = 0;
+    		gridBagConstraints.gridy = infoRow;
+    		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+    		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    		pnlStats.add(lblPosition, gridBagConstraints);
+    		
+    		txtPosition.setName("txtPosition"); // NOI18N
+    		txtPosition.setText(planet.getSystemPositionText());
+    		txtPosition.setEditable(false);
+    		txtPosition.setLineWrap(true);
+    		txtPosition.setWrapStyleWord(true);
+    		gridBagConstraints = new java.awt.GridBagConstraints();
+    		gridBagConstraints.gridx = 1;
+    		gridBagConstraints.gridy = infoRow;
+    		gridBagConstraints.weightx = 0.5;
+    		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+    		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+    		pnlStats.add(txtPosition, gridBagConstraints);
+    		
+    		++ infoRow;
+		}
 		
 		lblJumpPoint.setName("lblJumpPoint"); // NOI18N
 		lblJumpPoint.setText(resourceMap.getString("lblJumpPoint1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = infoRow;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblJumpPoint, gridBagConstraints);
@@ -265,18 +286,20 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		txtJumpPoint.setWrapStyleWord(true);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = infoRow;
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(txtJumpPoint, gridBagConstraints);
 		
+		++ infoRow;
+		
 		lblSatellite.setName("lblSatellite"); // NOI18N
 		lblSatellite.setText(resourceMap.getString("lblSatellite1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = infoRow;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblSatellite, gridBagConstraints);
@@ -288,219 +311,262 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		txtSatellite.setWrapStyleWord(true);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = infoRow;
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(txtSatellite, gridBagConstraints);
 		
-		lblGravity.setName("lblGravity1"); // NOI18N
-		lblGravity.setText(resourceMap.getString("lblGravity1.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 5;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		pnlStats.add(lblGravity, gridBagConstraints);
+		++ infoRow;
 		
-		txtGravity.setName("lblGravity2"); // NOI18N
-		txtGravity.setText(Double.toString(planet.getGravity()));
-		txtGravity.setEditable(false);
-		txtGravity.setLineWrap(true);
-		txtGravity.setWrapStyleWord(true);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 5;
-		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		pnlStats.add(txtGravity, gridBagConstraints);
+		if(null != planet.getGravity()) {
+    		lblGravity.setName("lblGravity1"); // NOI18N
+    		lblGravity.setText(resourceMap.getString("lblGravity1.text"));
+    		gridBagConstraints = new java.awt.GridBagConstraints();
+    		gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = infoRow;
+    		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+    		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    		pnlStats.add(lblGravity, gridBagConstraints);
+    		
+    		txtGravity.setName("lblGravity2"); // NOI18N
+    		txtGravity.setText(planet.getGravityText());
+    		txtGravity.setEditable(false);
+    		txtGravity.setLineWrap(true);
+    		txtGravity.setWrapStyleWord(true);
+    		gridBagConstraints = new java.awt.GridBagConstraints();
+    		gridBagConstraints.gridx = 1;
+    		gridBagConstraints.gridy = infoRow;
+    		gridBagConstraints.weightx = 0.5;
+    		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+    		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    		pnlStats.add(txtGravity, gridBagConstraints);
+    		
+    		++ infoRow;
+		}
 		
-		lblPressure.setName("lblPressure1"); // NOI18N
-		lblPressure.setText(resourceMap.getString("lblPressure1.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 6;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		pnlStats.add(lblPressure, gridBagConstraints);
+		if(null != planet.getPressure(currentDate)) {
+    		lblPressure.setName("lblPressure1"); // NOI18N
+    		lblPressure.setText(resourceMap.getString("lblPressure1.text"));
+    		gridBagConstraints = new java.awt.GridBagConstraints();
+    		gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = infoRow;
+    		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+    		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    		pnlStats.add(lblPressure, gridBagConstraints);
+    		
+    		txtPressure.setName("lblPressure2"); // NOI18N
+    		txtPressure.setText(planet.getPressureName(currentDate));
+    		txtPressure.setEditable(false);
+    		txtPressure.setLineWrap(true);
+    		txtPressure.setWrapStyleWord(true);
+    		gridBagConstraints = new java.awt.GridBagConstraints();
+    		gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = infoRow;
+    		gridBagConstraints.weightx = 0.5;
+    		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+    		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    		pnlStats.add(txtPressure, gridBagConstraints);
+    		
+            ++ infoRow;
+		}
 		
-		txtPressure.setName("lblPressure2"); // NOI18N
-		txtPressure.setText(planet.getPressureName());
-		txtPressure.setEditable(false);
-		txtPressure.setLineWrap(true);
-		txtPressure.setWrapStyleWord(true);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 6;
-		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		pnlStats.add(txtPressure, gridBagConstraints);
+		if((null != planet.getTemperature(currentDate)) || (null != planet.getClimate(currentDate))) {
+    		lblTemp.setName("lblTemp1"); // NOI18N
+    		lblTemp.setText(resourceMap.getString("lblTemp1.text"));
+    		gridBagConstraints = new java.awt.GridBagConstraints();
+    		gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = infoRow;
+    		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+    		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    		pnlStats.add(lblTemp, gridBagConstraints);
+    		
+    		txtTemp.setName("lblTemp2"); // NOI18N
+    	    String text;
+    	    if( null == planet.getClimate(currentDate) ) {
+                text = planet.getTemperature(currentDate) + "°C";
+            } else if( null == planet.getTemperature(currentDate) ) {
+                text = "(" + planet.getClimateName(currentDate) + ")";
+            } else {
+                text = planet.getTemperature(currentDate) + "°C (" + planet.getClimateName(currentDate) + ")";
+            }
+            txtTemp.setText(text);
+    		txtTemp.setEditable(false);
+    		txtTemp.setLineWrap(true);
+    		txtTemp.setWrapStyleWord(true);
+    		gridBagConstraints = new java.awt.GridBagConstraints();
+    		gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = infoRow;
+    		gridBagConstraints.weightx = 0.5;
+    		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+    		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    		pnlStats.add(txtTemp, gridBagConstraints);
+    		
+    		++ infoRow;
+		}
 		
-		lblTemp.setName("lblTemp1"); // NOI18N
-		lblTemp.setText(resourceMap.getString("lblTemp1.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 7;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		pnlStats.add(lblTemp, gridBagConstraints);
-		
-		txtTemp.setName("lblTemp2"); // NOI18N
-		txtTemp.setText(planet.getTemperature() + "C (" + planet.getClimateName() + ")");
-		txtTemp.setEditable(false);
-		txtTemp.setLineWrap(true);
-		txtTemp.setWrapStyleWord(true);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 7;
-		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		pnlStats.add(txtTemp, gridBagConstraints);
-		
-		lblWater.setName("lblWater1"); // NOI18N
-		lblWater.setText(resourceMap.getString("lblWater1.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 8;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		pnlStats.add(lblWater, gridBagConstraints);
-		
-		txtWater.setName("lblWater2"); // NOI18N
-		txtWater.setText(planet.getPercentWater() + " percent");
-		txtWater.setEditable(false);
-		txtWater.setLineWrap(true);
-		txtWater.setWrapStyleWord(true);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 8;
-		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		pnlStats.add(txtWater, gridBagConstraints);
+		if(null != planet.getPercentWater(currentDate)) {
+    		lblWater.setName("lblWater1"); // NOI18N
+    		lblWater.setText(resourceMap.getString("lblWater1.text"));
+    		gridBagConstraints = new java.awt.GridBagConstraints();
+    		gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = infoRow;
+    		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+    		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    		pnlStats.add(lblWater, gridBagConstraints);
+    		
+    		txtWater.setName("lblWater2"); // NOI18N
+    		txtWater.setText(planet.getPercentWater(currentDate) + " percent");
+    		txtWater.setEditable(false);
+    		txtWater.setLineWrap(true);
+    		txtWater.setWrapStyleWord(true);
+    		gridBagConstraints = new java.awt.GridBagConstraints();
+    		gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = infoRow;
+    		gridBagConstraints.weightx = 0.5;
+    		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+    		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    		pnlStats.add(txtWater, gridBagConstraints);
+    		
+    		++ infoRow;
+		}
 		
 		lblRecharge.setName("lblRecharge1"); // NOI18N
 		lblRecharge.setText(resourceMap.getString("lblRecharge1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridy = infoRow;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblRecharge, gridBagConstraints);
 		
 		txtRecharge.setName("lblRecharge2"); // NOI18N
-		txtRecharge.setText(planet.getRechargeStations());
+		txtRecharge.setText(planet.getRechargeStationsText(currentDate));
 		txtRecharge.setEditable(false);
 		txtRecharge.setLineWrap(true);
 		txtRecharge.setWrapStyleWord(true);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridy = infoRow;
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(txtRecharge, gridBagConstraints);
 		
-		lblHPG.setName("lblHPG1"); // NOI18N
-		lblHPG.setText(resourceMap.getString("lblHPG1.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 10;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		pnlStats.add(lblHPG, gridBagConstraints);
+        ++ infoRow;
 		
-		txtHPG.setName("lblHPG2"); // NOI18N
-		txtHPG.setText(planet.getHPGClass());
-		txtHPG.setEditable(false);
-		txtHPG.setLineWrap(true);
-		txtHPG.setWrapStyleWord(true);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 10;
-		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		pnlStats.add(txtHPG, gridBagConstraints);
-		
-		lblAnimal.setName("lblAnimal1"); // NOI18N
-		lblAnimal.setText(resourceMap.getString("lblAnimal1.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 11;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		pnlStats.add(lblAnimal, gridBagConstraints);
-		
-		txtAnimal.setName("lblAnimal2"); // NOI18N
-		txtAnimal.setText(planet.getLifeFormName());
-		txtAnimal.setEditable(false);
-		txtAnimal.setLineWrap(true);
-		txtAnimal.setWrapStyleWord(true);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 11;
-		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		pnlStats.add(txtAnimal, gridBagConstraints);
-		
-		lblSocioIndustrial.setName("lblSocioIndustrial1"); // NOI18N
-		lblSocioIndustrial.setText(resourceMap.getString("lblSocioIndustrial1.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 12;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		pnlStats.add(lblSocioIndustrial, gridBagConstraints);
-		
-		txtSocioIndustrial.setName("lblSocioIndustrial2"); // NOI18N
-		txtSocioIndustrial.setText(planet.getSocioIndustrialLevel());
-		txtSocioIndustrial.setEditable(false);
-		txtSocioIndustrial.setLineWrap(true);
-		txtSocioIndustrial.setWrapStyleWord(true);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 12;
-		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		pnlStats.add(txtSocioIndustrial, gridBagConstraints);
-		
-		lblLandMass.setName("lblLandMass1"); // NOI18N
-		lblLandMass.setText(resourceMap.getString("lblLandMass1.text"));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 13;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		pnlStats.add(lblLandMass, gridBagConstraints);
-		
-		txtLandMass.setName("lblLandMass2"); // NOI18N
-		txtLandMass.setText(planet.getLandMassDescription());
-		txtLandMass.setEditable(false);
-		txtLandMass.setLineWrap(true);
-		txtLandMass.setWrapStyleWord(true);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 13;
-		gridBagConstraints.weightx = 0.5;
-		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		pnlStats.add(txtLandMass, gridBagConstraints);
-		
+        if(null != planet.getHPGClass(currentDate)) {
+    		lblHPG.setName("lblHPG1"); // NOI18N
+    		lblHPG.setText(resourceMap.getString("lblHPG1.text"));
+    		gridBagConstraints = new java.awt.GridBagConstraints();
+    		gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = infoRow;
+    		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+    		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    		pnlStats.add(lblHPG, gridBagConstraints);
+    		
+    		txtHPG.setName("lblHPG2"); // NOI18N
+    		txtHPG.setText(planet.getHPGClass(currentDate));
+    		txtHPG.setEditable(false);
+    		txtHPG.setLineWrap(true);
+    		txtHPG.setWrapStyleWord(true);
+    		gridBagConstraints = new java.awt.GridBagConstraints();
+    		gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = infoRow;
+    		gridBagConstraints.weightx = 0.5;
+    		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+    		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    		pnlStats.add(txtHPG, gridBagConstraints);
+    		
+            ++ infoRow;
+        }
+
+        if(null != planet.getLifeForm(currentDate)) {
+    		lblAnimal.setName("lblAnimal1"); // NOI18N
+    		lblAnimal.setText(resourceMap.getString("lblAnimal1.text"));
+    		gridBagConstraints = new java.awt.GridBagConstraints();
+    		gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = infoRow;
+    		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+    		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    		pnlStats.add(lblAnimal, gridBagConstraints);
+    		
+    		txtAnimal.setName("lblAnimal2"); // NOI18N
+    		txtAnimal.setText(planet.getLifeFormName(currentDate));
+    		txtAnimal.setEditable(false);
+    		txtAnimal.setLineWrap(true);
+    		txtAnimal.setWrapStyleWord(true);
+    		gridBagConstraints = new java.awt.GridBagConstraints();
+    		gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = infoRow;
+    		gridBagConstraints.weightx = 0.5;
+    		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+    		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    		pnlStats.add(txtAnimal, gridBagConstraints);
+    		
+            ++ infoRow;
+        }
+        
+        if(null != planet.getSocioIndustrial(currentDate)) {
+    		lblSocioIndustrial.setName("lblSocioIndustrial1"); // NOI18N
+    		lblSocioIndustrial.setText(resourceMap.getString("lblSocioIndustrial1.text"));
+    		gridBagConstraints = new java.awt.GridBagConstraints();
+    		gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = infoRow;
+    		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+    		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    		pnlStats.add(lblSocioIndustrial, gridBagConstraints);
+    		
+    		txtSocioIndustrial.setName("lblSocioIndustrial2"); // NOI18N
+    		txtSocioIndustrial.setText(planet.getSocioIndustrialText(currentDate));
+    		txtSocioIndustrial.setEditable(false);
+    		txtSocioIndustrial.setLineWrap(true);
+    		txtSocioIndustrial.setWrapStyleWord(true);
+    		gridBagConstraints = new java.awt.GridBagConstraints();
+    		gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = infoRow;
+    		gridBagConstraints.weightx = 0.5;
+    		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+    		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    		pnlStats.add(txtSocioIndustrial, gridBagConstraints);
+    		
+            ++ infoRow;
+        }
+        
+        if(null != planet.getLandMasses()) {
+    		lblLandMass.setName("lblLandMass1"); // NOI18N
+    		lblLandMass.setText(resourceMap.getString("lblLandMass1.text"));
+    		gridBagConstraints = new java.awt.GridBagConstraints();
+    		gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = infoRow;
+    		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+    		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    		pnlStats.add(lblLandMass, gridBagConstraints);
+    		
+    		txtLandMass.setName("lblLandMass2"); // NOI18N
+    		txtLandMass.setText(planet.getLandMassDescription());
+    		txtLandMass.setEditable(false);
+    		txtLandMass.setLineWrap(true);
+    		txtLandMass.setWrapStyleWord(true);
+    		gridBagConstraints = new java.awt.GridBagConstraints();
+    		gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = infoRow;
+    		gridBagConstraints.weightx = 0.5;
+    		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+    		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    		pnlStats.add(txtLandMass, gridBagConstraints);
+    		
+            ++ infoRow;
+        }
     }
 }

@@ -3439,8 +3439,8 @@ public class CampaignGUI extends JPanel {
     private void calculateJumpPath() {
         if (null != panMap.getSelectedPlanet()) {
             panMap.setJumpPath(getCampaign().calculateJumpPath(
-                    getCampaign().getCurrentPlanetName(),
-                    panMap.getSelectedPlanet().getName()));
+                    getCampaign().getCurrentPlanet(),
+                    panMap.getSelectedPlanet()));
             refreshPlanetView();
         }
     }

@@ -334,7 +334,7 @@ public class ContractSummaryPanel extends JPanel {
 			mainPanel.add(lblDistance, gridBagConstraints);
 
 			txtDistance.setName("txtDistance"); // NOI18N
-			JumpPath path = campaign.calculateJumpPath(campaign.getCurrentPlanetName(), contract.getPlanetName());
+			JumpPath path = campaign.calculateJumpPath(campaign.getCurrentPlanet(), contract.getPlanet());
 			int days = (int)Math.ceil((path).getTotalTime(campaign.getLocation().getTransitTime()));
 			int jumps = path.getJumps();
 			if (campaign.getCurrentPlanetName().equals(contract.getPlanetName())

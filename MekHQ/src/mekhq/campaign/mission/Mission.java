@@ -30,6 +30,8 @@ import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.Planets;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -110,10 +112,15 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 	public String getPlanetName() {
 		return planetName;
 	}
+	
 	public void setPlanetName(String n) {
 		this.planetName = n;
 	}
 	
+    public Planet getPlanet() {
+        return Planets.getInstance().getPlanetById(planetName);
+    }
+
 	public String getDescription() {
 		return desc;
 	}

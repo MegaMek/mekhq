@@ -106,7 +106,7 @@ public class JumpPath implements Serializable {
 			if(planet.equals(getLastPlanet())) {
 				continue;
 			}
-			rechargeTime += planet.getRechargeTime();
+			rechargeTime += planet.getRechargeTime(null);
 		}
 		return rechargeTime/24.0;
 	}
@@ -154,7 +154,7 @@ public class JumpPath implements Serializable {
 		for(Planet p : path) {
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<planetName>"
-				+MekHqXmlUtil.escape(p.getName())
+				+MekHqXmlUtil.escape(p.getId())
 				+"</planetName>");
 		}
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</jumpPath>");

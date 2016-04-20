@@ -69,6 +69,7 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planets;
 import mekhq.campaign.universe.UnitTableData;
 
+import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -311,7 +312,7 @@ public class AtBScenario extends Scenario {
 		}
 		if (campaign.getCampaignOptions().getUsePlanetaryConditions() &&
 				null != campaign.getMission(getMissionId())) {
-			setPlanetaryConditions(campaign.getMission(getMissionId()));
+			setPlanetaryConditions(campaign.getMission(getMissionId()), campaign);
 		}
 		setMapSize();
 		setMapFile();
@@ -395,12 +396,12 @@ public class AtBScenario extends Scenario {
 		}
 	}
 
-	public void setPlanetaryConditions(Mission mission) {
+	public void setPlanetaryConditions(Mission mission, Campaign campaign) {
 		if (null != mission) {
 			Planet p = Planets.getInstance().getPlanets().get(mission.getPlanetName());
 			if (null != p) {
-				atmosphere = p.getPressure();
-				gravity = (float)p.getGravity();
+				atmosphere = p.getPressure(new DateTime(campaign.getCalendar()));
+				gravity = p.getGravity().floatValue();
 			}
 		}
 	}
