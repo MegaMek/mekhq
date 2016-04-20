@@ -262,6 +262,10 @@ public class Planets {
                     });
             
             for (Planet s : planetList.values()) {
+                if((null == s.getX()) || (null == s.getY())) {
+                    MekHQ.logError(String.format("Planet \"%s\" is missing coordinates", s.getId()));
+                    continue;
+                }
                 int x = (int)(s.getX()/30.0);
                 int y = (int)(s.getY()/30.0);
                 if (planetGrid.get(x) == null) {
