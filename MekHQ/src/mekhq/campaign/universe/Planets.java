@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -133,6 +134,27 @@ public class Planets {
         return( null != id ? planetList.get(id) : null);
     }
     
+    /** Return the planet by given name at a given time point */
+    public Planet getPlanetByName(String name, DateTime when) {
+        if(null == name) {
+            return null;
+        }
+        name = name.toLowerCase(Locale.ROOT);
+        for(Planet planet : planetList.values()) {
+            if(null != planet) {
+                String planetName = planet.getName(when);
+                if((null != planetName) && planetName.toLowerCase(Locale.ROOT).equals(name)) {
+                    return planet;
+                }
+                planetName = planet.getShortName(when);
+                if((null != planetName) && planetName.toLowerCase(Locale.ROOT).equals(name)) {
+                    return planet;
+                }
+            }
+        }
+        return null;
+    }
+
     public List<NewsItem> getPlanetaryNews(DateTime when) {
         List<NewsItem> news = new ArrayList<>();
         for(Planet planet : planetList.values()) {

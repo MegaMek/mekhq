@@ -404,7 +404,7 @@ public class CampaignGUI extends JPanel {
     InterstellarMapPanel panMap;
     private JSplitPane splitMap;
     private JScrollPane scrollPlanetView;
-    private JSuggestField suggestPlanet;
+    JSuggestField suggestPlanet;
 
     /* For the personnel tab */
     private JPanel panPersonnel;
@@ -1137,8 +1137,7 @@ public class CampaignGUI extends JPanel {
         panMapView.add(new JLabel(resourceMap.getString("lblFindPlanet.text")),
                 gridBagConstraints);
 
-        suggestPlanet = new JSuggestField(getFrame(), getCampaign()
-                .getPlanetNames());
+        suggestPlanet = new JSuggestField(getFrame(), getCampaign().getPlanetNames());
         suggestPlanet.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 Planet p = getCampaign().getPlanet(suggestPlanet.getText());
@@ -3992,6 +3991,7 @@ public class CampaignGUI extends JPanel {
         refreshOverview();
         refreshPlanetView();
         panMap.repaint();
+        suggestPlanet.setSuggestData(getCampaign().getPlanetNames());
     }// GEN-LAST:event_btnAdvanceDayActionPerformed
 
     public boolean nagShortMaintenance() {

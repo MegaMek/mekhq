@@ -4878,14 +4878,14 @@ public class Campaign implements Serializable {
 
     public Vector<String> getPlanetNames() {
         Vector<String> plntNames = new Vector<String>();
-        for (String key : Planets.getInstance().getPlanets().keySet()) {
-            plntNames.add(key);
+        for (Planet key : Planets.getInstance().getPlanets().values()) {
+            plntNames.add(key.getPrintableName(new DateTime(calendar)));
         }
         return plntNames;
     }
 
     public Planet getPlanet(String name) {
-        return Planets.getInstance().getPlanets().get(name);
+        return Planets.getInstance().getPlanetByName(name, new DateTime(calendar));
     }
 
     /**
