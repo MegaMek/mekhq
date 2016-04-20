@@ -1242,9 +1242,8 @@ public class Utilities {
     /**
      * Run through the directory and call parser.parse(fis) for each XML file found. Don't recurse.
      */
-    public static void parseXMLFiles(String string, FileParser fileParser) {
-        // TODO Auto-generated method stub
-        
+    public static void parseXMLFiles(String dirName, FileParser parser) {
+        parseXMLFiles(dirName, parser, false);
     }
 
     /**

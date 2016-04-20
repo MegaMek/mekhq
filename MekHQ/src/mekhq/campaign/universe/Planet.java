@@ -128,7 +128,7 @@ public class Planet implements Serializable {
     // Orbital information
     /** Semimajor axis (average distance to parent star), in AU */
     @XmlElement(name = "orbitRadius")
-    private Double orbitSemimajorAxis = 0.0;
+    private Double orbitSemimajorAxis;
     private Double orbitEccentricity;
     /** Degrees to the system's invariable plane */
     private Double orbitInclination;
@@ -190,9 +190,9 @@ public class Planet implements Serializable {
     // Human influence
     /** Order of magnitude of the population - 1 */
     @XmlElement(name = "pop")
-    public Integer populationRating;
-    public String government;
-    public Integer controlRating;
+    private Integer populationRating;
+    private String government;
+    private Integer controlRating;
     @XmlJavaTypeAdapter(SocioIndustrialDataAdapter.class)
     private SocioIndustrialData socioIndustrial;
     @XmlJavaTypeAdapter(HPGRatingAdapter.class)
@@ -229,10 +229,6 @@ public class Planet implements Serializable {
     public Boolean delete;
 
     public Planet() {
-        this.factions = new ArrayList<>();
-        //this.garrisonUnits = new ArrayList<String>();
-        this.satellites = new ArrayList<>();
-        this.landMasses = new ArrayList<>();
     }
 
     // Constant base data
@@ -464,6 +460,34 @@ public class Planet implements Serializable {
         return null != currentHPG ? EquipmentType.getRatingName(currentHPG) : ""; //$NON-NLS-1$
     }
 
+    public Integer getPopulationRating(DateTime when) {
+        return getEventData(when, populationRating, new EventGetter<Integer>() {
+            @Override public Integer get(PlanetaryEvent e) { return e.populationRating; }
+        });
+    }
+    
+    public String getPopulationRatingString(DateTime when) {
+        Integer pops = getPopulationRating(when);
+        return (null != pops) ? StarUtil.getPopulationRatingString(pops.intValue()) : "unknown";
+    }
+    
+    public String getGovernment(DateTime when) {
+        return getEventData(when, government, new EventGetter<String>() {
+            @Override public String get(PlanetaryEvent e) { return e.government; }
+        });
+    }
+
+    public Integer getControlRating(DateTime when) {
+        return getEventData(when, controlRating, new EventGetter<Integer>() {
+            @Override public Integer get(PlanetaryEvent e) { return e.controlRating; }
+        });
+    }
+    
+    public String getControlRatingString(DateTime when) {
+        Integer cr = getControlRating(when);
+        return (null != cr) ? StarUtil.getControlRatingString(cr.intValue()) : "actual situation unclear";
+    }
+    
     public LifeForm getLifeForm(DateTime when) {
         return getEventData(when, null != lifeForm ? lifeForm : LifeForm.NONE, new EventGetter<LifeForm>() {
             @Override public LifeForm get(PlanetaryEvent e) { return e.lifeForm; }
@@ -764,6 +788,9 @@ public class Planet implements Serializable {
             greenhouseEffect = Utilities.nonNull(other.greenhouseEffect, greenhouseEffect);
             volcanicActivity = Utilities.nonNull(other.volcanicActivity, volcanicActivity);
             tectonicActivity = Utilities.nonNull(other.tectonicActivity, tectonicActivity);
+            populationRating = Utilities.nonNull(other.populationRating, populationRating);
+            government = Utilities.nonNull(other.government, government);
+            controlRating = Utilities.nonNull(other.controlRating, controlRating);
             habitability = Utilities.nonNull(other.habitability, habitability);
             dayLength = Utilities.nonNull(other.dayLength, dayLength);
             satellites = Utilities.nonNull(other.satellites, satellites);
@@ -792,6 +819,9 @@ public class Planet implements Serializable {
                         myEvent.albedo = Utilities.nonNull(event.albedo, myEvent.albedo);
                         myEvent.greenhouseEffect = Utilities.nonNull(event.greenhouseEffect, myEvent.greenhouseEffect);
                         myEvent.habitability = Utilities.nonNull(event.habitability, myEvent.habitability);
+                        myEvent.populationRating = Utilities.nonNull(event.populationRating, myEvent.populationRating);
+                        myEvent.government = Utilities.nonNull(event.government, myEvent.government);
+                        myEvent.controlRating = Utilities.nonNull(event.controlRating, myEvent.controlRating);
                         myEvent.nadirCharge = Utilities.nonNull(event.nadirCharge, myEvent.nadirCharge);
                         myEvent.zenithCharge = Utilities.nonNull(event.zenithCharge, myEvent.zenithCharge);
                     }
@@ -892,6 +922,10 @@ public class Planet implements Serializable {
         public Double albedo;
         public Double greenhouseEffect;
         public Integer habitability;
+        @XmlElement(name = "pop")
+        public Integer populationRating;
+        public String government;
+        public Integer controlRating;
         // Stellar support, to be moved later
         public Boolean nadirCharge;
         public Boolean zenithCharge;
