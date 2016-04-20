@@ -209,11 +209,11 @@ public class PartsStore implements Serializable {
 				if(et.hasSubType(MiscType.S_SUPERCHARGER)) {
 					for(int rating = 10; rating <= 400; rating += 5) {
 						for(double eton = 0.5; eton <= 10.5; eton += 0.5) {
-							float weight = Engine.ENGINE_RATINGS[(int) Math.ceil(rating / 5.0)];
-							float minweight = weight * 0.5f;
-							minweight = (float) (Math.ceil((TestEntity.ceilMaxHalf(minweight, TestEntity.CEIL_HALFTON) / 10.0) * 2.0) / 2.0);
-							float maxweight = weight * 2.0f;
-							maxweight = (float) (Math.ceil((TestEntity.ceilMaxHalf(maxweight, TestEntity.CEIL_HALFTON) / 10.0) * 2.0) / 2.0);
+							double weight = Engine.ENGINE_RATINGS[(int) Math.ceil(rating / 5.0)];
+							double minweight = weight * 0.5f;
+							minweight = Math.ceil((TestEntity.ceilMaxHalf(minweight, TestEntity.Ceil.HALFTON) / 10.0) * 2.0) / 2.0;
+							double maxweight = weight * 2.0f;
+							maxweight = Math.ceil((TestEntity.ceilMaxHalf(maxweight, TestEntity.Ceil.HALFTON) / 10.0) * 2.0) / 2.0;
 							if(eton < minweight || eton > maxweight) {
 								continue;
 							}
@@ -266,7 +266,7 @@ public class PartsStore implements Serializable {
 	}
 
 	private double getEngineTonnage(Engine engine) {
-		float weight = Engine.ENGINE_RATINGS[(int) Math.ceil(engine.getRating() / 5.0)];
+	    double weight = Engine.ENGINE_RATINGS[(int) Math.ceil(engine.getRating() / 5.0)];
         switch (engine.getEngineType()) {
             case Engine.COMBUSTION_ENGINE:
                 weight *= 2.0f;
@@ -295,11 +295,11 @@ public class PartsStore implements Serializable {
             case Engine.NONE:
                 return 0;
         }
-        weight = TestEntity.ceilMaxHalf(weight, TestEntity.CEIL_HALFTON);
+        weight = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
         if (engine.hasFlag(Engine.TANK_ENGINE) && engine.isFusion()) {
             weight *= 1.5f;
         }
-        float toReturn = TestEntity.ceilMaxHalf(weight, TestEntity.CEIL_HALFTON);
+        double toReturn = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
         return toReturn;
 	}
 

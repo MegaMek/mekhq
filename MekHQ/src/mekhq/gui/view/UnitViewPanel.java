@@ -232,7 +232,7 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		pnlStats.add(lblTonnage, gridBagConstraints);
 		
 		txtTonnage.setName("lblTonnage2"); // NOI18N
-		txtTonnage.setText(Float.toString(entity.getWeight()));
+		txtTonnage.setText(Double.toString(entity.getWeight()));
 		txtTonnage.setEditable(false);
 		txtTonnage.setLineWrap(true);
 		txtTonnage.setWrapStyleWord(true);

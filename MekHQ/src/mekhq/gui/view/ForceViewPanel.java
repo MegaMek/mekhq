@@ -204,7 +204,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		
 	 	long bv = 0;
     	long cost = 0;
-    	float ton = 0;
+    	double ton = 0;
     	String commander = "";
     	String LanceTech = "";
     	String assigned = "";
@@ -587,7 +587,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
     	//by only traversing once
     	int bv = 0;
     	int cost = 0;
-    	float ton = 0;
+    	double ton = 0;
     	int number = 0;
     	String commander = "No personnel found";
     	ArrayList<Person> people = new ArrayList<Person>();

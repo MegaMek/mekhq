@@ -75,7 +75,7 @@ public class SpacecraftEngine extends Part {
 		if(null != unit) {
 			clan = unit.getEntity().isClan();
 			if(unit.getEntity() instanceof SmallCraft) {
-				float moveFactor = unit.getEntity().getWeight() * unit.getEntity().getOriginalWalkMP();
+			    double moveFactor = unit.getEntity().getWeight() * unit.getEntity().getOriginalWalkMP();
 				if(clan) {
 					engineTonnage = Math.round(moveFactor * 0.061 * 2)/2f;
 				} else {

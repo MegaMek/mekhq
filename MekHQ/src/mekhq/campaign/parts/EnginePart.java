@@ -74,7 +74,7 @@ public class EnginePart extends Part {
 
 	@Override
 	public double getTonnage() {
-		float weight = Engine.ENGINE_RATINGS[(int) Math.ceil(engine.getRating() / 5.0)];
+		double weight = Engine.ENGINE_RATINGS[(int) Math.ceil(engine.getRating() / 5.0)];
         switch (engine.getEngineType()) {
             case Engine.COMBUSTION_ENGINE:
                 weight *= 2.0f;
@@ -103,15 +103,15 @@ public class EnginePart extends Part {
             case Engine.NONE:
                 return 0;
         }
-        weight = TestEntity.ceilMaxHalf(weight, TestEntity.CEIL_HALFTON);
+        weight = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
 
         if (engine.hasFlag(Engine.TANK_ENGINE) && engine.isFusion()) {
             weight *= 1.5f;
         }
-        float toReturn = TestEntity.ceilMaxHalf(weight, TestEntity.CEIL_HALFTON);
+        double toReturn = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
         // hover have a minimum weight of 20%
         if (forHover) {
-            return Math.max(TestEntity.ceilMaxHalf(getUnitTonnage()/5, TestEntity.CEIL_HALFTON), toReturn);
+            return Math.max(TestEntity.ceilMaxHalf(getUnitTonnage()/5, TestEntity.Ceil.HALFTON), toReturn);
         }
         return toReturn;
 	}
