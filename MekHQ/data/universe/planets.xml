@@ -210,12 +210,12 @@ Austen-Armstrong Industries</desc>
 		<climate>4</climate>
 		<percentWater>18</percentWater>
 		<hpg>b</hpg>
-		<lifeform>0</lifeform>
+		<lifeForm>0</lifeForm>
 		<satellite>Amarigna</satellite>
 		<socioIndustrial>C-B-C-C-C</socioIndustrial>
-		<landmass>Tsechi (Tigray)</landmass>
-		<landmass>Simien</landmass>
-		<landmass>Adwa</landmass>
+		<landMass>Tsechi (Tigray)</landMass>
+		<landMass>Simien</landMass>
+		<landMass>Adwa</landMass>
 		<desc>Abiy Adi is a largely desert world in the Pesht Military District. The industy on the planet uses so much of the planet's indigenous water that the locals depend on imported water.</desc>
 	</planet>
 	<planet>
@@ -865,8 +865,8 @@ Addicks remains an important world today, though it has lost much of its glory o
 		<hpg>b</hpg>
 		<lifeForm>0</lifeForm>
 		<socioIndustrial>B-B-D-C-D </socioIndustrial>
-		<landmass>Agematsu Prime</landmass>
-		<landmass>Little Irehuna Island</landmass>
+		<landMass>Agematsu Prime</landMass>
+		<landMass>Little Irehuna Island</landMass>
 		<desc>An inhospitable rock in space, that was colonized by a religious sect looking to escape from humanity’s corruption, In the late 3060 Ishikawajima‐Harima began producing Battle Armor here.</desc>
 	</planet>
 	<planet>
@@ -948,8 +948,8 @@ Addicks remains an important world today, though it has lost much of its glory o
 		<lifeForm>5</lifeForm>
 		<satellite>None</satellite>
 		<socioIndustrial>B-C-B-B-C</socioIndustrial>
-		<landmass>Andrine (Ladakh and Srinagar)</landmass>
-		<landmass>Simla</landmass>
+		<landMass>Andrine (Ladakh and Srinagar)</landMass>
+		<landMass>Simla</landMass>
 		<desc>Aitutaki was originally established as a trade way-station by the Principality of Regulus, however the planet’s economy has since switched to an agricultural center for the region. The planet has also been a primary training hub for the Regulan military since the early 25th Century. 
 
 Aitutaki’s early settlers made a unique distinction by creating two capital cities, Ladakh and Srinagar. Ladakh was created as the center of government and Srinagar as the center for financial, commercial and industrial concerns with the intent of minimizing interference between commerce and government.</desc>
@@ -984,7 +984,7 @@ Aitutaki’s early settlers made a unique distinction by creating two capital ci
 		<satellite>Burtscheid</satellite>
 		<climate>5</climate>
 		<socioIndustrial>B-B-A-B-D</socioIndustrial>
-		<landmass>Aachen (Rheinphalia)</landmass>
+		<landMass>Aachen (Rheinphalia)</landMass>
 		<desc>Aix-la-Chapelle is an inhospitable world with high atmospheric pressure, chemical taints in the air, and the harsh weather patterns that make the planet barely tolerable to humans, however its one large landmass is blessed with an abundance of natural resources. Diplan 'Mechyards has a factory on world that produces most of the components for the mechs it builds on planet. Massive greenhouses produce grown foodstuff for the local inhabitants. But meats and soil for the greenhouses must still be imported from off-world due to the worlds climate.</desc>
 	</planet>
 	<planet>
@@ -1274,7 +1274,7 @@ Alarion is primarily settled by people of German, Romanian and English descent.<
 		<hpg>A</hpg>
 		<lifeForm>5</lifeForm>
 		<socioIndustrial>B-B-C-D-D</socioIndustrial>
-		<landmass>Albiero Prime (Corant City)</landmass>
+		<landMass>Albiero Prime (Corant City)</landMass>
 		<desc>Albiero is a nearly dead world whose natural resources are almost completely exhausted. Only the fact that the other worlds in the Albiero Prefecture are in even worse shape keeps this prefecture capital alive. Before it reached its current state, Albiero held vast deposits of copper and iron ore. These minerals led several mining concerns to arrive and exploit the resources. Unfortunately after the fall of the Star League the advanced mining machines weren't serviceable, and eventually broke down completely. The resulting loss of income depressed the local economy. The only group who really benefited from Albiero's state was the DCMS. The extensive mining operations left a labyrinth of tunnels under the world's surface which proved to be an excellent training facility.</desc>
 	</planet>
 	<planet>
@@ -1719,8 +1719,8 @@ Alcor was overlooked during the Jihad, the only known fighting that took place i
 		<lifeForm>5</lifeForm>
 		<satellite>Sinai</satellite>
 		<socioIndustrial>D-D-C-D-B</socioIndustrial>
-		<landmass>Cairusia</landmass>
-		<landmass>Jeddasia</landmass>
+		<landMass>Cairusia</landMass>
+		<landMass>Jeddasia</landMass>
 		<desc>Alexandria was once a wealthy planet covered in modern cities and was a cultural center with some of the most famous art collections in the entire Inner Sphere. The planet also boasted a strong industrial base and vast natural resources. Unfortunately, the Succession Wars took their toll and near constant raids and invasions of this planet have reduced the cities to shambles, the beautiful countryside to barren war-torn fields. The only traces of the planet’s former glory can be found in the remote cities of Lam Pole and Cherbourg, which have survived due to possessing no military value.</desc>
 	</planet>
 	<planet>
@@ -1781,8 +1781,8 @@ Alcor was overlooked during the Jihad, the only known fighting that took place i
 		<satellite>Mecca</satellite>
 		<climate>4</climate>
 		<socioIndustrial>C-C-B-B-D</socioIndustrial>
-		<landmass>Algedi Primus (Algiers)</landmass>
-		<landmass>Algedi Secundus</landmass>
+		<landMass>Algedi Primus (Algiers)</landMass>
+		<landMass>Algedi Secundus</landMass>
 		<desc>A prefecture capital in the Benjamin Military district, Algedi is a barren arid world with no true night. The sun is so large that it takes up a full third of the sky during the day. Settled by the Azami long ago, who are a very independent people, this often leads to clashes between their ways and those of the Combine. The Azami very reluctantly allow Non‐Azami to enter their “Desert Paradise.” The Azami of the world have an unnatural fear of the dark because of the planets permanent daylight. Imported life‐forms adapted to desert life are flourishing on the planet. Asketen Sand Walkers and Terran Burros are commonly seen grazing on tough grasses and cacti.  Efficiency on this world is very poor; only the Azami seem to have adjusted. Other people not accustomed to the planet seem to suffer from broken biological clocks. Although an important
 Industrial, Command and logistical world, paperwork in this planet and its prefecture is in a perpetual snarl.</desc>
 	</planet>
@@ -2566,12 +2566,12 @@ Despite being aware of the impending, though slow coming, temperature change tha
 		<lifeForm>7</lifeForm>
 		<satellite>Romulus</satellite>
 		<socioIndustrial>B-B-B-C-C</socioIndustrial>
-		<landmass>Alba</landmass>
-		<landmass>Gaul</landmass>
-		<landmass>Hispania</landmass>
-		<landmass>Italia (Nova Roma)</landmass>
-		<landmass>Moesia</landmass>
-		<landmass>Ostia</landmass>
+		<landMass>Alba</landMass>
+		<landMass>Gaul</landMass>
+		<landMass>Hispania</landMass>
+		<landMass>Italia (Nova Roma)</landMass>
+		<landMass>Moesia</landMass>
+		<landMass>Ostia</landMass>
 		<desc>Alphard is the capital of the Marian Hegemony and the nation's seat of power. Alphard is an arid planet full of canyons and arroyos. There is just barely enough arable land on the northern continents for the planet to be self sufficient. Just below the surface Alphard contains vast deposits of metals and gemstones. After the formation of the Hegemony in the late 30th Century, Alphard has seen the introduction of industry picked up in the later part of the 31st Century. The planetary capital is Nova Roma, which was built in the style of ancient Rome out of the local golden sandstone, and is a matter of pride for the young Periphery nation.
 		
 Alphard is home to several industrial concerns, including the Alphard Trading Corporation which produces combat vehicles and during the Word of Blake Jihad upgraded to produce primitive BattleMechs. The factory is located in the hilly city of O’Reilly on the Italia continent. The other primary factory is the Marian Arms, Incorporated, located in the valleys of the Alba continent. THe Marian Arms factory produces combat vehicles, BattleMechs and during the Word of Blake Jihad expanded to also produce primitive BattleMechs. 
@@ -3294,9 +3294,9 @@ The capital city, Gaines, located on the southern polar continent of Tanzaria, i
 		<lifeForm>4</lifeForm>
 		<satellite>Caprice</satellite>
 		<socioIndustrial>C-C-B-C-C</socioIndustrial>
-		<landmass>Auroria (New Horizon City)</landmass>
-		<landmass>Hume</landmass>
-		<landmass>Locke</landmass>
+		<landMass>Auroria (New Horizon City)</landMass>
+		<landMass>Hume</landMass>
+		<landMass>Locke</landMass>
 		<desc>3135 - A warm and pleasant world colonized early in the first Terran exodus and claimed even before the Star League by House Marik‘s Free Worlds League, Alula Australis was a highly developed world even before it fell under the sway of the Terran Hegemony. Under the joint Free Worlds/Hegemony banner, Alula Australis benefited from the glories of the Star League era, and became a major industrial world that included among its exports industrial metals, power generation systems, electronics, and even BattleMechs. Assaulted during the Amaris Coup, this world fared better than most, and reverted to Marik control for much of the Succession Wars, though heavy raiding crippled its BattleMech-dominated industrial base by the close of the thirtieth century, sending the planet into a severe depression. The planet experienced a revival, however, when veins of rare earths and gemstones were discovered in the mountain ranges outside the planetary capital of New Horizon City in the late 2990s, and today these valuable exports form the basis for a mining and refining industry. Still in Marik hands at the time of the Blakist Jihad, Alula Australis was spared the worst of the fighting, and all three of its major landmasses—Auroria in the northern hemisphere, Hume and Locke in the southern—boast major industrial centers. New Horizon City is located on the southern peninsula of Auroria, while Sturgeon, home to the planet‘s largest chemical corporation, AA PolyChem Unlimited, dominates the central Hubbes River Valley on Hume.
 		
 		Alula Australis has the distinction of being the first planet that House Marik deployed BattleMechs on.</desc>
@@ -3849,8 +3849,8 @@ An Ting fell to the 'Curse of Galedon' plague that devastated Galedon V and was 
 		<satellite>Mulhacen</satellite>
 		<satellite>Betic</satellite>
 		<socioIndustrial>A-B-B-C-C</socioIndustrial>
-		<landmass>Altay (Jojoken)</landmass>
-		<landmass>Zahle</landmass>
+		<landMass>Altay (Jojoken)</landMass>
+		<landMass>Zahle</landMass>
 		<desc>Andurien is the Capital of the Duchy of Andurien and as such suffered greatly for the Andurien Succession of the 3030s. While the planet and its infrastructure returned to previous levels, the planet was slow to recover the financial prestige it once possessed. The planet has significant industrial facilities producing a wealth of civilian and military goods. However, after the Andurien Succession, all military manufacturing was turned over to the Free Worlds League instead of being controlled by the Duchy of Andurien.
 
 Manufacturing centers:
@@ -5460,9 +5460,9 @@ Though a major exporter of heavy metals and radioactive elements, as well as sma
 		<satellite>Hyde</satellite>
 		<climate>2</climate>
 		<socioIndustrial>B-B-C-B-B </socioIndustrial>
-		<landmass>Rhodesia (Iscariot)</landmass>
-		<landmass>Zaire</landmass>
-		<landmass>Vesuvius Prime</landmass>
+		<landMass>Rhodesia (Iscariot)</landMass>
+		<landMass>Zaire</landMass>
+		<landMass>Vesuvius Prime</landMass>
 		<desc>Ashio is an unremarkable planet, aside from being the capital of the Ashio Prefecture. As the capital it has significant logistical and command infrastructure. The planet has modest agricultural, manufacturing and mining industries. The planet is also home to the largest volcano in the Inner Sphere, Mount Vesuvius Major. The volcano is over ten kilometers tall. Though long dormant, scientists estimate that if where to erupt, it could block all sunlight from the planet, sending it into an ice age.</desc>
 	</planet>
 	<planet>
@@ -6226,9 +6226,9 @@ The capital and primary spaceport city of Atria Prime, located on the southern p
 		<satellite>Numidia</satellite>
 		<satellite>Bona</satellite>
 		<socioIndustrial>B-B-C-C-A</socioIndustrial>
-		<landmass>Kabuko</landmass>
-		<landmass>Roma</landmass>
-		<landmass>Grecian</landmass>
+		<landMass>Kabuko</landMass>
+		<landMass>Roma</landMass>
+		<landMass>Grecian</landMass>
 		<desc>Augustine was originally settled as a religious colony by Jesuits. However, since its founding the planet has attracted a broad range of peoples and religions and grew to be an important part of the Marik Commonwealth. Unfortunately brutal fighting during the early Succession Wars saw the population drop by more than half. Additionally the famous Seminary and much of the planet’s infrastructure was destroyed.
 
 However, by the early 31st century this turned around and Augustine began to rebuild and repopulate as many people immigrated to the hospitable warm-temperate planet.
@@ -6492,9 +6492,9 @@ Most of the wilds of Queensland, the planet’s largest continent, have remained
 		<lifeForm>6</lifeForm>
 		<climate>5</climate>
 		<socioIndustrial>A-A-B-B-B</socioIndustrial>
-		<landmass>Albion (Stratford)</landmass>
-		<landmass>Britannia</landmass>
-		<landmass>Norman</landmass>
+		<landMass>Albion (Stratford)</landMass>
+		<landMass>Britannia</landMass>
+		<landMass>Norman</landMass>
 		<desc>An industrial world in the Irece Prefecture. The planet is home to Matabushi, Inc.</desc>
 	</planet>
 	<planet>
@@ -9206,9 +9206,9 @@ Bithinian Ballistics</desc>
 		<satellite>Bereich</satellite>
 		<climate>4</climate>
 		<socioIndustrial>B-C-A-C-D</socioIndustrial>
-		<landmass>Lomma (Oasis V)</landmass>
-		<landmass>Icefall</landmass>
-		<landmass>Skåne</landmass>
+		<landMass>Lomma (Oasis V)</landMass>
+		<landMass>Icefall</landMass>
+		<landMass>Skåne</landMass>
 		<desc>Bjarred is a small world first settled in the 23rd Century by explorers from the Ozawa Merchant organization. The planet is a technologically advanced world with Basic Heavy Industry but Limited Industrial Output. The planet has little open water on its surface. What water the world possesses is underground running through vast catacombs. The surface vegetation and agriculture criss‐cross the world following the paths of these underground water ways but it leaves the planets with a very poor agricultural base requiring they import food. The world's many mountain ranges are also barren in regards to life, but are rich is valuable minerals and metal A prefecture capital before the Clan Invasion, Bjarred resumed that status after the world was reclaimed from Clan Nova Cat in a famous coin toss. The continent of Icefall was so named for a disastrous ice asteroid crash that occurred when attempting to provide comet water to early colonists.</desc>
 	</planet>
 	<planet>
@@ -11148,10 +11148,10 @@ The children of Bucklands tend to view their planet as boring and the majority s
 		<satellite>Geodesia</satellite>
 		<climate>3</climate>
 		<socioIndustrial>A-B-A-B-A </socioIndustrial>
-		<landmass>Sanjucendo (Buckminster City) </landmass>
-		<landmass>Richard’s Rock</landmass>
-		<landmass>Storm</landmass>
-		<landmass>Trestal</landmass>
+		<landMass>Sanjucendo (Buckminster City) </landMass>
+		<landMass>Richard’s Rock</landMass>
+		<landMass>Storm</landMass>
+		<landMass>Trestal</landMass>
 		<desc>Buckminster is an agricultural world that is considered one the Draconis Combines' top producers of foodstuffs. The world is also a highly advanced and has moderate industry, mostly to support the planets agriculture. In 3005 the world became a prefecture capital. Prior to that the world enjoyed a good trading relationship with the Lyran world of Port Moseby. However, after becoming a capital Buckminster become a major command center for the region and the long-time home planet of the Second Sword of Light.  The increased presence of military forces on the world, and the exercises and training runs that they require, have begun to dramatically reduced the productivity of the farmland. This is starting to have an adverse impact on the planets economy. All of these changes to the world since 3005 have resulted in the creation of several covert and overt anti-Kurita groups.</desc>
 	</planet>
 	<planet>
@@ -11976,11 +11976,11 @@ Earthwerks Incorporated</desc>
 		<hpg>A</hpg>
 		<lifeForm>5</lifeForm>
 		<socioIndustrial>D-C-C-D-C</socioIndustrial>
-		<landmass>Dolorous Garde</landmass>
-		<landmass>Cameliard</landmass>
-		<landmass>Badon</landmass>
-		<landmass>Sauvage</landmass>
-		<landmass>Joyous Garde</landmass>
+		<landMass>Dolorous Garde</landMass>
+		<landMass>Cameliard</landMass>
+		<landMass>Badon</landMass>
+		<landMass>Sauvage</landMass>
+		<landMass>Joyous Garde</landMass>
 		<desc>Camlann is important to the Free Worlds League after the ruling in Federal League courts that allowed the planet to become independent from the Regulus Province. Since then hundreds of planets in the League have declared themselves independent and have greatly affected political importance of some regions.
 
 Camlann itself is barely able to sustain itself, the primarily industry and exports from Camlann are communications gear and components. Most of Camlann has been terraformed and over the years the planet has become comfortable for human life. The planet is known for its several unique dinosaur like species.</desc>
@@ -12130,8 +12130,8 @@ Camlann itself is barely able to sustain itself, the primarily industry and expo
 		<lifeForm>2</lifeForm>
 		<satellite>Lonely</satellite>
 		<socioIndustrial>D-C-D-D-C</socioIndustrial>
-		<landmass>Cosenza (Ausapolis)</landmass>
-		<landmass>Torino Islands</landmass>
+		<landMass>Cosenza (Ausapolis)</landMass>
+		<landMass>Torino Islands</landMass>
 		<desc>Campoleone is a cold world on the edge of the Periphery border. The planet is lightly populated and acts primarily as a trade center supported by subsistence-level agriculture. The planet is dotted with villas of wealthy merchants and more than a few spacers choose to retire to Campoleone for its natural beauty. The planet has earned a reputation as the place to go for information on the deep Periphery as it is the primary trade hub for deep Periphery traders and the Free Worlds League. There is little industry on the planet and almost all goods come in from the tradeport.</desc>
 	</planet>
 	<planet>
@@ -13725,11 +13725,11 @@ Edge Industries</desc>
 		<lifeForm>7</lifeForm>
 		<satellite>Blanca</satellite>
 		<socioIndustrial>D-C-B-D-B</socioIndustrial>
-		<landmass>Las Cruces (Puerto Cortés)</landmass>
-		<landmass>Mazatlán</landmass>
-		<landmass>Santa Rosa</landmass>
-		<landmass>Alamogordo</landmass>
-		<landmass>San Clemente</landmass>
+		<landMass>Las Cruces (Puerto Cortés)</landMass>
+		<landMass>Mazatlán</landMass>
+		<landMass>Santa Rosa</landMass>
+		<landMass>Alamogordo</landMass>
+		<landMass>San Clemente</landMass>
 		<desc>Cerillos is a dry and dusty world on the edge of the Free Worlds League. The planet is part of the unofficial 'Trinity' province along with Galisteo and Sierra. Most of the inhabitants of the three worlds descend from hispanic and indian populations of southwestern North America.
 
 Like the other Trinity worlds, Cerillos' primary industry is farming. Both agriculture and ranching are common on Cerillos, however the lack of wealth on the Trinity worlds makes military service both a likely and respected choice for the natives of the Trinity worlds.</desc>
@@ -14186,8 +14186,8 @@ During the Succession Wars, the exports from Starpad to agriculturally poorer ne
 		<satellite>Medway</satellite>
 		<climate>3</climate>
 		<socioIndustrial>A-B-B-B-C </socioIndustrial>
-		<landmass>Crom (Strabo)</landmass>
-		<landmass>Lemure</landmass>
+		<landMass>Crom (Strabo)</landMass>
+		<landMass>Lemure</landMass>
 		<desc>The planet Chatham is a scenic world when seen from orbit. Unfortunately, upon landing the taint of centuries of pollution combined with the planets native bacteria have created a taint to the atmosphere. Even with the tainted atmosphere the planet maintains a modest agricultural output. Chatham is a high-tech world moderately industrialized with hood industrial output. Due to the planets mostly self-sufficient resources its long been the home to the companies Tomori Trans Industrial, Wakazashi Enterprises, and Stellar Trek.</desc>
 	</planet>
 	<planet>
@@ -14937,9 +14937,9 @@ This led to a very hostile environment by the mid 3020s with many residents just
 		<satellite>Brana</satellite>
 		<satellite>Kurna</satellite>
 		<socioIndustrial>D-C-B-D-A</socioIndustrial>
-		<landmass>Hastings (Sheridan)</landmass>
-		<landmass>Ermine</landmass>
-		<landmass>Hawthorne</landmass>
+		<landMass>Hastings (Sheridan)</landMass>
+		<landMass>Ermine</landMass>
+		<landMass>Hawthorne</landMass>
 		<desc>Claybrooke is a world rich in natural resources. With large deposits of raw ores and minerals on both moons and the planet itself, mining is a major industry on Claybrooke. However, the primary industry on planet remains agriculture thanks to the fertile soil and temperate climate.</desc>
 	</planet>
 	<planet>
@@ -19114,9 +19114,9 @@ Bowie Industries</desc>
 		<satellite>Nebulos)</satellite>
 		<climate>3</climate>
 		<socioIndustrial>B-B-A-B-C</socioIndustrial>
-		<landmass>Mataeo (Fortress Dieron)</landmass>
-		<landmass>Voltenna</landmass>
-		<landmass>Wennisaka</landmass>
+		<landMass>Mataeo (Fortress Dieron)</landMass>
+		<landMass>Voltenna</landMass>
+		<landMass>Wennisaka</landMass>
 		<desc>Dieron was one of the worlds abandoned by the Terran Alliance following the Outer Reaches Rebellion. Later the world would be incorporated into the Terran Hegemony becoming part of the Lone Star Province. Dieron is a world with numerous large mountain ranges creating countless small valleys. The planet is geologically unstable, as a result earthquakes are a common problem. Nestled into the large Mountain are cramped cities stuck between towering mountains. In the time of the Star League, Dieron was a large and thriving planet. The SLDF maintained a major command and logistics center on Dieron. The largest of the Star League complexes at the time was Fortress Dieron. After the Exodus the Draconis Combine became quite interested in acquiring Dieron. The planet's extensive natural resources, advanced technology and industry made it a prime target. When the Combine seized the planet they had underestimated how much of the planet had suffered during the war to oust Stefan Amaris. The SLDF has also been very thurough stripping the planet of all useful material. After seizing the planet the Combine began creating factories in the shells of Dieron’s deep mountains and slowly rebuilt the world into a thriving industrial powerhouse. Even with the earthquakes, claustrophobic living space, and occasional political dissent, the Dieronese are a content people. The natives are protective of their world and despite centuries of Kurita rule many natives still remember the glory days of the Terran Hegemony and the Star League and still refer to locations and cities by their original colonial names.
 
 The capital is currently Fort Dieron, but in the past San Martin and Tahlwynn have served as well.
@@ -19191,10 +19191,10 @@ The capital is currently Fort Dieron, but in the past San Martin and Tahlwynn ha
 		<satellite>Ecole</satellite>
 		<satellite>Marie Theresa</satellite>
 		<socioIndustrial>C-C-B-D-B</socioIndustrial>
-		<landmass>Normandy (New Bastogne)</landmass>
-		<landmass>Vinci</landmass>
-		<landmass>St. Therese</landmass>
-		<landmass>St. Germaine</landmass>
+		<landMass>Normandy (New Bastogne)</landMass>
+		<landMass>Vinci</landMass>
+		<landMass>St. Therese</landMass>
+		<landMass>St. Germaine</landMass>
 		<desc>Dieudonne is a very hospitable world with a wide variety of unique flora and fauna with a myrid of medical applications as well as being edible. The planet also contains a wealth of mineral deposits which resulted in a large number of refineries and manufacturing centers. Unfortunately battles over the centuries between first the Hegemony, Commonwealth and League and later just the League and Commonwealth took its toll and much of the heavy industry on planet was destroyed after the fall of the Star League.
 
 The Free Worlds League finally established full control of the planet in the mid-29th Century and continued to use the planet as linchpin for their military activities in the region of space near Terra.</desc>
@@ -24524,9 +24524,9 @@ When Gallery was originally settled there were no native lifeforms so the origin
 		<satellite>2</satellite>
 		<climate>5</climate>
 		<socioIndustrial>C-C-B-C-B </socioIndustrial>
-		<landmass>Eire (New Derry)</landmass>
-		<landmass>Samphire</landmass>
-		<landmass>Ilnacullin</landmass>
+		<landMass>Eire (New Derry)</landMass>
+		<landMass>Samphire</landMass>
+		<landMass>Ilnacullin</landMass>
 		<desc>Galtor III is an agriculture world that is moderately advanced with basic heavy industry. The planet has three continents. The first continent, Eire, has a spine of vast mountains and an extensive agricultural plain. The other two continents are mostly desert and mountain with sections of coastal flood plains and jungles. New Derry and New Wuhan City are the largest on the planet. Originally founded by members of the Pan-Oriental Co-prosperity and the Free Irish National Federation the colonists differences soon led to a civil war. Only the breakout of a plague ultimately united the world. During the Age of War Galtor III became the breadbasket feeding the surrounding systems. During the Star League the SLDF built a massive logistical base on the planet and soon the world supplied food to SLDF troops around the Inner Sphere.</desc>
 	</planet>
 	<planet>
@@ -25249,7 +25249,7 @@ In 2315, Genoa became a member of the Liao Protectorate before it was taken by t
 		<satellite>Unity</satellite>
 		<satellite>Understanding</satellite>
 		<socioIndustrial>B-C-B-C-C</socioIndustrial>
-		<landmass>Matrah (Portent)</landmass>
+		<landMass>Matrah (Portent)</landMass>
 		<desc>After heavy terraforming during early colonization Gibson became one of the most hospitable planets in the entire Free Worlds League. Semi-arid, but extremely comfortable for human life, Gibson manages to be completely self-sufficient. Due to the planet’s fertile farming land and comfortable atmosphere, Gibson was colonized by a wide diversity of peoples and religions.
 
 While the diversity of Gibson made it seem like the ideal planet for Word of Blake’s relocation during their exile from Terra. Unfortunately when the Word began forcing their beliefs on the population, they soon found public sentiment polarized against them, resulting in a bloody and costly guerrilla war between the natives of the planet and the Word of Blake. An uneasy peace was restored by Thomas Marik and the Knights of the Inner Sphere but only after the inhabitants of Gibson and their new Word of Blake neighbors received their own separate enclaves on planet.
@@ -25304,9 +25304,9 @@ Brigadier Corporation</desc>
 		<satellite>Mazel</satellite>
 		<satellite>Nando</satellite>
 		<socioIndustrial>C-C-B-B-B</socioIndustrial>
-		<landmass>Alliago Major (Ooessay)</landmass>
-		<landmass>Alliago Minor</landmass>
-		<landmass>Carrabesto</landmass>
+		<landMass>Alliago Major (Ooessay)</landMass>
+		<landMass>Alliago Minor</landMass>
+		<landMass>Carrabesto</landMass>
 		<desc>There are three continents that help make up the surface of Gienah. The Continent of Carrabesto lies in the north, with the larger landmass of Alliago Major along the equator and Alliago Minor covering the southern pole.  Alliago Major contains the capital city and planetary spaceport.  Alliago Minor is used as a training ground for cold-weather operations by the local defense forces.  Gienah is a major commercial world and a trade partner with many of the technology deprived border planets of the Free Worlds League.  A manufacturer of civilian and military vehicles, Gienah Automotive, calls Gienah home.  Gienah Automotive headquarters and factories are found in the massive city of Molfetta, located on the continent of Carrabesto.</desc>
 	</planet>
 	<planet>
@@ -27749,8 +27749,8 @@ During their Holy War, the Blakists found ready converts among the technological
 		<lifeForm>3</lifeForm>
 		<climate>2</climate>
 		<socioIndustrial>C-B-B-B-C</socioIndustrial>
-		<landmass>Niedersachsen (Wexler)</landmass>
-		<landmass>Sylvania</landmass>
+		<landMass>Niedersachsen (Wexler)</landMass>
+		<landMass>Sylvania</landMass>
 		<desc>Hanover is a quiet world with a boreal climate. The planet is moderately advanced and industrialized world. The planet is mostly self-sufficient and supports modest agriculture. Home to People’s Protection, a company that produces security systems and small arms. Also home to Saxe-Heidelberg Heavy Industries.</desc>
 	</planet>
 	<planet>
@@ -28967,10 +28967,10 @@ Andrea County Armor Yards</desc>
 		<lifeForm>5</lifeForm>
 		<satellite>Hesperus II-Alpha</satellite>
 		<socioIndustrial>A-A-A-A-B</socioIndustrial>
-		<landmass>East Barrens</landmass>
-		<landmass>North Whitman</landmass>
-		<landmass>South Whitman (Maria's Elegy)</landmass>
-		<landmass>West Barrens</landmass>
+		<landMass>East Barrens</landMass>
+		<landMass>North Whitman</landMass>
+		<landMass>South Whitman (Maria's Elegy)</landMass>
+		<landMass>West Barrens</landMass>
 		<desc>Hesperus II is a haggard and craggy looking planet. All four major continents are covered in high mountain peaks and rugged canyons. The planet has very little arable land and is hotter than many settled worlds. All considered it has little to suggest itself as a liveable planet. The exception is the massive amounts of raw materials in the mountain ranges and most importantly, the massive ‘Mech factories which have made Hesperus II the premier planet for ‘Mech production in the Inner Sphere. Almost the entire population of Hesperus II works at or is involved in work at the Defiance ‘Mech Factories.
 
 The planet and the factories have been the target of invasion numerous times throughout its history but the mountainous terrain and the fact that most of the factories were built inside of the numerous mountain ranges have made them natural fortresses, making Hesperus II exceptionally hard to capture.
@@ -30155,8 +30155,8 @@ During the Star League-era, Hsien prospered as part of the Terran Hegemony, befo
 		<satellite>Hou Wah</satellite>
 		<climate>5</climate>
 		<socioIndustrial>A-B-A-B-B</socioIndustrial>
-		<landmass>Polsca (Paradiso)</landmass>
-		<landmass>Bergen</landmass>
+		<landMass>Polsca (Paradiso)</landMass>
+		<landMass>Bergen</landMass>
 		<desc>Hun Ho is a full self-sufficient, moderately industrialized high-tech world. A very hot tropical paradise with abundant food which supplies most of the planet's population that lives around the barren polar areas. These areas have less risk from the aggressive jungle dwelling predators and the planet's mineral resources are easily accessible. The planet is important to the Draconis Combine for its industrial production from the LexaTech Industries planet in Corsan on the Bergen continent.</desc>
 		<factionChange>
 			<date>2319-01-01</date>
@@ -31100,7 +31100,7 @@ Trunner, the largest city and planetary capital, is home to Imbross AeroTech Ind
 		<lifeForm>4</lifeForm>
 		<satellite>Agiruur</satellite>
 		<socioIndustrial>A-A-B-A-B</socioIndustrial>
-		<landmass>Insel Desteufels (Utopia)</landmass>
+		<landMass>Insel Desteufels (Utopia)</landMass>
 		<desc>Insel Desteufels (“Devil’s Island”) is the only continent set in a vast ocean peppered with island chains. Inarcs planetary capital is Utopia. The major industry on Inarcs is the extraction of mineral resources from the many islands dotting the oceans. Inarcs started out as a Star League penal colony due to a clerical error that listed the planet as uninhabitable. Close to 100,000 criminals and agitators were exported to the world, who in turn built a thriving colony. With this accomplishment the league pardoned the colonists, opening the world to off-world commerce. Blackstone Industries is located in the snowy mountain city of Erewhon on the Insel Desteufels continent. Inarcs is also home to the conventional fighter manufacturer Scoltek Associates. Their plant is also located on Insel Desteufels, but at the small town of Hellmouth in the flatlands of the continent.</desc>
 	</planet>
 	<planet>
@@ -31546,9 +31546,9 @@ Ingress‘s temporary military weakness made it an easy target during the Blakis
 		<satellite>Bahia</satellite>
 		<climate>3</climate>
 		<socioIndustrial>A-A-A-A-A</socioIndustrial>
-		<landmass>Baiano</landmass>
-		<landmass>Salvador</landmass>
-		<landmass>Santana (New Barcella)</landmass>
+		<landMass>Baiano</landMass>
+		<landMass>Salvador</landMass>
+		<landMass>Santana (New Barcella)</landMass>
 		<desc>Irece is a heavily industrialized high-tech world that is fully self-sufficient. It’s ideal climate also allows it to be a huge food producer in the region. It’s also an important Command and Industrial world to the Draconis Combine, home to the LexaTech Industries Stinger LAM plant. The world is home of the 9.7 kilometer tall mountain known as Tengoku. (Japanese translation of the name is Heaven.) Tengoku peaks into the planet's stratosphere and is located a hundred kilometers from world's capital city New Barcella.</desc>
 	</planet>
 	<planet>
@@ -31607,10 +31607,10 @@ Ingress‘s temporary military weakness made it an easy target during the Blakis
 		<lifeForm>2</lifeForm>
 		<satellite>Prospero</satellite>
 		<socioIndustrial>A-A-C-A-D</socioIndustrial>
-		<landmass>Indran</landmass>
-		<landmass>Hathor</landmass>
-		<landmass>Bruin</landmass>
-		<landmass>Kriess</landmass>
+		<landMass>Indran</landMass>
+		<landMass>Hathor</landMass>
+		<landMass>Bruin</landMass>
+		<landMass>Kriess</landMass>
 		<desc>The planet Irian is unique in its ownership and governance. Officially the planet is a Corporate Fief of Irian Technologies and the government is a unique conglomerate of government and business. The planet itself is prosperous and is comparable to many provincial capitals in the Free Worlds League in terms of wealth and prosperity and the planet is diversely industrialized with factories servicing the various branches of the IrTech Conglomerate. While the military factories suffered during the Succession Wars, the rest of IrTech remained prosperous and the corporation refused to relocate their military factories, instead deciding to repair and rebuild when they had the chance.
 
 Irian’s terrain is best described as bland. The planet’s terrain is dominated by low rolling hills with sparse vegetation and the climate is adequate for human habitation.</desc>
@@ -31693,9 +31693,9 @@ Irian’s terrain is best described as bland. The planet’s terrain is dominate
 		<satellite>Lara</satellite>
 		<climate>5</climate>
 		<socioIndustrial>A-B-A-C-B</socioIndustrial>
-		<landmass>South Umbrian (New Gotham City)</landmass>
-		<landmass>North Umbrian</landmass>
-		<landmass>Easter</landmass>
+		<landMass>South Umbrian (New Gotham City)</landMass>
+		<landMass>North Umbrian</landMass>
+		<landMass>Easter</landMass>
 		<desc>Irurzun is an important command and logistical world for the Draconis Combine. In spite of its hot and humid atmosphere it’s a fully self-sufficient moderately industrialized high‐tech world with large deposits of valuable minerals. Most of the mining takes place on the continent of South Umbrain. On the other continents and away from the populated areas Irurzun shows a more agricultural side; many small farms raising crops. With the discovery of so many natural resources it is unlikely these agricultural areas will remain intact much longer.</desc>
 		<factionChange>
 			<date>2319-01-01</date>
@@ -32356,9 +32356,9 @@ Taurus Territorial Industries</desc>
 		<satellite>Gunma</satellite>
 		<climate>3</climate>
 		<socioIndustrial>C-C-A-C-B</socioIndustrial>
-		<landmass>Isobe (Usui)</landmass>
-		<landmass>Morinoie</landmass>
-		<landmass>Savoie</landmass>
+		<landMass>Isobe (Usui)</landMass>
+		<landMass>Morinoie</landMass>
+		<landMass>Savoie</landMass>
 		<desc>Jeanette is a fully self-sufficient and moderately advanced world within the Bjarred Prefecture with extensive raw materials. The planet's small population ignores interstellar matters and Buddhism is a common religion on the planet with a major Buddhist temple on the Continent of Savoie. The continent of Morinoie is home to the Jeanette Naval Yards.</desc>
 	</planet>
 	<planet>
@@ -32915,9 +32915,9 @@ Jonathan has a 20 hour day and takes 745 standard days to orbit its sun.</desc>
 		<satellite>Shinmachi</satellite>
 		<climate>2</climate>
 		<socioIndustrial>A-B-A-B-B</socioIndustrial>
-		<landmass>Sakurajima (Kuroda)</landmass>
-		<landmass>Kyushu</landmass>
-		<landmass>Kamoike</landmass>
+		<landMass>Sakurajima (Kuroda)</landMass>
+		<landMass>Kyushu</landMass>
+		<landMass>Kamoike</landMass>
 		<desc>Kagoshima is a high-tech world with extensive raw materials and is the Capital of the Kagoshima Prefecture in the Pesht Military District. There is a monument in the city of Fujima commemorating the birthplace of Subhash Indrahar; a much grander monument to Takashi Kurita stands in Eto, the city of the late Coordinator’s birth. The city Kuroda on Sakurajima is home to the prestigious Wisdom of the Dragon military academy. The Kyushu continent is the home of Nissan General Motors near the city of Onami.</desc>
 		<factionChange>
 			<date>2319-01-01</date>
@@ -33051,8 +33051,8 @@ Jonathan has a 20 hour day and takes 745 standard days to orbit its sun.</desc>
 		<satellite>Yamanashi</satellite>
 		<climate>2</climate>
 		<socioIndustrial>A-B-A-B-B</socioIndustrial>
-		<landmass>Kai Koshu (Kurokami)</landmass>
-		<landmass>Kirifuri</landmass>
+		<landMass>Kai Koshu (Kurokami)</landMass>
+		<landMass>Kirifuri</landMass>
 		<desc>Kajikazawa is a high-tech world with abundant natural resources and is a prefecture capital in the Benjamin Military District. The planet's close location to Benjamin results in a lot of the administrative work that normally appears on a prefecture capital getting re-routed from Benjamin. The Kai Koshu continent enjoys a mild climate and pleasant landscapes which the government capitalizes on, creating a major tourist industry and by renting out vacation mansions to the harried politicians of nearby Benjamin. After the Clan invasion the world experienced a large building boom. The Draconis Combine relocated the Cosby BattleMech and Myomer Research Firm plant to the continent of Kai Koshu near the city of Hokusai. In addition, a recharge station was constructed at the zenith jump point. As a result, Comstar is considering plans to upgrade the local HPG station to a Class A facility.</desc>
 		<factionChange>
 			<date>2319-01-01</date>
@@ -33158,9 +33158,9 @@ Jonathan has a 20 hour day and takes 745 standard days to orbit its sun.</desc>
 		<satellite>Carbons</satellite>
 		<satellite>Deons</satellite>
 		<socioIndustrial>B-A-C-B-C</socioIndustrial>
-		<landmass>Kaleen</landmass>
-		<landmass>Kalmia (Sakuntalem)</landmass>
-		<landmass>Kumar</landmass>
+		<landMass>Kaleen</landMass>
+		<landMass>Kalmia (Sakuntalem)</landMass>
+		<landMass>Kumar</landMass>
 		<desc>Located on the border of the Free Worlds League and Lyran Commonwealth and the site of vital manufacturing centers and a large military base, Kalidasa has been a site of countless battles between the Commonwealth and League over its history. During the 31st Century the planet was established as a trade center between the Free Worlds League and Lyran Commonwealth which resulted in a reduction of military action on Kalidasa and allowed the planet to flourish.
 
 Supported by light industry, mining and refinery, trade on Kalidasa is brisk as goods from all over the Commonwealth and League are brought together and exchanged.
@@ -33654,8 +33654,8 @@ By 3091, in an extreme example of a runaway greenhouse effect, the average surfa
 		<hpg>A</hpg>
 		<lifeForm>8</lifeForm>
 		<satellite>Loren’s Folly</satellite>
-		<landmass>Hurste</landmass>
-		<landmass>Muran (District City)</landmass>
+		<landMass>Hurste</landMass>
+		<landMass>Muran (District City)</landMass>
 		<landMass>Thespia</landMass>
 		<socioIndustrial>A-A-B-B-C</socioIndustrial>
 		<desc>Kathil was originally a poor agriculture world, however it has grown into one of the Star League’s key manufacturing planets and after the fall of the League it became one of the most important planets in the Federated Suns. The rise in importance of Kathil during the Star League was due to heavy industrial build up, including the McKenna Shipyards which were built in 2602 and soon after General Motors established its largest manufacturing facility on the planet.
@@ -33765,7 +33765,7 @@ Kaumberg was primarily settled by colonists hailing from Germany and Austria.</d
 		<pressure>2</pressure>
 		<gravity>0.61</gravity>
 		<lifeForm>2</lifeForm>
-		<climate>40</climate>
+		<climate>0</climate>
 		<percentWater>9</percentWater>
 		<temperature>4</temperature>
 		<spectralClass>B</spectralClass>
@@ -34059,7 +34059,7 @@ The Blakist Holy War destroyed much of Kawich‘s industry, but The Republic of 
 		<lifeForm>5</lifeForm>
 		<climate>4</climate>
 		<socioIndustrial>B-C-D-C-D</socioIndustrial>
-		<landmass>Wanaland (Gondovia)</landmass>
+		<landMass>Wanaland (Gondovia)</landMass>
 		<desc>Kaznejoy is an advanced world with basic heavy industry. The world is hot arid with few natural resources and is considered by many to be an inhospitable wasteland. The planet is a prefecture capital in the Benjamin Military District but many wonder why. The most common answer is that the planet's hostile environment is vital to the training of DEST commandos. Near the City Jigokudani on the Shinano Continent is Ibuki Robotics and Manufacturing</desc>
 		<factionChange>
 			<date>2571-07-09</date>
@@ -35283,8 +35283,8 @@ The planet has moderate natural resources and enough arable land to sustain itse
 		<lifeForm>3</lifeForm>
 		<climate>2</climate>
 		<socioIndustrial>B-B-C-C-A</socioIndustrial>
-		<landmass>Bounty (Dark Earth)</landmass>
-		<landmass>Needles</landmass>
+		<landMass>Bounty (Dark Earth)</landMass>
+		<landMass>Needles</landMass>
 		<desc>A breadbasket world in the Matsuida prefecture of the Galedon Military district; Kirei Na Niwa is a planet renowned for agriculture and a year round warm climate. The continent of Needles is home to needle like mountains that surround the plains. These plains are battered by severe and unpredictable windstorms. The city of Newton on the continent is home to Kinkakuji Enterprises.</desc>
 		<factionChange>
 			<date>2341-01-01</date>
@@ -37366,9 +37366,9 @@ Aside from the large island continent of Galapagos in the northern hemisphere of
 		<lifeForm>3</lifeForm>
 		<climate>2</climate>
 		<socioIndustrial>B-A-A-B-C</socioIndustrial>
-		<landmass>Upolu (Aiga-i-le-Tai)</landmass>
-		<landmass>Longwalk</landmass>
-		<landmass>Firesand</landmass>
+		<landMass>Upolu (Aiga-i-le-Tai)</landMass>
+		<landMass>Longwalk</landMass>
+		<landMass>Firesand</landMass>
 		<desc>Lapida II is a heavily industrialized and resource rich world in the Proserpina Prefecture of the Benjamin Military District. The planet is cold and has an atmosphere tainted by hundreds of years of strip mining and industry. The city of Mulifanua on the continent of Upolu is home to Nimakachi Fusion Products. Nimakachi Fusion Products purchased the bankrupt Sendai mining complex in 2602. They transformed the subterranean complex into a self-contained manufacturing enclave. The fact that the area surrounding the factories is covered with a warren of shantytowns creating heavy urban environments that are nearly impossible to fight through have been vital to Nimakachi’s defense, along with their highly experienced and well equipped security force, combined the facility is almost impossible to raid. Also on world are numerous mineral processing and construction factories that produce everything from furniture, to tractors, to BattleMechs. The continent of Firesand is home to several well-hidden refit and supply centers. The continent received its name from the corrosive and toxic ammoniac salt sands that cover most of Firesand.</desc>
 	</planet>
 	<planet>
@@ -37960,9 +37960,9 @@ Aside from the large island continent of Galapagos in the northern hemisphere of
 		<hpg>B</hpg>
 		<lifeForm>1</lifeForm>
 		<socioIndustrial>B-C-C-C-D</socioIndustrial>
-		<landmass>Eiffel</landmass>
-		<landmass>Lutetia</landmass>
-		<landmass>Orléans (Beauborg)</landmass>
+		<landMass>Eiffel</landMass>
+		<landMass>Lutetia</landMass>
+		<landMass>Orléans (Beauborg)</landMass>
 		<desc>Les Halles is an arctic planet with only a narrow equatorial band that is capable of comfortably supporting human life. Les Halles is located at a strategic location along the border of the Free Worlds League and the Capellan Confederation, which has often made it a military target, the planet also serves as a major trade hub. Les Halles supports several cities built around the multiple spaceports on planet. The spaceports are often ringed by large warehouses full of various goods and resources both mundane and exotic. While trade is heavily monitored it is no secret that Les Halles has a thriving black-market.
 
 The primary industry on Les Halles is the extraction and refining of fuel used in spacecraft. In the mid to late 31st Century an orbital repair yard was constructed to serve as a repair and maintenance station as well as a cargo-waystation.</desc>
@@ -39238,9 +39238,9 @@ Norse Storm</desc>
 		<satellite>Titania</satellite>
 		<climate>3</climate>
 		<socioIndustrial>B-C-C-C-B</socioIndustrial>
-		<landmass>Whiteland (Bitter Lake)</landmass>
-		<landmass>Blueland</landmass>
-		<landmass>Redland</landmass>
+		<landMass>Whiteland (Bitter Lake)</landMass>
+		<landMass>Blueland</landMass>
+		<landMass>Redland</landMass>
 		<desc>Loysville is an advanced world; but home to primarily farmers, fisherman and tourists. The system is located in the Kagoshima prefecture of the Pesht Military District. The planet's largest continent is the arctic Whiteland. The planet is home to the Ishikawajima-Harima Battle Armor Industries, a new plant that opened in 3066.</desc>
 	</planet>
 	<planet>
@@ -41028,9 +41028,9 @@ The Word of Blake Jihad initially overlooked the planet, but later in the Jihad,
 		<satellite>Kafuffle</satellite>
 		<climate>3</climate>
 		<socioIndustrial>A-A-A-A-B</socioIndustrial>
-		<landmass>Tiller (New Pontiac)</landmass>
-		<landmass>Aileen</landmass>
-		<landmass>Latvia</landmass>
+		<landMass>Tiller (New Pontiac)</landMass>
+		<landMass>Aileen</landMass>
+		<landMass>Latvia</landMass>
 		<desc>Marduk is a comfortable planet with a temperate climate, mild weather, fertile land and a vast array of forests and jungles. The planet originally attracted settlers to farm the large tracts of arable land, however just prior to the formation of the Star League large deposits of minerals and ores were discovered and led to a change in the planet’s economy from agriculture to mining and soon after to heavy industry, including a large sprawling ‘Mech factory. While the planet, specifically the factories, were targeted many times during the Succession Wars, they were never destroyed and continued to churn out ‘Mechs even though the planet changed hands between the Federated Suns and the Draconis Combine several times.
 
 Manufacturing centers:
@@ -41187,8 +41187,8 @@ Unfortunately, the loss of the Star League–era atmospheric purifiers during th
 		<satellite>Hradcany</satellite>
 		<satellite>Malla Strana</satellite>
 		<socioIndustrial>A-A-C-A-B</socioIndustrial>
-		<landmass>Chavalet</landmass>
-		<landmass>Mondaria (Dormuth)</landmass>
+		<landMass>Chavalet</landMass>
+		<landMass>Mondaria (Dormuth)</landMass>
 		<desc>The planet Marik was founded by Antonin Marik in 2139 on behalf of the Terran Alliance. The planet quickly grew into a financial and industrial leader in the region, thanks to a wealth of raw materials. The wealth of the planet Marik helped spread the Marik Commonwealth to include other nearby systems.
 
 Despite  being an arid world, Marik is densely populated, thanks primarily to the industrial might and wealth available on the planet. The population is primarily located in cities designed to endure the typical rough weather and tectonic activities that occur regularly.
@@ -42419,7 +42419,7 @@ The planetary capital, Worthentown and primary seat of power are located on the 
 		<lifeForm>5</lifeForm>
 		<satellite>Saratoga</satellite>
 		<socioIndustrial>A-A-B-B-C</socioIndustrial>
-		<landmass>Jahreszeitwunder (Europa)</landmass>
+		<landMass>Jahreszeitwunder (Europa)</landMass>
 		<desc>Melissia is covered by a massive single continent that covers an entire hemisphere and runs from pole to pole. The Continent earned the nickname Jahreszeitwunder (“Seasons of Wonder”) due to the extreme seasons experienced on the planet.  The northern and southernmost latitudes in the span of a day can potentially experience the extremes of all seasons. Broad Run, a massive river, almost divides the continent in half. The Broad Run runs from the Valiant Mountains, located along the western edge of the continent and empties into a sea at the Broad Run Delta in the east. North of the Delta lies the loveless Valley, home to a vast percentage of local farmlands. The planetary capital and principal spaceport of Europa also call the Valley home. Rich deposits of titanium are located beneath the northern ice shelf. Melissia was originally discovered and settled by colonists from nearby Coventry. Melissia is a self-sufficient, modestly industrial world.
         
 Melissia is home to Grumman-Cri, a facility built by Grumman Amaglamated during the Word of Blake Jihad to build Marksman Artillery Vehicles. The facility initially gained a cool welcome by the locals, due to the reputation of Grumman as the manufacturer of the Ontos tanks, staples in the Free Worlds League Military. The Grumman-Cri facility is located in the small town of Broad Run, located in the wetlands of Jahreszeitwunder.
@@ -43192,9 +43192,9 @@ Menkib has 25 hour days and orbits its sun every 37 standard days.</desc>
 		<satellite>Oscuro Corazon</satellite>
 		<climate>3</climate>
 		<socioIndustrial>A-B-A-B-B</socioIndustrial>
-		<landmass>Brook (Saginaw)</landmass>
-		<landmass>Kahn</landmass>
-		<landmass>Kure</landmass>
+		<landMass>Brook (Saginaw)</landMass>
+		<landMass>Kahn</landMass>
+		<landMass>Kure</landMass>
 		<desc>Midway is a comfortable temperate planet that is almost entirely covered in water. The planet has abundant sources of materials which are used in the heavy industry on planet and in orbit. The planet is home to the orbital Midway Shipyards, one of the Combine's rare jumpship production and maintenance facilities.</desc>
 		<factionChange>
 			<date>2571-07-09</date>
@@ -46203,9 +46203,9 @@ New Capetown is moderately industrialized and is a comfortable temperate planet 
 		<lifeForm>5</lifeForm>
 		<satellite>Lot</satellite>
 		<socioIndustrial>D-C-C-D-C</socioIndustrial>
-		<landmass>Béziers</landmass>
-		<landmass>Mindanao (Cienfuegos)</landmass>
-		<landmass>Ostrov (Quito)</landmass>
+		<landMass>Béziers</landMass>
+		<landMass>Mindanao (Cienfuegos)</landMass>
+		<landMass>Ostrov (Quito)</landMass>
 		<desc>New Delos has been a pivotal world for the Free Worlds League. The planet was the homeworld of George Humphries, the seat of power of Anton Marik during attempted coup, the original ruling house of Oriente died fighting on New Delos, and various conferences btween the League, Confederation and Terran Hegemony took place in the grand cities of New Delos. New Delos was slow to recover from the aftermath of Anton Marik’s Civil War. With the planet’s political infrastructure decimated by the Wolf Dragoons the planet lost its place in the Free Worlds League and many citizens chose to relocate to other worlds. Many cities have since become ghost towns or have been entirely reclaimed by nature.</desc>
 	</planet>
 	<planet>
@@ -46767,10 +46767,10 @@ Galtor Naval Yards</desc>
 		<satellite>Taka</satellite>
 		<satellite>Wing-Chiu</satellite>
 		<socioIndustrial>B-B-B-A-C</socioIndustrial>
-		<landmass>Asharu (Hirihito)</landmass>
-		<landmass>Kalasaka</landmass>
-		<landmass>Koshimatu</landmass>
-		<landmass>Zuishami</landmass>
+		<landMass>Asharu (Hirihito)</landMass>
+		<landMass>Kalasaka</landMass>
+		<landMass>Koshimatu</landMass>
+		<landMass>Zuishami</landMass>
 		<desc>New Kyoto is a temperate planet with a wide range of native life. Unfortunately for early colonists the native life was extremely resistant to imported species, with most imported wildlife and fauna either being killed off by native creatures or dying of native diseases. However, colonists were eventually able to overcome these issues and successfully introduced foreign species. There is still a ban for the export of any wildlife or fauna from New Kyoto.
 
 Kyoto has an extensiveindustrial presence with many factories and other industries springing up along the coasts of the planet’s four continents. The planet boasts several spaceports in order to support exporting goods from the many factories to other planets in Lyran Commonwealth as well as trade with the Free Worlds League.
@@ -46902,8 +46902,8 @@ New Macao has 22 hour days and orbits its sun every 364 standard days.</desc>
 		<lifeForm>2</lifeForm>
 		<satellite>Delphi</satellite>
 		<socioIndustrial>C-B-B-A-B-A</socioIndustrial>
-		<landmass>New Greenland (Kasnov)</landmass>
-		<landmass>Olympica (Darienbad)</landmass>
+		<landMass>New Greenland (Kasnov)</landMass>
+		<landMass>Olympica (Darienbad)</landMass>
 		<desc>An uneasy peace has covered New Olympia for centuries between the Olympica Province and the rest of the planet which is part of the Free Worlds League. Technically the island province is an independent realm in the middle of the Free Worlds League. This unique status as an independent region has drawn the wealthy of the Free Worlds League that are eager to live under the comforts provided at the heart of the League while avoiding the taxes imposed on most planets.
 
 Most industry on the planet is centered around catering to the rich individuals seeking to take advantage of the Olympica Provinces’ tax free status.</desc>
@@ -47169,10 +47169,10 @@ As word slowly spread, New Rhodes III became a pleasure destination from across 
 		<satellite>Chiai</satellite>
 		<climate>3</climate>
 		<socioIndustrial>C-B-C-B-B</socioIndustrial>
-		<landmass>Shimoji (Yamashiro)</landmass>
-		<landmass>Nippon</landmass>
-		<landmass>Kurima</landmass>
-		<landmass>Tarama</landmass>
+		<landMass>Shimoji (Yamashiro)</landMass>
+		<landMass>Nippon</landMass>
+		<landMass>Kurima</landMass>
+		<landMass>Tarama</landMass>
 		<desc>In the early days of space colonization, New Samarkand was one of the most populous colonies. It was also a deeply divided state. The planet was covered with sovereign city states that each had their own armed forces and were regularly at war with each other. It was on New Samarkand that House Kurita first rose to prominence, the brothers Shiro and Urizen Kurita rose first to control the city-state of Yamashiro and eventually the entire planet. From there they began the foundations for what would become the Draconis Combine. 
 
 New Samarkand served as the capital of the Draconis combine until June of 2617 when the Coordinator announced plans to move the capital to Luthien. New Samarkand's glory days vanished with the relocation of the Combine capital and many of its industrial concerns and it became a shadow of its former self. 
@@ -47797,8 +47797,8 @@ Like other worlds, Ningpo was not immune to the effects of the Word of Blake's J
 		<satellite>Favonius (asteroid)</satellite>
 		<climate>3</climate>
 		<socioIndustrial>B-C-C-D-A</socioIndustrial>
-		<landmass>Anemoi (New Zephyrus)</landmass>
-		<landmass>Hyacinth</landmass>
+		<landMass>Anemoi (New Zephyrus)</landMass>
+		<landMass>Hyacinth</landMass>
 		<desc>While Ningxia has become known for its diamonds, which are perfect for industrial processes, the world was actually settled for its beautiful landscapes. Regarded as a planet sized bonsai garden, every effort to exploit the diamond deposites has been stopped by highly placed nobles, including Coordinator Takashi Kurita. These nobles, as well as many prominent businessmen, maintain vacation homes on the picturesque world. The Ningxia has only one city, New Zephyus. It is the site of the planet's primary spaceport, but in the 3020's it suffered from a series of breakdowns that affected its ability to service DropShips. In fact, Ningxia was the site of several DropShip related accidents during this time. As a result, the agricultural companies that form the core of the planet's economy experienced difficulty in shipping their products. The temporary solution was to have DropShips land directly on the farms to load cargo, but most of the population was opposed to the practice due to the massive damage it caused.</desc>
 		<factionChange>
 			<date>2571-07-09</date>
@@ -48857,9 +48857,9 @@ Today, Nusakan is home to a thriving population and reborn computer and electron
 		<lifeForm>6</lifeForm>
 		<climate>3</climate>
 		<socioIndustrial>B-C-B-C-B</socioIndustrial>
-		<landmass>Stockholm (Nykvarn)</landmass>
-		<landmass>Falun</landmass>
-		<landmass>Bothnia</landmass>
+		<landMass>Stockholm (Nykvarn)</landMass>
+		<landMass>Falun</landMass>
+		<landMass>Bothnia</landMass>
 		<desc>When this world was freed from the Smoke Jaguars during Operation Bulldog the liberators were surprised to find a monument built by the occupiers to honor the Nykvarn Armored Battalion. The Clanners had felt that the Armored Battalion had impressed the invaders in combat, even though they were wiped out.</desc>
 	</planet>
 	<planet>
@@ -49219,9 +49219,9 @@ Today, Nusakan is home to a thriving population and reborn computer and electron
 		<lifeForm>6</lifeForm>
 		<satellite>Box</satellite>
 		<socioIndustrial>C-C-B-C-B</socioIndustrial>
-		<landmass>Rossonia</landmass>
-		<landmass>Ulm</landmass>
-		<landmass>Salva</landmass>
+		<landMass>Rossonia</landMass>
+		<landMass>Ulm</landMass>
+		<landMass>Salva</landMass>
 		<desc>The planet Ohrensen was part of the Capellan Confederation for much of its history before being captured by the Free Worlds League. Unfortunately for Ohrensen, the Confederation used scorched earth tactics which did significant damage to the planet before being forced off. League rebuilding was rife with corruption, which resulted in the planet's industry and economy recovering but the average citizen was left well below the standard of living in the rest of the Free Worlds League.
 
 The corruption on planet has resulted in the more inhabited continent of Rossonia to be run primarily by gangs operating under the facade of legitimate businesses. While the more rural continents of Salva and Ulm are nearly lawless, with the farmers and ranchers preferring to be armed at all times.</desc>
@@ -49627,7 +49627,7 @@ Brigadier Corporation
 			<faction>CGB,DC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3099-04-31</date>
+			<date>3099-04-30</date>
 			<faction>CGB</faction>
 		</factionChange>
 		<factionChange>
@@ -49727,11 +49727,11 @@ Pinard Protectorates Limited</desc>
 		<satellite>Coruna</satellite>
 		<satellite>Escorial</satellite>
 		<socioIndustrial>A-A-B-A-B</socioIndustrial>
-		<landmass>Avillan</landmass>
-		<landmass>Burgos</landmass>
-		<landmass>Martigues (Amur)</landmass>
-		<landmass>Navarran</landmass>
-		<landmass>Tarragonan</landmass>
+		<landMass>Avillan</landMass>
+		<landMass>Burgos</landMass>
+		<landMass>Martigues (Amur)</landMass>
+		<landMass>Navarran</landMass>
+		<landMass>Tarragonan</landMass>
 		<desc>Oriente is the capital of the Duchy of Oriente and a key world in the Free Worlds League. While the planet is heavily industrialized its pleasant, slightly warmer than Terran, climate also allows agriculture to flourish on the temperate continents of Martigues and Navarran.
 
 The equatorial continents of Avillan and Tarragonan are better described as archipelagos and often suffer turbulent storms, however the residents have adapted to the month long stormy seasons and enjoy tranquil tropical weather the rest of the year. 
@@ -49869,8 +49869,8 @@ Etna Foundries</desc>
 		<satellite>Mejiro</satellite>
 		<climate>3</climate>
 		<socioIndustrial>A-C-B-C-C</socioIndustrial>
-		<landmass>Shinjuku (Takadanobaba)</landmass>
-		<landmass>Ridgland</landmass>
+		<landMass>Shinjuku (Takadanobaba)</landMass>
+		<landMass>Ridgland</landMass>
 		<desc>For most of its history, Oshika has been a prefecture capital world. As a result, its cities and industry (what little there is of it) are all geared towards the efficient running of the government. The capital city, Takadanobaba, is located in Oshika's only mountain range the Trilby Mountains. The DCMS headquarters is also located there, which means political power actually flows from the garrisoning military unit. The world has little to recommend it for colonization, as it is poor in both natural resources and nutrient weak soil, barely capable of food production on its own. As a result Oshika requires the import of chemical fertilizers. In 3025 several entrepreneurs tried to raise the Oshika Ox (a cross between an elephant and a cow) for commercial export. The Oshika Ox was already a popular foodstuff on Oshika and exporting the animal seemed a logical next step. However, as of 3079 this venture seems to have failed.</desc>
 		<factionChange>
 			<date>2319-01-01</date>
@@ -51464,9 +51464,9 @@ Alphard Trading Corporation [destroyed 3075]</desc>
 		<satellite>Buda</satellite>
 		<climate>5</climate>
 		<socioIndustrial>A-A-A-B-B</socioIndustrial>
-		<landmass>Andrassy (Danube)</landmass>
-		<landmass>Teleki</landmass>
-		<landmass>Ruhr</landmass>
+		<landMass>Andrassy (Danube)</landMass>
+		<landMass>Teleki</landMass>
+		<landMass>Ruhr</landMass>
 		<desc>Pesht was discovered by early explorers from the Ozawan Merchant Clan in 2212. The Ozawan Clan made multiple attempts over the course of several decades to settle the forest covered planet, however, the world's native ape predators interferred with these efforts. The Clan was eventually forced to relinquish the planet to the Draconis Combine. It wasn't until 2320 world was finally settled but only after the Combine "discovered" the ape-like creatures for themselves. After losing an entire settlement did efforts go into nearly exterminating the beast before Pesht was habitable. After clearing the predators, Combine's true intentions for colonizing Pesht were revealed. The planet became a military colony used by the Combine as a launch pad to conqueror neraby worlds. From Pesht, DCMS forces were able to launch military engagements into the Draconis Rift region. Eventually Pesht became the capital of its own military district after Coordinator Martin McAllister implented his restructuring of the Combine's governmental system. The majority of military forces that had been stationed on Pesht when it was originally a staging base were moved to defend the Combine's new capital of Luthien in mid 27th Century. The University of Pesht in Danube is known for its impressive graduate studies, especially in history.</desc>
 	</planet>
 	<planet>
@@ -52549,8 +52549,8 @@ Hadrian Mechanized Industries</desc>
 		<hpg>A</hpg>
 		<lifeForm>6</lifeForm>
 		<socioIndustrial>B-B-C-B-B</socioIndustrial>
-		<landmass>Marsdentica (Allison City)</landmass>
-		<landmass>Steinerheim</landmass>
+		<landMass>Marsdentica (Allison City)</landMass>
+		<landMass>Steinerheim</landMass>
 		<desc>Porrima is a world rich in resources, including ample quantities of industrial metals, and precious gems.  Fertile soil, an abundant water supply and a warm climate make Porriman a thriving agriculture world.  Every sixty-two years the planet goes through a harsh weather cycle known as “wet seasons”. The “wet seasons” consist of weeks of heavy rainfall, deadly lightning, and hurricane-force winds.  These powerful “wet seasons” are brought on by the gravitational pull from Porrima’s inward neighbor, Chira. This results in a planetary “wobble”, throwing the weather into a furor. Unprepared, Porriman’s first settlers were washed away. Colonists have since taken precautions to prevent disasters during the “wet seasons”.   Colonies have moved to higher elevations, and cities are built with safeguards to circumvent the effects of the destructive “wet seasons”. On the southern temperate continent of Marsdentica lies Allison City, the planetary Capital.  Allison City is built with high walls and a series of channels that prevents the overflow of the Equanica and Giovanni rivers. The north polar supercontinent of Steinerheim is the main source of the planet’s mining and agriculture.  Settlements on this continent are far enough inland that the storms have less effect on the population.</desc>
 	</planet>
 	<planet>
@@ -53415,11 +53415,11 @@ While the planet was once home to a sprawling Brigadier Corporation ‘Mech fact
 		<satellite>Taikata</satellite>
 		<climate>3</climate>
 		<socioIndustrial>A-B-B-A-B</socioIndustrial>
-		<landmass>Bragadin (Conqueror’s Pride)</landmass>
-		<landmass>Greater Harpago</landmass>
-		<landmass>Lesser Harpago</landmass>
-		<landmass>Amerigo</landmass>
-		<landmass>Darwin</landmass>
+		<landMass>Bragadin (Conqueror’s Pride)</landMass>
+		<landMass>Greater Harpago</landMass>
+		<landMass>Lesser Harpago</landMass>
+		<landMass>Amerigo</landMass>
+		<landMass>Darwin</landMass>
 		<desc>Proserpina was one of the Core Worlds and home to several major manufacturing firms, including Guided Technologies and Bulldog Enterprises. Their factories, and many others, exploited the petrochemical and mineral resources of the planet directly and refined metals from the metal ores extracted from Proserpina before shipping the refined materials to nearby planets. After the fall of the Star League the world faced nearly constant raids by the Federated Suns. During one of these raids the defending DCMS forces used a nerve gas to destroy the invaders. As a result the planet's surface is mostly poisonous after the Succession Wars; In fact two of its five continents (Amerigo and Greater Harpago) are completely uninhabitable. In 3066, despite the passage of so many years, both the air and water on planet surface are still contaminated. However, the rich minerals of the planet and well developed industry keep the planet and its inhabitants prosperous, even if they do need to wear environmental suits and breathing masks to leave their homes.
 
 The location of Proserpina on the Federated Suns border requires the DCMS to keep a strong garrison on the world. To further fortify their position, the DCMS has establishing an extensive network of refit and supply facilities for defending troops. Proserpina is also known for the University of Proserpina, a military academy that has consistently turned out high-quality graduates for the DCMS.</desc>
@@ -53519,9 +53519,9 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 		<lifeForm>7</lifeForm>
 		<climate>2</climate>
 		<socioIndustrial>A-A-A-B-D</socioIndustrial>
-		<landmass>Cordell (Fair Weather)</landmass>
-		<landmass>Ribbon</landmass>
-		<landmass>Bandeau</landmass>
+		<landMass>Cordell (Fair Weather)</landMass>
+		<landMass>Ribbon</landMass>
+		<landMass>Bandeau</landMass>
 		<desc>Qandahar was settled for its vast natural resources. Unfortunately, the early settlers did not restrain the output of their factories and as a result the ecosystem of Qandahar eventually collapsed. The largely Arab population has frequently clashed with the Combine administrators, trying in a vain plea to clean up the world's pollution. The toxic pollution was so bad that by 3025 50% of the native lifeforms were extinct. The only organisms that could successfully live outside the domed cities were the Toxic Life Forms. Developed on Terra in the mid 22nd century, these organisms consumed and digested toxic waste. In the early 31st century a small underground movement named the "Holy Struggle" attempted to shut down the Dow Nexus Fusion Products factories because of unsafe working conditions for their employees. The struggle became bloody. Though the ISF had several informers and agents in place to destroy the Holy Struggle they never stepped in because of orders from the Coordinator himself, to allow the movement to chastise Dow Nexus.</desc>
 	</planet>
 	<planet>
@@ -54075,9 +54075,9 @@ During its time in the Draconis Combine, Radstadt was infamous for being home to
 		<lifeForm>7</lifeForm>
 		<satellite>Caliban</satellite>
 		<socioIndustrial>B-C-B-A-D</socioIndustrial>
-		<landmass>Tempestia</landmass>
-		<landmass>Tsunamus</landmass>
-		<landmass>Pyrammus</landmass>
+		<landMass>Tempestia</landMass>
+		<landMass>Tsunamus</landMass>
+		<landMass>Pyrammus</landMass>
 		<desc>Rahne is a small planet with very little arable land, an extremely short growing season and scarce water. To make matters worse the planet is constantly assailed by massive dust storms, which have greatly hampered efforts to tap into the mineral wealth available near the surface of the planet. The extreme weather on Rahne is caused by its massive moon Caliban, which is nearly as large as Rahne.
 
 Rahne has four seasons, Storm, Calm, Cold, and Melting, each of which lasts only 21 days. During the Melting season, temperatures often rise above 100 degrees celsius, making it the most dangerous of the four seasons. The extreme weather means that all human dwellings are underground and only during the Calm and Cold seasons can humans survive outside.
@@ -54710,9 +54710,9 @@ If it were not for the constant raids and invasions, Redfield would likely have 
 		<lifeForm>5</lifeForm>
 		<satellite>Zamzama</satellite>
 		<socioIndustrial>A-B-B-A-B</socioIndustrial>
-		<landmass>Chebbin</landmass>
-		<landmass>Tabar</landmass>
-		<landmass>Tinnin (Regulus City)</landmass>
+		<landMass>Chebbin</landMass>
+		<landMass>Tabar</landMass>
+		<landMass>Tinnin (Regulus City)</landMass>
 		<desc>Regulus originally belonged to the Selaj family, until their attempts to kill off the entire Marik line resulted in the Selaj family’s fall from power and expulsion from the Free Worlds League. While the Selaj are gone, their influence remains in the Indian styled architecture that dominates most of the cities on Regulus. Even with the seditious Selaj family removed, Regulus, as the capital of the Principality of Regulus has long been a thorn in the side of the Free Worlds League and the leading Mariks. Regulus is content to enjoy the benefits of being part of the League but is often unwilling or slow to respond to calls for support from the rest of the League.
 
 Trade is the primary industry on Regulus and the planet is a well known trade-port in League space. Aside from the typical trade of goods and services, Regulus is famous for its contributions to entertainment in the Free Worlds League. The planet is a major producer of Holovids and music, which finds its way all throughout League space and into surrounding realms.
@@ -56962,9 +56962,9 @@ As of the 32nd century, this world is little more than an outpost, with no agric
 		<lifeForm>7</lifeForm>
 		<satellite>Radlan</satellite>
 		<socioIndustrial>C-D-C-C-C</socioIndustrial>
-		<landmass>Patra</landmass>
-		<landmass>Katerini</landmass>
-		<landmass>Xanthi</landmass>
+		<landMass>Patra</landMass>
+		<landMass>Katerini</landMass>
+		<landMass>Xanthi</landMass>
 		<desc>Sadurni is a comfortable planet for human habitation and the planet’s economy is primarily based on agriculture. The planet is also renowned for its skilled artisans and stonemasons. Other than food exports, Sadurni is of very limited military importance.</desc>
 	</planet>
 	<planet>
@@ -58080,7 +58080,7 @@ Tengo Aerospace</desc>
 		<satellite>Pupil</satellite>
 		<climate>1</climate>
 		<socioIndustrial>C-C-B-C-D</socioIndustrial>
-		<landmass>Craton (Manahawkin)</landmass>
+		<landMass>Craton (Manahawkin)</landMass>
 		<desc>Savinsville attracts tourists every thirty three years when the world’s three moons come into alignment on the night side, appearing as an immense eye in the sky for a single night.</desc>
 	</planet>
 	<planet>
@@ -58473,8 +58473,8 @@ Although the fall of the First Star League brought an end to terraforming on Sch
 		<satellite>Grant</satellite>
 		<climate>3</climate>
 		<socioIndustrial>B-B-A-A-A</socioIndustrial>
-		<landmass>Colfax (Creekshell)</landmass>
-		<landmass>Lackland</landmass>
+		<landMass>Colfax (Creekshell)</landMass>
+		<landMass>Lackland</landMass>
 		<desc>Schuyler is an agricultural world that gained some significant manufacturing capacity prior to the Rasalhague secession, when it was further away from hostile borders. Schuyler is home to several factories, including one of the Inner Sphere’s few remaining JumpShip manufacturers.</desc>
 	</planet>
 	<planet>
@@ -59673,8 +59673,8 @@ Shiba is home to a Duchy RTC facility, which is located in the flatlands of Abbo
 		<satellite>Nagasaki</satellite>
 		<climate>3</climate>
 		<socioIndustrial>B-B-A-B-C</socioIndustrial>
-		<landmass>Shangai (Irezumi City)</landmass>
-		<landmass>Kasaki Island</landmass>
+		<landMass>Shangai (Irezumi City)</landMass>
+		<landMass>Kasaki Island</landMass>
 		<desc>Shimonita possesses a single large continent surrounded by islands. The surrounding ocean is constantly whipped into a frenzy by massive storm activity that perpetually forms in Shimonita's atmosphere. These storms occasionally flood the coastal areas of Shanghai (the continent), so colonists built their cities well inland, away from the coastlines. Shimonita's ecology provides enough fresh water and arable land to support the local population, but not enough to generate any exports. The same is true of the mineral resources on the world. Geologists from the Ozawa Mercantile Association found large deposits of metal ores off the coast of Shanghai and the Ozawa Mercantile Association quickly negotiated rights to establish offshore and underwater mining operations on Shimonita. When House Kurita established control over the Draconis Combine, the Ozawa Mercantile Association's facilities became property of the Dragon. Within a century, poor maintenance routines and violent weather rendered the offshore and underwater plants useless. Occasionally investors would buy the plants and get them running but these operations never lasted for more than a few decades.</desc>
 	</planet>
 	<planet>
@@ -61572,11 +61572,11 @@ The local population have a pragmatic political approach that can almost be mist
 		<percentWater>82</percentWater>
 		<hpg>B</hpg>
 		<lifeForm>0</lifeForm>
-		<climate>9</climate>
+		<climate>0</climate>
 		<socioIndustrial>B-B-B-B-C</socioIndustrial>
-		<landmass>Soul (Terminus)</landmass>
-		<landmass>Spirit</landmass>
-		<landmass>Eternus</landmass>
+		<landMass>Soul (Terminus)</landMass>
+		<landMass>Spirit</landMass>
+		<landMass>Eternus</landMass>
 		<desc>An inhospitable ice ball orbiting a dim star, Soul tests its inhabitants’ survival abilities every day. Lacking axial tilt in its circular orbit, there are no significant seasonal changes; just long days of bright but cold sunlight and long nights of biting cold. An equator‐girdling network of immense greenhouses, using fusion power for heat and sunlamps, grow food for the locals. The capital city is located on the perpetual terminator at the planet’s northern pole.</desc>
 	</planet>
 	<planet>
@@ -62483,11 +62483,11 @@ Tengo Aerospace</desc>
 		<satellite>Carthage</satellite>
 		<satellite>Clyde</satellite>
 		<socioIndustrial>B-A-B-B-B</socioIndustrial>
-		<landmass>Aberdeenshire</landmass>
-		<landmass>Angus</landmass>
-		<landmass>Highland (Glencoe)</landmass>
-		<landmass>Lanarkshire (New Endinburgh)</landmass>
-		<landmass>Lothian</landmass>
+		<landMass>Aberdeenshire</landMass>
+		<landMass>Angus</landMass>
+		<landMass>Highland (Glencoe)</landMass>
+		<landMass>Lanarkshire (New Endinburgh)</landMass>
+		<landMass>Lothian</landMass>
 		<desc>The native vegetation of Stewart initially gave early settlers a difficult time as they were incompatible with human biology and the native species made it difficult for terran vegetation to live on the planet, forcing settlers to rely on expensive food imports. After some work hybrid of terran and native vegetation made farming possible on Stewart and removed the planet’s reliance on outside food sources. Efforts to alter the ecosystem of Stewart also revealed large deposits of minerals and ores which have made the planet wealthy.
 
 Stewart was the capital of the independent Stewart Commonwealth prior to the formation of the Free Worlds League and continued to be the capital of the Commonwealth after it joined the Free Worlds League.
@@ -63202,9 +63202,9 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 		<lifeForm>2</lifeForm>
 		<satellite>Niflheim</satellite>
 		<socioIndustrial>B-B-A-B-F</socioIndustrial>
-		<landmass>Wessler</landmass>
-		<landmass>Lestrades (Curitiba)</landmass>
-		<landmass>Aberdale</landmass>
+		<landMass>Wessler</landMass>
+		<landMass>Lestrades (Curitiba)</landMass>
+		<landMass>Aberdale</landMass>
 		<desc>Summer is a world of rocky hills and valleys cloaked in shadows, mostly barren except for swaths of purplish scrub-grass.  During the summer months the air is replete with the unusual odors from the blooming native plants.  Despite its weak sun, Summer is a warm world, due to its thinning ozone layer. Fuel production is the main industry of Summer.  The world is rich in crude oil and radioactive metals.  Summer is not an agriculturally sound world.  The soil is not fertile enough to grow enough crops to support the planet’s population.  Summer must rely on trade with neighboring worlds, trading fuel for food.  A collection of commercial refineries on the polar continent of Aberdale are by far the largest producers on the planet.  Deposits of germanium are mined in the Balise Mountains on the continent of Wessler. The continent of Lestrade holds the capital city of Curitiba.</desc>
 	</planet>
 	<planet>
@@ -63754,9 +63754,9 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 		<lifeForm>3</lifeForm>
 		<climate>2</climate>
 		<socioIndustrial>B-B-A-C-A</socioIndustrial>
-		<landmass>Kitatsuru (Yamanashi)</landmass>
-		<landmass>Maudlin</landmass>
-		<landmass>Joy</landmass>
+		<landMass>Kitatsuru (Yamanashi)</landMass>
+		<landMass>Maudlin</landMass>
+		<landMass>Joy</landMass>
 		<desc>Originally an Outworlds Alliance colony populated largely by pacifistic farmers and miners, Tabayama was an early target during the invasion of the Alliance by Star League forces during the Reunification War. On the 25th of July 2585 the Treaty of Cerberus was signed, declaring peace between those involved in the conquest of the Outworlds Alliance. When the treaty took effect on the 1st of August, Tabayama and 13 other planets were formally annexed to the Draconis Combine as a part of the treaty terms. In the 31st century Tabayama was the capital world of the Galedon Military District's Periphery prefecture. Most of the citizens are employed in running the prefecture's government. Interestingly, the importation of white-tailed deer from Terra has led to an ecological crisis. Lacking natural predators, these deer reproduce so quickly that the human population is in constant danger of losing their croplands. In 3025 more than two million citizens of Tabayama were employed as hunters, and they were barely able to keep the deer population under control. Tabayama has taken advantage of their deer problem by exporting venison to several nearby worlds.</desc>
 	</planet>
 	<planet>
@@ -63835,7 +63835,7 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 		<landMass>Danville</landMass>
 		<landMass>North Hamilton</landMass>
 		<landMass>South Hamilton (Calhoun)</landMass>
-		<landmass>Ontario</landmass>
+		<landMass>Ontario</landMass>
 		<socioIndustrial>A-A-C-B-C</socioIndustrial>
 		<desc>Talcott is a highly advanced planet with significant industrialization. The planet is self sufficient in terms of both raw materials and agriculture and is home to a General Motors 'Mech factory. Talcott is a comfortable planet to live on, if a bit cool. The most noticable difference from Terra is the slightly reduced gravity.</desc>
 	</planet>
@@ -64162,7 +64162,7 @@ Forerunner A.G.</desc>
 			<faction>CCO,CSV</faction>
 		</factionChange>
 		<factionChange>
-			<date>3074-12-216</date>
+			<date>3074-12-26</date>
 			<faction>CSV</faction>
 		</factionChange>
 		<factionChange>
@@ -65865,7 +65865,7 @@ Tharkad Aerospace Group</desc>
 			<faction>CW,FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3051-13-22</date>
+			<date>3051-12-23</date>
 			<faction>CW</faction>
 		</factionChange>
 		<factionChange>
@@ -65944,8 +65944,8 @@ Tharkad Aerospace Group</desc>
 		<satellite>Palatine</satellite>
 		<satellite>Ostia</satellite>
 		<socioIndustrial>B-A-B-A-B</socioIndustrial>
-		<landmass>New Assam (Tezpur)</landmass>
-		<landmass>Perugia (Verona)</landmass>
+		<landMass>New Assam (Tezpur)</landMass>
+		<landMass>Perugia (Verona)</landMass>
 		<desc>Tiber is a major manufacturing world in the Principality of Regulus and even though the planet is jointly administered by Regulus and the Duchy of New Assam, Regulus is the primary power on planet and controls the vast majority of the factories located on the continent of Perugia, while the Duchy of New Assam administers the lightly industrialized continent of New Assam. 
 
 Manufacturing centers:
@@ -66010,9 +66010,9 @@ Earthwerks Incorporated</desc>
 		<lifeForm>3</lifeForm>
 		<climate>3</climate>
 		<socioIndustrial>C-C-D-C-A</socioIndustrial>
-		<landmass>Zakatali (Kars Oblast)</landmass>
-		<landmass>Imeretia</landmass>
-		<landmass>Erivan</landmass>
+		<landMass>Zakatali (Kars Oblast)</landMass>
+		<landMass>Imeretia</landMass>
+		<landMass>Erivan</landMass>
 		<desc>The planet Tiflis has little strategic importance. It is simply an average agricultural world that produces large amounts of Terran timber. This timber is harvested and exported, but before it leaves the world it serves as an obstacle to the severe wind storms that arrive on Tiflis every six years.</desc>
 		<factionChange>
 			<date>2319-01-01</date>
@@ -66484,9 +66484,9 @@ Timbuktu has been a staging ground used by the Lyran Commonwealth to coordinate 
 		<satellite>1 (Chikuma)</satellite>
 		<climate>5</climate>
 		<socioIndustrial>A-A-C-B-B</socioIndustrial>
-		<landmass>Shinano (Nagano)</landmass>
-		<landmass>Rikuzen</landmass>
-		<landmass>Onsen</landmass>
+		<landMass>Shinano (Nagano)</landMass>
+		<landMass>Rikuzen</landMass>
+		<landMass>Onsen</landMass>
 		<desc>Togura has the site of Stellar Trek's headquarters and some of their operations for many years. However, due to the lack of appropriate natural resources, most of the ores and metals needed by the facility were imported from other systems. In addition to the shipbuilding industry, tourism is the other primary pillar of Togura's economy. Many people visit the world every year to see the equatorial ocean that surrounds the entire world.</desc>
 		<factionChange>
 			<date>2319-01-01</date>
@@ -66570,10 +66570,10 @@ Timbuktu has been a staging ground used by the Lyran Commonwealth to coordinate 
 		<satellite>Schippke</satellite>
 		<climate>5</climate>
 		<socioIndustrial>A-A-B-A-B</socioIndustrial>
-		<landmass>Tong-Do (West Lime)</landmass>
-		<landmass>Seo-Do</landmass>
-		<landmass>U’san-Do</landmass>
-		<landmass>Ulnung-Do</landmass>
+		<landMass>Tong-Do (West Lime)</landMass>
+		<landMass>Seo-Do</landMass>
+		<landMass>U’san-Do</landMass>
+		<landMass>Ulnung-Do</landMass>
 		<desc>Tok Do is covered by jungles and populated by many bird species. The local birds vary in size from the two meter tall Saurus to the tiny Speck, whose wingspan barely reaches one centimeter. Despite the presence of the Alshain Weapons factory and the Combine's traditional lack of environmental concern, the humidity of Tok Do's atmosphere apparently blocks most of the airborne pollutants that would otherwise have long since polluted most planets.</desc>
 		<factionChange>
 			<date>2319-01-01</date>
@@ -68384,8 +68384,8 @@ With no substantial industry or natural resources, the Blakists largely overlook
 		<satellite>Harmony</satellite>
 		<climate>2</climate>
 		<socioIndustrial>B-C-B-C-B</socioIndustrial>
-		<landmass>Amelia (Unity City)</landmass>
-		<landmass>Manfred</landmass>
+		<landMass>Amelia (Unity City)</landMass>
+		<landMass>Manfred</landMass>
 		<desc>Until the arrival of Pesht Motors, Unity was a quiet world. Barely settled and full of land untouched by humans, the area around the Pesht Motors plant quickly developed into a city. The population of Unity doubled by 3079 after the arrival of Pesht Motors. Though the increased production required by the DCMS to fight the Jihad has helped Unity's economy, the environmental damage inflicted by heavy industry is already being felt. Orville River and Lake Dunn have begun to change in the face of unregulated pollution.</desc>
 		<factionChange>
 			<date>2319-01-01</date>
@@ -69050,8 +69050,8 @@ In the centuries of the Succession Wars, Unukalhai was largely overlooked by inv
 		<lifeForm>5</lifeForm>
 		<satellite>Citadel</satellite>
 		<socioIndustrial>A-B-C-B-C</socioIndustrial>
-		<landmass>Cantania (Orloff City)</landmass>
-		<landmass>Modena</landmass>
+		<landMass>Cantania (Orloff City)</landMass>
+		<landMass>Modena</landMass>
 		<desc>Vanra has a grand military tradition and the planet itself is comfortable for inhabitation, if slightly colder than Terra. The planet is well developed in terms of industry and technology but it does not have an abundance of natural resources or agriculture, only enough to be self sufficient on both counts.</desc>
 	</planet>
 	<planet>
@@ -72219,8 +72219,8 @@ Woodstock‘s third continent, Essex, is the only blemish on this otherwise beau
 		<satellite>Henan</satellite>
 		<climate>3</climate>
 		<socioIndustrial>A-C-D-C-C</socioIndustrial>
-		<landmass>Zhumadian (Nanyang)</landmass>
-		<landmass>Zhejiang</landmass>
+		<landMass>Zhumadian (Nanyang)</landMass>
+		<landMass>Zhejiang</landMass>
 		<desc>Xinyang is the capital world of the Xinyang Prefecture. Located in the center of the Draconis Combine close to Luthien, Xinyang wasn't subject to raids like many of the border worlds. The only resource Xinyang has a large supply of is fresh water, otherwise it would be an industrial powerhouse. Given its relatively central location, the DCMS and DCA use it as a trans-shipment point and administrative headquarters. There is also a major military hospital on the world, and the ISF maintains a facility to debrief soldiers returning from the front lines. This hospital can house up to ten thousand patients at once, but the Jihad strained even this massive facility. The planet cannot produce enough food to feed all its residents, so shipments of food are quite common.</desc>
 		<factionChange>
 			<date>2319-01-01</date>
@@ -78201,7 +78201,7 @@ However, the Devil's Brigade had one striking success: they found the ancient st
 		<subtype>2</subtype>
 		<luminosity>V</luminosity>
 		<sysPos>3</sysPos>
-		<satelite>Tonegawa Major</satelite>
+		<satellite>Tonegawa Major</satellite>
 		<landMass>Nedze</landMass>
 		<landMass>Naxus</landMass>
 		<landMass>Kozuf</landMass>
@@ -78356,7 +78356,7 @@ However, the Devil's Brigade had one striking success: they found the ancient st
 		<subtype>1</subtype>
 		<luminosity>V</luminosity>
 		<sysPos>4</sysPos>
-		<satelite>Francois</satelite>
+		<satellite>Francois</satellite>
 	</planet>
 	<planet>
 		<name>Gabenstad</name>
