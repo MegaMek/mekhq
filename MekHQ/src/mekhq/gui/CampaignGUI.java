@@ -4600,7 +4600,7 @@ public class CampaignGUI extends JPanel {
             String skillLvl = "Unknown";
             int TimePerDay = 0;
             for (Person tech : getCampaign().getTechs()) {
-                if (getCampaign().isWorkingOnRefit(tech)) {
+                if (getCampaign().isWorkingOnRefit(tech) || tech.isEngineer()) {
                     continue;
                 }
                 if (tech.getSecondaryRole() == Person.T_MECH_TECH || tech.getSecondaryRole() == Person.T_MECHANIC || tech.getSecondaryRole() == Person.T_AERO_TECH) {
