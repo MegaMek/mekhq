@@ -82,7 +82,9 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
                     gui.showRetirementDefectionDialog();
                     break;
                 }
-                gui.getCampaign().newDay();
+               if(!gui.getCampaign().newDay()) {
+                   break;
+               }
                 //String newLogString = logPanel.getLogText();
                 //newLogString = newLogString.concat(gui.getCampaign().getCurrentReportHTML());
                 if(firstDay) {

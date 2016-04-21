@@ -90,6 +90,7 @@ import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.VTOL;
+import megamek.common.event.EventBus;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.GameOptions;
@@ -106,6 +107,8 @@ import mekhq.MekHqXmlUtil;
 import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.Version;
+import mekhq.campaign.event.DayEndingEvent;
+import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
@@ -2005,7 +2008,11 @@ public class Campaign implements Serializable {
     	return Math.max(total, role);
     }
 
-    public void newDay() {
+    /** @return <code>true</code> if the new day arrived */
+    public boolean newDay() {
+        if(EventBus.triggerEvent(new DayEndingEvent(this))) {
+            return false;
+        }
         calendar.add(Calendar.DAY_OF_MONTH, 1);
         currentReport.clear();
         currentReportHTML = "";
@@ -2572,6 +2579,8 @@ public class Campaign implements Serializable {
         }
         // check for anything else in finances
         finances.newDay(this);
+        EventBus.triggerEvent(new NewDayEvent(this));
+        return true;
     }
 
     private ArrayList<Contract> getActiveContracts() {

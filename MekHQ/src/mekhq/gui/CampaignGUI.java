@@ -3971,7 +3971,9 @@ public class CampaignGUI extends JPanel {
                 return;
             }
         }
-        getCampaign().newDay();
+        if(!getCampaign().newDay()) {
+            return;
+        }
         refreshScenarioList();
         refreshMissions();
         refreshServicedUnitList();
