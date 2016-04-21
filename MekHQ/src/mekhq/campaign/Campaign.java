@@ -587,6 +587,10 @@ public class Campaign implements Serializable {
             force.addUnit(u.getId());
             u.setScenarioId(force.getScenarioId());
             if (null != force.getTechID()) {
+                if (null != u.getTech()) {
+                    Person oldTech = u.getTech();
+                    oldTech.removeTechUnitId(u.getId());
+                }
             	Person forceTech = getPerson(force.getTechID());
             	if (forceTech.canTech(u.getEntity())) {
             	    u.setTech(force.getTechID());
