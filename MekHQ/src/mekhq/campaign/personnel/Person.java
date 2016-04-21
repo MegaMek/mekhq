@@ -941,6 +941,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 			id = UUID.randomUUID();
 		}
 		baby.setId(id);
+		baby.setAncestorsID(tmpAncID);
 		campaign.addReport(getName() + " has given birth to " + baby.getName() + ", a baby " + (baby.getGender() == G_MALE ? "boy!" : "girl!"));
 		setDueDate(null);
 		return baby;
