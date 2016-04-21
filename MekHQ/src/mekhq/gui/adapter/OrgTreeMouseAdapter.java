@@ -117,6 +117,10 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 		for (UUID uuid : singleForce.getAllUnits()) {
                 			Unit u = gui.getCampaign().getUnit(uuid);
                 			if (u != null) {
+                			    if (null != u.getTech()) {
+                			        Person oldTech = u.getTech();
+                			        oldTech.removeTechUnitId(u.getId());
+                			    }
                 				u.setTech(tech.getId());
                 				tech.addTechUnitID(u.getId());
                 			}
