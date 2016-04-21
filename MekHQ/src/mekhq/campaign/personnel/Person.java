@@ -3800,4 +3800,29 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public void setEngineer(boolean b) {
     	engineer = b;
     }
+    
+    public String getChildList() {
+        String childList = "";
+        for (Ancestors a : campaign.getAncestors()) {
+            if (getId().equals(a.getMotherID()) || getId().equals(a.getFatherID())) {
+                for (Person p : campaign.getPersonnel()) {
+                    if (a.getId().equals(p.getAncestorsID())) {
+                        childList = p.getFullName() + "<br>";
+                    }
+                }
+            }
+        }
+        return "<html>" + childList + "<html>";
+    }
+
+    public boolean hasChildren() {
+        boolean hasKids = false;
+        for (Ancestors a : campaign.getAncestors()) {
+            if (getId().equals(a.getMotherID()) || getId().equals(a.getFatherID())) {
+                hasKids = true;
+                break;
+            }
+        }
+        return hasKids;
+    }
 }
