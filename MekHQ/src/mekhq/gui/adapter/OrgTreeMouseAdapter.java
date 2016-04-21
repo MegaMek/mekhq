@@ -117,6 +117,10 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 		for (UUID uuid : singleForce.getAllUnits()) {
                 			Unit u = gui.getCampaign().getUnit(uuid);
                 			if (u != null) {
+                			    if (null != u.getTech()) {
+                			        Person oldTech = u.getTech();
+                			        oldTech.removeTechUnitId(u.getId());
+                			    }
                 				u.setTech(tech.getId());
                 				tech.addTechUnitID(u.getId());
                 			}
@@ -459,7 +463,7 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                         menu = new JMenu("Add Tech to Force");
                         menu.setEnabled(false);
                         for (Person tech : gui.getCampaign().getTechs()) {
-                        	if (tech.getMaintenanceTimeUsing() == 0) {
+                        	if (tech.getMaintenanceTimeUsing() == 0 && !tech.isEngineer()) {
                         		String skillLvl = "Unknown";
                         		skillLvl = SkillType.getExperienceLevelName(tech.getExperienceLevel(false));
                         		menuItem = new JMenuItem(tech.getFullTitle() + " (" + skillLvl + ", " + tech.getRoleDesc() + ")");
