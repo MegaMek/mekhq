@@ -63,6 +63,7 @@ import megamek.common.util.EncodeControl;
 import megamek.server.Server;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.handler.XPHandler;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
@@ -145,6 +146,7 @@ public class MekHQ implements GameListener {
         //read in preferences
     	readPreferences();
     	setLookAndFeel();
+    	initEventHandlers();
         //create a start up frame and display it
         StartUpGUI sud = new StartUpGUI(this);
         sud.setVisible(true);
@@ -507,5 +509,10 @@ public class MekHQ implements GameListener {
 
 	public IconPackage getIconPackage() {
 	    return iconPackage;
+	}
+	
+	// TODO: This needs to be way more flexible, but it will do for now.
+	private void initEventHandlers() {
+	    EVENT_BUS.register(new XPHandler());
 	}
 }

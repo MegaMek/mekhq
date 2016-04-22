@@ -168,7 +168,8 @@ public class CampaignOptions implements Serializable {
     private int targetIdleXP;
     private int monthsIdleXP;
     private int contractNegotiationXP;
-    private int adminWeeklyXP;
+    private int adminXP;
+    private int adminXPPeriod;
 
     //repair related
     private boolean destroyByMargin;
@@ -316,7 +317,8 @@ public class CampaignOptions implements Serializable {
         targetIdleXP = 10;
         monthsIdleXP = 2;
         contractNegotiationXP = 0;
-        adminWeeklyXP = 0;
+        adminXP = 0;
+        adminXPPeriod = 1;
         unitRatingMethod = UnitRatingMethod.INTERSTELLAR_OPS;
         waitingPeriod = 7;
         acquisitionSkill = S_TECH;
@@ -1010,12 +1012,20 @@ public class CampaignOptions implements Serializable {
         contractNegotiationXP = m;
     }
 
-    public int getAdminWeeklyXP() {
-        return adminWeeklyXP;
+    public int getAdminXP() {
+        return adminXP;
     }
 
-    public void setAdminWeeklyXP(int m) {
-        adminWeeklyXP = m;
+    public void setAdminXP(int m) {
+        adminXP = m;
+    }
+
+    public int getAdminXPPeriod() {
+        return adminXPPeriod;
+    }
+
+    public void setAdminXPPeriod(int m) {
+        adminXPPeriod = m;
     }
 
     public int getWaitingPeriod() {
@@ -1772,7 +1782,8 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "targetIdleXP", targetIdleXP);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "monthsIdleXP", monthsIdleXP);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "contractNegotiationXP", contractNegotiationXP);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "adminWeeklyXP", adminWeeklyXP);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "adminWeeklyXP", adminXP);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "adminXPPeriod", adminXPPeriod);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "limitByYear", limitByYear);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "disallowExtinctStuff", disallowExtinctStuff);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowClanPurchases", allowClanPurchases);
@@ -2038,7 +2049,9 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("contractNegotiationXP")) {
                 retVal.contractNegotiationXP = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("adminWeeklyXP")) {
-                retVal.adminWeeklyXP = Integer.parseInt(wn2.getTextContent().trim());
+                retVal.adminXP = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("adminXPPeriod")) {
+                retVal.adminXPPeriod = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("waitingPeriod")) {
                 retVal.waitingPeriod = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("healWaitingPeriod")) {
