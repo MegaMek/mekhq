@@ -38,6 +38,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import megamek.client.Client;
+import megamek.common.event.EventBus;
 import megamek.common.event.GameBoardChangeEvent;
 import megamek.common.event.GameBoardNewEvent;
 import megamek.common.event.GameCFREvent;
@@ -84,7 +85,8 @@ public class MekHQ implements GameListener {
 	public static String PROPERTIES_FILE = "mmconf/mekhq.properties";
 	public static String PRESET_DIR = "./mmconf/mhqPresets/";
 
-
+	public static final EventBus EVENT_BUS = new EventBus();
+	
 	//stuff related to MM games
     private Server myServer = null;
     private GameThread gameThread = null;
@@ -133,7 +135,7 @@ public class MekHQ implements GameListener {
 	protected static MekHQ getInstance() {
 		return new MekHQ();
 	}
-
+	
     /**
      * At startup create and show the main frame of the application.
      */

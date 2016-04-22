@@ -90,7 +90,6 @@ import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.VTOL;
-import megamek.common.event.EventBus;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.GameOptions;
@@ -2010,7 +2009,7 @@ public class Campaign implements Serializable {
 
     /** @return <code>true</code> if the new day arrived */
     public boolean newDay() {
-        if(EventBus.triggerEvent(new DayEndingEvent(this))) {
+        if(MekHQ.EVENT_BUS.trigger(new DayEndingEvent(this))) {
             return false;
         }
         calendar.add(Calendar.DAY_OF_MONTH, 1);
@@ -2579,7 +2578,7 @@ public class Campaign implements Serializable {
         }
         // check for anything else in finances
         finances.newDay(this);
-        EventBus.triggerEvent(new NewDayEvent(this));
+        MekHQ.EVENT_BUS.trigger(new NewDayEvent(this));
         return true;
     }
 
