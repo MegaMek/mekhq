@@ -80,6 +80,8 @@ public class PersonViewPanel extends javax.swing.JPanel {
     private javax.swing.JLabel lblAdvancedMedical2;
     private javax.swing.JLabel lblSpouse1;
     private javax.swing.JLabel lblSpouse2;
+    private javax.swing.JLabel lblChildren1;
+    private javax.swing.JLabel lblChildren2;
 
     ResourceBundle resourceMap = null;
 
@@ -277,6 +279,8 @@ public class PersonViewPanel extends javax.swing.JPanel {
         lblAdvancedMedical2 = new JLabel();
         lblSpouse1 = new JLabel();
         lblSpouse2 = new JLabel();
+        lblChildren1 = new JLabel();
+        lblChildren2 = new JLabel();
 
         java.awt.GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new GridBagLayout());
@@ -482,6 +486,30 @@ public class PersonViewPanel extends javax.swing.JPanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblSpouse2, gridBagConstraints);
+        }
+
+        if (campaign.getCampaignOptions().useParentage() && person.hasChildren()) {
+            secondy++;
+            lblChildren1.setName("lblChildren1"); // NOI18N //$NON-NLS-1$
+            lblChildren1.setText(resourceMap.getString("lblChildren1.text")); //$NON-NLS-1$
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = secondy;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblChildren1, gridBagConstraints);
+
+            lblChildren2.setName("lblChildren2"); // NOI18N //$NON-NLS-1$
+            lblChildren2.setText(person.getChildList());
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = secondy;
+            gridBagConstraints.gridwidth = 3;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblChildren2, gridBagConstraints);
         }
 
         if(campaign.getCampaignOptions().useAbilities() && person.countOptions(PilotOptions.LVL3_ADVANTAGES) > 0) {

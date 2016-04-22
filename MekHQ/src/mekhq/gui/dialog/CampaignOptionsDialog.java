@@ -293,6 +293,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JTextField txtMaxAcquisitions;
     private JCheckBox chkUseUnofficialProcreation;
     private JCheckBox chkUseUnofficialProcreationNoRelationship;
+    private JCheckBox chkUseParentage;
     private JCheckBox chkUseTransfers;
 
 
@@ -1450,9 +1451,14 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = 18;
         panPersonnel.add(chkUseUnofficialProcreationNoRelationship, gridBagConstraints);
 
+        chkUseParentage = new JCheckBox("Display children in the person panel");
+        chkUseParentage.setSelected(options.useParentage());
+        gridBagConstraints.gridy = 19;
+        panPersonnel.add(chkUseParentage, gridBagConstraints);
+
         chkUseTransfers = new JCheckBox("Log Saver - Use Reassign instead of Remove/Assign"); // NOI18N
         chkUseTransfers.setSelected(options.useTransfers());
-        gridBagConstraints.gridy = 19;
+        gridBagConstraints.gridy = 20;
         panPersonnel.add(chkUseTransfers, gridBagConstraints);
 
         JPanel panSalary = new JPanel(new GridBagLayout());
@@ -1557,7 +1563,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 20;
+        gridBagConstraints.gridheight = 21;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -4173,6 +4179,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setTougherHealing(useTougherHealing.isSelected());
         options.setUseUnofficialProcreation(chkUseUnofficialProcreation.isSelected());
         options.setUseUnofficialProcreationNoRelationship(chkUseUnofficialProcreationNoRelationship.isSelected());
+        options.setUseParentage(chkUseParentage.isSelected());
         options.setUseTransfers(chkUseTransfers.isSelected());
         options.setDefaultPrisonerStatus(comboPrisonerStatus.getSelectedIndex());
 
