@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -366,6 +367,24 @@ public class ExtraData {
         
         public String toString(T val) {
             return (null != val) ? val.toString() : null;
+        }
+        
+        @Override
+        public int hashCode() {
+            return Objects.hash(name, type);
+        }
+        
+        @Override
+        public boolean equals(Object object) {
+            if(this == object) {
+                return true;
+            }
+            if((null == object) || (getClass() != object.getClass())) {
+                return false;
+            }
+            @SuppressWarnings("unchecked")
+            final Key<T> other = (Key<T>) object;
+            return Objects.equals(name, other.name) && (type == other.type);
         }
     }
     
