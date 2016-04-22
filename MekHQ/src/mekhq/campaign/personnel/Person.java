@@ -33,7 +33,6 @@ import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
