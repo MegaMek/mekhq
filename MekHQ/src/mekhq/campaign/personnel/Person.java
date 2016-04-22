@@ -33,6 +33,7 @@ import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
@@ -67,6 +68,7 @@ import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.ExtraData;
 import mekhq.campaign.LogEntry;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
@@ -273,6 +275,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     private int originalUnitWeight; // uses EntityWeightClass; 0 (Extra-Light) for no original unit
     private int originalUnitTech; // 0 = IS1, 1 = IS2, 2 = Clan
     private UUID originalUnitId;
+    
+    // Generic extra data, for use with plugins and mods
+    private ExtraData extraData = new ExtraData();
 
     //lets just go ahead and pass in the campaign - to hell with OOP
     private Campaign campaign;
@@ -1074,6 +1079,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public boolean isInActive() {
         return getStatus() != S_ACTIVE;
     }
+    
+    public ExtraData getExtraData() {
+        return extraData;
+    }
 
     public void writeToXml(PrintWriter pw1, int indent) {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
@@ -1329,6 +1338,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                 + "<acquisitions>"
                 + acquisitions
                 + "</acquisitions>");
+        if(null != extraData) {
+            extraData.writeToXml(pw1);
+        }
        pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
     }
 
@@ -1560,6 +1572,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     retVal.originalUnitTech = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitId")) {
                     retVal.originalUnitId = UUID.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("extraData")) {
+                    retVal.extraData = ExtraData.createFromXml(wn2);
                 }
             }
 
