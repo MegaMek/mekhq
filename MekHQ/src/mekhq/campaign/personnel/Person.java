@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.UUID;
@@ -3803,17 +3804,20 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
     
     public String getChildList() {
-        String childList = "";
-        for (Ancestors a : campaign.getAncestors()) {
-            if (getId().equals(a.getMotherID()) || getId().equals(a.getFatherID())) {
-                for (Person p : campaign.getPersonnel()) {
-                    if (a.getId().equals(p.getAncestorsID())) {
-                        childList = p.getFullName() + "<br>";
-                    }
-                }
+        List<UUID> ancestors = new ArrayList<>();
+        for(Ancestors a : campaign.getAncestors()) {
+            if((null != a)
+                && getId().equals(a.getMotherID()) || getId().equals(a.getFatherID())) {
+                ancestors.add(a.getId());
             }
         }
-        return "<html>" + childList + "<html>";
+        List<String> children = new ArrayList<>();
+        for (Person p : campaign.getPersonnel()) {
+            if(ancestors.contains(p.getAncestorsID())) {
+                children.add(p.getFullName());
+            }
+        }
+        return "<html>" + Utilities.combineString(children, "<br/>") + "</html>";
     }
 
     public boolean hasChildren() {

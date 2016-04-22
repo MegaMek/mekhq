@@ -1,6 +1,15 @@
 VERSION HISTORY
 ----------------------------------
 v0.3.28-git
++ PR #60: UI Enhancement - Show children in person panel
++ Adding two CampaignEvent events: DayEndingEvent (cancellable), NewDayEvent
++ Bug #59: Ancestor Id not set at birth
++ Bug #57: Tech not properly removed when adding a unit to a force that already included a tech.
++ Bug #56: Adding a lance tech would not clear the units from the old techs
++ Bug #55: Assign Tech to lance should not include vessel crewman
++ Bug #1: Ship engineers now show up in refit tech list
++ PR #52: Updating tonnage/mass to use doubles to avoid rounding errors
++ Syntax errors in planetary data fixed
 + Bug [#925]: Issues with reload of MHQ and Settings
 + [AtB] When failure to deploy results in defeat, replace generated entities with stubs.
 + Issue #40: [ATB] 3.25 : Enemy reinforcements incorrectly set to deploy at the start of the game
