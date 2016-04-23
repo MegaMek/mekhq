@@ -485,7 +485,7 @@ public final class StarUtil {
             if( type.length() > 1 + subTypeString.length() && null == parsedLuminosity ) {
                 // We might have a luminosity, try to parse it
                 parsedLuminosity = validateLuminosity(type.substring(1 + subTypeString.length()));
-                if( parsedLuminosity.equals(Planet.LUM_VII) ) {
+                if( null != parsedLuminosity && parsedLuminosity.equals(Planet.LUM_VII) ) {
                     // That's not how white dwarfs work
                     return null;
                 }
