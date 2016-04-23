@@ -5415,6 +5415,10 @@ public class Campaign implements Serializable {
                     bestF = currentF;
                 }
             }
+            if(null == bestMatch) {
+                // We're done - probably failed to find anything
+                break;
+            }
             current = bestMatch;
             closed.add(current);
             open.remove(current);
