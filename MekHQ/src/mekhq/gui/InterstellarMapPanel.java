@@ -424,7 +424,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                 }
             } else {
                 // Just a black circle then
-                g2.setPaint(Color.WHITE);
+                g2.setPaint(Color.BLACK);
                 arc.setArcByCenter(x, y, size, 0, 360.0, Arc2D.PIE);
                 g2.fill(arc);
             }
