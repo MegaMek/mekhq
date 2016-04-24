@@ -1084,6 +1084,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         return extraData;
     }
 
+    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
@@ -1341,7 +1342,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         if(null != extraData) {
             extraData.writeToXml(pw1);
         }
-       pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
     }
 
     public static Person generateInstanceFromXML(Node wn, Campaign c, Version version) {
