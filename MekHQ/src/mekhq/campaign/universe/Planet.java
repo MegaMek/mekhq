@@ -678,9 +678,9 @@ public class Planet implements Serializable {
     public String getRechargeTimeText(DateTime when) {
         Integer time = getRechargeTime(when);
         if(null == time) {
-            return "∞"; //$NON-NLS-1$
+            return "recharging impossible"; //$NON-NLS-1$
         } else {
-            return String.format("%d", time); //$NON-NLS-1$
+            return String.format("%d hours", time); //$NON-NLS-1$
         }
     }
     
