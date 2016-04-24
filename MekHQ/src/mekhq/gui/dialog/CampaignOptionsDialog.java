@@ -283,6 +283,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JSpinner spnMonthsIdleXP;
     private JSpinner spnContractNegotiationXP;
     private JSpinner spnAdminWeeklyXP;
+    private JSpinner spnAdminWeeklyXPPeriod;
 
     private JCheckBox chkSupportStaffOnly;
     private JSpinner spnAcquireWaitingPeriod;
@@ -2088,7 +2089,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panXP.add(new JLabel("XP awarded to the selected negotiator for a new contract"), gridBagConstraints);
 
-        spnAdminWeeklyXP = new JSpinner(new SpinnerNumberModel(options.getAdminWeeklyXP(), 0, 10000, 1));
+        spnAdminWeeklyXP = new JSpinner(new SpinnerNumberModel(options.getAdminXP(), 0, 10000, 1));
         ((JSpinner.DefaultEditor) spnAdminWeeklyXP.getEditor()).getTextField().setEditable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -2103,7 +2104,24 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        panXP.add(new JLabel("XP awarded to each administrator every Monday for the work of the previous week"), gridBagConstraints);
+        panXP.add(new JLabel("XP awarded to each administrator every Monday for the work of the previous"), gridBagConstraints);
+
+        spnAdminWeeklyXPPeriod = new JSpinner(new SpinnerNumberModel(options.getAdminXPPeriod(), 1, 100, 1));
+        ((JSpinner.DefaultEditor) spnAdminWeeklyXPPeriod.getEditor()).getTextField().setEditable(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panXP.add(spnAdminWeeklyXPPeriod, gridBagConstraints);
+
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panXP.add(new JLabel("week(s)"), gridBagConstraints);
 
         txtInstructionsXP = new JTextArea();
         txtInstructionsXP.setText(resourceMap.getString("txtInstructionsXP.text"));
@@ -4156,7 +4174,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setIdleXP((Integer) spnIdleXP.getModel().getValue());
         options.setMonthsIdleXP((Integer) spnMonthsIdleXP.getModel().getValue());
         options.setContractNegotiationXP((Integer) spnContractNegotiationXP.getModel().getValue());
-        options.setAdminWeeklyXP((Integer) spnAdminWeeklyXP.getModel().getValue());
+        options.setAdminXP((Integer) spnAdminWeeklyXP.getModel().getValue());
+        options.setAdminXPPeriod((Integer) spnAdminWeeklyXPPeriod.getModel().getValue());
         options.setTargetIdleXP((Integer) spnTargetIdleXP.getModel().getValue());
 
         options.setLimitByYear(limitByYearBox.isSelected());
