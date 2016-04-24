@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
 v0.3.28-git
++ Bug #43 / PR #62: Making admins gain their XP less often than once per week if requested,
+                    have that option work independently from AtB.
 + PR #60: UI Enhancement - Show children in person panel
 + Adding two CampaignEvent events: DayEndingEvent (cancellable), NewDayEvent
 + Bug #59: Ancestor Id not set at birth
