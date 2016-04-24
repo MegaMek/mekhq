@@ -231,7 +231,7 @@ public class PlanetViewPanel extends JPanel {
         pnlStats.add(lblStarType, gridBagConstraints);
         
         txtStarType.setName("lblStarType2"); // NOI18N
-        txtStarType.setText(planet.getSpectralType() + " (" + planet.getRechargeTime(currentDate) + " hours)");
+        txtStarType.setText(planet.getSpectralTypeText() + " (" + planet.getRechargeTimeText(currentDate) + " hours)");
         txtStarType.setEditable(false);
         txtStarType.setLineWrap(true);
         txtStarType.setWrapStyleWord(true);

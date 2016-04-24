@@ -102,7 +102,7 @@ public class JumpPathViewPanel extends javax.swing.JPanel {
 		javax.swing.JLabel lblPlanet;
 		DateTime currentDate = new DateTime(campaign.getCalendar());
 		for(Planet planet : path.getPlanets()) {
-			lblPlanet = new javax.swing.JLabel(planet.getPrintableName(currentDate) + " (" + planet.getRechargeTime(currentDate) + " hours)");
+			lblPlanet = new javax.swing.JLabel(planet.getPrintableName(currentDate) + " (" + planet.getRechargeTimeText(currentDate) + " hours)");
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = i;

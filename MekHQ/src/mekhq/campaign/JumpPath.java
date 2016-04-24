@@ -106,7 +106,11 @@ public class JumpPath implements Serializable {
 			if(planet.equals(getLastPlanet())) {
 				continue;
 			}
-			rechargeTime += planet.getRechargeTime(null);
+			Integer starRechargeTime = planet.getRechargeTime(null);
+			if(null == starRechargeTime) {
+			    return Double.POSITIVE_INFINITY;
+			}
+			rechargeTime += starRechargeTime;
 		}
 		return rechargeTime/24.0;
 	}

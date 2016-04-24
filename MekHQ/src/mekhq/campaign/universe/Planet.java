@@ -84,6 +84,8 @@ public class Planet implements Serializable {
     public static final int SPECTRAL_Y = 9;
     // Spectral class "D" (white dwarfs) are determined by their luminosity "VII" - the number is here for sorting
     public static final int SPECTRAL_D = 99;
+    // "Q" - not a proper star (neutron stars QN, pulsars QP, black holes QB, ...)
+    public static final int SPECTRAL_Q = 100;
     // TODO: Wolf-Rayet stars ("W"), carbon stars ("C"), S-type stars ("S"), 
     
     public static final String LUM_0           = "0"; //$NON-NLS-1$
@@ -344,6 +346,21 @@ public class Planet implements Serializable {
         return null != spectralType ? StarUtil.getSpectralType(spectralClass, subtype, luminosity) : "?"; //$NON-NLS-1$
     }
     
+    public String getSpectralTypeText() {
+        if(null == spectralType || spectralType.isEmpty()) {
+            return "unknown";
+        }
+        if(spectralType.startsWith("Q")) {
+            switch(spectralType) {
+                case "QB": return "black hole"; //$NON-NLS-1$
+                case "QN": return "neutron star"; //$NON-NLS-1$
+                case "QP": return "pulsar"; //$NON-NLS-1$
+                default: return "unknown";
+            }
+        }
+        return spectralType;
+    }
+
     public Integer getSpectralClass() {
         return spectralClass;
     }
@@ -642,7 +659,7 @@ public class Planet implements Serializable {
     }
     
     /** Recharge time in hours (assuming the usage of the fastest charing method available) */
-    public int getRechargeTime(DateTime when) {
+    public Integer getRechargeTime(DateTime when) {
         if(isZenithCharge(when) || isNadirCharge(when)) {
             return Math.min(176, 141 + 10*spectralClass + subtype.intValue());
         } else {
@@ -651,13 +668,22 @@ public class Planet implements Serializable {
     }
     
     /** Recharge time in hours using solar radiation alone (at jump point and 100% efficiency) */
-    public int getSolarRechargeTime() {
+    public Integer getSolarRechargeTime() {
         if( null == spectralClass || null == subtype ) {
             return 183;
         }
         return StarUtil.getSolarRechargeTime(spectralClass, subtype);
     }
 
+    public String getRechargeTimeText(DateTime when) {
+        Integer time = getRechargeTime(when);
+        if(null == time) {
+            return "∞"; //$NON-NLS-1$
+        } else {
+            return String.format("%d", time); //$NON-NLS-1$
+        }
+    }
+    
     // Astronavigation
     
     /** @return the average travel time from low orbit to the jump point at 1g, in Terran days */

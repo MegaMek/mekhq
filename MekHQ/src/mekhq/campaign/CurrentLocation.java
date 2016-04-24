@@ -98,8 +98,9 @@ public class CurrentLocation implements Serializable {
 	}
 	
 	public String getReport(Date date) {
+	    DateTime now = new DateTime(date);
 		String toReturn = "<b>Current Location</b><br>";
-		toReturn += currentPlanet.getShortDesc(new DateTime(date)) + "<br> ";
+		toReturn += currentPlanet.getShortDesc(now) + "<br> ";
 		if(null != jumpPath && !jumpPath.isEmpty()) {
 			toReturn += "In transit to " + jumpPath.getLastPlanet().getPrintableName(new DateTime(date)) + " ";
 		}
@@ -111,7 +112,9 @@ public class CurrentLocation implements Serializable {
 		} else {
 			toReturn += "<i>" + Math.round(100.0*getTransitTime())/100.0 + " days out </i>";
 		}
-		toReturn += ", <i>" + Math.round(100.0*rechargeTime/currentPlanet.getRechargeTime(new DateTime(date))) + "% charged</i>";
+		if(null != currentPlanet.getRechargeTime(now)) {
+		    toReturn += ", <i>" + Math.round(100.0*rechargeTime/currentPlanet.getRechargeTime(now)) + "% charged</i>";
+		}
 		return "<html>" + toReturn + "</html>";
 	}
 	
@@ -132,11 +135,15 @@ public class CurrentLocation implements Serializable {
 		//because jumpships don't go anywhere
 	    DateTime currentDate = new DateTime(campaign.getCalendar());
 		double hours = 24.0;
-		double usedRechargeTime = Math.min(hours, currentPlanet.getRechargeTime(currentDate) - rechargeTime);
+		Integer neededRechargeTime = currentPlanet.getRechargeTime(currentDate);
+		if(null == neededRechargeTime) {
+		    neededRechargeTime = Integer.MAX_VALUE;
+		}
+		double usedRechargeTime = Math.min(hours, neededRechargeTime - rechargeTime);
 		if(usedRechargeTime > 0) {
 			campaign.addReport("Jumpships spent " + Math.round(100.0 * usedRechargeTime)/100.0 + " hours recharging drives");
 			rechargeTime += usedRechargeTime;
-			if(rechargeTime >= currentPlanet.getRechargeTime(currentDate)) {
+			if(rechargeTime >= neededRechargeTime) {
 				campaign.addReport("Jumpship drives full charged");
 			}
 		}
@@ -155,7 +162,7 @@ public class CurrentLocation implements Serializable {
 					campaign.addReport("Jump point reached");
 				}
 			}
-			if(isAtJumpPoint() && rechargeTime >= currentPlanet.getRechargeTime(currentDate)) {
+			if(isAtJumpPoint() && rechargeTime >= neededRechargeTime) {
 				//jump
 				if(campaign.getCampaignOptions().payForTransport()) {				    
 					if(!campaign.getFinances().debit(campaign.calculateCostPerJump(true), Transaction.C_TRANSPORT, "jump from " + currentPlanet.getName(currentDate) + " to " + jumpPath.get(1).getName(currentDate), campaign.getCalendar().getTime())) {
@@ -171,11 +178,11 @@ public class CurrentLocation implements Serializable {
 				transitTime = currentPlanet.getTimeToJumpPoint(1.0);
 				rechargeTime = 0;
 				//if there are hours remaining, then begin recharging jump drive
-				usedRechargeTime = Math.min(hours, currentPlanet.getRechargeTime(currentDate) - rechargeTime);
+				usedRechargeTime = Math.min(hours, neededRechargeTime - rechargeTime);
 				if(usedRechargeTime > 0) {
 					campaign.addReport("Jumpships spent " + Math.round(100.0 * usedRechargeTime)/100.0 + " hours recharging drives");
 					rechargeTime += usedRechargeTime;
-					if(rechargeTime >= currentPlanet.getRechargeTime(currentDate)) {
+					if(rechargeTime >= neededRechargeTime) {
 						campaign.addReport("Jumpship drives full charged");
 					}
 				}

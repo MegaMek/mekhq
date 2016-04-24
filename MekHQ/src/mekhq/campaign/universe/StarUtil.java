@@ -352,11 +352,15 @@ public final class StarUtil {
         return Utilities.lerp(getMinLifeZone(spectralTypeNumber), getMinLifeZone(spectralTypeNumber), remainder);
     }
 
-    public static int getSolarRechargeTime(int spectralClass, double subtype) {
-        if( spectralClass == Planet.SPECTRAL_T ) {
+    public static Integer getSolarRechargeTime(int spectralClass, double subtype) {
+        if(spectralClass == Planet.SPECTRAL_Q) {
+            // Not a star, can't recharge here
+            return null;
+        }
+        if(spectralClass == Planet.SPECTRAL_T) {
             // months!
             return RECHARGE_HOURS_CLASS_T[(int)subtype];
-        } else if( spectralClass == Planet.SPECTRAL_L ) {
+        } else if(spectralClass == Planet.SPECTRAL_L) {
             // weeks!
             return RECHARGE_HOURS_CLASS_L[(int)subtype];
         } else {
@@ -402,6 +406,10 @@ public final class StarUtil {
             return null;
         }
         
+        if(spectralClass == Planet.SPECTRAL_Q) {
+            return (null != luminosity) ? "Q" + luminosity : "Q"; //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        
         // Formatting subtype value up to two decimal points, if needed
         int subtypeValue = (int)Math.round(subtype * 100);
         if( subtypeValue < 0 ) { subtypeValue = 0; }
@@ -430,7 +438,7 @@ public final class StarUtil {
 
     /** Parser for spectral type strings */
     public static SpectralDefinition parseSpectralType(String type) {
-        if( null == type ) {
+        if((null == type) || type.isEmpty()) {
             return null;
         }
         
@@ -439,6 +447,11 @@ public final class StarUtil {
         Integer parsedSpectralClass = null;
         Double parsedSubtype = null;
         String parsedLuminosity = null;
+        
+        // Non-stellar objects
+        if(type.startsWith("Q")) {
+            return new SpectralDefinition(type, Planet.SPECTRAL_Q, 0.0, type.substring(1));
+        }
         
         // Subdwarf prefix parsing
         if( type.length() > 2 && type.startsWith("sd") ) { //$NON-NLS-1$
