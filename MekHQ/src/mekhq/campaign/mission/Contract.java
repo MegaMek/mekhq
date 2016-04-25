@@ -28,18 +28,16 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import org.joda.time.DateTime;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.BattleArmor;
 import megamek.common.Infantry;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.Planets;
-
-import org.joda.time.DateTime;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 
 /**
