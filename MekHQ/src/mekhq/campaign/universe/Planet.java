@@ -659,16 +659,16 @@ public class Planet implements Serializable {
     }
     
     /** Recharge time in hours (assuming the usage of the fastest charing method available) */
-    public Integer getRechargeTime(DateTime when) {
+    public double getRechargeTime(DateTime when) {
         if(isZenithCharge(when) || isNadirCharge(when)) {
-            return Math.min(176, 141 + 10*spectralClass + subtype.intValue());
+            return Math.min(176.0, 141 + 10*spectralClass + subtype);
         } else {
             return getSolarRechargeTime();
         }
     }
     
     /** Recharge time in hours using solar radiation alone (at jump point and 100% efficiency) */
-    public Integer getSolarRechargeTime() {
+    public double getSolarRechargeTime() {
         if( null == spectralClass || null == subtype ) {
             return 183;
         }
@@ -676,11 +676,11 @@ public class Planet implements Serializable {
     }
 
     public String getRechargeTimeText(DateTime when) {
-        Integer time = getRechargeTime(when);
-        if(null == time) {
+        double time = getRechargeTime(when);
+        if(Double.isInfinite(time)) {
             return "recharging impossible"; //$NON-NLS-1$
         } else {
-            return String.format("%d hours", time); //$NON-NLS-1$
+            return String.format("%.0f hours", time); //$NON-NLS-1$
         }
     }
     

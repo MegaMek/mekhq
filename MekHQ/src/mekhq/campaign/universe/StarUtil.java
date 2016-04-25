@@ -59,7 +59,7 @@ public final class StarUtil {
     // (stars becoming smaller, dimmer, cooler and so on in one direction)
     
     // Temperature ranges for generation only. "Real" stars can lie outside of those.
-    private static final int[] TEMPERATURE_RANGES = new int[]{
+    private static final int[] TEMPERATURE_RANGES = {
         65000, // Above class O
         57500, 53500, 50000, 46500, 43500, 40500, 37500, 34500, 31500, 30000, // Class O
         27000, 25000, 23000, 21000, 19500, 18000, 16500, 14000, 12000, 10000, // Class B
@@ -73,7 +73,7 @@ public final class StarUtil {
     };
 
     // Mass ranges in solar masses for generation purpose
-    private static final double[] MIN_MASS = new double[] {
+    private static final double[] MIN_MASS = {
         2437.5, 1235, 837.5, 538.2, 371, 234.3, 151.2, 94.9, 57.72, 35.25, // Class O
         23.1, 15.6, 11.85, 8.08, 6.561, 5.494, 4.7891, 4.0338, 3.3012, 2.6628, // Class B
         2.091, 1.938, 1.8662, 1.7802, 1.74, 1.6965, 1.672, 1.584, 1.5575, 1.513, // Class A
@@ -85,7 +85,7 @@ public final class StarUtil {
         0.01104, 0.010695, 0.01034, 0.01026, 0.010176, 0.010088, 0.009996, 0.0099, 0.009702, 0.009504 // Class T
     };
     
-    private static final double[] MAX_MASS = new double[] {
+    private static final double[] MAX_MASS = {
         5062.5, 2565, 1662.5, 1021.8, 689, 425.7, 268.8, 165.1, 98.28, 58.75, // Class O
         36.9, 24.4, 18.15, 12.12, 9.639, 7.906, 6.7509, 5.6862, 4.5588, 3.6772, // Class B
         2.829, 2.622, 2.4738, 2.3598, 2.26, 2.2035, 2.128, 2.016, 1.9425, 1.887, // Class A
@@ -98,7 +98,7 @@ public final class StarUtil {
     };
     
     // Average luminosity in terms of Solar luminosity. O-class stars are BRIGHT. Generated values are +/-10% of this.
-    private static final double[] AVG_LUMINOSITY = new double[] {
+    private static final double[] AVG_LUMINOSITY = {
         12000000, 6000000, 4000000, 2500000, 1700000, 1050000, 670000, 410000, 250000, 150000, // Class O
         96000, 64000, 19600, 4890, 2290, 1160, 692, 380, 180, 85, // Class B
         35, 27, 22.5, 19, 16, 13.8, 12, 10.6, 9.7, 8.85, // Class A
@@ -111,7 +111,7 @@ public final class StarUtil {
     };
     
     //taken from Dropships and Jumpships sourcebook, pg. 17. L- and T-classes estimated
-    private static final double[] DISTANCE_TO_JUMP_POINT = new double[]{
+    private static final double[] DISTANCE_TO_JUMP_POINT = {
         Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
         Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
         347840509855.0, 282065439915.0, 229404075188.0, 187117766777.0, 153063985045.0, // Class B
@@ -133,11 +133,11 @@ public final class StarUtil {
     };
     
     // Slightly modified IO Beta table
-    private static final int[] REALISTIC_SPECTRAL_TYPE = new int[]{
+    private static final int[] REALISTIC_SPECTRAL_TYPE = {
             Planet.SPECTRAL_F, Planet.SPECTRAL_M, Planet.SPECTRAL_G, Planet.SPECTRAL_K, Planet.SPECTRAL_M,
             Planet.SPECTRAL_M, Planet.SPECTRAL_M, Planet.SPECTRAL_M, Planet.SPECTRAL_M, Planet.SPECTRAL_L, -1};
 
-    private static final int[] HOT_SPECTRAL_TYPE = new int[]{
+    private static final int[] HOT_SPECTRAL_TYPE = {
         Planet.SPECTRAL_B, Planet.SPECTRAL_B, Planet.SPECTRAL_A, Planet.SPECTRAL_A, Planet.SPECTRAL_A,
         Planet.SPECTRAL_F, Planet.SPECTRAL_F, Planet.SPECTRAL_F, Planet.SPECTRAL_F, Planet.SPECTRAL_F, Planet.SPECTRAL_F};
     
@@ -145,7 +145,7 @@ public final class StarUtil {
         Planet.SPECTRAL_M, Planet.SPECTRAL_M, Planet.SPECTRAL_M, Planet.SPECTRAL_K, Planet.SPECTRAL_K,
         Planet.SPECTRAL_G, Planet.SPECTRAL_G, Planet.SPECTRAL_F, Planet.SPECTRAL_F, Planet.SPECTRAL_F, Planet.SPECTRAL_F};
     
-    private static final double[] MIN_LIFE_ZONE = new double[]{
+    private static final double[] MIN_LIFE_ZONE = {
         Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
         Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
         18836034615.0, 13789104394.0, 9577962205.0, 6922924960.0, 4737540501.0, // Class B
@@ -166,7 +166,7 @@ public final class StarUtil {
          147711.0, 124816.0, 104182.0,  85718.0,  69334.0    
     };
     
-    private static final double[] MAX_LIFE_ZONE = new double[]{
+    private static final double[] MAX_LIFE_ZONE = {
         Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
         Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
         38242858157.0, 27996060437.0, 19446165689.0, 14055635525.0, 9618642836.0, // Class B
@@ -188,11 +188,11 @@ public final class StarUtil {
     };
         
 
-    private static final int[] RECHARGE_HOURS_CLASS_L = new int[]{
-            512, 616, 717, 901, 1142, 1462, 1767, 2325, 3617, 5038};
+    private static final double[] RECHARGE_HOURS_CLASS_L = {
+            512.0, 616.0, 717.0, 901.0, 1142.0, 1462.0, 1767.0, 2325.0, 3617.0, 5038.0, 7973.0};
 
-    private static final int[] RECHARGE_HOURS_CLASS_T = new int[]{
-            7973, 13371, 21315, 35876, 70424, 134352, 215620, 32188, 569703, 892922};
+    private static final double[] RECHARGE_HOURS_CLASS_T = {
+            7973.0, 13371.0, 21315.0, 35876.0, 70424.0, 134352.0, 215620.0, 32188.0, 569703.0, 892922.0, 10000000.0};
     
     private static final Set<String> VALID_WHITE_DWARF_SUBCLASSES = new TreeSet<String>();
     static {
@@ -352,19 +352,20 @@ public final class StarUtil {
         return Utilities.lerp(getMinLifeZone(spectralTypeNumber), getMinLifeZone(spectralTypeNumber), remainder);
     }
 
-    public static Integer getSolarRechargeTime(int spectralClass, double subtype) {
+    public static double getSolarRechargeTime(int spectralClass, double subtype) {
         if(spectralClass == Planet.SPECTRAL_Q) {
             // Not a star, can't recharge here
-            return null;
+            return Double.POSITIVE_INFINITY;
         }
+        int intSubtype = (int)subtype;
         if(spectralClass == Planet.SPECTRAL_T) {
             // months!
-            return RECHARGE_HOURS_CLASS_T[(int)subtype];
+            return Utilities.lerp(RECHARGE_HOURS_CLASS_T[intSubtype], RECHARGE_HOURS_CLASS_T[intSubtype + 1], subtype - intSubtype);
         } else if(spectralClass == Planet.SPECTRAL_L) {
             // weeks!
-            return RECHARGE_HOURS_CLASS_L[(int)subtype];
+            return Utilities.lerp(RECHARGE_HOURS_CLASS_L[intSubtype], RECHARGE_HOURS_CLASS_L[intSubtype + 1], subtype - intSubtype);
         } else {
-            return 141 + 10*spectralClass + (int)subtype;
+            return 141 + 10*spectralClass + subtype;
         }
     }
 

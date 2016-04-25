@@ -5358,6 +5358,7 @@ public class Campaign implements Serializable {
             return jpath;
         }
 
+        final DateTime now = new DateTime(calendar);
         String current = startKey;
         ArrayList<String> closed = new ArrayList<String>();
         ArrayList<String> open = new ArrayList<String>();
@@ -5367,11 +5368,11 @@ public class Campaign implements Serializable {
         // we are going to through and set up some hashes that will make our
         // work easier
         // hash of parent key
-        Hashtable<String, String> parent = new Hashtable<String, String>();
+        Hashtable<String, String> parent = new Hashtable<>();
         // hash of H for each planet which will not change
-        Hashtable<String, Double> scoreH = new Hashtable<String, Double>();
+        Hashtable<String, Double> scoreH = new Hashtable<>();
         // hash of G for each planet which might change
-        Hashtable<String, Integer> scoreG = new Hashtable<String, Integer>();
+        Hashtable<String, Double> scoreG = new Hashtable<>();
 
         for (String key : Planets.getInstance().getPlanets().keySet()) {
             scoreH.put(
@@ -5379,14 +5380,13 @@ public class Campaign implements Serializable {
                     end.getDistanceTo(Planets.getInstance().getPlanets()
                                              .get(key)));
         }
-        scoreG.put(current, 0);
+        scoreG.put(current, 0.0);
         closed.add(current);
 
         while (!found && jumps < 10000) {
             jumps++;
-            int currentG = scoreG.get(current) + 1;
-            List<Planet> neighborKeys = Planets.getNearbyPlanets(Planets
-            		.getInstance().getPlanets().get(current), 30);
+            double currentG = scoreG.get(current) + Planets.getInstance().getPlanetById(current).getRechargeTime(now);
+            List<Planet> neighborKeys = Planets.getNearbyPlanets(Planets.getInstance().getPlanetById(current), 30);
             for (Planet neighborKey : neighborKeys) {
                 if (closed.contains(neighborKey.getId())) {
                     continue;
@@ -5406,7 +5406,7 @@ public class Campaign implements Serializable {
                 }
             }
             String bestMatch = null;
-            double bestF = Integer.MAX_VALUE;
+            double bestF = Double.POSITIVE_INFINITY;
             for (String possible : open) {
                 // calculate F
                 double currentF = scoreG.get(possible) + scoreH.get(possible);

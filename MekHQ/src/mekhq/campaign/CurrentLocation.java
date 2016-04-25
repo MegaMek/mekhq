@@ -112,7 +112,7 @@ public class CurrentLocation implements Serializable {
 		} else {
 			toReturn += "<i>" + Math.round(100.0*getTransitTime())/100.0 + " days out </i>";
 		}
-		if(null != currentPlanet.getRechargeTime(now)) {
+		if(!Double.isInfinite(currentPlanet.getRechargeTime(now))) {
 		    toReturn += ", <i>" + Math.round(100.0*rechargeTime/currentPlanet.getRechargeTime(now)) + "% charged</i>";
 		}
 		return "<html>" + toReturn + "</html>";
@@ -135,10 +135,7 @@ public class CurrentLocation implements Serializable {
 		//because jumpships don't go anywhere
 	    DateTime currentDate = new DateTime(campaign.getCalendar());
 		double hours = 24.0;
-		Integer neededRechargeTime = currentPlanet.getRechargeTime(currentDate);
-		if(null == neededRechargeTime) {
-		    neededRechargeTime = Integer.MAX_VALUE;
-		}
+		double neededRechargeTime = currentPlanet.getRechargeTime(currentDate);
 		double usedRechargeTime = Math.min(hours, neededRechargeTime - rechargeTime);
 		if(usedRechargeTime > 0) {
 			campaign.addReport("Jumpships spent " + Math.round(100.0 * usedRechargeTime)/100.0 + " hours recharging drives");
