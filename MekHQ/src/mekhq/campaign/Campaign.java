@@ -54,6 +54,7 @@ import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.joda.time.DateTime;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -392,7 +393,7 @@ public class Campaign implements Serializable {
     }
 
     public String getCurrentPlanetName() {
-        return location.getCurrentPlanet().getShortName();
+        return location.getCurrentPlanet().getPrintableName(new DateTime(calendar));
     }
 
     public Planet getCurrentPlanet() {
@@ -2028,7 +2029,10 @@ public class Campaign implements Serializable {
         }
 
         //read the news
-        for (NewsItem article : news.fetchNewsFor(calendar.getTime())) {
+        for(NewsItem article : news.fetchNewsFor(calendar.getTime())) {
+            addReport(article.getHeadlineForReport());
+        }
+        for(NewsItem article : Planets.getInstance().getPlanetaryNews(new DateTime(calendar))) {
             addReport(article.getHeadlineForReport());
         }
 
@@ -2140,7 +2144,7 @@ public class Campaign implements Serializable {
         		 * for transport or splitting the unit, etc.
         		 */
         		if (!getLocation().isOnPlanet() && //null != getLocation().getJumpPath() &&
-        				getLocation().getJumpPath().getLastPlanet().getName().equals(m.getPlanetName())) {
+        				getLocation().getJumpPath().getLastPlanet().getId().equals(m.getPlanetName())) {
         			/*transitTime is measured in days; round up to the next
         			 * whole day, then convert to milliseconds */
         			GregorianCalendar cal = (GregorianCalendar)calendar.clone();
@@ -4878,14 +4882,14 @@ public class Campaign implements Serializable {
 
     public Vector<String> getPlanetNames() {
         Vector<String> plntNames = new Vector<String>();
-        for (String key : Planets.getInstance().getPlanets().keySet()) {
-            plntNames.add(key);
+        for (Planet key : Planets.getInstance().getPlanets().values()) {
+            plntNames.add(key.getPrintableName(new DateTime(calendar)));
         }
         return plntNames;
     }
 
     public Planet getPlanet(String name) {
-        return Planets.getInstance().getPlanets().get(name);
+        return Planets.getInstance().getPlanetByName(name, new DateTime(calendar));
     }
 
     /**
@@ -5348,30 +5352,31 @@ public class Campaign implements Serializable {
      * @param endKey
      * @return
      */
-    public JumpPath calculateJumpPath(String startKey, String endKey) {
-
+    public JumpPath calculateJumpPath(Planet start, Planet end) {
+        String startKey = start.getId();
+        String endKey = end.getId();
+        
         if (startKey.equals(endKey)) {
             JumpPath jpath = new JumpPath();
-            jpath.addPlanet(getPlanet(startKey));
+            jpath.addPlanet(start);
             return jpath;
         }
 
+        final DateTime now = new DateTime(calendar);
         String current = startKey;
         ArrayList<String> closed = new ArrayList<String>();
         ArrayList<String> open = new ArrayList<String>();
         boolean found = false;
         int jumps = 0;
 
-        Planet end = Planets.getInstance().getPlanets().get(endKey);
-
         // we are going to through and set up some hashes that will make our
         // work easier
         // hash of parent key
-        Hashtable<String, String> parent = new Hashtable<String, String>();
+        Hashtable<String, String> parent = new Hashtable<>();
         // hash of H for each planet which will not change
-        Hashtable<String, Double> scoreH = new Hashtable<String, Double>();
+        Hashtable<String, Double> scoreH = new Hashtable<>();
         // hash of G for each planet which might change
-        Hashtable<String, Integer> scoreG = new Hashtable<String, Integer>();
+        Hashtable<String, Double> scoreG = new Hashtable<>();
 
         for (String key : Planets.getInstance().getPlanets().keySet()) {
             scoreH.put(
@@ -5379,34 +5384,33 @@ public class Campaign implements Serializable {
                     end.getDistanceTo(Planets.getInstance().getPlanets()
                                              .get(key)));
         }
-        scoreG.put(current, 0);
+        scoreG.put(current, 0.0);
         closed.add(current);
 
         while (!found && jumps < 10000) {
             jumps++;
-            int currentG = scoreG.get(current) + 1;
-            ArrayList<String> neighborKeys = Planets.getNearbyPlanets(Planets
-            		.getInstance().getPlanets().get(current), 30);
-            for (String neighborKey : neighborKeys) {
-                if (closed.contains(neighborKey)) {
+            double currentG = scoreG.get(current) + Planets.getInstance().getPlanetById(current).getRechargeTime(now);
+            List<Planet> neighborKeys = Planets.getNearbyPlanets(Planets.getInstance().getPlanetById(current), 30);
+            for (Planet neighborKey : neighborKeys) {
+                if (closed.contains(neighborKey.getId())) {
                     continue;
-                } else if (open.contains(neighborKey)) {
+                } else if (open.contains(neighborKey.getId())) {
                     // is the current G better than the existing G
-                    if (currentG < scoreG.get(neighborKey)) {
+                    if (currentG < scoreG.get(neighborKey.getId())) {
                         // then change G and parent
-                        scoreG.put(neighborKey, currentG);
-                        parent.put(neighborKey, current);
+                        scoreG.put(neighborKey.getId(), currentG);
+                        parent.put(neighborKey.getId(), current);
                     }
                 } else {
                     // put the current G for this one in memory
-                    scoreG.put(neighborKey, currentG);
+                    scoreG.put(neighborKey.getId(), currentG);
                     // put the parent in memory
-                    parent.put(neighborKey, current);
-                    open.add(neighborKey);
+                    parent.put(neighborKey.getId(), current);
+                    open.add(neighborKey.getId());
                 }
             }
             String bestMatch = null;
-            double bestF = Integer.MAX_VALUE;
+            double bestF = Double.POSITIVE_INFINITY;
             for (String possible : open) {
                 // calculate F
                 double currentF = scoreG.get(possible) + scoreH.get(possible);
@@ -5416,6 +5420,10 @@ public class Campaign implements Serializable {
                 }
             }
             current = bestMatch;
+            if(null == current) {
+                // We're done - probably failed to find anything
+                break;
+            }
             closed.add(current);
             open.remove(current);
             if (current.equals(endKey)) {
@@ -5440,7 +5448,7 @@ public class Campaign implements Serializable {
         return finalPath;
     }
 
-    public ArrayList<String> getAllReachablePlanetsFrom(Planet planet) {
+    public List<Planet> getAllReachablePlanetsFrom(Planet planet) {
         return Planets.getNearbyPlanets(planet, 30);
     }
 
@@ -6366,7 +6374,7 @@ public class Campaign implements Serializable {
     }
 
     public void setStartingPlanet() {
-    	Hashtable<String, Planet> planetList = Planets.getInstance().getPlanets();
+    	Map<String, Planet> planetList = Planets.getInstance().getPlanets();
         Planet startingPlanet = planetList.get(getFaction().getStartingPlanet(getEra()));
 
         if (startingPlanet == null) {

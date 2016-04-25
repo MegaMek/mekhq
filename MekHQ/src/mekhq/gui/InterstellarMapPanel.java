@@ -20,11 +20,14 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+
+import org.joda.time.DateTime;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
@@ -203,7 +206,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                     	}
                         if(e.isAltDown()) {
                         	//calculate a new jump path from the current location
-                        	jumpPath = campaign.calculateJumpPath(campaign.getCurrentPlanetName(), target.getName());
+                        	jumpPath = campaign.calculateJumpPath(campaign.getCurrentPlanet(), target);
                         	selectedPlanet = target;
                     		repaint();
                     		hqview.refreshPlanetView();
@@ -216,7 +219,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                         	if(null == lastPlanet) {
                         		lastPlanet = campaign.getCurrentPlanet();
                         	}
-                        	JumpPath addPath = campaign.calculateJumpPath(lastPlanet.getName(), target.getName());
+                        	JumpPath addPath = campaign.calculateJumpPath(lastPlanet, target);
                   			if(!jumpPath.isEmpty()) {
                   				addPath.removeFirstPlanet();
                   			}
@@ -410,15 +413,21 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 				arc.setArcByCenter(x, y, size * 1.2, 0, 360, Arc2D.OPEN);
 				g2.fill(arc);
 			}
-			ArrayList<Faction> factions = planet.getCurrentFactions(campaign.getCalendar().getTime());
-			for(int i = 0; i < factions.size(); i++) {
-				Faction faction = factions.get(i);
-				g2.setPaint(faction.getColor());
-				arc.setArcByCenter(x, y, size, 0, 360.0 * (1-((double)i)/factions.size()), Arc2D.PIE);
-				g2.fill(arc);
-			}
-
-
+            Set<Faction> factions = planet.getFactionSet(new DateTime(campaign.getCalendar()));
+            if(null != factions) {
+                int i = 0;
+                for(Faction faction : factions) {
+                    g2.setPaint(faction.getColor());
+                    arc.setArcByCenter(x, y, size, 0, 360.0 * (1-((double)i)/factions.size()), Arc2D.PIE);
+                    g2.fill(arc);
+                    ++ i;
+                }
+            } else {
+                // Just a black circle then
+                g2.setPaint(Color.BLACK);
+                arc.setArcByCenter(x, y, size, 0, 360.0, Arc2D.PIE);
+                g2.fill(arc);
+            }
 		}
 
 		//cycle through planets again and assign names - to make sure names go on outside
@@ -429,7 +438,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 					|| jumpPath.contains(planet)
 					|| (null != campaign.getLocation().getJumpPath() && campaign.getLocation().getJumpPath().contains(planet))) {
 				g2.setPaint(Color.WHITE);
-	            g2.drawString(planet.getShortName(), (float)(x+size * 1.8), (float)y);
+	            g2.drawString(planet.getPrintableName(new DateTime(campaign.getCalendar())), (float)(x+size * 1.8), (float)y);
 	        }
 		}
 

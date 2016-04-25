@@ -29,6 +29,7 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.universe.Planet;
 
+import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -97,7 +98,7 @@ public class JumpPath implements Serializable {
 		return endTime;
 	}
 	
-	public double getTotalRechargeTime() {
+	public double getTotalRechargeTime(DateTime when) {
 		int rechargeTime = 0;
 		for(Planet planet : path) {
 			if(planet.equals(getFirstPlanet())) {
@@ -106,7 +107,7 @@ public class JumpPath implements Serializable {
 			if(planet.equals(getLastPlanet())) {
 				continue;
 			}
-			rechargeTime += planet.getRechargeTime();
+			rechargeTime += planet.getRechargeTime(when);
 		}
 		return rechargeTime/24.0;
 	}
@@ -115,8 +116,8 @@ public class JumpPath implements Serializable {
 		return size()-1;
 	}
 	
-	public double getTotalTime(double currentTransit) {	
-		return getTotalRechargeTime() + getStartTime(currentTransit) + getEndTime();
+	public double getTotalTime(DateTime when, double currentTransit) {	
+		return getTotalRechargeTime(when) + getStartTime(currentTransit) + getEndTime();
 	}
 	
 	public void addPlanet(Planet p) {
@@ -154,7 +155,7 @@ public class JumpPath implements Serializable {
 		for(Planet p : path) {
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<planetName>"
-				+MekHqXmlUtil.escape(p.getName())
+				+MekHqXmlUtil.escape(p.getId())
 				+"</planetName>");
 		}
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</jumpPath>");

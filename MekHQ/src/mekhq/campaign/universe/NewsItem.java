@@ -31,6 +31,8 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import mekhq.Utilities;
+
 
 /**
  * NewsItem
@@ -59,16 +61,36 @@ public class NewsItem {
         return headline;
     }
     
+    public void setHeadline(String headline) {
+        this.headline = Utilities.nonNull(headline, this.headline);
+    }
+    
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
     public String getDescription() {
         return description;
+    }
+    
+    public void setDescription(String description) {
+        this.description = description;
     }
     
     public String getService() {
         return service;
     }
 
+    public void setService(String service) {
+        this.service = service;
+    }
+
     public Date getDate() {
         return date;
+    }
+    
+    public void setDate(Date date) {
+        this.date = date;
     }
     
     public int getId() {
