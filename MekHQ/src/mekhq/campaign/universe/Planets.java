@@ -221,7 +221,7 @@ public class Planets {
     }
     
     public void generatePlanets() throws DOMException, ParseException {
-        MekHQ.logMessage("Starting load of planetary data from XML...");
+        MekHQ.logMessage("Starting load of planetary data from XML..."); //$NON-NLS-1$
         long currentTime = System.currentTimeMillis();
         synchronized (LOADING_LOCK) {
             // Step 1: Initialize variables.
@@ -246,14 +246,14 @@ public class Planets {
             planetGrid.clear();
             
             // Step 2: Read the default file
-            try(FileInputStream fis = new FileInputStream("data/universe/planets.xml")) {
+            try(FileInputStream fis = new FileInputStream("data/universe/planets.xml")) { //$NON-NLS-1$
                 updatePlanets(fis);
             } catch (Exception ex) {
                 MekHQ.logError(ex);
             }
             
             // Step 3: Load all the xml files within the planets subdirectory, if it exists
-            Utilities.parseXMLFiles("data/universe/planets",
+            Utilities.parseXMLFiles("data/universe/planets", //$NON-NLS-1$
                     new FileParser() {
                         @Override
                         public void parse(FileInputStream is) {
@@ -261,27 +261,46 @@ public class Planets {
                         }
                     });
             
-            for (Planet s : planetList.values()) {
-                if((null == s.getX()) || (null == s.getY())) {
-                    MekHQ.logError(String.format("Planet \"%s\" is missing coordinates", s.getId()));
+            List<Planet> toRemove = new ArrayList<>();
+            for (Planet planet : planetList.values()) {
+                if((null == planet.getX()) || (null == planet.getY())) {
+                    MekHQ.logError(String.format("Planet \"%s\" is missing coordinates", planet.getId())); //$NON-NLS-1$
+                    toRemove.add(planet);
                     continue;
                 }
-                int x = (int)(s.getX()/30.0);
-                int y = (int)(s.getY()/30.0);
+                int x = (int)(planet.getX()/30.0);
+                int y = (int)(planet.getY()/30.0);
                 if (planetGrid.get(x) == null) {
                     planetGrid.put(x, new HashMap<Integer, Set<Planet>>());
                 }
                 if (planetGrid.get(x).get(y) == null) {
                     planetGrid.get(x).put(y, new HashSet<Planet>());
                 }
-                if( !planetGrid.get(x).get(y).contains(s) ) {
-                    planetGrid.get(x).get(y).add(s);
+                if( !planetGrid.get(x).get(y).contains(planet) ) {
+                    planetGrid.get(x).get(y).add(planet);
                 }
+            }
+            for(Planet planet : toRemove) {
+                planetList.remove(planet.getId());
             }
             done();
         }
-        MekHQ.logMessage(String.format("Loaded a total of %d planets in %.2fs.",
+        MekHQ.logMessage(String.format(Locale.ROOT,
+                "Loaded a total of %d planets in %.3fs.", //$NON-NLS-1$
                 planetList.size(), (System.currentTimeMillis() - currentTime) / 1000.0));
+        // Planetary sanity check time!
+        for(Planet planet : planetList.values()) {
+            List<Planet> veryClosePlanets = Planets.getNearbyPlanets(planet, 1);
+            if(veryClosePlanets.size() > 1) {
+                for(Planet closePlanet : veryClosePlanets) {
+                    if(!planet.getId().equals(closePlanet.getId())) {
+                        MekHQ.logMessage(String.format(Locale.ROOT,
+                                "Extremly close planets detected. Data error? %s <-> %s: %.3f ly", //$NON-NLS-1$
+                                planet.getId(), closePlanet.getId(), planet.getDistanceTo(closePlanet)));
+                    }
+                }
+            }
+        }
     }
     
     public void writePlanet(OutputStream out, Planet planet) {
