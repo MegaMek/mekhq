@@ -7,8 +7,6 @@ First data/universe/planets.xml, then the files in data/universe/planets/
 subfolder, sorted case-insensitively. Information read later in the process
 overwrites information read earlier.
 
-The additional fil
-
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <planets>
     <planet>...</planet>
