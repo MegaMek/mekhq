@@ -156,7 +156,7 @@ public class Planet implements Serializable {
     
     // Surface description
     private Integer percentWater;
-    @XmlElement(name = "volcamism")
+    @XmlElement(name = "volcanism")
     private Integer volcanicActivity;
     @XmlElement(name = "tectonics")
     private Integer tectonicActivity;

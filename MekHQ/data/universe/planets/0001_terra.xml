@@ -12,7 +12,7 @@
 		<dayLength>24.0</dayLength>
 		<tilt>23.44</tilt>
 		<class>EARTH</class>
-		<volcamism>2</volcamism>
+		<volcanism>2</volcanism>
 		<tectonics>2</tectonics>
 		<pressureAtm>1.0</pressureAtm>
 		<atmMass>1.0</atmMass>
