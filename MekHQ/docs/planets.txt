@@ -1,0 +1,351 @@
+The planetary definition data resides in the data/universe/planets.xml and
+the XML files inside the data/universe/planets/ folder.
+
+Each of those files are a simple XML file with <planet> entries. The tag
+names are case-sensitive. The files are read in a consistent order:
+First data/universe/planets.xml, then the files in data/universe/planets/
+subfolder, sorted case-insensitively. Information read later in the process
+overwrites information read earlier.
+
+The additional fil
+
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<planets>
+    <planet>...</planet>
+</planets>
+
+Inside the <planet> tag, the following three tags are required:
+
+<name>(string)</name> - the name of the planet
+<xcood>(number)</xcood> - X-coordinate on the map, in light years
+<ycood>(number)</ycood> - Y-coordinate, also in light years
+
+The remaining information is optional:
+
+<id>(string)</id>
+
+Internal ID of the planet. If not set, equals to the name.
+Used to allow multiple planets to share the same name.
+
+If the same ID (or failing that, name) is encountered multiple
+times, the later values overwrite the earlier defined values.
+
+<shortName>(string)</shortName>
+
+Short variant of the name, for display purposes.
+
+<sysPos>(integer)</sysPos>
+
+The planet's orbital position in the system.
+
+<spectralType>(string)</spectralType>
+
+The star's spectral type. MekHQ can parse most simple types like
+"G2V", "sdM4.5", "O3IIIne", "B5V(e)+DQ6.2" and so on. If set,
+the following three values are ignored.
+
+Spectral types starting with "Q" are non-stellar points in space.
+In particular, "QB" are black holes, "QN" neutron stars and
+"QP" pulsars.
+
+If missing, the spectral type gets generated from the following
+values (spectralClass, subtype and luminosity). If those are
+also missing, a procedurally generated "habitable" main sequence
+dwarf star is set.
+
+<spectralClass>(character)</spectralClass>
+
+One-character description of the spectral class. Valid values
+are "O", "B", "A", "F", "G", "K", "M", "L", "T" and "Y"
+
+Ignored if spectral type is set. If only the spectral class is
+set, subtype is generated randomly and luminosity is set to "V".
+
+Also ignored if the luminosity is set to "VII" (white dwarf).
+
+<subtype>(number between 0.00 and 9.99)</subtype>
+
+Numberic sub-type of the spectral class. Ignored is spectralType
+is set. Values can be given with any precision, but they are
+rounded down to the nearest two digits after the decimal dot.
+
+<luminosity>(string)</luminosity>
+
+A valid luminosity identifier. One of the following values:
+
+0, Ia0, Ia-0, Ia+, I, Ia, Iab, Ib, I-II, I/II, Ib-II, Ib/II,
+II, II-III, II/III, III, III-IV, III/IV, IV, IV-V, IV/V, V,
+VI, VI+, VII
+
+The luminosity type "VI" are subdwarfs, "VI+" extreme
+subdwarfs and "VII" white dwarfs.
+
+Ignored if spectralType is set.
+
+<nadirCharge>(true or false)</nadirCharge>
+<zenithCharge>(true or false)</zenithCharge>
+
+If there is a recharging station at the nadir or zenith jump point,
+respectively. Both default to "false".
+
+<orbitRadius>(number)</orbitRadius>
+
+Orbital "radius" (technically semimajor axis) of the planet's
+orbit, in AU. Defaults to roughly the middle of the habitable zone
+of the star.
+
+<orbitEccentricity>(number at or above 0.0 and below 1.0)</orbitEccentricity>
+
+Orbital eccentricity, defaults to "unknown", which is assumed
+to be at or near 0.0 for all calculations requiring it.
+
+<orbitInclination>(number between 0.0 and 90.0)</orbitInclination>
+
+Orbital inclination in relation to the system's invariable plane.
+Defaults to "unknown".
+
+<satellites>(integer)</satellites>
+
+Amount of natural satellites of the planet. Defaults to "unknown"
+if no satellite name is set, else the amount of satellite entries.
+
+<satellite>(string)</satellite>
+
+Name of a natural satellite of the planet. Can be given more
+than one time if there are more.
+
+<mass>(number)</mass>
+
+Mass of the planet, in Earth masses. Defaults to "unknown"
+for display purposes and 1.0 for calculations.
+
+<radius>(number)</radius>
+
+Radius of the planet, in Earth masses. Defaults to "unknown" for
+display purposes and 1.0 for calculations.
+
+<density>(number)</density>
+
+Density of the planet in kg/m³. Defaults to "unknown".
+Earth has a density of 5515.
+
+<gravity>(number)</gravity>
+
+Surface gravity of the planet, in Earth's gravity. Defaults
+to "unknown" for display purposes and 1.0 for calculations.
+
+<dayLength>(number)</dayLength>
+
+Length of day (that is not the same as rotational period!)
+on the planet's equator, in hours.
+
+<tilt>(number between 0.0 and 90.0)</tilt>
+
+Axial tilt of the planet, in degrees. Defaults to "unknown"
+for display and 0.0 for calculations. Earth's is 23.44.
+
+<className>(string)</className>
+
+Planetary class. Currently unused.
+
+<percentWater>(integer between 0 and 100)</percentWater>
+
+Amount of the surface area covered by liquid water.
+
+<volcanism>(integer between 0 and 6)</volcanism>
+
+Amount of volcanic activity on the planet. Defaults to "unknown".
+Earth's is 2.
+
+Planets with volcanism score of 6 are either just forming or in
+the process of breaking apart.
+
+<tectonics>(number between 0 and 6)</tectonics>
+
+Relative tectonic activity of the planet. Defaults to "unknown".
+Earth's is 2.
+
+Planets with tectonics score of 0 have an unmoving, single crust (but
+can still have shield volcanoes). Planets with a tectonics score of 6
+have separate "continental" plates the size of small islands.
+
+<landMass>(string)</landMass>
+
+A continent's of major land mass name. Can be given more than once.
+
+<pressure>(integer between 0 and 5)</pressure>
+
+The atmosphere's general pressure category. Defaults to "unknown".
+Valid values correspond to the atmospheric types "vacuum", "trace",
+"thin", "standard", "high" and "very high".
+
+<pressureAtm>(number)</pressureAtm>
+
+Air pressure in standard pressure units (101325 Pa); defaults to "unknown".
+
+<atmosphere>(string)</atmosphere>
+
+Short description of the atmosphere
+
+<atmMass>(number)</atmMass>
+
+Atmospheric molar mass compared to Earth's standard 28.9645 kg/mol
+
+<albedo>(number between 0.0 and 1.0)</albedo>
+
+The atmosphere's average albedo (amount of sunlight reflected).
+Defaults to "unknown". Earth's is 0.33.
+
+<greenhouse>(number)</greenhouse>
+
+The strength of the planet's greenhouse effect (making it warmer
+than it should be given its orbital position and albedo).
+Defaults to "unknown". Earth's is (currently) 0.12.
+
+<temperature>(integer above -270)</temperature>
+
+The average surface temperature at the equator in °C.
+
+<climate>(string or integer from 0 to 5)</climate>
+
+The planet's overall climate, from 0 (arctic) to 5 (tropical).
+Defaults to "unknown" for display purposes and 3 (warm-temperate)
+for calculations. Earth's is 3 (warm-temperate).
+
+Alternatively, can be given as one of the following strings:
+
+ARCTIC, BOREAL, TEMPERATE, WARM, TROPICAL, SUPERTROPICAL, HELL
+
+<lifeForm>(string or integer from 0 to 8)</lifeForm>
+
+Highest (native) life form (still not killed off by the humans). An integer
+or string from the following table:
+
+0, NONE
+1, MICROBE
+2, PLANT
+3, FISH
+4, AMPH
+5, REPTILE
+6, BIRD
+7, MAMMAL
+8, INSECT
+
+<habitability>(integer)</habitability>
+
+The base habitability of the planet. This corresponds roughly to how much
+human population the planet could support even without modern technology
+(see the "pop" tag for details). Defaults to "unknown" and can be negative.
+
+Earth's is typically 7.
+
+<pop>(integer from -1 to 12)</pop>
+
+The planet's population rating. Defaults to "unknown"; -1 means "no population".
+The other values describe orders of magnitude:
+
+0: a few people
+1: tens of people
+2: hundreds of people
+3: thousands
+4: tens of thousands
+5: hundreds of thousands
+6: millions
+7: tens of millions
+8: hundreds of millions
+9: billions
+10: tens of billions
+11: hundreds of billions
+12: trillions
+
+Values above 12 make little sense and are displayed as "uncountable" or variant
+thereof. Earth's pop value is typically 9 or 10.
+
+<government>(string)</government>
+
+Textual description of the government type. Defaults to "none".
+
+<controlRating>(integer from -1 to 7)</controlRating>
+
+The amount of actual control the nominal government wields over the population.
+Tends to drop sharply towards the periphery, with the exception of the clan
+homeworlds. Defaults to "situation unclear".
+
+The values correspond to textual descriptions as follows:
+
+-1: total anarchy, not even the government bothers pretending otherwise
+0: anarchy, no governmental control outside of the line of sight of its trooops
+1: very free society, wild west mentality, everyone is armed, ...
+2: free society
+3: moderately free society
+4: controlled society, strong weapon control laws and surveillance
+5: repressive society, secret police, gulags, ...
+6: population under total control and surveillance
+7: population consists almost entirely of slaves to the ruling class
+
+<socioIndustrial>(string)</socioIndustrial>
+
+The socio-industrial index as defined in the BT publications.
+Defaults to X-X-X-X-X.
+
+<hpg>(character)</hpg>
+
+HPG service rating, as defined in the BT publications. Default "X".
+
+<faction>(comma separated list of faction IDs)<faction>
+
+The current factions on the planet. The valid factions are defined in the
+data/universe/factions.xml file. Defaults to "no faction".
+
+<desc>(string)</desc>
+
+Free-form description of the planet and star system.
+
+<event>
+	<date>(date)</date>
+	<message>(string)</message>
+	...
+</event>
+
+A generic event changing some of the planet's data on the given date. The
+date line is required. The message line is optional and makes the event show
+up in the daily log, as a news item.
+
+The following data can be changed:
+
+* name
+* shortName
+* nadirCharge and zenithCharge
+* percentWater
+* pressure
+* pressureAtm
+* atmosphere
+* atmMass
+* albedo
+* greenhouse
+* temperature
+* climate
+* lifeForm
+* habitability
+* pop
+* government
+* controlRating
+* socioIndustrial
+* hpg
+* faction
+
+<factionChange>
+	<date>(date)</date>
+	<faction>(comma separated list of faction IDs)</faction>
+</factionChange>
+
+Obsolete form of the event tag, only applicable to faction changes. It's
+retained for backwards compatibility only and should not be used in
+newer data sets.
+
+<delete>(true or false)</delete>
+
+A marker telling the planet data loader to delete the planet with the
+given ID from its database, if found. All the other data defined in the entry
+is ignored, save for name and id, which are used to identify the entry
+to delete. Defaults to "false" (obviously).
