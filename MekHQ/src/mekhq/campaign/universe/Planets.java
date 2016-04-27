@@ -309,6 +309,16 @@ public class Planets {
         }
     }
     
+    public void writePlanets(OutputStream out, List<Planet> planets) {
+        LocalPlanetList temp = new LocalPlanetList();
+        temp.list = planets;
+        try {
+            marshaller.marshal(temp, out);
+        } catch (Exception e) {
+            MekHQ.logError(e);
+        }
+    }
+    
     @XmlRootElement(name="planets")
     private static final class LocalPlanetList {
         @XmlElement(name="planet")
