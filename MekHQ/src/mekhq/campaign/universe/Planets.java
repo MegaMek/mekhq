@@ -182,13 +182,11 @@ public class Planets {
     }
 
     private void updatePlanets(FileInputStream source) {
-        try {
-            // JAXB unmarshaller closes the stream it doesn't own. Bad JAXB. BAD.
-            InputStream is = new FilterInputStream(source) {
+        // JAXB unmarshaller closes the stream it doesn't own. Bad JAXB. BAD.
+        try(InputStream is = new FilterInputStream(source) {
                 @Override
                 public void close() { /* ignore */ }
-            };
-            
+            }) {
             // Reset the file stream
             source.getChannel().position(0);
 
