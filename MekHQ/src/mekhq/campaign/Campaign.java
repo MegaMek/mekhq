@@ -5390,7 +5390,7 @@ public class Campaign implements Serializable {
         while (!found && jumps < 10000) {
             jumps++;
             double currentG = scoreG.get(current) + Planets.getInstance().getPlanetById(current).getRechargeTime(now);
-            List<Planet> neighborKeys = Planets.getNearbyPlanets(Planets.getInstance().getPlanetById(current), 30);
+            List<Planet> neighborKeys = Planets.getInstance().getNearbyPlanets(Planets.getInstance().getPlanetById(current), 30);
             for (Planet neighborKey : neighborKeys) {
                 if (closed.contains(neighborKey.getId())) {
                     continue;
@@ -5449,7 +5449,7 @@ public class Campaign implements Serializable {
     }
 
     public List<Planet> getAllReachablePlanetsFrom(Planet planet) {
-        return Planets.getNearbyPlanets(planet, 30);
+        return Planets.getInstance().getNearbyPlanets(planet, 30);
     }
 
     /**

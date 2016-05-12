@@ -212,6 +212,8 @@ public class Planet implements Serializable {
      * a hash to keep track of dynamic planet changes
      * <p>
      * sorted map of [date of change: change information]
+     * <p>
+     * Package-private so that Planets can access it
      */
     @XmlTransient
     TreeMap<DateTime, PlanetaryEvent> events;
@@ -380,7 +382,7 @@ public class Planet implements Serializable {
     // Date-dependant data
     
     @SuppressWarnings("unchecked")
-    private PlanetaryEvent getOrCreateEvent(DateTime when) {
+    PlanetaryEvent getOrCreateEvent(DateTime when) {
         if(null == when) {
             return null;
         }
@@ -835,28 +837,7 @@ public class Planet implements Serializable {
                 for( PlanetaryEvent event : other.getEvents() ) {
                     if( null != event && null != event.date ) {
                         PlanetaryEvent myEvent = getOrCreateEvent(event.date);
-                        myEvent.climate = Utilities.nonNull(event.climate, myEvent.climate);
-                        myEvent.faction = Utilities.nonNull(event.faction, myEvent.faction);
-                        myEvent.hpg = Utilities.nonNull(event.hpg, myEvent.hpg);
-                        myEvent.lifeForm = Utilities.nonNull(event.lifeForm, myEvent.lifeForm);
-                        myEvent.message = Utilities.nonNull(event.message, myEvent.message);
-                        myEvent.name = Utilities.nonNull(event.name, myEvent.name);
-                        myEvent.percentWater = Utilities.nonNull(event.percentWater, myEvent.percentWater);
-                        myEvent.shortName = Utilities.nonNull(event.shortName, myEvent.shortName);
-                        myEvent.socioIndustrial = Utilities.nonNull(event.socioIndustrial, myEvent.socioIndustrial);
-                        myEvent.temperature = Utilities.nonNull(event.temperature, myEvent.temperature);
-                        myEvent.pressure = Utilities.nonNull(event.pressure, myEvent.pressure);
-                        myEvent.pressureAtm = Utilities.nonNull(event.pressureAtm, myEvent.pressureAtm);
-                        myEvent.atmMass = Utilities.nonNull(event.atmMass, myEvent.atmMass);
-                        myEvent.atmosphere = Utilities.nonNull(event.atmosphere, myEvent.atmosphere);
-                        myEvent.albedo = Utilities.nonNull(event.albedo, myEvent.albedo);
-                        myEvent.greenhouseEffect = Utilities.nonNull(event.greenhouseEffect, myEvent.greenhouseEffect);
-                        myEvent.habitability = Utilities.nonNull(event.habitability, myEvent.habitability);
-                        myEvent.populationRating = Utilities.nonNull(event.populationRating, myEvent.populationRating);
-                        myEvent.government = Utilities.nonNull(event.government, myEvent.government);
-                        myEvent.controlRating = Utilities.nonNull(event.controlRating, myEvent.controlRating);
-                        myEvent.nadirCharge = Utilities.nonNull(event.nadirCharge, myEvent.nadirCharge);
-                        myEvent.zenithCharge = Utilities.nonNull(event.zenithCharge, myEvent.zenithCharge);
+                        myEvent.copyDataFrom(event);
                     }
                 }
             }
@@ -962,6 +943,31 @@ public class Planet implements Serializable {
         // Stellar support, to be moved later
         public Boolean nadirCharge;
         public Boolean zenithCharge;
+        
+        public void copyDataFrom(PlanetaryEvent other) {
+            climate = Utilities.nonNull(other.climate, climate);
+            faction = Utilities.nonNull(other.faction, faction);
+            hpg = Utilities.nonNull(other.hpg, hpg);
+            lifeForm = Utilities.nonNull(other.lifeForm, lifeForm);
+            message = Utilities.nonNull(other.message, message);
+            name = Utilities.nonNull(other.name, name);
+            percentWater = Utilities.nonNull(other.percentWater, percentWater);
+            shortName = Utilities.nonNull(other.shortName, shortName);
+            socioIndustrial = Utilities.nonNull(other.socioIndustrial, socioIndustrial);
+            temperature = Utilities.nonNull(other.temperature, temperature);
+            pressure = Utilities.nonNull(other.pressure, pressure);
+            pressureAtm = Utilities.nonNull(other.pressureAtm, pressureAtm);
+            atmMass = Utilities.nonNull(other.atmMass, atmMass);
+            atmosphere = Utilities.nonNull(other.atmosphere, atmosphere);
+            albedo = Utilities.nonNull(other.albedo, albedo);
+            greenhouseEffect = Utilities.nonNull(other.greenhouseEffect, greenhouseEffect);
+            habitability = Utilities.nonNull(other.habitability, habitability);
+            populationRating = Utilities.nonNull(other.populationRating, populationRating);
+            government = Utilities.nonNull(other.government, government);
+            controlRating = Utilities.nonNull(other.controlRating, controlRating);
+            nadirCharge = Utilities.nonNull(other.nadirCharge, nadirCharge);
+            zenithCharge = Utilities.nonNull(other.zenithCharge, zenithCharge);
+        }
     }
     
     public static final class FactionChange {

@@ -195,7 +195,7 @@ public class ContractMarket implements Serializable {
                 // Just one faction. Are there any others nearby?
                 Faction onlyFaction = currentFactions.iterator().next();
                 if( !onlyFaction.isPeriphery() ) {
-                    for (Planet key : Planets.getNearbyPlanets(campaign.getCurrentPlanet(), 30)) {
+                    for (Planet key : Planets.getInstance().getNearbyPlanets(campaign.getCurrentPlanet(), 30)) {
                         for (Faction f : key.getFactionSet(currentDate)) {
                             if( !onlyFaction.equals(f) ) {
                                 inBackwater = false;
@@ -447,7 +447,7 @@ public class ContractMarket implements Serializable {
         if (!contract.getEnemyCode().equals("REB") &&
         		!contract.getEnemyCode().equals("PIR")) {
         	boolean factionValid = false;
-        	for (Planet p : Planets.getNearbyPlanets(campaign.getCurrentPlanet(), 30)) {
+        	for (Planet p : Planets.getInstance().getNearbyPlanets(campaign.getCurrentPlanet(), 30)) {
         		if (factionValid) break;
         		for (Faction f : p.getFactionSet(new DateTime(campaign.getCalendar()))) {
         			if (f.getShortName().equals(contract.getEnemyCode())) {
