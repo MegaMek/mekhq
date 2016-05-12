@@ -191,9 +191,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         pack();
 
         // center this dialog over the owner
-        int xPos = (int) (owner.getLocation().getX() + (owner.getWidth() / 2) - (getWidth() / 2));
-        int yPos = (int) (owner.getLocation().getY() + (owner.getHeight() / 2) - (getHeight() / 2));
-        setLocation(xPos, yPos);
+        setLocationRelativeTo(owner);
     }
 
     /**
