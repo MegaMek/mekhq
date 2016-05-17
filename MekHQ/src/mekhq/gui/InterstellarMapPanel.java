@@ -20,6 +20,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -33,6 +34,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.Planets;
+import mekhq.gui.dialog.NewPlanetaryEventDialog;
 
 
 /**
@@ -180,6 +183,18 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                                 jumpPath = new JumpPath();
                                 center(selectedPlanet);
                                 hqview.refreshLocation();
+                            }
+                        });
+                    }
+                    menuGM.add(item);
+                    item = new JMenuItem("Edit planetary events");
+                    item.setEnabled(selectedPlanet != null && campaign.isGM());
+                    if (selectedPlanet != null) {
+                        item.setText("Edit planetary events for " + selectedPlanet.getPrintableName(new DateTime(campaign.getCalendar())));
+                        item.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent ae) {
+                                openPlanetEventEditor(selectedPlanet);
                             }
                         });
                     }
@@ -495,6 +510,17 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
     	hqview.refreshPlanetView();
     }
 
+    private void openPlanetEventEditor(Planet p) {
+        NewPlanetaryEventDialog editor = new NewPlanetaryEventDialog(null, campaign, selectedPlanet);
+        editor.setVisible(true);
+        List<Planet.PlanetaryEvent> result = editor.getChangedEvents();
+        if((null != result) && !result.isEmpty()) {
+            Planets.getInstance().updatePlanetaryEvents(p.getId(), result, true);
+            repaint();
+            hqview.refreshPlanetView();
+        }
+
+    }
     /**
      * All configuration behaviour of InterStellarMap are saved here.
      *
