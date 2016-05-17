@@ -5,6 +5,7 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,6 +31,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.joda.time.DateTime;
 import org.w3c.dom.DOMException;
+import org.w3c.dom.Node;
 
 import mekhq.FileParser;
 import mekhq.MekHQ;
@@ -72,6 +74,20 @@ public class Planets {
             planets.loader.start();
         }
         return planets;
+    }
+    
+    public static void reload(boolean waitForFinish) {
+        planets = null;
+        getInstance();
+        if(waitForFinish) {
+            try {
+                while(!planets.isInitialized()) {
+                    Thread.sleep(10);
+                }
+            } catch(InterruptedException iex) {
+                MekHQ.logError(iex);
+            }
+        }
     }
 
     private ConcurrentMap<String, Planet> planetList = new ConcurrentHashMap<>();
@@ -200,6 +216,40 @@ public class Planets {
         }
     }
     
+    public void writePlanet(Writer out, Planet planet) {
+        try {
+            marshaller.marshal(planet, out);
+        } catch (Exception e) {
+            MekHQ.logError(e);
+        }
+    }
+    
+
+    public void writePlanetaryEvent(OutputStream out, Planet.PlanetaryEvent event) {
+        try {
+            marshaller.marshal(event, out);
+        } catch (Exception e) {
+            MekHQ.logError(e);
+        }
+    }
+    
+    public void writePlanetaryEvent(Writer out, Planet.PlanetaryEvent event) {
+        try {
+            marshaller.marshal(event, out);
+        } catch (Exception e) {
+            MekHQ.logError(e);
+        }
+    }
+    
+    public Planet.PlanetaryEvent readPlanetaryEvent(Node node) {
+        try {
+            return (Planet.PlanetaryEvent) unmarshaller.unmarshal(node);
+        } catch (JAXBException e) {
+            MekHQ.logError(e);
+        }
+        return null;
+    }
+
     public void writePlanets(OutputStream out, List<Planet> planets) {
         LocalPlanetList temp = new LocalPlanetList();
         temp.list = planets;

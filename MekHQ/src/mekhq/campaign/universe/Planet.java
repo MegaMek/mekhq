@@ -906,6 +906,7 @@ public class Planet implements Serializable {
     }
 
     /** A class representing some event, possibly changing planetary information */
+    @XmlRootElement(name="event")
     public static final class PlanetaryEvent {
         @XmlJavaTypeAdapter(DateAdapter.class)
         public DateTime date;
