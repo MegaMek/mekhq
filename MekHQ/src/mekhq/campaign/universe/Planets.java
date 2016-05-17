@@ -168,6 +168,11 @@ public class Planets {
     
     /** @return <code>true</code> if the planet was known and got updated, <code>false</code> otherwise */
     public boolean updatePlanetaryEvents(String id, Collection<Planet.PlanetaryEvent> events) {
+        return updatePlanetaryEvents(id, events, false);
+    }
+    
+    /** @return <code>true</code> if the planet was known and got updated, <code>false</code> otherwise */
+    public boolean updatePlanetaryEvents(String id, Collection<Planet.PlanetaryEvent> events, boolean replace) {
         Planet planet = getPlanetById(id);
         if(null == planet) {
             return false;
@@ -176,7 +181,11 @@ public class Planets {
             for(Planet.PlanetaryEvent event : events) {
                 if(null != event.date) {
                     Planet.PlanetaryEvent planetaryEvent = planet.getOrCreateEvent(event.date);
-                    planetaryEvent.copyDataFrom(event);
+                    if(replace) {
+                        planetaryEvent.replaceDataFrom(event);
+                    } else {
+                        planetaryEvent.copyDataFrom(event);
+                    }
                 }
             }
         }

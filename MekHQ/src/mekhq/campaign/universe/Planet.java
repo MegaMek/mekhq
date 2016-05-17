@@ -967,6 +967,32 @@ public class Planet implements Serializable {
             custom = (other.custom || custom);
         }
         
+        public void replaceDataFrom(PlanetaryEvent other) {
+            climate = other.climate;
+            faction = other.faction;
+            hpg = other.hpg;
+            lifeForm = other.lifeForm;
+            message = other.message;
+            name = other.name;
+            percentWater = other.percentWater;
+            shortName = other.shortName;
+            socioIndustrial = other.socioIndustrial;
+            temperature = other.temperature;
+            pressure = other.pressure;
+            pressureAtm = other.pressureAtm;
+            atmMass = other.atmMass;
+            atmosphere = other.atmosphere;
+            albedo = other.albedo;
+            greenhouseEffect = other.greenhouseEffect;
+            habitability = other.habitability;
+            populationRating = other.populationRating;
+            government = other.government;
+            controlRating = other.controlRating;
+            nadirCharge = other.nadirCharge;
+            zenithCharge = other.zenithCharge;
+            custom = (other.custom || custom);
+        }
+        
         /** @return <code>true</code> if the event doesn't contain any change */
         public boolean isEmpty() {
             return (null == climate) && (null == faction) && (null == hpg) && (null == lifeForm)
