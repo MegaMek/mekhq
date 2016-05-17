@@ -26,13 +26,18 @@ import java.io.FileInputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import megamek.common.EquipmentType;
 import mekhq.MekHQ;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 
@@ -395,6 +400,19 @@ public class Faction {
 		}
 		MekHQ.logMessage("Loaded a total of " + factions.keySet().size() + " factions");
 	}
+
+    /** @return Sorted list of faction names as one string */
+    public static String getFactionNames(Collection<Faction> factions, int era) {
+        if( null == factions ) {
+            return "-"; //$NON-NLS-1$
+        }
+        List<String> factionNames = new ArrayList<String>(factions.size());
+        for(Faction f : factions) {
+            factionNames.add(f.getFullName(era));
+        }
+        Collections.sort(factionNames);
+        return Utilities.combineString(factionNames, "/"); //$NON-NLS-1$
+    }
 
 
 }

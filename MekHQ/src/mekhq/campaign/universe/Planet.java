@@ -235,6 +235,10 @@ public class Planet implements Serializable {
     public Planet() {
     }
 
+    public Planet(String id) {
+        this.id = id;
+    }
+
     // Constant base data
     
     public String getId() {
@@ -382,7 +386,7 @@ public class Planet implements Serializable {
     // Date-dependant data
     
     @SuppressWarnings("unchecked")
-    PlanetaryEvent getOrCreateEvent(DateTime when) {
+    public PlanetaryEvent getOrCreateEvent(DateTime when) {
         if(null == when) {
             return null;
         }
@@ -619,17 +623,8 @@ public class Planet implements Serializable {
     }
 
     public String getFactionDesc(DateTime when) {
-        int era = Era.getEra(when.getYear() + 1900);
-        Set<Faction> factions = getFactionSet(when);
-        if( null == factions ) {
-            return "-"; //$NON-NLS-1$
-        }
-        List<String> factionNames = new ArrayList<String>(factions.size());
-        for( Faction f : factions ) {
-            factionNames.add(f.getFullName(era));
-        }
-        Collections.sort(factionNames);
-        return Utilities.combineString(factionNames, "/"); //$NON-NLS-1$
+        int era = Era.getEra(when.getYear());
+        return Faction.getFactionNames(getFactionSet(when), era);
     }
 
     // Stellar event data, to be moved
@@ -943,6 +938,8 @@ public class Planet implements Serializable {
         // Stellar support, to be moved later
         public Boolean nadirCharge;
         public Boolean zenithCharge;
+        // Events marked as "custom" are saved to scenario files and loaded from there
+        public transient boolean custom = false;
         
         public void copyDataFrom(PlanetaryEvent other) {
             climate = Utilities.nonNull(other.climate, climate);
@@ -967,6 +964,17 @@ public class Planet implements Serializable {
             controlRating = Utilities.nonNull(other.controlRating, controlRating);
             nadirCharge = Utilities.nonNull(other.nadirCharge, nadirCharge);
             zenithCharge = Utilities.nonNull(other.zenithCharge, zenithCharge);
+            custom = (other.custom || custom);
+        }
+        
+        /** @return <code>true</code> if the event doesn't contain any change */
+        public boolean isEmpty() {
+            return (null == climate) && (null == faction) && (null == hpg) && (null == lifeForm)
+                && (null == message) && (null == name) && (null == shortName) && (null == socioIndustrial)
+                && (null == temperature) && (null == pressure) && (null == pressureAtm)
+                && (null == atmMass) && (null == atmosphere) && (null == albedo) && (null == greenhouseEffect)
+                && (null == habitability) && (null == populationRating) && (null == government)
+                && (null == controlRating) && (null == nadirCharge) && (null == zenithCharge);
         }
     }
     
