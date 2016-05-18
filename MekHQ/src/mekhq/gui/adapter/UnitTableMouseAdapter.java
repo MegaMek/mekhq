@@ -29,6 +29,7 @@ import megamek.common.Player;
 import megamek.common.loaders.BLKFile;
 import mekhq.Utilities;
 import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
@@ -532,6 +533,27 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 gui.refreshUnitView();
                 gui.refreshOrganization();
             }
+        } else if(command.equalsIgnoreCase("RESTORE_UNIT")) {
+            for (Unit unit : units) {
+                if(unit.isAvailable() && (unit.getPartsNeedingFixing().size() > 0)) {
+                    for(Part part : unit.getPartsNeedingFixing()) {
+                        if(part instanceof Armor) {
+                            final Armor armor = (Armor) part;
+                            armor.setAmount(armor.getTotalAmount());
+                        }
+                        part.fix();
+                        part.resetTimeSpent();
+                        part.resetOvertime();
+                        part.setTeamId(null);
+                        part.cancelReservation();
+                    }
+                }
+            }
+            gui.refreshServicedUnitList();
+            gui.refreshUnitList();
+            gui.refreshTaskList();
+            gui.refreshUnitView();
+            gui.refreshOrganization();
         }
     }
 
@@ -624,8 +646,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                             .getEntity(), curType, gui.getCampaign()
                             .getCampaignOptions().getTechLevel())) {
                         cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
-                        if (atype.equals(curType)
-                        		&& atype.getMunitionType() == curType.getMunitionType()) {
+                        if (atype.equals(curType) && atype.getMunitionType() == curType.getMunitionType()) {
                             cbMenuItem.setSelected(true);
                         } else {
                             cbMenuItem.setActionCommand("SWAP_AMMO:"
@@ -879,6 +900,11 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             menu.add(menuItem);
             menuItem = new JMenuItem("Edit Damage...");
             menuItem.setActionCommand("EDIT_DAMAGE");
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(gui.getCampaign().isGM());
+            menu.add(menuItem);
+            menuItem = new JMenuItem("Restore Unit");
+            menuItem.setActionCommand("RESTORE_UNIT");
             menuItem.addActionListener(this);
             menuItem.setEnabled(gui.getCampaign().isGM());
             menu.add(menuItem);
