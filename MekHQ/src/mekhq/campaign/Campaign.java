@@ -3351,6 +3351,26 @@ public class Campaign implements Serializable {
             }
             retirementDefectionTracker.writeToXml(pw1, 1);
         }
+        
+        // Customised planetary events
+        pw1.println("\t<customPlanetaryEvents>");
+        for(Planet p : Planets.getInstance().getPlanets().values()) {
+            List<Planet.PlanetaryEvent> customEvents = new ArrayList<>();
+            for(Planet.PlanetaryEvent event : p.getEvents()) {
+                if(event.custom) {
+                    customEvents.add(event);
+                }
+            }
+            if(!customEvents.isEmpty()) {
+                pw1.println("\t\t<planet><id>" + p.getId() + "</id>");
+                for(Planet.PlanetaryEvent event : customEvents) {
+                    Planets.getInstance().writePlanetaryEvent(pw1, event);
+                    pw1.println();
+                }
+                pw1.println("\t\t</planet>");
+            }
+        }
+        pw1.println("\t</customPlanetaryEvents>");
 
         writeCustoms(pw1);
         // Okay, we're done.
@@ -3643,6 +3663,8 @@ public class Campaign implements Serializable {
                 	processLanceNodes(retVal, wn);
                 } else if (xn.equalsIgnoreCase("retirementDefectionTracker")) {
                 	retVal.retirementDefectionTracker = RetirementDefectionTracker.generateInstanceFromXML(wn, retVal);
+                } else if (xn.equalsIgnoreCase("customPlanetaryEvents")) {
+                    updatePlanetaryEventsFromXML(wn);
                 }
 
             } else {
@@ -4058,6 +4080,43 @@ public class Campaign implements Serializable {
         MekHQ.logMessage("Load of campaign file complete!");
 
         return retVal;
+    }
+
+    private static void updatePlanetaryEventsFromXML(Node wn) {
+        Planets.reload(true);
+        NodeList wList = wn.getChildNodes();
+        for (int x = 0; x < wList.getLength(); x++) {
+            Node wn2 = wList.item(x);
+
+            // If it's not an element node, we ignore it.
+            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (wn2.getNodeName().equalsIgnoreCase("planet")) {
+                NodeList planetNodes = wn2.getChildNodes();
+                String planetId = null;
+                List<Planet.PlanetaryEvent> events = new ArrayList<>();
+                for(int n = 0; n < planetNodes.getLength(); ++ n) {
+                    Node planetNode = planetNodes.item(n);
+                    if(planetNode.getNodeType() != Node.ELEMENT_NODE) {
+                        continue;
+                    }
+                    if(planetNode.getNodeName().equalsIgnoreCase("id")) {
+                        planetId = planetNode.getTextContent();
+                    } else if(planetNode.getNodeName().equalsIgnoreCase("event")) {
+                        Planet.PlanetaryEvent event = Planets.getInstance().readPlanetaryEvent(planetNode);
+                        if(null != event) {
+                            event.custom = true;
+                            events.add(event);
+                        }
+                    }
+                }
+                if(null != planetId) {
+                    Planets.getInstance().updatePlanetaryEvents(planetId, events, true);
+                }
+            }
+        }
     }
 
     private static void fixIdReferences(Campaign retVal) {
