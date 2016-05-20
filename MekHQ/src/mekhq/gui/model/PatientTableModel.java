@@ -35,6 +35,9 @@ public class PatientTableModel extends AbstractListModel<Person> {
 
     @Override
     public Person getElementAt(int index) {
+        if (index < 0 || index >= patients.size()) {
+            return null;
+        }
         return patients.get(index);
     }
 

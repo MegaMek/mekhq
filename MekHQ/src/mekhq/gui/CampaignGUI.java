@@ -6683,7 +6683,11 @@ public class CampaignGUI extends JPanel {
             return patients;
         }
         for (int idx : indices) {
-            patients.add((Person) unassignedPatientModel.getElementAt(idx));
+            Person p = assignedPatientModel.getElementAt(idx);
+            if (p == null) {
+                continue;
+            }
+            patients.add(p);
         }
         return patients;
     }
@@ -6695,7 +6699,11 @@ public class CampaignGUI extends JPanel {
             return patients;
         }
         for (int idx : indices) {
-            patients.add((Person) assignedPatientModel.getElementAt(idx));
+            Person p = assignedPatientModel.getElementAt(idx);
+            if (p == null) {
+                continue;
+            }
+            patients.add(p);
         }
         return patients;
     }
