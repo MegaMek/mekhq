@@ -6522,6 +6522,7 @@ public class Campaign implements Serializable {
         entity.setLastTarget(Entity.NONE);
         entity.setNeverDeployed(true);
         entity.setStuck(false);
+        entity.resetCoolantFailureAmount();
         if (!entity.getSensors().isEmpty()) {
             entity.setNextSensor(entity.getSensors().firstElement());
         }
