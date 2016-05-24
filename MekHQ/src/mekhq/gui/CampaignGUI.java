@@ -8734,7 +8734,6 @@ public class CampaignGUI extends JPanel {
         getCampaign().getCampaignOptions().setEdge(getCampaign().getGameOptions().getOption("edge").booleanValue());
         getCampaign().getCampaignOptions().setImplants(getCampaign().getGameOptions().getOption("manei_domini").booleanValue());
         getCampaign().getCampaignOptions().setQuirks(getCampaign().getGameOptions().getOption("stratops_quirks").booleanValue());
-        getCampaign().getCampaignOptions().setLimitByYear(getCampaign().getGameOptions().getOption("is_eq_limits").booleanValue());
         getCampaign().getCampaignOptions().setAllowCanonOnly(getCampaign().getGameOptions().getOption("canon_only").booleanValue());
         getCampaign().getCampaignOptions().setTechLevel(TechConstants.getSimpleLevel(getCampaign().getGameOptions().getOption("techlevel").stringValue()));
     }
