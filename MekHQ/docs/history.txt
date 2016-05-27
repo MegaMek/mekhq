@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.28-git
+v0.3.28 (2016-04-16 19:30 UTC)
 + Bug #43 / PR #62: Making admins gain their XP less often than once per week if requested,
                     have that option work independently from AtB.
 + PR #60: UI Enhancement - Show children in person panel
@@ -16,6 +16,8 @@ v0.3.28-git
 + [AtB] When failure to deploy results in defeat, replace generated entities with stubs.
 + Issue #40: [ATB] 3.25 : Enemy reinforcements incorrectly set to deploy at the start of the game
 + Issue #68: IndexOutOfBoundsException when advancing day
++ Updated MegaMek.jar to 0.41.18
++ Updated MegaMekLab.jar to 0.1.54
 
 v0.3.27 (2016-04-16 00:30 UTC)
 + Updated MegaMek.jar to 0.41.17
