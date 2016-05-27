@@ -1,5 +1,7 @@
 VERSION HISTORY
 ----------------------------------
+v0.3.29-git
+
 v0.3.28 (2016-04-16 19:30 UTC)
 + Bug #43 / PR #62: Making admins gain their XP less often than once per week if requested,
                     have that option work independently from AtB.
