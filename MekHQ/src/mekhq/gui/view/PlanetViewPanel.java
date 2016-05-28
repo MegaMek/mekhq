@@ -18,6 +18,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.text.DefaultCaret;
 
 import org.joda.time.DateTime;
 
@@ -116,6 +117,7 @@ public class PlanetViewPanel extends JPanel {
         add(pnlNeighbors, gridBagConstraints);
         
         txtDesc.setName("txtDesc");
+        ((DefaultCaret) txtDesc.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
         txtDesc.setText(planet.getDescription());
         txtDesc.setEditable(false);
         txtDesc.setLineWrap(true);
