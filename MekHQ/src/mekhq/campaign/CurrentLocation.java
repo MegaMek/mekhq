@@ -24,6 +24,7 @@ package mekhq.campaign;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Locale;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -99,23 +100,24 @@ public class CurrentLocation implements Serializable {
 	
 	public String getReport(Date date) {
 	    DateTime now = new DateTime(date);
-		String toReturn = "<b>Current Location</b><br>";
-		toReturn += currentPlanet.getShortDesc(now) + "<br> ";
+	    StringBuilder sb = new StringBuilder();
+	    sb.append("<html><b>Current Location</b><br>");
+	    sb.append(currentPlanet.getPrintableName(now)).append("<br>");
 		if(null != jumpPath && !jumpPath.isEmpty()) {
-			toReturn += "In transit to " + jumpPath.getLastPlanet().getPrintableName(new DateTime(date)) + " ";
+		    sb.append("In transit to ").append(jumpPath.getLastPlanet().getPrintableName(new DateTime(date))).append(" ");
 		}
 		if(isOnPlanet()) {
-			toReturn += "<i>On Planet</i>";
+			sb.append("<i>on planet</i>");
 		} 
 		else if(isAtJumpPoint()) {
-			toReturn += "<i>At Jump Point</i>";
+		    sb.append("<i>at jump point</i>");
 		} else {
-			toReturn += "<i>" + Math.round(100.0*getTransitTime())/100.0 + " days out </i>";
+		    sb.append("<i>").append(String.format(Locale.ROOT, "%.2f", getTransitTime())).append(" days out </i>");
 		}
 		if(!Double.isInfinite(currentPlanet.getRechargeTime(now))) {
-		    toReturn += ", <i>" + Math.round(100.0*rechargeTime/currentPlanet.getRechargeTime(now)) + "% charged</i>";
+		    sb.append(", <i>").append(String.format(Locale.ROOT, "%.0f", 100.0 * rechargeTime/currentPlanet.getRechargeTime(now))).append("% charged </i>");
 		}
-		return "<html>" + toReturn + "</html>";
+		return sb.append("</html>").toString();
 	}
 	
 	public JumpPath getJumpPath() {
