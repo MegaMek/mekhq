@@ -3836,12 +3836,15 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public boolean hasChildren() {
         boolean hasKids = false;
-        for (Ancestors a : campaign.getAncestors()) {
-            if (getId().equals(a.getMotherID()) || getId().equals(a.getFatherID())) {
-                hasKids = true;
-                break;
+        if (getId() != null) {
+            for (Ancestors a : campaign.getAncestors()) {
+                if (getId().equals(a.getMotherID()) || getId().equals(a.getFatherID())) {
+                    hasKids = true;
+                    break;
+                }
             }
         }
+        
         return hasKids;
     }
 }

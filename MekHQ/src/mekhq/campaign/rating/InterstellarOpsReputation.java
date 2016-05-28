@@ -468,13 +468,13 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
         if (SkillType.getExperienceLevelName(-1).equalsIgnoreCase(level)) {
             return 0;
         } else if (SkillType.getExperienceLevelName(SkillType.EXP_GREEN).equalsIgnoreCase(level)) {
-            return 0;
-        } else if (SkillType.getExperienceLevelName(SkillType.EXP_REGULAR).equalsIgnoreCase(level)) {
             return 5;
-        } else if (SkillType.getExperienceLevelName(SkillType.EXP_VETERAN).equalsIgnoreCase(level)) {
+        } else if (SkillType.getExperienceLevelName(SkillType.EXP_REGULAR).equalsIgnoreCase(level)) {
             return 10;
+        } else if (SkillType.getExperienceLevelName(SkillType.EXP_VETERAN).equalsIgnoreCase(level)) {
+            return 20;
         }
-        return 20;
+        return 40;
     }
 
     @Override
