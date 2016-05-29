@@ -6713,7 +6713,7 @@ public class CampaignGUI extends JPanel {
             return patients;
         }
         for (int idx : indices) {
-            Person p = assignedPatientModel.getElementAt(idx);
+            Person p = unassignedPatientModel.getElementAt(idx);
             if (p == null) {
                 continue;
             }
