@@ -2,6 +2,8 @@ package mekhq;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.util.ImageFileFactory;
@@ -21,6 +23,13 @@ public class IconPackage {
     private DirectoryItems camos;
     private DirectoryItems forceIcons;
     protected static MechTileset mt;
+    
+    /** A map of keys to various gui elements, for future skinning purposes */
+    private final Map<String, String> guiElements = new HashMap<>();
+    {
+        // Skin defaults
+        guiElements.put("infirmary_background", "data/images/misc/field_hospital.jpg");
+    }
     
     public IconPackage() {
 
@@ -76,5 +85,9 @@ public class IconPackage {
     
     public MechTileset getMechTiles() {
         return mt;
+    }
+    
+    public String getGuiElement(String key) {
+        return guiElements.get(key);
     }
 }

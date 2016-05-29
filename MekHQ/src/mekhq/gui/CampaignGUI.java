@@ -2339,7 +2339,13 @@ public class CampaignGUI extends JPanel {
         panInfirmary = new JPanel(new GridBagLayout()) {
             private static final long serialVersionUID = -4380823251614946212L;
             
-            private final Image bg = Toolkit.getDefaultToolkit().createImage("data/images/misc/field_hospital.jpg");
+            private Image bg = null;
+            {
+                String bgImageFile = getIconPackage().getGuiElement("infirmary_background");
+                if(null != bgImageFile && !bgImageFile.isEmpty()) {
+                    bg = Toolkit.getDefaultToolkit().createImage(bgImageFile);
+                }
+            }
             
             @Override
             protected void paintComponent(Graphics g)
