@@ -54,6 +54,7 @@ import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
@@ -400,8 +401,8 @@ public class AtBScenario extends Scenario {
 		if (null != mission) {
 			Planet p = Planets.getInstance().getPlanets().get(mission.getPlanetName());
 			if (null != p) {
-				atmosphere = p.getPressure(new DateTime(campaign.getCalendar()));
-				gravity = p.getGravity().floatValue();
+				atmosphere = Utilities.nonNull(p.getPressure(new DateTime(campaign.getCalendar())), atmosphere);
+				gravity = Utilities.nonNull(p.getGravity(), gravity).floatValue();
 			}
 		}
 	}
