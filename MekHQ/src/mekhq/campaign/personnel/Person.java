@@ -947,7 +947,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		}
 		baby.setId(id);
 		baby.setAncestorsID(tmpAncID);
-		campaign.addReport(getName() + " has given birth to " + baby.getName() + ", a baby " + (baby.getGender() == G_MALE ? "boy!" : "girl!"));
+		campaign.addReport(getName() + " has given birth to " + baby.getHyperlinkedName() + ", a baby " + (baby.getGender() == G_MALE ? "boy!" : "girl!"));
 		setDueDate(null);
 		return baby;
 	}
@@ -966,7 +966,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 						GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
 						tCal.add(GregorianCalendar.DAY_OF_YEAR, 40*7);
 						setDueDate(tCal);
-						campaign.addReport(getFullName()+" has conceived");
+						campaign.addReport(getHyperlinkedName()+" has conceived");
 					}
 				} else if (getSpouse() != null) {
 					if (getSpouse().isActive() && !getSpouse().isDeployed() && getSpouse().getAge(campaign.getCalendar()) > 13) {
@@ -975,7 +975,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 							GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
 							tCal.add(GregorianCalendar.DAY_OF_YEAR, 40*7);
 							setDueDate(tCal);
-							campaign.addReport(getFullName()+" has conceived");
+							campaign.addReport(getHyperlinkedName()+" has conceived");
 						}
 					}
 				}
