@@ -24,9 +24,11 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.Window;
@@ -36,6 +38,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.ImageObserver;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -2333,23 +2336,54 @@ public class CampaignGUI extends JPanel {
     private void initInfirmaryTab() {
         GridBagConstraints gridBagConstraints;
 
-        panInfirmary = new JPanel(new GridBagLayout());
+        panInfirmary = new JPanel(new GridBagLayout()) {
+            private static final long serialVersionUID = -4380823251614946212L;
+            
+            private Image bg = null;
+            {
+                String bgImageFile = getIconPackage().getGuiElement("infirmary_background");
+                if(null != bgImageFile && !bgImageFile.isEmpty()) {
+                    bg = Toolkit.getDefaultToolkit().createImage(bgImageFile);
+                }
+            }
+            
+            @Override
+            protected void paintComponent(Graphics g)
+            {
+                super.paintComponent(g);
+                if(null == bg) {
+                    return;
+                }
+                int size = Math.max(getWidth(), getHeight());
+                g.drawImage(bg, 0, 0, size, size, new ImageObserver() {
+                    @Override
+                    public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
+                        if((infoflags & ImageObserver.ALLBITS) != 0) {
+                            repaint();
+                            return false;
+                        }
+                        return true;
+                    }
+                });
+            }
+        };
 
         doctorsModel = new DocTableModel(getCampaign());
         docTable = new JTable(doctorsModel);
         docTable.setRowHeight(60);
-        docTable.getColumnModel().getColumn(0)
-                .setCellRenderer(doctorsModel.getRenderer(getIconPackage()));
-        docTable.getSelectionModel().addListSelectionListener(
-                new javax.swing.event.ListSelectionListener() {
-                    public void valueChanged(
-                            javax.swing.event.ListSelectionEvent evt) {
-                        docTableValueChanged(evt);
-                    }
-                });
+        docTable.getColumnModel().getColumn(0).setCellRenderer(doctorsModel.getRenderer(getIconPackage()));
+        docTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent evt) {
+                docTableValueChanged(evt);
+            }
+        });
+        docTable.setOpaque(false);
         JScrollPane scrollDocTable = new JScrollPane(docTable);
         scrollDocTable.setMinimumSize(new java.awt.Dimension(300, 300));
         scrollDocTable.setPreferredSize(new java.awt.Dimension(300, 300));
+        scrollDocTable.setOpaque(false);
+        scrollDocTable.getViewport().setOpaque(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -2361,11 +2395,11 @@ public class CampaignGUI extends JPanel {
         panInfirmary.add(scrollDocTable, gridBagConstraints);
 
         btnAssignDoc = new JButton(resourceMap.getString("btnAssignDoc.text")); // NOI18N
-        btnAssignDoc.setToolTipText(resourceMap
-                .getString("btnAssignDoc.toolTipText")); // NOI18N
+        btnAssignDoc.setToolTipText(resourceMap.getString("btnAssignDoc.toolTipText")); // NOI18N
         btnAssignDoc.setEnabled(false);
         btnAssignDoc.addActionListener(new ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
                 assignDoctor();
             }
         });
@@ -2375,11 +2409,11 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panInfirmary.add(btnAssignDoc, gridBagConstraints);
 
-        btnUnassignDoc = new JButton(
-                resourceMap.getString("btnUnassignDoc.text")); // NOI18N
+        btnUnassignDoc = new JButton(resourceMap.getString("btnUnassignDoc.text")); // NOI18N
         btnUnassignDoc.setEnabled(false);
         btnUnassignDoc.addActionListener(new ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
                 unassignDoctor();
             }
         });
@@ -2393,46 +2427,42 @@ public class CampaignGUI extends JPanel {
         listAssignedPatient = new JList<Person>(assignedPatientModel);
         listAssignedPatient.setCellRenderer(assignedPatientModel
                 .getRenderer(getIconPackage()));
-        listAssignedPatient.setLayoutOrientation(JList.VERTICAL_WRAP);
-        listAssignedPatient.setVisibleRowCount(5);
-        listAssignedPatient.getSelectionModel().addListSelectionListener(
-                new javax.swing.event.ListSelectionListener() {
-                    public void valueChanged(
-                            javax.swing.event.ListSelectionEvent evt) {
-                        patientTableValueChanged();
-                    }
-                });
+        listAssignedPatient.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+        listAssignedPatient.setVisibleRowCount(-1);
+        listAssignedPatient.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent evt) {
+                patientTableValueChanged();
+            }
+        });
+        listAssignedPatient.setOpaque(false);
         JScrollPane scrollAssignedPatient = new JScrollPane(listAssignedPatient);
         scrollAssignedPatient.setMinimumSize(new java.awt.Dimension(300, 360));
-        scrollAssignedPatient
-                .setPreferredSize(new java.awt.Dimension(300, 360));
-
+        scrollAssignedPatient.setPreferredSize(new java.awt.Dimension(300, 360));
+        scrollAssignedPatient.setOpaque(false);
+        scrollAssignedPatient.getViewport().setOpaque(false);
         unassignedPatientModel = new PatientTableModel(getCampaign());
         listUnassignedPatient = new JList<Person>(unassignedPatientModel);
         listUnassignedPatient.setCellRenderer(unassignedPatientModel
                 .getRenderer(getIconPackage()));
         listUnassignedPatient.setLayoutOrientation(JList.HORIZONTAL_WRAP);
         listUnassignedPatient.setVisibleRowCount(-1);
-        listUnassignedPatient.getSelectionModel().addListSelectionListener(
-                new javax.swing.event.ListSelectionListener() {
-                    public void valueChanged(
-                            javax.swing.event.ListSelectionEvent evt) {
-                        patientTableValueChanged();
-                    }
-                });
-        JScrollPane scrollUnassignedPatient = new JScrollPane(
-                listUnassignedPatient);
-        scrollUnassignedPatient
-                .setMinimumSize(new java.awt.Dimension(300, 200));
-        scrollUnassignedPatient.setPreferredSize(new java.awt.Dimension(300,
-                300));
-
-        listAssignedPatient.setBorder(BorderFactory
-                .createTitledBorder(resourceMap
-                        .getString("panAssignedPatient.title")));
-        listUnassignedPatient.setBorder(BorderFactory
-                .createTitledBorder(resourceMap
-                        .getString("panUnassignedPatient.title")));
+        listUnassignedPatient.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent evt) {
+                patientTableValueChanged();
+            }
+        });
+        listUnassignedPatient.setOpaque(false);
+        JScrollPane scrollUnassignedPatient = new JScrollPane(listUnassignedPatient);
+        scrollUnassignedPatient.setMinimumSize(new java.awt.Dimension(300, 200));
+        scrollUnassignedPatient.setPreferredSize(new java.awt.Dimension(300, 300));
+        scrollUnassignedPatient.setOpaque(false);
+        scrollUnassignedPatient.getViewport().setOpaque(false);
+        listAssignedPatient.setBorder(BorderFactory.createTitledBorder(
+                resourceMap.getString("panAssignedPatient.title")));
+        listUnassignedPatient.setBorder(BorderFactory.createTitledBorder(
+                resourceMap.getString("panUnassignedPatient.title")));
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -3927,10 +3957,9 @@ public class CampaignGUI extends JPanel {
         updateAssignDoctorEnabled();
     }
 
-    private void docTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
+    private void docTableValueChanged(ListSelectionEvent evt) {
         refreshPatientList();
         updateAssignDoctorEnabled();
-
     }
 
     private void PartsTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -6545,36 +6574,43 @@ public class CampaignGUI extends JPanel {
         ArrayList<Person> unassigned = new ArrayList<Person>();
         for (Person patient : getCampaign().getPatients()) {
             // Knock out inactive doctors
-            if (patient != null
-                    && patient.getDoctorId() != null
-                    && getCampaign().getPerson(patient.getDoctorId()) != null
-                    && getCampaign().getPerson(patient.getDoctorId())
-                            .isInActive()) {
+            if((patient != null)
+                && (patient.getDoctorId() != null)
+                && (getCampaign().getPerson(patient.getDoctorId()) != null)
+                && getCampaign().getPerson(patient.getDoctorId()).isInActive()) {
                 patient.setDoctorId(null, getCampaign().getCampaignOptions()
                         .getNaturalHealingWaitingPeriod());
             }
-            if (patient.getDoctorId() == null) {
+            if(patient.getDoctorId() == null) {
                 unassigned.add(patient);
-            } else if (doctor != null
-                    && patient.getDoctorId().equals(doctor.getId())) {
+            } else if((doctor != null) && patient.getDoctorId().equals(doctor.getId())) {
                 assigned.add(patient);
             }
         }
-        int assignedIdx = listAssignedPatient.getSelectedIndex();
-        int unassignedIdx = listUnassignedPatient.getSelectedIndex();
+        List<Person> assignedPatients = getSelectedAssignedPatients();
+        List<Person> unassignedPatients = getSelectedUnassignedPatients();
+        int[] assignedIndices = new int[assignedPatients.size()];
+        Arrays.fill(assignedIndices, Integer.MAX_VALUE);
+        int[] unassignedIndices = new int[unassignedPatients.size()];
+        Arrays.fill(unassignedIndices, Integer.MAX_VALUE);
+        
         assignedPatientModel.setData(assigned);
         unassignedPatientModel.setData(unassigned);
-        if (assignedIdx < assignedPatientModel.getSize()) {
-            listAssignedPatient.setSelectedIndex(assignedIdx);
-        } else {
-            listAssignedPatient.setSelectedIndex(-1);
+        
+        int i = 0;
+        for(Person patient : assignedPatients) {
+            int idx = assigned.indexOf(patient);
+            assignedIndices[i] = (idx >= 0) ? idx : Integer.MAX_VALUE;
+            ++ i;
         }
-        if (unassignedIdx < unassignedPatientModel.getSize()) {
-            listUnassignedPatient.setSelectedIndex(unassignedIdx);
-        } else {
-            listUnassignedPatient.setSelectedIndex(-1);
+        i = 0;
+        for(Person patient : unassignedPatients) {
+            int idx = unassigned.indexOf(patient);
+            unassignedIndices[i] = (idx >= 0) ? idx : Integer.MAX_VALUE;
+            ++ i;
         }
-
+        listAssignedPatient.setSelectedIndices(assignedIndices);
+        listUnassignedPatient.setSelectedIndices(unassignedIndices);
     }
 
     public void refreshPartsList() {
@@ -6683,7 +6719,7 @@ public class CampaignGUI extends JPanel {
             return patients;
         }
         for (int idx : indices) {
-            Person p = assignedPatientModel.getElementAt(idx);
+            Person p = unassignedPatientModel.getElementAt(idx);
             if (p == null) {
                 continue;
             }
