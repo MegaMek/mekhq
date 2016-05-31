@@ -211,9 +211,14 @@ private MechSummary performRollRat() {
 		Campaign campaign = gui.getCampaign();
 		//Taken from mekhq.campaign.market.UnitMarket.addOffers();
 		MechSummary ms = null;
-		RandomUnitGenerator.getInstance().setChosenRAT(rat);
+		RandomUnitGenerator rug = RandomUnitGenerator.getInstance();
+		if(!rug.isInitialized()) {
+			unitPicked.setText("RAT tables are still loading");
+			return null;
+		}
+		rug.setChosenRAT(rat);
 		for(int i = 0;i < 10000;i++){ //This way we get a terminating condition to prevent locking if an option causes problems.
-			ArrayList<MechSummary> msl = RandomUnitGenerator.getInstance().generate(1);
+			ArrayList<MechSummary> msl = rug.generate(1);
 			if (msl.size() > 0) {
 				ms = msl.get(0);
 				MekHQ.logMessage("picked "+ ms.getName() + ", determining if legal");

@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -76,77 +77,74 @@ public class UnitTableData implements Serializable, ActionListener {
 
 	private ArrayList<ActionListener> listeners;
 
-	public static final int WT_LIGHT = 0;
-	public static final int WT_MEDIUM = 1;
-	public static final int WT_HEAVY = 2;
-	public static final int WT_ASSAULT = 3;
-	public static final String[] weightNames = {
-		"Light", "Medium", "Heavy", "Assault"
-	};
-	
-	public static int getWeightIndex(String weight){
-		weight = weight.toLowerCase();
-		if(weight.matches("light")) return WT_LIGHT;
-		else if(weight.matches("medium")) return WT_MEDIUM;
-		else if(weight.matches("heavy")) return WT_HEAVY;
-		else if(weight.matches("assault")) return WT_ASSAULT;
-		else return -1;
-	}
+    public static final int WT_LIGHT = 0;
+    public static final int WT_MEDIUM = 1;
+    public static final int WT_HEAVY = 2;
+    public static final int WT_ASSAULT = 3;
+    public static final String[] weightNames = "Light,Medium,Heavy,Assault".split(","); //$NON-NLS-1$ //$NON-NLS-2$
+    
+    public static int getWeightIndex(String weight){
+        switch(weight.toLowerCase(Locale.ROOT)) {
+            case "light": return WT_LIGHT; //$NON-NLS-1$
+            case "medium": return WT_MEDIUM; //$NON-NLS-1$
+            case "heavy": return WT_HEAVY; //$NON-NLS-1$
+            case "assault": return WT_ASSAULT; //$NON-NLS-1$
+            default: return -1;
+        }
+    }
 
-	public static final int UNIT_MECH = 0;
-	public static final int UNIT_VEHICLE = 1;
-	public static final int UNIT_AERO = 2;
-	public static final int UNIT_DROPSHIP = 3;
-	public static final int UNIT_INFANTRY = 4;
-	public static final int UNIT_BATTLEARMOR = 5;
-	public static final int UNIT_PROTOMECH = 6;
-	public static final int UNIT_COUNT = 7;
-	public static final String[] unitNames = {
-		"Mek", "Vehicle", "Aero", "Dropship", "Infantry",
-		"Battle Armor", "ProtoMek"
-	};
-	
-	public static int getUnitTypeIndex(String type){
-		type = type.toLowerCase();
-		if(type.matches("mek") || type.matches("mech")) return UNIT_MECH;
-		else if(type.matches("vehicle")) return UNIT_VEHICLE;
-		else if(type.matches("aero")) return UNIT_AERO;
-		else if(type.matches("dropship")) return UNIT_DROPSHIP;
-		else if(type.matches("infantry")) return UNIT_INFANTRY;
-		else if(type.matches("battle armor") || type.matches("battle armour")) return UNIT_BATTLEARMOR;
-		else if(type.matches("protomek") || type.matches("protomech")) return UNIT_PROTOMECH;
-		else return -1;
-	}
-	
-	public static final int QUALITY_F = 0;
-	public static final int QUALITY_D = 1;
-	public static final int QUALITY_C = 2;
-	public static final int QUALITY_B = 3;
-	public static final int QUALITY_A = 4;
-	public static final int QUALITY_AA = 5;
-	public static final String[] qualityNames = {
-			"F", "D", "C", "B", "A", "AA"
-	};
-	
-	public static int getQualityIndex(String quality){
-		quality = quality.toLowerCase();
-		if(quality.matches("f")) return QUALITY_F;
-		else if(quality.matches("d")) return QUALITY_D;
-		else if(quality.matches("c")) return QUALITY_C;
-		else if(quality.matches("b")) return QUALITY_B;
-		else if(quality.matches("a")) return QUALITY_A;
-		else if(quality.matches("aa")) return QUALITY_AA;
-		else return -1;
-	}
+    public static final int UNIT_MECH = 0;
+    public static final int UNIT_VEHICLE = 1;
+    public static final int UNIT_AERO = 2;
+    public static final int UNIT_DROPSHIP = 3;
+    public static final int UNIT_INFANTRY = 4;
+    public static final int UNIT_BATTLEARMOR = 5;
+    public static final int UNIT_PROTOMECH = 6;
+    public static final int UNIT_COUNT = 7;
+    public static final String[] unitNames =
+        "Mek,Vehicle,Aero,Dropship,Infantry,Battle Armor,ProtoMek".split(","); //$NON-NLS-1$ //$NON-NLS-2$
+    
+    public static int getUnitTypeIndex(String type){
+        switch(type.toLowerCase(Locale.ROOT)) {
+            case "mek": case "mech": return UNIT_MECH; //$NON-NLS-1$ //$NON-NLS-2$
+            case "vehicle": return UNIT_VEHICLE; //$NON-NLS-1$
+            case "aero": return UNIT_AERO; //$NON-NLS-1$
+            case "dropship": return UNIT_DROPSHIP; //$NON-NLS-1$
+            case "infantry": return UNIT_INFANTRY; //$NON-NLS-1$
+            case "battle armor": case "battle armour": return UNIT_BATTLEARMOR; //$NON-NLS-1$ //$NON-NLS-2$
+            case "protomek": case "protomech": return UNIT_PROTOMECH;  //$NON-NLS-1$//$NON-NLS-2$
+            default: return -1;
+        }
+    }
+    
+    public static final int QUALITY_F = 0;
+    public static final int QUALITY_D = 1;
+    public static final int QUALITY_C = 2;
+    public static final int QUALITY_B = 3;
+    public static final int QUALITY_A = 4;
+    public static final int QUALITY_AA = 5;
+    public static final String[] qualityNames = "F,D,C,B,A,AA".split(","); //$NON-NLS-1$ //$NON-NLS-2$
+    
+    public static int getQualityIndex(String quality){
+        switch(quality.toLowerCase(Locale.ROOT)) {
+            case "f": return QUALITY_F; //$NON-NLS-1$
+            case "d": return QUALITY_D; //$NON-NLS-1$
+            case "c": return QUALITY_C; //$NON-NLS-1$
+            case "b": return QUALITY_B; //$NON-NLS-1$
+            case "a": return QUALITY_A; //$NON-NLS-1$
+            case "aa": return QUALITY_AA; //$NON-NLS-1$
+            default: return -1;
+        }
+    }
 
-	public static ArrayList<String> getAllRATNames() {
-		if (allRatNames == null) {
-			allRatNames = new ArrayList<String>();
-			populateRatNames();
-		}
-		return allRatNames;
-	}
-	
+    public static ArrayList<String> getAllRATNames() {
+        if (allRatNames == null) {
+            allRatNames = new ArrayList<String>();
+            populateRatNames();
+        }
+        return allRatNames;
+    }
+    
 	/**
 	 * Retrieves the names of all RATCollections that meet the criteria.
 	 * 
