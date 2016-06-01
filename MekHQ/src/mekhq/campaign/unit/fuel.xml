@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<materials>
+<!-- Build-in fuel definitions -->
+<material id="FUEL_GAS"><name>Fuel-grade natural gas</name><value>1200</value><usage>FUEL</usage><storage>FLUID</storage><tr>A</tr><tags>pressure</tags></material>
+<material id="FUEL_ICE"><name>Fuel-grade petrochemicals</name><value>1000</value><usage>FUEL</usage><storage>FLUID</storage><tr>A</tr></material>
+<material id="HYDROGEN"><name>Hydrogen</name><value>15000</value><usage>FUEL</usage><storage>FLUID</storage><tr>A</tr><tags>pressure,ultracool</tags></material>
+<material id="FUEL_ALCOHOL"><name>Fuel-grade alcohol</name><value>1500</value><usage>FUEL</usage><storage>FLUID</storage><tr>A</tr></material>
+</materials>
