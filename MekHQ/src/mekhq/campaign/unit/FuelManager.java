@@ -39,6 +39,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.material.Material;
 import mekhq.campaign.material.MaterialStorage;
+import mekhq.campaign.material.MaterialUsage;
 import mekhq.campaign.material.Materials;
 
 public final class FuelManager {
@@ -65,6 +66,8 @@ public final class FuelManager {
             }
         }
     }
+    
+    // getFuelCapability(...) - return the totality of all fuel tanks inside the unit or list of units
     
     /** @return the internal fuel storage of the given entity */
     public static Collection<MaterialStorage> getFuelCapability(Entity e) {
@@ -150,5 +153,83 @@ public final class FuelManager {
         }
         
         return getFuelCapability(c.getUnits());
+    }
+    
+    // getFuelTonnage(...) - return a specific unit's maximum fuel tonnage for the specific fuel
+    
+    /** @return the entity's maximum fuel tonnage for the specific fuel material */
+    public static double getFuelTonnage(Entity e, Material m) {
+        if((null == e) || (null == m) || !m.hasUsage(MaterialUsage.FUEL)) {
+            return 0.0;
+        }
+        
+        for(MaterialStorage storage : getFuelCapability(e)) {
+            if(m.equals(storage.getMaterial())) {
+                return storage.getAmount();
+            }
+        }
+        
+        return 0.0;
+    }
+    
+    /** @return the entity's maximum fuel tonnage for the specific fuel material id */
+    public static double getFuelTonnage(Entity e, String materialId) {
+        return getFuelTonnage(e, Materials.getMaterial(materialId));
+    }
+
+    /** @return the unit's maximum fuel tonnage for the specific fuel material */
+    public static double getFuelTonnage(Unit u, Material m) {
+        if(null == u) {
+            return 0.0;
+        }
+        
+        return getFuelTonnage(u.getEntity(), m);
+    }
+    
+    /** @return the unit's maximum fuel tonnage for the specific fuel material */
+    public static double getFuelTonnage(Unit u, String materialId) {
+        return getFuelTonnage(u, Materials.getMaterial(materialId));
+    }
+    
+    /** @return the unit collection's maximum fuel tonnage for the specific fuel material id */
+    public static double getFuelTonnage(Collection<Unit> units, Material m) {
+        if((null == units) || units.isEmpty() || (null == m) || !m.hasUsage(MaterialUsage.FUEL)) {
+            return 0.0;
+        }
+        
+        double result = 0.0;
+        for(Unit u : units) {
+            result += getFuelTonnage(u, m);
+        }
+        
+        return result;
+    }
+    
+    /** @return the unit collection's maximum fuel tonnage for the specific fuel material id */
+    public static double getFuelTonnage(Collection<Unit> units, String materialId) {
+        return getFuelTonnage(units, Materials.getMaterial(materialId));
+    }
+    
+    /** @return the given force's maximum fuel tonnage for the specific fuel material */
+    public static double getFuelTonnage(Campaign c, Force f, Material m) {
+        if((null == c) || (null == f) || (null == m) || !m.hasUsage(MaterialUsage.FUEL)) {
+            return 0.0;
+        }
+        
+        Collection<UUID> uuids = f.getAllUnits();
+        List<Unit> units = new ArrayList<>(uuids.size());
+        for(UUID unitId : f.getAllUnits()) {
+            Unit u = c.getUnit(unitId);
+            if((null != u) && (null != u.getEntity())) {
+                units.add(u);
+            }
+        }
+        
+        return getFuelTonnage(units, m);
+    }
+    
+    /** @return the given force's maximum fuel tonnage for the specific fuel material id */
+    public static double getFuelTonnage(Campaign c, Force f, String materialId) {
+        return getFuelTonnage(c, f, Materials.getMaterial(materialId));
     }
 }
