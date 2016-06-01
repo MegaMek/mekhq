@@ -718,7 +718,12 @@ public class AtBScenario extends Scenario {
 			 * the player can keep the 'Mech without a battle so no enemy
 			 * units are generated.
 			 */
-			if (botForces.get(0) != null && specMissionEnemies != null
+			
+			if(specMissionEnemies == null ){
+				setForces(campaign);
+			}
+			
+			if (specMissionEnemies != null && botForces.get(0) != null 
 					&& specMissionEnemies.get(weight) != null) {
 				botForces.get(0).setEntityList(specMissionEnemies.get(weight));
 			}
