@@ -38,6 +38,7 @@ import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
 import org.joda.time.DateTime;
@@ -49,13 +50,12 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planets;
 import mekhq.gui.dialog.NewPlanetaryEventDialog;
 
-
 /**
  * This is not functional yet. Just testing things out.
  * A lot of this code is borrowed from InterstellarMap.java in MekWars
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class InterstellarMapPanel extends javax.swing.JPanel {
+public class InterstellarMapPanel extends JPanel {
     private static final long serialVersionUID = -1110105822399704646L;
 
     private ArrayList<Planet> planets;
@@ -75,34 +75,35 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 
         setBorder(BorderFactory.createLineBorder(Color.black));
 
-        //TODO: get the key listener working
         addKeyListener(new KeyAdapter() {
             /** Handle the key pressed event from the text field. */
             @Override
             public void keyPressed(KeyEvent e) {
                 int keyCode = e.getKeyCode();
-
-                if (keyCode == 37)// left arrow
-                {
+                boolean moved = false;
+                if(keyCode == KeyEvent.VK_LEFT) {
                     conf.offset.y -= conf.scale;
-                } else if (keyCode == 38) // uparrow
-                {
-                    conf.offset.x -= conf.scale;
-                } else if (keyCode == 39)// right arrow
-                {
-                   conf.offset.y += conf.scale;
-                } else if (keyCode == 40)// down arrow
-                {
-                    conf.offset.x += conf.scale;
-                } else {
-                    return;
+                    moved = true;
                 }
-                repaint();
+                if(keyCode == KeyEvent.VK_RIGHT) {
+                    conf.offset.y += conf.scale;
+                    moved = true;
+                }
+                if(keyCode == KeyEvent.VK_DOWN) {
+                    conf.offset.x += conf.scale;
+                    moved = true;
+                }
+                if(keyCode == KeyEvent.VK_UP) {
+                    conf.offset.x -= conf.scale;
+                    moved = true;
+                }
+                if(moved) {
+                    repaint();
+                }
             }
         });
 
         addMouseListener(new MouseAdapter() {
-
             @Override
             public void mouseEntered(MouseEvent e) {
                 lastMousePos = new Point(e.getX(), e.getY());
@@ -289,7 +290,6 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 
             @Override
             public void mouseMoved(MouseEvent e) {
-
                 if (lastMousePos == null) {
                     lastMousePos = new Point(e.getX(), e.getY());
                 } else {
@@ -319,7 +319,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
     }
 
     /**
-     * Computes the map-coordinate from the screen koordinate system
+     * Computes the map-coordinate from the screen coordinate system
      */
     private double scr2mapX(int x) {
         return Math.round((x - getWidth() / 2 - conf.offset.x) / conf.scale);
@@ -346,7 +346,6 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
         repaint();
     }
 
-
     @Override
     protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
@@ -365,8 +364,8 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
             arc.setArcByCenter(x, y, jumpRadius, 0, 360, Arc2D.OPEN);
             g2.fill(arc);
         }
-
-      //draw a jump path
+        
+        //draw a jump path
         for(int i = 0; i < jumpPath.size(); i++) {
             Planet planetB = jumpPath.get(i);
             double x = map2scrX(planetB.getX());
@@ -480,7 +479,6 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                 g2.drawString(planet.getPrintableName(new DateTime(campaign.getCalendar())), (float)(x+size * 1.8), (float)y);
             }
         }
-
     }
 
      /**
