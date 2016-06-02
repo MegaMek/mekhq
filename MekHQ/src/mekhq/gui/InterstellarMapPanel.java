@@ -18,9 +18,13 @@
  */
 package mekhq.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -36,10 +40,16 @@ import java.util.List;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLayeredPane;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JViewport;
+import javax.swing.Timer;
 
 import org.joda.time.DateTime;
 
@@ -57,7 +67,17 @@ import mekhq.gui.dialog.NewPlanetaryEventDialog;
  */
 public class InterstellarMapPanel extends JPanel {
     private static final long serialVersionUID = -1110105822399704646L;
-
+    
+    private JLayeredPane pane;
+    private JPanel mapPanel;
+    private JViewport optionView;
+    private JPanel optionPanel;
+    private JButton optionButton;
+    private JCheckBox optEmptySystems;
+    
+    private Timer optionPanelTimer;
+    private boolean optionPanelHidden;
+    
     private ArrayList<Planet> planets;
     private JumpPath jumpPath;
     private Campaign campaign;
@@ -67,11 +87,46 @@ public class InterstellarMapPanel extends JPanel {
     private Point lastMousePos = null;
     private int mouseMod = 0;
 
+    private transient double minX;
+    private transient double minY;
+    private transient double maxX;
+    private transient double maxY;
+    private transient DateTime now;
+
     public InterstellarMapPanel(Campaign c, CampaignGUI view) {
         campaign = c;
         planets = campaign.getPlanets();
         hqview = view;
         jumpPath = new JumpPath();
+        optionPanelHidden = true;
+        optionPanelTimer = new Timer(50, new ActionListener() {
+            Point viewPoint = new Point();
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int width = optionView.getWidth();
+                int height = optionView.getHeight();
+                int maxWidth = optionPanel.getWidth();
+                int maxHeight = optionPanel.getHeight();
+                int minWidth = 30;
+                int minHeight = 30;
+                if(optionPanelHidden && ((width !=  minWidth) || (height != minHeight))) {
+                    width = Math.max(width - maxWidth / 5, minWidth);
+                    height = Math.max(height - maxHeight / 5, minHeight);
+                } else if(!optionPanelHidden && ((width != maxWidth) || (height != maxHeight))) {
+                    width = Math.min(width + maxWidth / 5, maxWidth);
+                    height = Math.min(height + maxHeight / 5, maxHeight);
+                } else {
+                    optionPanelTimer.stop();
+                    return;
+                }
+                optionView.setBounds(pane.getParent().getWidth() - 10 - width, pane.getParent().getHeight() - 10 - height, width, height);
+                viewPoint.move(0, maxHeight - minHeight);
+                optionView.setViewPosition(viewPoint);
+                optionView.revalidate();
+                repaint();
+            }
+        });
 
         setBorder(BorderFactory.createLineBorder(Color.black));
 
@@ -305,6 +360,205 @@ public class InterstellarMapPanel extends JPanel {
                  zoom(Math.pow(1.5,-1 * e.getWheelRotation()));
              }
         });
+        
+        pane = new JLayeredPane();
+        mapPanel = new JPanel() {
+            private static final long serialVersionUID = -6666762147393179909L;
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setColor(Color.BLACK);
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                double size = 1 + 5 * Math.log(conf.scale);
+                size = Math.max(Math.min(size, conf.maxdotSize), conf.minDotSize);
+                
+                minX = scr2mapX(- size / 2.0);
+                minY = scr2mapY(getHeight() + size / 2.0);
+                maxX = scr2mapX(getWidth() + size / 2.0);
+                maxY = scr2mapY(- size / 2.0);
+                now = new DateTime(campaign.getCalendar());
+                
+                Arc2D.Double arc = new Arc2D.Double();
+                //first get the jump diameter for selected planet
+                if(null != selectedPlanet && conf.scale > conf.showPlanetNamesThreshold) {
+                    double x = map2scrX(selectedPlanet.getX());
+                    double y = map2scrY(selectedPlanet.getY());
+                    double z = map2scrX(selectedPlanet.getX() + 30);
+                    double jumpRadius = (z - x);
+                    g2.setPaint(Color.DARK_GRAY);
+                    arc.setArcByCenter(x, y, jumpRadius, 0, 360, Arc2D.OPEN);
+                    g2.fill(arc);
+                }
+                
+                //draw a jump path
+                for(int i = 0; i < jumpPath.size(); i++) {
+                    Planet planetB = jumpPath.get(i);
+                    double x = map2scrX(planetB.getX());
+                    double y = map2scrY(planetB.getY());
+                    //lest try rings
+                    g2.setPaint(Color.WHITE);
+                    arc.setArcByCenter(x, y, size * 1.8, 0, 360, Arc2D.OPEN);
+                    g2.fill(arc);
+                    g2.setPaint(Color.BLACK);
+                    arc.setArcByCenter(x, y, size * 1.6, 0, 360, Arc2D.OPEN);
+                    g2.fill(arc);
+                    g2.setPaint(Color.WHITE);
+                    arc.setArcByCenter(x, y, size * 1.4, 0, 360, Arc2D.OPEN);
+                    g2.fill(arc);
+                    g2.setPaint(Color.BLACK);
+                    arc.setArcByCenter(x, y, size * 1.2, 0, 360, Arc2D.OPEN);
+                    g2.fill(arc);
+                    if(i > 0) {
+                        Planet planetA = jumpPath.get(i-1);
+                        g2.setPaint(Color.WHITE);
+                        g2.draw(new Line2D.Double(map2scrX(planetA.getX()), map2scrY(planetA.getY()), map2scrX(planetB.getX()), map2scrY(planetB.getY())));
+                    }
+                }
+
+                //check to see if the unit is traveling on a jump path currently and if so
+                //draw this one too, in a different color
+                if(null != campaign.getLocation().getJumpPath()) {
+                    for(int i = 0; i < campaign.getLocation().getJumpPath().size(); i++) {
+                        Planet planetB = campaign.getLocation().getJumpPath().get(i);
+                        double x = map2scrX(planetB.getX());
+                        double y = map2scrY(planetB.getY());
+                        //lest try rings
+                        g2.setPaint(Color.YELLOW);
+                        arc.setArcByCenter(x, y, size * 1.8, 0, 360, Arc2D.OPEN);
+                        g2.fill(arc);
+                        g2.setPaint(Color.BLACK);
+                        arc.setArcByCenter(x, y, size * 1.6, 0, 360, Arc2D.OPEN);
+                        g2.fill(arc);
+                        g2.setPaint(Color.YELLOW);
+                        arc.setArcByCenter(x, y, size * 1.4, 0, 360, Arc2D.OPEN);
+                        g2.fill(arc);
+                        g2.setPaint(Color.BLACK);
+                        arc.setArcByCenter(x, y, size * 1.2, 0, 360, Arc2D.OPEN);
+                        g2.fill(arc);
+                        if(i > 0) {
+                            Planet planetA = campaign.getLocation().getJumpPath().get(i-1);
+                            g2.setPaint(Color.YELLOW);
+                            g2.draw(new Line2D.Double(map2scrX(planetA.getX()), map2scrY(planetA.getY()), map2scrX(planetB.getX()), map2scrY(planetB.getY())));
+                        }
+                    }
+                }
+
+                for(Planet planet : planets) {
+                    if(isPlanetVisible(planet, false)) {
+                        double x = map2scrX(planet.getX());
+                        double y = map2scrY(planet.getY());
+                        if(planet.equals(campaign.getCurrentPlanet())) {
+                            //lest try rings
+                            g2.setPaint(Color.ORANGE);
+                            arc.setArcByCenter(x, y, size * 1.8, 0, 360, Arc2D.OPEN);
+                            g2.fill(arc);
+                            g2.setPaint(Color.BLACK);
+                            arc.setArcByCenter(x, y, size * 1.6, 0, 360, Arc2D.OPEN);
+                            g2.fill(arc);
+                            g2.setPaint(Color.ORANGE);
+                            arc.setArcByCenter(x, y, size * 1.4, 0, 360, Arc2D.OPEN);
+                            g2.fill(arc);
+                            g2.setPaint(Color.BLACK);
+                            arc.setArcByCenter(x, y, size * 1.2, 0, 360, Arc2D.OPEN);
+                            g2.fill(arc);
+                        }
+                        if(null != selectedPlanet && selectedPlanet.equals(planet)) {
+                            //lest try rings
+                            g2.setPaint(Color.WHITE);
+                            arc.setArcByCenter(x, y, size * 1.8, 0, 360, Arc2D.OPEN);
+                            g2.fill(arc);
+                            g2.setPaint(Color.BLACK);
+                            arc.setArcByCenter(x, y, size * 1.6, 0, 360, Arc2D.OPEN);
+                            g2.fill(arc);
+                            g2.setPaint(Color.WHITE);
+                            arc.setArcByCenter(x, y, size * 1.4, 0, 360, Arc2D.OPEN);
+                            g2.fill(arc);
+                            g2.setPaint(Color.BLACK);
+                            arc.setArcByCenter(x, y, size * 1.2, 0, 360, Arc2D.OPEN);
+                            g2.fill(arc);
+                        }
+                        Set<Faction> factions = planet.getFactionSet(now);
+                        if(null != factions) {
+                            int i = 0;
+                            for(Faction faction : factions) {
+                                g2.setPaint(faction.getColor());
+                                arc.setArcByCenter(x, y, size, 0, 360.0 * (1-((double)i)/factions.size()), Arc2D.PIE);
+                                g2.fill(arc);
+                                ++ i;
+                            }
+                        } else {
+                            // Just a black circle then
+                            g2.setPaint(Color.BLACK);
+                            arc.setArcByCenter(x, y, size, 0, 360.0, Arc2D.PIE);
+                            g2.fill(arc);
+                        }
+                    }
+                }
+
+                //cycle through planets again and assign names - to make sure names go on outside
+                for(Planet planet : planets) {
+                    if(isPlanetVisible(planet, !optEmptySystems.isSelected())) {
+                        double x = map2scrX(planet.getX());
+                        double y = map2scrY(planet.getY());
+                        if (conf.showPlanetNamesThreshold == 0 || conf.scale > conf.showPlanetNamesThreshold
+                                || jumpPath.contains(planet)
+                                || (null != campaign.getLocation().getJumpPath() && campaign.getLocation().getJumpPath().contains(planet))) {
+                            g2.setPaint(Color.WHITE);
+                            g2.drawString(planet.getPrintableName(new DateTime(campaign.getCalendar())), (float)(x+size * 1.8), (float)y);
+                        }
+                    }
+                }
+            }
+        };
+        pane.add(mapPanel, Integer.valueOf(1));
+        
+        optionPanel = new JPanel(new BorderLayout(0, 3));
+        optionPanel.setBackground(new Color(0, 100, 230, 200));
+        optionPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+        
+        optEmptySystems = new JCheckBox("Empty systems");
+        optEmptySystems.setOpaque(false);
+        optEmptySystems.setForeground(new Color(150, 220, 255));
+        optEmptySystems.setFocusable(false);
+        optEmptySystems.setFont(optEmptySystems.getFont().deriveFont(Font.BOLD));
+        optEmptySystems.setPreferredSize(new Dimension(150, 20));
+        optEmptySystems.setIcon(new ImageIcon("data/images/misc/checkbox_unselected.png"));
+        optEmptySystems.setSelectedIcon(new ImageIcon("data/images/misc/checkbox_selected.png"));
+        optEmptySystems.setSelected(true);
+        optEmptySystems.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                repaint();
+            }
+        });
+        
+        optionPanel.add(optEmptySystems, BorderLayout.NORTH);
+        
+        optionButton = new JButton();
+        optionButton.setPreferredSize(new Dimension(24, 24));
+        optionButton.setMargin(new Insets(0, 0, 0, 0));
+        optionButton.setBorder(BorderFactory.createEmptyBorder());
+        optionButton.setBackground(new Color(0, 100, 230, 150));
+        optionButton.setFocusable(false);
+        optionButton.setIcon(new ImageIcon("data/images/misc/option_button.png"));
+        optionButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                optionPanelHidden = !optionPanelHidden;
+                optionPanelTimer.start();
+            }
+        });
+        optionPanel.add(optionButton, BorderLayout.WEST);
+
+        optionView = new JViewport();
+        optionView.add(optionPanel);
+        
+        pane.add(optionView, Integer.valueOf(10));
+        
+        add(pane);
+        
+        optionPanelTimer.start();
     }
 
     public void setCampaign(Campaign c) {
@@ -318,10 +572,21 @@ public class InterstellarMapPanel extends JPanel {
         repaint();
     }
 
+    @Override
+    protected void paintComponent(Graphics g) {
+        int width = getWidth();
+        int height = getHeight();
+        pane.setBounds(0, 0, width, height);
+        mapPanel.setBounds(0, 0, width, height);
+        optionView.setBounds(width - 10 - optionView.getWidth(), height - 10 - optionView.getHeight(), optionView.getWidth(), optionView.getHeight());
+
+        super.paintComponent(g);
+    }
+    
     /**
      * Computes the map-coordinate from the screen coordinate system
      */
-    private double scr2mapX(int x) {
+    private double scr2mapX(double x) {
         return Math.round((x - getWidth() / 2 - conf.offset.x) / conf.scale);
     }
 
@@ -329,7 +594,7 @@ public class InterstellarMapPanel extends JPanel {
         return Math.round(getWidth() / 2 + x * conf.scale) + conf.offset.x;
     }
 
-    private double scr2mapY(int y) {
+    private double scr2mapY(double y) {
         return Math.round((getHeight() / 2 - (y - conf.offset.y)) / conf.scale);
     }
 
@@ -346,140 +611,6 @@ public class InterstellarMapPanel extends JPanel {
         repaint();
     }
 
-    @Override
-    protected void paintComponent(Graphics g) {
-        Graphics2D g2 = (Graphics2D) g;
-        g2.setColor(Color.BLACK);
-        g2.fillRect(0, 0, getWidth(), getHeight());
-        double size = 1 + 5 * Math.log(conf.scale);
-        size = Math.max(Math.min(size, conf.maxdotSize), conf.minDotSize);
-        Arc2D.Double arc = new Arc2D.Double();
-        //first get the jump diameter for selected planet
-        if(null != selectedPlanet && conf.scale > conf.showPlanetNamesThreshold) {
-            double x = map2scrX(selectedPlanet.getX());
-            double y = map2scrY(selectedPlanet.getY());
-            double z = map2scrX(selectedPlanet.getX() + 30);
-            double jumpRadius = (z - x);
-            g2.setPaint(Color.DARK_GRAY);
-            arc.setArcByCenter(x, y, jumpRadius, 0, 360, Arc2D.OPEN);
-            g2.fill(arc);
-        }
-        
-        //draw a jump path
-        for(int i = 0; i < jumpPath.size(); i++) {
-            Planet planetB = jumpPath.get(i);
-            double x = map2scrX(planetB.getX());
-            double y = map2scrY(planetB.getY());
-            //lest try rings
-            g2.setPaint(Color.WHITE);
-            arc.setArcByCenter(x, y, size * 1.8, 0, 360, Arc2D.OPEN);
-            g2.fill(arc);
-            g2.setPaint(Color.BLACK);
-            arc.setArcByCenter(x, y, size * 1.6, 0, 360, Arc2D.OPEN);
-            g2.fill(arc);
-            g2.setPaint(Color.WHITE);
-            arc.setArcByCenter(x, y, size * 1.4, 0, 360, Arc2D.OPEN);
-            g2.fill(arc);
-            g2.setPaint(Color.BLACK);
-            arc.setArcByCenter(x, y, size * 1.2, 0, 360, Arc2D.OPEN);
-            g2.fill(arc);
-            if(i > 0) {
-                Planet planetA = jumpPath.get(i-1);
-                g2.setPaint(Color.WHITE);
-                g2.draw(new Line2D.Double(map2scrX(planetA.getX()), map2scrY(planetA.getY()), map2scrX(planetB.getX()), map2scrY(planetB.getY())));
-            }
-        }
-
-        //check to see if the unit is traveling on a jump path currently and if so
-        //draw this one too, in a different color
-        if(null != campaign.getLocation().getJumpPath()) {
-            for(int i = 0; i < campaign.getLocation().getJumpPath().size(); i++) {
-                Planet planetB = campaign.getLocation().getJumpPath().get(i);
-                double x = map2scrX(planetB.getX());
-                double y = map2scrY(planetB.getY());
-                //lest try rings
-                g2.setPaint(Color.YELLOW);
-                arc.setArcByCenter(x, y, size * 1.8, 0, 360, Arc2D.OPEN);
-                g2.fill(arc);
-                g2.setPaint(Color.BLACK);
-                arc.setArcByCenter(x, y, size * 1.6, 0, 360, Arc2D.OPEN);
-                g2.fill(arc);
-                g2.setPaint(Color.YELLOW);
-                arc.setArcByCenter(x, y, size * 1.4, 0, 360, Arc2D.OPEN);
-                g2.fill(arc);
-                g2.setPaint(Color.BLACK);
-                arc.setArcByCenter(x, y, size * 1.2, 0, 360, Arc2D.OPEN);
-                g2.fill(arc);
-                if(i > 0) {
-                    Planet planetA = campaign.getLocation().getJumpPath().get(i-1);
-                    g2.setPaint(Color.YELLOW);
-                    g2.draw(new Line2D.Double(map2scrX(planetA.getX()), map2scrY(planetA.getY()), map2scrX(planetB.getX()), map2scrY(planetB.getY())));
-                }
-            }
-        }
-
-        for(Planet planet : planets) {
-            double x = map2scrX(planet.getX());
-            double y = map2scrY(planet.getY());
-            if(planet.equals(campaign.getCurrentPlanet())) {
-                //lest try rings
-                g2.setPaint(Color.ORANGE);
-                arc.setArcByCenter(x, y, size * 1.8, 0, 360, Arc2D.OPEN);
-                g2.fill(arc);
-                g2.setPaint(Color.BLACK);
-                arc.setArcByCenter(x, y, size * 1.6, 0, 360, Arc2D.OPEN);
-                g2.fill(arc);
-                g2.setPaint(Color.ORANGE);
-                arc.setArcByCenter(x, y, size * 1.4, 0, 360, Arc2D.OPEN);
-                g2.fill(arc);
-                g2.setPaint(Color.BLACK);
-                arc.setArcByCenter(x, y, size * 1.2, 0, 360, Arc2D.OPEN);
-                g2.fill(arc);
-            }
-            if(null != selectedPlanet && selectedPlanet.equals(planet)) {
-                //lest try rings
-                g2.setPaint(Color.WHITE);
-                arc.setArcByCenter(x, y, size * 1.8, 0, 360, Arc2D.OPEN);
-                g2.fill(arc);
-                g2.setPaint(Color.BLACK);
-                arc.setArcByCenter(x, y, size * 1.6, 0, 360, Arc2D.OPEN);
-                g2.fill(arc);
-                g2.setPaint(Color.WHITE);
-                arc.setArcByCenter(x, y, size * 1.4, 0, 360, Arc2D.OPEN);
-                g2.fill(arc);
-                g2.setPaint(Color.BLACK);
-                arc.setArcByCenter(x, y, size * 1.2, 0, 360, Arc2D.OPEN);
-                g2.fill(arc);
-            }
-            Set<Faction> factions = planet.getFactionSet(new DateTime(campaign.getCalendar()));
-            if(null != factions) {
-                int i = 0;
-                for(Faction faction : factions) {
-                    g2.setPaint(faction.getColor());
-                    arc.setArcByCenter(x, y, size, 0, 360.0 * (1-((double)i)/factions.size()), Arc2D.PIE);
-                    g2.fill(arc);
-                    ++ i;
-                }
-            } else {
-                // Just a black circle then
-                g2.setPaint(Color.BLACK);
-                arc.setArcByCenter(x, y, size, 0, 360.0, Arc2D.PIE);
-                g2.fill(arc);
-            }
-        }
-
-        //cycle through planets again and assign names - to make sure names go on outside
-        for(Planet planet : planets) {
-            double x = map2scrX(planet.getX());
-            double y = map2scrY(planet.getY());
-            if (conf.showPlanetNamesThreshold == 0 || conf.scale > conf.showPlanetNamesThreshold
-                    || jumpPath.contains(planet)
-                    || (null != campaign.getLocation().getJumpPath() && campaign.getLocation().getJumpPath().contains(planet))) {
-                g2.setPaint(Color.WHITE);
-                g2.drawString(planet.getPrintableName(new DateTime(campaign.getCalendar())), (float)(x+size * 1.8), (float)y);
-            }
-        }
-    }
 
      /**
      * Calculate the nearest neighbour for the given point If anyone has a better algorithm than this stupid kind of shit, please, feel free to exchange my brute force thing... An good idea would be an voronoi diagram and the sweep algorithm from Steven Fortune.
@@ -498,6 +629,39 @@ public class InterstellarMapPanel extends JPanel {
         return minPlanet;
     }
 
+    private boolean isPlanetVisible(Planet planet, boolean hideEmpty) {
+        if(null == planet) {
+            return false;
+        }
+        // The current planet and the selected one are always visible
+        if(planet.equals(campaign.getCurrentPlanet()) || planet.equals(selectedPlanet)) {
+            return true;
+        }
+        // viewport check
+        double x = planet.getX().doubleValue();
+        double y = planet.getY().doubleValue();
+        if((x < minX) || (x > maxX) || (y < minY) || (y > maxY)) {
+            return false;
+        }
+        if(hideEmpty) {
+            // Filter out "empty" systems
+            Set<Faction> factions = planet.getFactionSet(now);
+            if((null == factions) || factions.isEmpty()) {
+                return false;
+            }
+            boolean empty = true;
+            for(Faction faction : factions) {
+                String id = faction.getShortName();
+                // TODO: Replace with proper methods instead of magic strings
+                if(!id.equals("UND") && !id.equals("ABN") && !id.equals("NONE")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    empty = false;
+                }
+            }
+            return !empty;
+        }
+        return true;
+    }
+    
     /**
      * Activate and Center
      */
