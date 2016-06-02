@@ -137,19 +137,19 @@ public class InterstellarMapPanel extends JPanel {
                 int keyCode = e.getKeyCode();
                 boolean moved = false;
                 if(keyCode == KeyEvent.VK_LEFT) {
-                    conf.offset.y -= conf.scale;
+                    conf.centerY -= 1.0;
                     moved = true;
                 }
                 if(keyCode == KeyEvent.VK_RIGHT) {
-                    conf.offset.y += conf.scale;
+                    conf.centerY += 1.0;
                     moved = true;
                 }
                 if(keyCode == KeyEvent.VK_DOWN) {
-                    conf.offset.x += conf.scale;
+                    conf.centerX += 1.0;
                     moved = true;
                 }
                 if(keyCode == KeyEvent.VK_UP) {
-                    conf.offset.x -= conf.scale;
+                    conf.centerX -= 1.0;
                     moved = true;
                 }
                 if(moved) {
@@ -190,7 +190,7 @@ public class InterstellarMapPanel extends JPanel {
                     item.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent ae) {
-                            zoom(1.5);
+                            zoom(1.5, lastMousePos);
                         }
                     });
                     popup.add(item);
@@ -198,7 +198,7 @@ public class InterstellarMapPanel extends JPanel {
                     item.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent ae) {
-                            zoom(0.5);
+                            zoom(0.5, lastMousePos);
                         }
                     });
                     popup.add(item);
@@ -230,7 +230,8 @@ public class InterstellarMapPanel extends JPanel {
                     item.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent ae) {
-                            conf.offset = new Point();
+                            conf.centerX = 0.0;
+                            conf.centerY = 0.0;
                             repaint();
                         }
                     });
@@ -335,8 +336,8 @@ public class InterstellarMapPanel extends JPanel {
                    return;
                 }
                 if (lastMousePos != null) {
-                    conf.offset.x -= lastMousePos.x - e.getX();
-                    conf.offset.y -= lastMousePos.y - e.getY();
+                    conf.centerX -= (lastMousePos.x - e.getX()) / conf.scale;
+                    conf.centerY -= (lastMousePos.y - e.getY()) / conf.scale;
                     lastMousePos.x = e.getX();
                     lastMousePos.y = e.getY();
                 }
@@ -357,7 +358,7 @@ public class InterstellarMapPanel extends JPanel {
         addMouseWheelListener(new MouseAdapter() {
              @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
-                 zoom(Math.pow(1.5,-1 * e.getWheelRotation()));
+                 zoom(Math.pow(1.5,-1 * e.getWheelRotation()), e.getPoint());
              }
         });
         
@@ -373,10 +374,10 @@ public class InterstellarMapPanel extends JPanel {
                 double size = 1 + 5 * Math.log(conf.scale);
                 size = Math.max(Math.min(size, conf.maxdotSize), conf.minDotSize);
                 
-                minX = scr2mapX(- size / 2.0);
-                minY = scr2mapY(getHeight() + size / 2.0);
-                maxX = scr2mapX(getWidth() + size / 2.0);
-                maxY = scr2mapY(- size / 2.0);
+                minX = scr2mapX(- size * 2.0);
+                minY = scr2mapY(getHeight() + size * 2.0);
+                maxX = scr2mapX(getWidth() + size * 2.0);
+                maxY = scr2mapY(- size * 2.0);
                 now = new DateTime(campaign.getCalendar());
                 
                 Arc2D.Double arc = new Arc2D.Double();
@@ -587,19 +588,19 @@ public class InterstellarMapPanel extends JPanel {
      * Computes the map-coordinate from the screen coordinate system
      */
     private double scr2mapX(double x) {
-        return Math.round((x - getWidth() / 2 - conf.offset.x) / conf.scale);
+        return (x - getWidth() / 2.0) / conf.scale - conf.centerX;
     }
 
     private double map2scrX(double x) {
-        return Math.round(getWidth() / 2 + x * conf.scale) + conf.offset.x;
+        return getWidth() / 2.0 + (x + conf.centerX) * conf.scale;
     }
 
     private double scr2mapY(double y) {
-        return Math.round((getHeight() / 2 - (y - conf.offset.y)) / conf.scale);
+        return (getHeight() / 2.0 - y) / conf.scale + conf.centerY;
     }
 
     private double map2scrY(double y) {
-        return Math.round(getHeight() / 2 - y * conf.scale) + conf.offset.y;
+        return getHeight() / 2.0 - (y - conf.centerY) * conf.scale;
     }
 
     public void setSelectedPlanet(Planet p) {
@@ -670,15 +671,16 @@ public class InterstellarMapPanel extends JPanel {
         if (p == null) {
             return;
         }
-        conf.offset.setLocation(-p.getX() * conf.scale, p.getY() * conf.scale);
+        conf.centerX = - p.getX();
+        conf.centerY = p.getY();
         repaint();
     }
 
-    private void zoom(double percent) {
-        conf.scale *= percent;
-        if (selectedPlanet != null) {
-            conf.offset.setLocation(-selectedPlanet.getX() * conf.scale, selectedPlanet.getY() * conf.scale);
+    private void zoom(double percent, Point pos) {
+        if(null != pos) {
+            // TODO: Calculate offset to zoom at mouse position
         }
+        conf.scale *= percent;
         repaint();
     }
 
@@ -737,7 +739,8 @@ public class InterstellarMapPanel extends JPanel {
         /**
          * The scrolling offset
          */
-        Point offset = new Point();
+        double centerX = 0.0;
+        double centerY = 0.0;
         /**
          * The current selected Planet-id
          */
