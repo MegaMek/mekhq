@@ -1,6 +1,17 @@
 VERSION HISTORY
 ----------------------------------
 v0.3.29-git
++ Adding a simple view option to the interstellar map (show/hide "empty" planets)
++ Code cleanup/refactor of the interstellar map panel
++ Issue #96: Null Pointer Exception from Special Mission (Prison Break)
++ Issue #91: Can't assign patients to doctors
++ PR #92: Cleanup of the infirmary panel
++ PR #94: Conception and Birth messages now have names hyperlinked. 
++ Issue #88: Current location displayed as "null"
++ Fixed IO Reputation rating value for experience.
++ Fixed an NPE in hasChildren() when trying to hire new personnel
++ Issue #64: Coolant failures not reset between missions.
++ Issue #63: Unable to edit mission - error about duplicate mission name.
 + Issue #89: AtB - NPE Setting Planetary Conditions
 
 v0.3.28 (2016-04-16 19:30 UTC)
