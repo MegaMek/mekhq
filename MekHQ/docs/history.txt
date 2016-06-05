@@ -1,5 +1,7 @@
 VERSION HISTORY
 ----------------------------------
+v0.3.30-git
+
 v0.3.29 (2016-06-05 22:40 UTC)
 + Adding a simple view option to the interstellar map (show/hide "empty" planets)
 + Code cleanup/refactor of the interstellar map panel
@@ -15,6 +17,8 @@ v0.3.29 (2016-06-05 22:40 UTC)
 + Issue #89: AtB - NPE Setting Planetary Conditions
 + Interstellar map panel QoL improvements: Zooming at the middle of the screen
 + PR #95 - AtB Uses Int Ops Reputation Factor when IO rating is used
++ Updated MegaMek.jar to 0.41.19
++ Updated MegaMekLab.jar to 0.1.55
 
 v0.3.28 (2016-04-16 19:30 UTC)
 + Bug #43 / PR #62: Making admins gain their XP less often than once per week if requested,
