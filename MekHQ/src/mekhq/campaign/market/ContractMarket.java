@@ -26,6 +26,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Set;
 
 import megamek.client.RandomSkillsGenerator;
 import megamek.common.Compute;
@@ -41,9 +42,11 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planets;
 import mekhq.campaign.universe.RandomFactionGenerator;
 
+import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -164,8 +167,9 @@ public class ContractMarket implements Serializable {
 
 			int numContracts = Compute.d6() - 4 + unitRatingMod;
 
-			ArrayList<Faction> currentFactions =
-					campaign.getCurrentPlanet().getCurrentFactions(campaign.getDate());
+			DateTime currentDate = new DateTime(campaign.getCalendar());
+			Set<Faction> currentFactions =
+					campaign.getCurrentPlanet().getFactionSet(currentDate);
 			boolean inMinorFaction = true;
 			for (Faction f : currentFactions) {
 				if (RandomFactionGenerator.getInstance().isMajorPower(f) ||
@@ -179,27 +183,38 @@ public class ContractMarket implements Serializable {
 			}
 
 			boolean inBackwater = true;
-			if (!currentFactions.get(0).isPeriphery()) {
-				if (currentFactions.size() > 1) {
-					inBackwater = false;
-				} else {
-					for (String key : Planets.getNearbyPlanets(campaign.getCurrentPlanet(), 30)) {
-						for (Faction f : Planets.getInstance().getPlanets().get(key).getCurrentFactions(campaign.getDate())) {
-							if (!f.getShortName().equals(currentFactions.get(0).getShortName())) {
-								inBackwater = false;
-								break;
-							}
-						}
-						if (!inBackwater) break;
-					}
-				}
-			}
-			if (inBackwater) {
+            if( currentFactions.size() > 1 )
+            {
+                // More than one faction, if any is *not* periphery, we're not in backwater either
+                for( Faction f : currentFactions ) {
+                    if( !f.isPeriphery() ) {
+                        inBackwater = false;
+                    }
+                }
+            } else {
+                // Just one faction. Are there any others nearby?
+                Faction onlyFaction = currentFactions.iterator().next();
+                if( !onlyFaction.isPeriphery() ) {
+                    for (Planet key : Planets.getInstance().getNearbyPlanets(campaign.getCurrentPlanet(), 30)) {
+                        for (Faction f : key.getFactionSet(currentDate)) {
+                            if( !onlyFaction.equals(f) ) {
+                                inBackwater = false;
+                                break;
+                            }
+                        }
+                        if (!inBackwater) {
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            if (inBackwater) {
 				numContracts--;
 			}
 
 			if (campaign.getFactionCode().equals("MERC") || campaign.getFactionCode().equals("PIR")) {
-				if (campaign.getAtBConfig().isHiringHall(campaign.getCurrentPlanet().getName(), campaign.getDate())) {
+				if (campaign.getAtBConfig().isHiringHall(campaign.getCurrentPlanet().getId(), campaign.getDate())) {
 					numContracts++;
 					/* Though the rules do not state these modifiers are mutually exclusive, the fact that the
 					 * distance of Galatea from a border means that it has no advantage for Mercs over border
@@ -218,9 +233,9 @@ public class ContractMarket implements Serializable {
 			/* If located on a faction's capital (interpreted as the starting planet for that faction),
 			 * generate one contract offer for that faction.
 			 */
-			for (Faction f : campaign.getCurrentPlanet().getCurrentFactions(campaign.getDate())) {
+			for (Faction f : campaign.getCurrentPlanet().getFactionSet(currentDate)) {
 				try {
-					if (f.getStartingPlanet(campaign.getEra()).equals(campaign.getCurrentPlanet().getName())
+					if (f.getStartingPlanet(campaign.getEra()).equals(campaign.getCurrentPlanet().getId())
 							&& RandomFactionGenerator.getInstance().getEmployerSet().contains(f.getShortName())) {
 						AtBContract c = generateAtBContract(campaign, f.getShortName(), unitRatingMod);
 						if (c != null) {
@@ -364,7 +379,7 @@ public class ContractMarket implements Serializable {
 		}
 		JumpPath jp = null;
 		try {
-			jp = campaign.calculateJumpPath(campaign.getCurrentPlanetName(), contract.getPlanetName());
+			jp = campaign.calculateJumpPath(campaign.getCurrentPlanet(), contract.getPlanet());
 		} catch (NullPointerException ex) {
 			// could not calculate jump path; leave jp null
 		}
@@ -432,9 +447,9 @@ public class ContractMarket implements Serializable {
         if (!contract.getEnemyCode().equals("REB") &&
         		!contract.getEnemyCode().equals("PIR")) {
         	boolean factionValid = false;
-        	for (String p : Planets.getNearbyPlanets(campaign.getCurrentPlanet(), 30)) {
+        	for (Planet p : Planets.getInstance().getNearbyPlanets(campaign.getCurrentPlanet(), 30)) {
         		if (factionValid) break;
-        		for (Faction f : Planets.getInstance().getPlanets().get(p).getCurrentFactions(campaign.getDate())) {
+        		for (Faction f : p.getFactionSet(new DateTime(campaign.getCalendar()))) {
         			if (f.getShortName().equals(contract.getEnemyCode())) {
         				factionValid = true;
         				break;

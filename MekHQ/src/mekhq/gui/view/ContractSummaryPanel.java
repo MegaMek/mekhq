@@ -35,6 +35,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import org.joda.time.DateTime;
+
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.market.ContractMarket;
@@ -199,7 +202,7 @@ public class ContractSummaryPanel extends JPanel {
 		lblSalvageRights = new JLabel();
 		txtSalvageRights = new JTextArea();
 
-		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractMarketDialog");
+		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractMarketDialog", new EncodeControl()); //$NON-NLS-1$
 
 		java.awt.GridBagConstraints gridBagConstraints;
 		mainPanel.setLayout(new java.awt.GridBagLayout());
@@ -333,8 +336,8 @@ public class ContractSummaryPanel extends JPanel {
 			mainPanel.add(lblDistance, gridBagConstraints);
 
 			txtDistance.setName("txtDistance"); // NOI18N
-			JumpPath path = campaign.calculateJumpPath(campaign.getCurrentPlanetName(), contract.getPlanetName());
-			int days = (int)Math.ceil((path).getTotalTime(campaign.getLocation().getTransitTime()));
+			JumpPath path = campaign.calculateJumpPath(campaign.getCurrentPlanet(), contract.getPlanet());
+			int days = (int)Math.ceil((path).getTotalTime(new DateTime(contract.getStartDate()), campaign.getLocation().getTransitTime()));
 			int jumps = path.getJumps();
 			if (campaign.getCurrentPlanetName().equals(contract.getPlanetName())
 					&&campaign.getLocation().isOnPlanet()) {

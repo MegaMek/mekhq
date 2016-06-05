@@ -42,7 +42,9 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -51,6 +53,13 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.joda.time.DateTime;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import megamek.client.RandomNameGenerator;
 import megamek.client.RandomUnitGenerator;
@@ -98,6 +107,8 @@ import mekhq.MekHqXmlUtil;
 import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.Version;
+import mekhq.campaign.event.DayEndingEvent;
+import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
@@ -120,11 +131,11 @@ import mekhq.campaign.parts.BaArmor;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekLocation;
-import mekhq.campaign.parts.MissingBattleArmorSuit;
 import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.MissingMekActuator;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.parts.ProtomekArmor;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.StructuralIntegrity;
@@ -160,19 +171,15 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.Modes;
-import mekhq.gui.PortraitFileFactory;
-
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import mekhq.gui.utilities.PortraitFileFactory;
 
 /**
  * @author Taharqa The main campaign class, keeps track of teams and units
  */
 public class Campaign implements Serializable {
-    private static final long serialVersionUID = -6312434701389973056L;
+    private static final String REPORT_LINEBREAK = "<br/><br/>"; //$NON-NLS-1$
+
+	private static final long serialVersionUID = -6312434701389973056L;
 
     // we have three things to track: (1) teams, (2) units, (3) repair tasks
     // we will use the same basic system (borrowed from MegaMek) for tracking
@@ -235,6 +242,8 @@ public class Campaign implements Serializable {
     private Ranks ranks;
 
     private ArrayList<String> currentReport;
+    private transient String currentReportHTML;
+    private transient List<String> newReports;
 
     private boolean overtime;
     private boolean gmMode;
@@ -272,6 +281,8 @@ public class Campaign implements Serializable {
         player = new Player(0, "self");
         game.addPlayer(0, player);
         currentReport = new ArrayList<String>();
+        currentReportHTML = "";
+        newReports = new ArrayList<String>();
         calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
         dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");
         shortDateFormat = new SimpleDateFormat("yyyyMMdd");
@@ -382,7 +393,7 @@ public class Campaign implements Serializable {
     }
 
     public String getCurrentPlanetName() {
-        return location.getCurrentPlanet().getShortName();
+        return location.getCurrentPlanet().getPrintableName(new DateTime(calendar));
     }
 
     public Planet getCurrentPlanet() {
@@ -579,6 +590,10 @@ public class Campaign implements Serializable {
             force.addUnit(u.getId());
             u.setScenarioId(force.getScenarioId());
             if (null != force.getTechID()) {
+                if (null != u.getTech()) {
+                    Person oldTech = u.getTech();
+                    oldTech.removeTechUnitId(u.getId());
+                }
             	Person forceTech = getPerson(force.getTechID());
             	if (forceTech.canTech(u.getEntity())) {
             	    u.setTech(force.getTechID());
@@ -1113,50 +1128,103 @@ public class Campaign implements Serializable {
         return parts;
     }
 
-    public Hashtable<String, Integer> getPartsInUse() {
-    	Hashtable<String, Integer> inUse = new Hashtable<String, Integer>();
-    	for (Part p : parts) {
-    		// SI isn't a proper "part"
-    		if (p instanceof StructuralIntegrity) {
-    			continue;
-    		}
-
-    		String pname = p.getName();
-			Unit u = p.getUnit();
-			if (!(p instanceof MissingBattleArmorSuit)) {
-				p.setUnit(null);
-			}
-			String details = p.getDetails();
-			p.setUnit(u);
-		    details = details.replaceFirst("\\d+\\shit\\(s\\),\\s", "");
-		    details = details.replaceFirst("\\d+\\shit\\(s\\)", "");
-		    if (details.length() > 0 && !(p instanceof Armor || p instanceof BaArmor || p instanceof ProtomekArmor)) {
-		    	pname +=  " (" + details + ")";
-		    }
-    		int q = 1;
-    		if (p instanceof Armor) {
-    			Armor a = (Armor) p;
-    			q = a.getAmount();
-    		}
-    		if (p instanceof BaArmor) {
-    			BaArmor a = (BaArmor) p;
-    			q = a.getAmount();
-    		}
-    		if (p instanceof ProtomekArmor) {
-    			ProtomekArmor a = (ProtomekArmor) p;
-    			q = a.getAmount();
-    		}
-    		if (p.getUnit() != null || p.getUnitId() != null) {
-    			if (inUse.containsKey(pname)) {
-    				int temp = inUse.get(pname);
-    				temp += q;
-    				inUse.put(pname, temp);
-    			} else {
-    				inUse.put(pname, q);
-    			}
-    		}
-    	}
-    	return inUse;
+    private int getQuantity(Part p) {
+        if(p instanceof Armor) {
+            return ((Armor) p).getAmount();
+        }
+        if(p instanceof AmmoStorage) {
+            return ((AmmoStorage) p).getShots();
+        }
+        return ((p.getUnit() != null) || (p.getUnitId() != null)) ? 1 : p.getQuantity();
+    }
+    
+    private PartInUse getPartInUse(Part p) {
+        // SI isn't a proper "part"
+        if (p instanceof StructuralIntegrity) {
+            return null;
+        }
+        // Makes no sense buying those separately from the chasis
+        if((p instanceof EquipmentPart)
+            && (((EquipmentPart) p).getType().hasFlag(MiscType.F_CHASSIS_MODIFICATION)))
+        {
+            return null;
+        }
+        // Replace a "missing" part with a corresponding "new" one.
+        if(p instanceof MissingPart) {
+            p = ((MissingPart) p).getNewPart();
+        }
+        PartInUse result = new PartInUse(p);
+        return (null != result.getPartToBuy()) ? result : null;
+    }
+    
+    private void updatePartInUseData(PartInUse piu, Part p) {
+        if ((p.getUnit() != null) || (p.getUnitId() != null) || (p instanceof MissingPart)) {
+            piu.setUseCount(piu.getUseCount() + getQuantity(p));
+        } else {
+            if(p.isPresent()) {
+                piu.setStoreCount(piu.getStoreCount() + getQuantity(p));
+            } else {
+                piu.setTransferCount(piu.getTransferCount() + getQuantity(p));
+            }
+        }
+    }
+    
+    /** Update the piu with the current campaign data */
+    public void updatePartInUse(PartInUse piu) {
+        piu.setUseCount(0);
+        piu.setStoreCount(0);
+        piu.setTransferCount(0);
+        piu.setPlannedCount(0);
+        for(Part p : parts) {
+            PartInUse newPiu = getPartInUse(p);
+            if(piu.equals(newPiu)) {
+                updatePartInUseData(piu, p);
+            }
+        }
+        for(IAcquisitionWork maybePart : shoppingList.getPartList()) {
+            PartInUse newPiu = getPartInUse((Part) maybePart);
+            if(piu.equals(newPiu)) {
+                piu.setPlannedCount(piu.getPlannedCount()
+                    + getQuantity((maybePart instanceof MissingPart) ? ((MissingPart) maybePart).getNewPart() : (Part) maybePart)
+                    * maybePart.getQuantity());
+            }
+        }
+    }
+    
+    public Set<PartInUse> getPartsInUse() {
+        // java.util.Set doesn't supply a get(Object) method, so we have to use a java.util.Map
+        Map<PartInUse, PartInUse> inUse = new HashMap<PartInUse, PartInUse>();
+        for(Part p : parts) {
+            PartInUse piu = getPartInUse(p);
+            if(null == piu) {
+                continue;
+            }
+            if( inUse.containsKey(piu) ) {
+                piu = inUse.get(piu);
+            } else {
+                inUse.put(piu, piu);
+            }
+            updatePartInUseData(piu, p);
+        }
+        for(IAcquisitionWork maybePart : shoppingList.getPartList()) {
+            if(!(maybePart instanceof Part)) {
+                continue;
+            }
+            PartInUse piu = getPartInUse((Part) maybePart);
+            if(null == piu) {
+                continue;
+            }
+            if( inUse.containsKey(piu) ) {
+                piu = inUse.get(piu);
+            } else {
+                inUse.put(piu, piu);
+            }
+            piu.setPlannedCount(piu.getPlannedCount()
+                + getQuantity((maybePart instanceof MissingPart) ? ((MissingPart) maybePart).getNewPart() : (Part) maybePart)
+                * maybePart.getQuantity());
+            
+        }
+        return inUse.keySet();
     }
 
     public Part getPart(int id) {
@@ -1172,14 +1240,15 @@ public class Campaign implements Serializable {
     }
 
     public String getCurrentReportHTML() {
-        String toReturn = "";
-        // lets do the report backwards
-        for (String s : currentReport) {
-            toReturn += s + "<br/><br/>";
-        }
-        return toReturn;
+    	return currentReportHTML;
     }
 
+    public List<String> fetchAndClearNewReports() {
+    	List<String> oldReports = newReports;
+    	newReports = new ArrayList<String>();
+    	return oldReports;
+    }
+    
 	/**
 	 * Finds the active person in a particular role with the highest level
 	 * in a given, with an optional secondary skill to break ties.
@@ -1939,9 +2008,15 @@ public class Campaign implements Serializable {
     	return Math.max(total, role);
     }
 
-    public void newDay() {
+    /** @return <code>true</code> if the new day arrived */
+    public boolean newDay() {
+        if(MekHQ.EVENT_BUS.trigger(new DayEndingEvent(this))) {
+            return false;
+        }
         calendar.add(Calendar.DAY_OF_MONTH, 1);
         currentReport.clear();
+        currentReportHTML = "";
+        newReports.clear();
         addReport("<b>" + getDateAsString() + "</b>");
 
         if (calendar.get(Calendar.DAY_OF_YEAR) == 1) {
@@ -1954,7 +2029,10 @@ public class Campaign implements Serializable {
         }
 
         //read the news
-        for (NewsItem article : news.fetchNewsFor(calendar.getTime())) {
+        for(NewsItem article : news.fetchNewsFor(calendar.getTime())) {
+            addReport(article.getHeadlineForReport());
+        }
+        for(NewsItem article : Planets.getInstance().getPlanetaryNews(new DateTime(calendar))) {
             addReport(article.getHeadlineForReport());
         }
 
@@ -1984,7 +2062,7 @@ public class Campaign implements Serializable {
             	if (roll > 12) roll = 12;
             	int change = numPersonnel * (roll - 5) / 100;
             	while (change < 0 && dependents.size() > 0) {
-            		removePerson(dependents.get(Compute.randomInt(dependents.size())).getId());
+            		removePerson(Utilities.getRandomItem(dependents).getId());
             		change++;
             	}
     			for (int i = 0; i < change; i++) {
@@ -2066,7 +2144,7 @@ public class Campaign implements Serializable {
         		 * for transport or splitting the unit, etc.
         		 */
         		if (!getLocation().isOnPlanet() && //null != getLocation().getJumpPath() &&
-        				getLocation().getJumpPath().getLastPlanet().getName().equals(m.getPlanetName())) {
+        				getLocation().getJumpPath().getLastPlanet().getId().equals(m.getPlanetName())) {
         			/*transitTime is measured in days; round up to the next
         			 * whole day, then convert to milliseconds */
         			GregorianCalendar cal = (GregorianCalendar)calendar.clone();
@@ -2086,14 +2164,6 @@ public class Campaign implements Serializable {
             					" requirements resulted in " + deficit +
             					((deficit==1)?" minor contract breach":" minor contract breaches"));
             		}
-            		// Administrator Weekly XP
-            		if (campaignOptions.getAdminWeeklyXP() > 0) {
-                		for (Person p : this.getPersonnel()) {
-                		    if (p.isAdminPrimary()) {
-                		        p.awardXP(campaignOptions.getAdminWeeklyXP());
-                		    }
-                		}
-            		}
             	}
 
         		for (Scenario s : m.getScenarios()) {
@@ -2106,6 +2176,7 @@ public class Campaign implements Serializable {
         				((AtBContract)m).addPlayerMinorBreach();
         				addReport("Failure to deploy for " + s.getName() +
         						" resulted in defeat and a minor contract breach.");
+        				((AtBScenario)s).generateStub(this);
         			}
         		}
         	}
@@ -2197,7 +2268,7 @@ public class Campaign implements Serializable {
 	        					}
 	        				}
 	        				if (lList.size() > 0) {
-	        					Lance lance = lList.get(Compute.randomInt(lList.size()));
+	        					Lance lance = Utilities.getRandomItem(lList);
 	        					AtBScenario scenario = new AtBScenario(this, lance, AtBScenario.BASEATTACK, false,
 	        							Lance.getBattleDate(calendar));
 	        					for (int i = 0; i < sList.size(); i++) {
@@ -2411,7 +2482,13 @@ public class Campaign implements Serializable {
                     tech = getPerson(part.getAssignedTeamId());
                 }
                 if (null != tech) {
-                    fixPart(part, tech);
+                    if(null != tech.getSkillForWorkingOn(part)) {
+                        fixPart(part, tech);
+                    } else {
+                        addReport(String.format("%s looks at %s, recalls his total lack of skill for working with such technology, then slowly puts the tools down before anybody gets hurt.",
+                            tech.getHyperlinkedFullTitle(), part.getName()));
+                        part.setTeamId(null);
+                    }
                 } else {
                     JOptionPane.showMessageDialog(null, "Could not find tech for part: "+part.getName()+" on unit: "+part.getUnit().getHyperlinkedName(), "Invalid Auto-continue", JOptionPane.ERROR_MESSAGE);
                 }
@@ -2497,6 +2574,8 @@ public class Campaign implements Serializable {
         }
         // check for anything else in finances
         finances.newDay(this);
+        MekHQ.EVENT_BUS.trigger(new NewDayEvent(this));
+        return true;
     }
 
     private ArrayList<Contract> getActiveContracts() {
@@ -2933,6 +3012,14 @@ public class Campaign implements Serializable {
 
     public void addReport(String r) {
         currentReport.add(r);
+        if( currentReportHTML.length() > 0 ) {
+        	currentReportHTML = currentReportHTML + REPORT_LINEBREAK + r;
+            newReports.add(REPORT_LINEBREAK);
+            newReports.add(r);
+        } else {
+        	currentReportHTML = r;
+            newReports.add(r);
+        }
     }
 
     public void addReports(ArrayList<String> reports) {
@@ -3264,6 +3351,26 @@ public class Campaign implements Serializable {
             }
             retirementDefectionTracker.writeToXml(pw1, 1);
         }
+        
+        // Customised planetary events
+        pw1.println("\t<customPlanetaryEvents>");
+        for(Planet p : Planets.getInstance().getPlanets().values()) {
+            List<Planet.PlanetaryEvent> customEvents = new ArrayList<>();
+            for(Planet.PlanetaryEvent event : p.getEvents()) {
+                if(event.custom) {
+                    customEvents.add(event);
+                }
+            }
+            if(!customEvents.isEmpty()) {
+                pw1.println("\t\t<planet><id>" + p.getId() + "</id>");
+                for(Planet.PlanetaryEvent event : customEvents) {
+                    Planets.getInstance().writePlanetaryEvent(pw1, event);
+                    pw1.println();
+                }
+                pw1.println("\t\t</planet>");
+            }
+        }
+        pw1.println("\t</customPlanetaryEvents>");
 
         writeCustoms(pw1);
         // Okay, we're done.
@@ -3556,6 +3663,8 @@ public class Campaign implements Serializable {
                 	processLanceNodes(retVal, wn);
                 } else if (xn.equalsIgnoreCase("retirementDefectionTracker")) {
                 	retVal.retirementDefectionTracker = RetirementDefectionTracker.generateInstanceFromXML(wn, retVal);
+                } else if (xn.equalsIgnoreCase("customPlanetaryEvents")) {
+                    updatePlanetaryEventsFromXML(wn);
                 }
 
             } else {
@@ -3971,6 +4080,43 @@ public class Campaign implements Serializable {
         MekHQ.logMessage("Load of campaign file complete!");
 
         return retVal;
+    }
+
+    private static void updatePlanetaryEventsFromXML(Node wn) {
+        Planets.reload(true);
+        NodeList wList = wn.getChildNodes();
+        for (int x = 0; x < wList.getLength(); x++) {
+            Node wn2 = wList.item(x);
+
+            // If it's not an element node, we ignore it.
+            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (wn2.getNodeName().equalsIgnoreCase("planet")) {
+                NodeList planetNodes = wn2.getChildNodes();
+                String planetId = null;
+                List<Planet.PlanetaryEvent> events = new ArrayList<>();
+                for(int n = 0; n < planetNodes.getLength(); ++ n) {
+                    Node planetNode = planetNodes.item(n);
+                    if(planetNode.getNodeType() != Node.ELEMENT_NODE) {
+                        continue;
+                    }
+                    if(planetNode.getNodeName().equalsIgnoreCase("id")) {
+                        planetId = planetNode.getTextContent();
+                    } else if(planetNode.getNodeName().equalsIgnoreCase("event")) {
+                        Planet.PlanetaryEvent event = Planets.getInstance().readPlanetaryEvent(planetNode);
+                        if(null != event) {
+                            event.custom = true;
+                            events.add(event);
+                        }
+                    }
+                }
+                if(null != planetId) {
+                    Planets.getInstance().updatePlanetaryEvents(planetId, events, true);
+                }
+            }
+        }
     }
 
     private static void fixIdReferences(Campaign retVal) {
@@ -4742,6 +4888,18 @@ public class Campaign implements Serializable {
             retVal.ranks = new Ranks(rankSystem);
             retVal.ranks.setOldRankSystem(rankSystem);
         }
+        retVal.currentReportHTML = Utilities.combineString(retVal.currentReport, REPORT_LINEBREAK);
+        // Everything's new
+        retVal.newReports = new ArrayList<String>(retVal.currentReport.size() * 2);
+        boolean firstReport = true;
+        for(String report : retVal.currentReport) {
+        	if(firstReport) {
+        		firstReport = false;
+        	} else {
+        		retVal.newReports.add(REPORT_LINEBREAK);
+        	}
+        	retVal.newReports.add(report);
+        }
     }
 
     private static void processLanceNodes(Campaign retVal, Node wn) {
@@ -4783,14 +4941,14 @@ public class Campaign implements Serializable {
 
     public Vector<String> getPlanetNames() {
         Vector<String> plntNames = new Vector<String>();
-        for (String key : Planets.getInstance().getPlanets().keySet()) {
-            plntNames.add(key);
+        for (Planet key : Planets.getInstance().getPlanets().values()) {
+            plntNames.add(key.getPrintableName(new DateTime(calendar)));
         }
         return plntNames;
     }
 
     public Planet getPlanet(String name) {
-        return Planets.getInstance().getPlanets().get(name);
+        return Planets.getInstance().getPlanetByName(name, new DateTime(calendar));
     }
 
     /**
@@ -5169,8 +5327,7 @@ public class Campaign implements Serializable {
 		        weight--;
 		    }
 		}
-		String name = weightedList.get(Compute.randomInt(weightedList
-		                                                         .size()));
+		String name = Utilities.getRandomItem(weightedList);
 		if (name.equals("specialist")) {
 		    String special = Crew.SPECIAL_NONE;
 		    switch (Compute.randomInt(2)) {
@@ -5254,30 +5411,31 @@ public class Campaign implements Serializable {
      * @param endKey
      * @return
      */
-    public JumpPath calculateJumpPath(String startKey, String endKey) {
-
+    public JumpPath calculateJumpPath(Planet start, Planet end) {
+        String startKey = start.getId();
+        String endKey = end.getId();
+        
         if (startKey.equals(endKey)) {
             JumpPath jpath = new JumpPath();
-            jpath.addPlanet(getPlanet(startKey));
+            jpath.addPlanet(start);
             return jpath;
         }
 
+        final DateTime now = new DateTime(calendar);
         String current = startKey;
         ArrayList<String> closed = new ArrayList<String>();
         ArrayList<String> open = new ArrayList<String>();
         boolean found = false;
         int jumps = 0;
 
-        Planet end = Planets.getInstance().getPlanets().get(endKey);
-
         // we are going to through and set up some hashes that will make our
         // work easier
         // hash of parent key
-        Hashtable<String, String> parent = new Hashtable<String, String>();
+        Hashtable<String, String> parent = new Hashtable<>();
         // hash of H for each planet which will not change
-        Hashtable<String, Double> scoreH = new Hashtable<String, Double>();
+        Hashtable<String, Double> scoreH = new Hashtable<>();
         // hash of G for each planet which might change
-        Hashtable<String, Integer> scoreG = new Hashtable<String, Integer>();
+        Hashtable<String, Double> scoreG = new Hashtable<>();
 
         for (String key : Planets.getInstance().getPlanets().keySet()) {
             scoreH.put(
@@ -5285,34 +5443,33 @@ public class Campaign implements Serializable {
                     end.getDistanceTo(Planets.getInstance().getPlanets()
                                              .get(key)));
         }
-        scoreG.put(current, 0);
+        scoreG.put(current, 0.0);
         closed.add(current);
 
         while (!found && jumps < 10000) {
             jumps++;
-            int currentG = scoreG.get(current) + 1;
-            ArrayList<String> neighborKeys = Planets.getNearbyPlanets(Planets
-            		.getInstance().getPlanets().get(current), 30);
-            for (String neighborKey : neighborKeys) {
-                if (closed.contains(neighborKey)) {
+            double currentG = scoreG.get(current) + Planets.getInstance().getPlanetById(current).getRechargeTime(now);
+            List<Planet> neighborKeys = Planets.getInstance().getNearbyPlanets(Planets.getInstance().getPlanetById(current), 30);
+            for (Planet neighborKey : neighborKeys) {
+                if (closed.contains(neighborKey.getId())) {
                     continue;
-                } else if (open.contains(neighborKey)) {
+                } else if (open.contains(neighborKey.getId())) {
                     // is the current G better than the existing G
-                    if (currentG < scoreG.get(neighborKey)) {
+                    if (currentG < scoreG.get(neighborKey.getId())) {
                         // then change G and parent
-                        scoreG.put(neighborKey, currentG);
-                        parent.put(neighborKey, current);
+                        scoreG.put(neighborKey.getId(), currentG);
+                        parent.put(neighborKey.getId(), current);
                     }
                 } else {
                     // put the current G for this one in memory
-                    scoreG.put(neighborKey, currentG);
+                    scoreG.put(neighborKey.getId(), currentG);
                     // put the parent in memory
-                    parent.put(neighborKey, current);
-                    open.add(neighborKey);
+                    parent.put(neighborKey.getId(), current);
+                    open.add(neighborKey.getId());
                 }
             }
             String bestMatch = null;
-            double bestF = Integer.MAX_VALUE;
+            double bestF = Double.POSITIVE_INFINITY;
             for (String possible : open) {
                 // calculate F
                 double currentF = scoreG.get(possible) + scoreH.get(possible);
@@ -5322,6 +5479,10 @@ public class Campaign implements Serializable {
                 }
             }
             current = bestMatch;
+            if(null == current) {
+                // We're done - probably failed to find anything
+                break;
+            }
             closed.add(current);
             open.remove(current);
             if (current.equals(endKey)) {
@@ -5346,8 +5507,8 @@ public class Campaign implements Serializable {
         return finalPath;
     }
 
-    public ArrayList<String> getAllReachablePlanetsFrom(Planet planet) {
-        return Planets.getNearbyPlanets(planet, 30);
+    public List<Planet> getAllReachablePlanetsFrom(Planet planet) {
+        return Planets.getInstance().getNearbyPlanets(planet, 30);
     }
 
     /**
@@ -5956,6 +6117,9 @@ public class Campaign implements Serializable {
         switch (status) {
             case Person.PRISONER_NOT:
                 p.setFreeMan();
+                if (p.getRankNumeric() < 0) {
+                    changeRank(p, 0, false);
+                }
                 p.addLogEntry(getDate(), "Freed");
                 break;
             case Person.PRISONER_YES:
@@ -6269,7 +6433,7 @@ public class Campaign implements Serializable {
     }
 
     public void setStartingPlanet() {
-    	Hashtable<String, Planet> planetList = Planets.getInstance().getPlanets();
+    	Map<String, Planet> planetList = Planets.getInstance().getPlanets();
         Planet startingPlanet = planetList.get(getFaction().getStartingPlanet(getEra()));
 
         if (startingPlanet == null) {
@@ -6337,6 +6501,7 @@ public class Campaign implements Serializable {
             m.setUsedThisRound(false);
             m.resetJam();
         }
+        entity.setDeployed(false);
         entity.setPassedThrough(new Vector<Coords>());
         entity.resetFiringArcs();
         entity.resetBays();
@@ -6357,6 +6522,7 @@ public class Campaign implements Serializable {
         entity.setLastTarget(Entity.NONE);
         entity.setNeverDeployed(true);
         entity.setStuck(false);
+        entity.resetCoolantFailureAmount();
         if (!entity.getSensors().isEmpty()) {
             entity.setNextSensor(entity.getSensors().firstElement());
         }

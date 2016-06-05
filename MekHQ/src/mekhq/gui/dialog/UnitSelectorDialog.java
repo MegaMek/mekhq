@@ -55,6 +55,7 @@ import megamek.common.MechView;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -153,7 +154,7 @@ public class UnitSelectorDialog extends JDialog {
         btnResetSearch = new JButton();
         panelSearchBtns = new JPanel();
 
-		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitSelectorDialog");
+		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitSelectorDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(resourceMap.getString("Form.title")); // NOI18N
         setName("Form"); // NOI18N
@@ -608,7 +609,7 @@ public class UnitSelectorDialog extends JDialog {
             btnBuy.removeActionListener(actionListener);
         }
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("UnitSelectorDialog");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("UnitSelectorDialog", new EncodeControl()); //$NON-NLS-1$
         btnBuy.setText(resourceMap.getString("btnBuy.textSelect")); // NOI18N
 
         btnBuy.addActionListener(new java.awt.event.ActionListener() {

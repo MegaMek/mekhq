@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.Kill;
 
 
@@ -65,7 +66,7 @@ public class KillDialog extends javax.swing.JDialog {
         btnClose = new javax.swing.JButton();
         btnDate = new javax.swing.JButton();
     
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.KillDialog");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.KillDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("Form.title") + " " + name);

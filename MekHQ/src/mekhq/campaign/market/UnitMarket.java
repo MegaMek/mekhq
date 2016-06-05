@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Set;
 
 import megamek.client.RandomUnitGenerator;
 import megamek.common.Compute;
@@ -32,6 +33,7 @@ import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
@@ -42,6 +44,7 @@ import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.UnitTableData;
 import mekhq.campaign.universe.UnitTableData.FactionTables;
 
+import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -164,8 +167,8 @@ public class UnitMarket implements Serializable {
 			}
 
 			if (campaign.getUnitRatingMod() >= IUnitRating.DRAGOON_B) {
-				ArrayList<Faction> factions = campaign.getCurrentPlanet().getCurrentFactions(campaign.getDate());
-				String faction = factions.get(Compute.randomInt(factions.size())).getShortName();
+				Set<Faction> factions = campaign.getCurrentPlanet().getFactionSet(new DateTime(campaign.getCalendar()));
+				String faction = Utilities.getRandomItem(factions).getShortName();
 				if (campaign.getFaction().isClan() ||
 						!Faction.getFaction(faction).isClan()) {
 					addOffers(campaign, Compute.d6() - 3,

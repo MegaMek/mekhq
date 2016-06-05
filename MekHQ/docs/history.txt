@@ -1,9 +1,76 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.25-git
+v0.3.29-git
++ Adding a simple view option to the interstellar map (show/hide "empty" planets)
++ Code cleanup/refactor of the interstellar map panel
++ Issue #96: Null Pointer Exception from Special Mission (Prison Break)
++ Issue #91: Can't assign patients to doctors
++ PR #92: Cleanup of the infirmary panel
++ PR #94: Conception and Birth messages now have names hyperlinked. 
++ Issue #88: Current location displayed as "null"
++ Fixed IO Reputation rating value for experience.
++ Fixed an NPE in hasChildren() when trying to hire new personnel
++ Issue #64: Coolant failures not reset between missions.
++ Issue #63: Unable to edit mission - error about duplicate mission name.
++ Issue #89: AtB - NPE Setting Planetary Conditions
+
+v0.3.28 (2016-04-16 19:30 UTC)
++ Bug #43 / PR #62: Making admins gain their XP less often than once per week if requested,
+                    have that option work independently from AtB.
++ PR #60: UI Enhancement - Show children in person panel
++ Adding two CampaignEvent events: DayEndingEvent (cancellable), NewDayEvent
++ Bug #59: Ancestor Id not set at birth
++ Bug #57: Tech not properly removed when adding a unit to a force that already included a tech.
++ Bug #56: Adding a lance tech would not clear the units from the old techs
++ Bug #55: Assign Tech to lance should not include vessel crewman
++ Bug #1: Ship engineers now show up in refit tech list
++ PR #52: Updating tonnage/mass to use doubles to avoid rounding errors
++ Syntax errors in planetary data fixed
++ Bug [#925]: Issues with reload of MHQ and Settings
++ [AtB] When failure to deploy results in defeat, replace generated entities with stubs.
++ Issue #40: [ATB] 3.25 : Enemy reinforcements incorrectly set to deploy at the start of the game
++ Issue #68: IndexOutOfBoundsException when advancing day
++ Updated MegaMek.jar to 0.41.18
++ Updated MegaMekLab.jar to 0.1.54
+
+v0.3.27 (2016-04-16 00:30 UTC)
++ Updated MegaMek.jar to 0.41.17
++ Updated MegaMekLab.jar to 0.1.53
+
+v0.3.26 (2016-04-10 21:53 UTC)
++ Bug #31: NPE when advancing a day due to people without tech skills having assigned a repair job
++ PR #37: Redesigning the "Parts in use" dialogue to 1. work and 2. have some more useful data to display
++ Raising XP limits for gained XP and abilities, as per SF feature request 354
++ PR #38: Recording "willing to defect" prisoner status,
+          allow to recruit them without resorting to GM tools,
+          allow to easily find them by sorting by rank
++ PR #35: Adding age limiting options to the "Hire in bulk" dialogue
++ Feature: Choose Surname on Marriage
++ PR #9: UI Enhancement - Added Dependents group to Personnel Type menu
++ PR #8: UI Enhancement - Add Spouse to Person Panel
++ PR #34: Make generateRandomCrewWithCombinedSkill() also generate and register the crew's unique IDs
++ Bug: GameOptionsDialog does not match MegaMek's GameOptionsDialog
+    This bug was caused by duplicating G.O.D. rather than just implementing MM's
+    version of it. I added the one minor thing the MM version needed added to support
+    MHQ and other external programs, and then switched to using it. I also removed the
+    MHQ included version to avoid mistakes in the future.
++ Updated MegaMek.jar to 894609a to avoid build errors when not pointing at other projects
++ Issue #20: GameOptions Dialog Okay button shows as disabled after recent code changes
++ Issue #21: Incorrect passing of MegaMek options from MekHQ
++ Issue #19: Presets folder gets packaged without the actual preset files
++ Issue #14: Logging Maintenance Rolls Option
++ Cleaned replaced a lot of old manual boolean checks with parseBoolean, more needs done
++ Issue #22: Classpath fix for MM/MML jar files broken by commit ec84325
++ Bug: Added entity.setDeployed(false) to Campaign.clearGameData(Entity)
++ Updated MegaMek.jar to 0.41.16
++ Updated MegaMekLab.jar to 0.1.52
+
+v0.3.25 (2016-02-21 14:15 UTC)
 + Updating MHQ Data files to be in line with MM 41.14 (Multi-commits)
 + Bug [#959]: MekHQ Start New Campaign Bug
 + Updated Campaign.clearGameData to reset isStuck state
++ Updated MegaMek.jar to 0.41.15
++ Updated MegaMekLab.jar to 0.1.51
 
 v0.3.24 (2016-02-02 13:10 UTC)
 + Bug [#841]: [ATB] Hold the line : Enemy reinforcements may start in any location

@@ -1261,48 +1261,48 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 			//although we might want to adjust it downward because of the labor cost of salvaging
 			return 1.0;
 		}
-		float tonnage = 100f;
+		double tonnage = 100;
 		if(entity instanceof Mech && ((Mech)entity).isIndustrial()) {
-			tonnage = 400f;
+			tonnage = 400;
 		}
 		else if(entity instanceof VTOL) {
-			tonnage = 30f;
+			tonnage = 30;
 		}
 		else if(entity instanceof Tank) {
 			if(entity.getMovementMode() == EntityMovementMode.WHEELED || entity.getMovementMode() == EntityMovementMode.NAVAL) {
-				tonnage = 200f;
+				tonnage = 200;
 			}
 			else if(entity.getMovementMode() == EntityMovementMode.HOVER || entity.getMovementMode() == EntityMovementMode.SUBMARINE) {
-				tonnage = 50f;
+				tonnage = 50;
 			}
 			else if(entity.getMovementMode() == EntityMovementMode.HYDROFOIL) {
-				tonnage = 75f;
+				tonnage = 75;
 			}
 			else if(entity.getMovementMode() == EntityMovementMode.WIGE) {
-				tonnage = 25f;
+				tonnage = 25;
 			}
 		}
 		else if(entity instanceof Dropship) {
 			if(((Aero)entity).isSpheroid()) {
-				multiplier = 28f;
+				multiplier = 28;
 			} else {
-				multiplier = 36f;
+				multiplier = 36;
 			}
 		}
 		else if(entity instanceof SmallCraft) {
-			tonnage = 50f;
+			tonnage = 50;
 		}
 		else if(entity instanceof SpaceStation) {
-			multiplier = 5f;
+			multiplier = 5;
 		}
 		else if(entity instanceof Warship) {
-			multiplier = 2f;
+			multiplier = 2;
 		}
 		else if(entity instanceof Jumpship) {
-			multiplier = 1.25f;
+			multiplier = 1.25;
 		}
 		else if(entity instanceof Aero) {
-			tonnage = 200f;
+			tonnage = 200;
 		}
 		if(!(entity instanceof Infantry) && !(entity instanceof Dropship) && !(entity instanceof Jumpship)) {
 			multiplier = 1 + (entity.getWeight() / tonnage);
@@ -1404,7 +1404,7 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 		if(null != refit) {
 			refit.writeToXml(pw1, indentLvl+1);
 		}
-		if(null != lastMaintenanceReport) {
+		if(null != lastMaintenanceReport && campaign.getCampaignOptions().checkMaintenance()) {
 		    pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
 		            +"<lastMaintenanceReport><![CDATA["
 	                +lastMaintenanceReport

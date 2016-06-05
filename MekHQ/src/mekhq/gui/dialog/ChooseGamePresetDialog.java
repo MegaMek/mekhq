@@ -35,6 +35,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.GamePreset;
 
 /**
@@ -77,7 +78,7 @@ public class ChooseGamePresetDialog extends javax.swing.JDialog {
 
     	 ButtonGroup group = new ButtonGroup();
     	 
-    	 ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseGamePresetDialog");
+    	 ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseGamePresetDialog", new EncodeControl()); //$NON-NLS-1$
     	 setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     	 setName("Form"); // NOI18N
     	 

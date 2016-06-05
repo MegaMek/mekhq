@@ -58,6 +58,7 @@ import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.client.ui.swing.MechViewPanel;
 import megamek.common.Entity;
 import megamek.common.GunEmplacement;
+import megamek.common.util.EncodeControl;
 import mekhq.Utilities;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
@@ -220,7 +221,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
     	cardLayout = new CardLayout();
 
-    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveScenarioWizardDialog");
+    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveScenarioWizardDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 
@@ -1116,7 +1117,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     }
 
     private void switchInstructions() {
-    	final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveScenarioWizardDialog");
+    	final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveScenarioWizardDialog", new EncodeControl()); //$NON-NLS-1$
     	if(currentPanel.equals(UNITSPANEL)) {
     		txtInstructions.setText(resourceMap.getString("txtInstructions.text.missingunits"));
     	}

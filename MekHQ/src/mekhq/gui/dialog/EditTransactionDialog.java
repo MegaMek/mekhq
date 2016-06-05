@@ -29,6 +29,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Transaction;
 
@@ -41,7 +42,7 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
 
     private final DateFormat LONG_DATE = DateFormat.getDateInstance(DateFormat.LONG);
 
-    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddFundsDialog");
+    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddFundsDialog", new EncodeControl()); //$NON-NLS-1$
 
     private Transaction oldTransaction;
     private Transaction newTransaction;

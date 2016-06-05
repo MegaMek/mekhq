@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<!-- Example file enhancing base information for a planet, in this case Terra -->
+<planets>
+	<planet>
+		<id>Terra</id>
+		<orbitRadius>1.00000011</orbitRadius>
+		<orbitEccentricity>0.0167086</orbitEccentricity>
+		<orbitInclination>1.578690</orbitInclination>
+		<mass>1.0</mass>
+		<radius>1.0</radius>
+		<density>5515</density>
+		<dayLength>24.0</dayLength>
+		<tilt>23.44</tilt>
+		<class>EARTH</class>
+		<volcanism>2</volcanism>
+		<tectonics>2</tectonics>
+		<pressureAtm>1.0</pressureAtm>
+		<atmMass>1.0</atmMass>
+		<albedo>0.33</albedo>
+		<greenhouse>0.12</greenhouse>
+		<habitability>7</habitability>
+		<pop>10</pop>
+		<government>Democracy (Representative)</government>
+		<controlRating>5</controlRating>
+	</planet>
+</planets>

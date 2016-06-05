@@ -27,127 +27,95 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import megamek.client.RandomUnitGenerator;
-import megamek.common.Compute;
-import mekhq.MekHQ;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.client.RandomUnitGenerator;
+import mekhq.MekHQ;
+import mekhq.Utilities;
+
 /**
  * Provides the correct RAT name for the given source, faction, year,
  * unit type, and equipment rating.
- * 
+ *
  * @author Neoancient
  *
  */
 public class UnitTableData implements Serializable, ActionListener {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -2047012666986245214L;
 	Map<String, Map<Integer, Map<String, FactionTables>>> ratTree;
 	//example: ratTree.get("Xotl").get(3028).get("FWL")
 	Map<String, ArrayList<String>> altTables;
-	
+
 	private static UnitTableData utd = null;
 	private static boolean interrupted = false;
 	private static boolean dispose = false;
 	private Thread loader;
 	private boolean initialized;
 	private boolean initializing;
-	
+
 	//used for CampaignOptionsDialog
 	private static ArrayList<String> allRatNames;
 
 	private ArrayList<ActionListener> listeners;
 
-    public static final int WT_LIGHT = 0;
-    public static final int WT_MEDIUM = 1;
-    public static final int WT_HEAVY = 2;
-    public static final int WT_ASSAULT = 3;
-    public static final String[] weightNames = "Light,Medium,Heavy,Assault".split(","); //$NON-NLS-1$ //$NON-NLS-2$
-    
-    public static int getWeightIndex(String weight){
-        switch(weight.toLowerCase(Locale.ROOT)) {
-            case "light": return WT_LIGHT; //$NON-NLS-1$
-            case "medium": return WT_MEDIUM; //$NON-NLS-1$
-            case "heavy": return WT_HEAVY; //$NON-NLS-1$
-            case "assault": return WT_ASSAULT; //$NON-NLS-1$
-            default: return -1;
-        }
-    }
+	public static final int WT_LIGHT = 0;
+	public static final int WT_MEDIUM = 1;
+	public static final int WT_HEAVY = 2;
+	public static final int WT_ASSAULT = 3;
+	public static final String[] weightNames = {
+		"Light", "Medium", "Heavy", "Assault"
+	};
 
-    public static final int UNIT_MECH = 0;
-    public static final int UNIT_VEHICLE = 1;
-    public static final int UNIT_AERO = 2;
-    public static final int UNIT_DROPSHIP = 3;
-    public static final int UNIT_INFANTRY = 4;
-    public static final int UNIT_BATTLEARMOR = 5;
-    public static final int UNIT_PROTOMECH = 6;
-    public static final int UNIT_COUNT = 7;
-    public static final String[] unitNames =
-        "Mek,Vehicle,Aero,Dropship,Infantry,Battle Armor,ProtoMek".split(","); //$NON-NLS-1$ //$NON-NLS-2$
-    
-    public static int getUnitTypeIndex(String type){
-        switch(type.toLowerCase(Locale.ROOT)) {
-            case "mek": case "mech": return UNIT_MECH; //$NON-NLS-1$ //$NON-NLS-2$
-            case "vehicle": return UNIT_VEHICLE; //$NON-NLS-1$
-            case "aero": return UNIT_AERO; //$NON-NLS-1$
-            case "dropship": return UNIT_DROPSHIP; //$NON-NLS-1$
-            case "infantry": return UNIT_INFANTRY; //$NON-NLS-1$
-            case "battle armor": case "battle armour": return UNIT_BATTLEARMOR; //$NON-NLS-1$ //$NON-NLS-2$
-            case "protomek": case "protomech": return UNIT_PROTOMECH;  //$NON-NLS-1$//$NON-NLS-2$
-            default: return -1;
-        }
-    }
-    
-    public static final int QUALITY_F = 0;
-    public static final int QUALITY_D = 1;
-    public static final int QUALITY_C = 2;
-    public static final int QUALITY_B = 3;
-    public static final int QUALITY_A = 4;
-    public static final int QUALITY_AA = 5;
-    public static final String[] qualityNames = "F,D,C,B,A,AA".split(","); //$NON-NLS-1$ //$NON-NLS-2$
-    
-    public static int getQualityIndex(String quality){
-        switch(quality.toLowerCase(Locale.ROOT)) {
-            case "f": return QUALITY_F; //$NON-NLS-1$
-            case "d": return QUALITY_D; //$NON-NLS-1$
-            case "c": return QUALITY_C; //$NON-NLS-1$
-            case "b": return QUALITY_B; //$NON-NLS-1$
-            case "a": return QUALITY_A; //$NON-NLS-1$
-            case "aa": return QUALITY_AA; //$NON-NLS-1$
-            default: return -1;
-        }
-    }
+	public static final int UNIT_MECH = 0;
+	public static final int UNIT_VEHICLE = 1;
+	public static final int UNIT_AERO = 2;
+	public static final int UNIT_DROPSHIP = 3;
+	public static final int UNIT_INFANTRY = 4;
+	public static final int UNIT_BATTLEARMOR = 5;
+	public static final int UNIT_PROTOMECH = 6;
+	public static final int UNIT_COUNT = 7;
+	public static final String[] unitNames = {
+		"Mek", "Vehicle", "Aero", "Dropship", "Infantry",
+		"Battle Armor", "ProtoMek"
+	};
 
-    public static ArrayList<String> getAllRATNames() {
-        if (allRatNames == null) {
-            allRatNames = new ArrayList<String>();
-            populateRatNames();
-        }
-        return allRatNames;
-    }
-    
+	public static final int QUALITY_F = 0;
+	public static final int QUALITY_D = 1;
+	public static final int QUALITY_C = 2;
+	public static final int QUALITY_B = 3;
+	public static final int QUALITY_A = 4;
+	public static final int QUALITY_AA = 5;
+
+	public static ArrayList<String> getAllRATNames() {
+		if (allRatNames == null) {
+			allRatNames = new ArrayList<String>();
+			populateRatNames();
+		}
+		return allRatNames;
+	}
+
 	/**
 	 * Retrieves the names of all RATCollections that meet the criteria.
-	 * 
+	 *
 	 * @param faction-the shortname code of the faction or a generic code (_IS, _Periphery...)
 	 * @param unitType-code for the type of unit (mech, vehicle, etc)
 	 * @param year- if > 0, only RATs from this date or earlier are returned.
@@ -174,7 +142,6 @@ public class UnitTableData implements Serializable, ActionListener {
 	 * returns true if the collection has tables for the faction/unitType
 	 * not later than year
 	 */
-	
 	public boolean hasRAT(String collection, int year, String faction, int unitType) {
 		if (ratTree.get(collection) == null) {
 			return false;
@@ -212,14 +179,14 @@ public class UnitTableData implements Serializable, ActionListener {
 	public List<FactionTables> getRATCollections(String faction, int unitType) {
 		return getRATCollections(faction, unitType, 0);
 	}
-	
+
 	/* Searches an array of RAT sources in order for one that matches
 	 * the faction, year, and unit type, checking alternate factions
 	 * (periphery, general, etc.) for each source. If none is found,
 	 * searches the array in ascending chronological order for the
 	 * best fit, then defaults to Total Warfare.
 	 */
-	
+
 	public FactionTables getBestRAT(String[] rats, int year, String faction, int unitType) {
 		ArrayList<String> sorted = new ArrayList<String>();
 		ArrayList<String> altFactions = getAltFactions(faction);
@@ -241,10 +208,8 @@ public class UnitTableData implements Serializable, ActionListener {
 					return getFirstRAT("War of 39", f, unitType);
 				}
 			}
-			String[] successorStates = {"CC", "DC", "FS", "FWL", "LA"};
-			return getFirstRAT("War of 39",
-					successorStates[Compute.randomInt(successorStates.length)],
-					unitType);
+			List<String> successorStates = Arrays.asList("CC", "DC", "FS", "FWL", "LA");
+			return getFirstRAT("War of 39", Utilities.getRandomItem(successorStates), unitType);
 		}
 		/* Sort the sources according to the earliest year that appears
 		 * in each; may miss some overlap but should be accurate in
@@ -281,7 +246,7 @@ public class UnitTableData implements Serializable, ActionListener {
 				" unitType " + unitType + " in " + year );
 		return null;
 	}
-	
+
 	public ArrayList<String> getAltFactions(String fName) {
 		ArrayList<String> retVal = new ArrayList<String>();
 		retVal.add(fName);
@@ -303,7 +268,7 @@ public class UnitTableData implements Serializable, ActionListener {
 	}
 
 	/* Returns the latest year for the rat and faction that does not exceed year*/
-	
+
 	public FactionTables getClosestRAT(String rat, int year, String faction, int unitType) {
 		FactionTables retval = null;
 		for (int y : ratTree.get(rat).keySet()) {
@@ -317,7 +282,7 @@ public class UnitTableData implements Serializable, ActionListener {
 		}
 		return retval;
 	}
-	
+
 	/* returns the first (earliest) RAT in the collection for the faction */
 
 	public FactionTables getFirstRAT(String rat, String faction, int unitType) {
@@ -333,7 +298,7 @@ public class UnitTableData implements Serializable, ActionListener {
 	public FactionTables getRAT(String rat, int year, String faction) {
 		return ratTree.get(rat).get(year).get(faction);
 	}
-	
+
 	public UnitTableData() {
 		listeners = new ArrayList<ActionListener>();
 	}
@@ -366,7 +331,7 @@ public class UnitTableData implements Serializable, ActionListener {
 			dispose = false;
 		}
 	}
-	
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() instanceof RandomUnitGenerator) {
@@ -432,11 +397,11 @@ public class UnitTableData implements Serializable, ActionListener {
 			MekHQ.logError("Error reading unit table data");
 		}
 	}
-	
+
 	private void createFromXml(FileInputStream fis) {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		Document xmlDoc = null;
-		
+
 		DocumentBuilder db;
 		try {
 			db = dbf.newDocumentBuilder();
@@ -444,19 +409,19 @@ public class UnitTableData implements Serializable, ActionListener {
 		} catch (Exception e) {
 			MekHQ.logError("While loading unit table data: " + e.getMessage());
 		}
-		
+
 		Element elem = xmlDoc.getDocumentElement();
 		NodeList nl = elem.getChildNodes();
 		elem.normalize();
-		
+
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node ratNode = nl.item(i);
 			if (ratNode.getParentNode() != elem) {
 				continue;
 			}
-			
+
 			int xc = ratNode.getNodeType();
-			
+
 			if (xc == Node.ELEMENT_NODE) {
 				String xn = ratNode.getNodeName();
 				if (xn.equalsIgnoreCase("altTables")) {
@@ -467,7 +432,7 @@ public class UnitTableData implements Serializable, ActionListener {
 					NodeList factionNodes = ratNode.getChildNodes();
 					for (int j = 0; j < factionNodes.getLength(); j++) {
 						Node altsNode = factionNodes.item(j);
-						
+
 						if (altsNode.getNodeType() == Node.ELEMENT_NODE) {
 							String fn = altsNode.getNodeName();
 							if (fn.equalsIgnoreCase("tables")) {
@@ -481,14 +446,14 @@ public class UnitTableData implements Serializable, ActionListener {
 					String ratSource = ratNode.getAttributes().getNamedItem("name").getTextContent();
 					int year = Integer.parseInt(ratNode.getAttributes().getNamedItem("era").getTextContent());
 					if (ratTree.get(ratSource) == null) {
-						ratTree.put(ratSource, new TreeMap<Integer, Map<String, FactionTables>>());						
+						ratTree.put(ratSource, new TreeMap<Integer, Map<String, FactionTables>>());
 					}
 					ratTree.get(ratSource).put(year, new TreeMap<String, FactionTables>());
-					
+
 					NodeList factionNodes = ratNode.getChildNodes();
 					for (int j = 0; j < factionNodes.getLength(); j++) {
 						Node factionNode = factionNodes.item(j);
-						
+
 						if (factionNode.getNodeType() == Node.ELEMENT_NODE) {
 							String fn = factionNode.getNodeName();
 							if (fn.equalsIgnoreCase("faction")) {
@@ -519,7 +484,7 @@ public class UnitTableData implements Serializable, ActionListener {
 		utd = null;
 		initialized = false;
 		initializing = false;
-	}	
+	}
 
 	public static synchronized UnitTableData getInstance() {
 		if (null == utd) {
@@ -553,7 +518,7 @@ public class UnitTableData implements Serializable, ActionListener {
 		//Remember the first and last eras for each RAT
 		HashMap<String, Integer> earliest = new HashMap<String, Integer>();
 		HashMap<String, Integer> latest = new HashMap<String, Integer>();
-		
+
 		File f = new File("data/universe/ratinfo.xml");
 		FileInputStream fis = null;
 
@@ -570,19 +535,19 @@ public class UnitTableData implements Serializable, ActionListener {
 			ex.printStackTrace();
 			MekHQ.logError("While loading unit table data: " + ex.getMessage());
 		}
-				
+
 		Element elem = xmlDoc.getDocumentElement();
 		NodeList nl = elem.getChildNodes();
 		elem.normalize();
-		
+
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node ratNode = nl.item(i);
 			if (ratNode.getParentNode() != elem) {
 				continue;
 			}
-			
+
 			int xc = ratNode.getNodeType();
-			
+
 			if (xc == Node.ELEMENT_NODE) {
 				String xn = ratNode.getNodeName();
 				if (xn.equalsIgnoreCase("rat")) {
@@ -624,12 +589,12 @@ public class UnitTableData implements Serializable, ActionListener {
 		Integer year;
 		String factionCode;
 
-		/* 
+		/*
 		 * The name of the RAT used by RandomUnitGenerator.setChosenRAT(String)
-		 * 
+		 *
 		 * Stored in arrays to distinguish weight and quality where applicable
 		 * according to the following schema:
-		 * 
+		 *
 		 * mechs.get(weight).get(quality)
 		 * dropships.get(quality)
 		 */
@@ -654,7 +619,7 @@ public class UnitTableData implements Serializable, ActionListener {
 			for (int i = 0; i < nl.getLength(); i++) {
 				Node unitNode = nl.item(i);
 				int xc = unitNode.getNodeType();
-				
+
 				if (xc == Node.ELEMENT_NODE) {
 					String xn = unitNode.getNodeName();
 					if (xn.equalsIgnoreCase("mech")) {
@@ -717,7 +682,7 @@ public class UnitTableData implements Serializable, ActionListener {
 					units.add(new ArrayList<String>());
 				}
 			}
-			
+
 			for (String rat : rats) {
 				units.get(weightClass).add(rat);
 			}
@@ -827,7 +792,7 @@ public class UnitTableData implements Serializable, ActionListener {
 		public String getTable(int unitType, int quality) {
 			return getTable(unitType, 0, quality);
 		}
-		
+
 		public boolean isValid(HashSet<String> rats) {
 			if (!validateWeightUnits(mechs, rats)) {
 				mechs = null;
@@ -851,7 +816,7 @@ public class UnitTableData implements Serializable, ActionListener {
 				protomechs = null;
 			}
 			return null != mechs || null != vees || null != aero || null != dropships ||
-					null != infantry || null != battleArmor || null != protomechs; 
+					null != infantry || null != battleArmor || null != protomechs;
 		}
 
 		protected boolean validateWeightUnits(ArrayList<ArrayList<String>> units, HashSet<String> rats) {

@@ -27,6 +27,10 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.UUID;
 
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.EquipmentType;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
@@ -41,10 +45,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.Modes;
-
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Parts do the lions share of the work of repairing, salvaging, reloading, refueling, etc.
@@ -1280,5 +1280,18 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     		&& getLocation() == getUnit().getEntity().getLocationFromAbbr(loc);
     }
     
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(getName());
+        sb.append(" "); //$NON-NLS-1$
+        sb.append(getDetails());
+        sb.append(", q: "); //$NON-NLS-1$
+        sb.append(quantity);
+        if(null != unit) {
+            sb.append(", mounted: "); //$NON-NLS-1$
+            sb.append(unit);
+        }
+        return sb.toString();
+    }
 }
 

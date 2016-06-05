@@ -10,6 +10,7 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.List;
 
 import javax.swing.JDialog;
 
@@ -51,8 +52,11 @@ public class DailyReportLogDialog extends JDialog {
         add(panLog, BorderLayout.CENTER);
     }
     
-    public void refreshLog() {
-        panLog.refreshLog(gui.getCampaign().getCurrentReportHTML());
+    public void refreshLog(String report) {
+        panLog.refreshLog(report);
     }
     
+    public void appendLog(List<String> newReports) {
+    	panLog.appendLog(newReports);
+    }
 }

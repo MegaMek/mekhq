@@ -31,6 +31,7 @@ import java.util.UUID;
 
 import javax.swing.BorderFactory;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 
@@ -91,7 +92,7 @@ public class EditInjuryEntryDialog extends javax.swing.JDialog {
         panBtn = new javax.swing.JPanel();
         panMain = new javax.swing.JPanel();
         
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditInjuryEntryDialog");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditInjuryEntryDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("Form.title"));

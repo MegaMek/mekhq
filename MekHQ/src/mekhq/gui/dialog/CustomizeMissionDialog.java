@@ -28,9 +28,10 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
-import mekhq.gui.JSuggestField;
+import mekhq.gui.utilities.JSuggestField;
 
 /**
  *
@@ -72,7 +73,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         txtDesc = new javax.swing.JTextArea();
         lblPlanetName = new javax.swing.JLabel();
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeMissionDialog");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeMissionDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("title"));
@@ -205,16 +206,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
 
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
-    	String chosenName = txtName.getText();
-    	for(Mission m : campaign.getMissions()) {
-    		if(m.getName().equals(chosenName)) {
-    			JOptionPane.showMessageDialog(frame,
-    				    "There is already a mission with the name " + chosenName,
-    				    "Duplicate Mission Name",
-    				    JOptionPane.ERROR_MESSAGE);
-    			return;
-    		}
-    	}
+
     	mission.setName(txtName.getText());
     	mission.setType(txtType.getText());
     	mission.setPlanetName(suggestPlanet.getText());

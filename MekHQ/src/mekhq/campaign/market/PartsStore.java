@@ -25,6 +25,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 import megamek.common.Aero;
 import megamek.common.AmmoType;
@@ -93,15 +96,23 @@ public class PartsStore implements Serializable {
 	 */
 	private static final long serialVersionUID = 1686222527383868364L;
 
+	private static int EXPECTED_SIZE = 50000;
+	
 	private ArrayList<Part> parts;
+	private Map<String, Part> nameAndDetailMap;
 
 	public PartsStore(Campaign c) {
-		parts = new ArrayList<Part>();
+		parts = new ArrayList<Part>(EXPECTED_SIZE);
+		nameAndDetailMap = new HashMap<String, Part>(EXPECTED_SIZE);
 		stock(c);
 	}
 
 	public ArrayList<Part> getInventory() {
 		return parts;
+	}
+	
+	public Part getByNameAndDetails(String nameAndDetails) {
+		return nameAndDetailMap.get(nameAndDetails);
 	}
 
 	public void stock(Campaign c) {
@@ -117,8 +128,22 @@ public class PartsStore implements Serializable {
 		stockProtomekLocations(c);
 		stockProtomekComponents(c);
 		stockBattleArmorSuits(c);
+		
+		Pattern cleanUp1 = Pattern.compile("\\d+\\shit\\(s\\),\\s"); //$NON-NLS-1$
+		Pattern cleanUp2 = Pattern.compile("\\d+\\shit\\(s\\)"); //$NON-NLS-1$
+		StringBuilder sb = new StringBuilder();
 		for(Part p : parts) {
 			p.setBrandNew(true);
+			sb.setLength(0);
+			sb.append(p.getName());
+			if(!(p instanceof Armor || p instanceof BaArmor || p instanceof ProtomekArmor)) {
+				String details = p.getDetails();
+				details = cleanUp2.matcher(cleanUp1.matcher(details).replaceFirst("")).replaceFirst(""); //$NON-NLS-1$ //$NON-NLS-2$
+				if (details.length() > 0) {
+					sb.append(" (").append(details).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+		    }
+			nameAndDetailMap.put(sb.toString(), p);
 		}
 	}
 
@@ -184,11 +209,11 @@ public class PartsStore implements Serializable {
 				if(et.hasSubType(MiscType.S_SUPERCHARGER)) {
 					for(int rating = 10; rating <= 400; rating += 5) {
 						for(double eton = 0.5; eton <= 10.5; eton += 0.5) {
-							float weight = Engine.ENGINE_RATINGS[(int) Math.ceil(rating / 5.0)];
-							float minweight = weight * 0.5f;
-							minweight = (float) (Math.ceil((TestEntity.ceilMaxHalf(minweight, TestEntity.CEIL_HALFTON) / 10.0) * 2.0) / 2.0);
-							float maxweight = weight * 2.0f;
-							maxweight = (float) (Math.ceil((TestEntity.ceilMaxHalf(maxweight, TestEntity.CEIL_HALFTON) / 10.0) * 2.0) / 2.0);
+							double weight = Engine.ENGINE_RATINGS[(int) Math.ceil(rating / 5.0)];
+							double minweight = weight * 0.5f;
+							minweight = Math.ceil((TestEntity.ceilMaxHalf(minweight, TestEntity.Ceil.HALFTON) / 10.0) * 2.0) / 2.0;
+							double maxweight = weight * 2.0f;
+							maxweight = Math.ceil((TestEntity.ceilMaxHalf(maxweight, TestEntity.Ceil.HALFTON) / 10.0) * 2.0) / 2.0;
 							if(eton < minweight || eton > maxweight) {
 								continue;
 							}
@@ -241,7 +266,7 @@ public class PartsStore implements Serializable {
 	}
 
 	private double getEngineTonnage(Engine engine) {
-		float weight = Engine.ENGINE_RATINGS[(int) Math.ceil(engine.getRating() / 5.0)];
+	    double weight = Engine.ENGINE_RATINGS[(int) Math.ceil(engine.getRating() / 5.0)];
         switch (engine.getEngineType()) {
             case Engine.COMBUSTION_ENGINE:
                 weight *= 2.0f;
@@ -270,11 +295,11 @@ public class PartsStore implements Serializable {
             case Engine.NONE:
                 return 0;
         }
-        weight = TestEntity.ceilMaxHalf(weight, TestEntity.CEIL_HALFTON);
+        weight = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
         if (engine.hasFlag(Engine.TANK_ENGINE) && engine.isFusion()) {
             weight *= 1.5f;
         }
-        float toReturn = TestEntity.ceilMaxHalf(weight, TestEntity.CEIL_HALFTON);
+        double toReturn = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
         return toReturn;
 	}
 
@@ -484,6 +509,8 @@ public class PartsStore implements Serializable {
 					    //for(int ctype = Mech.COCKPIT_STANDARD; ctype < Mech.COCKPIT_STRING.length; ctype++) {
 					        parts.add(new MekLocation(loc, ton, type, false, false, true, true, c));
 	                        parts.add(new MekLocation(loc, ton, type, true, false, true, true, c));
+					        parts.add(new MekLocation(loc, ton, type, false, false, false, false, c));
+	                        parts.add(new MekLocation(loc, ton, type, true, false, false, false, c));
 				        //}
 					} else {
     				    parts.add(new MekLocation(loc, ton, type, false, false, false, false, c));

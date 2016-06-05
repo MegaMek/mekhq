@@ -38,6 +38,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import megamek.client.Client;
+import megamek.common.event.EventBus;
 import megamek.common.event.GameBoardChangeEvent;
 import megamek.common.event.GameBoardNewEvent;
 import megamek.common.event.GameCFREvent;
@@ -58,9 +59,11 @@ import megamek.common.event.GameReportEvent;
 import megamek.common.event.GameSettingsChangeEvent;
 import megamek.common.event.GameTurnChangeEvent;
 import megamek.common.event.GameVictoryEvent;
+import megamek.common.util.EncodeControl;
 import megamek.server.Server;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.handler.XPHandler;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
@@ -83,7 +86,8 @@ public class MekHQ implements GameListener {
 	public static String PROPERTIES_FILE = "mmconf/mekhq.properties";
 	public static String PRESET_DIR = "./mmconf/mhqPresets/";
 
-
+	public static final EventBus EVENT_BUS = new EventBus();
+	
 	//stuff related to MM games
     private Server myServer = null;
     private GameThread gameThread = null;
@@ -132,16 +136,17 @@ public class MekHQ implements GameListener {
 	protected static MekHQ getInstance() {
 		return new MekHQ();
 	}
-
+	
     /**
      * At startup create and show the main frame of the application.
      */
     protected void startup() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ", new EncodeControl()); //$NON-NLS-1$
         MekHQ.logMessage(resourceMap.getString("Application.name") + " " + resourceMap.getString("Application.version"));
         //read in preferences
     	readPreferences();
     	setLookAndFeel();
+    	initEventHandlers();
         //create a start up frame and display it
         StartUpGUI sud = new StartUpGUI(this);
         sud.setVisible(true);
@@ -445,7 +450,7 @@ public class MekHQ implements GameListener {
             campaigngui.filterPersonnel();
             campaigngui.refreshDoctorsList();
             campaigngui.refreshPatientList();
-            campaigngui.refreshReport();
+            campaigngui.initReport();
             campaigngui.changeMission();
             campaigngui.refreshFinancialTransactions();
 
@@ -504,5 +509,10 @@ public class MekHQ implements GameListener {
 
 	public IconPackage getIconPackage() {
 	    return iconPackage;
+	}
+	
+	// TODO: This needs to be way more flexible, but it will do for now.
+	private void initEventHandlers() {
+	    EVENT_BUS.register(new XPHandler());
 	}
 }

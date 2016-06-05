@@ -59,7 +59,7 @@ public class CampaignOptions implements Serializable {
 
     public final static String S_TECH = "Tech";
     public final static String S_AUTO = "Automatic Success";
-    
+
     public final static int PRISONER_RANK = 0;
     public final static int BONDSMAN_RANK = 1;
 
@@ -91,6 +91,7 @@ public class CampaignOptions implements Serializable {
     private int maxAcquisitions;
     private boolean useUnofficialProcreation;
     private boolean useUnofficialProcreationNoRelationship;
+    private boolean useParentage;
     private boolean useTransfers;
     private boolean capturePrisoners;
     private int defaultPrisonerStatus;
@@ -167,7 +168,8 @@ public class CampaignOptions implements Serializable {
     private int targetIdleXP;
     private int monthsIdleXP;
     private int contractNegotiationXP;
-    private int adminWeeklyXP;
+    private int adminXP;
+    private int adminXPPeriod;
 
     //repair related
     private boolean destroyByMargin;
@@ -315,7 +317,8 @@ public class CampaignOptions implements Serializable {
         targetIdleXP = 10;
         monthsIdleXP = 2;
         contractNegotiationXP = 0;
-        adminWeeklyXP = 0;
+        adminXP = 0;
+        adminXPPeriod = 1;
         unitRatingMethod = UnitRatingMethod.INTERSTELLAR_OPS;
         waitingPeriod = 7;
         acquisitionSkill = S_TECH;
@@ -349,6 +352,7 @@ public class CampaignOptions implements Serializable {
         maxAcquisitions = 0;
         useUnofficialProcreation = false;
         useUnofficialProcreationNoRelationship = false;
+        useParentage = false;
         useTransfers = true;
         capturePrisoners = true;
         defaultPrisonerStatus = PRISONER_RANK;
@@ -502,11 +506,11 @@ public class CampaignOptions implements Serializable {
 	public void setAssignedTechFirst(boolean assignedTechFirst) {
 		this.assignedTechFirst = assignedTechFirst;
 	}
-	
+
 	public boolean useResetToFirstTech() {
 		return resetToFirstTech;
 	}
-	
+
 	public void setResetToFirstTech(boolean resetToFirstTech) {
 		this.resetToFirstTech = resetToFirstTech;
 	}
@@ -622,11 +626,11 @@ public class CampaignOptions implements Serializable {
     public void setImplants(boolean b) {
         this.useImplants = b;
     }
-	
+
 	public boolean useAltQualityAveraging() {
 		return altQualityAveraging;
 	}
-	
+
 	public void setAltQualityAveraging(boolean altQualityAveraging) {
 		this.altQualityAveraging = altQualityAveraging;
 	}
@@ -864,7 +868,7 @@ public class CampaignOptions implements Serializable {
     public void setLimitByYear(boolean b) {
         limitByYear = b;
     }
-    
+
     public boolean disallowExtinctStuff() {
         return disallowExtinctStuff;
     }
@@ -1008,12 +1012,20 @@ public class CampaignOptions implements Serializable {
         contractNegotiationXP = m;
     }
 
-    public int getAdminWeeklyXP() {
-        return adminWeeklyXP;
+    public int getAdminXP() {
+        return adminXP;
     }
 
-    public void setAdminWeeklyXP(int m) {
-        adminWeeklyXP = m;
+    public void setAdminXP(int m) {
+        adminXP = m;
+    }
+
+    public int getAdminXPPeriod() {
+        return adminXPPeriod;
+    }
+
+    public void setAdminXPPeriod(int m) {
+        adminXPPeriod = m;
     }
 
     public int getWaitingPeriod() {
@@ -1191,7 +1203,7 @@ public class CampaignOptions implements Serializable {
     public void setUseUnofficalMaintenance(boolean b) {
     	useUnofficalMaintenance = b;
     }
-    
+
     public boolean reverseQualityNames() {
         return reverseQualityNames;
     }
@@ -1223,7 +1235,7 @@ public class CampaignOptions implements Serializable {
     public void setDestroyMargin(int d) {
         destroyMargin = d;
     }
-    
+
     public int getDestroyPartTarget() {
         return destroyPartTarget;
     }
@@ -1263,23 +1275,31 @@ public class CampaignOptions implements Serializable {
     public void setUseUnofficialProcreationNoRelationship(boolean b) {
     	useUnofficialProcreationNoRelationship = b;
     }
-    
+
+    public boolean useParentage() {
+        return useParentage;
+    }
+
+    public void setUseParentage(boolean b) {
+        useParentage = b;
+    }
+
     public boolean useTransfers() {
     	return useTransfers;
     }
-    
+
     public void setUseTransfers(boolean b) {
     	useTransfers = b;
     }
-    
+
     public boolean capturePrisoners() {
     	return capturePrisoners;
     }
-    
+
     public void setCapturePrisoners(boolean b) {
     	capturePrisoners = b;
     }
-    
+
     public int getDefaultPrisonerStatus() {
         return defaultPrisonerStatus;
     }
@@ -1519,11 +1539,11 @@ public class CampaignOptions implements Serializable {
 	public boolean getTrackUnitFatigue() {
 		return trackUnitFatigue;
 	}
-	
+
 	public void setTrackUnitFatigue(boolean fatigue) {
 		trackUnitFatigue = fatigue;
 	}
-	
+
 	public void setMercSizeLimited(boolean limit) {
 		mercSizeLimited = limit;
 	}
@@ -1762,7 +1782,8 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "targetIdleXP", targetIdleXP);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "monthsIdleXP", monthsIdleXP);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "contractNegotiationXP", contractNegotiationXP);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "adminWeeklyXP", adminWeeklyXP);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "adminWeeklyXP", adminXP);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "adminXPPeriod", adminXPPeriod);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "limitByYear", limitByYear);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "disallowExtinctStuff", disallowExtinctStuff);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowClanPurchases", allowClanPurchases);
@@ -1805,6 +1826,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maxAcquisitions", maxAcquisitions);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficialProcreation", useUnofficialProcreation);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficialProcreationNoRelationship", useUnofficialProcreationNoRelationship);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useParentage", useParentage);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTransfers", useTransfers);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "capturePrisoners", capturePrisoners);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "defaultPrisonerStatus", defaultPrisonerStatus);
@@ -2027,7 +2049,9 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("contractNegotiationXP")) {
                 retVal.contractNegotiationXP = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("adminWeeklyXP")) {
-                retVal.adminWeeklyXP = Integer.parseInt(wn2.getTextContent().trim());
+                retVal.adminXP = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("adminXPPeriod")) {
+                retVal.adminXPPeriod = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("waitingPeriod")) {
                 retVal.waitingPeriod = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("healWaitingPeriod")) {
@@ -2057,23 +2081,11 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractPercent")) {
                 retVal.equipmentContractPercent = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractBase")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.equipmentContractBase = true;
-                } else {
-                    retVal.equipmentContractBase = false;
-                }
+                retVal.equipmentContractBase = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractSaleValue")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.equipmentContractSaleValue = true;
-                } else {
-                    retVal.equipmentContractSaleValue = false;
-                }
+                retVal.equipmentContractSaleValue = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("blcSaleValue")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.blcSaleValue = true;
-                } else {
-                    retVal.blcSaleValue = false;
-                }
+                retVal.blcSaleValue = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionSupportStaffOnly")) {
                 if (wn2.getTextContent().equalsIgnoreCase("true")) {
                     retVal.acquisitionSupportStaffOnly = true;
@@ -2138,20 +2150,14 @@ public class CampaignOptions implements Serializable {
                     retVal.setUnitRatingMethod((method != null) ? method : UnitRatingMethod.INTERSTELLAR_OPS);
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("usePortraitForType")) {
-                String[] values = wn2.getTextContent().split(",");
+                String[] values = wn2.getTextContent().split(","); //$NON-NLS-1$
                 for (int i = 0; i < values.length; i++) {
-                    if (values[i].equalsIgnoreCase("true")) {
-                        retVal.usePortraitForType[i] = true;
-                    } else {
-                        retVal.usePortraitForType[i] = false;
+                    if(i < retVal.usePortraitForType.length) {
+                        retVal.usePortraitForType[i] = Boolean.parseBoolean(values[i].trim());
                     }
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("destroyByMargin")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.destroyByMargin = true;
-                } else {
-                    retVal.destroyByMargin = false;
-                }
+                retVal.destroyByMargin = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("destroyMargin")) {
                 retVal.destroyMargin = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("destroyPartTarget")) {
@@ -2167,11 +2173,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficalMaintenance")) {
                 retVal.useUnofficalMaintenance = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("checkMaintenance")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.checkMaintenance = true;
-                } else {
-                    retVal.checkMaintenance = false;
-                }
+                retVal.checkMaintenance = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("minimumHitsForVees")) {
                 retVal.minimumHitsForVees = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("maxAcquisitions")) {
@@ -2180,6 +2182,8 @@ public class CampaignOptions implements Serializable {
             	retVal.useUnofficialProcreation = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreationNoRelationship")) {
             	retVal.useUnofficialProcreationNoRelationship = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useParentage")) {
+                retVal.useParentage = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useTransfers")) {
             	retVal.useTransfers = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) {
@@ -2187,11 +2191,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("defaultPrisonerStatus")) {
                 retVal.defaultPrisonerStatus = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVees")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true")) {
-                    retVal.useRandomHitsForVees = true;
-                } else {
-                    retVal.useRandomHitsForVees = false;
-                }
+                retVal.useRandomHitsForVees = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) {
                 retVal.personnelMarketType = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomEliteRemoval")) {

@@ -90,6 +90,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -282,6 +283,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JSpinner spnMonthsIdleXP;
     private JSpinner spnContractNegotiationXP;
     private JSpinner spnAdminWeeklyXP;
+    private JSpinner spnAdminWeeklyXPPeriod;
 
     private JCheckBox chkSupportStaffOnly;
     private JSpinner spnAcquireWaitingPeriod;
@@ -292,6 +294,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JTextField txtMaxAcquisitions;
     private JCheckBox chkUseUnofficialProcreation;
     private JCheckBox chkUseUnofficialProcreationNoRelationship;
+    private JCheckBox chkUseParentage;
     private JCheckBox chkUseTransfers;
 
 
@@ -587,7 +590,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         chkSupportStaffOnly = new JCheckBox();
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("title.text"));
@@ -1449,9 +1452,14 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = 18;
         panPersonnel.add(chkUseUnofficialProcreationNoRelationship, gridBagConstraints);
 
+        chkUseParentage = new JCheckBox("Display children in the person panel");
+        chkUseParentage.setSelected(options.useParentage());
+        gridBagConstraints.gridy = 19;
+        panPersonnel.add(chkUseParentage, gridBagConstraints);
+
         chkUseTransfers = new JCheckBox("Log Saver - Use Reassign instead of Remove/Assign"); // NOI18N
         chkUseTransfers.setSelected(options.useTransfers());
-        gridBagConstraints.gridy = 19;
+        gridBagConstraints.gridy = 20;
         panPersonnel.add(chkUseTransfers, gridBagConstraints);
 
         JPanel panSalary = new JPanel(new GridBagLayout());
@@ -1556,7 +1564,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 20;
+        gridBagConstraints.gridheight = 21;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -1877,7 +1885,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panXP.setLayout(new java.awt.GridBagLayout());
 
         lblScenarioXP = new JLabel(resourceMap.getString("lblScenarioXP.text"));
-        spnScenarioXP = new JSpinner(new SpinnerNumberModel(options.getScenarioXP(), 0, 50, 1));
+        spnScenarioXP = new JSpinner(new SpinnerNumberModel(options.getScenarioXP(), 0, 10000, 1));
         ((JSpinner.DefaultEditor) spnScenarioXP.getEditor()).getTextField().setEditable(false);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1898,7 +1906,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panXP.add(lblScenarioXP, gridBagConstraints);
 
         lblKillXP = new JLabel(resourceMap.getString("lblKillXP.text"));
-        spnKillXP = new JSpinner(new SpinnerNumberModel(options.getKillXPAward(), 0, 50, 1));
+        spnKillXP = new JSpinner(new SpinnerNumberModel(options.getKillXPAward(), 0, 10000, 1));
         ((JSpinner.DefaultEditor) spnKillXP.getEditor()).getTextField().setEditable(false);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1918,7 +1926,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panXP.add(lblKillXP, gridBagConstraints);
 
         lblKills = new JLabel(resourceMap.getString("lblKills.text"));
-        spnKills = new JSpinner(new SpinnerNumberModel(options.getKillsForXP(), 0, 50, 1));
+        spnKills = new JSpinner(new SpinnerNumberModel(options.getKillsForXP(), 0, 10000, 1));
         ((JSpinner.DefaultEditor) spnKills.getEditor()).getTextField().setEditable(false);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1938,7 +1946,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panXP.add(lblKills, gridBagConstraints);
 
         lblTaskXP = new JLabel(resourceMap.getString("lblKillXP.text"));
-        spnTaskXP = new JSpinner(new SpinnerNumberModel(options.getTaskXP(), 0, 50, 1));
+        spnTaskXP = new JSpinner(new SpinnerNumberModel(options.getTaskXP(), 0, 10000, 1));
         ((JSpinner.DefaultEditor) spnTaskXP.getEditor()).getTextField().setEditable(false);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1958,7 +1966,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panXP.add(lblTaskXP, gridBagConstraints);
 
         lblTasks = new JLabel(resourceMap.getString("lblTasks.text"));
-        spnNTasksXP = new JSpinner(new SpinnerNumberModel(options.getNTasksXP(), 0, 50, 1));
+        spnNTasksXP = new JSpinner(new SpinnerNumberModel(options.getNTasksXP(), 0, 10000, 1));
         ((JSpinner.DefaultEditor) spnNTasksXP.getEditor()).getTextField().setEditable(false);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1978,7 +1986,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panXP.add(lblTasks, gridBagConstraints);
 
         lblSuccessXp = new JLabel(resourceMap.getString("lblSuccessXP.text"));
-        spnSuccessXP = new JSpinner(new SpinnerNumberModel(options.getSuccessXP(), 0, 50, 1));
+        spnSuccessXP = new JSpinner(new SpinnerNumberModel(options.getSuccessXP(), 0, 10000, 1));
         ((JSpinner.DefaultEditor) spnSuccessXP.getEditor()).getTextField().setEditable(false);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1999,7 +2007,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panXP.add(lblSuccessXp, gridBagConstraints);
 
         lblMistakeXP = new JLabel(resourceMap.getString("lblMistakeXP.text"));
-        spnMistakeXP = new JSpinner(new SpinnerNumberModel(options.getMistakeXP(), 0, 50, 1));
+        spnMistakeXP = new JSpinner(new SpinnerNumberModel(options.getMistakeXP(), 0, 10000, 1));
         ((JSpinner.DefaultEditor) spnMistakeXP.getEditor()).getTextField().setEditable(false);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -2019,7 +2027,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panXP.add(lblMistakeXP, gridBagConstraints);
 
-        spnIdleXP = new JSpinner(new SpinnerNumberModel(options.getIdleXP(), 0, 50, 1));
+        spnIdleXP = new JSpinner(new SpinnerNumberModel(options.getIdleXP(), 0, 10000, 1));
         ((JSpinner.DefaultEditor) spnIdleXP.getEditor()).getTextField().setEditable(false);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -2064,7 +2072,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panXP.add(spnTargetIdleXP, gridBagConstraints);
 
-        spnContractNegotiationXP = new JSpinner(new SpinnerNumberModel(options.getContractNegotiationXP(), 0, 36, 1));
+        spnContractNegotiationXP = new JSpinner(new SpinnerNumberModel(options.getContractNegotiationXP(), 0, 10000, 1));
         ((JSpinner.DefaultEditor) spnContractNegotiationXP.getEditor()).getTextField().setEditable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -2081,7 +2089,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panXP.add(new JLabel("XP awarded to the selected negotiator for a new contract"), gridBagConstraints);
 
-        spnAdminWeeklyXP = new JSpinner(new SpinnerNumberModel(options.getAdminWeeklyXP(), 0, 36, 1));
+        spnAdminWeeklyXP = new JSpinner(new SpinnerNumberModel(options.getAdminXP(), 0, 10000, 1));
         ((JSpinner.DefaultEditor) spnAdminWeeklyXP.getEditor()).getTextField().setEditable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -2096,7 +2104,24 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        panXP.add(new JLabel("XP awarded to each administrator every Monday for the work of the previous week"), gridBagConstraints);
+        panXP.add(new JLabel("XP awarded to each administrator every Monday for the work of the previous"), gridBagConstraints);
+
+        spnAdminWeeklyXPPeriod = new JSpinner(new SpinnerNumberModel(options.getAdminXPPeriod(), 1, 100, 1));
+        ((JSpinner.DefaultEditor) spnAdminWeeklyXPPeriod.getEditor()).getTextField().setEditable(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panXP.add(spnAdminWeeklyXPPeriod, gridBagConstraints);
+
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panXP.add(new JLabel("week(s)"), gridBagConstraints);
 
         txtInstructionsXP = new JTextArea();
         txtInstructionsXP.setText(resourceMap.getString("txtInstructionsXP.text"));
@@ -4149,7 +4174,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setIdleXP((Integer) spnIdleXP.getModel().getValue());
         options.setMonthsIdleXP((Integer) spnMonthsIdleXP.getModel().getValue());
         options.setContractNegotiationXP((Integer) spnContractNegotiationXP.getModel().getValue());
-        options.setAdminWeeklyXP((Integer) spnAdminWeeklyXP.getModel().getValue());
+        options.setAdminXP((Integer) spnAdminWeeklyXP.getModel().getValue());
+        options.setAdminXPPeriod((Integer) spnAdminWeeklyXPPeriod.getModel().getValue());
         options.setTargetIdleXP((Integer) spnTargetIdleXP.getModel().getValue());
 
         options.setLimitByYear(limitByYearBox.isSelected());
@@ -4172,6 +4198,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setTougherHealing(useTougherHealing.isSelected());
         options.setUseUnofficialProcreation(chkUseUnofficialProcreation.isSelected());
         options.setUseUnofficialProcreationNoRelationship(chkUseUnofficialProcreationNoRelationship.isSelected());
+        options.setUseParentage(chkUseParentage.isSelected());
         options.setUseTransfers(chkUseTransfers.isSelected());
         options.setDefaultPrisonerStatus(comboPrisonerStatus.getSelectedIndex());
 
@@ -4547,7 +4574,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     }
 
     private void setAtBSkillCosts() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl()); //$NON-NLS-1$
     	if (btnUseAtBSkillCosts.isSelected()) {
     		final String[] combatSkills = {SkillType.S_PILOT_MECH,SkillType.S_GUN_MECH,SkillType.S_PILOT_AERO,SkillType.S_GUN_AERO,
     				SkillType.S_PILOT_GVEE,SkillType.S_PILOT_VTOL,SkillType.S_PILOT_NVEE,SkillType.S_GUN_VEE,
@@ -4604,7 +4631,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     }
 
     private void setAtBSPACosts() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl()); //$NON-NLS-1$
 
     	if (btnUseAtBSPACosts.isSelected()) {
     		tempSPA = atbSPA;

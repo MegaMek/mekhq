@@ -34,6 +34,7 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.TargetRoll;
 import megamek.common.util.DirectoryItems;
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.PersonnelMarket;
@@ -123,7 +124,7 @@ public class PersonnelMarketDialog extends JDialog {
         //choicePersonView = new javax.swing.JComboBox();
         //lblPersonView = new javax.swing.JLabel();
 
-		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitSelectorDialog");
+		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitSelectorDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Personnel Market"); // NOI18N
         setName("Form"); // NOI18N

@@ -54,6 +54,7 @@ import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
@@ -69,6 +70,7 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planets;
 import mekhq.campaign.universe.UnitTableData;
 
+import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -311,7 +313,7 @@ public class AtBScenario extends Scenario {
 		}
 		if (campaign.getCampaignOptions().getUsePlanetaryConditions() &&
 				null != campaign.getMission(getMissionId())) {
-			setPlanetaryConditions(campaign.getMission(getMissionId()));
+			setPlanetaryConditions(campaign.getMission(getMissionId()), campaign);
 		}
 		setMapSize();
 		setMapFile();
@@ -395,12 +397,12 @@ public class AtBScenario extends Scenario {
 		}
 	}
 
-	public void setPlanetaryConditions(Mission mission) {
+	public void setPlanetaryConditions(Mission mission, Campaign campaign) {
 		if (null != mission) {
 			Planet p = Planets.getInstance().getPlanets().get(mission.getPlanetName());
 			if (null != p) {
-				atmosphere = p.getPressure();
-				gravity = (float)p.getGravity();
+				atmosphere = Utilities.nonNull(p.getPressure(new DateTime(campaign.getCalendar())), atmosphere);
+				gravity = Utilities.nonNull(p.getGravity(), gravity).floatValue();
 			}
 		}
 	}
@@ -716,7 +718,12 @@ public class AtBScenario extends Scenario {
 			 * the player can keep the 'Mech without a battle so no enemy
 			 * units are generated.
 			 */
-			if (botForces.get(0) != null && specMissionEnemies != null
+			
+			if(specMissionEnemies == null ){
+				setForces(campaign);
+			}
+			
+			if (specMissionEnemies != null && botForces.get(0) != null 
 					&& specMissionEnemies.get(weight) != null) {
 				botForces.get(0).setEntityList(specMissionEnemies.get(weight));
 			}
@@ -2573,6 +2580,10 @@ public class AtBScenario extends Scenario {
 						Entity en = null;
 						try {
 							en = MekHqXmlUtil.getEntityFromXmlString(wn3);
+							if (wn3.getAttributes().getNamedItem("deployment") != null) {
+								en.setDeployRound(Math.max(0,
+										Integer.parseInt(wn3.getAttributes().getNamedItem("deployment").getTextContent())));
+							}
 						} catch (Exception e) {
 							MekHQ.logError("Error loading allied unit in scenario");
 							MekHQ.logError(e);
@@ -2592,6 +2603,10 @@ public class AtBScenario extends Scenario {
 						Entity en = null;
 						try {
 							en = MekHqXmlUtil.getEntityFromXmlString(wn3);
+							if (wn3.getAttributes().getNamedItem("deployment") != null) {
+								en.setDeployRound(Math.max(0,
+										Integer.parseInt(wn3.getAttributes().getNamedItem("deployment").getTextContent())));
+							}
 						} catch (Exception e) {
 							MekHQ.logError("Error loading allied unit in scenario");
 							MekHQ.logError(e);
@@ -2619,6 +2634,10 @@ public class AtBScenario extends Scenario {
 								Entity en = null;
 								try {
 									en = MekHqXmlUtil.getEntityFromXmlString(wn4);
+									if (wn4.getAttributes().getNamedItem("deployment") != null) {
+										en.setDeployRound(Math.max(0,
+												Integer.parseInt(wn4.getAttributes().getNamedItem("deployment").getTextContent())));
+									}
 								} catch (Exception e) {
 									MekHQ.logError("Error loading allied unit in scenario");
 									MekHQ.logError(e);
@@ -3024,19 +3043,17 @@ public class AtBScenario extends Scenario {
 			}
 			pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</entities>");
 
-			if (!behaviorSettings.isDefault()) {
-				pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<behaviorSettings>");
-				MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "forcedWithdrawal", behaviorSettings.isForcedWithdrawal());
-				MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "goHome", behaviorSettings.shouldGoHome());
-				MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "autoFlee", behaviorSettings.shouldAutoFlee());
-				MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "selfPreservationIndex", behaviorSettings.getSelfPreservationIndex());
-				MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "fallShameIndex", behaviorSettings.getFallShameIndex());
-				MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "hyperAggressionIndex", behaviorSettings.getHyperAggressionIndex());
-				MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "homeEdge", behaviorSettings.getHomeEdge().ordinal());
-				MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "herdMentalityIndex", behaviorSettings.getHerdMentalityIndex());
-				MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "braveryIndex", behaviorSettings.getBraveryIndex());
-				pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</behaviorSettings>");
-			}
+			pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<behaviorSettings>");
+			MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "forcedWithdrawal", behaviorSettings.isForcedWithdrawal());
+			MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "goHome", behaviorSettings.shouldGoHome());
+			MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "autoFlee", behaviorSettings.shouldAutoFlee());
+			MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "selfPreservationIndex", behaviorSettings.getSelfPreservationIndex());
+			MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "fallShameIndex", behaviorSettings.getFallShameIndex());
+			MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "hyperAggressionIndex", behaviorSettings.getHyperAggressionIndex());
+			MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "homeEdge", behaviorSettings.getHomeEdge().ordinal());
+			MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "herdMentalityIndex", behaviorSettings.getHerdMentalityIndex());
+			MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "braveryIndex", behaviorSettings.getBraveryIndex());
+			pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</behaviorSettings>");
 		}
 
 		public void setFieldsFromXmlNode(Node wn) {
@@ -3063,6 +3080,10 @@ public class AtBScenario extends Scenario {
 							Entity en = null;
 							try {
 								en = MekHqXmlUtil.getEntityFromXmlString(wn3);
+								if (wn3.getAttributes().getNamedItem("deployment") != null) {
+									en.setDeployRound(Math.max(0,
+											Integer.parseInt(wn3.getAttributes().getNamedItem("deployment").getTextContent())));
+								}
 							} catch (Exception e) {
 								MekHQ.logError("Error loading allied unit in scenario");
 								MekHQ.logError(e);

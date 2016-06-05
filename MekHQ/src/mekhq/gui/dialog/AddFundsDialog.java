@@ -31,6 +31,7 @@ import javax.swing.WindowConstants;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.finances.Transaction;
 
 /**
@@ -42,7 +43,7 @@ public class AddFundsDialog extends JDialog implements FocusListener {
 
     private JFormattedTextField descriptionField;
     private JComboBox<String> categoryCombo;
-    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddFundsDialog");
+    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddFundsDialog", new EncodeControl()); //$NON-NLS-1$
     private int closedType = JOptionPane.CLOSED_OPTION;
 
 	/** Creates new form AlertPopup */

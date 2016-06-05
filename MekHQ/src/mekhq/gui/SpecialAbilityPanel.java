@@ -11,6 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.gui.dialog.CampaignOptionsDialog;
 import mekhq.gui.dialog.EditSpecialAbilityDialog;
@@ -60,7 +61,7 @@ public class SpecialAbilityPanel extends JPanel {
         
         private void initComponents() {
             
-            ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.SpecialAbilityPanel");
+            ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.SpecialAbilityPanel", new EncodeControl()); //$NON-NLS-1$
 
             GridBagConstraints c = new GridBagConstraints();
           

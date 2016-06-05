@@ -52,6 +52,7 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.TargetRoll;
 import megamek.common.UnitType;
+import megamek.common.util.EncodeControl;
 import mekhq.Utilities;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
@@ -145,7 +146,7 @@ public class RetirementDefectionDialog extends JDialog {
 	}
 
 	private void initComponents(boolean doRetirement) {
-		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.RetirementDefectionDialog");
+		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.RetirementDefectionDialog", new EncodeControl()); //$NON-NLS-1$
         setTitle(resourceMap.getString("title.text"));
 
         setLayout(new BorderLayout());
@@ -481,7 +482,7 @@ public class RetirementDefectionDialog extends JDialog {
 								hqView.getCampaign());
 				initResults();
 
-				ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.RetirementDefectionDialog");
+				ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.RetirementDefectionDialog", new EncodeControl()); //$NON-NLS-1$
 				btnEdit.setVisible(true);
 				btnRoll.setVisible(false);
 				btnDone.setVisible(true);

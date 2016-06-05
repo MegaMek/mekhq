@@ -9,6 +9,7 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collections;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -67,6 +68,7 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent event) {
         if (event.getSource().equals(btnStart)) {
+            boolean firstDay = true;
             for (int numDays = (int)spnDays.getValue(); numDays > 0; numDays--) {
                 spnDays.setValue(numDays);
                 if (gui.getCampaign().checkOverDueLoans()
@@ -80,10 +82,18 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
                     gui.showRetirementDefectionDialog();
                     break;
                 }
-                gui.getCampaign().newDay();
-                String newLogString = logPanel.getLogText();
-                newLogString = newLogString.concat(gui.getCampaign().getCurrentReportHTML());
-                logPanel.refreshLog(newLogString);
+               if(!gui.getCampaign().newDay()) {
+                   break;
+               }
+                //String newLogString = logPanel.getLogText();
+                //newLogString = newLogString.concat(gui.getCampaign().getCurrentReportHTML());
+                if(firstDay) {
+                    logPanel.refreshLog(gui.getCampaign().getCurrentReportHTML());
+                    firstDay = false;
+                } else {
+                    logPanel.appendLog(Collections.singletonList("<hr/>")); //$NON-NLS-1$
+                    logPanel.appendLog(gui.getCampaign().fetchAndClearNewReports());
+                }
             }
             gui.refreshScenarioList();
             gui.refreshMissions();
@@ -99,7 +109,7 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
             gui.refreshCalendar();
             gui.refreshLocation();
             gui.refreshOrganization();
-            gui.refreshReport();
+            gui.initReport();
             gui.refreshFunds();
             gui.refreshFinancialTransactions();
             gui.refreshOverview();

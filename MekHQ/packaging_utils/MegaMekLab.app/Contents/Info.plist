@@ -31,7 +31,6 @@
       <array>
         <string>$JAVAROOT/../../../../MekHQ.app/Contents/Resources/Java/MegaMekLab.jar</string>
         <string>$JAVAROOT/../../../../MekHQ.app/Contents/Resources/Java/MegaMek.jar</string>
-        <string>$JAVAROOT/../../../../MekHQ.app/Contents/Resources/Java/lib/TinyXML.jar</string>
       </array>
       <key>VMOptions</key>
       <string>-Xmx512m</string>

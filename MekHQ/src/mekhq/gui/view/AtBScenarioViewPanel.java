@@ -60,6 +60,7 @@ import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.common.Crew;
 import megamek.common.IStartingPositions;
 import megamek.common.PlanetaryConditions;
+import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.ForceStub;
@@ -217,7 +218,7 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
 	}
 
     private void fillStats() {
-    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBScenarioViewPanel");
+    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBScenarioViewPanel", new EncodeControl()); //$NON-NLS-1$
     	lblStatus = new javax.swing.JLabel();
 
     	GridBagConstraints gridBagConstraints = new GridBagConstraints();

@@ -63,6 +63,7 @@ import megamek.common.Entity;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
@@ -153,7 +154,7 @@ public class UnitMarketDialog extends JDialog {
         btnPurchase = new JButton();
         btnClose = new JButton();
 
-		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitMarketDialog");
+		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitMarketDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(resourceMap.getString("Form.title")); // NOI18N
         setName("Form"); // NOI18N

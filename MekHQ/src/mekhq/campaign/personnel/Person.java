@@ -32,9 +32,14 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
@@ -63,6 +68,7 @@ import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.ExtraData;
 import mekhq.campaign.LogEntry;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
@@ -70,9 +76,6 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.Modes;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -162,6 +165,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     protected GregorianCalendar dueDate;
 
     private String name;
+    private String maidenname;
+
     private String callsign;
     private int gender;
 
@@ -186,6 +191,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     protected int salary;
     private int hits;
     private int prisonerStatus;
+    // Is this person willing to defect? Only for prisoners ...
+    private boolean willingToDefect;
 
     boolean dependent;
     boolean commander;
@@ -214,6 +221,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     //portrait
     protected String portraitCategory;
     protected String portraitFile;
+    // runtime override (not saved)
+    protected transient String portraitCategoryOverride;
+    protected transient String portraitFileOverride;
 
     // Our rank
     private int rank;
@@ -265,6 +275,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     private int originalUnitWeight; // uses EntityWeightClass; 0 (Extra-Light) for no original unit
     private int originalUnitTech; // 0 = IS1, 1 = IS2, 2 = Clan
     private UUID originalUnitId;
+    
+    // Generic extra data, for use with plugins and mods
+    private ExtraData extraData = new ExtraData();
 
     //lets just go ahead and pass in the campaign - to hell with OOP
     private Campaign campaign;
@@ -279,6 +292,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         callsign = "";
         portraitCategory = Crew.ROOT_PORTRAIT;
         portraitFile = Crew.PORTRAIT_NONE;
+        portraitCategoryOverride = null;
+        portraitFileOverride = null;
         xp = 0;
         acquisitions = 0;
         gender = G_MALE;
@@ -383,11 +398,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public void setBondsman() {
         prisonerStatus = PRISONER_BONDSMAN;
+        willingToDefect = false;
         setRankNumeric(Ranks.RANK_BONDSMAN);
     }
 
     public boolean isFree() {
-        return (isPrisoner() || isBondsman());
+        return (!isPrisoner() && !isBondsman());
     }
 
     public void setFreeMan() {
@@ -396,10 +412,21 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public void setPrisonerStatus(int status) {
         prisonerStatus = status;
+        if( prisonerStatus != PRISONER_YES ) {
+            willingToDefect = false;
+        }
     }
 
     public int getPrisonerStatus() {
         return prisonerStatus;
+    }
+    
+    public boolean isWillingToDefect() {
+        return willingToDefect;
+    }
+    
+    public void setWillingToDefect(boolean willingToDefect) {
+        this.willingToDefect = willingToDefect && (prisonerStatus == PRISONER_YES);
     }
 
     public String getGenderName() {
@@ -550,6 +577,14 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         this.name = n;
     }
 
+    public String getMaidenName() {
+        return maidenname;
+    }
+
+    public void setMaidenName(String n) {
+        this.maidenname = n;
+    }
+
     public String getFullName() {
     	if (bloodname.length() > 0) {
     		return name + " " + bloodname;
@@ -570,11 +605,11 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
 
     public String getPortraitCategory() {
-        return portraitCategory;
+        return Utilities.nonNull(portraitCategoryOverride, portraitCategory);
     }
 
     public String getPortraitFileName() {
-        return portraitFile;
+        return Utilities.nonNull(portraitFileOverride, portraitFile);
     }
 
     public void setPortraitCategory(String s) {
@@ -584,6 +619,15 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public void setPortraitFileName(String s) {
         this.portraitFile = s;
     }
+
+    public void setPortraitCategoryOverride(String s) {
+        this.portraitCategoryOverride = s;
+    }
+
+    public void setPortraitFileNameOverride(String s) {
+        this.portraitFileOverride = s;
+    }
+
 
     public int getPrimaryRole() {
         return primaryRole;
@@ -902,7 +946,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 			id = UUID.randomUUID();
 		}
 		baby.setId(id);
-		campaign.addReport(getName() + " has given birth to " + baby.getName() + ", a baby " + (baby.getGender() == G_MALE ? "boy!" : "girl!"));
+		baby.setAncestorsID(tmpAncID);
+		campaign.addReport(getName() + " has given birth to " + baby.getHyperlinkedName() + ", a baby " + (baby.getGender() == G_MALE ? "boy!" : "girl!"));
 		setDueDate(null);
 		return baby;
 	}
@@ -921,7 +966,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 						GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
 						tCal.add(GregorianCalendar.DAY_OF_YEAR, 40*7);
 						setDueDate(tCal);
-						campaign.addReport(getFullName()+" has conceived");
+						campaign.addReport(getHyperlinkedName()+" has conceived");
 					}
 				} else if (getSpouse() != null) {
 					if (getSpouse().isActive() && !getSpouse().isDeployed() && getSpouse().getAge(campaign.getCalendar()) > 13) {
@@ -930,7 +975,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 							GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
 							tCal.add(GregorianCalendar.DAY_OF_YEAR, 40*7);
 							setDueDate(tCal);
-							campaign.addReport(getFullName()+" has conceived");
+							campaign.addReport(getHyperlinkedName()+" has conceived");
 						}
 					}
 				}
@@ -1034,7 +1079,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public boolean isInActive() {
         return getStatus() != S_ACTIVE;
     }
+    
+    public ExtraData getExtraData() {
+        return extraData;
+    }
 
+    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
@@ -1047,6 +1097,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     + "<name>"
                     + MekHqXmlUtil.escape(name)
                     + "</name>");
+        if (maidenname != null) {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                    + "<maidenname>"
+                    + MekHqXmlUtil.escape(maidenname)
+                    + "</maidenname>");
+        }
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<callsign>"
                     + MekHqXmlUtil.escape(callsign)
@@ -1186,6 +1242,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     + prisonerStatus
                     + "</prisonerstatus>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                    + "<willingToDefect>"
+                    + willingToDefect
+                    + "</willingToDefect>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<hits>"
                     + hits
                     + "</hits>");
@@ -1279,7 +1339,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                 + "<acquisitions>"
                 + acquisitions
                 + "</acquisitions>");
-       pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
+        if(null != extraData) {
+            extraData.writeToXml(pw1);
+        }
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
     }
 
     public static Person generateInstanceFromXML(Node wn, Campaign c, Version version) {
@@ -1309,6 +1372,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.name = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("maidenname")) {
+                    retVal.maidenname = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("callsign")) {
                     retVal.callsign = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("commander")) {
@@ -1405,6 +1470,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     retVal.status = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("prisonerstatus")) {
                     retVal.prisonerStatus = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("willingToDefect")) {
+                    retVal.willingToDefect = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("salary")) {
                     retVal.salary = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("minutesLeft")) {
@@ -1506,6 +1573,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     retVal.originalUnitTech = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitId")) {
                     retVal.originalUnitId = UUID.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("extraData")) {
+                    retVal.extraData = ExtraData.createFromXml(wn2);
                 }
             }
 
@@ -2101,7 +2170,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
 
     public String makeHTMLRankDiv() {
-    	return "<div id=\""+getId()+"\">"+getRankName()+"</div>";
+    	return "<div id=\""+getId()+"\">"+getRankName()+ (isWillingToDefect() ? "*" : "") + "</div>";
     }
 
     public String getHyperlinkedFullTitle() {
@@ -2293,6 +2362,24 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public void removeSkill(String skillName) {
         if (hasSkill(skillName)) {
             skills.remove(skillName);
+        }
+    }
+    
+    /**
+     * Remove all skills
+     */
+    public void removeAllSkills() {
+        skills.clear();
+    }
+    
+    /**
+     * Limit skills to the maximum of the given level
+     */
+    public void limitSkills(int maxLvl) {
+        for(Map.Entry<String, Skill> skill : skills.entrySet()) {
+            if(skill.getValue().getLevel() > maxLvl) {
+                skill.getValue().setLevel(maxLvl);
+            }
         }
     }
 
@@ -3728,5 +3815,36 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public void setEngineer(boolean b) {
     	engineer = b;
+    }
+    
+    public String getChildList() {
+        List<UUID> ancestors = new ArrayList<>();
+        for(Ancestors a : campaign.getAncestors()) {
+            if((null != a)
+                && getId().equals(a.getMotherID()) || getId().equals(a.getFatherID())) {
+                ancestors.add(a.getId());
+            }
+        }
+        List<String> children = new ArrayList<>();
+        for (Person p : campaign.getPersonnel()) {
+            if(ancestors.contains(p.getAncestorsID())) {
+                children.add(p.getFullName());
+            }
+        }
+        return "<html>" + Utilities.combineString(children, "<br/>") + "</html>";
+    }
+
+    public boolean hasChildren() {
+        boolean hasKids = false;
+        if (getId() != null) {
+            for (Ancestors a : campaign.getAncestors()) {
+                if (getId().equals(a.getMotherID()) || getId().equals(a.getFatherID())) {
+                    hasKids = true;
+                    break;
+                }
+            }
+        }
+        
+        return hasKids;
     }
 }

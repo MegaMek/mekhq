@@ -26,6 +26,7 @@ import megamek.common.MechView;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import megamek.common.util.DirectoryItems;
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.EntityImage;
@@ -83,7 +84,7 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		txtFluff = new javax.swing.JTextArea();
 		pnlStats = new javax.swing.JPanel();
 		
-    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitViewPanel");
+    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitViewPanel", new EncodeControl()); //$NON-NLS-1$
 
 		setLayout(new java.awt.GridBagLayout());
 
@@ -231,7 +232,7 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		pnlStats.add(lblTonnage, gridBagConstraints);
 		
 		txtTonnage.setName("lblTonnage2"); // NOI18N
-		txtTonnage.setText(Float.toString(entity.getWeight()));
+		txtTonnage.setText(Double.toString(entity.getWeight()));
 		txtTonnage.setEditable(false);
 		txtTonnage.setLineWrap(true);
 		txtTonnage.setWrapStyleWord(true);

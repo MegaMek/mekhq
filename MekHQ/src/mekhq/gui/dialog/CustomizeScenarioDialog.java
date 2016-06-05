@@ -43,6 +43,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumn;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Loot;
@@ -130,7 +131,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         panMain = new javax.swing.JPanel();
         panBtn = new javax.swing.JPanel();
         
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeScenarioDialog");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeScenarioDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("title.new"));

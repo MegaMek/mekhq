@@ -33,17 +33,19 @@ import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -56,6 +58,7 @@ import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
 import megamek.common.Compute;
 import megamek.common.ConvFighter;
+import megamek.common.Coords;
 import megamek.common.Crew;
 import megamek.common.Entity;
 import megamek.common.Infantry;
@@ -89,10 +92,8 @@ public class Utilities {
 	private static final int MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24;
 
 	// A couple of arrays for use in the getLevelName() method
-    private static int[]    arabicNumbers = { 1000,  900,  500,  400,  100,   90,
-        50,   40,   10,    9,    5,    4,    1 };
-    private static String[] romanNumerals = { "M",  "CM",  "D",  "CD", "C",  "XC",
-      "L",  "XL",  "X",  "IX", "V",  "IV", "I" };
+    private static int[]    arabicNumbers = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+    private static String[] romanNumerals = "M,CM,D,CD,C,XC,L,XL,X,IX,V,IV,I".split(","); //$NON-NLS-1$ //$NON-NLS-2$
 
     public static int roll3d6() {
         Vector<Integer> rolls = new Vector<Integer>();
@@ -115,6 +116,139 @@ public class Utilities {
         }
 
     	return result;
+    }
+
+    /**
+     * Get a random element out of a collection, with equal probability.
+     * <p>
+     * This is the same as calling the following code, only plays nicely with
+     * all collections (including ones like Set which don't implement RandomAccess)
+     * and deals gracefully with empty collections.
+     * <pre>
+     * collection.get(Compute.randomInt(collection.size());
+     * </pre>
+     * 
+     * @return <i>null</i> if the collection itself is null or empty;
+     * can return <i>null</i> if the collection contains <i>null</i> items.
+     * 
+     */
+    public static <T> T getRandomItem(Collection<? extends T> collection) {
+        if((null == collection) || collection.isEmpty()) {
+            return null;
+        }
+        int index = Compute.randomInt(collection.size());
+        Iterator<? extends T> iterator = collection.iterator();
+        for(int i = 0; i < index; ++ i) {
+            iterator.next();
+        }
+        return iterator.next();
+    }
+
+    /**
+     * Get a random element out of a list, with equal probability.
+     * <p>
+     * This is the same as calling the following code,
+     * only deals gracefully with empty lists.
+     * <pre>
+     * list.get(Compute.randomInt(list.size());
+     * </pre>
+     * 
+     * @return <i>null</i> if the list itself is null or empty;
+     * can return <i>null</i> if the list contains <i>null</i> items.
+     * 
+     */
+    public static <T> T getRandomItem(List<? extends T> list) {
+        if((null == list) || list.isEmpty() ) {
+            return null;
+        }
+        int index = Compute.randomInt(list.size());
+        return list.get(index);
+    }
+    
+    /**
+     * @return linear interpolation value between min and max
+     */
+    public static double lerp(double min, double max, double f) {
+        // The order of operations is important here, to not lose precision
+        return min * (1.0 - f) + max * f;
+    }
+    
+    /**
+     * @return linear interpolation value between min and max, rounded to the nearest integer
+     */
+    public static int lerp(int min, int max, double f) {
+        // The order of operations is important here, to not lose precision
+        return (int)Math.round(min * (1.0 - f) + max * f);
+    }
+    
+    /**
+     * @return linear interpolation value between min and max, rounded to the nearest coordinate
+     * <p>
+     * For theory behind the method used, see: http://www.redblobgames.com/grids/hexagons/
+     */
+    public static Coords lerp(Coords min, Coords max, double f) {
+    	int minX = min.getX();
+    	int minZ = min.getY() - (min.getX() - (min.getX() & 1)) / 2;
+    	int minY = - minX - minZ;
+    	int maxX = max.getX();
+    	int maxZ = max.getY() - (max.getX() - (max.getX() & 1)) / 2;
+    	int maxY = - maxX - maxZ;
+    	double lerpX = lerp((double)minX, (double)maxX, f);
+    	double lerpY = lerp((double)minY, (double)maxY, f);
+    	double lerpZ = lerp((double)minZ, (double)maxZ, f);
+    	int resultX = (int) Math.round(lerpX);
+    	int resultY = (int) Math.round(lerpY);
+    	int resultZ = (int) Math.round(lerpZ);
+    	double diffX = Math.abs(resultX * 1.0 - lerpX);
+    	double diffY = Math.abs(resultY * 1.0 - lerpY);
+    	double diffZ = Math.abs(resultZ * 1.0 - lerpZ);
+    	if((diffX > diffY) && (diffX > diffZ)) {
+    		resultX = - resultY - resultZ;
+    	} else if(diffY > diffZ) {
+    		resultY = - resultX - resultZ;
+    	} else {
+    		resultZ = - resultX - resultY;
+    	}
+    	return new Coords(resultX, resultZ + (resultX - (resultX & 1)) / 2);
+    }
+
+    /**
+     * The method is returns the same as a call to the following code:
+     * <pre>T result = (null != getFirst()) ? getFirst() : getSecond();</pre>
+     * ... with the major difference that getFirst() and getSecond() get evaluated exactly once.
+     * <p>
+     * This means that it doesn't matter if getFirst() is relatively expensive to evaluate
+     * or has side effects. It also means that getSecond() gets evaluated <i>regardless</i> if
+     * it is needed or not. Since Java guarantees the order of evaluation for arguments to be
+     * the same as the order in which they appear (JSR 15.7.4), this makes it more suitable
+     * for re-playable procedural generation and similar method calls with side effects.
+     * 
+     * @return the first argument if it's not <i>null</i>, else the second argument
+     */
+    public static <T> T nonNull(T first, T second) {
+        return (null != first) ? first : second;
+    }
+    
+    /**
+     * For details and caveats, see the two-argument method.
+     * 
+     * @return the first non-<i>null</i> argument, else <i>null</i> if all are <i>null</i>
+     */
+    @SafeVarargs
+    public static <T> T nonNull(T first, T second, T ... others) {
+        if(null != first) {
+            return first;
+        }
+        if(null != second) {
+            return second;
+        }
+        T result = others[0];
+        int index = 1;
+        while((null == result) && (index < others.length)) {
+            result = others[index];
+            ++ index;
+        }
+        return result;
     }
 
     public static ArrayList<AmmoType> getMunitionsFor(Entity entity, AmmoType cur_atype, int techLvl) {
@@ -562,6 +696,9 @@ public class Utilities {
                 nameset = true;
             }
             if(addToUnit) {
+            	if(null == c.getPerson(p.getId())) {
+            		c.recruitPerson(p);
+            	}
 				if(unit.usesSoloPilot() || unit.usesSoldiers()) {
 					unit.addPilotOrSoldier(p);
 				} else {
@@ -578,6 +715,9 @@ public class Utilities {
             }
             if(addToUnit) {
 				if (!(unit.usesSoloPilot() || unit.usesSoldiers()) && unit.canTakeMoreGunners()) {
+	            	if(null == c.getPerson(p.getId())) {
+	            		c.recruitPerson(p);
+	            	}
 					unit.addGunner(p);
 				}
             }
@@ -591,6 +731,9 @@ public class Utilities {
             }
             if(addToUnit) {
 				if (!(unit.usesSoloPilot() || unit.usesSoldiers()) && unit.canTakeMoreVesselCrew()) {
+	            	if(null == c.getPerson(p.getId())) {
+	            		c.recruitPerson(p);
+	            	}
 					unit.addVesselCrew(p);
 				}
             }
@@ -603,6 +746,9 @@ public class Utilities {
                 nameset = true;
             }
 			if(addToUnit) {
+            	if(null == c.getPerson(navigator.getId())) {
+            		c.recruitPerson(navigator);
+            	}
 				unit.setNavigator(navigator);
 			}
 	        newCrew.add(navigator);
@@ -677,41 +823,41 @@ public class Utilities {
 
 	public static String getOptionDisplayName(IOption option) {
 		String name = option.getDisplayableNameWithValue();
-		name = name.replaceAll("\\(.+?\\)", "");
+		name = name.replaceAll("\\(.+?\\)", ""); //$NON-NLS-1$ //$NON-NLS-2$
 		if(option.getType() == IOption.CHOICE) {
-			name += " - " + option.getValue();
+			name += " - " + option.getValue(); //$NON-NLS-1$
 		}
 		return name;
 	}
 
 	public static String printIntegerArray(int[] array) {
-		String values = "";
+		String values = ""; //$NON-NLS-1$
 		for(int i = 0; i < array.length; i++) {
 			values += Integer.toString(array[i]);
 			if(i < (array.length-1)) {
-				values += ",";
+				values += ","; //$NON-NLS-1$
 			}
 		}
 		return values;
 	}
 
 	public static String printDoubleArray(double[] array) {
-        String values = "";
+        String values = ""; //$NON-NLS-1$
         for(int i = 0; i < array.length; i++) {
             values += Double.toString(array[i]);
             if(i < (array.length-1)) {
-                values += ",";
+                values += ","; //$NON-NLS-1$
             }
         }
         return values;
     }
 
 	public static String printBooleanArray(boolean[] array) {
-		String values = "";
+		String values = ""; //$NON-NLS-1$
 		for(int i = 0; i < array.length; i++) {
 			values += Boolean.toString(array[i]);
 			if(i < (array.length-1)) {
-				values += ",";
+				values += ","; //$NON-NLS-1$
 			}
 		}
 		return values;
@@ -761,10 +907,10 @@ public class Utilities {
 			}
 			in.close();
 			out.close();
-			System.out.println("File copied.");
+			System.out.println("File copied."); //$NON-NLS-1$
 		}
 		catch(FileNotFoundException ex){
-			System.out.println(ex.getMessage() + " in the specified directory.");
+			System.out.println(ex.getMessage() + " in the specified directory."); //$NON-NLS-1$
 		}
 		catch(IOException e){
 			System.out.println(e.getMessage());
@@ -945,29 +1091,29 @@ public class Utilities {
 	        for(int i = 0; i < model.getColumnCount(); i++) {
 	            String s = model.getColumnName(i);
 	            if(null == s) {
-                    s = "";
+                    s = ""; //$NON-NLS-1$
                 }
-                if (s.contains("\"")) {
-                    s = s.replace("\"", "\"\"");
+                if (s.contains("\"")) { //$NON-NLS-1$
+                    s = s.replace("\"", "\"\""); //$NON-NLS-1$ //$NON-NLS-2$
                 }
-                s = "\"" + s + "\"";
-                csv.write(s+",");
+                s = "\"" + s + "\""; //$NON-NLS-1$ //$NON-NLS-2$
+                csv.write(s+","); //$NON-NLS-1$
 	        }
-	        csv.write("\n");
+	        csv.write("\n"); //$NON-NLS-1$
 
 	        for(int i=0; i< model.getRowCount(); i++) {
 	            for(int j=0; j < model.getColumnCount(); j++) {
 	                String s = model.getValueAt(i,j).toString();
 	                if(null == s) {
-	                    s = "";
+	                    s = ""; //$NON-NLS-1$
 	                }
-	                if (s.contains("\"")) {
-	                    s = s.replace("\"", "\"\"");
+	                if (s.contains("\"")) { //$NON-NLS-1$
+	                    s = s.replace("\"", "\"\""); //$NON-NLS-1$ //$NON-NLS-2$
 	                }
-	                s = "\"" + s + "\"";
-	                csv.write(s+",");
+	                s = "\"" + s + "\""; //$NON-NLS-1$ //$NON-NLS-2$
+	                csv.write(s+","); //$NON-NLS-1$
 	            }
-	            csv.write("\n");
+	            csv.write("\n"); //$NON-NLS-1$
 	        }
 	        csv.close();
 
@@ -983,26 +1129,31 @@ public class Utilities {
         return output;
     }
 
-    public static String combineString(Vector<String> vec, String sep) {
-        String output = "";
-        Enumeration<String> eVec = vec.elements();
-        while(eVec.hasMoreElements()) {
-            output += eVec.nextElement();
-            if(eVec.hasMoreElements()) {
-                output += sep;
-            }
+    public static String combineString(Collection<String> vec, String sep) {
+        if((null == vec) || (null == sep)) {
+            return null;
         }
-        return output;
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for( String part : vec ) {
+            if( first ) {
+                first = false;
+            } else {
+                sb.append(sep);
+            }
+            sb.append(part);
+        }
+        return sb.toString();
     }
 
     public static String getRomanNumeralsFromArabicNumber(int level, boolean checkZero) {
     	// If we're 0, then we just return an empty string
     	if (checkZero && level == 0) {
-    		return "";
+    		return ""; //$NON-NLS-1$
     	}
 
     	// Roman numeral, prepended with a space for display purposes
-    	String roman = " ";
+    	String roman = " "; //$NON-NLS-1$
         int num = level+1;
 
         for (int i = 0; i < arabicNumbers.length; i++) {
@@ -1018,7 +1169,7 @@ public class Utilities {
     // TODO: Optionize this to allow user to choose roman or arabic numerals
     public static int getArabicNumberFromRomanNumerals(String name) {
     	// If we're 0, then we just return an empty string
-    	if (name.equals("")) {
+    	if (name.equals("")) { //$NON-NLS-1$
     		return 0;
     	}
 
@@ -1051,6 +1202,7 @@ public class Utilities {
 
 		// Sort list with comparator, to compare the Map values
 		Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+			@Override
 			public int compare(Map.Entry<String, Integer> o1,
                                            Map.Entry<String, Integer> o2) {
 				return (o1.getValue()).compareTo(o2.getValue());
@@ -1087,4 +1239,71 @@ public class Utilities {
     	        || en.isStuck();
     }
 
+    /**
+     * Run through the directory and call parser.parse(fis) for each XML file found. Don't recurse.
+     */
+    public static void parseXMLFiles(String dirName, FileParser parser) {
+        parseXMLFiles(dirName, parser, false);
+    }
+
+    /**
+     * Run through the directory and call parser.parse(fis) for each XML file found.
+     */
+    public static void parseXMLFiles(String dirName, FileParser parser, boolean recurse) {
+        if( null == dirName || null == parser ) {
+            throw new NullPointerException();
+        }
+        File dir = new File(dirName);
+        if( dir.isDirectory() ) {
+            File[] files = dir.listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    return name.toLowerCase(Locale.ROOT).endsWith(".xml"); //$NON-NLS-1$
+                }
+            });
+            if( null != files && files.length > 0 ) {
+                // Case-insensitive sorting. Yes, even on Windows. Deal with it.
+                Arrays.sort(files, new Comparator<File>() {
+                    @Override
+                    public int compare(File f1, File f2) {
+                        return f1.getPath().compareTo(f2.getPath());
+                    }
+                });
+                // Try parsing and updating the main list, one by one
+                for( File file : files ) {
+                    if( file.isFile() ) {
+                        try(FileInputStream fis = new FileInputStream(file)) {
+                            parser.parse(fis);
+                        } catch(Exception ex) {
+                            // Ignore this file then
+                            MekHQ.logError("Exception trying to parse " + file.getPath() + " - ignoring."); //$NON-NLS-1$ //$NON-NLS-2$
+                            MekHQ.logError(ex);
+                        }
+                    }
+                }
+            }
+            
+            if( !recurse ) {
+                // We're done
+                return;
+            }
+            
+            // Get subdirectories too
+            File[] dirs = dir.listFiles();
+            if( null != dirs && dirs.length > 0 ) {
+                Arrays.sort(dirs, new Comparator<File>() {
+                    @Override
+                    public int compare(File f1, File f2) {
+                        return f1.getPath().compareTo(f2.getPath());
+                    }
+                });
+                for( File subDirectory : dirs ) {
+                    if( subDirectory.isDirectory() ) {
+                        parseXMLFiles(subDirectory.getPath(), parser, recurse);
+                    }
+                }
+            }
+
+        }
+    }
 }

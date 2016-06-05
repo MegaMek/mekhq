@@ -39,6 +39,7 @@ import megamek.common.TargetRoll;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
@@ -634,6 +635,14 @@ public class PersonnelMarket {
         for (Person p : personnel) {
             p.writeToXml(pw1, indent + 1);
         }
+        if (paidRecruitment) {
+        	pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<paidRecruitment/>");
+        }
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "paidRecruitType", paidRecruitType);
+        if (shipSearch) {
+        	pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<shipSearch/>");
+        }
+        
         for (UUID id : attachedEntities.keySet()) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<entity id=\"" + id.toString() + "\">"
@@ -682,6 +691,12 @@ public class PersonnelMarket {
                     if (null != en) {
                     	retVal.attachedEntities.put(id, en);
                     }
+            	} else if (wn2.getNodeName().equalsIgnoreCase("paidRecruitment")) {
+            		retVal.paidRecruitment = true;
+            	} else if (wn2.getNodeName().equalsIgnoreCase("paidRecruitType")) {
+            		retVal.paidRecruitType = Integer.parseInt(wn2.getTextContent());
+            	} else if (wn2.getNodeName().equalsIgnoreCase("shipSearch")) {
+            		retVal.shipSearch = true;
           		} else  {
             		// Error condition of sorts!
             		// Errr, what should we do here?
@@ -1128,7 +1143,7 @@ public class PersonnelMarket {
     				clans.add(f);
     			}
     		}
-    		return clans.get(Compute.randomInt(clans.size()));
+    		return Utilities.getRandomItem(clans);
     	}
     	return RandomFactionGenerator.getInstance().getEmployer();
     }

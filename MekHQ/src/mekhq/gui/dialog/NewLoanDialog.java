@@ -47,6 +47,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
@@ -135,7 +136,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         lblTotalPayment = new JLabel();
         lblCollateralAmount = new JLabel();
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewLoanDialog");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewLoanDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("title"));

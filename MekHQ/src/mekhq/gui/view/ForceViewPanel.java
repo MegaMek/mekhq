@@ -25,6 +25,7 @@ import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Crew;
 import megamek.common.Entity;
 import megamek.common.UnitType;
+import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -183,7 +184,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 	
 	private void fillStats() {
 		
-    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ForceViewPanel");
+    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ForceViewPanel", new EncodeControl()); //$NON-NLS-1$
 
     	lblType = new javax.swing.JLabel();
     	lblAssign1 = new javax.swing.JLabel();
@@ -203,7 +204,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		
 	 	long bv = 0;
     	long cost = 0;
-    	float ton = 0;
+    	double ton = 0;
     	String commander = "";
     	String LanceTech = "";
     	String assigned = "";
@@ -586,7 +587,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
     	//by only traversing once
     	int bv = 0;
     	int cost = 0;
-    	float ton = 0;
+    	double ton = 0;
     	int number = 0;
     	String commander = "No personnel found";
     	ArrayList<Person> people = new ArrayList<Person>();

@@ -10,6 +10,8 @@ import java.util.ResourceBundle;
 
 import javax.swing.JLabel;
 
+import megamek.common.util.EncodeControl;
+
 /**
  *
  * @author Jay Lason
@@ -46,7 +48,7 @@ public class GamePresetDescriptionDialog extends javax.swing.JDialog {
 		btnOK = new javax.swing.JButton();
 		btnCancel = new javax.swing.JButton();
 
-		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.TextAreaDialog");
+		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.TextAreaDialog", new EncodeControl()); //$NON-NLS-1$
 
 		setLayout(new java.awt.GridBagLayout());
 		

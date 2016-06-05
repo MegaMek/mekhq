@@ -31,6 +31,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
@@ -158,7 +159,7 @@ public class AtBContractViewPanel extends JPanel {
 		lblScore = new JLabel();
 		txtScore = new JTextArea();
 		
-		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel");
+		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel", new EncodeControl()); //$NON-NLS-1$
 
     	java.awt.GridBagConstraints gridBagConstraints;
 		pnlStats.setLayout(new java.awt.GridBagLayout());

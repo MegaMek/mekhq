@@ -20,7 +20,7 @@
 	<!-- Global properties for this build -->
 	<!-- Version and packaging properties -->
 	<property name="project.name" value="mekhq" />
-	<property name="version" value="0.3.25-git"/>
+	<property name="version" value="0.3.29-git"/>
 	<property name="osxdist" value="${project.name}-${version}-mac" />
 	<property name="windist" value="${project.name}-${version}-windows" />
 	<property name="nixdist" value="${project.name}-${version}" />
@@ -45,7 +45,6 @@
 
 
 	<property name="timestampfile" value="${logdir}/timestamp" />
-	<property name="TinyXMLsrc" value="TinyXML07-src.zip" />
 
 	<!-- Name of the target jarfile and the class containing the main-Method -->
 	<property name="jarfile" value="MekHQ.jar" />
@@ -184,7 +183,7 @@
         <copy todir="${localdir}/${confdir}">
             <fileset dir="${localdir}/${confdir}-OLD" >
                 <include name="mekhq.properties" />
-                <include name="mhqPresets" />
+                <include name="mhqPresets/" />
             </fileset>
         </copy>
         <copy todir="${localdir}/${confdir}">

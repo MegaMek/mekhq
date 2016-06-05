@@ -100,7 +100,7 @@ public class EditSpecialAbilityDialog extends JDialog {
         btnClose = new javax.swing.JButton();
 
 
-        spnXP = new JSpinner(new SpinnerNumberModel(currentXP, -1, 100, 1));
+        spnXP = new JSpinner(new SpinnerNumberModel(currentXP, -1, 100000, 1));
 
         JPanel panXP = new JPanel(new GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
