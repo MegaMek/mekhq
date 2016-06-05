@@ -187,13 +187,19 @@ private void initComponents() {
 		}
 }
 
+private int indexStringArray(String[] array, String string){
+	for(int i = 0; i < array.length; i++){
+		if(array[i].equalsIgnoreCase(string)) return i;
+	}
+	return -1;
+}
 
 private MechSummary performRollRat() {
 	try{
 		UnitTableData unitTables = UnitTableData.getInstance();
-		int unitType = Arrays.binarySearch(UnitTableData.unitNames,unitTypePicker.getSelectedItem().toString());
-		int unitQuality = Arrays.binarySearch(UnitTableData.qualityNames,qualityPicker.getSelectedItem().toString());
-		int unitWeight = Arrays.binarySearch(UnitTableData.weightNames,unitWeightPicker.getSelectedItem().toString());
+		int unitType = indexStringArray(UnitTableData.unitNames,unitTypePicker.getSelectedItem().toString());
+		int unitQuality = indexStringArray(UnitTableData.qualityNames,qualityPicker.getSelectedItem().toString());
+		int unitWeight = indexStringArray(UnitTableData.weightNames,unitWeightPicker.getSelectedItem().toString());
 		
 		if(!unitTables.isInitialized()){
 			unitPicked.setText("No Unit Tables Initialized.");
