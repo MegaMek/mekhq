@@ -13,6 +13,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 
 import javax.swing.BorderFactory;
@@ -190,19 +191,21 @@ private void initComponents() {
 private MechSummary performRollRat() {
 	try{
 		UnitTableData unitTables = UnitTableData.getInstance();
+		int unitType = Arrays.binarySearch(UnitTableData.unitNames,unitTypePicker.getSelectedItem().toString());
+		int unitQuality = Arrays.binarySearch(UnitTableData.qualityNames,qualityPicker.getSelectedItem().toString());
+		int unitWeight = Arrays.binarySearch(UnitTableData.weightNames,unitWeightPicker.getSelectedItem().toString());
+		
 		if(!unitTables.isInitialized()){
 			unitPicked.setText("No Unit Tables Initialized.");
 			return null;
 		}
 		FactionTables selection = unitTables.getBestRAT(gui.getCampaign().getCampaignOptions().getRATs(), Integer.parseInt(yearPicker.getText()),
-				factionPicker.getSelectedItem().toString(), UnitTableData.getUnitTypeIndex(unitTypePicker.getSelectedItem().toString()));
+				factionPicker.getSelectedItem().toString(), unitWeight);
 		if( selection == null){
 			unitPicked.setText("No Unit Table Avaliable for Selection");
 			return null;
 		}
-		String rat = selection.getTable(UnitTableData.getUnitTypeIndex(unitTypePicker.getSelectedItem().toString()),
-				UnitTableData.getWeightIndex(unitWeightPicker.getSelectedItem().toString()),
-				UnitTableData.getQualityIndex(qualityPicker.getSelectedItem().toString()));
+		String rat = selection.getTable(unitType,unitWeight,unitQuality);
 		MekHQ.logMessage("Selected: " + rat);
 		if (rat == null){
 			unitPicked.setText("No Unit Table Avaliable for Selection");
