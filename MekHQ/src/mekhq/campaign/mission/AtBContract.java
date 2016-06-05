@@ -354,19 +354,25 @@ public class AtBContract extends Contract implements Serializable {
 	public void calculatePaymentMultiplier(Campaign campaign) {
 		int unitRatingMod = campaign.getUnitRatingMod();
 		double multiplier = 1.0;
-		if (unitRatingMod >= IUnitRating.DRAGOON_A){
-			multiplier *= 2.0;
-		}
-		if (unitRatingMod == IUnitRating.DRAGOON_B){
-			multiplier *= 1.5;
-		}
-		if (unitRatingMod == IUnitRating.DRAGOON_D){
-			multiplier *= 0.8;
-		}
-		if (unitRatingMod == IUnitRating.DRAGOON_F){
-			multiplier *= 0.5;
-		}
-		
+		// IntOps reputation factor then Dragoons rating
+        if (campaign.getCampaignOptions().useDragoonRating()
+                && campaign.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.INTERSTELLAR_OPS)) {
+            multiplier *= (unitRatingMod * .2) + .5;
+        } else {
+            if (unitRatingMod >= IUnitRating.DRAGOON_A){
+                multiplier *= 2.0;
+            }
+            if (unitRatingMod == IUnitRating.DRAGOON_B){
+                multiplier *= 1.5;
+            }
+            if (unitRatingMod == IUnitRating.DRAGOON_D){
+                multiplier *= 0.8;
+            }
+            if (unitRatingMod == IUnitRating.DRAGOON_F){
+                multiplier *= 0.5;
+            }
+        }
+
 		switch (missionType) {
 		case MT_CADREDUTY:
 			multiplier *= 0.8;
@@ -410,7 +416,7 @@ public class AtBContract extends Contract implements Serializable {
 				enemyCode.equals("PIR")) {
 			multiplier *= 1.1;
 		}
-		
+
 		int cmdrStrategy = 0;
 		if (campaign.getFlaggedCommander() != null &&
 				campaign.getFlaggedCommander().getSkill(SkillType.S_STRATEGY) != null) {
