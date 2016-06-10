@@ -1068,9 +1068,13 @@ public class AtBScenario extends Scenario {
 							otherForce));
 			for (int i = 0; i < 6; i++) {
 				if (attacker) {
-					enemy.add(this.getEntityByName(randomGunEmplacement(), getContract(campaign).getEnemyCode(), campaign));
+					enemy.add(this.getEntityByName(randomGunEmplacement(),
+							getContract(campaign).getEnemyCode(),
+							getContract(campaign).getEnemySkill(), campaign));
 				} else {
-					allyBot.add(this.getEntityByName(randomGunEmplacement(), getContract(campaign).getEmployerCode(), campaign));
+					allyBot.add(this.getEntityByName(randomGunEmplacement(),
+							getContract(campaign).getEmployerCode(),
+							getContract(campaign).getAllySkill(), campaign));
 				}
 			}
 			break;
@@ -1131,7 +1135,9 @@ public class AtBScenario extends Scenario {
 				}
 				if (!dropshipFound) {
 					Entity dropship = getEntityByName("Leopard (2537)",
-							getContract(campaign).getEmployerCode(), campaign);
+							getContract(campaign).getEmployerCode(),
+							getContract(campaign).getAllySkill(),
+							campaign);
 					alliesPlayer.add(dropship);
 					attachedUnitIds.add(UUID.fromString(dropship.getExternalIdAsString()));
 				}
@@ -1910,10 +1916,11 @@ public class AtBScenario extends Scenario {
 	 *
 	 * @param name			Full name (chassis + model) of the entity to generate.
 	 * @param fName			Faction code to use for crew name generation
+	 * @param skill			RandomSkillsGenerator.L_* constant for the average force skill level.
 	 * @param campaign
 	 * @return				A new Entity
 	 */
-	private Entity getEntityByName(String name, String fName, Campaign campaign) {
+	private Entity getEntityByName(String name, String fName, int skill, Campaign campaign) {
         MechSummary mechSummary = MechSummaryCache.getInstance().getMech(
                 name);
         if (mechSummary == null) {
@@ -1943,7 +1950,7 @@ public class AtBScenario extends Scenario {
 
 		RandomSkillsGenerator rsg = new RandomSkillsGenerator();
 		rsg.setMethod(RandomSkillsGenerator.M_TAHARQA);
-		rsg.setLevel(RandomSkillsGenerator.L_REG);
+		rsg.setLevel(skill);
 
 		if (faction.isClan()) rsg.setType(RandomSkillsGenerator.T_CLAN);
 		int[] skills = rsg.getRandomSkills(en);
