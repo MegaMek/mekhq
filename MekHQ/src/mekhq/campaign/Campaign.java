@@ -415,7 +415,9 @@ public class Campaign implements Serializable {
     public ArrayList<Lance> getLanceList() {
     	ArrayList<Lance> retVal = new ArrayList<Lance>();
     	for (Lance l : lances.values()) {
-    		retVal.add(l);
+    		if (forceIds.containsKey(l.getForceId())) {
+    			retVal.add(l);
+    		}
     	}
     	return retVal;
     }
@@ -3345,7 +3347,9 @@ public class Campaign implements Serializable {
             if (lances.size() > 0)   {
             	pw1.println("\t<lances>");
             	for (Lance l : lances.values()) {
-            		l.writeToXml(pw1, 2);
+            		if (forceIds.containsKey(l.getForceId())) {
+            			l.writeToXml(pw1, 2);
+            		}
             	}
             	pw1.println("\t</lances>");
             }

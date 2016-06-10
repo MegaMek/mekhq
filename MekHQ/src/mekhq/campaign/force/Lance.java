@@ -174,7 +174,11 @@ public class Lance implements Serializable, MekHqXmlSerializable {
 		if (c.getFaction().isClan()) {
 			return (int)Math.ceil(getEffectivePoints(c));
 		}
-		return c.getForce(forceId).getUnits().size();
+		if (c.getForce(forceId) != null) {
+			return c.getForce(forceId).getUnits().size();
+		} else {
+			return 0;
+		}
 	}
 
 	public double getEffectivePoints(Campaign c) {
