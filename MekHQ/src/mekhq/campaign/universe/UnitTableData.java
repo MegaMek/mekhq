@@ -81,6 +81,8 @@ public class UnitTableData implements Serializable, ActionListener {
 	public static final int WT_MEDIUM = 1;
 	public static final int WT_HEAVY = 2;
 	public static final int WT_ASSAULT = 3;
+	public static final int NUM_WT_CLASSES = 4;
+	public static final int NUM_WT_CLASSES_AERO = 3;
 	public static final String[] weightNames = {
 		"Light", "Medium", "Heavy", "Assault"
 	};
@@ -390,7 +392,6 @@ public class UnitTableData implements Serializable, ActionListener {
 		try {
 			fis = new FileInputStream(f);
 			createFromXml(fis);
-			fis.close();
 			fis.close();
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -742,28 +743,43 @@ public class UnitTableData implements Serializable, ActionListener {
 			return protomechs != null;
 		}
 
-		public String getTable(int unitType, int weight, int quality) {
+		public String getTable(int unitType, int weightClass, int quality) {
 			ArrayList<String> units = null;
 			switch (unitType) {
 			case UNIT_MECH:
-				if (mechs.size() > 1) {
-					units = mechs.get(weight);
-				} else {
+				if (mechs == null || mechs.size() == 0) {
+					return null;
+				} else if (mechs.size() == 1) {
 					units = mechs.get(0);
+				} else if (mechs.size() < NUM_WT_CLASSES) {
+					/* If the ratinfo.xml file does not supply a RAT for every weight
+					 * class category, select based on proportial position.
+					 */
+					units = mechs.get(weightClass * mechs.size() / (NUM_WT_CLASSES));
+				} else {
+					units = mechs.get(weightClass);
 				}
 				break;
 			case UNIT_VEHICLE:
-				if (vees.size() > 1) {
-					units = vees.get(weight);
-				} else {
+				if (vees == null || vees.size() == 0) {
+					return null;
+				} else if (vees.size() == 1) {
 					units = vees.get(0);
+				} else if (vees.size() < NUM_WT_CLASSES) {
+					units = vees.get(weightClass * vees.size() / (NUM_WT_CLASSES));
+				} else {
+					units = vees.get(weightClass);
 				}
 				break;
 			case UNIT_AERO:
-				if (aero.size() > 1) {
-					units = aero.get(weight);
-				} else {
+				if (aero == null || aero.size() == 0) {
+					return null;
+				} else if (aero.size() == 1) {
 					units = aero.get(0);
+				} else if (aero.size() < NUM_WT_CLASSES_AERO) {
+					units = aero.get(weightClass * aero.size() / (NUM_WT_CLASSES_AERO));
+				} else {
+					units = aero.get(weightClass);
 				}
 				break;
 			case UNIT_DROPSHIP:

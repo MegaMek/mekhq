@@ -3,6 +3,7 @@ VERSION HISTORY
 v0.3.30-git
 + Issue #29: MekHQ will not load.
 + Issue #69: 3.27 : ATB, allies generated use incorrect skill rating
++ Bug: missing or incorrect values in ratinfo.xml can cause ArrayOutOfBoundsException.
 
 v0.3.29 (2016-06-05 22:40 UTC)
 + Adding a simple view option to the interstellar map (show/hide "empty" planets)
