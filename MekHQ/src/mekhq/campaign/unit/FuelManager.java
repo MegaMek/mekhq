@@ -67,6 +67,21 @@ public final class FuelManager {
         }
     }
     
+    private static Entity getBaseEntity(Entity e) {
+        MechSummaryCache msc = MechSummaryCache.getInstance();
+        MechSummary summary = msc.getMech((e.getChassis() + " " + e.getModel()).trim()); //$NON-NLS-1$
+        if(null != summary) {
+            try {
+                return new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+            } catch (EntityLoadingException elex) {
+                MekHQ.logError(elex);
+            }
+        } else {
+            MekHQ.logError("Couldn't load base entity definition for " + e.getChassis() + " " + e.getModel()); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        return null;
+    }
+    
     // getFuelCapability(...) - return the totality of all fuel tanks inside the unit or list of units
     
     /** @return the internal fuel storage of the given entity */
@@ -76,25 +91,18 @@ public final class FuelManager {
         }
         initialize();
         List<MaterialStorage> result = new ArrayList<>();
-        MechSummaryCache msc = MechSummaryCache.getInstance();
         if(e instanceof Aero) {
-            MechSummary summary = msc.getMech((e.getChassis() + " " + e.getModel()).trim()); //$NON-NLS-1$
-            if(null != summary) {
-                try {
-                    Aero base = (Aero) new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
-                    Engine engine = base.getEngine();
-                    if(engine.hasFlag(Engine.COMBUSTION_ENGINE)) {
-                        result.add(new MaterialStorage(petrochemicals, base.getFuelTonnage()));
-                    } else {
-                        result.add(new MaterialStorage(hydrogen, base.getFuelTonnage()));
-                    }
-                } catch (EntityLoadingException elex) {
-                    MekHQ.logError(elex);
+            Aero base = (Aero) getBaseEntity(e);
+            if(null != base) {
+                Engine engine = base.getEngine();
+                if(engine.hasFlag(Engine.COMBUSTION_ENGINE)) {
+                    result.add(new MaterialStorage(petrochemicals, base.getFuelTonnage()));
+                } else {
+                    result.add(new MaterialStorage(hydrogen, base.getFuelTonnage()));
                 }
-            } else {
-                MekHQ.logError("Couldn't load base entity definition for " + e.getChassis() + " " + e.getModel()); //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
+        // TODO: Other unit types, where applicable
         return result;
     }
     
@@ -136,7 +144,7 @@ public final class FuelManager {
         
         Collection<UUID> uuids = f.getAllUnits();
         List<Unit> units = new ArrayList<>(uuids.size());
-        for(UUID unitId : f.getAllUnits()) {
+        for(UUID unitId : uuids) {
             Unit u = c.getUnit(unitId);
             if((null != u) && (null != u.getEntity())) {
                 units.add(u);
@@ -231,5 +239,53 @@ public final class FuelManager {
     /** @return the given force's maximum fuel tonnage for the specific fuel material id */
     public static double getFuelTonnage(Campaign c, Force f, String materialId) {
         return getFuelTonnage(c, f, Materials.getMaterial(materialId));
+    }
+    
+    // fill(...) - fill the specific units' internal fuel tank
+
+    /** Fill the entity's internal tanks */
+    public static void fill(Entity e) {
+        if(null == e) {
+            return;
+        }
+        initialize();
+        if(e instanceof Aero) {
+            Aero base = (Aero) getBaseEntity(e);
+            if(null != base) {
+                ((Aero) e).setFuelTonnage(base.getFuelTonnage());
+            }
+        }
+    }
+    
+    /** Fill the unit's internal tanks */
+    public static void fill(Unit u) {
+        if(null != u) {
+            fill(u.getEntity());
+        }
+    }
+    
+    /** Fill the collection of unit's internal tanks */
+    public static void fill(Collection<Unit> units) {
+        if(null != units) {
+            for(Unit u : units) {
+                fill(u);
+            }
+        }
+    }
+    
+    /** Fill the specified force's internal tanks */
+    public static void fill(Campaign c, Force f) {
+        if((null != c) && (null != f)) {
+            for(UUID unitId : f.getAllUnits()) {
+                fill(c.getUnit(unitId));
+            }
+        }
+    }
+    
+    /** Fill all units in the given campaign's internal tanks. */
+    public static void fill(Campaign c) {
+        if(null != c) {
+            fill(c.getUnits());
+        }
     }
 }
