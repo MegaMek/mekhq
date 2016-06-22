@@ -513,7 +513,7 @@ public class CampaignGUI extends JPanel {
     private LoanTableModel loanModel;
     private ScenarioTableModel scenarioModel;
     private OrgTreeModel orgModel;
-	private PartsInUseTableModel overviewPartsModel;
+    private PartsInUseTableModel overviewPartsModel;
 
 
     /* table sorters for tables that can be filtered */
@@ -533,7 +533,7 @@ public class CampaignGUI extends JPanel {
     // Overview Parts In Use
     private JScrollPane scrollOverviewParts;
     private JPanel overviewPartsPanel;
-	private JTable overviewPartsInUseTable;
+    private JTable overviewPartsInUseTable;
     // Overview Transport
     private JScrollPane scrollOverviewTransport;
     // Overview Personnel
@@ -633,7 +633,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void showGMToolsDialog() {
-    	GMToolsDialog gmTools = new GMToolsDialog(getFrame(), this);
+        GMToolsDialog gmTools = new GMToolsDialog(getFrame(), this);
         gmTools.setVisible(true);
     }
 
@@ -735,14 +735,14 @@ public class CampaignGUI extends JPanel {
         // The finance tab can be a pain to update when dealing with large units.
         // Refresh it on tab change to that panel instead.
         tabMain.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				if(tabMain.getSelectedComponent() == panFinances) { // Yes, identity check
-					refreshFinancialReport();
-				}
-				
-			}
-		});
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if(tabMain.getSelectedComponent() == panFinances) { // Yes, identity check
+                    refreshFinancialReport();
+                }
+                
+            }
+        });
         initMain();
         initTopButtons();
         initStatusBar();
@@ -1229,100 +1229,100 @@ public class CampaignGUI extends JPanel {
         panMap.setCampaign(getCampaign());
     }
 
-	private void initOverviewTab() {
-		GridBagConstraints gridBagConstraints;
+    private void initOverviewTab() {
+        GridBagConstraints gridBagConstraints;
 
-		panOverview = new JPanel();
-		setTabOverview(new JTabbedPane());
-		scrollOverviewParts = new JScrollPane();
-		initOverviewPartsInUse();
-		scrollOverviewTransport = new JScrollPane();
-		scrollOverviewCombatPersonnel = new JScrollPane();
-		scrollOverviewSupportPersonnel = new JScrollPane();
-		scrollOverviewHangar = new JScrollPane();
-		overviewHangarArea = new JTextArea();
-		splitOverviewHangar = new JSplitPane();
-		scrollOverviewUnitRating = new JScrollPane();
-		scrollOverviewCargo = new JScrollPane();
+        panOverview = new JPanel();
+        setTabOverview(new JTabbedPane());
+        scrollOverviewParts = new JScrollPane();
+        initOverviewPartsInUse();
+        scrollOverviewTransport = new JScrollPane();
+        scrollOverviewCombatPersonnel = new JScrollPane();
+        scrollOverviewSupportPersonnel = new JScrollPane();
+        scrollOverviewHangar = new JScrollPane();
+        overviewHangarArea = new JTextArea();
+        splitOverviewHangar = new JSplitPane();
+        scrollOverviewUnitRating = new JScrollPane();
+        scrollOverviewCargo = new JScrollPane();
 
-		// Overview tab
-		panOverview.setName("panelOverview"); // NOI18N
-		panOverview.setLayout(new java.awt.GridBagLayout());
+        // Overview tab
+        panOverview.setName("panelOverview"); // NOI18N
+        panOverview.setLayout(new java.awt.GridBagLayout());
 
-		getTabOverview().setToolTipText(resourceMap.getString("tabOverview.toolTipText")); // NOI18N
-		getTabOverview().setMinimumSize(new java.awt.Dimension(250, 250));
-		getTabOverview().setName("tabOverview"); // NOI18N
-		getTabOverview().setPreferredSize(new java.awt.Dimension(800, 300));
+        getTabOverview().setToolTipText(resourceMap.getString("tabOverview.toolTipText")); // NOI18N
+        getTabOverview().setMinimumSize(new java.awt.Dimension(250, 250));
+        getTabOverview().setName("tabOverview"); // NOI18N
+        getTabOverview().setPreferredSize(new java.awt.Dimension(800, 300));
 
-		scrollOverviewTransport.setToolTipText(resourceMap.getString("scrollOverviewTransport.TabConstraints.toolTipText")); // NOI18N
-		scrollOverviewTransport.setMinimumSize(new java.awt.Dimension(350, 400));
-		scrollOverviewTransport.setPreferredSize(new java.awt.Dimension(350, 400));
-		scrollOverviewTransport.setViewportView(new TransportReport(getCampaign()).getReport());
-		getTabOverview().addTab(resourceMap.getString("scrollOverviewTransport.TabConstraints.tabTitle"), scrollOverviewTransport);
+        scrollOverviewTransport.setToolTipText(resourceMap.getString("scrollOverviewTransport.TabConstraints.toolTipText")); // NOI18N
+        scrollOverviewTransport.setMinimumSize(new java.awt.Dimension(350, 400));
+        scrollOverviewTransport.setPreferredSize(new java.awt.Dimension(350, 400));
+        scrollOverviewTransport.setViewportView(new TransportReport(getCampaign()).getReport());
+        getTabOverview().addTab(resourceMap.getString("scrollOverviewTransport.TabConstraints.tabTitle"), scrollOverviewTransport);
 
-		scrollOverviewCargo.setToolTipText(resourceMap.getString("scrollOverviewCargo.TabConstraints.toolTipText")); // NOI18N
-		scrollOverviewCargo.setMinimumSize(new java.awt.Dimension(350, 400));
-		scrollOverviewCargo.setPreferredSize(new java.awt.Dimension(350, 400));
-		scrollOverviewCargo.setViewportView(new CargoReport(getCampaign()).getReport());
-		getTabOverview().addTab(resourceMap.getString("scrollOverviewCargo.TabConstraints.tabTitle"), scrollOverviewCargo);
+        scrollOverviewCargo.setToolTipText(resourceMap.getString("scrollOverviewCargo.TabConstraints.toolTipText")); // NOI18N
+        scrollOverviewCargo.setMinimumSize(new java.awt.Dimension(350, 400));
+        scrollOverviewCargo.setPreferredSize(new java.awt.Dimension(350, 400));
+        scrollOverviewCargo.setViewportView(new CargoReport(getCampaign()).getReport());
+        getTabOverview().addTab(resourceMap.getString("scrollOverviewCargo.TabConstraints.tabTitle"), scrollOverviewCargo);
 
-		scrollOverviewCombatPersonnel.setMinimumSize(new java.awt.Dimension(350, 400));
-		scrollOverviewCombatPersonnel.setPreferredSize(new java.awt.Dimension(350, 400));
-		scrollOverviewCombatPersonnel.setViewportView(new PersonnelReport(getCampaign()).getCombatPersonnelReport());
-		scrollOverviewSupportPersonnel.setMinimumSize(new java.awt.Dimension(350, 400));
-		scrollOverviewSupportPersonnel.setPreferredSize(new java.awt.Dimension(350, 400));
+        scrollOverviewCombatPersonnel.setMinimumSize(new java.awt.Dimension(350, 400));
+        scrollOverviewCombatPersonnel.setPreferredSize(new java.awt.Dimension(350, 400));
+        scrollOverviewCombatPersonnel.setViewportView(new PersonnelReport(getCampaign()).getCombatPersonnelReport());
+        scrollOverviewSupportPersonnel.setMinimumSize(new java.awt.Dimension(350, 400));
+        scrollOverviewSupportPersonnel.setPreferredSize(new java.awt.Dimension(350, 400));
         scrollOverviewSupportPersonnel.setViewportView(new PersonnelReport(getCampaign()).getSupportPersonnelReport());
 
-		splitOverviewPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollOverviewCombatPersonnel, scrollOverviewSupportPersonnel);
-		splitOverviewPersonnel.setName("splitOverviewPersonnel");
-		splitOverviewPersonnel.setOneTouchExpandable(true);
-		splitOverviewPersonnel.setResizeWeight(0.5);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 1.0;
-		getTabOverview().addTab(resourceMap.getString("scrollOverviewPersonnel.TabConstraints.tabTitle"), splitOverviewPersonnel);
+        splitOverviewPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollOverviewCombatPersonnel, scrollOverviewSupportPersonnel);
+        splitOverviewPersonnel.setName("splitOverviewPersonnel");
+        splitOverviewPersonnel.setOneTouchExpandable(true);
+        splitOverviewPersonnel.setResizeWeight(0.5);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        getTabOverview().addTab(resourceMap.getString("scrollOverviewPersonnel.TabConstraints.tabTitle"), splitOverviewPersonnel);
 
-		scrollOverviewHangar.setViewportView(new HangarReport(getCampaign()).getHangarTree());
-		overviewHangarArea.setName("overviewHangarArea"); // NOI18N
-		overviewHangarArea.setLineWrap(false);
-		overviewHangarArea.setFont(new Font("Courier New", Font.PLAIN, 18));
-		overviewHangarArea.setText("");
-		overviewHangarArea.setEditable(false);
-		overviewHangarArea.setName("overviewHangarArea"); // NOI18N
-		splitOverviewHangar = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollOverviewHangar, overviewHangarArea);
-		splitOverviewHangar.setName("splitOverviewHangar");
-		splitOverviewHangar.setOneTouchExpandable(true);
-		splitOverviewHangar.setResizeWeight(0.5);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 1.0;
-		getTabOverview().addTab(resourceMap.getString("scrollOverviewHangar.TabConstraints.tabTitle"), splitOverviewHangar);
+        scrollOverviewHangar.setViewportView(new HangarReport(getCampaign()).getHangarTree());
+        overviewHangarArea.setName("overviewHangarArea"); // NOI18N
+        overviewHangarArea.setLineWrap(false);
+        overviewHangarArea.setFont(new Font("Courier New", Font.PLAIN, 18));
+        overviewHangarArea.setText("");
+        overviewHangarArea.setEditable(false);
+        overviewHangarArea.setName("overviewHangarArea"); // NOI18N
+        splitOverviewHangar = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollOverviewHangar, overviewHangarArea);
+        splitOverviewHangar.setName("splitOverviewHangar");
+        splitOverviewHangar.setOneTouchExpandable(true);
+        splitOverviewHangar.setResizeWeight(0.5);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        getTabOverview().addTab(resourceMap.getString("scrollOverviewHangar.TabConstraints.tabTitle"), splitOverviewHangar);
 
-		overviewPartsPanel.setName("overviewPartsPanel"); // NOI18N
-		scrollOverviewParts.setViewportView(overviewPartsPanel);
-		getTabOverview().addTab(resourceMap.getString("scrollOverviewParts.TabConstraints.tabTitle"), scrollOverviewParts);
+        overviewPartsPanel.setName("overviewPartsPanel"); // NOI18N
+        scrollOverviewParts.setViewportView(overviewPartsPanel);
+        getTabOverview().addTab(resourceMap.getString("scrollOverviewParts.TabConstraints.tabTitle"), scrollOverviewParts);
 
-		rating = UnitRatingFactory.getUnitRating(getCampaign());
-		rating.reInitialize();
-		scrollOverviewUnitRating.setViewportView(new RatingReport(getCampaign()).getReport());
-		getTabOverview().addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"), scrollOverviewUnitRating);
+        rating = UnitRatingFactory.getUnitRating(getCampaign());
+        rating.reInitialize();
+        scrollOverviewUnitRating.setViewportView(new RatingReport(getCampaign()).getReport());
+        getTabOverview().addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"), scrollOverviewUnitRating);
 
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 1.0;
-		//gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-		panOverview.add(getTabOverview(), gridBagConstraints);
-	}
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        //gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+        panOverview.add(getTabOverview(), gridBagConstraints);
+    }
 
     private void initPersonnelTab() {
         GridBagConstraints gridBagConstraints;
@@ -1408,7 +1408,7 @@ public class CampaignGUI extends JPanel {
         personnelSorter.setComparator(PersonnelTableModel.COL_SALARY,
                 new FormattedNumberSorter());
         personnelSorter.setComparator(PersonnelTableModel.COL_AGE,
-        		new FormattedNumberSorter());
+                new FormattedNumberSorter());
         personnelTable.setRowSorter(personnelSorter);
         ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
         sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_RANK,
@@ -3387,18 +3387,18 @@ public class CampaignGUI extends JPanel {
                                             && getCampaign().getFinances()
                                                     .getBalance() >= rdd
                                                     .totalPayout()) {
-                                    	final int[] admins = {Person.T_ADMIN_COM, Person.T_ADMIN_HR,
-                                    			Person.T_ADMIN_LOG, Person.T_ADMIN_TRA};
-                                    	for (int role : admins) {
-                                    		Person admin = getCampaign().findBestInRole(role, SkillType.S_ADMIN);
-                                    		if (admin != null) {
+                                        final int[] admins = {Person.T_ADMIN_COM, Person.T_ADMIN_HR,
+                                                Person.T_ADMIN_LOG, Person.T_ADMIN_TRA};
+                                        for (int role : admins) {
+                                            Person admin = getCampaign().findBestInRole(role, SkillType.S_ADMIN);
+                                            if (admin != null) {
                                                 admin.setXp(admin.getXp() + 1);
                                                 getCampaign()
                                                         .addReport(
                                                                 admin.getHyperlinkedName()
                                                                         + " has gained 1 XP.");
-                                    		}
-                                    	}
+                                            }
+                                        }
                                     }
                                     if (!getCampaign().applyRetirement(
                                             rdd.totalPayout(),
@@ -3651,25 +3651,25 @@ public class CampaignGUI extends JPanel {
                 }
             }
 
-			JTable table = techTable;
-			if (onWarehouseTab()) {
-				table = whTechTable;
-			}
+            JTable table = techTable;
+            if (onWarehouseTab()) {
+                table = whTechTable;
+            }
 
-			// If requested, switch to top entry
-			if(getCampaign().getCampaignOptions().useResetToFirstTech() && table.getRowCount() > 0) {
-				table.setRowSelectionInterval(0, 0);
-			} else {
-				// Or get the selected tech back
-				for (int i = 0; i < table.getRowCount(); i++) {
-					Person p = techsModel
-							.getTechAt(table.convertRowIndexToModel(i));
-					if (tech.getId().equals(p.getId())) {
-						table.setRowSelectionInterval(i, i);
-						break;
-					}
-				}
-			}
+            // If requested, switch to top entry
+            if(getCampaign().getCampaignOptions().useResetToFirstTech() && table.getRowCount() > 0) {
+                table.setRowSelectionInterval(0, 0);
+            } else {
+                // Or get the selected tech back
+                for (int i = 0; i < table.getRowCount(); i++) {
+                    Person p = techsModel
+                            .getTechAt(table.convertRowIndexToModel(i));
+                    if (tech.getId().equals(p.getId())) {
+                        table.setRowSelectionInterval(i, i);
+                        break;
+                    }
+                }
+            }
         }
         if (selectedLocation != -1) {
             if (selectedUnit == null || getSelectedServicedUnit() == null
@@ -4264,10 +4264,10 @@ public class CampaignGUI extends JPanel {
         // TODO: does this effectively deal with memory management issues?
         dataLoadingDialog.setVisible(true);
         if (hadAtB && !getCampaign().getCampaignOptions().getUseAtB()) {
-        	UnitTableData.getInstance().dispose();
-        	RandomFactionGenerator.getInstance().dispose();
-        	RandomUnitGenerator.getInstance().dispose();
-        	RandomNameGenerator.getInstance().dispose();
+            UnitTableData.getInstance().dispose();
+            RandomFactionGenerator.getInstance().dispose();
+            RandomUnitGenerator.getInstance().dispose();
+            RandomNameGenerator.getInstance().dispose();
         }
     }
 
@@ -4480,13 +4480,13 @@ public class CampaignGUI extends JPanel {
                     }
                 }
                 RandomNameGenerator.getInstance();
-    			RandomFactionGenerator.getInstance().updateTables(getCampaign().getDate(),
-    					getCampaign().getCurrentPlanet(), getCampaign().getCampaignOptions());
+                RandomFactionGenerator.getInstance().updateTables(getCampaign().getDate(),
+                        getCampaign().getCurrentPlanet(), getCampaign().getCampaignOptions());
             } else {
-            	RandomFactionGenerator.getInstance().dispose();
-            	UnitTableData.getInstance().dispose();
-            	RandomUnitGenerator.getInstance().dispose();
-            	RandomNameGenerator.getInstance().dispose();
+                RandomFactionGenerator.getInstance().dispose();
+                UnitTableData.getInstance().dispose();
+                RandomUnitGenerator.getInstance().dispose();
+                RandomNameGenerator.getInstance().dispose();
             }
         }
         refreshCalendar();
@@ -4635,9 +4635,9 @@ public class CampaignGUI extends JPanel {
                     continue;
                 }
                 if (tech.getSecondaryRole() == Person.T_MECH_TECH || tech.getSecondaryRole() == Person.T_MECHANIC || tech.getSecondaryRole() == Person.T_AERO_TECH) {
-                	TimePerDay = 240 - tech.getMaintenanceTimeUsing();
+                    TimePerDay = 240 - tech.getMaintenanceTimeUsing();
                 } else {
-                	TimePerDay = 480 - tech.getMaintenanceTimeUsing();
+                    TimePerDay = 480 - tech.getMaintenanceTimeUsing();
                 }
                 skillLvl = SkillType.getExperienceLevelName(tech.getExperienceLevel(false));
                 name = tech.getFullName()
@@ -4772,17 +4772,17 @@ public class CampaignGUI extends JPanel {
     }
 
     public Part getPartByNameAndDetails(String pnd) {
-    	return getCampaign().getPartsStore().getByNameAndDetails(pnd);
+        return getCampaign().getPartsStore().getByNameAndDetails(pnd);
     }
 
     public void refreshOverview() {
-    	int drIndex = getTabOverview().indexOfComponent(scrollOverviewUnitRating);
+        int drIndex = getTabOverview().indexOfComponent(scrollOverviewUnitRating);
         if (!getCampaign().getCampaignOptions().useDragoonRating() && drIndex != -1) {
-        	getTabOverview().removeTabAt(drIndex);
+            getTabOverview().removeTabAt(drIndex);
         } else {
-        	if (drIndex == -1) {
-        		getTabOverview().addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"), scrollOverviewUnitRating);
-        	}
+            if (drIndex == -1) {
+                getTabOverview().addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"), scrollOverviewUnitRating);
+            }
         }
 
         scrollOverviewUnitRating.setViewportView(new RatingReport(getCampaign()).getReport());
@@ -6027,20 +6027,20 @@ public class CampaignGUI extends JPanel {
         }
 
         if (undeployed.length() > 0) {
-        	Object[] options = {"Continue",
+            Object[] options = {"Continue",
             "Cancel"};
-        	int n = JOptionPane.showOptionDialog(getFrame(),
-        			"The following units could not be deployed:"
-        					+ undeployed.toString(),
-        					"Could not deploy some units",
-						JOptionPane.OK_CANCEL_OPTION,
-						JOptionPane.WARNING_MESSAGE,
-						null,
-						options,
-						options[1]);
-        	if(n==1) {
-        		return;
-        	}
+            int n = JOptionPane.showOptionDialog(getFrame(),
+                    "The following units could not be deployed:"
+                            + undeployed.toString(),
+                            "Could not deploy some units",
+                        JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.WARNING_MESSAGE,
+                        null,
+                        options,
+                        options[1]);
+            if(n==1) {
+                return;
+            }
         }
 
         if (chosen.size() > 0) {
@@ -6097,21 +6097,21 @@ public class CampaignGUI extends JPanel {
         }
 
         if (undeployed.length() > 0) {
-        	Object[] options = {"Continue",
+            Object[] options = {"Continue",
                     "Cancel"};
-        	int n = JOptionPane.showOptionDialog(getFrame(),
-        			"The following units could not be deployed:"
+            int n = JOptionPane.showOptionDialog(getFrame(),
+                    "The following units could not be deployed:"
                             + undeployed.toString(),
                     "Could not deploy some units",
-        					JOptionPane.OK_CANCEL_OPTION,
-        					JOptionPane.WARNING_MESSAGE,
-        					null,
-        					options,
-        					options[1]);
+                            JOptionPane.OK_CANCEL_OPTION,
+                            JOptionPane.WARNING_MESSAGE,
+                            null,
+                            options,
+                            options[1]);
 
-        	if(n==1) {
-        		return;
-        	}
+            if(n==1) {
+                return;
+            }
         }
 
         if (getCampaign().getCampaignOptions().getUseAtB()
@@ -6140,14 +6140,14 @@ public class CampaignGUI extends JPanel {
                         int slowest = 12;
                         for (UUID id : units) {
                             if (chosen.contains(getCampaign().getUnit(id))) {
-                            	int speed = getCampaign().getUnit(id).getEntity().getWalkMP();
-                            	if (getCampaign().getUnit(id).getEntity().getJumpMP() > 0) {
-                            		if (getCampaign().getUnit(id).getEntity() instanceof megamek.common.Infantry) {
-                            			speed = getCampaign().getUnit(id).getEntity().getJumpMP();
-                            		} else {
-                            			speed++;
-                            		}
-                            	}
+                                int speed = getCampaign().getUnit(id).getEntity().getWalkMP();
+                                if (getCampaign().getUnit(id).getEntity().getJumpMP() > 0) {
+                                    if (getCampaign().getUnit(id).getEntity() instanceof megamek.common.Infantry) {
+                                        speed = getCampaign().getUnit(id).getEntity().getJumpMP();
+                                    } else {
+                                        speed++;
+                                    }
+                                }
                                 slowest = Math.min(slowest, speed);
                             }
                         }
@@ -6212,20 +6212,20 @@ public class CampaignGUI extends JPanel {
         }
 
         if (undeployed.length() > 0) {
-        	Object[] options = {"Continue",
+            Object[] options = {"Continue",
             "Cancel"};
-        	int n = JOptionPane.showOptionDialog(getFrame(),
-        			"The following units could not be deployed:"
-        					+ undeployed.toString(),
-        					"Could not deploy some units",
-						JOptionPane.OK_CANCEL_OPTION,
-						JOptionPane.WARNING_MESSAGE,
-						null,
-						options,
-						options[1]);
-        	if(n==1) {
-        		return;
-        	}
+            int n = JOptionPane.showOptionDialog(getFrame(),
+                    "The following units could not be deployed:"
+                            + undeployed.toString(),
+                            "Could not deploy some units",
+                        JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.WARNING_MESSAGE,
+                        null,
+                        options,
+                        options[1]);
+            if(n==1) {
+                return;
+            }
         }
 
         if (chosen.size() > 0) {
@@ -6263,20 +6263,20 @@ public class CampaignGUI extends JPanel {
         }
 
         if (undeployed.length() > 0) {
-        	Object[] options = {"Continue",
+            Object[] options = {"Continue",
             "Cancel"};
-        	int n = JOptionPane.showOptionDialog(getFrame(),
-        			"The following units could not be deployed:"
-        					+ undeployed.toString(),
-        					"Could not deploy some units",
-						JOptionPane.OK_CANCEL_OPTION,
-						JOptionPane.WARNING_MESSAGE,
-						null,
-						options,
-						options[1]);
-        	if(n==1) {
-        		return;
-        	}
+            int n = JOptionPane.showOptionDialog(getFrame(),
+                    "The following units could not be deployed:"
+                            + undeployed.toString(),
+                            "Could not deploy some units",
+                        JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.WARNING_MESSAGE,
+                        null,
+                        options,
+                        options[1]);
+            if(n==1) {
+                return;
+            }
         }
 
         JFileChooser saveList = new JFileChooser(".");
@@ -6644,15 +6644,15 @@ public class CampaignGUI extends JPanel {
 
     public void refreshReport() {
         List<String> newLogEntries = getCampaign().fetchAndClearNewReports();
-    	panLog.appendLog(newLogEntries);
-    	logDialog.appendLog(newLogEntries);
+        panLog.appendLog(newLogEntries);
+        logDialog.appendLog(newLogEntries);
     }
     
     public void initReport() {
         String report = getCampaign().getCurrentReportHTML();
-    	panLog.refreshLog(report);
-    	logDialog.refreshLog(report);
-    	getCampaign().fetchAndClearNewReports();
+        panLog.refreshLog(report);
+        logDialog.refreshLog(report);
+        getCampaign().fetchAndClearNewReports();
     }
 
     public void refreshOrganization() {
@@ -7010,15 +7010,15 @@ public class CampaignGUI extends JPanel {
                 TechTableModel techModel = entry.getModel();
                 Person tech = techModel.getTechAt(entry.getIdentifier());
                 if(null != unit && unit.isSelfCrewed()) {
-                	if(tech.getPrimaryRole() != Person.T_SPACE_CREW) {
-                		return false;
-                	}
-                	//check whether the engineer is assigned to the correct unit
-                	return unit.getId().equals(tech.getUnitId());
+                    if(tech.getPrimaryRole() != Person.T_SPACE_CREW) {
+                        return false;
+                    }
+                    //check whether the engineer is assigned to the correct unit
+                    return unit.getId().equals(tech.getUnitId());
                 }
                 if (tech.getPrimaryRole() == Person.T_SPACE_CREW
                         && (null != unit) && !unit.isSelfCrewed()) {
-                	return false;
+                    return false;
                 }
                 if (!onWarehouseTab() && !tech.isRightTechTypeFor(part)
                         && !btnShowAllTechs.isSelected()) {
