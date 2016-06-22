@@ -18,6 +18,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.text.DefaultCaret;
 
 import org.joda.time.DateTime;
@@ -25,6 +26,7 @@ import org.joda.time.DateTime;
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.Planet.SocioIndustrialData;
 
 /**
  * A custom panel that gets filled in with goodies from a Planet record
@@ -64,7 +66,7 @@ public class PlanetViewPanel extends JPanel {
     private JLabel lblAnimal;
     private JTextArea txtAnimal;
     private JLabel lblSocioIndustrial;
-    private JTextArea txtSocioIndustrial;
+    private JTextPane txtSocioIndustrial;
     private JLabel lblLandMass;
     private JTextArea txtLandMass;
 
@@ -202,7 +204,7 @@ public class PlanetViewPanel extends JPanel {
         lblAnimal = new JLabel();
         txtAnimal = new JTextArea();
         lblSocioIndustrial = new JLabel();
-        txtSocioIndustrial = new JTextArea();
+        txtSocioIndustrial = new JTextPane();
         lblLandMass = new JLabel();
         txtLandMass = new JTextArea();
         
@@ -596,10 +598,11 @@ public class PlanetViewPanel extends JPanel {
             pnlStats.add(lblSocioIndustrial, gridBagConstraints);
             
             txtSocioIndustrial.setName("lblSocioIndustrial2"); // NOI18N
-            txtSocioIndustrial.setText(planet.getSocioIndustrialText(currentDate));
+            SocioIndustrialData sid = planet.getSocioIndustrial(currentDate);
+            String sidText = (null == sid) ? "" : sid.getHTMLDescription();
+            txtSocioIndustrial.setContentType("text/html");
+            txtSocioIndustrial.setText(sidText);
             txtSocioIndustrial.setEditable(false);
-            txtSocioIndustrial.setLineWrap(true);
-            txtSocioIndustrial.setWrapStyleWord(true);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = infoRow;

@@ -902,7 +902,133 @@ public class Planet implements Serializable {
                 + "-" + EquipmentType.getRatingName(rawMaterials) //$NON-NLS-1$
                 + "-" + EquipmentType.getRatingName(output) //$NON-NLS-1$
                 + "-" + EquipmentType.getRatingName(agriculture); //$NON-NLS-1$
-             }
+         }
+        
+        /** @return the USILR rating as a HTML description */
+        public String getHTMLDescription() {
+            // TODO: Internationalization
+            // TODO: Some way to encode "advanced" ultra-tech worlds (rating "AA" for technological sophistication)
+            // TODO: Some way to encode "regressed" worlds
+            // Note that rating "E" isn't used in official USILR codes, but we add them for completeness
+            StringBuilder sb = new StringBuilder("<html><body style='width: 50px; font: 10px sans-serif'>");
+            switch(tech) {
+                case EquipmentType.RATING_A:
+                    sb.append("A: High-tech world<br>");
+                    break;
+                case EquipmentType.RATING_B:
+                    sb.append("B: Advanced world<br>");
+                    break;
+                case EquipmentType.RATING_C:
+                    sb.append("C: Moderately advanced world<br>");
+                    break;
+                case EquipmentType.RATING_D:
+                    sb.append("D: Lower-tech world; about 21st- to 22nd-century level<br>");
+                    break;
+                case EquipmentType.RATING_E:
+                    sb.append("E: Lower-tech world; about 20th century level<br>");
+                    break;
+                case EquipmentType.RATING_F:
+                    sb.append("F: Primitive world<br>");
+                    break;
+                default:
+                    sb.append("X: Technological sophistication unknown<br>");
+                    break;
+            }
+            switch(industry) {
+                case EquipmentType.RATING_A:
+                    sb.append("A: Heavily industrialized<br>");
+                    break;
+                case EquipmentType.RATING_B:
+                    sb.append("B: Moderately industrialized<br>");
+                    break;
+                case EquipmentType.RATING_C:
+                    sb.append("C: Basic heavy industry; about 22nd century level<br>");
+                    break;
+                case EquipmentType.RATING_D:
+                    sb.append("D: Low industrialization; about 20th century level<br>");
+                    break;
+                case EquipmentType.RATING_E:
+                    sb.append("E: Very low industrialization; about 19th century level<br>");
+                    break;
+                case EquipmentType.RATING_F:
+                    sb.append("F: No industrialization<br>");
+                    break;
+                default:
+                    sb.append("X: Industrialization level unknown<br>");
+                    break;
+            }
+            switch(rawMaterials) {
+                case EquipmentType.RATING_A:
+                    sb.append("A: Fully self-sufficient raw material production<br>");
+                    break;
+                case EquipmentType.RATING_B:
+                    sb.append("B: Mostly self-sufficient raw material production<br>");
+                    break;
+                case EquipmentType.RATING_C:
+                    sb.append("C: Limited raw material production<br>");
+                    break;
+                case EquipmentType.RATING_D:
+                    sb.append("D: Production dependent on imports of raw materials<br>");
+                    break;
+                case EquipmentType.RATING_E:
+                    sb.append("E: Production highly dependent on imports of raw materials<br>");
+                    break;
+                case EquipmentType.RATING_F:
+                    sb.append("F: No economically viable local raw material production<br>");
+                    break;
+                default:
+                    sb.append("X: Raw material dependence unknown<br>");
+                    break;
+            }
+            switch(output) {
+                case EquipmentType.RATING_A:
+                    sb.append("A: High industrial output<br>");
+                    break;
+                case EquipmentType.RATING_B:
+                    sb.append("B: Good industrial output<br>");
+                    break;
+                case EquipmentType.RATING_C:
+                    sb.append("C: Limited industrial output<br>"); // Bad for Ferengi
+                    break;
+                case EquipmentType.RATING_D:
+                    sb.append("D: Negligable industrial output<br>");
+                    break;
+                case EquipmentType.RATING_E:
+                    sb.append("E: Negligable industrial output<br>");
+                    break;
+                case EquipmentType.RATING_F:
+                    sb.append("F: No industrial output<br>"); // Good for Ferengi
+                    break;
+                default:
+                    sb.append("X: Industrial output unknown<br>");
+                    break;
+            }
+            switch(agriculture) {
+                case EquipmentType.RATING_A:
+                    sb.append("A: Breadbasket<br>");
+                    break;
+                case EquipmentType.RATING_B:
+                    sb.append("B: Agriculturally abundant world<br>");
+                    break;
+                case EquipmentType.RATING_C:
+                    sb.append("C: Modest agriculture<br>");
+                    break;
+                case EquipmentType.RATING_D:
+                    sb.append("D: Poor agriculture<br>");
+                    break;
+                case EquipmentType.RATING_E:
+                    sb.append("E: Very poor agriculture<br>");
+                    break;
+                case EquipmentType.RATING_F:
+                    sb.append("F: Barren world<br>");
+                    break;
+                default:
+                    sb.append("X: Agricultural level unknown<br>");
+                    break;
+            }
+
+            return sb.append("</body></html>").toString();
+        }
     }
 
     /** A class representing some event, possibly changing planetary information */
