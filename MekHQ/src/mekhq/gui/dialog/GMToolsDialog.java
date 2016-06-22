@@ -5,7 +5,6 @@
 
 package mekhq.gui.dialog;
 
-import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -14,6 +13,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -47,7 +50,7 @@ public class GMToolsDialog extends JDialog implements ActionListener {
     private JSpinner sizeDice;
     private JLabel d = new JLabel("d");
     
-    private JComboBox<String> factionPicker;
+    private JComboBox<FactionChoice> factionPicker;
     private JTextField yearPicker;
     private JComboBox<String> qualityPicker;
     private JComboBox<String> unitTypePicker;
@@ -66,8 +69,8 @@ public class GMToolsDialog extends JDialog implements ActionListener {
         setName("formGMTools"); // NOI18N
         setTitle("GM Tools");
         getContentPane().setLayout(new java.awt.GridBagLayout());
-        this.setPreferredSize(new Dimension(600,300));
-        this.setMinimumSize(new Dimension(600,300));
+        //this.setPreferredSize(new Dimension(600,300));
+        //this.setMinimumSize(new Dimension(600,300));
         initComponents();
         setLocationRelativeTo(parent);
         pack();
@@ -82,7 +85,6 @@ public class GMToolsDialog extends JDialog implements ActionListener {
         dicePanel.add(numDice, newGridBagConstraints(0,0));
         
         dicePanel.add(d, newGridBagConstraints(1,0));
-
 
         sizeDice = new JSpinner(new SpinnerNumberModel(6, 1, 200, 1));
         ((JSpinner.DefaultEditor)sizeDice.getEditor()).getTextField().setEditable(true);
@@ -105,14 +107,39 @@ public class GMToolsDialog extends JDialog implements ActionListener {
         JPanel ratPanel = new JPanel(new GridBagLayout());
         ratPanel.setBorder(BorderFactory.createTitledBorder("RAT Roller"));
         
-        factionPicker = new JComboBox<String>(Faction.getFactionList().toArray(new String[Faction.getFactionList().size()]));
+        Collection<String> factionIds = Faction.getFactionList();
+        List<FactionChoice> factionChoices = new ArrayList<>(factionIds.size());
+        int era = gui.getCampaign().getEra();
+        StringBuilder sb = new StringBuilder();
+        for(String factionId : factionIds) {
+            sb.setLength(0);
+            sb.append(Faction.getFaction(factionId).getFullName(era)).append(" [").append(factionId).append("]");
+            factionChoices.add(new FactionChoice(factionId, sb.toString()));
+        }
+        Collections.sort(factionChoices, new Comparator<FactionChoice>() {
+            @Override
+            public int compare(FactionChoice o1, FactionChoice o2) {
+                if(o1 == o2 || o1.faction == o2.faction) {
+                    return 0;
+                }
+                if(null == o1 || null == o1.faction) {
+                    return -1;
+                }
+                if(null == o2 || null == o2.faction) {
+                    return 1;
+                }
+                return o1.faction.compareTo(o2.faction);
+            }
+            
+        });
+        factionPicker = new JComboBox<FactionChoice>(factionChoices.toArray(new FactionChoice[factionChoices.size()]));
         System.out.println(gui.getCampaign().getCalendar().get(Calendar.YEAR));
         yearPicker = new JTextField(5);
         yearPicker.setText(String.valueOf(gui.getCampaign().getCalendar().get(Calendar.YEAR)));
         qualityPicker = new JComboBox<String>(UnitTableData.qualityNames);
         unitTypePicker = new JComboBox<String>(UnitTableData.unitNames);
         unitWeightPicker = new JComboBox<String>(UnitTableData.weightNames);
-        unitPicked = new JLabel();
+        unitPicked = new JLabel("-");
         
         ratPanel.add(new JLabel("Year"), newGridBagConstraints(0, 0));
         ratPanel.add(yearPicker, newGridBagConstraints(0, 1));
@@ -149,8 +176,8 @@ public class GMToolsDialog extends JDialog implements ActionListener {
     }
     
     private GridBagConstraints newGridBagConstraints(int x, int y, int width, int height) {
-        return new GridBagConstraints(x, y, width, height, 1, 1,
-            GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(0,0,0,0), 0, 0);
+        return new GridBagConstraints(x, y, width, height, 1.0, 1.0,
+            GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(0, 3, 0, 3), 0, 0);
     }
     
     private void initComponents() {    
@@ -170,15 +197,15 @@ public class GMToolsDialog extends JDialog implements ActionListener {
         
         if(event.getActionCommand().equals(RAT_ADDER_TOOL)) {
             MechSummary ms = performRollRat();
-            if(ms!=null){
-                Entity e;
+            if(null != ms){
+                Entity e = null;
                 try {
                     e = new MechFileParser(ms.getSourceFile(),ms.getEntryName()).getEntity();
-                gui.getCampaign().addUnit(e, false, 0);
-                gui.refreshUnitList();
-                gui.refreshServicedUnitList();
-                gui.refreshReport();
-                gui.refreshOverview();
+                    gui.getCampaign().addUnit(e, false, 0);
+                    gui.refreshUnitList();
+                    gui.refreshServicedUnitList();
+                    gui.refreshReport();
+                    gui.refreshOverview();
                 } catch (EntityLoadingException e1) {
                     e1.printStackTrace();
                     MekHQ.logError("Failed to load entity " + ms.getName() + " from " + ms.getSourceFile().toString());
@@ -206,13 +233,14 @@ public class GMToolsDialog extends JDialog implements ActionListener {
                 unitPicked.setText("No Unit Tables Initialized.");
                 return null;
             }
-            FactionTables selection = unitTables.getBestRAT(gui.getCampaign().getCampaignOptions().getRATs(), Integer.parseInt(yearPicker.getText()),
-                    factionPicker.getSelectedItem().toString(), unitWeight);
+            int targetYear = Integer.parseInt(yearPicker.getText());
+            FactionTables selection = unitTables.getBestRAT(gui.getCampaign().getCampaignOptions().getRATs(), targetYear,
+                    ((FactionChoice) factionPicker.getSelectedItem()).id, unitWeight);
             if(null == selection) {
                 unitPicked.setText("No Unit Table Avaliable for Selection");
                 return null;
             }
-            String rat = selection.getTable(unitType,unitWeight,unitQuality);
+            String rat = selection.getTable(unitType, unitWeight, unitQuality);
             MekHQ.logMessage("Selected: " + rat);
             if(null == rat) {
                 unitPicked.setText("No Unit Table Avaliable for Selection");
@@ -227,13 +255,13 @@ public class GMToolsDialog extends JDialog implements ActionListener {
                 return null;
             }
             rug.setChosenRAT(rat);
-            for(int i = 0; i < 10000; ++ i) {
+            for(int i = 0; i < 10; ++ i) {
                 ArrayList<MechSummary> msl = rug.generate(1);
                 if (msl.size() > 0) {
                     ms = msl.get(0);
-                    MekHQ.logMessage("picked "+ ms.getName() + ", determining if legal");
-                    if (campaign.getCampaignOptions().limitByYear() &&
-                        Integer.parseInt(yearPicker.getText()) < ms.getYear()) {
+                    //MekHQ.logMessage("picked "+ ms.getName() + ", determining if legal");
+                    if (campaign.getCampaignOptions().limitByYear() && targetYear < ms.getYear()) {
+                        // Illegal due to build year
                         continue;
                     }
                     if ((campaign.getCampaignOptions().allowClanPurchases() && ms.isClan())
@@ -254,5 +282,20 @@ public class GMToolsDialog extends JDialog implements ActionListener {
 
     public void performDiceRoll() {
             diceResults.setText(String.format("Result: %5d", Utilities.dice((Integer)numDice.getValue(), (Integer)sizeDice.getValue())));
+    }
+    
+    private static class FactionChoice {
+        public final String faction;
+        public final String id;
+        
+        public FactionChoice(String id, String faction) {
+            this.id = id;
+            this.faction = faction;
+        }
+        
+        @Override
+        public String toString() {
+            return faction;
+        }
     }
 }
