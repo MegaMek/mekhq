@@ -106,6 +106,7 @@ public class UnitTableData implements Serializable, ActionListener {
 	public static final int QUALITY_B = 3;
 	public static final int QUALITY_A = 4;
 	public static final int QUALITY_AA = 5;
+	public static final String[] qualityNames = {"F","D","C","B","A","AA"};
 
 	public static ArrayList<String> getAllRATNames() {
 		if (allRatNames == null) {
@@ -114,7 +115,7 @@ public class UnitTableData implements Serializable, ActionListener {
 		}
 		return allRatNames;
 	}
-
+	
 	/**
 	 * Retrieves the names of all RATCollections that meet the criteria.
 	 *

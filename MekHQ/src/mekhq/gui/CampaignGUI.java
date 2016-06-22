@@ -556,7 +556,6 @@ public class CampaignGUI extends JPanel {
     public int selectedMission;
 
     private DailyReportLogDialog logDialog;
-    private GMToolsDialog gmTools;
     private AdvanceDaysDialog advanceDaysDialog;
     private BloodnameDialog bloodnameDialog;
 
@@ -634,6 +633,7 @@ public class CampaignGUI extends JPanel {
     }
 
     public void showGMToolsDialog() {
+    	GMToolsDialog gmTools = new GMToolsDialog(getFrame(), this);
         gmTools.setVisible(true);
     }
 
@@ -3121,7 +3121,6 @@ public class CampaignGUI extends JPanel {
         panLog = new DailyReportLogPanel(reportHLL);
         panLog.setMinimumSize(new java.awt.Dimension(150, 100));
         logDialog = new DailyReportLogDialog(getFrame(), this, reportHLL);
-        gmTools = new GMToolsDialog(getFrame());
         bloodnameDialog = new BloodnameDialog(getFrame());
 
         mainPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tabMain, panLog);
