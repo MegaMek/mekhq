@@ -100,6 +100,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	private long cost;
 	private boolean failedCheck;
 	private boolean customJob;
+	private boolean isRefurbishing;
 	private boolean kitFound;
 	private String fixableString;
 
@@ -122,7 +123,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		fixableString = null;
 	}
 
-	public Refit(Unit oUnit, Entity newEn, boolean custom) {
+	public Refit(Unit oUnit, Entity newEn, boolean custom, boolean refurbish) {
+	    isRefurbishing = refurbish;
 		customJob = custom;
 		oldUnit = oUnit;
 		newEntity = newEn;
@@ -632,6 +634,27 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				}
 			}
 		}
+
+		// Now we set the refurbishment values
+		if (isRefurbishing) {
+		    refitClass = CLASS_E;
+
+           if (newEntity instanceof megamek.common.Warship || newEntity instanceof megamek.common.SpaceStation) {
+               time = 40320;
+           } else if (newEntity instanceof megamek.common.Dropship || newEntity instanceof megamek.common.Jumpship) {
+               time = 13440;
+           } else if (newEntity instanceof Mech || newEntity instanceof megamek.common.Aero || newEntity instanceof megamek.common.ConvFighter || newEntity instanceof megamek.common.SmallCraft) {
+               time = 6720;
+           } else if (newEntity instanceof BattleArmor || newEntity instanceof megamek.common.Tank || newEntity instanceof megamek.common.Protomech) {
+               time = 3360;
+           } else {
+               time = 1111;
+               MekHQ.logMessage("Unit " + newEntity.getModel() + " did not set its time correctly.");
+           }
+
+           // The cost is equal to 10 percent of the units base value (not modified for quality).
+           cost = (long) (oldUnit.getBuyCost() * .1);
+		}
 	}
 
 	public void begin() throws EntityLoadingException, IOException {
@@ -698,6 +721,13 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		    }
 		}
 
+		if (isRefurbishing) {
+           if (campaign.buyRefurbishment(this)) {
+               campaign.addReport("<font color='green'><b>Refurbishment ready to begin</b></font>");
+           } else {
+               campaign.addReport("You cannot afford to refurbish " + oldUnit.getEntity().getShortName() + ". Transaction cancelled");
+		    }
+		}
 	}
 
 	public void reserveNewParts() {
@@ -986,6 +1016,14 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			oldUnit.addPilotOrSoldier(soldier);
 		}
 		oldUnit.resetPilotAndEntity();
+
+		if (isRefurbishing) {
+           for (Part p : oldUnit.getParts()) {
+               if (p.getQuality() != QUALITY_F) {
+                   p.improveQuality();
+               }
+           }
+       }
 	}
 
 	public void saveCustomization() throws EntityLoadingException, IOException {
@@ -1140,15 +1178,26 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 
 	@Override
 	public String succeed() {
-		complete();
-		return "The customization of "+ oldUnit.getEntity().getShortName() + " is complete.";
+	    complete();
+		if (isRefurbishing) {
+            return "Refurbishment of " + oldUnit.getEntity().getShortName() + " is complete.";
+        } else {
+            return "The customization of "+ oldUnit.getEntity().getShortName() + " is complete.";
+        }
 	}
 
 	@Override
 	public String fail(int rating) {
 		timeSpent = 0;
 		failedCheck = true;
-		return "The customization of " + oldUnit.getEntity().getShortName() + " will take " + getTimeLeft() + " additional minutes to complete.";
+		// Refurbishment doesn't get extra time like standard refits.
+        if (isRefurbishing) {
+            oldUnit.setRefit(null); // Failed roll results in lost time and money
+            return "Refurbishment of " + oldUnit.getEntity().getShortName() + " was unsuccessful";
+        }
+        else {
+            return "The customization of " + oldUnit.getEntity().getShortName() + " will take " + getTimeLeft() + " additional minutes to complete.";
+        }
 	}
 
 	@Override
@@ -1165,6 +1214,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	public String getPartName() {
 		if(customJob) {
 			return newEntity.getShortName() + " Customization";
+		} else if (isRefurbishing) {
+            return newEntity.getShortName() + " Refurbishment";
 		} else {
 			return newEntity.getShortName() + " Refit Kit";
 		}
@@ -1311,6 +1362,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				+ "</customJob>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<kitFound>" + kitFound
 				+ "</kitFound>");
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<isRefurbishing>" + isRefurbishing
+                + "</isRefurbishing>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<armorNeeded>" + armorNeeded
 				+ "</armorNeeded>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<sameArmorType>" + sameArmorType
@@ -1397,6 +1450,11 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 						retVal.customJob = true;
 					else
 						retVal.customJob = false;
+				} else if (wn2.getNodeName().equalsIgnoreCase("isRefurbishing")) {
+                    if (wn2.getTextContent().equalsIgnoreCase("true"))
+                        retVal.isRefurbishing = true;
+                    else 
+                        retVal.isRefurbishing = false;
 				} else if (wn2.getNodeName().equalsIgnoreCase("kitFound")) {
 					if (wn2.getTextContent().equalsIgnoreCase("true"))
 						retVal.kitFound = true;
@@ -1865,4 +1923,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		return EquipmentType.DATE_NONE;
 	}
 
+	public boolean isBeingRefurbished() {
+        return isRefurbishing;
+    }
 }

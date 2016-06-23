@@ -4686,8 +4686,15 @@ public class CampaignGUI extends JPanel {
         // check to see if user really wants to do it - give some info on what
         // will be done
         // TODO: better information
+        String RefitRefurbish;
+        if (r.isBeingRefurbished()) {
+            RefitRefurbish = "Refurbishment is a " + r.getRefitClassName() + " refit and must be done at a factory and costs 10% of the purchase price"
+                             + ".\n Are you sure you want to refurbish "; 
+        } else {
+            RefitRefurbish = "This is a " + r.getRefitClassName() + " refit. Are you sure you want to refit ";
+        }
         if (0 != JOptionPane
-                .showConfirmDialog(null, "Are you sure you want to refit "
+                .showConfirmDialog(null, RefitRefurbish
                         + r.getUnit().getName() + "?", "Proceed?",
                         JOptionPane.YES_NO_OPTION)) {
             return;
