@@ -53,6 +53,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -276,10 +277,6 @@ import mekhq.gui.view.UnitViewPanel;
  * The application's main frame.
  */
 public class CampaignGUI extends JPanel {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = -687162569841072579L;
 
     public static final int UNIT_VIEW_WIDTH = 450;
@@ -4208,18 +4205,34 @@ public class CampaignGUI extends JPanel {
 
     private void assignDoctor() {
         Person doctor = getSelectedDoctor();
-        for (Person p : getSelectedUnassignedPatients()) {
-            if (null != p
-                    && null != doctor
-                    && (p.needsFixing() || (getCampaign().getCampaignOptions()
-                            .useAdvancedMedical() && p.needsAMFixing()))
-                    && getCampaign().getPatientsFor(doctor) < 25
-                    && getCampaign().getTargetFor(p, doctor).getValue() != TargetRoll.IMPOSSIBLE) {
-                p.setDoctorId(doctor.getId(), getCampaign()
-                        .getCampaignOptions().getHealingWaitingPeriod());
+        if(null == doctor) {
+            return;
+        }
+        Collection<Person> selectedPatients = getSelectedUnassignedPatients();
+        if(selectedPatients.isEmpty()) {
+            // Pick the first in the list ... if there are any
+            int patientSize = unassignedPatientModel.getSize();
+            for(int i = 0; i < patientSize; ++ i) {
+                Person p = unassignedPatientModel.getElementAt(i);
+                if((null != p)
+                        && (p.needsFixing() || (getCampaign().getCampaignOptions().useAdvancedMedical() && p.needsAMFixing()))
+                        && (getCampaign().getPatientsFor(doctor) < 25)
+                        && (getCampaign().getTargetFor(p, doctor).getValue() != TargetRoll.IMPOSSIBLE)) {
+                        p.setDoctorId(doctor.getId(), getCampaign().getCampaignOptions().getHealingWaitingPeriod());
+                        break;
+                    }
+            }
+            
+        } else {
+            for (Person p : selectedPatients) {
+                if((null != p)
+                    && (p.needsFixing() || (getCampaign().getCampaignOptions().useAdvancedMedical() && p.needsAMFixing()))
+                    && (getCampaign().getPatientsFor(doctor) < 25)
+                    && (getCampaign().getTargetFor(p, doctor).getValue() != TargetRoll.IMPOSSIBLE)) {
+                    p.setDoctorId(doctor.getId(), getCampaign().getCampaignOptions().getHealingWaitingPeriod());
+                }
             }
         }
-
         refreshTechsList();
         refreshDoctorsList();
         refreshPatientList();
@@ -6846,12 +6859,9 @@ public class CampaignGUI extends JPanel {
 
     protected void updateAssignDoctorEnabled() {
         Person doctor = getSelectedDoctor();
-        if (!getSelectedUnassignedPatients().isEmpty() && null != doctor
-                && getCampaign().getPatientsFor(doctor) < 25) {
-            btnAssignDoc.setEnabled(true);
-        } else {
-            btnAssignDoc.setEnabled(false);
-        }
+        btnAssignDoc.setEnabled((null != doctor)
+            && (getCampaign().getPatientsFor(doctor) < 25)
+            && (unassignedPatientModel.getSize() > 0));
         btnUnassignDoc.setEnabled(!getSelectedAssignedPatients().isEmpty());
     }
 

@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.3.30-git
++ Issue #110: Unassigned patients no longer get selected automatically
 + Adding planetary icon display to the planet detail view (+ "icon" data entry)
 + Adding HPG network display overlay to the interstellar map panel
 + Issue #29: MekHQ will not load.
