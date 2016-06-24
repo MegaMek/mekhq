@@ -22,5 +22,6 @@
 		<pop>10</pop>
 		<government>Democracy (Representative)</government>
 		<controlRating>5</controlRating>
+		<icon>earth</icon>
 	</planet>
 </planets>

@@ -207,6 +207,7 @@ public class Planet implements Serializable {
 
     // Fluff
     private String desc;
+    private String icon;
 
     /**
      * a hash to keep track of dynamic planet changes
@@ -331,6 +332,10 @@ public class Planet implements Serializable {
     
     public String getDescription() {
         return desc;
+    }
+    
+    public String getIcon() {
+        return icon;
     }
     
     // Constant stellar data (to be moved out later)
@@ -827,6 +832,7 @@ public class Planet implements Serializable {
             sysPos = Utilities.nonNull(other.sysPos, sysPos);
             temperature = Utilities.nonNull(other.temperature, temperature);
             socioIndustrial = Utilities.nonNull(other.socioIndustrial, socioIndustrial);
+            icon = Utilities.nonNull(other.icon, icon);
             // Merge (not replace!) events
             if( null != other.events ) {
                 for( PlanetaryEvent event : other.getEvents() ) {

@@ -1,0 +1,2 @@
+default=images/universe/planets.png(576,576-64,64)
+earth=images/universe/planets.png(192,128-64,64)

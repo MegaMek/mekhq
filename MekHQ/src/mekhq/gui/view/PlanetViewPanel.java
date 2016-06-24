@@ -8,9 +8,14 @@ package mekhq.gui.view;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
+import java.awt.RenderingHints;
+import java.awt.geom.Arc2D;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -24,8 +29,10 @@ import javax.swing.text.DefaultCaret;
 import org.joda.time.DateTime;
 
 import megamek.common.util.EncodeControl;
+import megamek.common.util.ImageUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.StarUtil;
 import mekhq.campaign.universe.Planet.SocioIndustrialData;
 
 /**
@@ -69,7 +76,8 @@ public class PlanetViewPanel extends JPanel {
     private JTextPane txtSocioIndustrial;
     private JLabel lblLandMass;
     private JTextArea txtLandMass;
-
+    
+    private Image planetIcon = null;
     
     public PlanetViewPanel(Planet p, Campaign c) {
         this.planet = p;
@@ -137,6 +145,8 @@ public class PlanetViewPanel extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(txtDesc, gridBagConstraints);
+        
+        planetIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(planet), getToolkit());
     }
 
     private void getNeighbors() {
@@ -176,6 +186,26 @@ public class PlanetViewPanel extends JPanel {
         }        
     }
     
+    @Override
+    protected void paintChildren(Graphics g) {
+        super.paintChildren(g);
+    
+        if(null != planetIcon) {
+            Graphics2D gfx = (Graphics2D) g;
+            final int width = getWidth();
+            final int offset = 6;
+            gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            Arc2D.Double arc = new Arc2D.Double();
+            gfx.setPaint(Color.BLACK);
+            arc.setArcByCenter(width - 32 - offset, 32 + offset, 35, 0, 360, Arc2D.OPEN);
+            gfx.fill(arc);
+            gfx.setPaint(Color.WHITE);
+            arc.setArcByCenter(width - 32 - offset, 32 + offset, 34, 0, 360, Arc2D.OPEN);
+            gfx.fill(arc);
+            gfx.drawImage(planetIcon, width - 64 - offset, offset, 64, 64, null);
+        }
+    }
+
     private void fillStats() {
         
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PlanetViewPanel", new EncodeControl()); //$NON-NLS-1$

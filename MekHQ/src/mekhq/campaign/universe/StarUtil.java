@@ -18,12 +18,20 @@
  */
 package mekhq.campaign.universe;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
+import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.universe.Planet.SpectralDefinition;
 
@@ -201,6 +209,10 @@ public final class StarUtil {
             + "BOZ,BQZ,OQZ,ABOQ,ABOZ,ABQZ,AOQZ,BOQZ,ABOQZ,C,X".split(","))); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
+    private static final String ICON_DATA_FILE = "images/universe/planet_icons.txt";
+    private static final Map<String, String> ICON_DATA = new HashMap<>();
+    private static boolean iconDataLoaded = false;
+    
     // Generators
     
     public static String generateSpectralType(Random rnd, boolean lifeFriendly) {
@@ -584,5 +596,30 @@ public final class StarUtil {
             default: return "enslaved population";
         }
     }
+    
+    public static String getIconImage(Planet planet) {
+        if(!iconDataLoaded) {
+            try(BufferedReader reader = new BufferedReader(new FileReader(new File("data", ICON_DATA_FILE)))) {
+                String line;
+                while(null != (line = reader.readLine())) {
+                    if(line.startsWith("#")) {
+                        // Ignore comments
+                        continue;
+                    }
+                    String[] parts = line.split("=", 2);
+                    if((null != parts) && (parts.length == 2)) {
+                        ICON_DATA.put(parts[0], parts[1]);
+                    }
+                }
+                iconDataLoaded = true;
+            } catch (FileNotFoundException e) {
+                MekHQ.logError(e);
+            } catch (IOException e) {
+                MekHQ.logError(e);
+            }
+        }
+        return ICON_DATA.get(Utilities.nonNull(planet.getIcon(), "default"));
+    }
+    
     private StarUtil() {}
 }
