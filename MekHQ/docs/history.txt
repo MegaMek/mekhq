@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.3.30-git
++ Adding HPG network display overlay to the interstellar map panel
 + Issue #29: MekHQ will not load.
 + Issue #69: 3.27 : ATB, allies generated use incorrect skill rating
 + Bug: missing or incorrect values in ratinfo.xml can cause ArrayOutOfBoundsException.

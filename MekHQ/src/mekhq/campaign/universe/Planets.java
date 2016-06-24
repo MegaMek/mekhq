@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -33,6 +34,7 @@ import org.joda.time.DateTime;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 
+import megamek.common.EquipmentType;
 import mekhq.FileParser;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -94,6 +96,10 @@ public class Planets {
     /* organizes systems into a grid of 30lyx30ly squares so we can find
      * nearby systems without iterating through the entire planet list. */
     private HashMap<Integer, Map<Integer, Set<Planet>>> planetGrid = new HashMap<>();
+    
+    // HPG Network cache (to not recalculate all the damn time)
+    private Collection<Planets.HPGLink> hpgNetworkCache = null;
+    private DateTime hpgNetworkCacheDate = null;
     
     private Thread loader;
     private boolean initialized = false;
@@ -178,6 +184,32 @@ public class Planets {
             }
         }
         return news;
+    }
+    
+    public Collection<Planets.HPGLink> getHPGNetwork(DateTime when) {
+        if((null != when) && when.equals(hpgNetworkCacheDate)) {
+            return hpgNetworkCache;
+        }
+        
+        Set<HPGLink> result = new HashSet<>();
+        for(Planet planet : planetList.values()) {
+            Integer hpg = planet.getHPG(when);
+            if((null != hpg) && (hpg.intValue() == EquipmentType.RATING_A)) {
+                Collection<Planet> neighbors = getNearbyPlanets(planet, 50);
+                for(Planet neighbor : neighbors) {
+                    hpg = neighbor.getHPG(when);
+                    if(null != hpg) {
+                        HPGLink link = new HPGLink(planet, neighbor, hpg.intValue());
+                        if(!result.contains(link)) {
+                            result.add(link);
+                        }
+                    }
+                }
+            }
+        }
+        hpgNetworkCache = result;
+        hpgNetworkCacheDate = when;
+        return result;
     }
     
     // Customisation and export helper methods
@@ -427,4 +459,37 @@ public class Planets {
             }
         }
     }
+    
+    /** A data class representing a HPG link between two planets */
+    public static final class HPGLink {
+        /** In case of HPG-A to HPG-B networks, <code>primary</code> holds the HPG-A node. Else the order doesn't matter. */
+        public final Planet primary;
+        public final Planet secondary;
+        public final int rating;
+        
+        public HPGLink(Planet primary, Planet secondary, int rating) {
+            this.primary = primary;
+            this.secondary = secondary;
+            this.rating = rating;
+        }
+        
+        @Override
+        public int hashCode() {
+            return Objects.hash(primary, secondary, rating);
+        }
+        
+        @Override
+        public boolean equals(Object obj) {
+            if(this == obj) {
+                return true;
+            }
+            if((null == obj) || (getClass() != obj.getClass())) {
+                return false;
+            }
+            final HPGLink other = (HPGLink) obj;
+            return Objects.equals(primary, other.primary) && Objects.equals(secondary, other.secondary)
+                && (rating == other.rating);
+        }
+    }
+
 }
