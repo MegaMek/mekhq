@@ -824,6 +824,7 @@ public class CampaignGUI extends JPanel {
         orgTree.getSelectionModel().setSelectionMode(
                 TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         orgTree.addTreeSelectionListener(new TreeSelectionListener() {
+            @Override
             public void valueChanged(TreeSelectionEvent e) {
                 refreshForceView();
             }
@@ -879,6 +880,7 @@ public class CampaignGUI extends JPanel {
 
         choiceMission = new JComboBox<String>();
         choiceMission.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 changeMission();
             }
@@ -906,6 +908,7 @@ public class CampaignGUI extends JPanel {
         btnAddMission.setToolTipText(resourceMap
                 .getString("btnAddMission.toolTipText")); // NOI18N
         btnAddMission.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addMission();
             }
@@ -917,6 +920,7 @@ public class CampaignGUI extends JPanel {
         btnAddScenario.setToolTipText(resourceMap
                 .getString("btnAddScenario.toolTipText")); // NOI18N
         btnAddScenario.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addScenario();
             }
@@ -928,6 +932,7 @@ public class CampaignGUI extends JPanel {
         btnEditMission.setToolTipText(resourceMap
                 .getString("btnEditMission.toolTipText")); // NOI18N
         btnEditMission.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 editMission();
             }
@@ -939,6 +944,7 @@ public class CampaignGUI extends JPanel {
         btnCompleteMission.setToolTipText(resourceMap
                 .getString("btnCompleteMission.toolTipText")); // NOI18N
         btnCompleteMission.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 completeMission();
             }
@@ -951,6 +957,7 @@ public class CampaignGUI extends JPanel {
                 .getString("btnDeleteMission.toolTipText")); // NOI18N
         btnDeleteMission.setName("btnDeleteMission"); // NOI18N
         btnDeleteMission.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 deleteMission();
             }
@@ -979,6 +986,7 @@ public class CampaignGUI extends JPanel {
         scenarioTable.setIntercellSpacing(new Dimension(0, 0));
         scenarioTable.getSelectionModel().addListSelectionListener(
                 new javax.swing.event.ListSelectionListener() {
+                    @Override
                     public void valueChanged(
                             javax.swing.event.ListSelectionEvent evt) {
                         refreshScenarioView();
@@ -1008,6 +1016,7 @@ public class CampaignGUI extends JPanel {
         btnStartGame.setToolTipText(resourceMap
                 .getString("btnStartGame.toolTipText")); // NOI18N
         btnStartGame.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 startScenario();
             }
@@ -1019,6 +1028,7 @@ public class CampaignGUI extends JPanel {
         btnJoinGame.setToolTipText(resourceMap
                 .getString("btnJoinGame.toolTipText")); // NOI18N
         btnJoinGame.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 joinScenario();
             }
@@ -1030,6 +1040,7 @@ public class CampaignGUI extends JPanel {
         btnLoadGame.setToolTipText(resourceMap
                 .getString("btnLoadGame.toolTipText")); // NOI18N
         btnLoadGame.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 loadScenario();
             }
@@ -1041,6 +1052,7 @@ public class CampaignGUI extends JPanel {
         btnPrintRS.setToolTipText(resourceMap
                 .getString("btnPrintRS.toolTipText")); // NOI18N
         btnPrintRS.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 printRecordSheets();
             }
@@ -1053,6 +1065,7 @@ public class CampaignGUI extends JPanel {
                 .setToolTipText(resourceMap.getString("btnGetMul.toolTipText")); // NOI18N
         btnGetMul.setName("btnGetMul"); // NOI18N
         btnGetMul.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 deployListFile();
             }
@@ -1065,6 +1078,7 @@ public class CampaignGUI extends JPanel {
         btnResolveScenario.setToolTipText(resourceMap
                 .getString("btnResolveScenario.toolTipText")); // NOI18N
         btnResolveScenario.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 resolveScenario();
             }
@@ -1077,6 +1091,7 @@ public class CampaignGUI extends JPanel {
         btnClearAssignedUnits.setToolTipText(resourceMap
                 .getString("btnClearAssignedUnits.toolTipText")); // NOI18N
         btnClearAssignedUnits.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 clearAssignedUnits();
             }
@@ -1142,6 +1157,7 @@ public class CampaignGUI extends JPanel {
 
         suggestPlanet = new JSuggestField(getFrame(), getCampaign().getPlanetNames());
         suggestPlanet.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 Planet p = getCampaign().getPlanet(suggestPlanet.getText());
                 if (null != p) {
@@ -1164,6 +1180,7 @@ public class CampaignGUI extends JPanel {
         btnCalculateJumpPath.setToolTipText(resourceMap
                 .getString("btnCalculateJumpPath.toolTipText")); // NOI18N
         btnCalculateJumpPath.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 calculateJumpPath();
             }
@@ -1182,6 +1199,7 @@ public class CampaignGUI extends JPanel {
         btnBeginTransit.setToolTipText(resourceMap
                 .getString("btnBeginTransit.toolTipText")); // NOI18N
         btnBeginTransit.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 beginTransit();
             }
@@ -1346,6 +1364,7 @@ public class CampaignGUI extends JPanel {
         choicePerson = new JComboBox<String>(personGroupModel);
         choicePerson.setSelectedIndex(0);
         choicePerson.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 filterPersonnel();
             }
@@ -1376,6 +1395,7 @@ public class CampaignGUI extends JPanel {
         choicePersonView = new JComboBox<String>(personViewModel);
         choicePersonView.setSelectedIndex(PV_GENERAL);
         choicePersonView.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 changePersonnelView();
             }
@@ -1430,6 +1450,7 @@ public class CampaignGUI extends JPanel {
         changePersonnelView();
         personnelTable.getSelectionModel().addListSelectionListener(
                 new javax.swing.event.ListSelectionListener() {
+                    @Override
                     public void valueChanged(ListSelectionEvent evt) {
                         refreshPersonnelView();
                     }
@@ -1491,6 +1512,7 @@ public class CampaignGUI extends JPanel {
         choiceUnit = new JComboBox<String>(unitGroupModel);
         choiceUnit.setSelectedIndex(0);
         choiceUnit.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 filterUnits();
             }
@@ -1519,6 +1541,7 @@ public class CampaignGUI extends JPanel {
         choiceUnitView = new JComboBox<String>(unitViewModel);
         choiceUnitView.setSelectedIndex(UV_GENERAL);
         choiceUnitView.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 changeUnitView();
             }
@@ -1569,6 +1592,7 @@ public class CampaignGUI extends JPanel {
         changeUnitView();
         getUnitTable().getSelectionModel().addListSelectionListener(
                 new javax.swing.event.ListSelectionListener() {
+                    @Override
                     public void valueChanged(
                             javax.swing.event.ListSelectionEvent evt) {
                         refreshUnitView();
@@ -1610,6 +1634,7 @@ public class CampaignGUI extends JPanel {
              */
             private static final long serialVersionUID = 4958203340754214211L;
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (acquireUnitsTable.getSelectedRow() < 0) {
                     return;
@@ -1626,6 +1651,7 @@ public class CampaignGUI extends JPanel {
              */
             private static final long serialVersionUID = -8377486575329708963L;
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (acquireUnitsTable.getSelectedRow() < 0) {
                     return;
@@ -1705,6 +1731,7 @@ public class CampaignGUI extends JPanel {
         choiceParts = new JComboBox<String>(partsGroupModel);
         choiceParts.setSelectedIndex(0);
         choiceParts.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 filterParts();
             }
@@ -1736,6 +1763,7 @@ public class CampaignGUI extends JPanel {
         choicePartsView = new JComboBox<String>(partsGroupViewModel);
         choicePartsView.setSelectedIndex(0);
         choicePartsView.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 filterParts();
             }
@@ -1768,6 +1796,7 @@ public class CampaignGUI extends JPanel {
         partsTable.setShowGrid(false);
         partsTable.getSelectionModel().addListSelectionListener(
                 new javax.swing.event.ListSelectionListener() {
+                    @Override
                     public void valueChanged(
                             javax.swing.event.ListSelectionEvent evt) {
                         PartsTableValueChanged(evt);
@@ -1822,6 +1851,7 @@ public class CampaignGUI extends JPanel {
              */
             private static final long serialVersionUID = 1L;
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (acquirePartsTable.getSelectedRow() < 0) {
                     return;
@@ -1838,6 +1868,7 @@ public class CampaignGUI extends JPanel {
              */
             private static final long serialVersionUID = 1L;
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (acquirePartsTable.getSelectedRow() < 0) {
                     return;
@@ -1879,6 +1910,7 @@ public class CampaignGUI extends JPanel {
         btnDoTaskWarehouse.setEnabled(false);
         btnDoTaskWarehouse.setName("btnDoTask"); // NOI18N
         btnDoTaskWarehouse.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 doTask();
             }
@@ -1932,6 +1964,7 @@ public class CampaignGUI extends JPanel {
         btnShowAllTechsWarehouse.setToolTipText(resourceMap
                 .getString("btnShowAllTechs.toolTipText")); // NOI18N
         btnShowAllTechsWarehouse.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 filterTechs(true);
             }
@@ -1954,6 +1987,7 @@ public class CampaignGUI extends JPanel {
                 .setCellRenderer(techsModel.getRenderer(getIconPackage()));
         whTechTable.getSelectionModel().addListSelectionListener(
                 new javax.swing.event.ListSelectionListener() {
+                    @Override
                     public void valueChanged(
                             javax.swing.event.ListSelectionEvent evt) {
                         updateTechTarget();
@@ -2045,6 +2079,7 @@ public class CampaignGUI extends JPanel {
         servicedUnitTable.setShowGrid(false);
         servicedUnitTable.getSelectionModel().addListSelectionListener(
                 new javax.swing.event.ListSelectionListener() {
+                    @Override
                     public void valueChanged(
                             javax.swing.event.ListSelectionEvent evt) {
                         servicedUnitTableValueChanged(evt);
@@ -2087,6 +2122,7 @@ public class CampaignGUI extends JPanel {
                 .setCellRenderer(techsModel.getRenderer(getIconPackage()));
         techTable.getSelectionModel().addListSelectionListener(
                 new ListSelectionListener() {
+                    @Override
                     public void valueChanged(
                             ListSelectionEvent evt) {
                         updateTechTarget();
@@ -2117,6 +2153,7 @@ public class CampaignGUI extends JPanel {
                 .setToolTipText(resourceMap.getString("btnDoTask.toolTipText")); // NOI18N
         btnDoTask.setEnabled(false);
         btnDoTask.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 doTask();
             }
@@ -2169,6 +2206,7 @@ public class CampaignGUI extends JPanel {
         choiceLocation.addItem("All");
         choiceLocation.setEnabled(false);
         choiceLocation.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 filterTasks();
             }
@@ -2193,6 +2231,7 @@ public class CampaignGUI extends JPanel {
                 .setCellRenderer(taskModel.getRenderer(getIconPackage()));
         taskTable.getSelectionModel().addListSelectionListener(
                 new javax.swing.event.ListSelectionListener() {
+                    @Override
                     public void valueChanged(
                             javax.swing.event.ListSelectionEvent evt) {
                         taskTableValueChanged(evt);
@@ -2212,6 +2251,7 @@ public class CampaignGUI extends JPanel {
         btnUseBonusPart = new JButton();
         btnUseBonusPart.setVisible(false);
         btnUseBonusPart.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 useBonusPart();
             }
@@ -2230,6 +2270,7 @@ public class CampaignGUI extends JPanel {
                 .setCellRenderer(acquireModel.getRenderer(getIconPackage()));
         acquisitionTable.getSelectionModel().addListSelectionListener(
                 new javax.swing.event.ListSelectionListener() {
+                    @Override
                     public void valueChanged(
                             javax.swing.event.ListSelectionEvent evt) {
                         acquisitionTableValueChanged(evt);
@@ -2256,6 +2297,7 @@ public class CampaignGUI extends JPanel {
         panTasks.add(tabTasks, gridBagConstraints);
 
         tabTasks.addChangeListener(new ChangeListener() {
+            @Override
             public void stateChanged(ChangeEvent evt) {
                 taskTabChanged();
             }
@@ -2269,6 +2311,7 @@ public class CampaignGUI extends JPanel {
                 .getString("btnShowAllTechs.toolTipText")); // NOI18N
         btnShowAllTechs.setName("btnShowAllTechs"); // NOI18N
         btnShowAllTechs.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 filterTechs(false);
             }
@@ -2561,6 +2604,7 @@ public class CampaignGUI extends JPanel {
         JPanel pnlFinanceBtns = new JPanel(new GridLayout(2, 2));
         btnAddFunds = new JButton("Add Funds (GM)");
         btnAddFunds.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addFundsActionPerformed(evt);
             }
@@ -2569,6 +2613,7 @@ public class CampaignGUI extends JPanel {
         pnlFinanceBtns.add(btnAddFunds);
         JButton btnGetLoan = new JButton("Get Loan");
         btnGetLoan.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 showNewLoanDialog();
             }
@@ -2577,6 +2622,7 @@ public class CampaignGUI extends JPanel {
 
         btnManageAssets = new JButton("Manage Assets (GM)");
         btnManageAssets.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 manageAssets();
             }
@@ -2620,6 +2666,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem menuLoad = new JMenuItem(
                 resourceMap.getString("menuLoad.text")); // NOI18N
         menuLoad.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuLoadXmlActionPerformed(evt);
             }
@@ -2629,6 +2676,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem menuSave = new JMenuItem(
                 resourceMap.getString("menuSave.text")); // NOI18N
         menuSave.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuSaveXmlActionPerformed(evt);
             }
@@ -2657,6 +2705,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miExportOptions = new JMenuItem(
                 resourceMap.getString("miExportOptions.text")); // NOI18N
         miExportOptions.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 miExportOptionsActionPerformed(evt);
             }
@@ -2666,6 +2715,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miExportPersonCSV = new JMenuItem(
                 resourceMap.getString("miExportPersonCSV.text")); // NOI18N
         miExportPersonCSV.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 exportTable(personnelTable, getCampaign().getName()
                         + getCampaign().getShortDateAsString()
@@ -2677,6 +2727,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miExportUnitCSV = new JMenuItem(
                 resourceMap.getString("miExportUnitCSV.text")); // NOI18N
         miExportUnitCSV.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 exportTable(getUnitTable(), getCampaign().getName()
                         + getCampaign().getShortDateAsString()
@@ -2688,6 +2739,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miImportOptions = new JMenuItem(
                 resourceMap.getString("miImportOptions.text")); // NOI18N
         miImportOptions.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 miImportOptionsActionPerformed(evt);
             }
@@ -2697,6 +2749,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miImportPerson = new JMenuItem(
                 resourceMap.getString("miImportPerson.text")); // NOI18N
         miImportPerson.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 miImportPersonActionPerformed(evt);
             }
@@ -2706,6 +2759,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miImportParts = new JMenuItem(
                 resourceMap.getString("miImportParts.text")); // NOI18N
         miImportParts.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 miImportPartsActionPerformed(evt);
             }
@@ -2715,6 +2769,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miLoadForces = new JMenuItem(
                 resourceMap.getString("miLoadForces.text")); // NOI18N
         miLoadForces.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 miLoadForcesActionPerformed(evt);
             }
@@ -2728,6 +2783,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miMercRoster = new JMenuItem(
                 resourceMap.getString("miMercRoster.text")); // NOI18N
         miMercRoster.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 showMercRosterDialog();
             }
@@ -2737,6 +2793,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem menuOptions = new JMenuItem(
                 resourceMap.getString("menuOptions.text")); // NOI18N
         menuOptions.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuOptionsActionPerformed(evt);
             }
@@ -2746,6 +2803,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem menuOptionsMM = new JMenuItem(
                 resourceMap.getString("menuOptionsMM.text")); // NOI18N
         menuOptionsMM.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuOptionsMMActionPerformed(evt);
             }
@@ -2759,6 +2817,7 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem menuExitItem = new JMenuItem("Exit");
         menuExitItem.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 getApplication().exit();
             }
@@ -2772,6 +2831,7 @@ public class CampaignGUI extends JPanel {
         // Personnel Market
         JMenuItem miPersonnelMarket = new JMenuItem("Personnel Market");
         miPersonnelMarket.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 hirePersonMarket();
             }
@@ -2781,6 +2841,7 @@ public class CampaignGUI extends JPanel {
         // Contract Market
         miContractMarket = new JMenuItem("Contract Market");
         miContractMarket.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 showContractMarket();
             }
@@ -2791,6 +2852,7 @@ public class CampaignGUI extends JPanel {
 
         miUnitMarket = new JMenuItem("Unit Market");
         miUnitMarket.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 showUnitMarket();
             }
@@ -2801,6 +2863,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miPurchaseUnit = new JMenuItem(
                 resourceMap.getString("miPurchaseUnit.text")); // NOI18N
         miPurchaseUnit.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 miPurchaseUnitActionPerformed(evt);
             }
@@ -2810,6 +2873,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miBuyParts = new JMenuItem(
                 resourceMap.getString("miBuyParts.text")); // NOI18N
         miBuyParts.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buyParts();
             }
@@ -2817,6 +2881,7 @@ public class CampaignGUI extends JPanel {
         menuMarket.add(miBuyParts);
         JMenuItem miHireBulk = new JMenuItem("Hire Personnel in Bulk");
         miHireBulk.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 hireBulkPersonnel();
             }
@@ -2831,6 +2896,7 @@ public class CampaignGUI extends JPanel {
                     .getFaction().isClan())); // NOI18N
             miHire.setActionCommand(Integer.toString(i));
             miHire.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     hirePerson(evt);
                 }
@@ -2843,6 +2909,7 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miHireAstechs = new JMenuItem("Hire Astechs");
         miHireAstechs.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
                         getFrame(), true, "Hire How Many Astechs?", 1, 0, 100);
@@ -2859,6 +2926,7 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miFireAstechs = new JMenuItem("Release Astechs");
         miFireAstechs.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
                         getFrame(), true, "Release How Many Astechs?", 1, 0,
@@ -2877,6 +2945,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miFullStrengthAstechs = new JMenuItem(
                 "Bring All Tech Teams to Full Strength");
         miFullStrengthAstechs.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 int need = (getCampaign().getTechs().size() * 6)
                         - getCampaign().getNumberAstechs();
@@ -2892,6 +2961,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miFireAllAstechs = new JMenuItem(
                 "Release All Astechs from Pool");
         miFireAllAstechs.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 getCampaign().decreaseAstechPool(getCampaign().getAstechPool());
                 refreshTechsList();
@@ -2904,6 +2974,7 @@ public class CampaignGUI extends JPanel {
         JMenu menuMedicPool = new JMenu("Medic Pool");
         JMenuItem miHireMedics = new JMenuItem("Hire Medics");
         miHireMedics.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
                         getFrame(), true, "Hire How Many Medics?", 1, 0, 100);
@@ -2920,6 +2991,7 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miFireMedics = new JMenuItem("Release Medics");
         miFireMedics.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
                         getFrame(), true, "Release How Many Medics?", 1, 0,
@@ -2937,6 +3009,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miFullStrengthMedics = new JMenuItem(
                 "Bring All Medical Teams to Full Strength");
         miFullStrengthMedics.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 int need = (getCampaign().getDoctors().size() * 4)
                         - getCampaign().getNumberMedics();
@@ -2951,6 +3024,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miFireAllMedics = new JMenuItem(
                 "Release All Medics from Pool");
         miFireAllMedics.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 getCampaign().decreaseMedicPool(getCampaign().getMedicPool());
                 refreshDoctorsList();
@@ -2966,6 +3040,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miDragoonsRating = new JMenuItem(
                 resourceMap.getString("miDragoonsRating.text")); // NOI18N
         miDragoonsRating.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 showReport(new RatingReport(getCampaign()));
             }
@@ -2975,6 +3050,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miPersonnelReport = new JMenuItem(
                 resourceMap.getString("miPersonnelReport.text")); // NOI18N
         miPersonnelReport.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 showReport(new PersonnelReport(getCampaign()));
             }
@@ -2984,6 +3060,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miHangarBreakdown = new JMenuItem(
                 resourceMap.getString("miHangarBreakdown.text")); // NOI18N
         miHangarBreakdown.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 showReport(new HangarReport(getCampaign()));
             }
@@ -2993,6 +3070,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miTransportReport = new JMenuItem(
                 resourceMap.getString("miTransportReport.text")); // NOI18N
         miTransportReport.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 showReport(new TransportReport(getCampaign()));
             }
@@ -3002,6 +3080,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miCargoReport = new JMenuItem(
                 resourceMap.getString("miCargoReport.text")); // NOI18N
         miCargoReport.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 showReport(new CargoReport(getCampaign()));
             }
@@ -3015,6 +3094,7 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miChat = new JMenuItem(resourceMap.getString("miChat.text")); // NOI18N
         miChat.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 miChatActionPerformed(evt);
             }
@@ -3026,6 +3106,7 @@ public class CampaignGUI extends JPanel {
         JMenu menuView = new JMenu("View"); // NOI18N
         miDetachLog = new JMenuItem("Detach Daily Report Log"); // NOI18N
         miDetachLog.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 showDailyReportDialog();
             }
@@ -3035,6 +3116,7 @@ public class CampaignGUI extends JPanel {
         miAttachLog = new JMenuItem("Attach Daily Report Log"); // NOI18N
         miAttachLog.setEnabled(false);
         miAttachLog.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 hideDailyReportDialog();
             }
@@ -3044,6 +3126,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miBloodnameDialog = new JMenuItem("Show Bloodname Dialog...");
         miBloodnameDialog.setEnabled(true);
         miBloodnameDialog.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 showBloodnameDialog();
             }
@@ -3056,6 +3139,7 @@ public class CampaignGUI extends JPanel {
         miRetirementDefectionDialog.setVisible(getCampaign()
                 .getCampaignOptions().getUseAtB());
         miRetirementDefectionDialog.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 showRetirementDefectionDialog();
             }
@@ -3065,6 +3149,7 @@ public class CampaignGUI extends JPanel {
         miShowOverview = new JCheckBoxMenuItem("Show Overview Tab");
         miShowOverview.setSelected(getTabOverview().isVisible());
         miShowOverview.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 toggleOverviewTab();
             }
@@ -3078,6 +3163,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miGMToolsDialog = new JMenuItem("Show GM Tools Dialog");
         miGMToolsDialog.setEnabled(true);
         miGMToolsDialog.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 showGMToolsDialog();
             }
@@ -3086,6 +3172,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miAdvanceMultipleDays = new JMenuItem("Advance Multiple Days");
         miAdvanceMultipleDays.setEnabled(true);
         miAdvanceMultipleDays.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 showAdvanceDaysDialog();
             }
@@ -3095,6 +3182,7 @@ public class CampaignGUI extends JPanel {
                 "Randomize Bloodnames All Personnel");
         miBloodnames.setEnabled(true);
         miBloodnames.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 randomizeAllBloodnames();
             }
@@ -3108,6 +3196,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem menuAboutItem = new JMenuItem("aboutMenuItem"); // NOI18N
         menuAboutItem.setText("About");
         menuAboutItem.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 showAboutBox();
             }
@@ -3167,6 +3256,7 @@ public class CampaignGUI extends JPanel {
                 .setToolTipText(resourceMap.getString("btnGMMode.toolTipText")); // NOI18N
         btnGMMode.setSelected(getCampaign().isGM());
         btnGMMode.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnGMModeActionPerformed(evt);
             }
@@ -3189,6 +3279,7 @@ public class CampaignGUI extends JPanel {
         btnOvertime.setToolTipText(resourceMap
                 .getString("btnOvertime.toolTipText")); // NOI18N
         btnOvertime.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOvertimeActionPerformed(evt);
             }
@@ -3210,6 +3301,7 @@ public class CampaignGUI extends JPanel {
         btnAdvanceDay.setToolTipText(resourceMap
                 .getString("btnAdvanceDay.toolTipText")); // NOI18N
         btnAdvanceDay.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 advanceDay();
             }
@@ -3305,6 +3397,7 @@ public class CampaignGUI extends JPanel {
     private void changeTheme(java.awt.event.ActionEvent evt) {
         final String lafClassName = evt.getActionCommand();
         Runnable runnable = new Runnable() {
+            @Override
             public void run() {
                 try {
                     UIManager.setLookAndFeel(lafClassName);
@@ -3332,6 +3425,7 @@ public class CampaignGUI extends JPanel {
             menuThemes.add(miPlaf);
             miPlaf.setActionCommand(plaf.getClassName());
             miPlaf.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     changeTheme(evt);
                 }
@@ -4954,6 +5048,7 @@ public class CampaignGUI extends JPanel {
         // I can't just call it here, because it ends up getting reset somewhere
         // later
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 scrollPersonnelView.getVerticalScrollBar().setValue(0);
             }
@@ -4975,6 +5070,7 @@ public class CampaignGUI extends JPanel {
         // I can't just call it here, because it ends up getting reset somewhere
         // later
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 scrollUnitView.getVerticalScrollBar().setValue(0);
             }
@@ -5009,6 +5105,7 @@ public class CampaignGUI extends JPanel {
         // I can't just call it here, because it ends up getting reset somewhere
         // later
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 scrollScenarioView.getVerticalScrollBar().setValue(0);
             }
@@ -5058,6 +5155,7 @@ public class CampaignGUI extends JPanel {
             // I can't just call it here, because it ends up getting reset
             // somewhere later
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     scrollForceView.getVerticalScrollBar().setValue(0);
                 }
@@ -5066,6 +5164,7 @@ public class CampaignGUI extends JPanel {
             scrollForceView.setViewportView(new ForceViewPanel((Force) node,
                     getCampaign(), getIconPackage()));
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     scrollForceView.getVerticalScrollBar().setValue(0);
                 }
@@ -6405,6 +6504,7 @@ public class CampaignGUI extends JPanel {
                 // I can't just call it here, because it ends up getting reset
                 // somewhere later
                 javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
                         scrollMissionView.getVerticalScrollBar().setValue(0);
                     }
@@ -6657,6 +6757,7 @@ public class CampaignGUI extends JPanel {
 
     public void refreshOrganization() {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 orgTree.updateUI();
                 // This seems like bad juju since it makes it annoying as hell to
@@ -8359,6 +8460,7 @@ public class CampaignGUI extends JPanel {
     public class TaskTableMouseAdapter extends MouseInputAdapter implements
             ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent action) {
             String command = action.getActionCommand();
             Part part = taskModel.getTaskAt(taskTable
@@ -8509,6 +8611,7 @@ public class CampaignGUI extends JPanel {
 
     public class AcquisitionTableMouseAdapter extends MouseInputAdapter
             implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent action) {
             String command = action.getActionCommand();
             IAcquisitionWork acquisitionWork = acquireModel
