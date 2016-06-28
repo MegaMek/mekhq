@@ -1,5 +1,7 @@
 VERSION HISTORY
 ----------------------------------
+v0.3.31-git
+
 v0.3.30
 + Issue #110: Unassigned patients no longer get selected automatically
 + Adding planetary icon display to the planet detail view (+ "icon" data entry)
