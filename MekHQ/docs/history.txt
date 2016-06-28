@@ -1,12 +1,14 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.30-git
+v0.3.30
 + Issue #110: Unassigned patients no longer get selected automatically
 + Adding planetary icon display to the planet detail view (+ "icon" data entry)
 + Adding HPG network display overlay to the interstellar map panel
 + Issue #29: MekHQ will not load.
 + Issue #69: 3.27 : ATB, allies generated use incorrect skill rating
-+ Bug: missing or incorrect values in ratinfo.xml can cause ArrayOutOfBoundsException.
++ Bug: missing or incorrect values in ratinfo.xml can cause ArrayOutOfBoundsException
++ Updated MegaMek.jar to 0.41.20
++ Updated MegaMekLab.jar to 0.1.56
 
 v0.3.29 (2016-06-05 22:40 UTC)
 + Adding a simple view option to the interstellar map (show/hide "empty" planets)
