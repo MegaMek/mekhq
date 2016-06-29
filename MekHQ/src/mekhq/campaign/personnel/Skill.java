@@ -121,6 +121,10 @@ public class Skill implements Serializable, MekHqXmlSerializable {
     }
     
     public void improve() {
+        if(level >= SkillType.NUM_LEVELS - 1) {
+            // Can't improve past the max
+            return;
+        }
         level = level + 1;
         //if the cost for the next level is zero (or less than zero), then 
         //keep improve until you hit a non-zero cost
