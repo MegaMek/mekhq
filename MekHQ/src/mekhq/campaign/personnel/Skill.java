@@ -56,154 +56,150 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Skill implements Serializable, MekHqXmlSerializable {
+    private static final long serialVersionUID = 2470620816562038469L;
+    
+    private SkillType type;
+    private int level;
+    private int bonus;
+    
+    public Skill() {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 2470620816562038469L;
-	
-	private SkillType type;
-	private int level;
-	private int bonus;
-	
-	public Skill() {
+    }
+    
+    public Skill(String t) {
+        this(t, SkillType.EXP_REGULAR, false, 0);
+    }
+    
+    public Skill(String t, int exp, boolean random, int bonus) {
+        this.type = SkillType.getType(t);
+        this.level = type.getLevelFromExperience(exp);
+        //check to see if we should randomize
+        if(random) {
+            int roll = Compute.d6();
+            if(roll < 2 && level > 0) {
+                this.level--;
+            }
+            else if(roll > 5 && level < 10) {
+                this.level++;
+            }
+        }
+        this.bonus = bonus;
+    }
+    
+    public Skill(String t, int lvl, int bns) {
+        this.type = SkillType.getType(t);
+        this.level = lvl;
+        this.bonus = bns;
+    }
 
-	}
-	
-	public Skill(String t) {
-		this(t, SkillType.EXP_REGULAR, false, 0);
-	}
-	
-	public Skill(String t, int exp, boolean random, int bonus) {
-		this.type = SkillType.getType(t);
-		this.level = type.getLevelFromExperience(exp);
-		//check to see if we should randomize
-		if(random) {
-			int roll = Compute.d6();
-			if(roll < 2 && level > 0) {
-				this.level--;
-			}
-			else if(roll > 5 && level < 10) {
-				this.level++;
-			}
-		}
-		this.bonus = bonus;
-	}
-	
-	public Skill(String t, int lvl, int bns) {
-		this.type = SkillType.getType(t);
-		this.level = lvl;
-		this.bonus = bns;
-	}
-
-	public int getLevel() {
-		return level;
-	}
-	
-	public void setLevel(int l) {
-		this.level = l;
-	}
-	
-	public int getBonus() {
-		return bonus;
-	}
-	
-	public void setBonus(int b) {
-		this.bonus = b;
-	}
-	
-	public SkillType getType() {
-		return type;
-	}
-	
-	public int getFinalSkillValue() {
-		if(type.countUp()) {
-			return type.getTarget() + level + bonus;
-		} else {
-			return type.getTarget() - level - bonus;
-		}
-	}
-	
-	public void improve() {	
-		level = level + 1;
-		//if the cost for the next level is zero (or less than zero), then 
-		//keep improve until you hit a non-zero cost
-		if(type.getCost(level)<=0) {
-			improve();
-		}
-	}
-	
-	public int getCostToImprove() {
-		int cost = 0;
-		int i = 1;
-		while(cost <= 0 && (level+i) < SkillType.NUM_LEVELS) {
-			cost = type.getCost(level+i);
-			++i;
-		}
-		return cost;
-	}
-	
-	public int getExperienceLevel() {
-		return type.getExperienceLevel(getLevel());
-	}
-	
-	@Override
-	public String toString() {
-		if(type.countUp()) {
-			return "+" + getFinalSkillValue();
-		} else {
-			return getFinalSkillValue() + "+";
-		}
-	}	
-	
-	public void writeToXml(PrintWriter pw1, int indent) {
-		pw1.println(MekHqXmlUtil.indentStr(indent) + "<skill>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<type>"
-				+type.getName()
-				+"</type>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<level>"
-				+level
-				+"</level>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<bonus>"
-				+bonus
-				+"</bonus>");
-		pw1.println(MekHqXmlUtil.indentStr(indent) + "</skill>");
-	}
-	
-	public static Skill generateInstanceFromXML(Node wn) {
-		Skill retVal = null;
-		
-		try {
-			retVal = new Skill();
-			
-			// Okay, now load Skill-specific fields!
-			NodeList nl = wn.getChildNodes();
-			
-			for (int x=0; x<nl.getLength(); x++) {
-				Node wn2 = nl.item(x);
-				
-				if (wn2.getNodeName().equalsIgnoreCase("type")) {
-					retVal.type = SkillType.getType(wn2.getTextContent());
-				} else if (wn2.getNodeName().equalsIgnoreCase("level")) {
-					retVal.level = Integer.parseInt(wn2.getTextContent());
-				} else if (wn2.getNodeName().equalsIgnoreCase("bonus")) {
-					retVal.bonus = Integer.parseInt(wn2.getTextContent());
-				}
-			}
-		} catch (Exception ex) {
-			// Errrr, apparently either the class name was invalid...
-			// Or the listed name doesn't exist.
-			// Doh!
-			MekHQ.logError(ex);
-		}
-		
-		return retVal;
-	}
-	
-	public void updateType() {
-		type = SkillType.getType(type.getName());
-	}
+    public int getLevel() {
+        return level;
+    }
+    
+    public void setLevel(int l) {
+        this.level = l;
+    }
+    
+    public int getBonus() {
+        return bonus;
+    }
+    
+    public void setBonus(int b) {
+        this.bonus = b;
+    }
+    
+    public SkillType getType() {
+        return type;
+    }
+    
+    public int getFinalSkillValue() {
+        if(type.countUp()) {
+            return type.getTarget() + level + bonus;
+        } else {
+            return type.getTarget() - level - bonus;
+        }
+    }
+    
+    public void improve() {
+        level = level + 1;
+        //if the cost for the next level is zero (or less than zero), then 
+        //keep improve until you hit a non-zero cost
+        if(type.getCost(level) <= 0) {
+            improve();
+        }
+    }
+    
+    public int getCostToImprove() {
+        int cost = 0;
+        int i = 1;
+        while(cost <= 0 && (level+i) < SkillType.NUM_LEVELS) {
+            cost = type.getCost(level+i);
+            ++i;
+        }
+        return cost;
+    }
+    
+    public int getExperienceLevel() {
+        return type.getExperienceLevel(getLevel());
+    }
+    
+    @Override
+    public String toString() {
+        if(type.countUp()) {
+            return "+" + getFinalSkillValue();
+        } else {
+            return getFinalSkillValue() + "+";
+        }
+    }    
+    
+    public void writeToXml(PrintWriter pw1, int indent) {
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "<skill>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<type>"
+                +type.getName()
+                +"</type>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<level>"
+                +level
+                +"</level>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<bonus>"
+                +bonus
+                +"</bonus>");
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "</skill>");
+    }
+    
+    public static Skill generateInstanceFromXML(Node wn) {
+        Skill retVal = null;
+        
+        try {
+            retVal = new Skill();
+            
+            // Okay, now load Skill-specific fields!
+            NodeList nl = wn.getChildNodes();
+            
+            for (int x=0; x<nl.getLength(); x++) {
+                Node wn2 = nl.item(x);
+                
+                if (wn2.getNodeName().equalsIgnoreCase("type")) {
+                    retVal.type = SkillType.getType(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("level")) {
+                    retVal.level = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("bonus")) {
+                    retVal.bonus = Integer.parseInt(wn2.getTextContent());
+                }
+            }
+        } catch (Exception ex) {
+            // Errrr, apparently either the class name was invalid...
+            // Or the listed name doesn't exist.
+            // Doh!
+            MekHQ.logError(ex);
+        }
+        
+        return retVal;
+    }
+    
+    public void updateType() {
+        type = SkillType.getType(type.getName());
+    }
 }
