@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
 v0.3.31-git
++ Bug: Skill.improve() didn't check for maximum skill level (SkillType.NUM_LEVELS)
++ Feature Request #80: Automated Skill Purchases
 
 v0.3.30
 + Issue #110: Unassigned patients no longer get selected automatically

@@ -1,0 +1,366 @@
+package mekhq.gui.dialog;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTable;
+import javax.swing.RowFilter;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+
+import megamek.common.options.PilotOptions;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.Skill;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.gui.model.PersonnelTableModel;
+import mekhq.gui.sorter.FormattedNumberSorter;
+import mekhq.gui.sorter.RankSorter;
+
+public final class BatchXPDialog extends JDialog {
+    private static final String CHOICE_NO_SKILL = "- Skill -";
+
+    private static final long serialVersionUID = -7897406116865495209L;
+
+    private final Campaign campaign;
+    private final PersonnelTableModel personnelModel;
+    private final TableRowSorter<PersonnelTableModel> personnelSorter;
+    private final PersonnelFilter personnelFilter;
+    private boolean dataChanged = false;
+    
+    private JTable personnelTable;
+    private JComboBox<PersonTypeItem> choiceType;
+    private JComboBox<PersonTypeItem> choiceExp;
+    private JComboBox<String> choiceSkill;
+    private JSpinner skillLevel;
+    private JButton buttonSpendXP;
+
+    private final List<Integer> personnelColumns = Arrays.asList(
+            PersonnelTableModel.COL_RANK,
+            PersonnelTableModel.COL_NAME,
+            PersonnelTableModel.COL_AGE,
+            PersonnelTableModel.COL_TYPE,
+            PersonnelTableModel.COL_XP
+    );
+
+    public BatchXPDialog(JFrame parent, Campaign campaign) {
+        super(parent, "Mass training", true);
+        
+        this.campaign = Objects.requireNonNull(campaign);
+        this.personnelModel = new PersonnelTableModel(campaign);
+        personnelModel.refreshData();
+        personnelSorter = new TableRowSorter<PersonnelTableModel>(personnelModel);
+        personnelSorter.setSortsOnUpdates(true);
+        personnelSorter.setComparator(PersonnelTableModel.COL_RANK, new RankSorter(campaign));
+        personnelSorter.setComparator(PersonnelTableModel.COL_AGE, new FormattedNumberSorter());
+        personnelSorter.setComparator(PersonnelTableModel.COL_XP, new FormattedNumberSorter());
+        personnelSorter.setSortKeys(Arrays.asList(new RowSorter.SortKey(1, SortOrder.ASCENDING)));
+        personnelFilter = new PersonnelFilter();
+        personnelSorter.setRowFilter(personnelFilter);
+        
+        initComponents();
+    }
+
+    private void initComponents() {
+        setLayout(new BorderLayout());
+
+        add(getPersonnelTable(), BorderLayout.EAST);
+        add(getButtonPanel(), BorderLayout.WEST);
+        
+        pack();
+        setLocationRelativeTo(getParent());
+    }
+    
+    private JComponent getPersonnelTable() {
+        personnelTable = new JTable(personnelModel);
+        personnelTable.setCellSelectionEnabled(false);
+        personnelTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        
+        for(int i = PersonnelTableModel.N_COL - 1; i >= 0 ; -- i) {
+            TableColumn column = personnelTable.getColumnModel().getColumn(i);
+            if(personnelColumns.contains(Integer.valueOf(i))) {
+                column.setPreferredWidth(personnelModel.getColumnWidth(i));
+                column.setCellRenderer(new CellRenderer());
+            } else {
+                personnelTable.removeColumn(column);
+            }
+            
+        }
+        personnelTable.setIntercellSpacing(new Dimension(1, 0));
+        personnelTable.setShowGrid(false);
+        personnelTable.setRowSorter(personnelSorter);
+        
+        return new JScrollPane(personnelTable);
+    }
+    
+    private JComponent getButtonPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        choiceType = new JComboBox<PersonTypeItem>();
+        choiceType.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) choiceType.getPreferredSize().getHeight()));
+        DefaultComboBoxModel<PersonTypeItem> personTypeModel = new DefaultComboBoxModel<>();
+        personTypeModel.addElement(new PersonTypeItem("- Primary Role -", null));
+        for(int i = 1; i < Person.T_NUM; ++ i) {
+            personTypeModel.addElement(new PersonTypeItem(Person.getRoleDesc(i,campaign.getFaction().isClan()), i));
+        }
+        personTypeModel.addElement(new PersonTypeItem(Person.getRoleDesc(0, campaign.getFaction().isClan()), 0));
+        // Add "none" for generic AsTechs
+        choiceType.setModel(personTypeModel);
+        choiceType.setSelectedIndex(0);
+        choiceType.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                personnelFilter.setPrimaryRole(((PersonTypeItem)choiceType.getSelectedItem()).id);
+                personnelSorter.sort();
+            }
+        });
+        panel.add(choiceType);
+        
+        choiceExp = new JComboBox<PersonTypeItem>();
+        choiceExp.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) choiceType.getPreferredSize().getHeight()));
+        DefaultComboBoxModel<PersonTypeItem> personExpModel = new DefaultComboBoxModel<>();
+        personExpModel.addElement(new PersonTypeItem("- Experience Level -", null));
+        for(int i = 0; i < 5; ++ i) {
+            personExpModel.addElement(new PersonTypeItem(SkillType.getExperienceLevelName(i), i));
+        }
+        choiceExp.setModel(personExpModel);
+        choiceExp.setSelectedIndex(0);
+        choiceExp.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                personnelFilter.setExpLevel(((PersonTypeItem)choiceExp.getSelectedItem()).id);
+                personnelSorter.sort();
+            }
+        });
+        panel.add(choiceExp);
+        
+        choiceSkill = new JComboBox<String>();
+        choiceSkill.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) choiceSkill.getPreferredSize().getHeight()));
+        DefaultComboBoxModel<String> personSkillModel = new DefaultComboBoxModel<>();
+        personSkillModel.addElement(CHOICE_NO_SKILL);
+        for(String skill : SkillType.getSkillList()) {
+            personSkillModel.addElement(skill);
+        }
+        choiceSkill.setModel(personSkillModel);
+        choiceSkill.setSelectedIndex(0);
+        choiceSkill.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(CHOICE_NO_SKILL.equals(choiceSkill.getSelectedItem())) {
+                    personnelFilter.setSkill(null);
+                    buttonSpendXP.setEnabled(false);
+                } else {
+                    personnelFilter.setSkill((String) choiceSkill.getSelectedItem());
+                    buttonSpendXP.setEnabled(true);
+                }
+                personnelSorter.sort();
+            }
+        });
+        panel.add(choiceSkill);
+        
+        panel.add(Box.createRigidArea(new Dimension(10, 10)));
+        panel.add(new JLabel("Target skill level:"));
+        
+        skillLevel = new JSpinner(new SpinnerNumberModel(10, 1, 10, 1));
+        skillLevel.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) skillLevel.getPreferredSize().getHeight()));
+        skillLevel.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                int maxSkillLevel = (Integer)skillLevel.getModel().getValue();
+                personnelFilter.setMaxSkillLevel(maxSkillLevel);
+                personnelSorter.sort();
+            }
+        });
+        panel.add(skillLevel);
+
+        panel.add(Box.createVerticalGlue());
+        
+        JPanel buttons = new JPanel(new FlowLayout());
+        buttons.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) buttons.getPreferredSize().getHeight()));
+
+        buttonSpendXP = new JButton("Spend XP");
+        buttonSpendXP.setEnabled(false);
+        buttonSpendXP.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                spendXP();
+            }
+        });
+        buttons.add(buttonSpendXP);
+
+        JButton button = new JButton("Close");
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                setVisible(false);
+            }
+        });
+        buttons.add(button);
+
+        panel.add(buttons);
+        
+        return panel;
+    }
+
+    protected void spendXP() {
+        String skillName = (String) choiceSkill.getSelectedItem();
+        if(CHOICE_NO_SKILL.equals(skillName)) {
+            // This shouldn't happen, but guard against it anyway.
+            return;
+        }
+        int rows = personnelTable.getRowCount();
+        while(rows > 0) {
+            for(int i = 0; i < rows; ++ i) {
+                Person p = personnelModel.getPerson(personnelTable.convertRowIndexToModel(i));
+                int cost = 0;
+                if(p.hasSkill(skillName)) {
+                    cost = p.getCostToImprove(skillName);
+                } else {
+                    cost = SkillType.getType(skillName).getCost(0);
+                }
+                int experience = p.getExperienceLevel(false);
+                
+                // Improve the skill and deduce the cost
+                p.improveSkill(skillName);
+                campaign.personUpdated(p);
+                p.setXp(p.getXp() - cost);
+                campaign.addReport(String.format("%s improved %s!", p.getHyperlinkedName(), skillName));
+                
+                // The next part is bollocks and doesn't belong here, but as long as we hardcode AtB ...
+                if(campaign.getCampaignOptions().getUseAtB()) {
+                    if((p.getPrimaryRole() > Person.T_NONE) && (p.getPrimaryRole() <= Person.T_CONV_PILOT)
+                        && (p.getExperienceLevel(false) > experience) && (experience >= SkillType.EXP_REGULAR)) {
+                        String spa = campaign.rollSPA(p.getPrimaryRole(), p);
+                        if(null == spa) {
+                            if(campaign.getCampaignOptions().useEdge()) {
+                                p.acquireAbility(PilotOptions.EDGE_ADVANTAGES, "edge", p.getEdge() + 1);
+                                campaign.addReport(String.format("%s gained edge point!", p.getHyperlinkedName()));
+                            }
+                        } else {
+                            campaign.addReport(String.format("%s gained %s!", p.getHyperlinkedName(), SpecialAbility.getDisplayName(spa)));
+                        }
+                    }
+                }
+            }
+            // Refresh the filter and continue if we still have anyone available
+            personnelSorter.sort();
+            rows = personnelTable.getRowCount();
+            dataChanged = true;
+        }
+        
+    }
+
+    public boolean hasDataChanged() {
+        return dataChanged;
+    }
+ 
+    public static class CellRenderer extends DefaultTableCellRenderer {
+        private static final long serialVersionUID = 8387527228725524653L;
+        
+        @Override
+        public Component getTableCellRendererComponent(JTable table,
+                Object value, boolean isSelected, boolean hasFocus,
+                int row, int column) {
+            super.getTableCellRendererComponent(table, value, isSelected,
+                    hasFocus, row, column);
+            setOpaque(true);
+
+            setForeground(Color.BLACK);
+            if((row % 2) == 0) {
+                setBackground(new Color(220, 220, 220));
+            } else {
+                setBackground(Color.WHITE);
+            }
+
+            return this;
+        }
+    }
+    
+    public static class PersonnelFilter extends RowFilter<PersonnelTableModel, Integer> {
+        private Integer primaryRole = null;
+        private Integer expLevel = null;
+        private String skill = null;
+        private int maxSkillLevel = 10;
+        
+        @Override
+        public boolean include(RowFilter.Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
+            Person p = entry.getModel().getPerson(entry.getIdentifier().intValue());
+            if((null != primaryRole) && (p.getPrimaryRole() != primaryRole.intValue())) {
+                return false;
+            }
+            if((null != expLevel) && (p.getExperienceLevel(false) != expLevel.intValue())) {
+                return false;
+            }
+            if((null != skill)) {
+                Skill s = p.getSkill(skill);
+                if(null == s) {
+                    int cost = SkillType.getType(skill).getCost(0);
+                    return (cost >= 0) && (cost <= p.getXp());
+                } else {
+                    int cost = s.getCostToImprove();
+                    return (s.getLevel() < maxSkillLevel) && (cost >= 0) && (cost <= p.getXp());
+                }
+            }
+            return true;
+        }
+        
+        public void setPrimaryRole(Integer role) {
+            primaryRole = role;
+        }
+        
+        public void setExpLevel(Integer level) {
+            expLevel = level;
+        }
+        
+        public void setSkill(String skillName) {
+            skill = skillName;
+        }
+        
+        public void setMaxSkillLevel(int level) {
+            maxSkillLevel = level;
+        }
+    }
+    
+    private static class PersonTypeItem {
+        public String name;
+        public Integer id;
+        
+        public PersonTypeItem(String name, Integer id) {
+            this.name = Objects.requireNonNull(name);
+            this.id = id;
+        }
+        
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+}

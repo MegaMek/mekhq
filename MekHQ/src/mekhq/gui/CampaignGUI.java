@@ -202,6 +202,7 @@ import mekhq.gui.adapter.ServicedUnitsTableMouseAdapter;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
 import mekhq.gui.dialog.AddFundsDialog;
 import mekhq.gui.dialog.AdvanceDaysDialog;
+import mekhq.gui.dialog.BatchXPDialog;
 import mekhq.gui.dialog.BloodnameDialog;
 import mekhq.gui.dialog.CampaignOptionsDialog;
 import mekhq.gui.dialog.ChooseMulFilesDialog;
@@ -654,6 +655,15 @@ public class CampaignGUI extends JPanel {
         refreshUnitList();
         refreshPersonnelList();
         refreshOrganization();
+    }
+
+    public void spendBatchXP() {
+        BatchXPDialog batchXPDialog = new BatchXPDialog(getFrame(), getCampaign());
+        batchXPDialog.setVisible(true);
+        
+        if(batchXPDialog.hasDataChanged()) {
+            refreshPersonnelList();
+        }
     }
 
     public void showBloodnameDialog() {
@@ -3175,8 +3185,7 @@ public class CampaignGUI extends JPanel {
             }
         });
         menuManage.add(miAdvanceMultipleDays);
-        JMenuItem miBloodnames = new JMenuItem(
-                "Randomize Bloodnames All Personnel");
+        JMenuItem miBloodnames = new JMenuItem("Randomize Bloodnames All Personnel");
         miBloodnames.setEnabled(true);
         miBloodnames.addActionListener(new ActionListener() {
             @Override
@@ -3185,6 +3194,15 @@ public class CampaignGUI extends JPanel {
             }
         });
         menuManage.add(miBloodnames);
+        JMenuItem miBatchXP = new JMenuItem("Mass training");
+        miBatchXP.setEnabled(true);
+        miBatchXP.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                spendBatchXP();
+            }
+        });
+        menuManage.add(miBatchXP);
 
         menuBar.add(menuManage);
 
