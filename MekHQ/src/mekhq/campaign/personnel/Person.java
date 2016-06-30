@@ -408,6 +408,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public void setFreeMan() {
         prisonerStatus = PRISONER_NOT;
+        willingToDefect = false;
     }
 
     public void setPrisonerStatus(int status) {
@@ -2170,7 +2171,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
 
     public String makeHTMLRankDiv() {
-    	return "<div id=\""+getId()+"\">"+getRankName()+ (isWillingToDefect() ? "*" : "") + "</div>";
+    	return "<div id=\""+getId()+"\">"+getRankName()+ (isPrisoner() && isWillingToDefect() ? "*" : "") + "</div>";
     }
 
     public String getHyperlinkedFullTitle() {

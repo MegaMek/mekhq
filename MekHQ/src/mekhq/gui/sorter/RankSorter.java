@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.Ranks;
 
  /**
      * A comparator for ranks written as strings with "-" sorted to the bottom always
@@ -39,6 +40,10 @@ import mekhq.campaign.personnel.Person;
 	        	Person p1 = campaign.getPerson(UUID.fromString(s11));
 	        	// the rank orders match, try comparing the levels
 	        	if (p0.getRankNumeric() == p1.getRankNumeric()) {
+	        	    // For prisoners: Sort those willing to defect "above" those who don't
+	        	    if(p0.getRankNumeric() == Ranks.RANK_PRISONER) {
+	        	        return Boolean.compare(p0.isWillingToDefect(), p1.isWillingToDefect());
+	        	    }
 	        		// the levels match too, try comparing MD rank
 	        		if (p0.getRankLevel() == p1.getRankLevel()) {
 	        		    if(p0.getManeiDominiRank() == p1.getManeiDominiRank()) {

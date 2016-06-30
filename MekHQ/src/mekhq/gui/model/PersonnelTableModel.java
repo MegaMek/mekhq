@@ -258,6 +258,7 @@ import mekhq.gui.BasicInfo;
             return getPerson(row).isDeployed();
         }
 
+        @Override
         public Object getValueAt(int row, int col) {
             Person p;
             DecimalFormat formatter = new DecimalFormat();
@@ -598,6 +599,7 @@ import mekhq.gui.BasicInfo;
 
             private static final long serialVersionUID = 9054581142945717303L;
 
+            @Override
             public Component getTableCellRendererComponent(JTable table,
                     Object value, boolean isSelected, boolean hasFocus,
                     int row, int column) {
@@ -638,6 +640,7 @@ import mekhq.gui.BasicInfo;
                 super(icons);
             }
 
+            @Override
             public Component getTableCellRendererComponent(JTable table,
                     Object value, boolean isSelected, boolean hasFocus,
                     int row, int column) {
