@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
 v0.3.31-git
++ Bug: Packaging of some images didn't happen
++ Bug: Recruited prisoners don't get their "willing to defect" flag cleared
 + Bug: Skill.improve() didn't check for maximum skill level (SkillType.NUM_LEVELS)
 + Feature Request #80: Automated Skill Purchases
 
