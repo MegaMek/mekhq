@@ -166,10 +166,8 @@
                 <include name="images/force/" />
                 <include name="images/portraits/" />
                 <include name="images/fluff/mech/*.png" />
-                <include name="images/misc/mekhq-load.png" />
-                <include name="images/misc/mekhq-splash.png" />
-                <include name="images/misc/tools.png" />
-                <include name="images/misc/mekhq.png" />
+                <include name="images/misc/" />
+                <include name="images/universe/" />
             </fileset>
         </copy>
     	<!-- grab the new graphical hits -->
