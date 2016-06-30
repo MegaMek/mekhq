@@ -209,6 +209,16 @@ public class SkillType implements Serializable {
         return costs[lvl];
     }
     
+    /** @return the maximum level of that skill (the last one not set to cost = -1, or 10) */
+    public int getMaxLevel() {
+        for(int lvl = 0; lvl < costs.length; ++ lvl) {
+            if(costs[lvl] < 0) {
+                return lvl - 1;
+            }
+        }
+        return costs.length - 1;
+    }
+    
     public static void setCost(String name, int cost, int lvl) {
         SkillType type = lookupHash.get(name);
         if(null != name && lvl < 11) {
