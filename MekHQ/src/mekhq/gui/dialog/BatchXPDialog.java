@@ -26,6 +26,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SortOrder;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
@@ -69,6 +70,8 @@ public final class BatchXPDialog extends JDialog {
             PersonnelTableModel.COL_TYPE,
             PersonnelTableModel.COL_XP
     );
+
+    private JLabel matchedPersonnelLabel;
 
     public BatchXPDialog(JFrame parent, Campaign campaign) {
         super(parent, "Mass training", true);
@@ -117,7 +120,9 @@ public final class BatchXPDialog extends JDialog {
         personnelTable.setShowGrid(false);
         personnelTable.setRowSorter(personnelSorter);
         
-        return new JScrollPane(personnelTable);
+        JScrollPane pane = new JScrollPane(personnelTable);
+        pane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        return pane;
     }
     
     private JComponent getButtonPanel() {
@@ -139,7 +144,7 @@ public final class BatchXPDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent evt) {
                 personnelFilter.setPrimaryRole(((PersonTypeItem)choiceType.getSelectedItem()).id);
-                personnelSorter.sort();
+                updatePersonnelTable();
             }
         });
         panel.add(choiceType);
@@ -157,7 +162,7 @@ public final class BatchXPDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent evt) {
                 personnelFilter.setExpLevel(((PersonTypeItem)choiceExp.getSelectedItem()).id);
-                personnelSorter.sort();
+                updatePersonnelTable();
             }
         });
         panel.add(choiceExp);
@@ -189,7 +194,7 @@ public final class BatchXPDialog extends JDialog {
                     }
                     buttonSpendXP.setEnabled(true);
                 }
-                personnelSorter.sort();
+                updatePersonnelTable();
             }
         });
         panel.add(choiceSkill);
@@ -204,12 +209,16 @@ public final class BatchXPDialog extends JDialog {
             public void stateChanged(ChangeEvent e) {
                 int maxSkillLevel = (Integer)skillLevel.getModel().getValue();
                 personnelFilter.setMaxSkillLevel(maxSkillLevel);
-                personnelSorter.sort();
+                updatePersonnelTable();
             }
         });
         panel.add(skillLevel);
 
         panel.add(Box.createVerticalGlue());
+        
+        matchedPersonnelLabel = new JLabel("");
+        matchedPersonnelLabel.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) matchedPersonnelLabel.getPreferredSize().getHeight()));
+        panel.add(matchedPersonnelLabel);
         
         JPanel buttons = new JPanel(new FlowLayout());
         buttons.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) buttons.getPreferredSize().getHeight()));
@@ -236,6 +245,16 @@ public final class BatchXPDialog extends JDialog {
         panel.add(buttons);
         
         return panel;
+    }
+
+    protected void updatePersonnelTable() {
+        personnelSorter.sort();
+        if(!CHOICE_NO_SKILL.equals(choiceSkill.getSelectedItem())) {
+            int rows = personnelTable.getRowCount();
+            matchedPersonnelLabel.setText(String.format("%d eligable", rows));
+        } else {
+            matchedPersonnelLabel.setText("");
+        }
     }
 
     protected void spendXP() {
@@ -279,7 +298,7 @@ public final class BatchXPDialog extends JDialog {
                 }
             }
             // Refresh the filter and continue if we still have anyone available
-            personnelSorter.sort();
+            updatePersonnelTable();
             rows = personnelTable.getRowCount();
             dataChanged = true;
         }
