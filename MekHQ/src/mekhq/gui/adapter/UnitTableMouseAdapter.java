@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.text.NumberFormat;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.UUID;
 import java.util.Vector;
 
@@ -21,6 +23,7 @@ import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
+import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.Infantry;
 import megamek.common.Mech;
@@ -30,6 +33,7 @@ import megamek.common.loaders.BLKFile;
 import mekhq.Utilities;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
@@ -535,18 +539,55 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             }
         } else if(command.equalsIgnoreCase("RESTORE_UNIT")) {
             for (Unit unit : units) {
-                if(unit.isAvailable() && (unit.getPartsNeedingFixing().size() > 0)) {
-                    for(Part part : unit.getPartsNeedingFixing()) {
+                unit.setSalvage(false);
+                Collection<Part> partsToFix = new HashSet<>(unit.getParts());
+                boolean needsCheck = true;
+                while(unit.isAvailable() && needsCheck) {
+                    needsCheck = false;
+                    for(Part part : partsToFix) {
                         if(part instanceof Armor) {
                             final Armor armor = (Armor) part;
                             armor.setAmount(armor.getTotalAmount());
+                        } else if(part instanceof AmmoBin) {
+                            final AmmoBin ammoBin = (AmmoBin) part;
+                            ammoBin.setShotsNeeded(0);
                         }
-                        part.fix();
-                        part.resetTimeSpent();
-                        part.resetOvertime();
-                        part.setTeamId(null);
-                        part.cancelReservation();
+                        if(part instanceof MissingPart) {
+                            // MissingPart has no easy way to just tell it "replace me with a workig one" either ...
+                            part.resetTimeSpent();
+                            part.resetOvertime();
+                            part.setTeamId(null);
+                            part.cancelReservation();
+                            unit.removePart(part);
+                            needsCheck = true;
+                        } else {
+                            if(part.needsFixing()) {
+                                needsCheck = true;
+                            }
+                            part.fix();
+                            part.resetTimeSpent();
+                            part.resetOvertime();
+                            part.setTeamId(null);
+                            part.cancelReservation();
+                        }
                     }
+                    // TODO: Make this less painful. We just want to fix hips and shoulders.
+                    Entity entity = unit.getEntity();
+                    for(int loc : new int[]{
+                        Mech.LOC_CLEG, Mech.LOC_LLEG, Mech.LOC_RLEG, Mech.LOC_LARM, Mech.LOC_RARM}) {
+                        int numberOfCriticals = entity.getNumberOfCriticals(loc);
+                        for(int crit = 0; crit < numberOfCriticals; ++ crit) {
+                            CriticalSlot slot = entity.getCritical(loc, crit);
+                            if(null != slot) {
+                                slot.setHit(false);
+                                slot.setDestroyed(false);
+                            }
+                        }
+                    }
+                    // Check for more parts to fix (because the list above is not
+                    // sorted usefully)
+                    unit.initializeParts(true);
+                    partsToFix = new HashSet<>(unit.getParts());
                 }
             }
             gui.refreshServicedUnitList();
