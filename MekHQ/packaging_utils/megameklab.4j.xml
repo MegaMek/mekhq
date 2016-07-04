@@ -6,6 +6,8 @@
   	<mainClass>megameklab.com.MegaMekLab</mainClass>
   	<cp>lib/MegaMek.jar</cp>
   	<cp>lib/MegaMekLab.jar</cp>
+    <cp>lib/xstream-1.4.7.jar</cp>
+    <cp>lib/svgSalamander.jar</cp>
   </classPath>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
