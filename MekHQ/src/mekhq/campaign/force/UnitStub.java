@@ -34,104 +34,100 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
-	public class UnitStub implements Serializable {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1448449600864209589L;
-		
-		private String desc;
-		private String portraitCategory;
-		private String portraitFileName;
-		
-		public UnitStub() {
-			portraitCategory = Crew.ROOT_PORTRAIT;
-	        portraitFileName = Crew.PORTRAIT_NONE;
-			desc = "";
-		}
-		
-		public UnitStub(Unit u) {
-			portraitCategory = Crew.ROOT_PORTRAIT;
-	        portraitFileName = Crew.PORTRAIT_NONE;
-			desc = getUnitDescription(u);
-			Person commander = u.getCommander();
-			if(null != commander) {
-				portraitCategory = commander.getPortraitCategory();
-				portraitFileName = commander.getPortraitFileName();
-			}
-		}
-		
-		public String toString() {
-			return desc;
-		}
-		
-		public String getPortraitCategory() {
-			return portraitCategory;
-		}
-		
-		public String getPortraitFileName() {
-			return portraitFileName;
-		}
-		
-		private String getUnitDescription(Unit u) {
-			String name = "<font color='red'>No Crew</font>";
-	    	String uname = "";
-	    	Person pp = u.getCommander();
-	    	if(null != pp) {
-	    		name = pp.getFullTitle();
-	    		name += " (" + u.getEntity().getCrew().getGunnery() + "/" + u.getEntity().getCrew().getPiloting() + ")";
-	    		if(pp.needsFixing()) {
-	    			name = "<font color='red'>" + name + "</font>";
-	    		}     
-	    	}
-	    	uname = "<i>" + u.getName() + "</i>";
-	    	if(u.isDamaged()) {
-	    		uname = "<font color='red'>" + uname + "</font>";
-	    	}          	
-	    	return "<html>" + name + ", " + uname + "</html>";
-		}
-		
-		public void writeToXml(PrintWriter pw1, int indent) {
-			pw1.println(MekHqXmlUtil.indentStr(indent) + "<unitStub>");
-			pw1.println(MekHqXmlUtil.indentStr(indent+1)
-					+"<desc>"
-					+MekHqXmlUtil.escape(desc)
-					+"</desc>");
-			pw1.println(MekHqXmlUtil.indentStr(indent+1)
-					+"<portraitCategory>"
-					+MekHqXmlUtil.escape(portraitCategory)
-					+"</portraitCategory>");
-			pw1.println(MekHqXmlUtil.indentStr(indent+1)
-					+"<portraitFileName>"
-					+MekHqXmlUtil.escape(portraitFileName)
-					+"</portraitFileName>");
-			pw1.println(MekHqXmlUtil.indentStr(indent) + "</unitStub>");
-		}
-		
-		public static UnitStub generateInstanceFromXML(Node wn) {
-			UnitStub retVal = null;
-			
-			try {		
-				retVal = new UnitStub();
-				NodeList nl = wn.getChildNodes();
-				
-				for (int x=0; x<nl.getLength(); x++) {
-					Node wn2 = nl.item(x);
-					if (wn2.getNodeName().equalsIgnoreCase("desc")) {
-						retVal.desc = wn2.getTextContent();
-					} else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
-						retVal.portraitCategory = wn2.getTextContent();
-					} else if (wn2.getNodeName().equalsIgnoreCase("portraitFileName")) {
-						retVal.portraitFileName = wn2.getTextContent();
-					} 
-				}
-			} catch (Exception ex) {
-				// Errrr, apparently either the class name was invalid...
-				// Or the listed name doesn't exist.
-				// Doh!
-				MekHQ.logError(ex);
-			}
-			return retVal;
-		}
-	}
+public class UnitStub implements Serializable {
+    private static final long serialVersionUID = 1448449600864209589L;
+    
+    private String desc;
+    private String portraitCategory;
+    private String portraitFileName;
+    
+    public UnitStub() {
+        portraitCategory = Crew.ROOT_PORTRAIT;
+        portraitFileName = Crew.PORTRAIT_NONE;
+        desc = "";
+    }
+    
+    public UnitStub(Unit u) {
+        portraitCategory = Crew.ROOT_PORTRAIT;
+        portraitFileName = Crew.PORTRAIT_NONE;
+        desc = getUnitDescription(u);
+        Person commander = u.getCommander();
+        if(null != commander) {
+            portraitCategory = commander.getPortraitCategory();
+            portraitFileName = commander.getPortraitFileName();
+        }
+    }
+    
+    public String toString() {
+        return desc;
+    }
+    
+    public String getPortraitCategory() {
+        return portraitCategory;
+    }
+    
+    public String getPortraitFileName() {
+        return portraitFileName;
+    }
+    
+    private String getUnitDescription(Unit u) {
+        String name = "<font color='red'>No Crew</font>";
+        String uname = "";
+        Person pp = u.getCommander();
+        if(null != pp) {
+            name = pp.getFullTitle();
+            name += " (" + u.getEntity().getCrew().getGunnery() + "/" + u.getEntity().getCrew().getPiloting() + ")";
+            if(pp.needsFixing()) {
+                name = "<font color='red'>" + name + "</font>";
+            }     
+        }
+        uname = "<i>" + u.getName() + "</i>";
+        if(u.isDamaged()) {
+            uname = "<font color='red'>" + uname + "</font>";
+        }              
+        return "<html>" + name + ", " + uname + "</html>";
+    }
+    
+    public void writeToXml(PrintWriter pw1, int indent) {
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "<unitStub>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<desc>"
+                +MekHqXmlUtil.escape(desc)
+                +"</desc>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<portraitCategory>"
+                +MekHqXmlUtil.escape(portraitCategory)
+                +"</portraitCategory>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<portraitFileName>"
+                +MekHqXmlUtil.escape(portraitFileName)
+                +"</portraitFileName>");
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "</unitStub>");
+    }
+    
+    public static UnitStub generateInstanceFromXML(Node wn) {
+        UnitStub retVal = null;
+        
+        try {        
+            retVal = new UnitStub();
+            NodeList nl = wn.getChildNodes();
+            
+            for (int x=0; x<nl.getLength(); x++) {
+                Node wn2 = nl.item(x);
+                if (wn2.getNodeName().equalsIgnoreCase("desc")) {
+                    retVal.desc = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
+                    retVal.portraitCategory = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("portraitFileName")) {
+                    retVal.portraitFileName = wn2.getTextContent();
+                } 
+            }
+        } catch (Exception ex) {
+            // Errrr, apparently either the class name was invalid...
+            // Or the listed name doesn't exist.
+            // Doh!
+            MekHQ.logError(ex);
+        }
+        return retVal;
+    }
+}
