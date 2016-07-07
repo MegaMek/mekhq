@@ -491,8 +491,7 @@ public class Planet implements Serializable {
     }
 
     public String getHPGClass(DateTime when) {
-        Integer currentHPG = getHPG(when);
-        return null != currentHPG ? EquipmentType.getRatingName(currentHPG) : ""; //$NON-NLS-1$
+        return StarUtil.getHPGClass(getHPG(when));
     }
 
     public Integer getPopulationRating(DateTime when) {

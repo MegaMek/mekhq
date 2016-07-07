@@ -754,6 +754,7 @@ public class InterstellarMapPanel extends JPanel {
         List<Planet.PlanetaryEvent> result = editor.getChangedEvents();
         if((null != result) && !result.isEmpty()) {
             Planets.getInstance().updatePlanetaryEvents(p.getId(), result, true);
+            Planets.getInstance().recalcHPGNetwork();
             repaint();
             hqview.refreshPlanetView();
         }

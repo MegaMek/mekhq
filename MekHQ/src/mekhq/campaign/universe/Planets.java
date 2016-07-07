@@ -186,6 +186,11 @@ public class Planets {
         return news;
     }
     
+    /** Clean up the local HPG network cache */
+    public void recalcHPGNetwork() {
+        hpgNetworkCacheDate = null;
+    }
+    
     public Collection<Planets.HPGLink> getHPGNetwork(DateTime when) {
         if((null != when) && when.equals(hpgNetworkCacheDate)) {
             return hpgNetworkCache;

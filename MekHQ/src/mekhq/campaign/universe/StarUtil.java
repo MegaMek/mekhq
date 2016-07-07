@@ -31,6 +31,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
+import megamek.common.EquipmentType;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.universe.Planet.SpectralDefinition;
@@ -594,6 +595,20 @@ public final class StarUtil {
             case 5: return "repressive";
             case 6: return "under total control";
             default: return "enslaved population";
+        }
+    }
+    
+    public static String getHPGClass(Integer hpg) {
+        if(null == hpg) {
+            return null;
+        }
+        switch(hpg.intValue()) {
+            case EquipmentType.RATING_A: return "A-rated HPG";
+            case EquipmentType.RATING_B: return "B-rated HPG";
+            case EquipmentType.RATING_C: return "C-rated Service";
+            case EquipmentType.RATING_D: return "D-rated Service";
+            case EquipmentType.RATING_X: return "none";
+            default: return "unknown";
         }
     }
     

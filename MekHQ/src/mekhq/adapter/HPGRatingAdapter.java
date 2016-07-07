@@ -18,16 +18,47 @@
  */
 package mekhq.adapter;
 
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
+import megamek.common.EquipmentType;
+
 public class HPGRatingAdapter extends XmlAdapter<String, Integer> {
+    private final static Map<String, Integer> stringToEquipmentTypeMap = new HashMap<String, Integer>(6);
+    private final static Map<Integer, String> equipmentTypeToStringMap = new HashMap<Integer, String>(6);
+    static {
+        stringToEquipmentTypeMap.put("A", EquipmentType.RATING_A); //$NON-NLS-1$
+        stringToEquipmentTypeMap.put("B", EquipmentType.RATING_B); //$NON-NLS-1$
+        stringToEquipmentTypeMap.put("C", EquipmentType.RATING_C); //$NON-NLS-1$
+        stringToEquipmentTypeMap.put("D", EquipmentType.RATING_D); //$NON-NLS-1$
+        stringToEquipmentTypeMap.put("X", EquipmentType.RATING_X); //$NON-NLS-1$
+        equipmentTypeToStringMap.put(EquipmentType.RATING_A, "A"); //$NON-NLS-1$
+        equipmentTypeToStringMap.put(EquipmentType.RATING_B, "B"); //$NON-NLS-1$
+        equipmentTypeToStringMap.put(EquipmentType.RATING_C, "C"); //$NON-NLS-1$
+        equipmentTypeToStringMap.put(EquipmentType.RATING_D, "D"); //$NON-NLS-1$
+        equipmentTypeToStringMap.put(EquipmentType.RATING_X, "X"); //$NON-NLS-1$
+    }
+    
+    public static int convertRatingToCode(String rating) {
+        Integer result = stringToEquipmentTypeMap.get(rating.toUpperCase(Locale.ROOT));
+        return null != result ? result.intValue() : EquipmentType.RATING_X;
+    }
+    
+    public static String convertCodeToRating(int code) {
+        String result = equipmentTypeToStringMap.get(code);
+        return null != result ? result : "?"; //$NON-NLS-1$
+    }
+
     @Override
     public Integer unmarshal(String v) throws Exception {
-        return SocioIndustrialDataAdapter.convertRatingToCode(v);
+        return HPGRatingAdapter.convertRatingToCode(v);
     }
 
     @Override
     public String marshal(Integer v) throws Exception {
-        return SocioIndustrialDataAdapter.convertCodeToRating(v);
+        return HPGRatingAdapter.convertCodeToRating(v);
     }
 }
