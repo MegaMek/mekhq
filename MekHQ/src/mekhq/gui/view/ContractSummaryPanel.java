@@ -35,9 +35,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import org.joda.time.DateTime;
-
 import megamek.common.util.EncodeControl;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.market.ContractMarket;
@@ -337,7 +336,7 @@ public class ContractSummaryPanel extends JPanel {
 
 			txtDistance.setName("txtDistance"); // NOI18N
 			JumpPath path = campaign.calculateJumpPath(campaign.getCurrentPlanet(), contract.getPlanet());
-			int days = (int)Math.ceil((path).getTotalTime(new DateTime(contract.getStartDate()), campaign.getLocation().getTransitTime()));
+			int days = (int)Math.ceil((path).getTotalTime(Utilities.getDateTimeDay(contract.getStartDate()), campaign.getLocation().getTransitTime()));
 			int jumps = path.getJumps();
 			if (campaign.getCurrentPlanetName().equals(contract.getPlanetName())
 					&&campaign.getLocation().isOnPlanet()) {

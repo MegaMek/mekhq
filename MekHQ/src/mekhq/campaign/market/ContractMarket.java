@@ -28,10 +28,15 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Set;
 
+import org.joda.time.DateTime;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.client.RandomSkillsGenerator;
 import megamek.common.Compute;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
@@ -45,10 +50,6 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planets;
 import mekhq.campaign.universe.RandomFactionGenerator;
-
-import org.joda.time.DateTime;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Contract offers that are generated monthly under AtB rules.
@@ -167,7 +168,7 @@ public class ContractMarket implements Serializable {
 
 			int numContracts = Compute.d6() - 4 + unitRatingMod;
 
-			DateTime currentDate = new DateTime(campaign.getCalendar());
+			DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
 			Set<Faction> currentFactions =
 					campaign.getCurrentPlanet().getFactionSet(currentDate);
 			boolean inMinorFaction = true;
@@ -449,7 +450,7 @@ public class ContractMarket implements Serializable {
         	boolean factionValid = false;
         	for (Planet p : Planets.getInstance().getNearbyPlanets(campaign.getCurrentPlanet(), 30)) {
         		if (factionValid) break;
-        		for (Faction f : p.getFactionSet(new DateTime(campaign.getCalendar()))) {
+        		for (Faction f : p.getFactionSet(Utilities.getDateTimeDay(campaign.getCalendar()))) {
         			if (f.getShortName().equals(contract.getEnemyCode())) {
         				factionValid = true;
         				break;

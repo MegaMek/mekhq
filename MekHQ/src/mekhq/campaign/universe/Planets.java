@@ -177,7 +177,7 @@ public class Planets {
                 if((null != event) && (null != event.message)) {
                     NewsItem item = new NewsItem();
                     item.setHeadline(event.message);
-                    item.setDate(event.date.toDate());
+                    item.setDate(event.date);
                     item.setLocation(planet.getPrintableName(when));
                     news.add(item);
                 }

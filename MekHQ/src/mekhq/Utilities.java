@@ -53,6 +53,10 @@ import java.util.Vector;
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDateTime;
+
 import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
@@ -1075,6 +1079,16 @@ public class Utilities {
 	    }
 	    return diff;
 	}
+
+	/** @return the current date as a DateTime time stamp for midnight in UTC time zone */
+    public static DateTime getDateTimeDay(Calendar cal) {
+        return new LocalDateTime(cal).toDateTime(DateTimeZone.UTC);
+    }
+    
+    /** @return the current date as a DateTime time stamp for midnight in UTC time zone */
+    public static DateTime getDateTimeDay(Date date) {
+        return new LocalDateTime(date).toDateTime(DateTimeZone.UTC);
+    }
 
 	/**
 	 * export a jtable to TSV

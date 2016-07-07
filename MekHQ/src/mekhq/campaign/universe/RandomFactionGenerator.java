@@ -37,17 +37,16 @@ import java.util.TreeSet;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import megamek.common.Compute;
-import mekhq.MekHQ;
-import mekhq.Utilities;
-import mekhq.campaign.CampaignOptions;
-
-import org.joda.time.DateTime;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import megamek.common.Compute;
+import mekhq.MekHQ;
+import mekhq.Utilities;
+import mekhq.campaign.CampaignOptions;
 
 /**
  * @author Neoancient
@@ -421,7 +420,7 @@ public class RandomFactionGenerator implements Serializable {
 		borders.clear();
 		currentFactions.clear();
 		for (Planet p : Planets.getInstance().getPlanets().values()) {
-			for (Faction f : p.getFactionSet(new DateTime(date))) {
+			for (Faction f : p.getFactionSet(Utilities.getDateTimeDay(date))) {
 				String fName = f.getShortName();
 				if (fName.equals("ABN") ||
 						fName.equals("UND") ||
@@ -477,7 +476,7 @@ public class RandomFactionGenerator implements Serializable {
 			distance = BORDER_RANGE_NEAR_PERIPHERY;
 		}
 		for (Planet planetKey : Planets.getInstance().getNearbyPlanets(p, distance)) {
-			for (Faction f2 : planetKey.getFactionSet(new DateTime(lastUpdate))) {
+			for (Faction f2 : planetKey.getFactionSet(Utilities.getDateTimeDay(lastUpdate))) {
 				String eName = f2.getShortName();
 				if (eName.equals("ABN") ||
 						eName.equals("UND") ||
@@ -713,7 +712,7 @@ public class RandomFactionGenerator implements Serializable {
 		if (border != null) {
 			for (Planet startingPlanet : border) {
 				for (Planet planetKey : Planets.getInstance().getNearbyPlanets(startingPlanet, maxJumps * 30)) {
-					for (Faction f : planetKey.getFactionSet(new DateTime(date))) {
+					for (Faction f : planetKey.getFactionSet(Utilities.getDateTimeDay(date))) {
 						if (f.getShortName().equals(defender) ||
 								defender.equals("PIR") ||
 								(f.getShortName().equals(attacker) && defender.equals("REB"))) {

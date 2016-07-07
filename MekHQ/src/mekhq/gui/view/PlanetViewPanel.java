@@ -30,6 +30,7 @@ import org.joda.time.DateTime;
 
 import megamek.common.util.EncodeControl;
 import megamek.common.util.ImageUtil;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.StarUtil;
@@ -97,7 +98,7 @@ public class PlanetViewPanel extends JPanel {
         setBackground(Color.WHITE);
 
         pnlStats.setName("pnlStats");
-        pnlStats.setBorder(BorderFactory.createTitledBorder(planet.getPrintableName(new DateTime(campaign.getCalendar()))));
+        pnlStats.setBorder(BorderFactory.createTitledBorder(planet.getPrintableName(Utilities.getDateTimeDay(campaign.getCalendar()))));
         pnlStats.setBackground(Color.WHITE);
         fillStats();
         gridBagConstraints = new GridBagConstraints();
@@ -155,7 +156,7 @@ public class PlanetViewPanel extends JPanel {
         int i = 0;
         JLabel lblNeighbor;
         JLabel lblDistance;
-        DateTime currentDate = new DateTime(campaign.getCalendar());
+        DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
         for(Planet neighbor : campaign.getAllReachablePlanetsFrom(planet)) {
             if(neighbor.equals(planet)) {
                 continue;
@@ -240,7 +241,7 @@ public class PlanetViewPanel extends JPanel {
         
         GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new GridBagLayout());
-        DateTime currentDate = new DateTime(campaign.getCalendar());
+        DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
 
         lblOwner.setName("lblOwner"); // NOI18N
         lblOwner.setText("<html><i>" + planet.getFactionDesc(currentDate) + "</i></html>");

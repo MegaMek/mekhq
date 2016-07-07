@@ -393,7 +393,7 @@ public class Campaign implements Serializable {
     }
 
     public String getCurrentPlanetName() {
-        return location.getCurrentPlanet().getPrintableName(new DateTime(calendar));
+        return location.getCurrentPlanet().getPrintableName(Utilities.getDateTimeDay(calendar));
     }
 
     public Planet getCurrentPlanet() {
@@ -1989,7 +1989,6 @@ public class Campaign implements Serializable {
 
     public void reloadNews() {
         news.loadNewsFor(calendar.get(Calendar.YEAR));
-
     }
 
     public int getDeploymentDeficit(AtBContract contract) {
@@ -2031,10 +2030,11 @@ public class Campaign implements Serializable {
         }
 
         //read the news
-        for(NewsItem article : news.fetchNewsFor(calendar.getTime())) {
+        DateTime now = Utilities.getDateTimeDay(calendar);
+        for(NewsItem article : news.fetchNewsFor(now)) {
             addReport(article.getHeadlineForReport());
         }
-        for(NewsItem article : Planets.getInstance().getPlanetaryNews(new DateTime(calendar))) {
+        for(NewsItem article : Planets.getInstance().getPlanetaryNews(now)) {
             addReport(article.getHeadlineForReport());
         }
 
@@ -4946,13 +4946,13 @@ public class Campaign implements Serializable {
     public Vector<String> getPlanetNames() {
         Vector<String> plntNames = new Vector<String>();
         for (Planet key : Planets.getInstance().getPlanets().values()) {
-            plntNames.add(key.getPrintableName(new DateTime(calendar)));
+            plntNames.add(key.getPrintableName(Utilities.getDateTimeDay(calendar)));
         }
         return plntNames;
     }
 
     public Planet getPlanet(String name) {
-        return Planets.getInstance().getPlanetByName(name, new DateTime(calendar));
+        return Planets.getInstance().getPlanetByName(name, Utilities.getDateTimeDay(calendar));
     }
 
     /**
@@ -5425,7 +5425,7 @@ public class Campaign implements Serializable {
             return jpath;
         }
 
-        final DateTime now = new DateTime(calendar);
+        final DateTime now = Utilities.getDateTimeDay(calendar);
         String current = startKey;
         ArrayList<String> closed = new ArrayList<String>();
         ArrayList<String> open = new ArrayList<String>();

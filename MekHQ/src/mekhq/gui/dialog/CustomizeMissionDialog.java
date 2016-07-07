@@ -26,7 +26,6 @@ import java.awt.Frame;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
-import javax.swing.JOptionPane;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;

@@ -38,8 +38,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-import org.joda.time.DateTime;
-
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.AtBContract;
@@ -482,7 +481,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 			for (Planet p : RandomFactionGenerator.getInstance().
 					getMissionTargetList(getCurrentEmployerCode(), getCurrentEnemyCode(),
 							campaign.getDate())) {
-				planets.add(p.getName(new DateTime(campaign.getCalendar())));
+				planets.add(p.getName(Utilities.getDateTimeDay(campaign.getCalendar())));
 			}
 		}
 		if ((contract.getMissionType() < AtBContract.MT_PLANETARYASSAULT ||
@@ -491,7 +490,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 			for (Planet p : RandomFactionGenerator.getInstance().
 					getMissionTargetList(getCurrentEnemyCode(), getCurrentEmployerCode(),
 							campaign.getDate())) {
-				planets.add(p.getName(new DateTime(campaign.getCalendar())));
+				planets.add(p.getName(Utilities.getDateTimeDay(campaign.getCalendar())));
 			}
 		}
 		cbPlanets.removeAllItems();

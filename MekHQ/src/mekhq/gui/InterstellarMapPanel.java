@@ -58,6 +58,7 @@ import javax.swing.Timer;
 import org.joda.time.DateTime;
 
 import megamek.common.EquipmentType;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.universe.Faction;
@@ -273,7 +274,7 @@ public class InterstellarMapPanel extends JPanel {
                     item = new JMenuItem("Edit planetary events");
                     item.setEnabled(selectedPlanet != null && campaign.isGM());
                     if (selectedPlanet != null) {
-                        item.setText("Edit planetary events for " + selectedPlanet.getPrintableName(new DateTime(campaign.getCalendar())));
+                        item.setText("Edit planetary events for " + selectedPlanet.getPrintableName(Utilities.getDateTimeDay(campaign.getCalendar())));
                         item.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent ae) {
@@ -385,7 +386,7 @@ public class InterstellarMapPanel extends JPanel {
                 minY = scr2mapY(getHeight() + size * 2.0);
                 maxX = scr2mapX(getWidth() + size * 2.0);
                 maxY = scr2mapY(- size * 2.0);
-                now = new DateTime(campaign.getCalendar());
+                now = Utilities.getDateTimeDay(campaign.getCalendar());
                 
                 Arc2D.Double arc = new Arc2D.Double();
                 //first get the jump diameter for selected planet
@@ -536,7 +537,7 @@ public class InterstellarMapPanel extends JPanel {
                                 || jumpPath.contains(planet)
                                 || (null != campaign.getLocation().getJumpPath() && campaign.getLocation().getJumpPath().contains(planet))) {
                             g2.setPaint(Color.WHITE);
-                            g2.drawString(planet.getPrintableName(new DateTime(campaign.getCalendar())), (float)(x+size * 1.8), (float)y);
+                            g2.drawString(planet.getPrintableName(Utilities.getDateTimeDay(campaign.getCalendar())), (float)(x+size * 1.8), (float)y);
                         }
                     }
                 }

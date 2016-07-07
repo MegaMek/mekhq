@@ -159,7 +159,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         super(parent, modal);
         this.planet = new Planet(Objects.requireNonNull(planet).getId());
         this.planet.copyDataFrom(planet);
-        this.date = new DateTime(campaign.getCalendar());
+        this.date = Utilities.getDateTimeDay(campaign.getCalendar());
         initComponents();
         setLocationRelativeTo(parent);
     }
@@ -220,7 +220,7 @@ public class NewPlanetaryEventDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 DateChooser dc = new DateChooser((content instanceof Frame) ? (Frame) content : null, date.toGregorianCalendar());
                 if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-                    date = new DateTime(dc.getDate());
+                    date = Utilities.getDateTimeDay(dc.getDate());
                     updateDate();
                 }
             }

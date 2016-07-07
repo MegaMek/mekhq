@@ -26,14 +26,15 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Locale;
 
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.finances.Transaction;
-import mekhq.campaign.universe.Planet;
-
 import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
+import mekhq.Utilities;
+import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.universe.Planet;
 
 
 /**
@@ -99,12 +100,12 @@ public class CurrentLocation implements Serializable {
 	}
 	
 	public String getReport(Date date) {
-	    DateTime now = new DateTime(date);
+	    DateTime now = Utilities.getDateTimeDay(date);
 	    StringBuilder sb = new StringBuilder();
 	    sb.append("<html><b>Current Location</b><br>");
 	    sb.append(currentPlanet.getPrintableName(now)).append("<br>");
 		if(null != jumpPath && !jumpPath.isEmpty()) {
-		    sb.append("In transit to ").append(jumpPath.getLastPlanet().getPrintableName(new DateTime(date))).append(" ");
+		    sb.append("In transit to ").append(jumpPath.getLastPlanet().getPrintableName(now)).append(" ");
 		}
 		if(isOnPlanet()) {
 			sb.append("<i>on planet</i>");
@@ -135,7 +136,7 @@ public class CurrentLocation implements Serializable {
 	public void newDay(Campaign campaign) {
 		//recharge even if there is no jump path
 		//because jumpships don't go anywhere
-	    DateTime currentDate = new DateTime(campaign.getCalendar());
+	    DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
 		double hours = 24.0;
 		double neededRechargeTime = currentPlanet.getRechargeTime(currentDate);
 		double usedRechargeTime = Math.min(hours, neededRechargeTime - rechargeTime);

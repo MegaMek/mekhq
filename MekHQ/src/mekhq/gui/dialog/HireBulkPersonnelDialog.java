@@ -37,6 +37,7 @@ import org.joda.time.Years;
 
 import megamek.common.Compute;
 import megamek.common.util.EncodeControl;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Rank;
@@ -257,9 +258,9 @@ public class HireBulkPersonnelDialog extends JDialog {
         DateTime latestBirthDate = null;
         if(useAge) {
             // One day before birthday
-            earliestBirthDate = new DateTime(today).minus(Years.years(maxAgeVal + 1)).plus(Days.ONE);
+            earliestBirthDate = Utilities.getDateTimeDay(today).minus(Years.years(maxAgeVal + 1)).plus(Days.ONE);
             // Just the birthday
-            latestBirthDate = new DateTime(today).minus(Years.years(minAgeVal));
+            latestBirthDate = Utilities.getDateTimeDay(today).minus(Years.years(minAgeVal));
         } 
         while(number > 0) {
             Person p = campaign.newPerson(((PersonTypeItem)choiceType.getSelectedItem()).id);

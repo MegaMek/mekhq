@@ -21,11 +21,13 @@ package mekhq.adapter;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.joda.time.DateTime;
+import org.joda.time.chrono.GJChronology;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 public class DateAdapter extends XmlAdapter<String, DateTime> {
-    private final static DateTimeFormatter FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd");
+    private final static DateTimeFormatter FORMATTER =
+        DateTimeFormat.forPattern("yyyy-MM-dd").withChronology(GJChronology.getInstanceUTC());
     
     @Override
     public DateTime unmarshal(final String xml) throws Exception {

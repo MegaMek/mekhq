@@ -31,6 +31,9 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.Vector;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.client.RandomNameGenerator;
 import megamek.client.RandomSkillsGenerator;
 import megamek.client.RandomUnitGenerator;
@@ -69,10 +72,6 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planets;
 import mekhq.campaign.universe.UnitTableData;
-
-import org.joda.time.DateTime;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * @author Neoancient
@@ -401,7 +400,7 @@ public class AtBScenario extends Scenario {
 		if (null != mission) {
 			Planet p = Planets.getInstance().getPlanets().get(mission.getPlanetName());
 			if (null != p) {
-				atmosphere = Utilities.nonNull(p.getPressure(new DateTime(campaign.getCalendar())), atmosphere);
+				atmosphere = Utilities.nonNull(p.getPressure(Utilities.getDateTimeDay(campaign.getCalendar())), atmosphere);
 				gravity = Utilities.nonNull(p.getGravity(), gravity).floatValue();
 			}
 		}

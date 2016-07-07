@@ -28,7 +28,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -36,6 +35,7 @@ import megamek.common.BattleArmor;
 import megamek.common.Infantry;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 
@@ -446,7 +446,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		GregorianCalendar cal = new GregorianCalendar();
 		cal.setTime(startDate);
 		if(adjustStartDate && null != c.getPlanet(planetName)) {
-		    int days = (int)Math.ceil(c.calculateJumpPath(c.getCurrentPlanet(), getPlanet()).getTotalTime(new DateTime(startDate), c.getLocation().getTransitTime()));
+		    int days = (int)Math.ceil(c.calculateJumpPath(c.getCurrentPlanet(), getPlanet()).getTotalTime(Utilities.getDateTimeDay(cal), c.getLocation().getTransitTime()));
 		    while(days > 0) {
 		        cal.add(Calendar.DAY_OF_YEAR, 1);
 		        days--;

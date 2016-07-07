@@ -21,33 +21,40 @@
 
 package mekhq.campaign.universe;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.joda.time.DateTime;
+import org.joda.time.chrono.GJChronology;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import mekhq.Utilities;
-
+import mekhq.adapter.DateAdapter;
 
 /**
  * NewsItem
  * 
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
+@XmlRootElement(name="newsItem")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class NewsItem {
-   
-    private Date date;
+    private final static DateTimeFormatter FORMATTER =
+        DateTimeFormat.forPattern("yyyy-MM-dd").withChronology(GJChronology.getInstanceUTC());
+    
+    @XmlJavaTypeAdapter(DateAdapter.class)
+    private DateTime date;
     private String headline;
+    @XmlElement(name="desc")
     private String description;
     private String service;
     private String location;
     //ids will only be assigned when news is read in for the year
-    private int id;
+    transient private int id;
     
     public NewsItem() {
         this.headline = "None";
@@ -85,11 +92,11 @@ public class NewsItem {
         this.service = service;
     }
 
-    public Date getDate() {
+    public DateTime getDate() {
         return date;
     }
     
-    public void setDate(Date date) {
+    public void setDate(DateTime date) {
         this.date = date;
     }
     
@@ -102,9 +109,7 @@ public class NewsItem {
     }
     
     public int getYear() {
-        GregorianCalendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        return cal.get(Calendar.YEAR);
+        return date.getYear();
     }
     
     public String getPrefix() {
@@ -133,30 +138,7 @@ public class NewsItem {
     }
     
     public String getFullDescription() {
-        String s = "<html><h1>" + getHeadline() + "</h1>(" + new SimpleDateFormat("d-MMMM-yyyy").format(date) + ")<br><p>" + getPrefix() + description + "</p></html>";
+        String s = "<html><h1>" + getHeadline() + "</h1>(" + date.toString(FORMATTER) + ")<br><p>" + getPrefix() + description + "</p></html>";
         return s;
     }
-    
-    public static NewsItem getNewsItemFromXML(Node wn) throws DOMException, ParseException {
-        NewsItem retVal = new NewsItem();
-        NodeList nl = wn.getChildNodes();
-        
-        for (int x=0; x<nl.getLength(); x++) {
-            Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("headline")) {
-                retVal.headline = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("service")) {
-                retVal.service = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("location")) {
-                retVal.location = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
-                retVal.description = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
-                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                retVal.date = df.parse(wn2.getTextContent().trim());
-            } 
-        }
-        return retVal;
-    }
-    
 }

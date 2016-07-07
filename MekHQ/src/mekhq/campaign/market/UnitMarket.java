@@ -27,6 +27,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Set;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.client.RandomUnitGenerator;
 import megamek.common.Compute;
 import megamek.common.MechSummary;
@@ -43,10 +46,6 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.UnitTableData;
 import mekhq.campaign.universe.UnitTableData.FactionTables;
-
-import org.joda.time.DateTime;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Generates units available for sale.
@@ -167,7 +166,7 @@ public class UnitMarket implements Serializable {
 			}
 
 			if (campaign.getUnitRatingMod() >= IUnitRating.DRAGOON_B) {
-				Set<Faction> factions = campaign.getCurrentPlanet().getFactionSet(new DateTime(campaign.getCalendar()));
+				Set<Faction> factions = campaign.getCurrentPlanet().getFactionSet(Utilities.getDateTimeDay(campaign.getCalendar()));
 				String faction = Utilities.getRandomItem(factions).getShortName();
 				if (campaign.getFaction().isClan() ||
 						!Faction.getFaction(faction).isClan()) {
