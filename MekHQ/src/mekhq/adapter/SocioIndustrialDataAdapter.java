@@ -37,12 +37,14 @@ public class SocioIndustrialDataAdapter extends XmlAdapter<String, Planet.SocioI
         stringToEquipmentTypeMap.put("D", EquipmentType.RATING_D); //$NON-NLS-1$
         stringToEquipmentTypeMap.put("E", EquipmentType.RATING_E); //$NON-NLS-1$
         stringToEquipmentTypeMap.put("F", EquipmentType.RATING_F); //$NON-NLS-1$
+        equipmentTypeToStringMap.put(-1, "ADV"); //$NON-NLS-1$
         equipmentTypeToStringMap.put(EquipmentType.RATING_A, "A"); //$NON-NLS-1$
         equipmentTypeToStringMap.put(EquipmentType.RATING_B, "B"); //$NON-NLS-1$
         equipmentTypeToStringMap.put(EquipmentType.RATING_C, "C"); //$NON-NLS-1$
         equipmentTypeToStringMap.put(EquipmentType.RATING_D, "D"); //$NON-NLS-1$
         equipmentTypeToStringMap.put(EquipmentType.RATING_E, "E"); //$NON-NLS-1$
         equipmentTypeToStringMap.put(EquipmentType.RATING_F, "F"); //$NON-NLS-1$
+        equipmentTypeToStringMap.put(EquipmentType.RATING_X, "R"); //$NON-NLS-1$
     }
     private final String SEPARATOR = "-"; //$NON-NLS-1$
     
@@ -62,6 +64,15 @@ public class SocioIndustrialDataAdapter extends XmlAdapter<String, Planet.SocioI
         Planet.SocioIndustrialData result = new Planet.SocioIndustrialData();
         if(socio.length >= 5) {
             result.tech = convertRatingToCode(socio[0]);
+            if(result.tech == EquipmentType.RATING_C) {
+                // Could be ADV or R too
+                String techRating = socio[0].toUpperCase(Locale.ROOT);
+                if(techRating.equals("ADV")) {
+                    result.tech = -1;
+                } else if(techRating.equals("R")) {
+                    result.tech = EquipmentType.RATING_X;
+                }
+            }
             result.industry = convertRatingToCode(socio[1]);
             result.rawMaterials = convertRatingToCode(socio[2]);
             result.output = convertRatingToCode(socio[3]);

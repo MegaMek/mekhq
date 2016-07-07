@@ -917,6 +917,9 @@ public class Planet implements Serializable {
             // Note that rating "E" isn't used in official USILR codes, but we add them for completeness
             StringBuilder sb = new StringBuilder("<html><body style='width: 50px; font: 10px sans-serif'>");
             switch(tech) {
+                case -1:
+                    sb.append("Advanced: Ultra high-tech world<br>");
+                    break;
                 case EquipmentType.RATING_A:
                     sb.append("A: High-tech world<br>");
                     break;
@@ -934,6 +937,9 @@ public class Planet implements Serializable {
                     break;
                 case EquipmentType.RATING_F:
                     sb.append("F: Primitive world<br>");
+                    break;
+                case EquipmentType.RATING_X:
+                    sb.append("Regressed: Pre-industrial world<br>");
                     break;
                 default:
                     sb.append("X: Technological sophistication unknown<br>");

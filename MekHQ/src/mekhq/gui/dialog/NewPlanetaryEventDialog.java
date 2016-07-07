@@ -956,7 +956,13 @@ public class NewPlanetaryEventDialog extends JDialog {
         waterCombined.setText(null != intValue ? String.format(resourceMap.getString("water.combined.format"), intValue) : resourceMap.getString("undefined.text")); //$NON-NLS-1$ //$NON-NLS-2$
         intValue = planet.getTemperature(date);
         temperatureCombined.setText(null != intValue ? String.format(resourceMap.getString("temperature.combined.format"), intValue) : resourceMap.getString("undefined.text")); //$NON-NLS-1$ //$NON-NLS-2$
-        socioindustrialCombined.setText(planet.getSocioIndustrialText(date));
+        String socioIndustrialText = "";
+        try {
+            socioIndustrialText= SOCIO_INDUSTRIAL_ADAPTER.marshal(planet.getSocioIndustrial(date));
+        } catch(Exception ex) {
+            // Do nothing
+        }
+        socioindustrialCombined.setText(socioIndustrialText);
         hpgCombined.setText(planet.getHPGClass(date));
         pressureCombined.setText(planet.getPressureName(date));
         Double doubleValue = planet.getPressureAtm(date);
