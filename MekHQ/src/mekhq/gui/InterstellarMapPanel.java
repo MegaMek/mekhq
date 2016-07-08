@@ -414,11 +414,15 @@ public class InterstellarMapPanel extends JPanel {
                     g2.fill(arc);
                 }
                 
-                if((conf.scale > 0.5) && optISWAreas.isSelected()) {
+                if((conf.scale > 1.0) && optISWAreas.isSelected()) {
                     final double HEX_SIZE = 30.0;
                     AffineTransform transform = getMap2ScrTransform();
-                    for(int x = -25; x < 26; ++ x) {
-                        for(int y = -25; y < 26; ++ y) {
+                    int minX = (int) Math.floor(scr2mapX(0.0) / HEX_SIZE / Math.sqrt(3) * 2.0);
+                    int maxX = (int) Math.ceil(scr2mapX(getWidth()) / HEX_SIZE / Math.sqrt(3) * 2.0);
+                    int minY = (int) Math.floor(scr2mapY(getHeight()) / HEX_SIZE);
+                    int maxY = (int) Math.ceil(scr2mapY(0.0) / HEX_SIZE);
+                    for(int x = minX; x <= maxX; ++ x) {
+                        for(int y = minY; y <= maxY; ++ y) {
                             GeneralPath path = new GeneralPath();
                             boolean first = true;
                             double coordX = x * HEX_SIZE * Math.sqrt(3) / 2.0;
