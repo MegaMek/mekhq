@@ -719,6 +719,11 @@ public class Planet implements Serializable {
         return Math.sqrt(Math.pow(x - anotherPlanet.x, 2) + Math.pow(y - anotherPlanet.y, 2));
     }
 
+    /** @return the distance to a point in space in light years */
+    public double getDistanceTo(double x, double y) {
+        return Math.sqrt(Math.pow(x - this.x, 2) + Math.pow(y - this.y, 2));
+    }
+
     // JAXB marshalling support
     
     @SuppressWarnings({ "unused", "unchecked" })
