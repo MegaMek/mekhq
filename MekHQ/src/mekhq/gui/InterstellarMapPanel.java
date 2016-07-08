@@ -415,14 +415,15 @@ public class InterstellarMapPanel extends JPanel {
                 }
                 
                 if((conf.scale > 0.5) && optISWAreas.isSelected()) {
+                    final double HEX_SIZE = 30.0;
                     AffineTransform transform = getMap2ScrTransform();
                     for(int x = -25; x < 26; ++ x) {
                         for(int y = -25; y < 26; ++ y) {
                             GeneralPath path = new GeneralPath();
                             boolean first = true;
-                            double coordX = x * 15.0 * Math.sqrt(3);
-                            double coordY = y * 30.0 + (x % 2) * 15.0;
-                            for(Vector2d pos : genHexCoords(coordX, coordY, 15)) {
+                            double coordX = x * HEX_SIZE * Math.sqrt(3) / 2.0;
+                            double coordY = y * HEX_SIZE + (x % 2) * HEX_SIZE / 2.0;
+                            for(Vector2d pos : genHexCoords(coordX, coordY, HEX_SIZE / 2.0)) {
                                 if(first) {
                                     path.moveTo(pos.x, pos.y);
                                     first = false;
@@ -434,7 +435,7 @@ public class InterstellarMapPanel extends JPanel {
                             Paint factionPaint = new Color(0.0f, 0.0f, 0.0f, 0.25f);
                             Paint linePaint = new Color(1.0f, 1.0f, 1.0f, 0.25f);
                             Set<Faction> hexFactions = new HashSet<>();
-                            for(Planet planet : Planets.getInstance().getNearbyPlanets(coordX, coordY, 20)) {
+                            for(Planet planet : Planets.getInstance().getNearbyPlanets(coordX, coordY, (int) Math.round(HEX_SIZE * 1.3))) {
                                 if(!isPlanetEmpty(planet) && path.contains(planet.getX(), planet.getY())) {
                                     hexFactions.addAll(planet.getFactionSet(now));
                                 }
@@ -459,7 +460,7 @@ public class InterstellarMapPanel extends JPanel {
                                 float[] paintFractions = new float[factionSize * 2];
                                 Color[] paintColors = new Color[factionSize * 2];
                                 for(int i = 0; i < factionSize; ++ i) {
-                                    paintFractions[i * 2] = i * (1.0f / factionSize) + 0.01f;
+                                    paintFractions[i * 2] = i * (1.0f / factionSize) + 0.001f;
                                     paintFractions[i * 2 + 1] = (i + 1) * (1.0f / factionSize);
                                     Color factionColor = factionIterator.next().getColor();
                                     factionColor.getComponents(colorComponents);
