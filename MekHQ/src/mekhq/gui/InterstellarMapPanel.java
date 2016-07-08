@@ -484,7 +484,7 @@ public class InterstellarMapPanel extends JPanel {
                             g2.fill(path);
                             g2.setPaint(linePaint);
                             Shape clip = g2.getClip();
-                            g2.setClip(path);
+                            g2.clip(path);
                             g2.setStroke(new BasicStroke(4.0f));
                             g2.draw(path);
                             g2.setClip(clip);
