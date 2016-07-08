@@ -35,6 +35,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Arc2D;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,6 +55,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JViewport;
 import javax.swing.Timer;
+import javax.vecmath.Vector2d;
 
 import org.joda.time.DateTime;
 
@@ -79,8 +81,11 @@ public class InterstellarMapPanel extends JPanel {
     private JViewport optionView;
     private JPanel optionPanel;
     private JButton optionButton;
+    
+    // Map view options
     private JCheckBox optEmptySystems;
     private JCheckBox optHPGNetwork;
+    private JCheckBox optISWAreas;
 
     private Timer optionPanelTimer;
     private boolean optionPanelHidden;
@@ -400,6 +405,27 @@ public class InterstellarMapPanel extends JPanel {
                     g2.fill(arc);
                 }
                 
+                if((conf.scale > 0.5) && optISWAreas.isSelected()) {
+                    g2.setPaint(Color.WHITE);
+                    for(int x = -2; x < 3; ++ x) {
+                        for(int y = -25; y < 26; ++ y) {
+                            GeneralPath path = new GeneralPath();
+                            boolean firstPoint = true;
+                            for(Vector2d pos : genHexCoords(x * 30.0 * Math.sqrt(3), y * 30.0, 15.0)) {
+                                Vector2d drawCoords = map2scr(pos);
+                                if(firstPoint) {
+                                    path.moveTo(drawCoords.x, drawCoords.y);
+                                    firstPoint = false;
+                                } else {
+                                    path.lineTo(drawCoords.x, drawCoords.y);
+                                }
+                            }
+                            path.closePath();
+                            g2.draw(path);
+                        }
+                    }
+                }
+                
                 //draw a jump path
                 for(int i = 0; i < jumpPath.size(); i++) {
                     Planet planetB = jumpPath.get(i);
@@ -553,38 +579,12 @@ public class InterstellarMapPanel extends JPanel {
         Icon checkboxIcon = new ImageIcon("data/images/misc/checkbox_unselected.png");
         Icon checkboxSelectedIcon = new ImageIcon("data/images/misc/checkbox_selected.png");
         
-        optEmptySystems = new JCheckBox("Empty systems");
-        optEmptySystems.setOpaque(false);
-        optEmptySystems.setForeground(new Color(150, 220, 255));
-        optEmptySystems.setFocusable(false);
-        optEmptySystems.setFont(optEmptySystems.getFont().deriveFont(Font.BOLD));
-        optEmptySystems.setPreferredSize(new Dimension(150, 20));
-        optEmptySystems.setIcon(checkboxIcon);
-        optEmptySystems.setSelectedIcon(checkboxSelectedIcon);
+        optEmptySystems = createOptionCheckBox("Empty systems", checkboxIcon, checkboxSelectedIcon);
         optEmptySystems.setSelected(true);
-        optEmptySystems.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                repaint();
-            }
-        });
         optionPanel.add(optEmptySystems);
-        
-        optHPGNetwork = new JCheckBox("HPG Network");
-        optHPGNetwork.setOpaque(false);
-        optHPGNetwork.setForeground(new Color(150, 220, 255));
-        optHPGNetwork.setFocusable(false);
-        optHPGNetwork.setFont(optHPGNetwork.getFont().deriveFont(Font.BOLD));
-        optHPGNetwork.setPreferredSize(new Dimension(150, 20));
-        optHPGNetwork.setIcon(checkboxIcon);
-        optHPGNetwork.setSelectedIcon(checkboxSelectedIcon);
-        optHPGNetwork.setSelected(false);
-        optHPGNetwork.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                repaint();
-            }
-        });
+        optISWAreas = createOptionCheckBox("ISW Areas", checkboxIcon, checkboxSelectedIcon);
+        optionPanel.add(optISWAreas);
+        optHPGNetwork = createOptionCheckBox("HPG Network", checkboxIcon, checkboxSelectedIcon);
         optionPanel.add(optHPGNetwork);
 
         optionButton = new JButton();
@@ -635,6 +635,34 @@ public class InterstellarMapPanel extends JPanel {
         super.paintComponent(g);
     }
     
+    private JCheckBox createOptionCheckBox(String text, Icon checkboxIcon, Icon checkboxSelectedIcon) {
+        JCheckBox checkBox = new JCheckBox(text);
+        checkBox.setOpaque(false);
+        checkBox.setForeground(new Color(150, 220, 255));
+        checkBox.setFocusable(false);
+        checkBox.setFont(checkBox.getFont().deriveFont(Font.BOLD));
+        checkBox.setPreferredSize(new Dimension(150, 20));
+        checkBox.setIcon(checkboxIcon);
+        checkBox.setSelectedIcon(checkboxSelectedIcon);
+        checkBox.setSelected(false);
+        checkBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                repaint();
+            }
+        });
+        return checkBox;
+    }
+    
+    private List<Vector2d> genHexCoords(double centerX, double centerY, double radius) {
+        List<Vector2d> result = new ArrayList<>(6);
+        radius *= Math.sqrt(4.0/3.0);
+        for(int i = 0; i < 6; ++ i) {
+            result.add(new Vector2d(centerX + radius * Math.cos(Math.PI / 3 * i), centerY + radius * Math.sin(Math.PI / 3 * i)));
+        }
+        return result;
+    }
+    
     /**
      * Computes the map-coordinate from the screen coordinate system
      */
@@ -654,6 +682,10 @@ public class InterstellarMapPanel extends JPanel {
         return getHeight() / 2.0 - (y - conf.centerY) * conf.scale;
     }
 
+    private Vector2d map2scr(Vector2d pos) {
+        return new Vector2d(map2scrX(pos.x), map2scrY(pos.y));
+    }
+    
     public void setSelectedPlanet(Planet p) {
         selectedPlanet = p;
         if(conf.scale < 4.0) {
