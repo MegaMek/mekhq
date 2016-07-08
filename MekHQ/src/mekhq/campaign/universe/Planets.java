@@ -114,17 +114,17 @@ public class Planets {
         return planetGrid.get(x).get(y);
     }
     
-    public List<Planet> getNearbyPlanets(final Planet planet, int distance) {
+    public List<Planet> getNearbyPlanets(final double centerX, final double centerY, int distance) {
         List<Planet> neighbors = new ArrayList<>();
         int gridRadius = (int)Math.ceil(distance / 30.0);
-        int gridX = (int)(planet.getX() / 30.0);
-        int gridY = (int)(planet.getY() / 30.0);
+        int gridX = (int)(centerX / 30.0);
+        int gridY = (int)(centerY / 30.0);
         for (int x = gridX - gridRadius; x <= gridX + gridRadius; x++) {
             for (int y = gridY - gridRadius; y <= gridY + gridRadius; y++) {
                 Set<Planet> grid = getPlanetGrid(x, y);
                 if(null != grid) {
                     for(Planet p : grid) {
-                        if(p.getDistanceTo(planet) <= distance) {
+                        if(p.getDistanceTo(centerX, centerY) <= distance) {
                             neighbors.add(p);
                         }
                     }
@@ -134,10 +134,14 @@ public class Planets {
         Collections.sort(neighbors, new Comparator<Planet>() {
             @Override
             public int compare(Planet o1, Planet o2) {
-                return Double.compare(planet.getDistanceTo(o1), planet.getDistanceTo(o2));
+                return Double.compare(o1.getDistanceTo(centerX, centerY), o2.getDistanceTo(centerX, centerY));
             }
         });
         return neighbors;
+    }
+    
+    public List<Planet> getNearbyPlanets(final Planet planet, int distance) {
+        return getNearbyPlanets(planet.getX(), planet.getY(), distance);
     }
 
     public ConcurrentMap<String, Planet> getPlanets() {

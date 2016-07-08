@@ -25,8 +25,12 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.LinearGradientPaint;
+import java.awt.MultipleGradientPaint;
+import java.awt.Paint;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -34,11 +38,16 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -406,27 +415,84 @@ public class InterstellarMapPanel extends JPanel {
                 }
                 
                 if((conf.scale > 0.5) && optISWAreas.isSelected()) {
-                    g2.setPaint(Color.WHITE);
-                    for(int x = -2; x < 3; ++ x) {
+                    AffineTransform transform = getMap2ScrTransform();
+                    for(int x = -25; x < 26; ++ x) {
                         for(int y = -25; y < 26; ++ y) {
                             GeneralPath path = new GeneralPath();
-                            boolean firstPoint = true;
-                            for(Vector2d pos : genHexCoords(x * 30.0 * Math.sqrt(3), y * 30.0, 15.0)) {
-                                Vector2d drawCoords = map2scr(pos);
-                                if(firstPoint) {
-                                    path.moveTo(drawCoords.x, drawCoords.y);
-                                    firstPoint = false;
+                            boolean first = true;
+                            double coordX = x * 15.0 * Math.sqrt(3);
+                            double coordY = y * 30.0 + (x % 2) * 15.0;
+                            for(Vector2d pos : genHexCoords(coordX, coordY, 15)) {
+                                if(first) {
+                                    path.moveTo(pos.x, pos.y);
+                                    first = false;
                                 } else {
-                                    path.lineTo(drawCoords.x, drawCoords.y);
+                                    path.lineTo(pos.x, pos.y);
                                 }
                             }
                             path.closePath();
+                            Paint factionPaint = new Color(0.0f, 0.0f, 0.0f, 0.25f);
+                            Paint linePaint = new Color(1.0f, 1.0f, 1.0f, 0.25f);
+                            Set<Faction> hexFactions = new HashSet<>();
+                            for(Planet planet : Planets.getInstance().getNearbyPlanets(coordX, coordY, 20)) {
+                                if(!isPlanetEmpty(planet) && path.contains(planet.getX(), planet.getY())) {
+                                    hexFactions.addAll(planet.getFactionSet(now));
+                                }
+                            }
+                            
+                            path.transform(transform);
+                            
+                            if(hexFactions.size() == 1) {
+                                // Single-faction hex
+                                Color factionColor = hexFactions.iterator().next().getColor();
+                                float[] colorComponents = new float[4];
+                                factionColor.getComponents(colorComponents);
+                                factionPaint = new Color(colorComponents[0], colorComponents[1], colorComponents[2], 0.25f);
+                                Color lineColor = factionColor.brighter();
+                                lineColor.getComponents(colorComponents);
+                                linePaint = new Color(colorComponents[0], colorComponents[1], colorComponents[2], 0.25f);
+                            } else if(hexFactions.size() > 1) {
+                                // Create the painted stripes data
+                                int factionSize = hexFactions.size();
+                                Iterator<Faction> factionIterator = hexFactions.iterator();
+                                float[] colorComponents = new float[4];
+                                float[] paintFractions = new float[factionSize * 2];
+                                Color[] paintColors = new Color[factionSize * 2];
+                                for(int i = 0; i < factionSize; ++ i) {
+                                    paintFractions[i * 2] = i * (1.0f / factionSize) + 0.01f;
+                                    paintFractions[i * 2 + 1] = (i + 1) * (1.0f / factionSize);
+                                    Color factionColor = factionIterator.next().getColor();
+                                    factionColor.getComponents(colorComponents);
+                                    factionColor = new Color(colorComponents[0], colorComponents[1], colorComponents[2], 0.25f);
+                                    paintColors[i * 2] = factionColor;
+                                    paintColors[i * 2 + 1] = factionColor;
+                                }
+                                paintFractions[0] = 0.0f;
+                                
+                                // Determine where to anchor the stripes
+                                Point2D firstPoint = new Point2D.Double(map2scrX(coordX), map2scrY(coordY));
+                                Point2D secondPoint = new Point2D.Double(
+                                    firstPoint.getX() + 10 * conf.scale,
+                                    firstPoint.getY() + 10 * conf.scale);
+                                factionPaint = new LinearGradientPaint(
+                                    firstPoint, secondPoint, paintFractions, paintColors,
+                                    MultipleGradientPaint.CycleMethod.REPEAT);
+                                linePaint = new Color(1.0f, 0.2f, 0.0f, 0.5f);
+                            }
+                            g2.setPaint(factionPaint);
+                            g2.fill(path);
+                            g2.setPaint(linePaint);
+                            g2.setStroke(new BasicStroke(6.0f));
+                            Shape clip = g2.getClip();
+                            g2.setClip(path);
                             g2.draw(path);
+                            g2.setClip(clip);
                         }
                     }
                 }
                 
                 //draw a jump path
+                g2.setStroke(new BasicStroke(1.0f));
                 for(int i = 0; i < jumpPath.size(); i++) {
                     Planet planetB = jumpPath.get(i);
                     double x = map2scrX(planetB.getX());
@@ -537,7 +603,7 @@ public class InterstellarMapPanel extends JPanel {
                             g2.fill(arc);
                         }
                         Set<Faction> factions = planet.getFactionSet(now);
-                        if(null != factions) {
+                        if(null != factions && !isPlanetEmpty(planet)) {
                             int i = 0;
                             for(Faction faction : factions) {
                                 g2.setPaint(faction.getColor());
@@ -547,7 +613,7 @@ public class InterstellarMapPanel extends JPanel {
                             }
                         } else {
                             // Just a black circle then
-                            g2.setPaint(Color.BLACK);
+                            g2.setPaint(new Color(0.0f, 0.0f, 0.0f, 0.5f));
                             arc.setArcByCenter(x, y, size, 0, 360.0, Arc2D.PIE);
                             g2.fill(arc);
                         }
@@ -654,11 +720,20 @@ public class InterstellarMapPanel extends JPanel {
         return checkBox;
     }
     
+    private static final Vector2d[] BASE_HEXCOORDS = {
+        new Vector2d(1.0, 0.0),
+        new Vector2d(Math.cos(Math.PI / 3.0), Math.sin(Math.PI / 3.0)),
+        new Vector2d(Math.cos(2.0 * Math.PI / 3.0), Math.sin(2.0 * Math.PI / 3.0)),
+        new Vector2d(-1.0, 0.0),
+        new Vector2d(Math.cos(4.0 * Math.PI / 3.0), Math.sin(4.0 * Math.PI / 3.0)),
+        new Vector2d(Math.cos(5.0 * Math.PI / 3.0), Math.sin(5.0 * Math.PI / 3.0))
+    };
+    
     private List<Vector2d> genHexCoords(double centerX, double centerY, double radius) {
         List<Vector2d> result = new ArrayList<>(6);
         radius *= Math.sqrt(4.0/3.0);
         for(int i = 0; i < 6; ++ i) {
-            result.add(new Vector2d(centerX + radius * Math.cos(Math.PI / 3 * i), centerY + radius * Math.sin(Math.PI / 3 * i)));
+            result.add(new Vector2d(centerX + radius * BASE_HEXCOORDS[i].x, centerY + radius * BASE_HEXCOORDS[i].y));
         }
         return result;
     }
@@ -682,8 +757,12 @@ public class InterstellarMapPanel extends JPanel {
         return getHeight() / 2.0 - (y - conf.centerY) * conf.scale;
     }
 
-    private Vector2d map2scr(Vector2d pos) {
-        return new Vector2d(map2scrX(pos.x), map2scrY(pos.y));
+    private AffineTransform getMap2ScrTransform() {
+        AffineTransform transform = new AffineTransform();
+        transform.translate(getWidth() / 2.0, getHeight() / 2.0);
+        transform.scale(conf.scale, - conf.scale);
+        transform.translate(conf.centerX, - conf.centerY);
+        return transform;
     }
     
     public void setSelectedPlanet(Planet p) {
@@ -694,7 +773,6 @@ public class InterstellarMapPanel extends JPanel {
         center(selectedPlanet);
         repaint();
     }
-
 
      /**
      * Calculate the nearest neighbour for the given point If anyone has a better algorithm than this stupid kind of shit, please, feel free to exchange my brute force thing... An good idea would be an voronoi diagram and the sweep algorithm from Steven Fortune.
@@ -713,6 +791,22 @@ public class InterstellarMapPanel extends JPanel {
         return minPlanet;
     }
 
+    private boolean isPlanetEmpty(Planet planet) {
+        Set<Faction> factions = planet.getFactionSet(now);
+        if((null == factions) || factions.isEmpty()) {
+            return false;
+        }
+        boolean empty = true;
+        for(Faction faction : factions) {
+            String id = faction.getShortName();
+            // TODO: Replace with proper methods instead of magic strings
+            if(!id.equals("UND") && !id.equals("ABN") && !id.equals("NONE")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                empty = false;
+            }
+        }
+        return empty;
+    }
+    
     private boolean isPlanetVisible(Planet planet, boolean hideEmpty) {
         if(null == planet) {
             return false;
@@ -729,19 +823,7 @@ public class InterstellarMapPanel extends JPanel {
         }
         if(hideEmpty) {
             // Filter out "empty" systems
-            Set<Faction> factions = planet.getFactionSet(now);
-            if((null == factions) || factions.isEmpty()) {
-                return false;
-            }
-            boolean empty = true;
-            for(Faction faction : factions) {
-                String id = faction.getShortName();
-                // TODO: Replace with proper methods instead of magic strings
-                if(!id.equals("UND") && !id.equals("ABN") && !id.equals("NONE")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                    empty = false;
-                }
-            }
-            return !empty;
+            return !isPlanetEmpty(planet);
         }
         return true;
     }
