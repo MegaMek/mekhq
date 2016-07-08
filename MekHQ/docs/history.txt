@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.3.31-git
++ Adding an "Inner Sphere at War" hex map overlay to the interstellar panel
 + Issue #120: Hanger->GM Mode->Restore Unit Issues
 + Bug: Packaging of some images didn't happen
 + Bug: Recruited prisoners don't get their "willing to defect" flag cleared
