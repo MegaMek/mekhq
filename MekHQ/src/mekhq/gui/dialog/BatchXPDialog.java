@@ -40,7 +40,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.RankSorter;
@@ -264,6 +263,7 @@ public final class BatchXPDialog extends JDialog {
             return;
         }
         int rows = personnelTable.getRowCount();
+        int improvedPersonnelCount = rows;
         while(rows > 0) {
             for(int i = 0; i < rows; ++ i) {
                 Person p = personnelModel.getPerson(personnelTable.convertRowIndexToModel(i));
@@ -279,7 +279,6 @@ public final class BatchXPDialog extends JDialog {
                 p.improveSkill(skillName);
                 campaign.personUpdated(p);
                 p.setXp(p.getXp() - cost);
-                campaign.addReport(String.format("%s improved %s!", p.getHyperlinkedName(), skillName));
                 
                 // The next part is bollocks and doesn't belong here, but as long as we hardcode AtB ...
                 if(campaign.getCampaignOptions().getUseAtB()) {
@@ -289,10 +288,10 @@ public final class BatchXPDialog extends JDialog {
                         if(null == spa) {
                             if(campaign.getCampaignOptions().useEdge()) {
                                 p.acquireAbility(PilotOptions.EDGE_ADVANTAGES, "edge", p.getEdge() + 1);
-                                campaign.addReport(String.format("%s gained edge point!", p.getHyperlinkedName()));
+                                p.addLogEntry(campaign.getDate(), String.format("Gained edge point"));
                             }
                         } else {
-                            campaign.addReport(String.format("%s gained %s!", p.getHyperlinkedName(), SpecialAbility.getDisplayName(spa)));
+                            p.addLogEntry(campaign.getDate(), String.format("Gained %s", spa));
                         }
                     }
                 }
@@ -301,6 +300,9 @@ public final class BatchXPDialog extends JDialog {
             updatePersonnelTable();
             rows = personnelTable.getRowCount();
             dataChanged = true;
+        }
+        if(improvedPersonnelCount > 0) {
+            campaign.addReport("Improved the " + skillName + " skill of " + improvedPersonnelCount + " personnel.");
         }
         
     }

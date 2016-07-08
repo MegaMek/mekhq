@@ -663,6 +663,7 @@ public class CampaignGUI extends JPanel {
         
         if(batchXPDialog.hasDataChanged()) {
             refreshPersonnelList();
+            refreshReport();
         }
     }
 
