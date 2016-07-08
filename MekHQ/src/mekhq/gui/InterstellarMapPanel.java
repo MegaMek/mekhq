@@ -473,8 +473,8 @@ public class InterstellarMapPanel extends JPanel {
                                 // Determine where to anchor the stripes
                                 Point2D firstPoint = new Point2D.Double(map2scrX(coordX), map2scrY(coordY));
                                 Point2D secondPoint = new Point2D.Double(
-                                    firstPoint.getX() + 10 * conf.scale,
-                                    firstPoint.getY() + 10 * conf.scale);
+                                    firstPoint.getX() + 6 * conf.scale,
+                                    firstPoint.getY() + 6 * conf.scale);
                                 factionPaint = new LinearGradientPaint(
                                     firstPoint, secondPoint, paintFractions, paintColors,
                                     MultipleGradientPaint.CycleMethod.REPEAT);
@@ -483,9 +483,9 @@ public class InterstellarMapPanel extends JPanel {
                             g2.setPaint(factionPaint);
                             g2.fill(path);
                             g2.setPaint(linePaint);
-                            g2.setStroke(new BasicStroke(6.0f));
                             Shape clip = g2.getClip();
                             g2.setClip(path);
+                            g2.setStroke(new BasicStroke(4.0f));
                             g2.draw(path);
                             g2.setClip(clip);
                         }
