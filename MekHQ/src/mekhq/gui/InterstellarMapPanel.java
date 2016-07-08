@@ -42,7 +42,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
-import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -85,6 +84,15 @@ import mekhq.gui.dialog.NewPlanetaryEventDialog;
 public class InterstellarMapPanel extends JPanel {
     private static final long serialVersionUID = -1110105822399704646L;
     
+    private static final Vector2d[] BASE_HEXCOORDS = {
+        new Vector2d(1.0, 0.0),
+        new Vector2d(Math.cos(Math.PI / 3.0), Math.sin(Math.PI / 3.0)),
+        new Vector2d(Math.cos(2.0 * Math.PI / 3.0), Math.sin(2.0 * Math.PI / 3.0)),
+        new Vector2d(-1.0, 0.0),
+        new Vector2d(Math.cos(4.0 * Math.PI / 3.0), Math.sin(4.0 * Math.PI / 3.0)),
+        new Vector2d(Math.cos(5.0 * Math.PI / 3.0), Math.sin(5.0 * Math.PI / 3.0))
+    };
+
     private JLayeredPane pane;
     private JPanel mapPanel;
     private JViewport optionView;
@@ -415,27 +423,21 @@ public class InterstellarMapPanel extends JPanel {
                 }
                 
                 if((conf.scale > 1.0) && optISWAreas.isSelected()) {
+                    // IDEA: Allow for different hex sizes later on.
                     final double HEX_SIZE = 30.0;
+                    final double SPACING_X = HEX_SIZE * Math.sqrt(3) / 2.0;
                     AffineTransform transform = getMap2ScrTransform();
-                    int minX = (int) Math.floor(scr2mapX(0.0) / HEX_SIZE / Math.sqrt(3) * 2.0);
-                    int maxX = (int) Math.ceil(scr2mapX(getWidth()) / HEX_SIZE / Math.sqrt(3) * 2.0);
+                    int minX = (int) Math.floor(scr2mapX(0.0) / SPACING_X);
+                    int maxX = (int) Math.ceil(scr2mapX(getWidth()) / SPACING_X);
                     int minY = (int) Math.floor(scr2mapY(getHeight()) / HEX_SIZE);
                     int maxY = (int) Math.ceil(scr2mapY(0.0) / HEX_SIZE);
+                    GeneralPath path = new GeneralPath();
                     for(int x = minX; x <= maxX; ++ x) {
                         for(int y = minY; y <= maxY; ++ y) {
-                            GeneralPath path = new GeneralPath();
-                            boolean first = true;
-                            double coordX = x * HEX_SIZE * Math.sqrt(3) / 2.0;
+                            double coordX = x * SPACING_X;
                             double coordY = y * HEX_SIZE + (x % 2) * HEX_SIZE / 2.0;
-                            for(Vector2d pos : genHexCoords(coordX, coordY, HEX_SIZE / 2.0)) {
-                                if(first) {
-                                    path.moveTo(pos.x, pos.y);
-                                    first = false;
-                                } else {
-                                    path.lineTo(pos.x, pos.y);
-                                }
-                            }
-                            path.closePath();
+                            setupHexPath(path, coordX, coordY, HEX_SIZE / 2.0);
+
                             Paint factionPaint = new Color(0.0f, 0.0f, 0.0f, 0.25f);
                             Paint linePaint = new Color(1.0f, 1.0f, 1.0f, 0.25f);
                             Set<Faction> hexFactions = new HashSet<>();
@@ -446,7 +448,7 @@ public class InterstellarMapPanel extends JPanel {
                             }
                             
                             path.transform(transform);
-                            
+
                             if(hexFactions.size() == 1) {
                                 // Single-faction hex
                                 Color factionColor = hexFactions.iterator().next().getColor();
@@ -725,22 +727,17 @@ public class InterstellarMapPanel extends JPanel {
         return checkBox;
     }
     
-    private static final Vector2d[] BASE_HEXCOORDS = {
-        new Vector2d(1.0, 0.0),
-        new Vector2d(Math.cos(Math.PI / 3.0), Math.sin(Math.PI / 3.0)),
-        new Vector2d(Math.cos(2.0 * Math.PI / 3.0), Math.sin(2.0 * Math.PI / 3.0)),
-        new Vector2d(-1.0, 0.0),
-        new Vector2d(Math.cos(4.0 * Math.PI / 3.0), Math.sin(4.0 * Math.PI / 3.0)),
-        new Vector2d(Math.cos(5.0 * Math.PI / 3.0), Math.sin(5.0 * Math.PI / 3.0))
-    };
-    
-    private List<Vector2d> genHexCoords(double centerX, double centerY, double radius) {
-        List<Vector2d> result = new ArrayList<>(6);
-        radius *= Math.sqrt(4.0/3.0);
-        for(int i = 0; i < 6; ++ i) {
-            result.add(new Vector2d(centerX + radius * BASE_HEXCOORDS[i].x, centerY + radius * BASE_HEXCOORDS[i].y));
+    private void setupHexPath(GeneralPath path, double centerX, double centerY, double radius) {
+        if(null == path) {
+            return;
         }
-        return result;
+        radius *= Math.sqrt(4.0/3.0);
+        path.reset();
+        path.moveTo(centerX + radius * BASE_HEXCOORDS[0].x, centerY + radius * BASE_HEXCOORDS[0].y);
+        for(int i = 1; i < 6; ++ i) {
+            path.lineTo(centerX + radius * BASE_HEXCOORDS[i].x, centerY + radius * BASE_HEXCOORDS[i].y);
+        }
+        path.closePath();
     }
     
     /**
