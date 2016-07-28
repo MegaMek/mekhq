@@ -185,7 +185,7 @@ public class VeeStabiliser extends Part {
 
 	@Override
 	public String checkFixable() {
-		if(!isSalvaging() && unit.isLocationBreached(loc)) {
+		if(!isSalvaging() && (null != unit) && unit.isLocationBreached(loc)) {
     		return unit.getEntity().getLocationName(loc) + " is breached.";
 		}
 		return null;
