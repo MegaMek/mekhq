@@ -6506,6 +6506,7 @@ public class Campaign implements Serializable {
             m.resetJam();
         }
         entity.setDeployed(false);
+        entity.setElevation(0);
         entity.setPassedThrough(new Vector<Coords>());
         entity.resetFiringArcs();
         entity.resetBays();
@@ -6550,16 +6551,6 @@ public class Campaign implements Serializable {
             a.setAltitude(5);
             a.setCurrentVelocity(0);
             a.setNextVelocity(0);
-        } else {
-            // Reset Elevation
-            if (entity instanceof VTOL) {
-                // VTOLs should elevation of 1 to deploy properly in MM
-                entity.setElevation(1);
-            } else {
-                // Elevation 0 represents "standing on the hex"
-                // Generally everything but VTOLs have a 0 starting elevation
-                entity.setElevation(0);
-            }
         }
         if(entity instanceof Tank) {
         	Tank t = (Tank)entity;
