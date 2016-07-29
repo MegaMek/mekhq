@@ -102,7 +102,7 @@ public class PersonnelEventLogModel extends DataTableModel {
     public int getPreferredWidth(int column) {
         switch(column) {
             case COL_DATE:
-                return 80;
+                return 90;
             case COL_TEXT:
                 return 300;
             default:
