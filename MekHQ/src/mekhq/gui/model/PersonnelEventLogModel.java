@@ -104,7 +104,7 @@ public class PersonnelEventLogModel extends DataTableModel {
             case COL_DATE:
                 return 90;
             case COL_TEXT:
-                return 300;
+                return 290;
             default:
                 return 100;
         }
