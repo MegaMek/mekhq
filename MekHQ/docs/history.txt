@@ -10,6 +10,8 @@ v0.3.31 (2016-07-31 10:00 UTC)
 + Bug: Skill.improve() didn't check for maximum skill level (SkillType.NUM_LEVELS)
 + Feature Request #80: Automated Skill Purchases
 + Bug: Reset Entity.elevation in Campaign.clearGameData
++ Updated MegaMek.jar to 0.41.21
++ Updated MegaMekLab.jar to 0.1.57
 
 v0.3.30 (2016-06-27 02:00 UTC)
 + Issue #110: Unassigned patients no longer get selected automatically
