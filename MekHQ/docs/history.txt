@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.31-git
+v0.3.32-git
+
+v0.3.31 (2016-07-31 10:00 UTC)
 + Adding an "Inner Sphere at War" hex map overlay to the interstellar panel
 + Issue #120: Hanger->GM Mode->Restore Unit Issues
 + Bug: Packaging of some images didn't happen
@@ -8,8 +10,10 @@ v0.3.31-git
 + Bug: Skill.improve() didn't check for maximum skill level (SkillType.NUM_LEVELS)
 + Feature Request #80: Automated Skill Purchases
 + Bug: Reset Entity.elevation in Campaign.clearGameData
++ Updated MegaMek.jar to 0.41.21
++ Updated MegaMekLab.jar to 0.1.57
 
-v0.3.30
+v0.3.30 (2016-06-27 02:00 UTC)
 + Issue #110: Unassigned patients no longer get selected automatically
 + Adding planetary icon display to the planet detail view (+ "icon" data entry)
 + Adding HPG network display overlay to the interstellar map panel
