@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.ResourceBundle;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -36,6 +37,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import megamek.common.options.PilotOptions;
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
@@ -45,8 +47,6 @@ import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.RankSorter;
 
 public final class BatchXPDialog extends JDialog {
-    private static final String CHOICE_NO_SKILL = "- Skill -";
-
     private static final long serialVersionUID = -7897406116865495209L;
 
     private final Campaign campaign;
@@ -61,7 +61,7 @@ public final class BatchXPDialog extends JDialog {
     private JComboBox<String> choiceSkill;
     private JSpinner skillLevel;
     private JButton buttonSpendXP;
-
+    
     private final List<Integer> personnelColumns = Arrays.asList(
             PersonnelTableModel.COL_RANK,
             PersonnelTableModel.COL_NAME,
@@ -72,8 +72,16 @@ public final class BatchXPDialog extends JDialog {
 
     private JLabel matchedPersonnelLabel;
 
+    private transient ResourceBundle resourceMap;
+    private transient String choiceNoSkill;
+
     public BatchXPDialog(JFrame parent, Campaign campaign) {
-        super(parent, "Mass training", true);
+        super(parent, "", true); //$NON-NLS-1$
+        
+        this.resourceMap = ResourceBundle.getBundle("mekhq.resources.BatchXPDialog", new EncodeControl()); //$NON-NLS-1$
+        
+        setTitle(resourceMap.getString("dialogue.title")); //$NON-NLS-1$
+        choiceNoSkill = resourceMap.getString("skill.choice.text"); //$NON-NLS-1$
         
         this.campaign = Objects.requireNonNull(campaign);
         this.personnelModel = new PersonnelTableModel(campaign);
@@ -131,7 +139,7 @@ public final class BatchXPDialog extends JDialog {
         choiceType = new JComboBox<PersonTypeItem>();
         choiceType.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) choiceType.getPreferredSize().getHeight()));
         DefaultComboBoxModel<PersonTypeItem> personTypeModel = new DefaultComboBoxModel<>();
-        personTypeModel.addElement(new PersonTypeItem("- Primary Role -", null));
+        personTypeModel.addElement(new PersonTypeItem(resourceMap.getString("primaryRole.choice.text"), null)); //$NON-NLS-1$
         for(int i = 1; i < Person.T_NUM; ++ i) {
             personTypeModel.addElement(new PersonTypeItem(Person.getRoleDesc(i,campaign.getFaction().isClan()), i));
         }
@@ -151,7 +159,7 @@ public final class BatchXPDialog extends JDialog {
         choiceExp = new JComboBox<PersonTypeItem>();
         choiceExp.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) choiceType.getPreferredSize().getHeight()));
         DefaultComboBoxModel<PersonTypeItem> personExpModel = new DefaultComboBoxModel<>();
-        personExpModel.addElement(new PersonTypeItem("- Experience Level -", null));
+        personExpModel.addElement(new PersonTypeItem(resourceMap.getString("experience.choice.text"), null)); //$NON-NLS-1$
         for(int i = 0; i < 5; ++ i) {
             personExpModel.addElement(new PersonTypeItem(SkillType.getExperienceLevelName(i), i));
         }
@@ -169,7 +177,7 @@ public final class BatchXPDialog extends JDialog {
         choiceSkill = new JComboBox<String>();
         choiceSkill.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) choiceSkill.getPreferredSize().getHeight()));
         DefaultComboBoxModel<String> personSkillModel = new DefaultComboBoxModel<>();
-        personSkillModel.addElement(CHOICE_NO_SKILL);
+        personSkillModel.addElement(choiceNoSkill);
         for(String skill : SkillType.getSkillList()) {
             personSkillModel.addElement(skill);
         }
@@ -178,7 +186,7 @@ public final class BatchXPDialog extends JDialog {
         choiceSkill.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(CHOICE_NO_SKILL.equals(choiceSkill.getSelectedItem())) {
+                if(choiceNoSkill.equals(choiceSkill.getSelectedItem())) {
                     personnelFilter.setSkill(null);
                     ((SpinnerNumberModel) skillLevel.getModel()).setMaximum(10);
                     buttonSpendXP.setEnabled(false);
@@ -199,7 +207,7 @@ public final class BatchXPDialog extends JDialog {
         panel.add(choiceSkill);
         
         panel.add(Box.createRigidArea(new Dimension(10, 10)));
-        panel.add(new JLabel("Target skill level:"));
+        panel.add(new JLabel(resourceMap.getString("targetSkillLevel.text"))); //$NON-NLS-1$
         
         skillLevel = new JSpinner(new SpinnerNumberModel(10, 0, 10, 1));
         skillLevel.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) skillLevel.getPreferredSize().getHeight()));
@@ -215,14 +223,14 @@ public final class BatchXPDialog extends JDialog {
 
         panel.add(Box.createVerticalGlue());
         
-        matchedPersonnelLabel = new JLabel("");
+        matchedPersonnelLabel = new JLabel(""); //$NON-NLS-1$
         matchedPersonnelLabel.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) matchedPersonnelLabel.getPreferredSize().getHeight()));
         panel.add(matchedPersonnelLabel);
         
         JPanel buttons = new JPanel(new FlowLayout());
         buttons.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) buttons.getPreferredSize().getHeight()));
 
-        buttonSpendXP = new JButton("Spend XP");
+        buttonSpendXP = new JButton(resourceMap.getString("spendXP.text")); //$NON-NLS-1$
         buttonSpendXP.setEnabled(false);
         buttonSpendXP.addActionListener(new ActionListener() {
             @Override
@@ -232,7 +240,7 @@ public final class BatchXPDialog extends JDialog {
         });
         buttons.add(buttonSpendXP);
 
-        JButton button = new JButton("Close");
+        JButton button = new JButton(resourceMap.getString("close.text")); //$NON-NLS-1$
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
@@ -248,17 +256,17 @@ public final class BatchXPDialog extends JDialog {
 
     protected void updatePersonnelTable() {
         personnelSorter.sort();
-        if(!CHOICE_NO_SKILL.equals(choiceSkill.getSelectedItem())) {
+        if(!choiceNoSkill.equals(choiceSkill.getSelectedItem())) {
             int rows = personnelTable.getRowCount();
-            matchedPersonnelLabel.setText(String.format("%d eligable", rows));
+            matchedPersonnelLabel.setText(String.format(resourceMap.getString("eligible.format"), rows)); //$NON-NLS-1$
         } else {
-            matchedPersonnelLabel.setText("");
+            matchedPersonnelLabel.setText(""); //$NON-NLS-1$
         }
     }
 
     protected void spendXP() {
         String skillName = (String) choiceSkill.getSelectedItem();
-        if(CHOICE_NO_SKILL.equals(skillName)) {
+        if(choiceNoSkill.equals(skillName)) {
             // This shouldn't happen, but guard against it anyway.
             return;
         }
@@ -287,11 +295,11 @@ public final class BatchXPDialog extends JDialog {
                         String spa = campaign.rollSPA(p.getPrimaryRole(), p);
                         if(null == spa) {
                             if(campaign.getCampaignOptions().useEdge()) {
-                                p.acquireAbility(PilotOptions.EDGE_ADVANTAGES, "edge", p.getEdge() + 1);
-                                p.addLogEntry(campaign.getDate(), String.format("Gained edge point"));
+                                p.acquireAbility(PilotOptions.EDGE_ADVANTAGES, "edge", p.getEdge() + 1); //$NON-NLS-1$
+                                p.addLogEntry(campaign.getDate(), String.format(resourceMap.getString("gainedEdge.text"))); //$NON-NLS-1$
                             }
                         } else {
-                            p.addLogEntry(campaign.getDate(), String.format("Gained %s", spa));
+                            p.addLogEntry(campaign.getDate(), String.format(resourceMap.getString("gained.format"), spa)); //$NON-NLS-1$
                         }
                     }
                 }
@@ -302,7 +310,7 @@ public final class BatchXPDialog extends JDialog {
             dataChanged = true;
         }
         if(improvedPersonnelCount > 0) {
-            campaign.addReport("Improved the " + skillName + " skill of " + improvedPersonnelCount + " personnel.");
+            campaign.addReport(String.format(resourceMap.getString("improvedSkills.format"), skillName, improvedPersonnelCount)); //$NON-NLS-1$
         }
         
     }
