@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.3.32-git
++ Issue #131: Personnel Market update blank
 
 v0.3.31 (2016-07-31 10:00 UTC)
 + Adding an "Inner Sphere at War" hex map overlay to the interstellar panel

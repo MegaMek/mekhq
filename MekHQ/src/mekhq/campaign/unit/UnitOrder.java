@@ -339,8 +339,9 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
         pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "</unitOrder>");
     }
     
-    public static UnitOrder generateInstanceFromXML(Node wn, Version version) {
+    public static UnitOrder generateInstanceFromXML(Node wn, Campaign c, Version version) {
         UnitOrder retVal = new UnitOrder();
+        retVal.campaign = c;
         
         NodeList nl = wn.getChildNodes();
 

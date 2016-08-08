@@ -380,17 +380,19 @@ public class PersonnelMarketDialog extends JDialog {
 	}//GEN-LAST:event_btnHireActionPerformed
 
 	private void addPerson() {
-		Entity en = personnelMarket.getAttachedEntity(selectedPerson);
-		UUID pid = selectedPerson.getId();
-	    if(null != selectedPerson) {
-	    	campaign.addPersonWithoutId(selectedPerson, true);
-			addUnit(en, false);
-	    	personnelMarket.removePerson(selectedPerson);
-    		personnelModel.setData(personnelMarket.getPersonnel());
-			personnelMarket.removeAttachedEntity(pid);
-	    	refreshHqView();
-	    	refreshPersonView();
-	    }
+		if (selectedPerson != null) {
+			Entity en = personnelMarket.getAttachedEntity(selectedPerson);
+			UUID pid = selectedPerson.getId();
+		    if(null != selectedPerson) {
+		    	campaign.addPersonWithoutId(selectedPerson, true);
+				addUnit(en, false);
+		    	personnelMarket.removePerson(selectedPerson);
+	    		personnelModel.setData(personnelMarket.getPersonnel());
+				personnelMarket.removeAttachedEntity(pid);
+		    	refreshHqView();
+		    	refreshPersonView();
+		    }
+		}
 	}
 
 	private void addUnit(Entity en, boolean pay) {
