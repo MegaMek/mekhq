@@ -101,7 +101,7 @@
 
 	<!-- following localdev-* tasks get, build & package the current version from local sources -->
 	<target name="localdev-get" depends="localdev-init" description="get the local source">
-		<copy todir="${localdir}">
+		<copy todir="${localdir}" encoding="UTF-8">
 			<fileset dir="${basedir}">
 				<exclude name="${localdir}" />
 			</fileset>
@@ -110,35 +110,35 @@
             but first we need to back it up because we will need to keep a few
             things-->
         <move file="${localdir}/${datadir}" tofile="${localdir}/${datadir}-OLD"/>
-        <copy todir="${localdir}/${datadir}">
+        <copy todir="${localdir}/${datadir}" encoding="UTF-8">
         	<fileset dir="${mmdir}/${datadir}">
         	</fileset>
         </copy>
         <!-- now add in record sheet vector images -->
-        <copy todir="${localdir}/${datadir}/images/recordsheets">
+        <copy todir="${localdir}/${datadir}/images/recordsheets" encoding="UTF-8">
             <fileset dir="${mmldir}/${datadir}/images/recordsheets">
             </fileset>
         </copy>
         <!-- now add in lib files -->
-        <copy todir="${localdir}/${libdir}">
+        <copy todir="${localdir}/${libdir}" encoding="UTF-8">
             <fileset dir="${mmdir}/${libdir}" />
         </copy>
-        <copy todir="${localdir}/${libdir}">
+        <copy todir="${localdir}/${libdir}" encoding="UTF-8">
             <fileset dir="${mmldir}/${libdir}" />
         </copy>
         <!-- now add in doc files from mm and mml -->
 		<mkdir dir="${localdir}/${docdir}/${docmmdir}" />
-        <copy todir="${localdir}/${docdir}/${docmmdir}">
+        <copy todir="${localdir}/${docdir}/${docmmdir}" encoding="UTF-8">
             <fileset dir="${mmdir}/${docdir}">
             </fileset>
         </copy>
         <mkdir dir="${localdir}/${docdir}/${docmmldir}" />
-        <copy todir="${localdir}/${docdir}/${docmmldir}">
+        <copy todir="${localdir}/${docdir}/${docmmldir}" encoding="UTF-8">
             <fileset dir="${mmldir}/${docdir}">
             </fileset>
         </copy>
         <!-- ok now move some stuff back into data that needs to be there-->
-        <copy todir="${localdir}/${datadir}">
+        <copy todir="${localdir}/${datadir}" encoding="UTF-8">
             <fileset dir="${localdir}/${datadir}-OLD" >
                 <include name="universe/" />
                 <include name="fonts/" />
@@ -152,18 +152,18 @@
             </fileset>
         </copy>
         <!-- grab the new graphical hits -->
-        <copy todir="${localdir}/${datadir}/images/misc">
+        <copy todir="${localdir}/${datadir}/images/misc" encoding="UTF-8">
             <fileset dir="${localdir}/${datadir}-OLD/images/misc" >
                 <include name="hits/" />
             </fileset>
         </copy>
         <!-- grab the megameklab misc images -->
-        <copy todir="${localdir}/${datadir}/images/misc">
+        <copy todir="${localdir}/${datadir}/images/misc" encoding="UTF-8">
             <fileset dir="${mmldir}/${datadir}/images/misc" >
             </fileset>
         </copy>
         <!-- grab the megameklab recordsheet files -->
-        <copy todir="${localdir}/${datadir}/images">
+        <copy todir="${localdir}/${datadir}/images" encoding="UTF-8">
             <fileset dir="${mmldir}/${datadir}/images" >
                 <include name="recordsheets/" />
             </fileset>
@@ -172,19 +172,19 @@
         <!--now we need to replace our mmconf with the latest from the MM svn
             but first we need to back it up because we will need to keep a few
             things-->
-        <move file="${localdir}/${confdir}" tofile="${localdir}/${confdir}-OLD"/>
-        <copy todir="${localdir}/${confdir}">
+        <move file="${localdir}/${confdir}" tofile="${localdir}/${confdir}-OLD" encoding="UTF-8"/>
+        <copy todir="${localdir}/${confdir}" encoding="UTF-8">
             <fileset dir="${mmdir}/${confdir}">
             </fileset>
         </copy>
         <!-- ok now move some stuff back into mmconf that needs to be there-->
-        <copy todir="${localdir}/${confdir}">
+        <copy todir="${localdir}/${confdir}" encoding="UTF-8">
             <fileset dir="${localdir}/${confdir}-OLD" >
                 <include name="mekhq.properties" />
                 <include name="mhqPresets/" />
             </fileset>
         </copy>
-        <copy todir="${localdir}/${confdir}">
+        <copy todir="${localdir}/${confdir}" encoding="UTF-8">
             <fileset dir="${mmldir}/${confdir}" >
             </fileset>
         </copy>
@@ -221,7 +221,7 @@
 
 	<target name="mac-bundle" description="Bundle the project built from local source into an Mac OSX distribution">
 		<mkdir dir="${osxdist}" />
-		<copy todir="${osxdist}">
+		<copy todir="${osxdist}" encoding="UTF-8">
 			<fileset dir="${localdir}" >
 				<include name="${logdir}/" />
 				<include name="${datadir}/" />
@@ -236,27 +236,27 @@
 			</fileset>
 		</copy>
 		<mkdir dir="${osxdist}/MegaMek.app" />
-		<copy todir="${osxdist}/MegaMek.app">
+		<copy todir="${osxdist}/MegaMek.app" encoding="UTF-8">
 			<fileset dir="${util}/MegaMek.app" >
 				<include name="**/*"/>
 			</fileset>
 		</copy>
-		<copy file="${util}/JavaApplicationStub" todir="${osxdist}/MegaMek.app/Contents/MacOS/"/>
+		<copy file="${util}/JavaApplicationStub" todir="${osxdist}/MegaMek.app/Contents/MacOS/" encoding="UTF-8"/>
 		<mkdir dir="${osxdist}/MegaMekLab.app" />
-		<copy todir="${osxdist}/MegaMekLab.app">
+		<copy todir="${osxdist}/MegaMekLab.app" encoding="UTF-8">
 			<fileset dir="${util}/MegaMekLab.app" >
 				<include name="**/*"/>
 			</fileset>
 		</copy>
-		<copy file="${util}/JavaApplicationStub" todir="${osxdist}/MegaMekLab.app/Contents/MacOS/"/>
+		<copy file="${util}/JavaApplicationStub" todir="${osxdist}/MegaMekLab.app/Contents/MacOS/" encoding="UTF-8"/>
 		<mkdir dir="${osxdist}/MekHQ.app" />
-		<copy todir="${osxdist}/MekHQ.app">
+		<copy todir="${osxdist}/MekHQ.app" encoding="UTF-8">
 			<fileset dir="${util}/MekHQ.app" >
 				<include name="**/*"/>
 			</fileset>
 		</copy>
-		<copy file="${util}/JavaApplicationStub" todir="${osxdist}/MekHQ.app/Contents/MacOS/"/>
-		<copy todir="${osxdist}/MekHQ.app/Contents/Resources/Java/">
+		<copy file="${util}/JavaApplicationStub" todir="${osxdist}/MekHQ.app/Contents/MacOS/" encoding="UTF-8"/>
+		<copy todir="${osxdist}/MekHQ.app/Contents/Resources/Java/" encoding="UTF-8">
 			<fileset dir="${localdir}" >
 				<include name="${libdir}/*.jar" />
 				<include name="${jarfile}" />
@@ -298,7 +298,7 @@
 	<target name="nix-bundle" description="Bundle the project built from local source into a unix distribution">
 		<mkdir dir="${nixdist}" />
 		<mkdir dir="${nixdist}/${nixdist}" />
-		<copy todir="${nixdist}/${nixdist}">
+		<copy todir="${nixdist}/${nixdist}" encoding="UTF-8">
 			<fileset dir="${localdir}" >
 				<include name="${jarfile}" />
 				<include name="${libdir}/*.jar" />
@@ -331,8 +331,8 @@
 
 	<!-- Produce an EXE file -->
 	<target name="exe" description="Generate an EXE wrappers for MekHQ.jar, MegaMek.jar, and MegaMekLab.jar">
-		<copy file="${localdir}/MegaMek.jar" tofile="${localdir}/lib/MegaMek.jar"/>
-		<copy file="${localdir}/MegaMekLab.jar" tofile="${localdir}/lib/MegaMekLab.jar"/>
+		<copy file="${localdir}/MegaMek.jar" tofile="${localdir}/lib/MegaMek.jar" encoding="UTF-8"/>
+		<copy file="${localdir}/MegaMekLab.jar" tofile="${localdir}/lib/MegaMekLab.jar" encoding="UTF-8"/>
 		<delete file="${localdir}/MekHQ.exe"/>
 		<launch4j configFile="${util}/mekhq.4j_local.xml" />
 		<delete file="${localdir}/MegaMek.exe"/>
@@ -343,7 +343,7 @@
 
 	<target name="win-bundle" depends="exe" description="Bundle the project built from local source into a Windows distribution">
 		<mkdir dir="${windist}" />
-		<copy todir="${windist}">
+		<copy todir="${windist}" encoding="UTF-8">
 			<fileset dir="${localdir}" >
 				<include name="${libdir}/*.jar" />
 				<include name="${logdir}/" />
@@ -362,9 +362,9 @@
                 <exclude name="**/*.psd"/>
 			</fileset>
 		</copy>
-		<copy file="${util}/mekhq.l4j.ini" todir="${windist}"/>
-		<copy file="${util}/megamek.l4j.ini" todir="${windist}"/>
-		<copy file="${util}/megameklab.l4j.ini" todir="${windist}"/>
+		<copy file="${util}/mekhq.l4j.ini" todir="${windist}" encoding="UTF-8"/>
+		<copy file="${util}/megamek.l4j.ini" todir="${windist}" encoding="UTF-8"/>
+		<copy file="${util}/megameklab.l4j.ini" todir="${windist}" encoding="UTF-8"/>
 	</target>
 
 	<target name="win-zip" description="Create a zipfile of the Windows distribution">
@@ -382,7 +382,7 @@
 	<target name="source-package" description="Package a source-only distribution of the project built from local source">
 		<mkdir dir="${srcdist}" />
 		<mkdir dir="${srcdist}/${srcdist}" />
-		<copy todir="${srcdist}/${srcdist}">
+		<copy todir="${srcdist}/${srcdist}" encoding="UTF-8">
 			<fileset dir="${localdir}" >
 				<exclude name="${builddir}/**"/>
 				<exclude name="MekHQ.jar"/>
