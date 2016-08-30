@@ -1,0 +1,223 @@
+The point of this document is to document and explain the features of AtB play via MekHQ.									///first draft August, 13. 2016, last edit 19/8/2016
+
+Table of contents
+- 1 What is AtB?
+- 2 Getting started
+- 3 Detailed explanation of the campaign options
+- 4	What to do if you think AtB should be a bit easier
+- 5 What to do if you think AtB is not challenging enough
+- 6 FAQ
+
+1. What is AtB?
+
+AtB stands for Against the Bot which is a set of rules designed to allow players to experience a BattleTech campaign while playing against the computer (Bot) without the input from other players. Most of these rules are implemented in MekHQ. The focus of the system is to play as a mercenary company but as the player is also the GM a wide variety of campaigns is possible. For more information  about MegaMek, MekHQ and MegaMekLab please visit megamek.info or the MegaMek games subforum on bg.battletech.com.
+
+2. Getting started
+
+In order to play Against the Bot you only need MekHQ but I recommend to also download a copy of the underlying rules which can be found at the MegaMek Games part of the bg.battletech.com forum.
+///link to latest mekhq release and latest rules thread here, maybe also Xotl RATs?
+After downloading and unzipping the files the next step is to open the MekHQ.exe or .jar and select "Start A New Campaign". MekHQ will ask you then to select a start date.
+With the start date selected MekHQ offers several option presets, select "Simple Preset"  ///or AtB in the future?///, now the campaign options dialogue opens and allows for more adjustments.
+
+In this chapter only the basic options are set, see chapter 3 for more details.
+"General" Tab
+Name: the name of your campaign, e.g. John's Heavy Cavalry.
+Faction: the faction the player is working for, select "Mercenary" for AtB play.
+enable "Use Unit Rating" and select "FM:Mercenaries (rev)"
+
+"Repair and Acquisition" Tab
+enable "Use Quirks"
+set "Waiting period (in days) between acquisition rolls" to 1 day.
+select "Administration" as "Acquisition Skill"
+enable "Only support personnel can make acquisition checks"
+set "Penalty for Clan Equipment" to 2 
+set "Penalty for Inner Sphere equipment" to 0
+set "Maximum Acquisition Per Day" to 2
+set "Delivery Time" to 2d6 + 0 days
+set "Minimum Transit Time" to 1 day
+set "Reduce Delivery time by" to 1 day per MoS
+
+"Tech Limits" Tab
+leave as is
+
+"Personnel" Tab
+enable "Use Tactics Skill"
+enable "Use Individual initiative Bonus"
+enable *Allow Special Abilities*
+
+"Finances" Tab
+deselect everything for the initial company creation, except "Limit loan parameters by unit rating"
+
+"Mercenary" Tab
+click "Base contract payment on percentage of TO&E unit value (IntOps Beta)"
+leave it at 5% and enable "Base on equipment sale value"
+enable "Base battle loss compensation on equipment sale value"
+
+"Experience" Tab
+set 1 XP for each completed scenario
+set 1 XP for every kill
+set 1 XP for every 25 successful tasks
+set 1 XP for every active month on a 2d6 roll of greater of equal to 10
+set 2 XP for the selected negotiator for a new contract
+
+"Personnel Market" Tab
+select "Against the Bot" as market type
+
+"Against the Bot" Tab
+enable "Use Against the Bot campaign rules"
+select desired Skill level
+click the "Set AtB costs for skills" and "Set AtB costs for speical abilities" buttons
+enable "Do retirement/defection rolls at contract completion"
+enable "Customize retirement rolls"
+enable "Use leadership skill"
+enable "Use vehicles"
+enable "Display a report when contract market refreshes"
+enable "Display a report when unit market refreshes"
+enable "Merc Company size limits"
+enable "Limit lance deployment by weight"
+enable "Limit lance deployment by size"
+enable "Use commander strategy"
+set "Base number of lances" to 3
+set "Per rank of strategy" to 1
+finally make sure Chosen RATs cover the selected time period.
+
+All other options are optional depending on desired difficulty and personal preferences.
+
+Now select your desired MegaMek options via File -> MegaMek options, keep in mind that the Bot does not support all optional rules, see the Princess documentation for further information.
+
+At this stage it is helpful to save the campaign via File -> Save Campaign as a fall-back and template for the future.
+
+With the options done it is time to actually create the mechs and personnel you are going to use at the start of the campaign. The rules for this process are explained in detail in the above mentioned rules file in the section "Company_Creation".
+First of all enable "GM Mode".
+For a quick-start hire 12 mechwarriors, 10 techs, 1 doctor and 1 admin via Marketplace -> Hire or Marketplace -> Hire Personnel in Bulk.  
+The first hired mechwarrior is the force commanding officer and gets a +1 bonus to gunnery and piloting skills as well as two random points in Tactics, Strategy or Leadership. Use GM Edit to adjust values by going to the Personnel Tab and right-click -> GM Mode -> Edit on the person to be adjusted. The second to fourth mechwarriors hired are your officers and receive a +1 bonus to gunnery or piloting as well as one random point in Tactics, Strategy or Leadership. All veteran skilled pilots get a single random SPA, all elite pilots get two per the AtB rules.
+Mechs can be generated in several ways (or not at all) although I recommend to use the system detailed in the rules file under Company_Creation for the first time. If this file is not available a roll on the Chosen Rat can be an alternative. To add a mech Marketplace -> Purchase Unit, select Unit Type "Mech" and the desired weight class finish by using the "Add (GM)" button.
+
+Before accepting a contract it is necessary to fill out the TO&E, in order to do so mechwarriors need to be assigned to their rides, in the Personnel tab right-click on the pilot -> assign to unit -> select desired unit. As soon as all available mechs are assigned to a pilot you must sort them into lances in the TO&E tab. By right-clicking on the "My Campaign" force icon new forces can be added. A 12 mech company usually consists of three lances with four mechs each, every lance must be commanded by an officer. There are certain size and weight limits to lances see the rules file for more information.
+The unit is now established yet there is more preparation to be done. I recommend to use "Add Funds (GM)" under the Finance tab to add some starting capital, 5%-20% of your starting net worth is reasonable. Before the cash can be spend the options turned off during creation must be turned on again.  
+
+File -> Campaign Options
+"Finance" Tab
+enable everything except "Use percentage based maintenance costs (Unofficial" and "Infantry Don't Count for Contract Pay".
+
+The last step before going on a mission is to buy a cache of ammunition and spare parts, Marketplace -> Purchase Parts, with the starting capital. I suggest some weapons, actuators and lots of ammunition and armour. If you run out of money at any time new funds can be made available by taking out a loan. The principal is restricted by your assets and rating in the AtB rules. Go to the Finance tab and use the "Get Loan" button to take out a loan. 
+
+Finally it is time to select the first contract, Marketplace -> Contract Market will bring up the contract market window which displays a few current offers at the start of the campaign. The offers are refreshed every month at the first of the month. For the first contract I strongly recommend a mission type of Cadre Duty, Garrison or Pirate Hunt; Guerilla Warfare or Planetary Invasion are almost certain to end very baldy. If no reasonable contract is available it is possible to generate new ones until an acceptable offer is made by using the "Generate (GM)" button in the contract window.
+The most important details of a contract are the location, enemy, monthly payout and salvage percentage. Too strong an enemy will put the survival of the company in jeopardy while insufficient payment and salvage percentages will collapse it financially. The location should be within a reasonable distance from your starting location, check the "Days (Jumps) to Location" entry on the contract offer to be certain.
+When a contract is a accepted it will show up in Briefing Room tab. Before MekHQ generates any scenarios it is necessary to transport to the contract location. Go to Interstellar Map and type your location into the "Find Planet" box, press enter and MekHQ will focus the space map on the planet. Now use the "Calculate Jump Path" button to plot a course to your target. Take a quick look at the summary on the right hand side of the Interstellar Map tab after plotting the course then press "Begin Transit" to lift off. You do not need to own any DropShips or Jumpships, the transport costs represent buying passage to your destination. The transit is likely to take several weeks or even months use the Manage Campaign -> Advance Multiple Days feature to speed it up.
+
+Once you are at the contract location your lances must be assigned to their duties. Go to the Briefing Room tab and take a look at the "Deployment Requirements" for your mission. Below in "Current Assignments" every lance can be assigned a duty which will influence the type of battle and opposition it will face. Make sure to at least assign your contract requirements and advance the time until a battle is generated. At the date of battle select the battle in the Briefing Room tab and press the "Start Game" button. MekHQ will now transfer the required data to MegaMek and you can begin your first fight against the bot.
+
+Enjoy and good luck.
+
+///chapters below only a rough draft
+
+3. Campaign Options in detail
+
+This chapter will deal in detail with campaign options insofar as they concern AtB play.
+
+"General" Tab
+The General tab is pretty straight forward and already explained in chapter 2. If you click on the "Camo" image it is possible to select a different camouflage pattern either from the stock images bundled with MekHQ or a custom image. Remember to transfer any custom images to the new version when migrating your campaign to a later build.
+
+"Repair and Acquisition" Tab
+While acquisition and delivery options are set in the rules the maintenance part is entirely optional. Turning maintenance on will force a parts based maintenance check on all your units. "Maintenance cycle length in days" sets the frequency while the "Maintenance modifier" is a simple modifier for each roll. The TN for a maintenance roll is also influenced by the repair location of the unit and the skill level of the assigned tech.
+The AtB rules recommend the following options when using the optional maintenance rules:
+disable "Use Era mods for repair rolls"
+enable "Make maintenance checks"
+set "Maintenance cycle length in days" to 30
+set "Maintenance modifier" to 0
+disable "Use quality modifiers in maintenance checks"
+enable "Only damage parts that are already at worst quality"
+If you find that these options produce unreasonable results the maintenance modifier is the best tool for adjustments.
+
+"Tech Limits" Tab
+In this tab it is possible to limit or expand the scope of the campaign.
+"Limit Units and Parts by Year" and "Disallow extinct units and parts" make sure that only equipment is available that should be there based on BattleTech lore. Every campaign is different and if you want to use Star League Era equipment during the 30th century disabling these options would allow you to do so.
+"Only allow canon units for purchase" is a good way to make sure that custom units or fan made variants included in MekHQ will not be present in the unit market during your campaign. 
+
+"Personnel" Tab
+The options in this tab are mainly used to enable a wider range of individualism or role play. Toughness and Pilot Edge are good ways to keep important people alive while the advanced medical rules will make injuries more interesting, see the advanced_medical file for details.
+"Capture Prisoners in Scenarios" is part of the AtB rules but if you are content with your personnel and in a good situation financially turning prisoners off can save some time. Remember to switch to "Bondsman" and observe the specific rules detailed in the rules file when facing the Clans.
+The procreation and children options are useful if you intend to play for a long time and create a family force like the Kell Hounds instead of simply hiring pilots as necessary.
+Salary should be only a small part of your costs but adjusting the modifiers or base salaries in this part allows you to customise greatly. Keep in mind that personnel with dual functions will be paid for both, a primary mechwarrior, secondary tech will get paid a salary for his mechwarrior duties with related modifiers and another compensation for his duties as tech with related modifiers.
+
+"Finance" Tab
+The life of a mercenary is about money so you should leave all options that have been set during chapter 2 enabled here. Adjusting the "Clan tech price modifier" can help you better represent the realities of your campaign. For example a campaign set in 3050 could have some rare equipment from the Clan Invasion available but it would be very costly indeed, a modifier of 2 or even 4 might be justified.
+If you play with maintenance enabled "Use percentage based maintenance costs" can make a huge difference. With this option enabled DropShips and JumpShips are so expensive to maintain that any time spend outside of a contract or in transport is a significant financial commitment and requires a stash of cash to survive.
+
+"Mercenary" Tab
+The main thing in this tab is to decide where the income of your mercenary company is supposed to come from. The higher the contract payment percentage, the higher the importance of actual payment compared to salvage and vice versa. This is an easy to adjust value to increase or decrease the financial difficulty of your campaign.
+
+"Experience" Tab
+The parameters set during chapter 2 are the basics from the AtB options but this is your campaign and awarding experience can be done in many ways. You should try to keep a balance between combat and support personnel to avoid absurd min-max situations, for example setting "XP awarded to each administrator every Monday for the work of previous weeks" to 5 XP per week will obviously allow your admins to advance a lot faster than your pilots eventually allowing them to be a better mechwarrior themselves by spending XP.
+As soon as you have played AtB for some time I recommend a trial and error approach to find a system that works for you.
+
+"Skills" and "Special Abilities" Tab
+Everything here is set by MekHQ via the buttons in the "Against the Button" tab. It sets the XP cost for every skill and SPA and there is no need to mess with it.
+
+"Skill Randomization" Tab
+This tab helps you to adjust generated personnel to your liking, perhaps to get recruits which better represent what you are looking for. "Personnel type Recruitment Bonus" put emphasis on what type of personnel you want while the other parts of the tab allow you to increase or decrease the probability of Artillery, Secondary, Tactics, SPAs and Small Arms skills. Since the AtB rules already give veteran and elite pilots SPAs increasing the likelihood of SPAs for veteran and elite here is a good idea.  
+
+"Rank System" Tab
+The rank system of all major powers are available to choose from. As a mercenary it is appropriate to use the general Star League system or if you have a distinct origin choose the corresponding system. The custom option allows you to create any system you like.
+
+"Name and Portrait Generation" Tab
+To give your campaign a more regional feel turn "Use chosen faction for assigned names" off and pick your desired faction to choose from. Keep in mind that even within the faction specific pools a significant amount of variation occurs. Portrait Generation is a good way to differentiate your important people from the grunts and identify with your pilots. As with Camo images, any portraits you add must be transferred to every new MekHQ version.
+
+"Personnel Market" Tab
+The important thing is to make sure that it says "Market Type Against the Bot" at all times similar to skills and SPAs no further adjustments are warranted.
+
+"Against the Bot" Tab
+This is the most important and most obvious place to change something in your AtB campaign.
+"Skill level" as an influence on the amount of forces you will have to face, the difference between Ultra-Green and Elite can be significant and make every fight a lot more dangerous.
+How shares work is detailed in the campaign rules, the most important part is that they can give you a bonus to retirement rolls and keep your company together. Even if you play with shares you might not want everyone to have a stake in your operation and thus keep "All personnel have shares" off, for example a group of mechjockeys starts a company on a shares system but hires their techs. Even with shares salaries have to be paid to everyone.
+"Do retirement/defection rolls at contract completion" should always be enabled because it is an important part of the rules and mercenary life to keep everyone together. "Customize retirement rolls" can help make a bad situation easier to deal with. It allows you to set a general modifier for all your personnel and an individual modifier for each person. It can be used to simulate a lot of situations like an injured pilot thinking about retirement, a soldier with newborn children to take care off or a friend certain to stay in your company no matter what.
+"Track unit fatigue" corresponds to the optional contract fatigue rules and gives all your personnel a fatigue modifier on retirement rolls. If you want more realism this is one possible option since it forces you to make a decision between lucrative contracts with a risky retirement roll at the end or a steady but potentially unprofitable garrison duty. In the worst case you might have to stay out of contract somewhere for several months to reduce fatigue.
+"Track original unit" helps with bookkeeping if you want to remember who owns what even after several reshuffles. This is especially useful to give retiring pilots the correct unit.
+If you enable aerospace units keep in mind that the bot cannot use them and any aero units will give you a significant advantage over the bot. Fighters can also add to the required number of lances you must deploy to meet your contractual obligations and should probably not be added to simply expand your TO&E. In contrast vehicles work fine.
+The contract and unit markets refresh on every first of the month, the personnel market on every Monday.
+
+"Contract search radius" can increase or decrease the allowed distance to your contract location. Use this option if you get no contracts at all or a lot of contracts which are very far away.
+The next four options deal with restriction the rules dictate for your company size, each individual lance and the spare parts you are able to buy during contracts. All of them are explained in the AtB rules and you should try to work within them because they transmit part of the feeling of AtB and BattleTech lore in general. However if anything prevents you from enjoying yourself turn it off it is only a framework after all.
+"Intensity" is an important option because it can drastically change the feeling of your campaign. The standard setting of "1" produces a lot of battles in most cases and can be overwhelming. If you want to focus more on swift progress instead of fighting reduce it by 0.1 steps until you find your sweet spot.
+
+"Double enemy vehicles" and "OpFor lance type ratios" adjust the composition of your enemy. At the beginning a large number of vehicles can be a challenge or you might look for a cleaner mech versus mech game style both can be achieved here.
+VTOLs are an important part of BattleTech but the bot does not yet fully support them and it might be better to not use them. Unlike with ASFs the bot can already do some things with VTOLs which makes them an option.
+"Use DropShips" can generate a few battle with DropShips but should be used with care. Loosing a DropShip has severe consequences for your contract and your financial situation. As stated above the bot does not support aero thus you will still face only ground opposition.
+Weather, light and planetary conditions are purely optional and personal preference. They can alter scenarios drastically and present new tactical questions but it is also possible to make a battle very annoying to play. The best way to find out which setting works for you is trial and error.
+The "Delay Timer" is useful if you have problems with the transfer from MekHQ to MegaMek which happens mostly on slower computers.
+
+
+4. What to do if you think AtB should be a bit easier.
+
+While playing AtB it is always important to remember that the rules are only a framework for you to enjoy yourself and that they can always be adapted as you like best.
+Broadly speaking there are two levels of play in AtB, strategic and tactical. The strategic level is about what forces you have, in what condition at which location at any given time. The tactical side is the actual combat played out in MegaMek. Both levels feed each other, weak forces will have a harder time in combat, poor performance in combat makes it harder to built a strong force.
+
+There are several options which make to strategic game a bit easier.
+"Against the Bot" Tab:
+enabling "Use share system" will make retirement rolls slightly easier, should be done at the start of a campaign
+enabling "Customize retirement rolls" will allow you to set modifiers on retirement rolls and keep your forces together
+disabling "Track unit fatigue" will remove a negative modifier on retirement rolls
+disabling "Restrict parts by mission" allow you to buy more parts during contracts and solves logistical headaches that way
+reducing "Intensity" decrease the number of battles thus allowing more time to repair and heal
+
+Besides adjusting options it is also important to remember the campaign rules and abide by their restrictions. Against the Bot creates the OpFor based on your lances' weight split in the four weight classes (0-130t light, 131-200t medium, 201-280t heavy, 280 -380t assault). I recommend medium and heavy lances as close to the tonnage limit as possible. Light and assault lances tend to generate more extreme odds scenarios. 
+...
+
+tactical
+skill level
+reduce OpFor in lobby
+deploy reinforcement beyond the provisions in the rules
+
+5. What to do if you think AtB is not challenging enough.
+
+As written above AtB is played on two levels.
+To increase the strategic difficulty maintenance and a reduction in payment are good options.
+
+Tactical difficulty can be increased by adjusting the skill level in the AtB options and turning double enemy vehicles on. Light, weather and planetary conditions can make the game harder for players as long as they do not optimise their forces to take advantage.
+
+
+6. FAQ
+Question: Is it possible to acquire DropShips and JumpShips?
+Answer: Yes. When out of contract go to Marketplace -> Personnel Market and select the "search for a ship next week" marker. The drop down menu lets you choose between JumpShips and DropShips. If your roll is successful the next time the market refreshes an individual will show up and have a ship as his vehicle. By hiring him you pay the full price for the ship and hire all needed crew at the same time.
+

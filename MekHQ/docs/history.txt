@@ -1,7 +1,10 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.32-git
+v0.3.33-git
+
+v0.3.32 (2016-08-26 03:00 UTC)
 + Issue #131: Personnel Market update blank
++ Adding Some of the missing AtB Docs
 
 v0.3.31 (2016-07-31 10:00 UTC)
 + Adding an "Inner Sphere at War" hex map overlay to the interstellar panel
