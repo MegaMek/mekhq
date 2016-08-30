@@ -200,7 +200,7 @@
             <mkdir dir="${pkgbuilddir}" />
             <!-- compile -->
             <echo message="MekHQ" />
-            <javac debug="true" debuglevel="lines,source" target="1.7" source="1.7" encoding="UTF-8" destdir="${pkgbuilddir}" srcdir="${pkgdir}/${srcdir}" memoryInitialSize="512m" memoryMaximumSize="512m" fork="true">
+            <javac debug="true" debuglevel="lines,source" target="1.8" source="1.8" encoding="UTF-8" destdir="${pkgbuilddir}" srcdir="${pkgdir}/${srcdir}" memoryInitialSize="512m" memoryMaximumSize="512m" fork="true">
                 <classpath>
                     <pathelement location="${pkgdir}" />
                     <fileset dir="${pkgdir}/${libdir}" includes="*.jar" />
