@@ -1,6 +1,7 @@
 /*
  * IAcquisitionWork.java
  * 
+ * Copyright (C) 2016 MegaMek team
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
  * This file is part of MekHQ.
@@ -23,50 +24,43 @@ package mekhq.campaign.work;
 import megamek.common.TargetRoll;
 import mekhq.campaign.unit.Unit;
 
-/**
- * 
- * @author Jay
- */
 public interface IAcquisitionWork extends IWork {
-	
-	
-	
-	public String getAcquisitionName();
-	
-	public Object getNewEquipment();
-	
-	public String getAcquisitionDesc();
-	
-	public Unit getUnit();
-	
-	public int getDaysToWait();
-	public void resetDaysToWait();
-	public void decrementDaysToWait();
-		
-	public String find(int transitDays);
-	
-	public String failToFind();
-	
-	public TargetRoll getAllAcquisitionMods();
+    public String getAcquisitionName();
+    
+    public Object getNewEquipment();
+    
+    public String getAcquisitionDesc();
+    
+    public Unit getUnit();
+    
+    public int getDaysToWait();
+    public void resetDaysToWait();
+    public void decrementDaysToWait();
+        
+    public String find(int transitDays);
+    
+    public String failToFind();
+    
+    public TargetRoll getAllAcquisitionMods();
 
-	public int getTechBase();
-	
-	public int getTechLevel();
-	
-	public int getQuantity();
-	
-	public void incrementQuantity();
-	
-	public void decrementQuantity();
-	
-	public long getBuyCost();
-	
-	public boolean isIntroducedBy(int year);
-	
-	public boolean isExtinctIn(int year);
-	
-	public int getAvailability(int era);
-	
-	public String getShoppingListReport(int quantity);
-	
+    public int getTechBase();
+    
+    public int getTechLevel();
+    
+    public int getQuantity();
+    
+    public void incrementQuantity();
+    
+    public void decrementQuantity();
+    
+    public long getBuyCost();
+    
+    public boolean isIntroducedBy(int year);
+    
+    public boolean isExtinctIn(int year);
+    
+    public int getAvailability(int era);
+    
+    public String getShoppingListReport(int quantity);
+
 }

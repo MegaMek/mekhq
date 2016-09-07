@@ -75,7 +75,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IPartWork;
-import mekhq.campaign.work.WorkTime;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -1923,6 +1922,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         return SkillType.getExperienceLevelName(getExperienceLevel(false));
     }
 
+	@Override
     public String toString() {
         return getFullName();
     }
@@ -3112,6 +3112,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public ArrayList<LogEntry> getPersonnelLog() {
         Collections.sort(personnelLog, new Comparator<LogEntry>() {
+            @Override
             public int compare(final LogEntry u1, final LogEntry u2) {
                 return u1.getDate().compareTo(u2.getDate());
             }
@@ -3501,6 +3502,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         }
     }
 
+    @Override
     public boolean needsAMFixing() {
         boolean retVal = false;
         if (injuries.size() > 0) {
