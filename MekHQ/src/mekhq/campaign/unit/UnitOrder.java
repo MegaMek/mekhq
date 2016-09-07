@@ -107,15 +107,9 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
     }
 
     @Override
-    public UUID getAssignedTeamId() {
+    public UUID getTeamId() {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    @Override
-    public WorkTime getMode() {
-        // TODO Auto-generated method stub
-        return WorkTime.NORMAL;
     }
 
     @Override

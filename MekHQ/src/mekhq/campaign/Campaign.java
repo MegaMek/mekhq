@@ -1344,8 +1344,8 @@ public class Campaign implements Serializable {
     public boolean isWorkingOnRefit(Person p) {
         for (Unit u : units) {
             if (u.isRefitting()) {
-                if (null != u.getRefit().getAssignedTeamId()
-                    && u.getRefit().getAssignedTeamId().equals(p.getId())) {
+                if (null != u.getRefit().getTeamId()
+                    && u.getRefit().getTeamId().equals(p.getId())) {
                     return true;
                 }
             }
@@ -1366,8 +1366,8 @@ public class Campaign implements Serializable {
     public int getPatientsFor(Person doctor) {
         int patients = 0;
         for (Person person : getPersonnel()) {
-            if (null != person.getAssignedTeamId()
-                && person.getAssignedTeamId().equals(doctor.getId())) {
+            if (null != person.getTeamId()
+                && person.getTeamId().equals(doctor.getId())) {
                 patients++;
             }
         }
@@ -1610,8 +1610,8 @@ public class Campaign implements Serializable {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, doctor.getFullName()
                                                          + " isn't a doctor, he just plays one on TV.");
         }
-        if (medWork.getAssignedTeamId() != null
-            && !medWork.getAssignedTeamId().equals(doctor.getId())) {
+        if (medWork.getTeamId() != null
+            && !medWork.getTeamId().equals(doctor.getId())) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                                   medWork.getPatientName()
                                   + " is already being tended by another doctor");
@@ -1785,7 +1785,7 @@ public class Campaign implements Serializable {
     }
 
     public void refit(Refit r) {
-        Person tech = getPerson(r.getAssignedTeamId());
+        Person tech = getPerson(r.getTeamId());
         if (null == tech) {
             addReport("No tech is assigned to refit "
                       + r.getOriginalEntity().getShortName()
@@ -2455,7 +2455,7 @@ public class Campaign implements Serializable {
         	if (part instanceof Refit) {
         		continue;
         	}
-            if (part.getAssignedTeamId() != null) {
+            if (part.getTeamId() != null) {
                 assignedPartIds.add(part.getId());
             }
             if (part.checkArrival()) {
@@ -2479,7 +2479,7 @@ public class Campaign implements Serializable {
                 if (part.getUnit() != null && part.getUnit().getEngineer() != null) {
                     tech = part.getUnit().getEngineer();
                 } else {
-                    tech = getPerson(part.getAssignedTeamId());
+                    tech = getPerson(part.getTeamId());
                 }
                 if (null != tech) {
                     if(null != tech.getSkillForWorkingOn(part)) {
@@ -2739,8 +2739,8 @@ public class Campaign implements Serializable {
 
     public void removeAllPatientsFor(Person doctor) {
         for (Person p : personnel) {
-            if (null != p.getAssignedTeamId()
-                && p.getAssignedTeamId().equals(doctor.getId())) {
+            if (null != p.getTeamId()
+                && p.getTeamId().equals(doctor.getId())) {
                 p.setDoctorId(null, getCampaignOptions()
                         .getNaturalHealingWaitingPeriod());
             }
@@ -5616,8 +5616,8 @@ public class Campaign implements Serializable {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                                   "This unit is not currently available!");
         }
-        if (partWork.getAssignedTeamId() != null
-            && !partWork.getAssignedTeamId().equals(tech.getId())) {
+        if (partWork.getTeamId() != null
+            && !partWork.getTeamId().equals(tech.getId())) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                                   "Already being worked on by another team");
         }
@@ -6195,7 +6195,7 @@ public class Campaign implements Serializable {
             }
             // If we're assigned to any repairs or refits, remove that assignment
             for (Part part : getParts()) {
-                if (person.getId().equals(part.getAssignedTeamId())) {
+                if (person.getId().equals(part.getTeamId())) {
                     part.cancelAssignment();
                 }
             }

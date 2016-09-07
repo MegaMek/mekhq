@@ -376,7 +376,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 			action = "Salvage ";
 		}
 		String scheduled = "";
-		if (getAssignedTeamId() != null) {
+		if (getTeamId() != null) {
 			scheduled = " (scheduled) ";
 		}
 
@@ -403,7 +403,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		String toReturn = "";
 		if(needsFixing()) {
 			String scheduled = "";
-			if (getAssignedTeamId() != null) {
+			if (getTeamId() != null) {
 				scheduled = " (scheduled) ";
 			}
 			String bonus = getAllMods(null).getValueAsString();
@@ -866,9 +866,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	        }
 	    }
 	    if(isClanTechBase() || (this instanceof MekLocation && this.getUnit() != null && this.getUnit().getEntity().isClan())) {
-	        if (campaign.getPerson(getAssignedTeamId()) == null) {
+	        if (campaign.getPerson(getTeamId()) == null) {
 	            mods.addModifier(2, "clan tech");
-	        } else if (!campaign.getPerson(getAssignedTeamId()).isClanner()) {
+	        } else if (!campaign.getPerson(getTeamId()).isClanner()) {
 	            mods.addModifier(2, "clan tech");
 	        }
 	    }
@@ -904,7 +904,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 
 	@Override
-	public UUID getAssignedTeamId() {
+	public UUID getTeamId() {
 		return teamId;
 	}
 
@@ -921,7 +921,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 	
 	public boolean isTeamSalvaging() {
-		return null != getAssignedTeamId() && isTeamSalvaging;
+		return null != getTeamId() && isTeamSalvaging;
 	}
 
 	public void setReserveId(UUID i) {

@@ -93,7 +93,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		bonus = "(" + bonus + ")";
 		String toReturn = "<html><font size='2'";
 		String scheduled = "";
-		if (getAssignedTeamId() != null) {
+		if (getTeamId() != null) {
 			scheduled = " (scheduled) ";
 		}
 	
@@ -196,7 +196,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	public boolean needsFixing() {
 		//missing parts always need fixing
 		if(null != unit) {
-			return (!unit.isSalvage() || null != getAssignedTeamId()) && unit.isRepairable();
+			return (!unit.isSalvage() || null != getTeamId()) && unit.isRepairable();
 		}
 		return false;
 	}
@@ -355,7 +355,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		//also need to split off a separate one
 		//shouldn't be null, but it never hurts to check
 		Part replacement = findReplacement(false);
-		UUID teamId = getAssignedTeamId();
+		UUID teamId = getTeamId();
 		if(null != replacement && null != teamId) {
 			if(replacement.getQuantity() > 1) {
 				Part actualReplacement = replacement.clone();

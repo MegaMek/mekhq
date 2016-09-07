@@ -6908,7 +6908,7 @@ public class CampaignGUI extends JPanel {
                     boolean wasNull = false;
                     // Temporarily set the Team ID if it isn't already.
                     // This is needed for the Clan Tech flag
-                    if (part.getAssignedTeamId() == null) {
+                    if (part.getTeamId() == null) {
                         part.setTeamId(tech.getId());
                         wasNull = true;
                     }

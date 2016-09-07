@@ -1152,11 +1152,6 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	}
 
 	@Override
-	public WorkTime getMode() {
-		return WorkTime.NORMAL;
-	}
-
-	@Override
 	public void resetTimeSpent() {
 		timeSpent = 0;
 	}
@@ -1211,7 +1206,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	}
 
 	@Override
-	public UUID getAssignedTeamId() {
+	public UUID getTeamId() {
 		return assignedTechId;
 	}
 

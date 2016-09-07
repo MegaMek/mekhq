@@ -1033,7 +1033,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         acquisitions++;
     }
 
-    public UUID getAssignedTeamId() {
+    @Override
+    public UUID getTeamId() {
         return doctorId;
     }
 
@@ -2312,12 +2313,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public void setSecondaryDesignator(int secondaryDesignator) {
         this.secondaryDesignator = secondaryDesignator;
     }
-
-    @Override
-    public WorkTime getMode() {
-        return WorkTime.NORMAL;
-    }
-
 
     @Override
     public int getDifficulty() {

@@ -39,8 +39,13 @@ public interface IWork {
     String fail(int rating);
     
     /** @return the team UUID assigned to this work unit, or <tt>null</tt> if nobody is working on it */
-    UUID getAssignedTeamId();
+    UUID getTeamId();
 
-    /** @return the current work time modifier set for this work unit */
-    WorkTime getMode();
+    /**
+     * @return the current work time modifier set for this work unit; only override if the work
+     * unit supports more than the default, constant work time
+     */
+    default WorkTime getMode() {
+        return WorkTime.NORMAL;
+    }
 }

@@ -3459,7 +3459,7 @@ public class Unit implements MekHqXmlSerializable {
 
     public boolean isUnderRepair() {
         for(Part p : getParts()) {
-            if(null != p.getAssignedTeamId()) {
+            if(null != p.getTeamId()) {
                 return true;
             }
         }

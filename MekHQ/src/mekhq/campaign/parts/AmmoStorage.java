@@ -230,7 +230,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 	public String getDesc() {
 		String toReturn = "<html><font size='2'";
 		String scheduled = "";
-		if (getAssignedTeamId() != null) {
+		if (getTeamId() != null) {
 			scheduled = " (scheduled) ";
 		}
 	
