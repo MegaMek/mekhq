@@ -75,7 +75,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IPartWork;
-import mekhq.campaign.work.Modes;
+import mekhq.campaign.work.WorkTime;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -2314,8 +2314,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
 
     @Override
-    public int getMode() {
-        return Modes.MODE_NORMAL;
+    public WorkTime getMode() {
+        return WorkTime.NORMAL;
     }
 
 

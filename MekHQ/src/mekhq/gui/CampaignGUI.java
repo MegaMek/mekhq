@@ -190,7 +190,7 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.UnitTableData;
 import mekhq.campaign.work.IAcquisitionWork;
-import mekhq.campaign.work.Modes;
+import mekhq.campaign.work.WorkTime;
 import mekhq.gui.adapter.FinanceTableMouseAdapter;
 import mekhq.gui.adapter.LoanTableMouseAdapter;
 import mekhq.gui.adapter.OrgTreeMouseAdapter;
@@ -7159,8 +7159,7 @@ public class CampaignGUI extends JPanel {
                     return false;
                 }
                 Skill skill = tech.getSkillForWorkingOn(part);
-                int modePenalty = Modes.getModeExperienceReduction(part
-                        .getMode());
+                int modePenalty = part.getMode().expReduction;
                 if (skill == null) {
                     return false;
                 }
@@ -8534,8 +8533,7 @@ public class CampaignGUI extends JPanel {
                  */
             } else if (command.contains("CHANGE_MODE")) {
                 String sel = command.split(":")[1];
-                int selected = Integer.parseInt(sel);
-                part.setMode(selected);
+                part.setMode(WorkTime.of(sel));
                 refreshServicedUnitList();
                 refreshUnitList();
                 refreshTaskList();
@@ -8600,12 +8598,12 @@ public class CampaignGUI extends JPanel {
                 // dont allow automatic success jobs to change mode
                 if (part.getAllMods(null).getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
                     menu = new JMenu("Mode");
-                    for (int i = 0; i < Modes.MODE_N; i++) {
-                        cbMenuItem = new JCheckBoxMenuItem(Modes.getModeName(i));
-                        if (part.getMode() == i) {
+                    for(WorkTime wt : WorkTime.DEFAULT_TIMES) {
+                        cbMenuItem = new JCheckBoxMenuItem(wt.name);
+                        if (part.getMode() == wt) {
                             cbMenuItem.setSelected(true);
                         } else {
-                            cbMenuItem.setActionCommand("CHANGE_MODE:" + i);
+                            cbMenuItem.setActionCommand("CHANGE_MODE:" + wt.id);
                             cbMenuItem.addActionListener(this);
                         }
                         cbMenuItem.setEnabled(!part.isBeingWorkedOn());

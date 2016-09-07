@@ -50,6 +50,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.campaign.work.WorkTime;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -112,9 +113,9 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
     }
 
     @Override
-    public int getMode() {
+    public WorkTime getMode() {
         // TODO Auto-generated method stub
-        return 0;
+        return WorkTime.NORMAL;
     }
 
     @Override

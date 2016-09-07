@@ -35,7 +35,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
-import mekhq.campaign.work.Modes;
+import mekhq.campaign.work.WorkTime;
 
 /**
  * A missing part is a placeholder on a unit to indicate that a replacement
@@ -112,7 +112,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
                 toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
             }
             toReturn += " " + bonus;
-            if (getMode() != Modes.MODE_NORMAL) {
+            if (getMode() != WorkTime.NORMAL) {
                 toReturn += "<br/><i>" + getCurrentModeName() + "</i>";
             }
         }

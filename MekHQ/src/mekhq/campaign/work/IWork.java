@@ -44,6 +44,6 @@ public abstract interface IWork {
 	
 	public abstract UUID getAssignedTeamId();
 
-	public abstract int getMode();
+	public abstract WorkTime getMode();
 	
 }

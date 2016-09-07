@@ -170,7 +170,6 @@ import mekhq.campaign.universe.UnitTableData;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IPartWork;
-import mekhq.campaign.work.Modes;
 import mekhq.gui.utilities.PortraitFileFactory;
 
 /**
@@ -1954,8 +1953,7 @@ public class Campaign implements Serializable {
                 tech.setNTasks(0);
             }
         } else {
-            int modePenalty = Modes.getModeExperienceReduction(partWork
-                                                                       .getMode());
+            int modePenalty = partWork.getMode().expReduction;
             int effectiveSkillLvl = tech.getSkillForWorkingOn(partWork)
                                         .getExperienceLevel() - modePenalty;
             if (getCampaignOptions().isDestroyByMargin()) {
@@ -5613,7 +5611,7 @@ public class Campaign implements Serializable {
 
     public TargetRoll getTargetFor(IPartWork partWork, Person tech) {
         Skill skill = tech.getSkillForWorkingOn(partWork);
-        int modePenalty = Modes.getModeExperienceReduction(partWork.getMode());
+        int modePenalty = partWork.getMode().expReduction;
         if (null != partWork.getUnit() && !partWork.getUnit().isAvailable(partWork instanceof Refit)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                                   "This unit is not currently available!");
@@ -6577,7 +6575,7 @@ public class Campaign implements Serializable {
     }
 
     public void refreshNetworks() {
-
+        if(1 == 1) return;
         for (Unit unit : getUnits()) {
             // we are going to rebuild the c3 and c3i networks based on
             // the c3UUIDs

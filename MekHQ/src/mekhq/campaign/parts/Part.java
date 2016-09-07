@@ -44,7 +44,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
-import mekhq.campaign.work.Modes;
+import mekhq.campaign.work.WorkTime;
 
 /**
  * Parts do the lions share of the work of repairing, salvaging, reloading, refueling, etc.
@@ -124,7 +124,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	// the minimum skill level in order to attempt
 	protected int skillMin;
 	//current repair mode for part
-	protected int mode;
+	protected WorkTime mode;
 	
 	protected UUID teamId;
 	private boolean isTeamSalvaging;
@@ -185,7 +185,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.unitTonnage = tonnage;
 		this.hits = 0;
 		this.skillMin = SkillType.EXP_GREEN;
-		this.mode = Modes.MODE_NORMAL;
+		this.mode = WorkTime.NORMAL;
 		this.timeSpent = 0;
 		this.unitId = null;
 		this.workingOvertime = false;
@@ -391,7 +391,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     		    toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
     		}
     		toReturn += " " + bonus;
-    		if (getMode() != Modes.MODE_NORMAL) {
+    		if (getMode() != WorkTime.NORMAL) {
     			toReturn += "<br/><i>" + getCurrentModeName() + "</i>";
     		}
 		}
@@ -414,7 +414,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 			toReturn += getTimeLeft() + " minutes" + scheduled;
 			toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
 			toReturn += " " + bonus;
-			if (getMode() != Modes.MODE_NORMAL) {
+			if (getMode() != WorkTime.NORMAL) {
 				toReturn += ", " + getCurrentModeName();
 			}
 		}
@@ -683,7 +683,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				} else if (wn2.getNodeName().equalsIgnoreCase("skillMin")) {
 					retVal.skillMin = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("mode")) {
-					retVal.mode = Integer.parseInt(wn2.getTextContent());
+					retVal.mode = WorkTime.of(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("daysToWait")) {
                     retVal.daysToWait = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
@@ -762,22 +762,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
 	@Override
 	public int getActualTime() {
-		switch (mode) {
-		case Modes.MODE_EXTRA_DOUBLE:
-			return 2 * getBaseTime();
-		case Modes.MODE_EXTRA_TRIPLE:
-			return 3 * getBaseTime();
-		case Modes.MODE_EXTRA_QUAD:
-			return 4 * getBaseTime();
-		case Modes.MODE_RUSH_ONE:
-			return (int) Math.ceil(getBaseTime() / 2.0);
-		case Modes.MODE_RUSH_TWO:
-			return (int) Math.ceil(getBaseTime() / 4.0);
-		case Modes.MODE_RUSH_THREE:
-			return (int) Math.ceil(getBaseTime() / 8.0);
-		default:
-			return getBaseTime();
-		}
+	    return (int) Math.ceil(getBaseTime() * mode.timeMultiplier);
 	}
 
 	@Override
@@ -811,19 +796,20 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.skillMin = i;
 	}
 
-	public int getMode() {
+	public WorkTime getMode() {
 		return mode;
 	}
 
-	public void setMode(int i) {
-		this.mode = i;
+	public void setMode(WorkTime wt) {
+		this.mode = wt;
 	}
 
 	@Override
 	public TargetRoll getAllMods(Person tech) {
 		TargetRoll mods = new TargetRoll(getDifficulty(), "difficulty");
-		if (Modes.getModeMod(mode,campaign.getCampaignOptions().isDestroyByMargin()) != 0) {
-			mods.addModifier(Modes.getModeMod(mode,campaign.getCampaignOptions().isDestroyByMargin()), getCurrentModeName());
+		int modeMod = mode.getMod(campaign.getCampaignOptions().isDestroyByMargin());
+		if (modeMod != 0) {
+			mods.addModifier(modeMod, getCurrentModeName());
 		}
 		if(null != unit) {
 			mods.append(unit.getSiteMod());
@@ -914,7 +900,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 
 	public String getCurrentModeName() {
-		return Modes.getModeName(mode);
+		return mode.name;
 	}
 
 	@Override
@@ -952,7 +938,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		hits = 0;
 		skillMin = SkillType.EXP_GREEN;
 		shorthandedMod = 0;
-		mode = Modes.MODE_NORMAL;
+		mode = WorkTime.NORMAL;
 	}
 
 	@Override

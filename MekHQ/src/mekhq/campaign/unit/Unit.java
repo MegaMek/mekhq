@@ -173,7 +173,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IMothballWork;
-import mekhq.campaign.work.Modes;
+import mekhq.campaign.work.WorkTime;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -3499,8 +3499,8 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
     }
 
     @Override
-    public int getMode() {
-        return Modes.MODE_NORMAL;
+    public WorkTime getMode() {
+        return WorkTime.NORMAL;
     }
 
 

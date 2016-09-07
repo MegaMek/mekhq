@@ -61,7 +61,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
-import mekhq.campaign.work.Modes;
+import mekhq.campaign.work.WorkTime;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -1152,8 +1152,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	}
 
 	@Override
-	public int getMode() {
-		return Modes.MODE_NORMAL;
+	public WorkTime getMode() {
+		return WorkTime.NORMAL;
 	}
 
 	@Override
