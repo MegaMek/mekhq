@@ -1,6 +1,7 @@
 /*
  * Unit.java
  *
+ * Copyright (C) 2016 MegaMek team
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
  * This file is part of MekHQ.
@@ -30,6 +31,10 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.UUID;
+
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import megamek.common.ASFBay;
 import megamek.common.Aero;
@@ -172,12 +177,6 @@ import mekhq.campaign.parts.equipment.MissingJumpJet;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
-import mekhq.campaign.work.IMothballWork;
-import mekhq.campaign.work.WorkTime;
-
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * This is a wrapper class for entity, so that we can add some functionality to
@@ -185,7 +184,7 @@ import org.w3c.dom.NodeList;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Unit implements MekHqXmlSerializable, IMothballWork {
+public class Unit implements MekHqXmlSerializable {
 
     public static final int SITE_FIELD = 0;
 	public static final int SITE_MOBILE_BASE = 1;
@@ -3454,55 +3453,6 @@ public class Unit implements MekHqXmlSerializable, IMothballWork {
 		}
 		return false;
 	}
-
-    /*MOTHBALL RELATED STUFF*/
-
-    @Override
-    public boolean needsFixing() {
-        return isMothballing();
-    }
-
-    @Override
-    public int getDifficulty() {
-        return TargetRoll.AUTOMATIC_SUCCESS;
-    }
-
-    @Override
-    public TargetRoll getAllMods(Person admin) {
-        TargetRoll mods = new TargetRoll(getDifficulty(), "difficulty");
-        return mods;
-    }
-
-    @Override
-    public String fail(int rating) {
-        return "you shouldn't be here.";
-    }
-
-    @Override
-    public String succeed() {
-        mothballTime = 0;
-        if(null != getTech()) {
-            remove(getTech(), false);
-        }
-        if(isMothballed()) {
-            mothballed = true;
-            return "Activation of " + getHyperlinkedName() + " complete.";
-        } else {
-            mothballed = false;
-            return "Mothballing of " + getHyperlinkedName() + " complete.";
-        }
-    }
-
-    @Override
-    public UUID getAssignedTeamId() {
-        return getTechId();
-    }
-
-    @Override
-    public WorkTime getMode() {
-        return WorkTime.NORMAL;
-    }
-
 
     public String getLastMaintenanceReport() {
         return lastMaintenanceReport;

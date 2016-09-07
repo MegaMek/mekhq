@@ -1,6 +1,7 @@
 /*
  * IMothballWork.java
  * 
+ * Copyright (C) 2016 MegaMek team
  * Copyright (c) 2013 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
  * This file is part of MekHQ.
@@ -20,10 +21,6 @@
  */
 package mekhq.campaign.work;
 
-/**
- * 
- * @author Jay
- */
+/** Marker interface for mothballing and un-mothballing. Currently unused. */
 public interface IMothballWork extends IWork {
-    
 }
