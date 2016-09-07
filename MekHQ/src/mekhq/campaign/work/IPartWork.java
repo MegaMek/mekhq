@@ -1,6 +1,7 @@
 /*
  * IPartWork.java
  * 
+ * Copyright (C) 2016 MegaMek team
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
  * This file is part of MekHQ.
@@ -26,49 +27,44 @@ import megamek.common.TargetRoll;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.unit.Unit;
 
-/**
- * 
- * @author Jay
- */
 public interface IPartWork extends IWork {
-	
-	public String getPartName();
-	
-	public int getSkillMin();
+    
+    String getPartName();
+    
+    int getSkillMin();
 
-	public int getBaseTime();
-	public int getActualTime();
-	public int getTimeSpent();
-	public int getTimeLeft();
-	public void addTimeSpent(int time);
-	public void resetTimeSpent();
-	public void resetOvertime();
-	public boolean isRightTechType(String skillType);
-	
-	public TargetRoll getAllModsForMaintenance();
-	
-	public UUID getAssignedTeamId();
-	public void setTeamId(UUID id);
-	public boolean hasWorkedOvertime();
-	public void setWorkedOvertime(boolean b);
-	public int getShorthandedMod();
-	public void setShorthandedMod(int i);
-	
-	public void updateConditionFromEntity(boolean checkForDestruction);
-	public void updateConditionFromPart();
-	public void fix();
-	public void remove(boolean salvage);
-	public MissingPart getMissingPart();
-	
-	public String getDesc();
-	public String getDetails();
-	
-	public Unit getUnit();
-	
-	public boolean isSalvaging();
-	
-	public String checkFixable();
-	
-	public void reservePart();
-	public void cancelReservation();
+    int getBaseTime();
+    int getActualTime();
+    int getTimeSpent();
+    int getTimeLeft();
+    void addTimeSpent(int time);
+    void resetTimeSpent();
+    void resetOvertime();
+    boolean isRightTechType(String skillType);
+    
+    TargetRoll getAllModsForMaintenance();
+    
+    void setTeamId(UUID id);
+    boolean hasWorkedOvertime();
+    void setWorkedOvertime(boolean b);
+    int getShorthandedMod();
+    void setShorthandedMod(int i);
+    
+    void updateConditionFromEntity(boolean checkForDestruction);
+    void updateConditionFromPart();
+    void fix();
+    void remove(boolean salvage);
+    MissingPart getMissingPart();
+    
+    String getDesc();
+    String getDetails();
+    
+    Unit getUnit();
+    
+    boolean isSalvaging();
+    
+    String checkFixable();
+    
+    void reservePart();
+    void cancelReservation();
 }
