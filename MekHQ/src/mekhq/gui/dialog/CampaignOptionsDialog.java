@@ -402,7 +402,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox chkUseWeatherConditions;
     private JCheckBox chkUseLightConditions;
     private JCheckBox chkUsePlanetaryConditions;
-    private JCheckBox chkUseAltMapgen;
     private JCheckBox chkUseAtBCapture;
 
     private JCheckBox chkAeroRecruitsHaveUnits;
@@ -3097,7 +3096,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         chkUseWeatherConditions = new JCheckBox();
         chkUseLightConditions = new JCheckBox();
         chkUsePlanetaryConditions = new JCheckBox();
-        chkUseAltMapgen = new JCheckBox();
         chkUseAtBCapture = new JCheckBox();
         spnStartGameDelay = new JSpinner();
 
@@ -3705,22 +3703,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(chkUsePlanetaryConditions, gridBagConstraints);
 
-        chkUseAltMapgen.setText(resourceMap.getString("chkUseAltMapgen.text"));
-        chkUseAltMapgen.setToolTipText(resourceMap.getString("chkUseAltMapgen.toolTipText"));
-        chkUseAltMapgen.setSelected(options.getUseAltMapgen());
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 10;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        panSubAtBScenario.add(chkUseAltMapgen, gridBagConstraints);
-
         chkUseAtBCapture.setText(resourceMap.getString("chkUseAtBCapture.text"));
         chkUseAtBCapture.setToolTipText(resourceMap.getString("chkUseAtBCapture.toolTipText"));
         chkUseAtBCapture.setSelected(options.getUseAtBCapture());
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 11;
+        gridBagConstraints.gridy = 10;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -3735,7 +3722,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         txtStartGameDelay.setWrapStyleWord(true);
         txtStartGameDelay.setOpaque(false);
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 12;
+        gridBagConstraints.gridy = 11;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -3744,7 +3731,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         JLabel lblStartGameDelay = new JLabel(resourceMap.getString("spnStartGameDelay.text"));
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 13;
+        gridBagConstraints.gridy = 12;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -4273,7 +4260,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUseWeatherConditions(chkUseWeatherConditions.isSelected());
         options.setUseLightConditions(chkUseLightConditions.isSelected());
         options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
-        options.setUseAltMapgen(chkUseAltMapgen.isSelected());
         options.setUseAtBCapture(chkUseAtBCapture.isSelected());
         options.setStartGameDelay((Integer)spnStartGameDelay.getValue());
 
