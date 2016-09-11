@@ -161,6 +161,7 @@ import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.News;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.Planet;
@@ -274,6 +275,7 @@ public class Campaign implements Serializable {
     private RetirementDefectionTracker retirementDefectionTracker; // AtB
     private int fatigueLevel; //AtB
     private AtBConfiguration atbConfig; //AtB
+    private IUnitGenerator unitGenerator;
 
     public Campaign() {
         game = new Game();
@@ -455,6 +457,23 @@ public class Campaign implements Serializable {
 
     public int getFatigueLevel() {
     	return fatigueLevel;
+    }
+    
+    public IUnitGenerator getUnitGenerator() {
+    	if (unitGenerator == null) {
+    		UnitTableData utd = UnitTableData.getInstance();
+    		while (!utd.isInitialized()) {
+                //Sleep for up to one second.
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException ignore) {
+
+                }    			
+    		}
+    		utd.setChosenRATs(campaignOptions.getRATs());
+    		unitGenerator = utd;
+    	}
+    	return unitGenerator;
     }
 
     public AtBConfiguration getAtBConfig() {

@@ -46,6 +46,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.client.RandomUnitGenerator;
+import megamek.common.EntityWeightClass;
+import megamek.common.MechSummary;
+import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 
@@ -56,7 +59,7 @@ import mekhq.Utilities;
  * @author Neoancient
  *
  */
-public class UnitTableData implements Serializable, ActionListener {
+public class UnitTableData implements Serializable, ActionListener, IUnitGenerator {
     /**
      *
      */
@@ -74,39 +77,10 @@ public class UnitTableData implements Serializable, ActionListener {
 
     //used for CampaignOptionsDialog
     private static ArrayList<String> allRatNames;
+    
+    private String[] selectedRATs = {};
 
     private ArrayList<ActionListener> listeners;
-
-    public static final int WT_LIGHT = 0;
-    public static final int WT_MEDIUM = 1;
-    public static final int WT_HEAVY = 2;
-    public static final int WT_ASSAULT = 3;
-    public static final int NUM_WT_CLASSES = 4;
-    public static final int NUM_WT_CLASSES_AERO = 3;
-    public static final String[] weightNames = {
-        "Light", "Medium", "Heavy", "Assault"
-    };
-
-    public static final int UNIT_MECH = 0;
-    public static final int UNIT_VEHICLE = 1;
-    public static final int UNIT_AERO = 2;
-    public static final int UNIT_DROPSHIP = 3;
-    public static final int UNIT_INFANTRY = 4;
-    public static final int UNIT_BATTLEARMOR = 5;
-    public static final int UNIT_PROTOMECH = 6;
-    public static final int UNIT_COUNT = 7;
-    public static final String[] unitNames = {
-        "Mek", "Vehicle", "Aero", "Dropship", "Infantry",
-        "Battle Armor", "ProtoMek"
-    };
-
-    public static final int QUALITY_F = 0;
-    public static final int QUALITY_D = 1;
-    public static final int QUALITY_C = 2;
-    public static final int QUALITY_B = 3;
-    public static final int QUALITY_A = 4;
-    public static final int QUALITY_AA = 5;
-    public static final String[] qualityNames = {"F","D","C","B","A","AA"};
 
     public static ArrayList<String> getAllRATNames() {
         if (allRatNames == null) {
@@ -124,6 +98,7 @@ public class UnitTableData implements Serializable, ActionListener {
      * @param year- if > 0, only RATs from this date or earlier are returned.
      * @return-a list of RATCollection names that can be used for getRAT(...)
      */
+
     public List<FactionTables> getRATCollections(String faction, int unitType, int year) {
         List<FactionTables> retval = new ArrayList<FactionTables>();
         for (String collection : ratTree.keySet()) {
@@ -140,7 +115,7 @@ public class UnitTableData implements Serializable, ActionListener {
         }
         return retval;
     }
-
+    
     /*
      * returns true if the collection has tables for the faction/unitType
      * not later than year
@@ -205,7 +180,7 @@ public class UnitTableData implements Serializable, ActionListener {
             sorted.add(source);
         }
         /* A hack to deal with the lack of aero in RATs before 3050 */
-        if ((unitType == UNIT_AERO || unitType == UNIT_DROPSHIP) && year < 3050) {
+        if ((unitType == UnitType.AERO || unitType == UnitType.DROPSHIP) && year < 3050) {
             for (String f : altFactions) {
                 if (hasRAT("War of 39", f, unitType)) {
                     return getFirstRAT("War of 39", f, unitType);
@@ -313,6 +288,11 @@ public class UnitTableData implements Serializable, ActionListener {
     public synchronized void removeListener(ActionListener l) {
         listeners.remove(l);
     }
+    
+    public void setChosenRATs(String[] rats) {
+    	selectedRATs = new String[rats.length];
+    	System.arraycopy(rats, 0, selectedRATs, 0, rats.length);
+    }
 
     public synchronized void populateTables() {
         ratTree = new TreeMap<String, Map<Integer, Map<String, FactionTables>>>();
@@ -375,7 +355,7 @@ public class UnitTableData implements Serializable, ActionListener {
         if (initialized) {
             for (ActionListener l : listeners) {
                 l.actionPerformed(new ActionEvent(
-                        this, ActionEvent.ACTION_PERFORMED, "ratiInitialized"));
+                        this, ActionEvent.ACTION_PERFORMED, "ratInitialized"));
             }
         }
     }
@@ -440,10 +420,10 @@ public class UnitTableData implements Serializable, ActionListener {
                             if (fn.equalsIgnoreCase("tables")) {
                                 for (String s : altsNode.getTextContent().trim().split(",")) {
                                     altTables.get(fName).add(s);
-                            }
-                        }
+	                            }
+	                        }
+	                    }
                     }
-                            }
                 } else if (xn.equalsIgnoreCase("rat")) {
                     String ratSource = ratNode.getAttributes().getNamedItem("name").getTextContent();
                     int year = Integer.parseInt(ratNode.getAttributes().getNamedItem("era").getTextContent());
@@ -704,19 +684,21 @@ public class UnitTableData implements Serializable, ActionListener {
 
         public boolean hasTable(int unitType) {
             switch (unitType) {
-            case UNIT_MECH:
+            case UnitType.MEK:
                 return mechs != null && mechs.size() > 0;
-            case UNIT_VEHICLE:
+            case UnitType.TANK:
+            case UnitType.VTOL:
+            case UnitType.NAVAL:
                 return vees != null && vees.size() > 0;
-            case UNIT_AERO:
+            case UnitType.AERO:
                 return aero != null && aero.size() > 0;
-            case UNIT_DROPSHIP:
+            case UnitType.DROPSHIP:
                 return dropships != null;
-            case UNIT_INFANTRY:
+            case UnitType.INFANTRY:
                 return infantry != null;
-            case UNIT_BATTLEARMOR:
+            case UnitType.BATTLE_ARMOR:
                 return battleArmor != null;
-            case UNIT_PROTOMECH:
+            case UnitType.PROTOMEK:
                 return protomechs != null;
             }
             return false;
@@ -744,66 +726,73 @@ public class UnitTableData implements Serializable, ActionListener {
             return protomechs != null;
         }
 
+        /**
+         * 
+         * @param unitType UnitType constant
+         * @param weightClass EntityWeightClass constant
+         * @param quality Quality rating index; zero is poorest
+         * @return The name of the appropriate RAT 
+         */
         public String getTable(int unitType, int weightClass, int quality) {
             ArrayList<String> units = null;
+            int wcIndex = weightClass - EntityWeightClass.WEIGHT_LIGHT;
             switch (unitType) {
-            case UNIT_MECH:
+            case UnitType.MEK:
                 if (mechs == null || mechs.size() == 0) {
                     return null;
                 } else if (mechs.size() == 1) {
                     units = mechs.get(0);
-                } else if (mechs.size() < NUM_WT_CLASSES) {
+                } else if (mechs.size() < 4) {
                     /* If the ratinfo.xml file does not supply a RAT for every weight
                      * class category, select based on proportial position.
                      */
-                    units = mechs.get(weightClass * mechs.size() / (NUM_WT_CLASSES));
+                    units = mechs.get(wcIndex * mechs.size() / 4);
                 } else {
-                    units = mechs.get(weightClass);
+                    units = mechs.get(wcIndex);
                 }
                 break;
-            case UNIT_VEHICLE:
+            case UnitType.TANK:
+            case UnitType.VTOL:
+            case UnitType.NAVAL:
                 if (vees == null || vees.size() == 0) {
                     return null;
                 } else if (vees.size() == 1) {
                     units = vees.get(0);
-                } else if (vees.size() < NUM_WT_CLASSES) {
-                    units = vees.get(weightClass * vees.size() / (NUM_WT_CLASSES));
+                } else if (vees.size() < 4) {
+                    units = vees.get(wcIndex * vees.size() / 4);
                 } else {
-                    units = vees.get(weightClass);
+                    units = vees.get(wcIndex);
                 }
                 break;
-            case UNIT_AERO:
+            case UnitType.AERO:
                 if (aero == null || aero.size() == 0) {
                     return null;
                 } else if (aero.size() == 1) {
                     units = aero.get(0);
-                } else if (aero.size() < NUM_WT_CLASSES_AERO) {
-                    units = aero.get(weightClass * aero.size() / (NUM_WT_CLASSES_AERO));
+                } else if (aero.size() < 3) {
+                    units = aero.get(wcIndex * aero.size() / 3);
                 } else {
-                    units = aero.get(weightClass);
+                    units = aero.get(wcIndex);
                 }
                 break;
-            case UNIT_DROPSHIP:
+            case UnitType.DROPSHIP:
                 units = dropships;
                 break;
-            case UNIT_INFANTRY:
+            case UnitType.INFANTRY:
                 units = infantry;
                 break;
-            case UNIT_BATTLEARMOR:
+            case UnitType.BATTLE_ARMOR:
                 units = battleArmor;
                 break;
-            case UNIT_PROTOMECH:
+            case UnitType.PROTOMEK:
                 units = protomechs;
                 break;
             }
             //Treat the top as A unless there is an explicit A+ RAT
             if (units.size() == 6) {
-                return units.get(QUALITY_AA - quality);
+                return units.get(quality);
             }
-            if (quality == QUALITY_AA) {
-                quality--;
-            }
-            return units.get(quality * units.size() / 5);
+            return units.get(Math.min(quality, 5) * units.size() / 5);
         }
 
         public String getTable(int unitType, int quality) {
@@ -877,5 +866,39 @@ public class UnitTableData implements Serializable, ActionListener {
             return false;
         }
     }
+    
+    @Override
+    public boolean isSupportedUnitType(int unitType) {
+    	return unitType == UnitType.MEK
+    			|| unitType == UnitType.TANK
+    			|| unitType == UnitType.AERO
+    			|| unitType == UnitType.DROPSHIP
+    			|| unitType == UnitType.INFANTRY
+    			|| unitType == UnitType.BATTLE_ARMOR
+    			|| unitType == UnitType.PROTOMEK;
+    }
+
+	@Override
+	public MechSummary generate(String faction, int unitType, int weightClass,
+			int year, int quality) {
+		List<MechSummary> list = generate(1, faction, unitType, weightClass, year, quality);
+		if (list.size() > 0) {
+			return list.get(0);
+		}
+		return null;
+	}
+
+	@Override
+	public List<MechSummary> generate(int count, String faction, int unitType,
+			int weightClass, int year, int quality) {
+		FactionTables ft = getBestRAT(selectedRATs, year,
+				faction, unitType);
+		String rat = ft.getTable(unitType, weightClass, quality);
+		if (null != rat) {
+			RandomUnitGenerator.getInstance().setChosenRAT(rat);
+			return RandomUnitGenerator.getInstance().generate(count);
+		}
+		return new ArrayList<MechSummary>();
+	}
 
 }
