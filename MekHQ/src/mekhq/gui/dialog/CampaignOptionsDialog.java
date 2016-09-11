@@ -38,7 +38,6 @@ import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.ResourceBundle;
@@ -353,11 +352,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     /* Against the Bot */
     private JPanel panAtB;
     private JCheckBox chkUseAtB;
-
-    private javax.swing.JToggleButton btnUseAtBSkillCosts;
-    private javax.swing.JToggleButton btnUseAtBSPACosts;
-    Hashtable<String, SpecialAbility> atbSPA;
-    Hashtable<String, SpecialAbility> originalSPA;
 
     private JComboBox<String> cbSkillLevel;
     private JCheckBox chkUseShareSystem;
@@ -1879,7 +1873,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         for(String name : spaNames) {
         	tempSPA.put(name, SpecialAbility.getAbility(name).clone());
         }
-        initAtBSPA();
 
         panXP.setName("panXP"); // NOI18N
         panXP.setLayout(new java.awt.GridBagLayout());
@@ -3061,9 +3054,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panAtB = new JPanel();
         chkUseAtB = new JCheckBox();
 
-        btnUseAtBSkillCosts = new javax.swing.JToggleButton();
-        btnUseAtBSPACosts = new javax.swing.JToggleButton();
-
         cbSkillLevel = new JComboBox<String>();
         chkUseShareSystem = new JCheckBox();
         chkSharesExcludeLargeCraft = new JCheckBox();
@@ -3154,28 +3144,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         panAtB.add(cbSkillLevel, gridBagConstraints);
-
-        btnUseAtBSkillCosts.setText(resourceMap.getString("btnUseAtBSkillCosts.text"));
-        btnUseAtBSkillCosts.setToolTipText(resourceMap.getString("btnUseAtBSkillCosts.toolTipText"));
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        panAtB.add(btnUseAtBSkillCosts, gridBagConstraints);
-        btnUseAtBSkillCosts.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				setAtBSkillCosts();
-			}
-        });
-
-        btnUseAtBSPACosts.setText(resourceMap.getString("btnUseAtBSPACosts.text"));
-        btnUseAtBSPACosts.setToolTipText(resourceMap.getString("btnUseAtBSPACosts.toolTipText"));
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 1;
-        panAtB.add(btnUseAtBSPACosts, gridBagConstraints);
-        btnUseAtBSPACosts.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				setAtBSPACosts();
-			}
-        });
 
         JPanel panSubAtBAdmin = new JPanel(new GridBagLayout());
         JPanel panSubAtBRat = new JPanel(new GridBagLayout());
@@ -4571,159 +4539,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     			c.setEnabled(enabled);
     		}
     	}
-    }
-
-    private void setAtBSkillCosts() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl()); //$NON-NLS-1$
-    	if (btnUseAtBSkillCosts.isSelected()) {
-    		final String[] combatSkills = {SkillType.S_PILOT_MECH,SkillType.S_GUN_MECH,SkillType.S_PILOT_AERO,SkillType.S_GUN_AERO,
-    				SkillType.S_PILOT_GVEE,SkillType.S_PILOT_VTOL,SkillType.S_PILOT_NVEE,SkillType.S_GUN_VEE,
-    				SkillType.S_PILOT_JET,SkillType.S_GUN_JET,SkillType.S_PILOT_SPACE,SkillType.S_GUN_SPACE,SkillType.S_NAV,
-    				SkillType.S_ARTILLERY,SkillType.S_GUN_BA,SkillType.S_GUN_PROTO,SkillType.S_SMALL_ARMS,SkillType.S_ANTI_MECH};
-    		final String[] supportSkills = {SkillType.S_TECH_MECH,SkillType.S_TECH_MECHANIC,SkillType.S_TECH_AERO,SkillType.S_TECH_BA,SkillType.S_TECH_VESSEL,SkillType.S_ASTECH,
-    				SkillType.S_DOCTOR,SkillType.S_MEDTECH,
-    				SkillType.S_ADMIN,SkillType.S_NEG,SkillType.S_SCROUNGE};
-    		final String[] officerSkills = {SkillType.S_TACTICS,SkillType.S_STRATEGY,SkillType.S_LEADER};
-
-    		final int[] combatXp = {5, 5, 5, 5, 10, 20, 40, 60, 100, -1, -1};
-    		final int[] supportXp = {0, 5, 0, 10, 20, 40, -1, -1, -1, -1, -1};
-    		final int[] officerXp = {0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
-
-            HashMap<String, Integer> skillIndices = new HashMap<String, Integer>();
-    		for (int i = 0; i < SkillType.skillList.length; i++) {
-    			skillIndices.put(SkillType.skillList[i], i);
-    		}
-
-    		for (String skillName : combatSkills) {
-    			hashSkillTargets.get(skillName).setValue(8);
-    			for (int i = 0; i < combatXp.length; i++) {
-    				tableXP.setValueAt(Integer.toString(combatXp[i]),
-    						skillIndices.get(skillName), i);
-    			}
-    		}
-    		for (String skillName : supportSkills) {
-    			hashSkillTargets.get(skillName).setValue(10);
-    			for (int i = 0; i < supportXp.length; i++) {
-    				tableXP.setValueAt(Integer.toString(supportXp[i]),
-    						skillIndices.get(skillName), i);
-    			}
-    		}
-    		for (String skillName : officerSkills) {
-    			hashSkillTargets.get(skillName).setValue(0);
-    			for (int i = 0; i < officerXp.length; i++) {
-    				tableXP.setValueAt(Integer.toString(officerXp[i]),
-    						skillIndices.get(skillName), i);
-    			}
-    		}
-    		btnUseAtBSkillCosts.setText(resourceMap.getString("btnRestoreAtBSkillCosts.text"));
-    		btnUseAtBSkillCosts.setToolTipText(resourceMap.getString("btnRestoreAtBSkillCosts.toolTipText"));
-    	} else {
-    		for (int i = 0; i < SkillType.skillList.length; i++) {
-    			String skillName = SkillType.skillList[i];
-    			hashSkillTargets.get(skillName).setValue(SkillType.getType(skillName).getTarget());
-    			for (int j = 0; j < 11; j++) {
-    				tableXP.setValueAt(Integer.toString(SkillType.getType(skillName).getCost(j)), i, j);
-    			}
-			}
-    		btnUseAtBSkillCosts.setText(resourceMap.getString("btnUseAtBSkillCosts.text"));
-    		btnUseAtBSkillCosts.setToolTipText(resourceMap.getString("btnUseAtBSkillCosts.toolTipText"));
-    	}
-    }
-
-    private void setAtBSPACosts() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl()); //$NON-NLS-1$
-
-    	if (btnUseAtBSPACosts.isSelected()) {
-    		tempSPA = atbSPA;
-    		btnUseAtBSPACosts.setText(resourceMap.getString("btnRestoreAtBSPACosts.text"));
-    		btnUseAtBSPACosts.setToolTipText(resourceMap.getString("btnRestoreAtBSPACosts.toolTipText"));
-    	} else {
-    		tempSPA = originalSPA;
-    		btnUseAtBSPACosts.setText(resourceMap.getString("btnUseAtBSPACosts.text"));
-    		btnUseAtBSPACosts.setToolTipText(resourceMap.getString("btnUseAtBSPACosts.toolTipText"));
-    	}
-
-    	panSpecialAbilities.removeAll();
-
-        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx =1.0;
-        gridBagConstraints.weighty =0.0;
-        panSpecialAbilities.add(btnAddSPA, gridBagConstraints);
-        btnAddSPA.setEnabled(true);
-
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.weightx =1.0;
-        gridBagConstraints.weighty =1.0;
-
-        for(String title : tempSPA.keySet()) {
-            panSpecialAbilities.add(new SpecialAbilityPanel(tempSPA.get(title), this), gridBagConstraints);
-            gridBagConstraints.gridy++;
-        }
-        panSpecialAbilities.revalidate();
-        panSpecialAbilities.repaint();
-    }
-
-    private void initAtBSPA() {
-    	Set<String> spaNames = SpecialAbility.getAllSpecialAbilities().keySet();
-    	atbSPA = new Hashtable<String, SpecialAbility>();
-    	originalSPA = new Hashtable<String, SpecialAbility>();
-	    for(String name : spaNames) {
-	    	originalSPA.put(name, SpecialAbility.getAbility(name).clone());
-	    	SpecialAbility spa = SpecialAbility.getAbility(name).clone();
-	    	switch (spa.getName()) {
-	    	case "dodge_maneuver":
-	    	case "hopping_jack":
-	    	case "melee_specialist":
-	    	case "melee_master":
-	    	case "weapon_specialist":
-	    	case "pain_resistance":
-	    	case "iron_man":
-	    	case "sensor_geek":
-	    		spa.setCost(20);
-	    		spa.setWeight(10);
-	    		break;
-	    	case "hot_dog":
-	    	case "maneuvering_ace":
-	    	case "cluster_hitter":
-	    	case "multi_tasker":
-	    	case "sandblaster":
-	    	case "some_like_it_hot":
-	    		spa.setCost(40);
-	    		spa.setWeight(5);
-	    		break;
-	    	case "jumping_jack":
-	    		spa.setCost(40);
-	    		spa.setWeight(10);
-	    		break;
-	    	case "cluster_master":
-	    		spa.setCost(60);
-	    		spa.setWeight(5);
-	    	case "allweather":
-	    	case "oblique_attacker":
-	    	case "sniper":
-	    	case "weathered":
-	    	case "blind_fighter":
-	    		spa.setCost(60);
-	    		spa.setWeight(2);
-	    		break;
-	    	case "specialist":
-	    		spa.setCost(40);
-	    		spa.setWeight(12);
-	    		break;
-	    	case "aptitude_gunnery":
-	    	case "tactical_genius":
-	    		spa.setCost(-1);
-	    		spa.setWeight(1);
-	    	}
-	    	atbSPA.put(name, spa);
-	    }
     }
 
     private void updateBattleChances() {
