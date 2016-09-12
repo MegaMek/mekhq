@@ -36,6 +36,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -46,6 +48,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.client.RandomUnitGenerator;
+import megamek.common.Compute;
 import megamek.common.EntityWeightClass;
 import megamek.common.MechSummary;
 import megamek.common.UnitType;
@@ -907,6 +910,36 @@ public class UnitTableData implements Serializable, ActionListener, IUnitGenerat
 			return RandomUnitGenerator.getInstance().generate(count);
 		}
 		return new ArrayList<MechSummary>();
+	}
+
+	private static final int RETRIES = 10;
+	@Override
+	public MechSummary generate(String faction, int unitType, int weightClass,
+			int year, int quality, Predicate<MechSummary> filter) {
+		List<MechSummary> list = generate(RETRIES, faction, unitType, weightClass,
+				year, quality);
+		for (MechSummary ms : list) {
+			if (filter.test(ms)) {
+				return ms;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public List<MechSummary> generate(int count, String faction, int unitType,
+			int weightClass, int year, int quality,
+			Predicate<MechSummary> filter) {
+		List<MechSummary> list = generate(RETRIES * count, faction, unitType, weightClass,
+				year, quality);
+		if (list.size() > 0) {
+			List<MechSummary> retVal = list.stream().filter(filter).collect(Collectors.toList());			
+			while (retVal.size() < count) {
+				retVal.add(list.get(Compute.randomInt(list.size())));
+			}
+			return retVal.subList(0, count);
+		}
+		return new ArrayList<>();
 	}
 
 }

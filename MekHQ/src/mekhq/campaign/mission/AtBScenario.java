@@ -28,8 +28,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -1786,8 +1788,20 @@ public class AtBScenario extends Scenario {
 	 * @return				A new Entity with crew.
 	 */
 	private Entity getEntity(String faction, int skill, int quality, int unitType, int weightClass, Campaign campaign) {
-		MechSummary ms = campaign.getUnitGenerator().generate(faction, unitType, weightClass, campaign.getCalendar().get(Calendar.YEAR), quality);
+		MechSummary ms = null;
+		if (unitType == UnitType.TANK && !campaign.getCampaignOptions().getOpforUsesVTOLs()) {
+			ms = campaign.getUnitGenerator()
+					.generate(faction, unitType, weightClass, campaign.getCalendar()
+							.get(Calendar.YEAR), quality, v -> !v.getUnitType().equals("VTOL"));			
+		} else {
+			ms = campaign.getUnitGenerator()
+					.generate(faction, unitType, weightClass, campaign.getCalendar()
+							.get(Calendar.YEAR), quality);
+		}
 
+		if (ms == null) {
+			return null;
+		}
 		return createEntityWithCrew(faction, skill, campaign, ms);
 	}
 
@@ -1863,101 +1877,6 @@ public class AtBScenario extends Scenario {
 		en.setExternalIdAsString(id.toString());
 		entityIds.put(id, en);
 		
-		return en;
-	}
-
-	/**
-	 * Generates an Entity and assigns skills and crew name
-	 *
-	 * @param rat		The name of the RAT to pass to RandomUnitGenerator
-	 * @param faction	The code for the faction to use in generating the crew name
-	 * @param skill		The skill level to pass to RandomSkillsGenerator
-	 * @param campaign
-	 * @return			A new Entity
-	 */
-	private Entity getUnitFromRat(String rat, String faction, int skill, Campaign campaign) {
-		Entity en = null;
-		MechSummary ms = null;
-		if (null == rat) {
-			MekHQ.logError("Could not locate appropriate RAT while generating scenario");
-			return null;
-		}
-
-		RandomUnitGenerator.getInstance().setChosenRAT(rat);
-		do {
-			ArrayList<MechSummary> msl = RandomUnitGenerator.getInstance().generate(1);
-			if (msl.size() > 0) {
-				ms = msl.get(0);
-			}
-			if (null == ms) {
-				MekHQ.logError("Unable to load summary from RAT " + rat + " while generating scenario");
-				return null;
-			}
-		} while (!campaign.getCampaignOptions().getOpforUsesVTOLs() &&
-				ms.getUnitType().equals("VTOL"));
-
-		try {
-			en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
-		} catch (Exception ex) {
-			en = null;
-			MekHQ.logError("Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage());
-			MekHQ.logError(ex);
-			return null;
-		}
-
-		en.setOwner(campaign.getPlayer());
-		en.setGame(campaign.getGame());
-
-		Faction f = Faction.getFaction(faction);
-
-		RandomNameGenerator rng = RandomNameGenerator.getInstance();
-		rng.setChosenFaction(f.getNameGenerator());
-		String crewName = rng.generate();
-
-		RandomSkillsGenerator rsg = new RandomSkillsGenerator();
-		rsg.setMethod(RandomSkillsGenerator.M_TAHARQA);
-		rsg.setLevel(skill);
-
-		if (f.isClan()) {
-			rsg.setType(RandomSkillsGenerator.T_CLAN);
-		}
-		int[] skills = rsg.getRandomSkills(en);
-
-		if (f.isClan() && Compute.d6(2) > 8 - getContract(campaign).getEnemySkill()
-				+ skills[0] + skills[1]) {
-			int phenotype;
-			switch (UnitType.determineUnitTypeCode(en)) {
-			case UnitType.MEK:
-				phenotype = Bloodname.P_MECHWARRIOR;
-				break;
-			case UnitType.BATTLE_ARMOR:
-				phenotype = Bloodname.P_ELEMENTAL;
-				break;
-			case UnitType.AERO:
-				phenotype = Bloodname.P_AEROSPACE;
-				break;
-			case UnitType.PROTOMEK:
-				phenotype = Bloodname.P_PROTOMECH;
-				break;
-			default:
-				phenotype = -1;
-			}
-			if (phenotype >= 0) {
-				crewName += " " + Bloodname.randomBloodname(faction, phenotype, campaign.getCalendar().get(Calendar.YEAR)).getName();
-			}
-		}
-
-		en.setCrew(new Crew(crewName,
-							Compute.getFullCrewSize(en),
-							skills[0], skills[1]));
-
-		UUID id = UUID.randomUUID();
-		while (null != entityIds.get(id)) {
-			id = UUID.randomUUID();
-		}
-		en.setExternalIdAsString(id.toString());
-		entityIds.put(id, en);
-
 		return en;
 	}
 
@@ -2355,9 +2274,13 @@ public class AtBScenario extends Scenario {
 	 * @param campaign
 	 */
 	private void addCivilianUnits(ArrayList<Entity> list, int num, Campaign campaign) {
-		for (int i = 0; i < num; i++) {
-			list.add(getUnitFromRat("CivilianUnits", "IND", RandomSkillsGenerator.L_GREEN, campaign));
-		}
+		RandomUnitGenerator.getInstance().setChosenRAT("CivilianUnits");
+		ArrayList<MechSummary> msl = RandomUnitGenerator.getInstance().generate(num);
+		
+		List<Entity> entities = msl.stream().map(ms -> createEntityWithCrew("IND",
+				RandomSkillsGenerator.L_GREEN, campaign, ms))
+				.collect(Collectors.<Entity>toList());
+		list.addAll(entities);
 	}
 
 	/* Convenience methods for frequently-used arguments */
