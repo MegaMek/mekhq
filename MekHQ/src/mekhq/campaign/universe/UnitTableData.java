@@ -98,8 +98,8 @@ public class UnitTableData implements Serializable, ActionListener, IUnitGenerat
      * @param year- if > 0, only RATs from this date or earlier are returned.
      * @return-a list of RATCollection names that can be used for getRAT(...)
      */
-
-    public List<FactionTables> getRATCollections(String faction, int unitType, int year) {
+/*
+    private List<FactionTables> getRATCollections(String faction, int unitType, int year) {
         List<FactionTables> retval = new ArrayList<FactionTables>();
         for (String collection : ratTree.keySet()) {
             for (Integer y : ratTree.get(collection).keySet()) {
@@ -115,12 +115,12 @@ public class UnitTableData implements Serializable, ActionListener, IUnitGenerat
         }
         return retval;
     }
-    
+ */   
     /*
      * returns true if the collection has tables for the faction/unitType
      * not later than year
      */
-    public boolean hasRAT(String collection, int year, String faction, int unitType) {
+    private boolean hasRAT(String collection, int year, String faction, int unitType) {
         if (ratTree.get(collection) == null) {
             return false;
         }
@@ -140,7 +140,7 @@ public class UnitTableData implements Serializable, ActionListener, IUnitGenerat
      * returns true if the collection has tables for the faction/unitType
      * regardless of year
      */
-    public boolean hasRAT(String collection, String faction, int unitType) {
+    private boolean hasRAT(String collection, String faction, int unitType) {
         if (ratTree.get(collection) == null) {
             System.err.println("Could not find RAT collection " + collection);
             return false;
@@ -153,10 +153,11 @@ public class UnitTableData implements Serializable, ActionListener, IUnitGenerat
         }
         return false;
     }
-
-    public List<FactionTables> getRATCollections(String faction, int unitType) {
+/*
+    private List<FactionTables> getRATCollections(String faction, int unitType) {
         return getRATCollections(faction, unitType, 0);
     }
+*/
 
     /* Searches an array of RAT sources in order for one that matches
      * the faction, year, and unit type, checking alternate factions
@@ -165,7 +166,7 @@ public class UnitTableData implements Serializable, ActionListener, IUnitGenerat
      * best fit, then defaults to Total Warfare.
      */
 
-    public FactionTables getBestRAT(String[] rats, int year, String faction, int unitType) {
+    private FactionTables getBestRAT(String[] rats, int year, String faction, int unitType) {
         ArrayList<String> sorted = new ArrayList<String>();
         ArrayList<String> altFactions = getAltFactions(faction);
         for (String source : rats) {
@@ -225,7 +226,7 @@ public class UnitTableData implements Serializable, ActionListener, IUnitGenerat
         return null;
     }
 
-    public ArrayList<String> getAltFactions(String fName) {
+    private ArrayList<String> getAltFactions(String fName) {
         ArrayList<String> retVal = new ArrayList<String>();
         retVal.add(fName);
         Faction f = Faction.getFaction(fName);
@@ -247,7 +248,7 @@ public class UnitTableData implements Serializable, ActionListener, IUnitGenerat
 
     /* Returns the latest year for the rat and faction that does not exceed year*/
 
-    public FactionTables getClosestRAT(String rat, int year, String faction, int unitType) {
+    private FactionTables getClosestRAT(String rat, int year, String faction, int unitType) {
         FactionTables retval = null;
         for (int y : ratTree.get(rat).keySet()) {
             if (y > year) {
@@ -263,7 +264,7 @@ public class UnitTableData implements Serializable, ActionListener, IUnitGenerat
 
     /* returns the first (earliest) RAT in the collection for the faction */
 
-    public FactionTables getFirstRAT(String rat, String faction, int unitType) {
+    private FactionTables getFirstRAT(String rat, String faction, int unitType) {
         for (int year : ratTree.get(rat).keySet()) {
             if (ratTree.get(rat).get(year).get(faction) != null &&
                     ratTree.get(rat).get(year).get(faction).hasTable(unitType)) {
@@ -273,11 +274,13 @@ public class UnitTableData implements Serializable, ActionListener, IUnitGenerat
         return null;
     }
 
-    public FactionTables getRAT(String rat, int year, String faction) {
+/*
+    private FactionTables getRAT(String rat, int year, String faction) {
         return ratTree.get(rat).get(year).get(faction);
     }
+*/
 
-    public UnitTableData() {
+    private UnitTableData() {
         listeners = new ArrayList<ActionListener>();
     }
 
@@ -294,7 +297,7 @@ public class UnitTableData implements Serializable, ActionListener, IUnitGenerat
     	System.arraycopy(rats, 0, selectedRATs, 0, rats.length);
     }
 
-    public synchronized void populateTables() {
+    private synchronized void populateTables() {
         ratTree = new TreeMap<String, Map<Integer, Map<String, FactionTables>>>();
         altTables = new HashMap<String, ArrayList<String>>();
         loadTableDataFromFile(new File("data/universe/ratinfo.xml"));
@@ -351,7 +354,7 @@ public class UnitTableData implements Serializable, ActionListener, IUnitGenerat
         }
     }
 
-    public void notifyListenersOfInitialization() {
+    private void notifyListenersOfInitialization() {
         if (initialized) {
             for (ActionListener l : listeners) {
                 l.actionPerformed(new ActionEvent(
@@ -562,14 +565,15 @@ public class UnitTableData implements Serializable, ActionListener, IUnitGenerat
         Collections.sort(allRatNames);
     }
 
-    public class FactionTables {
+    private class FactionTables {
         /**
          * Represents all the tables for a particular faction in a set of tables.
          * Values of strings are RAT names used by megamek.client.RandomUnitGenerator
          */
-        String ratSource;
-        Integer year;
-        String factionCode;
+
+//    	String ratSource;
+//        Integer year;
+//        String factionCode;
 
         /*
          * The name of the RAT used by RandomUnitGenerator.setChosenRAT(String)
@@ -588,15 +592,16 @@ public class UnitTableData implements Serializable, ActionListener, IUnitGenerat
         ArrayList<String> battleArmor;
         ArrayList<String> protomechs;
 
+        /*
         private FactionTables (String rat, Integer year) {
             ratSource = rat;
             this.year = year;
             factionCode = "General";
         }
-
+*/
         public FactionTables(Node factionNode, String factionCode, String collection, int year) {
-            this(collection, year);
-            this.factionCode = factionCode;
+//            this(collection, year);
+//            this.factionCode = factionCode;
             NodeList nl = factionNode.getChildNodes();
             for (int i = 0; i < nl.getLength(); i++) {
                 Node unitNode = nl.item(i);
@@ -677,11 +682,12 @@ public class UnitTableData implements Serializable, ActionListener, IUnitGenerat
             }
         }
 
+/*
         public String getName() {
             //used to write to save file
             return ratSource + "|" + year + "|" + factionCode;
         }
-
+*/
         public boolean hasTable(int unitType) {
             switch (unitType) {
             case UnitType.MEK:
@@ -704,6 +710,7 @@ public class UnitTableData implements Serializable, ActionListener, IUnitGenerat
             return false;
         }
 
+/*
         public boolean hasMechTables() {
             return mechs.size() > 0;
         }
@@ -725,7 +732,8 @@ public class UnitTableData implements Serializable, ActionListener, IUnitGenerat
         public boolean hasPMTable() {
             return protomechs != null;
         }
-
+*/
+        
         /**
          * 
          * @param unitType UnitType constant
@@ -794,11 +802,11 @@ public class UnitTableData implements Serializable, ActionListener, IUnitGenerat
             }
             return units.get(Math.min(quality, 5) * units.size() / 5);
         }
-
+/*
         public String getTable(int unitType, int quality) {
             return getTable(unitType, 0, quality);
         }
-
+*/
         public boolean isValid(HashSet<String> rats) {
             if (!validateWeightUnits(mechs, rats)) {
                 mechs = null;
