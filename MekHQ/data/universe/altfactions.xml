@@ -5,55 +5,62 @@ This file provides alternate factions to look for when attempting to locate a su
 
 -->
 <faction key="ARDC">MERC,LA</faction>
-
 <faction key="AB">DC</faction>
-
-<faction key="CDP">TC</faction>
-
-<faction key="CSL">CHH</faction>
-
-<faction key="DA">FWL</faction>
-
-<faction key="DGM">FWL</faction>
-
-<faction key="DO">FWL</faction>
-
-<faction key="DoO">FWL</faction>
-
-<faction key="DTA">FWL</faction>
-
-<faction key="CEI">CGS,NC</faction>
-
 <faction key="FWLR">FWL</faction>
-
-<faction key="MCM">FWL</faction>
-
-<faction key="MSC">FWL</faction>
-
-<faction key="OP">FWL</faction>
-
-<faction key="PG">FWL</faction>
-
-<faction key="PR">FWL</faction>
-
-<faction key="RF">FWL</faction>
-
-<faction key="RFS">FWL</faction>
-
-<faction key="SHC">FWL</faction>
-
-<faction key="SC">FWL</faction>
-
 <faction key="FC">FS,LA</faction>
-
 <faction key="SIC">CC</faction>
-
 <faction key="TFR">CC</faction>
-
-<faction key="TH">SL</faction>
-
 <faction key="WOB">CS</faction>
-
 <faction key="RON">DC</faction>
+<faction key="DS">CM</faction>
+<faction key="SKC">CM</faction>
+<faction key="ST">CM</faction>
+<faction key="TH">SL</faction>
+<faction key="UHC">FS</faction>
+
+<!--Clans-->
+<faction key="CSL">CHH</faction>
+<faction key="RA">CSR</faction>
+<faction key="RD">CGB</faction>
+<faction key="CWE">CW</faction>
+
+<!--FWL states-->
+<faction key="DA">FWL</faction>
+<faction key="DTA">FWL</faction>
+<faction key="RCM">FWL</faction>
+<faction key="MSC">FWL</faction>
+<faction key="MCM">MSC</faction>
+<faction key="SC">MSC</faction>
+<faction key="DGM">MSC</faction>
+<faction key="OP">FWL</faction>
+<faction key="DO">OP</faction>
+<faction key="DoO">OP</faction>
+<faction key="TP">OP</faction>
+<faction key="RF">FWL</faction>
+<faction key="PG">RF</faction>
+<faction key="PR">RF</faction>
+<faction key="RFS">RF</faction>
+<faction key="SHC">FWL</faction>
+<faction key="OZP">FWL</faction>
+<faction key="CP">CNC,CDS,FWL</faction>
+
+<!--Periphery-->
+<faction key="CDP">TC</faction>
+<faction key="FR">NCR</faction>
+<faction key="NCR">MOC,TC</faction>
+<faction key="FVC">FS</faction>
+<faction key="MC">FS</faction>
+<faction key="TD">PIR</faction>
+<faction key="CEI">CGS,NC</faction>
+<faction key="UC">NC</faction>
+
+<!--Dark Age minor factions-->
+<faction key="AA">ROS</faction>
+<faction key="RR">ROS</faction>
+<faction key="SA">ROS</faction>
+<faction key="ShA">ROS</faction>
+<faction key="TTU">ROS</faction>
+<faction key="CvW">FWL</faction>
+<faction key="MiC">FWL</faction>
 
 </altFactions>

@@ -303,13 +303,13 @@ public class RATManager implements IUnitGenerator {
     private RAT findRAT(String faction, int unitType, int weightClass, int year, int quality) {
     	List<String> factionList = factionTree(faction);
     	for (String collection : selectedCollections) {
-    		for (String f : factionList) {
-	    		for (int era : allRATs.get(collection).keySet()) {
-	    			if (era > year) {
-	    				continue;
-	    			}
-	    			Optional<RAT> match = allRATs.get(collection).get(era).stream()
-	        				.filter(rat -> rat.matches(f, unitType, weightClass, quality))
+    		for (int era : allRATs.get(collection).keySet()) {
+    			if (era > year) {
+    				continue;
+    			}
+    			for (String f : factionList) {
+    				Optional<RAT> match = allRATs.get(collection).get(era).stream()
+    						.filter(rat -> rat.matches(f, unitType, weightClass, quality))
 	        				.findFirst();
 	    			if (match.isPresent()) {
 	    				return match.get();
