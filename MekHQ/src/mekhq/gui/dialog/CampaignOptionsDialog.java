@@ -4266,9 +4266,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         //Strip dates used in display name
         String[] ratList = new String[chosenRatModel.size()];
         for (int i = 0; i < chosenRatModel.size(); i++) {
-        	ratList[i] = chosenRatModel.elementAt(i).replaceFirst("\\(.*?\\) ", "");
+        	ratList[i] = chosenRatModel.elementAt(i).replaceFirst(" \\(.*?\\)", "");
         }
         options.setRATs(ratList);
+        if (campaign.getUnitGenerator() instanceof RATManager) {
+        	((RATManager)campaign.getUnitGenerator()).setSelectedRATs(ratList);
+        }
         options.setSearchRadius((Integer)spnSearchRadius.getValue());
         options.setIntensity((Double)spnIntensity.getValue());
         options.setVariableContractLength(chkVariableContractLength.isSelected());

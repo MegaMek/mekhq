@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Predicate;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -234,29 +235,23 @@ public class GMToolsDialog extends JDialog implements ActionListener {
             int targetYear = Integer.parseInt(yearPicker.getText());
             
             Campaign campaign = gui.getCampaign();
-            for(int i = 0; i < 10; ++ i) {
-                MechSummary ms = ug
-                		.generate(((FactionChoice) factionPicker.getSelectedItem()).id,
-                				unitType, unitWeight, targetYear, unitQuality);
-                if (ms != null) {
-                    //MekHQ.logMessage("picked "+ ms.getName() + ", determining if legal");
-                    if (campaign.getCampaignOptions().limitByYear() && targetYear < ms.getYear()) {
-                        // Illegal due to build year
-                        continue;
-                    }
-                    if ((campaign.getCampaignOptions().allowClanPurchases() && ms.isClan())
-                        || (campaign.getCampaignOptions().allowISPurchases() && !ms.isClan())) {
-                            //We have found a unit
-                            unitPicked.setText(ms.getName());
-                            return ms;
-                    }
-                }    
+            Predicate<MechSummary> test = ms ->
+                	(!campaign.getCampaignOptions().limitByYear() || targetYear > ms.getYear())
+                		&& (!ms.isClan() || campaign.getCampaignOptions().allowClanPurchases())
+                		&& (ms.isClan() || campaign.getCampaignOptions().allowISPurchases());
+
+            MechSummary ms = ug
+            		.generate(((FactionChoice) factionPicker.getSelectedItem()).id,
+            				unitType, unitWeight, targetYear, unitQuality, test);
+            if (ms != null) {
+                unitPicked.setText(ms.getName());
+                return ms;
             }
         } catch(NumberFormatException e) {
             unitPicked.setText("Please enter a valid year");
             return null;
         }
-        unitPicked.setText("No Unit Table Avaliable for Selection.\n The year is the suspect cause");
+        unitPicked.setText("No unit matching criteria and purchase restrictions.");
         return null;
     }
 
