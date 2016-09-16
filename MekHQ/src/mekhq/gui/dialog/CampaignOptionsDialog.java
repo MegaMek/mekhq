@@ -40,6 +40,7 @@ import java.util.EventObject;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Vector;
@@ -105,7 +106,7 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.UnitTableData;
+import mekhq.campaign.universe.RATManager;
 import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.model.RankTableModel;
 import mekhq.gui.model.SortedComboBoxModel;
@@ -3286,12 +3287,18 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         chosenRatModel = new DefaultListModel<String>();
         for (String rat : options.getRATs()) {
-        	for (String displayName : UnitTableData.getAllRATNames()) {
-        		if (displayName.endsWith(rat)) {
-        			chosenRatModel.addElement(displayName);
-        			break;
-        		}
-        	}
+           	List<Integer> eras = RATManager.getAllRATCollections().get(rat);
+            if (eras != null) {
+            	StringBuilder displayName = new StringBuilder(rat);
+            	if (eras.size() > 0) {
+            		displayName.append(" (").append(eras.get(0));
+                	if (eras.size() > 1) {
+                		displayName.append("-").append(eras.get(eras.size() - 1));
+                	}
+                	displayName.append(")");
+            	}
+    			chosenRatModel.addElement(displayName.toString());
+        	}        	
         }
         chosenRats.setModel(chosenRatModel);
         chosenRats.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -3304,10 +3311,21 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 			}
         });
         availableRatModel = new DefaultListModel<String>();
-        for (String rat : UnitTableData.getAllRATNames()) {
-        	if (!chosenRatModel.contains(rat)) {
-        		availableRatModel.addElement(rat);
-        	}
+        for (String rat : RATManager.getAllRATCollections().keySet()) {
+           	List<Integer> eras = RATManager.getAllRATCollections().get(rat);
+            if (eras != null) {
+            	StringBuilder displayName = new StringBuilder(rat);
+            	if (eras.size() > 0) {
+            		displayName.append(" (").append(eras.get(0));
+                	if (eras.size() > 1) {
+                		displayName.append("-").append(eras.get(eras.size() - 1));
+                	}
+                	displayName.append(")");
+            	}
+            	if (!chosenRatModel.contains(displayName.toString())) {
+            		availableRatModel.addElement(displayName.toString());
+            	}
+        	}        	
         }
         availableRats.setModel(availableRatModel);
         availableRats.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

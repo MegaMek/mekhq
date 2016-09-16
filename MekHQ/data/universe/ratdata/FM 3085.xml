@@ -1,0 +1,3962 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rat source='FM 3085'>
+	<era year='3085'>
+		<rat name='3085 Calderon Protectorate Assault Mech B'>
+			<factions>CP</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Calderon Protectorate Assault Mech C'>
+			<factions>CP</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Calderon Protectorate Assault Mech D'>
+			<factions>CP</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Calderon Protectorate Assault Mech F'>
+			<factions>CP</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Calderon Protectorate Heavy Mech B'>
+			<factions>CP</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Calderon Protectorate Heavy Mech C'>
+			<factions>CP</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Calderon Protectorate Heavy Mech D'>
+			<factions>CP</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Calderon Protectorate Heavy Mech F'>
+			<factions>CP</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Calderon Protectorate Light Mech B'>
+			<factions>CP</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Calderon Protectorate Light Mech C'>
+			<factions>CP</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Calderon Protectorate Light Mech D'>
+			<factions>CP</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Calderon Protectorate Light Mech F'>
+			<factions>CP</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Calderon Protectorate Medium Mech B'>
+			<factions>CP</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Calderon Protectorate Medium Mech C'>
+			<factions>CP</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Calderon Protectorate Medium Mech D'>
+			<factions>CP</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Calderon Protectorate Medium Mech F'>
+			<factions>CP</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Capellan Confederation Heavy Mech A'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Cappellan Confederation Assault Mech A'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Cappellan Confederation Assault Mech B'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Cappellan Confederation Assault Mech C'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Cappellan Confederation Assault Mech D'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Cappellan Confederation Assault Mech F'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Cappellan Confederation Heavy Mech B'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Cappellan Confederation Heavy Mech C'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Cappellan Confederation Heavy Mech D'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Cappellan Confederation Heavy Mech F'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Cappellan Confederation Light Mech A'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Cappellan Confederation Light Mech B'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Cappellan Confederation Light Mech C'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Cappellan Confederation Light Mech D'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Cappellan Confederation Light Mech F'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Cappellan Confederation Medium Mech A'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Cappellan Confederation Medium Mech B'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Cappellan Confederation Medium Mech C'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Cappellan Confederation Medium Mech D'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Cappellan Confederation Medium Mech F'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Assault Mech Front Line'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Assault Mech Keshik'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Assault Mech Second Line'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Assault Tank Front Line'>
+			<factions>CDS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Assault Tank Keshik'>
+			<factions>CDS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Assault Tank Second Line'>
+			<factions>CDS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Battlearmor Front Line'>
+			<factions>CDS</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Battlearmor Keshik'>
+			<factions>CDS</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Battlearmor Second Line'>
+			<factions>CDS</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Heavy Aerospace Front Line'>
+			<factions>CDS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Heavy Aerospace Keshik'>
+			<factions>CDS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Heavy Aerospace Second Line'>
+			<factions>CDS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Heavy Mech Front Line'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Heavy Mech Keshik'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Heavy Mech Second Line'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Heavy Tank Front Line'>
+			<factions>CDS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Heavy Tank Keshik'>
+			<factions>CDS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Heavy Tank Second Line'>
+			<factions>CDS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Light Aerospace Front Line'>
+			<factions>CDS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Light Aerospace Keshik'>
+			<factions>CDS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Light Aerospace Second Line'>
+			<factions>CDS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Light Mech Front Line'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Light Mech Keshik'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Light Mech Second Line'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Light Tank Front Line'>
+			<factions>CDS</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Light Tank Keshik'>
+			<factions>CDS</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Light Tank Second Line'>
+			<factions>CDS</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Medium Aerospace Front Line'>
+			<factions>CDS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Medium Aerospace Keshik'>
+			<factions>CDS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Medium Aerospace Second Line'>
+			<factions>CDS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Medium Mech Front Line'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Medium Mech Keshik'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Medium Mech Second Line'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Medium Tank Front Line'>
+			<factions>CDS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Medium Tank Keshik'>
+			<factions>CDS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Diamond Shark Medium Tank Second Line'>
+			<factions>CDS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Assault Mech Front Line'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Assault Mech Keshik'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Assault Mech Second Line'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Assault Tank Front Line'>
+			<factions>CHH</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Assault Tank Keshik'>
+			<factions>CHH</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Assault Tank Second Line'>
+			<factions>CHH</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Battlearmor Front Line'>
+			<factions>CHH</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Battlearmor Keshik'>
+			<factions>CHH</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Battlearmor Second Line'>
+			<factions>CHH</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Heavy Aerospace Front Line'>
+			<factions>CHH</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Heavy Aerospace Keshik'>
+			<factions>CHH</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Heavy Aerospace Second Line'>
+			<factions>CHH</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Heavy Mech Front Line'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Heavy Mech Keshik'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Heavy Mech Second Line'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Heavy Tank Front Line'>
+			<factions>CHH</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Heavy Tank Keshik'>
+			<factions>CHH</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Heavy Tank Second Line'>
+			<factions>CHH</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Light Aerospace Front Line'>
+			<factions>CHH</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Light Aerospace Keshik'>
+			<factions>CHH</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Light Aerospace Second Line'>
+			<factions>CHH</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Light Mech Front Line'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Light Mech Keshik'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Light Mech Second Line'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Light Tank Front Line'>
+			<factions>CHH</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Light Tank Keshik'>
+			<factions>CHH</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Light Tank Second Line'>
+			<factions>CHH</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Medium Aerospace Front Line'>
+			<factions>CHH</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Medium Aerospace Keshik'>
+			<factions>CHH</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Medium Aerospace Second Line'>
+			<factions>CHH</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Medium Mech Front Line'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Medium Mech Keshik'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Medium Mech Second Line'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Medium Tank Front Line'>
+			<factions>CHH</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Medium Tank Keshik'>
+			<factions>CHH</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Hell&apos;s Horses Medium Tank Second Line'>
+			<factions>CHH</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Hells Horses Protomech Front Line'>
+			<factions>CHH</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Hells Horses Protomech Keshik'>
+			<factions>CHH</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Hells Horses Protomech Second Line'>
+			<factions>CHH</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Assault Mech Front Line'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Assault Mech Keshik'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Assault Mech Second Line'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Assault Tank Front Line'>
+			<factions>CJF</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Assault Tank Keshik'>
+			<factions>CJF</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Assault Tank Second Line'>
+			<factions>CJF</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Battlearmor Front Line'>
+			<factions>CJF</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Battlearmor Keshik'>
+			<factions>CJF</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Battlearmor Second Line'>
+			<factions>CJF</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Heavy Aerospace Front Line'>
+			<factions>CJF</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Heavy Aerospace Keshik'>
+			<factions>CJF</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Heavy Aerospace Second Line'>
+			<factions>CJF</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Heavy Mech Front Line'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Heavy Mech Keshik'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Heavy Mech Second Line'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Heavy Tank Front Line'>
+			<factions>CJF</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Heavy Tank Keshik'>
+			<factions>CJF</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Heavy Tank Second Line'>
+			<factions>CJF</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Light Aerospace Front Line'>
+			<factions>CJF</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Light Aerospace Keshik'>
+			<factions>CJF</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Light Aerospace Second Line'>
+			<factions>CJF</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Light Mech Front Line'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Light Mech Keshik'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Light Mech Second Line'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Light Tank Front Line'>
+			<factions>CJF</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Light Tank Keshik'>
+			<factions>CJF</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Light Tank Second Line'>
+			<factions>CJF</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Medium Aerospace Front Line'>
+			<factions>CJF</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Medium Aerospace Keshik'>
+			<factions>CJF</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Medium Aerospace Second Line'>
+			<factions>CJF</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Medium Mech Front Line'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Medium Mech Keshik'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Medium Mech Second Line'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Medium Tank Front Line'>
+			<factions>CJF</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Medium Tank Keshik'>
+			<factions>CJF</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Jade Falcon Medium Tank Second Line'>
+			<factions>CJF</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Assault Mech Front Line'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Assault Mech Keshik'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Assault Mech Second Line'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Assault Tank Front Line'>
+			<factions>CNC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Assault Tank Keshik'>
+			<factions>CNC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Assault Tank Second Line'>
+			<factions>CNC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Battlearmor Front Line'>
+			<factions>CNC</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Battlearmor Keshik'>
+			<factions>CNC</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Battlearmor Second Line'>
+			<factions>CNC</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Heavy Aerospace Front Line'>
+			<factions>CNC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Heavy Aerospace Keshik'>
+			<factions>CNC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Heavy Aerospace Second Line'>
+			<factions>CNC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Heavy Mech Front Line'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Heavy Mech Keshik'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Heavy Mech Second Line'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Heavy Tank Front Line'>
+			<factions>CNC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Heavy Tank Keshik'>
+			<factions>CNC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Heavy Tank Second Line'>
+			<factions>CNC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Light Aerospace Front Line'>
+			<factions>CNC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Light Aerospace Keshik'>
+			<factions>CNC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Light Aerospace Second Line'>
+			<factions>CNC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Light Mech Front Line'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Light Mech Keshik'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Light Mech Second Line'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Light Tank Front Line'>
+			<factions>CNC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Light Tank Keshik'>
+			<factions>CNC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Light Tank Second Line'>
+			<factions>CNC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Medium Aerospace Front Line'>
+			<factions>CNC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Medium Aerospace Keshik'>
+			<factions>CNC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Medium Aerospace Second Line'>
+			<factions>CNC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Medium Mech Front Line'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Medium Mech Keshik'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Medium Mech Second Line'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Medium Tank Front Line'>
+			<factions>CNC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Medium Tank Keshik'>
+			<factions>CNC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Medium Tank Second Line'>
+			<factions>CNC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Protomech Front Line'>
+			<factions>CNC</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Protomech Keshik'>
+			<factions>CNC</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Nova Cat Protomech Second Line'>
+			<factions>CNC</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Assault Mech Front Line'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Assault Mech Keshik'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Assault Mech Second Line'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Assault Tank Front Line'>
+			<factions>CW</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Assault Tank Keshik'>
+			<factions>CW</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Assault Tank Second Line'>
+			<factions>CW</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Battlearmor Front Line'>
+			<factions>CW</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Battlearmor Keshik'>
+			<factions>CW</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Battlearmor Second Line'>
+			<factions>CW</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Heavy Aerospace Front Line'>
+			<factions>CW</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Heavy Aerospace Keshik'>
+			<factions>CW</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Heavy Aerospace Second Line'>
+			<factions>CW</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Heavy Mech Front Line'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Heavy Mech Keshik'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Heavy Mech Second Line'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Heavy Tank Front Line'>
+			<factions>CW</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Heavy Tank Keshik'>
+			<factions>CW</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Heavy Tank Second Line'>
+			<factions>CW</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Light Aerospace Front Line'>
+			<factions>CW</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Light Aerospace Keshik'>
+			<factions>CW</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Light Aerospace Second Line'>
+			<factions>CW</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Light Mech Front Line'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Light Mech Keshik'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Light Mech Second Line'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Light Tank Front Line'>
+			<factions>CW</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Light Tank Keshik'>
+			<factions>CW</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Light Tank Second Line'>
+			<factions>CW</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Medium Aerospace Front Line'>
+			<factions>CW</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Medium Aerospace Keshik'>
+			<factions>CW</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Medium Aerospace Second Line'>
+			<factions>CW</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Medium Mech Front Line'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Medium Mech Keshik'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Medium Mech Second Line'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Medium Tank Front Line'>
+			<factions>CW</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Medium Tank Keshik'>
+			<factions>CW</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf Medium Tank Second Line'>
+			<factions>CW</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Assault Mech Front Line'>
+			<factions>CWIE</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Assault Mech Keshik'>
+			<factions>CWIE</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Assault Mech Second Line'>
+			<factions>CWIE</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Assault Tank Front Line'>
+			<factions>CWIE</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Assault Tank Keshik'>
+			<factions>CWIE</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Assault Tank Second Line'>
+			<factions>CWIE</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Battlearmor Front Line'>
+			<factions>CWIE</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Battlearmor Keshik'>
+			<factions>CWIE</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Battlearmor Second Line'>
+			<factions>CWIE</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Heavy Aerospace Front Line'>
+			<factions>CWIE</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Heavy Aerospace Keshik'>
+			<factions>CWIE</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Heavy Aerospace Second Line'>
+			<factions>CWIE</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Heavy Mech Front Line'>
+			<factions>CWIE</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Heavy Mech Keshik'>
+			<factions>CWIE</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Heavy Mech Second Line'>
+			<factions>CWIE</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Heavy Tank Front Line'>
+			<factions>CWIE</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Heavy Tank Keshik'>
+			<factions>CWIE</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Heavy Tank Second Line'>
+			<factions>CWIE</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Light Aerospace Front Line'>
+			<factions>CWIE</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Light Aerospace Keshik'>
+			<factions>CWIE</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Light Aerospace Second Line'>
+			<factions>CWIE</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Light Mech Front Line'>
+			<factions>CWIE</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Light Mech Keshik'>
+			<factions>CWIE</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Light Mech Second Line'>
+			<factions>CWIE</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Light Tank Front Line'>
+			<factions>CWIE</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Light Tank Keshik'>
+			<factions>CWIE</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Light Tank Second Line'>
+			<factions>CWIE</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Medium Aerospace Front Line'>
+			<factions>CWIE</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Medium Aerospace Keshik'>
+			<factions>CWIE</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Medium Aerospace Second Line'>
+			<factions>CWIE</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Medium Mech Front Line'>
+			<factions>CWIE</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Medium Mech Keshik'>
+			<factions>CWIE</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Medium Mech Second Line'>
+			<factions>CWIE</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Medium Tank Front Line'>
+			<factions>CWIE</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Medium Tank Keshik'>
+			<factions>CWIE</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Clan Wolf in Exile Medium Tank Second Line'>
+			<factions>CWIE</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Draconis Combine Assault Mech A'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Draconis Combine Assault Mech B'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Draconis Combine Assault Mech C'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Draconis Combine Assault Mech D'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Draconis Combine Assault Mech F'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Draconis Combine Heavy Mech A'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Draconis Combine Heavy Mech B'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Draconis Combine Heavy Mech C'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Draconis Combine Heavy Mech D'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Draconis Combine Heavy Mech F'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Draconis Combine Light Mech A'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Draconis Combine Light Mech B'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Draconis Combine Light Mech C'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Draconis Combine Light Mech D'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Draconis Combine Light Mech F'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Draconis Combine Medium Mech A'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Draconis Combine Medium Mech B'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Draconis Combine Medium Mech C'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Draconis Combine Medium Mech D'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Draconis Combine Medium Mech F'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Duchy of Andurien Assault Mech A'>
+			<factions>DA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Duchy of Andurien Assault Mech B'>
+			<factions>DA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Duchy of Andurien Assault Mech C'>
+			<factions>DA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Duchy of Andurien Assault Mech D'>
+			<factions>DA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Duchy of Andurien Assault Mech F'>
+			<factions>DA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Duchy of Andurien Heavy Mech A'>
+			<factions>DA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Duchy of Andurien Heavy Mech B'>
+			<factions>DA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Duchy of Andurien Heavy Mech C'>
+			<factions>DA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Duchy of Andurien Heavy Mech D'>
+			<factions>DA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Duchy of Andurien Heavy Mech F'>
+			<factions>DA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Duchy of Andurien Light Mech A'>
+			<factions>DA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Duchy of Andurien Light Mech B'>
+			<factions>DA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Duchy of Andurien Light Mech C'>
+			<factions>DA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Duchy of Andurien Light Mech D'>
+			<factions>DA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Duchy of Andurien Light Mech F'>
+			<factions>DA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Duchy of Andurien Medium Mech A'>
+			<factions>DA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Duchy of Andurien Medium Mech B'>
+			<factions>DA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Duchy of Andurien Medium Mech C'>
+			<factions>DA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Duchy of Andurien Medium Mech D'>
+			<factions>DA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Duchy of Andurien Medium Mech F'>
+			<factions>DA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Duchy of Oriente Assault Mech A'>
+			<factions>DO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Duchy of Oriente Assault Mech B'>
+			<factions>DO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Duchy of Oriente Assault Mech C'>
+			<factions>DO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Duchy of Oriente Assault Mech D'>
+			<factions>DO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Duchy of Oriente Assault Mech F'>
+			<factions>DO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Duchy of Oriente Heavy Mech A'>
+			<factions>DO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Duchy of Oriente Heavy Mech B'>
+			<factions>DO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Duchy of Oriente Heavy Mech C'>
+			<factions>DO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Duchy of Oriente Heavy Mech D'>
+			<factions>DO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Duchy of Oriente Heavy Mech F'>
+			<factions>DO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Duchy of Oriente Light Mech A'>
+			<factions>DO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Duchy of Oriente Light Mech B'>
+			<factions>DO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Duchy of Oriente Light Mech C'>
+			<factions>DO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Duchy of Oriente Light Mech D'>
+			<factions>DO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Duchy of Oriente Light Mech F'>
+			<factions>DO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Duchy of Oriente Medium Mech A'>
+			<factions>DO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Duchy of Oriente Medium Mech B'>
+			<factions>DO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Duchy of Oriente Medium Mech C'>
+			<factions>DO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Duchy of Oriente Medium Mech D'>
+			<factions>DO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Duchy of Oriente Medium Mech F'>
+			<factions>DO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Duchy of Tamarind-Abbey Assault Mech A'>
+			<factions>DTA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Duchy of Tamarind-Abbey Assault Mech B'>
+			<factions>DTA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Duchy of Tamarind-Abbey Assault Mech C'>
+			<factions>DTA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Duchy of Tamarind-Abbey Assault Mech D'>
+			<factions>DTA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Duchy of Tamarind-Abbey Assault Mech F'>
+			<factions>DTA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Duchy of Tamarind-Abbey Heavy Mech A'>
+			<factions>DTA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Duchy of Tamarind-Abbey Heavy Mech B'>
+			<factions>DTA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Duchy of Tamarind-Abbey Heavy Mech C'>
+			<factions>DTA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Duchy of Tamarind-Abbey Heavy Mech D'>
+			<factions>DTA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Duchy of Tamarind-Abbey Heavy Mech F'>
+			<factions>DTA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Duchy of Tamarind-Abbey Light Mech A'>
+			<factions>DTA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Duchy of Tamarind-Abbey Light Mech B'>
+			<factions>DTA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Duchy of Tamarind-Abbey Light Mech C'>
+			<factions>DTA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Duchy of Tamarind-Abbey Light Mech D'>
+			<factions>DTA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Duchy of Tamarind-Abbey Light Mech F'>
+			<factions>DTA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Duchy of Tamarind-Abbey Medium Mech A'>
+			<factions>DTA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Duchy of Tamarind-Abbey Medium Mech B'>
+			<factions>DTA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Duchy of Tamarind-Abbey Medium Mech C'>
+			<factions>DTA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Duchy of Tamarind-Abbey Medium Mech D'>
+			<factions>DTA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Duchy of Tamarind-Abbey Medium Mech F'>
+			<factions>DTA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Federated Suns Assault Mech A'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Federated Suns Assault Mech B'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Federated Suns Assault Mech C'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Federated Suns Assault Mech D'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Federated Suns Assault Mech F'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Federated Suns Heavy Mech A'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Federated Suns Heavy Mech B'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Federated Suns Heavy Mech C'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Federated Suns Heavy Mech D'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Federated Suns Heavy Mech F'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Federated Suns Light Mech A'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Federated Suns Light Mech B'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Federated Suns Light Mech C'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Federated Suns Light Mech D'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Federated Suns Light Mech F'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Federated Suns Medium Mech A'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Federated Suns Medium Mech B'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Federated Suns Medium Mech C'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Federated Suns Medium Mech D'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Federated Suns Medium Mech F'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Filtvelt Coalition Assault Mech B'>
+			<factions>FVC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Filtvelt Coalition Assault Mech C'>
+			<factions>FVC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Filtvelt Coalition Assault Mech D'>
+			<factions>FVC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Filtvelt Coalition Assault Mech F'>
+			<factions>FVC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Filtvelt Coalition Heavy Mech B'>
+			<factions>FVC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Filtvelt Coalition Heavy Mech C'>
+			<factions>FVC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Filtvelt Coalition Heavy Mech D'>
+			<factions>FVC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Filtvelt Coalition Heavy Mech F'>
+			<factions>FVC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Filtvelt Coalition Light Mech B'>
+			<factions>FVC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Filtvelt Coalition Light Mech C'>
+			<factions>FVC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Filtvelt Coalition Light Mech D'>
+			<factions>FVC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Filtvelt Coalition Light Mech F'>
+			<factions>FVC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Filtvelt Coalition Medium Mech B'>
+			<factions>FVC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Filtvelt Coalition Medium Mech C'>
+			<factions>FVC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Filtvelt Coalition Medium Mech D'>
+			<factions>FVC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Filtvelt Coalition Medium Mech F'>
+			<factions>FVC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Fronc Reaches Assault Mech B'>
+			<factions>FR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Fronc Reaches Assault Mech C'>
+			<factions>FR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Fronc Reaches Assault Mech D'>
+			<factions>FR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Fronc Reaches Assault Mech F'>
+			<factions>FR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Fronc Reaches Heavy Mech B'>
+			<factions>FR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Fronc Reaches Heavy Mech C'>
+			<factions>FR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Fronc Reaches Heavy Mech D'>
+			<factions>FR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Fronc Reaches Heavy Mech F'>
+			<factions>FR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Fronc Reaches Light Mech B'>
+			<factions>FR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Fronc Reaches Light Mech C'>
+			<factions>FR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Fronc Reaches Light Mech D'>
+			<factions>FR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Fronc Reaches Light Mech F'>
+			<factions>FR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Fronc Reaches Medium Mech B'>
+			<factions>FR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Fronc Reaches Medium Mech C'>
+			<factions>FR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Fronc Reaches Medium Mech D'>
+			<factions>FR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Fronc Reaches Medium Mech F'>
+			<factions>FR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Assault Mech Front Line'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Assault Mech Keshik'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Assault Mech Second Line'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Assault Tank Front Line'>
+			<factions>CGB</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Assault Tank Keshik'>
+			<factions>CGB</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Assault Tank Second Line'>
+			<factions>CGB</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Battlearmor Front Line'>
+			<factions>CGB</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Battlearmor Keshik'>
+			<factions>CGB</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Battlearmor Second Line'>
+			<factions>CGB</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Heavy Aerospace Front Line'>
+			<factions>CGB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Heavy Aerospace Keshik'>
+			<factions>CGB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Heavy Aerospace Second Line'>
+			<factions>CGB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Heavy Mech Front Line'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Heavy Mech Keshik'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Heavy Mech Second Line'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Heavy Tank Front Line'>
+			<factions>CGB</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Heavy Tank Keshik'>
+			<factions>CGB</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Heavy Tank Second Line'>
+			<factions>CGB</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Light Aerospace Front Line'>
+			<factions>CGB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Light Aerospace Keshik'>
+			<factions>CGB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Light Aerospace Second Line'>
+			<factions>CGB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Light Mech Front Line'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Light Mech Keshik'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Light Mech Second Line'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Light Tank Front Line'>
+			<factions>CGB</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Light Tank Keshik'>
+			<factions>CGB</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Light Tank Second Line'>
+			<factions>CGB</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Medium Aerospace Front Line'>
+			<factions>CGB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Medium Aerospace Keshik'>
+			<factions>CGB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Medium Aerospace Second Line'>
+			<factions>CGB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Medium Mech Front Line'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Medium Mech Keshik'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Medium Mech Second Line'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Medium Tank Front Line'>
+			<factions>CGB</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Medium Tank Keshik'>
+			<factions>CGB</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Ghost Bear Dominion Medium Tank Second Line'>
+			<factions>CGB</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Independent - Lesser Former League States Assault Mech A'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Independent - Lesser Former League States Assault Mech B'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Independent - Lesser Former League States Assault Mech C'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Independent - Lesser Former League States Assault Mech D'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Independent - Lesser Former League States Assault Mech F'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Independent - Lesser Former League States Heavy Mech A'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Independent - Lesser Former League States Heavy Mech B'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Independent - Lesser Former League States Heavy Mech C'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Independent - Lesser Former League States Heavy Mech D'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Independent - Lesser Former League States Heavy Mech F'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Independent - Lesser Former League States Light Mech A'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Independent - Lesser Former League States Light Mech B'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Independent - Lesser Former League States Light Mech C'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Independent - Lesser Former League States Light Mech D'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Independent - Lesser Former League States Light Mech F'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Independent - Lesser Former League States Medium Mech A'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Independent - Lesser Former League States Medium Mech B'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Independent - Lesser Former League States Medium Mech C'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Independent - Lesser Former League States Medium Mech D'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Independent - Lesser Former League States Medium Mech F'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Lyran Commonwealth Assault Mech A'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Lyran Commonwealth Assault Mech B'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Lyran Commonwealth Assault Mech C'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Lyran Commonwealth Assault Mech D'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Lyran Commonwealth Assault Mech F'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Lyran Commonwealth Heavy Mech A'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Lyran Commonwealth Heavy Mech B'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Lyran Commonwealth Heavy Mech C'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Lyran Commonwealth Heavy Mech D'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Lyran Commonwealth Heavy Mech F'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Lyran Commonwealth Light Mech A'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Lyran Commonwealth Light Mech B'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Lyran Commonwealth Light Mech C'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Lyran Commonwealth Light Mech D'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Lyran Commonwealth Light Mech F'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Lyran Commonwealth Medium Mech A'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Lyran Commonwealth Medium Mech B'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Lyran Commonwealth Medium Mech C'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Lyran Commonwealth Medium Mech D'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Lyran Commonwealth Medium Mech F'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Magistracy of Canopus Assault Mech A'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Magistracy of Canopus Assault Mech B'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Magistracy of Canopus Assault Mech C'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Magistracy of Canopus Assault Mech D'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Magistracy of Canopus Assault Mech F'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Magistracy of Canopus Heavy Mech A'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Magistracy of Canopus Heavy Mech B'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Magistracy of Canopus Heavy Mech C'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Magistracy of Canopus Heavy Mech D'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Magistracy of Canopus Heavy Mech F'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Magistracy of Canopus Light Mech A'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Magistracy of Canopus Light Mech B'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Magistracy of Canopus Light Mech C'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Magistracy of Canopus Light Mech D'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Magistracy of Canopus Light Mech F'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Magistracy of Canopus Medium Mech A'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Magistracy of Canopus Medium Mech B'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Magistracy of Canopus Medium Mech C'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Magistracy of Canopus Medium Mech D'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Magistracy of Canopus Medium Mech F'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Marian Hegemony Assault Mech B'>
+			<factions>MH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Marian Hegemony Assault Mech C'>
+			<factions>MH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Marian Hegemony Assault Mech D'>
+			<factions>MH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Marian Hegemony Assault Mech F'>
+			<factions>MH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Marian Hegemony Heavy Mech B'>
+			<factions>MH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Marian Hegemony Heavy Mech C'>
+			<factions>MH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Marian Hegemony Heavy Mech D'>
+			<factions>MH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Marian Hegemony Heavy Mech F'>
+			<factions>MH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Marian Hegemony Light Mech B'>
+			<factions>MH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Marian Hegemony Light Mech C'>
+			<factions>MH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Marian Hegemony Light Mech D'>
+			<factions>MH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Marian Hegemony Light Mech F'>
+			<factions>MH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Marian Hegemony Medium Mech B'>
+			<factions>MH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Marian Hegemony Medium Mech C'>
+			<factions>MH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Marian Hegemony Medium Mech D'>
+			<factions>MH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Marian Hegemony Medium Mech F'>
+			<factions>MH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Marik-Stewart Commonwealth Assault Mech A'>
+			<factions>MSC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Marik-Stewart Commonwealth Assault Mech B'>
+			<factions>MSC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Marik-Stewart Commonwealth Assault Mech C'>
+			<factions>MSC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Marik-Stewart Commonwealth Assault Mech D'>
+			<factions>MSC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Marik-Stewart Commonwealth Assault Mech F'>
+			<factions>MSC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Marik-Stewart Commonwealth Heavy Mech A'>
+			<factions>MSC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Marik-Stewart Commonwealth Heavy Mech B'>
+			<factions>MSC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Marik-Stewart Commonwealth Heavy Mech C'>
+			<factions>MSC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Marik-Stewart Commonwealth Heavy Mech D'>
+			<factions>MSC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Marik-Stewart Commonwealth Heavy Mech F'>
+			<factions>MSC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Marik-Stewart Commonwealth Light Mech A'>
+			<factions>MSC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Marik-Stewart Commonwealth Light Mech B'>
+			<factions>MSC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Marik-Stewart Commonwealth Light Mech C'>
+			<factions>MSC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Marik-Stewart Commonwealth Light Mech D'>
+			<factions>MSC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Marik-Stewart Commonwealth Light Mech F'>
+			<factions>MSC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Marik-Stewart Commonwealth Medium Mech A'>
+			<factions>MSC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Marik-Stewart Commonwealth Medium Mech B'>
+			<factions>MSC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Marik-Stewart Commonwealth Medium Mech C'>
+			<factions>MSC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Marik-Stewart Commonwealth Medium Mech D'>
+			<factions>MSC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Marik-Stewart Commonwealth Medium Mech F'>
+			<factions>MSC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Mercenary Assault Mech A'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Mercenary Assault Mech B'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Mercenary Assault Mech C'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Mercenary Assault Mech D'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Mercenary Assault Mech F'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Mercenary Heavy Mech A'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Mercenary Heavy Mech B'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Mercenary Heavy Mech C'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Mercenary Heavy Mech D'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Mercenary Heavy Mech F'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Mercenary Light Mech A'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Mercenary Light Mech B'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Mercenary Light Mech C'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Mercenary Light Mech D'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Mercenary Light Mech F'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Mercenary Medium Mech A'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Mercenary Medium Mech B'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Mercenary Medium Mech C'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Mercenary Medium Mech D'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Mercenary Medium Mech F'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Periphery General - Lesser States Assault Mech D'>
+			<factions>Periphery</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3085 Periphery General - Lesser States Assault Mech F'>
+			<factions>Periphery</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3085 Periphery General - Lesser States Heavy Mech D'>
+			<factions>Periphery</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3085 Periphery General - Lesser States Heavy Mech F'>
+			<factions>Periphery</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3085 Periphery General - Lesser States Light Mech D'>
+			<factions>Periphery</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3085 Periphery General - Lesser States Light Mech F'>
+			<factions>Periphery</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3085 Periphery General - Lesser States Medium Mech D'>
+			<factions>Periphery</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3085 Periphery General - Lesser States Medium Mech F'>
+			<factions>Periphery</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3085 Principality of Regulus Assault Mech A'>
+			<factions>PR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Principality of Regulus Assault Mech B'>
+			<factions>PR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Principality of Regulus Assault Mech C'>
+			<factions>PR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Principality of Regulus Assault Mech D'>
+			<factions>PR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Principality of Regulus Assault Mech F'>
+			<factions>PR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Principality of Regulus Heavy Mech A'>
+			<factions>PR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Principality of Regulus Heavy Mech B'>
+			<factions>PR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Principality of Regulus Heavy Mech C'>
+			<factions>PR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Principality of Regulus Heavy Mech D'>
+			<factions>PR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Principality of Regulus Heavy Mech F'>
+			<factions>PR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Principality of Regulus Light Mech A'>
+			<factions>PR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Principality of Regulus Light Mech B'>
+			<factions>PR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Principality of Regulus Light Mech C'>
+			<factions>PR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Principality of Regulus Light Mech D'>
+			<factions>PR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Principality of Regulus Light Mech F'>
+			<factions>PR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Principality of Regulus Medium Mech A'>
+			<factions>PR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Principality of Regulus Medium Mech B'>
+			<factions>PR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Principality of Regulus Medium Mech C'>
+			<factions>PR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Principality of Regulus Medium Mech D'>
+			<factions>PR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Principality of Regulus Medium Mech F'>
+			<factions>PR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Assault Mech Front Line'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Assault Mech Keshik'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Assault Mech Second Line'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Assault Tank Front Line'>
+			<factions>CSR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Assault Tank Keshik'>
+			<factions>CSR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Assault Tank Second Line'>
+			<factions>CSR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Battlearmor Front Line'>
+			<factions>CSR</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Battlearmor Keshik'>
+			<factions>CSR</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Battlearmor Second Line'>
+			<factions>CSR</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Heavy Aerospace Front Line'>
+			<factions>CSR</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Heavy Aerospace Keshik'>
+			<factions>CSR</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Heavy Aerospace Second Line'>
+			<factions>CSR</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Heavy Mech Front Line'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Heavy Mech Keshik'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Heavy Mech Second Line'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Heavy Tank Front Line'>
+			<factions>CSR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Heavy Tank Keshik'>
+			<factions>CSR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Heavy Tank Second Line'>
+			<factions>CSR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Light Aerospace Front Line'>
+			<factions>CSR</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Light Aerospace Keshik'>
+			<factions>CSR</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Light Aerospace Second Line'>
+			<factions>CSR</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Light Mech Front Line'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Light Mech Keshik'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Light Mech Second Line'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Light Tank Front Line'>
+			<factions>CSR</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Light Tank Keshik'>
+			<factions>CSR</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Light Tank Second Line'>
+			<factions>CSR</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Medium Aerospace Front Line'>
+			<factions>CSR</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Medium Aerospace Keshik'>
+			<factions>CSR</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Medium Aerospace Second Line'>
+			<factions>CSR</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Medium Mech Front Line'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Medium Mech Keshik'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Medium Mech Second Line'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Medium Tank Front Line'>
+			<factions>CSR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Medium Tank Keshik'>
+			<factions>CSR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Medium Tank Second Line'>
+			<factions>CSR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Protomech Front Line'>
+			<factions>CSR</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Protomech Keshik'>
+			<factions>CSR</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Raven Alliance Protomech Second Line'>
+			<factions>CSR</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Republic of the Sphere Assault Mech Hastati Sentinels'>
+			<factions>ROS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Republic of the Sphere Assault Mech Principes Guards'>
+			<factions>ROS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Republic of the Sphere Assault Mech Stone&apos;s Brigade'>
+			<factions>ROS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Republic of the Sphere Assault Mech Triarii Protectors'>
+			<factions>ROS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Republic of the Sphere Heavy Mech Hastati Sentinels'>
+			<factions>ROS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Republic of the Sphere Heavy Mech Principes Guards'>
+			<factions>ROS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Republic of the Sphere Heavy Mech Stone&apos;s Brigade'>
+			<factions>ROS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Republic of the Sphere Heavy Mech Triarii Protectors'>
+			<factions>ROS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Republic of the Sphere Light Mech Hastati Sentinels'>
+			<factions>ROS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Republic of the Sphere Light Mech Principes Guards'>
+			<factions>ROS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Republic of the Sphere Light Mech Stone&apos;s Brigade'>
+			<factions>ROS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Republic of the Sphere Light Mech Triarii Protectors'>
+			<factions>ROS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Republic of the Sphere Medium Mech Hastati Sentinels'>
+			<factions>ROS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Republic of the Sphere Medium Mech Principes Guards'>
+			<factions>ROS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Republic of the Sphere Medium Mech Stone&apos;s Brigade'>
+			<factions>ROS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Republic of the Sphere Medium Mech Triarii Protectors'>
+			<factions>ROS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='3085 Rim Commonality Assault Mech A'>
+			<factions>RCM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Rim Commonality Assault Mech B'>
+			<factions>RCM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Rim Commonality Assault Mech C'>
+			<factions>RCM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Rim Commonality Assault Mech D'>
+			<factions>RCM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Rim Commonality Assault Mech F'>
+			<factions>RCM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Rim Commonality Heavy Mech A'>
+			<factions>RCM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Rim Commonality Heavy Mech B'>
+			<factions>RCM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Rim Commonality Heavy Mech C'>
+			<factions>RCM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Rim Commonality Heavy Mech D'>
+			<factions>RCM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Rim Commonality Heavy Mech F'>
+			<factions>RCM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Rim Commonality Light Mech A'>
+			<factions>RCM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Rim Commonality Light Mech B'>
+			<factions>RCM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Rim Commonality Light Mech C'>
+			<factions>RCM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Rim Commonality Light Mech D'>
+			<factions>RCM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Rim Commonality Light Mech F'>
+			<factions>RCM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Rim Commonality Medium Mech A'>
+			<factions>RCM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Rim Commonality Medium Mech B'>
+			<factions>RCM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Rim Commonality Medium Mech C'>
+			<factions>RCM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Rim Commonality Medium Mech D'>
+			<factions>RCM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Rim Commonality Medium Mech F'>
+			<factions>RCM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Taurian Concordant Assault Mech A'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Taurian Concordant Assault Mech B'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Taurian Concordant Assault Mech C'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Taurian Concordant Assault Mech D'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Taurian Concordant Assault Mech F'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Taurian Concordant Heavy Mech A'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Taurian Concordant Heavy Mech B'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Taurian Concordant Heavy Mech C'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Taurian Concordant Heavy Mech D'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Taurian Concordant Heavy Mech F'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Taurian Concordant Light Mech A'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Taurian Concordant Light Mech B'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Taurian Concordant Light Mech C'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Taurian Concordant Light Mech D'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Taurian Concordant Light Mech F'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='3085 Taurian Concordant Medium Mech A'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='3085 Taurian Concordant Medium Mech B'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='3085 Taurian Concordant Medium Mech C'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='3085 Taurian Concordant Medium Mech D'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='3085 Taurian Concordant Medium Mech F'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+	</era>
+</rat>

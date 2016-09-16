@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<altFactions>
+<!--
+This file provides alternate factions to look for when attempting to locate a suitable RAT before going to the generic alternates for Clan, Periphery, or General. Multiple factions can be given, in which case they will be inserted into the sequence in random order.
+
+-->
+<faction key="ARDC">MERC,LA</faction>
+
+<faction key="AB">DC</faction>
+
+<faction key="CDP">TC</faction>
+
+<faction key="CSL">CHH</faction>
+
+<faction key="DA">FWL</faction>
+
+<faction key="DGM">FWL</faction>
+
+<faction key="DO">FWL</faction>
+
+<faction key="DoO">FWL</faction>
+
+<faction key="DTA">FWL</faction>
+
+<faction key="CEI">CGS,NC</faction>
+
+<faction key="FWLR">FWL</faction>
+
+<faction key="MCM">FWL</faction>
+
+<faction key="MSC">FWL</faction>
+
+<faction key="OP">FWL</faction>
+
+<faction key="PG">FWL</faction>
+
+<faction key="PR">FWL</faction>
+
+<faction key="RF">FWL</faction>
+
+<faction key="RFS">FWL</faction>
+
+<faction key="SHC">FWL</faction>
+
+<faction key="SC">FWL</faction>
+
+<faction key="FC">FS,LA</faction>
+
+<faction key="SIC">CC</faction>
+
+<faction key="TFR">CC</faction>
+
+<faction key="TH">SL</faction>
+
+<faction key="WOB">CS</faction>
+
+<faction key="RON">DC</faction>
+
+</altFactions>

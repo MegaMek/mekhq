@@ -166,8 +166,8 @@ import mekhq.campaign.universe.News;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planets;
+import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.RandomFactionGenerator;
-import mekhq.campaign.universe.UnitTableData;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IPartWork;
@@ -461,17 +461,9 @@ public class Campaign implements Serializable {
     
     public IUnitGenerator getUnitGenerator() {
     	if (unitGenerator == null) {
-    		UnitTableData utd = UnitTableData.getInstance();
-    		while (!utd.isInitialized()) {
-                //Sleep for up to one second.
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException ignore) {
-
-                }    			
-    		}
-    		utd.setChosenRATs(campaignOptions.getRATs());
-    		unitGenerator = utd;
+    		RATManager rm = new RATManager();
+    		rm.setSelectedRATs(campaignOptions.getRATs());
+    		unitGenerator = rm;
     	}
     	return unitGenerator;
     }
@@ -2964,17 +2956,6 @@ public class Campaign implements Serializable {
 
                 }
             }
-            while (!UnitTableData.getInstance().isInitialized()) {
-                //Sleep for up to one second.
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException ignore) {
-
-                }
-            }
-            /* UnitTableData starts initializing RandomUnitGenerator, but we want to make
-             * sure it's finished before allowing actions that will need it.
-             */
             while (!RandomUnitGenerator.getInstance().isInitialized()) {
                 //Sleep for up to one second.
                 try {

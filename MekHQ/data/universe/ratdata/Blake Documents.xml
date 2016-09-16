@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rat source='Blake Documents'>
+	<era year='3067'>
+		<rat name='Heavy Aerospace B/PM'>
+			<factions>WOB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='WoB Assault Mech A'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='WoB Assault Mech B'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='WoB Assault Mech Protectorate Militia'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='WoB Assault Mech Shadow Division'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='WoB Assault Vehicles (Blake Docs)'>
+			<factions>WOB</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='WoB Dropships A'>
+			<factions>WOB</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='WoB Dropships B'>
+			<factions>WOB</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='WoB Heavy Aerospace SD/A'>
+			<factions>WOB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='WoB Heavy Mech A'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='WoB Heavy Mech B'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='WoB Heavy Mech Protectorate Militia'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='WoB Heavy Mech Shadow Division'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='WoB Heavy Vehicles (Blake Docs)'>
+			<factions>WOB</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='WoB Light Aerospace B/PM'>
+			<factions>WOB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='WoB Light Aerospace SD/A'>
+			<factions>WOB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='WoB Light Mech A'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='WoB Light Mech B'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='WoB Light Mech Protectorate Militia'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='WoB Light Mech Shadow Division'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='WoB Light Vehicles (Blake Docs)'>
+			<factions>WOB</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='WoB Medium Aerospace B/PM'>
+			<factions>WOB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='WoB Medium Aerospace SD/A'>
+			<factions>WOB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='WoB Medium Mech Shadow Division'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='WoB Medium Mechs A'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='WoB Medium Mechs B'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='WoB Medium Mechs Protectorate Militia'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='WoB Medium Vehicles (Blake Docs)'>
+			<factions>WOB</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+	</era>
+</rat>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rat source='Historical Turning Points - Misery'>
+	<era year='3028'>
+		<rat name='Draconis Combine Assault &apos;Mech'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Draconis Combine Heavy &apos;Mech'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Draconis Combine Light &apos;Mech'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Draconis Combine Medium &apos;Mech'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Wolf&apos;s Dragoons Assault &apos;Mech'>
+			<factions>Wolf&apos;s Dragoons</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Wolf&apos;s Dragoons Heavy &apos;Mech'>
+			<factions>Wolf&apos;s Dragoons</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Wolf&apos;s Dragoons Light &apos;Mech'>
+			<factions>Wolf&apos;s Dragoons</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Wolf&apos;s Dragoons Medium &apos;Mech'>
+			<factions>Wolf&apos;s Dragoons</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+	</era>
+</rat>

@@ -38,7 +38,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.UnitTableData;
+import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.gui.CampaignGUI;
 
 public class GMToolsDialog extends JDialog implements ActionListener {
@@ -226,20 +226,16 @@ public class GMToolsDialog extends JDialog implements ActionListener {
     
     private MechSummary performRollRat() {
         try{
-            UnitTableData unitTables = UnitTableData.getInstance();
+            IUnitGenerator ug = gui.getCampaign().getUnitGenerator();
             int unitType = unitTypes[unitTypePicker.getSelectedIndex()];
             int unitQuality = qualityPicker.getSelectedIndex();
             int unitWeight = unitWeightPicker.getSelectedIndex() + EntityWeightClass.WEIGHT_LIGHT;
             
-            if(!unitTables.isInitialized()) {
-                unitPicked.setText("No Unit Tables Initialized.");
-                return null;
-            }
             int targetYear = Integer.parseInt(yearPicker.getText());
             
             Campaign campaign = gui.getCampaign();
             for(int i = 0; i < 10; ++ i) {
-                MechSummary ms = campaign.getUnitGenerator()
+                MechSummary ms = ug
                 		.generate(((FactionChoice) factionPicker.getSelectedItem()).id,
                 				unitType, unitWeight, targetYear, unitQuality);
                 if (ms != null) {

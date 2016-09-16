@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rat source='Deric Page'>
+	<era year='3025'>
+		<rat name='3025-3039 Inner Sphere and Periphery Infantry'>
+			<factions>General</factions>
+			<unitTypes>Infantry</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+	</era>
+	<era year='3050'>
+		<rat name='3050-plus Inner Sphere and Periphery Infantry'>
+			<factions>General</factions>
+			<unitTypes>Infantry</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+	</era>
+</rat>
