@@ -295,6 +295,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox chkUseUnofficialProcreation;
     private JCheckBox chkUseUnofficialProcreationNoRelationship;
     private JCheckBox chkUseParentage;
+    private JCheckBox chkLogConception;
     private JCheckBox chkUseTransfers;
 
 
@@ -1457,9 +1458,14 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = 19;
         panPersonnel.add(chkUseParentage, gridBagConstraints);
 
+        chkLogConception = new JCheckBox("Log Conception and Birth ");
+        chkLogConception.setSelected(options.logConception());
+        gridBagConstraints.gridy = 20;
+        panPersonnel.add(chkLogConception, gridBagConstraints);
+
         chkUseTransfers = new JCheckBox("Log Saver - Use Reassign instead of Remove/Assign"); // NOI18N
         chkUseTransfers.setSelected(options.useTransfers());
-        gridBagConstraints.gridy = 20;
+        gridBagConstraints.gridy = 21;
         panPersonnel.add(chkUseTransfers, gridBagConstraints);
 
         JPanel panSalary = new JPanel(new GridBagLayout());
@@ -1564,7 +1570,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 21;
+        gridBagConstraints.gridheight = 22;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -4199,6 +4205,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUseUnofficialProcreation(chkUseUnofficialProcreation.isSelected());
         options.setUseUnofficialProcreationNoRelationship(chkUseUnofficialProcreationNoRelationship.isSelected());
         options.setUseParentage(chkUseParentage.isSelected());
+        options.setLogConception(chkLogConception.isSelected());
         options.setUseTransfers(chkUseTransfers.isSelected());
         options.setDefaultPrisonerStatus(comboPrisonerStatus.getSelectedIndex());
 

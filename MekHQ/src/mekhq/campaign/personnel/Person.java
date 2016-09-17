@@ -948,6 +948,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		baby.setId(id);
 		baby.setAncestorsID(tmpAncID);
 		campaign.addReport(getName() + " has given birth to " + baby.getHyperlinkedName() + ", a baby " + (baby.getGender() == G_MALE ? "boy!" : "girl!"));
+		if (campaign.getCampaignOptions().logConception()) {
+		    addLogEntry(campaign.getDate(), "Delivered a healthy baby " + (baby.getGender() == G_MALE ? "boy!" : "girl!"));
+		}
 		setDueDate(null);
 		return baby;
 	}
@@ -967,15 +970,21 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 						tCal.add(GregorianCalendar.DAY_OF_YEAR, 40*7);
 						setDueDate(tCal);
 						campaign.addReport(getHyperlinkedName()+" has conceived");
+						if (campaign.getCampaignOptions().logConception()) {
+						    addLogEntry(campaign.getDate(), "Has conceived");
+				        }
 					}
 				} else if (getSpouse() != null) {
 					if (getSpouse().isActive() && !getSpouse().isDeployed() && getSpouse().getAge(campaign.getCalendar()) > 13) {
 						// 0.05% chance that this procreation attempt will create a child
-						if (Compute.randomInt(10000) < 2) {
+						if (Compute.randomInt(10000) < 200) {
 							GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
 							tCal.add(GregorianCalendar.DAY_OF_YEAR, 40*7);
 							setDueDate(tCal);
 							campaign.addReport(getHyperlinkedName()+" has conceived");
+							if (campaign.getCampaignOptions().logConception()) {
+							    addLogEntry(campaign.getDate(), "Has conceived");
+					        }
 						}
 					}
 				}
