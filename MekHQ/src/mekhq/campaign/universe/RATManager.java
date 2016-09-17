@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -364,18 +363,8 @@ public class RATManager implements IUnitGenerator {
 	@Override
 	public MechSummary generate(String faction, int unitType, int weightClass,
 			int year, int quality) {
-		RAT rat = findRAT(faction, unitType, weightClass, year, quality);
-		if (rat != null) {
-			RandomUnitGenerator.getInstance().setChosenRAT(rat.ratName);
-			List<MechSummary> list = RandomUnitGenerator.getInstance().generate(1);
-			if (list.size() > 0) {
-				return list.get(0);
-			}
-		}
-		return null;
+		return generate(faction, unitType, weightClass, year, quality, null);
 	}
-
-	private static final int RETRIES = 10;
 
 	/* (non-Javadoc)
 	 * @see mekhq.campaign.universe.IUnitGenerator#generate(java.lang.String, int, int, int, int, java.util.function.Predicate)
@@ -383,12 +372,10 @@ public class RATManager implements IUnitGenerator {
 	@Override
 	public MechSummary generate(String faction, int unitType, int weightClass,
 			int year, int quality, Predicate<MechSummary> filter) {
-		List<MechSummary> list = generate(RETRIES, faction, unitType, weightClass,
-				year, quality);
-		for (MechSummary ms : list) {
-			if (filter.test(ms)) {
-				return ms;
-			}
+		List<MechSummary> list = generate(1, faction, unitType, weightClass,
+				year, quality, filter);
+		if (list.size() > 0) {
+			return list.get(0);
 		}
 		return null;
 	}
@@ -399,12 +386,7 @@ public class RATManager implements IUnitGenerator {
 	@Override
 	public List<MechSummary> generate(int count, String faction, int unitType,
 			int weightClass, int year, int quality) {
-		RAT rat = findRAT(faction, unitType, weightClass, year, quality);
-		if (rat != null) {
-			RandomUnitGenerator.getInstance().setChosenRAT(rat.ratName);
-			return RandomUnitGenerator.getInstance().generate(count);
-		}
-		return new ArrayList<MechSummary>();
+		return generate(count, faction, unitType, weightClass, year, quality, null);
 	}
 
 	/* (non-Javadoc)
@@ -414,16 +396,12 @@ public class RATManager implements IUnitGenerator {
 	public List<MechSummary> generate(int count, String faction, int unitType,
 			int weightClass, int year, int quality,
 			Predicate<MechSummary> filter) {
-		List<MechSummary> list = generate(RETRIES * count, faction, unitType, weightClass,
-				year, quality);
-		if (list.size() > 0) {
-			List<MechSummary> retVal = list.stream().filter(filter).collect(Collectors.toList());			
-			while (retVal.size() < count) {
-				retVal.add(list.get(Compute.randomInt(list.size())));
-			}
-			return retVal.subList(0, count);
+		filter = ms -> ms.getUnitType().equals("Tank");
+		RAT rat = findRAT(faction, unitType, weightClass, year, quality);
+		if (rat != null) {
+			return RandomUnitGenerator.getInstance().generate(count, rat.ratName, filter);
 		}
-		return new ArrayList<>();
+		return new ArrayList<MechSummary>();
 	}
 
     private static class RAT {
