@@ -977,7 +977,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				} else if (getSpouse() != null) {
 					if (getSpouse().isActive() && !getSpouse().isDeployed() && getSpouse().getAge(campaign.getCalendar()) > 13) {
 						// 0.05% chance that this procreation attempt will create a child
-						if (Compute.randomInt(10000) < 200) {
+						if (Compute.randomInt(10000) < 2) {
 							GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
 							tCal.add(GregorianCalendar.DAY_OF_YEAR, 40*7);
 							setDueDate(tCal);
