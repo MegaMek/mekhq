@@ -396,7 +396,6 @@ public class RATManager implements IUnitGenerator {
 	public List<MechSummary> generate(int count, String faction, int unitType,
 			int weightClass, int year, int quality,
 			Predicate<MechSummary> filter) {
-		filter = ms -> ms.getUnitType().equals("Tank");
 		RAT rat = findRAT(faction, unitType, weightClass, year, quality);
 		if (rat != null) {
 			return RandomUnitGenerator.getInstance().generate(count, rat.ratName, filter);
