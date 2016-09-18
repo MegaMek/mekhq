@@ -166,6 +166,7 @@ import mekhq.campaign.universe.News;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planets;
+import mekhq.campaign.universe.RATGeneratorConnector;
 import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -461,9 +462,13 @@ public class Campaign implements Serializable {
     
     public IUnitGenerator getUnitGenerator() {
     	if (unitGenerator == null) {
+    		RATGeneratorConnector rgc = new RATGeneratorConnector(calendar.get(Calendar.YEAR));
+    		unitGenerator = rgc;
+    		/*
     		RATManager rm = new RATManager();
     		rm.setSelectedRATs(campaignOptions.getRATs());
     		unitGenerator = rm;
+    		*/
     	}
     	return unitGenerator;
     }
