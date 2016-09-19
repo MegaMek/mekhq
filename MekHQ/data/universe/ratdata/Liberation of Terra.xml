@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rat source='Liberation of Terra'>
+	<era year='2766'>
+		<rat name='Assault Mech (2766) RWR Line unit A'>
+			<factions>RWR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='Assault Mech (2766) RWR Line unit B'>
+			<factions>RWR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='Assault Mech (2766) RWR Republican Guard'>
+			<factions>RWR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Assault Vehicle (2766) RWR'>
+			<factions>RWR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Dropships (2766) RWR'>
+			<factions>RWR</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Heavy Aerospace (2766) RWR'>
+			<factions>RWR</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Heavy Mech (2766) RWR Line unit A'>
+			<factions>RWR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='Heavy Mech (2766) RWR Line unit B'>
+			<factions>RWR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='Heavy Mech (2766) RWR Republican Guard'>
+			<factions>RWR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Heavy Vehicle (2766) RWR'>
+			<factions>RWR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Light Aerospace (2766) RWR'>
+			<factions>RWR</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Light Mech (2766) RWR Line unit A'>
+			<factions>RWR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='Light Mech (2766) RWR Line unit B'>
+			<factions>RWR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='Light Mech (2766) RWR Republican Guard'>
+			<factions>RWR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Light Vehicle (2766) RWR'>
+			<factions>RWR</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Medium Aerospace (2766) RWR'>
+			<factions>RWR</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Medium Mech (2766) RWR Line unit A'>
+			<factions>RWR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='Medium Mech (2766) RWR Line unit B'>
+			<factions>RWR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='Medium Mech (2766) RWR Republican Guard'>
+			<factions>RWR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Medium Vehicle (2766) RWR'>
+			<factions>RWR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='SLDF Assault (2766) House Regular or SLDF Reserve'>
+			<factions>SL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='SLDF Assault (2766) Royal'>
+			<factions>SL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='SLDF Assault (2766) SLDF Regular or House Elite'>
+			<factions>SL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='SLDF Assault Vehicle (2766) Royal'>
+			<factions>SL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='SLDF Assault Vehicle (2766) SLDF Regular or House Elite'>
+			<factions>SL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='SLDF Dropship (2766)'>
+			<factions>SL</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='SLDF Heavy (2766) House Regular or SLDF Reserve'>
+			<factions>SL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='SLDF Heavy (2766) Royal'>
+			<factions>SL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='SLDF Heavy (2766) SLDF Regular or House Elite'>
+			<factions>SL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='SLDF Heavy (2766) SLDF Regular or House Regular'>
+			<factions>SL</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='SLDF Heavy (2766) SLDF Royal'>
+			<factions>SL</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='SLDF Heavy Vehicle (2766) Royal'>
+			<factions>SL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='SLDF Heavy Vehicle (2766) SLDF Regular or House Elite'>
+			<factions>SL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='SLDF Light (2766) House Regular or SLDF Reserve'>
+			<factions>SL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='SLDF Light (2766) Royal'>
+			<factions>SL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='SLDF Light (2766) SLDF Regular or House Elite'>
+			<factions>SL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='SLDF Light (2766) SLDF Regular or House Regular'>
+			<factions>SL</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='SLDF Light (2766) SLDF Royal'>
+			<factions>SL</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='SLDF Light Vehicle (2766) Royal'>
+			<factions>SL</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='SLDF Light Vehicle (2766) SLDF Regular or House Elite'>
+			<factions>SL</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='SLDF Medium (2766) House Regular or SLDF Reserve'>
+			<factions>SL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='SLDF Medium (2766) Royal'>
+			<factions>SL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='SLDF Medium (2766) SLDF Regular or House Elite'>
+			<factions>SL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='SLDF Medium (2766) SLDF Regular or House Regular'>
+			<factions>SL</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='SLDF Medium (2766) SLDF Royal'>
+			<factions>SL</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='SLDF Medium Vehicle (2766) Royal'>
+			<factions>SL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='SLDF Medium Vehicle (2766) SLDF Regular or House Elite'>
+			<factions>SL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+	</era>
+</rat>

@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rat source='Golden Century'>
+	<era year='2820'>
+		<rat name='2858 Golden Century Assault Mech'>
+			<factions>Clan</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2858 Golden Century Assault Vehicle'>
+			<factions>Clan</factions>
+			<unitTypes>Mek,Tank</unitTypes>
+			<weightClasses>H,A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2858 Golden Century Heavy Aerospace'>
+			<factions>Clan</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2858 Golden Century Heavy Vehicle'>
+			<factions>Clan</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2858 Golden Century Light Aerospace'>
+			<factions>Clan</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2858 Golden Century Light Mech'>
+			<factions>Clan</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2858 Golden Century Light Vehicle'>
+			<factions>Clan</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2858 Golden Century Medium Aerospace'>
+			<factions>Clan</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2858 Golden Century Medium Mech '>
+			<factions>Clan</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2858 Golden Century Medium Vehicle'>
+			<factions>Clan</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+	</era>
+	<era year='2860'>
+		<rat name='2858 Golden Century Light Aerospace'>
+			<factions>Clan</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2858 Golden Century Medium Aerospace'>
+			<factions>Clan</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2860 Golden Century Heavy Aerospace'>
+			<factions>Clan</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+	</era>
+	<era year='2865'>
+		<rat name='2858 Golden Century Assault Mech'>
+			<factions>Clan</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2858 Golden Century Light Mech'>
+			<factions>Clan</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2858 Golden Century Medium Mech '>
+			<factions>Clan</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2865 Golden Century Heavy Mech'>
+			<factions>Clan</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+	</era>
+	<era year='2870'>
+		<rat name='2858 Golden Century Assault Mech'>
+			<factions>Clan</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2858 Golden Century Assault Vehicle'>
+			<factions>Clan</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2858 Golden Century Heavy Vehicle'>
+			<factions>Clan</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2858 Golden Century Light Mech'>
+			<factions>Clan</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2858 Golden Century Medium Vehicle'>
+			<factions>Clan</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2865 Golden Century Heavy Mech'>
+			<factions>Clan</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2870 Golden Century Light Vehicle'>
+			<factions>Clan</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2870 Golden Century Medium Mech '>
+			<factions>Clan</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+	</era>
+	<era year='2871'>
+		<rat name='2858 Golden Century Heavy Vehicle'>
+			<factions>Clan</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2858 Golden Century Medium Vehicle'>
+			<factions>Clan</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2870 Golden Century Light Vehicle'>
+			<factions>Clan</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2871 Golden Century Assault Vehicle'>
+			<factions>Clan</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+	</era>
+	<era year='2874'>
+		<rat name='2858 Golden Century Assault Mech'>
+			<factions>Clan</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2858 Golden Century Light Aerospace'>
+			<factions>Clan</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2858 Golden Century Medium Aerospace'>
+			<factions>Clan</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2865 Golden Century Heavy Mech'>
+			<factions>Clan</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2874 Golden Century Heavy Aerospace'>
+			<factions>Clan</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2874 Golden Century Light Mech'>
+			<factions>Clan</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2874 Golden Century Medium Mech '>
+			<factions>Clan</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+	</era>
+	<era year='2875'>
+		<rat name='2858 Golden Century Heavy Vehicle'>
+			<factions>Clan</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2871 Golden Century Assault Vehicle'>
+			<factions>Clan</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2875 Golden Century Light Vehicle'>
+			<factions>Clan</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2875 Golden Century Medium Vehicle'>
+			<factions>Clan</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+	</era>
+	<era year='2878'>
+		<rat name='2858 Golden Century Medium Aerospace'>
+			<factions>Clan</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2874 Golden Century Heavy Aerospace'>
+			<factions>Clan</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2878 Golden Century Light Aerospace'>
+			<factions>Clan</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+	</era>
+	<era year='2883'>
+		<rat name='2858 Golden Century Medium Aerospace'>
+			<factions>Clan</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2874 Golden Century Heavy Aerospace'>
+			<factions>Clan</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2883 Golden Century Light Aerospace'>
+			<factions>Clan</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+	</era>
+	<era year='2887'>
+		<rat name='2865 Golden Century Heavy Mech'>
+			<factions>Clan</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2874 Golden Century Light Mech'>
+			<factions>Clan</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2874 Golden Century Medium Mech '>
+			<factions>Clan</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2887 Golden Century Assault Mech'>
+			<factions>Clan</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+	</era>
+</rat>

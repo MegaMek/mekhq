@@ -30,10 +30,11 @@ import java.util.Set;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.client.RandomUnitGenerator;
 import megamek.common.Compute;
+import megamek.common.EntityWeightClass;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
+import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -44,8 +45,6 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RandomFactionGenerator;
-import mekhq.campaign.universe.UnitTableData;
-import mekhq.campaign.universe.UnitTableData.FactionTables;
 
 /**
  * Generates units available for sale.
@@ -123,46 +122,46 @@ public class UnitMarket implements Serializable {
 			}
 
 			addOffers(campaign, Compute.d6() - 2, MARKET_OPEN,
-					UnitTableData.UNIT_MECH, null,
-					UnitTableData.QUALITY_F, 7);
+					UnitType.MEK, null,
+					IUnitRating.DRAGOON_F, 7);
 			addOffers(campaign, Compute.d6() - 1, MARKET_OPEN,
-					UnitTableData.UNIT_VEHICLE, null,
-					UnitTableData.QUALITY_F, 7);
+					UnitType.TANK, null,
+					IUnitRating.DRAGOON_F, 7);
 			addOffers(campaign, Compute.d6() - 2, MARKET_OPEN,
-					UnitTableData.UNIT_AERO, null,
-					UnitTableData.QUALITY_F, 7);
+					UnitType.AERO, null,
+					IUnitRating.DRAGOON_F, 7);
 
 			if (contract != null) {
 				addOffers(campaign, Compute.d6() - 3,
 						MARKET_EMPLOYER,
-						UnitTableData.UNIT_MECH,
+						UnitType.MEK,
 						contract.getEmployerCode(),
-						UnitTableData.QUALITY_D, 7);
+						IUnitRating.DRAGOON_D, 7);
 				addOffers(campaign, Compute.d6() - 2,
 						MARKET_EMPLOYER,
-						UnitTableData.UNIT_VEHICLE,
+						UnitType.TANK,
 						contract.getEmployerCode(),
-						UnitTableData.QUALITY_D, 7);
+						IUnitRating.DRAGOON_D, 7);
 				addOffers(campaign, Compute.d6() - 3,
 						MARKET_EMPLOYER,
-						UnitTableData.UNIT_AERO,
+						UnitType.AERO,
 						contract.getEmployerCode(),
-						UnitTableData.QUALITY_D, 7);
+						IUnitRating.DRAGOON_D, 7);
 			}
 
 			if (!campaign.getFaction().isClan()) {
 				addOffers(campaign, Compute.d6(3) - 9,
 						MARKET_MERCENARY,
-						UnitTableData.UNIT_MECH, "MERC",
-						UnitTableData.QUALITY_C, 5);
+						UnitType.MEK, "MERC",
+						IUnitRating.DRAGOON_C, 5);
 				addOffers(campaign, Compute.d6(3) - 6,
 						MARKET_MERCENARY,
-						UnitTableData.UNIT_VEHICLE, "MERC",
-						UnitTableData.QUALITY_C, 5);
+						UnitType.TANK, "MERC",
+						IUnitRating.DRAGOON_C, 5);
 				addOffers(campaign, Compute.d6(3) - 9,
 						MARKET_MERCENARY,
-						UnitTableData.UNIT_AERO, "MERC",
-						UnitTableData.QUALITY_C, 5);
+						UnitType.AERO, "MERC",
+						IUnitRating.DRAGOON_C, 5);
 			}
 
 			if (campaign.getUnitRatingMod() >= IUnitRating.DRAGOON_B) {
@@ -172,32 +171,32 @@ public class UnitMarket implements Serializable {
 						!Faction.getFaction(faction).isClan()) {
 					addOffers(campaign, Compute.d6() - 3,
 							MARKET_FACTORY,
-							UnitTableData.UNIT_MECH, faction,
-							UnitTableData.QUALITY_A, 6);
+							UnitType.MEK, faction,
+							IUnitRating.DRAGOON_A, 6);
 					addOffers(campaign, Compute.d6() - 2,
 							MARKET_FACTORY,
-							UnitTableData.UNIT_VEHICLE, faction,
-							UnitTableData.QUALITY_A, 6);
+							UnitType.TANK, faction,
+							IUnitRating.DRAGOON_A, 6);
 					addOffers(campaign, Compute.d6() - 3,
 							MARKET_FACTORY,
-							UnitTableData.UNIT_AERO, faction,
-							UnitTableData.QUALITY_A, 6);
+							UnitType.AERO, faction,
+							IUnitRating.DRAGOON_A, 6);
 				}
 			}
 
 			if (!campaign.getFaction().isClan()) {
 				addOffers(campaign, Compute.d6(2) - 6,
 						MARKET_BLACK,
-						UnitTableData.UNIT_MECH, null,
-						UnitTableData.QUALITY_C, 6);
+						UnitType.MEK, null,
+						IUnitRating.DRAGOON_C, 6);
 				addOffers(campaign, Compute.d6(2) - 4,
 						MARKET_BLACK,
-						UnitTableData.UNIT_VEHICLE, null,
-						UnitTableData.QUALITY_C, 6);
+						UnitType.TANK, null,
+						IUnitRating.DRAGOON_C, 6);
 				addOffers(campaign, Compute.d6(2) - 6,
 						MARKET_BLACK,
-						UnitTableData.UNIT_AERO, null,
-						UnitTableData.QUALITY_C, 6);
+						UnitType.AERO, null,
+						IUnitRating.DRAGOON_C, 6);
 			}
 
 			if (campaign.getCampaignOptions().getUnitMarketReportRefresh()) {
@@ -215,25 +214,12 @@ public class UnitMarket implements Serializable {
 			faction = campaign.getFactionCode();
 			market = MARKET_EMPLOYER;
 		}
-		FactionTables ft = UnitTableData.getInstance().getBestRAT(campaign.getCampaignOptions().getRATs(),
-				campaign.getCalendar().get(Calendar.YEAR),
-				faction, unitType);
-		if (ft == null) {
-			MekHQ.logMessage("Unit market could not locate appropriate RAT");
-			return;
-		}
 		for (int i = 0; i < num; i++) {
 			int weight = getRandomWeight(unitType, faction,
 					campaign.getCampaignOptions().getRegionalMechVariations());
-			String rat = ft.getTable(unitType, weight, quality);
-			if (rat == null) {
-				continue;
-			}
-			MechSummary ms = null;
-			RandomUnitGenerator.getInstance().setChosenRAT(rat);
-			ArrayList<MechSummary> msl = RandomUnitGenerator.getInstance().generate(1);
-			if (msl.size() > 0) {
-				ms = msl.get(0);
+			MechSummary ms = campaign.getUnitGenerator().generate(faction, unitType, weight,
+					campaign.getCalendar().get(Calendar.YEAR), quality);
+			if (ms != null) {
 				if (campaign.getCampaignOptions().limitByYear() &&
 						campaign.getCalendar().get(Calendar.YEAR) < ms.getYear()) {
 					continue;
@@ -254,31 +240,26 @@ public class UnitMarket implements Serializable {
 	/* Used by special event */
 	public String addSingleUnit(Campaign campaign, int market, int unitType,
 			String faction, int quality, int pricePct) {
-		FactionTables ft = UnitTableData.getInstance().getBestRAT(campaign.getCampaignOptions().getRATs(),
-				campaign.getCalendar().get(Calendar.YEAR),
-				faction, unitType);
 		int weight = getRandomWeight(unitType, faction,
 				campaign.getCampaignOptions().getRegionalMechVariations());
-		String rat = ft.getTable(unitType, weight, quality);
-		MechSummary ms = null;
-		if (null != rat) {
-			RandomUnitGenerator.getInstance().setChosenRAT(rat);
-			ArrayList<MechSummary> msl = RandomUnitGenerator.getInstance().generate(1);
-			if (msl.size() > 0) {
-				ms = msl.get(0);
-			}
+		MechSummary ms = campaign.getUnitGenerator().generate(faction, unitType, weight,
+				campaign.getCalendar().get(Calendar.YEAR), quality);
+		if (ms == null) {
+			return null;
+		} else {
+			offers.add(new MarketOffer(market, unitType, weight,
+					ms, pricePct));
+			return ms.getName();
 		}
-		offers.add(new MarketOffer(market, unitType, weight,
-				ms, pricePct));
-		return ms.getName();
+		
 	}
 	
 	public static int getRandomWeight(int unitType, String faction,
 			boolean regionalVariations) {
-		if (unitType == UnitTableData.UNIT_AERO) {
+		if (unitType == UnitType.AERO) {
 			return getRandomAeroWeight();
 		}
-		if (unitType == UnitTableData.UNIT_MECH && regionalVariations) {
+		if (unitType == UnitType.MEK && regionalVariations) {
 			return getRegionalMechWeight(faction);
 		}
 		return getRandomMechWeight();
@@ -286,41 +267,41 @@ public class UnitMarket implements Serializable {
 	
 	public static int getRandomMechWeight() {
 		int roll = Compute.randomInt(10);
-		if (roll <= 2) return UnitTableData.WT_LIGHT;
-		if (roll <= 6) return UnitTableData.WT_MEDIUM;
-		if (roll <= 8) return UnitTableData.WT_HEAVY;
-		return UnitTableData.WT_ASSAULT;
+		if (roll <= 2) return EntityWeightClass.WEIGHT_LIGHT;
+		if (roll <= 6) return EntityWeightClass.WEIGHT_MEDIUM;
+		if (roll <= 8) return EntityWeightClass.WEIGHT_HEAVY;
+		return EntityWeightClass.WEIGHT_ASSAULT;
 	}
 	
 	public static int getRegionalMechWeight(String faction) {
 		int roll = Compute.randomInt(100);
 		if (faction.equals("DC")) {
-			if (roll < 40) return UnitTableData.WT_LIGHT;
-			if (roll < 60) return UnitTableData.WT_MEDIUM;
-			if (roll < 90) return UnitTableData.WT_HEAVY;
-			return UnitTableData.WT_ASSAULT;
+			if (roll < 40) return EntityWeightClass.WEIGHT_LIGHT;
+			if (roll < 60) return EntityWeightClass.WEIGHT_MEDIUM;
+			if (roll < 90) return EntityWeightClass.WEIGHT_HEAVY;
+			return EntityWeightClass.WEIGHT_ASSAULT;
 		} else if (faction.equals("LA")) {
-			if (roll < 20) return UnitTableData.WT_LIGHT;
-			if (roll < 50) return UnitTableData.WT_MEDIUM;
-			if (roll < 85) return UnitTableData.WT_HEAVY;
-			return UnitTableData.WT_ASSAULT;
+			if (roll < 20) return EntityWeightClass.WEIGHT_LIGHT;
+			if (roll < 50) return EntityWeightClass.WEIGHT_MEDIUM;
+			if (roll < 85) return EntityWeightClass.WEIGHT_HEAVY;
+			return EntityWeightClass.WEIGHT_ASSAULT;
 		} else if (faction.equals("FWL")) {
-			if (roll < 30) return UnitTableData.WT_LIGHT;
-			if (roll < 70) return UnitTableData.WT_MEDIUM;
-			if (roll < 92) return UnitTableData.WT_HEAVY;
-			return UnitTableData.WT_ASSAULT;
+			if (roll < 30) return EntityWeightClass.WEIGHT_LIGHT;
+			if (roll < 70) return EntityWeightClass.WEIGHT_MEDIUM;
+			if (roll < 92) return EntityWeightClass.WEIGHT_HEAVY;
+			return EntityWeightClass.WEIGHT_ASSAULT;
 		}
-		if (roll < 30) return UnitTableData.WT_LIGHT;
-		if (roll < 70) return UnitTableData.WT_MEDIUM;
-		if (roll < 90) return UnitTableData.WT_HEAVY;
-		return UnitTableData.WT_ASSAULT;
+		if (roll < 30) return EntityWeightClass.WEIGHT_LIGHT;
+		if (roll < 70) return EntityWeightClass.WEIGHT_MEDIUM;
+		if (roll < 90) return EntityWeightClass.WEIGHT_HEAVY;
+		return EntityWeightClass.WEIGHT_ASSAULT;
 	}
 	
 	public static int getRandomAeroWeight() {
 		int roll = Compute.randomInt(8);
-		if (roll <= 2) return UnitTableData.WT_LIGHT;
-		if (roll <= 6) return UnitTableData.WT_MEDIUM;
-		return UnitTableData.WT_HEAVY;
+		if (roll <= 2) return EntityWeightClass.WEIGHT_LIGHT;
+		if (roll <= 6) return EntityWeightClass.WEIGHT_MEDIUM;
+		return EntityWeightClass.WEIGHT_HEAVY;
 	}
 
    public void writeToXml(PrintWriter pw1, int indent) {

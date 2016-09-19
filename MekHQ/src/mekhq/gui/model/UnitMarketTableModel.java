@@ -28,8 +28,8 @@ import java.util.ArrayList;
 import javax.swing.SwingConstants;
 
 import megamek.common.EntityWeightClass;
+import megamek.common.UnitType;
 import mekhq.campaign.market.UnitMarket;
-import mekhq.campaign.universe.UnitTableData;
 
 /**
  * Model for displaying offers on the UnitMarket
@@ -133,7 +133,7 @@ public class UnitMarketTableModel extends DataTableModel {
             return UnitMarket.marketNames[o.market];
         }
         if(col == COL_UNITTYPE) {
-            return UnitTableData.unitNames[o.unitType];
+            return UnitType.getTypeName(o.unitType);
         }
         if(col == COL_WEIGHTCLASS) {
                 return EntityWeightClass.getClassName(o.unitWeight,

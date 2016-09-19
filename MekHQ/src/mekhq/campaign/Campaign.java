@@ -161,12 +161,14 @@ import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.News;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planets;
+import mekhq.campaign.universe.RATGeneratorConnector;
+import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.RandomFactionGenerator;
-import mekhq.campaign.universe.UnitTableData;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IPartWork;
@@ -274,6 +276,7 @@ public class Campaign implements Serializable {
     private RetirementDefectionTracker retirementDefectionTracker; // AtB
     private int fatigueLevel; //AtB
     private AtBConfiguration atbConfig; //AtB
+    private IUnitGenerator unitGenerator;
 
     public Campaign() {
         game = new Game();
@@ -455,6 +458,39 @@ public class Campaign implements Serializable {
 
     public int getFatigueLevel() {
     	return fatigueLevel;
+    }
+    
+    /**
+     * Initializes the unit generator based on the method chosen in campaignOptions.
+     * Called when the unit generator is first used or when the method has been
+     * changed in campaignOptions.
+     */
+    public void initUnitGenerator() {
+		if (campaignOptions.useStaticRATs()) {
+    		RATManager rm = new RATManager();
+    		rm.setSelectedRATs(campaignOptions.getRATs());
+    		while (!RandomUnitGenerator.getInstance().isInitialized()) {
+    			try {
+					Thread.sleep(50);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+    		}
+    		unitGenerator = rm;    			
+		} else {
+			RATGeneratorConnector rgc = new RATGeneratorConnector(calendar.get(Calendar.YEAR));
+			unitGenerator = rgc;
+		}    	
+    }
+    
+    /**
+     * @return - the class responsible for generating random units
+     */
+    public IUnitGenerator getUnitGenerator() {
+    	if (unitGenerator == null) {
+    		initUnitGenerator();
+    	}
+    	return unitGenerator;
     }
 
     public AtBConfiguration getAtBConfig() {
@@ -2945,17 +2981,6 @@ public class Campaign implements Serializable {
 
                 }
             }
-            while (!UnitTableData.getInstance().isInitialized()) {
-                //Sleep for up to one second.
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException ignore) {
-
-                }
-            }
-            /* UnitTableData starts initializing RandomUnitGenerator, but we want to make
-             * sure it's finished before allowing actions that will need it.
-             */
             while (!RandomUnitGenerator.getInstance().isInitialized()) {
                 //Sleep for up to one second.
                 try {

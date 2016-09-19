@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rat source='Total Warfare'>
+	<era year='3067'>
+		<rat name='Clan Aerospace Heavy'>
+			<factions>Clan</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Aerospace Light'>
+			<factions>Clan</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Aerospace Medium'>
+			<factions>Clan</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Battle Armor'>
+			<factions>Clan</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Diamond Shark Assault Mech'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Diamond Shark Heavy Mech'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Diamond Shark Light &apos;Mech'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Diamond Shark Medium &apos;Mech'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Dropship'>
+			<factions>Clan</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear Assault &apos;Mech'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear Heavy &apos;Mech'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear Light &apos;Mech'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear Medium &apos;Mech'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon Assault &apos;Mech'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon Heavy &apos;Mech'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon Light &apos;Mech'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon Medium &apos;Mech'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Snow Raven Assault &apos;Mech'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Snow Raven Heavy &apos;Mech'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Snow Raven Light &apos;Mech'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Snow Raven Medium &apos;Mech'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Vehicle Assault'>
+			<factions>Clan</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Vehicle Heavy'>
+			<factions>Clan</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Vehicle Light'>
+			<factions>Clan</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Vehicle Medium'>
+			<factions>Clan</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Wolf Assault &apos;Mech'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Wolf Heavy &apos;Mech'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Wolf Light &apos;Mech'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Wolf Medium &apos;Mech'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Comstar Assault &apos;Mech'>
+			<factions>CS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Comstar Heavy &apos;Mech'>
+			<factions>CS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Comstar Light &apos;Mech'>
+			<factions>CS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Comstar Medium &apos;Mech'>
+			<factions>CS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Conventional Infantry'>
+			<factions>General</factions>
+			<unitTypes>Infantry</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='House Davion Assault &apos;Mech'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='House Davion Heavy &apos;Mech'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='House Davion Light &apos;Mech'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='House Davion Medium &apos;Mech'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='House Kurita Assault &apos;Mech'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='House Kurita Heavy &apos;Mech'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='House Kurita Light &apos;Mech'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='House Kurita Medium &apos;Mech'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='House Liao Assault &apos;Mech'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='House Liao Heavy &apos;Mech'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='House Liao Light &apos;Mech'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='House Liao Medium &apos;Mech'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='House Marik Assault &apos;Mech'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='House Marik Heavy &apos;Mech'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='House Marik Light &apos;Mech'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='House Marik Medium &apos;Mech'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='House Steiner Assault &apos;Mech'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='House Steiner Heavy &apos;Mech'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='House Steiner Light &apos;Mech'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='House Steiner Medium &apos;Mech'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Inner Sphere Aerospace Heavy'>
+			<factions>General</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Inner Sphere Aerospace Light'>
+			<factions>General</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Inner Sphere Aerospace Medium'>
+			<factions>General</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Inner Sphere Battle Armor'>
+			<factions>General</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Inner Sphere Dropship'>
+			<factions>General</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Inner Sphere Vehicle Assault'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Inner Sphere Vehicle Heavy'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Inner Sphere Vehicle Light'>
+			<factions>General</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Inner Sphere Vehicle Medium'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Periphery Assault &apos;Mech'>
+			<factions>Periphery</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Periphery Heavy &apos;Mech'>
+			<factions>Periphery</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Periphery Light &apos;Mech'>
+			<factions>Periphery</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Periphery Medium &apos;Mech'>
+			<factions>Periphery</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Protomechs'>
+			<factions>Clan</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='WoB Assault &apos;Mech'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='WoB Heavy &apos;Mech'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='WoB Light &apos;Mech'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='WoB Medium &apos;Mech'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+	</era>
+</rat>

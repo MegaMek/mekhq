@@ -1,0 +1,34 @@
+In order for the Against the Bot campaign system to be able to use custom random assignment tables (RATs), you will need to provide data to MekHQ detailing the contents of each RAT file. The RAT files themselves must be in the data/rat directory. The metadata, which describes to MekHQ how to use the custom files, must be in the data/universe/ratdata directory and end with ".xml". Each file is considered a separate collection, and its contents will appear as a listing in the RAT configuration section on the Against the Bot tab in Campaign Options in MekHQ.
+
+The name of the file has no requirements beyond the .xml suffix, but should be descriptive of the contents. Note that xml is case sensitive.
+
+The overall structure of the file is as follows, with values enclosed in brackets replaced with data about your custom RATs:
+<rat source='[source name]'>
+    <era year='[earliest year for RAT]'>
+        <rat name='[RAT name]'>
+            <factions>[list of faction keys]</factions>
+            <unitTypes>[list of unit types]</unitTypes>
+            <weightClasses>[list of weight class abbreviations]</weightClasses>
+            <ratings>[list of equipment ratings]</ratings>
+        </rat>
+        ...
+    </era>
+    ...
+</rat>
+
+Explanation of fields:
+[source name]: How this collection will appear in the list of available RATs in Campaign Options. Must be unique; if more than one file in data/universe/ratdata has the same value, only the last one loaded will be used.
+
+[earliest year for RAT]: The game year that the RAT should be considered available. The RATs contained a section dated after the game year will be passed over. Those dated within the game year or earlier will be checked earliest first, and moving back to the oldest until a matching RAT is found or all are checked.
+
+[RAT name]: This is the internal name of the RAT file (the first non-comment line). There must be one entry for each file in the RAT collection that is to be used. Including the same file multiple times will not break anything, but should be avoided because it is unnecessary and is more likely to create confusion.
+
+[list of factions]: faction keys should be the same as what is found in the data/universe/factions.xml file, in the <shortname> node. In addition to those factions, the values "Periphery", "Clan", and "General" are also acceptable; they will match any periphery faction, and Clan faction, or any non-Clan faction respectively.
+
+[list of unit types]: one or more of the following unit type values: Mek, Tank, BattleArmor, Infantry, ProtoMek, VTOL, Naval, ConventionalFighter, Aero, Small Craft, Dropship, Jumpship, Warship.
+
+[list of weight class abbreviations]: Normally L, M, H, or A, but UL and SH are acceptable for ultra-light and superheavy as well. C is understood as Colossal and is treated as a synonym of SH.
+
+[list of equipment ratings]: Usually one of the follwing: A, B, C, D, F. Clan ratings can be used instead, some of which have multiple possible values: Keshik/K, FL, SL/2L, Solahma/Sol, PG/PGC. It is also possible to give an A* value, but most RATs do not use this.
+
+When multiple values are provided as a list, they must be separated by commas with no space between. Any list value can be omitted, in which case it will match any value. When more than one RAT can match the search criteria, only the first will be returned.

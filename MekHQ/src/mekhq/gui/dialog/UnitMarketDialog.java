@@ -62,13 +62,13 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
+import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.UnitMarket;
-import mekhq.campaign.universe.UnitTableData;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.model.UnitMarketTableModel;
 import mekhq.gui.model.XTableColumnModel;
@@ -406,13 +406,13 @@ public class UnitMarketDialog extends JDialog {
     			UnitMarket.MarketOffer offer = marketModel.getOffer(entry.getIdentifier());
     			boolean underThreshold = !chkPctThreshold.isSelected() ||
     					offer.pct <= (Integer)spnThreshold.getValue();
-    			if (offer.unitType == UnitTableData.UNIT_MECH) {
+    			if (offer.unitType == UnitType.MEK) {
     				return underThreshold && chkShowMeks.isSelected();
     			}
-    			if (offer.unitType == UnitTableData.UNIT_VEHICLE) {
+    			if (offer.unitType == UnitType.TANK) {
     				return underThreshold && chkShowVees.isSelected();
     			}
-    			if (offer.unitType == UnitTableData.UNIT_AERO) {
+    			if (offer.unitType == UnitType.AERO) {
     				return underThreshold && chkShowAero.isSelected();
     			}
     			return false;

@@ -40,6 +40,7 @@ import java.util.EventObject;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Vector;
@@ -105,7 +106,7 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.UnitTableData;
+import mekhq.campaign.universe.RATManager;
 import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.model.RankTableModel;
 import mekhq.gui.model.SortedComboBoxModel;
@@ -380,6 +381,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox chkOpforUsesVTOLs;
     private JCheckBox chkUseDropShips;
 
+    private JRadioButton btnDynamicRATs;
+    private JRadioButton btnStaticRATs;
     private DefaultListModel<String> chosenRatModel;
     private DefaultListModel<String> availableRatModel;
     private JList<String> availableRats;
@@ -3108,6 +3111,15 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panAtB.setName("panAtB");
         panAtB.setLayout(new java.awt.GridBagLayout());
 
+        JPanel panSubAtBAdmin = new JPanel(new GridBagLayout());
+        JPanel panSubAtBRat = new JPanel(new GridBagLayout());
+        JPanel panSubAtBContract = new JPanel(new GridBagLayout());
+        JPanel panSubAtBScenario = new JPanel(new GridBagLayout());
+        panSubAtBAdmin.setBorder(BorderFactory.createTitledBorder("Unit Administration"));
+        panSubAtBRat.setBorder(BorderFactory.createTitledBorder("Random Assignment Tables"));
+        panSubAtBContract.setBorder(BorderFactory.createTitledBorder("Contract Operations"));
+        panSubAtBScenario.setBorder(BorderFactory.createTitledBorder("Scenarios"));
+
         chkUseAtB.setText(resourceMap.getString("chkUseAtB.text"));
         chkUseAtB.setToolTipText(resourceMap.getString("chkUseAtB.toolTipText"));
         chkUseAtB.setSelected(options.getUseAtB());
@@ -3119,13 +3131,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new Insets(10, 10, 10, 10);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panAtB.add(chkUseAtB, gridBagConstraints);
-        chkUseAtB.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				enableAtBComponents(panAtB, chkUseAtB.isSelected());
-			}
+        chkUseAtB.addActionListener(ev -> {
+        	enableAtBComponents(panAtB, chkUseAtB.isSelected());
+        	enableAtBComponents(panSubAtBRat,
+        			chkUseAtB.isSelected() && btnStaticRATs.isSelected());
         });
-		enableAtBComponents(panAtB, chkUseAtB.isSelected());
 
         JLabel lblSkillLevel = new JLabel(resourceMap.getString("lblSkillLevel.text"));
         gridBagConstraints.gridx = 0;
@@ -3143,15 +3153,22 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = 1;
         panAtB.add(cbSkillLevel, gridBagConstraints);
 
-        JPanel panSubAtBAdmin = new JPanel(new GridBagLayout());
-        JPanel panSubAtBRat = new JPanel(new GridBagLayout());
-        JPanel panSubAtBContract = new JPanel(new GridBagLayout());
-        JPanel panSubAtBScenario = new JPanel(new GridBagLayout());
-        panSubAtBAdmin.setBorder(BorderFactory.createTitledBorder("Unit Administration"));
-        panSubAtBRat.setBorder(BorderFactory.createTitledBorder("Random Assignment Tables"));
-        panSubAtBContract.setBorder(BorderFactory.createTitledBorder("Contract Operations"));
-        panSubAtBScenario.setBorder(BorderFactory.createTitledBorder("Scenarios"));
+        btnDynamicRATs = new JRadioButton(resourceMap.getString("btnDynamicRATs.text"));
+        btnDynamicRATs.setToolTipText(resourceMap.getString("btnDynamicRATs.tooltip"));
+        btnDynamicRATs.setSelected(!options.useStaticRATs());
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        panAtB.add(btnDynamicRATs, gridBagConstraints);
 
+        btnStaticRATs = new JRadioButton(resourceMap.getString("btnStaticRATs.text"));
+        btnStaticRATs.setToolTipText(resourceMap.getString("btnStaticRATs.tooltip"));
+        btnStaticRATs.setSelected(options.useStaticRATs());
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        panAtB.add(btnStaticRATs, gridBagConstraints);
+        btnStaticRATs.addItemListener(ev -> enableAtBComponents(panSubAtBRat,
+        		btnStaticRATs.isSelected()));
+        
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
@@ -3283,15 +3300,25 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 14;
         panSubAtBAdmin.add(chkUnitMarketReportRefresh, gridBagConstraints);
+        
+        ButtonGroup group = new ButtonGroup();
+        group.add(btnDynamicRATs);
+        group.add(btnStaticRATs);
 
         chosenRatModel = new DefaultListModel<String>();
         for (String rat : options.getRATs()) {
-        	for (String displayName : UnitTableData.getAllRATNames()) {
-        		if (displayName.endsWith(rat)) {
-        			chosenRatModel.addElement(displayName);
-        			break;
-        		}
-        	}
+           	List<Integer> eras = RATManager.getAllRATCollections().get(rat);
+            if (eras != null) {
+            	StringBuilder displayName = new StringBuilder(rat);
+            	if (eras.size() > 0) {
+            		displayName.append(" (").append(eras.get(0));
+                	if (eras.size() > 1) {
+                		displayName.append("-").append(eras.get(eras.size() - 1));
+                	}
+                	displayName.append(")");
+            	}
+    			chosenRatModel.addElement(displayName.toString());
+        	}        	
         }
         chosenRats.setModel(chosenRatModel);
         chosenRats.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -3304,10 +3331,21 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 			}
         });
         availableRatModel = new DefaultListModel<String>();
-        for (String rat : UnitTableData.getAllRATNames()) {
-        	if (!chosenRatModel.contains(rat)) {
-        		availableRatModel.addElement(rat);
-        	}
+        for (String rat : RATManager.getAllRATCollections().keySet()) {
+           	List<Integer> eras = RATManager.getAllRATCollections().get(rat);
+            if (eras != null) {
+            	StringBuilder displayName = new StringBuilder(rat);
+            	if (eras.size() > 0) {
+            		displayName.append(" (").append(eras.get(0));
+                	if (eras.size() > 1) {
+                		displayName.append("-").append(eras.get(eras.size() - 1));
+                	}
+                	displayName.append(")");
+            	}
+            	if (!chosenRatModel.contains(displayName.toString())) {
+            		availableRatModel.addElement(displayName.toString());
+            	}
+        	}        	
         }
         availableRats.setModel(availableRatModel);
         availableRats.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -3325,7 +3363,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         txtRatInstructions.setText(resourceMap.getString("txtRatInstructions.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -3334,21 +3372,21 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         JLabel lblChosenRats = new JLabel(resourceMap.getString("lblChosenRats.text"));
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 1;
         panSubAtBRat.add(lblChosenRats, gridBagConstraints);
 
         JLabel lblAvailableRats = new JLabel(resourceMap.getString("lblAvailableRats.text"));
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 3;
         panSubAtBRat.add(lblAvailableRats, gridBagConstraints);
 
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 4;
         panSubAtBRat.add(chosenRats, gridBagConstraints);
 
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 4;
         panSubAtBRat.add(availableRats, gridBagConstraints);
 
         JPanel panRatButtons = new JPanel();
@@ -3408,9 +3446,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         btnMoveRatDown.setEnabled(false);
         panRatButtons.add(btnMoveRatDown);
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 4;
         panSubAtBRat.add(panRatButtons, gridBagConstraints);
-
+        
         JLabel lblSearchRadius = new JLabel(resourceMap.getString("lblSearchRadius.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -3755,7 +3793,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         tabOptions.addTab(resourceMap.getString("panAtB.TabConstraints.tabTitle"),
                 scrAtB); // NOI18N
 		enableAtBComponents(panAtB, chkUseAtB.isSelected());
-
+		enableAtBComponents(panSubAtBRat, chkUseAtB.isSelected()
+				&& btnStaticRATs.isSelected());
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -4245,12 +4284,16 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setOpforUsesVTOLs(chkOpforUsesVTOLs.isSelected());
         options.setUseDropShips(chkUseDropShips.isSelected());
 
+        options.setStaticRATs(btnStaticRATs.isSelected());
         //Strip dates used in display name
         String[] ratList = new String[chosenRatModel.size()];
         for (int i = 0; i < chosenRatModel.size(); i++) {
-        	ratList[i] = chosenRatModel.elementAt(i).replaceFirst("\\(.*?\\) ", "");
+        	ratList[i] = chosenRatModel.elementAt(i).replaceFirst(" \\(.*?\\)", "");
         }
         options.setRATs(ratList);
+        if (campaign.getUnitGenerator() instanceof RATManager) {
+        	((RATManager)campaign.getUnitGenerator()).setSelectedRATs(ratList);
+        }
         options.setSearchRadius((Integer)spnSearchRadius.getValue());
         options.setIntensity((Double)spnIntensity.getValue());
         options.setVariableContractLength(chkVariableContractLength.isSelected());

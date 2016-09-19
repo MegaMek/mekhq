@@ -50,7 +50,6 @@ import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RandomFactionGenerator;
-import mekhq.campaign.universe.UnitTableData;
 import mekhq.gui.view.LanceAssignmentView;
 
 import org.w3c.dom.Node;
@@ -845,11 +844,14 @@ public class AtBContract extends Contract implements Serializable {
 					partsAvailabilityLevel++;
 					break;
 				case 6:
-					text += "Surplus Sale: " +
+					String unit = 
 							c.getUnitMarket().addSingleUnit(c, UnitMarket.MARKET_EMPLOYER,
-									UnitTableData.UNIT_MECH, getEmployerCode(),
+									UnitType.MEK, getEmployerCode(),
 									IUnitRating.DRAGOON_F, 50) +
 									" offered by employer on the <a href='UNIT_MARKET'>unit market</a>";
+					if (unit != null) {
+						text += "Surplus Sale: " + unit;						
+					}
 				}
 				c.addReport(text);
 				break;

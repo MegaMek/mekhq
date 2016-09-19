@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rat source='Historical-Brush Wars-Andurien Wars'>
+	<era year='3035'>
+		<rat name='3030 House Liao Mech - Assault'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 House Liao Mech - Heavy'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 House Liao Mech - Light'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 House Liao Mech - Medium'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 House Liao Vehicle - Assault '>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 House Liao Vehicle - Heavy'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 House Liao Vehicle - Light'>
+			<factions>CC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 House Liao Vehicle - Medium'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 House Marik Aerospace - Assault'>
+			<factions>FWL</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 House Marik Aerospace - Heavy'>
+			<factions>FWL</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 House Marik Aerospace - Light'>
+			<factions>FWL</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 House Marik Aerospace - Medium'>
+			<factions>FWL</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 House Marik Mech - Assault'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 House Marik Mech - Heavy'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 House Marik Mech - Light'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 House Marik Mech - Medium'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 House Marik Vehicle - Assault'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 House Marik Vehicle - Heavy'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 House Marik Vehicle - Light'>
+			<factions>FWL</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 House Marik Vehicle - Medium'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 Magistracy of Canopus Aerospace  - Heavy'>
+			<factions>MOC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 Magistracy of Canopus Aerospace  - Light'>
+			<factions>MOC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 Magistracy of Canopus Aerospace - Dropship'>
+			<factions>MOC</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 Magistracy of Canopus Aerospace - Medium'>
+			<factions>MOC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 Magistracy of Canopus Mech  - Assault'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 Magistracy of Canopus Mech  - Heavy'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 Magistracy of Canopus Mech  - Light'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 Magistracy of Canopus Mech  - Medium'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 Magistracy of Canopus Vehicle  - Assault'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 Magistracy of Canopus Vehicle  - Heavy'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 Magistracy of Canopus Vehicle  - Light'>
+			<factions>MOC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3030 Magistracy of Canopus Vehicle  - Medium'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+	</era>
+</rat>

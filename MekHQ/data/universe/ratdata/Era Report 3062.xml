@@ -1,0 +1,1803 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rat source='Era Report 3062'>
+	<era year='3055'>
+		<rat name='3055 House Davion - Assault'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 House Davion - Heavy'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 House Davion - Light'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 House Davion - Medium'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 House Kurita Mech - Assault'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 House Kurita Mech - Heavy'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 House Kurita Mech - Light'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 House Kurita Mech - Medium'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 House Liao - Assault'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 House Liao - Heavy'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 House Liao - Light'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 House Liao - Medium'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 House Marik - Assault'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 House Marik - Heavy'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 House Marik - Light'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 House Marik - Medium'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 House Steiner - Assault'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 House Steiner - Heavy'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 House Steiner - Light'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 House Steiner - Medium'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 Mercenary - Assault'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 Mercenary - Heavy'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 Mercenary - Light'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 Mercenary - Medium'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 Periphery - Assault'>
+			<factions>Periphery</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 Periphery - Heavy'>
+			<factions>Periphery</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 Periphery - Light'>
+			<factions>Periphery</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 Periphery - Medium'>
+			<factions>Periphery</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 Saint Ives Compact - Assault'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 Saint Ives Compact - Heavy'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 Saint Ives Compact - Light'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3055 Saint Ives Compact - Medium'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+	</era>
+	<era year='3062'>
+		<rat name='3062 Clan Blood Spirit - Aerospace'>
+			<factions>CBS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Blood Spirit - Assault'>
+			<factions>CBS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Blood Spirit - Assault Vehicle'>
+			<factions>CBS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Blood Spirit - Battle Armor'>
+			<factions>CBS</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Blood Spirit - Heavy'>
+			<factions>CBS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Blood Spirit - Heavy Vehicle'>
+			<factions>CBS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Blood Spirit - Light'>
+			<factions>CBS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Blood Spirit - Light Vehicle'>
+			<factions>CBS</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Blood Spirit - Medium'>
+			<factions>CBS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Blood Spirit - Medium Vehicle'>
+			<factions>CBS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Blood Spirit - ProtoMech'>
+			<factions>CBS</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Burrock - Aerospace'>
+			<factions>CB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Burrock - Assault'>
+			<factions>CB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Burrock - Assault Vehicle'>
+			<factions>CB</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Burrock - Battle Armor'>
+			<factions>CB</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Burrock - Heavy'>
+			<factions>CB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Burrock - Heavy Vehicle'>
+			<factions>CB</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Burrock - Light'>
+			<factions>CB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Burrock - Light Vehicle'>
+			<factions>CB</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Burrock - Medium'>
+			<factions>CB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Burrock - Medium Vehicle'>
+			<factions>CB</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Burrock - ProtoMech'>
+			<factions>CB</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Cloud Cobra - Aerospace'>
+			<factions>CCC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Cloud Cobra - Assault'>
+			<factions>CCC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Cloud Cobra - Assault Vehicle'>
+			<factions>CCC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Cloud Cobra - Battle Armor'>
+			<factions>CCC</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Cloud Cobra - Heavy'>
+			<factions>CCC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Cloud Cobra - Heavy Vehicle'>
+			<factions>CCC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Cloud Cobra - Light'>
+			<factions>CCC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Cloud Cobra - Light Vehicle'>
+			<factions>CCC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Cloud Cobra - Medium'>
+			<factions>CCC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Cloud Cobra - Medium Vehicle'>
+			<factions>CCC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Cloud Cobra - ProtoMech'>
+			<factions>CCC</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Coyote - Aerospace'>
+			<factions>CCO</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Coyote - Assault'>
+			<factions>CCO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Coyote - Assault Vehicle'>
+			<factions>CCO</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Coyote - Battle Armor'>
+			<factions>CCO</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Coyote - Heavy'>
+			<factions>CCO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Coyote - Heavy Vehicle'>
+			<factions>CCO</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Coyote - Light'>
+			<factions>CCO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Coyote - Light Vehicle'>
+			<factions>CCO</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Coyote - Medium'>
+			<factions>CCO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Coyote - Medium Vehicle'>
+			<factions>CCO</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Coyote - ProtoMech'>
+			<factions>CCO</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Diamond Shark - Aerospace'>
+			<factions>CDS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Diamond Shark - Assault'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Diamond Shark - Assault Vehicle'>
+			<factions>CDS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Diamond Shark - Battle Armor'>
+			<factions>CDS</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Diamond Shark - Heavy'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Diamond Shark - Heavy Vehicle'>
+			<factions>CDS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Diamond Shark - Light'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Diamond Shark - Light Vehicle'>
+			<factions>CDS</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Diamond Shark - Medium'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Diamond Shark - Medium Vehicle'>
+			<factions>CDS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Diamond Shark - ProtoMek'>
+			<factions>CDS</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Fire Mandrill - Aerospace'>
+			<factions>CFM</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Fire Mandrill - Assault'>
+			<factions>CFM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Fire Mandrill - Assault Vehicle'>
+			<factions>CFM</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Fire Mandrill - Battle Armor'>
+			<factions>CFM</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Fire Mandrill - Heavy'>
+			<factions>CFM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Fire Mandrill - Heavy Vehicle'>
+			<factions>CFM</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Fire Mandrill - Light'>
+			<factions>CFM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Fire Mandrill - Light Vehicle'>
+			<factions>CFM</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Fire Mandrill - Medium'>
+			<factions>CFM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Fire Mandrill - Medium Vehicle'>
+			<factions>CFM</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Fire Mandrill - ProtoMech'>
+			<factions>CFM</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Ghost Bear - Aerospace'>
+			<factions>CGB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Ghost Bear - Assault'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Ghost Bear - Assault Vehicle'>
+			<factions>CGB</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Ghost Bear - Battle Armor'>
+			<factions>CGB</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Ghost Bear - Heavy'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Ghost Bear - Heavy Vehicle'>
+			<factions>CGB</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Ghost Bear - Light'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Ghost Bear - Light Vehicle'>
+			<factions>CGB</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Ghost Bear - Medium'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Ghost Bear - Medium Vehicle'>
+			<factions>CGB</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Ghost Bear - ProtoMek'>
+			<factions>CGB</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Goliath Scorpion - Aerospace'>
+			<factions>CGS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Goliath Scorpion - Assault'>
+			<factions>CGS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Goliath Scorpion - Assault Vehicle'>
+			<factions>CGS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Goliath Scorpion - Battle Armor'>
+			<factions>CGS</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Goliath Scorpion - Heavy'>
+			<factions>CGS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Goliath Scorpion - Heavy Vehicle'>
+			<factions>CGS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Goliath Scorpion - Light'>
+			<factions>CGS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Goliath Scorpion - Light Vehicle'>
+			<factions>CGS</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Goliath Scorpion - Medium'>
+			<factions>CGS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Goliath Scorpion - Medium Vehicle'>
+			<factions>CGS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Goliath Scorpion - ProtoMech'>
+			<factions>CGS</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Hell&apos;s Horses - Aerospace'>
+			<factions>CHH</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Hell&apos;s Horses - Assault'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Hell&apos;s Horses - Assault Vehicle'>
+			<factions>CHH</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Hell&apos;s Horses - Battle Armor'>
+			<factions>CHH</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Hell&apos;s Horses - Heavy'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Hell&apos;s Horses - Heavy Vehicle'>
+			<factions>CHH</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Hell&apos;s Horses - Light'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Hell&apos;s Horses - Light Vehicle'>
+			<factions>CHH</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Hell&apos;s Horses - Medium'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Hell&apos;s Horses - Medium Vehicle'>
+			<factions>CHH</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Hell&apos;s Horses - ProtoMech'>
+			<factions>CHH</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Ice Hellion - Aerospace'>
+			<factions>CIH</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Ice Hellion - Assault'>
+			<factions>CIH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Ice Hellion - Assault Vehicle'>
+			<factions>CIH</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Ice Hellion - Battle Armor'>
+			<factions>CIH</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Ice Hellion - Heavy'>
+			<factions>CIH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Ice Hellion - Heavy Vehicle'>
+			<factions>CIH</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Ice Hellion - Light'>
+			<factions>CIH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Ice Hellion - Light Vehicle'>
+			<factions>CIH</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Ice Hellion - Medium'>
+			<factions>CIH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Ice Hellion - Medium Vehicle'>
+			<factions>CIH</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Ice Hellion - ProtoMech'>
+			<factions>CIH</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Jade Falcon - Aerospace'>
+			<factions>CJF</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Jade Falcon - Assault'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Jade Falcon - Assault Vehicle'>
+			<factions>CJF</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Jade Falcon - Battle Armor'>
+			<factions>CJF</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Jade Falcon - Heavy'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Jade Falcon - Heavy Vehicle'>
+			<factions>CJF</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Jade Falcon - Light'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Jade Falcon - Light Vehicle'>
+			<factions>CJF</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Jade Falcon - Medium'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Jade Falcon - Medium Vehicle'>
+			<factions>CJF</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Jade Falcon - ProtoMek'>
+			<factions>CJF</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Nova Cat - Aerospace'>
+			<factions>CNC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Nova Cat - Assault'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Nova Cat - Assault Vehicle'>
+			<factions>CNC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Nova Cat - Battle Armor'>
+			<factions>CNC</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Nova Cat - Heavy'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Nova Cat - Heavy Vehicle'>
+			<factions>CNC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Nova Cat - Light'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Nova Cat - Light Vehicle'>
+			<factions>CNC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Nova Cat - Medium'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Nova Cat - Medium Vehicle'>
+			<factions>CNC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Nova Cat - ProtoMek'>
+			<factions>CNC</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Smoke Jaguar - Aerospace'>
+			<factions>CSJ</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Smoke Jaguar - Assault'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Smoke Jaguar - Assault Vehicle'>
+			<factions>CSJ</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Smoke Jaguar - Battle Armor'>
+			<factions>CSJ</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Smoke Jaguar - Heavy'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Smoke Jaguar - Heavy Vehicle'>
+			<factions>CSJ</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Smoke Jaguar - Light'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Smoke Jaguar - Light Vehicle'>
+			<factions>CSJ</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Smoke Jaguar - Medium'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Smoke Jaguar - Medium Vehicle'>
+			<factions>CSJ</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Smoke Jaguar - ProtoMek'>
+			<factions>CSJ</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Snow Raven - Aerospace'>
+			<factions>CSR</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Snow Raven - Assault'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Snow Raven - Assault Vehicle'>
+			<factions>CSR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Snow Raven - Battle Armor'>
+			<factions>CSR</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Snow Raven - Heavy'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Snow Raven - Heavy Vehicle'>
+			<factions>CSR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Snow Raven - Light'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Snow Raven - Light Vehicle'>
+			<factions>CSR</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Snow Raven - Medium'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Snow Raven - Medium Vehicle'>
+			<factions>CSR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Snow Raven - ProtoMech'>
+			<factions>CSR</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Star Adder - Aerospace'>
+			<factions>CSA</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Star Adder - Assault'>
+			<factions>CSA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Star Adder - Assault Vehicle'>
+			<factions>CSA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Star Adder - Battle Armor'>
+			<factions>CSA</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Star Adder - Heavy'>
+			<factions>CSA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Star Adder - Heavy Vehicle'>
+			<factions>CSA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Star Adder - Light'>
+			<factions>CSA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Star Adder - Light Vehicle'>
+			<factions>CSA</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Star Adder - Medium'>
+			<factions>CSA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Star Adder - Medium Vehicle'>
+			<factions>CSA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Star Adder - ProtoMech'>
+			<factions>CSA</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Steel Viper - Aerospace'>
+			<factions>CSV</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Steel Viper - Assault'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Steel Viper - Assault Vehicle'>
+			<factions>CSV</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Steel Viper - Battle Armor'>
+			<factions>CSV</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Steel Viper - Heavy'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Steel Viper - Heavy Vehicle'>
+			<factions>CSV</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Steel Viper - Light'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Steel Viper - Light Vehicle'>
+			<factions>CSV</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Steel Viper - Medium'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Steel Viper - Medium Vehicle'>
+			<factions>CSV</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Steel Viper - ProtoMek'>
+			<factions>CSV</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Wolf - Aerospace'>
+			<factions>CW</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Wolf - Assault'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Wolf - Assault Vehicle'>
+			<factions>CW</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Wolf - Battle Armor'>
+			<factions>CW</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Wolf - Heavy'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Wolf - Heavy Vehicle'>
+			<factions>CW</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Wolf - Light'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Wolf - Light Vehicle'>
+			<factions>CW</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Wolf - Medium'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Wolf - Medium Vehicle'>
+			<factions>CW</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Clan Wolf - ProtoMek'>
+			<factions>CW</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Comstar - Aerospace'>
+			<factions>CS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Comstar - Assault'>
+			<factions>CS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Comstar - Heavy'>
+			<factions>CS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Comstar - Light'>
+			<factions>CS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Comstar - Medium'>
+			<factions>CS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Comstar - Vehicle'>
+			<factions>CS</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Free Rasalhague Republic - Aerospace'>
+			<factions>FRR</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Free Rasalhague Republic - Assault'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Free Rasalhague Republic - Heavy'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Free Rasalhague Republic - Light'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Free Rasalhague Republic - Medium'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Free Rasalhague Republic - Vehicle'>
+			<factions>FRR</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Davion - Aerospace'>
+			<factions>FS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Davion - Assault Mechs'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Davion - Assault Vehicles'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Davion - Heavy Mechs'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Davion - Heavy Vehicles'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Davion - Light Mechs'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Davion - Light Vehicles'>
+			<factions>FS</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Davion - Medium Mechs'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Davion - Medium Vehicles'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Kurita - Aerospace'>
+			<factions>DC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Kurita - Assault'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Kurita - Heavy'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Kurita - Light'>
+			<factions>DC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Kurita - Medium'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Kurita Mech - Assault'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Kurita Mech - Heavy'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Kurita Mech - Light'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Kurita Mech - Medium'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Liao - Aerospace'>
+			<factions>CC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Liao - Assault Mechs'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Liao - Assault Vehicles'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Liao - Heavy Mechs'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Liao - Heavy Vehicles'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Liao - Light Mechs'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Liao - Light Vehicles'>
+			<factions>CC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Liao - Medium Mechs'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Liao - Medium Vehicles'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Marik - Aerospace'>
+			<factions>FWL</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Marik - Assault'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Marik - Heavy'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Marik - Light'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Marik - Medium'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Steiner - Aerospace'>
+			<factions>LA</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Steiner - Assault Mechs'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Steiner - Assault Vehicles'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Steiner - Heavy Mechs'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Steiner - Heavy Vehicles'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Steiner - Light Mechs'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Steiner - Light Vehicles'>
+			<factions>LA</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Steiner - Medium Mechs'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 House Steiner - Medium Vehicles'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Mercenary - Aerospace'>
+			<factions>MERC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Mercenary - Assault Mechs'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Mercenary - Assault Vehicles'>
+			<factions>MERC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Mercenary - Heavy Mechs'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Mercenary - Heavy Vehicles'>
+			<factions>MERC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Mercenary - Light Mechs'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Mercenary - Light Vehicles'>
+			<factions>MERC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Mercenary - Medium Mechs'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Mercenary - Medium Vehicles'>
+			<factions>MERC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Periphery - Aerospace'>
+			<factions>Periphery</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Periphery - Assault Mechs'>
+			<factions>Periphery</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Periphery - Assault Vehicles'>
+			<factions>Periphery</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Periphery - Heavy Mechs'>
+			<factions>Periphery</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Periphery - Heavy Vehicles'>
+			<factions>Periphery</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Periphery - Light Mechs'>
+			<factions>Periphery</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Periphery - Light Vehicles'>
+			<factions>Periphery</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Periphery - Medium Mechs'>
+			<factions>Periphery</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Periphery - Medium Vehicles'>
+			<factions>Periphery</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Saint Ives Compact - Aerospace'>
+			<factions>SIC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Saint Ives Compact - Assault Mechs'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Saint Ives Compact - Assault Vehicles'>
+			<factions>SIC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Saint Ives Compact - Heavy Mechs'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Saint Ives Compact - Heavy Vehicles'>
+			<factions>SIC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Saint Ives Compact - Light Mechs'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Saint Ives Compact - Light Vehicles'>
+			<factions>SIC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Saint Ives Compact - Medium Mechs'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Saint Ives Compact - Medium Vehicles'>
+			<factions>SIC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Word of Blake - Aerospace'>
+			<factions>WOB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Word of Blake - Assault'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Word of Blake - Light'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Word of Blake - Medium'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 Word of Blake - Vehicle'>
+			<factions>WOB</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3062 World of Blake - Heavy'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+	</era>
+</rat>

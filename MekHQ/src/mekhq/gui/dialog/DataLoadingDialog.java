@@ -51,8 +51,8 @@ import mekhq.campaign.GamePreset;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planets;
+import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.RandomFactionGenerator;
-import mekhq.campaign.universe.UnitTableData;
 
 public class DataLoadingDialog extends JDialog implements PropertyChangeListener {
 
@@ -132,7 +132,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             }
             try {
             	//Load values needed for CampaignOptionsDialog
-            	UnitTableData.populateRatNames();
+            	RATManager.populateCollectionNames();
             } catch (Exception ex) {
     			ex.printStackTrace();
             }

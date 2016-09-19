@@ -1,0 +1,6085 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rat source='Xotl'>
+	<era year='2750'>
+		<rat name='Star League Regular 2750 Assault Mechs'>
+			<factions>SL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Star League Regular 2750 Heavy Mechs'>
+			<factions>SL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Star League Regular 2750 Light Mechs'>
+			<factions>SL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Star League Regular 2750 Medium Mechs'>
+			<factions>SL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Star League Royal 2750 Assault Mechs'>
+			<factions>SL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Star League Royal 2750 Heavy Mechs'>
+			<factions>SL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Star League Royal 2750 Light Mechs'>
+			<factions>SL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Star League Royal 2750 Medium Mechs'>
+			<factions>SL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+	</era>
+	<era year='3028'>
+		<rat name='Canopus 3028 Assault Vehicles A'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Canopus 3028 Assault Vehicles B'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Canopus 3028 Assault Vehicles C'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Canopus 3028 Assault Vehicles D'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Canopus 3028 Assault Vehicles F'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Canopus 3028 Heavy Vehicles A'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Canopus 3028 Heavy Vehicles B'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Canopus 3028 Heavy Vehicles C'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Canopus 3028 Heavy Vehicles D'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Canopus 3028 Heavy Vehicles F'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Canopus 3028 Light Vehicles A'>
+			<factions>MOC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Canopus 3028 Light Vehicles B'>
+			<factions>MOC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Canopus 3028 Light Vehicles C'>
+			<factions>MOC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Canopus 3028 Light Vehicles D'>
+			<factions>MOC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Canopus 3028 Light Vehicles F'>
+			<factions>MOC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Canopus 3028 Medium Vehicles A'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Canopus 3028 Medium Vehicles B'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Canopus 3028 Medium Vehicles C'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Canopus 3028 Medium Vehicles D'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Canopus 3028 Medium Vehicles F'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Canopus 3028-3050 Assault Mechs A'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Canopus 3028-3050 Assault Mechs B'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Canopus 3028-3050 Assault Mechs C'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Canopus 3028-3050 Assault Mechs D'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Canopus 3028-3050 Assault Mechs F'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Canopus 3028-3050 Heavy Mechs A'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Canopus 3028-3050 Heavy Mechs B'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Canopus 3028-3050 Heavy Mechs C'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Canopus 3028-3050 Heavy Mechs D'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Canopus 3028-3050 Heavy Mechs F'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Canopus 3028-3050 Light Mechs A'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Canopus 3028-3050 Light Mechs B'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Canopus 3028-3050 Light Mechs C'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Canopus 3028-3050 Light Mechs D'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Canopus 3028-3050 Light Mechs F'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Canopus 3028-3050 Medium Mechs A'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Canopus 3028-3050 Medium Mechs B'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Canopus 3028-3050 Medium Mechs C'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Canopus 3028-3050 Medium Mechs D'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Canopus 3028-3050 Medium Mechs F'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Davion 3028 Assault Mechs A'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Davion 3028 Assault Mechs B'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Davion 3028 Assault Mechs C'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Davion 3028 Assault Mechs D'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Davion 3028 Assault Mechs F'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Davion 3028 Assault Vehicles A'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Davion 3028 Assault Vehicles B'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Davion 3028 Assault Vehicles C'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Davion 3028 Assault Vehicles D'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Davion 3028 Assault Vehicles F'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Davion 3028 Heavy Mechs A'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Davion 3028 Heavy Mechs B'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Davion 3028 Heavy Mechs C'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Davion 3028 Heavy Mechs D'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Davion 3028 Heavy Mechs F'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Davion 3028 Heavy Vehicles A'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Davion 3028 Heavy Vehicles B'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Davion 3028 Heavy Vehicles C'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Davion 3028 Heavy Vehicles D'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Davion 3028 Heavy Vehicles F'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Davion 3028 Light Mechs A'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Davion 3028 Light Mechs B'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Davion 3028 Light Mechs C'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Davion 3028 Light Mechs D'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Davion 3028 Light Mechs F'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Davion 3028 Light Vehicles A'>
+			<factions>FS</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Davion 3028 Light Vehicles B'>
+			<factions>FS</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Davion 3028 Light Vehicles C'>
+			<factions>FS</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Davion 3028 Light Vehicles D'>
+			<factions>FS</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Davion 3028 Light Vehicles F'>
+			<factions>FS</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Davion 3028 Medium Mechs A'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Davion 3028 Medium Mechs B'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Davion 3028 Medium Mechs C'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Davion 3028 Medium Mechs D'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Davion 3028 Medium Mechs F'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Davion 3028 Medium Vehicles A'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Davion 3028 Medium Vehicles B'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Davion 3028 Medium Vehicles C'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Davion 3028 Medium Vehicles D'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Davion 3028 Medium Vehicles F'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Kurita 3028 Assault Mechs A'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Kurita 3028 Assault Mechs B'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Kurita 3028 Assault Mechs C'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Kurita 3028 Assault Mechs D'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Kurita 3028 Assault Mechs F'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Kurita 3028 Assault Vehicles A'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Kurita 3028 Assault Vehicles B'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Kurita 3028 Assault Vehicles C'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Kurita 3028 Assault Vehicles D'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Kurita 3028 Assault Vehicles F'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Kurita 3028 Heavy Mechs A'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Kurita 3028 Heavy Mechs B'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Kurita 3028 Heavy Mechs C'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Kurita 3028 Heavy Mechs D'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Kurita 3028 Heavy Mechs F'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Kurita 3028 Heavy Vehicles A'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Kurita 3028 Heavy Vehicles B'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Kurita 3028 Heavy Vehicles C'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Kurita 3028 Heavy Vehicles D'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Kurita 3028 Heavy Vehicles F'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Kurita 3028 Light Mechs A'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Kurita 3028 Light Mechs B'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Kurita 3028 Light Mechs C'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Kurita 3028 Light Mechs D'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Kurita 3028 Light Mechs F'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Kurita 3028 Light Vehicles A'>
+			<factions>DC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Kurita 3028 Light Vehicles B'>
+			<factions>DC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Kurita 3028 Light Vehicles C'>
+			<factions>DC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Kurita 3028 Light Vehicles D'>
+			<factions>DC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Kurita 3028 Light Vehicles F'>
+			<factions>DC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Kurita 3028 Medium Mechs A'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Kurita 3028 Medium Mechs B'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Kurita 3028 Medium Mechs C'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Kurita 3028 Medium Mechs D'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Kurita 3028 Medium Mechs F'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Kurita 3028 Medium Vehicles A'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Kurita 3028 Medium Vehicles B'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Kurita 3028 Medium Vehicles C'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Kurita 3028 Medium Vehicles D'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Kurita 3028 Medium Vehicles F'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Liao 3028 Assault Mechs A'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Liao 3028 Assault Mechs B'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Liao 3028 Assault Mechs C'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Liao 3028 Assault Mechs D'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Liao 3028 Assault Mechs F'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Liao 3028 Assault Vehicles A'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Liao 3028 Assault Vehicles B'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Liao 3028 Assault Vehicles C'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Liao 3028 Assault Vehicles D'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Liao 3028 Assault Vehicles F'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Liao 3028 Heavy Mechs A'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Liao 3028 Heavy Mechs B'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Liao 3028 Heavy Mechs C'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Liao 3028 Heavy Mechs D'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Liao 3028 Heavy Mechs F'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Liao 3028 Heavy Vehicles A'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Liao 3028 Heavy Vehicles B'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Liao 3028 Heavy Vehicles C'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Liao 3028 Heavy Vehicles D'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Liao 3028 Heavy Vehicles F'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Liao 3028 Light Mechs A'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Liao 3028 Light Mechs B'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Liao 3028 Light Mechs C'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Liao 3028 Light Mechs D'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Liao 3028 Light Mechs F'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Liao 3028 Light Vehicles A'>
+			<factions>CC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Liao 3028 Light Vehicles B'>
+			<factions>CC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Liao 3028 Light Vehicles C'>
+			<factions>CC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Liao 3028 Light Vehicles D'>
+			<factions>CC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Liao 3028 Light Vehicles F'>
+			<factions>CC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Liao 3028 Medium Mechs A'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Liao 3028 Medium Mechs B'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Liao 3028 Medium Mechs C'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Liao 3028 Medium Mechs D'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Liao 3028 Medium Mechs F'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Liao 3028 Medium Vehicles A'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Liao 3028 Medium Vehicles B'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Liao 3028 Medium Vehicles C'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Liao 3028 Medium Vehicles D'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Liao 3028 Medium Vehicles F'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Marik 3028 Assault Mechs A'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Marik 3028 Assault Mechs B'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Marik 3028 Assault Mechs C'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Marik 3028 Assault Mechs D'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Marik 3028 Assault Mechs F'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Marik 3028 Assault Vehicles A'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Marik 3028 Assault Vehicles B'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Marik 3028 Assault Vehicles C'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Marik 3028 Assault Vehicles D'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Marik 3028 Assault Vehicles F'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Marik 3028 Heavy Mechs A'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Marik 3028 Heavy Mechs B'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Marik 3028 Heavy Mechs C'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Marik 3028 Heavy Mechs D'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Marik 3028 Heavy Mechs F'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Marik 3028 Heavy Vehicles A'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Marik 3028 Heavy Vehicles B'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Marik 3028 Heavy Vehicles C'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Marik 3028 Heavy Vehicles D'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Marik 3028 Heavy Vehicles F'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Marik 3028 Light Mechs A'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Marik 3028 Light Mechs B'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Marik 3028 Light Mechs C'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Marik 3028 Light Mechs D'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Marik 3028 Light Mechs F'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Marik 3028 Light Vehicles A'>
+			<factions>FWL</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Marik 3028 Light Vehicles B'>
+			<factions>FWL</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Marik 3028 Light Vehicles C'>
+			<factions>FWL</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Marik 3028 Light Vehicles D'>
+			<factions>FWL</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Marik 3028 Light Vehicles F'>
+			<factions>FWL</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Marik 3028 Medium Mechs A'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Marik 3028 Medium Mechs B'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Marik 3028 Medium Mechs C'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Marik 3028 Medium Mechs D'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Marik 3028 Medium Mechs F'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Marik 3028 Medium Vehicles A'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Marik 3028 Medium Vehicles B'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Marik 3028 Medium Vehicles C'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Marik 3028 Medium Vehicles D'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Marik 3028 Medium Vehicles F'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028 Assault Vehicles A'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028 Assault Vehicles B'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028 Assault Vehicles C'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028 Assault Vehicles D'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028 Assault Vehicles F'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028 Heavy Vehicles A'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028 Heavy Vehicles B'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028 Heavy Vehicles C'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028 Heavy Vehicles D'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028 Heavy Vehicles F'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028 Light Vehicles A'>
+			<factions>General</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028 Light Vehicles B'>
+			<factions>General</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028 Light Vehicles C'>
+			<factions>General</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028 Light Vehicles D'>
+			<factions>General</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028 Light Vehicles F'>
+			<factions>General</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028 Medium Vehicles A'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028 Medium Vehicles B'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028 Medium Vehicles C'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028 Medium Vehicles D'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028 Medium Vehicles F'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028-3050 Assault Mechs A'>
+			<factions>General</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028-3050 Assault Mechs B'>
+			<factions>General</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028-3050 Assault Mechs C'>
+			<factions>General</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028-3050 Assault Mechs D'>
+			<factions>General</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028-3050 Assault Mechs F'>
+			<factions>General</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028-3050 Heavy Mechs A'>
+			<factions>General</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028-3050 Heavy Mechs B'>
+			<factions>General</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028-3050 Heavy Mechs C'>
+			<factions>General</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028-3050 Heavy Mechs D'>
+			<factions>General</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028-3050 Heavy Mechs F'>
+			<factions>General</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028-3050 Light Mechs A'>
+			<factions>General</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028-3050 Light Mechs B'>
+			<factions>General</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028-3050 Light Mechs C'>
+			<factions>General</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028-3050 Light Mechs D'>
+			<factions>General</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028-3050 Light Mechs F'>
+			<factions>General</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028-3050 Medium Mechs A'>
+			<factions>General</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028-3050 Medium Mechs B'>
+			<factions>General</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028-3050 Medium Mechs C'>
+			<factions>General</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028-3050 Medium Mechs D'>
+			<factions>General</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3028-3050 Medium Mechs F'>
+			<factions>General</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Outworlds 3028 Assault Vehicles A'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Outworlds 3028 Assault Vehicles B'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Outworlds 3028 Assault Vehicles C'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Outworlds 3028 Assault Vehicles D'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Outworlds 3028 Assault Vehicles F'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Outworlds 3028 Heavy Vehicles A'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Outworlds 3028 Heavy Vehicles B'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Outworlds 3028 Heavy Vehicles C'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Outworlds 3028 Heavy Vehicles D'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Outworlds 3028 Heavy Vehicles F'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Outworlds 3028 Light Vehicles A'>
+			<factions>OA</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Outworlds 3028 Light Vehicles B'>
+			<factions>OA</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Outworlds 3028 Light Vehicles C'>
+			<factions>OA</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Outworlds 3028 Light Vehicles D'>
+			<factions>OA</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Outworlds 3028 Light Vehicles F'>
+			<factions>OA</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Outworlds 3028 Medium Vehicles A'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Outworlds 3028 Medium Vehicles B'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Outworlds 3028 Medium Vehicles C'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Outworlds 3028 Medium Vehicles D'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Outworlds 3028 Medium Vehicles F'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Outworlds Alliance 3028-3050 Assault Mechs A'>
+			<factions>OA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Outworlds Alliance 3028-3050 Assault Mechs B'>
+			<factions>OA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Outworlds Alliance 3028-3050 Assault Mechs C'>
+			<factions>OA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Outworlds Alliance 3028-3050 Assault Mechs D'>
+			<factions>OA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Outworlds Alliance 3028-3050 Assault Mechs F'>
+			<factions>OA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Outworlds Alliance 3028-3050 Heavy Mechs A'>
+			<factions>OA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Outworlds Alliance 3028-3050 Heavy Mechs B'>
+			<factions>OA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Outworlds Alliance 3028-3050 Heavy Mechs C'>
+			<factions>OA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Outworlds Alliance 3028-3050 Heavy Mechs D'>
+			<factions>OA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Outworlds Alliance 3028-3050 Heavy Mechs F'>
+			<factions>OA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Outworlds Alliance 3028-3050 Light Mechs A'>
+			<factions>OA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Outworlds Alliance 3028-3050 Light Mechs B'>
+			<factions>OA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Outworlds Alliance 3028-3050 Light Mechs C'>
+			<factions>OA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Outworlds Alliance 3028-3050 Light Mechs D'>
+			<factions>OA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Outworlds Alliance 3028-3050 Light Mechs F'>
+			<factions>OA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Outworlds Alliance 3028-3050 Medium Mechs A'>
+			<factions>OA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Outworlds Alliance 3028-3050 Medium Mechs B'>
+			<factions>OA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Outworlds Alliance 3028-3050 Medium Mechs C'>
+			<factions>OA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Outworlds Alliance 3028-3050 Medium Mechs D'>
+			<factions>OA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Outworlds Alliance 3028-3050 Medium Mechs F'>
+			<factions>OA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Steiner 3028 Assault Mechs A'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Steiner 3028 Assault Mechs B'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Steiner 3028 Assault Mechs C'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Steiner 3028 Assault Mechs D'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Steiner 3028 Assault Mechs F'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Steiner 3028 Assault Vehicles A'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Steiner 3028 Assault Vehicles B'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Steiner 3028 Assault Vehicles C'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Steiner 3028 Assault Vehicles D'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Steiner 3028 Assault Vehicles F'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Steiner 3028 Heavy Mechs A'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Steiner 3028 Heavy Mechs B'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Steiner 3028 Heavy Mechs C'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Steiner 3028 Heavy Mechs D'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Steiner 3028 Heavy Mechs F'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Steiner 3028 Heavy Vehicles A'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Steiner 3028 Heavy Vehicles B'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Steiner 3028 Heavy Vehicles C'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Steiner 3028 Heavy Vehicles D'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Steiner 3028 Heavy Vehicles F'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Steiner 3028 Light Mechs A'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Steiner 3028 Light Mechs B'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Steiner 3028 Light Mechs C'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Steiner 3028 Light Mechs D'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Steiner 3028 Light Mechs F'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Steiner 3028 Light Vehicles A'>
+			<factions>LA</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Steiner 3028 Light Vehicles B'>
+			<factions>LA</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Steiner 3028 Light Vehicles C'>
+			<factions>LA</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Steiner 3028 Light Vehicles D'>
+			<factions>LA</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Steiner 3028 Light Vehicles F'>
+			<factions>LA</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Steiner 3028 Medium Mechs A'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Steiner 3028 Medium Mechs B'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Steiner 3028 Medium Mechs C'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Steiner 3028 Medium Mechs D'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Steiner 3028 Medium Mechs F'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Steiner 3028 Medium Vehicles A'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Steiner 3028 Medium Vehicles B'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Steiner 3028 Medium Vehicles C'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Steiner 3028 Medium Vehicles D'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Steiner 3028 Medium Vehicles F'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Taurian 3028 Assault Vehicles A'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Taurian 3028 Assault Vehicles B'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Taurian 3028 Assault Vehicles C'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Taurian 3028 Assault Vehicles D'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Taurian 3028 Assault Vehicles F'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Taurian 3028 Heavy Vehicles A'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Taurian 3028 Heavy Vehicles B'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Taurian 3028 Heavy Vehicles C'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Taurian 3028 Heavy Vehicles D'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Taurian 3028 Heavy Vehicles F'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Taurian 3028 Light Vehicles A'>
+			<factions>TC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Taurian 3028 Light Vehicles B'>
+			<factions>TC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Taurian 3028 Light Vehicles C'>
+			<factions>TC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Taurian 3028 Light Vehicles D'>
+			<factions>TC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Taurian 3028 Light Vehicles F'>
+			<factions>TC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Taurian 3028 Medium Vehicles A'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Taurian 3028 Medium Vehicles B'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Taurian 3028 Medium Vehicles C'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Taurian 3028 Medium Vehicles D'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Taurian 3028 Medium Vehicles F'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Taurian 3028-3050 Assault Mechs A'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Taurian 3028-3050 Assault Mechs B'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Taurian 3028-3050 Assault Mechs C'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Taurian 3028-3050 Assault Mechs D'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Taurian 3028-3050 Assault Mechs F'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Taurian 3028-3050 Heavy Mechs A'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Taurian 3028-3050 Heavy Mechs B'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Taurian 3028-3050 Heavy Mechs C'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Taurian 3028-3050 Heavy Mechs D'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Taurian 3028-3050 Heavy Mechs F'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Taurian 3028-3050 Light Mechs A'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Taurian 3028-3050 Light Mechs B'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Taurian 3028-3050 Light Mechs C'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Taurian 3028-3050 Light Mechs D'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Taurian 3028-3050 Light Mechs F'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Taurian 3028-3050 Medium Mechs A'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Taurian 3028-3050 Medium Mechs B'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Taurian 3028-3050 Medium Mechs C'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Taurian 3028-3050 Medium Mechs D'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Taurian 3028-3050 Medium Mechs F'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+	</era>
+	<era year='3039'>
+		<rat name='Canopus 3039 Assault Vehicles A'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Canopus 3039 Assault Vehicles B'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Canopus 3039 Assault Vehicles C'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Canopus 3039 Assault Vehicles D'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Canopus 3039 Assault Vehicles F'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Canopus 3039 Heavy Vehicles A'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Canopus 3039 Heavy Vehicles B'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Canopus 3039 Heavy Vehicles C'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Canopus 3039 Heavy Vehicles D'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Canopus 3039 Heavy Vehicles F'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Canopus 3039 Light Vehicles A'>
+			<factions>MOC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Canopus 3039 Light Vehicles B'>
+			<factions>MOC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Canopus 3039 Light Vehicles C'>
+			<factions>MOC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Canopus 3039 Light Vehicles D'>
+			<factions>MOC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Canopus 3039 Light Vehicles F'>
+			<factions>MOC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Canopus 3039 Medium Vehicles A'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Canopus 3039 Medium Vehicles B'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Canopus 3039 Medium Vehicles C'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Canopus 3039 Medium Vehicles D'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Canopus 3039 Medium Vehicles F'>
+			<factions>MOC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Davion 3039 Assault Mechs A'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Davion 3039 Assault Mechs B'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Davion 3039 Assault Mechs C'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Davion 3039 Assault Mechs D'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Davion 3039 Assault Mechs F'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Davion 3039 Assault Vehicles A'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Davion 3039 Assault Vehicles B'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Davion 3039 Assault Vehicles C'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Davion 3039 Assault Vehicles D'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Davion 3039 Assault Vehicles F'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Davion 3039 Heavy Mechs A'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Davion 3039 Heavy Mechs B'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Davion 3039 Heavy Mechs C'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Davion 3039 Heavy Mechs D'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Davion 3039 Heavy Mechs F'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Davion 3039 Heavy Vehicles A'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Davion 3039 Heavy Vehicles B'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Davion 3039 Heavy Vehicles C'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Davion 3039 Heavy Vehicles D'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Davion 3039 Heavy Vehicles F'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Davion 3039 Light Mechs A'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Davion 3039 Light Mechs B'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Davion 3039 Light Mechs C'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Davion 3039 Light Mechs D'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Davion 3039 Light Mechs F'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Davion 3039 Light Vehicles A'>
+			<factions>FS</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Davion 3039 Light Vehicles B'>
+			<factions>FS</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Davion 3039 Light Vehicles C'>
+			<factions>FS</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Davion 3039 Light Vehicles D'>
+			<factions>FS</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Davion 3039 Light Vehicles F'>
+			<factions>FS</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Davion 3039 Medium Mechs A'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Davion 3039 Medium Mechs B'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Davion 3039 Medium Mechs C'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Davion 3039 Medium Mechs D'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Davion 3039 Medium Mechs F'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Davion 3039 Medium Vehicles A'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Davion 3039 Medium Vehicles B'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Davion 3039 Medium Vehicles C'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Davion 3039 Medium Vehicles D'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Davion 3039 Medium Vehicles F'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Kurita 3039 Assault Mechs A'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Kurita 3039 Assault Mechs B'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Kurita 3039 Assault Mechs C'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Kurita 3039 Assault Mechs D'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Kurita 3039 Assault Mechs F'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Kurita 3039 Assault Vehicles A'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Kurita 3039 Assault Vehicles B'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Kurita 3039 Assault Vehicles C'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Kurita 3039 Assault Vehicles D'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Kurita 3039 Assault Vehicles F'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Kurita 3039 Heavy Mechs A'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Kurita 3039 Heavy Mechs B'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Kurita 3039 Heavy Mechs C'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Kurita 3039 Heavy Mechs D'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Kurita 3039 Heavy Mechs F'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Kurita 3039 Heavy Vehicles A'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Kurita 3039 Heavy Vehicles B'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Kurita 3039 Heavy Vehicles C'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Kurita 3039 Heavy Vehicles D'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Kurita 3039 Heavy Vehicles F'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Kurita 3039 Light Mechs A'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Kurita 3039 Light Mechs B'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Kurita 3039 Light Mechs C'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Kurita 3039 Light Mechs D'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Kurita 3039 Light Mechs F'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Kurita 3039 Light Vehicles A'>
+			<factions>DC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Kurita 3039 Light Vehicles B'>
+			<factions>DC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Kurita 3039 Light Vehicles C'>
+			<factions>DC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Kurita 3039 Light Vehicles D'>
+			<factions>DC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Kurita 3039 Light Vehicles F'>
+			<factions>DC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Kurita 3039 Medium Mechs A'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Kurita 3039 Medium Mechs B'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Kurita 3039 Medium Mechs C'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Kurita 3039 Medium Mechs D'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Kurita 3039 Medium Mechs F'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Kurita 3039 Medium Vehicles A'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Kurita 3039 Medium Vehicles B'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Kurita 3039 Medium Vehicles C'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Kurita 3039 Medium Vehicles D'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Kurita 3039 Medium Vehicles F'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Kurita Elite 3039 Assault Mechs'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A*</ratings>
+		</rat>
+		<rat name='Kurita Elite 3039 Heavy Mechs'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A*</ratings>
+		</rat>
+		<rat name='Kurita Elite 3039 Light Mechs'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A*</ratings>
+		</rat>
+		<rat name='Kurita Elite 3039 Medium Mechs'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A*</ratings>
+		</rat>
+		<rat name='Liao 3039 Assault Mechs A'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Liao 3039 Assault Mechs B'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Liao 3039 Assault Mechs C'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Liao 3039 Assault Mechs D'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Liao 3039 Assault Mechs F'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Liao 3039 Assault Vehicles A'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Liao 3039 Assault Vehicles B'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Liao 3039 Assault Vehicles C'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Liao 3039 Assault Vehicles D'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Liao 3039 Assault Vehicles F'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Liao 3039 Heavy Mechs A'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Liao 3039 Heavy Mechs B'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Liao 3039 Heavy Mechs C'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Liao 3039 Heavy Mechs D'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Liao 3039 Heavy Mechs F'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Liao 3039 Heavy Vehicles A'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Liao 3039 Heavy Vehicles B'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Liao 3039 Heavy Vehicles C'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Liao 3039 Heavy Vehicles D'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Liao 3039 Heavy Vehicles F'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Liao 3039 Light Mechs A'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Liao 3039 Light Mechs B'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Liao 3039 Light Mechs C'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Liao 3039 Light Mechs D'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Liao 3039 Light Mechs F'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Liao 3039 Light Vehicles A'>
+			<factions>CC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Liao 3039 Light Vehicles B'>
+			<factions>CC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Liao 3039 Light Vehicles C'>
+			<factions>CC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Liao 3039 Light Vehicles D'>
+			<factions>CC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Liao 3039 Light Vehicles F'>
+			<factions>CC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Liao 3039 Medium Mechs A'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Liao 3039 Medium Mechs B'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Liao 3039 Medium Mechs C'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Liao 3039 Medium Mechs D'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Liao 3039 Medium Mechs F'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Liao 3039 Medium Vehicles A'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Liao 3039 Medium Vehicles B'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Liao 3039 Medium Vehicles C'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Liao 3039 Medium Vehicles D'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Liao 3039 Medium Vehicles F'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Marik 3039 Assault Mechs A'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Marik 3039 Assault Mechs B'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Marik 3039 Assault Mechs C'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Marik 3039 Assault Mechs D'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Marik 3039 Assault Mechs F'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Marik 3039 Assault Vehicles A'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Marik 3039 Assault Vehicles B'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Marik 3039 Assault Vehicles C'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Marik 3039 Assault Vehicles D'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Marik 3039 Assault Vehicles F'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Marik 3039 Heavy Mechs A'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Marik 3039 Heavy Mechs B'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Marik 3039 Heavy Mechs C'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Marik 3039 Heavy Mechs D'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Marik 3039 Heavy Mechs F'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Marik 3039 Heavy Vehicles A'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Marik 3039 Heavy Vehicles B'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Marik 3039 Heavy Vehicles C'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Marik 3039 Heavy Vehicles D'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Marik 3039 Heavy Vehicles F'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Marik 3039 Light Mechs A'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Marik 3039 Light Mechs B'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Marik 3039 Light Mechs C'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Marik 3039 Light Mechs D'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Marik 3039 Light Mechs F'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Marik 3039 Light Vehicles A'>
+			<factions>FWL</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Marik 3039 Light Vehicles B'>
+			<factions>FWL</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Marik 3039 Light Vehicles C'>
+			<factions>FWL</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Marik 3039 Light Vehicles D'>
+			<factions>FWL</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Marik 3039 Light Vehicles F'>
+			<factions>FWL</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Marik 3039 Medium Mechs A'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Marik 3039 Medium Mechs B'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Marik 3039 Medium Mechs C'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Marik 3039 Medium Mechs D'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Marik 3039 Medium Mechs F'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Marik 3039 Medium Vehicles A'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Marik 3039 Medium Vehicles B'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Marik 3039 Medium Vehicles C'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Marik 3039 Medium Vehicles D'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Marik 3039 Medium Vehicles F'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3039 Assault Vehicles A'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3039 Assault Vehicles B'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3039 Assault Vehicles C'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3039 Assault Vehicles D'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3039 Assault Vehicles F'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3039 Heavy Vehicles A'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3039 Heavy Vehicles B'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3039 Heavy Vehicles C'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3039 Heavy Vehicles D'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3039 Heavy Vehicles F'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3039 Light Vehicles A'>
+			<factions>General</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3039 Light Vehicles B'>
+			<factions>General</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3039 Light Vehicles C'>
+			<factions>General</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3039 Light Vehicles D'>
+			<factions>General</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3039 Light Vehicles F'>
+			<factions>General</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3039 Medium Vehicles A'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3039 Medium Vehicles B'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3039 Medium Vehicles C'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3039 Medium Vehicles D'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Mercenary Periphery General 3039 Medium Vehicles F'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Outworlds 3039 Assault Vehicles A'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Outworlds 3039 Assault Vehicles B'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Outworlds 3039 Assault Vehicles C'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Outworlds 3039 Assault Vehicles D'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Outworlds 3039 Assault Vehicles F'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Outworlds 3039 Heavy Vehicles A'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Outworlds 3039 Heavy Vehicles B'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Outworlds 3039 Heavy Vehicles C'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Outworlds 3039 Heavy Vehicles D'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Outworlds 3039 Heavy Vehicles F'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Outworlds 3039 Light Vehicles A'>
+			<factions>OA</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Outworlds 3039 Light Vehicles B'>
+			<factions>OA</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Outworlds 3039 Light Vehicles C'>
+			<factions>OA</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Outworlds 3039 Light Vehicles D'>
+			<factions>OA</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Outworlds 3039 Light Vehicles F'>
+			<factions>OA</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Outworlds 3039 Medium Vehicles A'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Outworlds 3039 Medium Vehicles B'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Outworlds 3039 Medium Vehicles C'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Outworlds 3039 Medium Vehicles D'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Outworlds 3039 Medium Vehicles F'>
+			<factions>OA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Assault Mechs A'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Assault Mechs B'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Assault Mechs C'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Assault Mechs D'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Assault Mechs F'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Assault Vehicles A'>
+			<factions>FRR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Assault Vehicles B'>
+			<factions>FRR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Assault Vehicles C'>
+			<factions>FRR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Assault Vehicles D'>
+			<factions>FRR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Assault Vehicles F'>
+			<factions>FRR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Heavy Mechs A'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Heavy Mechs B'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Heavy Mechs C'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Heavy Mechs D'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Heavy Mechs F'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Heavy Vehicles A'>
+			<factions>FRR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Heavy Vehicles B'>
+			<factions>FRR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Heavy Vehicles C'>
+			<factions>FRR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Heavy Vehicles D'>
+			<factions>FRR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Heavy Vehicles F'>
+			<factions>FRR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Light Mechs A'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Light Mechs B'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Light Mechs C'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Light Mechs D'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Light Mechs F'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Light Vehicles A'>
+			<factions>FRR</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Light Vehicles B'>
+			<factions>FRR</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Light Vehicles C'>
+			<factions>FRR</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Light Vehicles D'>
+			<factions>FRR</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Light Vehicles F'>
+			<factions>FRR</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Medium Mechs A'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Medium Mechs B'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Medium Mechs C'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Medium Mechs D'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Medium Mechs F'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Medium Vehicles A'>
+			<factions>FRR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Medium Vehicles B'>
+			<factions>FRR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Medium Vehicles C'>
+			<factions>FRR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Medium Vehicles D'>
+			<factions>FRR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Rasalhague 3039 Medium Vehicles F'>
+			<factions>FRR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='St Ives 3039 Assault Mechs A'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='St Ives 3039 Assault Mechs B'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='St Ives 3039 Assault Mechs C'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='St Ives 3039 Assault Mechs D'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='St Ives 3039 Assault Mechs F'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='St Ives 3039 Assault Vehicles A'>
+			<factions>SIC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='St Ives 3039 Assault Vehicles B'>
+			<factions>SIC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='St Ives 3039 Assault Vehicles C'>
+			<factions>SIC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='St Ives 3039 Assault Vehicles D'>
+			<factions>SIC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='St Ives 3039 Assault Vehicles F'>
+			<factions>SIC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='St Ives 3039 Heavy Mechs A'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='St Ives 3039 Heavy Mechs B'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='St Ives 3039 Heavy Mechs C'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='St Ives 3039 Heavy Mechs D'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='St Ives 3039 Heavy Mechs F'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='St Ives 3039 Heavy Vehicles A'>
+			<factions>SIC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='St Ives 3039 Heavy Vehicles B'>
+			<factions>SIC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='St Ives 3039 Heavy Vehicles C'>
+			<factions>SIC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='St Ives 3039 Heavy Vehicles D'>
+			<factions>SIC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='St Ives 3039 Heavy Vehicles F'>
+			<factions>SIC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='St Ives 3039 Light Mechs A'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='St Ives 3039 Light Mechs B'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='St Ives 3039 Light Mechs C'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='St Ives 3039 Light Mechs D'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='St Ives 3039 Light Mechs F'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='St Ives 3039 Light Vehicles A'>
+			<factions>SIC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='St Ives 3039 Light Vehicles B'>
+			<factions>SIC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='St Ives 3039 Light Vehicles C'>
+			<factions>SIC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='St Ives 3039 Light Vehicles D'>
+			<factions>SIC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='St Ives 3039 Light Vehicles F'>
+			<factions>SIC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='St Ives 3039 Medium Mechs A'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='St Ives 3039 Medium Mechs B'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='St Ives 3039 Medium Mechs C'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='St Ives 3039 Medium Mechs D'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='St Ives 3039 Medium Mechs F'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='St Ives 3039 Medium Vehicles A'>
+			<factions>SIC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='St Ives 3039 Medium Vehicles B'>
+			<factions>SIC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='St Ives 3039 Medium Vehicles C'>
+			<factions>SIC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='St Ives 3039 Medium Vehicles D'>
+			<factions>SIC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='St Ives 3039 Medium Vehicles F'>
+			<factions>SIC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Steiner 3039 Assault Mechs A'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Steiner 3039 Assault Mechs B'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Steiner 3039 Assault Mechs C'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Steiner 3039 Assault Mechs D'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Steiner 3039 Assault Mechs F'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Steiner 3039 Assault Vehicles A'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Steiner 3039 Assault Vehicles B'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Steiner 3039 Assault Vehicles C'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Steiner 3039 Assault Vehicles D'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Steiner 3039 Assault Vehicles F'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Steiner 3039 Heavy Mechs A'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Steiner 3039 Heavy Mechs B'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Steiner 3039 Heavy Mechs C'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Steiner 3039 Heavy Mechs D'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Steiner 3039 Heavy Mechs F'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Steiner 3039 Heavy Vehicles A'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Steiner 3039 Heavy Vehicles B'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Steiner 3039 Heavy Vehicles C'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Steiner 3039 Heavy Vehicles D'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Steiner 3039 Heavy Vehicles F'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Steiner 3039 Light Mechs A'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Steiner 3039 Light Mechs B'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Steiner 3039 Light Mechs C'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Steiner 3039 Light Mechs D'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Steiner 3039 Light Mechs F'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Steiner 3039 Light Vehicles A'>
+			<factions>LA</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Steiner 3039 Light Vehicles B'>
+			<factions>LA</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Steiner 3039 Light Vehicles C'>
+			<factions>LA</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Steiner 3039 Light Vehicles D'>
+			<factions>LA</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Steiner 3039 Light Vehicles F'>
+			<factions>LA</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Steiner 3039 Medium Mechs A'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Steiner 3039 Medium Mechs B'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Steiner 3039 Medium Mechs C'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Steiner 3039 Medium Mechs D'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Steiner 3039 Medium Mechs F'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Steiner 3039 Medium Vehicles A'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Steiner 3039 Medium Vehicles B'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Steiner 3039 Medium Vehicles C'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Steiner 3039 Medium Vehicles D'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Steiner 3039 Medium Vehicles F'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Taurian 3039 Assault Vehicles A'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Taurian 3039 Assault Vehicles B'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Taurian 3039 Assault Vehicles C'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Taurian 3039 Assault Vehicles D'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Taurian 3039 Assault Vehicles F'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Taurian 3039 Heavy Vehicles A'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Taurian 3039 Heavy Vehicles B'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Taurian 3039 Heavy Vehicles C'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Taurian 3039 Heavy Vehicles D'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Taurian 3039 Heavy Vehicles F'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Taurian 3039 Light Vehicles A'>
+			<factions>TC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Taurian 3039 Light Vehicles B'>
+			<factions>TC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Taurian 3039 Light Vehicles C'>
+			<factions>TC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Taurian 3039 Light Vehicles D'>
+			<factions>TC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Taurian 3039 Light Vehicles F'>
+			<factions>TC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Taurian 3039 Medium Vehicles A'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Taurian 3039 Medium Vehicles B'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Taurian 3039 Medium Vehicles C'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Taurian 3039 Medium Vehicles D'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Taurian 3039 Medium Vehicles F'>
+			<factions>TC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+	</era>
+	<era year='3050'>
+		<rat name='Clan Diamond Shark 3050 Assault Mechs A'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Diamond Shark 3050 Assault Mechs B'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Diamond Shark 3050 Assault Mechs C'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Diamond Shark 3050 Assault Mechs D'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Diamond Shark 3050 Assault Mechs F'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Diamond Shark 3050 Heavy Mechs A'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Diamond Shark 3050 Heavy Mechs B'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Diamond Shark 3050 Heavy Mechs C'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Diamond Shark 3050 Heavy Mechs D'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Diamond Shark 3050 Heavy Mechs F'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Diamond Shark 3050 Light Mechs A'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Diamond Shark 3050 Light Mechs B'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Diamond Shark 3050 Light Mechs C'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Diamond Shark 3050 Light Mechs D'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Diamond Shark 3050 Light Mechs F'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Diamond Shark 3050 Medium Mechs A'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Diamond Shark 3050 Medium Mechs B'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Diamond Shark 3050 Medium Mechs C'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Diamond Shark 3050 Medium Mechs D'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Diamond Shark 3050 Medium Mechs F'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3050 Assault Mechs A'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3050 Assault Mechs B'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3050 Assault Mechs C'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3050 Assault Mechs D'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3050 Assault Mechs F'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3050 Heavy Mechs A'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3050 Heavy Mechs B'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3050 Heavy Mechs C'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3050 Heavy Mechs D'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3050 Heavy Mechs F'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3050 Light Mechs A'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3050 Light Mechs B'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3050 Light Mechs C'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3050 Light Mechs D'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3050 Light Mechs F'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3050 Medium Mechs A'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3050 Medium Mechs B'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3050 Medium Mechs C'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3050 Medium Mechs D'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3050 Medium Mechs F'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon 3050 Assault Mechs A'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon 3050 Assault Mechs B'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon 3050 Assault Mechs C'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon 3050 Assault Mechs D'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon 3050 Assault Mechs F'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon 3050 Heavy Mechs A'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon 3050 Heavy Mechs B'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon 3050 Heavy Mechs C'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon 3050 Heavy Mechs D'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon 3050 Heavy Mechs F'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon 3050 Light Mechs A'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon 3050 Light Mechs B'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon 3050 Light Mechs C'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon 3050 Light Mechs D'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon 3050 Light Mechs F'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon 3050 Medium Mechs A'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon 3050 Medium Mechs B'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon 3050 Medium Mechs C'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon 3050 Medium Mechs D'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon 3050 Medium Mechs F'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Nova Cat 3050 Assault Mechs A'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Nova Cat 3050 Assault Mechs B'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Nova Cat 3050 Assault Mechs C'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Nova Cat 3050 Assault Mechs D'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Nova Cat 3050 Assault Mechs F'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Nova Cat 3050 Heavy Mechs A'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Nova Cat 3050 Heavy Mechs B'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Nova Cat 3050 Heavy Mechs C'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Nova Cat 3050 Heavy Mechs D'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Nova Cat 3050 Heavy Mechs F'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Nova Cat 3050 Light Mechs A'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Nova Cat 3050 Light Mechs B'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Nova Cat 3050 Light Mechs C'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Nova Cat 3050 Light Mechs D'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Nova Cat 3050 Light Mechs F'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Nova Cat 3050 Medium Mechs A'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Nova Cat 3050 Medium Mechs B'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Nova Cat 3050 Medium Mechs C'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Nova Cat 3050 Medium Mechs D'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Nova Cat 3050 Medium Mechs F'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Smoke Jaguar 3050 Assault Mechs A'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Smoke Jaguar 3050 Assault Mechs B'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Smoke Jaguar 3050 Assault Mechs C'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Smoke Jaguar 3050 Assault Mechs D'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Smoke Jaguar 3050 Assault Mechs F'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Smoke Jaguar 3050 Heavy Mechs A'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Smoke Jaguar 3050 Heavy Mechs B'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Smoke Jaguar 3050 Heavy Mechs C'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Smoke Jaguar 3050 Heavy Mechs D'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Smoke Jaguar 3050 Heavy Mechs F'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Smoke Jaguar 3050 Light Mechs A'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Smoke Jaguar 3050 Light Mechs B'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Smoke Jaguar 3050 Light Mechs C'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Smoke Jaguar 3050 Light Mechs D'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Smoke Jaguar 3050 Light Mechs F'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Smoke Jaguar 3050 Medium Mechs A'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Smoke Jaguar 3050 Medium Mechs B'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Smoke Jaguar 3050 Medium Mechs C'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Smoke Jaguar 3050 Medium Mechs D'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Smoke Jaguar 3050 Medium Mechs F'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Steel Viper 3050 Assault Mechs A'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Steel Viper 3050 Assault Mechs B'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Steel Viper 3050 Assault Mechs C'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Steel Viper 3050 Assault Mechs D'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Steel Viper 3050 Assault Mechs F'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Steel Viper 3050 Heavy Mechs A'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Steel Viper 3050 Heavy Mechs B'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Steel Viper 3050 Heavy Mechs C'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Steel Viper 3050 Heavy Mechs D'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Steel Viper 3050 Heavy Mechs F'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Steel Viper 3050 Light Mechs A'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Steel Viper 3050 Light Mechs B'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Steel Viper 3050 Light Mechs C'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Steel Viper 3050 Light Mechs D'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Steel Viper 3050 Light Mechs F'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Steel Viper 3050 Medium Mechs A'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Steel Viper 3050 Medium Mechs B'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Steel Viper 3050 Medium Mechs C'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Steel Viper 3050 Medium Mechs D'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Steel Viper 3050 Medium Mechs F'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Wolf 3050 Assault Mechs A'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Wolf 3050 Assault Mechs B'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Wolf 3050 Assault Mechs C'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Wolf 3050 Assault Mechs D'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Wolf 3050 Assault Mechs F'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Wolf 3050 Heavy Mechs A'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Wolf 3050 Heavy Mechs B'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Wolf 3050 Heavy Mechs C'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Wolf 3050 Heavy Mechs D'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Wolf 3050 Heavy Mechs F'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Wolf 3050 Light Mechs A'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Wolf 3050 Light Mechs B'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Wolf 3050 Light Mechs C'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Wolf 3050 Light Mechs D'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Wolf 3050 Light Mechs F'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Wolf 3050 Medium Mechs A'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Wolf 3050 Medium Mechs B'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Wolf 3050 Medium Mechs C'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Wolf 3050 Medium Mechs D'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Wolf 3050 Medium Mechs F'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Davion 3050 Assault Mechs A'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Davion 3050 Assault Mechs B'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Davion 3050 Assault Mechs C'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Davion 3050 Assault Mechs D'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Davion 3050 Assault Mechs F'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Davion 3050 Heavy Mechs A'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Davion 3050 Heavy Mechs B'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Davion 3050 Heavy Mechs C'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Davion 3050 Heavy Mechs D'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Davion 3050 Heavy Mechs F'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Davion 3050 Light Mechs A'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Davion 3050 Light Mechs B'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Davion 3050 Light Mechs C'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Davion 3050 Light Mechs D'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Davion 3050 Light Mechs F'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Davion 3050 Medium Mechs A'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Davion 3050 Medium Mechs B'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Davion 3050 Medium Mechs C'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Davion 3050 Medium Mechs D'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Davion 3050 Medium Mechs F'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Kurita 3050 Assault Mechs A'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Kurita 3050 Assault Mechs B'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Kurita 3050 Assault Mechs C'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Kurita 3050 Assault Mechs D'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Kurita 3050 Assault Mechs F'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Kurita 3050 Heavy Mechs A'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Kurita 3050 Heavy Mechs B'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Kurita 3050 Heavy Mechs C'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Kurita 3050 Heavy Mechs D'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Kurita 3050 Heavy Mechs F'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Kurita 3050 Light Mechs A'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Kurita 3050 Light Mechs B'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Kurita 3050 Light Mechs C'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Kurita 3050 Light Mechs D'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Kurita 3050 Light Mechs F'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Kurita 3050 Medium Mechs A'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Kurita 3050 Medium Mechs B'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Kurita 3050 Medium Mechs C'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Kurita 3050 Medium Mechs D'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Kurita 3050 Medium Mechs F'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Liao 3050 Assault Mechs A'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Liao 3050 Assault Mechs B'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Liao 3050 Assault Mechs C'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Liao 3050 Assault Mechs D'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Liao 3050 Assault Mechs F'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Liao 3050 Heavy Mechs A'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Liao 3050 Heavy Mechs B'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Liao 3050 Heavy Mechs C'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Liao 3050 Heavy Mechs D'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Liao 3050 Heavy Mechs F'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Liao 3050 Light Mechs A'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Liao 3050 Light Mechs B'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Liao 3050 Light Mechs C'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Liao 3050 Light Mechs D'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Liao 3050 Light Mechs F'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Liao 3050 Medium Mechs A'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Liao 3050 Medium Mechs B'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Liao 3050 Medium Mechs C'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Liao 3050 Medium Mechs D'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Liao 3050 Medium Mechs F'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Marik 3050 Assault Mechs A'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Marik 3050 Assault Mechs B'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Marik 3050 Assault Mechs C'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Marik 3050 Assault Mechs D'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Marik 3050 Assault Mechs F'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Marik 3050 Heavy Mechs A'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Marik 3050 Heavy Mechs B'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Marik 3050 Heavy Mechs C'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Marik 3050 Heavy Mechs D'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Marik 3050 Heavy Mechs F'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Marik 3050 Light Mechs A'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Marik 3050 Light Mechs B'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Marik 3050 Light Mechs C'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Marik 3050 Light Mechs D'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Marik 3050 Light Mechs F'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Marik 3050 Medium Mechs A'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Marik 3050 Medium Mechs B'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Marik 3050 Medium Mechs C'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Marik 3050 Medium Mechs D'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Marik 3050 Medium Mechs F'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Steiner AB 3050 Assault Mechs A'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Steiner AB 3050 Assault Mechs B'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Steiner AB 3050 Heavy Mechs A'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Steiner AB 3050 Heavy Mechs B'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Steiner AB 3050 Light Mechs A'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Steiner AB 3050 Light Mechs B'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Steiner AB 3050 Medium Mechs A'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Steiner AB 3050 Medium Mechs B'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Steiner CDF 3050 Assault Mechs C'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Steiner CDF 3050 Assault Mechs D'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Steiner CDF 3050 Assault Mechs F'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Steiner CDF 3050 Heavy Mechs C'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Steiner CDF 3050 Heavy Mechs D'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Steiner CDF 3050 Heavy Mechs F'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Steiner CDF 3050 Light Mechs C'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Steiner CDF 3050 Light Mechs D'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Steiner CDF 3050 Light Mechs F'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Steiner CDF 3050 Medium Mechs C'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Steiner CDF 3050 Medium Mechs D'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Steiner CDF 3050 Medium Mechs F'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+	</era>
+	<era year='3052'>
+		<rat name='Clan Ghost Bear 3052 Assault Mechs A'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3052 Assault Mechs B'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3052 Assault Mechs C'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3052 Assault Mechs D'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3052 Assault Mechs F'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3052 Heavy Mechs A'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3052 Heavy Mechs B'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3052 Heavy Mechs C'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3052 Heavy Mechs D'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3052 Heavy Mechs F'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3052 Light Mechs A'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3052 Light Mechs B'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3052 Light Mechs C'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3052 Light Mechs D'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3052 Light Mechs F'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3052 Medium Mechs A'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3052 Medium Mechs B'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3052 Medium Mechs C'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3052 Medium Mechs D'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Ghost Bear 3052 Medium Mechs F'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Wolf 3052 Assault Mechs A'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Wolf 3052 Assault Mechs B'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Wolf 3052 Assault Mechs C'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Wolf 3052 Assault Mechs D'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Wolf 3052 Assault Mechs F'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Wolf 3052 Heavy Mechs A'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Wolf 3052 Heavy Mechs B'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Wolf 3052 Heavy Mechs C'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Wolf 3052 Heavy Mechs D'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Wolf 3052 Heavy Mechs F'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Wolf 3052 Light Mechs A'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Wolf 3052 Light Mechs B'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Wolf 3052 Light Mechs C'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Wolf 3052 Light Mechs D'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Wolf 3052 Light Mechs F'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Clan Wolf 3052 Medium Mechs A'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Clan Wolf 3052 Medium Mechs B'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Clan Wolf 3052 Medium Mechs C'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Clan Wolf 3052 Medium Mechs D'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Clan Wolf 3052 Medium Mechs F'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+	</era>
+</rat>

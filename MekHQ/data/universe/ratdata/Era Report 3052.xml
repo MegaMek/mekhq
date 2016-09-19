@@ -1,0 +1,1030 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rat source='Era Report 3052'>
+	<era year='3048'>
+		<rat name='3053 Clan - Battle Armor'>
+			<factions>Clan</factions>
+			<unitTypes>BattleArmor</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Blood Spirit - Aerospace'>
+			<factions>CBS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Blood Spirit Mech - Assault'>
+			<factions>CBS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Blood Spirit Mech - Heavy'>
+			<factions>CBS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Blood Spirit Mech - Light'>
+			<factions>CBS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Blood Spirit Mech - Medium'>
+			<factions>CBS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Burrock - Aerospace'>
+			<factions>CB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Burrock Mech - Assault'>
+			<factions>CB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Burrock Mech - Heavy'>
+			<factions>CB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Burrock Mech - Light'>
+			<factions>CB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Burrock Mech - Medium'>
+			<factions>CB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Cloud Cobra - Aerospace'>
+			<factions>CCC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Cloud Cobra Mech - Assault'>
+			<factions>CCC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Cloud Cobra Mech - Heavy'>
+			<factions>CCC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Cloud Cobra Mech - Light'>
+			<factions>CCC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Cloud Cobra Mech - Medium'>
+			<factions>CCC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Coyote - Aerospace'>
+			<factions>CCO</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Coyote Mech - Assault'>
+			<factions>CCO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Coyote Mech - Heavy'>
+			<factions>CCO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Coyote Mech - Light'>
+			<factions>CCO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Coyote Mech - Medium'>
+			<factions>CCO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Diamond Shark - Aerospace'>
+			<factions>CDS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Diamond Shark Mech - Assault'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Diamond Shark Mech - Heavy'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Diamond Shark Mech - Light'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Diamond Shark Mech - Medium'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Fire Mandrill - Aerospace'>
+			<factions>CFM</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Fire Mandrill Mech - Assault'>
+			<factions>CFM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Fire Mandrill Mech - Heavy'>
+			<factions>CFM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Fire Mandrill Mech - Light'>
+			<factions>CFM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Fire Mandrill Mech - Medium'>
+			<factions>CFM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Ghost Bear - Aerospace'>
+			<factions>CGB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Ghost Bear Mech - Assault'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Ghost Bear Mech - Heavy'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Ghost Bear Mech - Light'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Ghost Bear Mech - Medium'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Goliath Scorpion - Aerospace'>
+			<factions>CGS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Goliath Scorpion Mech - Assault'>
+			<factions>CGS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Goliath Scorpion Mech - Heavy'>
+			<factions>CGS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Goliath Scorpion Mech - Light'>
+			<factions>CGS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Goliath Scorpion Mech - Medium'>
+			<factions>CGS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Hell&apos;s Horses - Aerospace'>
+			<factions>CHH</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Hell&apos;s Horses Mech - Assault'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Hell&apos;s Horses Mech - Heavy'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Hell&apos;s Horses Mech - Light'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Hell&apos;s Horses Mech - Medium'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Ice Hellion - Aerospace'>
+			<factions>CIH</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Ice Hellion Mech - Assault'>
+			<factions>CIH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Ice Hellion Mech - Heavy'>
+			<factions>CIH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Ice Hellion Mech - Light'>
+			<factions>CIH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Ice Hellion Mech - Medium'>
+			<factions>CIH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Jade Falcon - Aerospace'>
+			<factions>CJF</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Jade Falcon Mech - Assault'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Jade Falcon Mech - Heavy'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Jade Falcon Mech - Light'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Jade Falcon Mech - Medium'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Nova Cat - Aerospace'>
+			<factions>CNC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Nova Cat Mech - Assault'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Nova Cat Mech - Heavy'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Nova Cat Mech - Light'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Nova Cat Mech - Medium'>
+			<factions>CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Smoke Jaguar - Aerospace'>
+			<factions>CSJ</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Smoke Jaguar Mech - Assault'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Smoke Jaguar Mech - Heavy'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Smoke Jaguar Mech - Light'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Smoke Jaguar Mech - Medium'>
+			<factions>CSJ</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Snow Raven - Aerospace'>
+			<factions>CSR</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Snow Raven Mech - Assault'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Snow Raven Mech - Heavy'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Snow Raven Mech - Light'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Snow Raven Mech - Medium'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Star Adder - Aerospace'>
+			<factions>CSA</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Star Adder Mech - Assault'>
+			<factions>CSA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Star Adder Mech - Heavy'>
+			<factions>CSA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Star Adder Mech - Light'>
+			<factions>CSA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Star Adder Mech - Medium'>
+			<factions>CSA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Steel Viper - Aerospace'>
+			<factions>CSV</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Steel Viper Mech - Assault'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Steel Viper Mech - Heavy'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Steel Viper Mech - Light'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Steel Viper Mech - Medium'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Wolf Mech - Aerospace'>
+			<factions>CW</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Wolf Mech - Assault'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Wolf Mech - Heavy'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Wolf Mech - Light'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Clan Wolf Mech - Medium'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 ComStar - Vehicle'>
+			<factions>CS</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 ComStar Aerospace - No Upgrades'>
+			<factions>CS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 ComStar Aerospace - Upgraded'>
+			<factions>CS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 ComStar Mech - Assault- No Upgraded'>
+			<factions>CS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 ComStar Mech - Assault- Upgraded'>
+			<factions>CS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 ComStar Mech - Heavy- No Upgraded'>
+			<factions>CS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 ComStar Mech - Heavy- Upgraded'>
+			<factions>CS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 ComStar Mech - Light- No Upgraded'>
+			<factions>CS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 ComStar Mech - Light- Upgraded'>
+			<factions>CS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 ComStar Mech - Medium- No Upgraded'>
+			<factions>CS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 ComStar Mech - Medium- Upgraded'>
+			<factions>CS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 Free Rasalhague Republic Aerospace - No Upgraded'>
+			<factions>FRR</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 Free Rasalhague Republic Aerospace - Upgraded'>
+			<factions>FRR</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 Free Rasalhague Republic Mech - Assault- No Upgraded'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 Free Rasalhague Republic Mech - Assault- Upgraded'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 Free Rasalhague Republic Mech - Heavy- No Upgraded'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 Free Rasalhague Republic Mech - Heavy- Upgraded'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 Free Rasalhague Republic Mech - Light- No Upgraded'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 Free Rasalhague Republic Mech - Light- Upgraded'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 Free Rasalhague Republic Mech - Medium- No Upgraded'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 Free Rasalhague Republic Mech - Medium- Upgraded'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 House Davion Aerospace- No Upgraded'>
+			<factions>FS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 House Davion Aerospace- Upgraded'>
+			<factions>FS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 House Davion Mech - Assault- No Upgraded'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 House Davion Mech - Assault- Upgraded'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 House Davion Mech - Heavy- No Upgraded'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 House Davion Mech - Heavy- Upgraded'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 House Davion Mech - Light- No Upgraded'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 House Davion Mech - Light- Upgraded'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 House Davion Mech - Medium- No Upgraded'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 House Davion Mech - Medium- Upgraded'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 House Kurita Aerospace - No Upgrade'>
+			<factions>DC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 House Kurita Aerospace - No Upgraded'>
+			<factions>DC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 House Kurita Mech - Assault- No Upgraded'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 House Kurita Mech - Assault- Upgraded'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 House Kurita Mech - Heavy- No Upgraded'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 House Kurita Mech - Heavy- Upgraded'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 House Kurita Mech - Light- No Upgraded'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 House Kurita Mech - Light- Upgraded'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 House Kurita Mech - Medium - Upgraded'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 House Kurita Mech - Medium- No Upgraded'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 House Liao Aerospace - No Upgraded'>
+			<factions>CC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 House Liao Aerospace - Upgraded'>
+			<factions>CC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 House Liao Mech -  Assault - No Upgraded'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 House Liao Mech -  Assault - Upgraded'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 House Liao Mech -  Heavy - No Upgraded'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 House Liao Mech -  Heavy - Upgraded'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 House Liao Mech -  Light - No Upgraded'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 House Liao Mech -  Light - Upgraded'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 House Liao Mech -  Medium - No Upgraded'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 House Liao Mech -  Medium - Upgraded'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 House Marik Aerospace - No Upgraded'>
+			<factions>FWL</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 House Marik Aerospace - Upgraded'>
+			<factions>FWL</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 House Marik Mech - Assault - No Upgraded'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 House Marik Mech - Assault - Upgraded'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 House Marik Mech - Heavy - No Upgraded'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 House Marik Mech - Heavy - Upgraded'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 House Marik Mech - Light - No Upgraded'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 House Marik Mech - Light - Upgraded'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 House Marik Mech - Medium - No Upgraded'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 House Marik Mech - Medium - Upgraded'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 House Steiner Aerospace - No Upgraded'>
+			<factions>LA</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 House Steiner Aerospace - Upgraded'>
+			<factions>LA</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 House Steiner Mech - Assault - No Upgraded'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 House Steiner Mech - Assault - Upgraded'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 House Steiner Mech - Heavy - No Upgraded'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 House Steiner Mech - Heavy - Upgraded'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 House Steiner Mech - Light - No Upgraded'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 House Steiner Mech - Light - Upgraded'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 House Steiner Mech - Medium - No Upgraded'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 House Steiner Mech - Medium - Upgraded'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 Inner Sphere Vehicle - Assault'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Inner Sphere Vehicle - Heavy'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Inner Sphere Vehicle - Light'>
+			<factions>General</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Inner Sphere Vehicle - Medium'>
+			<factions>General</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='3053 Saint Ives Compact Aerospace - No Upgraded'>
+			<factions>SIC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 Saint Ives Compact Aerospace - Upgraded'>
+			<factions>SIC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 Saint Ives Compact Mech -  Assault - No Upgraded'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 Saint Ives Compact Mech -  Assault - Upgraded'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 Saint Ives Compact Mech -  Heavy - No Upgraded'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 Saint Ives Compact Mech -  Heavy - Upgraded'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 Saint Ives Compact Mech -  Light - No Upgraded'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 Saint Ives Compact Mech -  Light - Upgraded'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='3053 Saint Ives Compact Mech -  Medium - No Upgraded'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='3053 Saint Ives Compact Mech -  Medium - Upgraded'>
+			<factions>SIC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+	</era>
+</rat>

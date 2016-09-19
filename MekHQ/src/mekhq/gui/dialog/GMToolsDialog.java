@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Predicate;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -28,17 +29,17 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
-import megamek.client.RandomUnitGenerator;
 import megamek.common.Entity;
+import megamek.common.EntityWeightClass;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
+import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.UnitTableData;
-import mekhq.campaign.universe.UnitTableData.FactionTables;
+import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.gui.CampaignGUI;
 
 public class GMToolsDialog extends JDialog implements ActionListener {
@@ -56,6 +57,10 @@ public class GMToolsDialog extends JDialog implements ActionListener {
     private JComboBox<String> unitTypePicker;
     private JComboBox<String> unitWeightPicker;
     private JLabel unitPicked;
+    private static final int[] unitTypes = {
+    	UnitType.MEK, UnitType.TANK, UnitType.AERO, UnitType.DROPSHIP,
+    	UnitType.INFANTRY, UnitType.BATTLE_ARMOR, UnitType.PROTOMEK
+    };
     
     private CampaignGUI gui;
 
@@ -104,6 +109,8 @@ public class GMToolsDialog extends JDialog implements ActionListener {
      * Using mekhq.campaign.universe.UnitTableData for RAT access
      */
     private JPanel getRATRoller() {
+    	final String[] qualityNames = {"F", "D", "C", "B", "A", "A*"};
+    	final String[] weightNames = {"Light", "Medium", "Heavy", "Assault"};
         JPanel ratPanel = new JPanel(new GridBagLayout());
         ratPanel.setBorder(BorderFactory.createTitledBorder("RAT Roller"));
         
@@ -136,9 +143,12 @@ public class GMToolsDialog extends JDialog implements ActionListener {
         System.out.println(gui.getCampaign().getCalendar().get(Calendar.YEAR));
         yearPicker = new JTextField(5);
         yearPicker.setText(String.valueOf(gui.getCampaign().getCalendar().get(Calendar.YEAR)));
-        qualityPicker = new JComboBox<String>(UnitTableData.qualityNames);
-        unitTypePicker = new JComboBox<String>(UnitTableData.unitNames);
-        unitWeightPicker = new JComboBox<String>(UnitTableData.weightNames);
+        qualityPicker = new JComboBox<String>(qualityNames);
+        unitTypePicker = new JComboBox<String>();
+        for (int ut : unitTypes) {
+        	unitTypePicker.addItem(ut == UnitType.TANK? "Vehicle" : UnitType.getTypeName(ut));
+        }
+        unitWeightPicker = new JComboBox<String>(weightNames);
         unitPicked = new JLabel("-");
         
         ratPanel.add(new JLabel("Year"), newGridBagConstraints(0, 0));
@@ -215,68 +225,33 @@ public class GMToolsDialog extends JDialog implements ActionListener {
         }
     }
     
-    private int indexStringArray(String[] array, String string){
-        for(int i = 0; i < array.length; ++ i){
-            if(array[i].equalsIgnoreCase(string)) return i;
-        }
-        return -1;
-    }
-    
     private MechSummary performRollRat() {
         try{
-            UnitTableData unitTables = UnitTableData.getInstance();
-            int unitType = indexStringArray(UnitTableData.unitNames,unitTypePicker.getSelectedItem().toString());
-            int unitQuality = indexStringArray(UnitTableData.qualityNames,qualityPicker.getSelectedItem().toString());
-            int unitWeight = indexStringArray(UnitTableData.weightNames,unitWeightPicker.getSelectedItem().toString());
+            IUnitGenerator ug = gui.getCampaign().getUnitGenerator();
+            int unitType = unitTypes[unitTypePicker.getSelectedIndex()];
+            int unitQuality = qualityPicker.getSelectedIndex();
+            int unitWeight = unitWeightPicker.getSelectedIndex() + EntityWeightClass.WEIGHT_LIGHT;
             
-            if(!unitTables.isInitialized()) {
-                unitPicked.setText("No Unit Tables Initialized.");
-                return null;
-            }
             int targetYear = Integer.parseInt(yearPicker.getText());
-            FactionTables selection = unitTables.getBestRAT(gui.getCampaign().getCampaignOptions().getRATs(), targetYear,
-                    ((FactionChoice) factionPicker.getSelectedItem()).id, unitWeight);
-            if(null == selection) {
-                unitPicked.setText("No Unit Table Avaliable for Selection");
-                return null;
-            }
-            String rat = selection.getTable(unitType, unitWeight, unitQuality);
-            MekHQ.logMessage("Selected: " + rat);
-            if(null == rat) {
-                unitPicked.setText("No Unit Table Avaliable for Selection");
-                return null;
-            }
+            
             Campaign campaign = gui.getCampaign();
-            //Taken from mekhq.campaign.market.UnitMarket.addOffers();
-            MechSummary ms = null;
-            RandomUnitGenerator rug = RandomUnitGenerator.getInstance();
-            if(!rug.isInitialized()) {
-                unitPicked.setText("RAT tables are still loading");
-                return null;
-            }
-            rug.setChosenRAT(rat);
-            for(int i = 0; i < 10; ++ i) {
-                ArrayList<MechSummary> msl = rug.generate(1);
-                if (msl.size() > 0) {
-                    ms = msl.get(0);
-                    //MekHQ.logMessage("picked "+ ms.getName() + ", determining if legal");
-                    if (campaign.getCampaignOptions().limitByYear() && targetYear < ms.getYear()) {
-                        // Illegal due to build year
-                        continue;
-                    }
-                    if ((campaign.getCampaignOptions().allowClanPurchases() && ms.isClan())
-                        || (campaign.getCampaignOptions().allowISPurchases() && !ms.isClan())) {
-                            //We have found a unit
-                            unitPicked.setText(ms.getName());
-                            return ms;
-                    }
-                }    
+            Predicate<MechSummary> test = ms ->
+                	(!campaign.getCampaignOptions().limitByYear() || targetYear > ms.getYear())
+                		&& (!ms.isClan() || campaign.getCampaignOptions().allowClanPurchases())
+                		&& (ms.isClan() || campaign.getCampaignOptions().allowISPurchases());
+
+            MechSummary ms = ug
+            		.generate(((FactionChoice) factionPicker.getSelectedItem()).id,
+            				unitType, unitWeight, targetYear, unitQuality, test);
+            if (ms != null) {
+                unitPicked.setText(ms.getName());
+                return ms;
             }
         } catch(NumberFormatException e) {
             unitPicked.setText("Please enter a valid year");
             return null;
         }
-        unitPicked.setText("No Unit Table Avaliable for Selection.\n The year is the suspect cause");
+        unitPicked.setText("No unit matching criteria and purchase restrictions.");
         return null;
     }
 

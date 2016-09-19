@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rat source='Operation Klondike'>
+	<era year='2800'>
+		<rat name='2821 Operations Klondike Clan Dropship'>
+			<factions>Clan</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2821 Operations Klondike Clan Heavy Aerospace'>
+			<factions>Clan</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2821 Operations Klondike Clan Light Aerospace '>
+			<factions>Clan</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2821 Operations Klondike Clan Medium Aerospace'>
+			<factions>Clan</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2821 Operations Klondike Pentagon Dropship'>
+			<factions>REB</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2821 Operations Klondike Pentagon Heavy Aerospace'>
+			<factions>REB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2821 Operations Klondike Pentagon Light Aerospace'>
+			<factions>REB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='2821 Operations Klondike Pentagon Medium Mech Aerospace'>
+			<factions>REB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+	</era>
+</rat>

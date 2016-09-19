@@ -1,0 +1,3565 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rat source='FM Updates'>
+	<era year='3067'>
+		<rat name=' Dropships (FMU)'>
+			<factions>CW</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='AFFS Assault Mechs A 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='AFFS Assault Mechs B 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='AFFS Assault Mechs C 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='AFFS Assault Mechs D 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='AFFS Assault Mechs F 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='AFFS Assault Vehicles 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='AFFS Heavy Aerospace 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='AFFS Heavy Mechs A 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='AFFS Heavy Mechs B 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='AFFS Heavy Mechs C 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='AFFS Heavy Mechs D 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='AFFS Heavy Mechs F 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='AFFS Heavy Tanks 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='AFFS Light Aerospace 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='AFFS Light Mechs A 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='AFFS Light Mechs B 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='AFFS Light Mechs C 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='AFFS Light Mechs D (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='AFFS Light Mechs F 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='AFFS Light Vehicles 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='AFFS Medium Aerospace 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='AFFS Medium Mechs A 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='AFFS Medium Mechs B 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='AFFS Medium Mechs C 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='AFFS Medium Mechs D 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='AFFS Medium Mechs F 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='AFFS Medium Vehicles 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='AFFS Military Dropship 3067 (FMU)'>
+			<factions>FS</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='CCAF Assault Mechs A (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='CCAF Assault Mechs B (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='CCAF Assault Mechs C (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='CCAF Assault Mechs D (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='CCAF Assault Mechs F (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='CCAF Assault Vehicles (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='CCAF Heavy Aerospace (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='CCAF Heavy Mechs A (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='CCAF Heavy Mechs B (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='CCAF Heavy Mechs C (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='CCAF Heavy Mechs D (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='CCAF Heavy Mechs F (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='CCAF Heavy Vehicles (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='CCAF Light Aerospace (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='CCAF Light Mechs A (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='CCAF Light Mechs B (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='CCAF Light Mechs C (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='CCAF Light Mechs D (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='CCAF Light Mechs F (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='CCAF Light Vehicles (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='CCAF Medium Aerospace (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='CCAF Medium Mechs A (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='CCAF Medium Mechs B (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='CCAF Medium Mechs C (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='CCAF Medium Mechs D (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='CCAF Medium Mechs F (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='CCAF Medium Vehicles (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='CCAF Military Dropship (FMU)'>
+			<factions>CC</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Castilian / Umayyad Assault Mechs 3067 FM-U'>
+			<factions>NC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Castilian / Umayyad Heavy Mechs 3067 FM-U'>
+			<factions>NC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Castilian / Umayyad Light Mechs 3067 FM-U'>
+			<factions>NC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Castilian / Umayyad Medium Mechs 3067 FM-U'>
+			<factions>NC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Circinus Federation Assault Mechs 3067 FM-U'>
+			<factions>CIR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Circinus Federation Heavy Mechs 3067 FM-U'>
+			<factions>CIR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Circinus Federation Light Mechs 3067 FM-U'>
+			<factions>CIR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Circinus Federation Medium Mechs 3067 FM-U'>
+			<factions>CIR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Blood Spirit Assault Vehicles (FMU)'>
+			<factions>CBS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Blood Spirit Dropships (FMU)'>
+			<factions>CBS</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Blood Spirit Front Line Light Mechs (FMU)'>
+			<factions>CBS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Blood Spirit Front Line Medium Mechs (FMU)'>
+			<factions>CBS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Blood Spirit Front-Line Assault Mechs (FMU)'>
+			<factions>CBS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Blood Spirit Front-Line Heavy Aerospace (FMU)'>
+			<factions>CBS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Blood Spirit Front-Line Heavy Mechs (FMU)'>
+			<factions>CBS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Blood Spirit Front-Line Light Aerospace (FMU)'>
+			<factions>CBS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Blood Spirit Front-Line Medium Aerospace (FMU)'>
+			<factions>CBS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Blood Spirit Heavy Vehicles (FMU)'>
+			<factions>CBS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Blood Spirit Light Vehicles (FMU)'>
+			<factions>CBS</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Blood Spirit Medium Vehicles (FMU)'>
+			<factions>CBS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Blood Spirit ProtoMech 3067 (FMU)'>
+			<factions>CBS</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Blood Spirit Second Line Light Mechs (FMU)'>
+			<factions>CBS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Blood Spirit Second Line Medium Mechs (FMU)'>
+			<factions>CBS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Blood Spirit Second-Line Assault Mechs (FMU)'>
+			<factions>CBS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Blood Spirit Second-Line Heavy Aerospace (FMU)'>
+			<factions>CBS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Blood Spirit Second-Line Heavy Mechs (FMU)'>
+			<factions>CBS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Blood Spirit Second-Line Light Aerospace (FMU)'>
+			<factions>CBS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Blood Spirit Second-Line Medium Aerospace (FMU)'>
+			<factions>CBS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Cloud Cobra ProtoMech 3067 (FMU)'>
+			<factions>CCC</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Coyote ProtoMech 3067 (FMU)'>
+			<factions>CCO</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Fire Mandrill Assault Vehicles (FMU)'>
+			<factions>CFM</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Fire Mandrill Front-Line Assault Mechs (FMU)'>
+			<factions>CFM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Fire Mandrill Front-Line Heavy Mechs (FMU)'>
+			<factions>CFM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Fire Mandrill Front-Line Light Mechs (FMU)'>
+			<factions>CFM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Fire Mandrill Front-Line Medium Mechs (FMU)'>
+			<factions>CFM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Fire Mandrill Heavy Vehicles (FMU)'>
+			<factions>CFM</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Fire Mandrill Light Vehicles (FMU)'>
+			<factions>CFM</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Fire Mandrill Medium Vehicles (FMU)'>
+			<factions>CFM</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Fire Mandrill ProtoMech 3067 (FMU)'>
+			<factions>CFM</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Fire Mandrill Second-Line Assault Mechs (FMU)'>
+			<factions>CFM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Fire Mandrill Second-Line Heavy Mechs (FMU)'>
+			<factions>CFM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Fire Mandrill Second-Line Light Mechs (FMU)'>
+			<factions>CFM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Fire Mandrill Second-Line Medium Mechs (FMU)'>
+			<factions>CFM</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Goliath Scorpion ProtoMech 3067 (FMU)'>
+			<factions>CGS</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Hell&apos;s Horses Assault Vehicles (FMU)'>
+			<factions>CHH</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Hell&apos;s Horses Dropships (FMU)'>
+			<factions>CHH</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Hell&apos;s Horses Front-Line Assault Mechs (FMU)'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Hell&apos;s Horses Front-Line Heavy Aerospace (FMU)'>
+			<factions>CHH</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Hell&apos;s Horses Front-Line Heavy Mechs (FMU)'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Hell&apos;s Horses Front-Line Light Aerospace (FMU)'>
+			<factions>CHH</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Hell&apos;s Horses Front-Line Light Mechs (FMU)'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Hell&apos;s Horses Front-Line Medium Aerospace (FMU)'>
+			<factions>CHH</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Hell&apos;s Horses Front-Line Medium Mechs (FMU)'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Hell&apos;s Horses Heavy Vehicles (FMU)'>
+			<factions>CHH</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Hell&apos;s Horses Light Vehicles (FMU)'>
+			<factions>CHH</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Hell&apos;s Horses Medium Vehicles (FMU)'>
+			<factions>CHH</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Hell&apos;s Horses ProtoMech 3067 (FMU)'>
+			<factions>CHH</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Hell&apos;s Horses Second-Line Assault Mechs (FMU)'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Hell&apos;s Horses Second-Line Heavy Aerospace (FMU)'>
+			<factions>CHH</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Hell&apos;s Horses Second-Line Heavy Mechs (FMU)'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Hell&apos;s Horses Second-Line Light Aerospace (FMU)'>
+			<factions>CHH</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Hell&apos;s Horses Second-Line Light Mechs (FMU)'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Hell&apos;s Horses Second-Line Medium Aerospace (FMU)'>
+			<factions>CHH</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Hell&apos;s Horses Second-Line Medium Mechs (FMU)'>
+			<factions>CHH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Ice Hellion Assault Vehicles (FMU)'>
+			<factions>CIH</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Ice Hellion Dropships (FMU)'>
+			<factions>CIH</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Ice Hellion Front-Line Assault Mechs (FMU)'>
+			<factions>CIH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Ice Hellion Front-Line Heavy Aerospace (FMU)'>
+			<factions>CIH</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Ice Hellion Front-Line Heavy Mechs (FMU)'>
+			<factions>CIH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Ice Hellion Front-Line Light Aerospace (FMU)'>
+			<factions>CIH</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Ice Hellion Front-Line Light Mechs (FMU)'>
+			<factions>CIH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Ice Hellion Front-Line Medium Aerospace (FMU)'>
+			<factions>CIH</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Ice Hellion Front-Line Medium Mechs (FMU)'>
+			<factions>CIH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Ice Hellion Heavy Vehicles (FMU)'>
+			<factions>CIH</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Ice Hellion Light Vehicles (FMU)'>
+			<factions>CIH</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Ice Hellion Medium Vehicles (FMU)'>
+			<factions>CIH</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Ice Hellion ProtoMech 3067 (FMU)'>
+			<factions>CIH</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Ice Hellion Second-Line Assault Mechs (FMU)'>
+			<factions>CIH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Ice Hellion Second-Line Heavy Aerospace (FMU)'>
+			<factions>CIH</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Ice Hellion Second-Line Heavy Mechs (FMU)'>
+			<factions>CIH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Ice Hellion Second-Line Light Aerospace (FMU)'>
+			<factions>CIH</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Ice Hellion Second-Line Light Mechs (FMU)'>
+			<factions>CIH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Ice Hellion Second-Line Medium Aerospace (FMU)'>
+			<factions>CIH</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Ice Hellion Second-Line Medium Mechs (FMU)'>
+			<factions>CIH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon Assault Vehicles (FMU)'>
+			<factions>CJF</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon Dropships (FMU)'>
+			<factions>CJF</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon Front-Line Assault Mechs (FMU)'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon Front-Line Heavy Aerospace (FMU)'>
+			<factions>CJF</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon Front-Line Heavy Mechs (FMU)'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon Front-Line Light Aerospace (FMU)'>
+			<factions>CJF</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon Front-Line Light Mechs (FMU)'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon Front-Line Medium Aerospace (FMU)'>
+			<factions>CJF</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon Front-Line Medium Mechs (FMU)'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon Heavy Vehicles (FMU)'>
+			<factions>CJF</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon Light Vehicles (FMU)'>
+			<factions>CJF</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon Medium Vehicles (FMU)'>
+			<factions>CJF</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon ProtoMech 3067 (FMU)'>
+			<factions>CJF</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon Second-Line Assault Mechs (FMU)'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon Second-Line Heavy Aerospace (FMU)'>
+			<factions>CJF</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon Second-Line Heavy Mechs (FMU)'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon Second-Line Light Aerospace (FMU)'>
+			<factions>CJF</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon Second-Line Light Mechs (FMU)'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon Second-Line Medium Aerospace (FMU)'>
+			<factions>CJF</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Jade Falcon Second-Line Medium Mechs (FMU)'>
+			<factions>CJF</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Nova Cat ProtoMech 3067 (FMU)'>
+			<factions> CNC</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Snow Raven ProtoMech 3067 (FMU)'>
+			<factions>CSR</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Star Adder Assault Vehicles (FMU)'>
+			<factions>CSA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Star Adder Dropships (FMU)'>
+			<factions>CSA</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Star Adder Front-Line Assault Mechs (FMU)'>
+			<factions>CSA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Star Adder Front-Line Heavy Aerospace (FMU)'>
+			<factions>CSA</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Star Adder Front-Line Heavy Mechs (FMU)'>
+			<factions>CSA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Star Adder Front-Line Light Aerospace (FMU)'>
+			<factions>CSA</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Star Adder Front-Line Light Mechs (FMU)'>
+			<factions>CSA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Star Adder Front-Line Medium Aerospace (FMU)'>
+			<factions>CSA</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Star Adder Front-Line Medium Mechs (FMU)'>
+			<factions>CSA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Clan Star Adder Heavy Vehicles (FMU)'>
+			<factions>CSA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Star Adder Light Vehicle (FMU)'>
+			<factions>CSA</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Star Adder Medium Vehicles (FMU)'>
+			<factions>CSA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Star Adder ProtoMech 3067 (FMU)'>
+			<factions>CSA</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Clan Star Adder Second-Line Assault Mechs (FMU)'>
+			<factions>CSA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Star Adder Second-Line Heavy Aerospace (FMU)'>
+			<factions>CSA</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Star Adder Second-Line Heavy Mechs (FMU)'>
+			<factions>CSA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Star Adder Second-Line Light Aerospace (FMU)'>
+			<factions>CSA</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Star Adder Second-Line Light Mechs (FMU)'>
+			<factions>CSA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Star Adder Second-Line Medium Aerospace (FMU)'>
+			<factions>CSA</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Star Adder Second-Line Medium Mechs (FMU)'>
+			<factions>CSA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Clan Wolf (in-Exile) ProtoMech 3067 (FMU)'>
+			<factions>CWIE</factions>
+			<unitTypes>ProtoMek</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Cloud Cobra Assault Vehicles (FMU)'>
+			<factions>CCC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Cloud Cobra Dropships (FMU)'>
+			<factions>CCC</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Cloud Cobra FL Assault Mechs (FMU)'>
+			<factions>CCC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Cloud Cobra FL Heavy ASF (FMU)'>
+			<factions>CCC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Cloud Cobra FL Heavy Mechs (FMU)'>
+			<factions>CCC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Cloud Cobra FL Light ASF (FMU)'>
+			<factions>CCC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Cloud Cobra FL Light Mechs (FMU)'>
+			<factions>CCC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Cloud Cobra FL Medium ASF (FMU)'>
+			<factions>CCC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Cloud Cobra FL Medium Mechs (FMU)'>
+			<factions>CCC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Cloud Cobra Heavy Vehicles (FMU)'>
+			<factions>CCC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Cloud Cobra Light Vehicles (FMU)'>
+			<factions>CCC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Cloud Cobra Medium Vehicles (FMU)'>
+			<factions>CCC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Cloud Cobra SL Assault Mechs (FMU)'>
+			<factions>CCC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Cloud Cobra SL Heavy ASF (FMU)'>
+			<factions>CCC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Cloud Cobra SL Heavy Mechs (FMU)'>
+			<factions>CCC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Cloud Cobra SL Light ASF (FMU)'>
+			<factions>CCC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Cloud Cobra SL Light Mechs (FMU)'>
+			<factions>CCC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Cloud Cobra SL Medium ASF (FMU)'>
+			<factions>CCC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Cloud Cobra SL Medium Mechs (FMU)'>
+			<factions>CCC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='ComStar Assault Mechs A 3067 (FMU)'>
+			<factions>CS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='ComStar Assault Mechs B 3067 (FMU)'>
+			<factions>CS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='ComStar Assault Vehicles 3067 (FMU)'>
+			<factions>CS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='ComStar Heavy Aerospace 3067 (FMU)'>
+			<factions>CS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='ComStar Heavy Mechs A 3067 (FMU)'>
+			<factions>CS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='ComStar Heavy Mechs B 3067 (FMU)'>
+			<factions>CS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='ComStar Heavy Tanks 3067 (FMU)'>
+			<factions>CS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='ComStar Light Aerospace 3067 (FMU)'>
+			<factions>CS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='ComStar Light Mechs A 3067 (FMU)'>
+			<factions>CS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='ComStar Light Mechs B 3067 (FMU)'>
+			<factions>CS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='ComStar Light Vehicles 3067 (FMU)'>
+			<factions>CS</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='ComStar Medium Aerospace 3067 (FMU)'>
+			<factions>CS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='ComStar Medium Mechs A 3067 (FMU)'>
+			<factions>CS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='ComStar Medium Mechs B 3067 (FMU)'>
+			<factions>CS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='ComStar Medium Vehicles 3067 (FMU)'>
+			<factions>CS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='ComStar Military Dropship 3067 (FMU)'>
+			<factions>CS</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Coyote 2nd-Line Assault Mechs (FMU)'>
+			<factions>CCO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Coyote 2nd-Line Heavy ASF (FMU)'>
+			<factions>CCO</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Coyote 2nd-Line Heavy Mechs (FMU)'>
+			<factions>CCO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Coyote 2nd-Line Light ASF (FMU)'>
+			<factions>CCO</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Coyote 2nd-Line Light Mechs (FMU)'>
+			<factions>CCO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Coyote 2nd-Line Medium ASF (FMU)'>
+			<factions>CCO</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Coyote 2nd-Line Medium Mechs (FMU)'>
+			<factions>CCO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Coyote Assault Vehicle (FMU)'>
+			<factions>CCO</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Coyote Dropships (FMU)'>
+			<factions>CCO</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Coyote Front-Line Assault Mechs (FMU)'>
+			<factions>CCO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Coyote Front-Line Heavy ASF (FMU)'>
+			<factions>CCO</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Coyote Front-Line Heavy Mechs (FMU)'>
+			<factions>CCO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Coyote Front-Line Light ASF (FMU)'>
+			<factions>CCO</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Coyote Front-Line Light Mechs (FMU)'>
+			<factions>CCO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Coyote Front-Line Medium ASF (FMU)'>
+			<factions>CCO</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Coyote Front-Line Medium Mechs (FMU)'>
+			<factions>CCO</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Coyote Heavy Vehicle (FMU)'>
+			<factions>CCO</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Coyote Light Vehicle (FMU)'>
+			<factions>CCO</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Coyote Medium Vehicle (FMU)'>
+			<factions>CCO</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Crusader Clan Front-Line Assault Mechs (Wolf)'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Crusader Clan Front-Line Heavy Mechs (Wolf)'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Crusader Clan Front-Line Light Mechs (Wolf)'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Crusader Clan Front-Line Medium Mechs (Wolf)'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Crusader Clan Second-Line Assault Mechs (Wolf),'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Crusader Clan Second-Line Heavy Mechs (Wolf),'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Crusader Clan Second-Line Light Mechs (Wolf),'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Crusader Clan Second-Line Medium Mechs (Wolf),'>
+			<factions>CW</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='DCMS Assault Mechs A 3067 FM-U'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='DCMS Assault Mechs B 3067 FM-U'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='DCMS Assault Mechs C 3067 FM-U'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='DCMS Assault Mechs D 3067 FM-U'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='DCMS Assault Mechs F 3067 FM-U'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='DCMS Assault Vehicles 3067 (FMU)'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='DCMS Heavy Aerospace 3067 (FMU)'>
+			<factions>DC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='DCMS Heavy Mechs A 3067 FM-U'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='DCMS Heavy Mechs B 3067 FM-U'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='DCMS Heavy Mechs C 3067 FM-U'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='DCMS Heavy Mechs D 3067 FM-U'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='DCMS Heavy Mechs F 3067 FM-U'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='DCMS Heavy Tanks 3067 (FMU)'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='DCMS Light Aerospace 3067 (FMU)'>
+			<factions>DC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='DCMS Light Mechs A 3067 FM-U'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='DCMS Light Mechs B 3067 FM-U'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='DCMS Light Mechs C 3067 FM-U'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='DCMS Light Mechs D 3067 FM-U'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='DCMS Light Mechs F 3067 FM-U'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='DCMS Light Vehicles 3067 (FMU)'>
+			<factions>DC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='DCMS Medium Aerospace 3067 (FMU)'>
+			<factions>DC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='DCMS Medium Mechs A 3067 FM-U'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='DCMS Medium Mechs B 3067 FM-U'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='DCMS Medium Mechs C 3067 FM-U'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='DCMS Medium Mechs D 3067 FM-U'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='DCMS Medium Mechs F 3067 FM-U'>
+			<factions>DC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='DCMS Medium Vehicles 3067 (FMU)'>
+			<factions>DC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='DCMS Military Dropship 3067'>
+			<factions>DC</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Diamond_Shark 2nd-Line Assault Mechs (FMU)'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Diamond_Shark 2nd-Line Heavy ASF (FMU)'>
+			<factions>CDS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Diamond_Shark 2nd-Line Heavy Mechs (FMU)'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Diamond_Shark 2nd-Line Light ASF (FMU)'>
+			<factions>CDS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Diamond_Shark 2nd-Line Light Mechs (FMU)'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Diamond_Shark 2nd-Line Medium ASF (FMU)'>
+			<factions>CDS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Diamond_Shark 2nd-Line Medium Mechs (FMU)'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Diamond_Shark Assault Vehicle (FMU)'>
+			<factions>CDS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Diamond_Shark Dropships (FMU)'>
+			<factions>CDS</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Diamond_Shark Front-Line Assault Mechs (FMU)'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Diamond_Shark Front-Line Heavy ASF (FMU)'>
+			<factions>CDS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Diamond_Shark Front-Line Heavy Mechs (FMU)'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Diamond_Shark Front-Line Light ASF (FMU)'>
+			<factions>CDS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Diamond_Shark Front-Line Light Mechs (FMU)'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Diamond_Shark Front-Line Medium ASF (FMU)'>
+			<factions>CDS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Diamond_Shark Front-Line Medium Mechs (FMU)'>
+			<factions>CDS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Diamond_Shark Heavy Vehicle (FMU)'>
+			<factions>CDS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Diamond_Shark Light Vehicle (FMU)'>
+			<factions>CDS</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Diamond_Shark Medium Vehicle (FMU)'>
+			<factions>CDS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='FRR Assault Mechs A 3067'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='FRR Assault Mechs B 3067'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='FRR Assault Mechs C 3067'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='FRR Assault Vehicles 3067'>
+			<factions>FRR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='FRR Heavy Aerospace 3067'>
+			<factions>FRR</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='FRR Heavy Mechs A 3067'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='FRR Heavy Mechs B 3067'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='FRR Heavy Mechs C 3067'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='FRR Heavy Tanks 3067'>
+			<factions>FRR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='FRR Light Aerospace 3067'>
+			<factions>FRR</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='FRR Light Mechs A 3067'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='FRR Light Mechs B 3067'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='FRR Light Mechs C 3067'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='FRR Light Vehicles 3067 '>
+			<factions>FRR</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='FRR Medium Aerospace 3067'>
+			<factions>FRR</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='FRR Medium Mechs A 3067'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='FRR Medium Mechs B 3067'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='FRR Medium Mechs C 3067'>
+			<factions>FRR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D</ratings>
+		</rat>
+		<rat name='FRR Medium Vehicles 3067'>
+			<factions>FRR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='FRR Military Dropship 3067'>
+			<factions>FRR</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='FWLM Assault Mechs A 3067 FM-U'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='FWLM Assault Mechs B 3067 FM-U'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='FWLM Assault Mechs C 3067 FM-U'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='FWLM Assault Mechs D 3067 FM-U'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='FWLM Assault Mechs F 3067 FM-U'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='FWLM Assault Vehicles 3067 (FMU)'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='FWLM Heavy Aerospace 3067 (FMU)'>
+			<factions>FWL</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='FWLM Heavy Mechs A 3067 FM-U'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='FWLM Heavy Mechs B 3067 FM-U'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='FWLM Heavy Mechs C 3067 FM-U'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='FWLM Heavy Mechs D 3067 FM-U'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='FWLM Heavy Mechs F 3067 FM-U'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='FWLM Heavy Tanks 3067 (FMU)'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='FWLM Light Aerospace 3067 (FMU)'>
+			<factions>FWL</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='FWLM Light Mechs A 3067 FM-U'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='FWLM Light Mechs B 3067 FM-U'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='FWLM Light Mechs C 3067 FM-U'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='FWLM Light Mechs D 3067 FM-U'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='FWLM Light Mechs F 3067 FM-U'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='FWLM Light Vehicles 3067 (FMU)'>
+			<factions>FWL</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='FWLM Medium Aerospace 3067 (FMU)'>
+			<factions>FWL</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='FWLM Medium Mechs A 3067 FM-U'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='FWLM Medium Mechs B 3067 FM-U'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='FWLM Medium Mechs C 3067 FM-U'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='FWLM Medium Mechs D 3067 FM-U'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='FWLM Medium Mechs F 3067 FM-U'>
+			<factions>FWL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='FWLM Medium Vehicles 3067 (FMU)'>
+			<factions>FWL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='FWLM Military Dropship 3067'>
+			<factions>FWL</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Ghost Bear 2nd-Line Assault Mechs (FMU)'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Ghost Bear 2nd-Line Heavy ASF (FMU)'>
+			<factions>CGB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Ghost Bear 2nd-Line Heavy Mechs (FMU)'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Ghost Bear 2nd-Line Light ASF (FMU)'>
+			<factions>CGB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Ghost Bear 2nd-Line Light Mechs (FMU)'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Ghost Bear 2nd-Line Medium ASF (FMU)'>
+			<factions>CGB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Ghost Bear 2nd-Line Medium Mechs (FMU)'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Ghost Bear Assault Vehicle (FMU)'>
+			<factions>CGB</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Ghost Bear Dropships (FMU)'>
+			<factions>CGB</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Ghost Bear Front-Line Assault Mechs (FMU)'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Ghost Bear Front-Line Heavy ASF (FMU)'>
+			<factions>CGB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Ghost Bear Front-Line Heavy Mechs (FMU)'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Ghost Bear Front-Line Light ASF (FMU)'>
+			<factions>CGB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Ghost Bear Front-Line Light Mechs (FMU)'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Ghost Bear Front-Line Medium ASF (FMU)'>
+			<factions>CGB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Ghost Bear Front-Line Medium Mechs (FMU)'>
+			<factions>CGB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Ghost Bear Heavy Vehicle (FMU)'>
+			<factions>CGB</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Ghost Bear Light Vehicle (FMU)'>
+			<factions>CGB</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Ghost Bear Medium Vehicle (FMU)'>
+			<factions>CGB</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Goliath Scorpion 2nd-Line Assault Mechs (FMU)'>
+			<factions>CGS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Goliath Scorpion 2nd-Line Heavy ASF (FMU)'>
+			<factions>CGS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Goliath Scorpion 2nd-Line Heavy Mechs (FMU)'>
+			<factions>CGS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Goliath Scorpion 2nd-Line Light ASF (FMU)'>
+			<factions>CGS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Goliath Scorpion 2nd-Line Light Mechs (FMU)'>
+			<factions>CGS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Goliath Scorpion 2nd-Line Medium ASF (FMU)'>
+			<factions>CGS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Goliath Scorpion 2nd-Line Medium Mechs (FMU)'>
+			<factions>CGS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Goliath Scorpion Assault Vehicle (FMU)'>
+			<factions>CGS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Goliath Scorpion Dropships (FMU)'>
+			<factions>CGS</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Goliath Scorpion Front-Line Assault Mechs (FMU)'>
+			<factions>CGS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Goliath Scorpion Front-Line Heavy ASF (FMU)'>
+			<factions>CGS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Goliath Scorpion Front-Line Heavy Mechs (FMU)'>
+			<factions>CGS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Goliath Scorpion Front-Line Light ASF (FMU)'>
+			<factions>CGS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Goliath Scorpion Front-Line Light Mechs (FMU)'>
+			<factions>CGS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Goliath Scorpion Front-Line Medium ASF (FMU)'>
+			<factions>CGS</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Goliath Scorpion Front-Line Medium Mechs (FMU)'>
+			<factions>CGS</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Goliath Scorpion Heavy Vehicle (FMU)'>
+			<factions>CGS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Goliath Scorpion Light Vehicle (FMU)'>
+			<factions>CGS</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Goliath Scorpion Medium Vehicle (FMU)'>
+			<factions>CGS</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Hanseatic League Assault Mechs 3067 FM-U'>
+			<factions>HL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Hanseatic League Heavy Mechs 3067 FM-U'>
+			<factions>HL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Hanseatic League Light Mechs 3067 FM-U'>
+			<factions>HL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Hanseatic League Medium Mechs 3067 FM-U'>
+			<factions>HL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='LAAF Assault Mechs A 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='LAAF Assault Mechs B 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='LAAF Assault Mechs C 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='LAAF Assault Mechs D 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='LAAF Assault Mechs F 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='LAAF Assault Vehicles 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='LAAF Heavy Aerospace 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='LAAF Heavy Mechs A 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='LAAF Heavy Mechs B 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='LAAF Heavy Mechs C 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='LAAF Heavy Mechs D 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='LAAF Heavy Mechs F 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='LAAF Heavy Tanks 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='LAAF Light Aerospace 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='LAAF Light Mechs A 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='LAAF Light Mechs B 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='LAAF Light Mechs C 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='LAAF Light Mechs D 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='LAAF Light Mechs F 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='LAAF Light Vehicles 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='LAAF Medium Aerospace 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='LAAF Medium Mechs A 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='LAAF Medium Mechs B 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='LAAF Medium Mechs C 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='LAAF Medium Mechs D 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='LAAF Medium Mechs F 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='LAAF Medium Vehicles 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='LAAF Military Dropship 3067 (FMU)'>
+			<factions>LA</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Magistracy of Canopus Assault Mechs A 3067 FM-U'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Magistracy of Canopus Assault Mechs B 3067 FM-U'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='Magistracy of Canopus Heavy Mechs A 3067 FM-U'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Magistracy of Canopus Heavy Mechs B 3067 FM-U'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='Magistracy of Canopus Light Mechs A 3067 FM-U'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Magistracy of Canopus Light Mechs B 3067 FM-U'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='Magistracy of Canopus Medium Mechs A 3067 FM-U'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Magistracy of Canopus Medium Mechs B 3067 FM-U'>
+			<factions>MOC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='Marian Hegemony Assault Mechs 3067 FM-U'>
+			<factions>MH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Marian Hegemony Heavy Mechs 3067 FM-U'>
+			<factions>MH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Marian Hegemony Light Mechs 3067 FM-U'>
+			<factions>MH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Marian Hegemony Medium Mechs 3067 FM-U'>
+			<factions>MH</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Mercenaries Assault A &apos;Mech'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Mercenaries Assault B &apos;Mech'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Mercenaries Assault C &apos;Mech'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Mercenaries Assault D &apos;Mech'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Mercenaries Assault F &apos;Mech'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Mercenaries Assault Tank'>
+			<factions>MERC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Mercenaries Dropship'>
+			<factions>MERC</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Mercenaries Heavy A &apos;Mech'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Mercenaries Heavy Aerospace'>
+			<factions>MERC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Mercenaries Heavy B &apos;Mech'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Mercenaries Heavy C &apos;Mech'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Mercenaries Heavy D &apos;Mech'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Mercenaries Heavy F &apos;Mech'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Mercenaries Heavy Tank'>
+			<factions>MERC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Mercenaries Light A &apos;Mech'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Mercenaries Light Aerospace'>
+			<factions>MERC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Mercenaries Light B &apos;Mech'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Mercenaries Light C &apos;Mech'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Mercenaries Light D &apos;Mech'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Mercenaries Light F &apos;Mech'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Mercenaries Light Tank'>
+			<factions>MERC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Mercenaries Medium A &apos;Mech'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Mercenaries Medium Aerospace'>
+			<factions>MERC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Mercenaries Medium B &apos;Mech'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B</ratings>
+		</rat>
+		<rat name='Mercenaries Medium C &apos;Mech'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C</ratings>
+		</rat>
+		<rat name='Mercenaries Medium D &apos;Mech'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>D</ratings>
+		</rat>
+		<rat name='Mercenaries Medium F &apos;Mech'>
+			<factions>MERC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F</ratings>
+		</rat>
+		<rat name='Mercenaries Medium Tank'>
+			<factions>MERC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Nova Cat 2nd-Line Assault Mechs (FMU)'>
+			<factions> CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Nova Cat 2nd-Line Heavy ASF (FMU)'>
+			<factions> CNC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Nova Cat 2nd-Line Heavy Mechs (FMU)'>
+			<factions> CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Nova Cat 2nd-Line Light ASF (FMU)'>
+			<factions> CNC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Nova Cat 2nd-Line Light Mechs (FMU)'>
+			<factions> CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Nova Cat 2nd-Line Medium ASF (FMU)'>
+			<factions> CNC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Nova Cat 2nd-Line Medium Mechs (FMU)'>
+			<factions> CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Nova Cat Assault Vehicle (FMU)'>
+			<factions> CNC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Nova Cat Dropships (FMU)'>
+			<factions> CNC</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Nova Cat Front-Line Assault Mechs (FMU)'>
+			<factions> CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Nova Cat Front-Line Heavy ASF (FMU)'>
+			<factions> CNC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Nova Cat Front-Line Heavy Mechs (FMU)'>
+			<factions> CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Nova Cat Front-Line Light ASF (FMU)'>
+			<factions> CNC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Nova Cat Front-Line Light Mechs (FMU)'>
+			<factions> CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Nova Cat Front-Line Medium ASF (FMU)'>
+			<factions> CNC</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Nova Cat Front-Line Medium Mechs (FMU)'>
+			<factions> CNC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Nova Cat Heavy Vehicle (FMU)'>
+			<factions> CNC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Nova Cat Light Vehicle (FMU)'>
+			<factions> CNC</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Nova Cat Medium Vehicle (FMU)'>
+			<factions> CNC</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Outworlds Dropship'>
+			<factions>OA</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Outworlds Heavy Aerospace'>
+			<factions>OA</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Outworlds Light Aerospace'>
+			<factions>OA</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Outworlds Medium Aerospace'>
+			<factions>OA</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Periphery Assault Mechs C 3067 FM-U'>
+			<factions>MOC,Periphery,TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Periphery Assault Tank'>
+			<factions>Periphery</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Periphery Dropship'>
+			<factions>Periphery</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Periphery Heavy Aerospace'>
+			<factions>Periphery</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Periphery Heavy Mechs C 3067 FM-U'>
+			<factions>MOC,Periphery,TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Periphery Heavy Tank'>
+			<factions>Periphery</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Periphery Light Aerospace'>
+			<factions>Periphery</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Periphery Light Mechs C 3067 FM-U'>
+			<factions>MOC,Periphery,TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Periphery Light Tank'>
+			<factions>Periphery</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Periphery Medium Aerospace'>
+			<factions>Periphery</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Periphery Medium Mechs C 3067 FM-U'>
+			<factions>MOC,Periphery,TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Periphery Medium Tank'>
+			<factions>Periphery</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Pirates Assault Mechs 3067 FM-U'>
+			<factions>PIR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Pirates Heavy Mechs 3067 FM-U'>
+			<factions>PIR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Pirates Light Mechs 3067 FM-U'>
+			<factions>PIR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Pirates Medium Mechs 3067 FM-U'>
+			<factions>PIR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='SL Assault Mechs 3067 (FMU)'>
+			<factions>SL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='SL Assault Vehicles 3067 (FMU)'>
+			<factions>SL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='SL Heavy Aerospace 3067 (FMU)'>
+			<factions>SL</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='SL Heavy Mechs 3067 (FMU)'>
+			<factions>SL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='SL Heavy Tanks 3067 (FMU)'>
+			<factions>SL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='SL Light Aerospace 3067 (FMU)'>
+			<factions>SL</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='SL Light Mechs 3067 (FMU)'>
+			<factions>SL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='SL Light Vehicles 3067 (FMU)'>
+			<factions>SL</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='SL Medium Aerospace 3067 (FMU)'>
+			<factions>SL</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='SL Medium Mechs 3067 (FMU)'>
+			<factions>SL</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='SL Medium Vehicles 3067 (FMU)'>
+			<factions>SL</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='SL Military Dropship 3067 (FMU)'>
+			<factions>SL</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Snow Raven 2nd-Line Assault Mechs (FMU)'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Snow Raven 2nd-Line Heavy ASF (FMU)'>
+			<factions>CSR</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Snow Raven 2nd-Line Heavy Mechs (FMU)'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Snow Raven 2nd-Line Light ASF (FMU)'>
+			<factions>CSR</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Snow Raven 2nd-Line Light Mechs (FMU)'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Snow Raven 2nd-Line Medium ASF (FMU)'>
+			<factions>CSR</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Snow Raven 2nd-Line Medium Mechs (FMU)'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Snow Raven Assault Vehicle (FMU)'>
+			<factions>CSR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Snow Raven Dropships (FMU)'>
+			<factions>CSR</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Snow Raven Front-Line Assault Mechs (FMU)'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Snow Raven Front-Line Heavy ASF (FMU)'>
+			<factions>CSR</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Snow Raven Front-Line Heavy Mechs (FMU)'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Snow Raven Front-Line Light ASF (FMU)'>
+			<factions>CSR</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Snow Raven Front-Line Light Mechs (FMU)'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Snow Raven Front-Line Medium ASF (FMU)'>
+			<factions>CSR</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Snow Raven Front-Line Medium Mechs (FMU)'>
+			<factions>CSR</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Snow Raven Heavy Vehicle (FMU)'>
+			<factions>CSR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Snow Raven Light Vehicle (FMU)'>
+			<factions>CSR</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Snow Raven Medium Vehicle (FMU)'>
+			<factions>CSR</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Steel Viper 2nd-Line Assault Mechs (FMU)'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Steel Viper 2nd-Line Heavy ASF (FMU)'>
+			<factions>CSV</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Steel Viper 2nd-Line Heavy Mechs (FMU)'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Steel Viper 2nd-Line Light ASF (FMU)'>
+			<factions>CSV</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Steel Viper 2nd-Line Light Mechs (FMU)'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Steel Viper 2nd-Line Medium ASF (FMU)'>
+			<factions>CSV</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Steel Viper 2nd-Line Medium Mechs (FMU)'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Steel Viper Assault Vehicle (FMU)'>
+			<factions>CSV</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Steel Viper Dropships (FMU)'>
+			<factions>CSV</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Steel Viper Front-Line Assault Mechs (FMU)'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Steel Viper Front-Line Heavy ASF (FMU)'>
+			<factions>CSV</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Steel Viper Front-Line Heavy Mechs (FMU)'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Steel Viper Front-Line Light ASF (FMU)'>
+			<factions>CSV</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Steel Viper Front-Line Light Mechs (FMU)'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Steel Viper Front-Line Medium ASF (FMU)'>
+			<factions>CSV</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Steel Viper Front-Line Medium Mechs (FMU)'>
+			<factions>CSV</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Steel Viper Heavy Vehicle (FMU)'>
+			<factions>CSV</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Steel Viper Light Vehicle (FMU)'>
+			<factions>CSV</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Steel Viper Medium Vehicle (FMU)'>
+			<factions>CSV</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Taurian Concordat Assault Mechs A 3067 FM-U'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Taurian Concordat Assault Mechs B 3067 FM-U'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='Taurian Concordat Heavy Mechs A 3067 FM-U'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Taurian Concordat Heavy Mechs B 3067 FM-U'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='Taurian Concordat Light Mechs A 3067 FM-U'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Taurian Concordat Light Mechs B 3067 FM-U'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='Taurian Concordat Medium Mechs A 3067 FM-U'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>A</ratings>
+		</rat>
+		<rat name='Taurian Concordat Medium Mechs B 3067 FM-U'>
+			<factions>TC</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>C,B</ratings>
+		</rat>
+		<rat name='WoB Assault Mechs A 3067 (FMU)'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='WoB Assault Mechs B 3067 (FMU)'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='WoB Assault Vehicles 3067 (FMU)'>
+			<factions>WOB</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='WoB Heavy Aerospace 3067 (FMU)'>
+			<factions>WOB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='WoB Heavy Mechs A 3067 (FMU)'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='WoB Heavy Mechs B 3067 (FMU)'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='WoB Heavy Tanks 3067 (FMU)'>
+			<factions>WOB</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='WoB Light Aerospace 3067 (FMU)'>
+			<factions>WOB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='WoB Light Mechs A 3067 (FMU)'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='WoB Light Mechs B 3067 (FMU)'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='WoB Light Vehicles 3067 (FMU)'>
+			<factions>WOB</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='WoB Medium Aerospace 3067 (FMU)'>
+			<factions>WOB</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='WoB Medium Mechs A 3067 (FMU)'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='WoB Medium Mechs B 3067 (FMU)'>
+			<factions>WOB</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='WoB Medium Vehicles 3067 (FMU)'>
+			<factions>WOB</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='WoB Military Dropship 3067 (FMU)'>
+			<factions>WOB</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Wolf (in-Exile) 2nd-Line Assault Mechs (FMU)'>
+			<factions>CWIE</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Wolf (in-Exile) 2nd-Line Heavy ASF (FMU)'>
+			<factions>CWIE</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Wolf (in-Exile) 2nd-Line Heavy Mechs (FMU)'>
+			<factions>CWIE</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Wolf (in-Exile) 2nd-Line Light ASF (FMU)'>
+			<factions>CWIE</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Wolf (in-Exile) 2nd-Line Light Mechs (FMU)'>
+			<factions>CWIE</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Wolf (in-Exile) 2nd-Line Medium ASF (FMU)'>
+			<factions>CWIE</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Wolf (in-Exile) 2nd-Line Medium Mechs (FMU)'>
+			<factions>CWIE</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Wolf (in-Exile) Assault Vehicle (FMU)'>
+			<factions>CWIE</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Wolf (in-Exile) Dropships (FMU)'>
+			<factions>CWIE</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Wolf (in-Exile) Front-Line Assault Mechs (FMU)'>
+			<factions>CWIE</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Wolf (in-Exile) Front-Line Heavy ASF (FMU)'>
+			<factions>CWIE</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Wolf (in-Exile) Front-Line Heavy Mechs (FMU)'>
+			<factions>CWIE</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Wolf (in-Exile) Front-Line Light ASF (FMU)'>
+			<factions>CWIE</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Wolf (in-Exile) Front-Line Light Mechs (FMU)'>
+			<factions>CWIE</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Wolf (in-Exile) Front-Line Medium ASF (FMU)'>
+			<factions>CWIE</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Wolf (in-Exile) Front-Line Medium Mechs (FMU)'>
+			<factions>CWIE</factions>
+			<unitTypes>Mek</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Wolf (in-Exile) Heavy Vehicle (FMU)'>
+			<factions>CWIE</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Wolf (in-Exile) Light Vehicle (FMU)'>
+			<factions>CWIE</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Wolf (in-Exile) Medium Vehicle (FMU)'>
+			<factions>CWIE</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Wolf 2nd-Line Heavy ASF (FMU)'>
+			<factions>CW</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Wolf 2nd-Line Light ASF (FMU)'>
+			<factions>CW</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Wolf 2nd-Line Medium ASF (FMU)'>
+			<factions>CW</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='Wolf Assault Vehicle (FMU)'>
+			<factions>CW</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>A</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Wolf Front-Line Heavy ASF (FMU)'>
+			<factions>CW</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Wolf Front-Line Light ASF (FMU)'>
+			<factions>CW</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Wolf Front-Line Medium ASF (FMU)'>
+			<factions>CW</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='Wolf Heavy Vehicle (FMU)'>
+			<factions>CW</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Wolf Light Vehicle (FMU)'>
+			<factions>CW</factions>
+			<unitTypes>Tank,VTOL</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='Wolf Medium Vehicle (FMU)'>
+			<factions>CW</factions>
+			<unitTypes>Tank</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='clan Fire Mandrill Dropships (FMU),'>
+			<factions>CFM</factions>
+			<unitTypes>Dropship</unitTypes>
+			<ratings>F,D,C,B,A</ratings>
+		</rat>
+		<rat name='clan Fire Mandrill Front-Line Heavy Aerospace (FMU)'>
+			<factions>CFM</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='clan Fire Mandrill Front-Line Light Aerospace (FMU)'>
+			<factions>CFM</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='clan Fire Mandrill Front-Line Medium Aerospace (FMU)'>
+			<factions>CFM</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>B,A</ratings>
+		</rat>
+		<rat name='clan Fire Mandrill Second-Line Heavy Aerospace (FMU)'>
+			<factions>CFM</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>H</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='clan Fire Mandrill Second-Line Light Aerospace (FMU)'>
+			<factions>CFM</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>L</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+		<rat name='clan Fire Mandrill Second-Line Medium Aerospace (FMU)'>
+			<factions>CFM</factions>
+			<unitTypes>Aero</unitTypes>
+			<weightClasses>M</weightClasses>
+			<ratings>F,D,C</ratings>
+		</rat>
+	</era>
+</rat>

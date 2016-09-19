@@ -28,14 +28,15 @@ import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.UUID;
 
-import megamek.client.RandomUnitGenerator;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
+import megamek.common.EntityWeightClass;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.TargetRoll;
+import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -48,7 +49,6 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RandomFactionGenerator;
-import mekhq.campaign.universe.UnitTableData;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -959,7 +959,7 @@ public class PersonnelMarket {
     	int unitType;
     	switch (p.getPrimaryRole()) {
     	case Person.T_MECHWARRIOR:
-    		unitType = UnitTableData.UNIT_MECH;
+    		unitType = UnitType.MEK;
     		break;
     	case Person.T_GVEE_DRIVER:
     	case Person.T_VEE_GUNNER:
@@ -969,13 +969,13 @@ public class PersonnelMarket {
     		if (!c.getCampaignOptions().getAeroRecruitsHaveUnits()) {
     			return;
     		}
-    		unitType = UnitTableData.UNIT_AERO;
+    		unitType = UnitType.AERO;
     		break;
     	case Person.T_SPACE_CREW:
     	case Person.T_SPACE_GUNNER:
     	case Person.T_SPACE_PILOT:
     		if (largeCraft) {
-    			unitType = UnitTableData.UNIT_DROPSHIP;
+    			unitType = UnitType.DROPSHIP;
     		} else {
     			return;
     		}
@@ -988,30 +988,30 @@ public class PersonnelMarket {
     		}
     		break;
     	case Person.T_INFANTRY:
-    		unitType = UnitTableData.UNIT_INFANTRY;
+    		unitType = UnitType.INFANTRY;
     		break;
     	case Person.T_BA:
-    		unitType = UnitTableData.UNIT_BATTLEARMOR;
+    		unitType = UnitType.BATTLE_ARMOR;
     		break;
     	case Person.T_PROTO_PILOT:
-    		unitType = UnitTableData.UNIT_PROTOMECH;
+    		unitType = UnitType.PROTOMEK;
     		break;
     	default:
     		return;
     	}
 
     	int weight = 0;
-    	if (unitType >= 0 && unitType <= UnitTableData.UNIT_AERO) {
+    	if (unitType >= 0 && unitType <= UnitType.AERO) {
 			int roll = Compute.d6(2);
 	    	if (roll < 8) {
 	    		return;
 	    	}
 	    	if (roll < 10) {
-	    		weight = UnitTableData.WT_LIGHT;
+	    		weight = EntityWeightClass.WEIGHT_LIGHT;
 	    	} else if (roll < 12) {
-	    		weight = UnitTableData.WT_MEDIUM;
+	    		weight = EntityWeightClass.WEIGHT_MEDIUM;
 	    	} else {
-	    		weight = UnitTableData.WT_HEAVY;
+	    		weight = EntityWeightClass.WEIGHT_HEAVY;
 	    	}
     	}
     	Entity en = null;
@@ -1032,21 +1032,7 @@ public class PersonnelMarket {
     		}
     		ms = MechSummaryCache.getInstance().getMech(name);
     	} else {
-    		UnitTableData.FactionTables ft = UnitTableData.getInstance().getBestRAT(c.getCampaignOptions().getRATs(),
-    				c.getCalendar().get(Calendar.YEAR),
-    				faction, unitType);
-    		if (null == ft) {
-    			//Most likely proto pilot for IS faction
-    			return;
-    		}
-    		String rat = ft.getTable(unitType, weight, UnitTableData.QUALITY_F);
-    		if (null != rat) {
-    			RandomUnitGenerator.getInstance().setChosenRAT(rat);
-    			ArrayList<MechSummary> msl = RandomUnitGenerator.getInstance().generate(1);
-    			if (msl.size() > 0) {
-    				ms = msl.get(0);
-    			}
-    		}
+    		ms = c.getUnitGenerator().generate(faction, unitType, weight, c.getCalendar().get(Calendar.YEAR), IUnitRating.DRAGOON_F);
     	}
     	if (null != ms) {
     		if (Faction.getFaction(faction).isClan() && ms.getName().matches(".*Platoon.*")) {
