@@ -2025,7 +2025,8 @@ public class AtBScenario extends Scenario {
 			return;
 		}
 
-		String weights = adjustForMaxWeight(lanceWeights[0][weightClass][Compute.d6() - 1],
+		String weights = adjustForMaxWeight(lanceWeights[0]
+				[weightClass - EntityWeightClass.WEIGHT_LIGHT][Compute.d6() - 1],
 				maxWeight);
 
 		int forceType = FORCE_MEK;
@@ -2125,7 +2126,8 @@ public class AtBScenario extends Scenario {
 			forceType = FORCE_VEHICLE;
 		}
 
-		String weights = adjustForMaxWeight(lanceWeights[1][weightClass][Compute.d6() - 1],
+		String weights = adjustForMaxWeight(lanceWeights[1]
+				[weightClass - EntityWeightClass.WEIGHT_LIGHT][Compute.d6() - 1],
 				maxWeight);
 
 		int unitType = (forceType == FORCE_VEHICLE)?UnitType.TANK:UnitType.MEK;
@@ -2199,7 +2201,8 @@ public class AtBScenario extends Scenario {
 	 */
 	private void addLevelII(ArrayList<Entity> list, String faction, int skill, int quality, int weightClass,
 			int maxWeight, Campaign campaign, int arrivalTurn) {
-		String weights = adjustForMaxWeight(lanceWeights[2][weightClass][Compute.d6() - 1],
+		String weights = adjustForMaxWeight(lanceWeights[2]
+				[weightClass - EntityWeightClass.WEIGHT_LIGHT][Compute.d6() - 1],
 				maxWeight);
 
 		int forceType = FORCE_MEK;
