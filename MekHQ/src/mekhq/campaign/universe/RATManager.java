@@ -102,9 +102,8 @@ public class RATManager implements IUnitGenerator {
 	 * @param collection Name of RAT collection to add
 	 */
 	public void addRAT(String collection) {
-		selectedCollections.add(collection);
-		if (!allRATs.containsKey(collection)) {
-			loadCollection(collection);
+		if (allRATs.containsKey(collection) || loadCollection(collection)) {
+			selectedCollections.add(collection);
 		}
 	}
 	
@@ -116,10 +115,10 @@ public class RATManager implements IUnitGenerator {
 		selectedCollections.remove(collection);
 	}
 	
-	public void loadCollection(String name) {
+	public boolean loadCollection(String name) {
 		if (!fileNames.containsKey(name)) {
 			MekHQ.logError("RAT collection " + name + " not found in " + RATINFO_DIR);
-			return;
+			return false;
 		}
         File f = new File(RATINFO_DIR, fileNames.get(name));
         FileInputStream fis = null;		
@@ -136,6 +135,7 @@ public class RATManager implements IUnitGenerator {
         } catch (Exception ex) {
             ex.printStackTrace();
             MekHQ.logError("While loading RAT info from " + f.getName() + ": " + ex.getMessage());
+            return false;
         }
         
         Element elem = xmlDoc.getDocumentElement();
@@ -166,8 +166,10 @@ public class RATManager implements IUnitGenerator {
         			}
         		}
         	}
+            return allRATs.get(name).size() > 0;
         } else {
         	MekHQ.logError("source attribute not found for RAT data in " + f.getName());
+        	return false;
         }
 	}
 
@@ -301,13 +303,17 @@ public class RATManager implements IUnitGenerator {
     
     private RAT findRAT(String faction, int unitType, int weightClass, int year, int quality) {
     	List<String> factionList = factionTree(faction);
-    	for (String collection : selectedCollections) {
-    		for (int era : allRATs.get(collection).keySet()) {
+    	for (String collectionName : selectedCollections) {
+    		Map<Integer,List<RAT>> collection = allRATs.get(collectionName);
+    		if (collection == null) {
+    			continue;
+    		}
+    		for (int era : collection.keySet()) {
     			if (era > year) {
     				continue;
     			}
     			for (String f : factionList) {
-    				Optional<RAT> match = allRATs.get(collection).get(era).stream()
+    				Optional<RAT> match = allRATs.get(collectionName).get(era).stream()
     						.filter(rat -> rat.matches(f, unitType, weightClass, quality))
 	        				.findFirst();
 	    			if (match.isPresent()) {
