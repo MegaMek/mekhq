@@ -231,7 +231,7 @@ public class CampaignOptions implements Serializable {
     private boolean trackOriginalUnit;
     private boolean mercSizeLimited;
     private String[] rats = {"Xotl", "Total Warfare"};
-    private String[] ratsNoEra = {"Xotl", "Total Warfare"};
+    private boolean staticRATs;
     private int searchRadius;
     private double intensity;
     private boolean variableContractLength;
@@ -1567,8 +1567,12 @@ public class CampaignOptions implements Serializable {
 		this.rats = rats;
 	}
 
-	public String[] getRATsNoEra() {
-		return ratsNoEra;
+	public boolean useStaticRATs() {
+		return staticRATs;
+	}
+	
+	public void setStaticRATs(boolean staticRATs) {
+		this.staticRATs = staticRATs;
 	}
 
 	public int getSearchRadius() {
@@ -1908,17 +1912,9 @@ public class CampaignOptions implements Serializable {
                 + "<rats>"
                 + MekHqXmlUtil.escape(csv)
                 + "</rats>");
-        csv = "";
-        for (int i = 0; i < ratsNoEra.length; i++) {
-        	csv += ratsNoEra[i];
-        	if (i < ratsNoEra.length - 1) {
-        		csv += ",";
-        	}
+        if (staticRATs) {
+        	pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<staticRATs/>");
         }
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                + "<ratsNoEra>"
-                + MekHqXmlUtil.escape(csv)
-                + "</ratsNoEra>");
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</campaignOptions>");
     }
 
@@ -2308,8 +2304,8 @@ public class CampaignOptions implements Serializable {
                 retVal.startGameDelay = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("rats")) {
             	retVal.rats = MekHqXmlUtil.unEscape(wn2.getTextContent().trim()).split(",");
-            } else if (wn2.getNodeName().equalsIgnoreCase("ratsNoEra")) {
-            	retVal.ratsNoEra = MekHqXmlUtil.unEscape(wn2.getTextContent().trim()).split(",");
+            } else if (wn2.getNodeName().equalsIgnoreCase("staticRATs")) {
+            	retVal.staticRATs = true;
             }
         }
 

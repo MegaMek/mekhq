@@ -460,15 +460,35 @@ public class Campaign implements Serializable {
     	return fatigueLevel;
     }
     
-    public IUnitGenerator getUnitGenerator() {
-    	if (unitGenerator == null) {
-    		RATGeneratorConnector rgc = new RATGeneratorConnector(calendar.get(Calendar.YEAR));
-    		unitGenerator = rgc;
-    		/*
+    /**
+     * Initializes the unit generator based on the method chosen in campaignOptions.
+     * Called when the unit generator is first used or when the method has been
+     * changed in campaignOptions.
+     */
+    public void initUnitGenerator() {
+		if (campaignOptions.useStaticRATs()) {
     		RATManager rm = new RATManager();
     		rm.setSelectedRATs(campaignOptions.getRATs());
-    		unitGenerator = rm;
-    		*/
+    		while (!RandomUnitGenerator.getInstance().isInitialized()) {
+    			try {
+					Thread.sleep(50);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+    		}
+    		unitGenerator = rm;    			
+		} else {
+			RATGeneratorConnector rgc = new RATGeneratorConnector(calendar.get(Calendar.YEAR));
+			unitGenerator = rgc;
+		}    	
+    }
+    
+    /**
+     * @return - the class responsible for generating random units
+     */
+    public IUnitGenerator getUnitGenerator() {
+    	if (unitGenerator == null) {
+    		initUnitGenerator();
     	}
     	return unitGenerator;
     }

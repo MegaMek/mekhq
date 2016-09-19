@@ -4558,6 +4558,7 @@ public class CampaignGUI extends JPanel {
 
     private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuOptionsActionPerformed
         boolean atb = getCampaign().getCampaignOptions().getUseAtB();
+        boolean staticRATs = getCampaign().getCampaignOptions().useStaticRATs();
         CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), true,
                 getCampaign(), getIconPackage().getCamos());
         cod.setVisible(true);
@@ -4600,6 +4601,9 @@ public class CampaignGUI extends JPanel {
                 RandomUnitGenerator.getInstance().dispose();
                 RandomNameGenerator.getInstance().dispose();
             }
+        }
+        if (staticRATs != getCampaign().getCampaignOptions().useStaticRATs()) {
+        	getCampaign().initUnitGenerator();
         }
         refreshCalendar();
         getCampaign().reloadNews();
