@@ -2,6 +2,7 @@ VERSION HISTORY
 ----------------------------------
 v0.3.33-git
 +Added AtB preset.
++Reworked AtB RAT subsystem and added option to use RAT Generator.
 
 v0.3.32 (2016-08-26 03:00 UTC)
 + Issue #131: Personnel Market update blank
