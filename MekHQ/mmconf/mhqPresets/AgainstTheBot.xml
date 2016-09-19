@@ -157,8 +157,7 @@
 		<salaryTypeBase>0,1500,1500,900,900,900,900,960,750,960,900,1000,1000,1000,1000,800,800,800,800,400,1500,400,500,500,500,500</salaryTypeBase>
 		<salaryXpMultiplier>0.6,0.6,1.0,1.6,3.2</salaryXpMultiplier>
 		<usePortraitForType>false,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false</usePortraitForType>
-		<rats>Neoancient,Xotl,Total Warfare</rats>
-		<ratsNoEra>Xotl,Total Warfare</ratsNoEra>
+		<rats>Xotl,Total Warfare</rats>
 	</campaignOptions>
 	<skillTypes>
 		<skillType>
@@ -494,12 +493,12 @@
 			<invalidAbilities>weapon_specialist</invalidAbilities>
 			<removeAbilities></removeAbilities>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Battlesuit::Regular</skill>
-				<skill>Gunnery/Aerospace::Regular</skill>
+				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Spacecraft::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Mech::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -528,12 +527,12 @@ at short, medium, or long/extended range, respectively, but only with a speciali
 			<invalidAbilities>cluster_hitter::cluster_master</invalidAbilities>
 			<removeAbilities></removeAbilities>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Battlesuit::Regular</skill>
-				<skill>Gunnery/Aerospace::Regular</skill>
+				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Spacecraft::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Mech::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -599,12 +598,12 @@ Note: This ability is only used for BattleMechs.</desc>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Battlesuit::Regular</skill>
-				<skill>Gunnery/Aerospace::Regular</skill>
+				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Spacecraft::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Mech::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -618,12 +617,12 @@ Note: This ability is only used for BattleMechs.</desc>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities>cluster_hitter</removeAbilities>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Veteran</skill>
 				<skill>Gunnery/Battlesuit::Veteran</skill>
-				<skill>Gunnery/Aerospace::Veteran</skill>
+				<skill>Gunnery/Aircraft::Veteran</skill>
 				<skill>Gunnery/Spacecraft::Veteran</skill>
-				<skill>Gunnery/Mech::Veteran</skill>
+				<skill>Gunnery/Aerospace::Veteran</skill>
 				<skill>Gunnery/Vehicle::Veteran</skill>
+				<skill>Gunnery/Mech::Veteran</skill>
 				<skill>Gunnery/Protomech::Veteran</skill>
 			</skillPrereq>
 		</ability>
@@ -637,12 +636,12 @@ Note: This ability is only used for BattleMechs.</desc>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Battlesuit::Regular</skill>
-				<skill>Gunnery/Aerospace::Regular</skill>
+				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Spacecraft::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Mech::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -677,11 +676,11 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Battlesuit::Regular</skill>
+				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Mech::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -695,12 +694,12 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft</skill>
 				<skill>Gunnery/Battlesuit</skill>
-				<skill>Gunnery/Aerospace</skill>
+				<skill>Gunnery/Aircraft</skill>
 				<skill>Gunnery/Spacecraft</skill>
-				<skill>Gunnery/Mech</skill>
+				<skill>Gunnery/Aerospace</skill>
 				<skill>Gunnery/Vehicle</skill>
+				<skill>Gunnery/Mech</skill>
 				<skill>Gunnery/Protomech</skill>
 			</skillPrereq>
 		</ability>
@@ -824,12 +823,12 @@ Note: This ability is only used for BattleMechs.</desc>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Veteran</skill>
 				<skill>Gunnery/Battlesuit::Veteran</skill>
-				<skill>Gunnery/Aerospace::Veteran</skill>
+				<skill>Gunnery/Aircraft::Veteran</skill>
 				<skill>Gunnery/Spacecraft::Veteran</skill>
-				<skill>Gunnery/Mech::Veteran</skill>
+				<skill>Gunnery/Aerospace::Veteran</skill>
 				<skill>Gunnery/Vehicle::Veteran</skill>
+				<skill>Gunnery/Mech::Veteran</skill>
 				<skill>Gunnery/Protomech::Veteran</skill>
 			</skillPrereq>
 		</ability>
@@ -859,11 +858,11 @@ Note: This ability is only used for BattleMechs.</desc>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Battlesuit::Regular</skill>
+				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Mech::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -877,12 +876,12 @@ Note: This ability is only used for BattleMechs.</desc>
 			<invalidAbilities>cluster_master</invalidAbilities>
 			<removeAbilities></removeAbilities>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Battlesuit::Regular</skill>
-				<skill>Gunnery/Aerospace::Regular</skill>
+				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Spacecraft::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Mech::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -910,12 +909,12 @@ Note: This ability is only used for BattleMechs.</desc>
 			<invalidAbilities>specialist</invalidAbilities>
 			<removeAbilities></removeAbilities>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Battlesuit::Regular</skill>
-				<skill>Gunnery/Aerospace::Regular</skill>
+				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Spacecraft::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Mech::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
