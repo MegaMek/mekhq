@@ -6600,7 +6600,6 @@ public class Campaign implements Serializable {
     }
 
     public void refreshNetworks() {
-        if(1 == 1) return;
         for (Unit unit : getUnits()) {
             // we are going to rebuild the c3 and c3i networks based on
             // the c3UUIDs

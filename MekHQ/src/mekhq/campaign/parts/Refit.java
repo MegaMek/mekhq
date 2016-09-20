@@ -32,6 +32,9 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.UUID;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
 import megamek.common.BipedMech;
@@ -61,10 +64,6 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
-import mekhq.campaign.work.WorkTime;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * This object tracks the refit of a given unit into a new unit.

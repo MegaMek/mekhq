@@ -22,7 +22,6 @@
 package mekhq.gui.dialog;
 
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
@@ -38,7 +37,6 @@ import mekhq.gui.utilities.JSuggestField;
  */
 public class CustomizeMissionDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
-    private Frame frame;
     private Mission mission;
     private Campaign campaign;
     private boolean newMission;
@@ -46,7 +44,6 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
     /** Creates new form NewTeamDialog */
     public CustomizeMissionDialog(java.awt.Frame parent, boolean modal, Mission m, Campaign c) {
         super(parent, modal);
-        this.frame = parent;
         if(null == m) {
         	mission = new Mission("New Mission");
         	newMission = true;

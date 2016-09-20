@@ -26,6 +26,9 @@ import java.io.PrintWriter;
 import java.util.Calendar;
 import java.util.UUID;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
 import megamek.common.ConvFighter;
@@ -50,10 +53,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
-import mekhq.campaign.work.WorkTime;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * We use an extension of unit to create a unit order acquisition work
