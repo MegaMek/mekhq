@@ -1,5 +1,8 @@
 VERSION HISTORY
 ----------------------------------
+v0.41.24-git
++ Version matched to MegaMek
+
 v0.3.33 (2016-09-20 00:07 UTC)
 + Added AtB preset.
 + Reworked AtB RAT subsystem and added option to use RAT Generator
