@@ -32,6 +32,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -101,7 +102,7 @@ public class RATManager implements IUnitGenerator {
 	 * Append RAT collection to list of selected RATs
 	 * @param collection Name of RAT collection to add
 	 */
-	public void addRAT(String collection) {
+	private void addRAT(String collection) {
 		if (allRATs.containsKey(collection) || loadCollection(collection)) {
 			selectedCollections.add(collection);
 		}
@@ -115,10 +116,18 @@ public class RATManager implements IUnitGenerator {
 		selectedCollections.remove(collection);
 	}
 	
-	public boolean loadCollection(String name) {
+	private boolean loadCollection(String name) {
 		if (!fileNames.containsKey(name)) {
 			MekHQ.logError("RAT collection " + name + " not found in " + RATINFO_DIR);
 			return false;
+		}
+		/* Need RUG to be loaded for validation */
+		while (!RandomUnitGenerator.getInstance().isInitialized()) {
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
         File f = new File(RATINFO_DIR, fileNames.get(name));
         FileInputStream fis = null;		
@@ -174,12 +183,13 @@ public class RATManager implements IUnitGenerator {
 	}
 
 	private void parseEraNode(Node eraNode, String name, int era) {
+		Set<String> allRatNames = RandomUnitGenerator.getInstance().getRatMap().keySet();
 		NodeList nl = eraNode.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node ratNode = nl.item(i);
 			if (ratNode.getNodeName().equals("rat")) {
 				RAT rat = RAT.createFromXml(ratNode);
-				if (rat != null) {
+				if (rat != null && allRatNames.contains(rat.ratName)) {
 					allRATs.get(name).get(era).add(rat);
 				}
 			}

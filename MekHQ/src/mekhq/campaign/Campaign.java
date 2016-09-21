@@ -468,7 +468,6 @@ public class Campaign implements Serializable {
     public void initUnitGenerator() {
 		if (campaignOptions.useStaticRATs()) {
     		RATManager rm = new RATManager();
-    		rm.setSelectedRATs(campaignOptions.getRATs());
     		while (!RandomUnitGenerator.getInstance().isInitialized()) {
     			try {
 					Thread.sleep(50);
@@ -476,6 +475,7 @@ public class Campaign implements Serializable {
 					e.printStackTrace();
 				}
     		}
+    		rm.setSelectedRATs(campaignOptions.getRATs());
     		unitGenerator = rm;    			
 		} else {
 			RATGeneratorConnector rgc = new RATGeneratorConnector(calendar.get(Calendar.YEAR));
