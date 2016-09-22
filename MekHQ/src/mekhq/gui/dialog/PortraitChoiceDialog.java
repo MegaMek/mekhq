@@ -19,6 +19,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.ResourceBundle;
 
 import javax.swing.DefaultComboBoxModel;
@@ -57,8 +58,14 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
     private PortraitTableModel portraitModel = new PortraitTableModel();
     private String category;
     private String filename;
+    private LinkedHashMap<String, String> iconMap;
     private PortraitTableMouseAdapter portraitMouseAdapter;
     private boolean force = false;
+    private JButton btnCancel;
+    private JButton btnSelect;
+    private JComboBox<String> comboCategories;
+    private JScrollPane scrPortrait;
+    private JTable tablePortrait;
 
 
     /** Creates new form CamoChoiceDialog */
@@ -75,6 +82,10 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
         portraitMouseAdapter = new PortraitTableMouseAdapter();
         this.portraits = portraits;
         this.force = force;
+        // If we're doing forces, initialize the hashmap for use
+        if (force) {
+            iconMap = new LinkedHashMap<String, String>();
+        }
         initComponents();
         fillTable((String) comboCategories.getSelectedItem());
         int rowIndex = 0;
@@ -89,7 +100,7 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
     }
 
     private void initComponents() {
-        GridBagConstraints gridBagConstraints;
+        GridBagConstraints gbc;
 
         scrPortrait = new JScrollPane();
         tablePortrait = new JTable();
@@ -97,6 +108,7 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
         btnSelect = new JButton();
         btnCancel = new JButton();
         JPanel portraitPanel = new JPanel();
+        getContentPane().setLayout(new GridBagLayout());
 
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PortraitChoiceDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -114,15 +126,15 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
         tablePortrait.addMouseListener(portraitMouseAdapter);
         scrPortrait.setViewportView(tablePortrait);
 
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        portraitPanel.add(scrPortrait, gridBagConstraints);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        portraitPanel.add(scrPortrait, gbc);
 
         DefaultComboBoxModel<String> categoryModel = new DefaultComboBoxModel<String>();
         String match = null;
@@ -151,13 +163,68 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
                 comboCategoriesItemStateChanged(evt);
             }
         });
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        portraitPanel.add(comboCategories, gridBagConstraints);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.weightx = 1.0;
+        portraitPanel.add(comboCategories, gbc);
+        
+        if (force) {
+            JTabbedPane tabbedPane = new JTabbedPane();
+            JPanel layeredPanel = new JPanel();
+
+            // Panel for Types (Frames are autoselected based on needs of the complete image)
+            JScrollPane scrTypes = new JScrollPane();
+            JTable tableTypes = new JTable();
+            JPanel panelTypes = new JPanel();
+
+            // Panel for Formations (Frames are autoselected based on needs of the complete image)
+            JScrollPane scrFormations = new JScrollPane();
+            JTable tableFormations = new JTable();
+            JPanel panelFormations = new JPanel();
+
+            // Panel for Adjustments (Frames are autoselected based on needs of the complete image)
+            JScrollPane scrAdjustments = new JScrollPane();
+            JTable tableAdjustments = new JTable();
+            JPanel panelAdjustments = new JPanel();
+
+            // Panel for Alphanumerics (Frames are autoselected based on needs of the complete image)
+            JScrollPane scrAlphanumerics = new JScrollPane();
+            JTable tableAlphanumerics = new JTable();
+            JPanel panelAlphanumerics = new JPanel();
+
+            // Panel for SpecialModifiers (Frames are autoselected based on needs of the complete image)
+            JScrollPane scrSpecialModifiers = new JScrollPane();
+            JTable tableSpecialModifiers = new JTable();
+            JPanel panelSpecialModifiers = new JPanel();
+
+            tabbedPane.addTab("Single Portrait", portraitPanel);
+            tabbedPane.addTab("Layered Portrait", layeredPanel);
+
+            // Add the tabbed pane to the content pane
+            gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            gbc.weightx = 1.0;
+            gbc.weighty = 1.0;
+            gbc.gridwidth = 2;
+            gbc.fill = GridBagConstraints.BOTH;
+            gbc.anchor = GridBagConstraints.NORTHWEST;
+            getContentPane().add(tabbedPane, gbc);
+        } else {
+            // Add the portrait panel to the content pane
+            gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            gbc.weightx = 1.0;
+            gbc.weighty = 1.0;
+            gbc.gridwidth = 2;
+            gbc.fill = GridBagConstraints.BOTH;
+            gbc.anchor = GridBagConstraints.NORTHWEST;
+            getContentPane().add(portraitPanel, gbc);
+        }
 
         btnSelect.setText(resourceMap.getString("btnSelect.text")); // NOI18N
         btnSelect.setName("btnSelect"); // NOI18N
@@ -166,11 +233,11 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
                 btnSelectActionPerformed(evt);
             }
         });
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.weightx = 0.5;
-        portraitPanel.add(btnSelect, gridBagConstraints);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.weightx = 0.5;
+        portraitPanel.add(btnSelect, gbc);
 
         btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
@@ -179,21 +246,11 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
                 btnCancelActionPerformed(evt);
             }
         });
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.weightx = 0.5;
-        portraitPanel.add(btnCancel, gridBagConstraints);
-
-        if (force) {
-            JTabbedPane tabbedPane = new JTabbedPane();
-            JPanel layeredPanel = new JPanel();
-            // TODO: Coming Soon!
-            tabbedPane.addTab("Single Portrait", portraitPanel);
-            tabbedPane.addTab("Layered Portrait", layeredPanel);
-        } else {
-            getContentPane().add(portraitPanel);
-        }
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.weightx = 0.5;
+        portraitPanel.add(btnCancel, gbc);
 
         pack();
     }
@@ -351,14 +408,15 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
     public class PortraitTableMouseAdapter extends MouseInputAdapter {
 
         @Override
-        public void mouseClicked(MouseEvent e) {
-
-            if (e.getClickCount() == 2) {
-                int row = tablePortrait.rowAtPoint(e.getPoint());
-                if(row < portraitModel.getRowCount()) {
-                    category = portraitModel.getCategory();
-                    filename = (String) portraitModel.getValueAt(row, 0);
-                    setVisible(false);
+        public void mouseClicked(MouseEvent evt) {
+            if (evt.getClickCount() == 2) {
+                if (tablePortrait.equals(evt.getSource())) {
+                    int row = tablePortrait.rowAtPoint(evt.getPoint());
+                    if(row < portraitModel.getRowCount()) {
+                        category = portraitModel.getCategory();
+                        filename = (String) portraitModel.getValueAt(row, 0);
+                        setVisible(false);
+                    }
                 }
             }
         }
@@ -379,7 +437,7 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
         }
 
         private void initComponents() {
-            GridBagConstraints gridBagConstraints;
+            GridBagConstraints gbc;
 
             lblImage = new JLabel();
 
@@ -388,13 +446,13 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
 
             lblImage.setText(""); // NOI18N
             lblImage.setName("lblImage"); // NOI18N
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = 0;
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.weighty = 1.0;
-            add(lblImage, gridBagConstraints);
+            gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            gbc.fill = GridBagConstraints.BOTH;
+            gbc.weightx = 1.0;
+            gbc.weighty = 1.0;
+            add(lblImage, gbc);
         }// </editor-fold>//GEN-END:initComponents
 
         public void setText(String text) {
@@ -427,14 +485,4 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
         // End of variables declaration//GEN-END:variables
 
     }
-
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JButton btnCancel;
-    private JButton btnSelect;
-    private JComboBox<String> comboCategories;
-    private JScrollPane scrPortrait;
-    private JTable tablePortrait;
-    // End of variables declaration//GEN-END:variables
-
 }

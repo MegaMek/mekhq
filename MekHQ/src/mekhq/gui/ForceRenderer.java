@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.util.Map;
+import java.util.Vector;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -197,30 +198,42 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
         if (Force.ROOT_LAYERED.equals(category)) {
             BufferedImage base = null;
             Graphics2D g2d = null;
-            for (Map.Entry<String, String> entry : force.getIconMap().entrySet()) {
-                try {
-                    // Load up the image piece
-                    BufferedImage tmp = (BufferedImage) getIconPackage().getForceIcons().getItem(entry.getKey(), entry.getValue());
+            try {
+                for (Map.Entry<String,  Vector<String>> entry : force.getIconMap().entrySet()) {
+                    if (null != entry.getValue() && !entry.getValue().isEmpty()) {
+                        for (String value : entry.getValue()) {
+                            // Load up the image piece
+                            BufferedImage tmp = (BufferedImage) getIconPackage().getForceIcons().getItem(entry.getKey(), value);
 
-                    // Create the new base if it isn't already
-                    if (null == base) {
-                        base = new BufferedImage(tmp.getWidth(), tmp.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                            // Create the new base if it isn't already
+                            if (null == base) {
+                                base = new BufferedImage(tmp.getWidth(), tmp.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
-                        // Get our Graphics to draw on
-                        g2d = base.createGraphics();
-                    }
+                                // Get our Graphics to draw on
+                                g2d = base.createGraphics();
+                            }
 
-                    // Draw the current buffered image onto the base, aligning bottom and right side
-                    g2d.drawImage(base, base.getWidth() - tmp.getWidth(), base.getHeight() - tmp.getHeight(), null);
-                } catch (Exception err) {
-                    err.printStackTrace();
-                } finally {
-                    if (null != g2d)
-                        g2d.dispose();
-                    if (null != base) {
-                        forceIcon = new ImageIcon(base);
+                            // Draw the current buffered image onto the base, aligning bottom and right side
+                            g2d.drawImage(base, base.getWidth() - tmp.getWidth(), base.getHeight() - tmp.getHeight(), null);
+                        }
                     }
                 }
+            } catch (Exception err) {
+                err.printStackTrace();
+            } finally {
+                if (null != g2d)
+                    g2d.dispose();
+                if (null == base) {
+                    try {
+                        base = (BufferedImage) getIconPackage().getForceIcons().getItem("", "empty.png");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                if(null != base) {
+                    base = (BufferedImage) base.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
+                }
+                forceIcon = new ImageIcon(base);
             }
         } else { // Standard force icon
             // Try to get the player's force icon file.
