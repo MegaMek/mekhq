@@ -21,7 +21,9 @@
 package mekhq.campaign.universe;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import megamek.client.ratgenerator.FactionRecord;
@@ -33,58 +35,79 @@ import megamek.common.UnitType;
 import mekhq.MekHQ;
 
 /**
+ * Provides access to RATGenerator through IUnitGenerator interface. Generated tables
+ * are stored in an LRU cache to speed repeated requests using the same parameters.
+ * 
  * @author Neoancient
  *
  */
 
 public class RATGeneratorConnector implements IUnitGenerator {
 	
-	private RATGenerator rg;
+	private static final int DEFAULT_CACHE_SIZE = 16;
+	
+	private LinkedHashMap<CacheKey,UnitTable> cache;
+	
+	public RATGeneratorConnector(int year) {
+		this(year, DEFAULT_CACHE_SIZE);
+	}
 	
 	/* Initialize RATGenerator and load the data for the current game year */
-	public RATGeneratorConnector(int year) {
-		rg = RATGenerator.getInstance();
-		while (!rg.isInitialized()) {
+	public RATGeneratorConnector(int year, int cacheSize) {
+		while (!RATGenerator.getInstance().isInitialized()) {
 			try {
 				Thread.sleep(50);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
-		rg.loadYear(year);
-	}
+		RATGenerator.getInstance().loadYear(year);
+		cache = new LinkedHashMap<CacheKey, UnitTable>(cacheSize, 0.75f, true) {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = -70691170834368783L;
 
-	/*TODO: cache generated tables */
-	private UnitTable createTable(String faction, int unitType, int weightClass, int year,
+			protected boolean removeEldestEntry(Map.Entry<CacheKey, UnitTable> entry) {
+				return size() >= cacheSize;
+			}
+		};
+	}
+	
+	private synchronized UnitTable findTable(String faction, int unitType, int weightClass, int year,
 			int quality) {
-		FactionRecord fRec = RATGenerator.getInstance().getFaction(faction);
-		if (fRec == null) {
-			Faction f = Faction.getFaction(faction);
-			if (f != null) {
-				if (f.isPeriphery()) {
-					fRec = RATGenerator.getInstance().getFaction("Periphery");
-				} else if (f.isClan()) {
-					fRec = RATGenerator.getInstance().getFaction("CLAN");					
-				} else {
-					fRec = RATGenerator.getInstance().getFaction("IS");
+		CacheKey key = new CacheKey(faction, unitType, weightClass, year, quality);
+		UnitTable retVal = cache.get(key);
+		if (retVal == null) {
+			FactionRecord fRec = RATGenerator.getInstance().getFaction(faction);
+			if (fRec == null) {
+				Faction f = Faction.getFaction(faction);
+				if (f != null) {
+					if (f.isPeriphery()) {
+						fRec = RATGenerator.getInstance().getFaction("Periphery");
+					} else if (f.isClan()) {
+						fRec = RATGenerator.getInstance().getFaction("CLAN");					
+					} else {
+						fRec = RATGenerator.getInstance().getFaction("IS");
+					}
+				}
+				if (fRec == null) {
+					MekHQ.logError("Could not locate faction record for " + faction);
+					return null;
 				}
 			}
-			if (fRec == null) {
-				MekHQ.logError("Could not locate faction record for " + faction);
-				return null;
+			String rating = null;
+			if (fRec.getRatingLevels().size() != 1) {
+				List<String> ratings = fRec.getRatingLevelSystem();
+				rating = ratings.get(Math.min(quality, ratings.size() - 1));
 			}
+			ArrayList<Integer> wcs = new ArrayList<Integer>();
+			wcs.add(weightClass);
+			
+			retVal = new UnitTable(fRec, unitType, year, rating, wcs,
+					ModelRecord.NETWORK_NONE, new ArrayList<>(), new ArrayList<>(), 2, fRec);
+			cache.put(key, retVal);
 		}
-		String rating = null;
-		if (fRec.getRatingLevels().size() != 1) {
-			List<String> ratings = fRec.getRatingLevelSystem();
-			rating = ratings.get(Math.min(quality, ratings.size() - 1));
-		}
-		ArrayList<Integer> wcs = new ArrayList<Integer>();
-		wcs.add(weightClass);
-		
-		UnitTable retVal = new UnitTable(fRec, unitType, year, rating, wcs,
-				ModelRecord.NETWORK_NONE, new ArrayList<>(), new ArrayList<>(), 2, fRec);
-		
 		return retVal;
 	}
 
@@ -103,7 +126,7 @@ public class RATGeneratorConnector implements IUnitGenerator {
 	@Override
 	public MechSummary generate(String faction, int unitType, int weightClass,
 			int year, int quality) {
-		UnitTable ut = createTable(faction, unitType, weightClass, year, quality);
+		UnitTable ut = findTable(faction, unitType, weightClass, year, quality);
 		return (ut == null)? null : ut.generateUnit();
 	}
 
@@ -113,7 +136,7 @@ public class RATGeneratorConnector implements IUnitGenerator {
 	@Override
 	public MechSummary generate(String faction, int unitType, int weightClass,
 			int year, int quality, Predicate<MechSummary> filter) {
-		UnitTable ut = createTable(faction, unitType, weightClass, year, quality);
+		UnitTable ut = findTable(faction, unitType, weightClass, year, quality);
 		return (ut == null)? null : ut.generateUnit(ms -> filter.test(ms));
 	}
 
@@ -123,7 +146,7 @@ public class RATGeneratorConnector implements IUnitGenerator {
 	@Override
 	public List<MechSummary> generate(int count, String faction, int unitType,
 			int weightClass, int year, int quality) {
-		UnitTable ut = createTable(faction, unitType, weightClass, year, quality);
+		UnitTable ut = findTable(faction, unitType, weightClass, year, quality);
 		return ut == null? new ArrayList<MechSummary>() : ut.generateUnits(count);
 	}
 
@@ -134,8 +157,42 @@ public class RATGeneratorConnector implements IUnitGenerator {
 	public List<MechSummary> generate(int count, String faction, int unitType,
 			int weightClass, int year, int quality,
 			Predicate<MechSummary> filter) {
-		UnitTable ut = createTable(faction, unitType, weightClass, year, quality);
+		UnitTable ut = findTable(faction, unitType, weightClass, year, quality);
 		return ut == null? new ArrayList<MechSummary>() : ut.generateUnits(count, ms -> filter.test(ms));
 	}
-
+	
+	private class CacheKey {
+		String faction;
+		int unitType;
+		int weightClass;
+		int year;
+		int quality;
+		
+		public CacheKey(String faction, int unitType, int weightClass, int year, int quality) {
+			this.faction = faction;
+			this.unitType = unitType;
+			this.weightClass = weightClass;
+			this.year = year;
+			this.quality = quality;
+		}
+		
+		@Override
+		public int hashCode() {
+			return	(quality << 29)
+					+ (year << 17)
+					+ (weightClass << 13)
+					+ (unitType << 9)
+					+ faction.hashCode(); 
+		}
+		
+		@Override
+		public boolean equals(Object other) {
+			return other instanceof CacheKey
+					&& faction.equals(((CacheKey)other).faction)
+					&& unitType == ((CacheKey)other).unitType
+					&& weightClass == ((CacheKey)other).weightClass
+					&& year == ((CacheKey)other).year
+					&& quality == ((CacheKey)other).quality;
+		}
+	}
 }
