@@ -45,7 +45,7 @@ import megamek.common.util.EncodeControl;
  *
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class PortraitChoiceDialog extends javax.swing.JDialog {
+public class ImageChoiceDialog extends javax.swing.JDialog {
 
      /**
 	 *
@@ -54,33 +54,33 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
 	/**
      * The categorized camo patterns.
      */
-    private DirectoryItems portraits;
-    private PortraitTableModel portraitModel = new PortraitTableModel();
+    private DirectoryItems imageItems;
+    private ImageTableModel imageTableModel = new ImageTableModel();
     private String category;
     private String filename;
     private LinkedHashMap<String, String> iconMap;
-    private PortraitTableMouseAdapter portraitMouseAdapter;
+    private ImageTableMouseAdapter portraitMouseAdapter;
     private boolean force = false;
     private JButton btnCancel;
     private JButton btnSelect;
     private JComboBox<String> comboCategories;
-    private JScrollPane scrPortrait;
-    private JTable tablePortrait;
+    private JScrollPane scrImages;
+    private JTable tableImages;
 
 
     /** Creates new form CamoChoiceDialog */
-    public PortraitChoiceDialog(Frame parent, boolean modal, String category, String file, DirectoryItems portraits) {
+    public ImageChoiceDialog(Frame parent, boolean modal, String category, String file, DirectoryItems portraits) {
         this(parent, modal, category, file, portraits, false);
     }
 
 
     /** Creates new form CamoChoiceDialog */
-    public PortraitChoiceDialog(java.awt.Frame parent, boolean modal, String category, String file, DirectoryItems portraits, boolean force) {
+    public ImageChoiceDialog(java.awt.Frame parent, boolean modal, String category, String file, DirectoryItems portraits, boolean force) {
         super(parent, modal);
         this.category = category;
         filename = file;
-        portraitMouseAdapter = new PortraitTableMouseAdapter();
-        this.portraits = portraits;
+        portraitMouseAdapter = new ImageTableMouseAdapter();
+        this.imageItems = portraits;
         this.force = force;
         // If we're doing forces, initialize the hashmap for use
         if (force) {
@@ -89,42 +89,42 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
         initComponents();
         fillTable((String) comboCategories.getSelectedItem());
         int rowIndex = 0;
-        for(int i = 0; i < portraitModel.getRowCount(); i++) {
-            if(((String) portraitModel.getValueAt(i, 0)).equals(filename)) {
+        for(int i = 0; i < imageTableModel.getRowCount(); i++) {
+            if(((String) imageTableModel.getValueAt(i, 0)).equals(filename)) {
                 rowIndex = i;
                 break;
             }
         }
-        tablePortrait.setRowSelectionInterval(rowIndex, rowIndex);
+        tableImages.setRowSelectionInterval(rowIndex, rowIndex);
         setLocationRelativeTo(parent);
     }
 
     private void initComponents() {
         GridBagConstraints gbc;
 
-        scrPortrait = new JScrollPane();
-        tablePortrait = new JTable();
+        scrImages = new JScrollPane();
+        tableImages = new JTable();
         comboCategories = new JComboBox<String>();
         btnSelect = new JButton();
         btnCancel = new JButton();
         JPanel portraitPanel = new JPanel();
         getContentPane().setLayout(new GridBagLayout());
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PortraitChoiceDialog", new EncodeControl()); //$NON-NLS-1$
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ImageChoiceDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
-        setTitle(resourceMap.getString("Form.title"));
+        setTitle(force ? resourceMap.getString("Force.title") : resourceMap.getString("Portrait.title"));
         portraitPanel.setLayout(new GridBagLayout());
 
-        scrPortrait.setName("jScrollPane1"); // NOI18N
+        scrImages.setName("jScrollPane1"); // NOI18N
 
-        tablePortrait.setModel(portraitModel);
-        tablePortrait.setName("tablePortrait"); // NOI18N
-        tablePortrait.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tablePortrait.setRowHeight(76);
-        tablePortrait.getColumnModel().getColumn(0).setCellRenderer(portraitModel.getRenderer());
-        tablePortrait.addMouseListener(portraitMouseAdapter);
-        scrPortrait.setViewportView(tablePortrait);
+        tableImages.setModel(imageTableModel);
+        tableImages.setName("tablePortrait"); // NOI18N
+        tableImages.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tableImages.setRowHeight(76);
+        tableImages.getColumnModel().getColumn(0).setCellRenderer(imageTableModel.getRenderer());
+        tableImages.addMouseListener(portraitMouseAdapter);
+        scrImages.setViewportView(tableImages);
 
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -134,13 +134,13 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        portraitPanel.add(scrPortrait, gbc);
+        portraitPanel.add(scrImages, gbc);
 
         DefaultComboBoxModel<String> categoryModel = new DefaultComboBoxModel<String>();
         String match = null;
         categoryModel.addElement(Crew.ROOT_PORTRAIT);
-        if (portraits != null) {
-            Iterator<String> names = portraits.getCategoryNames();
+        if (imageItems != null) {
+            Iterator<String> names = imageItems.getCategoryNames();
             while (names.hasNext()) {
                 String name = names.next();
                 if (!"".equals(name)) { //$NON-NLS-1$
@@ -260,9 +260,9 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
 	}
 
 	private void btnSelectActionPerformed(ActionEvent evt) {
-	    category = portraitModel.getCategory();
-	    if(tablePortrait.getSelectedRow() != -1) {
-	        filename = (String) portraitModel.getValueAt(tablePortrait.getSelectedRow(), 0);
+	    category = imageTableModel.getCategory();
+	    if(tableImages.getSelectedRow() != -1) {
+	        filename = (String) imageTableModel.getValueAt(tableImages.getSelectedRow(), 0);
 	    } else {
 	        filename = Crew.PORTRAIT_NONE;
 	    }
@@ -284,30 +284,30 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
     }
 
      private void fillTable(String category) {
-        portraitModel.reset();
-        portraitModel.setCategory(category);
+        imageTableModel.reset();
+        imageTableModel.setCategory(category);
         // Translate the "root camo" category name.
         Iterator<String> portraitNames;
         if (Crew.ROOT_PORTRAIT.equals(category)) {
-            portraitModel.addPortrait(Crew.PORTRAIT_NONE);
-            portraitNames = portraits.getItemNames(""); //$NON-NLS-1$
+            imageTableModel.addPortrait(Crew.PORTRAIT_NONE);
+            portraitNames = imageItems.getItemNames(""); //$NON-NLS-1$
         } else {
-            portraitNames = portraits.getItemNames(category);
+            portraitNames = imageItems.getItemNames(category);
         }
 
         // Get the camo names for this category.
         while (portraitNames.hasNext()) {
-                portraitModel.addPortrait(portraitNames.next());
+                imageTableModel.addPortrait(portraitNames.next());
         }
-        if(portraitModel.getRowCount() > 0) {
-            tablePortrait.setRowSelectionInterval(0, 0);
+        if(imageTableModel.getRowCount() > 0) {
+            tableImages.setRowSelectionInterval(0, 0);
         }
     }
 
      /**
         * A table model for displaying camos
      */
-    public class PortraitTableModel extends AbstractTableModel {
+    public class ImageTableModel extends AbstractTableModel {
 
         /**
 		 *
@@ -318,7 +318,7 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
         private ArrayList<String> names;
         private ArrayList<Image> images;
 
-        public PortraitTableModel() {
+        public ImageTableModel() {
             columnNames = new String[] {"Portraits"};
             category = Crew.ROOT_PORTRAIT;
             names = new ArrayList<String>();
@@ -375,8 +375,8 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
             return false;
         }
 
-        public PortraitTableModel.Renderer getRenderer() {
-            return new PortraitTableModel.Renderer(portraits);
+        public ImageTableModel.Renderer getRenderer() {
+            return new ImageTableModel.Renderer(imageItems);
         }
 
 
@@ -405,16 +405,16 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
        }
     }
 
-    public class PortraitTableMouseAdapter extends MouseInputAdapter {
+    public class ImageTableMouseAdapter extends MouseInputAdapter {
 
         @Override
         public void mouseClicked(MouseEvent evt) {
             if (evt.getClickCount() == 2) {
-                if (tablePortrait.equals(evt.getSource())) {
-                    int row = tablePortrait.rowAtPoint(evt.getPoint());
-                    if(row < portraitModel.getRowCount()) {
-                        category = portraitModel.getCategory();
-                        filename = (String) portraitModel.getValueAt(row, 0);
+                if (tableImages.equals(evt.getSource())) {
+                    int row = tableImages.rowAtPoint(evt.getPoint());
+                    if(row < imageTableModel.getRowCount()) {
+                        category = imageTableModel.getCategory();
+                        filename = (String) imageTableModel.getValueAt(row, 0);
                         setVisible(false);
                     }
                 }

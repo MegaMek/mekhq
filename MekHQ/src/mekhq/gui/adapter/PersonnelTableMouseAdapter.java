@@ -45,7 +45,7 @@ import mekhq.gui.dialog.EditPersonnelInjuriesDialog;
 import mekhq.gui.dialog.EditPersonnelLogDialog;
 import mekhq.gui.dialog.KillDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
-import mekhq.gui.dialog.PortraitChoiceDialog;
+import mekhq.gui.dialog.ImageChoiceDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.utilities.MenuScroller;
@@ -699,7 +699,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 gui.getCampaign().personUpdated(selectedPerson);
                 break;
             case CMD_EDIT_PORTRAIT:
-                PortraitChoiceDialog pcd = new PortraitChoiceDialog(gui.getFrame(),
+                ImageChoiceDialog pcd = new ImageChoiceDialog(gui.getFrame(),
                         true, selectedPerson.getPortraitCategory(),
                         selectedPerson.getPortraitFileName(), gui.getIconPackage()
                                 .getPortraits());

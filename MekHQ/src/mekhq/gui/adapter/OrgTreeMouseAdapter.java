@@ -24,7 +24,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.dialog.PortraitChoiceDialog;
+import mekhq.gui.dialog.ImageChoiceDialog;
 import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.utilities.MenuScroller;
 import mekhq.gui.utilities.StaticChecks;
@@ -181,7 +181,7 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
             gui.refreshOverview();
         } else if (command.contains("CHANGE_ICON")) {
             if (null != singleForce) {
-                PortraitChoiceDialog pcd = new PortraitChoiceDialog(
+                ImageChoiceDialog pcd = new ImageChoiceDialog(
                         gui.getFrame(), true, singleForce.getIconCategory(),
                         singleForce.getIconFileName(), gui.getIconPackage()
                                 .getForceIcons(), true);

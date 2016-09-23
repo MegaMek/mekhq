@@ -2,6 +2,7 @@ VERSION HISTORY
 ----------------------------------
 v0.41.24-git
 + Version matched to MegaMek
++ Refactored PortraitChoiceDialog to be ImageChoiceDialog since it's used for more than one thing
 
 v0.3.33 (2016-09-20 00:07 UTC)
 + Added AtB preset.
