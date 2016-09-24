@@ -137,6 +137,20 @@ public class ResolveScenarioTracker {
 				unitsStatus.put(uid, new UnitStatus(u));
 			}
 		}
+		/*
+		if (s instanceof AtBScenario) {
+			for (UUID uid : ((AtBScenario)s).getAttachedUnitIds()) {
+				TestUnit nu = generateNewTestUnit(((AtBScenario)s).getEntity(uid));
+				alliedUnits.add(nu);
+				unitsStatus.put(uid, new UnitStatus(nu));
+			}
+			for (UUID uid : ((AtBScenario)s).getSurvivalBonusIds()) {
+				TestUnit nu = generateNewTestUnit(((AtBScenario)s).getEntity(uid));
+				alliedUnits.add(nu);
+				unitsStatus.put(uid, new UnitStatus(nu));
+			}
+		}
+		*/
 		unitList = new JFileChooser(".");
 		unitList.setDialogTitle("Load Units");
 
@@ -217,6 +231,12 @@ public class ResolveScenarioTracker {
 			if(e.getOwnerId() == pid) {
 				if(!e.getExternalIdAsString().equals("-1")) {
 					UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
+					if (null == status && scenario instanceof AtBScenario) {
+						TestUnit nu = generateNewTestUnit(e);
+						status = new UnitStatus(nu);
+						unitsStatus.put(nu.getId(), status);
+						alliedUnits.add(nu);
+					}
 					if(null != status) {
 						boolean lost = (!e.canEscape() && !control) || e.getRemovalCondition() == IEntityRemovalConditions.REMOVE_DEVASTATED;
 						status.assignFoundEntity(e, lost);
@@ -234,9 +254,11 @@ public class ResolveScenarioTracker {
 				}
 			} else if(e.getOwner().getTeam() == team) {
 				TestUnit nu = generateNewTestUnit(e);
-				UnitStatus us = new UnitStatus(nu);
-				unitsStatus.put(nu.getId(), us);
+				UnitStatus status = new UnitStatus(nu);
+				unitsStatus.put(nu.getId(), status);
 				alliedUnits.add(nu);
+				boolean lost = (!e.canEscape() && !control) || e.getRemovalCondition() == IEntityRemovalConditions.REMOVE_DEVASTATED;
+				status.assignFoundEntity(e, lost);
 			} else if(e.getOwner().isEnemyOf(client.getLocalPlayer())) {
 				if(control) {
 					// Kill credit automatically assigned only if they can't escape
