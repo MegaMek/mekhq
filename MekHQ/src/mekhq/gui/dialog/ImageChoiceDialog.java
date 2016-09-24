@@ -1,5 +1,5 @@
 /*
- * CamoChoiceDialog.java
+ * ImageChoiceDialog.java
  *
  * Created on October 1, 2009, 3:10 PM
  */
@@ -21,11 +21,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.ResourceBundle;
+import java.util.Vector;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -33,6 +35,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.WindowConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -40,51 +44,90 @@ import javax.swing.table.TableCellRenderer;
 import megamek.common.Crew;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
+import mekhq.IconPackage;
+import mekhq.campaign.force.Force;
 
 /**
  *
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class ImageChoiceDialog extends javax.swing.JDialog {
+public class ImageChoiceDialog extends JDialog {
 
-     /**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-     * The categorized camo patterns.
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+    /**
+     * The categorized image patterns.
      */
     private DirectoryItems imageItems;
     private ImageTableModel imageTableModel = new ImageTableModel();
     private String category;
     private String filename;
-    private LinkedHashMap<String, String> iconMap;
-    private ImageTableMouseAdapter portraitMouseAdapter;
+    private LinkedHashMap<String, Vector<String>> iconMap; // Key = Image Filename, Value = Image Category
+    private ImageTableMouseAdapter imagesMouseAdapter;
     private boolean force = false;
     private JButton btnCancel;
     private JButton btnSelect;
     private JComboBox<String> comboCategories;
     private JScrollPane scrImages;
     private JTable tableImages;
+    
+    // BEGIN: Layered Images Support
+    private ImageIcon imageIcon = null;
+    private JLabel preview = new JLabel();
+    private JTabbedPane tabbedPane = new JTabbedPane();
+    private JTabbedPane layerTabs = new JTabbedPane();
+    private JPanel layerPanel = new JPanel();
+    // Types
+    private JScrollPane scrTypes = new JScrollPane();
+    private JTable tableTypes = new JTable();
+    private JPanel panelTypes = new JPanel();
+    private ImageTableModel typesModel = new ImageTableModel();
+    private String typesCategory = "Pieces/Type/";
+    // Formations
+    private JScrollPane scrFormations = new JScrollPane();
+    private JTable tableFormations = new JTable();
+    private JPanel panelFormations = new JPanel();
+    private ImageTableModel formationsModel = new ImageTableModel();
+    private String formationsCategory = "Pieces/Formations/";
+    // Adjustments
+    private JScrollPane scrAdjustments = new JScrollPane();
+    private JTable tableAdjustments = new JTable();
+    private JPanel panelAdjustments = new JPanel();
+    private ImageTableModel adjustmentsModel = new ImageTableModel();
+    private String adjustmentsCategory = "Pieces/Adjustments/";
+    // Alphanumerics
+    private JScrollPane scrAlphanumerics = new JScrollPane();
+    private JTable tableAlphanumerics = new JTable();
+    private JPanel panelAlphanumerics = new JPanel();
+    private ImageTableModel alphanumericsModel = new ImageTableModel();
+    private String alphanumericsCategory = "Pieces/Alphanumerics/";
+    // Special Modifiers
+    private JScrollPane scrSpecialModifiers = new JScrollPane();
+    private JTable tableSpecialModifiers = new JTable();
+    private JPanel panelSpecialModifiers = new JPanel();
+    private ImageTableModel specialModel = new ImageTableModel();
+    private String specialCategory = "Pieces/Special Modifiers/";
+    // EMD: Layered Images Support
 
-
-    /** Creates new form CamoChoiceDialog */
-    public ImageChoiceDialog(Frame parent, boolean modal, String category, String file, DirectoryItems portraits) {
-        this(parent, modal, category, file, portraits, false);
+    /** Creates new form ImageChoiceDialog */
+    public ImageChoiceDialog(Frame parent, boolean modal, String category, String file, DirectoryItems items) {
+        this(parent, modal, category, file, items, false);
     }
 
 
-    /** Creates new form CamoChoiceDialog */
-    public ImageChoiceDialog(java.awt.Frame parent, boolean modal, String category, String file, DirectoryItems portraits, boolean force) {
+    /** Creates new form ImageChoiceDialog */
+    public ImageChoiceDialog(Frame parent, boolean modal, String category, String file, DirectoryItems items, boolean force) {
         super(parent, modal);
         this.category = category;
         filename = file;
-        portraitMouseAdapter = new ImageTableMouseAdapter();
-        this.imageItems = portraits;
+        imagesMouseAdapter = new ImageTableMouseAdapter();
+        this.imageItems = items;
         this.force = force;
         // If we're doing forces, initialize the hashmap for use
         if (force) {
-            iconMap = new LinkedHashMap<String, String>();
+            iconMap = new LinkedHashMap<String, Vector<String>>();
         }
         initComponents();
         fillTable((String) comboCategories.getSelectedItem());
@@ -107,23 +150,33 @@ public class ImageChoiceDialog extends javax.swing.JDialog {
         comboCategories = new JComboBox<String>();
         btnSelect = new JButton();
         btnCancel = new JButton();
-        JPanel portraitPanel = new JPanel();
+        JPanel imagesPanel = new JPanel();
         getContentPane().setLayout(new GridBagLayout());
 
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ImageChoiceDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(force ? resourceMap.getString("Force.title") : resourceMap.getString("Portrait.title"));
-        portraitPanel.setLayout(new GridBagLayout());
+        imagesPanel.setLayout(new GridBagLayout());
 
-        scrImages.setName("jScrollPane1"); // NOI18N
+        scrImages.setName("scrImages"); // NOI18N
 
         tableImages.setModel(imageTableModel);
-        tableImages.setName("tablePortrait"); // NOI18N
+        tableImages.setName("tableImages"); // NOI18N
         tableImages.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tableImages.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent event) {
+                // Clear selections on the layered tables
+                tableAdjustments.clearSelection();
+                tableAlphanumerics.clearSelection();
+                tableFormations.clearSelection();
+                tableSpecialModifiers.clearSelection();
+                tableTypes.clearSelection();
+            }
+        });
         tableImages.setRowHeight(76);
         tableImages.getColumnModel().getColumn(0).setCellRenderer(imageTableModel.getRenderer());
-        tableImages.addMouseListener(portraitMouseAdapter);
+        tableImages.addMouseListener(imagesMouseAdapter);
         scrImages.setViewportView(tableImages);
 
         gbc = new GridBagConstraints();
@@ -134,7 +187,7 @@ public class ImageChoiceDialog extends javax.swing.JDialog {
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        portraitPanel.add(scrImages, gbc);
+        imagesPanel.add(scrImages, gbc);
 
         DefaultComboBoxModel<String> categoryModel = new DefaultComboBoxModel<String>();
         String match = null;
@@ -169,39 +222,141 @@ public class ImageChoiceDialog extends javax.swing.JDialog {
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.weightx = 1.0;
-        portraitPanel.add(comboCategories, gbc);
-        
+        imagesPanel.add(comboCategories, gbc);
+
         if (force) {
-            JTabbedPane tabbedPane = new JTabbedPane();
-            JPanel layeredPanel = new JPanel();
+            // Background setup for the layered options
+            gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            gbc.gridwidth = 3;
+            gbc.fill = GridBagConstraints.BOTH;
+            gbc.anchor = GridBagConstraints.NORTHWEST;
+            gbc.weightx = 1.0;
+            gbc.weighty = 1.0;
 
-            // Panel for Types (Frames are autoselected based on needs of the complete image)
-            JScrollPane scrTypes = new JScrollPane();
-            JTable tableTypes = new JTable();
-            JPanel panelTypes = new JPanel();
+            // Panel for Types
+            tableTypes.setModel(typesModel);
+            tableTypes.setName("tableTypes"); // NOI18N
+            tableTypes.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            tableTypes.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+                public void valueChanged(ListSelectionEvent event) {
+                    refreshLayeredPreview();
+                }
+            });
+            tableTypes.setRowHeight(76);
+            tableTypes.getColumnModel().getColumn(0).setCellRenderer(typesModel.getRenderer());
+            tableTypes.addMouseListener(new ImageTableMouseAdapter());
+            scrTypes.setViewportView(tableTypes);
+            panelTypes.add(scrTypes, gbc);
+            typesModel.reset();
+            typesModel.setCategory(typesCategory);
+            Iterator<String> imageNames = imageItems.getItemNames(typesCategory);
+            while (imageNames.hasNext()) {
+                typesModel.addImage(imageNames.next());
+            }
+            layerTabs.addTab(resourceMap.getString("Force.types"), panelTypes);
 
-            // Panel for Formations (Frames are autoselected based on needs of the complete image)
-            JScrollPane scrFormations = new JScrollPane();
-            JTable tableFormations = new JTable();
-            JPanel panelFormations = new JPanel();
+            // Panel for Formations
+            tableFormations.setModel(formationsModel);
+            tableFormations.setName("tableFormations"); // NOI18N
+            tableFormations.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            tableFormations.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+                public void valueChanged(ListSelectionEvent event) {
+                    refreshLayeredPreview();
+                }
+            });
+            tableFormations.setRowHeight(76);
+            tableFormations.getColumnModel().getColumn(0).setCellRenderer(formationsModel.getRenderer());
+            tableFormations.addMouseListener(new ImageTableMouseAdapter());
+            scrFormations.setViewportView(tableFormations);
+            panelFormations.add(scrFormations, gbc);
+            formationsModel.reset();
+            formationsModel.setCategory(formationsCategory);
+            Iterator<String> imageNamesTypes = imageItems.getItemNames(formationsCategory);
+            while (imageNamesTypes.hasNext()) {
+                formationsModel.addImage(imageNamesTypes.next());
+            }
+            layerTabs.addTab(resourceMap.getString("Force.formations"), panelFormations);
 
-            // Panel for Adjustments (Frames are autoselected based on needs of the complete image)
-            JScrollPane scrAdjustments = new JScrollPane();
-            JTable tableAdjustments = new JTable();
-            JPanel panelAdjustments = new JPanel();
+            // Panel for Adjustments
+            tableAdjustments.setModel(adjustmentsModel);
+            tableAdjustments.setName("tableAdjustments"); // NOI18N
+            tableAdjustments.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+            tableAdjustments.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+                public void valueChanged(ListSelectionEvent event) {
+                    refreshLayeredPreview();
+                }
+            });
+            tableAdjustments.setRowHeight(76);
+            tableAdjustments.getColumnModel().getColumn(0).setCellRenderer(adjustmentsModel.getRenderer());
+            tableAdjustments.addMouseListener(new ImageTableMouseAdapter());
+            scrAdjustments.setViewportView(tableAdjustments);
+            panelAdjustments.add(scrAdjustments, gbc);
+            adjustmentsModel.reset();
+            adjustmentsModel.setCategory(adjustmentsCategory);
+            Iterator<String> imageNamesAdjustments = imageItems.getItemNames(adjustmentsCategory);
+            while (imageNamesAdjustments.hasNext()) {
+                adjustmentsModel.addImage(imageNamesAdjustments.next());
+            }
+            layerTabs.addTab(resourceMap.getString("Force.adjustments"), panelAdjustments);
 
-            // Panel for Alphanumerics (Frames are autoselected based on needs of the complete image)
-            JScrollPane scrAlphanumerics = new JScrollPane();
-            JTable tableAlphanumerics = new JTable();
-            JPanel panelAlphanumerics = new JPanel();
+            // Panel for Alphanumerics
+            tableAlphanumerics.setModel(alphanumericsModel);
+            tableAlphanumerics.setName("tableAalphanumerics"); // NOI18N
+            tableAlphanumerics.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            tableAlphanumerics.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+                public void valueChanged(ListSelectionEvent event) {
+                    refreshLayeredPreview();
+                }
+            });
+            tableAlphanumerics.setRowHeight(76);
+            tableAlphanumerics.getColumnModel().getColumn(0).setCellRenderer(alphanumericsModel.getRenderer());
+            tableAlphanumerics.addMouseListener(new ImageTableMouseAdapter());
+            scrAlphanumerics.setViewportView(tableAlphanumerics);
+            panelAlphanumerics.add(scrAlphanumerics, gbc);
+            alphanumericsModel.reset();
+            alphanumericsModel.setCategory(alphanumericsCategory);
+            Iterator<String> imageNamesAlphanumerics = imageItems.getItemNames(alphanumericsCategory);
+            while (imageNamesAlphanumerics.hasNext()) {
+                alphanumericsModel.addImage(imageNamesAlphanumerics.next());
+            }
+            layerTabs.addTab(resourceMap.getString("Force.alphanumerics"), panelAlphanumerics);
 
-            // Panel for SpecialModifiers (Frames are autoselected based on needs of the complete image)
-            JScrollPane scrSpecialModifiers = new JScrollPane();
-            JTable tableSpecialModifiers = new JTable();
-            JPanel panelSpecialModifiers = new JPanel();
+            // Panel for SpecialModifiers
+            tableSpecialModifiers.setModel(specialModel);
+            tableSpecialModifiers.setName("tableSpecialModifiers"); // NOI18N
+            tableSpecialModifiers.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+            tableSpecialModifiers.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+                public void valueChanged(ListSelectionEvent event) {
+                    refreshLayeredPreview();
+                }
+            });
+            tableSpecialModifiers.setRowHeight(76);
+            tableSpecialModifiers.getColumnModel().getColumn(0).setCellRenderer(specialModel.getRenderer());
+            tableSpecialModifiers.addMouseListener(new ImageTableMouseAdapter());
+            scrSpecialModifiers.setViewportView(tableSpecialModifiers);
+            panelSpecialModifiers.add(scrSpecialModifiers, gbc);
+            specialModel.reset();
+            specialModel.setCategory(specialCategory);
+            Iterator<String> imageNamesSpecial = imageItems.getItemNames(specialCategory);
+            while (imageNamesSpecial.hasNext()) {
+                specialModel.addImage(imageNamesSpecial.next());
+            }
+            layerTabs.addTab(resourceMap.getString("Force.special"), panelSpecialModifiers);
+            
+            // Put it all together nice and pretty on the layerPanel
+            layerPanel.add(layerTabs, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 1;
+            gbc.gridwidth = 1;
+            gbc.fill = GridBagConstraints.NONE;
+            gbc.anchor = GridBagConstraints.SOUTH;
+            layerPanel.add(preview, gbc);
 
-            tabbedPane.addTab("Single Portrait", portraitPanel);
-            tabbedPane.addTab("Layered Portrait", layeredPanel);
+            // Add single and layered options to the dialog
+            tabbedPane.addTab(resourceMap.getString("Force.single"), imagesPanel);
+            tabbedPane.addTab(resourceMap.getString("Force.layered"), layerPanel);
 
             // Add the tabbed pane to the content pane
             gbc = new GridBagConstraints();
@@ -214,7 +369,7 @@ public class ImageChoiceDialog extends javax.swing.JDialog {
             gbc.anchor = GridBagConstraints.NORTHWEST;
             getContentPane().add(tabbedPane, gbc);
         } else {
-            // Add the portrait panel to the content pane
+            // Add the image panel to the content pane
             gbc = new GridBagConstraints();
             gbc.gridx = 0;
             gbc.gridy = 0;
@@ -223,7 +378,7 @@ public class ImageChoiceDialog extends javax.swing.JDialog {
             gbc.gridwidth = 2;
             gbc.fill = GridBagConstraints.BOTH;
             gbc.anchor = GridBagConstraints.NORTHWEST;
-            getContentPane().add(portraitPanel, gbc);
+            getContentPane().add(imagesPanel, gbc);
         }
 
         btnSelect.setText(resourceMap.getString("btnSelect.text")); // NOI18N
@@ -237,7 +392,7 @@ public class ImageChoiceDialog extends javax.swing.JDialog {
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.weightx = 0.5;
-        portraitPanel.add(btnSelect, gbc);
+        getContentPane().add(btnSelect, gbc);
 
         btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
@@ -250,30 +405,30 @@ public class ImageChoiceDialog extends javax.swing.JDialog {
         gbc.gridx = 1;
         gbc.gridy = 2;
         gbc.weightx = 0.5;
-        portraitPanel.add(btnCancel, gbc);
+        getContentPane().add(btnCancel, gbc);
 
         pack();
     }
 
-	private void btnCancelActionPerformed(ActionEvent evt) {
-	    setVisible(false);
-	}
+    private void btnCancelActionPerformed(ActionEvent evt) {
+        setVisible(false);
+    }
 
-	private void btnSelectActionPerformed(ActionEvent evt) {
-	    category = imageTableModel.getCategory();
-	    if(tableImages.getSelectedRow() != -1) {
-	        filename = (String) imageTableModel.getValueAt(tableImages.getSelectedRow(), 0);
-	    } else {
-	        filename = Crew.PORTRAIT_NONE;
-	    }
-	    setVisible(false);
-	}
+    private void btnSelectActionPerformed(ActionEvent evt) {
+        category = imageTableModel.getCategory();
+        if(tableImages.getSelectedRow() != -1) {
+            filename = (String) imageTableModel.getValueAt(tableImages.getSelectedRow(), 0);
+        } else {
+            filename = Crew.PORTRAIT_NONE;
+        }
+        setVisible(false);
+    }
 
-	private void comboCategoriesItemStateChanged(ItemEvent evt) {
-	    if (evt.getStateChange() == ItemEvent.SELECTED) {
-	        fillTable((String) evt.getItem());
-	    }
-	}//GEN-LAST:event_comboCategoriesItemStateChanged
+    private void comboCategoriesItemStateChanged(ItemEvent evt) {
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
+            fillTable((String) evt.getItem());
+        }
+    }//GEN-LAST:event_comboCategoriesItemStateChanged
 
     public String getCategory() {
         return category;
@@ -283,43 +438,126 @@ public class ImageChoiceDialog extends javax.swing.JDialog {
         return filename;
     }
 
-     private void fillTable(String category) {
+    /**
+     * @return the iconMap
+     */
+    public LinkedHashMap<String, Vector<String>> getIconMap() {
+        return iconMap;
+    }
+
+    /**
+     * @param iconMap the iconMap to set
+     */
+    public void setIconMap(LinkedHashMap<String, Vector<String>> iconMap) {
+        this.iconMap = iconMap;
+    }
+    
+    private void refreshLayeredPreview() {
+        // Add the image frame
+        if (iconMap.isEmpty()) {
+            Vector<String> frameVector = new Vector<String>();
+            frameVector.add("Frame.png");
+            iconMap.put("Pieces/Frames/", frameVector);
+        }
+        // Check each table for what is, or is not, selected
+        Vector<String> tmp;
+        if (tableAdjustments.getSelectedRow() == -1) {
+            iconMap.remove(adjustmentsCategory, iconMap.get(adjustmentsCategory));
+        } else {
+            tmp = new Vector<String>();
+            for (int index : tableAdjustments.getSelectedRows()) {
+                tmp.add((String) tableAdjustments.getValueAt(index, 0));
+                iconMap.put(adjustmentsCategory, tmp);
+            }
+        }
+        if (tableAlphanumerics.getSelectedRow() == -1) {
+            iconMap.remove(alphanumericsCategory, iconMap.get(alphanumericsCategory));
+        } else {
+            tmp = new Vector<String>();
+            for (int index : tableAlphanumerics.getSelectedRows()) {
+                tmp.add((String) tableAlphanumerics.getValueAt(index, 0));
+                iconMap.put(alphanumericsCategory, tmp);
+            }
+        }
+        if (tableFormations.getSelectedRow() == -1) {
+            iconMap.remove(formationsCategory, iconMap.get(formationsCategory));
+        } else {
+            tmp = new Vector<String>();
+            for (int index : tableFormations.getSelectedRows()) {
+                tmp.add((String) tableFormations.getValueAt(index, 0));
+                iconMap.put(formationsCategory, tmp);
+            }
+        }
+        if (tableSpecialModifiers.getSelectedRow() == -1) {
+            iconMap.remove(specialCategory, iconMap.get(specialCategory));
+        } else {
+            tmp = new Vector<String>();
+            for (int index : tableSpecialModifiers.getSelectedRows()) {
+                tmp.add((String) tableSpecialModifiers.getValueAt(index, 0));
+                iconMap.put(specialCategory, tmp);
+            }
+        }
+        if (tableTypes.getSelectedRow() == -1) {
+            iconMap.remove(typesCategory, iconMap.get(typesCategory));
+        } else {
+            tmp = new Vector<String>();
+            for (int index : tableTypes.getSelectedRows()) {
+                tmp.add((String) tableTypes.getValueAt(index, 0));
+                iconMap.put(typesCategory, tmp);
+            }
+        }
+        // Set the category to layered
+        category = Force.ROOT_LAYERED;
+        filename = Force.ICON_NONE;
+        // Build the layered image
+        imageIcon = IconPackage.buildLayeredIcon(category, filename, imageItems, iconMap);
+        // Disable selection of a static icon
+        tableImages.clearSelection();
+        // Update the preview
+        if (null == imageIcon) {
+            preview.setText("");
+        }
+        preview.setIcon(imageIcon);
+        preview.validate();
+    }
+
+    private void fillTable(String category) {
         imageTableModel.reset();
         imageTableModel.setCategory(category);
-        // Translate the "root camo" category name.
-        Iterator<String> portraitNames;
+        // Translate the "root image" category name.
+        Iterator<String> imageNames;
         if (Crew.ROOT_PORTRAIT.equals(category)) {
-            imageTableModel.addPortrait(Crew.PORTRAIT_NONE);
-            portraitNames = imageItems.getItemNames(""); //$NON-NLS-1$
+            imageTableModel.addImage(Crew.PORTRAIT_NONE);
+            imageNames = imageItems.getItemNames(""); //$NON-NLS-1$
         } else {
-            portraitNames = imageItems.getItemNames(category);
+            imageNames = imageItems.getItemNames(category);
         }
 
-        // Get the camo names for this category.
-        while (portraitNames.hasNext()) {
-                imageTableModel.addPortrait(portraitNames.next());
+        // Get the image names for this category.
+        while (imageNames.hasNext()) {
+            imageTableModel.addImage(imageNames.next());
         }
         if(imageTableModel.getRowCount() > 0) {
             tableImages.setRowSelectionInterval(0, 0);
         }
     }
 
-     /**
-        * A table model for displaying camos
+    /**
+     * A table model for displaying images
      */
     public class ImageTableModel extends AbstractTableModel {
 
         /**
-		 *
-		 */
-		private static final long serialVersionUID = 1L;
-		private String[] columnNames;
+         *
+         */
+        private static final long serialVersionUID = 1L;
+        private String[] columnNames;
         private String category;
         private ArrayList<String> names;
         private ArrayList<Image> images;
 
         public ImageTableModel() {
-            columnNames = new String[] {"Portraits"};
+            columnNames = new String[] {"Images"};
             category = Crew.ROOT_PORTRAIT;
             names = new ArrayList<String>();
             images = new ArrayList<Image>();
@@ -360,7 +598,7 @@ public class ImageChoiceDialog extends javax.swing.JDialog {
             return category;
         }
 
-        public void addPortrait(String name) {
+        public void addImage(String name) {
             names.add(name);
             fireTableDataChanged();
         }
@@ -380,15 +618,15 @@ public class ImageChoiceDialog extends javax.swing.JDialog {
         }
 
 
-        public class Renderer extends PortraitPanel implements TableCellRenderer {
+        public class Renderer extends ImagePanel implements TableCellRenderer {
 
-        	public Renderer(DirectoryItems portraits) {
-				super(portraits);
-			}
+            public Renderer(DirectoryItems images) {
+                super(images);
+            }
 
-			private static final long serialVersionUID = -6025788865509594987L;
+            private static final long serialVersionUID = -6025788865509594987L;
 
-			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = this;
                 setOpaque(true);
                 String name = getValueAt(row, column).toString();
@@ -402,7 +640,7 @@ public class ImageChoiceDialog extends javax.swing.JDialog {
 
                 return c;
             }
-       }
+        }
     }
 
     public class ImageTableMouseAdapter extends MouseInputAdapter {
@@ -422,17 +660,17 @@ public class ImageChoiceDialog extends javax.swing.JDialog {
         }
     }
 
-    public class PortraitPanel extends JPanel {
+    public class ImagePanel extends JPanel {
 
         /**
-    	 *
-    	 */
-    	private static final long serialVersionUID = -3724175393116586310L;
-    	private DirectoryItems portraits;
+         *
+         */
+        private static final long serialVersionUID = -3724175393116586310L;
+        private DirectoryItems items;
 
-        /** Creates new form CamoPanel */
-        public PortraitPanel(DirectoryItems portraits) {
-            this.portraits = portraits;
+        /** Creates new form ImagePanel */
+        public ImagePanel(DirectoryItems items) {
+            this.items = items;
             initComponents();
         }
 
@@ -466,16 +704,16 @@ public class ImageChoiceDialog extends javax.swing.JDialog {
                 return;
             }
 
-            // Try to get the portrait file.
+            // Try to get the image file.
             try {
-                // Translate the root portrait directory name.
+                // Translate the root image directory name.
                 if (Crew.ROOT_PORTRAIT.equals(category))
                     category = ""; //$NON-NLS-1$
-                Image portrait = (Image) portraits.getItem(category, name);
-                if(null != portrait) {
-                    portrait = portrait.getScaledInstance(-1, 76, Image.SCALE_DEFAULT);
+                Image image = (Image) items.getItem(category, name);
+                if(null != image) {
+                    image = image.getScaledInstance(-1, 76, Image.SCALE_DEFAULT);
                 }
-                lblImage.setIcon(new ImageIcon(portrait));
+                lblImage.setIcon(new ImageIcon(image));
             } catch (Exception err) {
                 err.printStackTrace();
             }

@@ -188,6 +188,7 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 pcd.setVisible(true);
                 singleForce.setIconCategory(pcd.getCategory());
                 singleForce.setIconFileName(pcd.getFileName());
+                singleForce.setIconMap(pcd.getIconMap());
                 gui.refreshOrganization();
             }
         } else if (command.contains("CHANGE_NAME")) {

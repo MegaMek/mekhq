@@ -339,6 +339,10 @@ public class Force implements Serializable {
     public LinkedHashMap<String, Vector<String>> getIconMap() {
         return iconMap;
     }
+    
+    public void setIconMap(LinkedHashMap<String, Vector<String>> iconMap) {
+        this.iconMap = iconMap;
+    }
 
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<force id=\""
