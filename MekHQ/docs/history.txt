@@ -2,6 +2,7 @@ VERSION HISTORY
 ----------------------------------
 v0.41.24-git
 + Version matched to MegaMek
++ Issue #33 [AtB]: All allied units are marked as total loss after battle even if undamaged
 
 v0.3.33 (2016-09-20 00:07 UTC)
 + Added AtB preset.

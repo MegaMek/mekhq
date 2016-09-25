@@ -307,6 +307,12 @@ public class ResolveScenarioTracker {
             if(e.getOwnerId() == pid) {
             	if(!e.getExternalIdAsString().equals("-1")) {
             	    UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
+					if (null == status && scenario instanceof AtBScenario) {
+						TestUnit nu = generateNewTestUnit(e);
+						status = new UnitStatus(nu);
+						unitsStatus.put(nu.getId(), status);
+						alliedUnits.add(nu);
+					}
                     if(null != status) {
                         status.assignFoundEntity(e, false);
 					}
