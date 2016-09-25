@@ -9,6 +9,7 @@ package mekhq.gui.view;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
+import java.util.LinkedHashMap;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -24,6 +25,7 @@ import javax.swing.tree.TreePath;
 import megamek.common.Crew;
 import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
 import mekhq.campaign.mission.Loot;
@@ -295,20 +297,20 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
         
         protected Icon getIconFrom(UnitStub unit) {
         	String category = unit.getPortraitCategory();
-        	String file = unit.getPortraitFileName();
+        	String filename = unit.getPortraitFileName();
         	
         	if(Crew.ROOT_PORTRAIT.equals(category)) {
         		category = "";
         	}
         	
         	// Return a null if the player has selected no portrait file.
-        	if ((null == category) || (null == file) || Crew.PORTRAIT_NONE.equals(file)) {
-        		file = "default.gif";
+        	if ((null == category) || (null == filename) || Crew.PORTRAIT_NONE.equals(filename)) {
+        		filename = "default.gif";
         	}
         	// Try to get the player's portrait file.
             Image portrait = null;
             try {
-                portrait = (Image) icons.getPortraits().getItem(category, file);
+                portrait = (Image) icons.getPortraits().getItem(category, filename);
                 if(null != portrait) {
                     portrait = portrait.getScaledInstance(50, -1, Image.SCALE_DEFAULT);               
                 } else {
@@ -326,21 +328,22 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
         
         protected Icon getIconFrom(ForceStub force) {
             String category = force.getIconCategory();
-            String file = force.getIconFileName();
+            String filename = force.getIconFileName();
+            LinkedHashMap<String, Vector<String>> iconMap = force.getIconMap();
 
             if(Crew.ROOT_PORTRAIT.equals(category)) {
            	 category = "";
             }
 
             // Return a null if the player has selected no portrait file.
-            if ((null == category) || (null == file) || Crew.PORTRAIT_NONE.equals(file)) {
-           	 file = "empty.png";
+            if ((null == category) || (null == filename) || (Crew.PORTRAIT_NONE.equals(filename) && !Force.ROOT_LAYERED.equals(category))) {
+           	 filename = "empty.png";
             }
 
             // Try to get the player's portrait file.
             Image portrait = null;
             try {
-           	 portrait = (Image) icons.getForceIcons().getItem(category, file);
+           	 portrait = IconPackage.buildForceIcon(category, filename, icons.getForceIcons(), iconMap);
            	if(null != portrait) {
                 portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
             } else {

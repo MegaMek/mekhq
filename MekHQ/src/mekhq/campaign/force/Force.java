@@ -362,7 +362,7 @@ public class Force implements Serializable {
                 +"<iconCategory>"
                 +MekHqXmlUtil.escape(iconCategory)
                 +"</iconCategory>");
-        if (iconCategory.equals(ROOT_LAYERED)) {
+        if (iconCategory.equals(Force.ROOT_LAYERED)) {
             pw1.println(MekHqXmlUtil.indentStr(indent+1)
                     +"<iconHashMap>");
             for (Map.Entry<String, Vector<String>> entry : iconMap.entrySet()) {
@@ -517,16 +517,6 @@ public class Force implements Serializable {
             }
             retVal.iconMap.put(key, values);
         }
-    /*if (iconCategory.equals(ROOT_LAYERED)) {
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<iconHashMap>");
-        for(Map.Entry<String, String> entry : iconMap.entrySet()) {
-            pw1.println(MekHqXmlUtil.indentStr(indent+2)
-                    +"<iconentry key=\"" + MekHqXmlUtil.escape(entry.getKey()) + "\" val=\""+ MekHqXmlUtil.escape(entry.getValue()) +"\"/>");
-        }
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"</iconHashMap>");
-    }*/
     }
     
     private static Vector<String> processIconMapSubNodes(Node wn, Version version) {

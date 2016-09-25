@@ -1,6 +1,6 @@
 package mekhq;
 
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
@@ -12,8 +12,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Vector;
-
-import javax.swing.ImageIcon;
 
 import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.util.ImageFileFactory;
@@ -111,8 +109,8 @@ public class IconPackage {
         return guiElements.get(key);
     }
     
-    public static ImageIcon buildLayeredIcon(String category, String filename, DirectoryItems items, LinkedHashMap<String, Vector<String>> iconMap) {
-        ImageIcon retVal = null;
+    public static Image buildForceIcon(String category, String filename, DirectoryItems items, LinkedHashMap<String, Vector<String>> iconMap) {
+        Image retVal = null;
         
         if(Crew.ROOT_PORTRAIT.equals(category)) {
             category = "";
@@ -129,7 +127,7 @@ public class IconPackage {
                     .getLocalGraphicsEnvironment().getDefaultScreenDevice()
                     .getDefaultConfiguration();
             BufferedImage base = null;
-            Graphics g2d = null;
+            Graphics2D g2d = null;
             BufferedImage tmp = null;
             try {
                 // Draw the frame, as needed
@@ -143,7 +141,7 @@ public class IconPackage {
                             base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
 
                             // Get our Graphics to draw on
-                            g2d = base.getGraphics();
+                            g2d = base.createGraphics();
                         }
                         
                         // Resize the base if this image is larger than the current base image
@@ -152,7 +150,7 @@ public class IconPackage {
                             base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
 
                             // Get our Graphics to draw on
-                            g2d = base.getGraphics();
+                            g2d = base.createGraphics();
                             
                             // Draw the old base onto the new base, aligning bottom right
                             g2d.drawImage(base, base.getWidth() - oldBase.getWidth(), base.getHeight() - oldBase.getHeight(), null);
@@ -174,7 +172,7 @@ public class IconPackage {
                             base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
 
                             // Get our Graphics to draw on
-                            g2d = base.getGraphics();
+                            g2d = base.createGraphics();
                         }
                         
                         // Resize the base if this image is larger than the current base image
@@ -183,7 +181,7 @@ public class IconPackage {
                             base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
 
                             // Get our Graphics to draw on
-                            g2d = base.getGraphics();
+                            g2d = base.createGraphics();
                             
                             // Draw the old base onto the new base, aligning bottom right
                             g2d.drawImage(base, base.getWidth() - oldBase.getWidth(), base.getHeight() - oldBase.getHeight(), null);
@@ -205,7 +203,7 @@ public class IconPackage {
                             base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
 
                             // Get our Graphics to draw on
-                            g2d = base.getGraphics();
+                            g2d = base.createGraphics();
                         }
                         
                         // Resize the base if this image is larger than the current base image
@@ -214,7 +212,7 @@ public class IconPackage {
                             base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
 
                             // Get our Graphics to draw on
-                            g2d = base.getGraphics();
+                            g2d = base.createGraphics();
                             
                             // Draw the old base onto the new base, aligning bottom right
                             g2d.drawImage(base, base.getWidth() - oldBase.getWidth(), base.getHeight() - oldBase.getHeight(), null);
@@ -236,7 +234,7 @@ public class IconPackage {
                             base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
 
                             // Get our Graphics to draw on
-                            g2d = base.getGraphics();
+                            g2d = base.createGraphics();
                         }
                         
                         // Resize the base if this image is larger than the current base image
@@ -245,7 +243,7 @@ public class IconPackage {
                             base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
 
                             // Get our Graphics to draw on
-                            g2d = base.getGraphics();
+                            g2d = base.createGraphics();
                             
                             // Draw the old base onto the new base, aligning bottom right
                             g2d.drawImage(base, base.getWidth() - oldBase.getWidth(), base.getHeight() - oldBase.getHeight(), null);
@@ -267,7 +265,7 @@ public class IconPackage {
                             base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
 
                             // Get our Graphics to draw on
-                            g2d = base.getGraphics();
+                            g2d = base.createGraphics();
                         }
                         
                         // Resize the base if this image is larger than the current base image
@@ -276,7 +274,7 @@ public class IconPackage {
                             base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
 
                             // Get our Graphics to draw on
-                            g2d = base.getGraphics();
+                            g2d = base.createGraphics();
                             
                             // Draw the old base onto the new base, aligning bottom right
                             g2d.drawImage(base, base.getWidth() - oldBase.getWidth(), base.getHeight() - oldBase.getHeight(), null);
@@ -298,7 +296,7 @@ public class IconPackage {
                             base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
 
                             // Get our Graphics to draw on
-                            g2d = base.getGraphics();
+                            g2d = base.createGraphics();
                         }
                         
                         // Resize the base if this image is larger than the current base image
@@ -307,7 +305,7 @@ public class IconPackage {
                             base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
 
                             // Get our Graphics to draw on
-                            g2d = base.getGraphics();
+                            g2d = base.createGraphics();
                             
                             // Draw the old base onto the new base, aligning bottom right
                             g2d.drawImage(base, base.getWidth() - oldBase.getWidth(), base.getHeight() - oldBase.getHeight(), null);
@@ -330,7 +328,7 @@ public class IconPackage {
                                 base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
 
                                 // Get our Graphics to draw on
-                                g2d = base.getGraphics();
+                                g2d = base.createGraphics();
                             }
                             
                             // Resize the base if this image is larger than the current base image
@@ -339,7 +337,7 @@ public class IconPackage {
                                 base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
 
                                 // Get our Graphics to draw on
-                                g2d = base.getGraphics();
+                                g2d = base.createGraphics();
                                 
                                 // Draw the old base onto the new base, aligning bottom right
                                 g2d.drawImage(base, base.getWidth() - oldBase.getWidth(), base.getHeight() - oldBase.getHeight(), null);
@@ -363,26 +361,20 @@ public class IconPackage {
                         e.printStackTrace();
                     }
                 }
-                Image finalImage = null;
-                if(null != base) {
-                    finalImage = base.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
-                }
-                retVal = new ImageIcon(finalImage);
+                retVal = base;
             }
         } else { // Standard force icon
             // Try to get the player's force icon file.
             Image scaledImage = null;
             try {
                 scaledImage = (Image) items.getItem(category, filename);
-                if(null != scaledImage) {
-                    scaledImage = scaledImage.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
-                } else {
+                if(null == scaledImage) {
                     scaledImage = (Image) items.getItem("", "empty.png");
                     if(null != scaledImage) {
                         scaledImage = scaledImage.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
                     }
                 }
-                retVal = new ImageIcon(scaledImage);
+                retVal = scaledImage;
             } catch (Exception err) {
                 err.printStackTrace();
             }

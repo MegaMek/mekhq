@@ -147,20 +147,20 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             return null;
         }
         String category = person.getPortraitCategory();
-        String file = person.getPortraitFileName();
+        String filename = person.getPortraitFileName();
 
         if(Crew.ROOT_PORTRAIT.equals(category)) {
             category = "";
         }
 
         // Return a null if the unit has no selected portrait file.
-        if ((null == category) || (null == file) || Crew.PORTRAIT_NONE.equals(file)) {
-            file = "default.gif";
+        if ((null == category) || (null == filename) || Crew.PORTRAIT_NONE.equals(filename)) {
+            filename = "default.gif";
         }
         // Try to get the unit's portrait file.
         Image portrait = null;
         try {
-            portrait = (Image) getIconPackage().getPortraits().getItem(category, file);
+            portrait = (Image) getIconPackage().getPortraits().getItem(category, filename);
             if(null != portrait) {
                 portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
             } else {
@@ -177,6 +177,10 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
     }
 
     protected Icon getIconFrom(Force force) {
-        return IconPackage.buildLayeredIcon(force.getIconCategory(), force.getIconFileName(), getIconPackage().getForceIcons(), force.getIconMap());
+        Image forceImage = IconPackage.buildForceIcon(force.getIconCategory(), force.getIconFileName(), getIconPackage().getForceIcons(), force.getIconMap());
+        if(null != forceImage) {
+            forceImage = forceImage.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
+        }
+        return new ImageIcon(forceImage);
     }
 }

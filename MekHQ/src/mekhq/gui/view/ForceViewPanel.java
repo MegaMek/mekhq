@@ -13,8 +13,10 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.ResourceBundle;
 import java.util.UUID;
+import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -145,23 +147,24 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		add(txtDesc, gridBagConstraints);
 	}
 	
-	private void setIcon(Force f, JLabel lbl, int scale) {
-        String category = f.getIconCategory();
-        String file = f.getIconFileName();
+	private void setIcon(Force force, JLabel lbl, int scale) {
+        String category = force.getIconCategory();
+        String filename = force.getIconFileName();
+        LinkedHashMap<String, Vector<String>> iconMap = force.getIconMap();
 
         if(Crew.ROOT_PORTRAIT.equals(category)) {
             category = "";
         }
 
         // Return a null if the player has selected no portrait file.
-        if ((null == category) || (null == file) || Crew.PORTRAIT_NONE.equals(file)) {
-        	file = "empty.png";
+        if ((null == category) || (null == filename) || (Crew.PORTRAIT_NONE.equals(filename) && !Force.ROOT_LAYERED.equals(category))) {
+        	filename = "empty.png";
         }
 
         // Try to get the player's portrait file.
         Image portrait = null;        
         try {
-            portrait = (Image) icons.getForceIcons().getItem(category, file);
+            portrait = IconPackage.buildForceIcon(category, filename, icons.getForceIcons(), iconMap);
             if(null != portrait) {
             	if(portrait.getWidth(lbl) > scale) { 
             		portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_DEFAULT);  
@@ -496,21 +499,21 @@ public class ForceViewPanel extends javax.swing.JPanel {
     public void setPortrait(Person p, JLabel lbl) {
 
         String category = p.getPortraitCategory();
-        String file = p.getPortraitFileName();
+        String filename = p.getPortraitFileName();
 
         if(Crew.ROOT_PORTRAIT.equals(category)) {
             category = "";
         }
 
         // Return a null if the player has selected no portrait file.
-        if ((null == category) || (null == file) || Crew.PORTRAIT_NONE.equals(file)) {
-        	file = "default.gif";
+        if ((null == category) || (null == filename) || Crew.PORTRAIT_NONE.equals(filename)) {
+        	filename = "default.gif";
         }
 
         // Try to get the player's portrait file.
         Image portrait = null;
         try {
-            portrait = (Image) icons.getPortraits().getItem(category, file);
+            portrait = (Image) icons.getPortraits().getItem(category, filename);
             if(null != portrait) {
                 portrait = portrait.getScaledInstance(72, -1, Image.SCALE_DEFAULT);               
             } else {

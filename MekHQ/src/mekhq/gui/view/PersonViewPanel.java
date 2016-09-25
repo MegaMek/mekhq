@@ -228,21 +228,21 @@ public class PersonViewPanel extends javax.swing.JPanel {
     public void setPortrait() {
 
         String category = person.getPortraitCategory();
-        String file = person.getPortraitFileName();
+        String filename = person.getPortraitFileName();
 
         if(Crew.ROOT_PORTRAIT.equals(category)) {
             category = ""; //$NON-NLS-1$
         }
 
         // Return a null if the player has selected no portrait file.
-        if ((null == category) || (null == file) || Crew.PORTRAIT_NONE.equals(file)) {
-            file = "default.gif"; //$NON-NLS-1$
+        if ((null == category) || (null == filename) || Crew.PORTRAIT_NONE.equals(filename)) {
+            filename = "default.gif"; //$NON-NLS-1$
         }
 
         // Try to get the player's portrait file.
         Image portrait = null;
         try {
-            portrait = (Image) portraits.getItem(category, file);
+            portrait = (Image) portraits.getItem(category, filename);
             if(null != portrait) {
                 portrait = portrait.getScaledInstance(100, -1, Image.SCALE_DEFAULT);
             } else {

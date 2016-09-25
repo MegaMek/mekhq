@@ -64,7 +64,7 @@ public class ImageChoiceDialog extends JDialog {
     private ImageTableModel imageTableModel = new ImageTableModel();
     private String category;
     private String filename;
-    private LinkedHashMap<String, Vector<String>> iconMap; // Key = Image Filename, Value = Image Category
+    private LinkedHashMap<String, Vector<String>> iconMap; // Key = Image Category, Value = Vector of Image Filenames 
     private ImageTableMouseAdapter imagesMouseAdapter;
     private boolean force = false;
     private JButton btnCancel;
@@ -504,7 +504,8 @@ public class ImageChoiceDialog extends JDialog {
         category = Force.ROOT_LAYERED;
         filename = Force.ICON_NONE;
         // Build the layered image
-        imageIcon = IconPackage.buildLayeredIcon(category, filename, imageItems, iconMap);
+        Image forceImage = IconPackage.buildForceIcon(category, filename, imageItems, iconMap);
+        imageIcon = new ImageIcon(forceImage);
         // Disable selection of a static icon
         tableImages.clearSelection();
         // Update the preview
