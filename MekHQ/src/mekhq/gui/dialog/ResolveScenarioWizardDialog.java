@@ -325,7 +325,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         		tracker.getScenario() instanceof AtBScenario) {
         	pnlAllyStatus.setLayout(new GridBagLayout());
         	gridBagConstraints = new java.awt.GridBagConstraints();
-        	gridBagConstraints.gridx = 1;
+        	gridBagConstraints.gridx = 0;
         	gridBagConstraints.gridy = 1;
         	gridBagConstraints.gridwidth = 1;
         	gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;

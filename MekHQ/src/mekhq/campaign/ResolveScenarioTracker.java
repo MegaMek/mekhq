@@ -137,20 +137,6 @@ public class ResolveScenarioTracker {
 				unitsStatus.put(uid, new UnitStatus(u));
 			}
 		}
-		/*
-		if (s instanceof AtBScenario) {
-			for (UUID uid : ((AtBScenario)s).getAttachedUnitIds()) {
-				TestUnit nu = generateNewTestUnit(((AtBScenario)s).getEntity(uid));
-				alliedUnits.add(nu);
-				unitsStatus.put(uid, new UnitStatus(nu));
-			}
-			for (UUID uid : ((AtBScenario)s).getSurvivalBonusIds()) {
-				TestUnit nu = generateNewTestUnit(((AtBScenario)s).getEntity(uid));
-				alliedUnits.add(nu);
-				unitsStatus.put(uid, new UnitStatus(nu));
-			}
-		}
-		*/
 		unitList = new JFileChooser(".");
 		unitList.setDialogTitle("Load Units");
 
@@ -768,10 +754,38 @@ public class ResolveScenarioTracker {
 				checkForLostLimbs(e, control);
 				if(!e.getExternalIdAsString().equals("-1")) {
 					UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
+					if (null == status && scenario instanceof AtBScenario) {
+						TestUnit nu = generateNewTestUnit(e);
+						status = new UnitStatus(nu);
+						unitsStatus.put(nu.getId(), status);
+						alliedUnits.add(nu);
+					}
 					if(null != status) {
 						boolean lost = (!e.canEscape() && !control) || e.getRemovalCondition() == IEntityRemovalConditions.REMOVE_DEVASTATED;
 						status.assignFoundEntity(e, lost);
 					}
+				}
+				if(null != e.getCrew()) {
+					if(!e.getCrew().getExternalIdAsString().equals("-1")) {
+						if(!e.getCrew().isEjected() || e instanceof EjectedCrew) {
+							pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
+						}
+						if(e instanceof EjectedCrew) {
+							ejections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
+						}
+					}
+				}
+			}
+
+			for (Entity e : parser.getAllies()) {
+				checkForLostLimbs(e, control);
+				if(!e.getExternalIdAsString().equals("-1")) {
+					TestUnit nu = generateNewTestUnit(e);
+					UnitStatus status = new UnitStatus(nu);
+					unitsStatus.put(nu.getId(), status);
+					alliedUnits.add(nu);
+					boolean lost = (!e.canEscape() && !control) || e.getRemovalCondition() == IEntityRemovalConditions.REMOVE_DEVASTATED;
+					status.assignFoundEntity(e, lost);
 				}
 				if(null != e.getCrew()) {
 					if(!e.getCrew().getExternalIdAsString().equals("-1")) {
