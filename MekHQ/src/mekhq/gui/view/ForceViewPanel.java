@@ -416,10 +416,10 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		JLabel lblForce;
 
 		int nexty = 0;
-		for(Force f : force.getSubForces()) {
+		for(Force subForce : force.getSubForces()) {
 			lblForce = new JLabel();
-			lblForce.setText(getSummaryFor(f));
-			setIcon(f, lblForce, 72);
+			lblForce.setText(getSummaryFor(subForce));
+			setIcon(subForce, lblForce, 72);
 			nexty++;
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
@@ -453,15 +453,15 @@ public class ForceViewPanel extends javax.swing.JPanel {
                return ((Comparable<Integer>)u2.getCommander().getRankNumeric()).compareTo(u1.getCommander().getRankNumeric());
             }
         });
- 		for(Unit u : unmannedUnits) {
- 			units.add(u);
+ 		for(Unit unit : unmannedUnits) {
+ 			units.add(unit);
  		}
- 		for(Unit u : units) {
- 			Person p = u.getCommander();
+ 		for(Unit unit : units) {
+ 			Person p = unit.getCommander();
  			lblPerson = new JLabel();
 			lblUnit = new JLabel();
 			if(null != p) {
-				lblPerson.setText(getSummaryFor(p, u));
+				lblPerson.setText(getSummaryFor(p, unit));
 				setPortrait(p, lblPerson);
 			}
 			nexty++;
@@ -473,9 +473,9 @@ public class ForceViewPanel extends javax.swing.JPanel {
 			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 			pnlSubUnits.add(lblPerson, gridBagConstraints);
-			if(null != u) {
-				lblUnit.setText(getSummaryFor(u));
-				lblUnit.setIcon(new ImageIcon(getImageFor(u, lblUnit)));			
+			if(null != unit) {
+				lblUnit.setText(getSummaryFor(unit));
+				lblUnit.setIcon(new ImageIcon(getImageFor(unit, lblUnit)));			
 			}
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 1;
