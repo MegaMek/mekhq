@@ -315,40 +315,6 @@ public class IconPackage {
                         g2d.drawImage(tmp, base.getWidth() - tmp.getWidth(), base.getHeight() - tmp.getHeight(), null);
                     }
                 }
-                /*
-                for (Map.Entry<String,  Vector<String>> entry : iconMap.entrySet()) {
-                    if (null != entry.getValue() && !entry.getValue().isEmpty()) {
-                        for (String value : entry.getValue()) {
-                            // Load up the image piece
-                            tmp = (BufferedImage) items.getItem(entry.getKey(), value);
-                            
-
-                            // Create the new base if it isn't already
-                            if (null == base) {
-                                base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
-
-                                // Get our Graphics to draw on
-                                g2d = base.createGraphics();
-                            }
-                            
-                            // Resize the base if this image is larger than the current base image
-                            if (tmp.getWidth() > base.getWidth() || tmp.getHeight() > base.getHeight()) {
-                                BufferedImage oldBase = base;
-                                base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
-
-                                // Get our Graphics to draw on
-                                g2d = base.createGraphics();
-                                
-                                // Draw the old base onto the new base, aligning bottom right
-                                g2d.drawImage(base, base.getWidth() - oldBase.getWidth(), base.getHeight() - oldBase.getHeight(), null);
-                            }
-
-                            // Draw the current buffered image onto the base, aligning bottom and right side
-                            g2d.drawImage(tmp, base.getWidth() - tmp.getWidth(), base.getHeight() - tmp.getHeight(), null);
-                        }
-                    }
-                }
-                */
             } catch (Exception err) {
                 err.printStackTrace();
             } finally {
