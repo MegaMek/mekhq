@@ -84,31 +84,26 @@ public class ImageChoiceDialog extends JDialog {
     private JTable tableTypes = new JTable();
     private JPanel panelTypes = new JPanel();
     private ImageTableModel typesModel = new ImageTableModel();
-    private String typesCategory = "Pieces/Type/";
     // Formations
     private JScrollPane scrFormations = new JScrollPane();
     private JTable tableFormations = new JTable();
     private JPanel panelFormations = new JPanel();
     private ImageTableModel formationsModel = new ImageTableModel();
-    private String formationsCategory = "Pieces/Formations/";
     // Adjustments
     private JScrollPane scrAdjustments = new JScrollPane();
     private JTable tableAdjustments = new JTable();
     private JPanel panelAdjustments = new JPanel();
     private ImageTableModel adjustmentsModel = new ImageTableModel();
-    private String adjustmentsCategory = "Pieces/Adjustments/";
     // Alphanumerics
     private JScrollPane scrAlphanumerics = new JScrollPane();
     private JTable tableAlphanumerics = new JTable();
     private JPanel panelAlphanumerics = new JPanel();
     private ImageTableModel alphanumericsModel = new ImageTableModel();
-    private String alphanumericsCategory = "Pieces/Alphanumerics/";
     // Special Modifiers
     private JScrollPane scrSpecialModifiers = new JScrollPane();
     private JTable tableSpecialModifiers = new JTable();
     private JPanel panelSpecialModifiers = new JPanel();
     private ImageTableModel specialModel = new ImageTableModel();
-    private String specialCategory = "Pieces/Special Modifiers/";
     // EMD: Layered Images Support
 
     /** Creates new form ImageChoiceDialog */
@@ -250,8 +245,8 @@ public class ImageChoiceDialog extends JDialog {
             scrTypes.setViewportView(tableTypes);
             panelTypes.add(scrTypes, gbc);
             typesModel.reset();
-            typesModel.setCategory(typesCategory);
-            Iterator<String> imageNames = imageItems.getItemNames(typesCategory);
+            typesModel.setCategory(IconPackage.FORCE_TYPE);
+            Iterator<String> imageNames = imageItems.getItemNames(IconPackage.FORCE_TYPE);
             while (imageNames.hasNext()) {
                 typesModel.addImage(imageNames.next());
             }
@@ -272,8 +267,8 @@ public class ImageChoiceDialog extends JDialog {
             scrFormations.setViewportView(tableFormations);
             panelFormations.add(scrFormations, gbc);
             formationsModel.reset();
-            formationsModel.setCategory(formationsCategory);
-            Iterator<String> imageNamesTypes = imageItems.getItemNames(formationsCategory);
+            formationsModel.setCategory(IconPackage.FORCE_FORMATIONS);
+            Iterator<String> imageNamesTypes = imageItems.getItemNames(IconPackage.FORCE_FORMATIONS);
             while (imageNamesTypes.hasNext()) {
                 formationsModel.addImage(imageNamesTypes.next());
             }
@@ -294,8 +289,8 @@ public class ImageChoiceDialog extends JDialog {
             scrAdjustments.setViewportView(tableAdjustments);
             panelAdjustments.add(scrAdjustments, gbc);
             adjustmentsModel.reset();
-            adjustmentsModel.setCategory(adjustmentsCategory);
-            Iterator<String> imageNamesAdjustments = imageItems.getItemNames(adjustmentsCategory);
+            adjustmentsModel.setCategory(IconPackage.FORCE_ADJUSTMENTS);
+            Iterator<String> imageNamesAdjustments = imageItems.getItemNames(IconPackage.FORCE_ADJUSTMENTS);
             while (imageNamesAdjustments.hasNext()) {
                 adjustmentsModel.addImage(imageNamesAdjustments.next());
             }
@@ -316,8 +311,8 @@ public class ImageChoiceDialog extends JDialog {
             scrAlphanumerics.setViewportView(tableAlphanumerics);
             panelAlphanumerics.add(scrAlphanumerics, gbc);
             alphanumericsModel.reset();
-            alphanumericsModel.setCategory(alphanumericsCategory);
-            Iterator<String> imageNamesAlphanumerics = imageItems.getItemNames(alphanumericsCategory);
+            alphanumericsModel.setCategory(IconPackage.FORCE_ALPHANUMERICS);
+            Iterator<String> imageNamesAlphanumerics = imageItems.getItemNames(IconPackage.FORCE_ALPHANUMERICS);
             while (imageNamesAlphanumerics.hasNext()) {
                 alphanumericsModel.addImage(imageNamesAlphanumerics.next());
             }
@@ -338,8 +333,8 @@ public class ImageChoiceDialog extends JDialog {
             scrSpecialModifiers.setViewportView(tableSpecialModifiers);
             panelSpecialModifiers.add(scrSpecialModifiers, gbc);
             specialModel.reset();
-            specialModel.setCategory(specialCategory);
-            Iterator<String> imageNamesSpecial = imageItems.getItemNames(specialCategory);
+            specialModel.setCategory(IconPackage.FORCE_SPECIAL_MODIFIERS);
+            Iterator<String> imageNamesSpecial = imageItems.getItemNames(IconPackage.FORCE_SPECIAL_MODIFIERS);
             while (imageNamesSpecial.hasNext()) {
                 specialModel.addImage(imageNamesSpecial.next());
             }
@@ -454,56 +449,55 @@ public class ImageChoiceDialog extends JDialog {
     
     private void refreshLayeredPreview() {
         // Add the image frame
-        if (iconMap.isEmpty()) {
-            Vector<String> frameVector = new Vector<String>();
-            frameVector.add("Frame.png");
-            iconMap.put("Pieces/Frames/", frameVector);
-        }
+        iconMap.clear();
+        Vector<String> frameVector = new Vector<String>();
+        frameVector.add("Frame.png");
+        iconMap.put(IconPackage.FORCE_FRAME, frameVector);
         // Check each table for what is, or is not, selected
         Vector<String> tmp;
-        if (tableAdjustments.getSelectedRow() == -1) {
-            iconMap.remove(adjustmentsCategory, iconMap.get(adjustmentsCategory));
-        } else {
-            tmp = new Vector<String>();
-            for (int index : tableAdjustments.getSelectedRows()) {
-                tmp.add((String) tableAdjustments.getValueAt(index, 0));
-                iconMap.put(adjustmentsCategory, tmp);
-            }
-        }
-        if (tableAlphanumerics.getSelectedRow() == -1) {
-            iconMap.remove(alphanumericsCategory, iconMap.get(alphanumericsCategory));
-        } else {
-            tmp = new Vector<String>();
-            for (int index : tableAlphanumerics.getSelectedRows()) {
-                tmp.add((String) tableAlphanumerics.getValueAt(index, 0));
-                iconMap.put(alphanumericsCategory, tmp);
-            }
-        }
-        if (tableFormations.getSelectedRow() == -1) {
-            iconMap.remove(formationsCategory, iconMap.get(formationsCategory));
-        } else {
-            tmp = new Vector<String>();
-            for (int index : tableFormations.getSelectedRows()) {
-                tmp.add((String) tableFormations.getValueAt(index, 0));
-                iconMap.put(formationsCategory, tmp);
-            }
-        }
-        if (tableSpecialModifiers.getSelectedRow() == -1) {
-            iconMap.remove(specialCategory, iconMap.get(specialCategory));
-        } else {
-            tmp = new Vector<String>();
-            for (int index : tableSpecialModifiers.getSelectedRows()) {
-                tmp.add((String) tableSpecialModifiers.getValueAt(index, 0));
-                iconMap.put(specialCategory, tmp);
-            }
-        }
         if (tableTypes.getSelectedRow() == -1) {
-            iconMap.remove(typesCategory, iconMap.get(typesCategory));
+            iconMap.remove(IconPackage.FORCE_TYPE, iconMap.get(IconPackage.FORCE_TYPE));
         } else {
             tmp = new Vector<String>();
             for (int index : tableTypes.getSelectedRows()) {
                 tmp.add((String) tableTypes.getValueAt(index, 0));
-                iconMap.put(typesCategory, tmp);
+                iconMap.put(IconPackage.FORCE_TYPE, tmp);
+            }
+        }
+        if (tableFormations.getSelectedRow() == -1) {
+            iconMap.remove(IconPackage.FORCE_FORMATIONS, iconMap.get(IconPackage.FORCE_FORMATIONS));
+        } else {
+            tmp = new Vector<String>();
+            for (int index : tableFormations.getSelectedRows()) {
+                tmp.add((String) tableFormations.getValueAt(index, 0));
+                iconMap.put(IconPackage.FORCE_FORMATIONS, tmp);
+            }
+        }
+        if (tableAdjustments.getSelectedRow() == -1) {
+            iconMap.remove(IconPackage.FORCE_ADJUSTMENTS, iconMap.get(IconPackage.FORCE_ADJUSTMENTS));
+        } else {
+            tmp = new Vector<String>();
+            for (int index : tableAdjustments.getSelectedRows()) {
+                tmp.add((String) tableAdjustments.getValueAt(index, 0));
+                iconMap.put(IconPackage.FORCE_ADJUSTMENTS, tmp);
+            }
+        }
+        if (tableAlphanumerics.getSelectedRow() == -1) {
+            iconMap.remove(IconPackage.FORCE_ALPHANUMERICS, iconMap.get(IconPackage.FORCE_ALPHANUMERICS));
+        } else {
+            tmp = new Vector<String>();
+            for (int index : tableAlphanumerics.getSelectedRows()) {
+                tmp.add((String) tableAlphanumerics.getValueAt(index, 0));
+                iconMap.put(IconPackage.FORCE_ALPHANUMERICS, tmp);
+            }
+        }
+        if (tableSpecialModifiers.getSelectedRow() == -1) {
+            iconMap.remove(IconPackage.FORCE_SPECIAL_MODIFIERS, iconMap.get(IconPackage.FORCE_SPECIAL_MODIFIERS));
+        } else {
+            tmp = new Vector<String>();
+            for (int index : tableSpecialModifiers.getSelectedRows()) {
+                tmp.add((String) tableSpecialModifiers.getValueAt(index, 0));
+                iconMap.put(IconPackage.FORCE_SPECIAL_MODIFIERS, tmp);
             }
         }
         // Set the category to layered
