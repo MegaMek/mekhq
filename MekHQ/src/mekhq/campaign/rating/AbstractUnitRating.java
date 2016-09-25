@@ -540,9 +540,9 @@ public abstract class AbstractUnitRating implements IUnitRating {
     protected void updateBayCount(Jumpship jumpship) {
         for (Bay bay : jumpship.getTransportBays()) {
             if (bay instanceof ASFBay) {
-                setFighterBayCount(getFighterBayCount() + 1);
+                setFighterBayCount(getFighterBayCount() + (int)bay.getCapacity());
             } else if (bay instanceof SmallCraftBay) {
-                setSmallCraftBayCount(getSmallCraftBayCount() + 1);
+                setSmallCraftBayCount(getSmallCraftBayCount() + (int)bay.getCapacity());
             }
         }
     }
