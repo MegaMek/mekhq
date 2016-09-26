@@ -4442,6 +4442,7 @@ public class Campaign implements Serializable {
                         try {
                             switch (option.getType()) {
                                 case IOption.STRING:
+                                case IOption.CHOICE:
                                     option.setValue((String) value);
                                     break;
 
@@ -4456,6 +4457,7 @@ public class Campaign implements Serializable {
                                 case IOption.FLOAT:
                                     option.setValue(new Float(value.toString()));
                                     break;
+                                    
                             }
                         } catch (IllegalArgumentException iaEx) {
                             MekHQ.logMessage("Error trying to load option '" + name + "' with a value of '" + value + "'."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

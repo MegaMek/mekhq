@@ -5,6 +5,7 @@ v0.41.24-git
 + Issue #33 [AtB]: All allied units are marked as total loss after battle even if undamaged
 + Issue #30: Dragoons rating tab transportation calculation issue
 + Issue #67: Scenario does not resolve - NPE in scenario resolution isCommander()
++ Issue #83: Megamek options -> Tech level is stuck on Standard
 
 v0.3.33 (2016-09-20 00:07 UTC)
 + Added AtB preset.
