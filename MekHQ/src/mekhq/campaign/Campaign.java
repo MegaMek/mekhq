@@ -5370,6 +5370,21 @@ public class Campaign implements Serializable {
 		    }
 		    person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
 		                          special);
+		} else if (name.equals("range_master")) {
+		    String special = Crew.RANGEMASTER_NONE;
+            switch (Compute.randomInt(2)) {
+                case 0:
+                    special = Crew.RANGEMASTER_MEDIUM;
+                    break;
+                case 1:
+                    special = Crew.RANGEMASTER_LONG;
+                    break;
+                case 2:
+                    special = Crew.RANGEMASTER_EXTREME;
+                    break;
+            }
+            person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
+                                  special);
 		} else if (name.equals("weapon_specialist")) {
 		    person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
 		                          SpecialAbility.chooseWeaponSpecialization(type,
