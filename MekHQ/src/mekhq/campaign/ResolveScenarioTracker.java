@@ -628,6 +628,26 @@ public class ResolveScenarioTracker {
 	            }
 	            //shuffling the crew ensures that casualties are randomly assigned in multi-crew units
 	            ArrayList<Person> crew = shuffleCrew(Utilities.generateRandomCrewWithCombinedSkill(u, campaign, false));
+
+	            //For vees we may need to know the commander or driver, which aren't assigned for TestUnit.
+	            Person commander = null;
+	            Person driver = null;
+	            if (en instanceof Tank) {
+	            	//Prefer gunner over driver, as in Unit::getCommander
+		            for (Person p : crew) {
+		            	if (p.getPrimaryRole() == Person.T_VEE_GUNNER) {
+		            		commander = p;
+			            } else if (p.getPrimaryRole() == Person.T_GVEE_DRIVER
+			            		|| p.getPrimaryRole() == Person.T_VTOL_PILOT
+			            		|| p.getPrimaryRole() == Person.T_NVEE_DRIVER) {
+		            		driver = p;
+			            }
+		            }
+	            }
+	            if (commander == null && crew.size() > 0) {
+	            	commander = crew.get(0);
+	            }
+	            
 	            int casualties = 0;
 	            int casualtiesAssigned = 0;
 	            if(en instanceof Infantry) {
@@ -687,14 +707,17 @@ public class ResolveScenarioTracker {
 	                                status.setHits(6);
 	                            }
 	                        }
-	                        else if(((Tank)en).isDriverHit() && u.isDriver(p)) {
+	                        else if(((Tank)en).isDriverHit()
+	                        		&& driver != null && driver.getId() == p.getId()) {
 	                            if(Compute.d6(2) >= 7) {
 	                                wounded = true;
 	                            } else {
 	                                status.setHits(6);
 	                            }
 	                        }
-	                        else if(((Tank)en).isCommanderHit() && u.isCommander(p)) {
+	                        else if(((Tank)en).isCommanderHit()
+	                        		&& commander != null
+	                        		&& commander.getId() == p.getId()) {
 	                            if(Compute.d6(2) >= 7) {
 	                                wounded = true;
 	                            } else {
