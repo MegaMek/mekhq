@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gamePreset>
 	<title>Official AtB Options</title>
-	<description>These are the default settings for the Against the Bot campaign system. As always change them to what you like for your style of play.</description>
+	<description>(Release 2)These are the default settings for the Against the Bot campaign system. As always change them to what you like for your style of play.</description>
 	<campaignOptions>
 		<clanPriceModifier>1.0</clanPriceModifier>
 		<useFactionForNames>true</useFactionForNames>
@@ -12,8 +12,8 @@
 		<assignedTechFirst>false</assignedTechFirst>
 		<resetToFirstTech>false</resetToFirstTech>
 		<useTactics>true</useTactics>
-		<useInitBonus>true</useInitBonus>
-		<useToughness>false</useToughness>
+		<useInitBonus>false</useInitBonus>
+		<useToughness>true</useToughness>
 		<useArtillery>true</useArtillery>
 		<useAbilities>true</useAbilities>
 		<useEdge>true</useEdge>
@@ -53,7 +53,7 @@
 		<adminXPPeriod>4</adminXPPeriod>
 		<limitByYear>true</limitByYear>
 		<disallowExtinctStuff>true</disallowExtinctStuff>
-		<allowClanPurchases>true</allowClanPurchases>
+		<allowClanPurchases>false</allowClanPurchases>
 		<allowISPurchases>true</allowISPurchases>
 		<allowCanonOnly>false</allowCanonOnly>
 		<useAmmoByType>true</useAmmoByType>
@@ -61,7 +61,7 @@
 		<waitingPeriod>1</waitingPeriod>
 		<acquisitionSkill>Administration</acquisitionSkill>
 		<acquisitionSupportStaffOnly>true</acquisitionSupportStaffOnly>
-		<techLevel>4</techLevel>
+		<techLevel>1</techLevel>
 		<nDiceTransitTime>2</nDiceTransitTime>
 		<constantTransitTime>0</constantTransitTime>
 		<unitTransitTime>0</unitTransitTime>
@@ -84,16 +84,16 @@
 		<destroyPartTarget>10</destroyPartTarget>
 		<maintenanceCycleDays>30</maintenanceCycleDays>
 		<maintenanceBonus>0</maintenanceBonus>
-		<useQualityMaintenance>false</useQualityMaintenance>
+		<useQualityMaintenance>true</useQualityMaintenance>
 		<reverseQualityNames>false</reverseQualityNames>
 		<useUnofficalMaintenance>true</useUnofficalMaintenance>
 		<checkMaintenance>true</checkMaintenance>
 		<useRandomHitsForVees>true</useRandomHitsForVees>
 		<minimumHitsForVees>1</minimumHitsForVees>
 		<maxAcquisitions>2</maxAcquisitions>
-		<useUnofficialProcreation>false</useUnofficialProcreation>
-		<useUnofficialProcreationNoRelationship>false</useUnofficialProcreationNoRelationship>
-		<useParentage>false</useParentage>
+		<useUnofficialProcreation>true</useUnofficialProcreation>
+		<useUnofficialProcreationNoRelationship>true</useUnofficialProcreationNoRelationship>
+		<useParentage>true</useParentage>
 		<useTransfers>true</useTransfers>
 		<capturePrisoners>true</capturePrisoners>
 		<defaultPrisonerStatus>0</defaultPrisonerStatus>
@@ -126,9 +126,9 @@
 		<useDropShips>false</useDropShips>
 		<skillLevel>2</skillLevel>
 		<aeroRecruitsHaveUnits>true</aeroRecruitsHaveUnits>
-		<useShareSystem>false</useShareSystem>
+		<useShareSystem>true</useShareSystem>
 		<sharesExcludeLargeCraft>true</sharesExcludeLargeCraft>
-		<sharesForAll>false</sharesForAll>
+		<sharesForAll>true</sharesForAll>
 		<retirementRolls>true</retirementRolls>
 		<customRetirementMods>true</customRetirementMods>
 		<trackUnitFatigue>true</trackUnitFatigue>
@@ -138,7 +138,7 @@
 		<searchRadius>800</searchRadius>
 		<intensity>1.0</intensity>
 		<variableContractLength>true</variableContractLength>
-		<instantUnitMarketDelivery>false</instantUnitMarketDelivery>
+		<instantUnitMarketDelivery>true</instantUnitMarketDelivery>
 		<useWeatherConditions>true</useWeatherConditions>
 		<useLightConditions>true</useLightConditions>
 		<usePlanetaryConditions>false</usePlanetaryConditions>
@@ -493,12 +493,12 @@
 			<invalidAbilities>weapon_specialist</invalidAbilities>
 			<removeAbilities></removeAbilities>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
-				<skill>Gunnery/Spacecraft::Regular</skill>
+				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -527,12 +527,12 @@ at short, medium, or long/extended range, respectively, but only with a speciali
 			<invalidAbilities>cluster_hitter::cluster_master</invalidAbilities>
 			<removeAbilities></removeAbilities>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
-				<skill>Gunnery/Spacecraft::Regular</skill>
+				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -598,12 +598,12 @@ Note: This ability is only used for BattleMechs.</desc>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
-				<skill>Gunnery/Spacecraft::Regular</skill>
+				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -617,12 +617,12 @@ Note: This ability is only used for BattleMechs.</desc>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities>cluster_hitter</removeAbilities>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Veteran</skill>
 				<skill>Gunnery/Aircraft::Veteran</skill>
-				<skill>Gunnery/Spacecraft::Veteran</skill>
+				<skill>Gunnery/Battlesuit::Veteran</skill>
 				<skill>Gunnery/Aerospace::Veteran</skill>
-				<skill>Gunnery/Vehicle::Veteran</skill>
+				<skill>Gunnery/Spacecraft::Veteran</skill>
 				<skill>Gunnery/Mech::Veteran</skill>
+				<skill>Gunnery/Vehicle::Veteran</skill>
 				<skill>Gunnery/Protomech::Veteran</skill>
 			</skillPrereq>
 		</ability>
@@ -636,12 +636,12 @@ Note: This ability is only used for BattleMechs.</desc>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
-				<skill>Gunnery/Spacecraft::Regular</skill>
+				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -676,11 +676,11 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
+				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -694,12 +694,12 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit</skill>
 				<skill>Gunnery/Aircraft</skill>
-				<skill>Gunnery/Spacecraft</skill>
+				<skill>Gunnery/Battlesuit</skill>
 				<skill>Gunnery/Aerospace</skill>
-				<skill>Gunnery/Vehicle</skill>
+				<skill>Gunnery/Spacecraft</skill>
 				<skill>Gunnery/Mech</skill>
+				<skill>Gunnery/Vehicle</skill>
 				<skill>Gunnery/Protomech</skill>
 			</skillPrereq>
 		</ability>
@@ -823,12 +823,12 @@ Note: This ability is only used for BattleMechs.</desc>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Veteran</skill>
 				<skill>Gunnery/Aircraft::Veteran</skill>
-				<skill>Gunnery/Spacecraft::Veteran</skill>
+				<skill>Gunnery/Battlesuit::Veteran</skill>
 				<skill>Gunnery/Aerospace::Veteran</skill>
-				<skill>Gunnery/Vehicle::Veteran</skill>
+				<skill>Gunnery/Spacecraft::Veteran</skill>
 				<skill>Gunnery/Mech::Veteran</skill>
+				<skill>Gunnery/Vehicle::Veteran</skill>
 				<skill>Gunnery/Protomech::Veteran</skill>
 			</skillPrereq>
 		</ability>
@@ -858,11 +858,11 @@ Note: This ability is only used for BattleMechs.</desc>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
+				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -876,12 +876,12 @@ Note: This ability is only used for BattleMechs.</desc>
 			<invalidAbilities>cluster_master</invalidAbilities>
 			<removeAbilities></removeAbilities>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
-				<skill>Gunnery/Spacecraft::Regular</skill>
+				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -909,12 +909,12 @@ Note: This ability is only used for BattleMechs.</desc>
 			<invalidAbilities>specialist</invalidAbilities>
 			<removeAbilities></removeAbilities>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
-				<skill>Gunnery/Spacecraft::Regular</skill>
+				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -994,16 +994,16 @@ Note: This ability is only used for BattleMechs.</desc>
 	<randomSkillPreferences>
 		<overallRecruitBonus>0</overallRecruitBonus>
 		<recruitBonuses>0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0</recruitBonuses>
-		<specialAbilBonus>-10,-10,-10,-10,-10</specialAbilBonus>
-		<tacticsMod>-10,-10,-10,-10,-10</tacticsMod>
+		<specialAbilBonus>-10,-10,-2,0,1</specialAbilBonus>
+		<tacticsMod>-10,-10,-7,-4,-1</tacticsMod>
 		<randomizeSkill>false</randomizeSkill>
 		<useClanBonuses>true</useClanBonuses>
 		<antiMekProb>10</antiMekProb>
-		<combatSmallArmsBonus>-10</combatSmallArmsBonus>
-		<supportSmallArmsBonus>-10</supportSmallArmsBonus>
-		<artilleryProb>0</artilleryProb>
-		<artilleryBonus>-4</artilleryBonus>
-		<secondSkillProb>0</secondSkillProb>
-		<secondSkillBonus>-10</secondSkillBonus>
+		<combatSmallArmsBonus>-3</combatSmallArmsBonus>
+		<supportSmallArmsBonus>-3</supportSmallArmsBonus>
+		<artilleryProb>10</artilleryProb>
+		<artilleryBonus>-2</artilleryBonus>
+		<secondSkillProb>10</secondSkillProb>
+		<secondSkillBonus>-4</secondSkillBonus>
 	</randomSkillPreferences>
 </gamePreset>
