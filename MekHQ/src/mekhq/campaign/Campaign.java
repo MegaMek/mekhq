@@ -3756,6 +3756,8 @@ public class Campaign implements Serializable {
                                                       .getTechLevel() + 1);
         }
 
+        long timestamp = System.currentTimeMillis();
+        
         // loop through forces to set force id
         for (int fid : retVal.forceIds.keySet()) {
             Force f = retVal.forceIds.get(fid);
@@ -3778,6 +3780,9 @@ public class Campaign implements Serializable {
             }
         }
 
+        MekHQ.logMessage(String.format("[Campaign Load] Force IDs set in %dms", System.currentTimeMillis() - timestamp));
+        timestamp = System.currentTimeMillis();
+        
         // Process parts...
         ArrayList<Part> spareParts = new ArrayList<Part>();
         ArrayList<Part> removeParts = new ArrayList<Part>();
@@ -3904,6 +3909,9 @@ public class Campaign implements Serializable {
             retVal.removePart(prt);
         }
 
+        MekHQ.logMessage(String.format("[Campaign Load] Parts processed in %dms", System.currentTimeMillis() - timestamp));
+        timestamp = System.currentTimeMillis();
+
         // All personnel need the rank reference fixed
         for (int x = 0; x < retVal.personnel.size(); x++) {
             Person psn = retVal.personnel.get(x);
@@ -3939,10 +3947,11 @@ public class Campaign implements Serializable {
             }
         }
 
-        // Okay, Units, need their pilot references fixed.
-        for (int x = 0; x < retVal.units.size(); x++) {
-            Unit unit = retVal.units.get(x);
+        MekHQ.logMessage(String.format("[Campaign Load] Rank references fixed in %dms", System.currentTimeMillis() - timestamp));
+        timestamp = System.currentTimeMillis();
 
+        // Okay, Units, need their pilot references fixed.
+        for(Unit unit : retVal.units) {
             // Also, the unit should have its campaign set.
             unit.campaign = retVal;
 
@@ -4004,18 +4013,23 @@ public class Campaign implements Serializable {
 	                }
                 }
             }
+        }
 
+        MekHQ.logMessage(String.format("[Campaign Load] Pilot references fixed in %dms", System.currentTimeMillis() - timestamp));
+        timestamp = System.currentTimeMillis();
 
+        for(Unit unit : retVal.units) {
             // Some units have been incorrectly assigned a null C3UUID as a string. This should correct that by setting a new C3UUID
             if ((unit.getEntity().hasC3() || unit.getEntity().hasC3i())
-            		&& (unit.getEntity().getC3UUIDAsString() == null || unit.getEntity().getC3UUIDAsString().equals("null"))) {
+                    && (unit.getEntity().getC3UUIDAsString() == null || unit.getEntity().getC3UUIDAsString().equals("null"))) {
                 unit.getEntity().setC3UUID();
                 unit.getEntity().setC3NetIdSelf();
             }
-
-            retVal.refreshNetworks();
-
         }
+        retVal.refreshNetworks();
+
+        MekHQ.logMessage(String.format("[Campaign Load] C3 networks refreshed in %dms", System.currentTimeMillis() - timestamp));
+        timestamp = System.currentTimeMillis();
 
         // ok, once we are sure that campaign has been set for all units, we can
         // now go
@@ -4037,7 +4051,13 @@ public class Campaign implements Serializable {
             }
         }
 
+        MekHQ.logMessage(String.format("[Campaign Load] Units initialized in %dms", System.currentTimeMillis() - timestamp));
+        timestamp = System.currentTimeMillis();
+
         retVal.reloadNews();
+
+        MekHQ.logMessage(String.format("[Campaign Load] News loaded in %dms", System.currentTimeMillis() - timestamp));
+        timestamp = System.currentTimeMillis();
 
         //**EVERYTHING HAS BEEN LOADED. NOW FOR SANITY CHECKS**//
 
@@ -4052,6 +4072,10 @@ public class Campaign implements Serializable {
         for(AmmoBin bin : binsToUnload) {
         	bin.unload();
         }
+        
+        MekHQ.logMessage(String.format("[Campaign Load] Ammo bins cleared in %dms", System.currentTimeMillis() - timestamp));
+        timestamp = System.currentTimeMillis();
+
 
         //Check all parts that are reserved for refit and if the refit id unit
         //is not refitting or is gone then unreserve
@@ -4063,6 +4087,9 @@ public class Campaign implements Serializable {
         		}
         	}
         }
+
+        MekHQ.logMessage(String.format("[Campaign Load] Reserved refit parts fixed in %dms", System.currentTimeMillis() - timestamp));
+        timestamp = System.currentTimeMillis();
 
         //try to stack as much as possible the parts in the warehouse that may be unstacked
         //for a variety of reasons
@@ -4103,6 +4130,9 @@ public class Campaign implements Serializable {
         for(Part toRemove : partsToRemove) {
         	retVal.removePart(toRemove);
         }
+
+        MekHQ.logMessage(String.format("[Campaign Load] Warehouse cleaned up in %dms", System.currentTimeMillis() - timestamp));
+        timestamp = System.currentTimeMillis();
 
         MekHQ.logMessage("Load of campaign file complete!");
 
