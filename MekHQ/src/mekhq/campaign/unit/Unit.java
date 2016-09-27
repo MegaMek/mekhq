@@ -54,6 +54,7 @@ import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;
 import megamek.common.EquipmentType;
+import megamek.common.FighterSquadron;
 import megamek.common.HeavyVehicleBay;
 import megamek.common.IArmorState;
 import megamek.common.ILocationExposureStatus;
@@ -1657,7 +1658,7 @@ public class Unit implements MekHqXmlSerializable {
     public void initializeParts(boolean addParts) {
 
         int erating = 0;
-        if(null != entity.getEngine()) {
+        if(!(entity instanceof FighterSquadron) && (null != entity.getEngine())) {
             erating = entity.getEngine().getRating();
         }
 
