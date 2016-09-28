@@ -53,6 +53,9 @@ import mekhq.campaign.force.Force;
  */
 public class ImageChoiceDialog extends JDialog {
 
+    private static final String PANEL_IMAGES = "panel_images";
+    private static final String PANEL_LAYERED = "panel_layered";
+    
     /**
      *
      */
@@ -153,6 +156,7 @@ public class ImageChoiceDialog extends JDialog {
         setName("Form"); // NOI18N
         setTitle(force ? resourceMap.getString("Force.title") : resourceMap.getString("Portrait.title"));
         imagesPanel.setLayout(new GridBagLayout());
+        imagesPanel.setName(PANEL_IMAGES);
 
         scrImages.setName("scrImages"); // NOI18N
 
@@ -160,6 +164,7 @@ public class ImageChoiceDialog extends JDialog {
         tableImages.setName("tableImages"); // NOI18N
         tableImages.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableImages.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
             public void valueChanged(ListSelectionEvent event) {
                 // Clear selections on the layered tables
                 tableAdjustments.clearSelection();
@@ -207,6 +212,7 @@ public class ImageChoiceDialog extends JDialog {
         comboCategories.setModel(categoryModel);
         comboCategories.setName("comboCategories"); // NOI18N
         comboCategories.addItemListener(new ItemListener() {
+            @Override
             public void itemStateChanged(ItemEvent evt) {
                 comboCategoriesItemStateChanged(evt);
             }
@@ -235,6 +241,7 @@ public class ImageChoiceDialog extends JDialog {
             tableTypes.setName("tableTypes"); // NOI18N
             tableTypes.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             tableTypes.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+                @Override
                 public void valueChanged(ListSelectionEvent event) {
                     refreshLayeredPreview();
                 }
@@ -257,6 +264,7 @@ public class ImageChoiceDialog extends JDialog {
             tableFormations.setName("tableFormations"); // NOI18N
             tableFormations.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             tableFormations.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+                @Override
                 public void valueChanged(ListSelectionEvent event) {
                     refreshLayeredPreview();
                 }
@@ -279,6 +287,7 @@ public class ImageChoiceDialog extends JDialog {
             tableAdjustments.setName("tableAdjustments"); // NOI18N
             tableAdjustments.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
             tableAdjustments.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+                @Override
                 public void valueChanged(ListSelectionEvent event) {
                     refreshLayeredPreview();
                 }
@@ -301,6 +310,7 @@ public class ImageChoiceDialog extends JDialog {
             tableAlphanumerics.setName("tableAalphanumerics"); // NOI18N
             tableAlphanumerics.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             tableAlphanumerics.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+                @Override
                 public void valueChanged(ListSelectionEvent event) {
                     refreshLayeredPreview();
                 }
@@ -323,6 +333,7 @@ public class ImageChoiceDialog extends JDialog {
             tableSpecialModifiers.setName("tableSpecialModifiers"); // NOI18N
             tableSpecialModifiers.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
             tableSpecialModifiers.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+                @Override
                 public void valueChanged(ListSelectionEvent event) {
                     refreshLayeredPreview();
                 }
@@ -348,6 +359,7 @@ public class ImageChoiceDialog extends JDialog {
             gbc.fill = GridBagConstraints.NONE;
             gbc.anchor = GridBagConstraints.SOUTH;
             layerPanel.add(preview, gbc);
+            layerPanel.setName(PANEL_LAYERED);
 
             // Add single and layered options to the dialog
             tabbedPane.addTab(resourceMap.getString("Force.single"), imagesPanel);
@@ -379,6 +391,7 @@ public class ImageChoiceDialog extends JDialog {
         btnSelect.setText(resourceMap.getString("btnSelect.text")); // NOI18N
         btnSelect.setName("btnSelect"); // NOI18N
         btnSelect.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 btnSelectActionPerformed(evt);
             }
@@ -392,6 +405,7 @@ public class ImageChoiceDialog extends JDialog {
         btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
         btnCancel.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 btnCancelActionPerformed(evt);
             }
@@ -410,7 +424,7 @@ public class ImageChoiceDialog extends JDialog {
     }
 
     private void btnSelectActionPerformed(ActionEvent evt) {
-        category = imageTableModel.getCategory();
+        category = tabbedPane.getSelectedComponent().getName().equals(PANEL_LAYERED) ? Force.ROOT_LAYERED : imageTableModel.getCategory();
         if(tableImages.getSelectedRow() != -1) {
             filename = (String) imageTableModel.getValueAt(tableImages.getSelectedRow(), 0);
         } else {
@@ -558,10 +572,12 @@ public class ImageChoiceDialog extends JDialog {
             images = new ArrayList<Image>();
         }
 
+        @Override
         public int getRowCount() {
             return names.size();
         }
 
+        @Override
         public int getColumnCount() {
             return 1;
         }
@@ -577,6 +593,7 @@ public class ImageChoiceDialog extends JDialog {
             return columnNames[column];
         }
 
+        @Override
         public Object getValueAt(int row, int col) {
             return names.get(row);
         }
@@ -621,6 +638,7 @@ public class ImageChoiceDialog extends JDialog {
 
             private static final long serialVersionUID = -6025788865509594987L;
 
+            @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = this;
                 setOpaque(true);
