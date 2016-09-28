@@ -27,8 +27,8 @@ import java.util.Locale;
 public enum WorkTime {
 	NORMAL(0, "Normal", 0, false, 0, 1.0),
 	EXTRA_2(1, "Extra time (x2)", -1, false, 0, 2.0),
-	EXTRA_4(2, "Extra time (x4)", -2, false, 0, 4.0),
-	EXTRA_8(3, "Extra time (x8)", -3, false, 0, 8.0),
+	EXTRA_4(2, "Extra time (x3)", -2, false, 0, 3.0),
+	EXTRA_8(3, "Extra time (x4)", -3, false, 0, 4.0),
 	RUSH_2(4, "Rush Job (1/2)", 1, true, 1, 0.5),
 	RUSH_4(5, "Rush Job (1/4)", 2, true, 2, 0.25),
 	RUSH_8(6, "Rush Job (1/8)", 3, true, 3, 0.125),
