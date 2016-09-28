@@ -558,7 +558,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                             part.resetOvertime();
                             part.setTeamId(null);
                             part.cancelReservation();
-                            unit.removePart(part);
+                            part.remove(false);
                             needsCheck = true;
                         } else {
                             if(part.needsFixing()) {
