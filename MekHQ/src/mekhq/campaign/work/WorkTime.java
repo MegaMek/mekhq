@@ -25,16 +25,16 @@ import java.util.Arrays;
 import java.util.Locale;
 
 public enum WorkTime {
-	NORMAL(0, "Normal", 0, false, 0, 1.0),
-	EXTRA_2(1, "Extra time (x2)", -1, false, 0, 2.0),
-	EXTRA_4(2, "Extra time (x3)", -2, false, 0, 3.0),
-	EXTRA_8(3, "Extra time (x4)", -3, false, 0, 4.0),
-	RUSH_2(4, "Rush Job (1/2)", 1, true, 1, 0.5),
-	RUSH_4(5, "Rush Job (1/4)", 2, true, 2, 0.25),
-	RUSH_8(6, "Rush Job (1/8)", 3, true, 3, 0.125),
+    NORMAL(0, "Normal", 0, false, 0, 1.0),
+    EXTRA_2(1, "Extra time (x2)", -1, false, 0, 2.0),
+    EXTRA_3(2, "Extra time (x3)", -2, false, 0, 3.0),
+    EXTRA_4(3, "Extra time (x4)", -3, false, 0, 4.0),
+    RUSH_2(4, "Rush Job (1/2)", 1, true, 1, 0.5),
+    RUSH_4(5, "Rush Job (1/4)", 2, true, 2, 0.25),
+    RUSH_8(6, "Rush Job (1/8)", 3, true, 3, 0.125),
     // Some additional tiers, in case people want to use them in alternate rules
-    EXTRA_15(-1, "Extra time (x15)", -4, false, 0, 15.0),
-    EXTRA_30(-1, "Extra time (x30)", -5, false, 0, 30.0),
+    EXTRA_6(-1, "Extra time (x6)", -4, false, 0, 6.0),
+    EXTRA_8(-1, "Extra time (x8)", -5, false, 0, 8.0),
     RUSH_15(-1, "Rush Job (1/15)", 4, true, 4, 1.0/15.0),
     RUSH_30(-1, "Rush Job (1/30)", 5, true, 5, 1.0/30.0);
     
@@ -67,11 +67,11 @@ public enum WorkTime {
     
     /** Default (Strategic Operations) work time modifiers */
     public static final WorkTime[] DEFAULT_TIMES = {
-        NORMAL, EXTRA_2, EXTRA_4, EXTRA_8, RUSH_2, RUSH_4, RUSH_8
+        NORMAL, EXTRA_2, EXTRA_3, EXTRA_4, RUSH_2, RUSH_4, RUSH_8
     };
     /** All possible work time modifiers (in a "logical" order, as opposed to <tt>values()</tt>) */
     public static final WorkTime[] ALL_TIMES = {
-        NORMAL, EXTRA_2, EXTRA_4, EXTRA_8, EXTRA_15, EXTRA_30, RUSH_2, RUSH_4, RUSH_8, RUSH_15, RUSH_30
+        NORMAL, EXTRA_2, EXTRA_3, EXTRA_4, EXTRA_6, EXTRA_8, RUSH_2, RUSH_4, RUSH_8, RUSH_15, RUSH_30
     };
 
     /** @return the work time order corresponding to the (old) ID */
