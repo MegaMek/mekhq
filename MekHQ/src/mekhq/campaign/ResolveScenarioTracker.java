@@ -206,9 +206,12 @@ public class ResolveScenarioTracker {
     }
 
     public void processGame() {
-
         int pid = client.getLocalPlayer().getId();
         int team = client.getLocalPlayer().getTeam();
+        // Fix game data
+        client.getGame().purgeGameListeners();
+        client.getGame().setEntitiesVector(Collections.list(victoryEvent.getEntities()));
+        client.getGame().setOutOfGameEntitiesVector(Collections.list(victoryEvent.getRetreatedEntities()));
 
         for (Enumeration<Entity> iter = victoryEvent.getEntities(); iter.hasMoreElements();) {
             Entity e = iter.nextElement();

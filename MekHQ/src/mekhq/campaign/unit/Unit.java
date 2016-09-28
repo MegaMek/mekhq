@@ -2108,13 +2108,13 @@ public class Unit implements MekHqXmlSerializable {
             }
         }
 
-        if(null == engine && !(entity instanceof Infantry)) {
+        if((null == engine) && !(entity instanceof Infantry) && !(entity instanceof FighterSquadron)) {
             if(entity instanceof SmallCraft || entity instanceof Jumpship) {
                 engine = new SpacecraftEngine((int) entity.getWeight(), 0, campaign, entity.isClan());
                 addPart(engine);
                 partsToAdd.add(engine);
                 ((SpacecraftEngine)engine).calculateTonnage();
-            } else {
+            } else if(null != entity.getEngine()) {
                 engine = new EnginePart((int) entity.getWeight(), new Engine(entity.getEngine().getRating(), entity.getEngine().getEngineType(), entity.getEngine().getFlags()), campaign, entity.getMovementMode() == EntityMovementMode.HOVER && entity instanceof Tank);
                 addPart(engine);
                 partsToAdd.add(engine);
