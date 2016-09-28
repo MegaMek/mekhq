@@ -69,6 +69,7 @@ import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.FuelManager;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 
@@ -1061,9 +1062,7 @@ public class ResolveScenarioTracker {
 				long currentValue = unit.getValueOfAllMissingParts();
 				campaign.clearGameData(en);
 				// FIXME: Need to implement a "fuel" part just like the "armor" part
-				if (en instanceof Aero) {
-					((Aero)en).setFuelTonnage(((Aero)ustatus.getBaseEntity()).getFuelTonnage());
-				}
+				FuelManager.fill(en);
 				unit.setEntity(en);
 				unit.runDiagnostic(true);
 				unit.resetPilotAndEntity();
