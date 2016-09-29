@@ -8,6 +8,7 @@ package mekhq.gui.dialog;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -230,7 +231,6 @@ public class ImageChoiceDialog extends JDialog {
             gbc = new GridBagConstraints();
             gbc.gridx = 0;
             gbc.gridy = 0;
-            gbc.gridwidth = 3;
             gbc.fill = GridBagConstraints.BOTH;
             gbc.anchor = GridBagConstraints.NORTHWEST;
             gbc.weightx = 1.0;
@@ -352,12 +352,14 @@ public class ImageChoiceDialog extends JDialog {
             layerTabs.addTab(resourceMap.getString("Force.special"), panelSpecialModifiers);
             
             // Put it all together nice and pretty on the layerPanel
+            layerPanel.setLayout(new GridBagLayout());
             layerPanel.add(layerTabs, gbc);
             gbc.gridx = 0;
             gbc.gridy = 1;
-            gbc.gridwidth = 1;
             gbc.fill = GridBagConstraints.NONE;
             gbc.anchor = GridBagConstraints.SOUTH;
+            gbc.weighty = 0.0;
+            preview.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
             layerPanel.add(preview, gbc);
             layerPanel.setName(PANEL_LAYERED);
 
@@ -556,10 +558,6 @@ public class ImageChoiceDialog extends JDialog {
      * A table model for displaying images
      */
     public class ImageTableModel extends AbstractTableModel {
-
-        /**
-         *
-         */
         private static final long serialVersionUID = 1L;
         private String[] columnNames;
         private String category;
@@ -725,7 +723,11 @@ public class ImageChoiceDialog extends JDialog {
                     category = ""; //$NON-NLS-1$
                 Image image = (Image) items.getItem(category, name);
                 if(null != image) {
-                    image = image.getScaledInstance(-1, 76, Image.SCALE_DEFAULT);
+                    if((null != category) && category.startsWith("Pieces/")) {
+                        image = image.getScaledInstance(110, -1, Image.SCALE_SMOOTH);
+                    } else {
+                        image = image.getScaledInstance(-1, 76, Image.SCALE_SMOOTH);
+                    }
                 }
                 lblImage.setIcon(new ImageIcon(image));
             } catch (Exception err) {
