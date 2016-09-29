@@ -424,7 +424,8 @@ public class ImageChoiceDialog extends JDialog {
     }
 
     private void btnSelectActionPerformed(ActionEvent evt) {
-        category = tabbedPane.getSelectedComponent().getName().equals(PANEL_LAYERED) ? Force.ROOT_LAYERED : imageTableModel.getCategory();
+        category = (null != tabbedPane.getSelectedComponent()) && PANEL_LAYERED.equals(tabbedPane.getSelectedComponent().getName())
+            ? Force.ROOT_LAYERED : imageTableModel.getCategory();
         if(tableImages.getSelectedRow() != -1) {
             filename = (String) imageTableModel.getValueAt(tableImages.getSelectedRow(), 0);
         } else {
