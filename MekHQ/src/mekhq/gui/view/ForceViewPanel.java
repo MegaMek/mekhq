@@ -166,19 +166,13 @@ public class ForceViewPanel extends javax.swing.JPanel {
         try {
             portrait = IconPackage.buildForceIcon(category, filename, icons.getForceIcons(), iconMap);
             if(null != portrait) {
-            	if(portrait.getWidth(lbl) > scale) { 
-            		portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_DEFAULT);  
-            	}
+        		portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_SMOOTH);  
             } else {
             	portrait = (Image) icons.getForceIcons().getItem("", "empty.png");
             }
+        	portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_SMOOTH);  
             ImageIcon icon = new ImageIcon(portrait);
-            lbl.setIcon(icon);
-            if(icon.getIconWidth() > scale) {
-            	portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_DEFAULT);  
-            	icon = new ImageIcon(portrait);
-            	lbl.setIcon(icon);
-            }
+        	lbl.setIcon(icon);
         } catch (Exception err) {
             err.printStackTrace();
         }
