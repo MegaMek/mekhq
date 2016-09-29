@@ -158,7 +158,7 @@ public class IconPackage {
                     }
                 }
             } catch (Exception err) {
-                err.printStackTrace();
+                MekHQ.logError(err);
             } finally {
                 if (null != g2d) {
                     g2d.dispose();
@@ -179,13 +179,10 @@ public class IconPackage {
                 scaledImage = (Image) items.getItem(category, filename);
                 if(null == scaledImage) {
                     scaledImage = (Image) items.getItem("", "empty.png");
-                    if(null != scaledImage) {
-                        scaledImage = scaledImage.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
-                    }
                 }
                 retVal = scaledImage;
             } catch (Exception err) {
-                err.printStackTrace();
+                MekHQ.logError(err);
             }
         }
         

@@ -834,11 +834,11 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
             try {
            	 portrait = IconPackage.buildForceIcon(category, filename, icons.getForceIcons(), iconMap);
            	if(null != portrait) {
-                portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
+                portrait = portrait.getScaledInstance(58, -1, Image.SCALE_SMOOTH);
             } else {
                 portrait = (Image) icons.getForceIcons().getItem("", "empty.png");
                 if(null != portrait) {
-                    portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
+                    portrait = portrait.getScaledInstance(58, -1, Image.SCALE_SMOOTH);
                 }
            	 }
            	 return new ImageIcon(portrait);
