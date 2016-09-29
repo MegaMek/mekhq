@@ -179,7 +179,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
     protected Icon getIconFrom(Force force) {
         Image forceImage = IconPackage.buildForceIcon(force.getIconCategory(), force.getIconFileName(), getIconPackage().getForceIcons(), force.getIconMap());
         if(null != forceImage) {
-            forceImage = forceImage.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
+            forceImage = forceImage.getScaledInstance(58, -1, Image.SCALE_SMOOTH);
         }
         return new ImageIcon(forceImage);
     }

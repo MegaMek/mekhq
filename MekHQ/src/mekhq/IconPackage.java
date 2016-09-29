@@ -42,6 +42,10 @@ public class IconPackage {
     public static String FORCE_ALPHANUMERICS        = "Pieces/Alphanumerics/"; //$NON-NLS-1$
     public static String FORCE_SPECIAL_MODIFIERS    = "Pieces/Special Modifiers/"; //$NON-NLS-1$
     
+    public static String[] FORCE_DRAW_ORDER = {FORCE_FRAME, FORCE_TYPE, FORCE_FORMATIONS,
+        FORCE_ADJUSTMENTS, FORCE_ALPHANUMERICS, FORCE_SPECIAL_MODIFIERS
+    };
+    
     /** A map of keys to various gui elements, for future skinning purposes */
     private final Map<String, String> guiElements = new HashMap<>();
     {
@@ -128,198 +132,37 @@ public class IconPackage {
                     .getDefaultConfiguration();
             BufferedImage base = null;
             Graphics2D g2d = null;
-            BufferedImage tmp = null;
             try {
-                // Draw the frame, as needed
-                if (iconMap.containsKey(IconPackage.FORCE_FRAME)) {
-                    for (String value : iconMap.get(IconPackage.FORCE_FRAME)) {
-                     // Load up the image piece
-                        tmp = (BufferedImage) items.getItem(IconPackage.FORCE_FRAME, value);
-                        
-                        // Create the new base if it isn't already
-                        if (null == base) {
-                            base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
-
-                            // Get our Graphics to draw on
-                            g2d = base.createGraphics();
+                int width = 0;
+                int height = 0;
+                // Gather height/width
+                for(String layer : FORCE_DRAW_ORDER) {
+                    if(iconMap.containsKey(layer)) {
+                        for(String value : iconMap.get(layer)) {
+                         // Load up the image piece
+                            BufferedImage img = (BufferedImage) items.getItem(layer, value);
+                            width = Math.max(img.getWidth(), width);
+                            height = Math.max(img.getHeight(), height);
                         }
-                        
-                        // Resize the base if this image is larger than the current base image
-                        if (tmp.getWidth() > base.getWidth() || tmp.getHeight() > base.getHeight()) {
-                            BufferedImage oldBase = base;
-                            base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
-
-                            // Get our Graphics to draw on
-                            g2d = base.createGraphics();
-                            
-                            // Draw the old base onto the new base, aligning bottom right
-                            g2d.drawImage(base, base.getWidth() - oldBase.getWidth(), base.getHeight() - oldBase.getHeight(), null);
-                        }
-
-                        // Draw the current buffered image onto the base, aligning bottom and right side
-                        g2d.drawImage(tmp, base.getWidth() - tmp.getWidth(), base.getHeight() - tmp.getHeight(), null);
                     }
                 }
-                
-                // Draw the selected type
-                if (iconMap.containsKey(IconPackage.FORCE_TYPE)) {
-                    for (String value : iconMap.get(IconPackage.FORCE_TYPE)) {
-                     // Load up the image piece
-                        tmp = (BufferedImage) items.getItem(IconPackage.FORCE_TYPE, value);
-                        
-                        // Create the new base if it isn't already
-                        if (null == base) {
-                            base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
-
-                            // Get our Graphics to draw on
-                            g2d = base.createGraphics();
+                base = config.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
+                g2d = base.createGraphics();
+                for(String layer : FORCE_DRAW_ORDER) {
+                    if(iconMap.containsKey(layer)) {
+                        for(String value : iconMap.get(layer)) {
+                            BufferedImage img = (BufferedImage) items.getItem(layer, value);
+                            // Draw the current buffered image onto the base, aligning bottom and right side
+                            g2d.drawImage(img, width - img.getWidth(), height - img.getHeight(), null);
                         }
-                        
-                        // Resize the base if this image is larger than the current base image
-                        if (tmp.getWidth() > base.getWidth() || tmp.getHeight() > base.getHeight()) {
-                            BufferedImage oldBase = base;
-                            base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
-
-                            // Get our Graphics to draw on
-                            g2d = base.createGraphics();
-                            
-                            // Draw the old base onto the new base, aligning bottom right
-                            g2d.drawImage(base, base.getWidth() - oldBase.getWidth(), base.getHeight() - oldBase.getHeight(), null);
-                        }
-
-                        // Draw the current buffered image onto the base, aligning bottom and right side
-                        g2d.drawImage(tmp, base.getWidth() - tmp.getWidth(), base.getHeight() - tmp.getHeight(), null);
-                    }
-                }
-                
-                // Draw the selected formation
-                if (iconMap.containsKey(IconPackage.FORCE_FORMATIONS)) {
-                    for (String value : iconMap.get(IconPackage.FORCE_FORMATIONS)) {
-                     // Load up the image piece
-                        tmp = (BufferedImage) items.getItem(IconPackage.FORCE_FORMATIONS, value);
-                        
-                        // Create the new base if it isn't already
-                        if (null == base) {
-                            base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
-
-                            // Get our Graphics to draw on
-                            g2d = base.createGraphics();
-                        }
-                        
-                        // Resize the base if this image is larger than the current base image
-                        if (tmp.getWidth() > base.getWidth() || tmp.getHeight() > base.getHeight()) {
-                            BufferedImage oldBase = base;
-                            base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
-
-                            // Get our Graphics to draw on
-                            g2d = base.createGraphics();
-                            
-                            // Draw the old base onto the new base, aligning bottom right
-                            g2d.drawImage(base, base.getWidth() - oldBase.getWidth(), base.getHeight() - oldBase.getHeight(), null);
-                        }
-
-                        // Draw the current buffered image onto the base, aligning bottom and right side
-                        g2d.drawImage(tmp, base.getWidth() - tmp.getWidth(), base.getHeight() - tmp.getHeight(), null);
-                    }
-                }
-                
-                // Draw any selected adjustments
-                if (iconMap.containsKey(IconPackage.FORCE_ADJUSTMENTS)) {
-                    for (String value : iconMap.get(IconPackage.FORCE_ADJUSTMENTS)) {
-                     // Load up the image piece
-                        tmp = (BufferedImage) items.getItem(IconPackage.FORCE_ADJUSTMENTS, value);
-                        
-                        // Create the new base if it isn't already
-                        if (null == base) {
-                            base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
-
-                            // Get our Graphics to draw on
-                            g2d = base.createGraphics();
-                        }
-                        
-                        // Resize the base if this image is larger than the current base image
-                        if (tmp.getWidth() > base.getWidth() || tmp.getHeight() > base.getHeight()) {
-                            BufferedImage oldBase = base;
-                            base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
-
-                            // Get our Graphics to draw on
-                            g2d = base.createGraphics();
-                            
-                            // Draw the old base onto the new base, aligning bottom right
-                            g2d.drawImage(base, base.getWidth() - oldBase.getWidth(), base.getHeight() - oldBase.getHeight(), null);
-                        }
-
-                        // Draw the current buffered image onto the base, aligning bottom and right side
-                        g2d.drawImage(tmp, base.getWidth() - tmp.getWidth(), base.getHeight() - tmp.getHeight(), null);
-                    }
-                }
-                
-                // Draw any selected alphanumerics
-                if (iconMap.containsKey(IconPackage.FORCE_ALPHANUMERICS)) {
-                    for (String value : iconMap.get(IconPackage.FORCE_ALPHANUMERICS)) {
-                     // Load up the image piece
-                        tmp = (BufferedImage) items.getItem(IconPackage.FORCE_ALPHANUMERICS, value);
-                        
-                        // Create the new base if it isn't already
-                        if (null == base) {
-                            base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
-
-                            // Get our Graphics to draw on
-                            g2d = base.createGraphics();
-                        }
-                        
-                        // Resize the base if this image is larger than the current base image
-                        if (tmp.getWidth() > base.getWidth() || tmp.getHeight() > base.getHeight()) {
-                            BufferedImage oldBase = base;
-                            base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
-
-                            // Get our Graphics to draw on
-                            g2d = base.createGraphics();
-                            
-                            // Draw the old base onto the new base, aligning bottom right
-                            g2d.drawImage(base, base.getWidth() - oldBase.getWidth(), base.getHeight() - oldBase.getHeight(), null);
-                        }
-
-                        // Draw the current buffered image onto the base, aligning bottom and right side
-                        g2d.drawImage(tmp, base.getWidth() - tmp.getWidth(), base.getHeight() - tmp.getHeight(), null);
-                    }
-                }
-                
-                // Draw the selected special modifiers
-                if (iconMap.containsKey(IconPackage.FORCE_SPECIAL_MODIFIERS)) {
-                    for (String value : iconMap.get(IconPackage.FORCE_SPECIAL_MODIFIERS)) {
-                     // Load up the image piece
-                        tmp = (BufferedImage) items.getItem(IconPackage.FORCE_SPECIAL_MODIFIERS, value);
-                        
-                        // Create the new base if it isn't already
-                        if (null == base) {
-                            base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
-
-                            // Get our Graphics to draw on
-                            g2d = base.createGraphics();
-                        }
-                        
-                        // Resize the base if this image is larger than the current base image
-                        if (tmp.getWidth() > base.getWidth() || tmp.getHeight() > base.getHeight()) {
-                            BufferedImage oldBase = base;
-                            base = config.createCompatibleImage(tmp.getWidth(), tmp.getHeight(), Transparency.TRANSLUCENT);
-
-                            // Get our Graphics to draw on
-                            g2d = base.createGraphics();
-                            
-                            // Draw the old base onto the new base, aligning bottom right
-                            g2d.drawImage(base, base.getWidth() - oldBase.getWidth(), base.getHeight() - oldBase.getHeight(), null);
-                        }
-
-                        // Draw the current buffered image onto the base, aligning bottom and right side
-                        g2d.drawImage(tmp, base.getWidth() - tmp.getWidth(), base.getHeight() - tmp.getHeight(), null);
                     }
                 }
             } catch (Exception err) {
                 err.printStackTrace();
             } finally {
-                if (null != g2d)
+                if (null != g2d) {
                     g2d.dispose();
+                }
                 if (null == base) {
                     try {
                         base = (BufferedImage) items.getItem("", "empty.png");
