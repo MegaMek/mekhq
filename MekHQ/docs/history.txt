@@ -2,6 +2,7 @@ VERSION HISTORY
 ----------------------------------
 v0.41.24-git
 + Version matched to MegaMek
++ Refactored PortraitChoiceDialog to be ImageChoiceDialog since it's used for more than one thing
 + Issue #33 [AtB]: All allied units are marked as total loss after battle even if undamaged
 + Issue #30: Dragoons rating tab transportation calculation issue
 + Issue #67: Scenario does not resolve - NPE in scenario resolution isCommander()

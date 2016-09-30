@@ -24,7 +24,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.dialog.PortraitChoiceDialog;
+import mekhq.gui.dialog.ImageChoiceDialog;
 import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.utilities.MenuScroller;
 import mekhq.gui.utilities.StaticChecks;
@@ -181,14 +181,17 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
             gui.refreshOverview();
         } else if (command.contains("CHANGE_ICON")) {
             if (null != singleForce) {
-                PortraitChoiceDialog pcd = new PortraitChoiceDialog(
+                ImageChoiceDialog pcd = new ImageChoiceDialog(
                         gui.getFrame(), true, singleForce.getIconCategory(),
                         singleForce.getIconFileName(), gui.getIconPackage()
-                                .getForceIcons());
+                                .getForceIcons(), true);
                 pcd.setVisible(true);
-                singleForce.setIconCategory(pcd.getCategory());
-                singleForce.setIconFileName(pcd.getFileName());
-                gui.refreshOrganization();
+                if (pcd.isChanged()) {
+                    singleForce.setIconCategory(pcd.getCategory());
+                    singleForce.setIconFileName(pcd.getFileName());
+                    singleForce.setIconMap(pcd.getIconMap());
+                    gui.refreshOrganization();
+                }
             }
         } else if (command.contains("CHANGE_NAME")) {
             if (null != singleForce) {
@@ -231,7 +234,7 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
             gui.refreshUnitList();
             gui.refreshOverview();
         } else if (command.contains("REMOVE_LANCE_TECH")) {
-           	if (singleForce.getTechID() != null) {            		
+           	if (singleForce.getTechID() != null) {
     			Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
     			oldTech.clearTechUnitIDs();
     			oldTech.addLogEntry(gui.getCampaign().getDate(), "Removed from " + singleForce.getName());
@@ -244,7 +247,7 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
            			}
            		}
     			singleForce.setTechID(null);
-    				
+
     			gui.refreshOrganization();
     			gui.refreshPersonnelList();
                 gui.refreshScenarioList();

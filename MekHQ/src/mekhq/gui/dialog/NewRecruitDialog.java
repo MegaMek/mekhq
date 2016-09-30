@@ -233,7 +233,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
     
     private void choosePortrait() {
-    	PortraitChoiceDialog pcd = new PortraitChoiceDialog(frame, true,
+    	ImageChoiceDialog pcd = new ImageChoiceDialog(frame, true,
 				person.getPortraitCategory(),
 				person.getPortraitFileName(), portraits);
 		pcd.setVisible(true);
