@@ -1000,8 +1000,10 @@ public class PersonnelMarket {
     		return;
     	}
 
-    	int weight = 0;
-    	if (unitType >= 0 && unitType <= UnitType.AERO) {
+    	int weight = -1;
+    	if (unitType == UnitType.MEK
+    			|| unitType == UnitType.TANK
+    			|| unitType == UnitType.AERO) {
 			int roll = Compute.d6(2);
 	    	if (roll < 8) {
 	    		return;
@@ -1047,6 +1049,10 @@ public class PersonnelMarket {
 	            MekHQ.logError("Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage());
 	            MekHQ.logError(ex);
 			}
+		} else {
+			MekHQ.logError("Personnel market could not find "
+					+ UnitType.getTypeName(unitType) + " for recruit from faction " + faction);
+			return;
 		}
 
 		if (null != en) {

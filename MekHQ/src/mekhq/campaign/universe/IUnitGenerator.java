@@ -47,7 +47,7 @@ public interface IUnitGenerator {
 	 * 
 	 * @param faction Faction shortname
 	 * @param unitType UnitType constant
-	 * @param weightClass EntityWeightClass constant
+	 * @param weightClass EntityWeightClass constant, or -1 for unspecified
 	 * @param year The year of the campaign date
 	 * @param quality Index of equipment rating, with zero being the lowest quality.
 	 * @return A unit that matches the criteria
@@ -59,7 +59,7 @@ public interface IUnitGenerator {
 	 * 
 	 * @param faction Faction shortname
 	 * @param unitType UnitType constant
-	 * @param weightClass EntityWeightClass constant
+	 * @param weightClass EntityWeightClass constant, or -1 for unspecified
 	 * @param year The year of the campaign date
 	 * @param quality Index of equipment rating, with zero being the lowest quality.
 	 * @param filter All generated units return true when the filter function is applied.
@@ -75,7 +75,7 @@ public interface IUnitGenerator {
 	 * @param count The number of units to generate
 	 * @param faction Faction shortname
 	 * @param unitType UnitType constant
-	 * @param weightClass EntityWeightClass constant
+	 * @param weightClass EntityWeightClass constant, or -1 for unspecified
 	 * @param year The year of the campaign date
 	 * @param quality Index of equipment rating, with zero being the lowest quality.
 	 * @return A list of units matching the criteria.
@@ -90,7 +90,7 @@ public interface IUnitGenerator {
 	 * @param count The number of units to generate
 	 * @param faction Faction shortname
 	 * @param unitType UnitType constant
-	 * @param weightClass EntityWeightClass constant
+	 * @param weightClass EntityWeightClass constant, or -1 for unspecified
 	 * @param year The year of the campaign date
 	 * @param quality Index of equipment rating, with zero being the lowest quality.
 	 * @param filter All generated units return true when the filter function is applied.
@@ -105,7 +105,7 @@ public interface IUnitGenerator {
 	 * 
 	 * @param faction Faction shortname
 	 * @param unitType UnitType constant
-	 * @param weightClass EntityWeightClass constant
+	 * @param weightClass EntityWeightClass constant, or -1 for unspecified
 	 * @param year The year of the campaign date
 	 * @param quality Index of equipment rating, with zero being the lowest quality.
 	 * @param options A map of additional parameters keyed to the parameter name.
@@ -123,7 +123,7 @@ public interface IUnitGenerator {
 	 * @param count The number of units to generate
 	 * @param faction Faction shortname
 	 * @param unitType UnitType constant
-	 * @param weightClass EntityWeightClass constant
+	 * @param weightClass EntityWeightClass constant, or -1 for unspecified
 	 * @param year The year of the campaign date
 	 * @param quality Index of equipment rating, with zero being the lowest quality.
 	 * @param options A map of additional parameters keyed to the parameter name.

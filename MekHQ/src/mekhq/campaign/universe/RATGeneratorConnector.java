@@ -102,7 +102,9 @@ public class RATGeneratorConnector implements IUnitGenerator {
 				rating = ratings.get(Math.min(quality, ratings.size() - 1));
 			}
 			ArrayList<Integer> wcs = new ArrayList<Integer>();
-			wcs.add(weightClass);
+			if (weightClass > 0) {
+				wcs.add(weightClass);
+			}
 			
 			retVal = new UnitTable(fRec, unitType, year, rating, wcs,
 					ModelRecord.NETWORK_NONE, new ArrayList<>(), new ArrayList<>(), 2, fRec);

@@ -429,7 +429,7 @@ public class RATManager implements IUnitGenerator {
     	public boolean matches(String faction, int unitType, int weightClass, int quality) {
     		return (factions.contains(faction) || factions.isEmpty())
     				&& (unitTypes.contains(unitType) || unitTypes.isEmpty())
-    				&& (weightClasses.contains(weightClass) || weightClasses.isEmpty())
+    				&& (weightClasses.contains(weightClass) || weightClasses.isEmpty() || weightClass < 0)
     				&& (ratings.contains(quality) || ratings.isEmpty());
     	}
     	
