@@ -13,8 +13,10 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.ResourceBundle;
 import java.util.UUID;
+import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -145,37 +147,32 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		add(txtDesc, gridBagConstraints);
 	}
 	
-	private void setIcon(Force f, JLabel lbl, int scale) {
-        String category = f.getIconCategory();
-        String file = f.getIconFileName();
+	private void setIcon(Force force, JLabel lbl, int scale) {
+        String category = force.getIconCategory();
+        String filename = force.getIconFileName();
+        LinkedHashMap<String, Vector<String>> iconMap = force.getIconMap();
 
         if(Crew.ROOT_PORTRAIT.equals(category)) {
             category = "";
         }
 
         // Return a null if the player has selected no portrait file.
-        if ((null == category) || (null == file) || Crew.PORTRAIT_NONE.equals(file)) {
-        	file = "empty.png";
+        if ((null == category) || (null == filename) || (Crew.PORTRAIT_NONE.equals(filename) && !Force.ROOT_LAYERED.equals(category))) {
+        	filename = "empty.png";
         }
 
         // Try to get the player's portrait file.
         Image portrait = null;        
         try {
-            portrait = (Image) icons.getForceIcons().getItem(category, file);
+            portrait = IconPackage.buildForceIcon(category, filename, icons.getForceIcons(), iconMap);
             if(null != portrait) {
-            	if(portrait.getWidth(lbl) > scale) { 
-            		portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_DEFAULT);  
-            	}
+        		portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_SMOOTH);  
             } else {
             	portrait = (Image) icons.getForceIcons().getItem("", "empty.png");
             }
+        	portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_SMOOTH);  
             ImageIcon icon = new ImageIcon(portrait);
-            lbl.setIcon(icon);
-            if(icon.getIconWidth() > scale) {
-            	portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_DEFAULT);  
-            	icon = new ImageIcon(portrait);
-            	lbl.setIcon(icon);
-            }
+        	lbl.setIcon(icon);
         } catch (Exception err) {
             err.printStackTrace();
         }
@@ -413,10 +410,10 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		JLabel lblForce;
 
 		int nexty = 0;
-		for(Force f : force.getSubForces()) {
+		for(Force subForce : force.getSubForces()) {
 			lblForce = new JLabel();
-			lblForce.setText(getSummaryFor(f));
-			setIcon(f, lblForce, 72);
+			lblForce.setText(getSummaryFor(subForce));
+			setIcon(subForce, lblForce, 72);
 			nexty++;
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
@@ -450,15 +447,15 @@ public class ForceViewPanel extends javax.swing.JPanel {
                return ((Comparable<Integer>)u2.getCommander().getRankNumeric()).compareTo(u1.getCommander().getRankNumeric());
             }
         });
- 		for(Unit u : unmannedUnits) {
- 			units.add(u);
+ 		for(Unit unit : unmannedUnits) {
+ 			units.add(unit);
  		}
- 		for(Unit u : units) {
- 			Person p = u.getCommander();
+ 		for(Unit unit : units) {
+ 			Person p = unit.getCommander();
  			lblPerson = new JLabel();
 			lblUnit = new JLabel();
 			if(null != p) {
-				lblPerson.setText(getSummaryFor(p, u));
+				lblPerson.setText(getSummaryFor(p, unit));
 				setPortrait(p, lblPerson);
 			}
 			nexty++;
@@ -470,9 +467,9 @@ public class ForceViewPanel extends javax.swing.JPanel {
 			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 			pnlSubUnits.add(lblPerson, gridBagConstraints);
-			if(null != u) {
-				lblUnit.setText(getSummaryFor(u));
-				lblUnit.setIcon(new ImageIcon(getImageFor(u, lblUnit)));			
+			if(null != unit) {
+				lblUnit.setText(getSummaryFor(unit));
+				lblUnit.setIcon(new ImageIcon(getImageFor(unit, lblUnit)));			
 			}
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 1;
@@ -496,21 +493,21 @@ public class ForceViewPanel extends javax.swing.JPanel {
     public void setPortrait(Person p, JLabel lbl) {
 
         String category = p.getPortraitCategory();
-        String file = p.getPortraitFileName();
+        String filename = p.getPortraitFileName();
 
         if(Crew.ROOT_PORTRAIT.equals(category)) {
             category = "";
         }
 
         // Return a null if the player has selected no portrait file.
-        if ((null == category) || (null == file) || Crew.PORTRAIT_NONE.equals(file)) {
-        	file = "default.gif";
+        if ((null == category) || (null == filename) || Crew.PORTRAIT_NONE.equals(filename)) {
+        	filename = "default.gif";
         }
 
         // Try to get the player's portrait file.
         Image portrait = null;
         try {
-            portrait = (Image) icons.getPortraits().getItem(category, file);
+            portrait = (Image) icons.getPortraits().getItem(category, filename);
             if(null != portrait) {
                 portrait = portrait.getScaledInstance(72, -1, Image.SCALE_DEFAULT);               
             } else {

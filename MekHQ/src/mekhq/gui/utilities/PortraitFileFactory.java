@@ -16,12 +16,15 @@ package mekhq.gui.utilities;
 
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import javax.imageio.ImageIO;
 
 import megamek.common.util.ItemFile;
 import megamek.common.util.ItemFileFactory;
@@ -81,13 +84,13 @@ public class PortraitFileFactory implements ItemFileFactory {
         return new ItemFile() {
 
             private File itemFile = file; // copy the file entry
-            private Image image = null; // cache the Image
+            private BufferedImage image = null; // cache the Image
 
             public Object getItem() throws Exception {
                 // Cache the image on first use.
                 if (null == image) {
                     String name = itemFile.getAbsolutePath();
-                    image = Toolkit.getDefaultToolkit().getImage(name);
+                    image = ImageIO.read(new File(name));
                 }
                 // Return a copy of the image.
                 //return image.getScaledInstance(150, -1, Image.SCALE_DEFAULT);

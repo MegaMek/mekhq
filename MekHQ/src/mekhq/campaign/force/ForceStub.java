@@ -23,16 +23,19 @@ package mekhq.campaign.force;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.Vector;
+
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * this is a hierarchical object that represents forces from the TO&E using 
@@ -49,6 +52,7 @@ public class ForceStub implements Serializable {
     public static final String ICON_NONE = "None";
     private String iconCategory = ROOT_ICON;
     private String iconFileName = ICON_NONE;
+    private LinkedHashMap<String, Vector<String>> iconMap = new LinkedHashMap<String, Vector<String>>();
 
     private String name;
     private Vector<ForceStub> subForces;
@@ -60,18 +64,19 @@ public class ForceStub implements Serializable {
         units = new Vector<UnitStub>();
     }
     
-    public ForceStub(Force f, Campaign c) {
-        name = f.getFullName();
+    public ForceStub(Force force, Campaign c) {
+        name = force.getFullName();
         subForces = new Vector<ForceStub>();
         units = new Vector<UnitStub>();
-        iconCategory = f.getIconCategory();
-        iconFileName = f.getIconFileName();
-        for(Force sub : f.getSubForces()) {
+        iconCategory = force.getIconCategory();
+        iconFileName = force.getIconFileName();
+        iconMap = force.getIconMap();
+        for(Force sub : force.getSubForces()) {
             ForceStub stub = new ForceStub(sub, c);
             //stub.setParentForce(this);
             subForces.add(stub);
         }
-        for(UUID uid : f.getUnits()) {
+        for(UUID uid : force.getUnits()) {
             Unit u = c.getUnit(uid);
             if(null != u) {
                 units.add(new UnitStub(u));
@@ -99,6 +104,14 @@ public class ForceStub implements Serializable {
         return iconFileName;
     }
     
+    public LinkedHashMap<String, Vector<String>> getIconMap() {
+        return iconMap;
+    }
+    
+    public void setIconMap(LinkedHashMap<String, Vector<String>> iconMap) {
+        this.iconMap = iconMap;
+    }
+    
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<forceStub>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -113,6 +126,28 @@ public class ForceStub implements Serializable {
                 +"<iconFileName>"
                 +MekHqXmlUtil.escape(iconFileName)
                 +"</iconFileName>");
+        if (iconCategory.equals(Force.ROOT_LAYERED)) {
+            pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                    +"<iconHashMap>");
+            for (Map.Entry<String, Vector<String>> entry : iconMap.entrySet()) {
+                if (null != entry.getValue() && !entry.getValue().isEmpty()) {
+                    pw1.println(MekHqXmlUtil.indentStr(indent+2)
+                            +"<iconentry key=\""
+                            +MekHqXmlUtil.escape(entry.getKey())
+                            +">");
+                    for (String value : entry.getValue()) {
+                        pw1.println(MekHqXmlUtil.indentStr(indent+2)
+                                +"<value name=\""
+                                +MekHqXmlUtil.escape(value)
+                                +"\"/>");
+                    }
+                    pw1.println(MekHqXmlUtil.indentStr(indent+2)
+                            +"</iconentry>");
+                }
+            }
+            pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                    +"</iconHashMap>");
+        }
         if(units.size() > 0) {
             pw1.println(MekHqXmlUtil.indentStr(indent+1)
                     +"<units>");
@@ -147,6 +182,8 @@ public class ForceStub implements Serializable {
                     retVal.name = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("iconCategory")) {
                     retVal.iconCategory = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("iconHashMap")) {
+                    processIconMapNodes(retVal, wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("iconFileName")) {
                     retVal.iconFileName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("units")) {
@@ -193,6 +230,48 @@ public class ForceStub implements Serializable {
         }
         
         return retVal;
+    }
+
+    private static void processIconMapNodes(ForceStub retVal, Node wn) {
+        NodeList nl = wn.getChildNodes();
+        for (int x=0; x<nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+
+            // If it's not an element node, we ignore it.
+            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            NamedNodeMap attrs = wn2.getAttributes();
+            Node keyNode = attrs.getNamedItem("key");
+            String key = keyNode.getTextContent();
+            Vector<String> values = null;
+            if (wn2.hasChildNodes()) {
+                values = processIconMapSubNodes(wn2);
+            }
+            retVal.getIconMap().put(key, values);
+        }
+    }
+    
+    private static Vector<String> processIconMapSubNodes(Node wn) {
+        Vector<String> values = new Vector<String>();
+        NodeList nl = wn.getChildNodes();
+        for (int x=0; x<nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+
+            // If it's not an element node, we ignore it.
+            if (wn2.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            NamedNodeMap attrs = wn2.getAttributes();
+            Node keyNode = attrs.getNamedItem("name");
+            String key = keyNode.getTextContent();
+            if (null != key && !key.isEmpty()) {
+                values.add(key);
+            }
+        }
+        return values;
     }
     
     public void addSubForce(ForceStub sub) {
