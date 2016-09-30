@@ -208,13 +208,13 @@ public class ResolveScenarioTracker {
     public void processGame() {
         int pid = client.getLocalPlayer().getId();
         int team = client.getLocalPlayer().getTeam();
-        // Fix game data
-        client.getGame().purgeGameListeners();
-        client.getGame().setEntitiesVector(Collections.list(victoryEvent.getEntities()));
-        client.getGame().setOutOfGameEntitiesVector(Collections.list(victoryEvent.getRetreatedEntities()));
 
         for (Enumeration<Entity> iter = victoryEvent.getEntities(); iter.hasMoreElements();) {
             Entity e = iter.nextElement();
+            if(e.getSubEntities().isPresent()) {
+                // Sub-entities have their own entry in the VictoryEvent data
+                continue;
+            }
             checkForLostLimbs(e, control);
             if(e.getOwnerId() == pid) {
                 if(!e.getExternalIdAsString().equals("-1")) {
@@ -274,6 +274,10 @@ public class ResolveScenarioTracker {
         // Utterly destroyed entities
         for (Enumeration<Entity> iter = victoryEvent.getDevastatedEntities(); iter.hasMoreElements();) {
             Entity e = iter.nextElement();
+            if(e.getSubEntities().isPresent()) {
+                // Sub-entities have their own entry in the VictoryEvent data
+                continue;
+            }
             if(e.getOwnerId() == pid) {
                 if(!e.getExternalIdAsString().equals("-1")) {
                     UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
@@ -305,6 +309,10 @@ public class ResolveScenarioTracker {
         //add retreated units
         for (Enumeration<Entity> iter = victoryEvent.getRetreatedEntities(); iter.hasMoreElements();) {
             Entity e = iter.nextElement();
+            if(e.getSubEntities().isPresent()) {
+                // Sub-entities have their own entry in the VictoryEvent data
+                continue;
+            }
             checkForLostLimbs(e, control);
             if(e.getOwnerId() == pid) {
                 if(!e.getExternalIdAsString().equals("-1")) {
@@ -338,6 +346,10 @@ public class ResolveScenarioTracker {
         Enumeration<Entity> wrecks = victoryEvent.getGraveyardEntities();
         while (wrecks.hasMoreElements()) {
             Entity e = wrecks.nextElement();
+            if(e.getSubEntities().isPresent()) {
+                // Sub-entities have their own entry in the VictoryEvent data
+                continue;
+            }
             checkForLostLimbs(e, control);
             if(e.getOwnerId() == pid) {
                 if(!e.getExternalIdAsString().equals("-1")) {
