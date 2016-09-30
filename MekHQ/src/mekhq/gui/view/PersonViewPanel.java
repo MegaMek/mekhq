@@ -12,6 +12,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
@@ -68,6 +70,8 @@ public class PersonViewPanel extends javax.swing.JPanel {
     private javax.swing.JLabel lblGender2;
     private javax.swing.JLabel lblStatus1;
     private javax.swing.JLabel lblStatus2;
+    private javax.swing.JLabel lblDuedate1;
+    private javax.swing.JLabel lblDuedate2;
     private javax.swing.JLabel lblTough1;
     private javax.swing.JLabel lblTough2;
     private javax.swing.JLabel lblEdge1;
@@ -267,6 +271,8 @@ public class PersonViewPanel extends javax.swing.JPanel {
         lblGender2 = new JLabel();
         lblStatus1 = new JLabel();
         lblStatus2 = new JLabel();
+        lblDuedate1 = new JLabel();
+        lblDuedate2 = new JLabel();
         lblTough1 = new JLabel();
         lblTough2 = new JLabel();
         lblEdge1 = new JLabel();
@@ -385,6 +391,32 @@ public class PersonViewPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblStatus2, gridBagConstraints);
+
+        if (person.getDueDate() != null) {
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+            String DueDate = df.format(person.getDueDate().getTime());
+
+            firsty++;
+            lblDuedate1.setName("lblDuedate1");
+            lblDuedate1.setText(resourceMap.getString("lblDuedate1.text")); //$NON-NLS-1$
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblDuedate1, gridBagConstraints);
+
+            lblDuedate2.setName("lblDuedate2"); // NOI18N
+            lblDuedate2.setText(DueDate);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblDuedate2, gridBagConstraints);
+        }
 
         int secondy = 0;
         JLabel lblName;

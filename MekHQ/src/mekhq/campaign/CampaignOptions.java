@@ -92,6 +92,7 @@ public class CampaignOptions implements Serializable {
     private boolean useUnofficialProcreation;
     private boolean useUnofficialProcreationNoRelationship;
     private boolean useParentage;
+    private boolean logConception;
     private boolean useTransfers;
     private boolean capturePrisoners;
     private int defaultPrisonerStatus;
@@ -352,6 +353,7 @@ public class CampaignOptions implements Serializable {
         useUnofficialProcreation = false;
         useUnofficialProcreationNoRelationship = false;
         useParentage = false;
+        logConception = false;
         useTransfers = true;
         capturePrisoners = true;
         defaultPrisonerStatus = PRISONER_RANK;
@@ -1283,6 +1285,14 @@ public class CampaignOptions implements Serializable {
         useParentage = b;
     }
 
+    public boolean logConception() {
+        return logConception;
+    }
+
+    public void setLogConception(boolean b) {
+        logConception = b;
+    }
+
     public boolean useTransfers() {
     	return useTransfers;
     }
@@ -1822,6 +1832,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficialProcreation", useUnofficialProcreation);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficialProcreationNoRelationship", useUnofficialProcreationNoRelationship);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useParentage", useParentage);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logConception", logConception);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTransfers", useTransfers);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "capturePrisoners", capturePrisoners);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "defaultPrisonerStatus", defaultPrisonerStatus);
@@ -2169,6 +2180,8 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreationNoRelationship")) {
             	retVal.useUnofficialProcreationNoRelationship = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useParentage")) {
+                retVal.useParentage = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("logConception")) {
                 retVal.useParentage = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useTransfers")) {
             	retVal.useTransfers = Boolean.parseBoolean(wn2.getTextContent().trim());
