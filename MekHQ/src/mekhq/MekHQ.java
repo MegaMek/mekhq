@@ -30,6 +30,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
@@ -38,6 +39,8 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import megamek.client.Client;
+import megamek.common.Entity;
+import megamek.common.Game;
 import megamek.common.event.EventBus;
 import megamek.common.event.GameBoardChangeEvent;
 import megamek.common.event.GameBoardNewEvent;

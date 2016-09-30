@@ -234,12 +234,17 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 if(!presets.isEmpty()) {
                 	ChooseGamePresetDialog cgpd = new ChooseGamePresetDialog(frame, true, presets);
                 	cgpd.setVisible(true);
-                	if(cgpd.wasCancelled()) {
+                	/* This code causes the new campaign process to abort after the campaign
+                	 * options dialog if the user cancels the preset dialog instead of choosing
+                	 * one. Since a preset is not necessary, I don't think it should abort the
+                	 * process -- Neoancient */
+                	//if(cgpd.wasCancelled()) {
                 		//FIXME: why is this not working?
-                		cancelled = true;
-                		cancel(true);
-                	}
-                	else if(null != cgpd.getSelectedPreset()) {
+                		//cancelled = true;
+                		//cancel(true);
+                	//}
+                	//else
+                	if(null != cgpd.getSelectedPreset()) {
         				cgpd.getSelectedPreset().apply(campaign);
         			}
                 }

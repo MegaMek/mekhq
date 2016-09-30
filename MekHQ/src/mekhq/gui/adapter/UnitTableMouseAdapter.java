@@ -558,7 +558,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                             part.resetOvertime();
                             part.setTeamId(null);
                             part.cancelReservation();
-                            unit.removePart(part);
+                            part.remove(false);
                             needsCheck = true;
                         } else {
                             if(part.needsFixing()) {
@@ -573,14 +573,16 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     }
                     // TODO: Make this less painful. We just want to fix hips and shoulders.
                     Entity entity = unit.getEntity();
-                    for(int loc : new int[]{
-                        Mech.LOC_CLEG, Mech.LOC_LLEG, Mech.LOC_RLEG, Mech.LOC_LARM, Mech.LOC_RARM}) {
-                        int numberOfCriticals = entity.getNumberOfCriticals(loc);
-                        for(int crit = 0; crit < numberOfCriticals; ++ crit) {
-                            CriticalSlot slot = entity.getCritical(loc, crit);
-                            if(null != slot) {
-                                slot.setHit(false);
-                                slot.setDestroyed(false);
+                    if(entity instanceof Mech) {
+                        for(int loc : new int[]{
+                            Mech.LOC_CLEG, Mech.LOC_LLEG, Mech.LOC_RLEG, Mech.LOC_LARM, Mech.LOC_RARM}) {
+                            int numberOfCriticals = entity.getNumberOfCriticals(loc);
+                            for(int crit = 0; crit < numberOfCriticals; ++ crit) {
+                                CriticalSlot slot = entity.getCritical(loc, crit);
+                                if(null != slot) {
+                                    slot.setHit(false);
+                                    slot.setDestroyed(false);
+                                }
                             }
                         }
                     }
