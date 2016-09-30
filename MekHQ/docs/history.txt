@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.41.24-git
++ Issue #170: MHQ Unable to Resolve Space Battle with Fighter Squadrons
 + Version matched to MegaMek
 + Refactored PortraitChoiceDialog to be ImageChoiceDialog since it's used for more than one thing
 + Issue #33 [AtB]: All allied units are marked as total loss after battle even if undamaged
