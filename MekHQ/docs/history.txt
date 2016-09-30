@@ -11,6 +11,7 @@ v0.41.24-git
 + Added Layered Force Icons - Functionality limited for now, but can be expanded further in the future
 + Fix bug with cancel and exit button in the ImageChoiceDialog
 + Fixed image preview for the layered icons
++ Feature: Log conception and birth in personnel log
 
 v0.3.33 (2016-09-20 00:07 UTC)
 + Added AtB preset.
