@@ -704,9 +704,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         selectedPerson.getPortraitFileName(), gui.getIconPackage()
                                 .getPortraits());
                 pcd.setVisible(true);
-                selectedPerson.setPortraitCategory(pcd.getCategory());
-                selectedPerson.setPortraitFileName(pcd.getFileName());
-                gui.getCampaign().personUpdated(selectedPerson);
+                if (pcd.isChanged()) {
+                    selectedPerson.setPortraitCategory(pcd.getCategory());
+                    selectedPerson.setPortraitFileName(pcd.getFileName());
+                    gui.getCampaign().personUpdated(selectedPerson);
+                }
                 break;
             case CMD_EDIT_BIOGRAPHY:
                 TextAreaDialog tad = new TextAreaDialog(gui.getFrame(), true,

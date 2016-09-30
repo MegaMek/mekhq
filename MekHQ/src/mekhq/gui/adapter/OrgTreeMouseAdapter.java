@@ -186,10 +186,12 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                         singleForce.getIconFileName(), gui.getIconPackage()
                                 .getForceIcons(), true);
                 pcd.setVisible(true);
-                singleForce.setIconCategory(pcd.getCategory());
-                singleForce.setIconFileName(pcd.getFileName());
-                singleForce.setIconMap(pcd.getIconMap());
-                gui.refreshOrganization();
+                if (pcd.isChanged()) {
+                    singleForce.setIconCategory(pcd.getCategory());
+                    singleForce.setIconFileName(pcd.getFileName());
+                    singleForce.setIconMap(pcd.getIconMap());
+                    gui.refreshOrganization();
+                }
             }
         } else if (command.contains("CHANGE_NAME")) {
             if (null != singleForce) {

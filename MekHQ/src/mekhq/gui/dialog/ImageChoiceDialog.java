@@ -76,6 +76,7 @@ public class ImageChoiceDialog extends JDialog {
     private JComboBox<String> comboCategories;
     private JScrollPane scrImages;
     private JTable tableImages;
+    private boolean changed = false;
     
     // BEGIN: Layered Images Support
     private ImageIcon imageIcon = null;
@@ -359,9 +360,11 @@ public class ImageChoiceDialog extends JDialog {
             gbc.fill = GridBagConstraints.NONE;
             gbc.anchor = GridBagConstraints.SOUTH;
             gbc.weighty = 0.0;
-            preview.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
+            preview.setMaximumSize(new Dimension(Integer.MAX_VALUE, 225));
+            preview.setMinimumSize(new Dimension(300, 225));
             layerPanel.add(preview, gbc);
             layerPanel.setName(PANEL_LAYERED);
+            refreshLayeredPreview();
 
             // Add single and layered options to the dialog
             tabbedPane.addTab(resourceMap.getString("Force.single"), imagesPanel);
@@ -433,8 +436,17 @@ public class ImageChoiceDialog extends JDialog {
         } else {
             filename = Crew.PORTRAIT_NONE;
         }
+        changed = true;
         setVisible(false);
     }
+
+    /**
+     * @return the changed
+     */
+    public boolean isChanged() {
+        return changed;
+    }
+
 
     private void comboCategoriesItemStateChanged(ItemEvent evt) {
         if (evt.getStateChange() == ItemEvent.SELECTED) {
