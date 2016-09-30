@@ -3487,7 +3487,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
             if (i.getTime() > 0) {
                 i.setTime(i.getTime() - 1);
             }
-            if (i.getTime() < 1 && !i.getPermanent()) {
+            if (i.getTime() <= 0 && !i.getPermanent()) {
                 if ((i.getType() == Injury.INJ_BROKEN_LIMB || i.getType() == Injury.INJ_SPRAIN || i.getType() == Injury.INJ_CONCUSSION
                      || i.getType() == Injury.INJ_BROKEN_COLLAR_BONE) && Compute.d6() == 1) {
                     i.setPermanent(true);
@@ -3507,7 +3507,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         boolean retVal = false;
         if (injuries.size() > 0) {
             for (Injury i : injuries) {
-                if (i.getTime() > 0) {
+                if (i.getTime() > 0 || !(i.getPermanent())) {
                     retVal = true;
                     break;
                 }
