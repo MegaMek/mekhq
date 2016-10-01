@@ -945,7 +945,7 @@ public class Campaign implements Serializable {
     }
 
     public void addPersonWithoutId(Person p, boolean log) {
-        while (null != personnelIds.get(p.getId())) {
+        while((null == p.getId()) || (null != personnelIds.get(p.getId()))) {
             p.setId(UUID.randomUUID());
         }
         addPersonWithoutId(p);

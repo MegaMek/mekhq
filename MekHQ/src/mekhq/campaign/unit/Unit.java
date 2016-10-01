@@ -2855,6 +2855,7 @@ public class Unit implements MekHqXmlSerializable {
     }
 
     public void addDriver(Person p) {
+        ensurePersonIsRegistered(p);
         drivers.add(p.getId());
         p.setUnitId(getId());
         resetPilotAndEntity();
@@ -2862,6 +2863,7 @@ public class Unit implements MekHqXmlSerializable {
     }
 
     public void addDriver(Person p, boolean useTransfers) {
+        ensurePersonIsRegistered(p);
         drivers.add(p.getId());
         p.setUnitId(getId());
         resetPilotAndEntity();
@@ -2873,6 +2875,7 @@ public class Unit implements MekHqXmlSerializable {
     }
 
     public void addGunner(Person p) {
+        ensurePersonIsRegistered(p);
         gunners.add(p.getId());
         p.setUnitId(getId());
         resetPilotAndEntity();
@@ -2880,6 +2883,7 @@ public class Unit implements MekHqXmlSerializable {
     }
 
     public void addGunner(Person p, boolean useTransfers) {
+        ensurePersonIsRegistered(p);
         gunners.add(p.getId());
         p.setUnitId(getId());
         resetPilotAndEntity();
@@ -2891,6 +2895,7 @@ public class Unit implements MekHqXmlSerializable {
     }
 
     public void addVesselCrew(Person p) {
+        ensurePersonIsRegistered(p);
         vesselCrew.add(p.getId());
         p.setUnitId(getId());
         resetPilotAndEntity();
@@ -2898,6 +2903,7 @@ public class Unit implements MekHqXmlSerializable {
     }
 
     public void addVesselCrew(Person p, boolean useTransfers) {
+        ensurePersonIsRegistered(p);
         vesselCrew.add(p.getId());
         p.setUnitId(getId());
         resetPilotAndEntity();
@@ -2909,6 +2915,7 @@ public class Unit implements MekHqXmlSerializable {
     }
 
     public void setNavigator(Person p) {
+        ensurePersonIsRegistered(p);
         navigator = p.getId();
         p.setUnitId(getId());
         resetPilotAndEntity();
@@ -2916,6 +2923,7 @@ public class Unit implements MekHqXmlSerializable {
     }
 
     public void setNavigator(Person p, boolean useTransfers) {
+        ensurePersonIsRegistered(p);
         navigator = p.getId();
         p.setUnitId(getId());
         resetPilotAndEntity();
@@ -2927,6 +2935,7 @@ public class Unit implements MekHqXmlSerializable {
     }
 
     public void setTech(Person p) {
+        ensurePersonIsRegistered(p);
         tech = p.getId();
         p.addTechUnitID(getId());
         p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
@@ -2940,7 +2949,15 @@ public class Unit implements MekHqXmlSerializable {
         tech = null;
     }
 
+    private void ensurePersonIsRegistered(Person p) {
+        Objects.requireNonNull(p);
+        if(null == campaign.getPerson(p.getId())) {
+            campaign.addPersonWithoutId(p, false);
+        }
+    }
+    
     public void addPilotOrSoldier(Person p) {
+        ensurePersonIsRegistered(p);
         drivers.add(p.getId());
         gunners.add(p.getId());
         p.setUnitId(getId());
@@ -2949,6 +2966,7 @@ public class Unit implements MekHqXmlSerializable {
     }
 
     public void addPilotOrSoldier(Person p, boolean useTransfers) {
+        ensurePersonIsRegistered(p);
         drivers.add(p.getId());
         gunners.add(p.getId());
         p.setUnitId(getId());
@@ -2961,6 +2979,7 @@ public class Unit implements MekHqXmlSerializable {
     }
 
     public void remove(Person p, boolean log) {
+        ensurePersonIsRegistered(p);
         if(p.getId().equals(tech)) {
             tech = null;
             p.removeTechUnitId(getId());
