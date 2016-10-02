@@ -27,7 +27,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.TreeMap;
+import java.util.function.Function;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -63,20 +63,22 @@ public class AtBConfiguration implements Serializable {
 	 */
 	private static final long serialVersionUID = 515628415152924457L;
 	
+	/* Contract generation */
 	private ArrayList<DatedRecord<String>> hiringHalls;
 	
+	/* Personnel and unit markets */
 	private int shipSearchCost = 100000;
 	private int shipSearchLengthWeeks = 4;
 	private Integer dropshipSearchTarget;
 	private Integer jumpshipSearchTarget;
 	private Integer warshipSearchTarget;
-	private TreeMap<Integer,String> dsTable;
-	private TreeMap<Integer,String> jsTable;
+	private WeightedTable<String> dsTable;
+	private WeightedTable<String> jsTable;
 	
 	private AtBConfiguration() {
 		hiringHalls = new ArrayList<DatedRecord<String>>();
-		dsTable = new TreeMap<>();
-		jsTable = new TreeMap<>();
+		dsTable = new WeightedTable<>();
+		jsTable = new WeightedTable<>();
 		setDefaults();
 	}
 	
@@ -101,19 +103,19 @@ public class AtBConfiguration implements Serializable {
 		jumpshipSearchTarget = 12;
 		warshipSearchTarget = null;
 		
-		dsTable.put(1, "Buccaneer (Standard)");
-		dsTable.put(7, "Mule (Standard)");
-		dsTable.put(8, "Seeker (2815)");
-		dsTable.put(12, "Gazelle (2531)");
-		dsTable.put(13, "Excalibur (2786)");
-		dsTable.put(15, "Leopard (2537)");
-		dsTable.put(19, "Union (2708)");
-		dsTable.put(20, "Overlord (2762)");
+		dsTable.add(1, "Buccaneer (Standard)");
+		dsTable.add(6, "Mule (Standard)");
+		dsTable.add(1, "Seeker (2815)");
+		dsTable.add(4, "Gazelle (2531)");
+		dsTable.add(1, "Excalibur (2786)");
+		dsTable.add(2, "Leopard (2537)");
+		dsTable.add(4, "Union (2708)");
+		dsTable.add(1, "Overlord (2762)");
 
-		jsTable.put(1, "Scout JumpShip (Standard)");
-		jsTable.put(3, "Merchant Jumpship (Standard)");
-		jsTable.put(6, "Invader Jumpship (Standard)");			
-}
+		jsTable.add(1, "Scout JumpShip (Standard)");
+		jsTable.add(2, "Merchant Jumpship (Standard)");
+		jsTable.add(3, "Invader Jumpship (Standard)");			
+	}
 	
 	public boolean isHiringHall(String planet, Date date) {
 		for (DatedRecord<String> rec : hiringHalls) {
@@ -181,17 +183,16 @@ public class AtBConfiguration implements Serializable {
     }
     
 	public MechSummary findShip(int unitType) {
-		TreeMap<Integer,String> table = null;
+		WeightedTable<String> table = null;
 		if (unitType == UnitType.JUMPSHIP) {
 			table = jsTable;
 		} else if (unitType == UnitType.DROPSHIP) {
 			table = dsTable;
 		}
-		if (table == null || table.lastKey() <= 0) {
+		String shipName = table.select();
+		if (shipName == null) {
 			return null;
 		}
-		int roll = Compute.randomInt(table.lastKey());
-		String shipName = table.ceilingEntry(roll + 1).getValue();
 		return MechSummaryCache.getInstance().getMech(shipName);
 	}
 	
@@ -298,7 +299,7 @@ public class AtBConfiguration implements Serializable {
 				break;
 			case "weightedTable":
 				if (wn.getAttributes().getNamedItem("unitType") != null) {
-					TreeMap<Integer,String> map = loadWeightedTableFromXml(wn);
+					WeightedTable<String> map = loadWeightedTableFromXml(wn);
 					switch (wn.getAttributes().getNamedItem("unitType").getTextContent()) {
 					case "Dropship":
 						dsTable = map;
@@ -312,16 +313,19 @@ public class AtBConfiguration implements Serializable {
 		}
 	}
 	
-	private TreeMap<Integer,String> loadWeightedTableFromXml(Node node) {
-		TreeMap<Integer,String> retVal = new TreeMap<>();
+	private WeightedTable<String> loadWeightedTableFromXml(Node node) {
+		return loadWeightedTableFromXml(node, s -> s);
+	}
+	
+	private <T>WeightedTable<T> loadWeightedTableFromXml(Node node, Function<String,T> fromString) {
+		WeightedTable<T> retVal = new WeightedTable<>();
 		NodeList nl = node.getChildNodes();
-		int accum = 0;
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node wn = nl.item(i);
 			if (wn.getNodeName().equals("entry")
 					&& wn.getAttributes().getNamedItem("weight") != null) {
-				accum += Integer.parseInt(wn.getAttributes().getNamedItem("weight").getTextContent());
-				retVal.put(accum, wn.getTextContent());
+				retVal.add(Integer.parseInt(wn.getAttributes().getNamedItem("weight").getTextContent()),
+						fromString.apply(wn.getTextContent()));
 			}
 		}
 		return retVal;
@@ -394,6 +398,39 @@ public class AtBConfiguration implements Serializable {
 		public boolean fitsDate(Date d) {
 			return (start == null || !start.after(d))
 					&& (end == null || !end.before(d));
+		}
+	}
+	
+	static class WeightedTable<T> {
+		private ArrayList<Integer> weights = new ArrayList<>();
+		private ArrayList<T> values = new ArrayList<>();
+		
+		public void add(Integer weight, T value) {
+			weights.add(weight);
+			values.add(value);
+		}
+		
+		public T remove(T value) {
+			int index = values.indexOf(value);
+			if (index > 0) {
+				weights.remove(index);
+				return values.remove(index);
+			}
+			return null;
+		}
+		
+		public T select() {
+			int total = weights.stream().mapToInt(w -> w.intValue()).sum();
+			if (total > 0) {
+				int roll = Compute.randomInt(total);
+				for (int i = 0; i < weights.size(); i++) {
+					if (roll < weights.get(i)) {
+						return values.get(i);
+					}
+					roll -= weights.get(i);
+				}
+			}
+			return null;
 		}
 	}
 }

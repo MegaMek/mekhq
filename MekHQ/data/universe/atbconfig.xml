@@ -34,6 +34,121 @@ Note that this feature is in development, and more options will be appearing.
 		
 	</contractGeneration>
 	
+	<scenarioGeneration>
+		<botForce org="IS,CLAN,CS">
+			<weightedTable playerLance="L">
+				<entry weight="9">M</entry>
+				<entry weight="7">LL</entry>
+				<entry weight="4">H</entry>
+			</weightedTable>
+			<weightedTable playerLance="M">
+				<entry weight="5">LL</entry>
+				<entry weight="5">H</entry>
+				<entry weight="10">ML</entry>
+			</weightedTable>
+			<weightedTable playerLance="H">
+				<entry weight="3">LLL</entry>
+				<entry weight="4">MM</entry>
+				<entry weight="2">A</entry>
+				<entry weight="3">HL</entry>
+				<entry weight="4">MLL</entry>
+				<entry weight="4">HM</entry>
+			</weightedTable>
+			<weightedTable playerLance="A">
+				<entry weight="4">MML</entry>
+				<entry weight="3">HLL</entry>
+				<entry weight="2">HH</entry>
+				<entry weight="2">AL</entry>
+				<entry weight="4">MMM</entry>
+				<entry weight="3">HML</entry>
+				<entry weight="2">AM</entry>
+			</weightedTable>
+		</botForce>
+		
+		<botLance org="IS">
+			<weightedTable lance="L">
+				<entry weight="3">LLLL</entry>
+				<entry weight="2">LLLM</entry>
+				<entry weight="1">LLMM</entry>
+			</weightedTable>
+			<weightedTable lance="M">
+				<entry weight="1">LLMM</entry>
+				<entry weight="2">LMMM</entry>
+				<entry weight="2">MMMM</entry>
+				<entry weight="1">MMMH</entry>
+			</weightedTable>
+			<weightedTable lance="H">
+				<entry weight="1">MMHH</entry>
+				<entry weight="2">MHHH</entry>
+				<entry weight="2">HHHH</entry>
+				<entry weight="1">HHHA</entry>
+			</weightedTable>
+			<weightedTable lance="A">
+				<entry weight="2">HHAA</entry>
+				<entry weight="3">HAAA</entry>
+				<entry weight="1">AAAA</entry>
+			</weightedTable>
+		</botLance>
+		
+		<botLance org="CLAN">
+			<weightedTable lance="L">
+				<entry>LLLLL</entry>
+				<entry>LLLLM</entry>
+				<entry>LLLMM</entry>
+			</weightedTable>
+			<weightedTable lance="M">
+				<entry weight="1">LLMMM</entry>
+				<entry weight="1">LMMMM</entry>
+				<entry weight="2">MMMMM</entry>
+				<entry weight="1">MMMMH</entry>
+				<entry weight="1">MMMHH</entry>
+			</weightedTable>
+			<weightedTable lance="H">
+				<entry weight="1">MMHHH</entry>
+				<entry weight="2">MHHHH</entry>
+				<entry weight="2">HHHHH</entry>
+				<entry weight="1">HHHHA</entry>
+			</weightedTable>
+			<weightedTable lance="A">
+				<entry weight="1">MHHAA</entry>
+				<entry weight="2">HHHAAA</entry>
+				<entry weight="2">HHAAA</entry>
+				<entry weight="1">AAAAA</entry>
+			</weightedTable>
+		</botLance>
+		
+		<botLance org="CS">
+			<weightedTable lance="L">
+				<entry weight="1">LLLLLL</entry>
+				<entry weight="2">LLLLLM</entry>
+				<entry weight="2">LLLLMM</entry>
+				<entry weight="1">LLLMMM</entry>
+			</weightedTable>
+			<weightedTable lance="M">
+				<entry weight="1">LLLMMM</entry>
+				<entry weight="1">LLMMMMM</entry>
+				<entry weight="1">LMMMMMM</entry>
+				<entry weight="1">MMMMMMM</entry>
+				<entry weight="1">MMMMMMH</entry>
+				<entry weight="1">MMMMMHH</entry>
+			</weightedTable>
+			<weightedTable lance="H">
+				<entry>MMMHHH</entry>
+				<entry>MMHHHH</entry>
+				<entry>MHHHHH</entry>
+				<entry>HHHHHH</entry>
+				<entry>HHHHHA</entry>
+				<entry>HHHHAA</entry>
+			</weightedTable>
+			<weightedTable lance="A">
+				<entry weight="2">HHHAAA</entry>
+				<entry weight="1">HHAAAA</entry>
+				<entry weight="2">HAAAAA</entry>
+				<entry weight="1">AAAAAA</entry>
+			</weightedTable>
+		</botLance>
+	</scenarioGeneration>
+	
 	<shipSearch>
 		<shipSearchCost>100000</shipSearchCost>
 		<shipSearchLengthWeeks>4</shipSearchLengthWeeks>
