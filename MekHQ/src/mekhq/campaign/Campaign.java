@@ -617,7 +617,7 @@ public class Campaign implements Serializable {
 
 		getFinances().debit(cost, Transaction.C_UNIT,
 				"Purchased " + en.getShortName(), getCalendar().getTime());
-		addUnit(en, false, transitDays);
+		addUnit(en, true, transitDays);
 		if (!getCampaignOptions().getInstantUnitMarketDelivery()) {
 			addReport("<font color='green'>Unit will be delivered in " + transitDays + " days.</font>");
 		}
