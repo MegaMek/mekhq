@@ -229,6 +229,7 @@ import mekhq.gui.dialog.RefitNameDialog;
 import mekhq.gui.dialog.ReportDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
+import mekhq.gui.dialog.ShipSearchDialog;
 import mekhq.gui.dialog.UnitMarketDialog;
 import mekhq.gui.dialog.UnitSelectorDialog;
 import mekhq.gui.handler.OrgTreeTransferHandler;
@@ -364,6 +365,7 @@ public class CampaignGUI extends JPanel {
     private JMenuItem miAttachLog;
     private JMenuItem miContractMarket;
     private JMenuItem miUnitMarket;
+    private JMenuItem miShipSearch;
     private JMenuItem miRetirementDefectionDialog;
     private JCheckBoxMenuItem miShowOverview;
 
@@ -2846,7 +2848,7 @@ public class CampaignGUI extends JPanel {
         menuMarket.add(miPersonnelMarket);
 
         // Contract Market
-        miContractMarket = new JMenuItem("Contract Market");
+        miContractMarket = new JMenuItem("Contract Market...");
         miContractMarket.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -2857,7 +2859,7 @@ public class CampaignGUI extends JPanel {
         miContractMarket.setVisible(getCampaign().getCampaignOptions()
                 .getUseAtB());
 
-        miUnitMarket = new JMenuItem("Unit Market");
+        miUnitMarket = new JMenuItem("Unit Market...");
         miUnitMarket.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -2866,6 +2868,11 @@ public class CampaignGUI extends JPanel {
         });
         menuMarket.add(miUnitMarket);
         miUnitMarket.setVisible(getCampaign().getCampaignOptions().getUseAtB());
+
+        miShipSearch = new JMenuItem("Ship Search...");
+        miShipSearch.addActionListener(ev -> showShipSearch());
+        menuMarket.add(miShipSearch);
+        miShipSearch.setVisible(getCampaign().getCampaignOptions().getUseAtB());
 
         JMenuItem miPurchaseUnit = new JMenuItem(
                 resourceMap.getString("miPurchaseUnit.text")); // NOI18N
@@ -4303,6 +4310,11 @@ public class CampaignGUI extends JPanel {
         umd.setVisible(true);
     }
 
+    public void showShipSearch() {
+        ShipSearchDialog ssd = new ShipSearchDialog(getFrame(), this);
+        ssd.setVisible(true);
+    }
+
     private void menuSaveXmlActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuSaveActionPerformed
         MekHQ.logMessage("Saving campaign...");
         // Choose a file...
@@ -4573,6 +4585,8 @@ public class CampaignGUI extends JPanel {
             miContractMarket.setVisible(getCampaign().getCampaignOptions()
                     .getUseAtB());
             miUnitMarket.setVisible(getCampaign().getCampaignOptions()
+                    .getUseAtB());
+            miShipSearch.setVisible(getCampaign().getCampaignOptions()
                     .getUseAtB());
             miRetirementDefectionDialog.setVisible(getCampaign()
                     .getCampaignOptions().getUseAtB());

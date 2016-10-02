@@ -71,7 +71,6 @@ public class PersonnelMarket {
 	/* Alternate types of rolls, set by PersonnelMarketDialog */
 	private boolean paidRecruitment = false;
 	private int paidRecruitType;
-	private boolean shipSearch = false;
 
 	public PersonnelMarket() {
 	}
@@ -102,13 +101,6 @@ public class PersonnelMarket {
 				updated = true;
 			} else {
 				c.addReport("<html><font color=\"red\">Insufficient funds for paid recruitment.</font></html>");
-			}
-		} else  if (shipSearch && c.getCalendar().get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
-			if (c.getFinances().debit(100000, Transaction.C_UNIT,
-					"Ship search", c.getDate())) {
-				doShipSearch(c);
-			} else {
-				c.addReport("<html><font color=\"red\">Insufficient funds for ship search.</font></html>");
 			}
 		} else {
 
@@ -610,14 +602,6 @@ public class PersonnelMarket {
     	paidRecruitment = pr;
     }
 
-    public boolean getShipSearch() {
-    	return shipSearch;
-    }
-
-    public void setShipSearch(boolean ss) {
-    	shipSearch = ss;
-    }
-
     public int getPaidRecruitType() {
     	return paidRecruitType;
     }
@@ -639,9 +623,6 @@ public class PersonnelMarket {
         	pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<paidRecruitment/>");
         }
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "paidRecruitType", paidRecruitType);
-        if (shipSearch) {
-        	pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<shipSearch/>");
-        }
         
         for (UUID id : attachedEntities.keySet()) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
@@ -695,8 +676,6 @@ public class PersonnelMarket {
             		retVal.paidRecruitment = true;
             	} else if (wn2.getNodeName().equalsIgnoreCase("paidRecruitType")) {
             		retVal.paidRecruitType = Integer.parseInt(wn2.getTextContent());
-            	} else if (wn2.getNodeName().equalsIgnoreCase("shipSearch")) {
-            		retVal.shipSearch = true;
           		} else  {
             		// Error condition of sorts!
             		// Errr, what should we do here?
@@ -928,34 +907,7 @@ public class PersonnelMarket {
     	return target;
     }
 
-    private void doShipSearch(Campaign c) {
-    	TargetRoll target = getShipSearchTarget(c, paidRecruitType == Person.T_NAVIGATOR);
-		int roll = Compute.d6(2);
-		if (roll < target.getValue()) {
-			c.addReport("Ship search unsuccessful");
-			return;
-		}
-		c.addReport("<a href='PERSONNEL_MARKET'>Ship search successful</a>");
-		Person p = null;
-		p = c.newPerson(paidRecruitType);
-		//TODO: ships available for long-term hire with mos == 0
-		if (null != p) {
-            UUID id = UUID.randomUUID();
-            while (null != personnelIds.get(id)) {
-                id = UUID.randomUUID();
-            }
-            p.setId(id);
-            personnel.add(p);
-            personnelIds.put(id, p);
-           	addRecruitUnit(p, c, true);
- 		}
-    }
-
     private void addRecruitUnit(Person p, Campaign c) {
-    	addRecruitUnit(p, c, false);
-    }
-
-    private void addRecruitUnit(Person p, Campaign c, boolean largeCraft) {
     	int unitType;
     	switch (p.getPrimaryRole()) {
     	case Person.T_MECHWARRIOR:
@@ -970,22 +922,6 @@ public class PersonnelMarket {
     			return;
     		}
     		unitType = UnitType.AERO;
-    		break;
-    	case Person.T_SPACE_CREW:
-    	case Person.T_SPACE_GUNNER:
-    	case Person.T_SPACE_PILOT:
-    		if (largeCraft) {
-    			unitType = UnitType.DROPSHIP;
-    		} else {
-    			return;
-    		}
-    		break;
-    	case Person.T_NAVIGATOR:
-    		if (largeCraft) {
-    			unitType = -1;
-    		} else {
-    			return;
-    		}
     		break;
     	case Person.T_INFANTRY:
     		unitType = UnitType.INFANTRY;
@@ -1019,23 +955,7 @@ public class PersonnelMarket {
     	Entity en = null;
 
     	String faction = getRecruitFaction(c);
-		MechSummary ms = null;
-
-    	if (unitType < 0) {
-    		//TODO: add other JumpShips
-    		String name;
-    		int roll = Compute.d6();
-    		if (roll == 1) {
-    			name = "Scout JumpShip (Standard)";
-    		} else if (roll < 4) {
-    			name = "Merchant Jumpship (Standard)";
-    		} else {
-    			name = "Invader Jumpship (Standard)";
-    		}
-    		ms = MechSummaryCache.getInstance().getMech(name);
-    	} else {
-    		ms = c.getUnitGenerator().generate(faction, unitType, weight, c.getCalendar().get(Calendar.YEAR), IUnitRating.DRAGOON_F);
-    	}
+		MechSummary ms = c.getUnitGenerator().generate(faction, unitType, weight, c.getCalendar().get(Calendar.YEAR), IUnitRating.DRAGOON_F);
     	if (null != ms) {
     		if (Faction.getFaction(faction).isClan() && ms.getName().matches(".*Platoon.*")) {
 				String name = "Clan " + ms.getName().replaceAll("Platoon", "Point");

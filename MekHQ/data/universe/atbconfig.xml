@@ -33,4 +33,29 @@ Note that this feature is in development, and more options will be appearing.
 		</hiringHalls>
 		
 	</contractGeneration>
+	
+	<shipSearch>
+		<shipSearchCost>100000</shipSearchCost>
+		<shipSearchLengthWeeks>4</shipSearchLengthWeeks>
+		<target unitType="Dropship">10</target>
+		<target unitType="Jumpship">12</target>
+		<!-- <target unitType="Warship">14</target> -->
+		
+		<weightedTable unitType="Dropship">
+			<entry weight="1">Buccaneer (Standard)</entry>
+			<entry weight="6">Mule (Standard)</entry>
+			<entry weight="1">Seeker (2815)</entry>
+			<entry weight="4">Gazelle (2531)</entry>
+			<entry weight="1">Excalibur (2786)</entry>
+			<entry weight="2">Leopard (2537)</entry>
+			<entry weight="4">Union (2708)</entry>
+			<entry weight="1">Overlord (2762)</entry>
+		</weightedTable>
+		
+		<weightedTable unitType="Jumpship">
+			<entry weight="1">Scout JumpShip (Standard)</entry>
+			<entry weight="2">Merchant Jumpship (Standard)</entry>
+			<entry weight="3">Invader Jumpship (Standard)</entry>			
+		</weightedTable>
+	</shipSearch>
 </atbPrefs>

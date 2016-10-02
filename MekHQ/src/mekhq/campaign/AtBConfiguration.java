@@ -27,6 +27,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -36,7 +37,15 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.Compute;
+import megamek.common.MechSummary;
+import megamek.common.MechSummaryCache;
+import megamek.common.TargetRoll;
+import megamek.common.UnitType;
 import mekhq.MekHQ;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.rating.IUnitRating;
 
 /**
  * @author Neoancient
@@ -56,8 +65,18 @@ public class AtBConfiguration implements Serializable {
 	
 	private ArrayList<DatedRecord<String>> hiringHalls;
 	
+	private int shipSearchCost = 100000;
+	private int shipSearchLengthWeeks = 4;
+	private Integer dropshipSearchTarget;
+	private Integer jumpshipSearchTarget;
+	private Integer warshipSearchTarget;
+	private TreeMap<Integer,String> dsTable;
+	private TreeMap<Integer,String> jsTable;
+	
 	private AtBConfiguration() {
 		hiringHalls = new ArrayList<DatedRecord<String>>();
+		dsTable = new TreeMap<>();
+		jsTable = new TreeMap<>();
 		setDefaults();
 	}
 	
@@ -76,8 +95,25 @@ public class AtBConfiguration implements Serializable {
 					df.parse("3067-10-15"), "Outreach"));
 		} catch (ParseException e) {
 			MekHQ.logError("Error in date format in AtBConfiguration.setDefaults()");
-		}		
-	}
+		}
+		
+		dropshipSearchTarget = 10;
+		jumpshipSearchTarget = 12;
+		warshipSearchTarget = null;
+		
+		dsTable.put(1, "Buccaneer (Standard)");
+		dsTable.put(7, "Mule (Standard)");
+		dsTable.put(8, "Seeker (2815)");
+		dsTable.put(12, "Gazelle (2531)");
+		dsTable.put(13, "Excalibur (2786)");
+		dsTable.put(15, "Leopard (2537)");
+		dsTable.put(19, "Union (2708)");
+		dsTable.put(20, "Overlord (2762)");
+
+		jsTable.put(1, "Scout JumpShip (Standard)");
+		jsTable.put(3, "Merchant Jumpship (Standard)");
+		jsTable.put(6, "Invader Jumpship (Standard)");			
+}
 	
 	public boolean isHiringHall(String planet, Date date) {
 		for (DatedRecord<String> rec : hiringHalls) {
@@ -86,6 +122,77 @@ public class AtBConfiguration implements Serializable {
 			}
 		}
 		return false;
+	}
+	
+	public int getShipSearchCost() {
+		return shipSearchCost;
+	}
+	
+	public int getShipSearchLengthWeeks() {
+		return shipSearchLengthWeeks;
+	}
+	
+	public int shipSearchCostPerWeek() {
+		return shipSearchCost / shipSearchLengthWeeks;
+	}
+	
+	public Integer getDropshipSearchTarget() {
+		return dropshipSearchTarget;
+	}
+	
+	public Integer getJumpshipSearchTarget() {
+		return jumpshipSearchTarget;
+	}
+	
+	public Integer getWarshipSearchTarget() {
+		return warshipSearchTarget;
+	}
+	
+	public Integer shipSearchTargetBase(int unitType) {
+		switch (unitType) {
+		case UnitType.DROPSHIP:
+			return dropshipSearchTarget;
+		case UnitType.JUMPSHIP:
+			return jumpshipSearchTarget;
+		case UnitType.WARSHIP:
+			return warshipSearchTarget;
+		}
+		return null;
+	}
+	
+    public TargetRoll shipSearchTargetRoll(int unitType, Campaign campaign) {
+    	if (shipSearchTargetBase(unitType) == null) {
+    		return new TargetRoll(TargetRoll.IMPOSSIBLE, "Base");
+    	}
+    	TargetRoll target = new TargetRoll(shipSearchTargetBase(unitType), "Base");
+		Person adminLog = campaign.findBestInRole(Person.T_ADMIN_LOG, SkillType.S_ADMIN);
+		int adminLogExp = (adminLog == null)?SkillType.EXP_ULTRA_GREEN:adminLog.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+    	for (Person p : campaign.getAdmins()) {
+			if ((p.getPrimaryRole() == Person.T_ADMIN_LOG ||
+					p.getSecondaryRole() == Person.T_ADMIN_LOG) &&
+					p.getSkill(SkillType.S_ADMIN).getExperienceLevel() > adminLogExp) {
+				adminLogExp = p.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+			}
+    	}
+    	target.addModifier(SkillType.EXP_REGULAR - adminLogExp, "Admin/Logistics");
+    	target.addModifier(IUnitRating.DRAGOON_C - campaign.getUnitRatingMod(),
+    			"Unit Rating");
+    	return target;    	
+    }
+    
+	public MechSummary findShip(int unitType) {
+		TreeMap<Integer,String> table = null;
+		if (unitType == UnitType.JUMPSHIP) {
+			table = jsTable;
+		} else if (unitType == UnitType.DROPSHIP) {
+			table = dsTable;
+		}
+		if (table == null || table.lastKey() <= 0) {
+			return null;
+		}
+		int roll = Compute.randomInt(table.lastKey());
+		String shipName = table.ceilingEntry(roll + 1).getValue();
+		return MechSummaryCache.getInstance().getMech(shipName);
 	}
 	
 	public static AtBConfiguration loadFromXml() {
@@ -117,6 +224,9 @@ public class AtBConfiguration implements Serializable {
 			switch (wn.getNodeName()) {
 			case "contractGeneration":
 				retVal.loadCampaignGenerationNodeFromXml(wn);
+				break;
+			case "shipSearch":
+				retVal.loadShipSearchNodeFromXml(wn);
 				break;
 			}
 		}
@@ -157,6 +267,64 @@ public class AtBConfiguration implements Serializable {
 				break;
 			}
 		}
+	}
+	
+	private void loadShipSearchNodeFromXml(Node node) {
+		NodeList nl = node.getChildNodes();
+		for (int i = 0; i < nl.getLength(); i++) {
+			Node wn = nl.item(i);
+			switch (wn.getNodeName()) {
+			case "shipSearchCost":
+				shipSearchCost = Integer.parseInt(wn.getTextContent());
+				break;
+			case "shipSearchLengthWeeks":
+				shipSearchLengthWeeks = Integer.parseInt(wn.getTextContent());
+				break;
+			case "target":
+				if (wn.getAttributes().getNamedItem("unitType") != null) {
+					Integer target = Integer.valueOf(wn.getTextContent());
+					switch (wn.getAttributes().getNamedItem("unitType").getTextContent()) {
+					case "Dropship":
+						dropshipSearchTarget = target;
+						break;
+					case "Jumpship":
+						jumpshipSearchTarget = target;
+						break;
+					case "Warship":
+						warshipSearchTarget = target;
+						break;
+					}
+				}
+				break;
+			case "weightedTable":
+				if (wn.getAttributes().getNamedItem("unitType") != null) {
+					TreeMap<Integer,String> map = loadWeightedTableFromXml(wn);
+					switch (wn.getAttributes().getNamedItem("unitType").getTextContent()) {
+					case "Dropship":
+						dsTable = map;
+						break;
+					case "Jumpship":
+						jsTable = map;
+					}
+				}
+				break;
+			}
+		}
+	}
+	
+	private TreeMap<Integer,String> loadWeightedTableFromXml(Node node) {
+		TreeMap<Integer,String> retVal = new TreeMap<>();
+		NodeList nl = node.getChildNodes();
+		int accum = 0;
+		for (int i = 0; i < nl.getLength(); i++) {
+			Node wn = nl.item(i);
+			if (wn.getNodeName().equals("entry")
+					&& wn.getAttributes().getNamedItem("weight") != null) {
+				accum += Integer.parseInt(wn.getAttributes().getNamedItem("weight").getTextContent());
+				retVal.put(accum, wn.getTextContent());
+			}
+		}
+		return retVal;
 	}
 	
 	/*

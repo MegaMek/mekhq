@@ -47,6 +47,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -276,6 +277,10 @@ public class Campaign implements Serializable {
     private RetirementDefectionTracker retirementDefectionTracker; // AtB
     private int fatigueLevel; //AtB
     private AtBConfiguration atbConfig; //AtB
+    private Calendar shipSearchStart; //AtB
+    private int shipSearchType;
+    private String shipSearchResult; //AtB
+    private Calendar shipSearchExpiration; //AtB
     private IUnitGenerator unitGenerator;
 
     public Campaign() {
@@ -498,6 +503,124 @@ public class Campaign implements Serializable {
     		atbConfig = AtBConfiguration.loadFromXml();
     	}
     	return atbConfig;
+    }
+    
+    /**
+     * 
+     * @return The date a ship search was started, or null if none is in progress.
+     */
+    public Calendar getShipSearchStart() {
+    	return shipSearchStart;
+    }
+    
+    /**
+     * 
+     * @return The lookup name of the available ship, or null if none is available 
+     */
+    public String getShipSearchResult() {
+    	return shipSearchResult;
+    }
+    
+    /**
+     * 
+     * @return The date the ship is no longer available, if there is one.
+     */
+    public Calendar getShipSearchExpiration() {
+    	return shipSearchExpiration;
+    }
+    
+    public void startShipSearch(int unitType) {
+    	shipSearchStart = (Calendar)calendar.clone();
+    	shipSearchType = unitType;
+    }
+    
+    public void endShipSearch() {
+    	shipSearchStart = null;
+    }
+    
+    private void processShipSearch() {
+    	if (shipSearchStart == null) {
+    		return;
+    	}
+    	StringBuilder report = new StringBuilder();
+		if (getFinances().debit(getAtBConfig().shipSearchCostPerWeek(), Transaction.C_UNIT,
+				"Ship search", getDate())) {
+			report.append(NumberFormat.getInstance().format(getAtBConfig().shipSearchCostPerWeek())
+					+ " C-bills deducted for ship search.");
+		} else {
+			addReport("<font color=\"red\">Insufficient funds for ship search.</font>");
+			shipSearchStart = null;
+			return;
+		}
+		long numDays = TimeUnit.MILLISECONDS.toDays(calendar.getTimeInMillis()
+				- shipSearchStart.getTimeInMillis());
+		if (numDays > 21) {
+			int roll = Compute.d6(2);
+			TargetRoll target = getAtBConfig().shipSearchTargetRoll(shipSearchType, this);
+			shipSearchStart = null;
+			report.append("<br/>Ship search target: ").append(target.getValueAsString())
+				.append(" roll: ").append(String.valueOf(roll));
+			//TODO: mos zero should make ship available on retainer
+			if (roll >= target.getValue()) {
+				report.append("<br/>Search successful. ");
+				MechSummary ms = unitGenerator.generate(factionCode, shipSearchType,
+						-1, getCalendar().get(Calendar.YEAR), getUnitRatingMod());
+				if (ms == null) {
+					ms = getAtBConfig().findShip(shipSearchType);
+				}
+				if (ms != null) {
+					shipSearchResult = ms.getName();
+					shipSearchExpiration = (Calendar)getCalendar().clone();
+					shipSearchExpiration.add(Calendar.DAY_OF_MONTH, 31);
+					report.append(shipSearchResult)
+						.append(" is available for purchase for ")
+						.append(NumberFormat.getInstance().format(ms.getCost()))
+						.append(" C-bills until ").append(dateFormat.format(shipSearchExpiration.getTime()));
+				} else {
+					report.append(" <font color=\"red\">Could not determine ship type.</font>");
+				}
+			} else {
+				report.append("<br/>Ship search unsuccessful.");
+			}
+		}
+		addReport(report.toString());
+		app.getCampaigngui().refreshReport();
+    }
+    
+    public void purchaseShipSearchResult() {
+		MechSummary ms = MechSummaryCache.getInstance().getMech(shipSearchResult);
+		if (ms == null) {
+            MekHQ.logError("Cannot find entry for " + shipSearchResult);
+            return;
+		}
+
+		long cost = ms.getCost();
+		if (getFunds() < cost) {
+			 addReport("<font color='red'><b> You cannot afford this unit. Transaction cancelled</b>.</font>");
+			 return;
+		}
+
+    	MechFileParser mechFileParser = null;
+        try {
+            mechFileParser = new MechFileParser(ms.getSourceFile(),
+            		ms.getEntryName());
+        } catch (Exception ex) {
+            MekHQ.logError(ex);
+            MekHQ.logError("Unable to load unit: " + ms.getEntryName());
+        }
+		Entity en = mechFileParser.getEntity();
+
+		int transitDays = getCampaignOptions().getInstantUnitMarketDelivery()?0:
+    		calculatePartTransitTime(Compute.d6(2) - 2);
+
+		getFinances().debit(cost, Transaction.C_UNIT,
+				"Purchased " + en.getShortName(), getCalendar().getTime());
+		addUnit(en, false, transitDays);
+		if (!getCampaignOptions().getInstantUnitMarketDelivery()) {
+			addReport("<font color='green'>Unit will be delivered in " + transitDays + " days.</font>");
+		}
+		shipSearchResult = null;
+		shipSearchExpiration = null;
     }
 
     public boolean applyRetirement(long totalPayout, HashMap<UUID, UUID> unitAssignments) {
@@ -2080,7 +2203,20 @@ public class Campaign implements Serializable {
         if (campaignOptions.getUseAtB()) {
         	contractMarket.generateContractOffers(this);
         	unitMarket.generateUnitOffers(this);
+        	
+        	if (shipSearchExpiration != null && !shipSearchExpiration.after(calendar)) {
+        		shipSearchExpiration = null;
+        		if (shipSearchResult != null) {
+        			addReport("Opportunity for purchase of " + shipSearchResult
+        					+ " has expired.");
+        			shipSearchResult = null;
+        		}
+        	}
 
+        	if (getCalendar().get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
+            	processShipSearch();        		
+        	}
+        	
         	//Add or remove dependents
             if (calendar.get(Calendar.DAY_OF_YEAR) == 1) {
             	int numPersonnel = 0;
@@ -3377,6 +3513,16 @@ public class Campaign implements Serializable {
             	pw1.println("\t</lances>");
             }
             retirementDefectionTracker.writeToXml(pw1, 1);
+            if (shipSearchStart != null) {
+            	MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "shipSearchStart",
+            			shortDateFormat.format(shipSearchStart.getTime()));
+            }
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "shipSearchType", shipSearchType);
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "shipSearchResult", shipSearchResult);
+            if (shipSearchExpiration != null) {
+            	MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "shipSearchExpiration",
+            			shortDateFormat.format(shipSearchExpiration.getTime()));
+            }
         }
         
         // Customised planetary events
@@ -3690,6 +3836,16 @@ public class Campaign implements Serializable {
                 	processLanceNodes(retVal, wn);
                 } else if (xn.equalsIgnoreCase("retirementDefectionTracker")) {
                 	retVal.retirementDefectionTracker = RetirementDefectionTracker.generateInstanceFromXML(wn, retVal);
+                } else if (xn.equalsIgnoreCase("shipSearchStart")) {
+                	retVal.shipSearchStart = new GregorianCalendar();
+                	retVal.shipSearchStart.setTime(retVal.shortDateFormat.parse(wn.getTextContent()));
+                } else if (xn.equalsIgnoreCase("shipSearchType")) {
+                	retVal.shipSearchType = Integer.parseInt(wn.getTextContent());
+                } else if (xn.equalsIgnoreCase("shipSearchResult")) {
+                	retVal.shipSearchResult = wn.getTextContent();
+                } else if (xn.equalsIgnoreCase("shipSearchExpiration")) {
+                	retVal.shipSearchExpiration = new GregorianCalendar();
+                	retVal.shipSearchExpiration.setTime(retVal.shortDateFormat.parse(wn.getTextContent()));
                 } else if (xn.equalsIgnoreCase("customPlanetaryEvents")) {
                     updatePlanetaryEventsFromXML(wn);
                 }
