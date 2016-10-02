@@ -33,6 +33,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -157,6 +158,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingFactory;
+import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Era;
@@ -834,7 +836,8 @@ public class Campaign implements Serializable {
         unit.setDaysToArrival(days);
 
         if (allowNewPilots) {
-            Utilities.generateRandomCrewWithCombinedSkill(unit, this, true);
+            Map<CrewType, Collection<Person>> newCrew = Utilities.genRandomCrewWithCombinedSkill(this, unit);
+            newCrew.forEach((type, personnel) -> personnel.forEach(p -> type.addMethod.accept(unit, p)));
         }
         unit.resetPilotAndEntity();
 
