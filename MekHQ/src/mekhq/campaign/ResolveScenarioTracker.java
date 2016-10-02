@@ -30,8 +30,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
@@ -445,8 +447,8 @@ public class ResolveScenarioTracker {
         }
     }
 
-    private ArrayList<Person> shuffleCrew(ArrayList<Person> source) {
-        ArrayList<Person> sortedList = new ArrayList<Person>();
+    private List<Person> shuffleCrew(List<Person> source) {
+        List<Person> sortedList = new ArrayList<Person>();
         Random generator = new Random();
 
         while (source.size() > 0)
@@ -486,7 +488,7 @@ public class ResolveScenarioTracker {
         //lets cycle through units and get their crew
         for(Unit u : units) {
             //shuffling the crew ensures that casualties are randomly assigned in multi-crew units
-            ArrayList<Person> crew = shuffleCrew(u.getActiveCrew());
+            List<Person> crew = shuffleCrew(u.getActiveCrew());
             Entity en = null;
             UnitStatus ustatus = unitsStatus.get(u.getId());
             if(null != ustatus) {
@@ -641,7 +643,8 @@ public class ResolveScenarioTracker {
                     continue;
                 }
                 //shuffling the crew ensures that casualties are randomly assigned in multi-crew units
-                ArrayList<Person> crew = shuffleCrew(Utilities.generateRandomCrewWithCombinedSkill(u, campaign, false));
+                List<Person> crew = Utilities.genRandomCrewWithCombinedSkill(campaign, u).values().stream().flatMap(c -> c.stream()).collect(Collectors.toList());
+                crew = shuffleCrew(crew);
 
                 //For vees we may need to know the commander or driver, which aren't assigned for TestUnit.
                 Person commander = null;
