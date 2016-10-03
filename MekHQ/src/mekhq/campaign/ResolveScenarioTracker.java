@@ -1268,7 +1268,6 @@ public class ResolveScenarioTracker {
      *
      */
     public class PersonStatus implements Comparable<PersonStatus> {
-
         private String name;
         private String unitName;
         private int hits;
@@ -1279,6 +1278,7 @@ public class ResolveScenarioTracker {
         private boolean pickedUp;
         private UUID personId;
         private boolean deployed;
+        private boolean forceDead;
 
         public PersonStatus(String n, String u, int h, UUID id) {
             name = n;
@@ -1291,6 +1291,7 @@ public class ResolveScenarioTracker {
             pickedUp = false;
             personId = id;
             deployed = true;
+            forceDead = false;
         }
 
         public UUID getId() {
@@ -1326,7 +1327,11 @@ public class ResolveScenarioTracker {
         }
 
         public boolean isDead() {
-            return hits >= 6;
+            return forceDead || (hits >= 6);
+        }
+        
+        public void setDead(boolean dead) {
+            this.forceDead = dead;
         }
 
         public boolean isMissing() {
