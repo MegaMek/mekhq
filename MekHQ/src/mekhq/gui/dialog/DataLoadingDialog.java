@@ -48,6 +48,7 @@ import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.GamePreset;
+import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planets;
@@ -267,6 +268,9 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         				campaign.getRetirementDefectionTracker().setLastRetirementRoll(campaign.getCalendar());
         			}
         		}
+            } else {
+                // Make sure campaign options event handlers get their data
+                MekHQ.EVENT_BUS.trigger(new OptionsChangedEvent(campaign));
             }
             return null;
         }
