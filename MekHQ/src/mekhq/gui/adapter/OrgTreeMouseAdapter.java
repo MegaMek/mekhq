@@ -132,7 +132,7 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 		}
                 		if (cantTech != "") {
                 		    cantTech += "You will need to assign a tech manually.";
-                		    JOptionPane.showMessageDialog(null, cantTech, "Acknowledge", JOptionPane.WARNING_MESSAGE);
+                		    JOptionPane.showMessageDialog(null, cantTech, "Warning", JOptionPane.WARNING_MESSAGE);
                 		}
                 	}
                 	gui.refreshOrganization();
