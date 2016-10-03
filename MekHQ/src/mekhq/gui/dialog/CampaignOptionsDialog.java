@@ -82,6 +82,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
+import javax.swing.text.NumberFormatter;
 
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Player;
@@ -1727,10 +1728,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panFinances.add(clanPriceModifierLabel, gridBagConstraints);
 
         spnClanPriceModifier = new JSpinner(new SpinnerNumberModel(options.getClanPriceModifier(), 1.0, null, 0.1));
-        ((JSpinner.DefaultEditor) spnClanPriceModifier.getEditor()).getTextField().setEditable(false);
-        ((JSpinner.DefaultEditor) spnClanPriceModifier.getEditor()).getTextField().setColumns(3);
-        spnClanPriceModifier.setToolTipText(resourceMap.getString("clanPriceModifierJFormattedTextField.toolTipText")
-                                           ); // NOI18N
+        spnClanPriceModifier.setEditor(new JSpinner.NumberEditor(spnClanPriceModifier, "0.00"));
+        spnClanPriceModifier.setToolTipText(resourceMap.getString("clanPriceModifierJFormattedTextField.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -1760,10 +1759,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             gridBagConstraints.gridx = 2;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             spnUsedPartsValue[i] = new JSpinner(new SpinnerNumberModel(options.getUsedPartsValue(i), 0.00, 1.00, 0.05));
-            ((JSpinner.DefaultEditor) spnUsedPartsValue[i].getEditor()).getTextField().setEditable(false);
-            ((JSpinner.DefaultEditor) spnUsedPartsValue[i].getEditor()).getTextField().setColumns(3);
-            spnUsedPartsValue[i].setToolTipText(resourceMap.getString("usedPartsValueJFormattedTextField" +
-                                                                      ".toolTipText")); // NOI18N
+            spnUsedPartsValue[i].setEditor(new JSpinner.NumberEditor(spnUsedPartsValue[i], "0.00"));
+            spnUsedPartsValue[i].setToolTipText(resourceMap.getString("usedPartsValueJFormattedTextField.toolTipText")); // NOI18N
             panFinances.add(spnUsedPartsValue[i], gridBagConstraints);
         }
 
@@ -1777,10 +1774,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panFinances.add(damagedPartsValueLabel, gridBagConstraints);
 
         spnDamagedPartsValue = new JSpinner(new SpinnerNumberModel(options.getDamagedPartsValue(), 0.00, 1.00, 0.05));
-        ((JSpinner.DefaultEditor) spnDamagedPartsValue.getEditor()).getTextField().setEditable(false);
-        ((JSpinner.DefaultEditor) spnDamagedPartsValue.getEditor()).getTextField().setColumns(3);
-        spnDamagedPartsValue.setToolTipText(resourceMap.getString("damagedPartsValueJFormattedTextField.toolTipText")
-                                           ); // NOI18N
+        spnDamagedPartsValue.setEditor(new JSpinner.NumberEditor(spnDamagedPartsValue, "0.00"));
+        spnDamagedPartsValue.setToolTipText(resourceMap.getString("damagedPartsValueJFormattedTextField.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 8;
@@ -1794,12 +1789,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panFinances.add(new JLabel("Reimbursement % (as decimal) for cancelled orders"), gridBagConstraints);
 
-        spnOrderRefund = new JSpinner(new SpinnerNumberModel(options.GetCanceledOrderReimbursement(), 0.00, 1.00,
-                                                             0.05));
-        ((JSpinner.DefaultEditor) spnOrderRefund.getEditor()).getTextField().setEditable(false);
-        ((JSpinner.DefaultEditor) spnOrderRefund.getEditor()).getTextField().setColumns(3);
-        //spnDamagedPartsValue.setToolTipText(resourceMap.getString("damagedPartsValueJFormattedTextField
-        // .toolTipText")); // NOI18N
+        spnOrderRefund = new JSpinner(new SpinnerNumberModel(options.GetCanceledOrderReimbursement(), 0.00, 1.00, 0.05));
+        spnOrderRefund.setEditor(new JSpinner.NumberEditor(spnOrderRefund, "0.00"));
+        //spnDamagedPartsValue.setToolTipText(resourceMap.getString("damagedPartsValueJFormattedTextField.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 9;
