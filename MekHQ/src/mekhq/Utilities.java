@@ -1147,6 +1147,25 @@ public class Utilities {
         return sb.toString();
     }
 
+    /** @return the input string with all words capitalized */
+    public static String capitalize(String str) {
+        if((null == str) || str.isEmpty()) {
+            return str;
+        }
+        final char[] buffer = str.toCharArray();
+        boolean capitalizeNext = true;
+        for(int i = 0; i < buffer.length; ++ i) {
+            final char ch = buffer[i];
+            if(Character.isWhitespace(ch)) {
+                capitalizeNext = true;
+            } else if(capitalizeNext) {
+                buffer[i] = Character.toTitleCase(ch);
+                capitalizeNext = false;
+            }
+        }
+        return new String(buffer);
+    }
+    
     public static String getRomanNumeralsFromArabicNumber(int level, boolean checkZero) {
     	// If we're 0, then we just return an empty string
     	if (checkZero && level == 0) {
