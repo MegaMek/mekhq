@@ -114,6 +114,7 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 	singleForce.setTechID(tech.getId());
                 	tech.addLogEntry(gui.getCampaign().getDate(), "Assigned to " + singleForce.getFullName());
                 	if (singleForce.getAllUnits() !=null) {
+                	    String cantTech = "";
                 		for (UUID uuid : singleForce.getAllUnits()) {
                 			Unit u = gui.getCampaign().getUnit(uuid);
                 			if (u != null) {
@@ -121,9 +122,17 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 			        Person oldTech = u.getTech();
                 			        oldTech.removeTechUnitId(u.getId());
                 			    }
-                				u.setTech(tech.getId());
-                				tech.addTechUnitID(u.getId());
+                			    if (tech.canTech(u.getEntity())) {
+                			        u.setTech(tech.getId());
+                                    tech.addTechUnitID(u.getId());
+                			    } else {
+                			        cantTech += tech.getName() + " cannot maintain " + u.getName() + "\n";
+                			    }
                 			}
+                		}
+                		if (cantTech != "") {
+                		    cantTech += "You will need to assign a tech manually.";
+                		    JOptionPane.showMessageDialog(null, cantTech, "Acknowledge", JOptionPane.WARNING_MESSAGE);
                 		}
                 	}
                 	gui.refreshOrganization();
