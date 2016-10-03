@@ -97,6 +97,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.GamePreset;
 import mekhq.campaign.RandomSkillPreferences;
+import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -603,6 +604,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         txtName.setName("txtName"); // NOI18N
         txtName.setPreferredSize(new java.awt.Dimension(500, 30));
         txtName.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtNameActionPerformed(evt);
             }
@@ -642,6 +644,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         btnDate.setName("btnDate"); // NOI18N
         btnDate.setPreferredSize(new java.awt.Dimension(400, 30));
         btnDate.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDateActionPerformed(evt);
             }
@@ -662,6 +665,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         comboFaction.setName("comboFaction"); // NOI18N
         comboFaction.setPreferredSize(new java.awt.Dimension(400, 30));
         comboFaction.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 factionSelected();
             }
@@ -700,6 +704,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         btnCamo.setName("btnCamo"); // NOI18N
         btnCamo.setPreferredSize(new java.awt.Dimension(84, 72));
         btnCamo.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCamoActionPerformed(evt);
             }
@@ -798,6 +803,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panSubRepair.add(useDamageMargin, gridBagConstraints);
 
         useDamageMargin.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 if (useDamageMargin.isSelected()) {
                     spnDamageMargin.setEnabled(true);
@@ -855,6 +861,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panSubMaintenance.add(checkMaintenance, gridBagConstraints);
 
         checkMaintenance.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 if (checkMaintenance.isSelected()) {
                     spnMaintenanceDays.setEnabled(true);
@@ -2260,6 +2267,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         btnAddSPA = new JButton("Add Another Special Ability");
         btnAddSPA.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnAddSPA();
             }
@@ -2604,6 +2612,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         comboRanks.setName("comboRanks"); // NOI18N
         comboRanks.setActionCommand("fillRanks");
         comboRanks.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
             	if (evt.getActionCommand().equals("fillRanks"))
             		fillRankInfo();
@@ -2662,6 +2671,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         }
         tableRanks.getSelectionModel().addListSelectionListener(
         		new ListSelectionListener() {
+                    @Override
                     public void valueChanged(
                             javax.swing.event.ListSelectionEvent evt) {
                         tableRanksValueChanged(evt);
@@ -2734,6 +2744,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useFactionForNamesBox.setName("useFactionForNamesBox"); // NOI18N
         useFactionForNamesBox.setSelected(options.useFactionForNames());
         useFactionForNamesBox.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 useFactionForNamesBoxEvent(evt);
             }
@@ -2897,6 +2908,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         personnelMarketType.setSelectedIndex(options.getPersonnelMarketType());
         personnelMarketType.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 personnelMarketRandomEliteRemoval.setEnabled(personnelMarketType.getSelectedIndex() ==
                                                              PersonnelMarket.TYPE_RANDOM
@@ -3815,6 +3827,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         btnOkay.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOkay.setName("btnOkay"); // NOI18N
         btnOkay.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOkayActionPerformed();
             }
@@ -3829,6 +3842,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         btnSave.setText(resourceMap.getString("btnSave.text")); // NOI18N
         btnSave.setName("btnSave"); // NOI18N
         btnSave.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSaveActionPerformed();
             }
@@ -3843,6 +3857,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         btnLoad.setText(resourceMap.getString("btnLoad.text")); // NOI18N
         btnLoad.setName("btnLoad"); // NOI18N
         btnLoad.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnLoadActionPerformed();
             }
@@ -3858,6 +3873,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCancelActionPerformed(evt);
             }
@@ -3971,6 +3987,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 				////TODO: it would be nice if we could just update the choices in this dialog now
 				//rather than closing it, but that is currently not possible given how
 				//this dialog is set up
+				MekHQ.EVENT_BUS.trigger(new OptionsChangedEvent(campaign));
 				this.setVisible(false);
 			}
 		}
@@ -4319,6 +4336,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setContractMarketReportRefresh(chkUnitMarketReportRefresh.isSelected());
 
         // End Against the Bot
+        MekHQ.EVENT_BUS.trigger(new OptionsChangedEvent(campaign, options));
     }
 
     private void btnOkayActionPerformed() {
@@ -4662,6 +4680,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         //
         //  Implement the ChangeListener
         //
+        @Override
         public void stateChanged(ChangeEvent e) {
             //  Keep the scrolling of the row table in sync with main table
             JViewport viewport = (JViewport) e.getSource();
@@ -4672,6 +4691,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         //
         //  Implement the PropertyChangeListener
         //
+        @Override
         public void propertyChange(PropertyChangeEvent e) {
             //  Keep the row table in sync with the main table
 
@@ -4697,6 +4717,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                 setHorizontalAlignment(JLabel.LEFT);
             }
 
+            @Override
             public Component getTableCellRendererComponent(
                     JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 if (table != null) {
@@ -4738,11 +4759,13 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             editor = ((JSpinner.NumberEditor) spinner.getEditor());
             textField = editor.getTextField();
             textField.addFocusListener(new FocusListener() {
+                @Override
                 public void focusGained(FocusEvent fe) {
                     System.err.println("Got focus");
                     //textField.setSelectionStart(0);
                     //textField.setSelectionEnd(1);
                     SwingUtilities.invokeLater(new Runnable() {
+                        @Override
                         public void run() {
                             if (valueSet) {
                                 textField.setCaretPosition(1);
@@ -4751,10 +4774,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                     });
                 }
 
+                @Override
                 public void focusLost(FocusEvent fe) {
                 }
             });
             textField.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent ae) {
                     stopCellEditing();
                 }
@@ -4762,6 +4787,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         }
 
         // Prepares the spinner component and returns it.
+        @Override
         public Component getTableCellEditorComponent(
                 JTable table, Object value, boolean isSelected, int row, int column
                                                     ) {
@@ -4769,6 +4795,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                 spinner.setValue(value);
             }
             SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     textField.requestFocus();
                 }
@@ -4776,6 +4803,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             return spinner;
         }
 
+        @Override
         public boolean isCellEditable(EventObject eo) {
             System.err.println("isCellEditable");
             if (eo instanceof KeyEvent) {
@@ -4793,10 +4821,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         }
 
         // Returns the spinners current value.
+        @Override
         public Object getCellEditorValue() {
             return spinner.getValue();
         }
 
+        @Override
         public boolean stopCellEditing() {
             System.err.println("Stopping edit");
             try {
