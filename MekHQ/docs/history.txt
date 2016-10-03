@@ -15,7 +15,8 @@ v0.41.24-git
 + Feature: Log conception and birth in personnel log
 + Fixes #179: Unable to load campaign with custom layered force icon
 + Updated AtB ship search to v2.31; ship search is now available on the Marketplace menu.
-  Closes #177:[ATB] Rolls for Dropship should occur 1 time a month 
+  Closes #177:[ATB] Rolls for Dropship should occur 1 time a month
++ Moved AtB opfor generation tables into data/universe/atbconfig.xml, where they can be customized by the player.
 
 v0.3.33 (2016-09-20 00:07 UTC)
 + Added AtB preset.

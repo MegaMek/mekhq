@@ -7,11 +7,25 @@ details used by the Against the Bot campaign system.
 
 Note that this feature is in development, and more options will be appearing.
 
+Several options make use of a <weightedTable> node, which is used to represent a table
+of options chosen by a dice roll. Each entry in the table has the form <entry weight="#">option</entry>.
+The value of the weight attribute indicates how likely that option is to be chosen:
+a value of 2 is twice as likely to be chosen as a value of 1, but half as likely as a value
+of 4. An entry of the form <entry>option</entry> has a weight of 1.
+
 -->
 
 <atbPrefs>
 
 	<scenarioGeneration>
+		<!-- Tables for generating the enemy force. <botForce> determines how many lances
+		or lance-equivalents are in the enemy force and the weight class of each.
+		The org attribute indicates which type of organization the opposing force uses:
+		CLAN is used for any Clan faction, CS for ComStar and WoB, and IS for all others.
+		If the same set of tables is used for multiple orgs, they are separated by commas.
+		There should be a <weightedTable> node for each of the four weight classes: L, M, H, A.
+		These correspond to the weight class of the player's lance. See above for the <weightTable>
+		format. -->
 		<botForce org="IS,CLAN,CS">
 			<weightedTable weightClass="L">
 				<entry weight="9">M</entry>
@@ -41,6 +55,11 @@ Note that this feature is in development, and more options will be appearing.
 				<entry weight="2">AM</entry>
 			</weightedTable>
 		</botForce>
+		
+		<!-- <botLance> determines the weight classes of the individual units that
+		make up each enemy Lance (or Star or Level II). The format is the same as for
+		<botForce>, but the weightClass attribute indicates the weight class of the enemy
+		lance selected by <botForce> above. -->
 		
 		<botLance org="IS">
 			<weightedTable weightClass="L">
@@ -148,13 +167,24 @@ Note that this feature is in development, and more options will be appearing.
 		
 	</contractGeneration>
 	
+	<!-- Values used for searching for an available ship to purchase. -->
 	<shipSearch>
+		<!-- The total cost of the search process -->
 		<shipSearchCost>100000</shipSearchCost>
+		
+		<!-- The number of weeks required to complete the ship search. -->
 		<shipSearchLengthWeeks>4</shipSearchLengthWeeks>
+		
+		<!-- The target number to for the dice roll to determine whether the ship search
+		was successful. Acceptable values for unitType are Dropship, Jumpship, and Warship.
+		If the target number is missing or commented out, that type of ship is not available
+		in a search. -->
 		<target unitType="Dropship">10</target>
 		<target unitType="Jumpship">12</target>
 		<!-- <target unitType="Warship">14</target> -->
 		
+		<!-- If the unit generation method selected in Campaign Options does not produce
+		a result, the following tables are used. -->
 		<weightedTable unitType="Dropship">
 			<entry weight="1">Buccaneer (Standard)</entry>
 			<entry weight="6">Mule (Standard)</entry>
