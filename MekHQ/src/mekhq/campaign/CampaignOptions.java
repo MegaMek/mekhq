@@ -2182,7 +2182,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("useParentage")) {
                 retVal.useParentage = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("logConception")) {
-                retVal.useParentage = Boolean.parseBoolean(wn2.getTextContent().trim());
+                retVal.logConception = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useTransfers")) {
             	retVal.useTransfers = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) {
