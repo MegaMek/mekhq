@@ -27,7 +27,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.ResourceBundle;
 import java.util.function.Function;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -85,46 +87,102 @@ public class AtBConfiguration implements Serializable {
 	private WeightedTable<String> dsTable;
 	private WeightedTable<String> jsTable;
 	
+	private ResourceBundle defaultProperties;
+	
 	private AtBConfiguration() {
 		hiringHalls = new ArrayList<DatedRecord<String>>();
 		dsTable = new WeightedTable<>();
 		jsTable = new WeightedTable<>();
-		setDefaults();
+		defaultProperties = ResourceBundle.getBundle("mekhq.resources.AtBConfigDefaults");
 	}
 	
 	/**
-	 * Provide default values in case the file is missing or contains errors. Defaults
-	 * are overridden as each section of the config file is processed, so if a section
-	 * is removed the default values remain in place.
+	 * Provide default values in case the file is missing or contains errors.
 	 */
-	private void setDefaults() {
-		
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		hiringHalls.add(new DatedRecord<String>(null, null, "Galatea"));
-		hiringHalls.add(new DatedRecord<String>(null, null, "Solaris"));
-		try {
-			hiringHalls.add(new DatedRecord<String>(df.parse("3031-01-01"),
-					df.parse("3067-10-15"), "Outreach"));
-		} catch (ParseException e) {
-			MekHQ.logError("Error in date format in AtBConfiguration.setDefaults()");
+	
+	private WeightedTable<String> getDefaultForceTable(String key, int index) {
+		String property = defaultProperties.getString(key);
+		String[] fields = property.split("\\|");
+		return parseDefaultWeightedTable(fields[index]);
+	}
+	
+	private WeightedTable<String> parseDefaultWeightedTable(String entry) {
+		return parseDefaultWeightedTable(entry, s -> s);
+	}
+	
+	private <T>WeightedTable<T> parseDefaultWeightedTable(String entry, Function<String,T> fromString) {
+		WeightedTable<T> retVal = new WeightedTable<>();
+		String[] entries = entry.split(",");
+		for (String e : entries) {
+			String[] fields = e.split(":");
+			retVal.add(Integer.parseInt(fields[0]), fromString.apply(fields[1]));
 		}
-		
-		dropshipSearchTarget = 10;
-		jumpshipSearchTarget = 12;
-		warshipSearchTarget = null;
-		
-		dsTable.add(1, "Buccaneer (Standard)");
-		dsTable.add(6, "Mule (Standard)");
-		dsTable.add(1, "Seeker (2815)");
-		dsTable.add(4, "Gazelle (2531)");
-		dsTable.add(1, "Excalibur (2786)");
-		dsTable.add(2, "Leopard (2537)");
-		dsTable.add(4, "Union (2708)");
-		dsTable.add(1, "Overlord (2762)");
-
-		jsTable.add(1, "Scout JumpShip (Standard)");
-		jsTable.add(2, "Merchant Jumpship (Standard)");
-		jsTable.add(3, "Invader Jumpship (Standard)");			
+		return retVal;
+	}
+	
+	/**
+	 * Used if the config file is missing.
+	 */
+	private void setAllValuesToDefaults() {
+		for (Enumeration<String> e = defaultProperties.getKeys(); e.hasMoreElements(); ) {
+			String key = e.nextElement();
+			String property = defaultProperties.getString(key);
+			switch (key) {
+			case "botForce.IS":
+			case "botForce.CLAN":
+			case "botForce.CS":
+				ArrayList<WeightedTable<String>> list = new ArrayList<>();
+				for (String entry : property.split("\\|")) {
+					list.add(parseDefaultWeightedTable(entry));
+				}
+				botForceTables.put(key.replace("botForce.", ""), list);
+				break;
+			case "botLance.IS":
+			case "botLance.CLAN":
+			case "botLance.CS":
+				list = new ArrayList<>();
+				for (String entry : property.split("\\|")) {
+					list.add(parseDefaultWeightedTable(entry));
+				}
+				botLanceTables.put(key.replace("botLance.", ""), list);
+				break;
+			case "hiringHalls":
+				SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+				for (String entry : property.split("\\|")) {
+					String[] fields = entry.split(",");
+					try {
+						hiringHalls.add(new DatedRecord<>(fields[0].length() > 0? df.parse(fields[0]) : null,
+								fields[1].length() > 0? df.parse(fields[1]) : null,
+										fields[2]));
+					} catch (ParseException ex) {
+						MekHQ.logError("Error parsing default date for hiring hall on " + fields[2]);
+						MekHQ.logError(ex);
+					}
+				}
+				break;
+			case "shipSearchCost":
+				shipSearchCost = Integer.parseInt(property);
+				break;
+			case "shipSearchLengthWeeks":
+				shipSearchLengthWeeks = Integer.parseInt(property);
+				break;
+			case "shipSearchTarget.Dropship":
+				dropshipSearchTarget = property.matches("\\d+")? Integer.valueOf(property) : null;
+				break;
+			case "shipSearchTarget.Jumpship":
+				jumpshipSearchTarget = property.matches("\\d+")? Integer.valueOf(property) : null;
+				break;
+			case "shipSearchTarget.Warship":
+				warshipSearchTarget = property.matches("\\d+")? Integer.valueOf(property) : null;
+				break;
+			case "ships.Dropship":
+				dsTable = parseDefaultWeightedTable(property);
+				break;
+			case "ships.Jumpship":
+				jsTable = parseDefaultWeightedTable(property);
+				break;
+			}
+		}
 	}
 	
 	public int weightClassIndex(int entityWeightClass) {
@@ -155,9 +213,10 @@ public class AtBConfiguration implements Serializable {
 	public String selectBotLances(String org, int weightClass, float rollMod) {
 		if (botForceTables.containsKey(org)) {
 			WeightedTable<String> table = botForceTables.get(org).get(weightClassIndex(weightClass));
-			if (table != null) {
-				return table.select(rollMod);
+			if (table == null) {
+				table = this.getDefaultForceTable("botForce." + org, weightClassIndex(weightClass));
 			}
+			return table.select(rollMod);
 		}
 		return null;
 	}
@@ -169,20 +228,17 @@ public class AtBConfiguration implements Serializable {
 	public String selectBotUnitWeights(String org, int weightClass, float rollMod) {
 		if (botLanceTables.containsKey(org)) {
 			WeightedTable<String> table = botLanceTables.get(org).get(weightClassIndex(weightClass));
-			if (table != null) {
-				return table.select(rollMod);
+			if (table == null) {
+				table = this.getDefaultForceTable("botLance." + org, weightClassIndex(weightClass));
 			}
+			return table.select(rollMod);
 		}
 		return null;
 	}
 	
 	public boolean isHiringHall(String planet, Date date) {
-		for (DatedRecord<String> rec : hiringHalls) {
-			if (rec.getValue().equals(planet) && rec.fitsDate(date)) {
-				return true;
-			}
-		}
-		return false;
+		return hiringHalls.stream().anyMatch( rec -> rec.getValue().equals(planet)
+				&& rec.fitsDate(date));
 	}
 	
 	public int getShipSearchCost() {
@@ -268,7 +324,8 @@ public class AtBConfiguration implements Serializable {
 	
 			xmlDoc = db.parse(fis);
 		} catch (FileNotFoundException ex) {
-			MekHQ.logError("File data/universe/atbconfig.xml not found.");
+			MekHQ.logError("File data/universe/atbconfig.xml not found. Loading defaults.");
+			retVal.setAllValuesToDefaults();
 			return retVal;
 		} catch (Exception ex) {
 			MekHQ.logError(ex);
