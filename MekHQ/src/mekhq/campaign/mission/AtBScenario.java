@@ -60,6 +60,7 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
+import mekhq.campaign.AtBConfiguration;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
@@ -158,24 +159,6 @@ public class AtBScenario extends Scenario {
 	 */
 	private static final int [] startPos = {
 		Board.START_N, Board.START_E, Board.START_S, Board.START_W
-	};
-
-	public static final String[][][] lanceWeights = {
-		//IS Lance
-		{{"LLLL", "LLLL", "LLLL", "LLLM", "LLLM", "LLMM"},
-			{"LLMM", "LMMMM", "LMMM", "MMMM", "MMMM", "MMMH"},
-			{"MMHH", "MHHH", "MHHH", "HHHH", "HHHH", "HHHA"},
-			{"HHAA", "HHAA", "HAAA", "HAAA", "HAAA", "AAAA"}},
-		//Clan Star
-		{{"LLLLL", "LLLLL", "LLLLM", "LLLLM", "LLLMM", "LLLMM"},
-			{"LLMMM", "LMMMM", "MMMMM", "MMMMM", "MMMMH", "MMMHH"},
-			{"MMHHH", "MHHHH", "MHHHH", "HHHHH", "HHHHH", "HHHHA"},
-			{"MHHAA", "HHHAA", "HHAAA", "HHAAA", "HHAAA", "AAAAA"}},
-		//ComStar/WoB Level II
-		{{"LLLLLL", "LLLLLL", "LLLLLL", "LLLLMM", "LLLLMM", "LLLMMM"},
-			{"LLLMMM", "LLMMMMM", "LMMMM", "MMMMMM", "MMMMMH", "MMMMHH"},
-			{"MMMHHH", "MMHHHH", "MHHHHH", "HHHHHH", "HHHHHA", "HHHHAA"},
-			{"HHHAAA", "HHHAAA", "HHAAAAA", "HAAAAA", "HAAAAA", "AAAAAA"}}
 	};
 
 	private int battleType;
@@ -1543,168 +1526,23 @@ public class AtBScenario extends Scenario {
 	 */
 	private void addEnemyForce(ArrayList<Entity> list, int weightClass,
 			int maxWeight, int rollMod, int weightMod, Campaign campaign) {
-		int roll = Compute.randomInt(20) + 1;
-		roll += (campaign.getCampaignOptions().getSkillLevel() - 2) * 5;
-		roll += rollMod;
-		switch (weightClass) {
-		case EntityWeightClass.WEIGHT_ULTRA_LIGHT:
-		case EntityWeightClass.WEIGHT_LIGHT:
-			if (roll < 1) {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_LIGHT + weightMod, maxWeight, campaign);
-			} else if (roll <= 10) {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_MEDIUM + weightMod, maxWeight, campaign);
-			} else if (roll < 17) {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_LIGHT + weightMod, maxWeight, campaign);
-				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_LIGHT + weightMod, maxWeight, campaign);
-				}
-			} else if (roll < 21) {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_HEAVY + weightMod, maxWeight, campaign);
-			} else {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_MEDIUM + weightMod, maxWeight, campaign);
-				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_LIGHT + weightMod, maxWeight, campaign);
-				}
+		String org = AtBConfiguration.ORG_IS;
+		if (getContract(campaign).getEnemyCode().equals("CS")
+				|| getContract(campaign).getEnemyCode().equals("WOB")) {
+			org = AtBConfiguration.ORG_CS;
+		} else {
+			Faction f = Faction.getFaction(getContract(campaign).getEnemyCode());
+			if (f != null && f.isClan()) {
+				org = AtBConfiguration.ORG_CLAN;
 			}
-			break;
-		case EntityWeightClass.WEIGHT_MEDIUM:
-			if (roll < 1) {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_MEDIUM + weightMod, maxWeight, campaign);
-			} else if (roll < 6) {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_LIGHT + weightMod, maxWeight, campaign);
-				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_LIGHT + weightMod, maxWeight, campaign);
-				}
-			} else if (roll < 11) {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_HEAVY + weightMod, maxWeight, campaign);
-			} else if (roll < 21) {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_MEDIUM + weightMod, maxWeight, campaign);
-				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_LIGHT + weightMod, maxWeight, campaign);
-				}
-			} else {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_MEDIUM + weightMod, maxWeight, campaign);
-				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_MEDIUM + weightMod, maxWeight, campaign);
-				}
-			}
-			break;
-		case EntityWeightClass.WEIGHT_HEAVY:
-			if (roll < 1) {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_MEDIUM + weightMod, maxWeight, campaign);
-				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_LIGHT + weightMod, maxWeight, campaign);
-				}
-			} else if (roll < 4) {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_LIGHT + weightMod, maxWeight, campaign);
-				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_LIGHT + weightMod, maxWeight, campaign);
-				}
-				if (campaign.getCampaignOptions().getSkillLevel() > 1) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_LIGHT + weightMod, maxWeight, campaign);
-				}
-			} else if (roll < 8) {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_MEDIUM + weightMod, maxWeight, campaign);
-				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_MEDIUM + weightMod, maxWeight, campaign);
-				}
-			} else if (roll < 10) {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_ASSAULT + weightMod, maxWeight, campaign);
-			} else if (roll < 13) {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_HEAVY + weightMod, maxWeight, campaign);
-				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_LIGHT + weightMod, maxWeight, campaign);
-				}
-			} else if (roll < 17) {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_MEDIUM + weightMod, maxWeight, campaign);
-				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_LIGHT + weightMod, maxWeight, campaign);
-				}
-				if (campaign.getCampaignOptions().getSkillLevel() > 1) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_LIGHT + weightMod, maxWeight, campaign);
-				}
-			} else if (roll < 21) {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_HEAVY + weightMod, maxWeight, campaign);
-				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_MEDIUM + weightMod, maxWeight, campaign);
-				}
-			} else {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_HEAVY + weightMod, maxWeight, campaign);
-				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_LIGHT + weightMod, maxWeight, campaign);
-				}
-				if (campaign.getCampaignOptions().getSkillLevel() > 1) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_LIGHT + weightMod, maxWeight, campaign);
-				}
-			}
-			break;
-		case EntityWeightClass.WEIGHT_ASSAULT:
-		case EntityWeightClass.WEIGHT_SUPER_HEAVY:
-			if (roll < 1) {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_MEDIUM + weightMod, maxWeight, campaign);
-				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_LIGHT + weightMod, maxWeight, campaign);
-				}
-				if (campaign.getCampaignOptions().getSkillLevel() > 1) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_LIGHT + weightMod, maxWeight, campaign);
-				}
-			} else if (roll < 5) {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_MEDIUM + weightMod, maxWeight, campaign);
-				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_MEDIUM + weightMod, maxWeight, campaign);
-				}
-				if (campaign.getCampaignOptions().getSkillLevel() > 1) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_LIGHT + weightMod, maxWeight, campaign);
-				}
-			} else if (roll < 8) {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_HEAVY + weightMod, maxWeight, campaign);
-				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_LIGHT + weightMod, maxWeight, campaign);
-				}
-				if (campaign.getCampaignOptions().getSkillLevel() > 1) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_LIGHT + weightMod, maxWeight, campaign);
-				}
-			} else if (roll < 10) {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_HEAVY + weightMod, maxWeight, campaign);
-				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_HEAVY + weightMod, maxWeight, campaign);
-				}
-			} else if (roll < 12) {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_ASSAULT + weightMod, maxWeight, campaign);
-				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_LIGHT + weightMod, maxWeight, campaign);
-				}
-			} else if (roll < 16) {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_MEDIUM + weightMod, maxWeight, campaign);
-				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_MEDIUM + weightMod, maxWeight, campaign);
-				}
-				if (campaign.getCampaignOptions().getSkillLevel() > 1) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_MEDIUM + weightMod, maxWeight, campaign);
-				}
-			} else if (roll < 19) {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_HEAVY + weightMod, maxWeight, campaign);
-				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_MEDIUM + weightMod, maxWeight, campaign);
-				}
-				if (campaign.getCampaignOptions().getSkillLevel() > 1) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_LIGHT + weightMod, maxWeight, campaign);
-				}
-			} else if (roll < 21) {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_ASSAULT + weightMod, maxWeight, campaign);
-				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_MEDIUM + weightMod, maxWeight, campaign);
-				}
-			} else {
-				addEnemyLance(list, EntityWeightClass.WEIGHT_ASSAULT + weightMod, maxWeight, campaign);
-				if (campaign.getCampaignOptions().getSkillLevel() > 0) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_MEDIUM + weightMod, maxWeight, campaign);
-				}
-				if (campaign.getCampaignOptions().getSkillLevel() > 1) {
-					addEnemyLance(list, EntityWeightClass.WEIGHT_LIGHT + weightMod, maxWeight, campaign);
-				}
-			}
-			break;
+		}
+		
+		String lances = campaign.getAtBConfig().selectBotLances(org, weightClass, rollMod/20f);
+		int maxLances = Math.min(lances.length(), campaign.getCampaignOptions().getSkillLevel() + 1);
+		
+		for (int i = 0; i < maxLances; i++) {
+			addEnemyLance(list, decodeWeightStr(lances, i) + weightMod,
+					maxWeight, campaign);
 		}
 	}
 
@@ -2025,9 +1863,8 @@ public class AtBScenario extends Scenario {
 			return;
 		}
 
-		String weights = adjustForMaxWeight(lanceWeights[0]
-				[weightClass - EntityWeightClass.WEIGHT_LIGHT][Compute.d6() - 1],
-				maxWeight);
+		String weights = adjustForMaxWeight(campaign.getAtBConfig()
+				.selectBotUnitWeights(AtBConfiguration.ORG_IS, weightClass), maxWeight);
 
 		int forceType = FORCE_MEK;
 		if (campaign.getCampaignOptions().getUseVehicles()) {
@@ -2126,9 +1963,8 @@ public class AtBScenario extends Scenario {
 			forceType = FORCE_VEHICLE;
 		}
 
-		String weights = adjustForMaxWeight(lanceWeights[1]
-				[weightClass - EntityWeightClass.WEIGHT_LIGHT][Compute.d6() - 1],
-				maxWeight);
+		String weights = adjustForMaxWeight(campaign.getAtBConfig()
+				.selectBotUnitWeights(AtBConfiguration.ORG_CLAN, weightClass), maxWeight);
 
 		int unitType = (forceType == FORCE_VEHICLE)?UnitType.TANK:UnitType.MEK;
 
@@ -2201,9 +2037,8 @@ public class AtBScenario extends Scenario {
 	 */
 	private void addLevelII(ArrayList<Entity> list, String faction, int skill, int quality, int weightClass,
 			int maxWeight, Campaign campaign, int arrivalTurn) {
-		String weights = adjustForMaxWeight(lanceWeights[2]
-				[weightClass - EntityWeightClass.WEIGHT_LIGHT][Compute.d6() - 1],
-				maxWeight);
+		String weights = adjustForMaxWeight(campaign.getAtBConfig()
+				.selectBotUnitWeights(AtBConfiguration.ORG_CS, weightClass), maxWeight);
 
 		int forceType = FORCE_MEK;
 		int roll = Compute.d6();

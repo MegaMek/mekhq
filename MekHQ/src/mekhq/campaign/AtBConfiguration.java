@@ -27,6 +27,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.function.Function;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -62,6 +63,15 @@ public class AtBConfiguration implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 515628415152924457L;
+	
+	/* Used to indicate size of lance or equivalent in opfor forces */
+	public static final String ORG_IS = "IS";
+	public static final String ORG_CLAN = "CLAN";
+	public static final String ORG_CS = "CS";
+	
+	/* Scenario generation */
+	private HashMap<String,ArrayList<WeightedTable<String>>> botForceTables = new HashMap<>();
+	private HashMap<String,ArrayList<WeightedTable<String>>> botLanceTables = new HashMap<>();
 	
 	/* Contract generation */
 	private ArrayList<DatedRecord<String>> hiringHalls;
@@ -115,6 +125,55 @@ public class AtBConfiguration implements Serializable {
 		jsTable.add(1, "Scout JumpShip (Standard)");
 		jsTable.add(2, "Merchant Jumpship (Standard)");
 		jsTable.add(3, "Invader Jumpship (Standard)");			
+	}
+	
+	public int weightClassIndex(int entityWeightClass) {
+		return entityWeightClass - 1;
+	}
+	
+	public int weightClassIndex(String wc) {
+		switch (wc) {
+		case "L":
+		case "UL":
+			return 0;
+		case "M":
+			return 1;
+		case "H":
+			return 2;
+		case "A":
+		case "C":
+		case "SH":
+			return 3;
+		}
+		throw new IllegalArgumentException("Could not parse weight class " + wc);
+	}
+	
+	public String selectBotLances(String org, int weightClass) {
+		return selectBotLances(org, weightClass, 0f);
+	}
+	
+	public String selectBotLances(String org, int weightClass, float rollMod) {
+		if (botForceTables.containsKey(org)) {
+			WeightedTable<String> table = botForceTables.get(org).get(weightClassIndex(weightClass));
+			if (table != null) {
+				return table.select(rollMod);
+			}
+		}
+		return null;
+	}
+	
+	public String selectBotUnitWeights(String org, int weightClass) {
+		return selectBotUnitWeights(org, weightClass, 0f);
+	}
+	
+	public String selectBotUnitWeights(String org, int weightClass, float rollMod) {
+		if (botLanceTables.containsKey(org)) {
+			WeightedTable<String> table = botLanceTables.get(org).get(weightClassIndex(weightClass));
+			if (table != null) {
+				return table.select(rollMod);
+			}
+		}
+		return null;
 	}
 	
 	public boolean isHiringHall(String planet, Date date) {
@@ -223,8 +282,11 @@ public class AtBConfiguration implements Serializable {
 		for (int x = 0; x < nl.getLength(); x++) {
 			Node wn = nl.item(x);
 			switch (wn.getNodeName()) {
+			case "scenarioGeneration":
+				retVal.loadScenarioGenerationNodeFromXml(wn);
+				break;
 			case "contractGeneration":
-				retVal.loadCampaignGenerationNodeFromXml(wn);
+				retVal.loadContractGenerationNodeFromXml(wn);
 				break;
 			case "shipSearch":
 				retVal.loadShipSearchNodeFromXml(wn);
@@ -235,7 +297,64 @@ public class AtBConfiguration implements Serializable {
 		return retVal;
 	}
 	
-	private void loadCampaignGenerationNodeFromXml(Node node) {
+	private void loadScenarioGenerationNodeFromXml(Node node) {
+		NodeList nl = node.getChildNodes();
+		for (int i = 0; i < nl.getLength(); i++) {
+			Node wn = nl.item(i);
+			String[] orgs;
+			ArrayList<WeightedTable<String>> list;
+			switch (wn.getNodeName()) {
+			case "botForce":
+				if (wn.getAttributes().getNamedItem("org") == null) {
+					orgs = new String[1];
+					orgs[0] = ORG_IS;
+				} else {
+					orgs = wn.getAttributes().getNamedItem("org").getTextContent().split(",");
+				}
+				list = loadForceTableFromXml(wn);
+				for (String org : orgs) {
+					botForceTables.put(org, list);
+				}
+				break;
+			case "botLance":
+				if (wn.getAttributes().getNamedItem("org") == null) {
+					orgs = new String[1];
+					orgs[0] = ORG_IS;
+				} else {
+					orgs = wn.getAttributes().getNamedItem("org").getTextContent().split(",");
+				}
+				list = loadForceTableFromXml(wn);
+				for (String org : orgs) {
+					botLanceTables.put(org, list);
+				}
+				break;
+			}
+		}
+	}
+	
+	private ArrayList<WeightedTable<String>> loadForceTableFromXml(Node node) {
+		ArrayList<WeightedTable<String>> retVal = new ArrayList<>();
+		NodeList nl = node.getChildNodes();
+		for (int i = 0; i < nl.getLength(); i++) {
+			Node wn = nl.item(i);
+			if (wn.getNodeName().equals("weightedTable")) {
+				try {
+					int weightClass = weightClassIndex(wn.getAttributes()
+							.getNamedItem("weightClass").getTextContent());
+					while (retVal.size() <= weightClass) {
+						retVal.add(null);
+					}
+					retVal.set(weightClass, loadWeightedTableFromXml(wn));
+				} catch (Exception ex) {
+					MekHQ.logError(ex);
+					MekHQ.logError("Could not parse weight class attribute for enemy forces table");
+				}							
+			}
+		}
+		return retVal;
+	}
+	
+	private void loadContractGenerationNodeFromXml(Node node) {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		
 		NodeList nl = node.getChildNodes();
@@ -337,7 +456,7 @@ public class AtBConfiguration implements Serializable {
 	 * the value should apply to all dates from the beginning
 	 * or to the end of the epoch, respectively.
 	 */
-	class DatedRecord<E> {
+	static class DatedRecord<E> {
 		private Date start;
 		private Date end;
 		private E value;
@@ -401,7 +520,12 @@ public class AtBConfiguration implements Serializable {
 		}
 	}
 	
-	static class WeightedTable<T> {
+	static class WeightedTable<T> implements Serializable {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1984759212668176620L;
+		
 		private ArrayList<Integer> weights = new ArrayList<>();
 		private ArrayList<T> values = new ArrayList<>();
 		
@@ -420,9 +544,19 @@ public class AtBConfiguration implements Serializable {
 		}
 		
 		public T select() {
+			return select(0f);
+		}
+		
+		/**
+		 * Select random entry proportionally to the weight values
+		 * @param rollMod - a modifier to the die roll, expressed as a fraction of the total weight
+		 * @return
+		 */
+		public T select(float rollMod) {
 			int total = weights.stream().mapToInt(w -> w.intValue()).sum();
 			if (total > 0) {
-				int roll = Compute.randomInt(total);
+				int roll = Math.min(Compute.randomInt(total) + (int)(total * rollMod + 0.5f),
+						total - 1);
 				for (int i = 0; i < weights.size(); i++) {
 					if (roll < weights.get(i)) {
 						return values.get(i);
