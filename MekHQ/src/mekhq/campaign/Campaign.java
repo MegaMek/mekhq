@@ -760,6 +760,10 @@ public class Campaign implements Serializable {
             	if (forceTech.canTech(u.getEntity())) {
             	    u.setTech(force.getTechID());
             	    forceTech.addTechUnitID(u.getId());
+            	} else {
+            	    String cantTech = forceTech.getName() + " cannot maintain " + u.getName() + "\n"
+            	            + "You will need to assign a tech manually.";
+            	    JOptionPane.showMessageDialog(null, cantTech, "Warning", JOptionPane.WARNING_MESSAGE);
             	}
             }
         }
