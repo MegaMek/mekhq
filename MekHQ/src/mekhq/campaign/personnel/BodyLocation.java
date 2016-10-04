@@ -120,7 +120,7 @@ public enum BodyLocation {
         return (null != this.parent) ? (this.parent == parent) || this.parent.isChildOf(parent) : false;
     }
     
-    private static final class XMLAdapter extends XmlAdapter<String, BodyLocation> {
+    public static final class XMLAdapter extends XmlAdapter<String, BodyLocation> {
         @Override
         public BodyLocation unmarshal(String v) throws Exception {
             return (null == v) ? null : BodyLocation.of(v);
