@@ -40,6 +40,7 @@ import java.util.UUID;
 import java.util.Vector;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.IntSupplier;
 import java.util.function.IntUnaryOperator;
 
 import org.w3c.dom.Node;
@@ -159,6 +160,13 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public static final int DESIG_CHI     = 12;
     public static final int DESIG_GAMMA   = 13;
     public static final int DESIG_NUM     = 14;
+
+    private static final IntSupplier PREGNANCY_DURATION = () -> {
+        double gaussian = Math.sqrt(-2 * Math.log(Math.random())) * Math.cos(2.0 * Math.PI * Math.random());
+        // To not get weird results, we limit the values to +/- 4.0 (almost 6 weeks)
+        gaussian = Math.max(-4.0, Math.min(4.0, gaussian));
+        return (int) Math.round(gaussian * 10 + 38 * 7);
+    };
 
     protected UUID id;
     protected int oldId;
@@ -962,7 +970,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 					// 0.005% chance that this procreation attempt will create a child
 					if (Compute.randomInt(100000) < 2) {
 						GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
-						tCal.add(GregorianCalendar.DAY_OF_YEAR, 40*7);
+						tCal.add(GregorianCalendar.DAY_OF_YEAR, PREGNANCY_DURATION.getAsInt());
 						setDueDate(tCal);
 						campaign.addReport(getHyperlinkedName()+" has conceived");
 						if (campaign.getCampaignOptions().logConception()) {
@@ -974,7 +982,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 						// 0.05% chance that this procreation attempt will create a child
 						if (Compute.randomInt(10000) < 2) {
 							GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
-							tCal.add(GregorianCalendar.DAY_OF_YEAR, 40*7);
+							tCal.add(GregorianCalendar.DAY_OF_YEAR, PREGNANCY_DURATION.getAsInt());
 							setDueDate(tCal);
 							campaign.addReport(getHyperlinkedName()+" has conceived");
 							if (campaign.getCampaignOptions().logConception()) {
