@@ -31,14 +31,237 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
  -->
 <factions>
 	<choosableFactionCodes>MERC,CC,DC,FS,FWL,LA,FC,ROS,CS,WOB,FRR,SIC,MOC,MH,OA,TC,CDS,CGB,CHH,CJF,CNC,CSJ,CSV,CSR,CW,CBS,CCC,CCO,CFM,CGS,CIH,CSA,TH,RWR,CIR,JF,PIR,NIOPS,CDP,HL,NC</choosableFactionCodes>
+	<!-- Early spaceflight factions -->
+	<faction>
+		<shortname>WA</shortname>
+		<fullname>Western Alliance</fullname>
+		<namegenerator>General</namegenerator>
+		<colorRGB>0,20,220</colorRGB>
+		<tags>is,minor</tags>
+		<start>2014</start>
+		<end>2085</end>
+		<successor>TA</successor>
+	</faction>
+	<faction>
+		<shortname>ACPS</shortname>
+		<fullname>Asian Co-Prosperity Sphere</fullname>
+		<namegenerator>CC</namegenerator>
+		<colorRGB>0,20,220</colorRGB>
+		<tags>is,minor</tags>
+		<start>2022</start>
+		<end>2024</end>
+		<successor>WA</successor>
+	</faction>
+	<!-- First exodus factions -->
+	<faction>
+		<shortname>TA</shortname>
+		<fullname>Terran Alliance</fullname>
+		<eraMods>-1,-1,-1,0,0,0,0,0,0</eraMods>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>207,119,57</colorRGB>
+		<tags>is</tags>
+		<start>2086</start>
+		<end>2314</end>
+		<successor>TH</successor>
+	</faction>
+	<faction>
+		<shortname>TH</shortname>
+		<id>18</id>
+		<fullname>Terran Hegemony</fullname>
+		<startingPlanet>Terra,Terra,Terra, , , , , ,</startingPlanet>
+		<eraMods>-1,-1,-1,0,0,0,0,0,0</eraMods>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>255,255,255</colorRGB>
+		<tags>is</tags>
+		<start>2315</start>
+		<end>2767</end>
+	</faction>
+	<faction>
+		<shortname>Alf</shortname>
+		<fullname>Alfrik</fullname>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>103,169,57</colorRGB>
+		<tags>is,minor</tags>
+		<start>2200</start> <!-- estimated -->
+	</faction>
 	<!-- Major Inner Sphere Factions -->
 	<faction>
-		<shortname>ABN</shortname>
-		<fullname>Abandoned</fullname>
+		<shortname>CC</shortname>
+		<id>1</id>
+		<fullname>Capellan Confederation</fullname>
+		<startingPlanet>Sian,Sian,Sian,Sian,Sian,Sian,Sian,Sian,Sian</startingPlanet>
+		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+		<nameGenerator>CC</nameGenerator>
+		<colorRGB>0,156,85</colorRGB>
+		<tags>is</tags>
+		<start>2367</start>
+	</faction>
+	<faction>
+		<shortname>DC</shortname>
+		<id>2</id>
+		<fullname>Draconis Combine</fullname>
+		<startingPlanet>New Samarkand,Luthien,Luthien,Luthien,Luthien,Luthien,Luthien,Luthien,Luthien</startingPlanet>
+		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
+		<nameGenerator>DC</nameGenerator>
+		<colorRGB>234,45,46</colorRGB>
+		<tags>is</tags>
+		<start>2319</start>
+	</faction>
+	<faction>
+		<shortname>FS</shortname>
+		<id>3</id>
+		<fullname>Federated Suns</fullname>
+		<startingPlanet>New Avalon,New Avalon,New Avalon,New Avalon,New Avalon,New Avalon,New Avalon,New Avalon,New Avalon</startingPlanet>
+		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
+		<nameGenerator>FS</nameGenerator>
+		<colorRGB>248,212,44</colorRGB>
+		<tags>is</tags>
+		<start>2317</start>
+	</faction>
+	<faction>
+		<shortname>FWL</shortname>
+		<id>4</id>
+		<fullname>Free Worlds League</fullname>
+		<startingPlanet>Atreus,Atreus,Atreus,Atreus,Atreus,Atreus,Atreus,Atreus,Atreus</startingPlanet>
+		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
+		<nameGenerator>FWL</nameGenerator>
+		<colorRGB>165,94,160</colorRGB>
+		<tags>is</tags>
+		<start>2271</start>
+	</faction>
+	<faction>
+		<shortname>LA</shortname>
+		<id>5</id>
+		<fullname>Lyran Commonwealth</fullname>
+		<startingPlanet>Tharkad,Tharkad,Tharkad,Tharkad,Tharkad,Tharkad,Tharkad,Tharkad,Tharkad</startingPlanet>
+		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+		<nameGenerator>LA</nameGenerator>
+		<colorRGB>0,124,186</colorRGB>
+		<altNames>, , , , , , ,Lyran Alliance,Lyran Alliance</altNames>
+		<tags>is</tags>
+		<start>2341</start>
+	</faction>
+	<!-- Star League Era factions -->
+	<faction>
+		<shortname>CRep</shortname>
+		<fullname>Capellan Republic</fullname>
+		<eraMods>1,0,0,0,0,0,0,0,0</eraMods>
+		<nameGenerator>CC</nameGenerator>
+		<colorRGB>2,166,79</colorRGB>
+		<tags>is,minor</tags>
+		<start>2194</start>
+		<end>2269</end>
+		<successor>CH</successor>
+	</faction>
+	<faction>
+		<shortname>CH</shortname>
+		<fullname>Capellan Hegemony</fullname>
+		<!-- Formed as a union of Capellan Republic and Capellan Co-Prosperity Sphere -->
+		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+		<nameGenerator>CC</nameGenerator>
+		<colorRGB>2,166,79</colorRGB>
+		<tags>is</tags>
+		<start>2270</start>
+		<end>2309</end>
+		<successor>CCom</successor>
+	</faction>
+	<faction>
+		<shortname>CCom</shortname>
+		<fullname>Capellan Commonality</fullname>
+		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+		<nameGenerator>CC</nameGenerator>
+		<colorRGB>2,166,79</colorRGB>
+		<tags>is</tags>
+		<start>2310</start>
+		<end>2366</end>
+		<successor>CC</successor>
+	</faction>
+	<faction>
+		<shortname>TU</shortname>
+		<fullname>Tikonov Union</fullname>
+		<nameGenerator>CC</nameGenerator>
+		<colorRGB>255,160,122</colorRGB>
+		<tags>is</tags>
+		<start>2177</start>
+		<end>2242</end>
+		<successor>TGU</successor>
+	</faction>
+	<faction>
+		<shortname>TGU</shortname>
+		<fullname>Tikonov Grand Union</fullname>
+		<nameGenerator>CC</nameGenerator>
+		<colorRGB>255,160,122</colorRGB>
+		<tags>is</tags>
+		<start>2243</start>
+		<end>2366</end>
+		<successor>CC</successor>
+	</faction>
+	<faction>
+		<shortname>CTL</shortname>
+		<fullname>Chesterton Trade Federation</fullname>
+		<startingPlanet>,,,,,,,,</startingPlanet>
+		<nameGenerator>CC</nameGenerator>
+		<colorRGB>184,134,22</colorRGB>
+		<tags>is</tags>
+		<start>2193</start>
+		<end>2357</end>
+		<successor>CC</successor>
+	</faction>
+	<faction>
+		<shortname>ChP</shortname>
+		<fullname>Chisholm Protectorate</fullname>
+		<startingPlanet>Elgin (Chisholm 2878-),,,,,,,,</startingPlanet>
+		<nameGenerator>CC</nameGenerator>
+		<colorRGB>224,104,32</colorRGB>
+		<tags>is</tags>
+		<start>2265</start>
+		<end>2335</end>
+		<successor>CC</successor>
+	</faction>
+	<faction>
+		<shortname>SSUP</shortname>
+		<fullname>Sarna Supremacy</fullname>
+		<startingPlanet>Sarna,Sarna,Sarna,Sarna,Sarna,Sarna,Sarna,Sarna,Sarna</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>0,0,0</colorRGB>
-		<tags>abandoned,inactive,chaos</tags>
+		<nameGenerator>CC</nameGenerator>
+		<colorRGB>184,134,11</colorRGB>
+		<tags>is</tags>
+		<start>2175</start>
+		<end>2366</end>
+		<successor>CC</successor>
+	</faction>
+	<faction>
+		<shortname>SIMA</shortname>
+		<fullname>St. Ives Mercantile Association</fullname>
+		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+		<nameGenerator>CC</nameGenerator>
+		<colorRGB>188,223,186</colorRGB>
+		<tags>is</tags>
+		<start>2245</start>
+		<end>2366</end>
+		<successor>CC</successor>
+	</faction>
+	<faction>
+		<shortname>SCW</shortname>
+		<fullname>Sian Commonwealth</fullname>
+		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+		<nameGenerator>CC</nameGenerator>
+		<colorRGB>2,166,79</colorRGB>
+		<tags>is</tags>
+		<start>2260</start>
+		<end>2366</end>
+		<successor>CC</successor>
+	</faction>
+	<faction>
+		<shortname>DoL</shortname>
+		<fullname>Duchy of Liao</fullname>
+		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+		<nameGenerator>CC</nameGenerator>
+		<colorRGB>2,166,79</colorRGB>
+		<tags>is</tags>
+		<start>2315</start>
+		<end>2366</end>
+		<successor>CC</successor>
 	</faction>
 	<faction>
 		<shortname>AG</shortname>
@@ -47,6 +270,210 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<nameGenerator>DC</nameGenerator>
 		<colorRGB>234,38,41</colorRGB>
 		<tags>is</tags>
+		<start>2302</start>
+		<end>2318</end>
+		<successor>DC</successor>
+	</faction>
+	<faction>
+		<shortname>AC</shortname>
+		<fullname>Azami Caliphate</fullname>
+		<startingPlanet>Algedi,,,,,,,,</startingPlanet>
+		<nameGenerator>DC</nameGenerator>
+		<colorRGB>255,80,93</colorRGB>
+		<tags>is</tags>
+		<start>2450</start>
+		<end>2516</end>
+		<successor>DC</successor>
+	</faction>
+	<faction>
+		<shortname>PoR</shortname>
+		<fullname>Principality of Rasalhague</fullname>
+		<startingPlanet>Rasalhague,,,,,,,,</startingPlanet>
+		<eraMods>0,0,0,0,0,0,2,1,0</eraMods>
+		<nameGenerator>FRR</nameGenerator>
+		<colorRGB>116,171,206</colorRGB>
+		<tags>is</tags>
+		<start>2260</start>
+		<end>2510</end>
+		<successor>DC</successor>
+	</faction>
+	<faction>
+		<shortname>Mara</shortname>
+		<fullname>Marlette Association</fullname>
+		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
+		<nameGenerator>FS</nameGenerator>
+		<colorRGB>254,214,0</colorRGB>
+		<tags>is</tags>
+		<start>2278</start>
+		<end>2324</end>
+		<successor>FS</successor>
+	</faction>
+    <faction>
+		<shortname>ME</shortname>
+		<fullname>Muskegon Coalition</fullname>
+		<startingPlanet>Muskegon,,,,,,,,</startingPlanet>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>254,214,0</colorRGB>
+		<tags>is</tags>
+		<start>2163</start>
+		<end>2316</end>
+		<successor>FS</successor>
+    </faction>
+	<faction>
+		<shortname>UHC</shortname>
+		<fullname>United Hindu Collective</fullname>
+		<startingPlanet>Basantapur,,,,,,,,</startingPlanet>
+		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
+		<nameGenerator>FS</nameGenerator>
+		<colorRGB>171,148,118</colorRGB>
+		<tags>is</tags>
+		<start>2240</start>
+		<end>2540</end>
+		<successor>FS</successor>
+	</faction>
+	<faction>
+		<shortname>MRep</shortname>
+		<fullname>Marik Republic</fullname>
+		<startingPlanet>Marik,,,,,,,,</startingPlanet>
+		<nameGenerator>FWL</nameGenerator>
+		<colorRGB>143,190,192</colorRGB>
+		<tags>is</tags>
+		<start>2238</start>
+		<end>2270</end>
+		<successor>FWL</successor>
+	</faction>
+	<faction>
+		<shortname>FoO</shortname>
+		<fullname>Federation of Oriente</fullname>
+		<startingPlanet>Oriente,,,,,,,,</startingPlanet>
+		<nameGenerator>FWL</nameGenerator>
+		<colorRGB>163,112,120</colorRGB>
+		<tags>is</tags>
+		<start>2241</start>
+		<end>2270</end>
+		<successor>FWL</successor>
+	</faction>
+	<faction>
+		<shortname>RP</shortname>
+		<fullname>Regulan Principality</fullname>
+		<startingPlanet>Regulas,,,,,,,,</startingPlanet>
+		<nameGenerator>FWL</nameGenerator>
+		<colorRGB>255,51,51</colorRGB>
+		<tags>is</tags>
+		<start>2243</start>
+		<end>2270</end>
+		<successor>FWL</successor>
+	</faction>
+	<faction>
+		<shortname>SCon</shortname>
+		<fullname>Stewart Confederation</fullname>
+		<startingPlanet>Stewart,,,,,,,,</startingPlanet>
+		<nameGenerator>FWL</nameGenerator>
+		<colorRGB>76,0,153</colorRGB>
+		<tags>is</tags>
+		<start>2259</start>
+		<end>2270</end>
+		<successor>FWL</successor>
+	</faction>
+	<faction>
+		<shortname>PD</shortname>
+		<fullname>Protertorate of Donegal</fullname>
+		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+		<nameGenerator>LA</nameGenerator>
+		<colorRGB>22,126,194</colorRGB>
+		<tags>is</tags>
+		<start>2313</start>
+		<end>2340</end>
+		<successor>LA</successor>
+	</faction>
+	<faction>
+		<shortname>FoS</shortname>
+		<fullname>Federation of Skye</fullname>
+		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+		<nameGenerator>LA</nameGenerator>
+		<colorRGB>22,126,194</colorRGB>
+		<tags>is</tags>
+		<start>2299</start>
+		<end>2340</end>
+		<successor>LA</successor>
+	</faction>
+	<faction>
+		<shortname>TamP</shortname>
+		<fullname>Tamar Pact</fullname>
+		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+		<nameGenerator>LA</nameGenerator>
+		<colorRGB>22,126,194</colorRGB>
+		<tags>is</tags>
+		<start>2235</start>
+		<end>2340</end>
+		<successor>LA</successor>
+	</faction>
+	<faction>
+		<shortname>RWR</shortname>
+		<id>19</id>
+		<fullname>Rim Worlds Republic</fullname>
+		<startingPlanet>Apollo,Apollo,Apollo,,,,,,,</startingPlanet>
+		<eraMods>1,1,1,0,0,0,0,0,0</eraMods>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>232,202,173</colorRGB>
+		<tags>periphery</tags>
+		<start>2250</start>
+		<end>2779</end>
+	</faction>
+	<faction>
+		<shortname>THW</shortname>
+		<fullname>Taurian Homeworlds</fullname>
+		<startingPlanet>Taurus,,,,,,,,</startingPlanet>
+		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>179,62,38</colorRGB>
+		<tags>periphery</tags>
+		<start>2253</start>
+		<end>2334</end>
+		<successor>TC</successor>
+	</faction>
+	<faction>
+		<shortname>TC</shortname>
+		<id>14</id>
+		<fullname>Taurian Concordat</fullname>
+		<startingPlanet>Taurus,Taurus,Taurus,Taurus,Taurus,Taurus,Taurus,Taurus,Taurus</startingPlanet>
+		<eraMods>1,1,1,1,2,3,2,1,0</eraMods>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>179,62,38</colorRGB>
+		<tags>periphery</tags>
+		<start>2335</start>
+	</faction>
+	<faction>
+		<shortname>MOC</shortname>
+		<id>12</id>
+		<fullname>Magistracy of Canopus</fullname>
+		<startingPlanet>Canopus IV,Canopus IV,Canopus IV,Canopus IV,Canopus IV,Canopus IV,Canopus IV,Canopus IV,Canopus IV</startingPlanet>
+		<eraMods>1,1,1,1,2,3,2,1,1</eraMods>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>57,158,145</colorRGB>
+		<tags>periphery</tags>
+		<start>2530</start>
+	</faction>
+	<faction>
+		<shortname>OA</shortname>
+		<id>13</id>
+		<fullname>Outworlds Alliance</fullname>
+		<startingPlanet>Alpheratz,Alpheratz,Alpheratz,Alpheratz,Alpheratz,Alpheratz,Alpheratz,Alpheratz,Alpheratz</startingPlanet>
+		<eraMods>1,1,1,1,2,3,2,1,0</eraMods>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>210,190,153</colorRGB>
+		<altNames>, , , , , , , ,Raven Alliance</altNames>
+		<tags>periphery</tags>
+		<start>2413</start>
+	</faction>
+	
+	<faction>
+		<shortname>ABN</shortname>
+		<fullname>Abandoned</fullname>
+		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>0,0,0</colorRGB>
+		<tags>abandoned,inactive,chaos</tags>
 	</faction>
 	<faction>
 		<shortname>ARDC</shortname>
@@ -83,32 +510,6 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>0,128,128</colorRGB>
 		<tags>periphery</tags>
-	</faction>
-	<faction>
-		<shortname>CCom</shortname>
-		<fullname>Capellan Commonality</fullname>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>2,166,79</colorRGB>
-		<tags>is</tags>
-	</faction>
-	<faction>
-		<shortname>CC</shortname>
-		<id>1</id>
-		<fullname>Capellan Confederation</fullname>
-		<startingPlanet>Sian,Sian,Sian,Sian,Sian,Sian,Sian,Sian,Sian</startingPlanet>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>0,156,85</colorRGB>
-		<tags>is</tags>
-	</faction>
-	<faction>
-		<shortname>CH</shortname>
-		<fullname>Capellan Hegemony</fullname>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>2,166,79</colorRGB>
-		<tags>is</tags>
 	</faction>
 	<faction>
 		<shortname>CI</shortname>
@@ -371,16 +772,6 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<tags>is,inactive</tags>
 	</faction>
 	<faction>
-		<shortname>DC</shortname>
-		<id>2</id>
-		<fullname>Draconis Combine</fullname>
-		<startingPlanet>New Samarkand,Luthien,Luthien,Luthien,Luthien,Luthien,Luthien,Luthien,Luthien</startingPlanet>
-		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
-		<nameGenerator>DC</nameGenerator>
-		<colorRGB>234,45,46</colorRGB>
-		<tags>is</tags>
-	</faction>
-	<faction>
 		<shortname>DA</shortname>
 		<fullname>Duchy of Andurien</fullname>
 		<startingPlanet>Andurien,Andurien,Andurien,Andurien,Andurien,Andurien,Andurien,Andurien,Andurien,</startingPlanet>
@@ -463,24 +854,6 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<tags>is</tags>
 	</faction>
 	<faction>
-		<shortname>FS</shortname>
-		<id>3</id>
-		<fullname>Federated Suns</fullname>
-		<startingPlanet>New Avalon,New Avalon,New Avalon,New Avalon,New Avalon,New Avalon,New Avalon,New Avalon,New Avalon</startingPlanet>
-		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
-		<nameGenerator>FS</nameGenerator>
-		<colorRGB>248,212,44</colorRGB>
-		<tags>is</tags>
-	</faction>
-	<faction>
-		<shortname>FoS</shortname>
-		<fullname>Federation of Skye</fullname>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>LA</nameGenerator>
-		<colorRGB>22,126,194</colorRGB>
-		<tags>is</tags>
-	</faction>
-	<faction>
 		<shortname>FVC</shortname>
 		<fullname>Filtvelt Coalition</fullname>
 		<startingPlanet>Filtvelt,Filtvelt,Filtvelt,Filtvelt,Filtvelt,Filtvelt,Filtvelt,Filtvelt,Filtvelt,</startingPlanet>
@@ -497,25 +870,6 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,0,0,0,2,1,0</eraMods>
 		<nameGenerator>FRR</nameGenerator>
 		<colorRGB>116,171,206</colorRGB>
-		<tags>is</tags>
-	</faction>
-	<faction>
-		<shortname>PoR</shortname>
-		<fullname>Principality of Rasalhague</fullname>
-		<startingPlanet>Rasalhague,Rasalhague,Rasalhague,Rasalhague,Rasalhague,Rasalhague,Rasalhague,Orestes,Orestes</startingPlanet>
-		<eraMods>0,0,0,0,0,0,2,1,0</eraMods>
-		<nameGenerator>FRR</nameGenerator>
-		<colorRGB>116,171,206</colorRGB>
-		<tags>is</tags>
-	</faction>
-	<faction>
-		<shortname>FWL</shortname>
-		<id>4</id>
-		<fullname>Free Worlds League</fullname>
-		<startingPlanet>Atreus,Atreus,Atreus,Atreus,Atreus,Atreus,Atreus,Atreus,Atreus</startingPlanet>
-		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
-		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>165,94,160</colorRGB>
 		<tags>is</tags>
 	</faction>
 	<faction>
@@ -615,41 +969,12 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<tags>is</tags>
 	</faction>
 	<faction>
-		<shortname>DoL</shortname>
-		<fullname>Duchy of Liao</fullname>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>2,166,79</colorRGB>
-		<tags>is</tags>
-	</faction>
-	<faction>
 		<shortname>LL</shortname>
 		<fullname>Lothian League</fullname>
 		<startingPlanet>,,Lothario,Lothario,Lothario,Lothario,Lothario,,</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>255,140,0</colorRGB>
-		<tags>periphery</tags>
-	</faction>
-	<faction>
-		<shortname>LA</shortname>
-		<id>5</id>
-		<fullname>Lyran Commonwealth</fullname>
-		<startingPlanet>Tharkad,Tharkad,Tharkad,Tharkad,Tharkad,Tharkad,Tharkad,Tharkad,Tharkad</startingPlanet>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>LA</nameGenerator>
-		<colorRGB>0,124,186</colorRGB>
-		<altNames>, , , , , , ,Lyran Alliance,Lyran Alliance</altNames>
-		<tags>is</tags>
-	</faction>
-	<faction>
-		<shortname>MOC</shortname>
-		<id>12</id>
-		<fullname>Magistracy of Canopus</fullname>
-		<startingPlanet>Canopus IV,Canopus IV,Canopus IV,Canopus IV,Canopus IV,Canopus IV,Canopus IV,Canopus IV,Canopus IV</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,1,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>57,158,145</colorRGB>
 		<tags>periphery</tags>
 	</faction>
 	<faction>
@@ -687,14 +1012,6 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>117,65,113</colorRGB>
-		<tags>is</tags>
-	</faction>
-	<faction>
-		<shortname>Mara</shortname>
-		<fullname>Marlette Association</fullname>
-		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
-		<nameGenerator>FS</nameGenerator>
-		<colorRGB>254,214,0</colorRGB>
 		<tags>is</tags>
 	</faction>
 	<faction>
@@ -780,17 +1097,6 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<tags>is</tags>
 	</faction>
 	<faction>
-		<shortname>OA</shortname>
-		<id>13</id>
-		<fullname>Outworlds Alliance</fullname>
-		<startingPlanet>Alpheratz,Alpheratz,Alpheratz,Alpheratz,Alpheratz,Alpheratz,Alpheratz,Alpheratz,Alpheratz</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,1,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>210,190,153</colorRGB>
-		<altNames>, , , , , , , ,Raven Alliance</altNames>
-		<tags>periphery</tags>
-	</faction>
-	<faction>
 		<shortname>PG</shortname>
 		<fullname>Principality of Gibson</fullname>
 		<startingPlanet>,,,,,,,Gibson,Gibson</startingPlanet>
@@ -806,14 +1112,6 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>192,143,189</colorRGB>
-		<tags>is</tags>
-	</faction>
-	<faction>
-		<shortname>PD</shortname>
-		<fullname>Protertorate of Donegal</fullname>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>LA</nameGenerator>
-		<colorRGB>22,126,194</colorRGB>
 		<tags>is</tags>
 	</faction>
 	<faction>
@@ -907,16 +1205,6 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<tags>periphery</tags>
 	</faction>
 	<faction>
-		<shortname>RWR</shortname>
-		<id>19</id>
-		<fullname>Rim Worlds Republic</fullname>
-		<startingPlanet>Apollo, Apollo, Apollo, , , , , , , </startingPlanet>
-		<eraMods>1,1,1,0,0,0,0,0,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>232,202,173</colorRGB>
-		<tags>periphery</tags>
-	</faction>
-	<faction>
 		<shortname>ST</shortname>
 		<fullname>Saiph Triumvirate</fullname>
 		<startingPlanet>,,,,,,Saiph,Saiph,Saiph</startingPlanet>
@@ -930,23 +1218,6 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<fullname>Sarna Protectorate</fullname>
 		<startingPlanet>,,,,,,,,</startingPlanet>
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>184,134,11</colorRGB>
-		<tags>is</tags>
-	</faction>
-	<faction>
-		<shortname>CTL</shortname>
-		<fullname>Chesterton Trade League</fullname>
-		<startingPlanet>,,,,,,,</startingPlanet>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>184,134,22</colorRGB>
-		<tags>trader</tags>
-	</faction>
-	<faction>
-		<shortname>SSUP</shortname>
-		<fullname>Sarna Supremacy</fullname>
-		<startingPlanet>Sarna,Sarna,Sarna,Sarna,Sarna,Sarna,Sarna,Sarna,Sarna</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>184,134,11</colorRGB>
 		<tags>is</tags>
@@ -977,14 +1248,6 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>188,223,186</colorRGB>
 		<tags>is</tags>
-	</faction>
-	<faction>
-		<shortname>SIMA</shortname>
-		<fullname>St. Ives Mercantile Association</fullname>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>188,223,186</colorRGB>
-		<tags>trader</tags>
 	</faction>
 	<faction>
 		<shortname>SL</shortname>
@@ -1032,57 +1295,12 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<tags>is</tags>
 	</faction>
 	<faction>
-		<shortname>TamP</shortname>
-		<fullname>Tamar Pact</fullname>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>LA</nameGenerator>
-		<colorRGB>22,126,194</colorRGB>
-		<tags>is</tags>
-	</faction>
-	<faction>
-		<shortname>TC</shortname>
-		<id>14</id>
-		<fullname>Taurian Concordat</fullname>
-		<startingPlanet>Taurus,Taurus,Taurus,Taurus,Taurus,Taurus,Taurus,Taurus,Taurus</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,1,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>179,62,38</colorRGB>
-		<tags>periphery</tags>
-	</faction>
-	<faction>
-		<shortname>THW</shortname>
-		<fullname>Taurian Homeworlds</fullname>
-		<startingPlanet>Taurus,,,,,,,,</startingPlanet>
-		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>179,62,38</colorRGB>
-		<tags>periphery</tags>
-	</faction>
-	<faction>
 		<shortname>TCC</shortname>
 		<fullname>Terracap Confederation</fullname>
 		<startingPlanet>,,,,,,Terra Firma,Terra Firma,Terra Firma</startingPlanet>
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>233,150,122</colorRGB>
-		<tags>is</tags>
-	</faction>
-	<faction>
-		<shortname>TA</shortname>
-		<fullname>Terran Alliance</fullname>
-		<eraMods>-1,-1,-1,0,0,0,0,0,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>207,119,57</colorRGB>
-		<tags>is</tags>
-	</faction>
-	<faction>
-		<shortname>TH</shortname>
-		<id>18</id>
-		<fullname>Terran Hegemony</fullname>
-		<startingPlanet>Terra,Terra,Terra, , , , , ,</startingPlanet>
-		<eraMods>-1,-1,-1,0,0,0,0,0,0</eraMods>
-		<nameGenerator>General</nameGenerator>
-		<colorRGB>255,255,255</colorRGB>
 		<tags>is</tags>
 	</faction>
 	<faction>
@@ -1113,14 +1331,6 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<tags>is</tags>
 	</faction>
 	<faction>
-		<shortname>TGU</shortname>
-		<fullname>Tikonov Grand Union</fullname>
-		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
-		<nameGenerator>CC</nameGenerator>
-		<colorRGB>255,160,122</colorRGB>
-		<tags>is</tags>
-	</faction>
-	<faction>
 		<shortname>TD</shortname>
 		<fullname>Tortuga Dominions</fullname>
 		<startingPlanet>,Tortuga Prime,Tortuga Prime,Tortuga Prime,Tortuga Prime,Tortuga Prime,Tortuga Prime,Tortuga Prime,Tortuga Prime</startingPlanet>
@@ -1136,15 +1346,6 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>0,0,0</colorRGB>
 		<tags>abandoned,inactive,chaos</tags>
-	</faction>
-	<faction>
-		<shortname>UHC</shortname>
-		<fullname>United Hindu Collective</fullname>
-		<startingPlanet>Basantapur,,,,,,,,</startingPlanet>
-		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
-		<nameGenerator>FS</nameGenerator>
-		<colorRGB>171,148,118</colorRGB>
-		<tags>is</tags>
 	</faction>
 	<faction>
 		<shortname>WOB</shortname>
@@ -1342,24 +1543,6 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
       <nameGenerator>General</nameGenerator>
       <colorRGB>102,255,255</colorRGB>
 		<tags>is</tags>
-   </faction>
-   <faction>
-      <shortname>ME</shortname>
-      <fullname>Muskegon Empire</fullname>
-      <startingPlanet>Muskegon, , , , , , , , </startingPlanet>
-      <nameGenerator>General</nameGenerator>
-      <colorRGB>254,214,0</colorRGB>
-		<tags>is</tags>
-   </faction>
-   <faction>
-      <shortname>CCon</shortname>
-      <fullname>Coreward Confederacy</fullname>
-      <startingPlanet>RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27</startingPlanet>
-      <eraMods>3,3,1,3,3,3,3,3,3</eraMods>
-      <altNames>Autocracy of New Virginia, Virginian Union, Rim Worlds Republic Outpost #27, , , , , , </altNames>
-      <nameGenerator>General</nameGenerator>
-      <colorRGB>255,0,0</colorRGB>
-		<tags>periphery</tags>
    </faction>
    <faction>
       <shortname>IE</shortname>

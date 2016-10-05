@@ -40,6 +40,7 @@ import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.joda.time.DateTime;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -70,6 +71,9 @@ public class Faction {
     private int[] eraMods;
     private Integer id;
     private Set<Tag> tags;
+    // Start and end years (inclusive)
+    private int start;
+    private int end;
 
     public Faction() {
         this("???", "Unknown");
@@ -84,6 +88,8 @@ public class Faction {
         altNames = new String[]{"","","","","","","","",""};
         eraMods = new int[]{0,0,0,0,0,0,0,0,0};
         tags = EnumSet.noneOf(Faction.Tag.class);
+        start = 0;
+        end = 9999;
     }
 
     public String getShortName() {
@@ -173,6 +179,14 @@ public class Faction {
     public boolean is(Faction.Tag tag) {
         return tags.contains(tag);
     }
+    
+    public boolean validIn(int year) {
+        return (year >= start) && (year <= end);
+    }
+    
+    public boolean validIn(DateTime time) {
+        return validIn(time.getYear());
+    }
 
     public Integer getId() {
         return id;
@@ -253,6 +267,10 @@ public class Faction {
                 }
             } else if(wn2.getNodeName().equalsIgnoreCase("id")) {
                 retVal.id = Integer.valueOf(wn2.getTextContent());
+            } else if(wn2.getNodeName().equalsIgnoreCase("start")) {
+                retVal.start = Integer.valueOf(wn2.getTextContent());
+            } else if(wn2.getNodeName().equalsIgnoreCase("end")) {
+                retVal.end = Integer.valueOf(wn2.getTextContent());
             } else if(wn2.getNodeName().equalsIgnoreCase("tags")) {
                 Arrays.stream(wn2.getTextContent().split(",")).map(tag -> tag.toUpperCase(Locale.ROOT))
                     .map(Tag::valueOf).forEach(tag -> retVal.tags.add(tag));
@@ -319,9 +337,19 @@ public class Faction {
 
                 if (xn.equalsIgnoreCase("faction")) {
                     Faction f = getFactionFromXML(wn);
-                    factions.put(f.getShortName(), f);
-                    if(null != f.getId()) {
-                        factionIdMap.put(f.getId(), f);
+                    if(!factions.containsKey(f.getShortName())) {
+                        factions.put(f.getShortName(), f);
+                        if(null != f.getId()) {
+                            if(!factionIdMap.containsKey(f.getId())) {
+                                factionIdMap.put(f.getId(), f);
+                            } else {
+                                MekHQ.logError(String.format("Faction id \"%d\" already used for faction %s, can't re-use it for %s",
+                                        f.getId().intValue(), factionIdMap.get(f.getId()).getFullName(0), f.getFullName(0)));
+                            }
+                        }
+                    } else {
+                        MekHQ.logError(String.format("Faction code \"%s\" already used for faction %s, can't re-use it for %s",
+                            f.getShortName(), factions.get(f.getShortName()).getFullName(0), f.getFullName(0)));
                     }
                 } else if (xn.equalsIgnoreCase("choosableFactionCodes")) {
                     choosableFactionCodes = wn.getTextContent().split(",");
