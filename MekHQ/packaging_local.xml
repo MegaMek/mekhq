@@ -246,7 +246,7 @@
             jvmversion="1.8+"
             version="${version}"
             vmoptions="-1024m">
-            <jarfileset dir="${pkgdir}">
+            <jarfileset dir="${localdir}">
                 <include name="**/*.jar" />
                 <exclude name="${util}/" />
             </jarfileset>
@@ -264,7 +264,7 @@
             jvmversion="1.8+"
             version="${version}"
             vmoptions="-1024m">
-            <jarfileset dir="${pkgdir}">
+            <jarfileset dir="${localdir}">
                 <include name="**/*.jar" />
                 <exclude name="${util}/" />
             </jarfileset>
@@ -282,7 +282,7 @@
             jvmversion="1.8+"
             version="${version}"
             vmoptions="-1024m">
-            <jarfileset dir="${pkgdir}">
+            <jarfileset dir="${localdir}">
                 <include name="**/*.jar" />
                 <exclude name="${util}/" />
             </jarfileset>
