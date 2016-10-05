@@ -82,7 +82,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
-import javax.swing.text.NumberFormatter;
 
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Player;
