@@ -18,6 +18,7 @@ v0.41.24-git
   Closes #177:[ATB] Rolls for Dropship should occur 1 time a month
 + Moved AtB opfor generation tables into data/universe/atbconfig.xml, where they can be customized by the player.
 + Issue #186: Clan battles returning 'No Random Assignment Table found for this faction'
++ Fixed Mac OSX Packaging (Hopefully for good this time!)
 
 v0.3.33 (2016-09-20 00:07 UTC)
 + Added AtB preset.
