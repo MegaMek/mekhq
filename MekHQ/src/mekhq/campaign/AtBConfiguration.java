@@ -498,10 +498,12 @@ public class AtBConfiguration implements Serializable {
 		NodeList nl = node.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node wn = nl.item(i);
-			if (wn.getNodeName().equals("entry")
-					&& wn.getAttributes().getNamedItem("weight") != null) {
-				retVal.add(Integer.parseInt(wn.getAttributes().getNamedItem("weight").getTextContent()),
-						fromString.apply(wn.getTextContent()));
+			if (wn.getNodeName().equals("entry")) {
+				int weight = 1;
+				if (wn.getAttributes().getNamedItem("weight") != null) {
+					weight = Integer.parseInt(wn.getAttributes().getNamedItem("weight").getTextContent());
+				}
+				retVal.add(weight, fromString.apply(wn.getTextContent()));
 			}
 		}
 		return retVal;
