@@ -609,8 +609,8 @@ public class CustomizeAtBContractDialog extends JDialog {
     	cbEmployer.removeAllItems();
     	cbEnemy.removeAllItems();
     	if (allFactions) {
-    		cbEmployer.addFactionEntries(Faction.factions.keySet(),	campaign.getEra());
-    		cbEnemy.addFactionEntries(Faction.factions.keySet(),	campaign.getEra());
+    		cbEmployer.addFactionEntries(Faction.getFactionList(),	campaign.getEra());
+    		cbEnemy.addFactionEntries(Faction.getFactionList(),	campaign.getEra());
     	} else {
     		cbEmployer.addFactionEntries(currentFactions, campaign.getEra());
     		cbEnemy.addFactionEntries(currentFactions, campaign.getEra());

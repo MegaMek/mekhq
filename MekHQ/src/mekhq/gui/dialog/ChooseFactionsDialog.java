@@ -133,7 +133,7 @@ public class ChooseFactionsDialog extends JDialog {
         
         public FactionListModel(DateTime date) {
             int era = Era.getEra(date.getYear());
-            for(Faction faction : Faction.factions.values()) {
+            for(Faction faction : Faction.getFactions()) {
                 factionMap.put(faction.getFullName(era), faction);
             }
             names = new ArrayList<>(factionMap.navigableKeySet());
