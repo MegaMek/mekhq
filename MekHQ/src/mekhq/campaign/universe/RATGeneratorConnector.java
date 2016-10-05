@@ -102,7 +102,7 @@ public class RATGeneratorConnector implements IUnitGenerator {
 				rating = ratings.get(Math.min(quality, ratings.size() - 1));
 			}
 			ArrayList<Integer> wcs = new ArrayList<Integer>();
-			if (weightClass > 0) {
+			if (weightClass >= 0) {
 				wcs.add(weightClass);
 			}
 			

@@ -1027,10 +1027,9 @@ public class AtBScenario extends Scenario {
 				}
 			}
 
-			/* Ally deploys 2 lances of a lighter weight class than the player. We subtract one more
-			 * to convert from EntityWeightClass (0 = ultra-light, 1 = light) to UnitTableData (0 = light)
-			 */
-			int allyForce = Math.max(getLance(campaign).getWeightClass(campaign) - 2, 0);
+			/* Ally deploys 2 lances of a lighter weight class than the player, minium light */
+			int allyForce = Math.max(getLance(campaign).getWeightClass(campaign) - 1,
+					EntityWeightClass.WEIGHT_LIGHT);
 			addLance(allyBot, getContract(campaign).getEmployerCode(),
 					getContract(campaign).getAllySkill(), getContract(campaign).getAllyQuality(),
 					allyForce, campaign);
@@ -2015,7 +2014,7 @@ public class AtBScenario extends Scenario {
 			unitType = forceType == FORCE_VEENOVA? UnitType.INFANTRY:UnitType.BATTLE_ARMOR;
 			for (int i = 0; i < 5; i++) {
 				Entity en = getEntity(faction, skill, quality,
-						unitType, 0, campaign);
+						unitType, -1, campaign);
 				if (null != en) {
 					en.setDeployRound(arrivalTurn);
 				}
