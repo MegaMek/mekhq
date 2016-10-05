@@ -747,7 +747,7 @@ public class CampaignGUI extends JPanel {
             @Override
             public void stateChanged(ChangeEvent e) {
                 if(tabMain.getSelectedComponent() == panFinances) { // Yes, identity check
-                    refreshFinancialReport();
+                    refreshFinancialTransactions();
                 }
                 
             }
@@ -2612,30 +2612,15 @@ public class CampaignGUI extends JPanel {
 
         JPanel pnlFinanceBtns = new JPanel(new GridLayout(2, 2));
         btnAddFunds = new JButton("Add Funds (GM)");
-        btnAddFunds.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addFundsActionPerformed(evt);
-            }
-        });
+        btnAddFunds.addActionListener(this::addFundsActionPerformed);
         btnAddFunds.setEnabled(getCampaign().isGM());
         pnlFinanceBtns.add(btnAddFunds);
         JButton btnGetLoan = new JButton("Get Loan");
-        btnGetLoan.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showNewLoanDialog();
-            }
-        });
+        btnGetLoan.addActionListener(e -> showNewLoanDialog());
         pnlFinanceBtns.add(btnGetLoan);
 
         btnManageAssets = new JButton("Manage Assets (GM)");
-        btnManageAssets.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                manageAssets();
-            }
-        });
+        btnManageAssets.addActionListener(e -> manageAssets());
         btnManageAssets.setEnabled(getCampaign().isGM());
         pnlFinanceBtns.add(btnManageAssets);
 
@@ -5226,7 +5211,7 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    private void addFundsActionPerformed(java.awt.event.ActionEvent evt) {
+    private void addFundsActionPerformed(ActionEvent evt) {
         AddFundsDialog addFundsDialog = new AddFundsDialog(getFrame(), true);
         addFundsDialog.setVisible(true);
         if (addFundsDialog.getClosedType() == JOptionPane.OK_OPTION) {

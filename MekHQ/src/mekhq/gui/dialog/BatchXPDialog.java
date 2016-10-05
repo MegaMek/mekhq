@@ -5,8 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.GridLayout;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -16,6 +15,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -30,8 +30,7 @@ import javax.swing.RowSorter;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SortOrder;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
@@ -60,6 +59,7 @@ public final class BatchXPDialog extends JDialog {
     private JComboBox<PersonTypeItem> choiceExp;
     private JComboBox<String> choiceSkill;
     private JSpinner skillLevel;
+    private JCheckBox allowPrisoners;
     private JButton buttonSpendXP;
     
     private final List<Integer> personnelColumns = Arrays.asList(
@@ -101,7 +101,7 @@ public final class BatchXPDialog extends JDialog {
     private void initComponents() {
         setLayout(new BorderLayout());
 
-        add(getPersonnelTable(), BorderLayout.EAST);
+        add(getPersonnelTable(), BorderLayout.CENTER);
         add(getButtonPanel(), BorderLayout.WEST);
         
         pack();
@@ -147,12 +147,9 @@ public final class BatchXPDialog extends JDialog {
         // Add "none" for generic AsTechs
         choiceType.setModel(personTypeModel);
         choiceType.setSelectedIndex(0);
-        choiceType.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                personnelFilter.setPrimaryRole(((PersonTypeItem)choiceType.getSelectedItem()).id);
-                updatePersonnelTable();
-            }
+        choiceType.addActionListener(e -> {
+            personnelFilter.setPrimaryRole(((PersonTypeItem)choiceType.getSelectedItem()).id);
+            updatePersonnelTable();
         });
         panel.add(choiceType);
         
@@ -165,12 +162,9 @@ public final class BatchXPDialog extends JDialog {
         }
         choiceExp.setModel(personExpModel);
         choiceExp.setSelectedIndex(0);
-        choiceExp.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                personnelFilter.setExpLevel(((PersonTypeItem)choiceExp.getSelectedItem()).id);
-                updatePersonnelTable();
-            }
+        choiceExp.addActionListener(e -> {
+            personnelFilter.setExpLevel(((PersonTypeItem)choiceExp.getSelectedItem()).id);
+            updatePersonnelTable();
         });
         panel.add(choiceExp);
         
@@ -183,26 +177,23 @@ public final class BatchXPDialog extends JDialog {
         }
         choiceSkill.setModel(personSkillModel);
         choiceSkill.setSelectedIndex(0);
-        choiceSkill.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(choiceNoSkill.equals(choiceSkill.getSelectedItem())) {
-                    personnelFilter.setSkill(null);
-                    ((SpinnerNumberModel) skillLevel.getModel()).setMaximum(10);
-                    buttonSpendXP.setEnabled(false);
-                } else {
-                    String skillName = (String) choiceSkill.getSelectedItem();
-                    personnelFilter.setSkill(skillName);
-                    int maxSkillLevel = SkillType.getType(skillName).getMaxLevel();
-                    int currentLevel = (Integer) skillLevel.getModel().getValue();
-                    ((SpinnerNumberModel) skillLevel.getModel()).setMaximum(maxSkillLevel);
-                    if(currentLevel > maxSkillLevel) {
-                        skillLevel.getModel().setValue(Integer.valueOf(maxSkillLevel));
-                    }
-                    buttonSpendXP.setEnabled(true);
+        choiceSkill.addActionListener(e -> {
+            if(choiceNoSkill.equals(choiceSkill.getSelectedItem())) {
+                personnelFilter.setSkill(null);
+                ((SpinnerNumberModel) skillLevel.getModel()).setMaximum(10);
+                buttonSpendXP.setEnabled(false);
+            } else {
+                String skillName = (String) choiceSkill.getSelectedItem();
+                personnelFilter.setSkill(skillName);
+                int maxSkillLevel = SkillType.getType(skillName).getMaxLevel();
+                int currentLevel = (Integer) skillLevel.getModel().getValue();
+                ((SpinnerNumberModel) skillLevel.getModel()).setMaximum(maxSkillLevel);
+                if(currentLevel > maxSkillLevel) {
+                    skillLevel.getModel().setValue(Integer.valueOf(maxSkillLevel));
                 }
-                updatePersonnelTable();
+                buttonSpendXP.setEnabled(true);
             }
+            updatePersonnelTable();
         });
         panel.add(choiceSkill);
         
@@ -211,16 +202,27 @@ public final class BatchXPDialog extends JDialog {
         
         skillLevel = new JSpinner(new SpinnerNumberModel(10, 0, 10, 1));
         skillLevel.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) skillLevel.getPreferredSize().getHeight()));
-        skillLevel.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                int maxSkillLevel = (Integer)skillLevel.getModel().getValue();
-                personnelFilter.setMaxSkillLevel(maxSkillLevel);
-                updatePersonnelTable();
-            }
+        skillLevel.addChangeListener(e ->
+        {
+            personnelFilter.setMaxSkillLevel((Integer)skillLevel.getModel().getValue());
+            updatePersonnelTable();
         });
         panel.add(skillLevel);
 
+        allowPrisoners = new JCheckBox(resourceMap.getString("allowPrisoners.text")); //$NON-NLS-1$
+        allowPrisoners.setHorizontalAlignment(SwingConstants.LEFT);
+        allowPrisoners.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) allowPrisoners.getPreferredSize().getHeight()));
+        allowPrisoners.addChangeListener(e ->
+        {
+            personnelFilter.setAllowPrisoners(allowPrisoners.isSelected());
+            updatePersonnelTable();
+        });
+        JPanel allowPrisonersPanel = new JPanel(new GridLayout(1, 1));
+        allowPrisonersPanel.setAlignmentY(JComponent.LEFT_ALIGNMENT);
+        allowPrisonersPanel.add(allowPrisoners);
+        allowPrisonersPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) allowPrisonersPanel.getPreferredSize().getHeight()));
+        panel.add(allowPrisonersPanel);
+        
         panel.add(Box.createVerticalGlue());
         
         matchedPersonnelLabel = new JLabel(""); //$NON-NLS-1$
@@ -232,25 +234,18 @@ public final class BatchXPDialog extends JDialog {
 
         buttonSpendXP = new JButton(resourceMap.getString("spendXP.text")); //$NON-NLS-1$
         buttonSpendXP.setEnabled(false);
-        buttonSpendXP.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                spendXP();
-            }
-        });
+        buttonSpendXP.addActionListener(e -> spendXP());
         buttons.add(buttonSpendXP);
 
         JButton button = new JButton(resourceMap.getString("close.text")); //$NON-NLS-1$
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                setVisible(false);
-            }
-        });
+        button.addActionListener(e -> setVisible(false));
         buttons.add(button);
 
         panel.add(buttons);
         
+        panel.setMaximumSize(new Dimension((int) panel.getPreferredSize().getWidth(), Short.MAX_VALUE));
+        panel.setMinimumSize(new Dimension((int) panel.getPreferredSize().getWidth(), 300));
+
         return panel;
     }
 
@@ -346,10 +341,17 @@ public final class BatchXPDialog extends JDialog {
         private Integer expLevel = null;
         private String skill = null;
         private int maxSkillLevel = 10;
+        private boolean prisoners = false;
         
         @Override
         public boolean include(RowFilter.Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
             Person p = entry.getModel().getPerson(entry.getIdentifier().intValue());
+            if(!p.isActive()) {
+                return false;
+            }
+            if(!prisoners && (p.isPrisoner() || p.isBondsman())) {
+                return false;
+            }
             if((null != primaryRole) && (p.getPrimaryRole() != primaryRole.intValue())) {
                 return false;
             }
@@ -383,6 +385,10 @@ public final class BatchXPDialog extends JDialog {
         
         public void setMaxSkillLevel(int level) {
             maxSkillLevel = level;
+        }
+        
+        public void setAllowPrisoners(boolean allowPrisoners) {
+            prisoners = allowPrisoners;
         }
     }
     

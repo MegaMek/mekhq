@@ -25,13 +25,14 @@ package mekhq.campaign.personnel;
 import java.io.PrintWriter;
 import java.util.UUID;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Compute;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 // Injury class based on Jayof9s' <jayof9s@gmail.com> Advanced Medical documents
 public class Injury {
@@ -39,7 +40,7 @@ public class Injury {
     private int days;
     private int originalDays;
     private int hits;
-    private int location;
+    private BodyLocation location;
     private int type;
     private boolean permanent;
     private boolean workedOn;
@@ -67,29 +68,21 @@ public class Injury {
      
      // Base constructor, in reality should never be used
      public Injury() {
-        fluff = "";
-        days = 0;
-        originalDays = 0;
-        hits = 0;
-        location = 0;
-        type = 0;
-        permanent = false;
-        workedOn = false;
-        extended = false;
+         this(0, "", BodyLocation.GENERIC, 0, 1, false, false);
     }
     
      // Normal constructor for a new injury that has not been treated by a doctor & does not have extended time
-    public Injury(int time, String text, int loc, int type, int num, boolean perm) {
+    public Injury(int time, String text, BodyLocation loc, int type, int num, boolean perm) {
         this(time, text, loc, type, num, perm, false);
     }
 
     // Constructor if this injury has been treated by a doctor, but without extended time
-    public Injury(int time, String text, int loc, int type, int num, boolean perm, boolean workedOn) {
+    public Injury(int time, String text, BodyLocation loc, int type, int num, boolean perm, boolean workedOn) {
         this(time, text, loc, type, num, perm, workedOn, false);
     }
     
     // Constructor for when this injury has extended time, full options includng worked on by a doctor
-    public Injury(int time, String text, int loc, int type, int num, boolean perm, boolean workedOn, boolean extended) {
+    public Injury(int time, String text, BodyLocation loc, int type, int num, boolean perm, boolean workedOn, boolean extended) {
         setTime(time);
         setOriginalTime(time);
         setFluff(text);
@@ -143,11 +136,11 @@ public class Injury {
         fluff = text;
     }
     
-    public int getLocation() {
+    public BodyLocation getLocation() {
         return location;
     }
     
-    public void setLocation(int loc) {
+    public void setLocation(BodyLocation loc) {
         location = loc;
     }
     
@@ -194,31 +187,7 @@ public class Injury {
     
     // Returns the full long name of this injury including location and type as applicable
     public String getName() {
-        String buffer = "";
-        
-        switch (location) {
-        case Person.BODY_HEAD:
-            buffer = "Head";
-            break;
-         case Person.BODY_LEFT_LEG:
-            buffer = "Left Leg";
-            break;
-         case Person.BODY_LEFT_ARM:
-            buffer = "Left Arm";
-            break;
-         case Person.BODY_CHEST:
-            buffer = "Chest";
-            break;
-         case Person.BODY_ABDOMEN:
-            buffer = "Abdomen";
-            break;
-         case Person.BODY_RIGHT_ARM:
-            buffer = "Right Arm";
-            break;
-         case Person.BODY_RIGHT_LEG:
-            buffer = "Right Leg";
-            break;
-        }
+        String buffer = Utilities.capitalize(location.readableName);
         
         switch (type) {
         case INJ_CUT:
@@ -339,7 +308,7 @@ public class Injury {
                 } else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
                     retVal.hits = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("location")) {
-                    retVal.location = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.location = BodyLocation.of(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("type")) {
                     retVal.type = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("permanent")) {
@@ -364,6 +333,21 @@ public class Injury {
             if (retVal.id == null) { // We didn't have an ID, so let's generate one!
                 retVal.id = UUID.randomUUID();
             }
+            // Fix hand/foot locations
+            if(retVal.fluff.endsWith(" hand")) {
+                switch(retVal.location) {
+                    case LEFT_ARM: retVal.location = BodyLocation.LEFT_HAND; break;
+                    case RIGHT_ARM: retVal.location = BodyLocation.RIGHT_HAND; break;
+                    default: // do nothing
+                }
+            }
+            if(retVal.fluff.endsWith(" foot")) {
+                switch(retVal.location) {
+                    case LEFT_LEG: retVal.location = BodyLocation.LEFT_FOOT; break;
+                    case RIGHT_LEG: retVal.location = BodyLocation.RIGHT_FOOT; break;
+                    default: // do nothing
+                }
+            }
         } catch (Exception ex) {
             // Doh!
             MekHQ.logError(ex);
@@ -374,33 +358,7 @@ public class Injury {
     
     // Return the location name for the injury by passing location to the static overload
     public String getLocationName() {
-        return getLocationName(location);
-    }
-    
-    // Return the location name for a specific body location
-    public static String getLocationName(int loc) {
-        if (loc == Person.BODY_HEAD) {
-            return "Head";
-        }
-         if (loc == Person.BODY_LEFT_LEG) {
-             return "Left Leg/Foot";
-         }
-         if (loc == Person.BODY_LEFT_ARM) {
-             return "Left Arm/Hand";
-         }
-         if (loc == Person.BODY_CHEST) {
-             return "Chest";
-         }
-         if (loc == Person.BODY_ABDOMEN) {
-             return "Abdomen";
-         }
-         if (loc == Person.BODY_RIGHT_ARM) {
-             return "Right Arm/Hand";
-         }
-         if (loc == Person.BODY_RIGHT_LEG) {
-             return "Right Leg/Foot";
-         }
-        return "";
+        return Utilities.capitalize(location.readableName);
     }
     
     // Return the name for this type of injury by passing the type to the static overload
@@ -464,46 +422,8 @@ public class Injury {
     }
     
     // Generate appropriate fluff text for this injury based on type and location. Uses proper gender pronouns.
-    public static String generateInjuryFluffText(int type, int location, int genderType) {
-        String name;
-        switch (location) {
-        case Person.BODY_HEAD:
-            name = "head";
-            break;
-        case Person.BODY_LEFT_LEG:
-            name = "left leg";
-            if (Compute.randomInt(10) < 2) {
-                name = "left foot";
-            }
-            break;
-        case Person.BODY_LEFT_ARM:
-            name = "left arm";
-            if (Compute.randomInt(10) < 2) {
-                name = "left hand";
-            }
-            break;
-        case Person.BODY_CHEST:
-            name = "chest";
-            break;
-        case Person.BODY_ABDOMEN:
-            name = "abdomen";
-            break;
-        case Person.BODY_RIGHT_ARM:
-            name = "right arm";
-            if (Compute.randomInt(10) < 2) {
-                name = "right hand";
-            }
-            break;
-        case Person.BODY_RIGHT_LEG:
-            name = "right leg";
-            if (Compute.randomInt(10) < 2) {
-                name = "right foot";
-            }
-            break;
-        default:
-            name = "Unknown";
-            break;
-        }
+    public static String generateInjuryFluffText(int type, BodyLocation location, int genderType) {
+        String name = location.readableName;
         
         switch (type) {
         case INJ_CUT:
@@ -544,12 +464,12 @@ public class Injury {
     }
     
     // Called when creating a new injury to determine the type of injury it is
-    public static int getInjuryTypeByLocation(int loc, int roll, int hit_location) {
+    public static int getInjuryTypeByLocation(BodyLocation loc, int roll, int hit_location) {
         switch (loc) {
-        case Person.BODY_LEFT_ARM:
-        case Person.BODY_RIGHT_ARM:
-        case Person.BODY_LEFT_LEG:
-        case Person.BODY_RIGHT_LEG:
+        case LEFT_ARM: case LEFT_HAND:
+        case RIGHT_ARM: case RIGHT_HAND:
+        case LEFT_LEG: case LEFT_FOOT:
+        case RIGHT_LEG: case RIGHT_FOOT:
             if (hit_location == 1) {
                 if (roll == 2) {
                     return INJ_CUT;
@@ -564,7 +484,7 @@ public class Injury {
                 return INJ_LOST_LIMB;
             }
             break;
-        case Person.BODY_HEAD:
+        case HEAD:
             if (hit_location == 1) {
                 return INJ_LACERATION;
             } else if (hit_location == 2 || hit_location == 3) {
@@ -575,7 +495,7 @@ public class Injury {
                 return INJ_CTE;
             }
             break;
-        case Person.BODY_CHEST:
+        case CHEST:
             if (hit_location == 1) {
                 if (roll == 2) {
                     return INJ_CUT;
@@ -592,7 +512,7 @@ public class Injury {
                 return INJ_BROKEN_BACK;
             }
             break;
-        case Person.BODY_ABDOMEN:
+        case ABDOMEN:
             if (hit_location == 1) {
                 if (roll == 2) {
                     return INJ_CUT;
