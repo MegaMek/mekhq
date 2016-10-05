@@ -525,6 +525,12 @@ public class Injury {
                 return INJ_INTERNAL_BLEEDING;
             }
             break;
+            case GENERIC:
+                break;
+            case INTERNAL:
+                break;
+            default:
+                break;
         }
         return 0;
     }
