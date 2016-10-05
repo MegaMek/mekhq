@@ -245,7 +245,7 @@
             useJavaXKey="true"
             jvmversion="1.8+"
             version="${version}"
-            vmoptions="-1024m">
+            vmoptions="-Xmx1024m">
             <jarfileset dir="${localdir}">
                 <include name="**/*.jar" />
                 <exclude name="${util}/" />
@@ -263,7 +263,7 @@
             useJavaXKey="true"
             jvmversion="1.8+"
             version="${version}"
-            vmoptions="-1024m">
+            vmoptions="-Xmx1024m">
             <jarfileset dir="${localdir}">
                 <include name="**/*.jar" />
                 <exclude name="${util}/" />
@@ -281,7 +281,7 @@
             useJavaXKey="true"
             jvmversion="1.8+"
             version="${version}"
-            vmoptions="-1024m">
+            vmoptions="-Xmx1024m">
             <jarfileset dir="${localdir}">
                 <include name="**/*.jar" />
                 <exclude name="${util}/" />
