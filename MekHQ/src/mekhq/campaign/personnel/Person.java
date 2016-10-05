@@ -162,7 +162,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public static final int DESIG_NUM     = 14;
 
     private static final IntSupplier PREGNANCY_DURATION = () -> {
-        double gaussian = Math.sqrt(-2 * Math.log(Math.random())) * Math.cos(2.0 * Math.PI * Math.random());
+        double gaussian = Math.sqrt(-2 * Math.log(Math.nextUp(Math.random())))
+            * Math.cos(2.0 * Math.PI * Math.random());
         // To not get weird results, we limit the values to +/- 4.0 (almost 6 weeks)
         gaussian = Math.max(-4.0, Math.min(4.0, gaussian));
         return (int) Math.round(gaussian * 10 + 38 * 7);
