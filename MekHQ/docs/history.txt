@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.41.24-git
+v0.41.24 (2016-10-06 03:15 UTC)
 + Issue #170: MHQ Unable to Resolve Space Battle with Fighter Squadrons
 + Version matched to MegaMek
 + Refactored PortraitChoiceDialog to be ImageChoiceDialog since it's used for more than one thing
@@ -19,6 +19,8 @@ v0.41.24-git
 + Moved AtB opfor generation tables into data/universe/atbconfig.xml, where they can be customized by the player.
 + Issue #186: Clan battles returning 'No Random Assignment Table found for this faction'
 + Fixed Mac OSX Packaging (Hopefully for good this time!)
++ Updated MegaMek.jar to 0.41.24
++ Updated MegaMekLab.jar to 0.41.24
 
 v0.3.33 (2016-09-20 00:07 UTC)
 + Added AtB preset.
