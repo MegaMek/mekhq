@@ -1,5 +1,7 @@
 VERSION HISTORY
 ----------------------------------
+v0.41.25-git
+
 v0.41.24 (2016-10-06 03:15 UTC)
 + Issue #170: MHQ Unable to Resolve Space Battle with Fighter Squadrons
 + Version matched to MegaMek
