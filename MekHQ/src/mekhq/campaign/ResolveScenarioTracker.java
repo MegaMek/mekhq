@@ -495,24 +495,37 @@ public class ResolveScenarioTracker {
             if(null != ustatus) {
                 en = ustatus.getEntity();
             }
-            //check for an ejected entity and if we find one then assign it instead to switch vees
-            //over to infantry checks for casualties
-            Entity ejected = ejections.get(u.getCommander().getId());
-            if(null != ejected) {
-                en = ejected;
-            }
             if(null == en) {
                 continue;
             }
+            //check for an ejected entity and if we find one then assign it instead to switch vees
+            //over to infantry checks for casualties
+            Entity ejected = ejections.get(u.getCommander().getId());
             //determine total casualties for infantry and large craft
             int casualties = 0;
             int casualtiesAssigned = 0;
-            if(en instanceof Infantry) {
-                en.applyDamage();
-                int strength = ((Infantry)en).getShootingStrength();
+            Infantry infantry = null;
+            if (en instanceof Infantry) {
+                infantry = (Infantry)en;
+            } else if (ejected != null && ejected instanceof Infantry) {
+                infantry = (Infantry)ejected;
+            }
+            if(infantry != null) {
+                infantry.applyDamage();
+                // If reading from a MUL, the shooting strength is set to Integer.MAX_VALUE if there is no damage.
+                int strength = Math.min(((Infantry)infantry).getShootingStrength(), crew.size());
                 casualties = crew.size() - strength;
                 if (ustatus.isTotalLoss()) {
                     casualties = crew.size();
+                }
+                // If a tank has already taken hits to the commander or driver, do not assign them again.
+                if (en instanceof Tank) {
+                    if (((Tank)en).isDriverHit()) {
+                        casualtiesAssigned++;
+                    }
+                    if (((Tank)en).isCommanderHit()) {
+                        casualtiesAssigned++;
+                    }
                 }
             }
             if(en instanceof SmallCraft || en instanceof Jumpship) {
@@ -587,14 +600,12 @@ public class ResolveScenarioTracker {
                             }
                         }
                     }
-                    else {
-                        if(casualtiesAssigned < casualties) {
-                            casualtiesAssigned++;
-                            if(Compute.d6(2) >= 7) {
-                                wounded = true;
-                            } else {
-                                status.setHits(6);
-                            }
+                    if(casualtiesAssigned < casualties) {
+                        casualtiesAssigned++;
+                        if(Compute.d6(2) >= 7) {
+                            wounded = true;
+                        } else {
+                            status.setHits(6);
                         }
                     }
                     if(wounded) {
@@ -801,7 +812,7 @@ public class ResolveScenarioTracker {
                 checkForLostLimbs(e, control);
                 if(!e.getExternalIdAsString().equals("-1")) {
                     UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
-                    if (null == status && scenario instanceof AtBScenario) {
+                    if (null == status && scenario instanceof AtBScenario && !(e instanceof EjectedCrew)) {
                         TestUnit nu = generateNewTestUnit(e);
                         status = new UnitStatus(nu);
                         unitsStatus.put(nu.getId(), status);
@@ -820,6 +831,7 @@ public class ResolveScenarioTracker {
                         if(e instanceof EjectedCrew) {
                             ejections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
                         }
+                        
                     }
                 }
             }
