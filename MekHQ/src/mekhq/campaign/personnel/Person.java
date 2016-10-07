@@ -3430,8 +3430,13 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     new_injuries.add(new Injury(Injury.generateHealingTime(campaign, Injury.INJ_INTERNAL_BLEEDING, hitsInLocation, this), Injury.generateInjuryFluffText(Injury.INJ_INTERNAL_BLEEDING, location, gender), location, Injury.INJ_INTERNAL_BLEEDING, hitsInLocation, false, bad_status));
                 }
                 break;
+            case GENERIC:
+            case INTERNAL:
+                // AM doesn't deal with those
+                break;
             default:
                 System.err.println("ERROR: Default CASE reached in (Advanced Medical Section) Person.applyDamage(" + location + ")");
+                break;
         }
         if (location == BodyLocation.HEAD) {
             Injury inj = getInjuryByLocation(location);
