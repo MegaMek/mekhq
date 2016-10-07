@@ -3431,7 +3431,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                 }
                 break;
             default:
-                System.err.println("ERROR: Default CASE reached in (Advanced Medical Section) Person.applyDamage()");
+                System.err.println("ERROR: Default CASE reached in (Advanced Medical Section) Person.applyDamage(" + location + ")");
         }
         if (location == BodyLocation.HEAD) {
             Injury inj = getInjuryByLocation(location);
