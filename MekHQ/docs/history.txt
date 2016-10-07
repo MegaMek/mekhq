@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.41.25-git
++ Issue #158: Scenario Resolution: ejected+fled pilots lose hits
 + Fixed forcestub save for layered force icons
 
 v0.41.24 (2016-10-06 03:15 UTC)
