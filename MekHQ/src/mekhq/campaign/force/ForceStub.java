@@ -134,7 +134,7 @@ public class ForceStub implements Serializable {
                     pw1.println(MekHqXmlUtil.indentStr(indent+2)
                             +"<iconentry key=\""
                             +MekHqXmlUtil.escape(entry.getKey())
-                            +">");
+                            +"\">");
                     for (String value : entry.getValue()) {
                         pw1.println(MekHqXmlUtil.indentStr(indent+2)
                                 +"<value name=\""
