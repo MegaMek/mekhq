@@ -31,6 +31,7 @@ import java.awt.Paint;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -530,18 +531,59 @@ public class InterstellarMapPanel extends JPanel {
                     Collection<Planets.HPGLink> hpgNetwork = Planets.getInstance().getHPGNetwork(now);
                     
                     Color darkCyan = new Color(0, 100, 50);
+                    Stroke thick = new BasicStroke(2.0f);
+                    Stroke thin = new BasicStroke(1.2f);
+                    Stroke dashed = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{2}, 0);
+                    Stroke dotted = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{2, 5}, 0);
+                    for(Planet planet : planets) {
+                        if(isPlanetVisible(planet, true)) {
+                            double x = map2scrX(planet.getX());
+                            double y = map2scrY(planet.getY());
+                            int hpgRating = Utilities.nonNull(planet.getHPG(now), EquipmentType.RATING_X);
+                            if(hpgRating == EquipmentType.RATING_A) {
+                                g2.setPaint(Color.CYAN);
+                                arc.setArcByCenter(x, y, size * 1.6, 0, 360, Arc2D.OPEN);
+                                g2.setStroke(thick);
+                                g2.draw(arc);
+                                //g2.fill(arc);
+                                //g2.setPaint(Color.BLACK);
+                                //arc.setArcByCenter(x, y, size * 1.6, 0, 360, Arc2D.OPEN);
+                                //g2.fill(arc);
+                            }
+                            if(hpgRating == EquipmentType.RATING_A || hpgRating == EquipmentType.RATING_B) {
+                                g2.setPaint(Color.CYAN);
+                                arc.setArcByCenter(x, y, size * 1.3, 0, 360, Arc2D.OPEN);
+                                g2.setStroke(thin);
+                                g2.draw(arc);
+                            }
+                            if(hpgRating == EquipmentType.RATING_C) {
+                                g2.setPaint(Color.CYAN);
+                                arc.setArcByCenter(x, y, size * 1.3, 0, 360, Arc2D.OPEN);
+                                g2.setStroke(dashed);
+                                g2.draw(arc);
+                            }
+                            if(hpgRating == EquipmentType.RATING_D) {
+                                g2.setPaint(darkCyan);
+                                arc.setArcByCenter(x, y, size * 1.3, 0, 360, Arc2D.OPEN);
+                                g2.setStroke(dotted);
+                                g2.draw(arc);
+                            }
+                        }
+                    }
                     for(Planets.HPGLink link : hpgNetwork) {
                         Planet p1 = link.primary;
                         Planet p2 = link.secondary;
-                        if(link.rating == EquipmentType.RATING_A) {
-                            g2.setPaint(Color.CYAN);
-                            g2.setStroke(new BasicStroke(1.5f));
-                            g2.draw(new Line2D.Double(map2scrX(p1.getX()), map2scrY(p1.getY()), map2scrX(p2.getX()), map2scrY(p2.getY())));
-                        }
-                        if(link.rating == EquipmentType.RATING_B) {
-                            g2.setPaint(darkCyan);
-                            g2.setStroke(new BasicStroke(1.0f));
-                            g2.draw(new Line2D.Double(map2scrX(p1.getX()), map2scrY(p1.getY()), map2scrX(p2.getX()), map2scrY(p2.getY())));
+                        if(isPlanetVisible(p1, false) || isPlanetVisible(p2, false)) {
+                            if(link.rating == EquipmentType.RATING_A) {
+                                g2.setPaint(Color.CYAN);
+                                g2.setStroke(thick);
+                                g2.draw(new Line2D.Double(map2scrX(p1.getX()), map2scrY(p1.getY()), map2scrX(p2.getX()), map2scrY(p2.getY())));
+                            }
+                            if(link.rating == EquipmentType.RATING_B) {
+                                g2.setPaint(Color.CYAN);
+                                g2.setStroke(dashed);
+                                g2.draw(new Line2D.Double(map2scrX(p1.getX()), map2scrY(p1.getY()), map2scrX(p2.getX()), map2scrY(p2.getY())));
+                            }
                         }
                     }
                     g2.setStroke(new BasicStroke(1.0f));
