@@ -405,6 +405,12 @@ public class InterstellarMapPanel extends JPanel {
                 double size = 1 + 5 * Math.log(conf.scale);
                 size = Math.max(Math.min(size, conf.maxdotSize), conf.minDotSize);
                 
+                final Stroke thick = new BasicStroke(2.0f);
+                final Stroke thin = new BasicStroke(1.2f);
+                final Stroke dashed = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{3}, 0);
+                final Stroke dotted = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{2, 5}, 0);
+                final Color darkCyan = new Color(0, 100, 50);
+
                 minX = scr2mapX(- size * 2.0);
                 minY = scr2mapY(getHeight() + size * 2.0);
                 maxX = scr2mapX(getWidth() + size * 2.0);
@@ -421,6 +427,14 @@ public class InterstellarMapPanel extends JPanel {
                     g2.setPaint(Color.DARK_GRAY);
                     arc.setArcByCenter(x, y, jumpRadius, 0, 360, Arc2D.OPEN);
                     g2.fill(arc);
+                    if(optHPGNetwork.isSelected()) {
+                        z = map2scrX(selectedPlanet.getX() + 50);
+                        jumpRadius = (z - x);
+                        g2.setPaint(darkCyan);
+                        g2.setStroke(dotted);
+                        arc.setArcByCenter(x, y, jumpRadius, 0, 360, Arc2D.OPEN);
+                        g2.draw(arc);
+                    }
                 }
                 
                 if((conf.scale > 1.0) && optISWAreas.isSelected()) {
@@ -530,11 +544,6 @@ public class InterstellarMapPanel extends JPanel {
                     // Grab the network from the planet manager
                     Collection<Planets.HPGLink> hpgNetwork = Planets.getInstance().getHPGNetwork(now);
                     
-                    Color darkCyan = new Color(0, 100, 50);
-                    Stroke thick = new BasicStroke(2.0f);
-                    Stroke thin = new BasicStroke(1.2f);
-                    Stroke dashed = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{2}, 0);
-                    Stroke dotted = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{2, 5}, 0);
                     for(Planet planet : planets) {
                         if(isPlanetVisible(planet, true)) {
                             double x = map2scrX(planet.getX());
