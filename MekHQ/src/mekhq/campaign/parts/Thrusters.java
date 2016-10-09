@@ -1,5 +1,5 @@
 /*
- * Avionics.java
+ * Thrusters.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -25,7 +25,6 @@ import java.io.PrintWriter;
 
 import megamek.common.Aero;
 import megamek.common.Compute;
-import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Jumpship;
