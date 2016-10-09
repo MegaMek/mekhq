@@ -232,7 +232,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		boolean replacingLocations = false;
 		boolean[] locationHasNewStuff = new boolean[newEntity.locations()];
 		Arrays.fill(locationHasNewStuff, Boolean.FALSE);
-		HashMap<EquipmentType,Integer> ammoNeeded = new HashMap<EquipmentType,Integer>();
+		HashMap<AmmoType,Integer> ammoNeeded = new HashMap<AmmoType,Integer>();
+		HashMap<AmmoType,Integer> ammoRemoved = new HashMap<AmmoType,Integer>();
 		ArrayList<Part> newPartList = new ArrayList<Part>();
 
 		//Step 1: put all of the parts from the current unit into a new arraylist so they can
@@ -375,12 +376,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				//shoppingList.add(nPart);
 			}
 			else if(nPart instanceof AmmoBin) {
-				EquipmentType type = ((AmmoBin)nPart).getType();
-				if(null == ammoNeeded.get(type)) {
-					ammoNeeded.put(type, ((AmmoType)((AmmoBin)nPart).getType()).getShots());
-				} else {
-					ammoNeeded.put(type,ammoNeeded.get(type) + ((AmmoType)((AmmoBin)nPart).getType()).getShots());
-				}
+				AmmoType type = (AmmoType)((AmmoBin)nPart).getType();
+				ammoNeeded.merge(type, ((AmmoType)((AmmoBin)nPart).getType()).getShots(),
+				        (a, b) -> a + b);
 				time += 120;
 				//check for ammo bins in storage to avoid the proliferation of infinite ammo bins
 				MissingAmmoBin mab = (MissingAmmoBin)nPart.getMissingPart();
@@ -524,8 +522,11 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				continue;
 			}
 			if(oPart instanceof AmmoBin) {
-				if(((AmmoBin)oPart).getShotsNeeded() < ((AmmoBin)oPart).getFullShots()) {
+			    int remainingShots = ((AmmoBin)oPart).getFullShots() - ((AmmoBin)oPart).getShotsNeeded();
+				if(remainingShots > 0) {
 					time += 120;
+	                ammoRemoved.merge((AmmoType)((AmmoBin)oPart).getType(), remainingShots,
+	                        (a, b) -> a + b);
 				}
 				continue;
 			}
@@ -558,9 +559,11 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			newArmorSupplies.setUnit(null);
 		}
 
-		for(EquipmentType type : ammoNeeded.keySet()) {
+		//TODO: use ammo removed from the old unit in the case of changing between full ton and half
+		//ton MG or OS/regular.
+		for(AmmoType type : ammoNeeded.keySet()) {
 			int shotsNeeded = Math.max(ammoNeeded.get(type) - getAmmoAvailable(type), 0);
-			int shotsPerTon = ((AmmoType)type).getShots();
+			int shotsPerTon = type.getShots();
 			cost += type.getCost(newEntity, false, -1) * ((double)shotsNeeded/shotsPerTon);
 		}
 
@@ -833,11 +836,11 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		return existingArmorSupplies;
 	}
 
-	public int getAmmoAvailable(EquipmentType type) {
+	public int getAmmoAvailable(AmmoType type) {
 		for(Part part : oldUnit.campaign.getSpareParts()) {
 			if(part instanceof AmmoStorage) {
 				AmmoStorage a = (AmmoStorage)part;
-				if(a.getType() == type) {
+				if(a.getType().equals(type)) {
 					return a.getShots();
 				}
 			}

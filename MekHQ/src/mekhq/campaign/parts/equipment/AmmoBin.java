@@ -443,7 +443,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	public boolean isSamePartType(Part part) {
     	return  part instanceof AmmoBin
                         && getType().equals( ((AmmoBin)part).getType() )
-                        && ((AmmoBin)part).isOneShot() == oneShot;
+                        && ((AmmoBin)part).getFullShots() == getFullShots();
     }
 
 	@Override
