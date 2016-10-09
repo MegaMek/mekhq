@@ -166,8 +166,7 @@ public class Thrusters extends Part {
 	public boolean needsFixing() {
 		if(null != getUnit() && null != getUnit().getEntity() && 
 				(getUnit().getEntity() instanceof Aero 
-						&& !(getUnit().getEntity() instanceof Dropship
-						        || getUnit().getEntity() instanceof SmallCraft
+						&& !(getUnit().getEntity() instanceof SmallCraft
 								|| getUnit().getEntity() instanceof Jumpship))) {
 			return false;
 		}
@@ -178,7 +177,7 @@ public class Thrusters extends Part {
 	public boolean isSalvaging() {
 		if(null != getUnit() && null != getUnit().getEntity() && 
 				(getUnit().getEntity() instanceof Aero 
-						&& !(getUnit().getEntity() instanceof Dropship 
+						&& !(getUnit().getEntity() instanceof SmallCraft 
 								|| getUnit().getEntity() instanceof Jumpship))) {
 			return false;
 		}
