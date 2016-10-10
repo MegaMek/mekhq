@@ -1951,7 +1951,8 @@ public class Campaign implements Serializable {
     }
 
     public void refit(Refit r) {
-        Person tech = getPerson(r.getTeamId());
+        Person tech = r.getUnit().getEngineer() == null?
+                getPerson(r.getTeamId()) : r.getUnit().getEngineer();
         if (null == tech) {
             addReport("No tech is assigned to refit "
                       + r.getOriginalEntity().getShortName()

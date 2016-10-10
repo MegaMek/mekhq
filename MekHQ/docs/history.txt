@@ -7,7 +7,8 @@ v0.41.25-git
 + Issue #141: Incorrect Ammo load from unit after refit
 + Bug [#924]: Refits end with incorrect ammo.
 + Issue #192: Replacing Retractable Blade in Campaign
-+ Bug [#596]: Parts are impossible to get when they shouldn't be. 
++ Bug [#596]: Parts are impossible to get when they shouldn't be.
++ Issue #77: Dropship refit time never decreases
 
 v0.41.24 (2016-10-06 03:15 UTC)
 + Issue #170: MHQ Unable to Resolve Space Battle with Fighter Squadrons
