@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.FontMetrics;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
@@ -20,7 +21,7 @@ import mekhq.campaign.Kill;
 import mekhq.campaign.LogEntry;
 
 public class PersonnelEventLogModel extends DataTableModel {
-    private static final long serialVersionUID = 2930826794853379579L;
+    private static final long serialVersionUID = 2930826794853379580L;
 
     private static final String EMPTY_CELL = ""; //$NON-NLS-1$
 
@@ -29,11 +30,13 @@ public class PersonnelEventLogModel extends DataTableModel {
 
     private ResourceBundle resourceMap;
     private SimpleDateFormat shortDateFormat;
+    private final int dateTextWidth;
 
     public PersonnelEventLogModel() {
         resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelEventLogModel", new EncodeControl()); //$NON-NLS-1$
         shortDateFormat = new SimpleDateFormat(resourceMap.getString("date.format")); //$NON-NLS-1$
         data = new ArrayList<Kill>();
+        dateTextWidth = getRenderer().metrics.stringWidth(shortDateFormat.format(new Date())) + 10;
     }
    
     @Override
@@ -102,7 +105,7 @@ public class PersonnelEventLogModel extends DataTableModel {
     public int getPreferredWidth(int column) {
         switch(column) {
             case COL_DATE:
-                return 80;
+                return dateTextWidth;
             case COL_TEXT:
                 return 300;
             default:

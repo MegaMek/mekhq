@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.FontMetrics;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
@@ -28,11 +29,13 @@ public class PersonnelKillLogModel extends DataTableModel {
 
     private ResourceBundle resourceMap;
     private SimpleDateFormat shortDateFormat;
+    private final int dateTextWidth;
 
     public PersonnelKillLogModel() {
         resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelKillLogModel", new EncodeControl()); //$NON-NLS-1$
         shortDateFormat = new SimpleDateFormat(resourceMap.getString("date.format")); //$NON-NLS-1$
         data = new ArrayList<Kill>();
+        dateTextWidth = getRenderer().metrics.stringWidth(shortDateFormat.format(new Date())) + 10;
     }
    
     @Override
@@ -103,7 +106,7 @@ public class PersonnelKillLogModel extends DataTableModel {
     public int getPreferredWidth(int column) {
         switch(column) {
             case COL_DATE:
-                return 80;
+                return dateTextWidth;
             case COL_TEXT:
                 return 300;
             default:
