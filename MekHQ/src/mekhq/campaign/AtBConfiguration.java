@@ -102,8 +102,17 @@ public class AtBConfiguration implements Serializable {
 	 */
 	
 	private WeightedTable<String> getDefaultForceTable(String key, int index) {
+	    if(index < 0) {
+            MekHQ.logError("Default force tables don't support negative weights, limiting to 0"); //$NON-NLS-1$
+	        index = 0;
+	    }
 		String property = defaultProperties.getString(key);
-		String[] fields = property.split("\\|");
+		String[] fields = property.split("\\|"); //$NON-NLS-1$
+		if(index >= fields.length) {
+		    // Deal with too short field lengths
+		    MekHQ.logError(String.format("Default force tables have %d weight entries; limiting the original value of %d.", fields.length, index)); //$NON-NLS-1$
+		    index = fields.length - 1;
+		}
 		return parseDefaultWeightedTable(fields[index]);
 	}
 	
@@ -214,14 +223,14 @@ public class AtBConfiguration implements Serializable {
 	public String selectBotLances(String org, int weightClass, float rollMod) {
 		if (botForceTables.containsKey(org)) {
 		    final List<WeightedTable<String>> botForceTable = botForceTables.get(org);
-		    final int weightClassIndex = weightClassIndex(weightClass);
+		    int weightClassIndex = weightClassIndex(weightClass);
 		    WeightedTable<String> table = null;
 		    if((weightClassIndex < 0) || (weightClassIndex >= botForceTable.size())) {
 	            MekHQ.logError(
-	                String.format("Bot force tables for organization \"%s\" don't have an entry for weight class %d, trying default", org, weightClass)); //$NON-NLS-1$
-		    } else {
-		        table = botForceTable.get(weightClassIndex);
+	                String.format("Bot force tables for organization \"%s\" don't have an entry for weight class %d, limiting to valid values", org, weightClass)); //$NON-NLS-1$
+	            weightClassIndex = Math.max(0, Math.min(weightClassIndex, botForceTable.size() - 1));
 		    }
+	        table = botForceTable.get(weightClassIndex);
 			if (null == table) {
 				table = getDefaultForceTable("botForce." + org, weightClassIndex);
 	            if (null == table) {

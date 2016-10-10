@@ -30,6 +30,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.stream.Collectors;
@@ -1088,9 +1089,10 @@ public class AtBScenario extends Scenario {
             }
             /* Must set per-entity start pos for units after start of scenarios. Reinforcements
              * arrive from the enemy home edge, which is not necessarily the start pos. */
-            for (Entity en : reinforcements) {
-                en.setStartingPos(enemyHome);
-            }
+            final int enemyDir = enemyHome;
+            reinforcements.stream().filter(Objects::nonNull).forEach(en -> {
+                en.setStartingPos(enemyDir);
+            });
             BotForce bf = getEnemyBotForce(getContract(campaign), enemyHome, enemyHome, reinforcements);
             bf.setName(bf.getName() + " (Reinforcements)");
             botForces.add(bf);
@@ -1131,9 +1133,8 @@ public class AtBScenario extends Scenario {
                 /* Set allied forces to deploy in (6 - speed) turns just as player's units,
                  * but only if not deploying by dropship.
                  */
-                int speed;
-                for (Entity entity : alliesPlayer) {
-                    speed = entity.getWalkMP();
+                alliesPlayer.stream().filter(Objects::nonNull).forEach(entity -> {
+                    int speed = entity.getWalkMP();
                     if (entity.getJumpMP() > 0) {
                         if (entity instanceof megamek.common.Infantry) {
                             speed = entity.getJumpMP();
@@ -1142,9 +1143,9 @@ public class AtBScenario extends Scenario {
                         }
                     }
                     entity.setDeployRound(Math.max(0, 6 - speed));
-                }
-                for (Entity entity : allyBot) {
-                    speed = entity.getWalkMP();
+                });
+                allyBot.stream().filter(Objects::nonNull).forEach(entity -> {
+                    int speed = entity.getWalkMP();
                     if (entity.getJumpMP() > 0) {
                         if (entity instanceof megamek.common.Infantry) {
                             speed = entity.getJumpMP();
@@ -1153,7 +1154,7 @@ public class AtBScenario extends Scenario {
                         }
                     }
                     entity.setDeployRound(Math.max(0, 6 - speed));
-                }
+                });
             }
         }
     }
