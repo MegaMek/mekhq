@@ -6,6 +6,7 @@ v0.41.25-git
 + Issue #151: Damaged Small Craft Thruster Shown As Avionics Repair
 + Issue #141: Incorrect Ammo load from unit after refit
 + Bug [#924]: Refits end with incorrect ammo.
++ Issue #192: Replacing Retractable Blade in Campaign
 
 v0.41.24 (2016-10-06 03:15 UTC)
 + Issue #170: MHQ Unable to Resolve Space Battle with Fighter Squadrons
