@@ -686,8 +686,16 @@ public class InterstellarMapPanel extends JPanel {
                         if (conf.showPlanetNamesThreshold == 0 || conf.scale > conf.showPlanetNamesThreshold
                                 || jumpPath.contains(planet)
                                 || (null != campaign.getLocation().getJumpPath() && campaign.getLocation().getJumpPath().contains(planet))) {
+                            final String planetName = planet.getPrintableName(Utilities.getDateTimeDay(campaign.getCalendar()));
+                            final float xPos = (float) (x + size * 1.8);
+                            final float yPos = (float) y;
+                            g2.setPaint(Color.BLACK);
+                            g2.drawString(planetName, xPos - 1f, yPos - 1f);
+                            g2.drawString(planetName, xPos + 1f, yPos - 1f);
+                            g2.drawString(planetName, xPos + 1f, yPos + 1f);
+                            g2.drawString(planetName, xPos - 1f, yPos + 1f);
                             g2.setPaint(Color.WHITE);
-                            g2.drawString(planet.getPrintableName(Utilities.getDateTimeDay(campaign.getCalendar())), (float)(x+size * 1.8), (float)y);
+                            g2.drawString(planetName, xPos, yPos);
                         }
                     }
                 }
