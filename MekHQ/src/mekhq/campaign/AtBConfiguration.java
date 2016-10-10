@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Function;
 
@@ -212,13 +213,29 @@ public class AtBConfiguration implements Serializable {
 	
 	public String selectBotLances(String org, int weightClass, float rollMod) {
 		if (botForceTables.containsKey(org)) {
-			WeightedTable<String> table = botForceTables.get(org).get(weightClassIndex(weightClass));
-			if (table == null) {
-				table = this.getDefaultForceTable("botForce." + org, weightClassIndex(weightClass));
+		    final List<WeightedTable<String>> botForceTable = botForceTables.get(org);
+		    final int weightClassIndex = weightClassIndex(weightClass);
+		    WeightedTable<String> table = null;
+		    if((weightClassIndex < 0) || (weightClassIndex >= botForceTable.size())) {
+	            MekHQ.logError(
+	                String.format("Bot force tables for organization \"%s\" don't have an entry for weight class %d, trying default", org, weightClass)); //$NON-NLS-1$
+		    } else {
+		        table = botForceTable.get(weightClassIndex);
+		    }
+			if (null == table) {
+				table = getDefaultForceTable("botForce." + org, weightClassIndex);
+	            if (null == table) {
+	                MekHQ.logError(
+	                    String.format("Default (fallback) bot force table for organization \"%s\" and weight class %d doesn't exist, ignoring", org, weightClass)); //$NON-NLS-1$
+	                return null;
+	            }
 			}
 			return table.select(rollMod);
+		} else {
+		    MekHQ.logError(
+		        String.format("Bot force tables for organization \"%s\" not found, ignoring", org)); //$NON-NLS-1$
+		    return null;
 		}
-		return null;
 	}
 	
 	public String selectBotUnitWeights(String org, int weightClass) {
