@@ -23,6 +23,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.table.TableColumn;
 
 import megamek.common.Crew;
@@ -592,7 +593,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
             pnlStats.add(lblImplants2, gridBagConstraints);
         }
 
-        if(campaign.getCampaignOptions().useAdvancedMedical() && !person.getEffects().equals("")) { //$NON-NLS-1$
+        if(campaign.getCampaignOptions().useAdvancedMedical() && person.hasInjuryModifiers()) {
             secondy++;
             lblAdvancedMedical1.setName("lblAdvancedMedical1"); // NOI18N
             lblAdvancedMedical1.setText(resourceMap.getString("lblAdvancedMedical1.text")); //$NON-NLS-1$
@@ -604,14 +605,14 @@ public class PersonViewPanel extends javax.swing.JPanel {
             pnlStats.add(lblAdvancedMedical1, gridBagConstraints);
 
             lblAdvancedMedical2.setName("lblAdvancedMedical2"); // NOI18N
-            lblAdvancedMedical2.setText(person.getEffects());
+            lblAdvancedMedical2.setText(person.getEffectString());
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = secondy;
             gridBagConstraints.gridwidth = 3;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblAdvancedMedical2, gridBagConstraints);
         }
@@ -654,7 +655,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
         GridBagConstraints gridBagConstraints;
         pnlInjuries.setLayout(new GridBagLayout());
         JLabel lblInjury;
-        JTextArea txtInjury;
+        JLabel txtInjury;
         int row = 0;
         ArrayList<Injury> injuries = person.getInjuries();
         for(Injury injury : injuries) {
@@ -668,22 +669,19 @@ public class PersonViewPanel extends javax.swing.JPanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInjuries.add(lblInjury, gridBagConstraints);
 
-            String text = (injury.getPermanent() && injury.getTime() < 1) ?
+            String text = (injury.isPermanent() && injury.getTime() < 1) ?
                 resourceMap.getString("lblPermanentInjury.text") //$NON-NLS-1$
                 : String.format(resourceMap.getString("format.injuryTime"), injury.getTime()); //$NON-NLS-1$
-            txtInjury = new JTextArea(text);
-            txtInjury.setEditable(false);
-            txtInjury.setLineWrap(true);
-            txtInjury.setWrapStyleWord(true);
+            txtInjury = new JLabel("<html>" + text + "</html>");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = row;
             gridBagConstraints.weightx = 1.0;
-            if(row == (injuries.size()-1)) {
+            if(row == (injuries.size() - 1)) {
                 gridBagConstraints.weighty = 1.0;
             }
             gridBagConstraints.insets = new Insets(0, 20, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInjuries.add(txtInjury, gridBagConstraints);
             row++;
