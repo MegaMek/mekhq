@@ -175,6 +175,10 @@ public class InjuryType {
         return maxSeverity;
     }
     
+    public boolean isHidden(Injury i) {
+        return false;
+    }
+    
     public String getName(BodyLocation loc, int severity) {
         return Utilities.capitalize(fluffText);
     }

@@ -92,6 +92,7 @@ public class Injury {
     /** Flag to indicate someone capable successfully treated this injury. */
     private boolean workedOn;
     private boolean extended;
+    private Hiding hidingState = Hiding.DEFAULT;
     @XmlElement(name="InjuryUUID")
     private UUID id;
     /** Generic extra data, for use with plugins and mods */
@@ -232,6 +233,14 @@ public class Injury {
         this.version = version;
     }
     
+    public boolean isHidden() {
+        return (hidingState != Hiding.NO) && ((hidingState == Hiding.YES) || type.isHidden(this));
+    }
+    
+    public void setHidingState(Hiding hidingState) {
+        this.hidingState = Objects.requireNonNull(hidingState);
+    }
+    
     // End Details Methods
     
     // Returns the full long name of this injury including location and type as applicable
@@ -299,6 +308,10 @@ public class Injury {
             extraData = new ExtraData();
         }
         
+        hidingState = Utilities.nonNull(hidingState, Hiding.DEFAULT);
+        
         version = Injury.VERSION;
     }
+    
+    public static enum Hiding { YES, NO, DEFAULT }
 }
