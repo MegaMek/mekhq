@@ -148,9 +148,12 @@ public class StaticChecks {
             if (!e.hasC3M()) {
                 return false;
             }
-            if (e.hasC3MM()) {
-                return false;
-            }
+            /* Units with multiple masters need to be set to company command before other masters
+             * can connect to them.
+             */
+//            if (e.hasC3MM()) {
+//                return false;
+//            }
             if (e.C3MasterIs(unit.getEntity())) {
                 return false;
             }

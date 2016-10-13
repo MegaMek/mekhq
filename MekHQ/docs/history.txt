@@ -9,6 +9,7 @@ v0.41.25-git
 + Issue #192: Replacing Retractable Blade in Campaign
 + Bug [#596]: Parts are impossible to get when they shouldn't be.
 + Issue #77: Dropship refit time never decreases
++ Issue #136: 2x C3 Master Mechs not working properly
 
 v0.41.24 (2016-10-06 03:15 UTC)
 + Issue #170: MHQ Unable to Resolve Space Battle with Fighter Squadrons
