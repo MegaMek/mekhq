@@ -35,8 +35,11 @@ import java.awt.event.ItemListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -335,9 +338,11 @@ public class ResolveScenarioWizardDialog extends JDialog {
         	i = 2;
         	j = 0;
         	JCheckBox chkAllyLost;
-        	ArrayList<UUID> allyIds = new ArrayList<>();
-        	allyIds.addAll(((AtBScenario)tracker.getScenario()).getAttachedUnitIds());
-        	allyIds.addAll(((AtBScenario)tracker.getScenario()).getSurvivalBonusIds());
+        	AtBScenario scen = (AtBScenario)tracker.getScenario();
+        	List<UUID> allyIds = Stream.concat(scen.getAttachedUnitIds().stream(),
+        	        scen.getSurvivalBonusIds().stream())
+        	        .filter(id -> scen.getEntity(id) != null)
+        	        .collect(Collectors.toList());
         	for (UUID id : allyIds) {
         		j++;
         		chkAllyLost = new JCheckBox();
