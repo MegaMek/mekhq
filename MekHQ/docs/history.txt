@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
-v0.41.25-git
+v0.41.26-git
+
+v0.41.25 (2016-10-15 14:40 UTC)
 + Issue #158: Scenario Resolution: ejected+fled pilots lose hits
 + Fixed forcestub save for layered force icons
 + Issue #151: Damaged Small Craft Thruster Shown As Avionics Repair
@@ -10,6 +12,7 @@ v0.41.25-git
 + Bug [#596]: Parts are impossible to get when they shouldn't be.
 + Issue #77: Dropship refit time never decreases
 + Issue #136: 2x C3 Master Mechs not working properly
++ Updated MegaMek.jar and MegaMekLab.jar to 0.41.25
 
 v0.41.24 (2016-10-06 03:15 UTC)
 + Issue #170: MHQ Unable to Resolve Space Battle with Fighter Squadrons
