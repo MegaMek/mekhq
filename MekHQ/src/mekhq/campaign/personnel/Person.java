@@ -326,7 +326,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         techUnitIds = new ArrayList<UUID>();
         salary = -1;
         phenotype = PHENOTYPE_NONE;
-        clan = campaign.getFaction().isClan();
+        clan = campaign.getFaction() != null && campaign.getFaction().isClan();
         bloodname = "";
         primaryDesignator = DESIG_NONE;
         secondaryDesignator = DESIG_NONE;
