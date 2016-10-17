@@ -39,6 +39,7 @@ import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions.MassRepairOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -933,6 +934,11 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		return name;
 	}
 
+	@Override
+    public int getMassRepairOptionType() {
+    	return MassRepairOption.OPTION_TYPE.OTHER;
+    }
+	
 	@Override
 	public void fix() {
 		hits = 0;

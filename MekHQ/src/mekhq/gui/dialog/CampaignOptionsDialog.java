@@ -95,6 +95,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.CampaignOptions.MassRepairOption;
 import mekhq.campaign.GamePreset;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.OptionsChangedEvent;
@@ -243,6 +244,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox useUnofficalMaintenance;
     private JCheckBox reverseQualityNames;
 
+    //Mass Repair/Salvage Options
+    private JCheckBox massRepairUseExtraTimeBox;
+    private JCheckBox massRepairUseRushJobBox;
+    private JCheckBox massRepairAllowCarryoverBox;
 
     private JRadioButton btnContractEquipment;
     private JRadioButton btnContractPersonnel;
@@ -416,7 +421,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     private JSpinner spnStartGameDelay;
 
-
     /**
      * Creates new form CampaignOptionsDialog
      */
@@ -479,6 +483,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         checkMaintenance.setSelected(options.checkMaintenance());
         reverseQualityNames.setSelected(options.reverseQualityNames());
 
+        //Mass Repair/Salvage Options
+        massRepairUseExtraTimeBox.setSelected(options.massRepairUseExtraTime());
+        massRepairUseRushJobBox.setSelected(options.massRepairUseRushJob());
+        massRepairAllowCarryoverBox.setSelected(options.massRepairAllowCarryover());
 
         sellUnitsBox.setSelected(options.canSellUnits());
         sellPartsBox.setSelected(options.canSellParts());
@@ -492,7 +500,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         useQuirksBox.setSelected(options.useQuirks());
         chkSupportStaffOnly.setSelected(options.isAcquisitionSupportStaffOnly());
-
     }
 
     /**
@@ -586,6 +593,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         logMaintenance = new JCheckBox();
         reverseQualityNames = new JCheckBox();
 
+        //Mass Repair/Salvage Options
+        massRepairUseExtraTimeBox = new JCheckBox();
+        massRepairUseRushJobBox = new JCheckBox();
+        massRepairAllowCarryoverBox = new JCheckBox();
+                
         chkSupportStaffOnly = new JCheckBox();
 
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl()); //$NON-NLS-1$
@@ -726,22 +738,60 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         tabOptions.addTab(resourceMap.getString("panGeneral.TabConstraints.tabTitle"), panGeneral); // NOI18N
 
         panRepair.setName("panRules"); // NOI18N
-        panRepair.setLayout(new java.awt.GridLayout(2, 2));
+        panRepair.setLayout(new java.awt.GridBagLayout());
 
         JPanel panSubRepair = new JPanel(new GridBagLayout());
         JPanel panSubMaintenance = new JPanel(new GridBagLayout());
         JPanel panSubAcquire = new JPanel(new GridBagLayout());
         JPanel panSubDelivery = new JPanel(new GridBagLayout());
+        JPanel panMassRepair = new JPanel(new GridBagLayout());
 
         panSubRepair.setBorder(BorderFactory.createTitledBorder("Repair"));
         panSubMaintenance.setBorder(BorderFactory.createTitledBorder("Maintenance"));
         panSubAcquire.setBorder(BorderFactory.createTitledBorder("Acquisition"));
         panSubDelivery.setBorder(BorderFactory.createTitledBorder("Delivery"));
-
-        panRepair.add(panSubRepair);
-        panRepair.add(panSubAcquire);
-        panRepair.add(panSubMaintenance);
-        panRepair.add(panSubDelivery);
+        panMassRepair.setBorder(BorderFactory.createTitledBorder("Mass Repair/Salvage"));
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = .5;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        panRepair.add(panSubRepair, gridBagConstraints);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = .5;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        panRepair.add(panSubAcquire, gridBagConstraints);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        panRepair.add(panSubMaintenance, gridBagConstraints);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        panRepair.add(panSubDelivery, gridBagConstraints);
+        
+        //We want the new mass repair panel to span two cells
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.weighty = 1;
+        gridBagConstraints.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        panRepair.add(panMassRepair, gridBagConstraints);
+        
+        addMassRepairOptions(panMassRepair, resourceMap);
 
         useEraModsCheckBox.setText(resourceMap.getString("useEraModsCheckBox.text")); // NOI18N
         useEraModsCheckBox.setToolTipText(resourceMap.getString("useEraModsCheckBox.toolTipText")); // NOI18N
@@ -3879,6 +3929,142 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    //START: Mass Repair/Salvage Controls
+    private static class MassRepairOptionControl {
+        protected JCheckBox activeBox = null;
+        protected JComboBox<String> minSkillCBox = null;
+        protected JSpinner minBTHSpn = null;
+        protected JSpinner maxBTHSpn = null;
+    }
+    
+    private MassRepairOptionControl[] massRepairOptionControls = null;
+    
+    private void addMassRepairOptions(JPanel parentPanel, ResourceBundle resourceMap) {
+    	GridBagConstraints gridBagConstraints = null;
+    	
+        massRepairUseExtraTimeBox.setText(resourceMap.getString("massRepairUseExtraTimeBox.text"));
+        massRepairUseExtraTimeBox.setToolTipText(resourceMap.getString("massRepairUseExtraTimeBox.toolTipText"));
+        massRepairUseExtraTimeBox.setName("massRepairUseExtraTimeBox");
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        parentPanel.add(massRepairUseExtraTimeBox, gridBagConstraints);
+    	
+        massRepairUseRushJobBox.setText(resourceMap.getString("massRepairUseRushJobBox.text"));
+        massRepairUseRushJobBox.setToolTipText(resourceMap.getString("massRepairUseRushJobBox.toolTipText"));
+        massRepairUseRushJobBox.setName("massRepairUseRushJobBox");
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        parentPanel.add(massRepairUseRushJobBox, gridBagConstraints);
+    	
+        massRepairAllowCarryoverBox.setText(resourceMap.getString("massRepairAllowCarryoverBox.text"));
+        massRepairAllowCarryoverBox.setToolTipText(resourceMap.getString("massRepairAllowCarryoverBox.toolTipText"));
+        massRepairAllowCarryoverBox.setName("massRepairAllowCarryoverBox");
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        parentPanel.add(massRepairAllowCarryoverBox, gridBagConstraints);
+
+        JPanel pnlItems = new JPanel(new GridLayout(0, 4));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        parentPanel.add(pnlItems, gridBagConstraints);
+        
+        massRepairOptionControls = new MassRepairOptionControl[MassRepairOption.OPTION_TYPE.MAX + 1];
+        massRepairOptionControls[MassRepairOption.OPTION_TYPE.ARMOR] = createMassRepairOptionControls(MassRepairOption.OPTION_TYPE.ARMOR, "Repair/Salvage Armor", "Allow mass repair/salvage of armor", "massRepairItemArmor", pnlItems);
+        massRepairOptionControls[MassRepairOption.OPTION_TYPE.AMMO] = createMassRepairOptionControls(MassRepairOption.OPTION_TYPE.AMMO, "Repair/Salvage Ammo", "Allow mass repair/salvage of ammo", "massRepairItemAmmo", pnlItems);
+        massRepairOptionControls[MassRepairOption.OPTION_TYPE.WEAPONS] = createMassRepairOptionControls(MassRepairOption.OPTION_TYPE.WEAPONS, "Repair/Salvage Weapons", "Allow mass repair/salvage of weapons", "massRepairItemWeapons", pnlItems);
+        massRepairOptionControls[MassRepairOption.OPTION_TYPE.LOCATIONS] = createMassRepairOptionControls(MassRepairOption.OPTION_TYPE.LOCATIONS, "Repair/Salvage Locations", "Allow mass repair/salvage of mek body parts and vehicle locations", "massRepairItemLocations", pnlItems);
+        massRepairOptionControls[MassRepairOption.OPTION_TYPE.ENGINES] = createMassRepairOptionControls(MassRepairOption.OPTION_TYPE.ENGINES, "Repair/Salvage Engines", "Allow mass repair/salvage of engines", "massRepairItemEngines", pnlItems);
+        massRepairOptionControls[MassRepairOption.OPTION_TYPE.GYROS] = createMassRepairOptionControls(MassRepairOption.OPTION_TYPE.GYROS, "Repair/Salvage Gyros", "Allow mass repair/salvage of gyros", "massRepairItemGyros", pnlItems);
+        massRepairOptionControls[MassRepairOption.OPTION_TYPE.ACTUATORS] = createMassRepairOptionControls(MassRepairOption.OPTION_TYPE.ACTUATORS, "Repair/Salvage Actuators", "Allow mass repair/salvage of actuators", "massRepairItemActuators", pnlItems);
+        massRepairOptionControls[MassRepairOption.OPTION_TYPE.ELECTRONICS] = createMassRepairOptionControls(MassRepairOption.OPTION_TYPE.ELECTRONICS, "Repair/Salvage Cockpits/Sensors/Life Support", "Allow mass repair/salvage of cockpits, life support, and sensors", "massRepairItemHead", pnlItems);
+        massRepairOptionControls[MassRepairOption.OPTION_TYPE.OTHER] = createMassRepairOptionControls(MassRepairOption.OPTION_TYPE.OTHER, "Repair/Salvage Other", "Allow mass repair/salvage of items which do not fall into the specific categories", "massRepairItemOther", pnlItems);
+	}
+
+	private MassRepairOptionControl createMassRepairOptionControls(int type, String text, String tooltipText, String activeBoxName, JPanel pnlItems) {
+		MassRepairOption mro = options.getMassRepairOptions()[type];
+		
+		if (null == mro) {
+			mro = new MassRepairOption(type, false, 0, 4, 5);
+		}
+		
+		MassRepairOptionControl mroc = new MassRepairOptionControl();
+		mroc.activeBox = createMassRepairOptionItemBox(text, tooltipText, activeBoxName, mro.isActive(), pnlItems);
+		mroc.minSkillCBox = createMassRepairMinSkillCBox(mro.getSkillMin(), mro.isActive(), pnlItems);
+		mroc.minBTHSpn = createMassRepairSkillBTHSpinner(mro.getBthMin(), mro.isActive(), pnlItems);
+		mroc.maxBTHSpn = createMassRepairSkillBTHSpinner(mro.getBthMax(), mro.isActive(), pnlItems);
+
+		mroc.activeBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                if (mroc.activeBox.isSelected()) {
+                    mroc.minSkillCBox.setEnabled(true);
+                    mroc.minBTHSpn.setEnabled(true);
+                    mroc.maxBTHSpn.setEnabled(true);
+                } else {
+                    mroc.minSkillCBox.setEnabled(false);
+                    mroc.minBTHSpn.setEnabled(false);
+                    mroc.maxBTHSpn.setEnabled(false);
+                }
+            }
+        });
+		
+		return mroc;
+	}
+
+	private JSpinner createMassRepairSkillBTHSpinner(int selectedValue, boolean enabled, JPanel pnlItems) {
+        JSpinner skillBTHSpn = new JSpinner(new SpinnerNumberModel(selectedValue, 1, 12, 1));
+        ((JSpinner.DefaultEditor) skillBTHSpn.getEditor()).getTextField().setEditable(false);
+        skillBTHSpn.setEnabled(enabled);
+        
+        pnlItems.add(skillBTHSpn);
+        
+        return skillBTHSpn;
+	}
+
+	private JComboBox<String> createMassRepairMinSkillCBox(int selectedValue, boolean enabled, JPanel pnlItems) {
+        DefaultComboBoxModel<String> skillModel = new DefaultComboBoxModel<String>();
+        skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_ULTRA_GREEN));
+        skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_GREEN));
+        skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_REGULAR));
+        skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_VETERAN));
+        skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_ELITE));
+        skillModel.setSelectedItem(SkillType.getExperienceLevelName(selectedValue));
+        JComboBox<String> skillCBox = new JComboBox<String>(skillModel);
+        skillCBox.setEnabled(enabled);
+        
+        pnlItems.add(skillCBox);
+
+        return skillCBox;
+	}
+
+	private JCheckBox createMassRepairOptionItemBox(String text, String toolTipText, String name, boolean selected, JPanel pnlItems) {
+        JCheckBox optionItemBox = new JCheckBox();
+        optionItemBox.setText(text);
+        optionItemBox.setToolTipText(toolTipText);
+        optionItemBox.setName(name);
+        optionItemBox.setSelected(selected);
+        
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.weightx = 1.0;
+        
+        pnlItems.add(optionItemBox, gridBagConstraints);
+        
+        return optionItemBox;
+    }
+    //END: Mass Repair/Salvage Controls
+        
     private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNameActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtNameActionPerformed
@@ -4146,6 +4332,23 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setSellUnits(sellUnitsBox.isSelected());
         options.setSellParts(sellPartsBox.isSelected());
 
+        //Mass Repair/Salvage Options
+        options.setMassRepairUseExtraTime(massRepairUseExtraTimeBox.isSelected());
+        options.setMassRepairUseRushJob(massRepairUseRushJobBox.isSelected());
+        options.setMassRepairAllowCarryover(massRepairAllowCarryoverBox.isSelected());
+        
+        for (int i = 0; i <= MassRepairOption.OPTION_TYPE.MAX; i++) {
+        	MassRepairOptionControl mroc = massRepairOptionControls[i];
+        	MassRepairOption mro = new MassRepairOption();
+        	mro.setType(i);
+        	mro.setActive(mroc.activeBox.isSelected());
+        	mro.setSkillMin(mroc.minSkillCBox.getSelectedIndex());
+        	mro.setBthMin((Integer)mroc.minBTHSpn.getValue());
+        	mro.setBthMax((Integer)mroc.maxBTHSpn.getValue());
+        	
+        	options.setMassRepairOption(i, mro);
+        }
+                
         options.setEquipmentContractBase(btnContractEquipment.isSelected());
         options.setEquipmentContractPercent((Double) spnEquipPercent.getModel().getValue());
         options.setEquipmentContractSaleValue(chkEquipContractSaleValue.isSelected());

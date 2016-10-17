@@ -28,6 +28,7 @@ import megamek.common.EquipmentType;
 import megamek.common.Protomech;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions.MassRepairOption;
 
 import org.w3c.dom.Node;
 
@@ -169,5 +170,9 @@ public class MissingProtomekLegActuator extends MissingPart {
 	public int getReIntroDate() {
 		return EquipmentType.DATE_NONE;
 	}
-
+	
+	@Override
+	public int getMassRepairOptionType() {
+    	return MassRepairOption.OPTION_TYPE.ACTUATORS;
+    }
 }

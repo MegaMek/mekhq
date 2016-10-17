@@ -33,6 +33,7 @@ import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions.MassRepairOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 
@@ -353,5 +354,9 @@ public class TankLocation extends Part {
 	public int getReIntroDate() {
 		return EquipmentType.DATE_NONE;
 	}
-	
+    
+    @Override
+	public int getMassRepairOptionType() {
+    	return MassRepairOption.OPTION_TYPE.LOCATIONS;
+    }
 }

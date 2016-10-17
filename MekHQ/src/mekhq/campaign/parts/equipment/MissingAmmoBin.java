@@ -27,6 +27,7 @@ import megamek.common.AmmoType;
 import megamek.common.EquipmentType;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions.MassRepairOption;
 import mekhq.campaign.parts.Part;
 
 import org.w3c.dom.Node;
@@ -146,4 +147,9 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 		}
 		restore();
 	}
+
+    @Override
+    public int getMassRepairOptionType() {
+    	return MassRepairOption.OPTION_TYPE.AMMO;
+    }
 }

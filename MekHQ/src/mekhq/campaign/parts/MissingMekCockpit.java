@@ -28,6 +28,7 @@ import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions.MassRepairOption;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -268,4 +269,9 @@ public class MissingMekCockpit extends MissingPart {
 			return EquipmentType.DATE_NONE;
 		}
 	}
+	
+	@Override
+	public int getMassRepairOptionType() {
+    	return MassRepairOption.OPTION_TYPE.ELECTRONICS;
+    }
 }

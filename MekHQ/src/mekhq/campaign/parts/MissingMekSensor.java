@@ -26,6 +26,7 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions.MassRepairOption;
 
 import org.w3c.dom.Node;
 
@@ -161,5 +162,9 @@ public class MissingMekSensor extends MissingPart {
 		 }
 		 return false;	
     }
-
+	
+	@Override
+	public int getMassRepairOptionType() {
+    	return MassRepairOption.OPTION_TYPE.ELECTRONICS;
+    }
 }

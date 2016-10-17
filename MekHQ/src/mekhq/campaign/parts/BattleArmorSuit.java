@@ -39,6 +39,7 @@ import megamek.common.TechConstants;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions.MassRepairOption;
 import mekhq.campaign.parts.equipment.BattleArmorEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -708,4 +709,9 @@ public class BattleArmorSuit extends Part {
 	public int getReIntroDate() {
 		return EquipmentType.DATE_NONE;
 	}
+	
+	@Override
+	public int getMassRepairOptionType() {
+    	return MassRepairOption.OPTION_TYPE.ARMOR;
+    }
 }

@@ -32,6 +32,7 @@ import megamek.common.SmallCraft;
 import megamek.common.TechConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions.MassRepairOption;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -257,6 +258,4 @@ public class StructuralIntegrity extends Part {
 	public int getReIntroDate() {
 		return EquipmentType.DATE_NONE;
 	}
-	
-	
 }

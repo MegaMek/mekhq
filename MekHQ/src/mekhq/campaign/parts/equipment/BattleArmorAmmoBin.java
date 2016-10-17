@@ -29,6 +29,7 @@ import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions.MassRepairOption;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -293,5 +294,10 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
         } catch(NullPointerException ex) {
         	//System.out.println("Found a null entity while calculating tonnage for " + name);
         }
+    }
+
+    @Override
+    public int getMassRepairOptionType() {
+    	return MassRepairOption.OPTION_TYPE.AMMO;
     }
 }

@@ -36,6 +36,7 @@ import megamek.common.Tank;
 import megamek.common.verifier.TestEntity;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions.MassRepairOption;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -470,6 +471,9 @@ public class MissingEnginePart extends MissingPart {
          }
          return false;	
     }
-
-
+	
+	@Override
+	public int getMassRepairOptionType() {
+    	return MassRepairOption.OPTION_TYPE.ENGINES;
+    }
 }

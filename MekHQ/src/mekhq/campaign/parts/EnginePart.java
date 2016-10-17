@@ -37,6 +37,7 @@ import megamek.common.TechConstants;
 import megamek.common.verifier.TestEntity;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions.MassRepairOption;
 import mekhq.campaign.personnel.SkillType;
 
 import org.w3c.dom.Node;
@@ -673,5 +674,9 @@ public class EnginePart extends Part {
          }
          return false;
     }
-
+	
+	@Override
+	public int getMassRepairOptionType() {
+    	return MassRepairOption.OPTION_TYPE.ENGINES;
+    }
 }
