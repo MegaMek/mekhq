@@ -21,11 +21,14 @@ package mekhq.gui.dialog;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,7 +43,10 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.UIManager;
 
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
@@ -48,13 +54,14 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.view.Paperdoll;
 
 public class MedicalViewDialog extends JDialog {
     private static final long serialVersionUID = 6178230374580087883L;
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-        
+
     private final Campaign campaign;
     private final Person person;
     private final IconPackage iconPackage;
@@ -62,6 +69,10 @@ public class MedicalViewDialog extends JDialog {
 
     private Paperdoll defaultMaleDoll;
     private Paperdoll defaultFemaleDoll;
+    
+    private transient Font labelFont;
+    private transient Font handwritingFont;
+    private Color labelColor;
 
     public MedicalViewDialog(Frame parent, Campaign c, Person p, IconPackage ip) {
         super();
@@ -85,6 +96,14 @@ public class MedicalViewDialog extends JDialog {
         setMinimumSize(new Dimension(1024, 768));
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(parent);
+        
+        labelFont = UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.PLAIN, 16);
+        labelColor = new Color(170, 170, 170);
+        try(InputStream fis = new FileInputStream("data/fonts/angelina.TTF")) {
+            handwritingFont = Font.createFont(Font.TRUETYPE_FONT, fis).deriveFont(Font.PLAIN, 22);
+        } catch (FontFormatException | IOException e) {
+            handwritingFont = null;
+        }
         initComponents();
     }
     
@@ -268,15 +287,18 @@ public class MedicalViewDialog extends JDialog {
                 panel.add(genWrittenText(Utilities.capitalize(inj.getLocation().readableName), false));
                 GregorianCalendar now = c.getCalendar();
                 now.add(Calendar.DAY_OF_YEAR, - inj.getOriginalTime());
+                JLabel injLabel = null;
                 if(inj.isPermanent() || (inj.getTime() <= 0)) {
-                    panel.add(genWrittenText(String.format("   %s - %s",
+                    injLabel = genWrittenText(String.format("   %s - %s",
                         inj.getType().getSimpleName(), DATE_FORMAT.format(now.getTime())),
-                        false));
+                        false);
                 } else {
-                    panel.add(genWrittenText(String.format("   %s - %s - est. %s left",
+                    injLabel = genWrittenText(String.format("   %s - %s - est. %s left",
                         inj.getType().getSimpleName(), DATE_FORMAT.format(now.getTime()), genTimePeriod(inj.getTime())),
-                        false));
+                        false);
                 }
+                injLabel.addMouseListener(new InjuryLabelMouseAdapter(injLabel, inj));
+                panel.add(injLabel);
             });
         
         return panel;
@@ -294,14 +316,14 @@ public class MedicalViewDialog extends JDialog {
 
     private JLabel genLabel(String text) {
         JLabel label = new JLabel(text);
-        label.setFont(new Font("Courier New", Font.PLAIN, 16));
-        label.setForeground(Color.GRAY);
+        label.setFont(labelFont);
+        label.setForeground(labelColor);
         return label;
     }
     
     private JLabel genWrittenText(String text, boolean withUnderline) {
         JLabel label = new JLabel("    " + text);
-        label.setFont(new Font("Bradley Hand ITC", Font.BOLD, 20));
+        label.setFont(handwritingFont);
         if(withUnderline) {
             label.setBorder(BorderFactory.createMatteBorder(0, 0, 3, 0, Color.BLACK));
         }
@@ -319,6 +341,45 @@ public class MedicalViewDialog extends JDialog {
             return String.format("%.0f months", days * 12.0 / 365.0);
         } else {
             return String.format("%.0f years", days * 1.0 / 365.0);
+        }
+    }
+    
+    private static class InjuryLabelMouseAdapter extends MouseAdapter {
+        private final JLabel label;
+        private final Injury injury;
+
+        public InjuryLabelMouseAdapter(JLabel label, Injury injury) {
+            this.label = label;
+            this.injury = injury;
+        }
+        
+        @Override
+        public void mouseEntered(MouseEvent e) {
+            label.setBackground(Color.LIGHT_GRAY);
+            label.setOpaque(true);
+            label.invalidate();
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+            label.setBackground(Color.WHITE);
+            label.setOpaque(false);
+            label.invalidate();
+        }
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if(e.getButton() == MouseEvent.BUTTON1) {
+                JPopupMenu popup = new JPopupMenu();
+                JLabel header = new JLabel(injury.getFluff());
+                header.setFont(UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.BOLD));
+                popup.add(header);
+                popup.addSeparator();
+                popup.add(new JMenuItem("Edit ..."));
+                popup.add(new JMenuItem("Remove"));
+                popup.setMinimumSize(new Dimension(160, 0));
+                popup.show(e.getComponent(), e.getX() - 160, e.getY() - 10);
+            }
         }
     }
 }
