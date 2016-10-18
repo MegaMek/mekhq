@@ -124,7 +124,7 @@ public class InjuryType {
     protected boolean permanent = false;
     protected int maxSeverity = 1;
     protected String fluffText = "";
-    
+    protected InjuryLevel level = InjuryLevel.MINOR;
     protected Set<BodyLocation> allowedLocations = null;
     
     protected InjuryType() {
@@ -185,6 +185,10 @@ public class InjuryType {
     
     public String getFluffText(BodyLocation loc, int severity, int gender) {
         return fluffText;
+    }
+    
+    public InjuryLevel getLevel(Injury i) {
+        return level;
     }
     
     public Injury newInjury(Campaign c, Person p, BodyLocation loc, int severity) {

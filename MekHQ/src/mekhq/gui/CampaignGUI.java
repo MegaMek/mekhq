@@ -5063,8 +5063,7 @@ public class CampaignGUI extends JPanel {
         }
         Person selectedPerson = personModel.getPerson(personnelTable
                 .convertRowIndexToModel(row));
-        scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson,
-                getCampaign(), getIconPackage().getPortraits()));
+        scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, getCampaign(), getIconPackage()));
         // This odd code is to make sure that the scrollbar stays at the top
         // I can't just call it here, because it ends up getting reset somewhere
         // later
@@ -5165,8 +5164,7 @@ public class CampaignGUI extends JPanel {
                 if (u.usesSoloPilot()) {
                     name = "Pilot";
                 }
-                tabUnit.add(name, new PersonViewPanel(p, getCampaign(),
-                        getIconPackage().getPortraits()));
+                tabUnit.add(name, new PersonViewPanel(p, getCampaign(), getIconPackage()));
             }
             tabUnit.add("Unit", new UnitViewPanel(u, getCampaign(),
                     getIconPackage().getCamos(), getIconPackage()

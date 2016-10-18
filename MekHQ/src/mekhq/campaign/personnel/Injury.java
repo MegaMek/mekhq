@@ -221,6 +221,10 @@ public class Injury {
         this.type = Objects.requireNonNull(type);
     }
     
+    public InjuryLevel getLevel() {
+        return type.getLevel(this);
+    }
+    
     public Collection<Modifier> getModifiers() {
         return type.getModifiers(this);
     }

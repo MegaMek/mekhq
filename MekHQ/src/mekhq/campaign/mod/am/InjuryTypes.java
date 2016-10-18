@@ -30,6 +30,7 @@ import mekhq.campaign.GameEffect;
 import mekhq.campaign.LogEntry;
 import mekhq.campaign.personnel.BodyLocation;
 import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.InjuryLevel;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Modifier;
 import mekhq.campaign.personnel.Person;
@@ -106,6 +107,7 @@ public final class InjuryTypes {
             recoveryTime = 180;
             allowedLocations = EnumSet.of(BodyLocation.CHEST, BodyLocation.ABDOMEN);
             permanent = true;
+            level = InjuryLevel.CHRONIC;
         }
     
         @Override
@@ -125,6 +127,7 @@ public final class InjuryTypes {
             recoveryTime = 150;
             allowedLocations = EnumSet.of(BodyLocation.CHEST);
             fluffText = "A broken back";
+            level = InjuryLevel.MAJOR;
         }
     
         @Override
@@ -156,6 +159,7 @@ public final class InjuryTypes {
             allowedLocations = EnumSet.of(BodyLocation.HEAD);
             permanent = true;
             fluffText = "Chronic traumatic encephalopathy";
+            level = InjuryLevel.DEADLY;
         }
     
         @Override
@@ -195,6 +199,7 @@ public final class InjuryTypes {
             recoveryTime = 20;
             allowedLocations = EnumSet.of(BodyLocation.CHEST);
             fluffText = "A punctured lung";
+            level = InjuryLevel.MAJOR;
         }
     
         @Override
@@ -208,6 +213,7 @@ public final class InjuryTypes {
             recoveryTime = 90;
             allowedLocations = EnumSet.of(BodyLocation.HEAD);
             fluffText = "A cerebral contusion";
+            level = InjuryLevel.MAJOR;
         }
     
         @Override
@@ -242,6 +248,7 @@ public final class InjuryTypes {
         public LostLimb() {
             recoveryTime = 28;
             permanent = true;
+            level = InjuryLevel.CHRONIC;
         }
     
         @Override
@@ -298,6 +305,11 @@ public final class InjuryTypes {
         }
         
         @Override
+        public InjuryLevel getLevel(Injury i) {
+            return (i.getHits() > 2) ? InjuryLevel.DEADLY : InjuryLevel.MAJOR;
+        }
+        
+        @Override
         public String getFluffText(BodyLocation loc, int severity, int gender) {
             switch(severity) {
                 case 2: return "Severe internal bleeding";
@@ -350,6 +362,7 @@ public final class InjuryTypes {
             recoveryTime = 22;
             allowedLocations = EnumSet.of(BodyLocation.CHEST);
             fluffText = "A broken collar bone";
+            level = InjuryLevel.MAJOR;
         }
     
         @Override
@@ -361,6 +374,7 @@ public final class InjuryTypes {
     public static final class BrokenLimb extends AMInjuryType {
         public BrokenLimb() {
             recoveryTime = 30;
+            level = InjuryLevel.MAJOR;
         }
     
         @Override
@@ -405,6 +419,7 @@ public final class InjuryTypes {
             recoveryTime = 10;
             allowedLocations = EnumSet.of(BodyLocation.ABDOMEN);
             fluffText = "A bruised kidney";
+            level = InjuryLevel.MINOR;
         }
     
         @Override
@@ -427,6 +442,7 @@ public final class InjuryTypes {
             recoveryTime = 20;
             allowedLocations = EnumSet.of(BodyLocation.CHEST);
             fluffText = "A broken rib";
+            level = InjuryLevel.MAJOR;
         }
     
         @Override
@@ -463,6 +479,11 @@ public final class InjuryTypes {
         }
     
         @Override
+        public InjuryLevel getLevel(Injury i) {
+            return (i.getHits() > 1) ? InjuryLevel.MAJOR : InjuryLevel.MINOR;
+        }
+        
+        @Override
         public List<GameEffect> genStressEffect(Campaign c, Person p, Injury i, int hits) {
             String secondEffectFluff = (i.getHits() == 1)
                 ? "concussion worsening" : "development of a cerebral contusion";
@@ -498,6 +519,7 @@ public final class InjuryTypes {
     public static final class Sprain extends AMInjuryType {
         public Sprain() {
             recoveryTime = 12;
+            level = InjuryLevel.MINOR;
         }
     
         @Override
@@ -533,6 +555,7 @@ public final class InjuryTypes {
     public static final class Laceration extends AMInjuryType {
         public Laceration() {
             allowedLocations = EnumSet.of(BodyLocation.HEAD);
+            level = InjuryLevel.MINOR;
         }
     
         @Override
@@ -554,6 +577,7 @@ public final class InjuryTypes {
     public static final class Bruise extends AMInjuryType {
         public Bruise() {
             allowedLocations = EnumSet.of(BodyLocation.CHEST, BodyLocation.ABDOMEN);
+            level = InjuryLevel.MINOR;
         }
     
         @Override
@@ -581,6 +605,7 @@ public final class InjuryTypes {
     public static final class Cut extends AMInjuryType {
         public Cut() {
             allowedLocations = EnumSet.of(BodyLocation.CHEST, BodyLocation.ABDOMEN);
+            level = InjuryLevel.MINOR;
         }
     
         @Override
