@@ -107,6 +107,7 @@ public final class InjuryTypes {
             recoveryTime = 180;
             allowedLocations = EnumSet.of(BodyLocation.CHEST, BodyLocation.ABDOMEN);
             permanent = true;
+            simpleName = "severed spine";
             level = InjuryLevel.CHRONIC;
         }
     
@@ -127,6 +128,7 @@ public final class InjuryTypes {
             recoveryTime = 150;
             allowedLocations = EnumSet.of(BodyLocation.CHEST);
             fluffText = "A broken back";
+            simpleName = "broken back";
             level = InjuryLevel.MAJOR;
         }
     
@@ -159,6 +161,7 @@ public final class InjuryTypes {
             allowedLocations = EnumSet.of(BodyLocation.HEAD);
             permanent = true;
             fluffText = "Chronic traumatic encephalopathy";
+            simpleName = "CTE";
             level = InjuryLevel.DEADLY;
         }
     
@@ -199,6 +202,7 @@ public final class InjuryTypes {
             recoveryTime = 20;
             allowedLocations = EnumSet.of(BodyLocation.CHEST);
             fluffText = "A punctured lung";
+            simpleName = "punctured lung";
             level = InjuryLevel.MAJOR;
         }
     
@@ -213,6 +217,7 @@ public final class InjuryTypes {
             recoveryTime = 90;
             allowedLocations = EnumSet.of(BodyLocation.HEAD);
             fluffText = "A cerebral contusion";
+            simpleName = "cerebral contusion";
             level = InjuryLevel.MAJOR;
         }
     
@@ -248,6 +253,7 @@ public final class InjuryTypes {
         public LostLimb() {
             recoveryTime = 28;
             permanent = true;
+            simpleName = "lost";
             level = InjuryLevel.CHRONIC;
         }
     
@@ -292,6 +298,7 @@ public final class InjuryTypes {
             recoveryTime = 20;
             allowedLocations = EnumSet.of(BodyLocation.ABDOMEN, BodyLocation.INTERNAL);
             maxSeverity = 3;
+            simpleName = "internal bleeding";
         }
     
         @Override
@@ -317,7 +324,7 @@ public final class InjuryTypes {
                 default: return "Internal bleeding";
             }
         }
-    
+
         @Override
         public List<GameEffect> genStressEffect(Campaign c, Person p, Injury i, int hits) {
             String secondEffectFluff = (i.getHits() < 3)
@@ -362,6 +369,7 @@ public final class InjuryTypes {
             recoveryTime = 22;
             allowedLocations = EnumSet.of(BodyLocation.CHEST);
             fluffText = "A broken collar bone";
+            simpleName = "broken collar bone";
             level = InjuryLevel.MAJOR;
         }
     
@@ -374,6 +382,7 @@ public final class InjuryTypes {
     public static final class BrokenLimb extends AMInjuryType {
         public BrokenLimb() {
             recoveryTime = 30;
+            simpleName = "broken";
             level = InjuryLevel.MAJOR;
         }
     
@@ -419,6 +428,7 @@ public final class InjuryTypes {
             recoveryTime = 10;
             allowedLocations = EnumSet.of(BodyLocation.ABDOMEN);
             fluffText = "A bruised kidney";
+            simpleName = "bruised kidney";
             level = InjuryLevel.MINOR;
         }
     
@@ -442,6 +452,7 @@ public final class InjuryTypes {
             recoveryTime = 20;
             allowedLocations = EnumSet.of(BodyLocation.CHEST);
             fluffText = "A broken rib";
+            simpleName = "broken rib";
             level = InjuryLevel.MAJOR;
         }
     
@@ -470,6 +481,7 @@ public final class InjuryTypes {
             recoveryTime = 14;
             allowedLocations = EnumSet.of(BodyLocation.HEAD);
             maxSeverity = 2;
+            simpleName = "concussion";
             fluffText = "A concussion";
         }
     
@@ -519,6 +531,7 @@ public final class InjuryTypes {
     public static final class Sprain extends AMInjuryType {
         public Sprain() {
             recoveryTime = 12;
+            simpleName = "sprained";
             level = InjuryLevel.MINOR;
         }
     
@@ -555,6 +568,7 @@ public final class InjuryTypes {
     public static final class Laceration extends AMInjuryType {
         public Laceration() {
             allowedLocations = EnumSet.of(BodyLocation.HEAD);
+            simpleName = "laceration";
             level = InjuryLevel.MINOR;
         }
     
@@ -577,6 +591,7 @@ public final class InjuryTypes {
     public static final class Bruise extends AMInjuryType {
         public Bruise() {
             allowedLocations = EnumSet.of(BodyLocation.CHEST, BodyLocation.ABDOMEN);
+            simpleName = "bruised";
             level = InjuryLevel.MINOR;
         }
     
@@ -605,6 +620,7 @@ public final class InjuryTypes {
     public static final class Cut extends AMInjuryType {
         public Cut() {
             allowedLocations = EnumSet.of(BodyLocation.CHEST, BodyLocation.ABDOMEN);
+            simpleName = "cut";
             level = InjuryLevel.MINOR;
         }
     

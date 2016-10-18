@@ -26,6 +26,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -38,11 +41,11 @@ import javax.swing.BoxLayout;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import javax.swing.border.Border;
 
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
+import mekhq.MekHQ;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
@@ -50,7 +53,8 @@ import mekhq.gui.view.Paperdoll;
 
 public class MedicalViewDialog extends JDialog {
     private static final long serialVersionUID = 6178230374580087883L;
-    
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+        
     private final Campaign campaign;
     private final Person person;
     private final IconPackage iconPackage;
@@ -58,7 +62,7 @@ public class MedicalViewDialog extends JDialog {
 
     private Paperdoll defaultMaleDoll;
     private Paperdoll defaultFemaleDoll;
-    
+
     public MedicalViewDialog(Frame parent, Campaign c, Person p, IconPackage ip) {
         super();
         this.campaign = Objects.requireNonNull(c);
@@ -67,8 +71,16 @@ public class MedicalViewDialog extends JDialog {
         resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel", new EncodeControl()); //$NON-NLS-1$
         
         // Preload default paperdolls
-        defaultMaleDoll = new Paperdoll(ip.getGuiElement("default_male_paperdoll"));
-        defaultFemaleDoll = new Paperdoll(ip.getGuiElement("default_female_paperdoll"));
+        try(InputStream fis = new FileInputStream(ip.getGuiElement("default_male_paperdoll"))) {
+            defaultMaleDoll = new Paperdoll(fis);
+        } catch(IOException e) {
+            MekHQ.logError(e);
+        }
+        try(InputStream fis = new FileInputStream(ip.getGuiElement("default_female_paperdoll"))) {
+            defaultFemaleDoll = new Paperdoll(fis);
+        } catch(IOException e) {
+            MekHQ.logError(e);
+        }
         
         setMinimumSize(new Dimension(1024, 768));
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -87,7 +99,7 @@ public class MedicalViewDialog extends JDialog {
         gbc.gridy = 0;
         gbc.gridheight = 5;
         
-        Paperdoll testDoll = new Paperdoll("data/images/misc/paperdoll/female.png");
+        Paperdoll testDoll = person.isMale() ? defaultMaleDoll : defaultFemaleDoll;
         person.getInjuries().stream().forEach(inj ->
         {
             Color col;
@@ -128,16 +140,34 @@ public class MedicalViewDialog extends JDialog {
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.BOTH;
         
-        getContentPane().add(genBaseDataPanel(campaign, person), gbc);
+        getContentPane().add(genBaseData(campaign, person), gbc);
         
         gbc.gridy = 1;
         
         getContentPane().add(genMedicalHistory(campaign, person), gbc);
         
+        gbc.gridy = 2;
+        
+        getContentPane().add(genAllergies(campaign, person), gbc);
+
+        gbc.gridy = 3;
+        
+        getContentPane().add(genIllnesses(campaign, person), gbc);
+
+        gbc.gridy = 4;
+        
+        getContentPane().add(genInjuries(campaign, person), gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.gridwidth = 2;
+        
+        getContentPane().add(genNotes(campaign, person), gbc);
+
         pack();
     }
     
-    private JPanel genBaseDataPanel(Campaign c, Person p) {
+    private JPanel genBaseData(Campaign c, Person p) {
         JPanel panel = new JPanel();
         panel.setOpaque(false);
         panel.setLayout(new GridLayout(10, 2));
@@ -156,10 +186,9 @@ public class MedicalViewDialog extends JDialog {
             givenNames = String.join(" ", Arrays.copyOf(nameParts, nameParts.length - 1));
         }
         
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         GregorianCalendar birthday = p.getBirthday();
-        dateFormat.setCalendar(birthday);
-        String birthdayString = dateFormat.format(birthday.getTime());
+        DATE_FORMAT.setCalendar(birthday);
+        String birthdayString = DATE_FORMAT.format(birthday.getTime());
         GregorianCalendar now = c.getCalendar();
         int ageInMonths = (now.get(Calendar.YEAR) - birthday.get(Calendar.YEAR)) * 12
             + now.get(Calendar.MONTH) - birthday.get(Calendar.MONTH);
@@ -207,6 +236,62 @@ public class MedicalViewDialog extends JDialog {
         return panel;
     }
     
+    private JPanel genAllergies(Campaign c, Person p) {
+        JPanel panel = new JPanel();
+        panel.setOpaque(false);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        panel.add(genLabel("Allergies"));
+        panel.add(genWrittenText("", false));
+        
+        return panel;
+    }
+    
+    private JPanel genIllnesses(Campaign c, Person p) {
+        JPanel panel = new JPanel();
+        panel.setOpaque(false);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        panel.add(genLabel("Illnesses"));
+        panel.add(genWrittenText("", false));
+        
+        return panel;
+    }
+    
+    private JPanel genInjuries(Campaign c, Person p) {
+        JPanel panel = new JPanel();
+        panel.setOpaque(false);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        panel.add(genLabel("Injuries"));
+        
+        p.getInjuries().stream().filter(inj -> !inj.isHidden())
+            .sorted((inj1, inj2) -> Integer.compare(inj2.getLevel().ordinal(), inj1.getLevel().ordinal()))
+            .forEachOrdered(inj -> {
+                panel.add(genWrittenText(Utilities.capitalize(inj.getLocation().readableName), false));
+                GregorianCalendar now = c.getCalendar();
+                now.add(Calendar.DAY_OF_YEAR, - inj.getOriginalTime());
+                if(inj.isPermanent() || (inj.getTime() <= 0)) {
+                    panel.add(genWrittenText(String.format("   %s - %s",
+                        inj.getType().getSimpleName(), DATE_FORMAT.format(now.getTime())),
+                        false));
+                } else {
+                    panel.add(genWrittenText(String.format("   %s - %s - est. %s left",
+                        inj.getType().getSimpleName(), DATE_FORMAT.format(now.getTime()), genTimePeriod(inj.getTime())),
+                        false));
+                }
+            });
+        
+        return panel;
+    }
+    
+    private JPanel genNotes(Campaign c, Person p) {
+        JPanel panel = new JPanel();
+        panel.setOpaque(false);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        panel.add(genLabel("Doctor's notes"));
+        panel.add(genWrittenText("", false));
+        
+        return panel;
+    }
+
     private JLabel genLabel(String text) {
         JLabel label = new JLabel(text);
         label.setFont(new Font("Courier New", Font.PLAIN, 16));
@@ -223,4 +308,17 @@ public class MedicalViewDialog extends JDialog {
         return label;
     }
     
+    private String genTimePeriod(int days) {
+        if(days <= 1) {
+            return "a day";
+        } else if(days < 21) {
+            return String.format("%d days", days);
+        } else if(days <= 12 * 7) {
+            return String.format("%.0f weeks", days * 1.0 / 7.0);
+        } else if(days <= 2 * 365) {
+            return String.format("%.0f months", days * 12.0 / 365.0);
+        } else {
+            return String.format("%.0f years", days * 1.0 / 365.0);
+        }
+    }
 }

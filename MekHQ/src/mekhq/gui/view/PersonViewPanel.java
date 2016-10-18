@@ -13,8 +13,10 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
@@ -22,11 +24,9 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
-import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
@@ -35,6 +35,7 @@ import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.LogEntry;
@@ -698,43 +699,51 @@ public class PersonViewPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
-        Paperdoll testDoll = new Paperdoll("data/images/misc/paperdoll/female.png");
-        person.getInjuries().stream().forEach(inj ->
-        {
-            Color col;
-            switch(inj.getLevel()) {
-                case CHRONIC:
-                    col =  new Color(255, 204, 255);
-                    break;
-                case DEADLY:
-                    col = Color.RED;
-                    break;
-                case MAJOR:
-                    col = Color.ORANGE;
-                    break;
-                case MINOR:
-                    col = Color.YELLOW;
-                    break;
-                case NONE:
-                    col = Color.WHITE;
-                    break;
-                default:
-                    col = Color.WHITE;
-                    break;
+        Paperdoll testDoll = null;
+        try(InputStream fis = new FileInputStream(ip.getGuiElement("default_female_paperdoll"))) {
+            testDoll = new Paperdoll(fis);
+        } catch(IOException e) {
+            MekHQ.logError(e);
+        }
+        if(null != testDoll) {
+            final Paperdoll doll = testDoll;
+            person.getInjuries().stream().forEach(inj ->
+            {
+                Color col;
+                switch(inj.getLevel()) {
+                    case CHRONIC:
+                        col =  new Color(255, 204, 255);
+                        break;
+                    case DEADLY:
+                        col = Color.RED;
+                        break;
+                    case MAJOR:
+                        col = Color.ORANGE;
+                        break;
+                    case MINOR:
+                        col = Color.YELLOW;
+                        break;
+                    case NONE:
+                        col = Color.WHITE;
+                        break;
+                    default:
+                        col = Color.WHITE;
+                        break;
+                    
+                }
                 
-            }
-            
-            testDoll.setLocColor(inj.getLocation(), col);
-        });
-        testDoll.addActionListener(event -> {
-            new MedicalViewDialog((Frame) SwingUtilities.getWindowAncestor(this), campaign, person, ip).setVisible(true);
-        });
-        testDoll.setMaximumSize(new Dimension(128, 384));
-        JPanel testDollWrapper = new JPanel(null);
-        testDollWrapper.setLayout(new BoxLayout(testDollWrapper, BoxLayout.LINE_AXIS));
-        testDollWrapper.add(testDoll);
-        testDollWrapper.setPreferredSize(new Dimension(64, 192));
-        pnlInjuries.add(testDollWrapper, gridBagConstraints);
+                doll.setLocColor(inj.getLocation(), col);
+            });
+            testDoll.addActionListener(event -> {
+                new MedicalViewDialog((Frame) SwingUtilities.getWindowAncestor(this), campaign, person, ip).setVisible(true);
+            });
+            testDoll.setMaximumSize(new Dimension(128, 384));
+            JPanel testDollWrapper = new JPanel(null);
+            testDollWrapper.setLayout(new BoxLayout(testDollWrapper, BoxLayout.LINE_AXIS));
+            testDollWrapper.add(testDoll);
+            testDollWrapper.setPreferredSize(new Dimension(64, 192));
+            pnlInjuries.add(testDollWrapper, gridBagConstraints);
+        }
     }
 
     private void fillKillRecord() {

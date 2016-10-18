@@ -36,7 +36,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.InputStream;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
@@ -78,9 +78,30 @@ public class Paperdoll extends Component {
 
     private transient double scale;
     
-    public Paperdoll(String baseImage) {
-        if((null != baseImage) && !baseImage.isEmpty()) {
-            base = Toolkit.getDefaultToolkit().createImage(baseImage);
+    public Paperdoll(InputStream is) {
+        locOverlays = new EnumMap<>(BodyLocation.class);
+        locColors = new EnumMap<>(BodyLocation.class);
+        
+        try {
+            loadShapeData(is);
+        } catch(Exception ex) {
+            MekHQ.logError(ex);
+        }
+        
+        enableEvents(AWTEvent.MOUSE_EVENT_MASK);
+    }
+    
+    public void loadShapeData(InputStream is) throws JAXBException {
+        JAXBContext context = JAXBContext.newInstance(OverlayLocDataList.class, OverlayLocData.class);
+        Unmarshaller unmarshaller = context.createUnmarshaller();
+        OverlayLocDataList dataList = (OverlayLocDataList) unmarshaller.unmarshal(is);
+        if(null != dataList.locs) {
+            dataList.locs.forEach(data -> {
+                locOverlays.put(data.loc, data.genPath());
+            });
+        }
+        if((null != dataList.base) && !dataList.base.isEmpty()) {
+            base = Toolkit.getDefaultToolkit().createImage(dataList.base);
             MediaTracker mt = new MediaTracker(this);
             mt.addImage(base, 0);
             try {
@@ -92,25 +113,6 @@ public class Paperdoll extends Component {
             base = new BufferedImage(DEFAULT_WIDTH, DEFAULT_HEIGHT, BufferedImage.TYPE_INT_ARGB);
         }
         setSize(base.getWidth(null), base.getHeight(null));
-        locOverlays = new EnumMap<>(BodyLocation.class);
-        locColors = new EnumMap<>(BodyLocation.class);
-        
-        try {
-            loadShapeData(new File("data/images/misc/paperdoll/female_overlay.xml"));
-        } catch(Exception ex) {
-            MekHQ.logError(ex);
-        }
-        
-        enableEvents(AWTEvent.MOUSE_EVENT_MASK);
-    }
-    
-    public void loadShapeData(File f) throws JAXBException {
-        JAXBContext context = JAXBContext.newInstance(OverlayLocDataList.class, OverlayLocData.class);
-        Unmarshaller unmarshaller = context.createUnmarshaller();
-        OverlayLocDataList dataList = (OverlayLocDataList) unmarshaller.unmarshal(f);
-        dataList.locs.forEach(data -> {
-            locOverlays.put(data.loc, data.genPath());
-        });
     }
     
     public void setLocShape(BodyLocation loc, Path2D path) {
@@ -191,6 +193,7 @@ public class Paperdoll extends Component {
     @XmlRootElement(name="overlays")
     @XmlAccessorType(XmlAccessType.FIELD)
     private static class OverlayLocDataList {
+        public String base;
         @XmlElement(name="loc")
         public List<OverlayLocData> locs;
     }

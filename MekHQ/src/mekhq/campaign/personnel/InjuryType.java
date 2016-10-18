@@ -124,6 +124,7 @@ public class InjuryType {
     protected boolean permanent = false;
     protected int maxSeverity = 1;
     protected String fluffText = "";
+    protected String simpleName = "injured";
     protected InjuryLevel level = InjuryLevel.MINOR;
     protected Set<BodyLocation> allowedLocations = null;
     
@@ -177,6 +178,10 @@ public class InjuryType {
     
     public boolean isHidden(Injury i) {
         return false;
+    }
+    
+    public String getSimpleName() {
+        return simpleName;
     }
     
     public String getName(BodyLocation loc, int severity) {
