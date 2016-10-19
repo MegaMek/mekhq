@@ -326,7 +326,7 @@ public class Campaign implements Serializable {
         game.setOptions(gameOptions);
         customs = new ArrayList<String>();
         shoppingList = new ShoppingList();
-        news = new News(calendar.get(Calendar.YEAR));
+        news = new News(calendar.get(Calendar.YEAR), id.getLeastSignificantBits());
         personnelMarket = new PersonnelMarket();
         contractMarket = new ContractMarket();
         unitMarket = new UnitMarket();
@@ -2160,7 +2160,7 @@ public class Campaign implements Serializable {
     }
 
     public void reloadNews() {
-        news.loadNewsFor(calendar.get(Calendar.YEAR));
+        news.loadNewsFor(calendar.get(Calendar.YEAR), id.getLeastSignificantBits());
     }
 
     public int getDeploymentDeficit(AtBContract contract) {
