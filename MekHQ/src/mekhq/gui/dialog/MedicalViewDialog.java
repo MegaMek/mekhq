@@ -28,6 +28,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.FileInputStream;
@@ -56,6 +57,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.personnel.BodyLocation;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.view.Paperdoll;
@@ -208,6 +210,28 @@ public class MedicalViewDialog extends JDialog {
             }
             
             doll.setLocColor(inj.getLocation(), col);
+        });
+        doll.addActionListener(ae -> {
+            BodyLocation loc = BodyLocation.of(ae.getActionCommand());
+            boolean locationPicked = !loc.readableName.isEmpty();
+            Point mousePos = doll.getMousePosition();
+            JPopupMenu popup = new JPopupMenu();
+            if(locationPicked) {
+                JLabel header = new JLabel(Utilities.capitalize(loc.readableName));
+                header.setFont(UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.BOLD));
+                popup.add(header);
+                popup.addSeparator();
+            }
+            JMenuItem edit = new JMenuItem("New injury ...", UIManager.getIcon("FileView.fileIcon"));
+            popup.add(edit);
+            JMenuItem remove = new JMenuItem(loc.readableName.isEmpty() ? "Heal all" : "Heal");
+            if(locationPicked && p.getInjuriesByLocation(loc).isEmpty()) {
+                remove.setEnabled(false);
+            }
+            popup.add(remove);
+            Dimension popupSize = popup.getPreferredSize();
+            popup.show(doll, (int) (mousePos.getX() - popupSize.getWidth()) + 10, (int) mousePos.getY() - 10);
+
         });
         panel.add(doll);
 
@@ -423,8 +447,8 @@ public class MedicalViewDialog extends JDialog {
                     label.getRootPane().getParent().revalidate();
                 });
                 popup.add(remove);
-                popup.setMinimumSize(new Dimension(160, 0));
-                popup.show(e.getComponent(), e.getX() - 160, e.getY() - 10);
+                Dimension popupSize = popup.getPreferredSize();
+                popup.show(e.getComponent(), e.getX() - (int) popupSize.getWidth() + 10, e.getY() - 10);
             }
         }
     }
