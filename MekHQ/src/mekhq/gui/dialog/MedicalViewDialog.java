@@ -77,6 +77,8 @@ public class MedicalViewDialog extends JDialog {
     private transient Font labelFont;
     private transient Font handwritingFont;
     private Color labelColor;
+    
+    private boolean gmMode;
 
     public MedicalViewDialog(Frame parent, Campaign c, Person p, IconPackage ip) {
         super();
@@ -323,7 +325,9 @@ public class MedicalViewDialog extends JDialog {
                         inj.getType().getSimpleName(), DATE_FORMAT.format(now.getTime()), genTimePeriod(inj.getTime())),
                         false);
                 }
-                injLabel.addMouseListener(new InjuryLabelMouseAdapter(injLabel, p, inj));
+                if(isGMMode()) {
+                    injLabel.addMouseListener(new InjuryLabelMouseAdapter(injLabel, p, inj));
+                }
                 panel.add(injLabel);
             });
         
@@ -370,6 +374,14 @@ public class MedicalViewDialog extends JDialog {
         }
     }
     
+    public boolean isGMMode() {
+        return gmMode;
+    }
+    
+    public void setGMMode(boolean gmMode) {
+        this.gmMode = gmMode;
+    }
+    
     private static class InjuryLabelMouseAdapter extends MouseAdapter {
         private final JLabel label;
         private final Person person;
@@ -408,11 +420,7 @@ public class MedicalViewDialog extends JDialog {
                 JMenuItem remove = new JMenuItem("Remove");
                 remove.addActionListener(ae -> {
                     person.removeInjury(injury);
-                    //Dimension size = label.getRootPane().getParent().getSize();
-                    //size.width += 100;
-                    //label.getRootPane().getParent().setSize(size);
                     label.getRootPane().getParent().revalidate();
-                    //label.getRootPane().getParent().repaint();
                 });
                 popup.add(remove);
                 popup.setMinimumSize(new Dimension(160, 0));

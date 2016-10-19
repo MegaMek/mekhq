@@ -7,6 +7,7 @@
 package mekhq.gui.view;
 
 import java.awt.Color;
+import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -23,6 +24,7 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -598,7 +600,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
             pnlStats.add(lblImplants2, gridBagConstraints);
         }
 
-        if(campaign.getCampaignOptions().useAdvancedMedical() && person.hasInjuryModifiers()) {
+        if(1 == 1) {
             secondy++;
             lblAdvancedMedical1.setName("lblAdvancedMedical1"); // NOI18N
             lblAdvancedMedical1.setText(resourceMap.getString("lblAdvancedMedical1.text")); //$NON-NLS-1$
@@ -614,12 +616,33 @@ public class PersonViewPanel extends javax.swing.JPanel {
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = secondy;
-            gridBagConstraints.gridwidth = 3;
+            gridBagConstraints.gridwidth = 2;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblAdvancedMedical2, gridBagConstraints);
+            
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 3;
+            gridBagConstraints.gridy = secondy;
+            gridBagConstraints.insets = new Insets(0, 0, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
+            JButton medicalButton = new JButton(new ImageIcon("data/images/misc/medical.png"));
+            medicalButton.addActionListener(event -> {
+                MedicalViewDialog medDialog = new MedicalViewDialog((Frame) SwingUtilities.getWindowAncestor(this), campaign, person, ip);
+                medDialog.setGMMode(campaign.isGM());
+                medDialog.setModalityType(ModalityType.APPLICATION_MODAL);
+                medDialog.setVisible(true);
+                removeAll();
+                initComponents();
+            });
+            medicalButton.setMaximumSize(new Dimension(32, 32));
+            medicalButton.setMargin(new Insets(0, 0, 0, 0));
+            medicalButton.setToolTipText("View medical details");
+            pnlStats.add(medicalButton, gridBagConstraints);
+
         }
     }
 
@@ -690,59 +713,6 @@ public class PersonViewPanel extends javax.swing.JPanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInjuries.add(txtInjury, gridBagConstraints);
             row++;
-        }
-        
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = row;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
-        Paperdoll testDoll = null;
-        try(InputStream fis = new FileInputStream(ip.getGuiElement("default_female_paperdoll"))) {
-            testDoll = new Paperdoll(fis);
-        } catch(IOException e) {
-            MekHQ.logError(e);
-        }
-        if(null != testDoll) {
-            final Paperdoll doll = testDoll;
-            person.getInjuries().stream().forEach(inj ->
-            {
-                Color col;
-                switch(inj.getLevel()) {
-                    case CHRONIC:
-                        col =  new Color(255, 204, 255);
-                        break;
-                    case DEADLY:
-                        col = Color.RED;
-                        break;
-                    case MAJOR:
-                        col = Color.ORANGE;
-                        break;
-                    case MINOR:
-                        col = Color.YELLOW;
-                        break;
-                    case NONE:
-                        col = Color.WHITE;
-                        break;
-                    default:
-                        col = Color.WHITE;
-                        break;
-                    
-                }
-                
-                doll.setLocColor(inj.getLocation(), col);
-            });
-            testDoll.addActionListener(event -> {
-                new MedicalViewDialog((Frame) SwingUtilities.getWindowAncestor(this), campaign, person, ip).setVisible(true);
-            });
-            testDoll.setMaximumSize(new Dimension(128, 384));
-            JPanel testDollWrapper = new JPanel(null);
-            testDollWrapper.setLayout(new BoxLayout(testDollWrapper, BoxLayout.LINE_AXIS));
-            testDollWrapper.add(testDoll);
-            testDollWrapper.setPreferredSize(new Dimension(64, 192));
-            pnlInjuries.add(testDollWrapper, gridBagConstraints);
         }
     }
 
