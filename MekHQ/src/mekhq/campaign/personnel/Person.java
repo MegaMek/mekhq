@@ -3161,7 +3161,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
      */
 
     public ArrayList<Injury> getInjuries() {
-        return injuries;
+        return new ArrayList<>(injuries);
     }
 
     public void clearInjuries() {

@@ -600,50 +600,47 @@ public class PersonViewPanel extends javax.swing.JPanel {
             pnlStats.add(lblImplants2, gridBagConstraints);
         }
 
-        if(1 == 1) {
-            secondy++;
-            lblAdvancedMedical1.setName("lblAdvancedMedical1"); // NOI18N
-            lblAdvancedMedical1.setText(resourceMap.getString("lblAdvancedMedical1.text")); //$NON-NLS-1$
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = secondy;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(lblAdvancedMedical1, gridBagConstraints);
+        secondy++;
+        lblAdvancedMedical1.setName("lblAdvancedMedical1"); // NOI18N
+        lblAdvancedMedical1.setText(resourceMap.getString("lblAdvancedMedical1.text")); //$NON-NLS-1$
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = secondy;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(lblAdvancedMedical1, gridBagConstraints);
 
-            lblAdvancedMedical2.setName("lblAdvancedMedical2"); // NOI18N
-            lblAdvancedMedical2.setText(person.getEffectString());
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = secondy;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlStats.add(lblAdvancedMedical2, gridBagConstraints);
-            
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 3;
-            gridBagConstraints.gridy = secondy;
-            gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
-            JButton medicalButton = new JButton(new ImageIcon("data/images/misc/medical.png"));
-            medicalButton.addActionListener(event -> {
-                MedicalViewDialog medDialog = new MedicalViewDialog((Frame) SwingUtilities.getWindowAncestor(this), campaign, person, ip);
-                medDialog.setGMMode(campaign.isGM());
-                medDialog.setModalityType(ModalityType.APPLICATION_MODAL);
-                medDialog.setVisible(true);
-                removeAll();
-                initComponents();
-            });
-            medicalButton.setMaximumSize(new Dimension(32, 32));
-            medicalButton.setMargin(new Insets(0, 0, 0, 0));
-            medicalButton.setToolTipText("View medical details");
-            pnlStats.add(medicalButton, gridBagConstraints);
-
-        }
+        lblAdvancedMedical2.setName("lblAdvancedMedical2"); // NOI18N
+        lblAdvancedMedical2.setText(person.getEffectString());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = secondy;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(lblAdvancedMedical2, gridBagConstraints);
+        
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = secondy;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
+        JButton medicalButton = new JButton(new ImageIcon("data/images/misc/medical.png")); //$NON-NLS-1$
+        medicalButton.addActionListener(event -> {
+            MedicalViewDialog medDialog = new MedicalViewDialog((Frame) SwingUtilities.getWindowAncestor(this), campaign, person, ip);
+            medDialog.setGMMode(campaign.isGM());
+            medDialog.setModalityType(ModalityType.APPLICATION_MODAL);
+            medDialog.setVisible(true);
+            removeAll();
+            initComponents();
+        });
+        medicalButton.setMaximumSize(new Dimension(32, 32));
+        medicalButton.setMargin(new Insets(0, 0, 0, 0));
+        medicalButton.setToolTipText("View medical details");
+        pnlStats.add(medicalButton, gridBagConstraints);
     }
 
     private void fillLog() {
