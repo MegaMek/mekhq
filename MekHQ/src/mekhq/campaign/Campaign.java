@@ -185,6 +185,8 @@ public class Campaign implements Serializable {
 
 	private static final long serialVersionUID = -6312434701389973056L;
 
+	private UUID id;
+	
     // we have three things to track: (1) teams, (2) units, (3) repair tasks
     // we will use the same basic system (borrowed from MegaMek) for tracking
     // all three
@@ -286,6 +288,7 @@ public class Campaign implements Serializable {
     private IUnitGenerator unitGenerator;
 
     public Campaign() {
+        id = UUID.randomUUID();
         game = new Game();
         player = new Player(0, "self");
         game.addPlayer(0, player);
@@ -368,6 +371,10 @@ public class Campaign implements Serializable {
     	return player;
     }
 
+    public UUID getId() {
+        return id;
+    }
+    
     public String getName() {
         return name;
     }
@@ -3400,6 +3407,7 @@ public class Campaign implements Serializable {
         // Basic Campaign Info
         pw1.println("\t<info>");
 
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "id", id.toString());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "name", name);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "faction", factionCode);
         if (retainerEmployerCode != null) {
@@ -5100,6 +5108,8 @@ public class Campaign implements Serializable {
                     retVal.medicPool = Integer.parseInt(wn.getTextContent().trim());
                 } else if (xn.equalsIgnoreCase("fatigueLevel")) {
                 	retVal.fatigueLevel = Integer.parseInt(wn.getTextContent().trim());
+                } else if (xn.equalsIgnoreCase("id")) {
+                    retVal.id = UUID.fromString(wn.getTextContent().trim());
                 }
             }
         }
