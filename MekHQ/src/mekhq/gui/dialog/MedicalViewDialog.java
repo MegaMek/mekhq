@@ -211,28 +211,31 @@ public class MedicalViewDialog extends JDialog {
             
             doll.setLocColor(inj.getLocation(), col);
         });
-        doll.addActionListener(ae -> {
-            BodyLocation loc = BodyLocation.of(ae.getActionCommand());
-            boolean locationPicked = !loc.readableName.isEmpty();
-            Point mousePos = doll.getMousePosition();
-            JPopupMenu popup = new JPopupMenu();
-            if(locationPicked) {
-                JLabel header = new JLabel(Utilities.capitalize(loc.readableName));
-                header.setFont(UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.BOLD));
-                popup.add(header);
-                popup.addSeparator();
-            }
-            JMenuItem edit = new JMenuItem("New injury ...", UIManager.getIcon("FileView.fileIcon"));
-            popup.add(edit);
-            JMenuItem remove = new JMenuItem(loc.readableName.isEmpty() ? "Heal all" : "Heal");
-            if(locationPicked && p.getInjuriesByLocation(loc).isEmpty()) {
-                remove.setEnabled(false);
-            }
-            popup.add(remove);
-            Dimension popupSize = popup.getPreferredSize();
-            popup.show(doll, (int) (mousePos.getX() - popupSize.getWidth()) + 10, (int) mousePos.getY() - 10);
-
-        });
+        if(isGMMode()) {
+            // TODO Don't add action listeners more than once
+            doll.addActionListener(ae -> {
+                BodyLocation loc = BodyLocation.of(ae.getActionCommand());
+                boolean locationPicked = !loc.readableName.isEmpty();
+                Point mousePos = doll.getMousePosition();
+                JPopupMenu popup = new JPopupMenu();
+                if(locationPicked) {
+                    JLabel header = new JLabel(Utilities.capitalize(loc.readableName));
+                    header.setFont(UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.BOLD));
+                    popup.add(header);
+                    popup.addSeparator();
+                }
+                JMenuItem edit = new JMenuItem("New injury ...", UIManager.getIcon("FileView.fileIcon"));
+                popup.add(edit);
+                JMenuItem remove = new JMenuItem(loc.readableName.isEmpty() ? "Heal all" : "Heal");
+                if(locationPicked && p.getInjuriesByLocation(loc).isEmpty()) {
+                    remove.setEnabled(false);
+                }
+                popup.add(remove);
+                Dimension popupSize = popup.getPreferredSize();
+                popup.show(doll, (int) (mousePos.getX() - popupSize.getWidth()) + 10, (int) mousePos.getY() - 10);
+    
+            });
+        }
         panel.add(doll);
 
         return panel;
