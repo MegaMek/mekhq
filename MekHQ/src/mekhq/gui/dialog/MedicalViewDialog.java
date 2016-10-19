@@ -19,6 +19,7 @@
 package mekhq.gui.dialog;
 
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontFormatException;
@@ -46,6 +47,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 
 import megamek.common.util.EncodeControl;
@@ -69,7 +71,9 @@ public class MedicalViewDialog extends JDialog {
 
     private Paperdoll defaultMaleDoll;
     private Paperdoll defaultFemaleDoll;
-    
+    private JPanel dollWrapper;
+    private JPanel injuryPanel;
+
     private transient Font labelFont;
     private transient Font handwritingFont;
     private Color labelColor;
@@ -93,7 +97,7 @@ public class MedicalViewDialog extends JDialog {
             MekHQ.logError(e);
         }
         
-        setMinimumSize(new Dimension(1024, 768));
+        setMinimumSize(new Dimension(1024, 800));
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(parent);
         
@@ -104,12 +108,15 @@ public class MedicalViewDialog extends JDialog {
         } catch (FontFormatException | IOException e) {
             handwritingFont = null;
         }
-        initComponents();
+        setBackground(Color.WHITE);
+        Container scrollPanel = new JPanel();
+        getContentPane().add(new JScrollPane(scrollPanel));
+        initComponents(scrollPanel);
     }
     
-    private void initComponents() {
-        getContentPane().setBackground(Color.WHITE);
-        getContentPane().setLayout(new GridBagLayout());
+    private void initComponents(Container cont) {
+        cont.setBackground(Color.WHITE);
+        cont.setLayout(new GridBagLayout());
         
         GridBagConstraints gbc;
         
@@ -118,7 +125,61 @@ public class MedicalViewDialog extends JDialog {
         gbc.gridy = 0;
         gbc.gridheight = 5;
         
-        Paperdoll testDoll = person.isMale() ? defaultMaleDoll : defaultFemaleDoll;
+        dollWrapper = new JPanel(null);
+        dollWrapper.setLayout(new BoxLayout(dollWrapper, BoxLayout.LINE_AXIS));
+        dollWrapper.setMinimumSize(new Dimension(256, 768));
+        dollWrapper.setMaximumSize(new Dimension(256, Integer.MAX_VALUE));
+        cont.add(dollWrapper, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridheight = 1;
+        gbc.weightx = 1.0;
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.BOTH;
+        
+        cont.add(genBaseData(campaign, person), gbc);
+        
+        gbc.gridy = 1;
+        
+        cont.add(genMedicalHistory(campaign, person), gbc);
+        
+        gbc.gridy = 2;
+        
+        cont.add(genAllergies(campaign, person), gbc);
+
+        gbc.gridy = 3;
+        
+        cont.add(genIllnesses(campaign, person), gbc);
+
+        gbc.gridy = 4;
+        
+        cont.add(injuryPanel = new JPanel(), gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.gridwidth = 2;
+        
+        cont.add(genNotes(campaign, person), gbc);
+
+        pack();
+    }
+
+    @Override
+    public void validate() {
+        dollWrapper.setVisible(false);
+        fillDoll(dollWrapper, campaign, person);
+        dollWrapper.setVisible(true);
+        injuryPanel.setVisible(false);
+        fillInjuries(injuryPanel, campaign, person);
+        injuryPanel.setVisible(true);
+        super.validate();
+    }
+    
+    private JPanel fillDoll(JPanel panel, Campaign c, Person p) {
+        panel.removeAll();
+        
+        Paperdoll doll = person.isMale() ? defaultMaleDoll : defaultFemaleDoll;
+        doll.clearLocColors();
         person.getInjuries().stream().forEach(inj ->
         {
             Color col;
@@ -144,46 +205,11 @@ public class MedicalViewDialog extends JDialog {
                 
             }
             
-            testDoll.setLocColor(inj.getLocation(), col);
+            doll.setLocColor(inj.getLocation(), col);
         });
-        JPanel testDollWrapper = new JPanel(null);
-        testDollWrapper.setLayout(new BoxLayout(testDollWrapper, BoxLayout.LINE_AXIS));
-        testDollWrapper.add(testDoll);
-        testDollWrapper.setMaximumSize(new Dimension(256, Integer.MAX_VALUE));
-        
-        getContentPane().add(testDollWrapper, gbc);
+        panel.add(doll);
 
-        gbc.gridx = 1;
-        gbc.gridheight = 1;
-        gbc.weightx = 1.0;
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.BOTH;
-        
-        getContentPane().add(genBaseData(campaign, person), gbc);
-        
-        gbc.gridy = 1;
-        
-        getContentPane().add(genMedicalHistory(campaign, person), gbc);
-        
-        gbc.gridy = 2;
-        
-        getContentPane().add(genAllergies(campaign, person), gbc);
-
-        gbc.gridy = 3;
-        
-        getContentPane().add(genIllnesses(campaign, person), gbc);
-
-        gbc.gridy = 4;
-        
-        getContentPane().add(genInjuries(campaign, person), gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 5;
-        gbc.gridwidth = 2;
-        
-        getContentPane().add(genNotes(campaign, person), gbc);
-
-        pack();
+        return panel;
     }
     
     private JPanel genBaseData(Campaign c, Person p) {
@@ -275,8 +301,8 @@ public class MedicalViewDialog extends JDialog {
         return panel;
     }
     
-    private JPanel genInjuries(Campaign c, Person p) {
-        JPanel panel = new JPanel();
+    private JPanel fillInjuries(JPanel panel, Campaign c, Person p) {
+        panel.removeAll();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.add(genLabel("Injuries"));
@@ -285,7 +311,7 @@ public class MedicalViewDialog extends JDialog {
             .sorted((inj1, inj2) -> Integer.compare(inj2.getLevel().ordinal(), inj1.getLevel().ordinal()))
             .forEachOrdered(inj -> {
                 panel.add(genWrittenText(Utilities.capitalize(inj.getLocation().readableName), false));
-                GregorianCalendar now = c.getCalendar();
+                GregorianCalendar now = (GregorianCalendar) c.getCalendar().clone();
                 now.add(Calendar.DAY_OF_YEAR, - inj.getOriginalTime());
                 JLabel injLabel = null;
                 if(inj.isPermanent() || (inj.getTime() <= 0)) {
@@ -297,7 +323,7 @@ public class MedicalViewDialog extends JDialog {
                         inj.getType().getSimpleName(), DATE_FORMAT.format(now.getTime()), genTimePeriod(inj.getTime())),
                         false);
                 }
-                injLabel.addMouseListener(new InjuryLabelMouseAdapter(injLabel, inj));
+                injLabel.addMouseListener(new InjuryLabelMouseAdapter(injLabel, p, inj));
                 panel.add(injLabel);
             });
         
@@ -346,10 +372,12 @@ public class MedicalViewDialog extends JDialog {
     
     private static class InjuryLabelMouseAdapter extends MouseAdapter {
         private final JLabel label;
+        private final Person person;
         private final Injury injury;
 
-        public InjuryLabelMouseAdapter(JLabel label, Injury injury) {
+        public InjuryLabelMouseAdapter(JLabel label, Person person, Injury injury) {
             this.label = label;
+            this.person = person;
             this.injury = injury;
         }
         
@@ -375,8 +403,18 @@ public class MedicalViewDialog extends JDialog {
                 header.setFont(UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.BOLD));
                 popup.add(header);
                 popup.addSeparator();
-                popup.add(new JMenuItem("Edit ..."));
-                popup.add(new JMenuItem("Remove"));
+                JMenuItem edit = new JMenuItem("Edit ...", UIManager.getIcon("FileView.fileIcon"));
+                popup.add(edit);
+                JMenuItem remove = new JMenuItem("Remove");
+                remove.addActionListener(ae -> {
+                    person.removeInjury(injury);
+                    //Dimension size = label.getRootPane().getParent().getSize();
+                    //size.width += 100;
+                    //label.getRootPane().getParent().setSize(size);
+                    label.getRootPane().getParent().revalidate();
+                    //label.getRootPane().getParent().repaint();
+                });
+                popup.add(remove);
                 popup.setMinimumSize(new Dimension(160, 0));
                 popup.show(e.getComponent(), e.getX() - 160, e.getY() - 10);
             }

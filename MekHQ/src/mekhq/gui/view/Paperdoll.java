@@ -134,6 +134,10 @@ public class Paperdoll extends Component {
         }
     }
     
+    public void clearLocColors() {
+        locColors.clear();
+    }
+    
     @Override
     public void paint(Graphics g) {
         final Graphics2D g2 = (Graphics2D) g;
