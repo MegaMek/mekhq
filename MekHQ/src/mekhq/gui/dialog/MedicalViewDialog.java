@@ -157,7 +157,7 @@ public class MedicalViewDialog extends JDialog {
                     .forEach(it -> {
                         IntStream.range(1, it.getMaxSeverity() + 1).forEach(severity -> {
                         JMenuItem add = new JMenuItem("... " + it.getSimpleName(severity));
-                        add.setActionCommand(it.getId() + "," + severity);
+                        add.setActionCommand(it.getKey() + "," + severity);
                         add.addActionListener(addActionListener);
                         addMenu.add(add);
                     });
@@ -272,6 +272,7 @@ public class MedicalViewDialog extends JDialog {
         doll = person.isMale() ? defaultMaleDoll : defaultFemaleDoll;
         doll.clearLocColors();
         doll.clearLocTags();
+        doll.setHighlightColor(new Color(127, 170, 255));
         person.getInjuries().stream().forEach(inj ->
         {
             Color col;

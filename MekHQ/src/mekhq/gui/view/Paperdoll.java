@@ -21,6 +21,7 @@ package mekhq.gui.view;
 import java.awt.AWTEvent;
 import java.awt.AWTEventMulticaster;
 import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -28,6 +29,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.MediaTracker;
+import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -81,7 +83,9 @@ public class Paperdoll extends Component {
     private Map<BodyLocation, Color> locColors;
     private Map<BodyLocation, Map<String, Image>> locOverlays;
     private Map<BodyLocation, String> locTags;
+    private Color highlightColor;
 
+    private transient BodyLocation hoverLoc;
     private transient double scale;
     
     public Paperdoll(InputStream is) {
@@ -96,7 +100,9 @@ public class Paperdoll extends Component {
             MekHQ.logError(ex);
         }
         
-        enableEvents(AWTEvent.MOUSE_EVENT_MASK);
+        highlightColor = null;
+        
+        enableEvents(AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK);
     }
     
     public void loadShapeData(InputStream is) throws JAXBException {
@@ -174,6 +180,17 @@ public class Paperdoll extends Component {
         locTags.clear();
     }
     
+    public Color getHighlightColor() {
+        return highlightColor;
+    }
+    
+    public void setHighlightColor(Color highlightColor) {
+        if(!Objects.equals(this.highlightColor, highlightColor)) {
+            invalidate();
+        }
+        this.highlightColor = highlightColor;
+    }
+    
     @Override
     public void paint(Graphics g) {
         final Graphics2D g2 = (Graphics2D) g;
@@ -207,6 +224,20 @@ public class Paperdoll extends Component {
                 g2.fill(overlay);
             });
         g2.setComposite(AlphaComposite.SrcOver);
+        
+        if((null != highlightColor) && (null != hoverLoc) && locShapes.containsKey(hoverLoc)) {
+            g2.setPaint(highlightColor);
+            g2.setStroke(new BasicStroke(5f));
+            g2.draw(locShapes.get(hoverLoc));
+        }
+    }
+    
+    public BodyLocation locationUnderPoint(double x, double y) {
+        final double scaledX = x / scale;
+        final double scaledY = y / scale;
+        return locShapes.entrySet().stream()
+            .filter(entry -> entry.getValue().contains(scaledX, scaledY)).findAny()
+            .map(entry -> entry.getKey()).orElse(BodyLocation.GENERIC);
     }
     
     @Override
@@ -226,15 +257,21 @@ public class Paperdoll extends Component {
     public void processEvent(AWTEvent e) {
         if(e instanceof MouseEvent) {
             final MouseEvent event = (MouseEvent) e;
+            if((event.getID() == MouseEvent.MOUSE_MOVED) || (event.getID() == MouseEvent.MOUSE_ENTERED)) {
+                BodyLocation oldHoverLoc = hoverLoc;
+                hoverLoc = locationUnderPoint(event.getX(), event.getY());
+                if(oldHoverLoc != hoverLoc) {
+                    repaint();
+                }
+            }
+            if(event.getID() == MouseEvent.MOUSE_EXITED) {
+                hoverLoc = null;
+                repaint();
+            }
             if(event.getButton() == MouseEvent.BUTTON1) {
                 if(event.getID() == MouseEvent.MOUSE_CLICKED) {
-                    if(null != listener) {
-                        final int x = (int) Math.round(event.getX() / scale);
-                        final int y = (int) Math.round(event.getY() / scale);
-                        BodyLocation loc = locShapes.entrySet().stream()
-                            .filter(entry -> entry.getValue().contains(x, y)).findAny()
-                            .map(entry -> entry.getKey()).orElse(BodyLocation.GENERIC);
-                        ActionEvent myEvent = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, loc.toString());
+                    if((null != listener) && (null != hoverLoc)) {
+                        ActionEvent myEvent = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, hoverLoc.toString());
                         listener.actionPerformed(myEvent);
                     }
                 }
