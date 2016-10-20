@@ -98,6 +98,7 @@
 			<p>67.50,202.44</p>
 			<p>67.56,193.50</p>
 		</path>
+		<image tag="lost">data/images/misc/paperdoll/female_lost_right_arm.png</image>
 	</loc>
 	<loc type="LEFT_ARM">
 		<path>
@@ -124,6 +125,7 @@
 			<p>181.00,201.67</p>
 			<p>181.33,192.33</p>
 		</path>
+		<image tag="lost">data/images/misc/paperdoll/female_lost_left_arm.png</image>
 	</loc>
 	<loc type="ABDOMEN">
 		<path>
@@ -174,6 +176,7 @@
 			<p>25.50,395.75</p>
 			<p>37.50,397.75</p>
 		</path>
+		<image tag="lost">data/images/misc/paperdoll/female_lost_right_hand.png</image>
 	</loc>
 	<loc type="LEFT_HAND">
 		<path>
@@ -202,6 +205,7 @@
 			<p>224.25,400.00</p>
 			<p>212.00,402.00</p>
 		</path>
+		<image tag="lost">data/images/misc/paperdoll/female_lost_left_hand.png</image>
 	</loc>
 	<loc type="RIGHT_LEG">
 		<path>
@@ -232,6 +236,7 @@
 			<p>121.00,455.67</p>
 			<p>121.67,424.67</p>
 		</path>
+		<image tag="lost">data/images/misc/paperdoll/female_lost_right_leg.png</image>
 	</loc>
 	<loc type="LEFT_LEG">
 		<path>
@@ -262,6 +267,7 @@
 			<p>196.25,374.00</p>
 			<p>126.75,399.75</p>
 		 </path>
+		<image tag="lost">data/images/misc/paperdoll/female_lost_left_leg.png</image>
 	</loc>
 	<loc type="RIGHT_FOOT">
 		<path>
@@ -286,6 +292,7 @@
 			<p>96.00,711.00</p>
 			<p>111.33,711.00</p>
 		 </path>
+		<image tag="lost">data/images/misc/paperdoll/female_lost_right_foot.png</image>
 	</loc>
 	<loc type="LEFT_FOOT">
 		<path>
@@ -308,5 +315,6 @@
 			<p>135.13,725.13</p>
 			<p>134.63,718.25</p>
 		 </path>
+		<image tag="lost">data/images/misc/paperdoll/female_lost_left_foot.png</image>
 	</loc>
 </overlays>
