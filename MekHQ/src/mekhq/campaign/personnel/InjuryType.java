@@ -181,6 +181,10 @@ public class InjuryType {
     }
     
     public String getSimpleName() {
+        return getSimpleName(1);
+    }
+    
+    public String getSimpleName(int severity) {
         return simpleName;
     }
     

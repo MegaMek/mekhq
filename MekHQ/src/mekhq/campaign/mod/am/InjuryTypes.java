@@ -107,6 +107,7 @@ public final class InjuryTypes {
             recoveryTime = 180;
             allowedLocations = EnumSet.of(BodyLocation.CHEST, BodyLocation.ABDOMEN);
             permanent = true;
+            fluffText = "A severed spine";
             simpleName = "severed spine";
             level = InjuryLevel.CHRONIC;
         }
@@ -326,6 +327,15 @@ public final class InjuryTypes {
         }
 
         @Override
+        public String getSimpleName(int severity) {
+            switch(severity) {
+                case 2: return "internal bleeding (severe)";
+                case 3: return "internal bleeding (critical)";
+                default: return "internal bleeding";
+            }
+        }
+
+        @Override
         public List<GameEffect> genStressEffect(Campaign c, Person p, Injury i, int hits) {
             String secondEffectFluff = (i.getHits() < 3)
                 ? "internal bleeding worsening" : "death";
@@ -481,7 +491,6 @@ public final class InjuryTypes {
             recoveryTime = 14;
             allowedLocations = EnumSet.of(BodyLocation.HEAD);
             maxSeverity = 2;
-            simpleName = "concussion";
             fluffText = "A concussion";
         }
     
@@ -493,6 +502,11 @@ public final class InjuryTypes {
         @Override
         public InjuryLevel getLevel(Injury i) {
             return (i.getHits() > 1) ? InjuryLevel.MAJOR : InjuryLevel.MINOR;
+        }
+        
+        @Override
+        public String getSimpleName(int severity) {
+            return ((severity == 1) ? "concussion" : "concussion (severe)");
         }
         
         @Override

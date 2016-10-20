@@ -43,6 +43,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.stream.IntStream;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -51,6 +52,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -67,6 +69,7 @@ import mekhq.campaign.ExtraData;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.BodyLocation;
 import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.view.Paperdoll;
 
@@ -140,8 +143,30 @@ public class MedicalViewDialog extends JDialog {
                 popup.add(header);
                 popup.addSeparator();
             }
-            JMenuItem edit = new JMenuItem("New injury ...", UIManager.getIcon("FileView.fileIcon"));
-            popup.add(edit);
+            if(locationPicked) {
+                ActionListener addActionListener = addEvent -> {
+                    String[] commands = addEvent.getActionCommand().split(",", 2);
+                    InjuryType addIType = InjuryType.byKey(commands[0]);
+                    int severity = Integer.valueOf(commands[1]);
+                    person.addInjury(addIType.newInjury(campaign, person, loc, severity));
+                    revalidate();
+                };
+                JMenu addMenu = new JMenu("Add ...");
+                InjuryType.getAllTypes().stream().filter(it -> it.isValidInLocation(loc))
+                    .sorted((it1, it2) -> it1.getSimpleName().compareToIgnoreCase(it2.getSimpleName()))
+                    .forEach(it -> {
+                        IntStream.range(1, it.getMaxSeverity() + 1).forEach(severity -> {
+                        JMenuItem add = new JMenuItem("... " + it.getSimpleName(severity));
+                        add.setActionCommand(it.getId() + "," + severity);
+                        add.addActionListener(addActionListener);
+                        addMenu.add(add);
+                    });
+                });
+                popup.add(addMenu);
+            } else {
+                JMenuItem edit = new JMenuItem("New injury ...", UIManager.getIcon("FileView.fileIcon"));
+                popup.add(edit);
+            }
             JMenuItem remove = new JMenuItem(loc.readableName.isEmpty() ? "Heal all" : "Heal", healImageIcon);
             if(locationPicked && p.getInjuriesByLocation(loc).isEmpty()) {
                 remove.setEnabled(false);
