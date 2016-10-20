@@ -41,6 +41,7 @@ import java.util.Vector;
 import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
 
+import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -1577,6 +1578,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                         }
                         retVal.injuries.add(Injury.generateInstanceFromXML(wn3));
                     }
+                    DateTime now = new DateTime(c.getCalendar());
+                    retVal.injuries.stream().filter(inj -> (null == inj.getStart()))
+                        .forEach(inj -> inj.setStart(now.minusDays(inj.getOriginalTime() - inj.getTime())));
                 } else if (wn2.getNodeName().equalsIgnoreCase("founder")) {
                     retVal.founder = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitWeight")) {

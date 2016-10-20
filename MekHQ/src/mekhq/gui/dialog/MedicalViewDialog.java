@@ -60,6 +60,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 
+import org.joda.time.chrono.GJChronology;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
 import mekhq.MekHQ;
@@ -76,6 +80,8 @@ import mekhq.gui.view.Paperdoll;
 public class MedicalViewDialog extends JDialog {
     private static final long serialVersionUID = 6178230374580087883L;
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private final static DateTimeFormatter DATE_FORMATTER =
+        DateTimeFormat.forPattern("yyyy-MM-dd").withChronology(GJChronology.getInstanceUTC());
 
     private static final ExtraData.Key<String> DOCTOR_NOTES = new ExtraData.StringKey("doctor_notes");
 
@@ -415,10 +421,10 @@ public class MedicalViewDialog extends JDialog {
                 JLabel injLabel = null;
                 if(inj.isPermanent() || (inj.getTime() <= 0)) {
                     injLabel = genWrittenText(String.format("%s - %s",
-                        inj.getType().getSimpleName(), DATE_FORMAT.format(now.getTime())));
+                        inj.getType().getSimpleName(), inj.getStart().toString(DATE_FORMATTER)));
                 } else {
                     injLabel = genWrittenText(String.format("%s - %s - est. %s left",
-                        inj.getType().getSimpleName(), DATE_FORMAT.format(now.getTime()), genTimePeriod(inj.getTime())));
+                        inj.getType().getSimpleName(), inj.getStart().toString(DATE_FORMATTER), genTimePeriod(inj.getTime())));
                 }
                 if(isGMMode()) {
                     injLabel.addMouseListener(new InjuryLabelMouseAdapter(injLabel, p, inj));

@@ -32,6 +32,8 @@ import java.util.Set;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.joda.time.DateTime;
+
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.GameEffect;
@@ -208,6 +210,7 @@ public class InjuryType {
         final String fluff = getFluffText(loc, severity, p.getGender());
         Injury result = new Injury(recoveryTime, fluff, loc, this, severity, false);
         result.setVersion(Injury.VERSION);
+        result.setStart(new DateTime(c.getCalendar()));
         return result;
     }
     

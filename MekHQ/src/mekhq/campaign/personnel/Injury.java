@@ -36,11 +36,14 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.adapter.DateAdapter;
 import mekhq.campaign.ExtraData;
 import mekhq.campaign.mod.am.InjuryTypes;
 
@@ -84,6 +87,8 @@ public class Injury {
     private String fluff;
     private int days;
     private int originalDays;
+    @XmlJavaTypeAdapter(DateAdapter.class)
+    private DateTime start;
     /** 0 = past injury, for scars, 1 = default, max depends on type */
     private int hits;
     private BodyLocation location;
@@ -140,6 +145,14 @@ public class Injury {
     // End UUID Control Methods
     
     // Time Control Methods
+    public DateTime getStart() {
+        return start;
+    }
+    
+    public void setStart(DateTime start) {
+        this.start = Objects.requireNonNull(start);
+    }
+    
     public int getTime() {
         return days;
     }

@@ -88,6 +88,7 @@ public class Paperdoll extends Component {
     private transient BodyLocation hoverLoc;
     private transient double scale;
     
+    // TODO: Make this work with any enum, not just BodyLocation
     public Paperdoll(InputStream is) {
         locShapes = new EnumMap<>(BodyLocation.class);
         locColors = new EnumMap<>(BodyLocation.class);
