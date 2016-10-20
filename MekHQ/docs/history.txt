@@ -13,6 +13,9 @@ v0.41.25 (2016-10-15 14:40 UTC)
 + Issue #77: Dropship refit time never decreases
 + Issue #136: 2x C3 Master Mechs not working properly
 + Updated MegaMek.jar and MegaMekLab.jar to 0.41.25
++ Issue #103: Dragoon Rating (FMM:Rev) Decreases as Dropship Carrying Capacity is Used.
++ Converted Interstellar Ops Beta Unit Rating to Campaign Ops Unit Rating to match the released version of the rules.
++ Added additional details to both the Dragoons and Campaign Ops Unit rating reports.
 
 v0.41.24 (2016-10-06 03:15 UTC)
 + Issue #170: MHQ Unable to Resolve Space Battle with Fighter Squadrons

@@ -989,6 +989,11 @@ public class Campaign implements Serializable {
         return units;
     }
 
+    // Since getUnits doesn't return a defensive copy and I don't know what I might break if I made it do so...
+    public ArrayList<Unit> getCopyOfUnits() {
+        return new ArrayList<>(units);
+    }
+
     public ArrayList<Entity> getEntities() {
         ArrayList<Entity> entities = new ArrayList<Entity>();
         for (Unit unit : getUnits()) {
@@ -6329,7 +6334,7 @@ public class Campaign implements Serializable {
 
     public int getNumberMedics() {
         int medics = medicPool;
-        for (Person p : personnel) {
+        for (Person p : getPersonnel()) {
             if ((p.getPrimaryRole() == Person.T_MEDIC || p.getSecondaryRole() == Person.T_MEDIC)
                 && p.isActive() && !p.isDeployed()) {
                 medics++;

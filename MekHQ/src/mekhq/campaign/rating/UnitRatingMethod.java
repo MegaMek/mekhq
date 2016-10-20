@@ -26,11 +26,12 @@ package mekhq.campaign.rating;
  * @since 9/24/2013
  */
 public enum UnitRatingMethod {
-    INTERSTELLAR_OPS("Interstellar Ops", new String[]{"Taharqa"}),
+    CAMPAIGN_OPS("Campaign Ops", new String[]{"Taharqa", "Interstellar Ops"}),
     FLD_MAN_MERCS_REV("FM: Mercenaries (rev)", new String[]{"FM: Mercenaries (rev)"});
 
     private String description;
-    private String[] legacyDescriptions; // Old 'Taharqa' rating method renamed to Stellar Ops.  This property exists for backwards compatability.
+    private String[] legacyDescriptions; // Old 'Taharqa' and 'Interstellar Ops' rating methods renamed to Campaign Ops.
+    // This property exists for backwards compatibility.
 
     UnitRatingMethod(String description, String[] legacyDescriptions) {
         this.description = description;
