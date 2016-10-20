@@ -31,8 +31,11 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 public enum BodyLocation {
     HEAD(0, "head"), LEFT_LEG(1, "left leg", true), LEFT_ARM(2, "left arm", true),
     CHEST(3, "chest"), ABDOMEN(4, "abdomen"), RIGHT_ARM(5, "right arm", true), RIGHT_LEG(6, "right leg", true),
-    INTERNAL(7, "innards"), LEFT_HAND(8, "left hand", true), RIGHT_HAND(9, "right hand", true),
-    LEFT_FOOT(10, "left foot", true), RIGHT_FOOT(11, "right foot", true), GENERIC(-1, "");
+    INTERNAL(7, "innards"),
+    LEFT_HAND(8, "left hand", true, LEFT_ARM),
+    RIGHT_HAND(9, "right hand", true, RIGHT_ARM),
+    LEFT_FOOT(10, "left foot", true, LEFT_LEG),
+    RIGHT_FOOT(11, "right foot", true, RIGHT_LEG), GENERIC(-1, "");
 
     // Initialize by-id array lookup table
     private static BodyLocation[] idMap;

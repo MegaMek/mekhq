@@ -41,9 +41,15 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.TreeMap;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -73,6 +79,7 @@ import mekhq.campaign.ExtraData;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.BodyLocation;
 import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.InjuryLevel;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.view.Paperdoll;
@@ -278,36 +285,39 @@ public class MedicalViewDialog extends JDialog {
         doll = person.isMale() ? defaultMaleDoll : defaultFemaleDoll;
         doll.clearLocColors();
         doll.clearLocTags();
-        doll.setHighlightColor(new Color(127, 170, 255));
-        person.getInjuries().stream().forEach(inj ->
-        {
-            Color col;
-            switch(inj.getLevel()) {
-                case CHRONIC:
-                    col =  new Color(255, 204, 255);
-                    break;
-                case DEADLY:
-                    col = Color.RED;
-                    break;
-                case MAJOR:
-                    col = Color.ORANGE;
-                    break;
-                case MINOR:
-                    col = Color.YELLOW;
-                    break;
-                case NONE:
-                    col = Color.WHITE;
-                    break;
-                default:
-                    col = Color.WHITE;
-                    break;
-                
-            }
-            doll.setLocColor(inj.getLocation(), col);
-            if(inj.getType().impliesMissingLocation(inj.getLocation())) {
-                doll.setLocTag(inj.getLocation(), "lost");
-            }
-        });
+        doll.setHighlightColor(new Color(170, 170, 255));
+        Arrays.stream(BodyLocation.values())
+            .filter(bl -> p.hasInjury(bl))
+            .forEach(bl -> {
+                if(person.isLocationMissing(bl) && !person.isLocationMissing(bl.parent)) {
+                    doll.setLocTag(bl, "lost");
+                } else if(!person.isLocationMissing(bl)) {
+                    InjuryLevel level = getMaxInjuryLevel(person, bl);
+                    Color col;
+                    switch(level) {
+                        case CHRONIC:
+                            col =  new Color(255, 204, 255);
+                            break;
+                        case DEADLY:
+                            col = Color.RED;
+                            break;
+                        case MAJOR:
+                            col = Color.ORANGE;
+                            break;
+                        case MINOR:
+                            col = Color.YELLOW;
+                            break;
+                        case NONE:
+                            col = Color.WHITE;
+                            break;
+                        default:
+                            col = Color.WHITE;
+                            break;
+                        
+                    }
+                    doll.setLocColor(bl, col);
+                }
+            });
         if(isGMMode()) {
             doll.addActionListener(dollActionListener);
         }
@@ -406,39 +416,66 @@ public class MedicalViewDialog extends JDialog {
         return panel;
     }
     
+    /** Get the maximum injury level in the specified location */
+    private InjuryLevel getMaxInjuryLevel(Person p, BodyLocation loc) {
+        return p.getInjuries().stream().filter(inj -> !inj.isHidden() && (inj.getLocation() == loc))
+            .sorted((inj1, inj2) -> Integer.compare(inj2.getLevel().ordinal(), inj1.getLevel().ordinal()))
+            .findFirst().map(Injury::getLevel).orElse(InjuryLevel.NONE);
+    }
+    
+    /** Compiles a list of body locations stream ordered by the maximum injury level in that location */ 
+    private Stream<BodyLocation> maxInjurylevelLocationStream(Person p) {
+        Map<BodyLocation, InjuryLevel> levelMap = new HashMap<>();
+        Arrays.stream(BodyLocation.values())
+            .filter(bl -> p.hasInjury(bl))
+            .forEach(bl -> {
+                levelMap.put(bl, getMaxInjuryLevel(p, bl));
+            });
+        return levelMap.entrySet().stream().sorted((entry1, entry2) ->
+            Integer.compare(entry2.getValue().ordinal(), entry1.getValue().ordinal())
+        ).map(Map.Entry::getKey);
+    }
+    
     private JPanel fillInjuries(JPanel panel, Campaign c, Person p) {
         panel.removeAll();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.add(genLabel("Injuries"));
         
-        p.getInjuries().stream().filter(inj -> !inj.isHidden())
-            .sorted((inj1, inj2) -> Integer.compare(inj2.getLevel().ordinal(), inj1.getLevel().ordinal()))
-            .forEachOrdered(inj -> {
-                panel.add(genWrittenText(Utilities.capitalize(inj.getLocation().readableName)));
-                GregorianCalendar now = (GregorianCalendar) c.getCalendar().clone();
-                now.add(Calendar.DAY_OF_YEAR, - inj.getOriginalTime());
-                JLabel injLabel = null;
-                if(inj.isPermanent() || (inj.getTime() <= 0)) {
-                    injLabel = genWrittenText(String.format("%s - %s",
-                        inj.getType().getSimpleName(), inj.getStart().toString(DATE_FORMATTER)));
-                } else {
-                    injLabel = genWrittenText(String.format("%s - %s - est. %s left",
-                        inj.getType().getSimpleName(), inj.getStart().toString(DATE_FORMATTER), genTimePeriod(inj.getTime())));
-                }
-                if(isGMMode()) {
-                    injLabel.addMouseListener(new InjuryLabelMouseAdapter(injLabel, p, inj));
-                }
-                
-                JPanel wrapper = new JPanel();
-                wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.X_AXIS));
-                wrapper.setOpaque(false);
-                wrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
-                wrapper.add(Box.createHorizontalStrut(30));
-                wrapper.add(injLabel);
-                
-                panel.add(wrapper);
-            });
+        maxInjurylevelLocationStream(p).forEachOrdered(bl -> {
+            JPanel blWrapper = new JPanel();
+            blWrapper.setLayout(new BoxLayout(blWrapper, BoxLayout.X_AXIS));
+            blWrapper.setOpaque(false);
+            blWrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
+            blWrapper.add(Box.createHorizontalStrut(30));
+            blWrapper.add(genWrittenText(Utilities.capitalize(bl.readableName)));
+            panel.add(blWrapper);
+            
+            p.getInjuriesByLocation(bl).stream()
+                .sorted((inj1, inj2) -> Integer.compare(inj2.getLevel().ordinal(), inj1.getLevel().ordinal()))
+                .forEachOrdered(inj -> {
+                    JLabel injLabel = null;
+                    if(inj.isPermanent() || (inj.getTime() <= 0)) {
+                        injLabel = genWrittenText(String.format("%s - %s",
+                            inj.getType().getSimpleName(), inj.getStart().toString(DATE_FORMATTER)));
+                    } else {
+                        injLabel = genWrittenText(String.format("%s - %s - est. %s left",
+                            inj.getType().getSimpleName(), inj.getStart().toString(DATE_FORMATTER), genTimePeriod(inj.getTime())));
+                    }
+                    if(isGMMode()) {
+                        injLabel.addMouseListener(new InjuryLabelMouseAdapter(injLabel, p, inj));
+                    }
+                    
+                    JPanel wrapper = new JPanel();
+                    wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.X_AXIS));
+                    wrapper.setOpaque(false);
+                    wrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
+                    wrapper.add(Box.createHorizontalStrut(60));
+                    wrapper.add(injLabel);
+                    
+                    panel.add(wrapper);
+                });
+        });
         
         return panel;
     }

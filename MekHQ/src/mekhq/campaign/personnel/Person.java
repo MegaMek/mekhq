@@ -3257,12 +3257,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         hitsPerLocation.put(location, getHitsInLocation(location) + 1);
     }
 
+    public boolean hasInjury(BodyLocation loc) {
+        return (null != getInjuryByLocation(loc));
+    }
+    
     public boolean hasInjury(BodyLocation loc, InjuryType type) {
-        if (getInjuryByLocationAndType(loc, type) != null) {
-            return true;
-        } else {
-            return false;
-        }
+        return (null != getInjuryByLocationAndType(loc, type));
     }
 
     @Override
@@ -3351,23 +3351,23 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
 
     public List<Injury> getInjuriesByLocation(BodyLocation loc) {
-        return getInjuries().stream()
+        return injuries.stream()
             .filter((i) -> (i.getLocation() == loc)).collect(Collectors.toList());
     }
 
     // Returns only the first injury in a location
     public Injury getInjuryByLocation(BodyLocation loc) {
-        return getInjuries().stream()
+        return injuries.stream()
             .filter((i) -> (i.getLocation() == loc)).findFirst().orElse(null);
     }
 
     public Injury getInjuryByType(InjuryType t) {
-        return getInjuries().stream()
+        return injuries.stream()
             .filter((i) -> (i.getType() == t)).findFirst().orElse(null);
     }
 
     public Injury getInjuryByLocationAndType(BodyLocation loc, InjuryType t) {
-        return getInjuries().stream()
+        return injuries.stream()
             .filter((i) -> (i.getLocation() == loc) && (i.getType() == t)).findFirst().orElse(null);
     }
 
