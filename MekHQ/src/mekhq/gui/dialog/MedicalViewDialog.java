@@ -246,6 +246,7 @@ public class MedicalViewDialog extends JDialog {
         }
         doll = person.isMale() ? defaultMaleDoll : defaultFemaleDoll;
         doll.clearLocColors();
+        doll.clearLocTags();
         person.getInjuries().stream().forEach(inj ->
         {
             Color col;
@@ -270,8 +271,10 @@ public class MedicalViewDialog extends JDialog {
                     break;
                 
             }
-            
             doll.setLocColor(inj.getLocation(), col);
+            if(inj.getType().impliesMissingLocation(inj.getLocation())) {
+                doll.setLocTag(inj.getLocation(), "lost");
+            }
         });
         if(isGMMode()) {
             doll.addActionListener(dollActionListener);

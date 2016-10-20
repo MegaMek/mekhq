@@ -38,10 +38,13 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import javax.xml.bind.JAXBContext;
@@ -53,6 +56,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -73,14 +77,18 @@ public class Paperdoll extends Component {
     private transient ActionListener listener;
     
     private Image base;
-    private Map<BodyLocation, Path2D> locOverlays;
+    private Map<BodyLocation, Path2D> locShapes;
     private Map<BodyLocation, Color> locColors;
+    private Map<BodyLocation, Map<String, Image>> locOverlays;
+    private Map<BodyLocation, String> locTags;
 
     private transient double scale;
     
     public Paperdoll(InputStream is) {
-        locOverlays = new EnumMap<>(BodyLocation.class);
+        locShapes = new EnumMap<>(BodyLocation.class);
         locColors = new EnumMap<>(BodyLocation.class);
+        locOverlays = new EnumMap<>(BodyLocation.class);
+        locTags = new EnumMap<>(BodyLocation.class);
         
         try {
             loadShapeData(is);
@@ -97,7 +105,18 @@ public class Paperdoll extends Component {
         OverlayLocDataList dataList = (OverlayLocDataList) unmarshaller.unmarshal(is);
         if(null != dataList.locs) {
             dataList.locs.forEach(data -> {
-                locOverlays.put(data.loc, data.genPath());
+                locShapes.put(data.loc, data.genPath());
+                if(null != data.overlayImages) {
+                    data.overlayImages.forEach(imgSpec -> {
+                        Map<String, Image> overlayMap = locOverlays.get(data.loc);
+                        if(null == overlayMap) {
+                            overlayMap = new HashMap<>();
+                            locOverlays.put(data.loc, overlayMap);
+                        }
+                        Image img = Toolkit.getDefaultToolkit().createImage(imgSpec.image);
+                        overlayMap.put(imgSpec.tag, img);
+                    });
+                }
             });
         }
         if((null != dataList.base) && !dataList.base.isEmpty()) {
@@ -118,9 +137,9 @@ public class Paperdoll extends Component {
     public void setLocShape(BodyLocation loc, Path2D path) {
         Objects.requireNonNull(loc);
         if(null != path) {
-            locOverlays.put(loc, (Path2D) path.clone());
+            locShapes.put(loc, (Path2D) path.clone());
         } else {
-            locOverlays.remove(loc);
+            locShapes.remove(loc);
         }
         invalidate();
     }
@@ -134,8 +153,25 @@ public class Paperdoll extends Component {
         }
     }
     
+    public void setLocTag(BodyLocation loc, String tag) {
+        Objects.requireNonNull(loc);
+        String oldTag = locTags.get(loc);
+        if(null == tag) {
+            locTags.remove(loc);
+        } else {
+            locTags.put(loc, tag);
+        }
+        if(!Objects.equals(tag, oldTag)) {
+            invalidate();
+        }
+    }
+    
     public void clearLocColors() {
         locColors.clear();
+    }
+    
+    public void clearLocTags() {
+        locTags.clear();
     }
     
     @Override
@@ -147,12 +183,25 @@ public class Paperdoll extends Component {
         final int imgWidth = base.getWidth(null);
         final int imgHeight = base.getHeight(null);
         scale = Math.min(getWidth() * 1.0 / imgWidth, getHeight() * 1.0 / imgHeight);
-        g2.drawImage(base, 0, 0, (int) Math.round(imgWidth * scale), (int) Math.round(imgHeight * scale), this);
+        final int scaledWidth = (int) Math.round(imgWidth * scale);
+        final int scaledHeight = (int) Math.round(imgHeight * scale);
+        g2.drawImage(base, 0, 0, scaledWidth, scaledHeight, this);
+        // Check for image overlays first, and record what we have drawn
+        Set<BodyLocation> drawnOverlays = EnumSet.noneOf(BodyLocation.class);
+        locTags.entrySet().stream().filter(Objects::nonNull)
+            .filter(entry -> ((null != entry.getValue()) && locOverlays.containsKey(entry.getKey())
+                && locOverlays.get(entry.getKey()).containsKey(entry.getValue())))
+            .forEach(entry -> {
+                final Image image = locOverlays.get(entry.getKey()).get(entry.getValue());
+                g2.drawImage(image, 0, 0, scaledWidth, scaledHeight, this);
+                drawnOverlays.add(entry.getKey());
+            });
         g2.scale(scale, scale);
         locColors.entrySet().stream().filter(Objects::nonNull)
-            .filter(entry -> ((null != entry.getValue()) && locOverlays.containsKey(entry.getKey())))
+            .filter(entry -> ((null != entry.getValue()) && locShapes.containsKey(entry.getKey())
+                && !drawnOverlays.contains(entry.getKey())))
             .forEach(entry -> {
-                final Path2D overlay = locOverlays.get(entry.getKey());
+                final Path2D overlay = locShapes.get(entry.getKey());
                 g2.setPaint(entry.getValue());
                 g2.setComposite(MultiplyComposite.INSTANCE);
                 g2.fill(overlay);
@@ -182,7 +231,7 @@ public class Paperdoll extends Component {
                     if(null != listener) {
                         final int x = (int) Math.round(event.getX() / scale);
                         final int y = (int) Math.round(event.getY() / scale);
-                        BodyLocation loc = locOverlays.entrySet().stream()
+                        BodyLocation loc = locShapes.entrySet().stream()
                             .filter(entry -> entry.getValue().contains(x, y)).findAny()
                             .map(entry -> entry.getKey()).orElse(BodyLocation.GENERIC);
                         ActionEvent myEvent = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, loc.toString());
@@ -211,8 +260,8 @@ public class Paperdoll extends Component {
         @XmlElementWrapper(name="path")
         @XmlJavaTypeAdapter(XMLPoint2DAdapter.class)
         public List<Point2D> path;
-        @XmlAttribute(name="missing")
-        public String missingImageOverlay;
+        @XmlElement(name="image")
+        public List<OverlayLocImage> overlayImages;
         
         public Path2D genPath() {
             Path2D result = new Path2D.Float();
@@ -224,6 +273,13 @@ public class Paperdoll extends Component {
             }
             return result;
         }
+    }
+    
+    public static class OverlayLocImage {
+        @XmlAttribute
+        public String tag;
+        @XmlValue
+        public String image;
     }
     
     private static class XMLPoint2DAdapter extends XmlAdapter<String, Point2D> {
