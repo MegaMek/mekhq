@@ -490,6 +490,7 @@ public class Campaign implements Serializable {
 				}
     		}
     		rm.setSelectedRATs(campaignOptions.getRATs());
+    		rm.setIgnoreRatEra(campaignOptions.canIgnoreRatEra());
     		unitGenerator = rm;    			
 		} else {
 			RATGeneratorConnector rgc = new RATGeneratorConnector(calendar.get(Calendar.YEAR));

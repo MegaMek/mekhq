@@ -233,6 +233,7 @@ public class CampaignOptions implements Serializable {
     private boolean mercSizeLimited;
     private String[] rats = {"Xotl", "Total Warfare"};
     private boolean staticRATs;
+    private boolean ignoreRatEra;
     private int searchRadius;
     private double intensity;
     private boolean variableContractLength;
@@ -1584,6 +1585,14 @@ public class CampaignOptions implements Serializable {
 	public void setStaticRATs(boolean staticRATs) {
 		this.staticRATs = staticRATs;
 	}
+	
+	public boolean canIgnoreRatEra() {
+	    return ignoreRatEra;
+	}
+	
+	public void setIgnoreRatEra(boolean ignore) {
+	    ignoreRatEra = ignore;
+	}
 
 	public int getSearchRadius() {
 		return searchRadius;
@@ -1924,7 +1933,10 @@ public class CampaignOptions implements Serializable {
                 + MekHqXmlUtil.escape(csv)
                 + "</rats>");
         if (staticRATs) {
-        	pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<staticRATs/>");
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<staticRATs/>");
+        }
+        if (ignoreRatEra) {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<ignoreRatEra/>");
         }
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</campaignOptions>");
     }
@@ -2318,7 +2330,9 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("rats")) {
             	retVal.rats = MekHqXmlUtil.unEscape(wn2.getTextContent().trim()).split(",");
             } else if (wn2.getNodeName().equalsIgnoreCase("staticRATs")) {
-            	retVal.staticRATs = true;
+                retVal.staticRATs = true;
+            } else if (wn2.getNodeName().equalsIgnoreCase("ignoreRatEra")) {
+                retVal.ignoreRatEra = true;
             }
         }
 

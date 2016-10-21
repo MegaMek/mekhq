@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.41.26-git
++ Issue #204: AtB generates empty unit markets with traditional RATS
 
 v0.41.25 (2016-10-15 14:40 UTC)
 + Issue #158: Scenario Resolution: ejected+fled pilots lose hits

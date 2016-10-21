@@ -43,7 +43,9 @@ import megamek.common.Compute;
 import megamek.common.EntityWeightClass;
 import megamek.common.MechSummary;
 import megamek.common.UnitType;
+import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
+import mekhq.campaign.event.OptionsChangedEvent;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -69,11 +71,20 @@ public class RATManager implements IUnitGenerator {
 
     private static Map<String,List<Integer>> allCollections = null;
     private static Map<String,String> fileNames = new HashMap<>();
+   
+    private boolean canIgnoreEra = false;
 
     public RATManager() {
         allRATs = new HashMap<>();
         selectedCollections = new ArrayList<>();
         loadAltFactions();
+        MekHQ.EVENT_BUS.register(this);
+    }
+    
+    @Subscribe
+    public void updateRATconfig(OptionsChangedEvent ev) {
+        canIgnoreEra = ev.getOptions().canIgnoreRatEra();
+        setSelectedRATs(ev.getOptions().getRATs());
     }
 
     /**
@@ -114,6 +125,10 @@ public class RATManager implements IUnitGenerator {
      */
     public void removeRAT(String collection) {
         selectedCollections.remove(collection);
+    }
+    
+    public void setIgnoreRatEra(boolean ignore) {
+        canIgnoreEra = ignore;
     }
 
     private boolean loadCollection(String name) {
@@ -323,11 +338,32 @@ public class RATManager implements IUnitGenerator {
                     continue;
                 }
                 for (String f : factionList) {
-                    Optional<RAT> match = allRATs.get(collectionName).get(era).stream()
+                    Optional<RAT> match = collection.get(era).stream()
                             .filter(rat -> rat.matches(f, unitType, weightClass, quality))
                             .findFirst();
                     if (match.isPresent()) {
                         return match.get();
+                    }
+                }
+            }
+        }
+        if (canIgnoreEra) {
+            for (String collectionName : selectedCollections) {
+                Map<Integer,List<RAT>> collection = allRATs.get(collectionName);
+                if (collection == null) {
+                    continue;
+                }
+                List<Integer> eras = new ArrayList<>(collection.keySet());
+                Collections.reverse(eras);
+
+                for (int era : eras) {
+                    for (String f : factionList) {
+                        Optional<RAT> match = collection.get(era).stream()
+                                .filter(rat -> rat.matches(f, unitType, weightClass, quality))
+                                .findFirst();
+                        if (match.isPresent()) {
+                            return match.get();
+                        }
                     }
                 }
             }
