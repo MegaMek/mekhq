@@ -5636,7 +5636,7 @@ public class Campaign implements Serializable {
     }
 
     /**
-     * Use an A* algorithm to find the best path between two planets For right now, we are just going to minimze the number
+     * Use an A* algorithm to find the best path between two planets For right now, we are just going to minimize the number
      * of jumps but we could extend this to take advantage of recharge information or other variables as well Based on
      * http://www.policyalmanac.org/games/aStarTutorial.htm
      *
@@ -5645,14 +5645,16 @@ public class Campaign implements Serializable {
      * @return
      */
     public JumpPath calculateJumpPath(Planet start, Planet end) {
-        String startKey = start.getId();
-        String endKey = end.getId();
-        
-        if (startKey.equals(endKey)) {
+        if(null == start) {
+            return null;
+        }
+        if((null == end) || start.getId().equals(end.getId())) {
             JumpPath jpath = new JumpPath();
             jpath.addPlanet(start);
             return jpath;
         }
+        String startKey = start.getId();
+        String endKey = end.getId();
 
         final DateTime now = Utilities.getDateTimeDay(calendar);
         String current = startKey;
