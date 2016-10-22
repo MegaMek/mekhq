@@ -480,6 +480,9 @@ public class Campaign implements Serializable {
      * changed in campaignOptions.
      */
     public void initUnitGenerator() {
+        if (unitGenerator != null && unitGenerator instanceof RATManager) {
+            MekHQ.EVENT_BUS.unregister(unitGenerator);
+        }
 		if (campaignOptions.useStaticRATs()) {
     		RATManager rm = new RATManager();
     		while (!RandomUnitGenerator.getInstance().isInitialized()) {
