@@ -123,7 +123,6 @@ public class NewsItem {
     }
     
     /** Finalize this news item's date according to its precision, using the supplied seed */
-    @SuppressWarnings("incomplete-switch")
     public void finalizeDate(long seed) {
         if((null == date) || (null == datePrecision) || (datePrecision == Precision.DAY)) {
             return;
