@@ -672,7 +672,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     if(people.length > 1) {
                         question = resourceMap.getString("confirmRemoveMultiple.text"); //$NON-NLS-1$
                     } else {
-                        question = String.format(resourceMap.getString("confirmRemove.text"), people[0].getFullTitle()); //$NON-NLS-1$
+                        question = String.format(resourceMap.getString("confirmRemove.format"), people[0].getFullTitle()); //$NON-NLS-1$
                     }
                     if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(
                             null, question, resourceMap.getString("removeQ.text"), //$NON-NLS-1$
