@@ -647,9 +647,9 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
         if (getBattleArmorTechTeamsNeeded() > getBaTechTeams()) {
             techShortage = true;
         }
-        if ((getProtoTechTeamsNeeded() + getInfantryTechTeamsNeeded()) > getGeneralTechTeams()) {
+        /*if ((getProtoTechTeamsNeeded() + getInfantryTechTeamsNeeded()) > getGeneralTechTeams()) {
             techShortage = true;
-        }
+        }*/
 
         setTotalTechTeams(getMechTechTeams() + getFighterTechTeams() + getVeeTechTeams() + getBaTechTeams() + getGeneralTechTeams());
         int totalTechTeamsNeeded = getMechTechTeamsNeeded() + getFighterTechTeamsNeeded() + getVeeTechTeamsNeeded() +
