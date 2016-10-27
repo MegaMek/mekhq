@@ -356,7 +356,7 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
         setMechTechTeamsNeeded(super.getMechCount());
         setFighterTechTeamsNeeded(super.getFighterCount());
         setProtoTechTeamsNeeded(new BigDecimal(super.getProtoCount()).divide(new BigDecimal(5), 0, RoundingMode.HALF_UP).intValue());
-        setVeeTechTeamsNeeded(getLightVeeCount());
+        setVeeTechTeamsNeeded((getLightVeeCount() + getHeavyVeeCount()));
         setBattleArmorTechTeamsNeeded(new BigDecimal(super.getBattleArmorCount())
                 .divide(new BigDecimal(5), 0, RoundingMode.HALF_UP)
                 .intValue());
@@ -369,7 +369,7 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
         setNonAdminPersonnelCount(0);
         List<Person> personnelList = new ArrayList<>(getCampaign().getPersonnel());
         for (Person p : personnelList) {
-            if (p.isAdmin()) {
+            if (p.isAdmin() || p.isDoctor()) {
                 continue;
             }
             setNonAdminPersonnelCount(getNonAdminPersonnelCount() + 1);
@@ -647,13 +647,13 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
         if (getBattleArmorTechTeamsNeeded() > getBaTechTeams()) {
             techShortage = true;
         }
-        if ((getProtoTechTeamsNeeded() + getInfantryTechTeamsNeeded()) > getGeneralTechTeams()) {
+        /*if ((getProtoTechTeamsNeeded() + getInfantryTechTeamsNeeded()) > getGeneralTechTeams()) {
             techShortage = true;
-        }
+        }*/
 
         setTotalTechTeams(getMechTechTeams() + getFighterTechTeams() + getVeeTechTeams() + getBaTechTeams() + getGeneralTechTeams());
         int totalTechTeamsNeeded = getMechTechTeamsNeeded() + getFighterTechTeamsNeeded() + getVeeTechTeamsNeeded() +
-                                   getBattleArmorTechTeamsNeeded() + getProtoTechTeamsNeeded() + getInfantryTechTeamsNeeded();
+                                   getBattleArmorTechTeamsNeeded()/* + getProtoTechTeamsNeeded() + getInfantryTechTeamsNeeded()*/;
         setSupportPercent(BigDecimal.ZERO);
         if (totalTechTeamsNeeded != 0) {
             setSupportPercent(new BigDecimal(getTotalTechTeams())
