@@ -653,7 +653,7 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
 
         setTotalTechTeams(getMechTechTeams() + getFighterTechTeams() + getVeeTechTeams() + getBaTechTeams() + getGeneralTechTeams());
         int totalTechTeamsNeeded = getMechTechTeamsNeeded() + getFighterTechTeamsNeeded() + getVeeTechTeamsNeeded() +
-                                   getBattleArmorTechTeamsNeeded() + getProtoTechTeamsNeeded() + getInfantryTechTeamsNeeded();
+                                   getBattleArmorTechTeamsNeeded()/* + getProtoTechTeamsNeeded() + getInfantryTechTeamsNeeded()*/;
         setSupportPercent(BigDecimal.ZERO);
         if (totalTechTeamsNeeded != 0) {
             setSupportPercent(new BigDecimal(getTotalTechTeams())
