@@ -369,7 +369,7 @@ public class InterstellarOpsReputation extends AbstractUnitRating {
         setNonAdminPersonnelCount(0);
         List<Person> personnelList = new ArrayList<>(getCampaign().getPersonnel());
         for (Person p : personnelList) {
-            if (p.isAdmin()) {
+            if (p.isAdmin() || p.isDoctor()) {
                 continue;
             }
             setNonAdminPersonnelCount(getNonAdminPersonnelCount() + 1);
