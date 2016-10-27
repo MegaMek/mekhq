@@ -24,14 +24,16 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import megamek.common.ASFBay;
 import megamek.common.BattleArmor;
 import megamek.common.BattleArmorBay;
 import megamek.common.Bay;
 import megamek.common.Dropship;
+import megamek.common.Entity;
 import megamek.common.HeavyVehicleBay;
 import megamek.common.Infantry;
 import megamek.common.InfantryBay;
@@ -39,12 +41,11 @@ import megamek.common.Jumpship;
 import megamek.common.LightVehicleBay;
 import megamek.common.MechBay;
 import megamek.common.SmallCraftBay;
-import megamek.common.TechConstants;
+import megamek.common.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -54,21 +55,24 @@ import mekhq.campaign.unit.Unit;
  */
 public abstract class AbstractUnitRating implements IUnitRating {
 
-    protected static final BigDecimal HUNDRED = new BigDecimal(100);
+    static final int HEADER_LENGTH = 19;
+    static final int SUBHEADER_LENGTH = 23;
+    static final int CATEGORY_LENGTH = 26;
+    static final int SUBCATEGORY_LENGTH = 31;
+
+    static final BigDecimal HUNDRED = new BigDecimal(100);
 
     private Campaign campaign = null;
 
-    protected static final BigDecimal greenThreshold = new BigDecimal("5.5");
-    protected static final BigDecimal regularThreshold = new BigDecimal("4.0");
-    protected static final BigDecimal veteranThreshold = new BigDecimal("2.5");
+    static final BigDecimal greenThreshold = new BigDecimal("5.5");
+    static final BigDecimal regularThreshold = new BigDecimal("4.0");
+    static final BigDecimal veteranThreshold = new BigDecimal("2.5");
 
     private List<Person> commanderList = new ArrayList<>();
     private BigDecimal numberUnits = BigDecimal.ZERO;
-    private BigDecimal numberIS2 = BigDecimal.ZERO;
-    private BigDecimal numberClan = BigDecimal.ZERO;
     private BigDecimal totalSkillLevels = BigDecimal.ZERO;
+    private final Map<String, Integer> skillRatingCounts = new HashMap<>();
     private int mechCount = 0;
-    private int superHeavyMechCount = 0;
     private int protoCount = 0;
     private int fighterCount = 0;
     private int lightVeeCount = 0;
@@ -77,15 +81,11 @@ public abstract class AbstractUnitRating implements IUnitRating {
     private int battleArmorCount = 0;
     private int numberBaSquads = 0;
     private int infantryCount = 0;
-    private int numberInfSquads = 0;
+    private int smallCraftCount = 0;
     private int dropshipCount = 0;
     private int warshipCount = 0;
     private int jumpshipCount = 0;
-    private int numberOther = 0; // Dropships, Jumpships, Warships, etc.
-    private int countIS2 = 0;
-    private int countClan = 0;
     private int mechBayCount = 0;
-    private int superHeavyMechBayCount = 0;
     private int protoBayCount = 0;
     private int fighterBayCount = 0;
     private int smallCraftBayCount = 0;
@@ -103,7 +103,6 @@ public abstract class AbstractUnitRating implements IUnitRating {
     private int failCount = 0;
     private BigDecimal supportPercent = BigDecimal.ZERO;
     private BigDecimal transportPercent = BigDecimal.ZERO;
-    private BigDecimal highTechPercent = BigDecimal.ZERO;
 
     private static boolean initialized = false;
 
@@ -117,11 +116,11 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setInitialized(false);
     }
 
-    protected static boolean isInitialized() {
+    static boolean isInitialized() {
         return initialized;
     }
 
-    protected static void setInitialized(boolean initialized) {
+    private static void setInitialized(boolean initialized) {
         AbstractUnitRating.initialized = initialized;
     }
 
@@ -131,7 +130,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     public String getAverageExperience() {
-        return SkillType.getExperienceLevelName(calcAverageExperience().setScale(0, RoundingMode.HALF_UP).intValue());
+        return getExperienceLevelName(calcAverageExperience());
     }
 
     public int getCombatRecordValue() {
@@ -159,8 +158,6 @@ public abstract class AbstractUnitRating implements IUnitRating {
 
     /**
      * Returns the average experience level for all combat personnel.
-     *
-     * @return
      */
     protected BigDecimal calcAverageExperience() {
         if (getNumberUnits().compareTo(BigDecimal.ZERO) > 0) {
@@ -172,21 +169,17 @@ public abstract class AbstractUnitRating implements IUnitRating {
 
     /**
      * Returns the number of breached contracts.
-     *
-     * @return
      */
-    public int getBreachCount() {
+    int getBreachCount() {
         return breachCount;
     }
 
-    protected List<Person> getCommanderList() {
+    List<Person> getCommanderList() {
         return commanderList;
     }
 
     /**
      * Returns the commander (highest ranking person) for this force.
-     *
-     * @return
      */
     public Person getCommander() {
         if ((commander == null)) {
@@ -205,34 +198,32 @@ public abstract class AbstractUnitRating implements IUnitRating {
             }
 
             //Sort the list of personnel by rank from highest to lowest.  Whoever has the highest rank is the commander.
-            Collections.sort(commanderList, new Comparator<Person>() {
-                public int compare(Person p1, Person p2) {
-                    // Active personnel outrank inactive personnel.
-                    if (p1.isActive() && !p2.isActive()) {
-                        return -1;
-                    } else if (!p1.isActive() && p2.isActive()) {
-                        return 1;
-                    }
-
-                    // Compare rank.
-                    int p1Rank = p1.getRankNumeric();
-                    int p2Rank = p2.getRankNumeric();
-                    if (p1Rank > p2Rank) {
-                        return -1;
-                    } else if (p1Rank < p2Rank) {
-                        return 1;
-                    }
-
-                    // Compare expreience.
-                    int p1ExperienceLevel = p1.getExperienceLevel(false);
-                    int p2ExperienceLevel = p2.getExperienceLevel(false);
-                    if (p1ExperienceLevel > p2ExperienceLevel) {
-                        return -1;
-                    } else if (p1ExperienceLevel < p2ExperienceLevel) {
-                        return 1;
-                    }
-                    return 0;
+            Collections.sort(commanderList, (p1, p2) -> {
+                // Active personnel outrank inactive personnel.
+                if (p1.isActive() && !p2.isActive()) {
+                    return -1;
+                } else if (!p1.isActive() && p2.isActive()) {
+                    return 1;
                 }
+
+                // Compare rank.
+                int p1Rank = p1.getRankNumeric();
+                int p2Rank = p2.getRankNumeric();
+                if (p1Rank > p2Rank) {
+                    return -1;
+                } else if (p1Rank < p2Rank) {
+                    return 1;
+                }
+
+                // Compare expreience.
+                int p1ExperienceLevel = p1.getExperienceLevel(false);
+                int p2ExperienceLevel = p2.getExperienceLevel(false);
+                if (p1ExperienceLevel > p2ExperienceLevel) {
+                    return -1;
+                } else if (p1ExperienceLevel < p2ExperienceLevel) {
+                    return 1;
+                }
+                return 0;
             });
             commander = commanderList.get(0);
         }
@@ -240,7 +231,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         return commander;
     }
 
-    public int getCommanderSkill(String skillName) {
+    int getCommanderSkill(String skillName) {
         Person commander = getCommander();
         if (commander == null) {
             return 0;
@@ -254,92 +245,24 @@ public abstract class AbstractUnitRating implements IUnitRating {
 
     /**
      * Returns the number of failed contracts.
-     *
-     * @return
      */
-    public int getFailCount() {
+    int getFailCount() {
         return failCount;
     }
 
-    /**
-     * Adds the tech level of the passed unit to the number of Clan or IS Advanced units in the list (as appropriate).
-     *
-     * @param u     The {@code Unit} to be evaluated.
-     * @param value The unit's value.  Most have a value of '1' but infantry and battle armor are less.
-     */
-    protected void updateAdvanceTechCount(Unit u, BigDecimal value) {
-        int techLevel = u.getEntity().getTechLevel();
-        if (techLevel > TechConstants.T_INTRO_BOXSET) {
-            if (TechConstants.isClan(techLevel)) {
-                setNumberClan(getNumberClan().add(value));
-                if (!isConventionalInfanry(u)) {
-                    setCountClan(getCountClan() + 1);
-                }
-            } else {
-                setNumberIS2(getNumberIS2().add(value));
-                if (!isConventionalInfanry(u)) {
-                    setCountIS2(getCountIS2() + 1);
-                }
-            }
-        }
-    }
-
     public int getTechValue() {
-
-        //Make sure we have units.
-        if (getNumberUnits().compareTo(BigDecimal.ZERO) == 0) {
-            return 0;
-        }
-
-        //Number of high-tech units is equal to the number of IS2 units plus twice the number of Clan units.
-        BigDecimal highTechNumber = new BigDecimal(getCountIS2() + (getCountClan() * 2));
-
-        //Conventional infantry does not count.
-        int numberUnits = getFighterCount() + getNumberBaSquads() + getMechCount() + getLightVeeCount() + getNumberOther();
-        if (numberUnits <= 0) {
-            return 0;
-        }
-
-        //Calculate the percentage of high-tech units.
-        setHighTechPercent(highTechNumber.divide(new BigDecimal(numberUnits), PRECISION, HALF_EVEN));
-        setHighTechPercent(getHighTechPercent().multiply(ONE_HUNDRED));
-
-        //Cannot go above 100 percent.
-        if (getHighTechPercent().compareTo(ONE_HUNDRED) > 0) {
-            setHighTechPercent(ONE_HUNDRED);
-        }
-
-        //Score is calculated from percentage above 30%.
-        BigDecimal scoredPercent = getHighTechPercent().subtract(new BigDecimal(30));
-
-        //If we have a negative value (hi-tech percent was < 30%) return a value of zero.
-        if (scoredPercent.compareTo(BigDecimal.ZERO) <= 0) {
-            return 0;
-        }
-
-        //Round down to the nearest whole percentage.
-        scoredPercent = scoredPercent.setScale(0, RoundingMode.DOWN);
-
-        //Add +5 points for every 10% remaining.
-        BigDecimal oneTenth = scoredPercent.divide(new BigDecimal(10), PRECISION, HALF_EVEN);
-        BigDecimal score = oneTenth.multiply(new BigDecimal(5));
-
-        return score.intValue();
+        return 0;
     }
 
     /**
      * Returns the number of successfully completed contracts.
-     *
-     * @return
      */
-    public int getSuccessCount() {
+    int getSuccessCount() {
         return successCount;
     }
 
     /**
      * Returns the overall percentage of fully supported units.
-     *
-     * @return
      */
     public BigDecimal getSupportPercent() {
         return supportPercent;
@@ -428,9 +351,8 @@ public abstract class AbstractUnitRating implements IUnitRating {
      * Calculates the weighted value of the unit based on if it is Infantry, Battle Armor or something else.
      *
      * @param u The {@code Unit} to be evaluated.
-     * @return
      */
-    protected BigDecimal getUnitValue(Unit u) {
+    BigDecimal getUnitValue(Unit u) {
         BigDecimal value = BigDecimal.ONE;
         if (isConventionalInfanry(u) && (((Infantry) u.getEntity()).getSquadN() == 1)) {
             value = new BigDecimal("0.25");
@@ -438,36 +360,31 @@ public abstract class AbstractUnitRating implements IUnitRating {
         return value;
     }
 
-    protected boolean isConventionalInfanry(Unit u) {
+    boolean isConventionalInfanry(Unit u) {
         return (u.getEntity() instanceof Infantry) && !(u.getEntity() instanceof BattleArmor);
     }
 
     /**
      * Returns the sum of all experience rating for all combat units.
-     *
-     * @return
      */
-    protected BigDecimal getTotalSkillLevels() {
-    	return getTotalSkillLevels(true);
+    BigDecimal getTotalSkillLevels() {
+        return getTotalSkillLevels(true);
     }
 
     /**
      * Returns the sum of all experience rating for all combat units.
      *
      * @param canInit Whether or not this method may initialize the values
-     * @return
      */
-    protected BigDecimal getTotalSkillLevels(boolean canInit) {
-    	if (canInit && !isInitialized()) {
-    		initValues();
-    	}
+    BigDecimal getTotalSkillLevels(boolean canInit) {
+        if (canInit && !isInitialized()) {
+            initValues();
+        }
         return totalSkillLevels;
     }
 
     /**
      * Returns the total number of combat units.
-     *
-     * @return
      */
     protected BigDecimal getNumberUnits() {
         return numberUnits;
@@ -485,38 +402,50 @@ public abstract class AbstractUnitRating implements IUnitRating {
      * and this method will immediately exit.
      */
     protected void initValues() {
-        setCommanderList(new ArrayList<Person>());
+        logMessage("Initializing unit rating.");
+        setCommanderList(new ArrayList<>());
         setNumberUnits(BigDecimal.ZERO);
-        setNumberIS2(BigDecimal.ZERO);
-        setNumberClan(BigDecimal.ZERO);
         setTotalSkillLevels(BigDecimal.ZERO);
+
         setMechCount(0);
         setFighterCount(0);
+        setSmallCraftCount(0);
+        setProtoCount(0);
         setLightVeeCount(0);
+        setHeavyVeeCount(0);
+        setSuperHeavyVeeCount(0);
         setBattleArmorCount(0);
+        setNumberBaSquads(0);
         setInfantryCount(0);
-        setNumberInfSquads(0);
-        setCountClan(0);
-        setCountIS2(0);
+        setJumpshipCount(0);
+        setWarshipCount(0);
+
         setMechBayCount(0);
         setFighterBayCount(0);
+        setSmallCraftBayCount(0);
+        setProtoBayCount(0);
         setBaBayCount(0);
         setLightVeeBayCount(0);
+        setHeavyVeeBayCount(0);
         setInfantryBayCount(0);
+        setDockingCollarCount(0);
+
         setWarhipWithDocsOwner(false);
         setWarshipOwner(false);
         setJumpshipOwner(false);
+
         setCommander(null);
         setBreachCount(0);
         setSuccessCount(0);
         setFailCount(0);
         setSupportPercent(BigDecimal.ZERO);
         setTransportPercent(BigDecimal.ZERO);
-        setHighTechPercent(BigDecimal.ZERO);
         setInitialized(true);
+        clearSkillRatingCounts();
+        logMessage("Initialization of unit rating complete.");
     }
 
-    protected void updateBayCount(Dropship ds) {
+    private void updateBayCount(Dropship ds) {
         // ToDo Superheavy Bays.
         for (Bay bay : ds.getTransportBays()) {
             if (bay instanceof MechBay) {
@@ -537,7 +466,15 @@ public abstract class AbstractUnitRating implements IUnitRating {
         }
     }
 
-    protected void updateBayCount(Jumpship jumpship) {
+    void updateBayCount(Entity e) {
+        if (e instanceof Dropship) {
+            updateBayCount((Dropship) e);
+        } else if (e instanceof Jumpship) {
+            updateBayCount((Jumpship) e);
+        }
+    }
+
+    private void updateBayCount(Jumpship jumpship) {
         for (Bay bay : jumpship.getTransportBays()) {
             if (bay instanceof ASFBay) {
                 setFighterBayCount(getFighterBayCount() + (int)bay.getCapacity());
@@ -547,7 +484,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         }
     }
 
-    protected void updateDockingCollarCount(Jumpship jumpship) {
+    void updateDockingCollarCount(Jumpship jumpship) {
         setDockingCollarCount(getDockingCollarCount() + jumpship.getDockingCollars().size());
     }
 
@@ -559,275 +496,296 @@ public abstract class AbstractUnitRating implements IUnitRating {
         this.campaign = campaign;
     }
 
-    protected void setCommanderList(List<Person> commanderList) {
+    private void setCommanderList(List<Person> commanderList) {
         this.commanderList = commanderList;
     }
 
-    protected void setNumberUnits(BigDecimal numberUnits) {
+    void setNumberUnits(BigDecimal numberUnits) {
         this.numberUnits = numberUnits;
     }
 
-    protected BigDecimal getNumberIS2() {
-        return numberIS2;
-    }
-
-    protected void setNumberIS2(BigDecimal numberIS2) {
-        this.numberIS2 = numberIS2;
-    }
-
-    protected BigDecimal getNumberClan() {
-        return numberClan;
-    }
-
-    protected void setNumberClan(BigDecimal numberClan) {
-        this.numberClan = numberClan;
-    }
-
-    protected void setTotalSkillLevels(BigDecimal totalSkillLevels) {
+    void setTotalSkillLevels(BigDecimal totalSkillLevels) {
         this.totalSkillLevels = totalSkillLevels;
     }
 
-    protected int getMechCount() {
+    /**
+     * Increments the count of the given skill rating by one.
+     *
+     * @param rating The skill rating to be incremented.
+     */
+    void incrementSkillRatingCounts(final String rating) {
+        int count = 1;
+        if (skillRatingCounts.containsKey(rating)) {
+            count += skillRatingCounts.get(rating);
+        }
+        skillRatingCounts.put(rating, count);
+    }
+
+    /**
+     * Returns a map of skill ratings and their counts.
+     */
+    Map<String, Integer> getSkillRatingCounts() {
+        // defensive copy
+        return new HashMap<>(skillRatingCounts);
+    }
+
+    private void clearSkillRatingCounts() {
+        skillRatingCounts.clear();
+    }
+
+    int getMechCount() {
         return mechCount;
     }
 
-    protected void setMechCount(int mechCount) {
+    void setMechCount(int mechCount) {
         this.mechCount = mechCount;
     }
 
-    protected int getSuperHeavyMechCount() {
-        return superHeavyMechCount;
+    private void incrementMechCount() {
+        mechCount++;
     }
 
-    protected void setSuperHeavyMechCount(int superHeavyMechCount) {
-        this.superHeavyMechCount = superHeavyMechCount;
-    }
-
-    protected int getProtoCount() {
+    int getProtoCount() {
         return protoCount;
     }
 
-    protected void setProtoCount(int protoCount) {
+    void setProtoCount(int protoCount) {
         this.protoCount = protoCount;
     }
 
-    protected int getFighterCount() {
+    private void incrementProtoCount() {
+        protoCount++;
+    }
+
+    int getFighterCount() {
         return fighterCount;
     }
 
-    protected void setFighterCount(int fighterCount) {
+    void setFighterCount(int fighterCount) {
         this.fighterCount = fighterCount;
     }
 
-    protected int getLightVeeCount() {
+    private void incrementFighterCount() {
+        fighterCount++;
+    }
+
+    int getLightVeeCount() {
         return lightVeeCount;
     }
 
-    protected void setLightVeeCount(int lightVeeCount) {
+    void setLightVeeCount(int lightVeeCount) {
         this.lightVeeCount = lightVeeCount;
     }
 
-    protected int getHeavyVeeCount() {
+    private void incrementLightVeeCount() {
+        lightVeeCount++;
+    }
+
+    int getHeavyVeeCount() {
         return heavyVeeCount;
     }
 
-    protected void setHeavyVeeCount(int heavyVeeCount) {
+    private void setHeavyVeeCount(int heavyVeeCount) {
         this.heavyVeeCount = heavyVeeCount;
     }
 
-    protected int getSuperHeavyVeeCount() {
+    private void incrementHeavyVeeCount() {
+        heavyVeeCount++;
+    }
+
+    int getSuperHeavyVeeCount() {
         return superHeavyVeeCount;
     }
 
-    protected void setSuperHeavyVeeCount(int superHeavyVeeCount) {
+    private void setSuperHeavyVeeCount(int superHeavyVeeCount) {
         this.superHeavyVeeCount = superHeavyVeeCount;
     }
 
-    protected int getBattleArmorCount() {
+    private void incrementSuperHeavyVeeCount() {
+        superHeavyVeeCount++;
+    }
+
+    int getBattleArmorCount() {
         return battleArmorCount;
     }
 
-    protected void setBattleArmorCount(int battleArmorCount) {
+    void setBattleArmorCount(int battleArmorCount) {
         this.battleArmorCount = battleArmorCount;
     }
 
-    protected int getNumberBaSquads() {
+    private void incrementBattleArmorCount(int amount) {
+        battleArmorCount += amount;
+    }
+
+    int getNumberBaSquads() {
         return numberBaSquads;
     }
 
-    protected void setNumberBaSquads(int numberBaSquads) {
+    private void setNumberBaSquads(int numberBaSquads) {
         this.numberBaSquads = numberBaSquads;
     }
 
-    protected int getInfantryCount() {
+    private void incrementNumberBaSquads() {
+        numberBaSquads++;
+    }
+
+    int getInfantryCount() {
         return infantryCount;
     }
 
-    protected void setInfantryCount(int infantryCount) {
+    void setInfantryCount(int infantryCount) {
         this.infantryCount = infantryCount;
     }
 
-    protected int getNumberInfSquads() {
-        return numberInfSquads;
-    }
-
-    protected void setNumberInfSquads(int numberInfSquads) {
-        this.numberInfSquads = numberInfSquads;
+    private void incrementInfantryCount(int amount) {
+        infantryCount += amount;
     }
 
     int calcInfantryPlatoons() {
         return (int) Math.ceil(getInfantryCount() / 28);
     }
 
-    protected int getDropshipCount() {
+    int getDropshipCount() {
         return dropshipCount;
     }
 
-    protected void setDropshipCount(int dropshipCount) {
+    void setDropshipCount(int dropshipCount) {
         this.dropshipCount = dropshipCount;
     }
 
-    protected int getWarshipCount() {
+    private void incrementDropshipCount() {
+        dropshipCount++;
+    }
+
+    int getSmallCraftCount() {
+        return smallCraftCount;
+    }
+
+    void setSmallCraftCount(int smallCraftCount) {
+        this.smallCraftCount = smallCraftCount;
+    }
+
+    private void incrementSmallCraftCount() {
+        smallCraftCount++;
+    }
+
+    int getWarshipCount() {
         return warshipCount;
     }
 
-    protected void setWarshipCount(int warshipCount) {
+    private void setWarshipCount(int warshipCount) {
         this.warshipCount = warshipCount;
     }
 
-    protected int getJumpshipCount() {
+    private void incrementWarshipCount() {
+        warshipCount++;
+    }
+
+    int getJumpshipCount() {
         return jumpshipCount;
     }
 
-    protected void setJumpshipCount(int jumpshipCount) {
+    void setJumpshipCount(int jumpshipCount) {
         this.jumpshipCount = jumpshipCount;
     }
 
-    protected int getNumberOther() {
-        return numberOther;
+    private void incrementJumpshipCount() {
+        jumpshipCount++;
     }
 
-    protected void setNumberOther(int numberOther) {
-        this.numberOther = numberOther;
-    }
-
-    protected int getCountIS2() {
-        return countIS2;
-    }
-
-    protected void setCountIS2(int countIS2) {
-        this.countIS2 = countIS2;
-    }
-
-    protected int getCountClan() {
-        return countClan;
-    }
-
-    protected void setCountClan(int countClan) {
-        this.countClan = countClan;
-    }
-
-    protected int getMechBayCount() {
+    int getMechBayCount() {
         return mechBayCount;
     }
 
-    protected void setMechBayCount(int mechBayCount) {
+    private void setMechBayCount(int mechBayCount) {
         this.mechBayCount = mechBayCount;
     }
 
-    protected int getSuperHeavyMechBayCount() {
-        return superHeavyMechBayCount;
-    }
-
-    protected void setSuperHeavyMechBayCount(int superHeavyMechBayCount) {
-        this.superHeavyMechBayCount = superHeavyMechBayCount;
-    }
-
-    protected int getProtoBayCount() {
+    int getProtoBayCount() {
         return protoBayCount;
     }
 
-    protected void setProtoBayCount(int protoBayCount) {
+    private void setProtoBayCount(int protoBayCount) {
         this.protoBayCount = protoBayCount;
     }
 
-    protected int getFighterBayCount() {
+    int getFighterBayCount() {
         return fighterBayCount;
     }
 
-    protected void setFighterBayCount(int fighterBayCount) {
+    private void setFighterBayCount(int fighterBayCount) {
         this.fighterBayCount = fighterBayCount;
     }
 
-    protected int getSmallCraftBayCount() {
+    int getSmallCraftBayCount() {
         return smallCraftBayCount;
     }
 
-    protected void setSmallCraftBayCount(int smallCraftBayCount) {
+    private void setSmallCraftBayCount(int smallCraftBayCount) {
         this.smallCraftBayCount = smallCraftBayCount;
     }
 
-    protected int getLightVeeBayCount() {
+    int getLightVeeBayCount() {
         return lightVeeBayCount;
     }
 
-    protected void setLightVeeBayCount(int lightVeeBayCount) {
+    private void setLightVeeBayCount(int lightVeeBayCount) {
         this.lightVeeBayCount = lightVeeBayCount;
     }
 
-    protected int getHeavyVeeBayCount() {
+    int getHeavyVeeBayCount() {
         return heavyVeeBayCount;
     }
 
-    protected void setHeavyVeeBayCount(int heavyVeeBayCount) {
+    private void setHeavyVeeBayCount(int heavyVeeBayCount) {
         this.heavyVeeBayCount = heavyVeeBayCount;
     }
 
-    protected int getBaBayCount() {
+    int getBaBayCount() {
         return baBayCount;
     }
 
-    protected void setBaBayCount(int baBayCount) {
+    private void setBaBayCount(int baBayCount) {
         this.baBayCount = baBayCount;
     }
 
-    protected int getInfantryBayCount() {
+    int getInfantryBayCount() {
         return infantryBayCount;
     }
 
-    protected void setInfantryBayCount(int infantryBayCount) {
+    private void setInfantryBayCount(int infantryBayCount) {
         this.infantryBayCount = infantryBayCount;
     }
 
-    protected int getDockingCollarCount() {
+    int getDockingCollarCount() {
         return dockingCollarCount;
     }
 
-    protected void setDockingCollarCount(int dockingCollarCount) {
+    void setDockingCollarCount(int dockingCollarCount) {
         this.dockingCollarCount = dockingCollarCount;
     }
 
-    protected boolean isWarhipWithDocsOwner() {
+    boolean isWarhipWithDocsOwner() {
         return warhipWithDocsOwner;
     }
 
-    protected void setWarhipWithDocsOwner(boolean warhipWithDocsOwner) {
+    void setWarhipWithDocsOwner(boolean warhipWithDocsOwner) {
         this.warhipWithDocsOwner = warhipWithDocsOwner;
     }
 
-    protected boolean isWarshipOwner() {
+    boolean isWarshipOwner() {
         return warshipOwner;
     }
 
-    protected void setWarshipOwner(boolean warshipOwner) {
+    void setWarshipOwner(boolean warshipOwner) {
         this.warshipOwner = warshipOwner;
     }
 
-    protected boolean isJumpshipOwner() {
+    boolean isJumpshipOwner() {
         return jumpshipOwner;
     }
 
-    protected void setJumpshipOwner(boolean jumpshipOwner) {
+    void setJumpshipOwner(boolean jumpshipOwner) {
         this.jumpshipOwner = jumpshipOwner;
     }
 
@@ -835,19 +793,19 @@ public abstract class AbstractUnitRating implements IUnitRating {
         this.commander = commander;
     }
 
-    protected void setBreachCount(int breachCount) {
+    private void setBreachCount(int breachCount) {
         this.breachCount = breachCount;
     }
 
-    protected void setSuccessCount(int successCount) {
+    private void setSuccessCount(int successCount) {
         this.successCount = successCount;
     }
 
-    protected void setFailCount(int failCount) {
+    private void setFailCount(int failCount) {
         this.failCount = failCount;
     }
 
-    protected void setSupportPercent(BigDecimal supportPercent) {
+    void setSupportPercent(BigDecimal supportPercent) {
         this.supportPercent = supportPercent;
     }
 
@@ -856,15 +814,70 @@ public abstract class AbstractUnitRating implements IUnitRating {
         return transportPercent;
     }
 
-    protected void setTransportPercent(BigDecimal transportPercent) {
+    void setTransportPercent(BigDecimal transportPercent) {
         this.transportPercent = transportPercent;
     }
 
-    protected BigDecimal getHighTechPercent() {
-        return highTechPercent;
+    void updateUnitCounts(Unit u) {
+        if (u.isMothballed()) {
+            return;
+        }
+        logMessage("Adding " + u.getName() + " to unit counts.");
+
+        Entity e = u.getEntity();
+        if (null == e) {
+            logMessage("Unit " + u.getName() + " is not an Entity.  Skipping.");
+            return;
+        }
+
+        int unitType = UnitType.determineUnitTypeCode(e);
+        logMessage("Unit " + u.getName() + " is a " + UnitType.getTypeDisplayableName(unitType));
+        switch (unitType) {
+            case UnitType.MEK:
+                incrementMechCount();
+                break;
+            case UnitType.PROTOMEK:
+                incrementProtoCount();
+                break;
+            case UnitType.VTOL:
+            case UnitType.TANK:
+                logMessage("Unit " + u.getName() + " weight is " + e.getWeight());
+                if (e.getWeight() <= 50f) {
+                    incrementLightVeeCount();
+                } else if (e.getWeight() <= 100f) {
+                    incrementHeavyVeeCount();
+                } else {
+                    incrementSuperHeavyVeeCount();
+                }
+                break;
+            case UnitType.DROPSHIP:
+                incrementDropshipCount();
+                break;
+            case UnitType.SMALL_CRAFT:
+                incrementSmallCraftCount();
+                break;
+            case UnitType.WARSHIP:
+                incrementWarshipCount();
+                break;
+            case UnitType.JUMPSHIP:
+                incrementJumpshipCount();
+                break;
+            case UnitType.AERO:
+            case UnitType.CONV_FIGHTER:
+                incrementFighterCount();
+                break;
+            case UnitType.BATTLE_ARMOR:
+                incrementNumberBaSquads();
+                incrementBattleArmorCount(((BattleArmor) e).getSquadSize());
+                break;
+            case UnitType.INFANTRY:
+                Infantry i = (Infantry) e;
+                incrementInfantryCount(i.getSquadSize() * i.getSquadN());
+                break;
+        }
     }
 
-    protected void setHighTechPercent(BigDecimal highTechPercent) {
-        this.highTechPercent = highTechPercent;
+    void logMessage(final String msg) {
+        System.out.println(msg);
     }
 }

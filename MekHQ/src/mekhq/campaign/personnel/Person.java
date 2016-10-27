@@ -2832,6 +2832,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         return (isAdminPrimary() || isAdminSecondary());
     }
 
+    public boolean isMedic() {
+        return (T_MEDIC == primaryRole) || (T_MEDIC == secondaryRole);
+    }
+
     public boolean isAdminPrimary() {
         return primaryRole == T_ADMIN_HR || primaryRole == T_ADMIN_COM || primaryRole == T_ADMIN_LOG || primaryRole == T_ADMIN_TRA;
     }

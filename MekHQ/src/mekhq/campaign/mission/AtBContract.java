@@ -355,10 +355,10 @@ public class AtBContract extends Contract implements Serializable {
 		double multiplier = 1.0;
 		// IntOps reputation factor then Dragoons rating
         if (campaign.getCampaignOptions().useDragoonRating()
-                && campaign.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.INTERSTELLAR_OPS)) {
-            multiplier *= (unitRatingMod * .2) + .5;
-        } else {
-            if (unitRatingMod >= IUnitRating.DRAGOON_A){
+			&& campaign.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
+			multiplier *= (unitRatingMod * .2) + .5;
+		} else {
+			if (unitRatingMod >= IUnitRating.DRAGOON_A){
                 multiplier *= 2.0;
             }
             if (unitRatingMod == IUnitRating.DRAGOON_B){

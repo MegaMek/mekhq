@@ -320,7 +320,7 @@ public class CampaignOptions implements Serializable {
         contractNegotiationXP = 0;
         adminXP = 0;
         adminXPPeriod = 1;
-        unitRatingMethod = UnitRatingMethod.INTERSTELLAR_OPS;
+        unitRatingMethod = UnitRatingMethod.CAMPAIGN_OPS;
         waitingPeriod = 7;
         acquisitionSkill = S_TECH;
         acquisitionSupportStaffOnly = true;
@@ -2156,7 +2156,7 @@ public class CampaignOptions implements Serializable {
                     ("dragoonsRatingMethod")) {
                 if (!wn2.getTextContent().isEmpty() && (wn2.getTextContent() != null)) {
                     UnitRatingMethod method = UnitRatingMethod.getUnitRatingMethod(wn2.getTextContent());
-                    retVal.setUnitRatingMethod((method != null) ? method : UnitRatingMethod.INTERSTELLAR_OPS);
+                    retVal.setUnitRatingMethod((method != null) ? method : UnitRatingMethod.CAMPAIGN_OPS);
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("usePortraitForType")) {
                 String[] values = wn2.getTextContent().split(","); //$NON-NLS-1$
