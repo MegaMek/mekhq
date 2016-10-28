@@ -16,6 +16,7 @@
     <path id="project.classpath">
         <pathelement path="${build}">
         </pathelement>
+        <fileset dir="${libdir}" includes="*.jar"/>
         <fileset dir="${basedir}">
             <include
                     name="MegaMek.jar" >

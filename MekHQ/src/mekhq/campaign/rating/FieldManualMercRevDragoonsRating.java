@@ -551,9 +551,10 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             return HUNDRED;
         }
 
-        BigDecimal percent = new BigDecimal(getTechSupportHours())
-                .divide(new BigDecimal(techSupportNeeded), PRECISION, HALF_EVEN)
-                .multiply(HUNDRED).setScale(0, RoundingMode.DOWN);
+        BigDecimal percent = BigDecimal.valueOf(getTechSupportHours())
+                                       .divide(BigDecimal.valueOf(techSupportNeeded), PRECISION, HALF_EVEN)
+                                       .multiply(HUNDRED)
+                                       .setScale(0, RoundingMode.DOWN);
 
         return (percent.compareTo(HUNDRED) > 0 ? HUNDRED : percent);
     }
@@ -799,7 +800,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                "+ Command: Does not incorporate any positive or negative traits from AToW or BRPG3." +
                "+ Transportation: This is computed by individual unit rather than by lance/star/squadron.\n" +
                "    Auxiliary vessels are not accounted for.\n" +
-               "+ Support: Artillery weapons & Naval vessels are not accounted for.";
+               "+ Support: Artillery weapons & Naval vessels are not accounted for.\n" +
+               "Note: The Dragoons Rating, RAW, does not account for Protomechs at all an Infantry only require admin & medical support, not tech support.";
     }
 
     public BigDecimal getTransportPercent() {
