@@ -96,6 +96,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_CHANGE_STATUS = "STATUS"; //$NON-NLS-1$
     private static final String CMD_ACQUIRE_SPECIALIST = "SPECIALIST"; //$NON-NLS-1$
     private static final String CMD_ACQUIRE_WEAPON_SPECIALIST = "WSPECIALIST"; //$NON-NLS-1$
+    private static final String CMD_ACQUIRE_RANGEMASTER = "RANGEMASTER"; //$NON-NLS-1$
     private static final String CMD_ACQUIRE_ABILITY = "ABILITY"; //$NON-NLS-1$
     private static final String CMD_IMPROVE = "IMPROVE"; //$NON-NLS-1$
     private static final String CMD_ADD_SPOUSE = "SPOUSE"; //$NON-NLS-1$
@@ -542,6 +543,17 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 int cost = Integer.parseInt(data[2]);
                 selectedPerson.acquireAbility(PilotOptions.LVL3_ADVANTAGES,
                         "specialist", selected); //$NON-NLS-1$
+                gui.getCampaign().personUpdated(selectedPerson);
+                selectedPerson.setXp(selectedPerson.getXp() - cost);
+                // TODO: add campaign report
+                break;
+            }
+            case CMD_ACQUIRE_RANGEMASTER:
+            {
+                String selected = data[1];
+                int cost = Integer.parseInt(data[2]);
+                selectedPerson.acquireAbility(PilotOptions.LVL3_ADVANTAGES,
+                        "range_master", selected); //$NON-NLS-1$
                 gui.getCampaign().personUpdated(selectedPerson);
                 selectedPerson.setXp(selectedPerson.getXp() - cost);
                 // TODO: add campaign report
@@ -1613,6 +1625,24 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                                 specialistMenu.add(menuItem);
                                 menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("ballisticSpecialist.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
                                 menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_SPECIALIST, Crew.SPECIAL_BALLISTIC, String.valueOf(cost)));
+                                menuItem.addActionListener(this);
+                                menuItem.setEnabled(available);
+                                specialistMenu.add(menuItem);
+                                abMenu.add(specialistMenu);
+                            } else if (ability.getName().equals("range_master")) { //$NON-NLS-1$
+                                JMenu specialistMenu = new JMenu(resourceMap.getString("rangemaster.text")); //$NON-NLS-1$
+                                menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("rangemaster_med.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
+                                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER, Crew.RANGEMASTER_MEDIUM, String.valueOf(cost)));
+                                menuItem.addActionListener(this);
+                                menuItem.setEnabled(available);
+                                specialistMenu.add(menuItem);
+                                menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("rangemaster_lng.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
+                                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER, Crew.RANGEMASTER_LONG, String.valueOf(cost)));
+                                menuItem.addActionListener(this);
+                                menuItem.setEnabled(available);
+                                specialistMenu.add(menuItem);
+                                menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("rangemaster_xtm.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
+                                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER, Crew.RANGEMASTER_EXTREME, String.valueOf(cost)));
                                 menuItem.addActionListener(this);
                                 menuItem.setEnabled(available);
                                 specialistMenu.add(menuItem);
