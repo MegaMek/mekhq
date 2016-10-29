@@ -134,6 +134,10 @@ public class MassRepairSalvageDialog extends JDialog {
 				continue;
 			}
 
+			if (unit.isDeployed()) {
+				continue;
+			}
+
 			if ((unit.getEntity() instanceof Tank) || (unit.getEntity() instanceof Aero)
 					|| (unit.getEntity() instanceof Mech)) {
 				unitList.add(unit);
@@ -742,13 +746,13 @@ public class MassRepairSalvageDialog extends JDialog {
 			btnSelectNone.setEnabled(false);
 			btnSelectAssigned.setEnabled(false);
 			btnSelectUnassigned.setEnabled(false);
-			
+
 			for (Unit unit : units) {
-				performMassRepairOrSalvage(unit, unit.isSalvage(), activeMROs);
+				performMassRepairOrSalvage(unit, unit.isSalvage(), activeMROs, useExtraTimeBox.isSelected(),
+						useRushJobBox.isSelected(), allowCarryoverBox.isSelected());
 			}
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(this,
-					"An error occurred while trying to perform the mass repair/salvage",
+			JOptionPane.showMessageDialog(this, "An error occurred while trying to perform the mass repair/salvage",
 					"Error occurred", JOptionPane.ERROR_MESSAGE);
 		} finally {
 			btnStart.setEnabled(true);
@@ -769,7 +773,8 @@ public class MassRepairSalvageDialog extends JDialog {
 		this.setVisible(false);
 	}
 
-	private void performMassRepairOrSalvage(Unit unit, boolean isSalvage, List<MassRepairOption> mroList) {
+	private void performMassRepairOrSalvage(Unit unit, boolean isSalvage, List<MassRepairOption> mroList,
+			boolean useExtraTime, boolean useRushJob, boolean allowCarryover) {
 		String actionDescriptor = isSalvage ? "salvage" : "repair";
 		Campaign campaign = campaignGUI.getCampaign();
 
@@ -805,7 +810,8 @@ public class MassRepairSalvageDialog extends JDialog {
 			int actionsPerformed = 1;
 
 			while (actionsPerformed > 0) {
-				actionsPerformed = performMassTechAction(unit, techs, mroByTypeMap, isSalvage);
+				actionsPerformed = performMassTechAction(unit, techs, mroByTypeMap, isSalvage, useExtraTime, useRushJob,
+						allowCarryover);
 				totalActionsPerformed += actionsPerformed;
 			}
 
@@ -817,10 +823,19 @@ public class MassRepairSalvageDialog extends JDialog {
 	}
 
 	private int performMassTechAction(Unit unit, List<Person> techs, Map<Integer, MassRepairOption> mroByTypeMap,
-			boolean salvaging) {
+			boolean salvaging, boolean useExtraTime, boolean useRushJob, boolean allowCarryover) {
 		Campaign campaign = campaignGUI.getCampaign();
 		int totalActionsPerformed = 0;
 		String actionDescriptor = salvaging ? "salvage" : "repair";
+
+		/*
+		 * If we're a mek and we have a limb with a bad shoulder/hip, we're
+		 * going to try to flip it to salvageable and remove all the parts so
+		 * that we can nuke the limb. If we do this, when we're finally done we
+		 * need to flip the mek back to repairable so that we don't accidentally
+		 * strip everything off it.
+		 */
+		boolean scrappingLimbMode = false;
 
 		if (techs.isEmpty()) {
 			campaign.addReport(
@@ -839,15 +854,74 @@ public class MassRepairSalvageDialog extends JDialog {
 		 */
 
 		if ((unit.getEntity() instanceof Mech) && !salvaging) {
+			Map<Integer, Part> badLocs = new HashMap<Integer, Part>();
+
 			for (Part part : parts) {
 				if ((part instanceof MekLocation) && part.onBadHipOrShoulder()) {
+					badLocs.put(((MekLocation) part).getLoc(), part);
+
 					campaign.addReport(String.format(
-							"Unable to repair any more parts on %s because the %s has a bad hip/shoulder.",
-							unit.getName(), part.getName()));
+							"Found an unfixable limb - %s. Going to remove all parts and scrap the limb before proceeding with other repairs",
+							part.getName()));
+				}
+			}
+
+			if (!badLocs.isEmpty()) {
+				MassRepairOption mro = mroByTypeMap.get(Part.REPAIR_PART_TYPE.GENERAL_LOCATION);
+
+				if ((null == mro) || !mro.isActive()) {
+					campaign.addReport(
+							"Unable to proceed with repairs because this mek has an unfixable limb but configured settings do not allow location repairs.");
 
 					return 0;
 				}
+
+				/*
+				 * Find our parts in our bad locations. If we don't actually
+				 * have, just scrap the limbs and move on with our normal work
+				 */
+
+				scrappingLimbMode = true;
+				unit.setSalvage(true);
+
+				List<Part> partsTemp = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId());
+				List<Part> partsOnBadLimbs = new ArrayList<Part>();
+
+				for (Part part : partsTemp) {
+					if (!(part instanceof MekLocation) && badLocs.containsKey(part.getLocation())) {
+						partsOnBadLimbs.add(part);
+					}
+				}
+
+				if (partsOnBadLimbs.isEmpty()) {
+					/*
+					 * We have no parts left on our bad limbs, so we'll just
+					 * scrap those limbs and rebuild the parts list and reset
+					 * back our normal repair mode
+					 */
+
+					for (Part part : badLocs.values()) {
+						campaign.addReport(part.scrap());
+					}
+
+					parts = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId());
+
+					scrappingLimbMode = false;
+					unit.setSalvage(false);
+				} else {
+					parts = partsOnBadLimbs;
+				}
 			}
+		}
+
+		/*
+		 * If we're scrapping limbs, we don't want salvage repairs to go into a
+		 * new day otherwise it can be confusing when trying to figure why a
+		 * unit can't be repaired because 'salvage' repairs don't show up on the
+		 * task list as scheduled if we're in 'repair' mode.
+		 */
+		if (scrappingLimbMode) {
+			allowCarryover = false;
 		}
 
 		/*
@@ -875,6 +949,11 @@ public class MassRepairSalvageDialog extends JDialog {
 			campaign.addReport(
 					String.format("Unable to %s any more parts from %s because there are no valid parts left to %s.",
 							actionDescriptor, unit.getName(), actionDescriptor));
+
+			if (scrappingLimbMode) {
+				unit.setSalvage(false);
+			}
+
 			return totalActionsPerformed;
 		}
 
@@ -934,7 +1013,7 @@ public class MassRepairSalvageDialog extends JDialog {
 
 				// Check if we need to increase the time to meet the min BTH
 				if (targetRoll.getValue() > mro.getBthMin()) {
-					if (!campaign.getCampaignOptions().massRepairUseExtraTime()) {
+					if (!useExtraTime) {
 						continue;
 					}
 
@@ -947,7 +1026,7 @@ public class MassRepairSalvageDialog extends JDialog {
 					selectedWorktime = newWorkTime;
 				} else if (targetRoll.getValue() < mro.getBthMax()) {
 					// Or decrease the time to meet the max BTH
-					if (campaign.getCampaignOptions().massRepairUseRushJob()) {
+					if (useRushJob) {
 						WorkTime newWorkTime = calculateNewMassRepairWorktime(part, tech, mro, campaign, false);
 
 						// This should never happen, but...
@@ -957,8 +1036,7 @@ public class MassRepairSalvageDialog extends JDialog {
 					}
 				}
 
-				if ((tech.getMinutesLeft() < part.getActualTime())
-						&& !campaign.getCampaignOptions().massRepairAllowCarryover()) {
+				if ((tech.getMinutesLeft() < part.getActualTime()) && !allowCarryover) {
 					continue;
 				}
 
@@ -1010,6 +1088,10 @@ public class MassRepairSalvageDialog extends JDialog {
 
 				Thread.yield();
 			}
+		}
+
+		if (scrappingLimbMode) {
+			unit.setSalvage(false);
 		}
 
 		return totalActionsPerformed;
