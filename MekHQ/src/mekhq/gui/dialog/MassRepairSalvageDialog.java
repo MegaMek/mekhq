@@ -669,7 +669,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
 
 		btnCancel = new JButton();
-		btnCancel.setText("Cancel"); // NOI18N
+		btnCancel.setText("Done"); // NOI18N
 		btnCancel.setName("btnClose"); // NOI18N
 		btnCancel.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -691,78 +691,70 @@ public class MassRepairSalvageDialog extends JDialog {
 			return;
 		}
 
-		try {
-			List<Unit> units = new ArrayList<Unit>();
+		List<Unit> units = new ArrayList<Unit>();
 
-			for (int i = 0; i < selectedRows.length; i++) {
-				int rowIdx = unitTable.convertRowIndexToModel(selectedRows[i]);
-				Unit unit = unitTableModel.getUnit(rowIdx);
+		for (int i = 0; i < selectedRows.length; i++) {
+			int rowIdx = unitTable.convertRowIndexToModel(selectedRows[i]);
+			Unit unit = unitTableModel.getUnit(rowIdx);
 
-				if (null == unit) {
-					continue;
-				}
-
-				units.add(unit);
+			if (null == unit) {
+				continue;
 			}
 
-			if (units.isEmpty()) {
-				JOptionPane.showMessageDialog(this, "No valid units selected", "No units", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-
-			List<MassRepairOption> activeMROs = new ArrayList<MassRepairOption>();
-
-			for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
-				int type = MassRepairOption.VALID_REPAIR_TYPES[i];
-
-				MassRepairOptionControl mroc = massRepairOptionControls[i];
-
-				if (!mroc.activeBox.isSelected()) {
-					continue;
-				}
-
-				MassRepairOption mro = new MassRepairOption();
-				mro.setType(type);
-				mro.setActive(mroc.activeBox.isSelected());
-				mro.setSkillMin(mroc.minSkillCBox.getSelectedIndex());
-				mro.setSkillMax(mroc.maxSkillCBox.getSelectedIndex());
-				mro.setBthMin((Integer) mroc.minBTHSpn.getValue());
-				mro.setBthMax((Integer) mroc.maxBTHSpn.getValue());
-
-				activeMROs.add(mro);
-			}
-
-			if (activeMROs.isEmpty()) {
-				JOptionPane.showMessageDialog(this,
-						"No repair options are currently enabled. Please activate at least one type of item to repair.",
-						"No repair options", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-
-			btnStart.setEnabled(false);
-			btnSaveAsDefault.setEnabled(false);
-			btnCancel.setEnabled(false);
-
-			btnSelectNone.setEnabled(false);
-			btnSelectAssigned.setEnabled(false);
-			btnSelectUnassigned.setEnabled(false);
-
-			for (Unit unit : units) {
-				performMassRepairOrSalvage(unit, unit.isSalvage(), activeMROs, useExtraTimeBox.isSelected(),
-						useRushJobBox.isSelected(), allowCarryoverBox.isSelected());
-			}
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(this, "An error occurred while trying to perform the mass repair/salvage",
-					"Error occurred", JOptionPane.ERROR_MESSAGE);
-		} finally {
-			btnStart.setEnabled(true);
-			btnSaveAsDefault.setEnabled(true);
-			btnCancel.setEnabled(true);
-
-			btnSelectNone.setEnabled(true);
-			btnSelectAssigned.setEnabled(true);
-			btnSelectUnassigned.setEnabled(true);
+			units.add(unit);
 		}
+
+		if (units.isEmpty()) {
+			JOptionPane.showMessageDialog(this, "No valid units selected", "No units", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		List<MassRepairOption> activeMROs = new ArrayList<MassRepairOption>();
+
+		for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
+			int type = MassRepairOption.VALID_REPAIR_TYPES[i];
+
+			MassRepairOptionControl mroc = massRepairOptionControls[i];
+
+			if (!mroc.activeBox.isSelected()) {
+				continue;
+			}
+
+			MassRepairOption mro = new MassRepairOption();
+			mro.setType(type);
+			mro.setActive(mroc.activeBox.isSelected());
+			mro.setSkillMin(mroc.minSkillCBox.getSelectedIndex());
+			mro.setSkillMax(mroc.maxSkillCBox.getSelectedIndex());
+			mro.setBthMin((Integer) mroc.minBTHSpn.getValue());
+			mro.setBthMax((Integer) mroc.maxBTHSpn.getValue());
+
+			activeMROs.add(mro);
+		}
+
+		if (activeMROs.isEmpty()) {
+			JOptionPane.showMessageDialog(this,
+					"No repair options are currently enabled. Please activate at least one type of item to repair.",
+					"No repair options", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		int repairsCompleted = 0;
+
+		for (Unit unit : units) {
+			repairsCompleted += performMassRepairOrSalvage(unit, unit.isSalvage(), activeMROs,
+					useExtraTimeBox.isSelected(), useRushJobBox.isSelected(), allowCarryoverBox.isSelected());
+		}
+
+		String msg = "";
+
+		if (repairsCompleted == 1) {
+			msg = "Mass Repair/Salvage complete. There was 1 repair completed or scheduled.";
+		} else {
+			msg = String.format("Mass Repair/Salvage complete. There were %d repairs completed or scheduled.",
+					repairsCompleted);
+		}
+
+		JOptionPane.showMessageDialog(this, msg, "Complete", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	private void btnSaveAsDefaultActionPerformed(ActionEvent evt) {
@@ -773,7 +765,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		this.setVisible(false);
 	}
 
-	private void performMassRepairOrSalvage(Unit unit, boolean isSalvage, List<MassRepairOption> mroList,
+	private int performMassRepairOrSalvage(Unit unit, boolean isSalvage, List<MassRepairOption> mroList,
 			boolean useExtraTime, boolean useRushJob, boolean allowCarryover) {
 		String actionDescriptor = isSalvage ? "salvage" : "repair";
 		Campaign campaign = campaignGUI.getCampaign();
@@ -781,6 +773,8 @@ public class MassRepairSalvageDialog extends JDialog {
 		campaign.addReport(String.format("Beginning mass %s on %s.", actionDescriptor, unit.getName()));
 
 		ArrayList<Person> techs = campaign.getTechs(true);
+
+		int totalActionsPerformed = 0;
 
 		if (techs.isEmpty()) {
 			campaign.addReport(String.format("No available techs to %s parts %s %s.", actionDescriptor,
@@ -806,7 +800,6 @@ public class MassRepairSalvageDialog extends JDialog {
 			 * first dependent upon others being finished, also failed actions
 			 * can be performed again by a tech with a higher skill.
 			 */
-			int totalActionsPerformed = 0;
 			int actionsPerformed = 1;
 
 			while (actionsPerformed > 0) {
@@ -820,6 +813,8 @@ public class MassRepairSalvageDialog extends JDialog {
 		}
 
 		campaignGUI.refreshReport();
+
+		return totalActionsPerformed;
 	}
 
 	private int performMassTechAction(Unit unit, List<Person> techs, Map<Integer, MassRepairOption> mroByTypeMap,
