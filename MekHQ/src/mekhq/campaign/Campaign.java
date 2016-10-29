@@ -2009,7 +2009,9 @@ public class Campaign implements Serializable {
                 } else {
                     report += r.fail(SkillType.EXP_GREEN);
                     // try to refit again in case the tech has any time left
-                    refit(r);
+                    if (!r.isBeingRefurbished()) {
+                        refit(r);
+                    }
                 }
                 report += wrongType;
             }
@@ -3342,6 +3344,18 @@ public class Campaign implements Serializable {
             armor.decrementQuantity();
         } else {
             armor.changeAmountAvailable(-1 * points);
+        }
+    }
+
+    public boolean buyRefurbishment(Part part) {
+        if (getCampaignOptions().payForParts()) {
+            if (finances.debit(part.getStickerPrice(), Transaction.C_EQUIP, "Purchase of " + part.getName(), calendar.getTime())) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return true;
         }
     }
 
