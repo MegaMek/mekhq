@@ -52,8 +52,8 @@ public class News {
     private Map<DateTime, List<NewsItem>> archive;
     private Map<Integer, NewsItem> news;
     
-    public News(int year) {
-        loadNewsFor(year);
+    public News(int year, long seed) {
+        loadNewsFor(year, seed);
     }
     
     public NewsItem getNewsItem(int id) {
@@ -71,7 +71,7 @@ public class News {
         }
     }
     
-    public void loadNewsFor(int year) {
+    public void loadNewsFor(int year, long seed) {
         synchronized(LOADING_LOCK) {
             archive = new HashMap<>();
             news = new HashMap<>();
@@ -126,11 +126,11 @@ public class News {
                         if(null == newsItem.getDate()) {
                             MekHQ.logMessage("The date is null for news Item " + newsItem.getHeadline());
                         }
-                        int y = newsItem.getYear();
-                        if(y != year) {
+                        if(!newsItem.isInYear(year)) {
                             continue;
                         }
                         List<NewsItem> items;
+                        newsItem.finalizeDate(seed);
                         if(null == archive.get(newsItem.getDate())) {
                             items = new ArrayList<NewsItem>();
                             items.add(newsItem);

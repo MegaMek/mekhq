@@ -2609,6 +2609,9 @@ public class Unit implements MekHqXmlSerializable {
             return;
         }
 
+        // Clear any stale game data that may somehow have gotten set incorrectly
+        campaign.clearGameData(entity);
+        
         //TODO: For the moment we need to max these out at 8 so people don't get errors
         //when they customize in MM but we should put an option in MM to ignore those limits
         //and set it to true when we start up through MHQ

@@ -1045,18 +1045,25 @@ public class PersonnelMarket {
     }
 
     public static String getRecruitFaction(Campaign c) {
-    	if (!c.getFactionCode().equals("MERC")) {
-    		return c.getFactionCode();
-    	}
-    	if (c.getCalendar().get(Calendar.YEAR) > 3055 && Compute.randomInt(20) == 0) {
-    		ArrayList<String> clans = new ArrayList<String>();
-    		for (String f : RandomFactionGenerator.getInstance().getCurrentFactions()) {
-    			if (Faction.getFaction(f).isClan()) {
-    				clans.add(f);
-    			}
-    		}
-    		return Utilities.getRandomItem(clans);
-    	}
-    	return RandomFactionGenerator.getInstance().getEmployer();
+        if (c.getFactionCode().equals("MERC")) {
+        	if (c.getCalendar().get(Calendar.YEAR) > 3055 && Compute.randomInt(20) == 0) {
+        		ArrayList<String> clans = new ArrayList<String>();
+        		for (String f : RandomFactionGenerator.getInstance().getCurrentFactions()) {
+        			if (Faction.getFaction(f).isClan()) {
+        				clans.add(f);
+        			}
+        		}
+        		String clan = Utilities.getRandomItem(clans);
+        		if (clan != null) {
+        		    return clan;
+        		}
+        	} else {
+        	    String faction = RandomFactionGenerator.getInstance().getEmployer();
+        	    if (faction != null) {
+        	        return faction;
+        	    }
+        	}
+        }
+        return c.getFactionCode();
     }
 }

@@ -238,6 +238,7 @@ public class CampaignOptions implements Serializable {
     private boolean mercSizeLimited;
     private String[] rats = {"Xotl", "Total Warfare"};
     private boolean staticRATs;
+    private boolean ignoreRatEra;
     private int searchRadius;
     private double intensity;
     private boolean variableContractLength;
@@ -329,7 +330,7 @@ public class CampaignOptions implements Serializable {
         contractNegotiationXP = 0;
         adminXP = 0;
         adminXPPeriod = 1;
-        unitRatingMethod = UnitRatingMethod.INTERSTELLAR_OPS;
+        unitRatingMethod = UnitRatingMethod.CAMPAIGN_OPS;
         waitingPeriod = 7;
         acquisitionSkill = S_TECH;
         acquisitionSupportStaffOnly = true;
@@ -1604,6 +1605,14 @@ public class CampaignOptions implements Serializable {
 	public void setStaticRATs(boolean staticRATs) {
 		this.staticRATs = staticRATs;
 	}
+	
+	public boolean canIgnoreRatEra() {
+	    return ignoreRatEra;
+	}
+	
+	public void setIgnoreRatEra(boolean ignore) {
+	    ignoreRatEra = ignore;
+	}
 
 	public int getSearchRadius() {
 		return searchRadius;
@@ -2028,7 +2037,10 @@ public class CampaignOptions implements Serializable {
                 + MekHqXmlUtil.escape(csv)
                 + "</rats>");
         if (staticRATs) {
-        	pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<staticRATs/>");
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<staticRATs/>");
+        }
+        if (ignoreRatEra) {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<ignoreRatEra/>");
         }
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</campaignOptions>");
     }
@@ -2248,7 +2260,7 @@ public class CampaignOptions implements Serializable {
                     ("dragoonsRatingMethod")) {
                 if (!wn2.getTextContent().isEmpty() && (wn2.getTextContent() != null)) {
                     UnitRatingMethod method = UnitRatingMethod.getUnitRatingMethod(wn2.getTextContent());
-                    retVal.setUnitRatingMethod((method != null) ? method : UnitRatingMethod.INTERSTELLAR_OPS);
+                    retVal.setUnitRatingMethod((method != null) ? method : UnitRatingMethod.CAMPAIGN_OPS);
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("usePortraitForType")) {
                 String[] values = wn2.getTextContent().split(","); //$NON-NLS-1$
@@ -2422,7 +2434,9 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("rats")) {
             	retVal.rats = MekHqXmlUtil.unEscape(wn2.getTextContent().trim()).split(",");
             } else if (wn2.getNodeName().equalsIgnoreCase("staticRATs")) {
-            	retVal.staticRATs = true;
+                retVal.staticRATs = true;
+            } else if (wn2.getNodeName().equalsIgnoreCase("ignoreRatEra")) {
+                retVal.ignoreRatEra = true;
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseExtraTime")) {
                 retVal.massRepairUseExtraTime = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseRushJob")) {

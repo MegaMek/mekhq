@@ -49,7 +49,14 @@ import org.w3c.dom.NodeList;
  */
 public class SkillType implements Serializable {
     private static final long serialVersionUID = -5569555585715305914L;
-    
+
+    public static final String ULTRA_GREEN_NM = "Ultra-Green";
+    public static final String GREEN_NM = "Green";
+    public static final String REGULAR_NM = "Regular";
+    public static final String VETERAN_NM = "Veteran";
+    public static final String ELITE_NM = "Elite";
+    public static final String[] SKILL_LEVEL_NAMES = {ULTRA_GREEN_NM, GREEN_NM, REGULAR_NM, VETERAN_NM, ELITE_NM};
+
     //combat skills
     public static final String S_PILOT_MECH  = "Piloting/Mech";
     public static final String S_PILOT_AERO  = "Piloting/Aerospace";
@@ -329,22 +336,22 @@ public class SkillType implements Serializable {
     public static String getExperienceLevelName(int level) {
         switch(level) {
         case EXP_ULTRA_GREEN:
-            return "Ultra-Green";
+            return ULTRA_GREEN_NM;
         case EXP_GREEN:
-            return "Green";
+            return GREEN_NM;
         case EXP_REGULAR:
-            return "Regular";
+            return REGULAR_NM;
         case EXP_VETERAN:
-            return "Veteran";
+            return VETERAN_NM;
         case EXP_ELITE:
-            return "Elite";
+            return ELITE_NM;
         case -1:
             return "Unknown";
         default:
             return "Impossible";
         }
     }
-    
+
     public static String getDrivingSkillFor(Entity en) {
         if(en instanceof Tank) {
             if(en instanceof VTOL) {

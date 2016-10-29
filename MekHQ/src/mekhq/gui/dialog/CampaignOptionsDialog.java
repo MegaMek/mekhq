@@ -384,6 +384,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     private JRadioButton btnDynamicRATs;
     private JRadioButton btnStaticRATs;
+    private JCheckBox chkIgnoreRatEra;
     private DefaultListModel<String> chosenRatModel;
     private DefaultListModel<String> availableRatModel;
     private JList<String> availableRats;
@@ -3127,6 +3128,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         btnRemoveRat = new JButton();
         btnMoveRatUp = new JButton();
         btnMoveRatDown = new JButton();
+        chkIgnoreRatEra = new JCheckBox();
 
         spnSearchRadius = new JSpinner();
         spnIntensity = new JSpinner();
@@ -3486,6 +3488,13 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
         panSubAtBRat.add(panRatButtons, gridBagConstraints);
+        
+        chkIgnoreRatEra.setText(resourceMap.getString("chkIgnoreRatEra.text"));
+        chkIgnoreRatEra.setToolTipText(resourceMap.getString("chkIgnoreRatEra.toolTipText"));
+        chkIgnoreRatEra.setSelected(options.canIgnoreRatEra());
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        panSubAtBRat.add(chkIgnoreRatEra, gridBagConstraints);
         
         JLabel lblSearchRadius = new JLabel(resourceMap.getString("lblSearchRadius.text"));
         gridBagConstraints = new GridBagConstraints();
@@ -4329,15 +4338,13 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUseDropShips(chkUseDropShips.isSelected());
 
         options.setStaticRATs(btnStaticRATs.isSelected());
+        options.setIgnoreRatEra(chkIgnoreRatEra.isSelected());
         //Strip dates used in display name
         String[] ratList = new String[chosenRatModel.size()];
         for (int i = 0; i < chosenRatModel.size(); i++) {
         	ratList[i] = chosenRatModel.elementAt(i).replaceFirst(" \\(.*?\\)", "");
         }
         options.setRATs(ratList);
-        if (campaign.getUnitGenerator() instanceof RATManager) {
-        	((RATManager)campaign.getUnitGenerator()).setSelectedRATs(ratList);
-        }
         options.setSearchRadius((Integer)spnSearchRadius.getValue());
         options.setIntensity((Double)spnIntensity.getValue());
         options.setVariableContractLength(chkVariableContractLength.isSelected());

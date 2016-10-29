@@ -205,7 +205,7 @@ public class MekLabPanel extends JPanel {
 		if(null == entity) {
 			return;
 		}
-		refit = new Refit(unit, entity, true); 
+		refit = new Refit(unit, entity, true, false); 
 		testEntity = null;
 		if(entity instanceof Aero) {
 			testEntity = new TestAero((Aero)entity, entityVerifier.aeroOption, null);

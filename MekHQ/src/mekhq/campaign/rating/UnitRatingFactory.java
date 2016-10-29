@@ -31,9 +31,6 @@ public class UnitRatingFactory {
 
     /**
      * Returns the Dragoons Rating method as selected in the Campaign Options dialog.
-     *
-     * @param campaign
-     * @return
      */
     public static IUnitRating getUnitRating(Campaign campaign) {
         UnitRatingMethod method = campaign.getCampaignOptions().getUnitRatingMethod();
@@ -41,7 +38,7 @@ public class UnitRatingFactory {
             return new FieldManualMercRevDragoonsRating(campaign);
         }
 
-        return new InterstellarOpsReputation(campaign);
+        return new CampaignOpsReputation(campaign);
     }
 
 }

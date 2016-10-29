@@ -326,7 +326,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         techUnitIds = new ArrayList<UUID>();
         salary = -1;
         phenotype = PHENOTYPE_NONE;
-        clan = campaign.getFaction().isClan();
+        clan = campaign.getFaction() != null && campaign.getFaction().isClan();
         bloodname = "";
         primaryDesignator = DESIG_NONE;
         secondaryDesignator = DESIG_NONE;
@@ -2830,6 +2830,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public boolean isAdmin() {
         return (isAdminPrimary() || isAdminSecondary());
+    }
+
+    public boolean isMedic() {
+        return (T_MEDIC == primaryRole) || (T_MEDIC == secondaryRole);
     }
 
     public boolean isAdminPrimary() {

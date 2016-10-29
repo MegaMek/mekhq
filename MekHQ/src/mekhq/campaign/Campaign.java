@@ -185,6 +185,8 @@ public class Campaign implements Serializable {
 
 	private static final long serialVersionUID = -6312434701389973056L;
 
+	private UUID id;
+	
     // we have three things to track: (1) teams, (2) units, (3) repair tasks
     // we will use the same basic system (borrowed from MegaMek) for tracking
     // all three
@@ -286,6 +288,7 @@ public class Campaign implements Serializable {
     private IUnitGenerator unitGenerator;
 
     public Campaign() {
+        id = UUID.randomUUID();
         game = new Game();
         player = new Player(0, "self");
         game.addPlayer(0, player);
@@ -323,7 +326,7 @@ public class Campaign implements Serializable {
         game.setOptions(gameOptions);
         customs = new ArrayList<String>();
         shoppingList = new ShoppingList();
-        news = new News(calendar.get(Calendar.YEAR));
+        news = new News(calendar.get(Calendar.YEAR), id.getLeastSignificantBits());
         personnelMarket = new PersonnelMarket();
         contractMarket = new ContractMarket();
         unitMarket = new UnitMarket();
@@ -368,6 +371,10 @@ public class Campaign implements Serializable {
     	return player;
     }
 
+    public UUID getId() {
+        return id;
+    }
+    
     public String getName() {
         return name;
     }
@@ -473,6 +480,9 @@ public class Campaign implements Serializable {
      * changed in campaignOptions.
      */
     public void initUnitGenerator() {
+        if (unitGenerator != null && unitGenerator instanceof RATManager) {
+            MekHQ.EVENT_BUS.unregister(unitGenerator);
+        }
 		if (campaignOptions.useStaticRATs()) {
     		RATManager rm = new RATManager();
     		while (!RandomUnitGenerator.getInstance().isInitialized()) {
@@ -483,6 +493,7 @@ public class Campaign implements Serializable {
 				}
     		}
     		rm.setSelectedRATs(campaignOptions.getRATs());
+    		rm.setIgnoreRatEra(campaignOptions.canIgnoreRatEra());
     		unitGenerator = rm;    			
 		} else {
 			RATGeneratorConnector rgc = new RATGeneratorConnector(calendar.get(Calendar.YEAR));
@@ -980,6 +991,11 @@ public class Campaign implements Serializable {
 
     public ArrayList<Unit> getUnits() {
         return units;
+    }
+
+    // Since getUnits doesn't return a defensive copy and I don't know what I might break if I made it do so...
+    public ArrayList<Unit> getCopyOfUnits() {
+        return new ArrayList<>(units);
     }
 
     public ArrayList<Entity> getEntities() {
@@ -1993,7 +2009,9 @@ public class Campaign implements Serializable {
                 } else {
                     report += r.fail(SkillType.EXP_GREEN);
                     // try to refit again in case the tech has any time left
-                    refit(r);
+                    if (!r.isBeingRefurbished()) {
+                        refit(r);
+                    }
                 }
                 report += wrongType;
             }
@@ -2153,7 +2171,7 @@ public class Campaign implements Serializable {
     }
 
     public void reloadNews() {
-        news.loadNewsFor(calendar.get(Calendar.YEAR));
+        news.loadNewsFor(calendar.get(Calendar.YEAR), id.getLeastSignificantBits());
     }
 
     public int getDeploymentDeficit(AtBContract contract) {
@@ -3329,6 +3347,18 @@ public class Campaign implements Serializable {
         }
     }
 
+    public boolean buyRefurbishment(Part part) {
+        if (getCampaignOptions().payForParts()) {
+            if (finances.debit(part.getStickerPrice(), Transaction.C_EQUIP, "Purchase of " + part.getName(), calendar.getTime())) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return true;
+        }
+    }
+
     public boolean buyPart(Part part, int transitDays) {
         return buyPart(part, 1, transitDays);
     }
@@ -3400,6 +3430,7 @@ public class Campaign implements Serializable {
         // Basic Campaign Info
         pw1.println("\t<info>");
 
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "id", id.toString());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "name", name);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "faction", factionCode);
         if (retainerEmployerCode != null) {
@@ -5100,6 +5131,8 @@ public class Campaign implements Serializable {
                     retVal.medicPool = Integer.parseInt(wn.getTextContent().trim());
                 } else if (xn.equalsIgnoreCase("fatigueLevel")) {
                 	retVal.fatigueLevel = Integer.parseInt(wn.getTextContent().trim());
+                } else if (xn.equalsIgnoreCase("id")) {
+                    retVal.id = UUID.fromString(wn.getTextContent().trim());
                 }
             }
         }
@@ -5566,6 +5599,21 @@ public class Campaign implements Serializable {
 		    }
 		    person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
 		                          special);
+		} else if (name.equals("range_master")) {
+		    String special = Crew.RANGEMASTER_NONE;
+            switch (Compute.randomInt(2)) {
+                case 0:
+                    special = Crew.RANGEMASTER_MEDIUM;
+                    break;
+                case 1:
+                    special = Crew.RANGEMASTER_LONG;
+                    break;
+                case 2:
+                    special = Crew.RANGEMASTER_EXTREME;
+                    break;
+            }
+            person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
+                                  special);
 		} else if (name.equals("weapon_specialist")) {
 		    person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
 		                          SpecialAbility.chooseWeaponSpecialization(type,
@@ -5626,7 +5674,7 @@ public class Campaign implements Serializable {
     }
 
     /**
-     * Use an A* algorithm to find the best path between two planets For right now, we are just going to minimze the number
+     * Use an A* algorithm to find the best path between two planets For right now, we are just going to minimize the number
      * of jumps but we could extend this to take advantage of recharge information or other variables as well Based on
      * http://www.policyalmanac.org/games/aStarTutorial.htm
      *
@@ -5635,14 +5683,16 @@ public class Campaign implements Serializable {
      * @return
      */
     public JumpPath calculateJumpPath(Planet start, Planet end) {
-        String startKey = start.getId();
-        String endKey = end.getId();
-        
-        if (startKey.equals(endKey)) {
+        if(null == start) {
+            return null;
+        }
+        if((null == end) || start.getId().equals(end.getId())) {
             JumpPath jpath = new JumpPath();
             jpath.addPlanet(start);
             return jpath;
         }
+        String startKey = start.getId();
+        String endKey = end.getId();
 
         final DateTime now = Utilities.getDateTimeDay(calendar);
         String current = startKey;
@@ -6319,7 +6369,7 @@ public class Campaign implements Serializable {
 
     public int getNumberMedics() {
         int medics = medicPool;
-        for (Person p : personnel) {
+        for (Person p : getPersonnel()) {
             if ((p.getPrimaryRole() == Person.T_MEDIC || p.getSecondaryRole() == Person.T_MEDIC)
                 && p.isActive() && !p.isDeployed()) {
                 medics++;
