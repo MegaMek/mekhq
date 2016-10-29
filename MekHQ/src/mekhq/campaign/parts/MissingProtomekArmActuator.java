@@ -29,7 +29,6 @@ import megamek.common.Protomech;
 import megamek.common.TechConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions.MassRepairOption;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -198,6 +197,6 @@ public class MissingProtomekArmActuator extends MissingPart {
 	
 	@Override
 	public int getMassRepairOptionType() {
-    	return MassRepairOption.OPTION_TYPE.ACTUATORS;
+    	return Part.REPAIR_PART_TYPE.ACTUATOR;
     }
 }

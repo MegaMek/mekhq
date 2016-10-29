@@ -31,7 +31,6 @@ import megamek.common.Mech;
 import megamek.common.TechConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions.MassRepairOption;
 import mekhq.campaign.personnel.SkillType;
 
 import org.w3c.dom.Node;
@@ -337,6 +336,6 @@ public class MekActuator extends Part {
 	
 	@Override
 	public int getMassRepairOptionType() {
-    	return MassRepairOption.OPTION_TYPE.ACTUATORS;
+    	return Part.REPAIR_PART_TYPE.ACTUATOR;
     }
 }

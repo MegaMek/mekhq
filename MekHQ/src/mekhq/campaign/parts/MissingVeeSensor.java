@@ -25,7 +25,6 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions.MassRepairOption;
 
 import org.w3c.dom.Node;
 
@@ -129,6 +128,6 @@ public class MissingVeeSensor extends MissingPart {
     
     @Override
 	public int getMassRepairOptionType() {
-    	return MassRepairOption.OPTION_TYPE.ELECTRONICS;
+    	return Part.REPAIR_PART_TYPE.ELECTRONICS;
     }
 }

@@ -37,7 +37,6 @@ import megamek.common.TechConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions.MassRepairOption;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.WorkTime;
@@ -735,6 +734,6 @@ public class Armor extends Part implements IAcquisitionWork {
 	
 	@Override
 	public int getMassRepairOptionType() {
-    	return MassRepairOption.OPTION_TYPE.ARMOR;
+    	return Part.REPAIR_PART_TYPE.ARMOR;
     }
 }

@@ -23,15 +23,17 @@ package mekhq.campaign;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import megamek.common.TechConstants;
-import megamek.common.WeaponType;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.UnitRatingMethod;
@@ -260,7 +262,7 @@ public class CampaignOptions implements Serializable {
     private boolean massRepairUseExtraTime;
     private boolean massRepairUseRushJob;
     private boolean massRepairAllowCarryover;
-    private MassRepairOption[] massRepairOptions;
+    private List<MassRepairOption> massRepairOptions;
 
     public CampaignOptions() {
         clanPriceModifier = 1.0;
@@ -461,10 +463,10 @@ public class CampaignOptions implements Serializable {
         massRepairUseExtraTime = true;
         massRepairUseRushJob = true;
         massRepairAllowCarryover = true;
-        massRepairOptions = new MassRepairOption[MassRepairOption.OPTION_TYPE.MAX + 1];
+        massRepairOptions = new ArrayList<MassRepairOption>();
         
-        for (int i = 0; i <= MassRepairOption.OPTION_TYPE.MAX; i++) {
-        	massRepairOptions[i] = new MassRepairOption(i, false, 0, 4, 5);
+        for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
+        	massRepairOptions.add(new MassRepairOption(MassRepairOption.VALID_REPAIR_TYPES[i]));
         }
    }
 
@@ -1778,18 +1780,42 @@ public class CampaignOptions implements Serializable {
 		this.massRepairAllowCarryover = b;
 	}
 	
-	public MassRepairOption[] getMassRepairOptions() {
+	public List<MassRepairOption> getMassRepairOptions() {
 		return massRepairOptions;
 	}
 
-	public void setMassRepairOptions(MassRepairOption[] massRepairOptions) {
+	public void setMassRepairOptions(List<MassRepairOption> massRepairOptions) {
 		this.massRepairOptions = massRepairOptions;
 	}
 
-	public void setMassRepairOption(int idx, MassRepairOption massRepairOption) {
-		this.massRepairOptions[idx] = massRepairOption;
+	public void addMassRepairOption(MassRepairOption mro) {
+		if (mro.getType() == -1) {
+			return;
+		}
+		
+		int foundIdx = -1;
+		
+		for (int i = 0; i < massRepairOptions.size(); i++) {
+			if (massRepairOptions.get(i).getType() == mro.getType()) {
+				foundIdx = i;
+				break;
+			}
+		}
+		
+		if (foundIdx == -1) {
+			massRepairOptions.add(mro);
+		} else {
+			massRepairOptions.add(foundIdx, mro);
+			massRepairOptions.remove(foundIdx + 1);
+		}
+		
+		Collections.sort(massRepairOptions, new Comparator<MassRepairOption>() {
+			@Override
+			public int compare(MassRepairOption o1, MassRepairOption o2) {
+				return o1.getType() < o2.getType() ? -1 : 1;
+			}
+		});
 	}
-
 
 	public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
@@ -1960,14 +1986,15 @@ public class CampaignOptions implements Serializable {
 
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<massRepairOptions>");
 
-        for (int i = 0; i <= MassRepairOption.OPTION_TYPE.MAX; i++) {
-        	MassRepairOption mro = massRepairOptions[i];
+        for (int i = 0; i < massRepairOptions.size(); i++) {
+        	MassRepairOption mro = massRepairOptions.get(i);
         	
         	pw1.println(MekHqXmlUtil.indentStr(indent + 2) + "<massRepairOption" + i + ">");
         	
         	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "type", mro.getType());
         	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "active", mro.isActive() ? 1 : 0);
         	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "skillMin", mro.getSkillMin());
+        	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "skillMax", mro.getSkillMax());
         	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "btnMin", mro.getBthMin());
         	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "btnMax", mro.getBthMax());
         	
@@ -2412,11 +2439,11 @@ public class CampaignOptions implements Serializable {
                         continue;
                     }
                     
-                    for (int mroTypeIdx = 0; mroTypeIdx <= MassRepairOption.OPTION_TYPE.MAX; mroTypeIdx++) {
+                    for (int mroTypeIdx = 0; mroTypeIdx < MassRepairOption.VALID_REPAIR_TYPES.length; mroTypeIdx++) {
                     	if (mroNode.getNodeName().equalsIgnoreCase("massRepairOption" + mroTypeIdx)) {
                     		
                     		MassRepairOption mro = new MassRepairOption();
-                    		mro.setType(mroTypeIdx);
+                    		mro.setType(-1);
                     		
                             NodeList mroItemList = mroNode.getChildNodes();
 
@@ -2432,10 +2459,14 @@ public class CampaignOptions implements Serializable {
                                 MekHQ.logMessage("\t" + mroItemNode.getTextContent(), 5);
                                 
                                 
-                                if (mroItemNode.getNodeName().equalsIgnoreCase("active")) {
-                                	mro.setActive(Integer.parseInt(mroItemNode.getTextContent().trim()) == 1);
+                                if (mroItemNode.getNodeName().equalsIgnoreCase("type")) {
+                                	mro.setType(Integer.parseInt(mroItemNode.getTextContent().trim()));
+                                } else if (mroItemNode.getNodeName().equalsIgnoreCase("active")) {
+                                    mro.setActive(Integer.parseInt(mroItemNode.getTextContent().trim()) == 1);
                                 } else if (mroItemNode.getNodeName().equalsIgnoreCase("skillMin")) {
                                 	mro.setSkillMin(Integer.parseInt(mroItemNode.getTextContent().trim()));
+                                } else if (mroItemNode.getNodeName().equalsIgnoreCase("skillMax")) {
+                                	mro.setSkillMax(Integer.parseInt(mroItemNode.getTextContent().trim()));
                                 } else if (mroItemNode.getNodeName().equalsIgnoreCase("btnMin")) {
                                 	mro.setBthMin(Integer.parseInt(mroItemNode.getTextContent().trim()));
                                 } else if (mroItemNode.getNodeName().equalsIgnoreCase("btnMax")) {
@@ -2443,7 +2474,9 @@ public class CampaignOptions implements Serializable {
                                 }
                             }
                             
-                            retVal.massRepairOptions[mroTypeIdx] = mro;
+                            if (mro.getType() != -1) {
+                            	retVal.addMassRepairOption(mro);
+                            }
                     	}
                     }                    
                 }            	
@@ -2456,33 +2489,32 @@ public class CampaignOptions implements Serializable {
     }
     
     public static class MassRepairOption {
-    	public interface OPTION_TYPE {
-    		public static final int ARMOR = 0;
-    		public static final int AMMO = 1;
-    		public static final int WEAPONS = 2;
-    		public static final int LOCATIONS = 3;
-    		public static final int ENGINES = 4;
-    		public static final int GYROS = 5;
-    		public static final int ACTUATORS = 6;
-    		public static final int ELECTRONICS = 7;
-    		public static final int OTHER = 8;
-    		public static final int MAX = 8;
-    	}
-
     	public MassRepairOption() {
+    		
     	}
     	
-    	public MassRepairOption(int type, boolean active, int skillMin, int bthMin, int bthMax) {
+    	public MassRepairOption(int type) {
+    		this (type, false, SkillType.EXP_ULTRA_GREEN, SkillType.EXP_ELITE, 4, 4);
+    	}
+    	
+    	public MassRepairOption(int type, boolean active, int skillMin, int skillMax, int bthMin, int bthMax) {
 			this.type = type;
 			this.active = active;
 			this.skillMin = skillMin;
+			this.skillMax = skillMax;
 			this.bthMin = bthMin;
 			this.bthMax = bthMax;
 		}
 
+    	public static int[] VALID_REPAIR_TYPES = new int[] { Part.REPAIR_PART_TYPE.ARMOR, Part.REPAIR_PART_TYPE.AMMO, 
+    			Part.REPAIR_PART_TYPE.WEAPON, Part.REPAIR_PART_TYPE.GENERAL_LOCATION, Part.REPAIR_PART_TYPE.ENGINE, 
+    			Part.REPAIR_PART_TYPE.GYRO, Part.REPAIR_PART_TYPE.ACTUATOR, Part.REPAIR_PART_TYPE.ELECTRONICS, 
+    			Part.REPAIR_PART_TYPE.GENERAL };
+    	
 		private int type;
-    	private boolean active;
+    	private boolean active = true;
     	private int skillMin;
+    	private int skillMax;
     	private int bthMin;
     	private int bthMax;
     	
@@ -2510,6 +2542,14 @@ public class CampaignOptions implements Serializable {
 			this.skillMin = skillMin;
 		}
 		
+		public int getSkillMax() {
+			return skillMax;
+		}
+		
+		public void setSkillMax(int skillMax) {
+			this.skillMax = skillMax;
+		}
+		
 		public int getBthMin() {
 			return bthMin;
 		}
@@ -2524,45 +2564,6 @@ public class CampaignOptions implements Serializable {
 		
 		public void setBthMax(int bthMax) {
 			this.bthMax = bthMax;
-		}
-
-		public static int findCorrectOptionType(Part part) {
-			if (part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof WeaponType) {
-				return OPTION_TYPE.WEAPONS;
-			} else {			
-				return part.getMassRepairOptionType();
-			}
-		}
-
-		public static String getShortName(int type) {
-			switch (type) {
-	    		case OPTION_TYPE.ARMOR:
-	    			return "Armor";
-	    			
-	    		case OPTION_TYPE.AMMO:
-	    			return "Ammo";
-	    			
-	    		case OPTION_TYPE.WEAPONS:
-	    			return "Weapons";
-	    			
-	    		case OPTION_TYPE.LOCATIONS:
-	    			return "Locations";
-	    			
-	    		case OPTION_TYPE.ENGINES:
-	    			return "Engines";
-	    			
-	    		case OPTION_TYPE.GYROS:
-	    			return "Gyros";
-	    			
-	    		case OPTION_TYPE.ACTUATORS:
-	    			return "Actuators";
-	    			
-	    		case OPTION_TYPE.ELECTRONICS:
-	    			return "Cockpit/Life Support/Sensors";
-	    			
-	    		default:
-	    			return "Other Items";
-			}
 		}
     }
 }

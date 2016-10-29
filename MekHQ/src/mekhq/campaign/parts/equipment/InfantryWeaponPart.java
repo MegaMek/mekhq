@@ -26,7 +26,6 @@ import java.io.PrintWriter;
 import megamek.common.EquipmentType;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions.MassRepairOption;
 import mekhq.campaign.parts.MissingPart;
 
 import org.w3c.dom.Node;
@@ -117,6 +116,6 @@ public class InfantryWeaponPart extends EquipmentPart {
 
     @Override
     public int getMassRepairOptionType() {
-    	return MassRepairOption.OPTION_TYPE.WEAPONS;
+    	return REPAIR_PART_TYPE.WEAPON;
     }
 }

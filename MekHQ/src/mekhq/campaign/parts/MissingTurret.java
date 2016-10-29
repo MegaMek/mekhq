@@ -29,7 +29,6 @@ import megamek.common.IArmorState;
 import megamek.common.Tank;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions.MassRepairOption;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -155,6 +154,6 @@ public class MissingTurret extends MissingPart {
     
     @Override
 	public int getMassRepairOptionType() {
-    	return MassRepairOption.OPTION_TYPE.LOCATIONS;
+    	return Part.REPAIR_PART_TYPE.GENERAL_LOCATION;
     }
 }

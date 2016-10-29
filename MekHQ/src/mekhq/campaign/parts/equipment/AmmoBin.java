@@ -35,7 +35,6 @@ import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.CampaignOptions.MassRepairOption;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.MissingPart;
@@ -740,6 +739,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public int getMassRepairOptionType() {
-    	return MassRepairOption.OPTION_TYPE.AMMO;
+    	return Part.REPAIR_PART_TYPE.AMMO;
     }
 }

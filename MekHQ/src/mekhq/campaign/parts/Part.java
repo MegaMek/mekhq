@@ -32,14 +32,17 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.EquipmentType;
+import megamek.common.MiscType;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
+import megamek.common.WeaponType;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions.MassRepairOption;
+import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -90,6 +93,21 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     public static final int QUALITY_E = 4;
     public static final int QUALITY_F = 5;
 
+	public interface REPAIR_PART_TYPE {
+		public static final int ARMOR = 0;
+		public static final int AMMO = 1;
+		public static final int WEAPON = 2;
+		public static final int GENERAL_LOCATION = 3;
+		public static final int ENGINE = 4;
+		public static final int GYRO = 5;
+		public static final int ACTUATOR = 6;
+		public static final int ELECTRONICS = 7;
+		public static final int GENERAL = 8;
+		public static final int HEATSINK = 9;
+		public static final int MEK_LOCATION = 10;		
+		public static final int PHYSICAL_WEAPON = 11;		
+	}
+    
 	private static final String[] partTypeLabels = { "Armor", "Weapon", "Ammo",
 			"Equipment Part", "Mek Actuator", "Mek Engine", "Mek Gyro",
 			"Mek Life Support", "Mek Body Part", "Mek Sensor",
@@ -936,7 +954,12 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
 	@Override
     public int getMassRepairOptionType() {
-    	return MassRepairOption.OPTION_TYPE.OTHER;
+    	return REPAIR_PART_TYPE.GENERAL;
+    }
+
+	@Override
+    public int getRepairPartType() {
+    	return getMassRepairOptionType();
     }
 	
 	@Override
@@ -1285,5 +1308,57 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         }
         return sb.toString();
     }
+
+	public static String getRepairTypeShortName(int type) {
+		switch (type) {
+    		case Part.REPAIR_PART_TYPE.ARMOR:
+    			return "Armor";
+    			
+    		case Part.REPAIR_PART_TYPE.AMMO:
+    			return "Ammo";
+    			
+    		case Part.REPAIR_PART_TYPE.WEAPON:
+    			return "Weapons";
+    			
+    		case Part.REPAIR_PART_TYPE.GENERAL_LOCATION:
+    			return "Locations";
+    			
+    		case Part.REPAIR_PART_TYPE.ENGINE:
+    			return "Engines";
+    			
+    		case Part.REPAIR_PART_TYPE.GYRO:
+    			return "Gyros";
+    			
+    		case Part.REPAIR_PART_TYPE.ACTUATOR:
+    			return "Actuators";
+    			
+    		case Part.REPAIR_PART_TYPE.ELECTRONICS:
+    			return "Cockpit/Life Support/Sensors";
+    			
+    		default:
+    			return "Other Items";
+		}
+	}
+	
+	public static int findCorrectMassRepairType(Part part) {
+		if (part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof WeaponType) {
+			return Part.REPAIR_PART_TYPE.WEAPON;
+		} else {			
+			return part.getMassRepairOptionType();
+		}
+	}
+	
+	public static int findCorrectRepairType(Part part) {
+		if ((part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof WeaponType) ||
+				(part instanceof MissingEquipmentPart && ((MissingEquipmentPart)part).getType() instanceof WeaponType)) {
+			return Part.REPAIR_PART_TYPE.WEAPON;
+		} else {
+			if (part instanceof EquipmentPart && ((EquipmentPart)part).getType().hasFlag(MiscType.F_CLUB)) {
+				return Part.REPAIR_PART_TYPE.PHYSICAL_WEAPON;
+			}
+			
+			return part.getRepairPartType();
+		}
+	}
 }
 

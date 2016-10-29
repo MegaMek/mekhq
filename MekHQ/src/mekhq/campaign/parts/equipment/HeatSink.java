@@ -28,6 +28,7 @@ import megamek.common.MiscType;
 import megamek.common.Mounted;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.MissingPart;
+import mekhq.campaign.parts.Part;
 
 /**
  *
@@ -109,4 +110,9 @@ public class HeatSink extends EquipmentPart {
 	public boolean needsFixing() {
 		return hits > 0;
 	}
+	
+	@Override
+	public int getRepairPartType() {
+    	return Part.REPAIR_PART_TYPE.HEATSINK;
+    }
 }

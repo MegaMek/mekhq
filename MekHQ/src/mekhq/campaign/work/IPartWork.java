@@ -69,4 +69,5 @@ public interface IPartWork extends IWork {
     void cancelReservation();
     
     int getMassRepairOptionType();
+    int getRepairPartType();
 }
