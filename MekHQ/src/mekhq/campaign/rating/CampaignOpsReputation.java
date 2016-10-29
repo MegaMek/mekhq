@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Map;
 
 import megamek.common.Crew;
-import megamek.common.Dropship;
 import megamek.common.Entity;
+import megamek.common.FixedWingSupport;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
@@ -52,19 +52,17 @@ class CampaignOpsReputation extends AbstractUnitRating {
 
     // Tech Support & Admins.
     private int mechTechTeamsNeeded = 0;
-    private int protoTechTeamsNeeded = 0;
-    private int veeTechTeamsNeeded = 0;
+    private int mechanicTeamsNeeded = 0;
     private int battleArmorTechTeamsNeeded = 0;
-    private int infantryTechTeamsNeeded = 0;
-    private int fighterTechTeamsNeeded = 0;
+    private int aeroTechTeamsNeeded = 0;
     private int adminsNeeded = 0;
 
     private int totalTechTeams = 0;
     private int mechTechTeams = 0;
-    private int fighterTechTeams = 0;
-    private int veeTechTeams = 0;
+    private int aeroTechTeams = 0;
+    private int mechanicTeams = 0;
     private int baTechTeams = 0;
-    private int generalTechTeams = 0; // ToDo: Should Protomech & Infantry techs be counted as separate skills?
+    private int generalTechTeams = 0;
     private final List<String> craftWithoutCrew = new ArrayList<>();
     private int technicians = 0;
 
@@ -88,24 +86,16 @@ class CampaignOpsReputation extends AbstractUnitRating {
         return mechTechTeamsNeeded;
     }
 
-    int getProtoTechTeamsNeeded() {
-        return protoTechTeamsNeeded;
-    }
-
-    int getVeeTechTeamsNeeded() {
-        return veeTechTeamsNeeded;
+    int getMechanicTeamsNeeded() {
+        return mechanicTeamsNeeded;
     }
 
     int getBattleArmorTechTeamsNeeded() {
         return battleArmorTechTeamsNeeded;
     }
 
-    int getInfantryTechTeamsNeeded() {
-        return infantryTechTeamsNeeded;
-    }
-
-    int getFighterTechTeamsNeeded() {
-        return fighterTechTeamsNeeded;
+    int getAeroTechTeamsNeeded() {
+        return aeroTechTeamsNeeded;
     }
 
     private void countUnits() {
@@ -137,21 +127,24 @@ class CampaignOpsReputation extends AbstractUnitRating {
                 updateTotalSkill(u.getEntity().getCrew(), UnitType.determineUnitTypeCode(entity));
             }
 
-            if (entity instanceof Dropship) {
-                if (u.getFullCrewSize() < u.getActiveCrew().size()) {
-                    addCraftWithoutCrew(u);
-                }
-            } else if (entity instanceof SmallCraft) {
-                if (u.getFullCrewSize() < u.getActiveCrew().size()) {
-                    addCraftWithoutCrew(u);
-                }
-            } else if (entity instanceof Warship) {
-                updateDockingCollarCount((Warship) entity);
-                if (u.getFullCrewSize() < u.getActiveCrew().size()) {
-                    addCraftWithoutCrew(u);
-                }
-            } else if (entity instanceof Jumpship) {
-                updateDockingCollarCount((Jumpship) entity);
+            // todo: Add Mobile Structure when Megamek supports it.
+            switch (unitType) {
+                case UnitType.SPACE_STATION:
+                case UnitType.NAVAL:
+                case UnitType.DROPSHIP:
+                    if (u.getFullCrewSize() < u.getActiveCrew().size()) {
+                        addCraftWithoutCrew(u);
+                    }
+                    break;
+                case UnitType.WARSHIP:
+                case UnitType.JUMPSHIP:
+                    updateDockingCollarCount((Jumpship) entity);
+                    if (u.getFullCrewSize() < u.getActiveCrew().size()) {
+                        addCraftWithoutCrew(u);
+                    }
+                    break;
+            }
+            if (entity instanceof FixedWingSupport) { // UnitType doesn't include FixedWingSupport.
                 if (u.getFullCrewSize() < u.getActiveCrew().size()) {
                     addCraftWithoutCrew(u);
                 }
@@ -241,18 +234,18 @@ class CampaignOpsReputation extends AbstractUnitRating {
     }
 
     private void calcNeededTechs() {
-        setMechTechTeamsNeeded(getMechCount());
-        setFighterTechTeamsNeeded(getFighterCount());
-        setProtoTechTeamsNeeded(BigDecimal.valueOf(getProtoCount()).divide(BigDecimal.valueOf(5),
-                                                                           0,
-                                                                           RoundingMode.HALF_UP).intValue());
-        setVeeTechTeamsNeeded(getVeeCount());
-        setBattleArmorTechTeamsNeeded(new BigDecimal(super.getBattleArmorCount())
-                                              .divide(BigDecimal.valueOf(5), 0, RoundingMode.HALF_UP)
-                                              .intValue());
-        setInfantryTechTeamsNeeded(new BigDecimal(super.getInfantryCount())
-                                           .divide(BigDecimal.valueOf(112), 0, RoundingMode.HALF_UP)
-                                           .intValue());
+        int protoTeamCount = BigDecimal.valueOf(getProtoCount())
+                                       .divide(BigDecimal.valueOf(5), 0, RoundingMode.HALF_UP)
+                                       .intValue();
+        setMechTechTeamsNeeded(getMechCount() + protoTeamCount);
+        setAeroTechTeamsNeeded(getFighterCount() + getSmallCraftCount());
+        int infantryTeamCount = BigDecimal.valueOf(getInfantryCount())
+                                          .divide(BigDecimal.valueOf(112), 0, RoundingMode.HALF_UP)
+                                          .intValue();
+        setMechanicTeamsNeeded(getSuperHeavyVeeCount() + getVeeCount() + infantryTeamCount);
+        setBattleArmorTechTeamsNeeded(BigDecimal.valueOf(getBattleArmorCount())
+                                                .divide(BigDecimal.valueOf(5), 0, RoundingMode.HALF_UP)
+                                                .intValue());
     }
 
     private void updatePersonnelCounts() {
@@ -520,8 +513,8 @@ class CampaignOpsReputation extends AbstractUnitRating {
         setTotalTechTeams(0);
         int astechTeams;
         setMechTechTeams(0);
-        setFighterTechTeams(0);
-        setVeeTechTeams(0);
+        setAeroTechTeams(0);
+        setMechanicTeams(0);
         setBaTechTeams(0);
         setGeneralTechTeams(0);
 
@@ -538,10 +531,10 @@ class CampaignOpsReputation extends AbstractUnitRating {
                 setMechTechTeams(getMechTechTeams() + 1);
                 astechTeams--;
             } else if (tech.getSkill(SkillType.S_TECH_AERO) != null) {
-                setFighterTechTeams(getFighterTechTeams() + 1);
+                setAeroTechTeams(getAeroTechTeams() + 1);
                 astechTeams--;
             } else if (tech.getSkill(SkillType.S_TECH_MECHANIC) != null) {
-                setVeeTechTeams(getVeeTechTeams() + 1);
+                setMechanicTeams(getMechanicTeams() + 1);
                 astechTeams--;
             } else if (tech.getSkill(SkillType.S_TECH_BA) != null) {
                 setBaTechTeams(getBaTechTeams() + 1);
@@ -556,24 +549,20 @@ class CampaignOpsReputation extends AbstractUnitRating {
         if (getMechTechTeamsNeeded() > getMechTechTeams()) {
             techShortage = true;
         }
-        if (getFighterTechTeamsNeeded() > getFighterTechTeams()) {
+        if (getAeroTechTeamsNeeded() > getAeroTechTeams()) {
             techShortage = true;
         }
-        if (getVeeTechTeamsNeeded() > getVeeTechTeams()) {
+        if (getMechanicTeamsNeeded() > getMechanicTeams()) {
             techShortage = true;
         }
         if (getBattleArmorTechTeamsNeeded() > getBaTechTeams()) {
             techShortage = true;
         }
-        if ((getProtoTechTeamsNeeded() + getInfantryTechTeamsNeeded()) > getGeneralTechTeams()) {
-            techShortage = true;
-        }
 
-        setTotalTechTeams(getMechTechTeams() + getFighterTechTeams() + getVeeTechTeams() + getBaTechTeams() +
+        setTotalTechTeams(getMechTechTeams() + getAeroTechTeams() + getMechanicTeams() + getBaTechTeams() +
                           getGeneralTechTeams());
-        int totalTechTeamsNeeded = getMechTechTeamsNeeded() + getFighterTechTeamsNeeded() + getVeeTechTeamsNeeded() +
-                                   getBattleArmorTechTeamsNeeded() + getProtoTechTeamsNeeded() +
-                                   getInfantryTechTeamsNeeded();
+        int totalTechTeamsNeeded = getMechTechTeamsNeeded() + getAeroTechTeamsNeeded() + getMechanicTeamsNeeded() +
+                                   getBattleArmorTechTeamsNeeded();
         setSupportPercent(BigDecimal.ZERO);
         if (totalTechTeamsNeeded != 0) {
             setSupportPercent(BigDecimal.valueOf(getTotalTechTeams())
@@ -731,23 +720,16 @@ class CampaignOpsReputation extends AbstractUnitRating {
         final String TEMPLATE_CAT = "        %-" + CATEGORY_LENGTH + "s %4d needed / %4d available";
         out.append("\n    Tech Support:");
         out.append("\n").append(String.format(TEMPLATE_CAT, "Mech Techs:", getMechTechTeamsNeeded(), getMechTechTeams()));
+        out.append("\n            NOTE: Protomechs and mechs use same techs.");
         out.append("\n").append(String.format(TEMPLATE_CAT,
-                                              "Fighter Techs:",
-                                              getFighterTechTeamsNeeded(),
-                                              getFighterTechTeams()));
-        out.append("\n").append(String.format(TEMPLATE_CAT, "Tank Techs:", getVeeTechTeamsNeeded(), getVeeTechTeams()));
+                                              "Aero Techs:",
+                                              getAeroTechTeamsNeeded(),
+                                              getAeroTechTeams()));
+        out.append("\n").append(String.format(TEMPLATE_CAT, "Mechanics:", getMechanicTeamsNeeded(), getMechanicTeams()));
+        out.append("\n            NOTE: Vehicles and Infantry use the same mechanics.");
         out.append("\n").append(String.format(TEMPLATE_CAT, "BA Techs:",
                                               getBattleArmorTechTeamsNeeded(),
                                               getBaTechTeams()));
-        out.append("\n").append(String.format(TEMPLATE_CAT,
-                                              "Protomech Techs:",
-                                              getProtoTechTeamsNeeded(),
-                                              0));
-        out.append("\n").append(String.format(TEMPLATE_CAT,
-                                              "Infantry Techs:",
-                                              getInfantryTechTeamsNeeded(),
-                                              0));
-        out.append("\n            NOTE: MHQ Does not currently support Infantry and Protomech specific techs.");
         out.append("\n").append(String.format(TEMPLATE_CAT, "Astechs:", technicians * 6, getCampaign().getAstechPool()));
         out.append("\n").append(String.format("    %-" + (CATEGORY_LENGTH + 4) + "s %4d needed / %4d available",
                                               "Admin Support:",
@@ -806,7 +788,6 @@ class CampaignOpsReputation extends AbstractUnitRating {
                "+ Command: Does not incorporate any positive or negative traits from AToW or BRPG3." +
                "+ Transportation: Transportation needs of Support Personnel are not accounted for as MHQ does not " +
                "track Bay Personnel or Passenger Quarters.\n" +
-               "+ Support: MHQ Does not currently support Infantry or Protomech specific techs." +
                "+ Criminal Activity: MHQ does not currently track criminal activity." +
                "+ Inactivity: MHQ does not track end dates for missions/contracts.";
     }
@@ -819,24 +800,16 @@ class CampaignOpsReputation extends AbstractUnitRating {
         this.mechTechTeamsNeeded = mechTechTeamsNeeded;
     }
 
-    private void setProtoTechTeamsNeeded(int protoTechTeamsNeeded) {
-        this.protoTechTeamsNeeded = protoTechTeamsNeeded;
-    }
-
-    private void setVeeTechTeamsNeeded(int veeTechTeamsNeeded) {
-        this.veeTechTeamsNeeded = veeTechTeamsNeeded;
+    private void setMechanicTeamsNeeded(int mechanicTeamsNeeded) {
+        this.mechanicTeamsNeeded = mechanicTeamsNeeded;
     }
 
     private void setBattleArmorTechTeamsNeeded(int battleArmorTechTeamsNeeded) {
         this.battleArmorTechTeamsNeeded = battleArmorTechTeamsNeeded;
     }
 
-    private void setInfantryTechTeamsNeeded(int infantryTechTeamsNeeded) {
-        this.infantryTechTeamsNeeded = infantryTechTeamsNeeded;
-    }
-
-    private void setFighterTechTeamsNeeded(int fighterTechTeamsNeeded) {
-        this.fighterTechTeamsNeeded = fighterTechTeamsNeeded;
+    private void setAeroTechTeamsNeeded(int aeroTechTeamsNeeded) {
+        this.aeroTechTeamsNeeded = aeroTechTeamsNeeded;
     }
 
     private void setAdminsNeeded(int adminsNeeded) {
@@ -859,20 +832,20 @@ class CampaignOpsReputation extends AbstractUnitRating {
         this.mechTechTeams = mechTechTeams;
     }
 
-    private int getFighterTechTeams() {
-        return fighterTechTeams;
+    private int getAeroTechTeams() {
+        return aeroTechTeams;
     }
 
-    private void setFighterTechTeams(int fighterTechTeams) {
-        this.fighterTechTeams = fighterTechTeams;
+    private void setAeroTechTeams(int aeroTechTeams) {
+        this.aeroTechTeams = aeroTechTeams;
     }
 
-    private int getVeeTechTeams() {
-        return veeTechTeams;
+    private int getMechanicTeams() {
+        return mechanicTeams;
     }
 
-    private void setVeeTechTeams(int veeTechTeams) {
-        this.veeTechTeams = veeTechTeams;
+    private void setMechanicTeams(int mechanicTeams) {
+        this.mechanicTeams = mechanicTeams;
     }
 
     private int getBaTechTeams() {

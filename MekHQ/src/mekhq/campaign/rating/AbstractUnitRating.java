@@ -832,6 +832,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
 
         int unitType = UnitType.determineUnitTypeCode(e);
         logMessage("Unit " + u.getName() + " is a " + UnitType.getTypeDisplayableName(unitType));
+        //todo: Add Airship when Megamek supports it.
         switch (unitType) {
             case UnitType.MEK:
                 incrementMechCount();
@@ -839,6 +840,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
             case UnitType.PROTOMEK:
                 incrementProtoCount();
                 break;
+            case UnitType.GUN_EMPLACEMENT:
             case UnitType.VTOL:
             case UnitType.TANK:
                 logMessage("Unit " + u.getName() + " weight is " + e.getWeight());

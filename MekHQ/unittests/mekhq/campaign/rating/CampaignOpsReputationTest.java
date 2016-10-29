@@ -742,11 +742,9 @@ public class CampaignOpsReputationTest {
         assertEquals(1, spyReputation.getDropshipCount());
         BigDecimalAssert.assertEquals(expectedTotalSkill, spyReputation.getTotalSkillLevels(), 2);
         assertEquals(4, spyReputation.getMechTechTeamsNeeded());
-        assertEquals(0, spyReputation.getProtoTechTeamsNeeded());
-        assertEquals(2, spyReputation.getFighterTechTeamsNeeded());
-        assertEquals(8, spyReputation.getVeeTechTeamsNeeded());
+        assertEquals(2, spyReputation.getAeroTechTeamsNeeded());
+        assertEquals(8, spyReputation.getMechanicTeamsNeeded());
         assertEquals(0, spyReputation.getBattleArmorTechTeamsNeeded());
-        assertEquals(0, spyReputation.getInfantryTechTeamsNeeded());
         assertEquals(20, spyReputation.getAdminsNeeded());
         assertEquals(expectedAverageSkill, spyReputation.calcAverageExperience());
         assertEquals(10, spyReputation.getExperienceValue());
@@ -765,11 +763,9 @@ public class CampaignOpsReputationTest {
         assertEquals(1, spyReputation.getDropshipCount());
         BigDecimalAssert.assertEquals(expectedTotalSkill, spyReputation.getTotalSkillLevels(), 2);
         assertEquals(4, spyReputation.getMechTechTeamsNeeded());
-        assertEquals(0, spyReputation.getProtoTechTeamsNeeded());
-        assertEquals(2, spyReputation.getFighterTechTeamsNeeded());
-        assertEquals(8, spyReputation.getVeeTechTeamsNeeded());
+        assertEquals(2, spyReputation.getAeroTechTeamsNeeded());
+        assertEquals(8, spyReputation.getMechanicTeamsNeeded());
         assertEquals(0, spyReputation.getBattleArmorTechTeamsNeeded());
-        assertEquals(0, spyReputation.getInfantryTechTeamsNeeded());
         assertEquals(20, spyReputation.getAdminsNeeded());
         assertEquals(expectedAverageSkill, spyReputation.calcAverageExperience());
         assertEquals(10, spyReputation.getExperienceValue());
@@ -787,11 +783,9 @@ public class CampaignOpsReputationTest {
         assertEquals(0, spyReputation.getDropshipCount());
         BigDecimalAssert.assertEquals(BigDecimal.ZERO, spyReputation.getTotalSkillLevels(), 2);
         assertEquals(0, spyReputation.getMechTechTeamsNeeded());
-        assertEquals(0, spyReputation.getProtoTechTeamsNeeded());
-        assertEquals(0, spyReputation.getFighterTechTeamsNeeded());
-        assertEquals(0, spyReputation.getVeeTechTeamsNeeded());
+        assertEquals(0, spyReputation.getAeroTechTeamsNeeded());
+        assertEquals(0, spyReputation.getMechanicTeamsNeeded());
         assertEquals(0, spyReputation.getBattleArmorTechTeamsNeeded());
-        assertEquals(0, spyReputation.getInfantryTechTeamsNeeded());
         assertEquals(0, spyReputation.getAdminsNeeded());
         assertEquals(BigDecimal.ZERO, spyReputation.calcAverageExperience());
         assertEquals(0, spyReputation.getExperienceValue());
@@ -954,12 +948,11 @@ public class CampaignOpsReputationTest {
                 "Support:             -5\n" +
                 "    Tech Support:\n" +
                 "        Mech Techs:                   4 needed /    0 available\n" +
-                "        Fighter Techs:                2 needed /    0 available\n" +
-                "        Tank Techs:                   8 needed /    0 available\n" +
+                "            NOTE: Protomechs and mechs use same techs.\n" +
+                "        Aero Techs:                   2 needed /    0 available\n" +
+                "        Mechanics:                    8 needed /    0 available\n" +
+                "            NOTE: Vehicles and Infantry use the same mechanics.\n" +
                 "        BA Techs:                     0 needed /    0 available\n" +
-                "        Protomech Techs:              0 needed /    0 available\n" +
-                "        Infantry Techs:               0 needed /    0 available\n" +
-                "            NOTE: MHQ Does not currently support Infantry and Protomech specific techs.\n" +
                 "        Astechs:                    168 needed /   84 available\n" +
                 "    Admin Support:                   20 needed /   10 available\n" +
                 "    Large Craft Crew:\n" +
@@ -1010,12 +1003,11 @@ public class CampaignOpsReputationTest {
                 "Support:              0\n" +
                 "    Tech Support:\n" +
                 "        Mech Techs:                   0 needed /    0 available\n" +
-                "        Fighter Techs:                0 needed /    0 available\n" +
-                "        Tank Techs:                   0 needed /    0 available\n" +
+                "            NOTE: Protomechs and mechs use same techs.\n" +
+                "        Aero Techs:                   0 needed /    0 available\n" +
+                "        Mechanics:                    0 needed /    0 available\n" +
+                "            NOTE: Vehicles and Infantry use the same mechanics.\n" +
                 "        BA Techs:                     0 needed /    0 available\n" +
-                "        Protomech Techs:              0 needed /    0 available\n" +
-                "        Infantry Techs:               0 needed /    0 available\n" +
-                "            NOTE: MHQ Does not currently support Infantry and Protomech specific techs.\n" +
                 "        Astechs:                    168 needed /    0 available\n" +
                 "    Admin Support:                    0 needed /    0 available\n" +
                 "    Large Craft Crew:\n" +
@@ -1044,11 +1036,9 @@ public class CampaignOpsReputationTest {
         techs.add(mockThunderbolt2Tech);
         doReturn(techs).when(mockCampaign).getTechs();
         doReturn(0).when(spyReputation).getMechTechTeamsNeeded();
-        doReturn(0).when(spyReputation).getVeeTechTeamsNeeded();
-        doReturn(0).when(spyReputation).getFighterTechTeamsNeeded();
+        doReturn(0).when(spyReputation).getMechanicTeamsNeeded();
+        doReturn(0).when(spyReputation).getAeroTechTeamsNeeded();
         doReturn(0).when(spyReputation).getBattleArmorTechTeamsNeeded();
-        doReturn(0).when(spyReputation).getProtoTechTeamsNeeded();
-        doReturn(0).when(spyReputation).getInfantryTechTeamsNeeded();
         assertEquals(0, spyReputation.calcTechSupportValue());
 
         // Test having techs without having any astechs.
@@ -1059,11 +1049,9 @@ public class CampaignOpsReputationTest {
         techs.add(mockThunderbolt2Tech);
         doReturn(techs).when(mockCampaign).getTechs();
         doReturn(2).when(spyReputation).getMechTechTeamsNeeded();
-        doReturn(0).when(spyReputation).getVeeTechTeamsNeeded();
-        doReturn(0).when(spyReputation).getFighterTechTeamsNeeded();
+        doReturn(0).when(spyReputation).getMechanicTeamsNeeded();
+        doReturn(0).when(spyReputation).getAeroTechTeamsNeeded();
         doReturn(0).when(spyReputation).getBattleArmorTechTeamsNeeded();
-        doReturn(0).when(spyReputation).getProtoTechTeamsNeeded();
-        doReturn(0).when(spyReputation).getInfantryTechTeamsNeeded();
         assertEquals(-5, spyReputation.calcTechSupportValue());
 
         // Test having astechs without having any techs.
@@ -1071,11 +1059,9 @@ public class CampaignOpsReputationTest {
         doReturn(mockCampaign).when(spyReputation).getCampaign();
         doReturn(new ArrayList<>(0)).when(mockCampaign).getTechs();
         doReturn(2).when(spyReputation).getMechTechTeamsNeeded();
-        doReturn(0).when(spyReputation).getVeeTechTeamsNeeded();
-        doReturn(0).when(spyReputation).getFighterTechTeamsNeeded();
+        doReturn(0).when(spyReputation).getMechanicTeamsNeeded();
+        doReturn(0).when(spyReputation).getAeroTechTeamsNeeded();
         doReturn(0).when(spyReputation).getBattleArmorTechTeamsNeeded();
-        doReturn(0).when(spyReputation).getProtoTechTeamsNeeded();
-        doReturn(0).when(spyReputation).getInfantryTechTeamsNeeded();
         assertEquals(-5, spyReputation.calcTechSupportValue());
     }
 }
