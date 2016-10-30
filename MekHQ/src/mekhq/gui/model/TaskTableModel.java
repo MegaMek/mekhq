@@ -59,7 +59,7 @@ public class TaskTableModel extends DataTableModel {
             int actualRow = table.convertRowIndexToModel(row);
             
             Part part = getTaskAt(actualRow);
-            Image imgTool = getToolkit().getImage(Part.findPartImage(part)); //$NON-NLS-1$
+            Image imgTool = getToolkit().getImage(Part.findPartImage(part, false)); //$NON-NLS-1$
             
             this.setImage(imgTool);
             setOpaque(true);
