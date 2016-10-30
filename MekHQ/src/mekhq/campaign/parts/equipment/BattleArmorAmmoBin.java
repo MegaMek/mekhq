@@ -294,4 +294,9 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
         	//System.out.println("Found a null entity while calculating tonnage for " + name);
         }
     }
+
+    @Override
+    public int getMassRepairOptionType() {
+    	return Part.REPAIR_PART_TYPE.AMMO;
+    }
 }

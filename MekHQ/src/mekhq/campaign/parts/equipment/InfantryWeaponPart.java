@@ -113,4 +113,9 @@ public class InfantryWeaponPart extends EquipmentPart {
 	public boolean isPrimary() {
 		return primary;
 	}
+
+    @Override
+    public int getMassRepairOptionType() {
+    	return REPAIR_PART_TYPE.WEAPON;
+    }
 }

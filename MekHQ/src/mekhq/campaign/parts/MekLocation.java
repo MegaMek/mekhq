@@ -873,4 +873,13 @@ public class MekLocation extends Part {
 		return EquipmentType.DATE_NONE;
 	}
 	
+	@Override
+	public int getMassRepairOptionType() {
+    	return Part.REPAIR_PART_TYPE.GENERAL_LOCATION;
+    }
+	
+	@Override
+	public int getRepairPartType() {
+    	return Part.REPAIR_PART_TYPE.MEK_LOCATION;
+    }
 }

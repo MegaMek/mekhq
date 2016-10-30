@@ -257,6 +257,4 @@ public class StructuralIntegrity extends Part {
 	public int getReIntroDate() {
 		return EquipmentType.DATE_NONE;
 	}
-	
-	
 }

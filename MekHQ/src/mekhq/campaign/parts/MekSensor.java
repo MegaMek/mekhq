@@ -290,5 +290,9 @@ public class MekSensor extends Part {
 		 }
 		 return false;
     }
-
+	
+	@Override
+	public int getMassRepairOptionType() {
+    	return Part.REPAIR_PART_TYPE.ELECTRONICS;
+    }
 }

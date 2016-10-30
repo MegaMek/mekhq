@@ -23,12 +23,17 @@ package mekhq.campaign;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import megamek.common.TechConstants;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.market.PersonnelMarket;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.UnitRatingMethod;
@@ -254,6 +259,11 @@ public class CampaignOptions implements Serializable {
     private boolean unitMarketReportRefresh;
     private int startGameDelay;
 
+    //Mass Repair/Salvage Options
+    private boolean massRepairUseExtraTime;
+    private boolean massRepairUseRushJob;
+    private boolean massRepairAllowCarryover;
+    private List<MassRepairOption> massRepairOptions;
 
     public CampaignOptions() {
         clanPriceModifier = 1.0;
@@ -449,6 +459,16 @@ public class CampaignOptions implements Serializable {
         contractMarketReportRefresh = true;
         unitMarketReportRefresh = true;
         startGameDelay = 500;
+        
+        //Mass Repair/Salvage Options
+        massRepairUseExtraTime = true;
+        massRepairUseRushJob = true;
+        massRepairAllowCarryover = true;
+        massRepairOptions = new ArrayList<MassRepairOption>();
+        
+        for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
+        	massRepairOptions.add(new MassRepairOption(MassRepairOption.VALID_REPAIR_TYPES[i]));
+        }
    }
 
     public UnitRatingMethod getUnitRatingMethod() {
@@ -1745,6 +1765,66 @@ public class CampaignOptions implements Serializable {
 	public void setStartGameDelay(int delay) {
 		startGameDelay = delay;
 	}
+	public boolean massRepairUseExtraTime() {
+		return massRepairUseExtraTime;
+	}
+
+	public void setMassRepairUseExtraTime(boolean b) {
+		this.massRepairUseExtraTime = b;
+	}
+
+	public boolean massRepairUseRushJob() {
+		return massRepairUseRushJob;
+	}
+
+	public void setMassRepairUseRushJob(boolean b) {
+		this.massRepairUseRushJob = b;
+	}
+
+	public boolean massRepairAllowCarryover() {
+		return massRepairAllowCarryover;
+	}
+
+	public void setMassRepairAllowCarryover(boolean b) {
+		this.massRepairAllowCarryover = b;
+	}
+	
+	public List<MassRepairOption> getMassRepairOptions() {
+		return massRepairOptions;
+	}
+
+	public void setMassRepairOptions(List<MassRepairOption> massRepairOptions) {
+		this.massRepairOptions = massRepairOptions;
+	}
+
+	public void addMassRepairOption(MassRepairOption mro) {
+		if (mro.getType() == -1) {
+			return;
+		}
+		
+		int foundIdx = -1;
+		
+		for (int i = 0; i < massRepairOptions.size(); i++) {
+			if (massRepairOptions.get(i).getType() == mro.getType()) {
+				foundIdx = i;
+				break;
+			}
+		}
+		
+		if (foundIdx == -1) {
+			massRepairOptions.add(mro);
+		} else {
+			massRepairOptions.add(foundIdx, mro);
+			massRepairOptions.remove(foundIdx + 1);
+		}
+		
+		Collections.sort(massRepairOptions, new Comparator<MassRepairOption>() {
+			@Override
+			public int compare(MassRepairOption o1, MassRepairOption o2) {
+				return o1.getType() < o2.getType() ? -1 : 1;
+			}
+		});
+	}
 
 	public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
@@ -1908,6 +1988,30 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitMarketReportRefresh", unitMarketReportRefresh);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "startGameDelay", startGameDelay);
 
+        //Mass Repair/Salvage Options
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairUseExtraTime", massRepairUseExtraTime);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairUseRushJob", massRepairUseRushJob);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairAllowCarryover", massRepairAllowCarryover);
+
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<massRepairOptions>");
+
+        for (int i = 0; i < massRepairOptions.size(); i++) {
+        	MassRepairOption mro = massRepairOptions.get(i);
+        	
+        	pw1.println(MekHqXmlUtil.indentStr(indent + 2) + "<massRepairOption" + i + ">");
+        	
+        	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "type", mro.getType());
+        	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "active", mro.isActive() ? 1 : 0);
+        	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "skillMin", mro.getSkillMin());
+        	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "skillMax", mro.getSkillMax());
+        	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "btnMin", mro.getBthMin());
+        	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3, "btnMax", mro.getBthMax());
+        	
+        	pw1.println(MekHqXmlUtil.indentStr(indent + 2) + "</massRepairOption" + i + ">");
+        }
+        
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</massRepairOptions>");
+        
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<salaryTypeBase>"
                     + Utilities.printIntegerArray(salaryTypeBase)
@@ -2333,11 +2437,147 @@ public class CampaignOptions implements Serializable {
                 retVal.staticRATs = true;
             } else if (wn2.getNodeName().equalsIgnoreCase("ignoreRatEra")) {
                 retVal.ignoreRatEra = true;
+            } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseExtraTime")) {
+                retVal.massRepairUseExtraTime = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseRushJob")) {
+                retVal.massRepairUseRushJob = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("massRepairAllowCarryover")) {
+                retVal.massRepairAllowCarryover = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptions")) {
+                NodeList mroList = wn2.getChildNodes();
+
+                for (int mroIdx = 0; mroIdx < mroList.getLength(); mroIdx++) {
+                    Node mroNode = mroList.item(mroIdx);
+
+                    if (mroNode.getNodeType() != Node.ELEMENT_NODE) {
+                        continue;
+                    }
+                    
+                    for (int mroTypeIdx = 0; mroTypeIdx < MassRepairOption.VALID_REPAIR_TYPES.length; mroTypeIdx++) {
+                    	if (mroNode.getNodeName().equalsIgnoreCase("massRepairOption" + mroTypeIdx)) {
+                    		
+                    		MassRepairOption mro = new MassRepairOption();
+                    		mro.setType(-1);
+                    		
+                            NodeList mroItemList = mroNode.getChildNodes();
+
+                            for (int mroItemIdx = 0; mroItemIdx < mroItemList.getLength(); mroItemIdx++) {
+                                Node mroItemNode = mroItemList.item(mroItemIdx);
+
+                                if (mroItemNode.getNodeType() != Node.ELEMENT_NODE) {
+                                    continue;
+                                }
+                     
+                                MekHQ.logMessage("---", 5);
+                                MekHQ.logMessage("massRepairOption" + mroTypeIdx + "." + mroItemNode.getNodeName(), 5);
+                                MekHQ.logMessage("\t" + mroItemNode.getTextContent(), 5);
+                                
+                                
+                                if (mroItemNode.getNodeName().equalsIgnoreCase("type")) {
+                                	mro.setType(Integer.parseInt(mroItemNode.getTextContent().trim()));
+                                } else if (mroItemNode.getNodeName().equalsIgnoreCase("active")) {
+                                    mro.setActive(Integer.parseInt(mroItemNode.getTextContent().trim()) == 1);
+                                } else if (mroItemNode.getNodeName().equalsIgnoreCase("skillMin")) {
+                                	mro.setSkillMin(Integer.parseInt(mroItemNode.getTextContent().trim()));
+                                } else if (mroItemNode.getNodeName().equalsIgnoreCase("skillMax")) {
+                                	mro.setSkillMax(Integer.parseInt(mroItemNode.getTextContent().trim()));
+                                } else if (mroItemNode.getNodeName().equalsIgnoreCase("btnMin")) {
+                                	mro.setBthMin(Integer.parseInt(mroItemNode.getTextContent().trim()));
+                                } else if (mroItemNode.getNodeName().equalsIgnoreCase("btnMax")) {
+                                	mro.setBthMax(Integer.parseInt(mroItemNode.getTextContent().trim()));
+                                }
+                            }
+                            
+                            if (mro.getType() != -1) {
+                            	retVal.addMassRepairOption(mro);
+                            }
+                    	}
+                    }                    
+                }            	
             }
         }
 
         MekHQ.logMessage("Load Campaign Options Complete!", 4);
 
         return retVal;
+    }
+    
+    public static class MassRepairOption {
+    	public MassRepairOption() {
+    		
+    	}
+    	
+    	public MassRepairOption(int type) {
+    		this (type, false, SkillType.EXP_ULTRA_GREEN, SkillType.EXP_ELITE, 4, 4);
+    	}
+    	
+    	public MassRepairOption(int type, boolean active, int skillMin, int skillMax, int bthMin, int bthMax) {
+			this.type = type;
+			this.active = active;
+			this.skillMin = skillMin;
+			this.skillMax = skillMax;
+			this.bthMin = bthMin;
+			this.bthMax = bthMax;
+		}
+
+    	public static int[] VALID_REPAIR_TYPES = new int[] { Part.REPAIR_PART_TYPE.ARMOR, Part.REPAIR_PART_TYPE.AMMO, 
+    			Part.REPAIR_PART_TYPE.WEAPON, Part.REPAIR_PART_TYPE.GENERAL_LOCATION, Part.REPAIR_PART_TYPE.ENGINE, 
+    			Part.REPAIR_PART_TYPE.GYRO, Part.REPAIR_PART_TYPE.ACTUATOR, Part.REPAIR_PART_TYPE.ELECTRONICS, 
+    			Part.REPAIR_PART_TYPE.GENERAL };
+    	
+		private int type;
+    	private boolean active = true;
+    	private int skillMin;
+    	private int skillMax;
+    	private int bthMin;
+    	private int bthMax;
+    	
+		public int getType() {
+			return type;
+		}
+		
+		public void setType(int type) {
+			this.type = type;
+		}
+		
+		public boolean isActive() {
+			return active;
+		}
+		
+		public void setActive(boolean active) {
+			this.active = active;
+		}
+		
+		public int getSkillMin() {
+			return skillMin;
+		}
+		
+		public void setSkillMin(int skillMin) {
+			this.skillMin = skillMin;
+		}
+		
+		public int getSkillMax() {
+			return skillMax;
+		}
+		
+		public void setSkillMax(int skillMax) {
+			this.skillMax = skillMax;
+		}
+		
+		public int getBthMin() {
+			return bthMin;
+		}
+		
+		public void setBthMin(int bthMin) {
+			this.bthMin = bthMin;
+		}
+		
+		public int getBthMax() {
+			return bthMax;
+		}
+		
+		public void setBthMax(int bthMax) {
+			this.bthMax = bthMax;
+		}
     }
 }

@@ -73,7 +73,12 @@ public enum WorkTime {
     public static final WorkTime[] ALL_TIMES = {
         NORMAL, EXTRA_2, EXTRA_3, EXTRA_4, EXTRA_6, EXTRA_8, RUSH_2, RUSH_4, RUSH_8, RUSH_15, RUSH_30
     };
-
+    
+    /** StratOps times in increasing order **/
+    public static final WorkTime[] STRAT_OPTS_INCREASING_TIMES = {
+    	RUSH_8, RUSH_4, RUSH_2, NORMAL, EXTRA_2, EXTRA_3, EXTRA_4
+    };
+    
     /** @return the work time order corresponding to the (old) ID */
     public static WorkTime of(int id) {
         return ((id > 0) && (id < idMap.length)) ? idMap[id] : NORMAL;
@@ -101,5 +106,34 @@ public enum WorkTime {
     /** @return the target number modificator */
     public int getMod(boolean includeRush) {
         return (!isRushed || includeRush) ? mod : 0;
+    }
+    
+    public WorkTime moveTimeToNextLevel(boolean increase) {
+    	int currentIdx = -1;
+    	
+    	for (int i = 0; i < STRAT_OPTS_INCREASING_TIMES.length; i++) {
+    		if (id == STRAT_OPTS_INCREASING_TIMES[i].id) {
+    			currentIdx = i;
+    			break;
+    		}
+    	}
+    	
+    	if (currentIdx == -1) {
+    		return null;
+    	}
+    	
+    	if (increase) {
+    		if (currentIdx == STRAT_OPTS_INCREASING_TIMES.length - 1) {
+    			return null;
+    		}
+    		
+    		return WorkTime.of(STRAT_OPTS_INCREASING_TIMES[currentIdx + 1].id);
+    	} else {
+    		if (currentIdx == 0) {
+    			return null;
+    		}
+    		
+    		return WorkTime.of(STRAT_OPTS_INCREASING_TIMES[currentIdx - 1].id);
+    	}
     }
 }

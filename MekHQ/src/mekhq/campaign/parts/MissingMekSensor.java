@@ -161,5 +161,9 @@ public class MissingMekSensor extends MissingPart {
 		 }
 		 return false;	
     }
-
+	
+	@Override
+	public int getMassRepairOptionType() {
+    	return Part.REPAIR_PART_TYPE.ELECTRONICS;
+    }
 }

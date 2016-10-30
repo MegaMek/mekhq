@@ -673,5 +673,9 @@ public class EnginePart extends Part {
          }
          return false;
     }
-
+	
+	@Override
+	public int getMassRepairOptionType() {
+    	return Part.REPAIR_PART_TYPE.ENGINE;
+    }
 }

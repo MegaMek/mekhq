@@ -162,4 +162,8 @@ public class MissingMekLifeSupport extends MissingPart {
 		 return false;	
     }
 	
+	@Override
+	public int getMassRepairOptionType() {
+    	return Part.REPAIR_PART_TYPE.ELECTRONICS;
+    }
 }

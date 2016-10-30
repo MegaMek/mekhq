@@ -281,4 +281,9 @@ public class ProtomekLegActuator extends Part {
 	public int getReIntroDate() {
 		return EquipmentType.DATE_NONE;
 	}
+    
+    @Override
+	public int getMassRepairOptionType() {
+    	return Part.REPAIR_PART_TYPE.ACTUATOR;
+    }
 }

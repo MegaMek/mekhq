@@ -146,4 +146,9 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 		}
 		restore();
 	}
+
+    @Override
+    public int getMassRepairOptionType() {
+    	return Part.REPAIR_PART_TYPE.AMMO;
+    }
 }

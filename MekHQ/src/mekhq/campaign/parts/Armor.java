@@ -731,4 +731,9 @@ public class Armor extends Part implements IAcquisitionWork {
         	this.name += " (" + EquipmentType.armorNames[type] + ")";
         }
 	}
+	
+	@Override
+	public int getMassRepairOptionType() {
+    	return Part.REPAIR_PART_TYPE.ARMOR;
+    }
 }

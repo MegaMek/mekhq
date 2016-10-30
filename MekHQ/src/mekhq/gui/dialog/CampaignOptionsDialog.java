@@ -243,7 +243,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox useUnofficalMaintenance;
     private JCheckBox reverseQualityNames;
 
-
     private JRadioButton btnContractEquipment;
     private JRadioButton btnContractPersonnel;
     private JSpinner spnEquipPercent;
@@ -417,7 +416,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     private JSpinner spnStartGameDelay;
 
-
     /**
      * Creates new form CampaignOptionsDialog
      */
@@ -480,7 +478,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         checkMaintenance.setSelected(options.checkMaintenance());
         reverseQualityNames.setSelected(options.reverseQualityNames());
 
-
         sellUnitsBox.setSelected(options.canSellUnits());
         sellPartsBox.setSelected(options.canSellParts());
 
@@ -493,7 +490,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         useQuirksBox.setSelected(options.useQuirks());
         chkSupportStaffOnly.setSelected(options.isAcquisitionSupportStaffOnly());
-
     }
 
     /**
@@ -586,7 +582,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         checkMaintenance = new JCheckBox();
         logMaintenance = new JCheckBox();
         reverseQualityNames = new JCheckBox();
-
+                
         chkSupportStaffOnly = new JCheckBox();
 
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl()); //$NON-NLS-1$
@@ -727,7 +723,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         tabOptions.addTab(resourceMap.getString("panGeneral.TabConstraints.tabTitle"), panGeneral); // NOI18N
 
         panRepair.setName("panRules"); // NOI18N
-        panRepair.setLayout(new java.awt.GridLayout(2, 2));
+        panRepair.setLayout(new java.awt.GridBagLayout());
 
         JPanel panSubRepair = new JPanel(new GridBagLayout());
         JPanel panSubMaintenance = new JPanel(new GridBagLayout());
@@ -738,11 +734,44 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panSubMaintenance.setBorder(BorderFactory.createTitledBorder("Maintenance"));
         panSubAcquire.setBorder(BorderFactory.createTitledBorder("Acquisition"));
         panSubDelivery.setBorder(BorderFactory.createTitledBorder("Delivery"));
-
-        panRepair.add(panSubRepair);
-        panRepair.add(panSubAcquire);
-        panRepair.add(panSubMaintenance);
-        panRepair.add(panSubDelivery);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = .5;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        panRepair.add(panSubRepair, gridBagConstraints);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = .5;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        panRepair.add(panSubAcquire, gridBagConstraints);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        panRepair.add(panSubMaintenance, gridBagConstraints);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        panRepair.add(panSubDelivery, gridBagConstraints);
+        
+        //We want the new mass repair panel to span two cells
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.weighty = 1;
+        gridBagConstraints.gridwidth = GridBagConstraints.REMAINDER;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 
         useEraModsCheckBox.setText(resourceMap.getString("useEraModsCheckBox.text")); // NOI18N
         useEraModsCheckBox.setToolTipText(resourceMap.getString("useEraModsCheckBox.toolTipText")); // NOI18N

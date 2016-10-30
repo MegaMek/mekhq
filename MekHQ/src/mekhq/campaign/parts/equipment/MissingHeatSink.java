@@ -49,10 +49,14 @@ public class MissingHeatSink extends MissingEquipmentPart {
 	public int getDifficulty() {
 		return -2;
 	}
-    
 
 	@Override
 	public Part getNewPart() {
 		return new HeatSink(getUnitTonnage(), type, -1, campaign);
 	}
+	
+	@Override
+	public int getRepairPartType() {
+    	return Part.REPAIR_PART_TYPE.HEATSINK;
+    }
 }

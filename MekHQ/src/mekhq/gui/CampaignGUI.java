@@ -3842,7 +3842,7 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    private Person getSelectedTech() {
+    public Person getSelectedTech() {
         JTable table = techTable;
         if (onWarehouseTab()) {
             table = whTechTable;
@@ -6889,6 +6889,7 @@ public class CampaignGUI extends JPanel {
 
     protected void updateTechTarget() {
         TargetRoll target = null;
+        
         if (acquireSelected()) {
             IAcquisitionWork acquire = getSelectedAcquisition();
             if (null != acquire) {
@@ -7168,6 +7169,9 @@ public class CampaignGUI extends JPanel {
                 }
                 if (part.getSkillMin() > SkillType.EXP_ELITE) {
                     return false;
+                }
+                if (tech.getMinutesLeft() <= 0) {
+                	return false;
                 }
                 return (getCampaign().getCampaignOptions().isDestroyByMargin() || part
                         .getSkillMin() <= (skill.getExperienceLevel() - modePenalty));
