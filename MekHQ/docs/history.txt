@@ -3,10 +3,14 @@ VERSION HISTORY
 v0.41.26-git
 + Issue #204: AtB generates empty unit markets with traditional RATS
 + Fixed bug with Export to MUL setting deployment round to -1 instead of 0
-+ Issue #103: Dragoon Rating (FMM:Rev) Decreases as Dropship Carrying Capacity is Used.
-+ Converted Interstellar Ops Beta Unit Rating to Campaign Ops Unit Rating to match the released version of the rules.
-+ Added additional details to both the Dragoons and Campaign Ops Unit rating reports.
-+ Issue #215: CO Rating showing tech shortage due to infantry.
++ Issue #103: Dragoon Rating (FMM:Rev) Decreases as Dropship Carrying Capacity is Used
++ Converted Interstellar Ops Beta Unit Rating to Campaign Ops Unit Rating to match the released version of the rules
++ Added additional details to both the Dragoons and Campaign Ops Unit rating reports
++ Issue #215: CO Rating showing tech shortage due to infantry
++ Added PR for Range Master support
++ Updated MegaMek.jar to allow building with Range Master support
++ Added PR for Mass Repair and Salvage
++ Added PR for Refurbishment
 
 v0.41.25 (2016-10-15 14:40 UTC)
 + Issue #158: Scenario Resolution: ejected+fled pilots lose hits

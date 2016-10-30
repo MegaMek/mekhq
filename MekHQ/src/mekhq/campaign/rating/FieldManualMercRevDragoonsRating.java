@@ -667,7 +667,6 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         return out.toString();
     }
 
-    @SuppressWarnings("StringBufferReplaceableByString")
     private String getCombatRecordDetails() {
         StringBuilder out = new StringBuilder();
         out.append(String.format("%-" + HEADER_LENGTH + "s %3d", "Combat Record:", getCombatRecordValue())).append("\n");
@@ -723,7 +722,6 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         return out.toString();
     }
 
-    @SuppressWarnings("StringBufferReplaceableByString")
     private String getSupportDetails() {
         StringBuilder out = new StringBuilder();
         out.append(String.format("%-" + HEADER_LENGTH + "s %3d", "Support:", getSupportValue()));
@@ -764,7 +762,6 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         return out.toString();
     }
 
-    @SuppressWarnings("StringBufferReplaceableByString")
     private String getFinancialDetails() {
         StringBuilder out = new StringBuilder();
         out.append(String.format("%-" + HEADER_LENGTH + "s %3d", "Financial:", getFinancialValue()));

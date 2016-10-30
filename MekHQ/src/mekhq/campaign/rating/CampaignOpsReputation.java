@@ -35,7 +35,6 @@ import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
 import megamek.common.UnitType;
-import megamek.common.Warship;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
