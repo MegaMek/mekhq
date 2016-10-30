@@ -21,6 +21,7 @@
 
 package mekhq.campaign.parts;
 
+import java.awt.Color;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -1361,7 +1362,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		}
 	}
 
-	public static String findPartImage(Part part, boolean baseImagesOnly) {
+	public static String[] findPartImage(Part part) {
 		String imgBase = null;
         int repairType = Part.findCorrectRepairType(part);
         
@@ -1418,17 +1419,12 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         	imgBase = "equipment";
         }
 
-        /*
-         * For the tasks table, we use enhanced images based upon status. 
-         * For the acquisition table, we only use the base images.
-         */
-        if (!baseImagesOnly) {
-        	
-        }
-        
-		String imgPath = "data/images/misc/repair/" + imgBase + ".png";
-        
-        return imgPath;
+
+        String[] imgData = new String[2];
+        imgData[0] = "data/images/misc/repair/";
+        imgData[1] = imgBase;
+
+        return imgData;
 	}
 }
 

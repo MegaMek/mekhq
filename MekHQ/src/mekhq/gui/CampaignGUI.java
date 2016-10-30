@@ -2233,7 +2233,7 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.weightx = 1.0;
         panTasks.add(panDoTask, gridBagConstraints);
 
-        taskModel = new TaskTableModel();
+        taskModel = new TaskTableModel(this);
         taskTable = new JTable(taskModel);
         taskTable.setRowHeight(70);
         taskTable.getColumnModel().getColumn(0)
