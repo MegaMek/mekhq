@@ -86,38 +86,36 @@ public class TaskTableModel extends DataTableModel {
             
             int availableLevel = REPAIR_STATE.AVAILABLE;
             
-            if (!part.isSalvaging()) {
-	            if (null != part.getTeamId()) {
-	            	availableLevel = REPAIR_STATE.SCHEDULED;
-	            } else {
-	            	if (part instanceof MissingPart) {
-	            		if (!((MissingPart)part).isReplacementAvailable()) {
-		            		String[] inventories = campaignGUI.getCampaign().getPartInventory(((MissingPart) part).getNewPart());
-		            		
-		            		//int inStock = processInventoryString(inventories[0]);
-		            		int inTransit = processInventoryString(inventories[1]);
-		            		int onOrder = processInventoryString(inventories[2]);
-		            		
-		            		if ((inTransit > 0) || (onOrder > 0)) {
-		            			availableLevel = REPAIR_STATE.IN_TRANSIT;
-		            		} else {
-		            			availableLevel = REPAIR_STATE.NOT_AVAILABLE;
-		            		}
+            if (null != part.getTeamId()) {
+            	availableLevel = REPAIR_STATE.SCHEDULED;
+            } else {            	
+            	if (part instanceof MissingPart) {
+            		if (!((MissingPart)part).isReplacementAvailable()) {
+	            		String[] inventories = campaignGUI.getCampaign().getPartInventory(((MissingPart) part).getNewPart());
+	            		
+	            		//int inStock = processInventoryString(inventories[0]);
+	            		int inTransit = processInventoryString(inventories[1]);
+	            		int onOrder = processInventoryString(inventories[2]);
+	            		
+	            		if ((inTransit > 0) || (onOrder > 0)) {
+	            			availableLevel = REPAIR_STATE.IN_TRANSIT;
+	            		} else {
+	            			availableLevel = REPAIR_STATE.NOT_AVAILABLE;
 	            		}
-	            	}
+            		}
+            	}
+            	
+            	if (availableLevel == REPAIR_STATE.AVAILABLE) {
+	                Person tech = campaignGUI.getSelectedTech();
 	            	
-	            	if (availableLevel == REPAIR_STATE.AVAILABLE) {
-		                Person tech = campaignGUI.getSelectedTech();
-		            	
-		                if (null != tech) {
-		                	TargetRoll roll = campaignGUI.getCampaign().getTargetFor(part, tech);
-		                	
-		                	if ((roll.getValue() == TargetRoll.IMPOSSIBLE) || (roll.getValue() == TargetRoll.AUTOMATIC_FAIL) || (roll.getValue() == TargetRoll.CHECK_FALSE)) {
-		                		availableLevel = REPAIR_STATE.BLOCKED;
-		                	}
-		                }
-	            	}
-	            }
+	                if (null != tech) {
+	                	TargetRoll roll = campaignGUI.getCampaign().getTargetFor(part, tech);
+	                	
+	                	if ((roll.getValue() == TargetRoll.IMPOSSIBLE) || (roll.getValue() == TargetRoll.AUTOMATIC_FAIL) || (roll.getValue() == TargetRoll.CHECK_FALSE)) {
+	                		availableLevel = REPAIR_STATE.BLOCKED;
+	                	}
+	                }
+            	}
             }
             
             String imgMod = "";
