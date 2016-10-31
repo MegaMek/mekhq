@@ -2134,7 +2134,7 @@ public class CampaignGUI extends JPanel {
                     @Override
                     public void valueChanged(
                             ListSelectionEvent evt) {
-                        updateTechTarget();
+                    	techTableValueChanged(evt);
                     }
                 });
         techSorter = new TableRowSorter<TechTableModel>(techsModel);
@@ -3925,6 +3925,12 @@ public class CampaignGUI extends JPanel {
         }
     }
 
+    private void techTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
+        updateTechTarget();
+        
+        taskTable.repaint();
+    }
+    
     public void focusOnUnit(UUID id) {
         if (null == id) {
             return;

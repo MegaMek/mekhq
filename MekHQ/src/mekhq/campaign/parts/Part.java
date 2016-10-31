@@ -21,7 +21,6 @@
 
 package mekhq.campaign.parts;
 
-import java.awt.Color;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
