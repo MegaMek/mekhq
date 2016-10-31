@@ -1,6 +1,5 @@
 package mekhq.gui.model;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
 import java.util.ArrayList;
@@ -13,8 +12,8 @@ import mekhq.IconPackage;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
-import mekhq.gui.BasicInfo;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.RepairTaskInfo;
 
 /**
  * A table model for displaying work items
@@ -60,7 +59,7 @@ public class TaskTableModel extends DataTableModel {
         return new TaskTableModel.Renderer(icons);
     }
 
-    public class Renderer extends BasicInfo implements TableCellRenderer {
+    public class Renderer extends RepairTaskInfo implements TableCellRenderer {
 
         public Renderer(IconPackage icons) {
             super(icons);
@@ -92,16 +91,18 @@ public class TaskTableModel extends DataTableModel {
 	            	availableLevel = REPAIR_STATE.SCHEDULED;
 	            } else {
 	            	if (part instanceof MissingPart) {
-	            		/*
-	            		String[] inventories = campaignGUI.getCampaign().getPartInventory(part);
-	
-	            		String inStockStr = inventories[0];
-	            		String inTransitStr = inventories[1];
-	            		String onOrderStr = inventories[2];
-	            		*/
-	            		
 	            		if (!((MissingPart)part).isReplacementAvailable()) {
-	            			availableLevel = REPAIR_STATE.NOT_AVAILABLE;	            			
+		            		String[] inventories = campaignGUI.getCampaign().getPartInventory(((MissingPart) part).getNewPart());
+		            		
+		            		//int inStock = processInventoryString(inventories[0]);
+		            		int inTransit = processInventoryString(inventories[1]);
+		            		int onOrder = processInventoryString(inventories[2]);
+		            		
+		            		if ((inTransit > 0) || (onOrder > 0)) {
+		            			availableLevel = REPAIR_STATE.IN_TRANSIT;
+		            		} else {
+		            			availableLevel = REPAIR_STATE.NOT_AVAILABLE;
+		            		}
 	            		}
 	            	}
 	            	
@@ -120,6 +121,7 @@ public class TaskTableModel extends DataTableModel {
             }
             
             String imgMod = "";
+            boolean setSecondary = false;
             
             switch (availableLevel) {
 	            case REPAIR_STATE.BLOCKED:
@@ -135,6 +137,7 @@ public class TaskTableModel extends DataTableModel {
 	            	break;
 	            	
 	            case REPAIR_STATE.SCHEDULED:
+	            	setSecondary = true;
 	            	break;
             }
 
@@ -145,7 +148,22 @@ public class TaskTableModel extends DataTableModel {
             
             this.setImage(imgTool);
             
+            if (setSecondary) {
+            	this.setSecondaryImage(getToolkit().getImage("data/images/misc/repair/working.png"));	
+            } else {
+            	this.setSecondaryImage(null);
+            }
+            
             return c;
         }
+
+        //This is a hack to compensate for the sub-optimal return values
+		private int processInventoryString(String str) {
+			if (str.indexOf(" ") > -1) {
+				return Integer.parseInt(str.substring(0, str.indexOf(" ")));
+			}
+
+			return Integer.parseInt(str);
+		}
     }
 }
