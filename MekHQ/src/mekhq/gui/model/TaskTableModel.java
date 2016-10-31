@@ -107,7 +107,21 @@ public class TaskTableModel extends DataTableModel {
             	
             	if (availableLevel == REPAIR_STATE.AVAILABLE) {
 	                Person tech = campaignGUI.getSelectedTech();
-	            	
+
+	                if (null == tech) {
+	                	//Find the best tech so we can show a preview until we select a tech
+	                	ArrayList<Person> techs = campaignGUI.getCampaign().getTechs(false);
+	                	
+	        			for (int i = techs.size() - 1; i >= 0; i--) {
+	        				Person techTemp = techs.get(i);
+
+	        				if (techTemp.canTech(part.getUnit().getEntity())) {
+	        					tech = techTemp;
+	        					break;
+	        				}
+	        			}
+	                }
+	                
 	                if (null != tech) {
 	                	TargetRoll roll = campaignGUI.getCampaign().getTargetFor(part, tech);
 	                	
