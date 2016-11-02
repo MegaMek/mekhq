@@ -2134,7 +2134,7 @@ public class CampaignGUI extends JPanel {
                     @Override
                     public void valueChanged(
                             ListSelectionEvent evt) {
-                        updateTechTarget();
+                    	techTableValueChanged(evt);
                     }
                 });
         techSorter = new TableRowSorter<TechTableModel>(techsModel);
@@ -2233,7 +2233,7 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.weightx = 1.0;
         panTasks.add(panDoTask, gridBagConstraints);
 
-        taskModel = new TaskTableModel();
+        taskModel = new TaskTableModel(this);
         taskTable = new JTable(taskModel);
         taskTable.setRowHeight(70);
         taskTable.getColumnModel().getColumn(0)
@@ -3925,6 +3925,12 @@ public class CampaignGUI extends JPanel {
         }
     }
 
+    private void techTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
+        updateTechTarget();
+        
+        taskTable.repaint();
+    }
+    
     public void focusOnUnit(UUID id) {
         if (null == id) {
             return;

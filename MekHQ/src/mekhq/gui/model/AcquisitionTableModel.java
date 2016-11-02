@@ -9,6 +9,7 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
 import mekhq.IconPackage;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.BasicInfo;
 
@@ -46,8 +47,20 @@ public class AcquisitionTableModel extends DataTableModel {
                 Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
             Component c = this;
+            int actualRow = table.convertRowIndexToModel(row);
             //MissingPart task = getAcquisitionAt(row);
-            Image imgTool = getToolkit().getImage("data/images/misc/tools.png"); //$NON-NLS-1$
+            
+            IAcquisitionWork aw = getAcquisitionAt(actualRow);
+            String imgPath = "";
+            
+            if (aw instanceof Part) {
+            	String[] imgData = Part.findPartImage((Part)aw);
+            	imgPath = imgData[0] + imgData[1] + ".png";
+            } else {
+            	imgPath = "data/images/misc/repair/equipment.png";
+            }
+            
+            Image imgTool = getToolkit().getImage(imgPath); //$NON-NLS-1$
             this.setImage(imgTool);
             setOpaque(true);
             setText(getValueAt(row, column).toString(), "black");

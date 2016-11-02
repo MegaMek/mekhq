@@ -7173,6 +7173,17 @@ public class Campaign implements Serializable {
 
     }
 
+    /*
+     * TODO: 
+     * 
+     * I think this should be rewritten to return a concrete class instead of 
+     * an array of strings.
+     * 
+     * This should have 3 ints for the values and an optional string modifier 
+     * for the points (armor) and shots (ammo).
+     * 
+     * Cord Awtry (kipstafoo) - 30-Oct-2016
+     */
     /**
      * This returns a String array of length three, with the following values 0 - the number of parts of this type, or
      * armor points, or ammo shots currently in stock 1 - the number of parts of this type, or armor points, or ammo shots

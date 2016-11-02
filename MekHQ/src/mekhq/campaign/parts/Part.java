@@ -1360,5 +1360,70 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 			return part.getRepairPartType();
 		}
 	}
+
+	public static String[] findPartImage(Part part) {
+		String imgBase = null;
+        int repairType = Part.findCorrectRepairType(part);
+        
+        switch (repairType) {
+        	case Part.REPAIR_PART_TYPE.ARMOR:
+        		imgBase = "armor";
+        		break;
+        	case Part.REPAIR_PART_TYPE.AMMO:
+        		imgBase = "ammo";
+        		break;
+        	case Part.REPAIR_PART_TYPE.ACTUATOR:
+        		imgBase = "actuator";
+        		break;
+        	case Part.REPAIR_PART_TYPE.ENGINE:
+        		imgBase = "engine";
+        		break;
+        	case Part.REPAIR_PART_TYPE.ELECTRONICS:
+        		imgBase = "electronics";
+        		break;
+        	case Part.REPAIR_PART_TYPE.HEATSINK:
+        		imgBase = "heatsink";
+        		break;
+        	case Part.REPAIR_PART_TYPE.WEAPON:
+        		EquipmentType equipmentType = null;
+        		
+        		if (part instanceof EquipmentPart) {
+        			equipmentType = ((EquipmentPart)part).getType();
+        		} else if (part instanceof MissingEquipmentPart) {
+        			equipmentType = ((MissingEquipmentPart)part).getType();
+        		}
+
+        		if (null != equipmentType) {
+	        		if (equipmentType.hasFlag(WeaponType.F_LASER)) {
+	        			imgBase = "laser";	
+	        		} else if (equipmentType.hasFlag(WeaponType.F_MISSILE)) {
+	        			imgBase = "missile";	
+	        		} else if (equipmentType.hasFlag(WeaponType.F_BALLISTIC)) {
+	        			imgBase = "ballistic";	
+	        		} else if (equipmentType.hasFlag(WeaponType.F_ARTILLERY)) {
+	        			imgBase = "artillery";	
+	        		}	        		
+        		}
+        		
+        		break;
+        	case Part.REPAIR_PART_TYPE.MEK_LOCATION:
+        		imgBase = "location_mek";
+        		break;
+        	case Part.REPAIR_PART_TYPE.PHYSICAL_WEAPON:
+        		imgBase = "melee";
+        		break;
+        }
+
+        if (null == imgBase) {
+        	imgBase = "equipment";
+        }
+
+
+        String[] imgData = new String[2];
+        imgData[0] = "data/images/misc/repair/";
+        imgData[1] = imgBase;
+
+        return imgData;
+	}
 }
 
