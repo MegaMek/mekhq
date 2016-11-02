@@ -156,7 +156,7 @@ public class IconPackage {
                         for(String value : iconMap.get(layer)) {
                             BufferedImage img = (BufferedImage) items.getItem(layer, value);
                             // Draw the current buffered image onto the base, aligning bottom and right side
-                            g2d.drawImage(img, width - img.getWidth(), height - img.getHeight(), null);
+                            g2d.drawImage(img, width - img.getWidth() + 1, height - img.getHeight() + 1, null);
                         }
                     }
                 }
