@@ -11,6 +11,7 @@ v0.41.26-git
 + Updated MegaMek.jar to allow building with Range Master support
 + Added PR for Mass Repair and Salvage
 + Added PR for Refurbishment
++ Added PR for Repair task icons
 
 v0.41.25 (2016-10-15 14:40 UTC)
 + Issue #158: Scenario Resolution: ejected+fled pilots lose hits
