@@ -417,16 +417,16 @@ class CampaignOpsReputation extends AbstractUnitRating {
         boolean doubleCapacity = true;
         boolean fullCapacity = true;
         int heavyVeeBays = getHeavyVeeBayCount();
-        if (getMechBayCount() < super.getMechCount()) {
+        if (getMechBayCount() < getMechCount()) {
             fullCapacity = false;
             doubleCapacity = false;
-        } else if (getMechBayCount() < super.getMechCount() * 2) {
+        } else if (getMechBayCount() < getMechCount() * 2) {
             doubleCapacity = false;
         }
-        if (getProtoBayCount() < super.getProtoCount()) {
+        if (getProtoBayCount() < getProtoCount()) {
             fullCapacity = false;
             doubleCapacity = false;
-        } else if (getProtoBayCount() < super.getProtoCount() * 2) {
+        } else if (getProtoBayCount() < getProtoCount() * 2) {
             doubleCapacity = false;
         }
         if (getHeavyVeeBayCount() < getHeavyVeeCount()) {
@@ -437,28 +437,28 @@ class CampaignOpsReputation extends AbstractUnitRating {
         }
         heavyVeeBays -= getHeavyVeeBayCount();
         int lightVeeBays = getLightVeeBayCount() + heavyVeeBays;
-        if (getLightVeeBayCount() < lightVeeBays) {
+        if (lightVeeBays < getLightVeeCount()) {
             fullCapacity = false;
             doubleCapacity = false;
-        } else if (getLightVeeBayCount() < lightVeeBays * 2) {
+        } else if (lightVeeBays < getLightVeeCount() * 2) {
             doubleCapacity = false;
         }
-        if (getFighterBayCount() < super.getFighterCount()) {
+        if (getFighterBayCount() < getFighterCount()) {
             fullCapacity = false;
             doubleCapacity = false;
-        } else if (getFighterBayCount() < super.getFighterCount() * 2) {
+        } else if (getFighterBayCount() < getFighterCount() * 2) {
             doubleCapacity = false;
         }
-        if ((getBaBayCount()) < super.getBattleArmorCount() / 5) {
+        if ((getBaBayCount()) < getBattleArmorCount() / 5) {
             fullCapacity = false;
             doubleCapacity = false;
-        } else if ((getBaBayCount() * 2) < 2 * super.getBattleArmorCount() / 5) {
+        } else if ((getBaBayCount() * 2) < 2 * getBattleArmorCount() / 5) {
             doubleCapacity = false;
         }
-        if (getInfantryBayCount() < super.getInfantryCount() / 28) {
+        if (getInfantryBayCount() < getInfantryCount() / 28) {
             fullCapacity = false;
             doubleCapacity = false;
-        } else if (getInfantryBayCount() < super.getInfantryCount() / 14) {
+        } else if (getInfantryBayCount() < getInfantryCount() / 14) {
             doubleCapacity = false;
         }
         if (getSmallCraftBayCount() < getSmallCraftCount()) {
@@ -500,7 +500,7 @@ class CampaignOpsReputation extends AbstractUnitRating {
                 totalValue += 5;
             }
         }
-        if (getDockingCollarCount() >= getDropshipCount()) {
+        if ((getDropshipCount() > 0) && (getDockingCollarCount() >= getDropshipCount())) {
             totalValue += 5;
         }
 
