@@ -1,5 +1,7 @@
-VERSION HISTORY
-----------------------------------
+VERSION HISTORY:
+----------------
+v0.41.27-git
+
 v0.41.26 (2016-11-02 02:00 UTC)
 + Issue #204: AtB generates empty unit markets with traditional RATS
 + Fixed bug with Export to MUL setting deployment round to -1 instead of 0
