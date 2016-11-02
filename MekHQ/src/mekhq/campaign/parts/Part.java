@@ -1361,28 +1361,28 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		}
 	}
 
-	public static String findPartImage(Part part) {
-		String imgPath = null;
+	public static String[] findPartImage(Part part) {
+		String imgBase = null;
         int repairType = Part.findCorrectRepairType(part);
         
         switch (repairType) {
         	case Part.REPAIR_PART_TYPE.ARMOR:
-        		imgPath = "data/images/misc/repair/armor.png";
+        		imgBase = "armor";
         		break;
         	case Part.REPAIR_PART_TYPE.AMMO:
-        		imgPath = "data/images/misc/repair/ammo.png";
+        		imgBase = "ammo";
         		break;
         	case Part.REPAIR_PART_TYPE.ACTUATOR:
-        		imgPath = "data/images/misc/repair/actuator.png";
+        		imgBase = "actuator";
         		break;
         	case Part.REPAIR_PART_TYPE.ENGINE:
-        		imgPath = "data/images/misc/repair/engine.png";
+        		imgBase = "engine";
         		break;
         	case Part.REPAIR_PART_TYPE.ELECTRONICS:
-        		imgPath = "data/images/misc/repair/electronics.png";
+        		imgBase = "electronics";
         		break;
         	case Part.REPAIR_PART_TYPE.HEATSINK:
-        		imgPath = "data/images/misc/repair/heatsink.png";
+        		imgBase = "heatsink";
         		break;
         	case Part.REPAIR_PART_TYPE.WEAPON:
         		EquipmentType equipmentType = null;
@@ -1395,30 +1395,35 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
         		if (null != equipmentType) {
 	        		if (equipmentType.hasFlag(WeaponType.F_LASER)) {
-	        			imgPath = "data/images/misc/repair/laser.png";	
+	        			imgBase = "laser";	
 	        		} else if (equipmentType.hasFlag(WeaponType.F_MISSILE)) {
-	        			imgPath = "data/images/misc/repair/missile.png";	
+	        			imgBase = "missile";	
 	        		} else if (equipmentType.hasFlag(WeaponType.F_BALLISTIC)) {
-	        			imgPath = "data/images/misc/repair/ballistic.png";	
+	        			imgBase = "ballistic";	
 	        		} else if (equipmentType.hasFlag(WeaponType.F_ARTILLERY)) {
-	        			imgPath = "data/images/misc/repair/artillery.png";	
+	        			imgBase = "artillery";	
 	        		}	        		
         		}
         		
         		break;
         	case Part.REPAIR_PART_TYPE.MEK_LOCATION:
-        		imgPath = "data/images/misc/repair/location_mek.png";
+        		imgBase = "location_mek";
         		break;
         	case Part.REPAIR_PART_TYPE.PHYSICAL_WEAPON:
-        		imgPath = "data/images/misc/repair/melee.png";
+        		imgBase = "melee";
         		break;
         }
 
-        if (null == imgPath) {
-        	imgPath = "data/images/misc/repair/equipment.png";
+        if (null == imgBase) {
+        	imgBase = "equipment";
         }
-        
-        return imgPath;
+
+
+        String[] imgData = new String[2];
+        imgData[0] = "data/images/misc/repair/";
+        imgData[1] = imgBase;
+
+        return imgData;
 	}
 }
 

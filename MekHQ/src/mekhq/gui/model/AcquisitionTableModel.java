@@ -54,7 +54,8 @@ public class AcquisitionTableModel extends DataTableModel {
             String imgPath = "";
             
             if (aw instanceof Part) {
-            	imgPath = Part.findPartImage((Part)aw);
+            	String[] imgData = Part.findPartImage((Part)aw);
+            	imgPath = imgData[0] + imgData[1] + ".png";
             } else {
             	imgPath = "data/images/misc/repair/equipment.png";
             }
