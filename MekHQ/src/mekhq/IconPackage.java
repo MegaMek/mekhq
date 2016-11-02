@@ -41,9 +41,12 @@ public class IconPackage {
     public static String FORCE_ADJUSTMENTS          = "Pieces/Adjustments/"; //$NON-NLS-1$
     public static String FORCE_ALPHANUMERICS        = "Pieces/Alphanumerics/"; //$NON-NLS-1$
     public static String FORCE_SPECIAL_MODIFIERS    = "Pieces/Special Modifiers/"; //$NON-NLS-1$
+    public static String FORCE_BACKGROUNDS          = "Pieces/Backgrounds/"; //$NON-NLS-1$
+    public static String FORCE_LOGOS                = "Pieces/Logos/"; //$NON-NLS-1$
     
-    public static String[] FORCE_DRAW_ORDER = {FORCE_FRAME, FORCE_TYPE, FORCE_FORMATIONS,
-        FORCE_ADJUSTMENTS, FORCE_ALPHANUMERICS, FORCE_SPECIAL_MODIFIERS
+    public static String[] FORCE_DRAW_ORDER = {
+            FORCE_BACKGROUNDS, FORCE_FRAME, FORCE_TYPE, FORCE_FORMATIONS, 
+            FORCE_ADJUSTMENTS, FORCE_ALPHANUMERICS, FORCE_SPECIAL_MODIFIERS, FORCE_LOGOS
     };
     
     /** A map of keys to various gui elements, for future skinning purposes */

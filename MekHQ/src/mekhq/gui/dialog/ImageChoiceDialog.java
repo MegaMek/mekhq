@@ -109,7 +109,17 @@ public class ImageChoiceDialog extends JDialog {
     private JTable tableSpecialModifiers = new JTable();
     private JPanel panelSpecialModifiers = new JPanel();
     private ImageTableModel specialModel = new ImageTableModel();
-    // EMD: Layered Images Support
+    // Backgrounds
+    private JScrollPane scrBackgrounds = new JScrollPane();
+    private JTable tableBackgrounds = new JTable();
+    private JPanel panelBackgrounds = new JPanel();
+    private ImageTableModel backgroundsModel = new ImageTableModel();
+    // Logos
+    private JScrollPane scrLogos = new JScrollPane();
+    private JTable tableLogos = new JTable();
+    private JPanel panelLogos = new JPanel();
+    private ImageTableModel logosModel = new ImageTableModel();
+    // END: Layered Images Support
 
     /** Creates new form ImageChoiceDialog */
     public ImageChoiceDialog(Frame parent, boolean modal, String category, String file, DirectoryItems items) {
@@ -173,6 +183,8 @@ public class ImageChoiceDialog extends JDialog {
                 tableAlphanumerics.clearSelection();
                 tableFormations.clearSelection();
                 tableSpecialModifiers.clearSelection();
+                tableBackgrounds.clearSelection();
+                tableLogos.clearSelection();
                 tableTypes.clearSelection();
             }
         });
@@ -351,6 +363,52 @@ public class ImageChoiceDialog extends JDialog {
                 specialModel.addImage(imageNamesSpecial.next());
             }
             layerTabs.addTab(resourceMap.getString("Force.special"), panelSpecialModifiers);
+
+            // Panel for Backgrounds
+            tableBackgrounds.setModel(backgroundsModel);
+            tableBackgrounds.setName("tableBackgrounds"); // NOI18N
+            tableBackgrounds.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+            tableBackgrounds.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+                @Override
+                public void valueChanged(ListSelectionEvent event) {
+                    refreshLayeredPreview();
+                }
+            });
+            tableBackgrounds.setRowHeight(76);
+            tableBackgrounds.getColumnModel().getColumn(0).setCellRenderer(specialModel.getRenderer());
+            tableBackgrounds.addMouseListener(new ImageTableMouseAdapter());
+            scrBackgrounds.setViewportView(tableBackgrounds);
+            panelBackgrounds.add(scrBackgrounds, gbc);
+            backgroundsModel.reset();
+            backgroundsModel.setCategory(IconPackage.FORCE_BACKGROUNDS);
+            Iterator<String> imageNamesBackgrounds = imageItems.getItemNames(IconPackage.FORCE_BACKGROUNDS);
+            while (imageNamesBackgrounds.hasNext()) {
+                backgroundsModel.addImage(imageNamesBackgrounds.next());
+            }
+            layerTabs.addTab(resourceMap.getString("Force.backgrounds"), panelBackgrounds);
+
+            // Panel for Logos
+            tableLogos.setModel(logosModel);
+            tableLogos.setName("tableLogos"); // NOI18N
+            tableLogos.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+            tableLogos.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+                @Override
+                public void valueChanged(ListSelectionEvent event) {
+                    refreshLayeredPreview();
+                }
+            });
+            tableLogos.setRowHeight(76);
+            tableLogos.getColumnModel().getColumn(0).setCellRenderer(specialModel.getRenderer());
+            tableLogos.addMouseListener(new ImageTableMouseAdapter());
+            scrLogos.setViewportView(tableLogos);
+            panelLogos.add(scrLogos, gbc);
+            logosModel.reset();
+            logosModel.setCategory(IconPackage.FORCE_LOGOS);
+            Iterator<String> imageNamesLogos = imageItems.getItemNames(IconPackage.FORCE_LOGOS);
+            while (imageNamesLogos.hasNext()) {
+                logosModel.addImage(imageNamesLogos.next());
+            }
+            layerTabs.addTab(resourceMap.getString("Force.logos"), panelLogos);
             
             // Put it all together nice and pretty on the layerPanel
             layerPanel.setLayout(new GridBagLayout());
@@ -527,6 +585,24 @@ public class ImageChoiceDialog extends JDialog {
             for (int index : tableSpecialModifiers.getSelectedRows()) {
                 tmp.add((String) tableSpecialModifiers.getValueAt(index, 0));
                 iconMap.put(IconPackage.FORCE_SPECIAL_MODIFIERS, tmp);
+            }
+        }
+        if (tableBackgrounds.getSelectedRow() == -1) {
+            iconMap.remove(IconPackage.FORCE_BACKGROUNDS, iconMap.get(IconPackage.FORCE_BACKGROUNDS));
+        } else {
+            tmp = new Vector<String>();
+            for (int index : tableBackgrounds.getSelectedRows()) {
+                tmp.add((String) tableBackgrounds.getValueAt(index, 0));
+                iconMap.put(IconPackage.FORCE_BACKGROUNDS, tmp);
+            }
+        }
+        if (tableLogos.getSelectedRow() == -1) {
+            iconMap.remove(IconPackage.FORCE_LOGOS, iconMap.get(IconPackage.FORCE_LOGOS));
+        } else {
+            tmp = new Vector<String>();
+            for (int index : tableLogos.getSelectedRows()) {
+                tmp.add((String) tableLogos.getValueAt(index, 0));
+                iconMap.put(IconPackage.FORCE_LOGOS, tmp);
             }
         }
         // Set the category to layered

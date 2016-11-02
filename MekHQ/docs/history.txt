@@ -12,6 +12,7 @@ v0.41.26-git
 + Added PR for Mass Repair and Salvage
 + Added PR for Refurbishment
 + Added PR for Repair task icons
++ New force icon pieces and categories
 
 v0.41.25 (2016-10-15 14:40 UTC)
 + Issue #158: Scenario Resolution: ejected+fled pilots lose hits
