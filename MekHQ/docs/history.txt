@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.41.26-git
+v0.41.26 (2016-11-02 02:00 UTC)
 + Issue #204: AtB generates empty unit markets with traditional RATS
 + Fixed bug with Export to MUL setting deployment round to -1 instead of 0
 + Issue #103: Dragoon Rating (FMM:Rev) Decreases as Dropship Carrying Capacity is Used
@@ -13,6 +13,7 @@ v0.41.26-git
 + Added PR for Refurbishment
 + Added PR for Repair task icons
 + New force icon pieces and categories
++ Updated MegaMek.jar and MegaMekLab.jar to 0.41.26
 
 v0.41.25 (2016-10-15 14:40 UTC)
 + Issue #158: Scenario Resolution: ejected+fled pilots lose hits
