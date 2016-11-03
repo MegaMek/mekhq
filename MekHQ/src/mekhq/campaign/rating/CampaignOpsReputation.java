@@ -152,7 +152,11 @@ class CampaignOpsReputation extends AbstractUnitRating {
     }
 
     private void updateTotalSkill(Infantry infantry) {
-        int gunnery = infantry.getCrew().getGunnery();
+        Crew crew = infantry.getCrew();
+        if (null == crew) {
+            return;
+        }
+        int gunnery = crew.getGunnery();
         int antiMek = infantry.getAntiMekSkill();
         if (antiMek == 0) {
             antiMek = gunnery + 1;
