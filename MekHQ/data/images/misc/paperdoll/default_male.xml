@@ -1,4 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <overlays>
 	<base>data/images/misc/paperdoll/male.png</base>
+	<loc type="HEAD">
+	</loc>
+	<loc type="CHEST">
+	</loc>
+	<loc type="RIGHT_ARM">
+		<image tag="lost">data/images/misc/paperdoll/male_lost_right_arm.png</image>
+	</loc>
+	<loc type="LEFT_ARM">
+		<image tag="lost">data/images/misc/paperdoll/male_lost_left_arm.png</image>
+	</loc>
+	<loc type="ABDOMEN">
+	 </loc>
+	 <loc type="RIGHT_HAND">
+		<image tag="lost">data/images/misc/paperdoll/male_lost_right_hand.png</image>
+	</loc>
+	<loc type="LEFT_HAND">
+		<image tag="lost">data/images/misc/paperdoll/male_lost_left_hand.png</image>
+	</loc>
+	<loc type="RIGHT_LEG">
+		<image tag="lost">data/images/misc/paperdoll/male_lost_right_leg.png</image>
+	</loc>
+	<loc type="LEFT_LEG">
+		<image tag="lost">data/images/misc/paperdoll/male_lost_left_leg.png</image>
+	</loc>
+	<loc type="RIGHT_FOOT">
+		<image tag="lost">data/images/misc/paperdoll/male_lost_right_foot.png</image>
+	</loc>
+	<loc type="LEFT_FOOT">
+		<image tag="lost">data/images/misc/paperdoll/male_lost_left_foot.png</image>
+	</loc>
 </overlays>
