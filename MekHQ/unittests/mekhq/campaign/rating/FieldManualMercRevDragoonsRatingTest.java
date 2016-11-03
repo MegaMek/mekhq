@@ -43,6 +43,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -429,5 +430,49 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockCampaign.getFlaggedCommander()).thenReturn(null);
         doReturn(null).when(testRating).getCommanderList();
         assertNull(testRating.getCommander());
+    }
+
+    @Test
+    public void testGetTransportationDetails() {
+        FieldManualMercRevDragoonsRating testRating = spy(new FieldManualMercRevDragoonsRating(mockCampaign));
+        testRating.initValues();
+        doReturn(-10).when(testRating).getTransportValue();
+        doReturn(BigDecimal.ZERO).when(testRating).getTransportPercent();
+        doReturn(4).when(testRating).getHeavyVeeCount();
+        doReturn(4).when(testRating).getLightVeeCount();
+
+        String expected = "Transportation      -10\n" +
+                          "    Dropship Capacity:       0%\n" +
+                          "        #Mech Bays:                   0 needed /   0 available\n" +
+                          "        #Fighter Bays:                0 needed /   0 available\n" +
+                          "        #Small Craft Bays:            0 needed /   0 available\n" +
+                          "        #Protomech Bays:              0 needed /   0 available\n" +
+                          "        #Heavy Vehicle Bays:          4 needed /   0 available\n" +
+                          "        #Light Vehicle Bays:          4 needed /   0 available (+ 0 excess heavy)\n" +
+                          "        #BA Bays:                     0 needed /   0 available\n" +
+                          "        #Infantry Bays:               0 needed /   0 available\n" +
+                          "    Jumpship?                No\n" +
+                          "    Warship w/out Collar?    No\n" +
+                          "    Warship w/ Collar?       No";
+        assertEquals(expected, testRating.getTransportationDetails());
+
+        // Add some heavy vee bays.
+        doReturn(0).when(testRating).getTransportValue();
+        doReturn(BigDecimal.valueOf(100)).when(testRating).getTransportPercent();
+        doReturn(8).when(testRating).getHeavyVeeBayCount();
+        expected = "Transportation        0\n" +
+                   "    Dropship Capacity:      100%\n" +
+                   "        #Mech Bays:                   0 needed /   0 available\n" +
+                   "        #Fighter Bays:                0 needed /   0 available\n" +
+                   "        #Small Craft Bays:            0 needed /   0 available\n" +
+                   "        #Protomech Bays:              0 needed /   0 available\n" +
+                   "        #Heavy Vehicle Bays:          4 needed /   8 available\n" +
+                   "        #Light Vehicle Bays:          4 needed /   0 available (+ 4 excess heavy)\n" +
+                   "        #BA Bays:                     0 needed /   0 available\n" +
+                   "        #Infantry Bays:               0 needed /   0 available\n" +
+                   "    Jumpship?                No\n" +
+                   "    Warship w/out Collar?    No\n" +
+                   "    Warship w/ Collar?       No";
+        assertEquals(expected, testRating.getTransportationDetails());
     }
 }

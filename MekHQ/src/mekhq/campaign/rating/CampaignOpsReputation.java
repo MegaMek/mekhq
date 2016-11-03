@@ -688,11 +688,11 @@ class CampaignOpsReputation extends AbstractUnitRating {
                "\n" + String.format(TEMPLATE, "Contract Breaches:", getBreachCount());
     }
 
-    private String getTransportationDetails() {
+    String getTransportationDetails() {
         final String TEMPLATE = "    %-" + CATEGORY_LENGTH + "s %3d needed / %3d available";
 
         int heavyVeeBayCount = getHeavyVeeBayCount();
-        int lightVeeBayCount = getLightVeeBayCount() + (heavyVeeBayCount - getHeavyVeeCount());
+        int excessHeavyVeeBays = Math.max(0, heavyVeeBayCount - getHeavyVeeCount());
 
         String out = String.format("%-" + HEADER_LENGTH + "s %3d", "Transportation:", getTransportValue()) +
                      "\n" + String.format(TEMPLATE, "Mech Bays:", getMechCount(), getMechBayCount()) +
@@ -700,7 +700,8 @@ class CampaignOpsReputation extends AbstractUnitRating {
                      "\n" + String.format(TEMPLATE, "Small Craft Bays:", getSmallCraftCount(), getSmallCraftBayCount()) +
                      "\n" + String.format(TEMPLATE, "Protomech Bays:", getProtoCount(), getProtoBayCount()) +
                      "\n" + String.format(TEMPLATE, "Heavy Vehicle Bays:", getHeavyVeeCount(), heavyVeeBayCount) +
-                     "\n" + String.format(TEMPLATE, "Light Vehicle Bays:", getLightVeeCount(), lightVeeBayCount) +
+                     "\n" + String.format(TEMPLATE, "Light Vehicle Bays:", getLightVeeCount(), getLightVeeBayCount()) +
+                     " (+ " + excessHeavyVeeBays + " excess heavy)" +
                      "\n" + String.format(TEMPLATE, "BA Bays:", getBattleArmorCount() / 5, getBaBayCount()) +
                      "\n" + String.format(TEMPLATE, "Infantry Bays:", getInfantryCount() / 28, getInfantryBayCount()) +
                      "\n" + String.format(TEMPLATE, "Docking Collars:", getDropshipCount(), getDockingCollarCount());
