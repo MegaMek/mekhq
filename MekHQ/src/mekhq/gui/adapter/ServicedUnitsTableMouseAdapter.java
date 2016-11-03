@@ -114,7 +114,7 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
             	unit = units[0];
             }
             
-            MassRepairSalvageDialog dlg = new MassRepairSalvageDialog(gui.getFrame(), true, gui, unit);
+            MassRepairSalvageDialog dlg = new MassRepairSalvageDialog(gui.getFrame(), true, gui, unit, MassRepairSalvageDialog.MODE.UNITS);
             dlg.setVisible(true);
 
             gui.refreshServicedUnitList();
