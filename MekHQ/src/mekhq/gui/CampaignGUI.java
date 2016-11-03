@@ -3603,11 +3603,8 @@ public class CampaignGUI extends JPanel {
                 return;
             }
             partId = part.getId();
-            // get a new cloned part to work with and decrement original
-            Part repairable = part.clone();
-            part.decrementQuantity();
-            getCampaign().fixPart(repairable, tech);
-            getCampaign().addPart(repairable, 0);
+            
+            Part repairable = getCampaign().fixWarehousePart(part, tech);
             // if the break off part failed to be repaired, then follow it with
             // the focus
             // otherwise keep the focus on the current row
