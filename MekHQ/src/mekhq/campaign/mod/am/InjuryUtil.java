@@ -77,6 +77,7 @@ public final class InjuryUtil {
             genUntreatedEffects(c, p).stream().forEach(GameEffect::apply);
         }
         genNaturalHealing(c, p).stream().forEach(GameEffect::apply);
+        p.decrementDaysToWaitForHealing();
     }
 
     /** Resolve injury modifications in case of entering combat with active ones */
@@ -291,6 +292,12 @@ public final class InjuryUtil {
                         rnd -> {
                             int time = i.getTime();
                             i.setTime((int) Math.max(Math.ceil(time * 1.2), time + 5));
+                            LogEntry entry = new LogEntry(c.getDate(),
+                                String.format("%s made a mistake and caused %s to worsen.",
+                                    doc.getFullTitle(), i.getName()),
+                                Person.LOGTYPE_MEDICAL);
+                            p.addLogEntry(entry);
+                            MekHQ.logMessage(entry.toString());
                             if(rnd.applyAsInt(100) < (fumbleLimit / 4)) {
                                 // TODO: Add in special handling of the critical
                                 // injuries like broken back (make perm),
@@ -300,10 +307,16 @@ public final class InjuryUtil {
                         }));
                 } else if((roll > critLimt) && (critTimeReduction > 0)) {
                     result.add(new GameEffect(
-                        String.format("%s performed some amazing work in treating %s of %s (%d fewer day(s) to heal)",
+                        String.format("%s performed some amazing work in treating %s of %s (%d fewer day(s) to heal).",
                             doc.getHyperlinkedFullTitle(), i.getName(), p.getHyperlinkedName(), critTimeReduction),
                         rnd -> {
                             i.setTime(i.getTime() - critTimeReduction);
+                            LogEntry entry = new LogEntry(c.getDate(),
+                                String.format("%s performed some amazing work in treating %s (%d fewer day(s) to heal).",
+                                    doc.getFullTitle(), i.getName(), critTimeReduction),
+                                Person.LOGTYPE_MEDICAL);
+                            p.addLogEntry(entry);
+                            MekHQ.logMessage(entry.toString());
                         }));
                 } else {
                     final int xpChance = (int) Math.round(100.0 / c.getCampaignOptions().getNTasksXP());
@@ -312,13 +325,24 @@ public final class InjuryUtil {
                             doc.getHyperlinkedFullTitle(), p.getHyperlinkedName(),
                             xpChance, c.getCampaignOptions().getTaskXP()),
                         rnd -> {
-                            if(doc.getNTasks() >= c.getCampaignOptions().getNTasksXP()) {
-                                doc.setXp(doc.getXp() + c.getCampaignOptions().getTaskXP());
+                            int taskXP = c.getCampaignOptions().getTaskXP();
+                            if((taskXP > 0) && (doc.getNTasks() >= c.getCampaignOptions().getNTasksXP())) {
+                                doc.setXp(doc.getXp() + taskXP);
                                 doc.setNTasks(0);
+                                LogEntry docEntry = new LogEntry(c.getDate(),
+                                    String.format("Gained %d XP from successful medical work.", taskXP));
+                                doc.addLogEntry(docEntry);
+                                MekHQ.logMessage(docEntry.toString());
                             } else {
                                 doc.setNTasks(doc.getNTasks() + 1);
                             }
                             i.setWorkedOn(true);
+                            LogEntry entry = new LogEntry(c.getDate(),
+                                String.format("%s successfully treated %s.",
+                                    doc.getFullTitle(), i.getName()),
+                                Person.LOGTYPE_MEDICAL);
+                            p.addLogEntry(entry);
+                            MekHQ.logMessage(entry.toString());
                             Unit u = c.getUnit(p.getUnitId());
                             if(null != u) {
                                 u.resetPilotAndEntity();
@@ -343,6 +367,7 @@ public final class InjuryUtil {
         }
         if (numTreated > 0) {
             final int xp = xpGained;
+            final int injuries = numTreated;
             final String treatmentSummary = (xpGained > 0)
                 ? String.format("%s successfully treated %s for %d injuries "
                     + "(%d XP gained, %d for mistakes, %d for critical successes, and %d for tasks).",
@@ -352,7 +377,22 @@ public final class InjuryUtil {
                     doc.getHyperlinkedFullTitle(), p.getHyperlinkedName(), numTreated);
                     
             result.add(new GameEffect(treatmentSummary,
-                rnd -> { doc.setXp(doc.getXp() + xp); }));
+                rnd -> {
+                    if(xp > 0) {
+                        doc.setXp(doc.getXp() + xp);
+                        LogEntry entry = new LogEntry(c.getDate(),
+                            String.format("Successfully treated %s for %d injuries, gaining %d XP",
+                                p.getName(), injuries, xp));
+                        doc.addLogEntry(entry);
+                        MekHQ.logMessage(entry.toString());
+                    } else {
+                        LogEntry entry = new LogEntry(c.getDate(),
+                            String.format("Successfully treated %s for %d injuries",
+                                p.getName(), injuries));
+                        doc.addLogEntry(entry);
+                        MekHQ.logMessage(entry.toString());
+                    }
+                }));
         }
         if (numResting > 0) {
             result.add(new GameEffect(
@@ -443,7 +483,7 @@ public final class InjuryUtil {
                         if(rnd.applyAsInt(100) < 30) {
                             i.setTime(i.getTime() + 1);
                             LogEntry entry = new LogEntry(c.getDate(),
-                                String.format("%s worsened its condition", i.getName()), Person.LOGTYPE_MEDICAL);
+                                String.format("%s worsened its condition due to lack of proper medical attention", i.getName()), Person.LOGTYPE_MEDICAL);
                             p.addLogEntry(entry);
                             MekHQ.logMessage(entry.toString());
                         }
