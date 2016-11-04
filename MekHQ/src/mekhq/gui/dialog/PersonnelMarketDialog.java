@@ -92,6 +92,7 @@ public class PersonnelMarketDialog extends JDialog {
         personnelMarket = c.getPersonnelMarket();
         personnelModel = new PersonnelTableModel(campaign);
         personnelModel.setData(personnelMarket.getPersonnel());
+        personnelModel.loadAssignmentFromMarket(personnelMarket);
         initComponents();
         filterPersonnel();
         setLocationRelativeTo(frame);
@@ -235,7 +236,8 @@ public class PersonnelMarketDialog extends JDialog {
             column.setCellRenderer(personnelModel.getRenderer(false, null));
             if(i != PersonnelTableModel.COL_NAME && i != PersonnelTableModel.COL_TYPE
                     && i != PersonnelTableModel.COL_SKILL && i != PersonnelTableModel.COL_AGE
-                    && i != PersonnelTableModel.COL_GENDER) {
+                    && i != PersonnelTableModel.COL_GENDER
+                    && i != PersonnelTableModel.COL_ASSIGN) {
                 ((XTableColumnModel)tablePersonnel.getColumnModel()).setColumnVisible(column, false);
             }
         }
