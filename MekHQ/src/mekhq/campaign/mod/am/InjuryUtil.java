@@ -271,7 +271,6 @@ public final class InjuryUtil {
         
         List<GameEffect> result = new ArrayList<>();
 
-
         for(Injury i : p.getInjuries()) {
             if(!i.isWorkedOn()) {
                 int roll = Compute.randomInt(100);
@@ -392,6 +391,7 @@ public final class InjuryUtil {
                         doc.addLogEntry(entry);
                         MekHQ.logMessage(entry.toString());
                     }
+                    p.setDaysToWaitForHealing(c.getCampaignOptions().getHealingWaitingPeriod());
                 }));
         }
         if (numResting > 0) {
@@ -464,7 +464,38 @@ public final class InjuryUtil {
                     }));
             }
         });
-        
+        if(null != p.getDoctorId()) {
+            result.add(new GameEffect("Infirmary health check-up",
+                rnd -> {
+                    boolean dismissed = false;
+                    if(p.getStatus() == Person.S_KIA) {
+                        dismissed = true;
+                        LogEntry entry = new LogEntry(c.getDate(), "Died in the infirmary", Person.LOGTYPE_MEDICAL);
+                        p.addLogEntry(entry);
+                        MekHQ.logMessage(entry.toString());
+                    } else if(p.getStatus() == Person.S_MIA) {
+                        // What? How?
+                        dismissed = true;
+                        LogEntry entry = new LogEntry(c.getDate(), "Got abducted from the infirmary", Person.LOGTYPE_MEDICAL);
+                        p.addLogEntry(entry);
+                        MekHQ.logMessage(entry.toString());
+                    } else if(p.getStatus() == Person.S_RETIRED) {
+                        dismissed = true;
+                        LogEntry entry = new LogEntry(c.getDate(), "Retired from active duty and got transferred out of the infirmary", Person.LOGTYPE_MEDICAL);
+                        p.addLogEntry(entry);
+                        MekHQ.logMessage(entry.toString());
+                    } else if(!p.needsFixing()) {
+                        dismissed = true;
+                        LogEntry entry = new LogEntry(c.getDate(), "Got dismissed from the infirmary", Person.LOGTYPE_MEDICAL);
+                        p.addLogEntry(entry);
+                        MekHQ.logMessage(entry.toString());
+                    }
+                    
+                    if(dismissed) {
+                        p.setDoctorId(null, c.getCampaignOptions().getHealingWaitingPeriod());
+                    }
+                }));
+        }
         return result;
     }
 
