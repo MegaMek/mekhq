@@ -261,7 +261,6 @@ public final class InjuryUtil {
         Objects.requireNonNull(p);
         Skill skill = doc.getSkill(SkillType.S_DOCTOR);
         int level = skill.getLevel();
-        int roll = Compute.randomInt(100);
         final int fumbleLimit = FUMBLE_LIMITS[(level >= 0) && (level <= 10) ? level : 0];
         final int critLimt = CRIT_LIMITS[(level >= 0) && (level <= 10) ? level : 0];
         int xpGained = 0;
@@ -272,17 +271,18 @@ public final class InjuryUtil {
         
         List<GameEffect> result = new ArrayList<>();
 
-        // Determine XP, if any
-        if (roll < Math.max(1, fumbleLimit / 10)) {
-            mistakeXP += c.getCampaignOptions().getMistakeXP();
-            xpGained += mistakeXP;
-        } else if (roll > Math.min(98, 99 - Math.round(99 - critLimt) / 10)) {
-            successXP += c.getCampaignOptions().getSuccessXP();
-            xpGained += successXP;
-        }
 
         for(Injury i : p.getInjuries()) {
             if(!i.isWorkedOn()) {
+                int roll = Compute.randomInt(100);
+                // Determine XP, if any
+                if (roll < Math.max(1, fumbleLimit / 10)) {
+                    mistakeXP += c.getCampaignOptions().getMistakeXP();
+                    xpGained += mistakeXP;
+                } else if (roll > Math.min(98, 99 - Math.round(99 - critLimt) / 10)) {
+                    successXP += c.getCampaignOptions().getSuccessXP();
+                    xpGained += successXP;
+                }
                 final int critTimeReduction = i.getTime() - (int) Math.floor(i.getTime() * 0.9);
                 if(roll < fumbleLimit) {
                     result.add(new GameEffect(
