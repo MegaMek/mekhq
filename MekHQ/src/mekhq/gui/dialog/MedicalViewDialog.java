@@ -42,9 +42,11 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -73,6 +75,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ExtraData;
+import mekhq.campaign.LogEntry;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.BodyLocation;
 import mekhq.campaign.personnel.Injury;
@@ -392,8 +395,29 @@ public class MedicalViewDialog extends JDialog {
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.add(genLabel("Past medical history"));
-        panel.add(genWrittenText(""));
-        
+        Map<String, List<LogEntry>> groupedEntries = p.getPersonnelLog().stream()
+            .filter(entry -> entry.isType(Person.LOGTYPE_MEDICAL))
+            .sorted((entry1, entry2) -> entry1.getDate().compareTo(entry2.getDate()))
+            .collect(Collectors.groupingBy(entry -> DATE_FORMAT.format(entry.getDate())));
+        groupedEntries.entrySet().stream()
+            .filter(e -> !e.getValue().isEmpty())
+            .sorted((e1, e2) -> e1.getKey().compareTo(e2.getKey()))
+            .forEachOrdered(e -> {
+                if(e.getValue().size() > 1) {
+                    panel.add(genWrittenText(e.getKey()));
+                    e.getValue().forEach(entry -> {
+                        JPanel wrapper = new JPanel();
+                        wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.X_AXIS));
+                        wrapper.setOpaque(false);
+                        wrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
+                        wrapper.add(Box.createHorizontalStrut(60));
+                        wrapper.add(genWrittenText(String.format("%s   ", entry.getDesc())));
+                        panel.add(wrapper);
+                    });
+                } else {
+                    panel.add(genWrittenText(String.format("%s - %s   ", e.getKey(), e.getValue().get(0).getDesc())));
+                }
+            });
         return panel;
     }
     
@@ -456,8 +480,11 @@ public class MedicalViewDialog extends JDialog {
                 .sorted((inj1, inj2) -> Integer.compare(inj2.getLevel().ordinal(), inj1.getLevel().ordinal()))
                 .forEachOrdered(inj -> {
                     JLabel injLabel = null;
-                    if(inj.isPermanent() || (inj.getTime() <= 0)) {
+                    if(inj.getType().isPermanent()) {
                         injLabel = genWrittenText(String.format("%s - %s",
+                            inj.getType().getSimpleName(), inj.getStart().toString(DATE_FORMATTER)));
+                    } else if(inj.isPermanent() || (inj.getTime() <= 0)) {
+                        injLabel = genWrittenText(String.format("%s - %s - permanent",
                             inj.getType().getSimpleName(), inj.getStart().toString(DATE_FORMATTER)));
                     } else {
                         injLabel = genWrittenText(String.format("%s - %s - est. %s left",

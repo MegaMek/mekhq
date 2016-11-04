@@ -67,7 +67,6 @@ public final class InjuryUtil {
     /** Run a daily healing check */
     public static void resolveDailyHealing(Campaign c, Person p) {
         Person doc = c.getPerson(p.getDoctorId());
-        MekHQ.logMessage("Medical status for " + p);
         // TODO: Reporting
         if((null != doc) && doc.isDoctor()) {
             if(p.getDaysToWaitForHealing() <= 0) {
@@ -296,7 +295,6 @@ public final class InjuryUtil {
                                     doc.getFullTitle(), i.getName()),
                                 Person.LOGTYPE_MEDICAL);
                             p.addLogEntry(entry);
-                            MekHQ.logMessage(entry.toString());
                             if(rnd.applyAsInt(100) < (fumbleLimit / 4)) {
                                 // TODO: Add in special handling of the critical
                                 // injuries like broken back (make perm),
@@ -315,7 +313,6 @@ public final class InjuryUtil {
                                     doc.getFullTitle(), i.getName(), critTimeReduction),
                                 Person.LOGTYPE_MEDICAL);
                             p.addLogEntry(entry);
-                            MekHQ.logMessage(entry.toString());
                         }));
                 } else {
                     final int xpChance = (int) Math.round(100.0 / c.getCampaignOptions().getNTasksXP());
@@ -331,7 +328,6 @@ public final class InjuryUtil {
                                 LogEntry docEntry = new LogEntry(c.getDate(),
                                     String.format("Gained %d XP from successful medical work.", taskXP));
                                 doc.addLogEntry(docEntry);
-                                MekHQ.logMessage(docEntry.toString());
                             } else {
                                 doc.setNTasks(doc.getNTasks() + 1);
                             }
@@ -341,7 +337,6 @@ public final class InjuryUtil {
                                     doc.getFullTitle(), i.getName()),
                                 Person.LOGTYPE_MEDICAL);
                             p.addLogEntry(entry);
-                            MekHQ.logMessage(entry.toString());
                             Unit u = c.getUnit(p.getUnitId());
                             if(null != u) {
                                 u.resetPilotAndEntity();
@@ -383,13 +378,11 @@ public final class InjuryUtil {
                             String.format("Successfully treated %s for %d injuries, gaining %d XP",
                                 p.getName(), injuries, xp));
                         doc.addLogEntry(entry);
-                        MekHQ.logMessage(entry.toString());
                     } else {
                         LogEntry entry = new LogEntry(c.getDate(),
                             String.format("Successfully treated %s for %d injuries",
                                 p.getName(), injuries));
                         doc.addLogEntry(entry);
-                        MekHQ.logMessage(entry.toString());
                     }
                     p.setDaysToWaitForHealing(c.getCampaignOptions().getHealingWaitingPeriod());
                 }));
@@ -425,13 +418,11 @@ public final class InjuryUtil {
                                 LogEntry entry = new LogEntry(c.getDate(),
                                     String.format("%s didn't heal properly", i.getName()), Person.LOGTYPE_MEDICAL);
                                 p.addLogEntry(entry);
-                                MekHQ.logMessage(entry.toString());
                             } else {
                                 p.removeInjury(i);
                                 LogEntry entry = new LogEntry(c.getDate(),
                                     String.format("%s healed", i.getName()), Person.LOGTYPE_MEDICAL);
                                 p.addLogEntry(entry);
-                                MekHQ.logMessage(entry.toString());
                             }
                         }));
                 } else {
@@ -443,7 +434,6 @@ public final class InjuryUtil {
                             LogEntry entry = new LogEntry(c.getDate(),
                                 String.format("%s healed", i.getName()), Person.LOGTYPE_MEDICAL);
                             p.addLogEntry(entry);
-                            MekHQ.logMessage(entry.toString());
                         }));
                 }
             } else if(i.getTime() > 1) {
@@ -460,7 +450,6 @@ public final class InjuryUtil {
                         LogEntry entry = new LogEntry(c.getDate(),
                             String.format("%s became a permanent injury", i.getName()), Person.LOGTYPE_MEDICAL);
                         p.addLogEntry(entry);
-                        MekHQ.logMessage(entry.toString());
                     }));
             }
         });
@@ -472,23 +461,19 @@ public final class InjuryUtil {
                         dismissed = true;
                         LogEntry entry = new LogEntry(c.getDate(), "Died in the infirmary", Person.LOGTYPE_MEDICAL);
                         p.addLogEntry(entry);
-                        MekHQ.logMessage(entry.toString());
                     } else if(p.getStatus() == Person.S_MIA) {
                         // What? How?
                         dismissed = true;
                         LogEntry entry = new LogEntry(c.getDate(), "Got abducted from the infirmary", Person.LOGTYPE_MEDICAL);
                         p.addLogEntry(entry);
-                        MekHQ.logMessage(entry.toString());
                     } else if(p.getStatus() == Person.S_RETIRED) {
                         dismissed = true;
                         LogEntry entry = new LogEntry(c.getDate(), "Retired from active duty and got transferred out of the infirmary", Person.LOGTYPE_MEDICAL);
                         p.addLogEntry(entry);
-                        MekHQ.logMessage(entry.toString());
                     } else if(!p.needsFixing()) {
                         dismissed = true;
                         LogEntry entry = new LogEntry(c.getDate(), "Got dismissed from the infirmary", Person.LOGTYPE_MEDICAL);
                         p.addLogEntry(entry);
-                        MekHQ.logMessage(entry.toString());
                     }
                     
                     if(dismissed) {
@@ -513,10 +498,12 @@ public final class InjuryUtil {
                     rnd -> {
                         if(rnd.applyAsInt(100) < 30) {
                             i.setTime(i.getTime() + 1);
+                            // TODO: Disabled, too much spam
+                            /*
                             LogEntry entry = new LogEntry(c.getDate(),
                                 String.format("%s worsened its condition due to lack of proper medical attention", i.getName()), Person.LOGTYPE_MEDICAL);
                             p.addLogEntry(entry);
-                            MekHQ.logMessage(entry.toString());
+                            */
                         }
                     }));
             }
