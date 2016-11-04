@@ -679,7 +679,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         return out.toString();
     }
 
-    private String getTransportationDetails() {
+    String getTransportationDetails() {
         StringBuilder out = new StringBuilder();
         out.append(String.format("%-" + HEADER_LENGTH + "s %3d", "Transportation", getTransportValue())).append("\n");
 
@@ -693,9 +693,14 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                                               getSmallCraftCount(),
                                               getSmallCraftBayCount()));
         out.append("\n").append(String.format(TEMPLATE_TWO, "Protomech Bays:", getProtoCount(), getProtoBayCount()));
-        out.append("\n").append(String.format(TEMPLATE_TWO, "Heavy Vehicle Bays:", getHeavyVeeCount(), getHeavyVeeBayCount()));
-        int lightVeeBays = Math.max(0, getHeavyVeeBayCount() - getHeavyVeeCount()) + getLightVeeBayCount();
-        out.append("\n").append(String.format(TEMPLATE_TWO, "Light Vehicle Bays:", getLightVeeCount(), lightVeeBays));
+        out.append("\n").append(String.format(TEMPLATE_TWO, "Heavy Vehicle Bays:", getHeavyVeeCount(),
+                                              getHeavyVeeBayCount()));
+        int excessHeavyVeeBays = Math.max(0, getHeavyVeeBayCount() - getHeavyVeeCount());
+        out.append("\n").append(String.format(TEMPLATE_TWO,
+                                              "Light Vehicle Bays:",
+                                              getLightVeeCount(),
+                                              getLightVeeBayCount()))
+           .append(" (plus ").append(excessHeavyVeeBays).append(" excess heavy)");
         out.append("\n").append(String.format(TEMPLATE_TWO, "BA Bays:", getNumberBaSquads(), getBaBayCount()));
         out.append("\n").append(String.format(TEMPLATE_TWO,
                                               "Infantry Bays:",
