@@ -9,20 +9,15 @@ package mekhq.gui.view;
 import java.awt.Color;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -37,7 +32,6 @@ import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.LogEntry;
@@ -52,7 +46,7 @@ import mekhq.gui.model.PersonnelKillLogModel;
  * A custom panel that gets filled in with goodies from a Person record
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class PersonViewPanel extends javax.swing.JPanel {
+public class PersonViewPanel extends JPanel {
     private static final long serialVersionUID = 7004741688464105277L;
 
     private Person person;
@@ -61,38 +55,38 @@ public class PersonViewPanel extends javax.swing.JPanel {
     private DirectoryItems portraits;
     private IconPackage ip;
 
-    private javax.swing.JLabel lblPortrait;
-    private javax.swing.JPanel pnlStats;
-    private javax.swing.JTextArea txtDesc;
-    private javax.swing.JPanel pnlKills;
-    private javax.swing.JPanel pnlLog;
-    private javax.swing.JPanel pnlInjuries;
+    private JLabel lblPortrait;
+    private JPanel pnlStats;
+    private JTextArea txtDesc;
+    private JPanel pnlKills;
+    private JPanel pnlLog;
+    private JPanel pnlInjuries;
 
-    private javax.swing.JLabel lblType;
-    private javax.swing.JLabel lblCall1;
-    private javax.swing.JLabel lblCall2;
-    private javax.swing.JLabel lblAge1;
-    private javax.swing.JLabel lblAge2;
-    private javax.swing.JLabel lblGender1;
-    private javax.swing.JLabel lblGender2;
-    private javax.swing.JLabel lblStatus1;
-    private javax.swing.JLabel lblStatus2;
-    private javax.swing.JLabel lblDuedate1;
-    private javax.swing.JLabel lblDuedate2;
-    private javax.swing.JLabel lblTough1;
-    private javax.swing.JLabel lblTough2;
-    private javax.swing.JLabel lblEdge1;
-    private javax.swing.JLabel lblEdge2;
-    private javax.swing.JLabel lblAbility1;
-    private javax.swing.JLabel lblAbility2;
-    private javax.swing.JLabel lblImplants1;
-    private javax.swing.JLabel lblImplants2;
-    private javax.swing.JLabel lblAdvancedMedical1;
-    private javax.swing.JLabel lblAdvancedMedical2;
-    private javax.swing.JLabel lblSpouse1;
-    private javax.swing.JLabel lblSpouse2;
-    private javax.swing.JLabel lblChildren1;
-    private javax.swing.JLabel lblChildren2;
+    private JLabel lblType;
+    private JLabel lblCall1;
+    private JLabel lblCall2;
+    private JLabel lblAge1;
+    private JLabel lblAge2;
+    private JLabel lblGender1;
+    private JLabel lblGender2;
+    private JLabel lblStatus1;
+    private JLabel lblStatus2;
+    private JLabel lblDuedate1;
+    private JLabel lblDuedate2;
+    private JLabel lblTough1;
+    private JLabel lblTough2;
+    private JLabel lblEdge1;
+    private JLabel lblEdge2;
+    private JLabel lblAbility1;
+    private JLabel lblAbility2;
+    private JLabel lblImplants1;
+    private JLabel lblImplants2;
+    private JLabel lblAdvancedMedical1;
+    private JLabel lblAdvancedMedical2;
+    private JLabel lblSpouse1;
+    private JLabel lblSpouse2;
+    private JLabel lblChildren1;
+    private JLabel lblChildren2;
 
     ResourceBundle resourceMap = null;
 
@@ -106,7 +100,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
     }
 
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
+        GridBagConstraints gridBagConstraints;
 
         lblPortrait = new JLabel();
         pnlStats = new JPanel();
@@ -296,7 +290,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
         lblChildren1 = new JLabel();
         lblChildren2 = new JLabel();
 
-        java.awt.GridBagConstraints gridBagConstraints;
+        GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new GridBagLayout());
 
         lblType.setName("lblType"); // NOI18N
@@ -630,16 +624,19 @@ public class PersonViewPanel extends javax.swing.JPanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHEAST;
         JButton medicalButton = new JButton(new ImageIcon("data/images/misc/medical.png")); //$NON-NLS-1$
         medicalButton.addActionListener(event -> {
-            MedicalViewDialog medDialog = new MedicalViewDialog((Frame) SwingUtilities.getWindowAncestor(this), campaign, person, ip);
+            MedicalViewDialog medDialog = new MedicalViewDialog(SwingUtilities.getWindowAncestor(this), campaign, person, ip);
             medDialog.setGMMode(campaign.isGM());
             medDialog.setModalityType(ModalityType.APPLICATION_MODAL);
             medDialog.setVisible(true);
             removeAll();
+            repaint();
+            revalidate();
             initComponents();
+            revalidate();
         });
         medicalButton.setMaximumSize(new Dimension(32, 32));
         medicalButton.setMargin(new Insets(0, 0, 0, 0));
-        medicalButton.setToolTipText("View medical details");
+        medicalButton.setToolTipText(resourceMap.getString("btnMedical.tooltip")); //$NON-NLS-1$
         pnlStats.add(medicalButton, gridBagConstraints);
     }
 

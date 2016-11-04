@@ -159,6 +159,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public static final int DESIG_CHI     = 12;
     public static final int DESIG_GAMMA   = 13;
     public static final int DESIG_NUM     = 14;
+    
+    public static final String LOGTYPE_MEDICAL = "med";
 
     private static final IntSupplier PREGNANCY_DURATION = () -> {
         double gaussian = Math.sqrt(-2 * Math.log(Math.nextUp(Math.random())))
@@ -3150,6 +3152,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
             }
         });
         return personnelLog;
+    }
+
+    public void addLogEntry(Date d, String desc, String type) {
+        personnelLog.add(new LogEntry(d, desc, type));
     }
 
     public void addLogEntry(Date d, String desc) {

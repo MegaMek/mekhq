@@ -24,13 +24,13 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontFormatException;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
+import java.awt.Window;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -42,12 +42,9 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.ResourceBundle;
-import java.util.TreeMap;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -86,11 +83,14 @@ import mekhq.gui.view.Paperdoll;
 
 public class MedicalViewDialog extends JDialog {
     private static final long serialVersionUID = 6178230374580087883L;
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private static final String MENU_CMD_SEPARATOR = ","; //$NON-NLS-1$
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd"); //$NON-NLS-1$
     private final static DateTimeFormatter DATE_FORMATTER =
-        DateTimeFormat.forPattern("yyyy-MM-dd").withChronology(GJChronology.getInstanceUTC());
+        DateTimeFormat.forPattern("yyyy-MM-dd").withChronology(GJChronology.getInstanceUTC()); //$NON-NLS-1$
 
-    private static final ExtraData.Key<String> DOCTOR_NOTES = new ExtraData.StringKey("doctor_notes");
+    private static final ExtraData.Key<String> DOCTOR_NOTES = new ExtraData.StringKey("doctor_notes"); //$NON-NLS-1$
+    // TODO: Custom paper dolls
+    private static final ExtraData.Key<String> PAPERDOLL = new ExtraData.StringKey("paperdoll_xml_file"); //$NON-NLS-1$
 
     private final Campaign campaign;
     private final Person person;
@@ -113,7 +113,7 @@ public class MedicalViewDialog extends JDialog {
     
     private boolean gmMode;
 
-    public MedicalViewDialog(Frame parent, Campaign c, Person p, IconPackage ip) {
+    public MedicalViewDialog(Window parent, Campaign c, Person p, IconPackage ip) {
         super();
         this.campaign = Objects.requireNonNull(c);
         this.person = Objects.requireNonNull(p);
@@ -136,14 +136,14 @@ public class MedicalViewDialog extends JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(parent);
         
-        labelFont = UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.PLAIN, 16);
-        try(InputStream fis = new FileInputStream("data/fonts/angelina.TTF")) {
+        labelFont = UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.PLAIN, 16); //$NON-NLS-1$
+        try(InputStream fis = new FileInputStream("data/fonts/angelina.TTF")) { //$NON-NLS-1$
             handwritingFont = Font.createFont(Font.TRUETYPE_FONT, fis).deriveFont(Font.PLAIN, 22);
         } catch (FontFormatException | IOException e) {
             handwritingFont = null;
         }
         labelColor = new Color(170, 170, 170);
-        healImageIcon = new ImageIcon(new ImageIcon("data/images/misc/medical.png").getImage().getScaledInstance(16, 16, Image.SCALE_DEFAULT));
+        healImageIcon = new ImageIcon(new ImageIcon("data/images/misc/medical.png").getImage().getScaledInstance(16, 16, Image.SCALE_DEFAULT)); //$NON-NLS-1$
         
         dollActionListener = ae -> {
             final BodyLocation loc = BodyLocation.of(ae.getActionCommand());
@@ -152,13 +152,13 @@ public class MedicalViewDialog extends JDialog {
             JPopupMenu popup = new JPopupMenu();
             if(locationPicked) {
                 JLabel header = new JLabel(Utilities.capitalize(loc.readableName));
-                header.setFont(UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.BOLD));
+                header.setFont(UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.BOLD)); //$NON-NLS-1$
                 popup.add(header);
                 popup.addSeparator();
             }
             if(locationPicked) {
                 ActionListener addActionListener = addEvent -> {
-                    String[] commands = addEvent.getActionCommand().split(",", 2);
+                    String[] commands = addEvent.getActionCommand().split(MENU_CMD_SEPARATOR, 2);
                     InjuryType addIType = InjuryType.byKey(commands[0]);
                     int severity = Integer.valueOf(commands[1]);
                     person.addInjury(addIType.newInjury(campaign, person, loc, severity));
@@ -170,14 +170,15 @@ public class MedicalViewDialog extends JDialog {
                     .forEach(it -> {
                         IntStream.range(1, it.getMaxSeverity() + 1).forEach(severity -> {
                         JMenuItem add = new JMenuItem("... " + it.getSimpleName(severity));
-                        add.setActionCommand(it.getKey() + "," + severity);
+                        add.setActionCommand(it.getKey() + MENU_CMD_SEPARATOR + severity);
                         add.addActionListener(addActionListener);
                         addMenu.add(add);
                     });
                 });
                 popup.add(addMenu);
             } else {
-                JMenuItem edit = new JMenuItem("New injury ...", UIManager.getIcon("FileView.fileIcon"));
+                JMenuItem edit = new JMenuItem("New injury ...",
+                    UIManager.getIcon("FileView.fileIcon")); //$NON-NLS-1$
                 popup.add(edit);
             }
             JMenuItem remove = new JMenuItem(loc.readableName.isEmpty() ? "Heal all" : "Heal", healImageIcon);
@@ -566,7 +567,7 @@ public class MedicalViewDialog extends JDialog {
             this.label = label;
             this.person = person;
             this.injury = injury;
-            this.healImageIcon = new ImageIcon(new ImageIcon("data/images/misc/medical.png").getImage().getScaledInstance(16, 16, Image.SCALE_DEFAULT));
+            this.healImageIcon = new ImageIcon(new ImageIcon("data/images/misc/medical.png").getImage().getScaledInstance(16, 16, Image.SCALE_DEFAULT)); //$NON-NLS-1$
         }
         
         @Override
@@ -588,10 +589,11 @@ public class MedicalViewDialog extends JDialog {
             if(e.getButton() == MouseEvent.BUTTON1) {
                 JPopupMenu popup = new JPopupMenu();
                 JLabel header = new JLabel(injury.getFluff());
-                header.setFont(UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.BOLD));
+                header.setFont(UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.BOLD)); //$NON-NLS-1$
                 popup.add(header);
                 popup.addSeparator();
-                JMenuItem edit = new JMenuItem("Edit ...", UIManager.getIcon("FileView.fileIcon"));
+                JMenuItem edit = new JMenuItem("Edit ...",
+                    UIManager.getIcon("FileView.fileIcon")); //$NON-NLS-1$
                 popup.add(edit);
                 JMenuItem remove = new JMenuItem("Remove", healImageIcon);
                 remove.addActionListener(ae -> {

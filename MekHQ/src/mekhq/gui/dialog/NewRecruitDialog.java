@@ -189,8 +189,8 @@ public class NewRecruitDialog extends javax.swing.JDialog {
         });
         panBottomButtons.add(btnClose, gridBagConstraints);
 
-        scrollView.setMinimumSize(new java.awt.Dimension(450, 150));
-        scrollView.setPreferredSize(new java.awt.Dimension(450, 150));
+        scrollView.setMinimumSize(new java.awt.Dimension(450, 180));
+        scrollView.setPreferredSize(new java.awt.Dimension(450, 180));
         scrollView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollView.setViewportView(null);
         refreshView();

@@ -151,7 +151,6 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingMASC;
 import mekhq.campaign.personnel.Ancestors;
 import mekhq.campaign.personnel.Bloodname;
-import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.RankTranslator;
 import mekhq.campaign.personnel.Ranks;
@@ -2414,10 +2413,6 @@ public class Campaign implements Serializable {
             }
             // TODO Advanced Medical needs to go away from here later on
             if(getCampaignOptions().useAdvancedMedical()) {
-                p.getInjuries().forEach(i ->
-                    addReport(p.getHyperlinkedFullTitle() + " spent time resting to heal "
-                        + p.getGenderPronoun(Person.PRONOUN_HISHER)
-                        + " " + i.getName() + "!"));
                 InjuryUtil.resolveDailyHealing(this, p);
                 Unit u = getUnit(p.getUnitId());
                 if (null != u) {
