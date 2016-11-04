@@ -47,6 +47,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CampaignOptions.MassRepairOption;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.parts.MekLocation;
+import mekhq.campaign.parts.MissingMekLocation;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
@@ -155,9 +156,10 @@ public class MassRepairSalvageDialog extends JDialog {
 	}
 
 	private void filterUnits() {
-		//Store selections so after the table is refreshed we can re-select them
+		// Store selections so after the table is refreshed we can re-select
+		// them
 		Map<String, Unit> selectedUnitMap = new HashMap<String, Unit>();
-		
+
 		int[] selectedRows = unitTable.getSelectedRows();
 
 		for (int i = 0; i < selectedRows.length; i++) {
@@ -170,7 +172,7 @@ public class MassRepairSalvageDialog extends JDialog {
 
 			selectedUnitMap.put(unit.getId().toString(), unit);
 		}
-		
+
 		int activeCount = 0;
 		int inactiveCount = 0;
 
@@ -203,7 +205,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		btnSelectUnassigned.setText("Select Inactive Units (" + inactiveCount + ")");
 
 		unitTableModel.setData(unitList);
-		
+
 		int unitCount = unitTable.getRowCount();
 
 		for (int i = 0; i < unitCount; i++) {
@@ -1007,7 +1009,7 @@ public class MassRepairSalvageDialog extends JDialog {
 				msg = String.format("Mass Repair/Salvage complete. There were %d repairs completed or scheduled.",
 						repairsCompleted);
 			}
-			
+
 			filterUnits();
 		} else if (isModeWarehouse()) {
 			int[] selectedRows = partsTable.getSelectedRows();
@@ -1122,7 +1124,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		String actionDescriptor = salvaging ? "salvage" : "repair";
 
 		List<Part> parts = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId());
-		
+
 		/*
 		 * If we're repairing a unit and we allow auto-scrapping of parts that
 		 * can't be fixed by an elite tech, let's first get rid of those parts
@@ -1130,14 +1132,14 @@ public class MassRepairSalvageDialog extends JDialog {
 		 */
 		if (scrapImpossible && !salvaging) {
 			boolean refreshParts = false;
-			
+
 			for (Part part : parts) {
 				if (part.getSkillMin() > SkillType.EXP_ELITE) {
 					campaign.addReport(part.scrap());
 					refreshParts = true;
 				}
 			}
-			
+
 			if (refreshParts) {
 				parts = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId());
 			}
@@ -1167,19 +1169,17 @@ public class MassRepairSalvageDialog extends JDialog {
 		 */
 
 		if ((unit.getEntity() instanceof Mech) && !salvaging) {
-			Map<Integer, Part> badLocs = new HashMap<Integer, Part>();
+			Map<Integer, Part> locationMap = new HashMap<Integer, Part>();
 
 			for (Part part : parts) {
 				if ((part instanceof MekLocation) && part.onBadHipOrShoulder()) {
-					badLocs.put(((MekLocation) part).getLoc(), part);
-
-					campaign.addReport(String.format(
-							"Found an unfixable limb - %s. Going to remove all parts and scrap the limb before proceeding with other repairs",
-							part.getName()));
+					locationMap.put(((MekLocation) part).getLoc(), part);
+				} else if (part instanceof MissingMekLocation) {
+					locationMap.put(((MissingMekLocation) part).getLoc(), part);
 				}
 			}
 
-			if (!badLocs.isEmpty()) {
+			if (!locationMap.isEmpty()) {
 				MassRepairOption mro = mroByTypeMap.get(Part.REPAIR_PART_TYPE.GENERAL_LOCATION);
 
 				if ((null == mro) || !mro.isActive()) {
@@ -1198,31 +1198,65 @@ public class MassRepairSalvageDialog extends JDialog {
 				unit.setSalvage(true);
 
 				List<Part> partsTemp = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId());
-				List<Part> partsOnBadLimbs = new ArrayList<Part>();
+				List<Part> partsToBeRemoved = new ArrayList<Part>();
+				Map<Integer, Integer> countOfPartsPerLocation = new HashMap<Integer, Integer>();
 
 				for (Part part : partsTemp) {
-					if (!(part instanceof MekLocation) && badLocs.containsKey(part.getLocation()) && part.isSalvaging()) {
-						partsOnBadLimbs.add(part);
+					if (!(part instanceof MekLocation) && !(part instanceof MissingMekLocation)
+							&& locationMap.containsKey(part.getLocation()) && part.isSalvaging()) {
+						partsToBeRemoved.add(part);
+
+						int count = 0;
+
+						if (countOfPartsPerLocation.containsKey(part.getLocation())) {
+							count = countOfPartsPerLocation.get(part.getLocation());
+						}
+
+						count++;
+
+						countOfPartsPerLocation.put(part.getLocation(), count);
 					}
 				}
 
-				if (partsOnBadLimbs.isEmpty()) {
+				if (partsToBeRemoved.isEmpty()) {
 					/*
-					 * We have no parts left on our bad limbs, so we'll just
-					 * scrap those limbs and rebuild the parts list and reset
-					 * back our normal repair mode
+					 * We have no parts left on our unfixable locations, so
+					 * we'll just scrap those locations and rebuild the parts
+					 * list and reset back our normal repair mode
 					 */
 
-					for (Part part : badLocs.values()) {
-						campaign.addReport(part.scrap());
+					for (Part part : locationMap.values()) {
+						if (part instanceof MekLocation) {
+							campaign.addReport(part.scrap());
+						}
 					}
-
-					parts = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId());
 
 					scrappingLimbMode = false;
 					unit.setSalvage(false);
+
+					parts = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId());
 				} else {
-					parts = partsOnBadLimbs;
+					for (int locId : countOfPartsPerLocation.keySet()) {
+						boolean unfixable = false;
+						Part loc = null;
+
+						if (locationMap.containsKey(locId)) {
+							loc = locationMap.get(locId);
+							unfixable = (loc instanceof MekLocation);
+						}
+
+						if (unfixable) {
+							campaign.addReport(String.format(
+									"Found an unfixable limb - %s which contains %s parts. Going to remove all parts and scrap the limb before proceeding with other repairs.",
+									loc.getName(), countOfPartsPerLocation.get(locId)));
+						} else {
+							campaign.addReport(String.format(
+									"Found missing location - %s which contains %s parts. Going to remove all parts before proceeding with other repairs.",
+									loc.getName(), countOfPartsPerLocation.get(locId)));
+						}
+					}
+
+					parts = partsToBeRemoved;
 				}
 			}
 		}
