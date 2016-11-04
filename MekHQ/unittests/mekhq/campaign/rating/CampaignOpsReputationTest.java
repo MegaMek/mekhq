@@ -848,18 +848,6 @@ public class CampaignOpsReputationTest {
         spyReputation.initValues();
         assertEquals(20, spyReputation.getTransportValue());
 
-        // Test not having any dropships (though we still have a jumpship).
-        doReturn(0).when(spyReputation).getDropshipCount();
-        doReturn(0).when(spyReputation).getMechBayCount();
-        doReturn(0).when(spyReputation).getInfantryBayCount();
-        doReturn(0).when(spyReputation).getLightVeeBayCount();
-        doReturn(0).when(spyReputation).getHeavyVeeBayCount();
-        doReturn(0).when(spyReputation).getBaBayCount();
-        doReturn(0).when(spyReputation).getFighterBayCount();
-        doReturn(0).when(spyReputation).getProtoBayCount();
-        doReturn(0).when(spyReputation).getSmallCraftBayCount();
-        assertEquals(0, spyReputation.getTransportValue());
-
         // Test a brand new campaign.
         buildFreshCampaign();
         spyReputation.initValues();
@@ -950,7 +938,7 @@ public class CampaignOpsReputationTest {
                 "    Small Craft Bays:            0 needed /   0 available\n" +
                 "    Protomech Bays:              0 needed /   0 available\n" +
                 "    Heavy Vehicle Bays:          0 needed /   0 available\n" +
-                "    Light Vehicle Bays:          8 needed /  22 available\n" +
+                "    Light Vehicle Bays:          8 needed /  22 available (+ 0 excess heavy)\n" +
                 "    BA Bays:                     0 needed /   0 available\n" +
                 "    Infantry Bays:               1 needed /   4 available\n" +
                 "    Docking Collars:             1 needed /   4 available\n" +
@@ -1005,7 +993,7 @@ public class CampaignOpsReputationTest {
                 "    Small Craft Bays:            0 needed /   0 available\n" +
                 "    Protomech Bays:              0 needed /   0 available\n" +
                 "    Heavy Vehicle Bays:          0 needed /   0 available\n" +
-                "    Light Vehicle Bays:          0 needed /   0 available\n" +
+                "    Light Vehicle Bays:          0 needed /   0 available (+ 0 excess heavy)\n" +
                 "    BA Bays:                     0 needed /   0 available\n" +
                 "    Infantry Bays:               0 needed /   0 available\n" +
                 "    Docking Collars:             0 needed /   0 available\n" +
@@ -1075,5 +1063,55 @@ public class CampaignOpsReputationTest {
         doReturn(0).when(spyReputation).getAeroTechTeamsNeeded();
         doReturn(0).when(spyReputation).getBattleArmorTechTeamsNeeded();
         assertEquals(-5, spyReputation.calcTechSupportValue());
+    }
+
+    @Test
+    public void testGetTransportationDetails() {
+        String expected = "Transportation:      20\n" +
+                          "    Mech Bays:                   4 needed /   4 available\n" +
+                          "    Fighter Bays:                2 needed /   2 available\n" +
+                          "    Small Craft Bays:            0 needed /   0 available\n" +
+                          "    Protomech Bays:              0 needed /   0 available\n" +
+                          "    Heavy Vehicle Bays:          0 needed /   0 available\n" +
+                          "    Light Vehicle Bays:          8 needed /  22 available (+ 0 excess heavy)\n" +
+                          "    BA Bays:                     0 needed /   0 available\n" +
+                          "    Infantry Bays:               1 needed /   4 available\n" +
+                          "    Docking Collars:             1 needed /   4 available\n" +
+                          "    Has Jumpships?             Yes\n" +
+                          "    Has Warships?               No";
+        spyReputation.initValues();
+        assertEquals(expected, spyReputation.getTransportationDetails());
+
+        // Add some heavy vehicles.
+        expected = "Transportation:      10\n" +
+                   "    Mech Bays:                   4 needed /   4 available\n" +
+                   "    Fighter Bays:                2 needed /   2 available\n" +
+                   "    Small Craft Bays:            0 needed /   0 available\n" +
+                   "    Protomech Bays:              0 needed /   0 available\n" +
+                   "    Heavy Vehicle Bays:          4 needed /   0 available\n" +
+                   "    Light Vehicle Bays:          8 needed /  22 available (+ 0 excess heavy)\n" +
+                   "    BA Bays:                     0 needed /   0 available\n" +
+                   "    Infantry Bays:               1 needed /   4 available\n" +
+                   "    Docking Collars:             1 needed /   4 available\n" +
+                   "    Has Jumpships?             Yes\n" +
+                   "    Has Warships?               No";
+        doReturn(4).when(spyReputation).getHeavyVeeCount();
+        assertEquals(expected, spyReputation.getTransportationDetails());
+
+        // Add excess heavy vehicle bays.
+        expected = "Transportation:      20\n" +
+                   "    Mech Bays:                   4 needed /   4 available\n" +
+                   "    Fighter Bays:                2 needed /   2 available\n" +
+                   "    Small Craft Bays:            0 needed /   0 available\n" +
+                   "    Protomech Bays:              0 needed /   0 available\n" +
+                   "    Heavy Vehicle Bays:          4 needed /   8 available\n" +
+                   "    Light Vehicle Bays:          8 needed /  22 available (+ 4 excess heavy)\n" +
+                   "    BA Bays:                     0 needed /   0 available\n" +
+                   "    Infantry Bays:               1 needed /   4 available\n" +
+                   "    Docking Collars:             1 needed /   4 available\n" +
+                   "    Has Jumpships?             Yes\n" +
+                   "    Has Warships?               No";
+        doReturn(8).when(spyReputation).getHeavyVeeBayCount();
+        assertEquals(expected, spyReputation.getTransportationDetails());
     }
 }
