@@ -848,6 +848,18 @@ public class CampaignOpsReputationTest {
         spyReputation.initValues();
         assertEquals(20, spyReputation.getTransportValue());
 
+        // Test not having any dropships (though we still have a jumpship).
+        doReturn(0).when(spyReputation).getDropshipCount();
+        doReturn(0).when(spyReputation).getMechBayCount();
+        doReturn(0).when(spyReputation).getInfantryBayCount();
+        doReturn(0).when(spyReputation).getLightVeeBayCount();
+        doReturn(0).when(spyReputation).getHeavyVeeBayCount();
+        doReturn(0).when(spyReputation).getBaBayCount();
+        doReturn(0).when(spyReputation).getFighterBayCount();
+        doReturn(0).when(spyReputation).getProtoBayCount();
+        doReturn(0).when(spyReputation).getSmallCraftBayCount();
+        assertEquals(0, spyReputation.getTransportValue());
+
         // Test a brand new campaign.
         buildFreshCampaign();
         spyReputation.initValues();
