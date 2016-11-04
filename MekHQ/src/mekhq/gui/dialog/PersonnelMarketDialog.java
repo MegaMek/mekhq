@@ -33,6 +33,7 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
+import megamek.common.util.StringUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.PersonnelMarket;
@@ -468,17 +469,34 @@ public class PersonnelMarketDialog extends JDialog {
     }
 
      void refreshPersonView() {
+    	 lblUnitCost.setText("");
+    	 
     	 int row = tablePersonnel.getSelectedRow();
-    	 if (unitCost > 0) {
-    		 lblUnitCost.setText("Unit cost: " + new java.text.DecimalFormat().format(unitCost));
-    	 } else {
-    		 lblUnitCost.setText("");
-    	 }
-         if(row < 0) {
+
+    	 if(row < 0) {
              scrollPersonnelView.setViewportView(null);
              return;
          }
+    	 
          Entity en = personnelMarket.getAttachedEntity(selectedPerson);
+         String unitText = "";
+         
+    	 if (unitCost > 0) {
+    		 unitText = "Unit cost: " + new java.text.DecimalFormat().format(unitCost);
+    	 }
+
+		 if (null != en) {
+			 if (StringUtil.isNullOrEmpty(unitText)) {
+				 unitText = "Unit: ";
+			 } else {
+				 unitText += " - ";
+			 }
+			 
+			 unitText += en.getDisplayName();
+		 }
+    	 
+    	 lblUnitCost.setText(unitText);
+    	 
          if (null != en) {
              JTabbedPane tabUnit = new JTabbedPane();
              String name = "Commander";
