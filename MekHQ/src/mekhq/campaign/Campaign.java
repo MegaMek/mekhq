@@ -2550,7 +2550,7 @@ public class Campaign implements Serializable {
             	if (p.isPregnant()) {
             		if (getCampaignOptions().useUnofficialProcreation()) {
 	            		if (getCalendar().compareTo((p.getDueDate())) == 0) {
-	            			babies.add(p.birth());
+	            			babies.addAll(p.birth());
 	            		}
             		} else {
             			p.setDueDate(null);

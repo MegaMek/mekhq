@@ -26,6 +26,7 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -35,6 +36,7 @@ import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
@@ -919,15 +921,14 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		return campaign.getPerson(getAncestors().getFatherID());
 	}
 
-	public Person birth() {
+	public Collection<Person> birth() {
 		Person baby = campaign.newPerson(T_NONE);
 		baby.setDependent(true);
 		UUID tmpAncID = null;
 
 		// Find already existing ancestor set of these parents
 		for (Ancestors a : campaign.getAncestors()) {
-			if (getId().equals(a.getMotherID())
-					&& ((getSpouseID() == null && a.getFatherID() == null) || getSpouseID().equals(a.getFatherID()))) {
+			if(getId().equals(a.getMotherID()) && Objects.equals(getSpouseID(), a.getFatherID())) {
 				tmpAncID = a.getId();
 				break;
 			}
@@ -956,7 +957,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		    addLogEntry(campaign.getDate(), "Delivered a healthy baby " + (baby.getGender() == G_MALE ? "boy!" : "girl!"));
 		}
 		setDueDate(null);
-		return baby;
+		// TODO Allow for twins and other multiple births
+		return Collections.singleton(baby);
 	}
 
 	public void procreate() {
