@@ -146,7 +146,7 @@ public class ExtraData {
      * 
      * @return The previous value if there was one.
      */
-    public <T> T setText(Key<T> key, String value) {
+    public <T> T setString(Key<T> key, String value) {
         if(null == key) {
             return null;
         }
