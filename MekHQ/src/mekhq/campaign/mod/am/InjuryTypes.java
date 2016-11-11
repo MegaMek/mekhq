@@ -60,7 +60,7 @@ public final class InjuryTypes {
     private static boolean registered = false;
     
     /** Register all injury types defined here. Don't use them until you called this once! */
-    public static void registerAll() {
+    public static synchronized void registerAll() {
         if(!registered) {
             InjuryType.register(0, "am:cut", CUT);
             InjuryType.register(1, "am:bruise", BRUISE);
