@@ -1,6 +1,10 @@
 VERSION HISTORY:
 ----------------
 v0.41.27-git
++ PR #232: "Advanced Medical" refactor - new medical dialogue, lots of under-the-hood improvements
++ Allowing twins, triplets, quadruplets ... and so on to be born
++ Recording the biological father of children at conception time
++ Issue #243: Pregnant widow can't give birth
 + Fixed bug with force icon layers being misaligned by 1px in both dimensions
 + Issue #220: NPE when updating unit rating and infantry have no troopers
 + Issue #228: Campaign Ops Unit Rating -- Heavy Vee Bays Affecting Display of Light Vee Bays
