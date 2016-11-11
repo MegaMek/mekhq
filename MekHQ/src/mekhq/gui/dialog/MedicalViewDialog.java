@@ -97,7 +97,6 @@ public class MedicalViewDialog extends JDialog {
 
     private final Campaign campaign;
     private final Person person;
-    private final IconPackage iconPackage;
     private ResourceBundle resourceMap = null;
 
     private Paperdoll defaultMaleDoll;
@@ -120,16 +119,16 @@ public class MedicalViewDialog extends JDialog {
         super();
         this.campaign = Objects.requireNonNull(c);
         this.person = Objects.requireNonNull(p);
-        this.iconPackage = Objects.requireNonNull(ip);
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel", new EncodeControl()); //$NON-NLS-1$
+        //this.iconPackage = Objects.requireNonNull(ip);
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog", new EncodeControl()); //$NON-NLS-1$
         
         // Preload default paperdolls
-        try(InputStream fis = new FileInputStream(ip.getGuiElement("default_male_paperdoll"))) {
+        try(InputStream fis = new FileInputStream(ip.getGuiElement("default_male_paperdoll"))) { //$NON-NLS-1$
             defaultMaleDoll = new Paperdoll(fis);
         } catch(IOException e) {
             MekHQ.logError(e);
         }
-        try(InputStream fis = new FileInputStream(ip.getGuiElement("default_female_paperdoll"))) {
+        try(InputStream fis = new FileInputStream(ip.getGuiElement("default_female_paperdoll"))) { //$NON-NLS-1$
             defaultFemaleDoll = new Paperdoll(fis);
         } catch(IOException e) {
             MekHQ.logError(e);
@@ -167,12 +166,12 @@ public class MedicalViewDialog extends JDialog {
                     person.addInjury(addIType.newInjury(campaign, person, loc, severity));
                     revalidate();
                 };
-                JMenu addMenu = new JMenu("Add ...");
+                JMenu addMenu = new JMenu(resourceMap.getString("menuAdd.text")); //$NON-NLS-1$
                 InjuryType.getAllTypes().stream().filter(it -> it.isValidInLocation(loc))
                     .sorted((it1, it2) -> it1.getSimpleName().compareToIgnoreCase(it2.getSimpleName()))
                     .forEach(it -> {
                         IntStream.range(1, it.getMaxSeverity() + 1).forEach(severity -> {
-                        JMenuItem add = new JMenuItem("... " + it.getSimpleName(severity));
+                        JMenuItem add = new JMenuItem(resourceMap.getString("menuMore.text") + it.getSimpleName(severity)); //$NON-NLS-1$
                         add.setActionCommand(it.getKey() + MENU_CMD_SEPARATOR + severity);
                         add.addActionListener(addActionListener);
                         addMenu.add(add);
@@ -180,11 +179,11 @@ public class MedicalViewDialog extends JDialog {
                 });
                 popup.add(addMenu);
             } else {
-                JMenuItem edit = new JMenuItem("New injury ...",
+                JMenuItem edit = new JMenuItem(resourceMap.getString("menuNewInjury.text"), //$NON-NLS-1$
                     UIManager.getIcon("FileView.fileIcon")); //$NON-NLS-1$
                 popup.add(edit);
             }
-            JMenuItem remove = new JMenuItem(loc.readableName.isEmpty() ? "Heal all" : "Heal", healImageIcon);
+            JMenuItem remove = new JMenuItem(loc.readableName.isEmpty() ? resourceMap.getString("menuHealAll.text") : resourceMap.getString("menuHeal.text"), healImageIcon); //$NON-NLS-1$ //$NON-NLS-2$
             if(locationPicked && p.getInjuriesByLocation(loc).isEmpty()) {
                 remove.setEnabled(false);
             } else {
@@ -206,7 +205,7 @@ public class MedicalViewDialog extends JDialog {
         getContentPane().add(new JScrollPane(scrollPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
         initComponents(scrollPanel);
         
-        JButton okayButton = new JButton("Done");
+        JButton okayButton = new JButton(resourceMap.getString("buttonDone.text")); //$NON-NLS-1$
         okayButton.addActionListener(ae -> {
             if(!notesArea.getText().isEmpty()) {
                 p.getExtraData().set(DOCTOR_NOTES, notesArea.getText());
@@ -294,7 +293,7 @@ public class MedicalViewDialog extends JDialog {
             .filter(bl -> p.hasInjury(bl))
             .forEach(bl -> {
                 if(person.isLocationMissing(bl) && !person.isLocationMissing(bl.parent)) {
-                    doll.setLocTag(bl, "lost");
+                    doll.setLocTag(bl, "lost"); //$NON-NLS-1$
                 } else if(!person.isLocationMissing(bl)) {
                     InjuryLevel level = getMaxInjuryLevel(person, bl);
                     Color col;
@@ -339,15 +338,15 @@ public class MedicalViewDialog extends JDialog {
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
         
         String name = p.getFullName();
-        String[] nameParts = name.split(" ", -1);
+        String[] nameParts = name.split(" ", -1); //$NON-NLS-1$
         
-        String familyName = "-";
-        String givenNames = "";
+        String familyName = "-"; //$NON-NLS-1$
+        String givenNames = ""; //$NON-NLS-1$
         if(nameParts.length < 2) {
             givenNames = nameParts[0];
         } else {
             familyName = nameParts[nameParts.length - 1];
-            givenNames = String.join(" ", Arrays.copyOf(nameParts, nameParts.length - 1));
+            givenNames = String.join(" ", Arrays.copyOf(nameParts, nameParts.length - 1)); //$NON-NLS-1$
         }
         
         GregorianCalendar birthday = (GregorianCalendar) p.getBirthday().clone();
@@ -357,36 +356,36 @@ public class MedicalViewDialog extends JDialog {
         int ageInMonths = (now.get(Calendar.YEAR) - birthday.get(Calendar.YEAR)) * 12
             + now.get(Calendar.MONTH) - birthday.get(Calendar.MONTH);
         
-        String phenotype = (p.getPhenotype() != Person.PHENOTYPE_NONE) ? p.getPhenotypeName() : "baseline";
+        String phenotype = (p.getPhenotype() != Person.PHENOTYPE_NONE) ? p.getPhenotypeName() : resourceMap.getString("baselinePhenotype.text"); //$NON-NLS-1$
         
         Force f = c.getForceFor(p);
-        String force = (null != f) ? f.getFullName() : "-";
+        String force = (null != f) ? f.getFullName() : "-"; //$NON-NLS-1$
         
         Person doc = c.getPerson(p.getDoctorId());
-        String doctor = "none";
+        String doctor = resourceMap.getString("none.text"); //$NON-NLS-1$
         if((null != doc) && doc.isActive()) {
             doctor = doc.getFullTitle();
         }
-        panel.add(genLabel("Family name"));
-        panel.add(genLabel("Given name(s)"));
+        panel.add(genLabel(resourceMap.getString("familyName.text"))); //$NON-NLS-1$
+        panel.add(genLabel(resourceMap.getString("givenNames.text"))); //$NON-NLS-1$
         panel.add(genWrittenPanel(familyName));
         panel.add(genWrittenPanel(givenNames));
-        panel.add(genLabel("Date of birth"));
-        panel.add(genLabel("Age yrs., mons."));
+        panel.add(genLabel(resourceMap.getString("birthDate.text"))); //$NON-NLS-1$
+        panel.add(genLabel(resourceMap.getString("age.text"))); //$NON-NLS-1$
         panel.add(genWrittenPanel(birthdayString));
-        panel.add(genWrittenPanel(String.format("%d, %d", ageInMonths / 12, ageInMonths % 12)));
-        panel.add(genLabel("Gender"));
-        panel.add(genLabel("Phenotype"));
-        panel.add(genWrittenPanel(p.isMale() ? "M" : "F"));
+        panel.add(genWrittenPanel(String.format(resourceMap.getString("age.format"), ageInMonths / 12, ageInMonths % 12))); //$NON-NLS-1$
+        panel.add(genLabel(resourceMap.getString("gender.text"))); //$NON-NLS-1$
+        panel.add(genLabel(resourceMap.getString("phenotype.text"))); //$NON-NLS-1$
+        panel.add(genWrittenPanel(p.isMale() ? resourceMap.getString("genderMale.text") : resourceMap.getString("genderFemale.text"))); //$NON-NLS-1$ //$NON-NLS-2$
         panel.add(genWrittenPanel(phenotype));
-        panel.add(genLabel("Assigned to unit"));
-        panel.add(genLabel(""));
+        panel.add(genLabel(resourceMap.getString("assignedTo.text"))); //$NON-NLS-1$
+        panel.add(genLabel("")); //$NON-NLS-1$
         panel.add(genWrittenPanel(force));
-        panel.add(genWrittenPanel(""));
-        panel.add(genLabel("Assigned medical staff"));
-        panel.add(genLabel("Last check-up"));
+        panel.add(genWrittenPanel("")); //$NON-NLS-1$
+        panel.add(genLabel(resourceMap.getString("assignedDoctor.text"))); //$NON-NLS-1$
+        panel.add(genLabel(resourceMap.getString("lastCheckup.text"))); //$NON-NLS-1$
         panel.add(genWrittenPanel(doctor));
-        panel.add(genWrittenPanel(""));
+        panel.add(genWrittenPanel("")); //$NON-NLS-1$
         return panel;
     }
     
@@ -394,7 +393,7 @@ public class MedicalViewDialog extends JDialog {
         JPanel panel = new JPanel();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-        panel.add(genLabel("Past medical history"));
+        panel.add(genLabel(resourceMap.getString("medicalHistory.text"))); //$NON-NLS-1$
         Map<String, List<LogEntry>> groupedEntries = p.getPersonnelLog().stream()
             .filter(entry -> entry.isType(Person.LOGTYPE_MEDICAL))
             .sorted((entry1, entry2) -> entry1.getDate().compareTo(entry2.getDate()))
@@ -411,11 +410,11 @@ public class MedicalViewDialog extends JDialog {
                         wrapper.setOpaque(false);
                         wrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
                         wrapper.add(Box.createHorizontalStrut(60));
-                        wrapper.add(genWrittenText(String.format("%s   ", entry.getDesc())));
+                        wrapper.add(genWrittenText(String.format(resourceMap.getString("historyText.format"), entry.getDesc()))); //$NON-NLS-1$
                         panel.add(wrapper);
                     });
                 } else {
-                    panel.add(genWrittenText(String.format("%s - %s   ", e.getKey(), e.getValue().get(0).getDesc())));
+                    panel.add(genWrittenText(String.format(resourceMap.getString("historyDateAndText.format"), e.getKey(), e.getValue().get(0).getDesc()))); //$NON-NLS-1$
                 }
             });
         return panel;
@@ -425,8 +424,8 @@ public class MedicalViewDialog extends JDialog {
         JPanel panel = new JPanel();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-        panel.add(genLabel("Allergies"));
-        panel.add(genWrittenText(""));
+        panel.add(genLabel(resourceMap.getString("allergies.text"))); //$NON-NLS-1$
+        panel.add(genWrittenText("")); //$NON-NLS-1$
         
         return panel;
     }
@@ -435,8 +434,8 @@ public class MedicalViewDialog extends JDialog {
         JPanel panel = new JPanel();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-        panel.add(genLabel("Illnesses"));
-        panel.add(genWrittenText(""));
+        panel.add(genLabel(resourceMap.getString("illnesses.text"))); //$NON-NLS-1$
+        panel.add(genWrittenText("")); //$NON-NLS-1$
         
         return panel;
     }
@@ -465,7 +464,7 @@ public class MedicalViewDialog extends JDialog {
         panel.removeAll();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-        panel.add(genLabel("Injuries"));
+        panel.add(genLabel(resourceMap.getString("injuries.text"))); //$NON-NLS-1$
         
         maxInjurylevelLocationStream(p).forEachOrdered(bl -> {
             JPanel blWrapper = new JPanel();
@@ -481,13 +480,13 @@ public class MedicalViewDialog extends JDialog {
                 .forEachOrdered(inj -> {
                     JLabel injLabel = null;
                     if(inj.getType().isPermanent()) {
-                        injLabel = genWrittenText(String.format("%s - %s",
+                        injLabel = genWrittenText(String.format(resourceMap.getString("injuriesText.format"), //$NON-NLS-1$
                             inj.getType().getSimpleName(), inj.getStart().toString(DATE_FORMATTER)));
                     } else if(inj.isPermanent() || (inj.getTime() <= 0)) {
-                        injLabel = genWrittenText(String.format("%s - %s - permanent",
+                        injLabel = genWrittenText(String.format(resourceMap.getString("injuriesPermanent.format"), //$NON-NLS-1$
                             inj.getType().getSimpleName(), inj.getStart().toString(DATE_FORMATTER)));
                     } else {
-                        injLabel = genWrittenText(String.format("%s - %s - est. %s left",
+                        injLabel = genWrittenText(String.format(resourceMap.getString("injuriesTextAndDuration.format"), //$NON-NLS-1$
                             inj.getType().getSimpleName(), inj.getStart().toString(DATE_FORMATTER), genTimePeriod(inj.getTime())));
                     }
                     if(isGMMode()) {
@@ -512,9 +511,9 @@ public class MedicalViewDialog extends JDialog {
         JPanel panel = new JPanel();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.add(genLabel("Doctor's notes"));
+        panel.add(genLabel(resourceMap.getString("doctorsNotes.text"))); //$NON-NLS-1$
         
-        String notes = p.getExtraData().get(DOCTOR_NOTES, "");
+        String notes = p.getExtraData().get(DOCTOR_NOTES, ""); //$NON-NLS-1$
         notesArea = new JTextArea(notes);
         notesArea.setEditable(true);
         notesArea.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -564,15 +563,15 @@ public class MedicalViewDialog extends JDialog {
     
     private String genTimePeriod(int days) {
         if(days <= 1) {
-            return "a day";
+            return resourceMap.getString("durationOneDay.text"); //$NON-NLS-1$
         } else if(days < 21) {
-            return String.format("%d days", days);
+            return String.format(resourceMap.getString("durationDays.format"), days); //$NON-NLS-1$
         } else if(days <= 12 * 7) {
-            return String.format("%.0f weeks", days * 1.0 / 7.0);
+            return String.format(resourceMap.getString("durationWeeks.format"), days * 1.0 / 7.0); //$NON-NLS-1$
         } else if(days <= 2 * 365) {
-            return String.format("%.0f months", days * 12.0 / 365.0);
+            return String.format(resourceMap.getString("durationMonths.format"), days * 12.0 / 365.0); //$NON-NLS-1$
         } else {
-            return String.format("%.0f years", days * 1.0 / 365.0);
+            return String.format(resourceMap.getString("durationYears.format"), days * 1.0 / 365.0); //$NON-NLS-1$
         }
     }
     
@@ -589,12 +588,14 @@ public class MedicalViewDialog extends JDialog {
         private final Person person;
         private final Injury injury;
         private ImageIcon healImageIcon;
+        private ResourceBundle resourceMap = null;
 
         public InjuryLabelMouseAdapter(JLabel label, Person person, Injury injury) {
             this.label = label;
             this.person = person;
             this.injury = injury;
             this.healImageIcon = new ImageIcon(new ImageIcon("data/images/misc/medical.png").getImage().getScaledInstance(16, 16, Image.SCALE_DEFAULT)); //$NON-NLS-1$
+            this.resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog", new EncodeControl()); //$NON-NLS-1$
         }
         
         @Override
@@ -619,10 +620,10 @@ public class MedicalViewDialog extends JDialog {
                 header.setFont(UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.BOLD)); //$NON-NLS-1$
                 popup.add(header);
                 popup.addSeparator();
-                JMenuItem edit = new JMenuItem("Edit ...",
+                JMenuItem edit = new JMenuItem(resourceMap.getString("menuEdit.text"), //$NON-NLS-1$
                     UIManager.getIcon("FileView.fileIcon")); //$NON-NLS-1$
                 popup.add(edit);
-                JMenuItem remove = new JMenuItem("Remove", healImageIcon);
+                JMenuItem remove = new JMenuItem(resourceMap.getString("menuRemove.text"), healImageIcon); //$NON-NLS-1$
                 remove.addActionListener(ae -> {
                     person.removeInjury(injury);
                     label.getRootPane().getParent().revalidate();
