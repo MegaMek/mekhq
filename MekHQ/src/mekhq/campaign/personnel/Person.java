@@ -39,7 +39,10 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.IntSupplier;
+import java.util.function.IntUnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -2860,6 +2863,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public boolean isAdmin() {
         return (isAdminPrimary() || isAdminSecondary());
+    }
+
+    public boolean isMedic() {
+        return (T_MEDIC == primaryRole) || (T_MEDIC == secondaryRole);
     }
 
     public boolean isAdminPrimary() {
