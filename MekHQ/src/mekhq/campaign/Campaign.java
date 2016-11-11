@@ -44,6 +44,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.UUID;
@@ -1125,6 +1126,16 @@ public class Campaign implements Serializable {
         return ancestors;
     }
 
+    /** @return a matching ancestors entry for the arguments, or null if there isn't any */
+    public Ancestors getAncestors(UUID fatherID, UUID motherID) {
+        for(Ancestors a : ancestors) {
+            if(Objects.equals(fatherID, a.getFatherID()) && Objects.equals(motherID, a.getMotherID())) {
+                return a;
+            }
+        }
+        return null;
+    }
+    
     public ArrayList<Person> getPatients() {
         ArrayList<Person> patients = new ArrayList<Person>();
         for (Person p : getPersonnel()) {

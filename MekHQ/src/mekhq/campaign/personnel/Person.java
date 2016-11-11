@@ -36,7 +36,6 @@ import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
@@ -44,6 +43,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.IntSupplier;
 import java.util.function.IntUnaryOperator;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -170,7 +171,25 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         gaussian = Math.max(-4.0, Math.min(4.0, gaussian));
         return (int) Math.round(gaussian * 10 + 38 * 7);
     };
-
+    private static final IntSupplier PREGNANCY_SIZE = () -> {
+        int children = 1;
+        // Hellin's law says it's 1:89 chance, to not make it appear too seldom, we use 1:50
+        while(Compute.randomInt(50) == 0) {
+            ++ children;
+        }
+        return Math.min(children, 8); // Limit to octuplets, for the sake of sanity
+    };
+    
+    private static final String[] PREGNANCY_MULTIPLE_NAMES = {null, null,
+        "twins", "triplets", "quadruplets", "quintuplets",
+        "sextuplets", "septuplets", "octuplets", "nonuplets", "decuplets"
+    };
+    
+    public static final ExtraData.IntKey PREGNANCY_CHILDREN_DATA
+        = new ExtraData.IntKey("procreation:children");
+    public static final ExtraData.StringKey PREGNANCY_FATHER_DATA
+        = new ExtraData.StringKey("procreation:father");
+    
     protected UUID id;
     protected int oldId;
 
@@ -922,81 +941,87 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	}
 
 	public Collection<Person> birth() {
-		Person baby = campaign.newPerson(T_NONE);
-		baby.setDependent(true);
-		UUID tmpAncID = null;
-
-		// Find already existing ancestor set of these parents
-		for (Ancestors a : campaign.getAncestors()) {
-			if(getId().equals(a.getMotherID()) && Objects.equals(getSpouseID(), a.getFatherID())) {
-				tmpAncID = a.getId();
-				break;
-			}
+        int size = extraData.get(PREGNANCY_CHILDREN_DATA, 1);
+        String fatherIDString = extraData.get(PREGNANCY_FATHER_DATA);
+        UUID fatherID = (null != fatherIDString) ? UUID.fromString(fatherIDString) : getSpouseID();
+		Ancestors anc = campaign.getAncestors(fatherID, id);
+		if(null == anc) {
+		    anc = campaign.createAncestors(fatherID, id);
 		}
-
-		if (tmpAncID == null) {
-			tmpAncID = campaign.createAncestors(getSpouseID(), id).getId();
-		}
-
-		String surname = "";
-		if (getName().contains(" ")) {
-			surname = getName().split(" ", 2)[1];
-		} else if (baby.getFather() != null && baby.getFather().getName().contains(" ")) {
-			surname = baby.getFather().getName().split(" ", 2)[1];
-		}
-		baby.setName(baby.getName().split(" ", 2)[0] + " " + surname);
-		baby.setBirthday((GregorianCalendar) campaign.getCalendar().clone());
-		UUID id = UUID.randomUUID();
-		while (null != campaign.getPerson(id)) {
-			id = UUID.randomUUID();
-		}
-		baby.setId(id);
-		baby.setAncestorsID(tmpAncID);
-		campaign.addReport(getName() + " has given birth to " + baby.getHyperlinkedName() + ", a baby " + (baby.getGender() == G_MALE ? "boy!" : "girl!"));
-		if (campaign.getCampaignOptions().logConception()) {
-		    addLogEntry(campaign.getDate(), "Delivered a healthy baby " + (baby.getGender() == G_MALE ? "boy!" : "girl!"));
-		}
-		setDueDate(null);
-		// TODO Allow for twins and other multiple births
-		return Collections.singleton(baby);
+		final UUID ancId = anc.getId();
+        final String surname = getName().contains(" ") ? getName().split(" ", 2)[1] : "";
+        
+        // Cleanup
+        setDueDate(null);
+        extraData.set(PREGNANCY_CHILDREN_DATA, 0);
+        extraData.set(PREGNANCY_FATHER_DATA, null);
+        
+        return IntStream.range(0, size).mapToObj(i -> {
+            Person baby = campaign.newPerson(T_NONE);
+            baby.setDependent(true);
+    		baby.setName(baby.getName().split(" ", 2)[0] + " " + surname);
+    		baby.setBirthday((GregorianCalendar) campaign.getCalendar().clone());
+    		UUID babyId = UUID.randomUUID();
+    		while (null != campaign.getPerson(babyId)) {
+    		    babyId = UUID.randomUUID();
+    		}
+    		baby.setId(babyId);
+    		baby.setAncestorsID(ancId);
+    		campaign.addReport(getHyperlinkedName() + " has given birth to " + baby.getHyperlinkedName() + ", a baby " + (baby.getGender() == G_MALE ? "boy!" : "girl!"));
+    		if (campaign.getCampaignOptions().logConception()) {
+    		    addLogEntry(campaign.getDate(), "Delivered a healthy baby " + (baby.getGender() == G_MALE ? "boy!" : "girl!"));
+    		}
+    		return baby;
+        }).collect(Collectors.toList());
 	}
 
-	public void procreate() {
-		// Spouse NULL protection...
-		if (getSpouseID() != null && getSpouse() == null) {
-			setSpouseID(null);
-		}
-		if (!isDeployed()) {
-			// Age limitations...
-			if (getAge(campaign.getCalendar()) > 13 && getAge(campaign.getCalendar()) < 51) {
-				if (getSpouse() == null && campaign.getCampaignOptions().useUnofficialProcreationNoRelationship()) {
-					// 0.005% chance that this procreation attempt will create a child
-					if (Compute.randomInt(100000) < 2) {
-						GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
-						tCal.add(GregorianCalendar.DAY_OF_YEAR, PREGNANCY_DURATION.getAsInt());
-						setDueDate(tCal);
-						campaign.addReport(getHyperlinkedName()+" has conceived");
-						if (campaign.getCampaignOptions().logConception()) {
-						    addLogEntry(campaign.getDate(), "Has conceived");
-				        }
-					}
-				} else if (getSpouse() != null) {
-					if (getSpouse().isActive() && !getSpouse().isDeployed() && getSpouse().getAge(campaign.getCalendar()) > 13) {
-						// 0.05% chance that this procreation attempt will create a child
-						if (Compute.randomInt(10000) < 2) {
-							GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
-							tCal.add(GregorianCalendar.DAY_OF_YEAR, PREGNANCY_DURATION.getAsInt());
-							setDueDate(tCal);
-							campaign.addReport(getHyperlinkedName()+" has conceived");
-							if (campaign.getCampaignOptions().logConception()) {
-							    addLogEntry(campaign.getDate(), "Has conceived");
-					        }
-						}
-					}
-				}
-			}
-		}
-	}
+    public void procreate() {
+        if(!isFemale() || isPregnant()) {
+            return;
+        }
+        // Spouse NULL protection...
+        if((getSpouseID() != null) && (getSpouse() == null)) {
+            setSpouseID(null);
+        }
+        if (!isDeployed()) {
+            // Age limitations...
+            if (getAge(campaign.getCalendar()) > 13 && getAge(campaign.getCalendar()) < 51) {
+                boolean concieved = false;
+                if (getSpouse() == null && campaign.getCampaignOptions().useUnofficialProcreationNoRelationship()) {
+                    // 0.005% chance that this procreation attempt will create a child
+                    concieved = (Compute.randomInt(100000) < 2);
+                } else if (getSpouse() != null) {
+                    if (getSpouse().isActive() && !getSpouse().isDeployed() && getSpouse().getAge(campaign.getCalendar()) > 13) {
+                        // 0.05% chance that this procreation attempt will create a child
+                        concieved = (Compute.randomInt(10000) < 2);
+                    }
+                }
+                
+                if(concieved) {
+                    GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
+                    tCal.add(GregorianCalendar.DAY_OF_YEAR, PREGNANCY_DURATION.getAsInt());
+                    setDueDate(tCal);
+                    int size = PREGNANCY_SIZE.getAsInt();
+                    extraData.set(PREGNANCY_CHILDREN_DATA, size);
+                    extraData.set(PREGNANCY_FATHER_DATA,
+                        (null != getSpouseID()) ? getSpouseID().toString() : null);
+
+                    String sizeString = (size < PREGNANCY_MULTIPLE_NAMES.length) ? PREGNANCY_MULTIPLE_NAMES[size] : null;
+                    if(null == sizeString) {
+                        campaign.addReport(getHyperlinkedName()+" has conceived");
+                        if (campaign.getCampaignOptions().logConception()) {
+                            addLogEntry(campaign.getDate(), "Has conceived");
+                        }
+                    } else {
+                        campaign.addReport(getHyperlinkedName()+" has conceived " + sizeString);
+                        if (campaign.getCampaignOptions().logConception()) {
+                            addLogEntry(campaign.getDate(), "Has conceived " + sizeString);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 	public boolean safeSpouse(Person p) {
 		// Huge convoluted return statement
