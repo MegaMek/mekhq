@@ -1,6 +1,7 @@
 /*
  * LogEntry.java
  * 
+ * Copyright (C) 2009-2016 MegaMek team
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
  * This file is part of MekHQ.
@@ -24,6 +25,7 @@ package mekhq.campaign;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
@@ -32,82 +34,111 @@ import mekhq.MekHqXmlUtil;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class LogEntry implements MekHqXmlSerializable {
-	
-	private Date date;
-	private String desc;
+    private String type;
+    private Date date;
+    private String desc;
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
-	public LogEntry() {
-		this(null, "");
-	}
-	
-	public LogEntry(Date d, String de) {
-		this.date = d;
-		this.desc = de;
-	}
-	
-	public void setDate(Date d) {
-		this.date = d;
-	}
-	
-	public Date getDate() {
-		return date;
-	}
-	
-	public void setDesc(String d) {
-		this.desc = d;
-	}
-	
-	public String getDesc() {
-		return desc;
-	}
-	
-	public void writeToXml(PrintWriter pw1, int indent) {
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-		pw1.println(MekHqXmlUtil.indentStr(indent) + "<logEntry>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<date>"
-				+df.format(date)
-				+"</date>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<desc>"
-				+MekHqXmlUtil.escape(desc)
-				+"</desc>");
-		pw1.println(MekHqXmlUtil.indentStr(indent) + "</logEntry>");
-	}
-	
-	public static LogEntry generateInstanceFromXML(Node wn) {
-		LogEntry retVal = new LogEntry();
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-		
-		try {	
-			// Okay, now load fields!
-			NodeList nl = wn.getChildNodes();
-			
-			for (int x=0; x<nl.getLength(); x++) {
-				Node wn2 = nl.item(x);
-				
-				if (wn2.getNodeName().equalsIgnoreCase("desc")) {
-					retVal.desc = wn2.getTextContent();
-				} else if (wn2.getNodeName().equalsIgnoreCase("date")) {
-					retVal.date = df.parse(wn2.getTextContent().trim());
-				}
-			}
-		} catch (Exception ex) {
-			// Doh!
-			MekHQ.logError(ex);
-		}
-		
-		return retVal;
-	}
-	
-	@Override
-	public LogEntry clone() {
-		return new LogEntry(getDate(), getDesc());
-	}
+    public LogEntry() {
+        this(null, "", null);
+    }
+    
+    public LogEntry(Date date, String desc) {
+        this(date, desc, null);
+    }
+    
+    public LogEntry(Date date, String desc, String type) {
+        this.date = date;
+        this.desc = Objects.requireNonNull(desc);
+        this.type = type;
+    }
+    
+    public void setDate(Date d) {
+        this.date = d;
+    }
+    
+    public Date getDate() {
+        return date;
+    }
+    
+    public void setDesc(String d) {
+        this.desc = Objects.requireNonNull(d);
+    }
+    
+    public String getDesc() {
+        return desc;
+    }
+    
+    public void setType(String type) {
+        this.type = type;
+    }
+    
+    public String getType() {
+        return type;
+    }
+    
+    public boolean isType(String type) {
+        return Objects.equals(this.type, type);
+    }
+    
+    @Override
+    public void writeToXml(PrintWriter pw1, int indent) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(MekHqXmlUtil.indentStr(indent)).append("<logEntry>");
+        if(null != date) {
+            sb.append("<date>").append(DATE_FORMAT.format(date)).append("</date>");
+        }
+        sb.append("<desc>").append(MekHqXmlUtil.escape(desc)).append("</desc>");
+        if(null != type) {
+            sb.append("<type>").append(MekHqXmlUtil.escape(type)).append("</type>");
+        }
+        sb.append("</logEntry>");
+        pw1.println(sb.toString());
+    }
+    
+    public static LogEntry generateInstanceFromXML(Node wn) {
+        LogEntry retVal = new LogEntry();
+        
+        try {    
+            // Okay, now load fields!
+            NodeList nl = wn.getChildNodes();
+            
+            for (int x=0; x<nl.getLength(); x++) {
+                Node wn2 = nl.item(x);
+                
+                if (wn2.getNodeName().equalsIgnoreCase("desc")) {
+                    retVal.desc = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("type")) {
+                    retVal.type = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
+                    retVal.date = DATE_FORMAT.parse(wn2.getTextContent().trim());
+                }
+            }
+        } catch (Exception ex) {
+            // Doh!
+            MekHQ.logError(ex);
+        }
+        
+        return retVal;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        if(null != date) {
+            sb.append("[").append(DATE_FORMAT.format(date)).append("] ");
+        }
+        sb.append(desc);
+        return sb.toString();
+    }
+    
+    @Override
+    public LogEntry clone() {
+        return new LogEntry(getDate(), getDesc(), getType());
+    }
 }
