@@ -246,7 +246,7 @@ public class InjuryType {
         boolean applyAsBoolean(T value);
     }
     
-    private static final class XMLAdapter extends XmlAdapter<String, InjuryType> {
+    public static final class XMLAdapter extends XmlAdapter<String, InjuryType> {
         @Override
         public InjuryType unmarshal(String v) throws Exception {
             return (null == v) ? null : InjuryType.byKey(v);
