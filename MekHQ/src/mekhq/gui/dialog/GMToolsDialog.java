@@ -57,10 +57,6 @@ public class GMToolsDialog extends JDialog implements ActionListener {
     private JComboBox<String> unitTypePicker;
     private JComboBox<String> unitWeightPicker;
     private JLabel unitPicked;
-    private static final int[] unitTypes = {
-    	UnitType.MEK, UnitType.TANK, UnitType.VTOL, UnitType.AERO, UnitType.DROPSHIP,
-    	UnitType.INFANTRY, UnitType.BATTLE_ARMOR, UnitType.PROTOMEK
-    };
     
     private CampaignGUI gui;
 
@@ -142,11 +138,18 @@ public class GMToolsDialog extends JDialog implements ActionListener {
         yearPicker.setText(String.valueOf(gui.getCampaign().getCalendar().get(Calendar.YEAR)));
         qualityPicker = new JComboBox<String>(qualityNames);
         unitTypePicker = new JComboBox<String>();
-        for (int ut : unitTypes) {
-        	unitTypePicker.addItem(UnitType.getTypeName(ut));
+        for (int ut = 0; ut < UnitType.SIZE; ut++) {
+            if (gui.getCampaign().getUnitGenerator().isSupportedUnitType(ut)) {
+                unitTypePicker.addItem(UnitType.getTypeName(ut));
+            }
         }
         unitWeightPicker = new JComboBox<String>(weightNames);
         unitPicked = new JLabel("-");
+        unitTypePicker.addItemListener(ev ->
+            unitWeightPicker.setEnabled(unitTypePicker.getSelectedItem().equals("Mek")
+                    || unitTypePicker.getSelectedItem().equals("Tank")
+                    || unitTypePicker.getSelectedItem().equals("Aero"))
+        );
         
         ratPanel.add(new JLabel("Year"), newGridBagConstraints(0, 0));
         ratPanel.add(yearPicker, newGridBagConstraints(0, 1));
@@ -225,9 +228,18 @@ public class GMToolsDialog extends JDialog implements ActionListener {
     private MechSummary performRollRat() {
         try{
             IUnitGenerator ug = gui.getCampaign().getUnitGenerator();
-            int unitType = unitTypes[unitTypePicker.getSelectedIndex()];
+            int unitType = 0;
+            for (int ut = 0; ut < UnitType.SIZE; ut++) {
+                if (UnitType.getTypeName(ut).equals(unitTypePicker.getSelectedItem())) {
+                    unitType = ut;
+                    break;
+                }
+            }
             int unitQuality = qualityPicker.getSelectedIndex();
             int unitWeight = unitWeightPicker.getSelectedIndex() + EntityWeightClass.WEIGHT_LIGHT;
+            if (!unitWeightPicker.isEnabled()) {
+                unitWeight = -1;
+            }
             
             int targetYear = Integer.parseInt(yearPicker.getText());
             

@@ -11,6 +11,7 @@ v0.41.27-git
 + Issue #244: [AtB] A Normal morale enemy gets Base Attack.
 + Issue #245: [AtB] Bonus payments are not made.
 + Issue #246: RAT Generator doesn't seem to generate any VTOLs.
++ Issue #247: GM Tools RAT Roller Will Not Add Dropships.
 
 v0.41.26 (2016-11-02 02:00 UTC)
 + Issue #204: AtB generates empty unit markets with traditional RATS
