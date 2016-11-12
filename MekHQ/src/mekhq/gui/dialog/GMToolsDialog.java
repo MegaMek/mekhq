@@ -58,7 +58,7 @@ public class GMToolsDialog extends JDialog implements ActionListener {
     private JComboBox<String> unitWeightPicker;
     private JLabel unitPicked;
     private static final int[] unitTypes = {
-    	UnitType.MEK, UnitType.TANK, UnitType.AERO, UnitType.DROPSHIP,
+    	UnitType.MEK, UnitType.TANK, UnitType.VTOL, UnitType.AERO, UnitType.DROPSHIP,
     	UnitType.INFANTRY, UnitType.BATTLE_ARMOR, UnitType.PROTOMEK
     };
     
@@ -105,9 +105,6 @@ public class GMToolsDialog extends JDialog implements ActionListener {
         return dicePanel;
     }
     
-    /**
-     * Using mekhq.campaign.universe.UnitTableData for RAT access
-     */
     private JPanel getRATRoller() {
     	final String[] qualityNames = {"F", "D", "C", "B", "A", "A*"};
     	final String[] weightNames = {"Light", "Medium", "Heavy", "Assault"};
@@ -146,7 +143,7 @@ public class GMToolsDialog extends JDialog implements ActionListener {
         qualityPicker = new JComboBox<String>(qualityNames);
         unitTypePicker = new JComboBox<String>();
         for (int ut : unitTypes) {
-        	unitTypePicker.addItem(ut == UnitType.TANK? "Vehicle" : UnitType.getTypeName(ut));
+        	unitTypePicker.addItem(UnitType.getTypeName(ut));
         }
         unitWeightPicker = new JComboBox<String>(weightNames);
         unitPicked = new JLabel("-");
@@ -239,7 +236,6 @@ public class GMToolsDialog extends JDialog implements ActionListener {
                 	(!campaign.getCampaignOptions().limitByYear() || targetYear > ms.getYear())
                 		&& (!ms.isClan() || campaign.getCampaignOptions().allowClanPurchases())
                 		&& (ms.isClan() || campaign.getCampaignOptions().allowISPurchases());
-
             MechSummary ms = ug
             		.generate(((FactionChoice) factionPicker.getSelectedItem()).id,
             				unitType, unitWeight, targetYear, unitQuality, test);
