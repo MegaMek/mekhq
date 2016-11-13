@@ -85,6 +85,7 @@ public class MassRepairSalvageDialog extends JDialog {
 	private JTable unitTable;
 	private TableRowSorter<UnitTableModel> unitSorter;
 	private JScrollPane scrollUnitList;
+	private JButton btnSelectNone;
 	private JButton btnSelectAssigned;
 	private JButton btnSelectUnassigned;
 
@@ -155,6 +156,19 @@ public class MassRepairSalvageDialog extends JDialog {
 		return mode == MODE.WAREHOUSE;
 	}
 
+	private static boolean isValidMRMSUnit(Unit unit) {
+		if (unit.isSelfCrewed() || !unit.isAvailable()) {
+			return false;
+		}
+
+		if (unit.isDeployed()) {
+			return false;
+		}
+
+		return (unit.getEntity() instanceof Tank) || (unit.getEntity() instanceof Aero)
+				|| (unit.getEntity() instanceof Mech);
+	}
+
 	private void filterUnits() {
 		// Store selections so after the table is refreshed we can re-select
 		// them
@@ -181,23 +195,16 @@ public class MassRepairSalvageDialog extends JDialog {
 		for (int i = 0; i < campaignGUI.getCampaign().getServiceableUnits().size(); i++) {
 			Unit unit = campaignGUI.getCampaign().getServiceableUnits().get(i);
 
-			if (unit.isSelfCrewed() || !unit.isAvailable()) {
+			if (!isValidMRMSUnit(unit)) {
 				continue;
 			}
 
-			if (unit.isDeployed()) {
-				continue;
-			}
+			unitList.add(unit);
 
-			if ((unit.getEntity() instanceof Tank) || (unit.getEntity() instanceof Aero)
-					|| (unit.getEntity() instanceof Mech)) {
-				unitList.add(unit);
-
-				if ((null == unit.getActiveCrew()) || unit.getActiveCrew().isEmpty()) {
-					inactiveCount++;
-				} else {
-					activeCount++;
-				}
+			if ((null == unit.getActiveCrew()) || unit.getActiveCrew().isEmpty()) {
+				inactiveCount++;
+			} else {
+				activeCount++;
 			}
 		}
 
@@ -261,6 +268,9 @@ public class MassRepairSalvageDialog extends JDialog {
 
 		btnSelectAllParts.setText("Select All (" + quantity + ")");
 		partsTableModel.setData(filteredPartsList);
+
+		int count = partsTable.getRowCount();
+		partsTable.addRowSelectionInterval(0, count - 1);
 	}
 
 	private void initComponents() {
@@ -319,9 +329,15 @@ public class MassRepairSalvageDialog extends JDialog {
 		unitSorter = new TableRowSorter<UnitTableModel>(unitTableModel);
 		unitSorter.setComparator(UnitTableModel.COL_STATUS, new UnitStatusSorter());
 		unitSorter.setComparator(UnitTableModel.COL_TYPE, new UnitTypeSorter());
+		unitSorter.setComparator(UnitTableModel.COL_RSTATUS, new Comparator<String>() {
+			@Override
+			public int compare(String s0, String s1) {
+				return s0.compareTo(s1);
+			}
+		});
 
 		ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
-		sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_TYPE, SortOrder.DESCENDING));
+		sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_STATUS, SortOrder.DESCENDING));
 		unitSorter.setSortKeys(sortKeys);
 
 		unitTable = new JTable(unitTableModel);
@@ -338,7 +354,8 @@ public class MassRepairSalvageDialog extends JDialog {
 			column.setPreferredWidth(unitTableModel.getColumnWidth(i));
 			column.setCellRenderer(unitTableModel.getRenderer(false, null));
 
-			if (i != UnitTableModel.COL_NAME && i != UnitTableModel.COL_STATUS && i != UnitTableModel.COL_TYPE) {
+			if (i != UnitTableModel.COL_NAME && i != UnitTableModel.COL_STATUS && i != UnitTableModel.COL_TYPE
+					&& i != UnitTableModel.COL_RSTATUS) {
 				((XTableColumnModel) unitTable.getColumnModel()).setColumnVisible(column, false);
 			}
 		}
@@ -417,16 +434,13 @@ public class MassRepairSalvageDialog extends JDialog {
 
 		int gridRowIdx = 0;
 
-		useExtraTimeBox = new JCheckBox();
-		useRushJobBox = new JCheckBox();
-		allowCarryoverBox = new JCheckBox();
-		scrapImpossibleBox = new JCheckBox();
-
 		GridBagConstraints gridBagConstraints = null;
 
+		useExtraTimeBox = new JCheckBox();
 		useExtraTimeBox.setText(resourceMap.getString("useExtraTimeBox.text"));
 		useExtraTimeBox.setToolTipText(resourceMap.getString("useExtraTimeBox.toolTipText"));
 		useExtraTimeBox.setName("massRepairUseExtraTimeBox");
+		useExtraTimeBox.setSelected(campaignOptions.massRepairUseExtraTime());
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = gridRowIdx++;
@@ -435,9 +449,11 @@ public class MassRepairSalvageDialog extends JDialog {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlOptions.add(useExtraTimeBox, gridBagConstraints);
 
+		useRushJobBox = new JCheckBox();
 		useRushJobBox.setText(resourceMap.getString("useRushJobBox.text"));
 		useRushJobBox.setToolTipText(resourceMap.getString("useRushJobBox.toolTipText"));
 		useRushJobBox.setName("massRepairUseRushJobBox");
+		useRushJobBox.setSelected(campaignOptions.massRepairUseRushJob());
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = gridRowIdx++;
@@ -445,9 +461,11 @@ public class MassRepairSalvageDialog extends JDialog {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlOptions.add(useRushJobBox, gridBagConstraints);
 
+		allowCarryoverBox = new JCheckBox();
 		allowCarryoverBox.setText(resourceMap.getString("allowCarryoverBox.text"));
 		allowCarryoverBox.setToolTipText(resourceMap.getString("allowCarryoverBox.toolTipText"));
 		allowCarryoverBox.setName("massRepairAllowCarryoverBox");
+		allowCarryoverBox.setSelected(campaignOptions.massRepairAllowCarryover());
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = gridRowIdx++;
@@ -456,9 +474,11 @@ public class MassRepairSalvageDialog extends JDialog {
 		pnlOptions.add(allowCarryoverBox, gridBagConstraints);
 
 		if (!isModeWarehouse()) {
+			scrapImpossibleBox = new JCheckBox();
 			scrapImpossibleBox.setText(resourceMap.getString("scrapImpossibleBox.text"));
 			scrapImpossibleBox.setToolTipText(resourceMap.getString("scrapImpossibleBox.toolTipText"));
 			scrapImpossibleBox.setName("massRepairScrapImpossibleBox");
+			scrapImpossibleBox.setSelected(campaignOptions.massRepairScrapImpossible());
 			gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = gridRowIdx++;
@@ -477,14 +497,6 @@ public class MassRepairSalvageDialog extends JDialog {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		pnlOptions.add(pnlItems, gridBagConstraints);
-
-		useExtraTimeBox.setSelected(campaignOptions.massRepairUseExtraTime());
-		useRushJobBox.setSelected(campaignOptions.massRepairUseRushJob());
-		allowCarryoverBox.setSelected(campaignOptions.massRepairAllowCarryover());
-
-		if (isModeWarehouse()) {
-			scrapImpossibleBox.setSelected(campaignOptions.massRepairScrapImpossible());
-		}
 
 		JLabel lbl = new JLabel("Item");
 		Font boldFont = new Font(lbl.getFont().getFontName(), Font.BOLD, lbl.getFont().getSize());
@@ -720,7 +732,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
 
-		JButton btnSelectNone = new JButton();
+		btnSelectNone = new JButton();
 		btnSelectNone.setText("Unselect All"); // NOI18N
 		btnSelectNone.setToolTipText("Unselect all units");
 		btnSelectNone.setName("btnSelectNone"); // NOI18N
@@ -998,7 +1010,7 @@ public class MassRepairSalvageDialog extends JDialog {
 			}
 
 			for (Unit unit : units) {
-				repairsCompleted += performUnitMassRepairOrSalvage(unit, unit.isSalvage(), activeMROs,
+				repairsCompleted += performUnitMassRepairOrSalvage(campaignGUI, unit, unit.isSalvage(), activeMROs,
 						useExtraTimeBox.isSelected(), useRushJobBox.isSelected(), allowCarryoverBox.isSelected(),
 						scrapImpossibleBox.isSelected());
 			}
@@ -1066,8 +1078,105 @@ public class MassRepairSalvageDialog extends JDialog {
 		this.setVisible(false);
 	}
 
-	private int performUnitMassRepairOrSalvage(Unit unit, boolean isSalvage, List<MassRepairOption> mroList,
-			boolean useExtraTime, boolean useRushJob, boolean allowCarryover, boolean scrapImpossible) {
+	private static List<MassRepairOption> createActiveMROsFromConfiguration(CampaignGUI campaignGUI) {
+		List<MassRepairOption> activeMROs = new ArrayList<MassRepairOption>();
+		List<MassRepairOption> mroList = campaignGUI.getCampaign().getCampaignOptions().getMassRepairOptions();
+
+		if (null != mroList) {
+			for (int i = 0; i < mroList.size(); i++) {
+				MassRepairOption mro = mroList.get(i);
+
+				if (mro.isActive()) {
+					activeMROs.add(mro);
+				}
+			}
+		}
+
+		return activeMROs;
+	}
+
+	public static void performSingleUnitMassRepairOrSalvage(CampaignGUI campaignGUI, Unit unit) {
+		CampaignOptions options = campaignGUI.getCampaign().getCampaignOptions();
+		List<MassRepairOption> activeMROs = createActiveMROsFromConfiguration(campaignGUI);
+		String msg = "";
+
+		int repairsCompleted = performUnitMassRepairOrSalvage(campaignGUI, unit, unit.isSalvage(), activeMROs,
+				options.massRepairUseExtraTime(), options.massRepairUseRushJob(), options.massRepairAllowCarryover(),
+				options.massRepairScrapImpossible());
+
+		if (repairsCompleted == 1) {
+			msg = "Mass Repair/Salvage complete. There was 1 repair completed or scheduled.";
+		} else {
+			msg = String.format("Mass Repair/Salvage complete. There were %d repairs completed or scheduled.",
+					repairsCompleted);
+		}
+
+		JOptionPane.showMessageDialog(campaignGUI.getFrame(), msg, "Complete", JOptionPane.INFORMATION_MESSAGE);
+
+		campaignGUI.getCampaign().addReport(msg);
+
+		campaignGUI.refreshReport();
+	}
+
+	public static void massRepairSalvageAllUnits(CampaignGUI campaignGUI) {
+		CampaignOptions options = campaignGUI.getCampaign().getCampaignOptions();
+		List<MassRepairOption> activeMROs = createActiveMROsFromConfiguration(campaignGUI);
+		String msg = "";
+		int repairsCompleted = 0;
+
+		List<Unit> units = new ArrayList<>();
+
+		for (int i = 0; i < campaignGUI.getCampaign().getServiceableUnits().size(); i++) {
+			Unit unit = campaignGUI.getCampaign().getServiceableUnits().get(i);
+
+			if (!isValidMRMSUnit(unit)) {
+				continue;
+			}
+
+			units.add(unit);
+		}
+
+		// Sort the list status fixing the least damaged first
+		Collections.sort(units, new Comparator<Unit>() {
+			@Override
+			public int compare(Unit o1, Unit o2) {
+				int damageIdx1 = UnitStatusSorter.getDamageStateIndex(Unit.getDamageStateName(o1.getDamageState()));
+				int damageIdx2 = UnitStatusSorter.getDamageStateIndex(Unit.getDamageStateName(o2.getDamageState()));
+
+				if (damageIdx2 == damageIdx1) {
+					return 0;
+				} else if (damageIdx2 < damageIdx1) {
+					return -1;
+				}
+
+				return 1;
+			}
+		});
+
+		for (Unit unit : units) {
+			repairsCompleted += performUnitMassRepairOrSalvage(campaignGUI, unit, unit.isSalvage(), activeMROs,
+					options.massRepairUseExtraTime(), options.massRepairUseRushJob(),
+					options.massRepairAllowCarryover(), options.massRepairScrapImpossible());
+		}
+
+		if (repairsCompleted == 1) {
+			msg = "Mass Repair/Salvage complete. There was 1 repair completed or scheduled.";
+		} else {
+			msg = String.format("Mass Repair/Salvage complete. There were %d repairs completed or scheduled.",
+					repairsCompleted);
+		}
+
+		JOptionPane.showMessageDialog(campaignGUI.getFrame(), msg, "Complete", JOptionPane.INFORMATION_MESSAGE);
+
+		campaignGUI.getCampaign().addReport(msg);
+
+		campaignGUI.refreshReport();
+
+	}
+
+	public static int performUnitMassRepairOrSalvage(CampaignGUI campaignGUI, Unit unit, boolean isSalvage,
+			List<MassRepairOption> mroList, boolean useExtraTime, boolean useRushJob, boolean allowCarryover,
+			boolean scrapImpossible) {
 		String actionDescriptor = isSalvage ? "salvage" : "repair";
 		Campaign campaign = campaignGUI.getCampaign();
 
@@ -1104,8 +1213,8 @@ public class MassRepairSalvageDialog extends JDialog {
 			int actionsPerformed = 1;
 
 			while (actionsPerformed > 0) {
-				actionsPerformed = performUnitMassTechAction(unit, techs, mroByTypeMap, isSalvage, useExtraTime,
-						useRushJob, allowCarryover, scrapImpossible);
+				actionsPerformed = performUnitMassTechAction(campaignGUI, unit, techs, mroByTypeMap, isSalvage,
+						useExtraTime, useRushJob, allowCarryover, scrapImpossible);
 				totalActionsPerformed += actionsPerformed;
 			}
 
@@ -1116,9 +1225,9 @@ public class MassRepairSalvageDialog extends JDialog {
 		return totalActionsPerformed;
 	}
 
-	private int performUnitMassTechAction(Unit unit, List<Person> techs, Map<Integer, MassRepairOption> mroByTypeMap,
-			boolean salvaging, boolean useExtraTime, boolean useRushJob, boolean allowCarryover,
-			boolean scrapImpossible) {
+	private static int performUnitMassTechAction(CampaignGUI campaignGUI, Unit unit, List<Person> techs,
+			Map<Integer, MassRepairOption> mroByTypeMap, boolean salvaging, boolean useExtraTime, boolean useRushJob,
+			boolean allowCarryover, boolean scrapImpossible) {
 		Campaign campaign = campaignGUI.getCampaign();
 		int totalActionsPerformed = 0;
 		String actionDescriptor = salvaging ? "salvage" : "repair";
@@ -1300,7 +1409,8 @@ public class MassRepairSalvageDialog extends JDialog {
 
 			// Search the list of techs each time for a variety of checks. We'll
 			// create a temporary truncated list of techs
-			if (repairPart(part, techs, mroByTypeMap, useExtraTime, useRushJob, allowCarryover, scrapImpossible)) {
+			if (repairPart(campaignGUI, part, techs, mroByTypeMap, useExtraTime, useRushJob, allowCarryover,
+					scrapImpossible, false)) {
 				totalActionsPerformed++;
 			}
 		}
@@ -1351,7 +1461,8 @@ public class MassRepairSalvageDialog extends JDialog {
 				int originalQuantity = part.getQuantity();
 
 				for (int i = 0; i < originalQuantity; i++) {
-					if (repairPart(part, techs, mroByTypeMap, useExtraTime, useRushJob, allowCarryover, false)) {
+					if (repairPart(campaignGUI, part, techs, mroByTypeMap, useExtraTime, useRushJob, allowCarryover,
+							false, true)) {
 						totalActionsPerformed++;
 					}
 				}
@@ -1361,8 +1472,9 @@ public class MassRepairSalvageDialog extends JDialog {
 		return totalActionsPerformed;
 	}
 
-	private boolean repairPart(Part part, List<Person> techs, Map<Integer, MassRepairOption> mroByTypeMap,
-			boolean useExtraTime, boolean useRushJob, boolean allowCarryover, boolean scrapImpossible) {
+	private static boolean repairPart(CampaignGUI campaignGUI, Part part, List<Person> techs,
+			Map<Integer, MassRepairOption> mroByTypeMap, boolean useExtraTime, boolean useRushJob,
+			boolean allowCarryover, boolean scrapImpossible, boolean warehouseMode) {
 		Map<String, WorkTime> techToWorktimeMap = new HashMap<String, WorkTime>();
 		int modePenalty = part.getMode().expReduction;
 		Campaign campaign = campaignGUI.getCampaign();
@@ -1378,7 +1490,7 @@ public class MassRepairSalvageDialog extends JDialog {
 
 			Person tech = techs.get(i);
 
-			if (isModeWarehouse() && !tech.isRightTechTypeFor(part)) {
+			if (warehouseMode && !tech.isRightTechTypeFor(part)) {
 				continue;
 			}
 
@@ -1482,7 +1594,7 @@ public class MassRepairSalvageDialog extends JDialog {
 
 			part.setMode(wt);
 
-			if (isModeWarehouse()) {
+			if (warehouseMode) {
 				campaign.fixWarehousePart(part, tech);
 			} else {
 				campaign.fixPart(part, tech);
@@ -1502,7 +1614,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		return false;
 	}
 
-	private List<Part> filterParts(List<Part> parts, Map<Integer, MassRepairOption> mroByTypeMap) {
+	private static List<Part> filterParts(List<Part> parts, Map<Integer, MassRepairOption> mroByTypeMap) {
 		List<Part> newParts = new ArrayList<Part>();
 
 		for (Part part : parts) {
@@ -1520,8 +1632,8 @@ public class MassRepairSalvageDialog extends JDialog {
 		return newParts;
 	}
 
-	private WorkTime calculateNewMassRepairWorktime(Part part, Person tech, MassRepairOption mro, Campaign campaign,
-			boolean increaseTime) {
+	private static WorkTime calculateNewMassRepairWorktime(Part part, Person tech, MassRepairOption mro,
+			Campaign campaign, boolean increaseTime) {
 		WorkTime newWorkTime = part.getMode();
 		WorkTime previousNewWorkTime = newWorkTime;
 		TargetRoll targetRoll = campaign.getTargetFor(part, tech);

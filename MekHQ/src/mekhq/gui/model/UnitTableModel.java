@@ -50,7 +50,8 @@ public class UnitTableModel extends DataTableModel {
     public final static int COL_PARTS    =   14;
     public final static int COL_SITE     =   15;
     public final static int COL_QUIRKS   =   16;
-    public final static int N_COL =          17;
+    public final static int COL_RSTATUS   =  17;
+    public final static int N_COL =          18;
 
     public UnitTableModel(Campaign c) {
         data = new ArrayList<Unit>();
@@ -103,6 +104,8 @@ public class UnitTableModel extends DataTableModel {
             return "Maintenance Costs";
         case COL_SITE:
             return "Site";
+        case COL_RSTATUS:
+        	return "Repair Status";
         default:
             return "?";
         }
@@ -116,6 +119,7 @@ public class UnitTableModel extends DataTableModel {
             return 50;
         case COL_COST:
         case COL_STATUS:
+        case COL_RSTATUS:
             return 80;
         case COL_PILOT:
         case COL_TECH:
@@ -132,6 +136,7 @@ public class UnitTableModel extends DataTableModel {
         case COL_QUALITY:
         case COL_QUIRKS:
         case COL_CREW:
+        case COL_RSTATUS:
             return SwingConstants.CENTER;
         case COL_WEIGHT:
         case COL_COST:
@@ -252,6 +257,9 @@ public class UnitTableModel extends DataTableModel {
         }
         if(col == COL_SITE) {
             return Unit.getSiteName(u.getSite());
+        }
+        if (col == COL_RSTATUS) {
+        	return u.isSalvage() ? "Salvage" : "Repair";
         }
         return "?";
     }
