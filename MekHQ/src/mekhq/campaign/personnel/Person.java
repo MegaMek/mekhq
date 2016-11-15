@@ -39,10 +39,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.function.IntSupplier;
-import java.util.function.IntUnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -83,13 +80,12 @@ import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
-import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IPartWork;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork {
+public class Person implements Serializable, MekHqXmlSerializable {
     private static final long serialVersionUID = -847642980395311152L;
 
     public static final int G_MALE = 0;
@@ -1073,11 +1069,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public void incrementAcquisition() {
         acquisitions++;
-    }
-
-    @Override
-    public UUID getTeamId() {
-        return doctorId;
     }
 
     public void setDoctorId(UUID t, int daysToWait) {
@@ -2360,28 +2351,20 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         this.secondaryDesignator = secondaryDesignator;
     }
 
-    @Override
-    public int getDifficulty() {
+    public int getHealingDifficulty() {
         if (campaign.getCampaignOptions().useTougherHealing()) {
             return Math.max(0, getHits() - 2);
         }
         return 0;
     }
 
-    @Override
-    public TargetRoll getAllMods(Person doctor) {
-        TargetRoll mods = new TargetRoll(getDifficulty(), "difficulty");
+    public TargetRoll getHealingMods(Person doctor) {
+        TargetRoll mods = new TargetRoll(getHealingDifficulty(), "difficulty");
         return mods;
     }
 
-    @Override
     public String fail(int rating) {
         return " <font color='red'><b>Failed to heal.</b></font>";
-    }
-
-    @Override
-    public String getPatientName() {
-        return getFullName();
     }
 
     public boolean hasSkill(String skillName) {
@@ -2466,7 +2449,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         return isLocationMissing(loc.parent);
     }
     
-    @Override
     public void heal() {
         hits = Math.max(hits - 1, 0);
         if (!needsFixing()) {
@@ -2474,12 +2456,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         }
     }
 
-    @Override
     public boolean needsFixing() {
         return (hits > 0 || needsAMFixing()) && status != S_KIA && status == S_ACTIVE;
     }
 
-    @Override
     public String succeed() {
         heal();
         return " <font color='green'><b>Successfully healed one hit.</b></font>";
@@ -3304,7 +3284,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         return (null != getInjuryByLocationAndType(loc, type));
     }
 
-    @Override
     public boolean needsAMFixing() {
         boolean retVal = false;
         if (injuries.size() > 0) {

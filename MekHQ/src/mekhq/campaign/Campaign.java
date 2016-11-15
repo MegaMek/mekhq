@@ -175,7 +175,6 @@ import mekhq.campaign.universe.RATGeneratorConnector;
 import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.work.IAcquisitionWork;
-import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.utilities.PortraitFileFactory;
 
@@ -1561,8 +1560,8 @@ public class Campaign implements Serializable {
     public int getPatientsFor(Person doctor) {
         int patients = 0;
         for (Person person : getPersonnel()) {
-            if (null != person.getTeamId()
-                && person.getTeamId().equals(doctor.getId())) {
+            if (null != person.getDoctorId()
+                && person.getDoctorId().equals(doctor.getId())) {
                 patients++;
             }
         }
@@ -1610,7 +1609,7 @@ public class Campaign implements Serializable {
         }
         String report = "";
         report += doctor.getHyperlinkedFullTitle() + " attempts to heal "
-                  + medWork.getPatientName();
+                  + medWork.getFullName();
         TargetRoll target = getTargetFor(medWork, doctor);
         int roll = Compute.d6(2);
         report = report + ",  needs " + target.getValueAsString()
@@ -1647,23 +1646,23 @@ public class Campaign implements Serializable {
         return report;
     }
 
-    public TargetRoll getTargetFor(IMedicalWork medWork, Person doctor) {
+    public TargetRoll getTargetFor(Person medWork, Person doctor) {
         Skill skill = doctor.getSkill(SkillType.S_DOCTOR);
         if (null == skill) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, doctor.getFullName()
                                                          + " isn't a doctor, he just plays one on TV.");
         }
-        if (medWork.getTeamId() != null
-            && !medWork.getTeamId().equals(doctor.getId())) {
+        if (medWork.getDoctorId() != null
+            && !medWork.getDoctorId().equals(doctor.getId())) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
-                                  medWork.getPatientName()
+                                  medWork.getFullName()
                                   + " is already being tended by another doctor");
         }
         if (!medWork.needsFixing()
             && !(getCampaignOptions().useAdvancedMedical() && medWork
                 .needsAMFixing())) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
-                                  medWork.getPatientName() + " does not require healing.");
+                                  medWork.getFullName() + " does not require healing.");
         }
         if (getPatientsFor(doctor) > 25) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, doctor.getFullName()
@@ -1679,7 +1678,7 @@ public class Campaign implements Serializable {
         if (helpMod > 0) {
             target.addModifier(helpMod, "shorthanded");
         }
-        target.append(medWork.getAllMods(doctor));
+        target.append(medWork.getHealingMods(doctor));
         return target;
     }
 
@@ -2773,8 +2772,8 @@ public class Campaign implements Serializable {
 
     public void removeAllPatientsFor(Person doctor) {
         for (Person p : personnel) {
-            if (null != p.getTeamId()
-                && p.getTeamId().equals(doctor.getId())) {
+            if (null != p.getDoctorId()
+                && p.getDoctorId().equals(doctor.getId())) {
                 p.setDoctorId(null, getCampaignOptions()
                         .getNaturalHealingWaitingPeriod());
             }
