@@ -33,8 +33,9 @@ public enum RefitType {
     D(5, "Class D Refit (Maintenance)", 3.0, 2),
     E(6, "Class E Refit (Factory)", 4.0, 3),
     F(7, "Class F Refit (Factory)", 5.0, 4),
-    X(8, "Class X Experimental Refit", 7.5, 6); // For custom rule sets
-
+    X(8, "Class X Experimental Refit", 7.5, 6), // For custom rule sets
+    IMPOSSIBLE(9, "impossible", Double.POSITIVE_INFINITY, Integer.MAX_VALUE); // To mark some changes as forbidden
+    
     // Initialize by-id array lookup table
     private static RefitType[] idMap;
     static {
