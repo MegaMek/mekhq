@@ -21,10 +21,12 @@
 
 package mekhq.campaign.universe;
 
+import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
 
+import megamek.common.EntityMovementMode;
 import megamek.common.MechSummary;
 
 /**
@@ -34,7 +36,14 @@ import megamek.common.MechSummary;
  *
  */
 public interface IUnitGenerator {
-
+    
+    /*
+     * For convenience in generating traditional ground + vtol units.
+     */
+    final static EnumSet<EntityMovementMode> MIXED_TANK_VTOL = EnumSet.of(EntityMovementMode.TRACKED,
+            EntityMovementMode.WHEELED, EntityMovementMode.HOVER, EntityMovementMode.WIGE,
+            EntityMovementMode.VTOL);
+    
 	/**
 	 * 
 	 * @param unitType UnitType constant
@@ -111,10 +120,9 @@ public interface IUnitGenerator {
 	 * @param options A map of additional parameters keyed to the parameter name.
 	 * @return A unit that matches the criteria
 	 */
-	default MechSummary generate(String faction, int unitType, int weightClass,
-			int year, int quality, Map<String,Object> options, Predicate<MechSummary> filter) {
-		return generate(faction, unitType, weightClass, year, quality, filter);
-	}
+	MechSummary generate(String faction, int unitType, int weightClass,
+			int year, int quality, Collection<EntityMovementMode> movementModes,
+			Predicate<MechSummary> filter);
 
 	/**
 	 * 
@@ -130,8 +138,7 @@ public interface IUnitGenerator {
 	 * @param filter All generated units return true when the filter function is applied.
 	 * @return A list of units matching the criteria.
 	 */
-	default List<MechSummary> generate(int count, String faction, int unitType, int weightClass,
-			int year, int quality, Map<String,Object> options, Predicate<MechSummary> filter) {
-		return generate(count, faction, unitType, weightClass, year, quality, filter);
-	}
+	List<MechSummary> generate(int count, String faction, int unitType, int weightClass,
+			int year, int quality, Collection<EntityMovementMode> movementModes,
+			Predicate<MechSummary> filter);
 }

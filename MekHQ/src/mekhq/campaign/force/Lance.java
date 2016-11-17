@@ -330,7 +330,8 @@ public class Lance implements Serializable, MekHqXmlSerializable {
     public AtBScenario checkForBattle(Campaign c) {
         int noBattle;
         int roll;
-        int battleTypeMod = (AtBContract.MORALE_NORMAL - getContract(c).getMoraleLevel()) * 5;
+        //thresholds are coded from charts with 1-100 range, so we add 1 to mod to adjust 0-based random int
+        int battleTypeMod = 1 + (AtBContract.MORALE_NORMAL - getContract(c).getMoraleLevel()) * 5;
         battleTypeMod += getContract(c).getBattleTypeMod();
         switch (role) {
         case ROLE_FIGHT:

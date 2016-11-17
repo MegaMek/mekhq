@@ -556,6 +556,7 @@ public class ResolveScenarioTracker {
                 //then the unit was devastated and no one ejected, so they should be dead, really dead
                 if(null == pilot) {
                     status.setHits(6);
+                    status.setDead(true);
                 }
                 //cant do the following by u.usesSoloPilot because entity may be different if ejected
                 else if(en instanceof Mech
@@ -583,6 +584,7 @@ public class ResolveScenarioTracker {
                                 wounded = true;
                             } else {
                                 status.setHits(6);
+                                status.setDead(true);
                             }
                         }
                         else if(((Tank)en).isDriverHit() && u.isDriver(p)) {
@@ -590,6 +592,7 @@ public class ResolveScenarioTracker {
                                 wounded = true;
                             } else {
                                 status.setHits(6);
+                                status.setDead(true);
                             }
                         }
                         else if(((Tank)en).isCommanderHit() && u.isCommander(p)) {
@@ -597,6 +600,7 @@ public class ResolveScenarioTracker {
                                 wounded = true;
                             } else {
                                 status.setHits(6);
+                                status.setDead(true);
                             }
                         }
                     }
@@ -606,6 +610,7 @@ public class ResolveScenarioTracker {
                             wounded = true;
                         } else {
                             status.setHits(6);
+                            status.setDead(true);
                         }
                     }
                     if(wounded) {
@@ -742,6 +747,7 @@ public class ResolveScenarioTracker {
                                     wounded = true;
                                 } else {
                                     status.setHits(6);
+                                    status.setDead(true);
                                 }
                             }
                             else if(((Tank)en).isCommanderHit()
@@ -751,6 +757,7 @@ public class ResolveScenarioTracker {
                                     wounded = true;
                                 } else {
                                     status.setHits(6);
+                                    status.setDead(true);
                                 }
                             }
                         }
@@ -761,6 +768,7 @@ public class ResolveScenarioTracker {
                                     wounded = true;
                                 } else {
                                     status.setHits(6);
+                                    status.setDead(true);
                                 }
                             }
                         }

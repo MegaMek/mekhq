@@ -117,6 +117,9 @@ public class BasicInfo extends JPanel {
                 return null;
             }
             Image base = icons.getMechTiles().imageFor(u.getEntity(), this, -1);
+            if (null == base) {
+                return null;
+            }
             int tint = PlayerColors.getColorRGB(u.campaign.getColorIndex());
             EntityImage entityImage = new EntityImage(base, tint, getCamo(u), this);
             return entityImage.loadPreviewImage();

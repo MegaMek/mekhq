@@ -32,6 +32,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ResourceBundle;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -44,6 +45,8 @@ import javax.swing.WindowConstants;
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.personnel.BodyLocation;
 import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.InjuryType;
+import mekhq.gui.model.FilterableComboBoxModel;
 
 /**
  *
@@ -59,7 +62,7 @@ public class EditInjuryEntryDialog extends JDialog {
     private JButton btnOK;
     private JTextArea txtDays;
     private JComboBox<BodyLocationChoice> ddLocation;
-    private JComboBox<String> ddType;
+    private JComboBox<InjuryTypeChoice> ddType;
     private JTextArea txtFluff;
     private JTextArea txtHits;
     private JComboBox<String> ddPermanent;
@@ -69,6 +72,8 @@ public class EditInjuryEntryDialog extends JDialog {
     private JPanel panMain;
     
     private BodyLocationChoice[] locations;
+    private InjuryTypeChoice[] types;
+    private FilterableComboBoxModel<InjuryTypeChoice> ddTypeModel;
     
     /** Creates new form EditInjuryEntryDialog */
     public EditInjuryEntryDialog(Frame parent, boolean modal, Injury e) {
@@ -88,14 +93,20 @@ public class EditInjuryEntryDialog extends JDialog {
             locations[i] = new BodyLocationChoice(loc);
             ++ i;
         }
-        String[] typeNames = new String[Injury.INJ_NUM];
-    	for (i = 0; i < Injury.INJ_NUM; i++) {
-    		typeNames[i] = Injury.getTypeName(i);
-    	}
+        types = InjuryType.getAllTypes().stream()
+            .map((type) -> new InjuryTypeChoice(type))
+            .collect(Collectors.toList()).toArray(new InjuryTypeChoice[0]);
     	String[] tf = { "True", "False" };
     	txtDays = new JTextArea();
-    	ddLocation = new JComboBox<BodyLocationChoice>(locations);
-    	ddType = new JComboBox<String>(typeNames);
+    	ddLocation = new JComboBox<>(locations);
+    	ddType = new JComboBox<>(types);
+    	ddTypeModel = new FilterableComboBoxModel<InjuryTypeChoice>(ddType.getModel());
+    	ddType.setModel(ddTypeModel);
+    	ddTypeModel.setFilter(it -> {
+    	    BodyLocation loc = ((BodyLocationChoice) ddLocation.getSelectedItem()).loc;
+    	    return it.type.isValidInLocation(loc);
+    	});
+    	ddTypeModel.updateFilter();
     	txtFluff = new JTextArea();
     	txtHits = new JTextArea();
     	ddPermanent = new JComboBox<String>(tf);
@@ -157,7 +168,12 @@ public class EditInjuryEntryDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panMain.add(ddLocation, gridBagConstraints);
         
-        ddType.setSelectedIndex(injury.getType());
+        for(InjuryTypeChoice choice : types) {
+            if(injury.getType() == choice.type) {
+                ddType.setSelectedItem(choice);
+                break;
+            }
+        } 
         ddType.setName("ddType");
         ddType.setEditable(false);
         ddType.setBorder(BorderFactory.createCompoundBorder(
@@ -215,7 +231,7 @@ public class EditInjuryEntryDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panMain.add(txtHits, gridBagConstraints);
         
-        ddPermanent.setSelectedIndex(injury.getPermanent() ? 0 : 1);
+        ddPermanent.setSelectedIndex(injury.isPermanent() ? 0 : 1);
         ddPermanent.setName("ddPermanent");
         ddPermanent.setEditable(false);
         ddPermanent.setBorder(BorderFactory.createCompoundBorder(
@@ -233,7 +249,7 @@ public class EditInjuryEntryDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panMain.add(ddPermanent, gridBagConstraints);
         
-        ddWorkedOn.setSelectedIndex(injury.getWorkedOn() ? 0 : 1);
+        ddWorkedOn.setSelectedIndex(injury.isWorkedOn() ? 0 : 1);
         ddWorkedOn.setName("ddWorkedOn");
         ddWorkedOn.setEditable(false);
         ddWorkedOn.setBorder(BorderFactory.createCompoundBorder(
@@ -300,7 +316,7 @@ public class EditInjuryEntryDialog extends JDialog {
     	injury.setHits(Integer.parseInt(txtHits.getText()));
     	injury.setFluff(txtFluff.getText());
         injury.setLocation(((BodyLocationChoice) ddLocation.getSelectedItem()).loc);
-        injury.setType(ddType.getSelectedIndex());
+        injury.setType(((InjuryTypeChoice)ddType.getSelectedItem()).type);
     	if (ddPermanent.getSelectedIndex() == 0) {
     		injury.setPermanent(true);
     	} else {
@@ -339,6 +355,19 @@ public class EditInjuryEntryDialog extends JDialog {
         @Override
         public String toString() {
             return loc.readableName;
+        }
+    }
+    
+    private static class InjuryTypeChoice {
+        public final InjuryType type;
+        
+        public InjuryTypeChoice(InjuryType type) {
+            this.type = type;
+        }
+        
+        @Override
+        public String toString() {
+            return type.getName(BodyLocation.GENERIC, 1);
         }
     }
 }
