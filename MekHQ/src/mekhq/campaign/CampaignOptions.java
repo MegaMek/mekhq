@@ -263,6 +263,7 @@ public class CampaignOptions implements Serializable {
     private boolean massRepairUseExtraTime;
     private boolean massRepairUseRushJob;
     private boolean massRepairAllowCarryover;
+    private boolean massRepairScrapImpossible;
     private List<MassRepairOption> massRepairOptions;
 
     public CampaignOptions() {
@@ -464,6 +465,7 @@ public class CampaignOptions implements Serializable {
         massRepairUseExtraTime = true;
         massRepairUseRushJob = true;
         massRepairAllowCarryover = true;
+        massRepairScrapImpossible = false;
         massRepairOptions = new ArrayList<MassRepairOption>();
         
         for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
@@ -1788,6 +1790,14 @@ public class CampaignOptions implements Serializable {
 	public void setMassRepairAllowCarryover(boolean b) {
 		this.massRepairAllowCarryover = b;
 	}
+
+	public boolean massRepairScrapImpossible() {
+		return massRepairScrapImpossible;
+	}
+
+	public void setMassRepairScrapImpossible(boolean b) {
+		this.massRepairScrapImpossible = b;
+	}
 	
 	public List<MassRepairOption> getMassRepairOptions() {
 		return massRepairOptions;
@@ -1992,7 +2002,8 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairUseExtraTime", massRepairUseExtraTime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairUseRushJob", massRepairUseRushJob);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairAllowCarryover", massRepairAllowCarryover);
-
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairScrapImpossible", massRepairScrapImpossible);
+        
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<massRepairOptions>");
 
         for (int i = 0; i < massRepairOptions.size(); i++) {
@@ -2443,6 +2454,8 @@ public class CampaignOptions implements Serializable {
                 retVal.massRepairUseRushJob = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairAllowCarryover")) {
                 retVal.massRepairAllowCarryover = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("massRepairScrapImpossible")) {
+                retVal.massRepairScrapImpossible = Boolean.parseBoolean(wn2.getTextContent().trim());                
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptions")) {
                 NodeList mroList = wn2.getChildNodes();
 
