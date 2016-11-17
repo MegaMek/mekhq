@@ -1879,6 +1879,16 @@ public class Campaign implements Serializable {
         addReport(report);
     }
 
+    public Part fixWarehousePart(Part part, Person tech) {
+        // get a new cloned part to work with and decrement original
+        Part repairable = part.clone();
+        part.decrementQuantity();
+        fixPart(repairable, tech);
+        addPart(repairable, 0);
+        
+        return repairable;
+    }
+    
     public void fixPart(IPartWork partWork, Person tech) {
         TargetRoll target = getTargetFor(partWork, tech);
         String report = "";
