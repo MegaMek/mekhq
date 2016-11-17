@@ -74,6 +74,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planets;
 
@@ -208,7 +209,7 @@ public class AtBScenario extends Scenario {
     ArrayList<UUID> survivalBonus;
 
     HashMap<UUID, Entity> entityIds;
-
+    
     public AtBScenario () {
         super();
         lanceForceId = -1;
@@ -1624,10 +1625,16 @@ public class AtBScenario extends Scenario {
      */
     private Entity getEntity(String faction, int skill, int quality, int unitType, int weightClass, Campaign campaign) {
         MechSummary ms = null;
-        if (unitType == UnitType.TANK && !campaign.getCampaignOptions().getOpforUsesVTOLs()) {
-            ms = campaign.getUnitGenerator()
-                    .generate(faction, unitType, weightClass, campaign.getCalendar()
-                            .get(Calendar.YEAR), quality, v -> !v.getUnitType().equals("VTOL"));            
+        if (unitType == UnitType.TANK) {
+            if (campaign.getCampaignOptions().getOpforUsesVTOLs()) {
+                ms = campaign.getUnitGenerator()
+                        .generate(faction, unitType, weightClass, campaign.getCalendar()
+                                .get(Calendar.YEAR), quality, IUnitGenerator.MIXED_TANK_VTOL, null);            
+            } else {
+                ms = campaign.getUnitGenerator()
+                        .generate(faction, unitType, weightClass, campaign.getCalendar()
+                                .get(Calendar.YEAR), quality, v -> !v.getUnitType().equals("VTOL"));
+            }
         } else {
             ms = campaign.getUnitGenerator()
                     .generate(faction, unitType, weightClass, campaign.getCalendar()

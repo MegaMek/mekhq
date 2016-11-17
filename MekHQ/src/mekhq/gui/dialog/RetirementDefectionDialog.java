@@ -54,6 +54,7 @@ import megamek.common.TargetRoll;
 import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
 import mekhq.Utilities;
+import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.RetirementDefectionTracker;
@@ -267,16 +268,24 @@ public class RetirementDefectionDialog extends JDialog {
         	}
         	columnModel.setColumnVisible(columnModel.getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_MISC_MOD)),
         			hqView.getCampaign().getCampaignOptions().getCustomRetirementMods());
-        	model.addTableModelListener(new TableModelListener() {
+            model.setData(targetRolls);
+            model.addTableModelListener(new TableModelListener() {
         		@Override
         		public void tableChanged(TableModelEvent ev) {
         			if (!hqView.getCampaign().getCampaignOptions().getUseShareSystem()) {
-        				lblTotal.setText(formatter.format(getTotalBonus()));
+        			    long bonus = getTotalBonus();
+        			    if (bonus > hqView.getCampaign().getFinances().getBalance()) {
+        			        lblTotal.setText("<html><font color='red'>"
+        			                + formatter.format(getTotalBonus()) + "</font></html>");
+        			        btnRoll.setEnabled(false);
+        			    } else {
+        			        lblTotal.setText(formatter.format(getTotalBonus()));
+        			        btnRoll.setEnabled(true);
+        			    }
         			}
         		}
         	});
-        	model.setData(targetRolls);
-
+ 
         	JScrollPane scroll = new JScrollPane();
         	scroll.setViewportView(personnelTable);
         	scroll.setPreferredSize(new Dimension(500, 500));
@@ -495,6 +504,8 @@ public class RetirementDefectionDialog extends JDialog {
 				} else {
 					txtInstructions.setText(resourceMap.getString("txtInstructions.Results.text"));
 				}
+				hqView.getCampaign().getFinances().debit(getTotalBonus(),
+				        Transaction.C_SALARY, "Bonus Payments", hqView.getCampaign().getDate());
 			} else if (ev.getSource().equals(btnDone)) {
 				for (UUID pid : ((RetirementTableModel)retireeTable.getModel()).getAltPayout().keySet()) {
 					rdTracker.getPayout(pid).setCbills(((RetirementTableModel)retireeTable.getModel()).getAltPayout().get(pid));

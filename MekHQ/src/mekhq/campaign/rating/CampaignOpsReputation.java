@@ -152,7 +152,11 @@ class CampaignOpsReputation extends AbstractUnitRating {
     }
 
     private void updateTotalSkill(Infantry infantry) {
-        int gunnery = infantry.getCrew().getGunnery();
+        Crew crew = infantry.getCrew();
+        if (null == crew) {
+            return;
+        }
+        int gunnery = crew.getGunnery();
         int antiMek = infantry.getAntiMekSkill();
         if (antiMek == 0) {
             antiMek = gunnery + 1;
@@ -417,16 +421,16 @@ class CampaignOpsReputation extends AbstractUnitRating {
         boolean doubleCapacity = true;
         boolean fullCapacity = true;
         int heavyVeeBays = getHeavyVeeBayCount();
-        if (getMechBayCount() < super.getMechCount()) {
+        if (getMechBayCount() < getMechCount()) {
             fullCapacity = false;
             doubleCapacity = false;
-        } else if (getMechBayCount() < super.getMechCount() * 2) {
+        } else if (getMechBayCount() < getMechCount() * 2) {
             doubleCapacity = false;
         }
-        if (getProtoBayCount() < super.getProtoCount()) {
+        if (getProtoBayCount() < getProtoCount()) {
             fullCapacity = false;
             doubleCapacity = false;
-        } else if (getProtoBayCount() < super.getProtoCount() * 2) {
+        } else if (getProtoBayCount() < getProtoCount() * 2) {
             doubleCapacity = false;
         }
         if (getHeavyVeeBayCount() < getHeavyVeeCount()) {
@@ -437,28 +441,28 @@ class CampaignOpsReputation extends AbstractUnitRating {
         }
         heavyVeeBays -= getHeavyVeeBayCount();
         int lightVeeBays = getLightVeeBayCount() + heavyVeeBays;
-        if (getLightVeeBayCount() < lightVeeBays) {
+        if (lightVeeBays < getLightVeeCount()) {
             fullCapacity = false;
             doubleCapacity = false;
-        } else if (getLightVeeBayCount() < lightVeeBays * 2) {
+        } else if (lightVeeBays < getLightVeeCount() * 2) {
             doubleCapacity = false;
         }
-        if (getFighterBayCount() < super.getFighterCount()) {
+        if (getFighterBayCount() < getFighterCount()) {
             fullCapacity = false;
             doubleCapacity = false;
-        } else if (getFighterBayCount() < super.getFighterCount() * 2) {
+        } else if (getFighterBayCount() < getFighterCount() * 2) {
             doubleCapacity = false;
         }
-        if ((getBaBayCount()) < super.getBattleArmorCount() / 5) {
+        if ((getBaBayCount()) < getBattleArmorCount() / 5) {
             fullCapacity = false;
             doubleCapacity = false;
-        } else if ((getBaBayCount() * 2) < 2 * super.getBattleArmorCount() / 5) {
+        } else if ((getBaBayCount() * 2) < 2 * getBattleArmorCount() / 5) {
             doubleCapacity = false;
         }
-        if (getInfantryBayCount() < super.getInfantryCount() / 28) {
+        if (getInfantryBayCount() < getInfantryCount() / 28) {
             fullCapacity = false;
             doubleCapacity = false;
-        } else if (getInfantryBayCount() < super.getInfantryCount() / 14) {
+        } else if (getInfantryBayCount() < getInfantryCount() / 14) {
             doubleCapacity = false;
         }
         if (getSmallCraftBayCount() < getSmallCraftCount()) {
@@ -500,7 +504,7 @@ class CampaignOpsReputation extends AbstractUnitRating {
                 totalValue += 5;
             }
         }
-        if (getDockingCollarCount() >= getDropshipCount()) {
+        if ((getDropshipCount() > 0) && (getDockingCollarCount() >= getDropshipCount())) {
             totalValue += 5;
         }
 
@@ -688,11 +692,11 @@ class CampaignOpsReputation extends AbstractUnitRating {
                "\n" + String.format(TEMPLATE, "Contract Breaches:", getBreachCount());
     }
 
-    private String getTransportationDetails() {
+    String getTransportationDetails() {
         final String TEMPLATE = "    %-" + CATEGORY_LENGTH + "s %3d needed / %3d available";
 
         int heavyVeeBayCount = getHeavyVeeBayCount();
-        int lightVeeBayCount = getLightVeeBayCount() + (heavyVeeBayCount - getHeavyVeeCount());
+        int excessHeavyVeeBays = Math.max(0, heavyVeeBayCount - getHeavyVeeCount());
 
         String out = String.format("%-" + HEADER_LENGTH + "s %3d", "Transportation:", getTransportValue()) +
                      "\n" + String.format(TEMPLATE, "Mech Bays:", getMechCount(), getMechBayCount()) +
@@ -700,7 +704,8 @@ class CampaignOpsReputation extends AbstractUnitRating {
                      "\n" + String.format(TEMPLATE, "Small Craft Bays:", getSmallCraftCount(), getSmallCraftBayCount()) +
                      "\n" + String.format(TEMPLATE, "Protomech Bays:", getProtoCount(), getProtoBayCount()) +
                      "\n" + String.format(TEMPLATE, "Heavy Vehicle Bays:", getHeavyVeeCount(), heavyVeeBayCount) +
-                     "\n" + String.format(TEMPLATE, "Light Vehicle Bays:", getLightVeeCount(), lightVeeBayCount) +
+                     "\n" + String.format(TEMPLATE, "Light Vehicle Bays:", getLightVeeCount(), getLightVeeBayCount()) +
+                     " (plus " + excessHeavyVeeBays + " excess heavy)" +
                      "\n" + String.format(TEMPLATE, "BA Bays:", getBattleArmorCount() / 5, getBaBayCount()) +
                      "\n" + String.format(TEMPLATE, "Infantry Bays:", getInfantryCount() / 28, getInfantryBayCount()) +
                      "\n" + String.format(TEMPLATE, "Docking Collars:", getDropshipCount(), getDockingCollarCount());

@@ -49,6 +49,7 @@ import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.GamePreset;
 import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planets;
@@ -169,6 +170,8 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             	try {
 					newCampaign = true;
 					campaign = new Campaign();
+	                 // TODO: Make this depending on campaign options
+                    InjuryTypes.registerAll();
 					campaign.setApp(app);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block

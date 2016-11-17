@@ -250,7 +250,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     		}
     		int injuryMod = 0;
     		for (Injury i : p.getInjuries()) {
-    			if (i.getPermanent()) {
+    			if (i.isPermanent()) {
     				injuryMod++;
     			}
     		}

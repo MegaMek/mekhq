@@ -69,7 +69,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
     
     private void refreshView() {
-    	scrollView.setViewportView(new PersonViewPanel(person, campaign, portraits));
+    	scrollView.setViewportView(new PersonViewPanel(person, campaign, hqView.getIconPackage()));
 		//This odd code is to make sure that the scrollbar stays at the top
 		//I cant just call it here, because it ends up getting reset somewhere later
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -189,8 +189,8 @@ public class NewRecruitDialog extends javax.swing.JDialog {
         });
         panBottomButtons.add(btnClose, gridBagConstraints);
 
-        scrollView.setMinimumSize(new java.awt.Dimension(450, 150));
-        scrollView.setPreferredSize(new java.awt.Dimension(450, 150));
+        scrollView.setMinimumSize(new java.awt.Dimension(450, 180));
+        scrollView.setPreferredSize(new java.awt.Dimension(450, 180));
         scrollView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollView.setViewportView(null);
         refreshView();

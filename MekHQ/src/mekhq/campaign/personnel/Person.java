@@ -26,6 +26,7 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -38,11 +39,11 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.function.IntSupplier;
-import java.util.function.IntUnaryOperator;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -75,17 +76,16 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.ExtraData;
 import mekhq.campaign.LogEntry;
-import mekhq.campaign.mod.am.HitLocationGen;
+import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
-import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IPartWork;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork {
+public class Person implements Serializable, MekHqXmlSerializable {
     private static final long serialVersionUID = -847642980395311152L;
 
     public static final int G_MALE = 0;
@@ -160,6 +160,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public static final int DESIG_CHI     = 12;
     public static final int DESIG_GAMMA   = 13;
     public static final int DESIG_NUM     = 14;
+    
+    public static final String LOGTYPE_MEDICAL = "med";
 
     private static final IntSupplier PREGNANCY_DURATION = () -> {
         double gaussian = Math.sqrt(-2 * Math.log(Math.nextUp(Math.random())))
@@ -168,7 +170,25 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         gaussian = Math.max(-4.0, Math.min(4.0, gaussian));
         return (int) Math.round(gaussian * 10 + 38 * 7);
     };
-
+    private static final IntSupplier PREGNANCY_SIZE = () -> {
+        int children = 1;
+        // Hellin's law says it's 1:89 chance, to not make it appear too seldom, we use 1:50
+        while(Compute.randomInt(50) == 0) {
+            ++ children;
+        }
+        return Math.min(children, 8); // Limit to octuplets, for the sake of sanity
+    };
+    
+    private static final String[] PREGNANCY_MULTIPLE_NAMES = {null, null,
+        "twins", "triplets", "quadruplets", "quintuplets",
+        "sextuplets", "septuplets", "octuplets", "nonuplets", "decuplets"
+    };
+    
+    public static final ExtraData.IntKey PREGNANCY_CHILDREN_DATA
+        = new ExtraData.IntKey("procreation:children");
+    public static final ExtraData.StringKey PREGNANCY_FATHER_DATA
+        = new ExtraData.StringKey("procreation:father");
+    
     protected UUID id;
     protected int oldId;
 
@@ -919,82 +939,88 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		return campaign.getPerson(getAncestors().getFatherID());
 	}
 
-	public Person birth() {
-		Person baby = campaign.newPerson(T_NONE);
-		baby.setDependent(true);
-		UUID tmpAncID = null;
-
-		// Find already existing ancestor set of these parents
-		for (Ancestors a : campaign.getAncestors()) {
-			if (getId().equals(a.getMotherID())
-					&& ((getSpouseID() == null && a.getFatherID() == null) || getSpouseID().equals(a.getFatherID()))) {
-				tmpAncID = a.getId();
-				break;
-			}
+	public Collection<Person> birth() {
+        int size = extraData.get(PREGNANCY_CHILDREN_DATA, 1);
+        String fatherIDString = extraData.get(PREGNANCY_FATHER_DATA);
+        UUID fatherID = (null != fatherIDString) ? UUID.fromString(fatherIDString) : getSpouseID();
+		Ancestors anc = campaign.getAncestors(fatherID, id);
+		if(null == anc) {
+		    anc = campaign.createAncestors(fatherID, id);
 		}
-
-		if (tmpAncID == null) {
-			tmpAncID = campaign.createAncestors(getSpouseID(), id).getId();
-		}
-
-		String surname = "";
-		if (getName().contains(" ")) {
-			surname = getName().split(" ", 2)[1];
-		} else if (baby.getFather() != null && baby.getFather().getName().contains(" ")) {
-			surname = baby.getFather().getName().split(" ", 2)[1];
-		}
-		baby.setName(baby.getName().split(" ", 2)[0] + " " + surname);
-		baby.setBirthday((GregorianCalendar) campaign.getCalendar().clone());
-		UUID id = UUID.randomUUID();
-		while (null != campaign.getPerson(id)) {
-			id = UUID.randomUUID();
-		}
-		baby.setId(id);
-		baby.setAncestorsID(tmpAncID);
-		campaign.addReport(getName() + " has given birth to " + baby.getHyperlinkedName() + ", a baby " + (baby.getGender() == G_MALE ? "boy!" : "girl!"));
-		if (campaign.getCampaignOptions().logConception()) {
-		    addLogEntry(campaign.getDate(), "Delivered a healthy baby " + (baby.getGender() == G_MALE ? "boy!" : "girl!"));
-		}
-		setDueDate(null);
-		return baby;
+		final UUID ancId = anc.getId();
+        final String surname = getName().contains(" ") ? getName().split(" ", 2)[1] : "";
+        
+        // Cleanup
+        setDueDate(null);
+        extraData.set(PREGNANCY_CHILDREN_DATA, 0);
+        extraData.set(PREGNANCY_FATHER_DATA, null);
+        
+        return IntStream.range(0, size).mapToObj(i -> {
+            Person baby = campaign.newPerson(T_NONE);
+            baby.setDependent(true);
+    		baby.setName(baby.getName().split(" ", 2)[0] + " " + surname);
+    		baby.setBirthday((GregorianCalendar) campaign.getCalendar().clone());
+    		UUID babyId = UUID.randomUUID();
+    		while (null != campaign.getPerson(babyId)) {
+    		    babyId = UUID.randomUUID();
+    		}
+    		baby.setId(babyId);
+    		baby.setAncestorsID(ancId);
+    		campaign.addReport(getHyperlinkedName() + " has given birth to " + baby.getHyperlinkedName() + ", a baby " + (baby.getGender() == G_MALE ? "boy!" : "girl!"));
+    		if (campaign.getCampaignOptions().logConception()) {
+    		    addLogEntry(campaign.getDate(), "Delivered a healthy baby " + (baby.getGender() == G_MALE ? "boy!" : "girl!"));
+    		}
+    		return baby;
+        }).collect(Collectors.toList());
 	}
 
-	public void procreate() {
-		// Spouse NULL protection...
-		if (getSpouseID() != null && getSpouse() == null) {
-			setSpouseID(null);
-		}
-		if (!isDeployed()) {
-			// Age limitations...
-			if (getAge(campaign.getCalendar()) > 13 && getAge(campaign.getCalendar()) < 51) {
-				if (getSpouse() == null && campaign.getCampaignOptions().useUnofficialProcreationNoRelationship()) {
-					// 0.005% chance that this procreation attempt will create a child
-					if (Compute.randomInt(100000) < 2) {
-						GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
-						tCal.add(GregorianCalendar.DAY_OF_YEAR, PREGNANCY_DURATION.getAsInt());
-						setDueDate(tCal);
-						campaign.addReport(getHyperlinkedName()+" has conceived");
-						if (campaign.getCampaignOptions().logConception()) {
-						    addLogEntry(campaign.getDate(), "Has conceived");
-				        }
-					}
-				} else if (getSpouse() != null) {
-					if (getSpouse().isActive() && !getSpouse().isDeployed() && getSpouse().getAge(campaign.getCalendar()) > 13) {
-						// 0.05% chance that this procreation attempt will create a child
-						if (Compute.randomInt(10000) < 2) {
-							GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
-							tCal.add(GregorianCalendar.DAY_OF_YEAR, PREGNANCY_DURATION.getAsInt());
-							setDueDate(tCal);
-							campaign.addReport(getHyperlinkedName()+" has conceived");
-							if (campaign.getCampaignOptions().logConception()) {
-							    addLogEntry(campaign.getDate(), "Has conceived");
-					        }
-						}
-					}
-				}
-			}
-		}
-	}
+    public void procreate() {
+        if(!isFemale() || isPregnant()) {
+            return;
+        }
+        // Spouse NULL protection...
+        if((getSpouseID() != null) && (getSpouse() == null)) {
+            setSpouseID(null);
+        }
+        if (!isDeployed()) {
+            // Age limitations...
+            if (getAge(campaign.getCalendar()) > 13 && getAge(campaign.getCalendar()) < 51) {
+                boolean concieved = false;
+                if (getSpouse() == null && campaign.getCampaignOptions().useUnofficialProcreationNoRelationship()) {
+                    // 0.005% chance that this procreation attempt will create a child
+                    concieved = (Compute.randomInt(100000) < 2);
+                } else if (getSpouse() != null) {
+                    if (getSpouse().isActive() && !getSpouse().isDeployed() && getSpouse().getAge(campaign.getCalendar()) > 13) {
+                        // 0.05% chance that this procreation attempt will create a child
+                        concieved = (Compute.randomInt(10000) < 2);
+                    }
+                }
+                
+                if(concieved) {
+                    GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
+                    tCal.add(GregorianCalendar.DAY_OF_YEAR, PREGNANCY_DURATION.getAsInt());
+                    setDueDate(tCal);
+                    int size = PREGNANCY_SIZE.getAsInt();
+                    extraData.set(PREGNANCY_CHILDREN_DATA, size);
+                    extraData.set(PREGNANCY_FATHER_DATA,
+                        (null != getSpouseID()) ? getSpouseID().toString() : null);
+
+                    String sizeString = (size < PREGNANCY_MULTIPLE_NAMES.length) ? PREGNANCY_MULTIPLE_NAMES[size] : null;
+                    if(null == sizeString) {
+                        campaign.addReport(getHyperlinkedName()+" has conceived");
+                        if (campaign.getCampaignOptions().logConception()) {
+                            addLogEntry(campaign.getDate(), "Has conceived");
+                        }
+                    } else {
+                        campaign.addReport(getHyperlinkedName()+" has conceived " + sizeString);
+                        if (campaign.getCampaignOptions().logConception()) {
+                            addLogEntry(campaign.getDate(), "Has conceived " + sizeString);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 	public boolean safeSpouse(Person p) {
 		// Huge convoluted return statement
@@ -1043,11 +1069,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
     public void incrementAcquisition() {
         acquisitions++;
-    }
-
-    @Override
-    public UUID getTeamId() {
-        return doctorId;
     }
 
     public void setDoctorId(UUID t, int daysToWait) {
@@ -1579,6 +1600,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                         }
                         retVal.injuries.add(Injury.generateInstanceFromXML(wn3));
                     }
+                    DateTime now = new DateTime(c.getCalendar());
+                    retVal.injuries.stream().filter(inj -> (null == inj.getStart()))
+                        .forEach(inj -> inj.setStart(now.minusDays(inj.getOriginalTime() - inj.getTime())));
                 } else if (wn2.getNodeName().equalsIgnoreCase("founder")) {
                     retVal.founder = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitWeight")) {
@@ -2327,28 +2351,20 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         this.secondaryDesignator = secondaryDesignator;
     }
 
-    @Override
-    public int getDifficulty() {
+    public int getHealingDifficulty() {
         if (campaign.getCampaignOptions().useTougherHealing()) {
             return Math.max(0, getHits() - 2);
         }
         return 0;
     }
 
-    @Override
-    public TargetRoll getAllMods(Person doctor) {
-        TargetRoll mods = new TargetRoll(getDifficulty(), "difficulty");
+    public TargetRoll getHealingMods(Person doctor) {
+        TargetRoll mods = new TargetRoll(getHealingDifficulty(), "difficulty");
         return mods;
     }
 
-    @Override
     public String fail(int rating) {
         return " <font color='red'><b>Failed to heal.</b></font>";
-    }
-
-    @Override
-    public String getPatientName() {
-        return getFullName();
     }
 
     public boolean hasSkill(String skillName) {
@@ -2425,7 +2441,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
             return false;
         }
         for(Injury i : getInjuriesByLocation(loc)) {
-            if(i.getType() == Injury.INJ_LOST_LIMB) {
+            if(i.getType().impliesMissingLocation(loc)) {
                 return true;
             }
         }
@@ -2433,7 +2449,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         return isLocationMissing(loc.parent);
     }
     
-    @Override
     public void heal() {
         hits = Math.max(hits - 1, 0);
         if (!needsFixing()) {
@@ -2441,12 +2456,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         }
     }
 
-    @Override
     public boolean needsFixing() {
         return (hits > 0 || needsAMFixing()) && status != S_KIA && status == S_ACTIVE;
     }
 
-    @Override
     public String succeed() {
         heal();
         return " <font color='green'><b>Successfully healed one hit.</b></font>";
@@ -3154,6 +3167,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         return personnelLog;
     }
 
+    public void addLogEntry(Date d, String desc, String type) {
+        personnelLog.add(new LogEntry(d, desc, type));
+    }
+
     public void addLogEntry(Date d, String desc) {
         personnelLog.add(new LogEntry(d, desc));
     }
@@ -3167,7 +3184,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
      */
 
     public ArrayList<Injury> getInjuries() {
-        return injuries;
+        return new ArrayList<>(injuries);
     }
 
     public void clearInjuries() {
@@ -3202,101 +3219,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
     
     public void diagnose(int hits) {
-        resolveSpecialDamage(hits);
-        Entity en = null;
-        Unit u = campaign.getUnit(getUnitId());
-        boolean mwasf = false;
-        if (u != null) {
-            en = u.getEntity();
-        }
-        if (en != null && (en instanceof Mech || en instanceof Aero)) {
-            mwasf = true;
-        }
-        int critMod = mwasf ? 0 : 2;
-        final BiFunction<IntUnaryOperator, Function<BodyLocation, Boolean>, BodyLocation> generator
-            = mwasf ? HitLocationGen::mechAndAsf : HitLocationGen::generic;
-        for (int i = 0; i < hits; i++) {
-            BodyLocation location = generator.apply(Compute::randomInt, (loc) -> !isLocationMissing(loc));
-            // apply hit here
-            applyBodyHit(location);
-            int roll = Compute.d6(2);
-            if ((roll + hits + critMod) > 12) {
-                // apply another hit to the same location if critical
-                applyBodyHit(location);
-            }
-        }
-        ArrayList<Injury> new_injuries = new ArrayList<Injury>();
-        for(BodyLocation l : BodyLocation.values()) {
-            if(l.isLimb) {
-                resolvePostDamage(l);
-            }
-            new_injuries.addAll(applyDamage(l));
-            hitsPerLocation.put(l, 0);
-        }
-        String ni_report = "";
-        for (Injury ni : new_injuries) {
-            ni_report += "\n\t\t" + ni.getFluff();
-        }
-        if (new_injuries.size() > 0) {
-            addLogEntry(campaign.getDate(), "Returned from combat with the following new injuries:" + ni_report);
-        }
-        injuries.addAll(new_injuries);
+        InjuryUtil.resolveAfterCombat(campaign, this, hits);
+        InjuryUtil.resolveCombatDamage(campaign, this, hits);
         setHits(0);
     }
-
-    public void resolvePostDamage(BodyLocation location) {
-        for (Injury injury : injuries) {
-            if (location == injury.getLocation()
-                && (injury.getType() == Injury.INJ_INTERNAL_BLEEDING
-                    || location == BodyLocation.HEAD
-                    || injury.getType() == Injury.INJ_BROKEN_BACK)
-                && getHitsInLocation(location) > 5) {
-                hitsPerLocation.put(location, 0);
-                changeStatus(S_KIA);
-            }
-        }
-    }
-
-    public void resolveSpecialDamage(int hits) {
-        ArrayList<Injury> new_injuries = new ArrayList<Injury>();
-        for (Injury injury : injuries) {
-            if (injury.getType() == Injury.INJ_CTE || injury.getType() == Injury.INJ_CONCUSSION || injury.getType() == Injury.INJ_CEREBRAL_CONTUSION
-                || injury.getType() == Injury.INJ_INTERNAL_BLEEDING || injury.getType() == Injury.INJ_BROKEN_LIMB
-                || injury.getType() == Injury.INJ_BROKEN_COLLAR_BONE || injury.getType() == Injury.INJ_PUNCTURED_LUNG) {
-                injury.setTime(Injury.generateHealingTime(campaign, injury.getType(), injury.getHits(), this));
-            }
-
-            if (injury.getType() == Injury.INJ_BROKEN_BACK && Compute.randomInt(100) < 20) {
-                changeStatus(S_RETIRED);
-                injury.setPermanent(true);
-            }
-
-            if (injury.getType() == Injury.INJ_BROKEN_RIB) {
-                int rib = Compute.randomInt(100);
-                if (rib < 1) {
-                    changeStatus(S_KIA);
-                } else if (rib < 10) {
-                    new_injuries.add(new Injury(Injury.generateHealingTime(campaign, Injury.INJ_PUNCTURED_LUNG, hits, this), Injury.generateInjuryFluffText(Injury.INJ_PUNCTURED_LUNG, injury.getLocation(), gender), injury.getLocation(), Injury.INJ_PUNCTURED_LUNG, getHitsInLocation(injury.getLocation()), false));
-                }
-            }
-
-            if (injury.getType() == Injury.INJ_BRUISED_KIDNEY) {
-                if (Compute.randomInt(100) < 10) {
-                    hitsPerLocation.put(injury.getLocation(), 3);
-                }
-            }
-
-            // Now reset all messages and healing times.
-            if (((Compute.d6() + hits) > 5) && (injury.getType() == Injury.INJ_CTE || injury.getType() == Injury.INJ_CONCUSSION
-                                                || injury.getType() == Injury.INJ_CEREBRAL_CONTUSION || injury.getType() == Injury.INJ_INTERNAL_BLEEDING)) {
-                injury.setHits(injury.getHits() + 1);
-                injury.setFluff(Injury.generateInjuryFluffText(injury.getType(), injury.getLocation(), PRONOUN_HISHER));
-            }
-        }
-
-        injuries.addAll(new_injuries);
-    }
-
     public void changeStatus(int status) {
         if (status == getStatus()) {
             return;
@@ -3350,139 +3276,19 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         hitsPerLocation.put(location, getHitsInLocation(location) + 1);
     }
 
-    public boolean hasInjury(BodyLocation loc, int type) {
-        if (getInjuryByLocationAndType(loc, type) != null) {
-            return true;
-        } else {
-            return false;
-        }
+    public boolean hasInjury(BodyLocation loc) {
+        return (null != getInjuryByLocation(loc));
+    }
+    
+    public boolean hasInjury(BodyLocation loc, InjuryType type) {
+        return (null != getInjuryByLocationAndType(loc, type));
     }
 
-    public ArrayList<Injury> applyDamage(BodyLocation location) {
-        ArrayList<Injury> new_injuries = new ArrayList<Injury>();
-        boolean bad_status = (getStatus() == S_KIA || getStatus() == S_MIA);
-        int roll = Compute.randomInt(2);
-        int hitsInLocation = getHitsInLocation(location);
-        int type = Injury.getInjuryTypeByLocation(location, roll, hitsInLocation);
-        if (hasInjury(location, type)) {
-            Injury injury = getInjuryByLocationAndType(location, type);
-            injury.setTime(Injury.generateHealingTime(campaign, injury.getType(), injury.getHits(), this));
-            return new_injuries;
-        }
-        switch (location) {
-            case LEFT_ARM: case LEFT_HAND:
-            case RIGHT_ARM: case RIGHT_HAND:
-            case LEFT_LEG: case LEFT_FOOT:
-            case RIGHT_LEG: case RIGHT_FOOT:
-                if (hitsInLocation == 1) {
-                    if (roll == 2) {
-                        new_injuries.add(new Injury(Injury.generateHealingTime(campaign, Injury.INJ_CUT, hitsInLocation, this), Injury.generateInjuryFluffText(Injury.INJ_CUT, location, gender), location, Injury.INJ_CUT, hitsInLocation, false, bad_status));
-                    } else {
-                        new_injuries.add(new Injury(Injury.generateHealingTime(campaign, Injury.INJ_BRUISE, hitsInLocation, this), Injury.generateInjuryFluffText(Injury.INJ_BRUISE, location, gender), location, Injury.INJ_BRUISE, hitsInLocation, false, bad_status));
-                    }
-                } else if (hitsInLocation == 2) {
-                    new_injuries.add(new Injury(Injury.generateHealingTime(campaign, Injury.INJ_SPRAIN, hitsInLocation, this), Injury.generateInjuryFluffText(Injury.INJ_SPRAIN, location, gender), location, Injury.INJ_SPRAIN, hitsInLocation, false, bad_status));
-                } else if (hitsInLocation == 3) {
-                    new_injuries.add(new Injury(Injury.generateHealingTime(campaign, Injury.INJ_BROKEN_LIMB, hitsInLocation, this), Injury.generateInjuryFluffText(Injury.INJ_BROKEN_LIMB, location, gender), location, Injury.INJ_BROKEN_LIMB, hitsInLocation, false, bad_status));
-                } else if (hitsInLocation > 3) {
-                    new_injuries.add(new Injury(Injury.generateHealingTime(campaign, Injury.INJ_LOST_LIMB, hitsInLocation, this), Injury.generateInjuryFluffText(Injury.INJ_LOST_LIMB, location, gender), location, Injury.INJ_LOST_LIMB, hitsInLocation, true));
-                }
-                break;
-            case HEAD:
-                if (hitsInLocation == 1) {
-                    new_injuries.add(new Injury(Injury.generateHealingTime(campaign, Injury.INJ_LACERATION, hitsInLocation, this), Injury.generateInjuryFluffText(Injury.INJ_LACERATION, location, gender), location, Injury.INJ_LACERATION, hitsInLocation, false, bad_status));
-                } else if (hitsInLocation == 2 || hitsInLocation == 3) {
-                    new_injuries.add(new Injury(Injury.generateHealingTime(campaign, Injury.INJ_CONCUSSION, hitsInLocation, this), Injury.generateInjuryFluffText(Injury.INJ_CONCUSSION, location, gender), location, Injury.INJ_CONCUSSION, hitsInLocation, false, bad_status));
-                } else if (hitsInLocation == 4) {
-                    new_injuries.add(new Injury(Injury.generateHealingTime(campaign, Injury.INJ_CEREBRAL_CONTUSION, hitsInLocation, this), Injury.generateInjuryFluffText(Injury.INJ_CEREBRAL_CONTUSION, location, gender), location, Injury.INJ_CEREBRAL_CONTUSION, hitsInLocation, false, bad_status));
-                } else if (hitsInLocation > 4) {
-                    new_injuries.add(new Injury(Injury.generateHealingTime(campaign, Injury.INJ_CTE, hitsInLocation, this), Injury.generateInjuryFluffText(Injury.INJ_CTE, location, gender), location, Injury.INJ_CTE, hitsInLocation, true));
-                }
-                break;
-            case CHEST:
-                if (hitsInLocation == 1) {
-                    if (roll == 2) {
-                        new_injuries.add(new Injury(Injury.generateHealingTime(campaign, Injury.INJ_CUT, hitsInLocation, this), Injury.generateInjuryFluffText(Injury.INJ_CUT, location, gender), location, Injury.INJ_CUT, hitsInLocation, false, bad_status));
-                    } else {
-                        new_injuries.add(new Injury(Injury.generateHealingTime(campaign, Injury.INJ_BRUISE, hitsInLocation, this), Injury.generateInjuryFluffText(Injury.INJ_BRUISE, location, gender), location, Injury.INJ_BRUISE, hitsInLocation, false, bad_status));
-                    }
-                } else if (hitsInLocation == 2) {
-                    new_injuries.add(new Injury(Injury.generateHealingTime(campaign, Injury.INJ_BROKEN_RIB, hitsInLocation, this), Injury.generateInjuryFluffText(Injury.INJ_BROKEN_RIB, location, gender), location, Injury.INJ_BROKEN_RIB, hitsInLocation, false, bad_status));
-                } else if (hitsInLocation == 3) {
-                    new_injuries.add(new Injury(Injury.generateHealingTime(campaign, Injury.INJ_BROKEN_COLLAR_BONE, hitsInLocation, this), Injury.generateInjuryFluffText(Injury.INJ_BROKEN_COLLAR_BONE, location, gender), location, Injury.INJ_BROKEN_COLLAR_BONE, hitsInLocation, false, bad_status));
-                } else if (hitsInLocation == 4) {
-                    new_injuries.add(new Injury(Injury.generateHealingTime(campaign, Injury.INJ_PUNCTURED_LUNG, hitsInLocation, this), Injury.generateInjuryFluffText(Injury.INJ_PUNCTURED_LUNG, location, gender), location, Injury.INJ_PUNCTURED_LUNG, hitsInLocation, false, bad_status));
-                } else if (hitsInLocation > 4) {
-                    if (Compute.randomInt(100) < 15) {
-                        changeStatus(Person.S_RETIRED);
-                        new_injuries.add(new Injury(Injury.generateHealingTime(campaign, Injury.INJ_BROKEN_BACK, hitsInLocation, this), Injury.generateInjuryFluffText(Injury.INJ_BROKEN_BACK, location, gender), location, Injury.INJ_BROKEN_BACK, hitsInLocation, true));
-                    } else {
-                        new_injuries.add(new Injury(Injury.generateHealingTime(campaign, Injury.INJ_BROKEN_BACK, hitsInLocation, this), Injury.generateInjuryFluffText(Injury.INJ_BROKEN_BACK, location, gender), location, Injury.INJ_BROKEN_BACK, hitsInLocation, false, bad_status));
-                    }
-                }
-                break;
-            case ABDOMEN:
-                if (hitsInLocation == 1) {
-                    if (roll == 2) {
-                        new_injuries.add(new Injury(Injury.generateHealingTime(campaign, Injury.INJ_CUT, hitsInLocation, this), Injury.generateInjuryFluffText(Injury.INJ_CUT, location, gender), location, Injury.INJ_CUT, hitsInLocation, false, bad_status));
-                    } else {
-                        new_injuries.add(new Injury(Injury.generateHealingTime(campaign, Injury.INJ_BRUISE, hitsInLocation, this), Injury.generateInjuryFluffText(Injury.INJ_BRUISE, location, gender), location, Injury.INJ_BRUISE, hitsInLocation, false, bad_status));
-                    }
-                } else if (hitsInLocation == 2) {
-                    new_injuries.add(new Injury(Injury.generateHealingTime(campaign, Injury.INJ_BRUISED_KIDNEY, hitsInLocation, this), Injury.generateInjuryFluffText(Injury.INJ_BRUISED_KIDNEY, location, gender), location, Injury.INJ_BRUISED_KIDNEY, hitsInLocation, false, bad_status));
-                } else if (hitsInLocation > 2) {
-                    new_injuries.add(new Injury(Injury.generateHealingTime(campaign, Injury.INJ_INTERNAL_BLEEDING, hitsInLocation, this), Injury.generateInjuryFluffText(Injury.INJ_INTERNAL_BLEEDING, location, gender), location, Injury.INJ_INTERNAL_BLEEDING, hitsInLocation, false, bad_status));
-                }
-                break;
-            case GENERIC:
-            case INTERNAL:
-                // AM doesn't deal with those
-                break;
-            default:
-                System.err.println("ERROR: Default CASE reached in (Advanced Medical Section) Person.applyDamage(" + location + ")");
-                break;
-        }
-        if (location == BodyLocation.HEAD) {
-            Injury inj = getInjuryByLocation(location);
-            if (inj != null && new_injuries != null && new_injuries.size() > 0) {
-                if (inj.getType() > new_injuries.get(0).getType()) {
-                    inj.setTime(Injury.generateHealingTime(campaign, inj.getHits(), inj.getType(), this));
-                    new_injuries.clear();
-                } else if (inj.getType() < new_injuries.get(0).getType()) {
-                    injuries.remove(inj);
-                }
-            }
-        }
-        return new_injuries;
-    }
-
-    public void AMheal() {
-        ArrayList<Injury> removals = new ArrayList<Injury>();
-        for (Injury i : injuries) {
-            if (i.getTime() > 0) {
-                i.setTime(i.getTime() - 1);
-            }
-            if (i.getTime() <= 0 && !i.getPermanent()) {
-                if ((i.getType() == Injury.INJ_BROKEN_LIMB || i.getType() == Injury.INJ_SPRAIN || i.getType() == Injury.INJ_CONCUSSION
-                     || i.getType() == Injury.INJ_BROKEN_COLLAR_BONE) && Compute.d6() == 1) {
-                    i.setPermanent(true);
-                } else {
-                    removals.add(i);
-                }
-            }
-        }
-        injuries.removeAll(removals);
-        if (!needsAMFixing()) {
-            doctorId = null;
-        }
-    }
-
-    @Override
     public boolean needsAMFixing() {
         boolean retVal = false;
         if (injuries.size() > 0) {
             for (Injury i : injuries) {
-                if (i.getTime() > 0 || !(i.getPermanent())) {
+                if (i.getTime() > 0 || !(i.isPermanent())) {
                     retVal = true;
                     break;
                 }
@@ -3492,81 +3298,31 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
 
     public int getPilotingInjuryMod() {
-        int mod = 0;
-        for (Injury injury : injuries) {
-            if ((injury.getType() == Injury.INJ_SPRAIN)
-                && ((injury.getLocation() == BodyLocation.LEFT_LEG) || (injury.getLocation() == BodyLocation.RIGHT_LEG)
-                    || (injury.getLocation() == BodyLocation.LEFT_FOOT) || (injury.getLocation() == BodyLocation.RIGHT_FOOT))) {
-                mod += 1;
-            }
-            if ((injury.getType() == Injury.INJ_BROKEN_LIMB)
-                && ((injury.getLocation() == BodyLocation.LEFT_LEG) || (injury.getLocation() == BodyLocation.RIGHT_LEG)
-                    || (injury.getLocation() == BodyLocation.LEFT_FOOT) || (injury.getLocation() == BodyLocation.RIGHT_FOOT))) {
-                if (injury.getPermanent()) {
-                    mod += 1;
-                } else {
-                    mod += 2;
-                }
-            }
-            if (injury.getType() == Injury.INJ_LOST_LIMB
-                && ((injury.getLocation() == BodyLocation.LEFT_LEG) || (injury.getLocation() == BodyLocation.RIGHT_LEG)
-                    || (injury.getLocation() == BodyLocation.LEFT_FOOT) || (injury.getLocation() == BodyLocation.RIGHT_FOOT))) {
-                mod += 3;
-            }
-            if (injury.getType() == Injury.INJ_CONCUSSION) {
-                mod += 1;
-            }
-            if (injury.getType() == Injury.INJ_CEREBRAL_CONTUSION) {
-                mod += 2;
-            }
-            if (injury.getType() == Injury.INJ_CTE || injury.getType() == Injury.INJ_BROKEN_BACK) {
-                mod += 3;
-            }
-        }
-        return mod;
+        return Modifier.calcTotalModifier(injuries.stream().flatMap(i -> i.getModifiers().stream()), Modifier.Value.PILOTING);
     }
 
     public int getGunneryInjuryMod() {
-        int mod = 0;
-        for (Injury injury : injuries) {
-            if (((injury.getType() == Injury.INJ_SPRAIN)
-                && ((injury.getLocation() == BodyLocation.LEFT_ARM) || (injury.getLocation() == BodyLocation.RIGHT_ARM))
-                    || (injury.getLocation() == BodyLocation.LEFT_HAND) || (injury.getLocation() == BodyLocation.RIGHT_HAND))
-                || injury.getType() == Injury.INJ_BROKEN_COLLAR_BONE) {
-                mod += 1;
-            }
-            if ((injury.getType() == Injury.INJ_BROKEN_LIMB)
-                && ((injury.getLocation() == BodyLocation.LEFT_ARM) || (injury.getLocation() == BodyLocation.RIGHT_ARM))
-                    || (injury.getLocation() == BodyLocation.LEFT_HAND) || (injury.getLocation() == BodyLocation.RIGHT_HAND)) {
-                if (injury.getPermanent()) {
-                    mod += 1;
-                } else {
-                    mod += 2;
-                }
-            }
-            if ((injury.getType() == Injury.INJ_BROKEN_BACK)
-                || (injury.getType() == Injury.INJ_LOST_LIMB
-                    && ((injury.getLocation() == BodyLocation.LEFT_ARM) || (injury.getLocation() == BodyLocation.RIGHT_ARM))
-                        || (injury.getLocation() == BodyLocation.LEFT_HAND) || (injury.getLocation() == BodyLocation.RIGHT_HAND))) {
-                mod += 3;
-            }
-        }
-        return mod;
+        return Modifier.calcTotalModifier(injuries.stream().flatMap(i -> i.getModifiers().stream()), Modifier.Value.GUNNERY);
     }
 
-    /*
-     * Returns an HTML encoded string of effects
+    /**
+     * @return an HTML encoded string of effects
      */
-    public String getEffects() {
-        String nl = "<br>";
-        String buffer = "";
-        if (getPilotingInjuryMod() > 0) {
-            buffer = buffer + "  Piloting +" + getPilotingInjuryMod() + nl;
+    public String getEffectString() {
+        StringBuilder sb = new StringBuilder("<html>");
+        final int pilotingMod = getPilotingInjuryMod();
+        final int gunneryMod = getGunneryInjuryMod();
+        if((pilotingMod != 0) && (pilotingMod < Integer.MAX_VALUE)) {
+            sb.append(String.format("  Piloting %+d <br>", pilotingMod));
+        } else if(pilotingMod == Integer.MAX_VALUE) {
+            sb.append("  Piloting: <i>Impossible</i>  <br>");
         }
-        if (getGunneryInjuryMod() > 0) {
-            buffer = buffer + "  Gunnery +" + getGunneryInjuryMod() + nl;
+        if((gunneryMod != 0) && (gunneryMod < Integer.MAX_VALUE)) {
+            sb.append(String.format("  Gunnery: %+d <br>", gunneryMod));
+        } else if(gunneryMod == Integer.MAX_VALUE) {
+            sb.append("  Gunnery: <i>Impossible</i>  <br>");
         }
-        return "<html>" + buffer + "</html>";
+        return sb.append("</html>").toString();
     }
 
     public String getInjuriesText() {
@@ -3575,15 +3331,20 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         for (Injury injury : injuries) {
             buffer = buffer + injury.getFluff() + nl;
         }
-        return buffer + getEffects();
+        return buffer + getEffectString();
     }
 
+    public boolean hasInjuryModifiers() {
+        return injuries.stream().flatMap(i -> i.getModifiers().stream())
+            .filter(mod -> mod.tags.contains(InjuryType.MODTAG_INJURY)).findFirst().isPresent();
+    }
+    
     public boolean hasInjuries(boolean permCheck) {
         boolean tf = false;
         if (injuries.size() > 0) {
             if (permCheck) {
                 for (Injury injury : injuries) {
-                    if (!injury.getPermanent() || injury.getTime() > 0) {
+                    if (!injury.isPermanent() || injury.getTime() > 0) {
                         tf = true;
                         break;
                     }
@@ -3600,66 +3361,32 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     		return false;
     	}
     	for (Injury injury : injuries) {
-    		if (!injury.getPermanent() || injury.getTime() > 0) {
+    		if (!injury.isPermanent() || injury.getTime() > 0) {
     			return false;
     		}
     	}
     	return true;
     }
 
-    public ArrayList<Injury> getInjuriesByLocation(BodyLocation loc) {
-        ArrayList<Injury> i = new ArrayList<Injury>();
-        for (Injury injury : getInjuries()) {
-            if (injury.getLocation() == loc) {
-                i.add(injury);
-            }
-        }
-        return i;
+    public List<Injury> getInjuriesByLocation(BodyLocation loc) {
+        return injuries.stream()
+            .filter((i) -> (i.getLocation() == loc)).collect(Collectors.toList());
     }
-
 
     // Returns only the first injury in a location
     public Injury getInjuryByLocation(BodyLocation loc) {
-        Injury i = null;
-        for (Injury injury : getInjuries()) {
-            if (injury.getLocation() == loc) {
-                i = injury;
-                break;
-            }
-        }
-        return i;
+        return injuries.stream()
+            .filter((i) -> (i.getLocation() == loc)).findFirst().orElse(null);
     }
 
-    public Injury getInjuryByType(int t) {
-        Injury i = null;
-        for (Injury injury : getInjuries()) {
-            if (injury.getType() == t) {
-                i = injury;
-                break;
-            }
-        }
-        return i;
+    public Injury getInjuryByType(InjuryType t) {
+        return injuries.stream()
+            .filter((i) -> (i.getType() == t)).findFirst().orElse(null);
     }
 
-    public Injury getInjuryByLocationAndType(BodyLocation loc, int t) {
-        Injury i = null;
-        for (Injury injury : injuries) {
-            if (injury.getType() == t && injury.getLocation() == loc) {
-                i = injury;
-            }
-        }
-        return i;
-    }
-
-    public boolean locationIsMissing(BodyLocation loc) {
-        boolean retVal = false;
-        for (Injury i : getInjuriesByLocation(loc)) {
-            if (i.getType() == Injury.INJ_LOST_LIMB) {
-                retVal = true;
-                break;
-            }
-        }
-        return retVal;
+    public Injury getInjuryByLocationAndType(BodyLocation loc, InjuryType t) {
+        return injuries.stream()
+            .filter((i) -> (i.getLocation() == loc) && (i.getType() == t)).findFirst().orElse(null);
     }
 
     public void addInjury(Injury i) {

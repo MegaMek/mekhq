@@ -44,6 +44,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.RandomFactionGenerator;
 
 /**
@@ -217,8 +218,15 @@ public class UnitMarket implements Serializable {
 		for (int i = 0; i < num; i++) {
 			int weight = getRandomWeight(unitType, faction,
 					campaign.getCampaignOptions().getRegionalMechVariations());
-			MechSummary ms = campaign.getUnitGenerator().generate(faction, unitType, weight,
+			MechSummary ms;
+			if (unitType == UnitType.TANK) {
+			    ms = campaign.getUnitGenerator().generate(faction, unitType, weight,
+	                    campaign.getCalendar().get(Calendar.YEAR), quality,
+	                    IUnitGenerator.MIXED_TANK_VTOL, null);
+			} else {
+			    ms = campaign.getUnitGenerator().generate(faction, unitType, weight,
 					campaign.getCalendar().get(Calendar.YEAR), quality);
+			}
 			if (ms != null) {
 				if (campaign.getCampaignOptions().limitByYear() &&
 						campaign.getCalendar().get(Calendar.YEAR) < ms.getYear()) {
