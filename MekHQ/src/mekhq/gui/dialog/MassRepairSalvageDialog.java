@@ -46,6 +46,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CampaignOptions.MassRepairOption;
 import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MissingMekLocation;
 import mekhq.campaign.parts.Part;
@@ -1624,6 +1625,10 @@ public class MassRepairSalvageDialog extends JDialog {
 				MassRepairOption mro = mroByTypeMap.get(repairType);
 
 				if ((null != mro) && mro.isActive()) {
+					if (!checkArmorSupply(part)) {
+						continue;
+					}
+					
 					newParts.add(part);
 				}
 			}
@@ -1632,6 +1637,18 @@ public class MassRepairSalvageDialog extends JDialog {
 		return newParts;
 	}
 
+	private static boolean checkArmorSupply(Part part) {
+		if (part.isSalvaging()) {
+			return true;
+		}
+		
+        if ((part instanceof Armor) && !((Armor) part).isInSupply()) {
+        	return false;
+        }
+        
+        return true;
+	}
+	
 	private static WorkTime calculateNewMassRepairWorktime(Part part, Person tech, MassRepairOption mro,
 			Campaign campaign, boolean increaseTime) {
 		WorkTime newWorkTime = part.getMode();
