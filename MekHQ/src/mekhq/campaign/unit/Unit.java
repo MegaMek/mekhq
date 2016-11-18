@@ -2994,6 +2994,9 @@ public class Unit implements MekHqXmlSerializable {
             if(p.getId().equals(navigator)) {
                 navigator = null;
             }
+            if((null != engineer) && p.getId().equals(engineer.getId())) {
+            	engineer = null;
+            }
             resetPilotAndEntity();
         }
         if(log) {
