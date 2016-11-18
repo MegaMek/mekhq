@@ -216,6 +216,7 @@ import mekhq.gui.dialog.GMToolsDialog;
 import mekhq.gui.dialog.HireBulkPersonnelDialog;
 import mekhq.gui.dialog.MaintenanceReportDialog;
 import mekhq.gui.dialog.ManageAssetsDialog;
+import mekhq.gui.dialog.MassRepairSalvageDialog;
 import mekhq.gui.dialog.MekHQAboutBox;
 import mekhq.gui.dialog.MercRosterDialog;
 import mekhq.gui.dialog.MissionTypeDialog;
@@ -2051,6 +2052,59 @@ public class CampaignGUI extends JPanel {
 
         JPanel panServicedUnits = new JPanel(new GridBagLayout());
 
+        //Add panel for MRMS buttons
+        JPanel massRepairButtons = new JPanel(new GridBagLayout());
+        
+        JButton btnMRMSDialog = new JButton();
+        btnMRMSDialog.setText("Mass Repair/Salvage"); // NOI18N
+        btnMRMSDialog.setToolTipText("Start Mass Repair/Salvage from dialog");
+        btnMRMSDialog.setName("btnMRMSDialog"); // NOI18N
+        btnMRMSDialog.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+	            MassRepairSalvageDialog dlg = new MassRepairSalvageDialog(getFrame(), true, getCampaignGUI(), null, MassRepairSalvageDialog.MODE.UNITS);
+	            dlg.setVisible(true);
+
+	            getCampaignGUI().refreshServicedUnitList();
+	            getCampaignGUI().refreshUnitList();
+	            getCampaignGUI().refreshOverview();
+			}
+		});
+        
+        JButton btnMRMSInstantAll = new JButton();
+        btnMRMSInstantAll.setText("Instant Mass Repair/Salvage All"); // NOI18N
+        btnMRMSInstantAll.setToolTipText("Perform Mass Repair/Salvage immediately on all units using active configuration");
+        btnMRMSInstantAll.setName("btnMRMSInstantAll"); // NOI18N
+        btnMRMSInstantAll.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				MassRepairSalvageDialog.massRepairSalvageAllUnits(getCampaignGUI());
+
+	            getCampaignGUI().refreshServicedUnitList();
+	            getCampaignGUI().refreshUnitList();
+	            getCampaignGUI().refreshOverview();
+			}
+		});
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        massRepairButtons.add(btnMRMSDialog, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        massRepairButtons.add(btnMRMSInstantAll, gridBagConstraints);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new Insets(5, 0, 5, 0);
+        panServicedUnits.add(massRepairButtons, gridBagConstraints);
+        
         servicedUnitModel = new UnitTableModel(getCampaign());
         servicedUnitTable = new JTable(servicedUnitModel);
         servicedUnitTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -2117,7 +2171,7 @@ public class CampaignGUI extends JPanel {
         splitServicedUnits.setResizeWeight(0.0);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -3603,11 +3657,8 @@ public class CampaignGUI extends JPanel {
                 return;
             }
             partId = part.getId();
-            // get a new cloned part to work with and decrement original
-            Part repairable = part.clone();
-            part.decrementQuantity();
-            getCampaign().fixPart(repairable, tech);
-            getCampaign().addPart(repairable, 0);
+            
+            Part repairable = getCampaign().fixWarehousePart(part, tech);
             // if the break off part failed to be repaired, then follow it with
             // the focus
             // otherwise keep the focus on the current row
@@ -5076,8 +5127,7 @@ public class CampaignGUI extends JPanel {
         }
         Person selectedPerson = personModel.getPerson(personnelTable
                 .convertRowIndexToModel(row));
-        scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson,
-                getCampaign(), getIconPackage().getPortraits()));
+        scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, getCampaign(), getIconPackage()));
         // This odd code is to make sure that the scrollbar stays at the top
         // I can't just call it here, because it ends up getting reset somewhere
         // later
@@ -5178,8 +5228,7 @@ public class CampaignGUI extends JPanel {
                 if (u.usesSoloPilot()) {
                     name = "Pilot";
                 }
-                tabUnit.add(name, new PersonViewPanel(p, getCampaign(),
-                        getIconPackage().getPortraits()));
+                tabUnit.add(name, new PersonViewPanel(p, getCampaign(), getIconPackage()));
             }
             tabUnit.add("Unit", new UnitViewPanel(u, getCampaign(),
                     getIconPackage().getCamos(), getIconPackage()
@@ -8312,6 +8361,9 @@ public class CampaignGUI extends JPanel {
             columnModel.setColumnVisible(
                     columnModel.getColumnByModelIndex(UnitTableModel.COL_SITE),
                     false);
+            columnModel.setColumnVisible(
+                    columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS),
+                    false);
         } else if (view == UV_GENERAL) {
             columnModel.setColumnVisible(
                     columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME),
@@ -8358,6 +8410,9 @@ public class CampaignGUI extends JPanel {
             columnModel.setColumnVisible(
                     columnModel.getColumnByModelIndex(UnitTableModel.COL_SITE),
                     false);
+            columnModel.setColumnVisible(
+                    columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS),
+                    false);
         } else if (view == UV_DETAILS) {
             columnModel.setColumnVisible(
                     columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME),
@@ -8403,6 +8458,9 @@ public class CampaignGUI extends JPanel {
                     .getColumnByModelIndex(UnitTableModel.COL_QUIRKS), true);
             columnModel.setColumnVisible(
                     columnModel.getColumnByModelIndex(UnitTableModel.COL_SITE),
+                    false);
+            columnModel.setColumnVisible(
+                    columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS),
                     false);
         } else if (view == UV_STATUS) {
             columnModel.setColumnVisible(
@@ -8451,6 +8509,9 @@ public class CampaignGUI extends JPanel {
             columnModel.setColumnVisible(
                     columnModel.getColumnByModelIndex(UnitTableModel.COL_SITE),
                     true);
+            columnModel.setColumnVisible(
+                    columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS),
+                    false);
         }
     }
 

@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,6 +41,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import megamek.client.RandomUnitGenerator;
 import megamek.common.Compute;
+import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;
 import megamek.common.MechSummary;
 import megamek.common.UnitType;
@@ -432,6 +434,18 @@ public class RATManager implements IUnitGenerator {
         return null;
     }
 
+    @Override
+    public MechSummary generate(String faction, int unitType, int weightClass,
+            int year, int quality, Collection<EntityMovementMode> movementModes,
+            Predicate<MechSummary> filter) {
+        List<MechSummary> list = generate(1, faction, unitType, weightClass,
+                year, quality, movementModes, filter);
+        if (list.size() > 0) {
+            return list.get(0);
+        }
+        return null;
+    }
+
     /* (non-Javadoc)
      * @see mekhq.campaign.universe.IUnitGenerator#generate(int, java.lang.String, int, int, int, int)
      */
@@ -450,6 +464,31 @@ public class RATManager implements IUnitGenerator {
             Predicate<MechSummary> filter) {
         RAT rat = findRAT(faction, unitType, weightClass, year, quality);
         if (rat != null) {
+            if (unitType == UnitType.TANK) {
+                filter = filter.and(ms -> ms.getUnitType().equals("Tank"));
+            } else if (unitType == UnitType.VTOL) {
+                filter = filter.and(ms -> ms.getUnitType().equals("VTOL"));
+            }
+            return RandomUnitGenerator.getInstance().generate(count, rat.ratName, filter);
+        }
+        return new ArrayList<MechSummary>();
+    }
+
+    @Override
+    public List<MechSummary> generate(int count, String faction, int unitType,
+            int weightClass, int year, int quality, Collection<EntityMovementMode> movementModes,
+            Predicate<MechSummary> filter) {
+        RAT rat = findRAT(faction, unitType, weightClass, year, quality);
+        if (rat != null) {
+            if (!movementModes.isEmpty()) {
+                Predicate<MechSummary> moveFilter = ms ->
+                    movementModes.contains(EntityMovementMode.getMode(ms.getUnitSubType()));
+                if (filter == null) {
+                    filter = moveFilter;
+                } else {
+                    filter = filter.and(moveFilter);
+                }
+            }
             return RandomUnitGenerator.getInstance().generate(count, rat.ratName, filter);
         }
         return new ArrayList<MechSummary>();

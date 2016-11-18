@@ -38,17 +38,6 @@ public enum WorkTime {
     RUSH_15(-1, "Rush Job (1/15)", 4, true, 4, 1.0/15.0),
     RUSH_30(-1, "Rush Job (1/30)", 5, true, 5, 1.0/30.0);
     
-    public final int id;
-    // User-displayable. TODO: Localize
-    public final String name;
-    // Base modificator to target number. Positive = more difficult. Use getMod(true) to get the value
-    private final int mod;
-    // Does this count as a rushed job?
-    public final boolean isRushed;
-    // Experience reduction for quick jobs
-    public final int expReduction;
-    public final double timeMultiplier;
-    
     // Initialize by-id array lookup table
     private static WorkTime[] idMap;
     static {
@@ -94,6 +83,17 @@ public enum WorkTime {
         return valueOf(str.toUpperCase(Locale.ROOT));
     }
     
+    public final int id;
+    // User-displayable. TODO: Localize
+    public final String name;
+    // Base modificator to target number. Positive = more difficult. Use getMod(true) to get the value
+    private final int mod;
+    // Does this count as a rushed job?
+    public final boolean isRushed;
+    // Experience reduction for quick jobs
+    public final int expReduction;
+    public final double timeMultiplier;
+
     private WorkTime(int id, String name, int mod, boolean isRushed, int expReduction, double timeMultiplier) {
         this.id = id;
         this.name = name;

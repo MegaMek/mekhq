@@ -3,6 +3,8 @@ package mekhq.gui.model;
 import java.awt.Component;
 import java.awt.Image;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
@@ -12,6 +14,7 @@ import mekhq.IconPackage;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.Skill;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.RepairTaskInfo;
 
@@ -20,7 +23,8 @@ import mekhq.gui.RepairTaskInfo;
  */
 public class TaskTableModel extends DataTableModel {
     private static final long serialVersionUID = -6256038046416893994L;
-
+    private static Map<String, Person> techCache = new HashMap<String, Person>();
+    
     private CampaignGUI campaignGUI;
     
     private interface REPAIR_STATE {
@@ -107,9 +111,9 @@ public class TaskTableModel extends DataTableModel {
             	
             	if (availableLevel == REPAIR_STATE.AVAILABLE) {
 	                Person tech = campaignGUI.getSelectedTech();
-
+	                
 	                if (null == tech) {
-	                	//Find the best tech so we can show a preview until we select a tech
+	                	//Find a valid tech that we can copy their skill from
 	                	ArrayList<Person> techs = campaignGUI.getCampaign().getTechs(false);
 	                	
 	        			for (int i = techs.size() - 1; i >= 0; i--) {
@@ -118,6 +122,24 @@ public class TaskTableModel extends DataTableModel {
 	        				if (techTemp.canTech(part.getUnit().getEntity())) {
 	        					tech = techTemp;
 	        					break;
+	        				}
+	        			}
+	        			
+	        			if (null != tech) {
+		        			Skill partSkill = tech.getSkillForWorkingOn(part);
+		        			String skillName = partSkill.getType().getName();
+		        			
+	        				//Find a tech in our placeholder cache
+	        				tech = techCache.get(skillName);
+	        				
+	        				if (null == tech) {
+			        			//Create a dummy elite tech with the proper skill and 1 minute and put it in our cache for later use
+			        			
+			        			tech = new Person(String.format("Temp Tech (%s)", skillName), campaignGUI.getCampaign());
+			        			tech.addSkill(skillName, partSkill.getType().getEliteLevel(), 1);
+			        			tech.setMinutesLeft(1);
+			        			
+			        			techCache.put(skillName, tech);
 	        				}
 	        			}
 	                }

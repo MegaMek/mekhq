@@ -1,6 +1,7 @@
 /*
  * EditPersonnelInjuriesDialog.java
  * 
+ * Copyright (C) 2009-2016 MegaMek team
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
  * This file is part of MekHQ.
@@ -26,14 +27,21 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -47,7 +55,7 @@ import mekhq.campaign.personnel.Person;
  *
  * @author  Ralgith
  */
-public class EditPersonnelInjuriesDialog extends javax.swing.JDialog {
+public class EditPersonnelInjuriesDialog extends JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
     private Frame frame;
     /*private Campaign campaign;
@@ -56,15 +64,15 @@ public class EditPersonnelInjuriesDialog extends javax.swing.JDialog {
     private ArrayList<Injury> injuries;
     private InjuryTableModel injuryModel;
     
-    private javax.swing.JButton btnAdd;
-    private javax.swing.JButton btnEdit;
-    private javax.swing.JButton btnDelete;
-    private javax.swing.JButton btnOK;
+    private JButton btnAdd;
+    private JButton btnEdit;
+    private JButton btnDelete;
+    private JButton btnOK;
     private JTable injuriesTable;
     private JScrollPane scrollInjuryTable;
     
     /** Creates new form EditPersonnelInjuriesDialog */
-    public EditPersonnelInjuriesDialog(java.awt.Frame parent, boolean modal, Campaign c, Person p) {
+    public EditPersonnelInjuriesDialog(Frame parent, boolean modal, Campaign c, Person p) {
         super(parent, modal);
         this.frame = parent;
         //campaign = c;
@@ -77,22 +85,23 @@ public class EditPersonnelInjuriesDialog extends javax.swing.JDialog {
 
     private void initComponents() {
 
-        btnOK = new javax.swing.JButton();
-        btnAdd = new javax.swing.JButton();
-        btnEdit = new javax.swing.JButton();
-        btnDelete = new javax.swing.JButton();
+        btnOK = new JButton();
+        btnAdd = new JButton();
+        btnEdit = new JButton();
+        btnDelete = new JButton();
 
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelInjuriesDialog", new EncodeControl()); //$NON-NLS-1$
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("Form.title") + " " + person.getName());
-        getContentPane().setLayout(new java.awt.BorderLayout());
+        getContentPane().setLayout(new BorderLayout());
         
         JPanel panBtns = new JPanel(new GridLayout(1,0));
         btnAdd.setText(resourceMap.getString("btnAdd.text")); // NOI18N
         btnAdd.setName("btnAdd"); // NOI18N
-        btnAdd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnAdd.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
                 addEntry();
             }
         });
@@ -100,8 +109,9 @@ public class EditPersonnelInjuriesDialog extends javax.swing.JDialog {
         btnEdit.setText(resourceMap.getString("btnEdit.text")); // NOI18N
         btnEdit.setName("btnEdit"); // NOI18N
         btnEdit.setEnabled(false);
-        btnEdit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnEdit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
                 editEntry();
             }
         });
@@ -109,8 +119,9 @@ public class EditPersonnelInjuriesDialog extends javax.swing.JDialog {
         btnDelete.setText(resourceMap.getString("btnDelete.text")); // NOI18N
         btnDelete.setName("btnDelete"); // NOI18N
         btnDelete.setEnabled(false);
-        btnDelete.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnDelete.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
                 deleteEntry();
             }
         });
@@ -132,9 +143,10 @@ public class EditPersonnelInjuriesDialog extends javax.swing.JDialog {
 		injuriesTable.setShowGrid(false);
 		injuriesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		injuriesTable.getSelectionModel().addListSelectionListener(
-				new javax.swing.event.ListSelectionListener() {
-					public void valueChanged(
-							javax.swing.event.ListSelectionEvent evt) {
+				new ListSelectionListener() {
+					@Override
+                    public void valueChanged(
+							ListSelectionEvent evt) {
 						injuriesTableValueChanged(evt);
 					}
 				});
@@ -146,8 +158,9 @@ public class EditPersonnelInjuriesDialog extends javax.swing.JDialog {
         
         btnOK.setText(resourceMap.getString("btnOK.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
-        btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnOK.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
                 btnOKActionPerformed(evt);
             }
         });
@@ -157,11 +170,11 @@ public class EditPersonnelInjuriesDialog extends javax.swing.JDialog {
     }
 
     
-    private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
+    private void btnOKActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
     	this.setVisible(false);
     }
     
-    private void injuriesTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
+    private void injuriesTableValueChanged(ListSelectionEvent evt) {
 		int row = injuriesTable.getSelectedRow();
 		btnDelete.setEnabled(row != -1);
 		btnEdit.setEnabled(row != -1);
@@ -227,10 +240,12 @@ public class EditPersonnelInjuriesDialog extends javax.swing.JDialog {
 			data = entries;
 		}
 		
-		public int getRowCount() {
+		@Override
+        public int getRowCount() {
             return data.size();
         }
 
+        @Override
         public int getColumnCount() {
             return N_COL;
         }
@@ -259,7 +274,8 @@ public class EditPersonnelInjuriesDialog extends javax.swing.JDialog {
             }
         }
 
-		public Object getValueAt(int row, int col) {
+		@Override
+        public Object getValueAt(int row, int col) {
 	        Injury entry;
 	        if(data.isEmpty()) {
 	        	return "";
@@ -273,7 +289,7 @@ public class EditPersonnelInjuriesDialog extends javax.swing.JDialog {
 				return entry.getLocationName();
 			}
 	        if(col == COL_TYPE) {
-				return entry.getTypeName();
+				return entry.getType().getName(entry.getLocation(), entry.getHits());
 			}
 			if(col == COL_FLUFF) {
 				return entry.getFluff();
@@ -282,10 +298,10 @@ public class EditPersonnelInjuriesDialog extends javax.swing.JDialog {
 				return Integer.toString(entry.getHits());
 			}
 			if(col == COL_PERMANENT) {
-				return Boolean.toString(entry.getPermanent());
+				return Boolean.toString(entry.isPermanent());
 			}
 			if(col == COL_WORKEDON) {
-				return Boolean.toString(entry.getWorkedOn());
+				return Boolean.toString(entry.isWorkedOn());
 			}
 			if(col == COL_EXTENDED) {
 				return Boolean.toString(entry.getExtended());
@@ -359,7 +375,8 @@ public class EditPersonnelInjuriesDialog extends javax.swing.JDialog {
 
 			private static final long serialVersionUID = 9054581142945717303L;
 
-			public Component getTableCellRendererComponent(JTable table,
+			@Override
+            public Component getTableCellRendererComponent(JTable table,
 					Object value, boolean isSelected, boolean hasFocus,
 					int row, int column) {
 				super.getTableCellRendererComponent(table, value, isSelected,

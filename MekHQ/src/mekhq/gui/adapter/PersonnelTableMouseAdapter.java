@@ -871,7 +871,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 String sel = data[1];
                 Injury toRemove = null;
                 for (Injury i : selectedPerson.getInjuries()) {
-                    if (i.getUUIDAsString().equals(sel)) {
+                    if (i.getUUID().toString().equals(sel)) {
                         toRemove = i;
                         break;
                     }
@@ -1908,7 +1908,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 if (oneSelected) {
                     for (Injury i : person.getInjuries()) {
                         menuItem = new JMenuItem(String.format(resourceMap.getString("removeInjury.format"), i.getName())); //$NON-NLS-1$
-                        menuItem.setActionCommand(makeCommand(CMD_REMOVE_INJURY, i.getUUIDAsString()));
+                        menuItem.setActionCommand(makeCommand(CMD_REMOVE_INJURY, i.getUUID().toString()));
                         menuItem.addActionListener(this);
                         menuItem.setEnabled(gui.getCampaign().isGM());
                         menu.add(menuItem);

@@ -17,6 +17,7 @@ import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.dialog.MassRepairSalvageDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
 
 public class PartsTableMouseAdapter extends MouseInputAdapter implements
@@ -176,6 +177,12 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements
             selectedPart.setMode(WorkTime.of(sel));
             gui.refreshPartsList();
             gui.refreshOverview();
+        } else if (command.contains("MASS_REPAIR")) {
+            MassRepairSalvageDialog dlg = new MassRepairSalvageDialog(gui.getFrame(), true, gui, MassRepairSalvageDialog.MODE.WAREHOUSE);
+            dlg.setVisible(true);
+            
+            gui.refreshPartsList();
+            gui.refreshOverview();
         }
     }
 
@@ -324,6 +331,11 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements
                     menu.add(cbMenuItem);
                 }
                 popup.add(menu);
+                
+                menuItem = new JMenuItem("Mass Repair");
+                menuItem.setActionCommand("MASS_REPAIR");
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
             }
             if (areAllPartsInTransit(parts)) {
                 menuItem = new JMenuItem("Cancel This Delivery");

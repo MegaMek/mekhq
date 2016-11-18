@@ -114,12 +114,17 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
             	unit = units[0];
             }
             
-            MassRepairSalvageDialog dlg = new MassRepairSalvageDialog(gui.getFrame(), true, gui, unit);
-            dlg.setVisible(true);
-
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshOverview();
+            if (unit.isDeployed()) {
+    			JOptionPane.showMessageDialog(gui.getFrame(),
+    					"Unit is currently deployed and can not be repaired.",
+    					"Unit is deployed", JOptionPane.ERROR_MESSAGE);
+            } else {
+				MassRepairSalvageDialog.performSingleUnitMassRepairOrSalvage(gui, unit);
+	
+				gui.refreshServicedUnitList();
+				gui.refreshUnitList();
+				gui.refreshOverview();
+            }
         } else if (command.equalsIgnoreCase("REMOVE")) {
             for (Unit unit : units) {
                 if (!unit.isDeployed()) {
@@ -261,8 +266,10 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
                     popup.add(menuItem);
                 }
                 
-                if (!unit.isSelfCrewed() && unit.isAvailable()) {
-                    menuItem = new JMenuItem("Mass Repair/Salvage");
+                if (!unit.isSelfCrewed() && unit.isAvailable() && !unit.isDeployed()) {
+                	String title = String.format("Mass %s", unit.isSalvage() ? "Salvage" : "Repair");
+                	
+                    menuItem = new JMenuItem(title);
                     menuItem.setActionCommand("MASS_REPAIR_SALVAGE");
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(unit.isAvailable());

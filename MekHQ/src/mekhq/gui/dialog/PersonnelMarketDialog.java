@@ -485,13 +485,13 @@ public class PersonnelMarketDialog extends JDialog {
              if (Compute.getFullCrewSize(en) == 1) {
             	 name = "Pilot";
              }
-             tabUnit.add(name, new PersonViewPanel(selectedPerson, campaign, portraits));
+             tabUnit.add(name, new PersonViewPanel(selectedPerson, campaign, hqView.getIconPackage()));
              MechViewPanel mvp = new MechViewPanel();
              mvp.setMech(en, true);
              tabUnit.add("Unit", mvp);
              scrollPersonnelView.setViewportView(tabUnit);
          } else {
-        	 scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, campaign, portraits));
+        	 scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, campaign, hqView.getIconPackage()));
          }
  		//This odd code is to make sure that the scrollbar stays at the top
  		//I cant just call it here, because it ends up getting reset somewhere later
