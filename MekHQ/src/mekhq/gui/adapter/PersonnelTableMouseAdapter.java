@@ -256,6 +256,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                                 u.runDiagnostic(false);
                             }
                         }
+                        /*
+                         * Incase there's still some assignments for this tech,
+                         * clear them out. This can happen if the target unit
+                         * above is null. The tech will still have the pointer
+                         * but to a null unit and it will never go away 
+                         * otherwise.
+                         */
+                        person.clearTechUnitIDs();
                     }
                 }
                 break;

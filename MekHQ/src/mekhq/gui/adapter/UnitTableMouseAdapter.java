@@ -69,12 +69,27 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             units[i] = gui.getUnitModel().getUnit(gui.getUnitTable()
                     .convertRowIndexToModel(rows[i]));
         }
-        if (command.equalsIgnoreCase("REMOVE_PILOT")) {
+        if (command.equalsIgnoreCase("REMOVE_ALL_PERSONNEL")) {
             for (Unit unit : units) {
                 for (Person p : unit.getCrew()) {
                     unit.remove(p, true);
                 }
+                
+                Person tech = unit.getTech();
+                
+                if (null != tech) {
+                	tech.removeTechUnitId(unit.getId());
+                }
+                
+                unit.removeTech();
+                
+                Person engineer = unit.getEngineer();
+                
+                if (null != engineer) {
+                	unit.remove(engineer, true);
+                }
             }
+            
             gui.refreshServicedUnitList();
             gui.refreshUnitList();
             gui.refreshOrganization();
@@ -923,9 +938,9 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 // remove pilot
                 popup.addSeparator();
                 menuItem = new JMenuItem("Remove all personnel");
-                menuItem.setActionCommand("REMOVE_PILOT");
+                menuItem.setActionCommand("REMOVE_ALL_PERSONNEL");
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(!unit.isUnmanned()
+                menuItem.setEnabled(!(unit.isUnmanned() && (null == unit.getTech()))
                         && !unit.isDeployed());
                 popup.add(menuItem);
                 menuItem = new JMenuItem("Name Unit");
