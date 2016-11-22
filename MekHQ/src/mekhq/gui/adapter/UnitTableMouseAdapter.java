@@ -71,6 +71,10 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
         }
         if (command.equalsIgnoreCase("REMOVE_ALL_PERSONNEL")) {
             for (Unit unit : units) {
+            	if (unit.isDeployed()) {
+            		continue;
+            	}
+            	
                 for (Person p : unit.getCrew()) {
                     unit.remove(p, true);
                 }
@@ -935,14 +939,18 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(true);
                 popup.add(menuItem);
-                // remove pilot
-                popup.addSeparator();
-                menuItem = new JMenuItem("Remove all personnel");
-                menuItem.setActionCommand("REMOVE_ALL_PERSONNEL");
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(!(unit.isUnmanned() && (null == unit.getTech()))
-                        && !unit.isDeployed());
-                popup.add(menuItem);
+            }
+                
+            // remove all personnel
+            popup.addSeparator();
+            menuItem = new JMenuItem("Remove all personnel");
+            menuItem.setActionCommand("REMOVE_ALL_PERSONNEL");
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(!(unit.isUnmanned() && (null == unit.getTech()))
+                    && !unit.isDeployed());
+            popup.add(menuItem);
+
+            if (oneSelected) {
                 menuItem = new JMenuItem("Name Unit");
                 menuItem.setActionCommand("FLUFF_NAME");
                 menuItem.addActionListener(this);
