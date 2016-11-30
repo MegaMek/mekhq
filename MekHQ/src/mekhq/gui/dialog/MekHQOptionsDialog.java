@@ -154,9 +154,11 @@ public class MekHQOptionsDialog extends JDialog {
 	public void refreshOptions() {
 		MekHQOptions options = MekHQOptions.getInstance();
 
-		if (options.getDateFormatLong().toPattern() == MekHQOptions.DATE_PATTERN_ISO_LONG) {
+		String datePattern = options.getDateFormatLong().toPattern();
+		
+		if (datePattern.equals(MekHQOptions.DATE_PATTERN_ISO_LONG)) {
 			rbtnDateFormatISO.doClick();
-		} else if (options.getDateFormatLong().toPattern() == MekHQOptions.DATE_PATTERN_LITTLE_ENDIAN_LONG) {
+		} else if (datePattern.equals(MekHQOptions.DATE_PATTERN_LITTLE_ENDIAN_LONG)) {
 			rbtnDateFormatLittleEndian.doClick();
 		} else {
 			/// ? nothing selected?
