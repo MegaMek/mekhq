@@ -242,8 +242,6 @@ public class Campaign implements Serializable {
 
     // calendar stuff
     public GregorianCalendar calendar;
-    private SimpleDateFormat dateFormatLong;
-    private SimpleDateFormat dateFormatShort;
 
     private String factionCode;
     private String retainerEmployerCode; //AtB
@@ -298,8 +296,6 @@ public class Campaign implements Serializable {
         currentReportHTML = "";
         newReports = new ArrayList<String>();
         calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
-        dateFormatLong = MekHQOptions.getInstance().getDateFormatLong();
-        dateFormatShort = MekHQOptions.getInstance().getDateFormatShort();
         name = "My Campaign";
         rng = new RandomNameGenerator();
         rng.populateNames();
@@ -590,7 +586,7 @@ public class Campaign implements Serializable {
 					report.append(shipSearchResult)
 						.append(" is available for purchase for ")
 						.append(NumberFormat.getInstance().format(ms.getCost()))
-						.append(" C-bills until ").append(dateFormatLong.format(shipSearchExpiration.getTime()));
+						.append(" C-bills until ").append(MekHQOptions.getInstance().getDateFormatLong().format(shipSearchExpiration.getTime()));
 				} else {
 					report.append(" <font color=\"red\">Could not determine ship type.</font>");
 				}
@@ -2927,11 +2923,11 @@ public class Campaign implements Serializable {
     }
 
     public String getDateAsString() {
-        return dateFormatLong.format(calendar.getTime());
+        return MekHQOptions.getInstance().getDateFormatLong().format(calendar.getTime());
     }
 
     public String getShortDateAsString() {
-        return dateFormatShort.format(calendar.getTime());
+        return MekHQOptions.getInstance().getDateFormatShort().format(calendar.getTime());
     }
 
     public void restore() {
@@ -3400,13 +3396,13 @@ public class Campaign implements Serializable {
             retirementDefectionTracker.writeToXml(pw1, 1);
             if (shipSearchStart != null) {
             	MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "shipSearchStart",
-            			dateFormatShort.format(shipSearchStart.getTime()));
+            			MekHQOptions.getInstance().getDateFormatDataStorage().format(shipSearchStart.getTime()));
             }
             MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "shipSearchType", shipSearchType);
             MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "shipSearchResult", shipSearchResult);
             if (shipSearchExpiration != null) {
             	MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "shipSearchExpiration",
-            			dateFormatShort.format(shipSearchExpiration.getTime()));
+            			MekHQOptions.getInstance().getDateFormatDataStorage().format(shipSearchExpiration.getTime()));
             }
         }
         
@@ -3725,14 +3721,22 @@ public class Campaign implements Serializable {
                 	retVal.retirementDefectionTracker = RetirementDefectionTracker.generateInstanceFromXML(wn, retVal);
                 } else if (xn.equalsIgnoreCase("shipSearchStart")) {
                 	retVal.shipSearchStart = new GregorianCalendar();
-                	retVal.shipSearchStart.setTime(retVal.dateFormatShort.parse(wn.getTextContent()));
+                	try {
+                		retVal.shipSearchStart.setTime(MekHQOptions.getInstance().getDateFormatDataStorage().parse(wn.getTextContent()));
+                	} catch (ParseException e) {
+                		retVal.shipSearchStart.setTime(new SimpleDateFormat("yyyyMMdd").parse(wn.getTextContent()));
+                	}
                 } else if (xn.equalsIgnoreCase("shipSearchType")) {
                 	retVal.shipSearchType = Integer.parseInt(wn.getTextContent());
                 } else if (xn.equalsIgnoreCase("shipSearchResult")) {
                 	retVal.shipSearchResult = wn.getTextContent();
                 } else if (xn.equalsIgnoreCase("shipSearchExpiration")) {
                 	retVal.shipSearchExpiration = new GregorianCalendar();
-                	retVal.shipSearchExpiration.setTime(retVal.dateFormatShort.parse(wn.getTextContent()));
+                	try {
+                		retVal.shipSearchExpiration.setTime(MekHQOptions.getInstance().getDateFormatDataStorage().parse(wn.getTextContent()));
+                	} catch (ParseException e) {
+                		retVal.shipSearchStart.setTime(new SimpleDateFormat("yyyyMMdd").parse(wn.getTextContent()));
+                	}
                 } else if (xn.equalsIgnoreCase("customPlanetaryEvents")) {
                     updatePlanetaryEventsFromXML(wn);
                 }
