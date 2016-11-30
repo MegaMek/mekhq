@@ -131,7 +131,7 @@ public class MekHQOptionsDialog extends JDialog {
 		if (rbtnDateFormatISO.isSelected()) {
 			dateFormatShort = new SimpleDateFormat(MekHQOptions.DATE_PATTERN_ISO_SHORT);
 			dateFormatLong = new SimpleDateFormat(MekHQOptions.DATE_PATTERN_ISO_LONG);
-		} else {
+		} else if (rbtnDateFormatLittleEndian.isSelected()) {
 			dateFormatShort = new SimpleDateFormat(MekHQOptions.DATE_PATTERN_LITTLE_ENDIAN_SHORT);
 			dateFormatLong = new SimpleDateFormat(MekHQOptions.DATE_PATTERN_LITTLE_ENDIAN_LONG);
 		}
