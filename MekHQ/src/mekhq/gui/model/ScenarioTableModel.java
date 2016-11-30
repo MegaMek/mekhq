@@ -1,6 +1,5 @@
 package mekhq.gui.model;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import javax.swing.SwingConstants;

@@ -3,7 +3,6 @@ package mekhq.gui.model;
 import java.awt.Color;
 import java.awt.Component;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import javax.swing.JTable;

@@ -22,7 +22,6 @@
 package mekhq.gui.dialog;
 
 import java.awt.Frame;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
