@@ -17,3 +17,4 @@ MekHQ.jar
 /*.tar.bz2
 /*.blame
 /.classpath
+/mekhqOptions.xml
