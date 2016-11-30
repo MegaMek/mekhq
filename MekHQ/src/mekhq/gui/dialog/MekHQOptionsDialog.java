@@ -30,6 +30,8 @@ public class MekHQOptionsDialog extends JDialog {
 	private JLabel lblDateFormat;
 
 	private JRadioButton rbtnDateFormatISO;
+	private JRadioButton rbtnDateFormatBigEndian;
+	private JRadioButton rbtnDateFormatMiddleEndian;
 	private JRadioButton rbtnDateFormatLittleEndian;
 
 	private ButtonGroup bgroupDateFormat;
@@ -68,15 +70,25 @@ public class MekHQOptionsDialog extends JDialog {
 		rbtnDateFormatISO = new JRadioButton();
 		rbtnDateFormatISO.setText(resourceMap.getString("rbtnDateFormatISO.text"));
 
+		rbtnDateFormatBigEndian = new JRadioButton();
+		rbtnDateFormatBigEndian.setText(resourceMap.getString("rbtnDateFormatBigEndian.text"));
+
+		rbtnDateFormatMiddleEndian = new JRadioButton();
+		rbtnDateFormatMiddleEndian.setText(resourceMap.getString("rbtnDateFormatMiddleEndian.text"));
+
 		rbtnDateFormatLittleEndian = new JRadioButton();
 		rbtnDateFormatLittleEndian.setText(resourceMap.getString("rbtnDateFormatLittleEndian.text"));
 
 		bgroupDateFormat = new ButtonGroup();
 		bgroupDateFormat.add(rbtnDateFormatISO);
+		bgroupDateFormat.add(rbtnDateFormatBigEndian);
+		bgroupDateFormat.add(rbtnDateFormatMiddleEndian);
 		bgroupDateFormat.add(rbtnDateFormatLittleEndian);
 
 		pnlDateFormat = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		pnlDateFormat.add(rbtnDateFormatISO);
+		pnlDateFormat.add(rbtnDateFormatBigEndian);
+		pnlDateFormat.add(rbtnDateFormatMiddleEndian);
 		pnlDateFormat.add(rbtnDateFormatLittleEndian);
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -124,13 +136,19 @@ public class MekHQOptionsDialog extends JDialog {
 	protected void btnSaveActionPerformed() {
 		MekHQOptions options = MekHQOptions.getInstance();
 
-		// initialize with default ISO
+		// initialize with default big endian
 		SimpleDateFormat dateFormatShort = new SimpleDateFormat(MekHQOptions.DATE_PATTERN_ISO_SHORT);
 		SimpleDateFormat dateFormatLong = new SimpleDateFormat(MekHQOptions.DATE_PATTERN_ISO_LONG);
 
 		if (rbtnDateFormatISO.isSelected()) {
 			dateFormatShort = new SimpleDateFormat(MekHQOptions.DATE_PATTERN_ISO_SHORT);
 			dateFormatLong = new SimpleDateFormat(MekHQOptions.DATE_PATTERN_ISO_LONG);
+		} else if (rbtnDateFormatBigEndian.isSelected()) {
+			dateFormatShort = new SimpleDateFormat(MekHQOptions.DATE_PATTERN_BIG_ENDIAN_SHORT);
+			dateFormatLong = new SimpleDateFormat(MekHQOptions.DATE_PATTERN_BIG_ENDIAN_LONG);
+		} else if (rbtnDateFormatMiddleEndian.isSelected()) {
+			dateFormatShort = new SimpleDateFormat(MekHQOptions.DATE_PATTERN_MIDDLE_ENDIAN_SHORT);
+			dateFormatLong = new SimpleDateFormat(MekHQOptions.DATE_PATTERN_MIDDLE_ENDIAN_LONG);
 		} else if (rbtnDateFormatLittleEndian.isSelected()) {
 			dateFormatShort = new SimpleDateFormat(MekHQOptions.DATE_PATTERN_LITTLE_ENDIAN_SHORT);
 			dateFormatLong = new SimpleDateFormat(MekHQOptions.DATE_PATTERN_LITTLE_ENDIAN_LONG);
@@ -155,13 +173,18 @@ public class MekHQOptionsDialog extends JDialog {
 		MekHQOptions options = MekHQOptions.getInstance();
 
 		String datePattern = options.getDateFormatLong().toPattern();
-		
+
 		if (datePattern.equals(MekHQOptions.DATE_PATTERN_ISO_LONG)) {
 			rbtnDateFormatISO.doClick();
+		} else if (datePattern.equals(MekHQOptions.DATE_PATTERN_BIG_ENDIAN_LONG)) {
+			rbtnDateFormatBigEndian.doClick();
+		} else if (datePattern.equals(MekHQOptions.DATE_PATTERN_MIDDLE_ENDIAN_LONG)) {
+			rbtnDateFormatMiddleEndian.doClick();
 		} else if (datePattern.equals(MekHQOptions.DATE_PATTERN_LITTLE_ENDIAN_LONG)) {
 			rbtnDateFormatLittleEndian.doClick();
 		} else {
-			/// ? nothing selected?
+			// other pattern? should never get here.
+			MekHQ.logError("MekHQOptionsDialog: Currently set date format pattern does not correspond to any presets.");
 		}
 	}
 

@@ -24,6 +24,12 @@ public class MekHQOptions {
 
 	public static final String DATE_PATTERN_ISO_LONG = "yyyy-MM-dd";
 	public static final String DATE_PATTERN_ISO_SHORT = "yyyy-MM-dd";
+	
+	public static final String DATE_PATTERN_BIG_ENDIAN_LONG = "yyyy MMMM dd, EEEE";
+	public static final String DATE_PATTERN_BIG_ENDIAN_SHORT = "yyyy-MM-dd";
+	
+	public static final String DATE_PATTERN_MIDDLE_ENDIAN_LONG = "EEEE, MMMM dd yyyy";
+	public static final String DATE_PATTERN_MIDDLE_ENDIAN_SHORT = "MM/dd/yyyy";
 
 	public static final String DATE_PATTERN_LITTLE_ENDIAN_LONG = "EEEE, dd MMMM yyyy";
 	public static final String DATE_PATTERN_LITTLE_ENDIAN_SHORT = "dd-MM-yyyy";
@@ -66,8 +72,8 @@ public class MekHQOptions {
 
 	private void initWithDefaults() {
 		dateFormatDataStorage = new SimpleDateFormat(DATE_TIME_PATTERN_ISO);
-		dateFormatLong = new SimpleDateFormat(DATE_PATTERN_ISO_LONG);
-		dateFormatShort = new SimpleDateFormat(DATE_PATTERN_ISO_SHORT);
+		dateFormatLong = new SimpleDateFormat(DATE_PATTERN_BIG_ENDIAN_LONG);
+		dateFormatShort = new SimpleDateFormat(DATE_PATTERN_BIG_ENDIAN_SHORT);
 	}
 
 	public SimpleDateFormat getDateFormatDataStorage() {
