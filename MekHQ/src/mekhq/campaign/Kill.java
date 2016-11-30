@@ -23,12 +23,14 @@ package mekhq.campaign;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.UUID;
 
 import mekhq.MekHQ;
+import mekhq.MekHQOptions;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 
@@ -118,8 +120,13 @@ public class Kill implements Serializable {
 				} else if (wn2.getNodeName().equalsIgnoreCase("killer")) {
 					retVal.killer = (wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("date")) {
-					SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-					retVal.date = df.parse(wn2.getTextContent().trim());
+					SimpleDateFormat df = MekHQOptions.getInstance().getDateFormatDataStorage();
+					SimpleDateFormat fallbackFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+					try {
+						retVal.date = df.parse(wn2.getTextContent().trim());
+					} catch (ParseException pe) {
+						retVal.date = fallbackFormat.parse(wn2.getTextContent().trim());
+					}
 				}
 			}
 		} catch (Exception ex) {
@@ -145,7 +152,7 @@ public class Kill implements Serializable {
 				+"<killer>"
 				+MekHqXmlUtil.escape(killer)
 				+"</killer>");
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		SimpleDateFormat df = MekHQOptions.getInstance().getDateFormatDataStorage();
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<date>"
 				+df.format(date)

@@ -72,6 +72,7 @@ import org.joda.time.format.DateTimeFormatter;
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
 import mekhq.MekHQ;
+import mekhq.MekHQOptions;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ExtraData;
@@ -87,9 +88,9 @@ import mekhq.gui.view.Paperdoll;
 public class MedicalViewDialog extends JDialog {
     private static final long serialVersionUID = 6178230374580087883L;
     private static final String MENU_CMD_SEPARATOR = ","; //$NON-NLS-1$
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd"); //$NON-NLS-1$
-    private final static DateTimeFormatter DATE_FORMATTER =
-        DateTimeFormat.forPattern("yyyy-MM-dd").withChronology(GJChronology.getInstanceUTC()); //$NON-NLS-1$
+    private static final DateTimeFormatter DATE_FORMATTER =	DateTimeFormat
+    		.forPattern(MekHQOptions.getInstance().getDateFormatShort().toPattern())
+    		.withChronology(GJChronology.getInstanceUTC());
 
     private static final ExtraData.Key<String> DOCTOR_NOTES = new ExtraData.StringKey("doctor_notes"); //$NON-NLS-1$
     // TODO: Custom paper dolls
@@ -350,8 +351,7 @@ public class MedicalViewDialog extends JDialog {
         }
         
         GregorianCalendar birthday = (GregorianCalendar) p.getBirthday().clone();
-        DATE_FORMAT.setCalendar(birthday);
-        String birthdayString = DATE_FORMAT.format(birthday.getTime());
+        String birthdayString = MekHQOptions.getInstance().getDateFormatShort().format(birthday.getTime());
         GregorianCalendar now = (GregorianCalendar) c.getCalendar().clone();
         int ageInMonths = (now.get(Calendar.YEAR) - birthday.get(Calendar.YEAR)) * 12
             + now.get(Calendar.MONTH) - birthday.get(Calendar.MONTH);
@@ -397,7 +397,7 @@ public class MedicalViewDialog extends JDialog {
         Map<String, List<LogEntry>> groupedEntries = p.getPersonnelLog().stream()
             .filter(entry -> entry.isType(Person.LOGTYPE_MEDICAL))
             .sorted((entry1, entry2) -> entry1.getDate().compareTo(entry2.getDate()))
-            .collect(Collectors.groupingBy(entry -> DATE_FORMAT.format(entry.getDate())));
+            .collect(Collectors.groupingBy(entry -> MekHQOptions.getInstance().getDateFormatShort().format(entry.getDate())));
         groupedEntries.entrySet().stream()
             .filter(e -> !e.getValue().isEmpty())
             .sorted((e1, e2) -> e1.getKey().compareTo(e2.getKey()))

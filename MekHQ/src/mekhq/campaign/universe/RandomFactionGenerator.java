@@ -45,6 +45,7 @@ import org.w3c.dom.NodeList;
 
 import megamek.common.Compute;
 import mekhq.MekHQ;
+import mekhq.MekHQOptions;
 import mekhq.Utilities;
 import mekhq.campaign.CampaignOptions;
 
@@ -215,11 +216,13 @@ public class RandomFactionGenerator implements Serializable {
 		Element rootElement = xmlDoc.getDocumentElement();
 		NodeList nl = rootElement.getChildNodes();
 		rootElement.normalize();
+
+		SimpleDateFormat df = MekHQOptions.getInstance().getDateFormatDataStorage();
+		SimpleDateFormat fallbackFormat = new SimpleDateFormat("yyyy-MM-dd");
+		final Date epoch_start = df.parse("0001-01-01 00:00:00");
+		final Date epoch_end = df.parse("9999-12-31 23:59:59");
 		
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		for (int i = 0; i < nl.getLength(); i++) {
-			final Date epoch_start = df.parse("0001-01-01");
-			final Date epoch_end = df.parse("9999-12-31");
 			Node wn = nl.item(i);
 			
 			if (wn.getParentNode() != rootElement)
@@ -266,10 +269,18 @@ public class RandomFactionGenerator implements Serializable {
 					String inner = "UND";
 					ArrayList<String> opponents = null;
 					if (wn.getAttributes().getNamedItem("start") != null) {
-						start = df.parse(wn.getAttributes().getNamedItem("start").getTextContent().trim());
+						try {
+							start = df.parse(wn.getAttributes().getNamedItem("start").getTextContent().trim());
+						} catch (ParseException e) {
+							start = fallbackFormat.parse(wn.getAttributes().getNamedItem("start").getTextContent().trim());
+						}
 					}
 					if (wn.getAttributes().getNamedItem("end") != null) {
-						end = df.parse(wn.getAttributes().getNamedItem("end").getTextContent().trim());
+						try {
+							end = df.parse(wn.getAttributes().getNamedItem("end").getTextContent().trim());
+						} catch (ParseException e) {
+							end = fallbackFormat.parse(wn.getAttributes().getNamedItem("end").getTextContent().trim());
+						}
 					}
 					for (int j = 0; j < wn.getChildNodes().getLength(); j++) {
 						Node wn2 = wn.getChildNodes().item(j);
@@ -306,9 +317,10 @@ public class RandomFactionGenerator implements Serializable {
 	
 	private void setFactionHint(HashMap<String, HashMap<String, ArrayList<FactionHint>>> hint,
 			Node node) throws DOMException, ParseException {
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		final Date epoch_start = df.parse("0001-01-01");
-		final Date epoch_end = df.parse("9999-12-31");
+		SimpleDateFormat df = MekHQOptions.getInstance().getDateFormatDataStorage();
+		SimpleDateFormat fallbackFormat = new SimpleDateFormat("yyyy-MM-dd");
+		final Date epoch_start = df.parse("0001-01-01 00:00:00");
+		final Date epoch_end = df.parse("9999-12-31 23:59:59");
 
 		String name = null;
 		Date start = epoch_start;
@@ -317,10 +329,18 @@ public class RandomFactionGenerator implements Serializable {
 			name = node.getAttributes().getNamedItem("name").getTextContent().trim();
 		}
 		if (node.getAttributes().getNamedItem("start") != null) {
-			start = df.parse(node.getAttributes().getNamedItem("start").getTextContent().trim());
+			try {
+				start = df.parse(node.getAttributes().getNamedItem("start").getTextContent().trim());
+			} catch (ParseException e) {
+				start = fallbackFormat.parse(node.getAttributes().getNamedItem("start").getTextContent().trim());
+			}
 		}
 		if (node.getAttributes().getNamedItem("end") != null) {
-			end = df.parse(node.getAttributes().getNamedItem("end").getTextContent().trim());
+			try {
+				end = df.parse(node.getAttributes().getNamedItem("end").getTextContent().trim());
+			} catch (ParseException e) {
+				end = fallbackFormat.parse(node.getAttributes().getNamedItem("end").getTextContent().trim());
+			}
 		}
 		for (int n = 0; n < node.getChildNodes().getLength(); n++) {
 			Node wn = node.getChildNodes().item(n);
@@ -328,10 +348,18 @@ public class RandomFactionGenerator implements Serializable {
 				Date localStart = start;
 				Date localEnd = end;
 				if (wn.getAttributes().getNamedItem("start") != null) {
-					localStart = df.parse(wn.getAttributes().getNamedItem("start").getTextContent().trim());
+					try {
+						localStart = df.parse(wn.getAttributes().getNamedItem("start").getTextContent().trim());
+					} catch (ParseException e) {
+						localStart = fallbackFormat.parse(wn.getAttributes().getNamedItem("start").getTextContent().trim());
+					}
 				}
 				if (wn.getAttributes().getNamedItem("end") != null) {
-					localEnd = df.parse(wn.getAttributes().getNamedItem("end").getTextContent().trim());
+					try {
+						localEnd = df.parse(wn.getAttributes().getNamedItem("end").getTextContent().trim());
+					} catch (ParseException e) {
+						localEnd = fallbackFormat.parse(wn.getAttributes().getNamedItem("end").getTextContent().trim());
+					}
 				}
 				
 				String[] parties = wn.getTextContent().trim().split(",");
@@ -360,14 +388,19 @@ public class RandomFactionGenerator implements Serializable {
 	}
 	
 	private void addNeutralExceptions(String faction, Node node) throws DOMException, ParseException {
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		final Date epoch_start = df.parse("0001-01-01");
-		final Date epoch_end = df.parse("9999-12-31");
+		SimpleDateFormat df = MekHQOptions.getInstance().getDateFormatDataStorage();
+		SimpleDateFormat fallbackFormat = new SimpleDateFormat("yyyy-MM-dd");
+		final Date epoch_start = df.parse("0001-01-01 00:00:00");
+		final Date epoch_end = df.parse("9999-12-31 23:59:59");
 
 		Date start = epoch_start;
 		Date end = epoch_end;
 		if (node.getAttributes().getNamedItem("end") != null) {
-			end = df.parse(node.getAttributes().getNamedItem("end").getTextContent().trim());
+			try {
+				end = df.parse(node.getAttributes().getNamedItem("end").getTextContent().trim());
+			} catch (ParseException e) {
+				end = fallbackFormat.parse(node.getAttributes().getNamedItem("end").getTextContent().trim());				
+			}
 		}
 		for (int n = 0; n < node.getChildNodes().getLength(); n++) {
 			Node wn = node.getChildNodes().item(n);
@@ -375,10 +408,18 @@ public class RandomFactionGenerator implements Serializable {
 				Date localStart = start;
 				Date localEnd = end;
 				if (wn.getAttributes().getNamedItem("start") != null) {
-					localStart = df.parse(wn.getAttributes().getNamedItem("start").getTextContent().trim());
+					try {
+						localStart = df.parse(wn.getAttributes().getNamedItem("start").getTextContent().trim());
+					} catch (ParseException e) {
+						localStart = fallbackFormat.parse(wn.getAttributes().getNamedItem("start").getTextContent().trim());				
+					}
 				}
 				if (wn.getAttributes().getNamedItem("end") != null) {
-					localEnd = df.parse(wn.getAttributes().getNamedItem("end").getTextContent().trim());
+					try {
+						localEnd = df.parse(wn.getAttributes().getNamedItem("end").getTextContent().trim());
+					} catch (ParseException e) {
+						localEnd = fallbackFormat.parse(wn.getAttributes().getNamedItem("end").getTextContent().trim());				
+					}
 				}
 				
 				String[] parties = wn.getTextContent().trim().split(",");

@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.Objects;
 
 import mekhq.MekHQ;
+import mekhq.MekHQOptions;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 
@@ -42,7 +43,7 @@ public class LogEntry implements MekHqXmlSerializable {
     private String type;
     private Date date;
     private String desc;
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+    private static final SimpleDateFormat DATE_FORMAT = MekHQOptions.getInstance().getDateFormatDataStorage();
 
     public LogEntry() {
         this(null, "", null);

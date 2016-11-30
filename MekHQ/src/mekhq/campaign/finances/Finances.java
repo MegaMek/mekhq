@@ -30,6 +30,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import mekhq.MekHQ;
+import mekhq.MekHQOptions;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -178,7 +180,7 @@ public class Finances implements Serializable {
             asset.writeToXml(pw1, indent+1);
         }
 		if(null != wentIntoDebt) {
-    		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+    		SimpleDateFormat df = MekHQOptions.getInstance().getDateFormatDataStorage();
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "wentIntoDebt", df.format(wentIntoDebt));
 		}
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</finances>");
@@ -202,16 +204,19 @@ public class Finances implements Serializable {
                  retVal.loanDefaults = Integer.parseInt(wn2.getTextContent().trim());
              }
 			 else if (wn2.getNodeName().equalsIgnoreCase("wentIntoDebt")) {
-			     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-			     try {
-			         retVal.wentIntoDebt = df.parse(wn2.getTextContent().trim());
-			     } catch (DOMException e) {
-			         // TODO Auto-generated catch block
-			         e.printStackTrace();
-			     } catch (ParseException e) {
-			         // TODO Auto-generated catch block
-			         e.printStackTrace();
-			     }
+				 try {
+					 SimpleDateFormat df = MekHQOptions.getInstance().getDateFormatDataStorage();
+				     SimpleDateFormat fallbackFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+				     try {
+				         retVal.wentIntoDebt = df.parse(wn2.getTextContent().trim());
+				     } catch (ParseException pe) {
+				         retVal.wentIntoDebt = fallbackFormat.parse(wn2.getTextContent().trim());
+				     }
+				 } catch (ParseException e) {
+					 MekHQ.logError(e);
+				 } catch (DOMException e) {
+					 MekHQ.logError(e);
+				 }
 			 }
 		}
 

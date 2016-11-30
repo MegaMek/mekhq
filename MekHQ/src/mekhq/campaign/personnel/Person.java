@@ -23,6 +23,7 @@ package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -68,6 +69,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import mekhq.MekHQ;
+import mekhq.MekHQOptions;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -1121,7 +1123,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat df = MekHQOptions.getInstance().getDateFormatDataStorage();
 
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\""
                     + id.toString()
@@ -1449,9 +1451,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("spouse")) {
                     retVal.spouse = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("duedate")) {
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                    retVal.dueDate = (GregorianCalendar) GregorianCalendar.getInstance();
-                    retVal.dueDate.setTime(df.parse(wn2.getTextContent().trim()));
+                    SimpleDateFormat df = MekHQOptions.getInstance().getDateFormatDataStorage();
+                    SimpleDateFormat fallbackFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                    retVal.dueDate = (GregorianCalendar) GregorianCalendar.getInstance();                    
+                    try {
+                    	retVal.dueDate.setTime(df.parse(wn2.getTextContent().trim()));
+                    } catch (ParseException e) {
+                    	retVal.dueDate.setTime(fallbackFormat.parse(wn2.getTextContent().trim()));
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
                     retVal.teamId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
@@ -1514,13 +1521,23 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("overtimeLeft")) {
                     retVal.overtimeLeft = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("birthday")) {
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                    retVal.birthday = (GregorianCalendar) GregorianCalendar.getInstance();
-                    retVal.birthday.setTime(df.parse(wn2.getTextContent().trim()));
+                    SimpleDateFormat df = MekHQOptions.getInstance().getDateFormatDataStorage();
+                    SimpleDateFormat fallbackFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                    retVal.birthday = (GregorianCalendar) GregorianCalendar.getInstance();              
+                    try {
+                    	retVal.birthday.setTime(df.parse(wn2.getTextContent().trim()));
+                    } catch (ParseException e) {
+                    	retVal.birthday.setTime(fallbackFormat.parse(wn2.getTextContent().trim()));
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("deathday")) {
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                    retVal.deathday = (GregorianCalendar) GregorianCalendar.getInstance();
-                    retVal.deathday.setTime(df.parse(wn2.getTextContent().trim()));
+                    SimpleDateFormat df = MekHQOptions.getInstance().getDateFormatDataStorage();
+                    SimpleDateFormat fallbackFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                    retVal.deathday = (GregorianCalendar) GregorianCalendar.getInstance();              
+                    try {
+                    	retVal.deathday.setTime(df.parse(wn2.getTextContent().trim()));
+                    } catch (ParseException e) {
+                    	retVal.deathday.setTime(fallbackFormat.parse(wn2.getTextContent().trim()));
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
                     advantages = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {

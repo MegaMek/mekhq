@@ -47,6 +47,7 @@ import megamek.common.MechSummaryCache;
 import megamek.common.TargetRoll;
 import megamek.common.UnitType;
 import mekhq.MekHQ;
+import mekhq.MekHQOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
@@ -157,13 +158,20 @@ public class AtBConfiguration implements Serializable {
 				botLanceTables.put(key.replace("botLance.", ""), list);
 				break;
 			case "hiringHalls":
-				SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+				SimpleDateFormat df = MekHQOptions.getInstance().getDateFormatDataStorage();
+				SimpleDateFormat fallbackFormat = new SimpleDateFormat("yyyy-MM-dd");
 				for (String entry : property.split("\\|")) {
 					String[] fields = entry.split(",");
 					try {
+						try {
 						hiringHalls.add(new DatedRecord<>(fields[0].length() > 0? df.parse(fields[0]) : null,
 								fields[1].length() > 0? df.parse(fields[1]) : null,
 										fields[2]));
+						} catch (ParseException pe) {
+							hiringHalls.add(new DatedRecord<>(fields[0].length() > 0? df.parse(fields[0]) : null,
+									fields[1].length() > 0? fallbackFormat.parse(fields[1]) : null,
+											fields[2]));
+						}
 					} catch (ParseException ex) {
 						MekHQ.logError("Error parsing default date for hiring hall on " + fields[2]);
 						MekHQ.logError(ex);
@@ -438,7 +446,9 @@ public class AtBConfiguration implements Serializable {
 	}
 	
 	private void loadContractGenerationNodeFromXml(Node node) {
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat df = MekHQOptions.getInstance().getDateFormatDataStorage();
+		// for backward compability
+		SimpleDateFormat fallbackFormat = new SimpleDateFormat("yyyy-MM-dd");
 		
 		NodeList nl = node.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
@@ -454,10 +464,18 @@ public class AtBConfiguration implements Serializable {
 						Date end = null;
 						try {
 							if (wn2.getAttributes().getNamedItem("start") != null) {
-								start = new Date(df.parse(wn2.getAttributes().getNamedItem("start").getTextContent()).getTime());
+								try {
+									start = new Date(df.parse(wn2.getAttributes().getNamedItem("start").getTextContent()).getTime());
+								} catch(ParseException e) {
+									start = new Date(fallbackFormat.parse(wn2.getAttributes().getNamedItem("start").getTextContent()).getTime());
+								}
 							}
 							if (wn2.getAttributes().getNamedItem("end") != null) {
-								end = new Date(df.parse(wn2.getAttributes().getNamedItem("end").getTextContent()).getTime());
+								try {
+									end = new Date(df.parse(wn2.getAttributes().getNamedItem("end").getTextContent()).getTime());
+								} catch(ParseException e) {
+									end = new Date(fallbackFormat.parse(wn2.getAttributes().getNamedItem("end").getTextContent()).getTime());
+								}
 							}
 						} catch (ParseException ex) {
 							MekHQ.logError("Error parsing date for hiring hall on " + wn2.getTextContent());

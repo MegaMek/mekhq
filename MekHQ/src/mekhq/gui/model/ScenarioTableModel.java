@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import javax.swing.SwingConstants;
 
+import mekhq.MekHQOptions;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
 
@@ -64,8 +65,7 @@ public class ScenarioTableModel extends DataTableModel {
             if(null == scenario.getDate()) {
                 return "-";
             } else {
-                SimpleDateFormat shortDateFormat = new SimpleDateFormat("MM/dd/yyyy");
-                return shortDateFormat.format(scenario.getDate());
+                return MekHQOptions.getInstance().getDateFormatShort().format(scenario.getDate());
             }
         }
         if(col == COL_ASSIGN) {

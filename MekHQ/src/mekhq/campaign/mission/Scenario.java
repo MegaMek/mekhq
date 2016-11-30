@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import mekhq.MekHQ;
+import mekhq.MekHQOptions;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
@@ -259,7 +260,7 @@ public class Scenario implements Serializable {
     }
     
     protected void writeToXmlBegin(PrintWriter pw1, int indent) {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat df = MekHQOptions.getInstance().getDateFormatDataStorage();
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<scenario id=\""
                 +id
                 +"\" type=\""
@@ -316,7 +317,8 @@ public class Scenario implements Serializable {
         NamedNodeMap attrs = wn.getAttributes();
         Node classNameNode = attrs.getNamedItem("type");
         String className = classNameNode.getTextContent();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat df = MekHQOptions.getInstance().getDateFormatDataStorage();
+        SimpleDateFormat fallbackFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         
         try {
             // Instantiate the correct child class, and call its parsing function.
@@ -342,7 +344,11 @@ public class Scenario implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("forceStub")) {
                     retVal.stub = ForceStub.generateInstanceFromXML(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
-                    retVal.date = df.parse(wn2.getTextContent().trim());
+                	try {
+                		retVal.date = df.parse(wn2.getTextContent().trim());
+                	} catch (ParseException e) {
+                		retVal.date = fallbackFormat.parse(wn2.getTextContent().trim());
+                	}
                 } else if (wn2.getNodeName().equalsIgnoreCase("loots")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y=0; y<nl2.getLength(); y++) {

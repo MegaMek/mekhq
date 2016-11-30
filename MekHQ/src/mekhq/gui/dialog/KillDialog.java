@@ -28,6 +28,7 @@ import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQOptions;
 import mekhq.campaign.Kill;
 
 
@@ -201,8 +202,7 @@ public class KillDialog extends javax.swing.JDialog {
     }
     
     private String getDateAsString() {
-    	SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy");
-        return dateFormat.format(date);
+        return MekHQOptions.getInstance().getDateFormatShort().format(date);
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables

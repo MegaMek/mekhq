@@ -44,6 +44,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQOptions;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
@@ -69,7 +70,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private Hashtable<String, JCheckBox> skillChks = new Hashtable<String, JCheckBox>();
     private PilotOptions options;
     private GregorianCalendar birthdate;
-    private SimpleDateFormat dateFormat;
+    private SimpleDateFormat dateFormatLong;
     private Frame frame;
     
     private javax.swing.JButton btnClose;
@@ -115,7 +116,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         super(parent, modal);
         this.campaign = campaign;
         this.frame = parent;
-        this.dateFormat = new SimpleDateFormat("MMMM d yyyy");
+        this.dateFormatLong = MekHQOptions.getInstance().getDateFormatLong();
         this.person = person;
         initializePilotAndOptions();
         setLocationRelativeTo(parent);
@@ -886,7 +887,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     }
     
     private String getDateAsString() {
-        return dateFormat.format(birthdate.getTime());
+        return dateFormatLong.format(birthdate.getTime());
     }
     
     private void changeSkillValue(String type) {

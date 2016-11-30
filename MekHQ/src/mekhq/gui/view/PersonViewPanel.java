@@ -32,6 +32,7 @@ import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
+import mekhq.MekHQOptions;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.LogEntry;
@@ -395,8 +396,8 @@ public class PersonViewPanel extends JPanel {
         pnlStats.add(lblStatus2, gridBagConstraints);
 
         if (person.getDueDate() != null) {
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-            String DueDate = df.format(person.getDueDate().getTime());
+            SimpleDateFormat dateFormatShort = MekHQOptions.getInstance().getDateFormatShort();
+            String DueDate = dateFormatShort.format(person.getDueDate().getTime());
 
             firsty++;
             lblDuedate1.setName("lblDuedate1");

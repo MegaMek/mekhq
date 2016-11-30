@@ -34,6 +34,7 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQOptions;
 import mekhq.campaign.LogEntry;
 
 /**
@@ -168,7 +169,6 @@ public class EditLogEntryDialog extends javax.swing.JDialog {
     }
     
     private String getDateAsString() {
-    	SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy");
-        return dateFormat.format(date);
+        return MekHQOptions.getInstance().getDateFormatShort().format(date);
     }
 }

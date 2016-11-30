@@ -17,6 +17,7 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQOptions;
 import mekhq.campaign.Kill;
 
 public class PersonnelKillLogModel extends DataTableModel {
@@ -28,14 +29,14 @@ public class PersonnelKillLogModel extends DataTableModel {
     public final static int COL_TEXT = 1;
 
     private ResourceBundle resourceMap;
-    private SimpleDateFormat shortDateFormat;
+    private SimpleDateFormat dateFormatShort;
     private final int dateTextWidth;
 
     public PersonnelKillLogModel() {
         resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelKillLogModel", new EncodeControl()); //$NON-NLS-1$
-        shortDateFormat = new SimpleDateFormat(resourceMap.getString("date.format")); //$NON-NLS-1$
+        dateFormatShort = MekHQOptions.getInstance().getDateFormatShort();
         data = new ArrayList<Kill>();
-        dateTextWidth = getRenderer().metrics.stringWidth(shortDateFormat.format(new Date())) + 10;
+        dateTextWidth = getRenderer().metrics.stringWidth(dateFormatShort.format(new Date())) + 10;
     }
    
     @Override
@@ -65,7 +66,7 @@ public class PersonnelKillLogModel extends DataTableModel {
         Kill kill = getKill(row);
         switch(column) {
             case COL_DATE:
-                return shortDateFormat.format(kill.getDate());
+                return dateFormatShort.format(kill.getDate());
             case COL_TEXT:
                 return String.format(
                     resourceMap.getString("killDetail.format"), //$NON-NLS-1$

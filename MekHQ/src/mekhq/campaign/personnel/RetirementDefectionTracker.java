@@ -24,6 +24,7 @@ package mekhq.campaign.personnel;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -40,6 +41,7 @@ import megamek.common.TargetRoll;
 import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
 import mekhq.MekHQ;
+import mekhq.MekHQOptions;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -624,7 +626,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
         		+ "</payouts>");
 
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat df = MekHQOptions.getInstance().getDateFormatDataStorage();
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1,
         		"lastRetirementRoll", df.format(lastRetirementRoll.getTime()));
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</retirementDefectionTracker>");		
@@ -709,8 +711,13 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                 		}
                 	}
                 } else if (wn2.getNodeName().equalsIgnoreCase("lastRetirementRoll")) {
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                    retVal.lastRetirementRoll.setTime(df.parse(wn2.getTextContent().trim()));
+                    SimpleDateFormat df = MekHQOptions.getInstance().getDateFormatDataStorage();
+                    SimpleDateFormat fallbackFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    try {
+                    	retVal.lastRetirementRoll.setTime(df.parse(wn2.getTextContent().trim()));
+                    } catch (ParseException e) {
+                    	retVal.lastRetirementRoll.setTime(fallbackFormat.parse(wn2.getTextContent().trim()));
+                    }
                 }
             }
         } catch (Exception ex) {

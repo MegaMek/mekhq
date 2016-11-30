@@ -35,6 +35,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQOptions;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
@@ -161,7 +162,7 @@ public class AtBContractViewPanel extends JPanel {
         GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new GridBagLayout());
         
-        SimpleDateFormat shortDateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        SimpleDateFormat dateFormatShort = MekHQOptions.getInstance().getDateFormatShort();
         
         int y = 0;
         
@@ -329,7 +330,7 @@ public class AtBContractViewPanel extends JPanel {
         pnlStats.add(lblStartDate, gridBagConstraints);
         
         txtStartDate.setName("txtStartDate"); // NOI18N
-        txtStartDate.setText(shortDateFormat.format(contract.getStartDate()));
+        txtStartDate.setText(dateFormatShort.format(contract.getStartDate()));
         txtStartDate.setEditable(false);
         txtStartDate.setLineWrap(true);
         txtStartDate.setWrapStyleWord(true);
@@ -352,7 +353,7 @@ public class AtBContractViewPanel extends JPanel {
         pnlStats.add(lblEndDate, gridBagConstraints);
         
         txtEndDate.setName("txtEndDate"); // NOI18N
-        txtEndDate.setText(shortDateFormat.format(contract.getEndingDate()));
+        txtEndDate.setText(dateFormatShort.format(contract.getEndingDate()));
         txtEndDate.setEditable(false);
         txtEndDate.setLineWrap(true);
         txtEndDate.setWrapStyleWord(true);

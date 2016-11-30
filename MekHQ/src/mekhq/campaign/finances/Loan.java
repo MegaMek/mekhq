@@ -31,6 +31,8 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import megamek.common.Compute;
+import mekhq.MekHQ;
+import mekhq.MekHQOptions;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -396,7 +398,7 @@ public class Loan implements MekHqXmlSerializable {
                 +"<overdue>"
                 +overdue
                 +"</overdue>");
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat df = MekHQOptions.getInstance().getDateFormatDataStorage();
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "nextPayment", df.format(nextPayment.getTime()));
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</loan>");
     }
@@ -430,16 +432,19 @@ public class Loan implements MekHqXmlSerializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("nPayments")) {
                 retVal.nPayments = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("nextPayment")) {
-                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                retVal.nextPayment = (GregorianCalendar) GregorianCalendar.getInstance();
                 try {
-                    retVal.nextPayment.setTime(df.parse(wn2.getTextContent().trim()));
+                	SimpleDateFormat df = MekHQOptions.getInstance().getDateFormatDataStorage();
+                    SimpleDateFormat fallbackFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                    retVal.nextPayment = (GregorianCalendar) GregorianCalendar.getInstance();
+                    try {
+                        retVal.nextPayment.setTime(df.parse(wn2.getTextContent().trim()));
+                    } catch (ParseException e) {
+                    	retVal.nextPayment.setTime(fallbackFormat.parse(wn2.getTextContent().trim()));
+                    }
                 } catch (DOMException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                	MekHQ.logError(e);
                 } catch (ParseException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                	MekHQ.logError(e);
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("overdue")) {
                 if (wn2.getTextContent().equalsIgnoreCase("true"))
