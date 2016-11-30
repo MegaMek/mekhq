@@ -37,7 +37,6 @@ import java.awt.event.MouseEvent;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -65,10 +64,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
 import mekhq.MekHQ;
@@ -88,14 +83,11 @@ import mekhq.gui.view.Paperdoll;
 public class MedicalViewDialog extends JDialog {
     private static final long serialVersionUID = 6178230374580087883L;
     private static final String MENU_CMD_SEPARATOR = ","; //$NON-NLS-1$
-    private static final DateTimeFormatter DATE_FORMATTER =	DateTimeFormat
-    		.forPattern(MekHQOptions.getInstance().getDateFormatShort().toPattern())
-    		.withChronology(GJChronology.getInstanceUTC());
 
     private static final ExtraData.Key<String> DOCTOR_NOTES = new ExtraData.StringKey("doctor_notes"); //$NON-NLS-1$
     // TODO: Custom paper dolls
     private static final ExtraData.Key<String> PAPERDOLL = new ExtraData.StringKey("paperdoll_xml_file"); //$NON-NLS-1$
-
+    
     private final Campaign campaign;
     private final Person person;
     private ResourceBundle resourceMap = null;
@@ -481,13 +473,13 @@ public class MedicalViewDialog extends JDialog {
                     JLabel injLabel = null;
                     if(inj.getType().isPermanent()) {
                         injLabel = genWrittenText(String.format(resourceMap.getString("injuriesText.format"), //$NON-NLS-1$
-                            inj.getType().getSimpleName(), inj.getStart().toString(DATE_FORMATTER)));
+                            inj.getType().getSimpleName(), MekHQOptions.getInstance().getDateFormatShort().format(inj.getStart())));
                     } else if(inj.isPermanent() || (inj.getTime() <= 0)) {
                         injLabel = genWrittenText(String.format(resourceMap.getString("injuriesPermanent.format"), //$NON-NLS-1$
-                            inj.getType().getSimpleName(), inj.getStart().toString(DATE_FORMATTER)));
+                            inj.getType().getSimpleName(), MekHQOptions.getInstance().getDateFormatShort().format(inj.getStart())));
                     } else {
                         injLabel = genWrittenText(String.format(resourceMap.getString("injuriesTextAndDuration.format"), //$NON-NLS-1$
-                            inj.getType().getSimpleName(), inj.getStart().toString(DATE_FORMATTER), genTimePeriod(inj.getTime())));
+                            inj.getType().getSimpleName(), MekHQOptions.getInstance().getDateFormatShort().format(inj.getStart()), genTimePeriod(inj.getTime())));
                     }
                     if(isGMMode()) {
                         injLabel.addMouseListener(new InjuryLabelMouseAdapter(injLabel, p, inj));

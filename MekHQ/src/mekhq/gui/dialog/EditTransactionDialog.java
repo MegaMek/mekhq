@@ -11,9 +11,9 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
@@ -31,6 +31,7 @@ import javax.swing.text.NumberFormatter;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import mekhq.MekHQOptions;
 import mekhq.campaign.finances.Transaction;
 
 public class EditTransactionDialog extends JDialog implements ActionListener, FocusListener, MouseListener {
@@ -40,7 +41,7 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
      */
     private static final long serialVersionUID = -8742160448355293487L;
 
-    private final DateFormat LONG_DATE = DateFormat.getDateInstance(DateFormat.LONG);
+    private SimpleDateFormat dateFormatLong = MekHQOptions.getInstance().getDateFormatLong();
 
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddFundsDialog", new EncodeControl()); //$NON-NLS-1$
 
@@ -127,7 +128,7 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
         panel.add(amountField);
 
         c.gridx++;
-        dateButton = new JButton(LONG_DATE.format(newTransaction.getDate()));
+        dateButton = new JButton(dateFormatLong.format(newTransaction.getDate()));
         dateButton.addActionListener(this);
         l.setConstraints(dateButton, c);
         panel.add(dateButton);
@@ -183,7 +184,7 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
             newTransaction.setCategory(Transaction.getCategoryIndex((String) categoryCombo.getSelectedItem()));
             newTransaction.setDescription(descriptionField.getText());
             try {
-                newTransaction.setDate(LONG_DATE.parse(dateButton.getText()));
+                newTransaction.setDate(dateFormatLong.parse(dateButton.getText()));
             } catch (ParseException e1) {
                 e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
@@ -196,7 +197,7 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
             calendar.setTime(newTransaction.getDate());
             DateChooser chooser = new DateChooser(parent, calendar);
             chooser.showDateChooser();
-            dateButton.setText(LONG_DATE.format(chooser.getDate().getTime()));
+            dateButton.setText(dateFormatLong.format(chooser.getDate().getTime()));
             chooser.dispose();
         }
     }
