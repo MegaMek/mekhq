@@ -18,6 +18,8 @@
  */
 package mekhq.adapter;
 
+import java.time.format.DateTimeParseException;
+
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.joda.time.DateTime;
@@ -25,17 +27,26 @@ import org.joda.time.chrono.GJChronology;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-public class DateAdapter extends XmlAdapter<String, DateTime> {
-    private final static DateTimeFormatter FORMATTER =
-        DateTimeFormat.forPattern("yyyy-MM-dd").withChronology(GJChronology.getInstanceUTC());
-    
-    @Override
-    public DateTime unmarshal(final String xml) throws Exception {
-        return FORMATTER.parseDateTime(xml);
-    }
+import mekhq.MekHQOptions;
 
-    @Override
-    public String marshal(final DateTime object) throws Exception {
-        return object.toString(FORMATTER);
-    }
+public class DateAdapter extends XmlAdapter<String, DateTime> {
+	private final static DateTimeFormatter FORMATTER =
+			DateTimeFormat.forPattern(MekHQOptions.getInstance().getDateFormatDataStorage().toPattern())
+			.withChronology(GJChronology.getInstanceUTC());
+	private final static DateTimeFormatter FORMATTER_FALLBACK =
+			DateTimeFormat.forPattern("yyyy-MM-dd").withChronology(GJChronology.getInstanceUTC());
+
+	@Override
+	public DateTime unmarshal(final String xml) throws Exception {
+		try {
+			return FORMATTER.parseDateTime(xml);
+		} catch (DateTimeParseException e) {
+			return FORMATTER_FALLBACK.parseDateTime(xml);
+		}
+	}
+
+	@Override
+	public String marshal(final DateTime object) throws Exception {
+		return object.toString(FORMATTER);
+	}
 }
