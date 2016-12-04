@@ -150,7 +150,9 @@ public class CampaignOptions implements Serializable {
     //contract related
     private boolean equipmentContractBase;
     private double equipmentContractPercent;
-    private double largeCraftContractPercent;
+    private double dropshipContractPercent;
+    private double jumpshipContractPercent;
+    private double warshipContractPercent;
     private boolean equipmentContractSaleValue;
     private boolean blcSaleValue;
 
@@ -357,7 +359,9 @@ public class CampaignOptions implements Serializable {
         acquireMinimumTimeUnit = TRANSIT_UNIT_MONTH;
         equipmentContractBase = false;
         equipmentContractPercent = 5.0;
-        largeCraftContractPercent = 1.0;
+        dropshipContractPercent = 1.0;
+        jumpshipContractPercent = 0.0;
+        warshipContractPercent = 0.0;
         equipmentContractSaleValue = false;
         blcSaleValue = false;
         clanAcquisitionPenalty = 0;
@@ -1205,12 +1209,28 @@ public class CampaignOptions implements Serializable {
         this.equipmentContractSaleValue = b;
     }
 
-    public double getLargeCraftContractPercent() {
-        return largeCraftContractPercent;
+    public double getDropshipContractPercent() {
+        return dropshipContractPercent;
     }
 
-    public void setLargeCraftContractPercent(double b) {
-        largeCraftContractPercent = b;
+    public void setDropshipContractPercent(double b) {
+        dropshipContractPercent = b;
+    }
+
+    public double getJumpshipContractPercent() {
+        return jumpshipContractPercent;
+    }
+
+    public void setJumpshipContractPercent(double b) {
+        jumpshipContractPercent = b;
+    }
+
+    public double getWarshipContractPercent() {
+        return warshipContractPercent;
+    }
+
+    public void setWarshipContractPercent(double b) {
+        warshipContractPercent = b;
     }
 
     public boolean useBLCSaleValue() {
@@ -1984,7 +2004,9 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquireMinimumTime", acquireMinimumTime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquireMinimumTimeUnit", acquireMinimumTimeUnit);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentContractPercent", equipmentContractPercent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "largeCraftContractPercent", largeCraftContractPercent);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "dropshipContractPercent", dropshipContractPercent);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "jumpshipContractPercent", jumpshipContractPercent);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "warshipContractPercent", warshipContractPercent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentContractBase", equipmentContractBase);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentContractSaleValue", equipmentContractSaleValue);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "blcSaleValue", blcSaleValue);
@@ -2294,8 +2316,12 @@ public class CampaignOptions implements Serializable {
                 retVal.isAcquisitionPenalty = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractPercent")) {
                 retVal.equipmentContractPercent = Double.parseDouble(wn2.getTextContent().trim());
-            } else if (wn2.getNodeName().equalsIgnoreCase("largeCraftContractPercent")) {
-                retVal.largeCraftContractPercent = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("dropshipContractPercent")) {
+                retVal.dropshipContractPercent = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("jumpshipContractPercent")) {
+                retVal.jumpshipContractPercent = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("warshipContractPercent")) {
+                retVal.warshipContractPercent = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractBase")) {
                 retVal.equipmentContractBase = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractSaleValue")) {

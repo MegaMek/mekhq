@@ -250,7 +250,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JRadioButton btnContractEquipment;
     private JRadioButton btnContractPersonnel;
     private JSpinner spnEquipPercent;
-    private JSpinner spnLargeCraftPercent;
+    private JSpinner spnDropshipPercent;
+    private JSpinner spnJumpshipPercent;
+    private JSpinner spnWarshipPercent;
     private JCheckBox chkEquipContractSaleValue;
     private JCheckBox chkBLCSaleValue;
     private JSpinner spnOrderRefund;
@@ -1906,9 +1908,17 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         spnEquipPercent = new JSpinner(new SpinnerNumberModel(options.getEquipmentContractPercent(), 0.1, 20, 0.1));
         ((JSpinner.DefaultEditor) spnEquipPercent.getEditor()).getTextField().setEditable(false);
 
-        spnLargeCraftPercent = new JSpinner(new SpinnerNumberModel(options.getLargeCraftContractPercent(), 0.0, 1.0, 0.1));
-        spnLargeCraftPercent.setEditor(new JSpinner.NumberEditor(spnLargeCraftPercent, "0.0"));
-        ((JSpinner.DefaultEditor) spnLargeCraftPercent.getEditor()).getTextField().setEditable(false);
+        spnDropshipPercent = new JSpinner(new SpinnerNumberModel(options.getDropshipContractPercent(), 0.0, 1.0, 0.1));
+        spnDropshipPercent.setEditor(new JSpinner.NumberEditor(spnDropshipPercent, "0.0"));
+        ((JSpinner.NumberEditor) spnDropshipPercent.getEditor()).getTextField().setEditable(false);
+
+        spnJumpshipPercent = new JSpinner(new SpinnerNumberModel(options.getJumpshipContractPercent(), 0.0, 1.0, 0.1));
+        spnJumpshipPercent.setEditor(new JSpinner.NumberEditor(spnJumpshipPercent, "0.0"));
+        ((JSpinner.DefaultEditor) spnJumpshipPercent.getEditor()).getTextField().setEditable(false);
+
+        spnWarshipPercent = new JSpinner(new SpinnerNumberModel(options.getWarshipContractPercent(), 0.0, 1.0, 0.1));
+        spnWarshipPercent.setEditor(new JSpinner.NumberEditor(spnWarshipPercent, "0.0"));
+        ((JSpinner.DefaultEditor) spnWarshipPercent.getEditor()).getTextField().setEditable(false);
 
         ButtonGroup groupContract = new ButtonGroup();
         groupContract.add(btnContractEquipment);
@@ -1953,17 +1963,45 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.insets = new Insets(5, 30, 5, 5);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(new JLabel("Large Craft Percent:"), gridBagConstraints);
+        panMercenary.add(new JLabel("Dropship Percent:"), gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         //gridBagConstraints.weightx = 1.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(spnLargeCraftPercent, gridBagConstraints);
+        panMercenary.add(spnDropshipPercent, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 30, 5, 5);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panMercenary.add(new JLabel("Jumpship Percent:"), gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        //gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panMercenary.add(spnJumpshipPercent, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 30, 5, 5);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panMercenary.add(new JLabel("Warship Percent:"), gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        //gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panMercenary.add(spnWarshipPercent, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 3;
         //gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
@@ -4275,7 +4313,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         options.setEquipmentContractBase(btnContractEquipment.isSelected());
         options.setEquipmentContractPercent((Double) spnEquipPercent.getModel().getValue());
-        options.setLargeCraftContractPercent((Double) spnLargeCraftPercent.getModel().getValue());
+        options.setDropshipContractPercent((Double) spnDropshipPercent.getModel().getValue());
+        options.setJumpshipContractPercent((Double) spnJumpshipPercent.getModel().getValue());
+        options.setWarshipContractPercent((Double) spnWarshipPercent.getModel().getValue());
         options.setEquipmentContractSaleValue(chkEquipContractSaleValue.isSelected());
         options.setBLCSaleValue(chkBLCSaleValue.isSelected());
 
