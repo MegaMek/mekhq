@@ -3871,4 +3871,17 @@ public class Unit implements MekHqXmlSerializable {
         }
         return "Unit for Entity: " + entName;
     }
+
+    public int getTechRating() {
+        int techRating = 0;
+        for(Part p : parts) {
+            int tempRating = p.getTechRating();
+            
+            if (tempRating > techRating) {
+                techRating = tempRating;
+            }
+        }
+        return techRating;
+    }
+
 }
