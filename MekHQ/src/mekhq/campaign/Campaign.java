@@ -2744,6 +2744,7 @@ public class Campaign implements Serializable {
             u.remove(person, true);
         }
         removeAllPatientsFor(person);
+        removeAllTechJobsFor(person);
 
         if (log) {
             addReport(person.getFullTitle()
@@ -2788,6 +2789,25 @@ public class Campaign implements Serializable {
                         .getNaturalHealingWaitingPeriod());
             }
         }
+    }
+    
+    public void removeAllTechJobsFor(Person tech) {
+    	if (tech == null || tech.getId() == null) {
+    		return;
+    	}
+    	for (Unit u : units) {
+    		if (tech.getId().equals(u.getTechId())) {
+    			u.removeTech();
+    		}
+    		if (u.getRefit() != null && tech.getId().equals(u.getRefit().getTeamId())) {
+    			u.getRefit().setTeamId(null);
+    		}
+    	}
+    	for (Part p : parts) {
+    		if (tech.getId().equals(p.getTeamId())) {
+    			p.setTeamId(null);
+    		}
+    	}
     }
 
     public void removeScenario(int id) {
