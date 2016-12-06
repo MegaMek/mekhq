@@ -375,7 +375,7 @@ public class ImageChoiceDialog extends JDialog {
                 }
             });
             tableBackgrounds.setRowHeight(76);
-            tableBackgrounds.getColumnModel().getColumn(0).setCellRenderer(specialModel.getRenderer());
+            tableBackgrounds.getColumnModel().getColumn(0).setCellRenderer(backgroundsModel.getRenderer());
             tableBackgrounds.addMouseListener(new ImageTableMouseAdapter());
             scrBackgrounds.setViewportView(tableBackgrounds);
             panelBackgrounds.add(scrBackgrounds, gbc);
@@ -398,7 +398,7 @@ public class ImageChoiceDialog extends JDialog {
                 }
             });
             tableLogos.setRowHeight(76);
-            tableLogos.getColumnModel().getColumn(0).setCellRenderer(specialModel.getRenderer());
+            tableLogos.getColumnModel().getColumn(0).setCellRenderer(logosModel.getRenderer());
             tableLogos.addMouseListener(new ImageTableMouseAdapter());
             scrLogos.setViewportView(tableLogos);
             panelLogos.add(scrLogos, gbc);

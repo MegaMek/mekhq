@@ -15,7 +15,7 @@ v0.41.27-git
 + Overhaul of Mass Repair/Salvage and adding Mass Repair to warehouse
 + Issue #239: Be smarter about clearing assignments when removing personnel from units and vice versa.
 + Issue #252: Enable 'remove all personnel' when selecting multiple units in the hangar 
-+ Issue #237: Remove Tech From Lance assignments upon retiring
++ Issue #239: Techs stuck on assignment (also #237, #261).
 
 v0.41.26 (2016-11-02 02:00 UTC)
 + Issue #204: AtB generates empty unit markets with traditional RATS
