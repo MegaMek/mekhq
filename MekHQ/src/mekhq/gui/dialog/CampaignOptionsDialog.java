@@ -1905,7 +1905,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             btnContractPersonnel.setSelected(true);
         }
 
-        spnEquipPercent = new JSpinner(new SpinnerNumberModel(options.getEquipmentContractPercent(), 0.1, 20, 0.1));
+        spnEquipPercent = new JSpinner(new SpinnerNumberModel(options.getEquipmentContractPercent(), 0.1, 5.0, 0.1));
+        spnEquipPercent.setEditor(new JSpinner.NumberEditor(spnEquipPercent, "0.0"));
         ((JSpinner.DefaultEditor) spnEquipPercent.getEditor()).getTextField().setEditable(false);
 
         spnDropshipPercent = new JSpinner(new SpinnerNumberModel(options.getDropshipContractPercent(), 0.0, 1.0, 0.1));

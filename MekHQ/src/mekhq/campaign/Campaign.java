@@ -92,6 +92,7 @@ import megamek.common.Protomech;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
+import megamek.common.Warship;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.logging.LogLevel;
@@ -7344,17 +7345,36 @@ public class Campaign implements Serializable {
             if (noInfantry && u.getEntity() instanceof Infantry && !(u.getEntity() instanceof BattleArmor)) {
             	continue;
             }
-            // lets exclude dropships and jumpships
-            if (u.getEntity() instanceof Dropship
-                || u.getEntity() instanceof Jumpship) {
-                continue;
-            }
-            // we will assume sale value for now, but make this customizable
-            if (getCampaignOptions().useEquipmentContractSaleValue()) {
-                value += u.getSellValue();
+            if (getCampaignOptions().getDropshipContractPercent() != 0 && u.getEntity() instanceof Dropship) {
+                // we will assume sale value for now, but make this customizable
+                if (getCampaignOptions().useEquipmentContractSaleValue()) {
+                    value += (getCampaignOptions().getDropshipContractPercent() / 100) * u.getSellValue();
+                } else {
+                    value += (getCampaignOptions().getDropshipContractPercent() / 100) * u.getBuyCost();
+                }
+            } else if (getCampaignOptions().getWarshipContractPercent() != 0 && u.getEntity() instanceof Warship) {
+                // we will assume sale value for now, but make this customizable
+                if (getCampaignOptions().useEquipmentContractSaleValue()) {
+                    value += (getCampaignOptions().getWarshipContractPercent() / 100) * u.getSellValue();
+                } else {
+                    value += (getCampaignOptions().getWarshipContractPercent() / 100) * u.getBuyCost();
+                }
+            } else if (getCampaignOptions().getJumpshipContractPercent() != 0 && u.getEntity() instanceof Jumpship) {
+                // we will assume sale value for now, but make this customizable
+                if (getCampaignOptions().useEquipmentContractSaleValue()) {
+                    value += (getCampaignOptions().getJumpshipContractPercent() / 100) * u.getSellValue();
+                } else {
+                    value += (getCampaignOptions().getJumpshipContractPercent() / 100) * u.getBuyCost();
+                }
             } else {
-                value += u.getBuyCost();
+                // we will assume sale value for now, but make this customizable
+                if (getCampaignOptions().useEquipmentContractSaleValue()) {
+                    value += (getCampaignOptions().getEquipmentContractPercent() / 100.0) * u.getSellValue();
+                } else {
+                    value += (getCampaignOptions().getEquipmentContractPercent() / 100.0) * u.getBuyCost();
+                }
             }
+
         }
         return value;
     }
