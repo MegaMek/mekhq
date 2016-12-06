@@ -105,9 +105,14 @@ public class Ancestors implements Serializable, MekHqXmlSerializable {
 		if (depth > 4) {
 			return false;
 		}
-		
+
 		depth++;
-		
+
+        // Don't forget the null check on anc
+        if (anc == null) {
+            return false;
+        }
+
 		// Nulls means we can't possibly have a match, eh?
 		if ((fatherID == null && motherID == null)
 				|| (anc.getFatherID() == null && anc.getMotherID() == null)){
