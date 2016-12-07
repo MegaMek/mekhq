@@ -2808,6 +2808,11 @@ public class Campaign implements Serializable {
     			p.setTeamId(null);
     		}
     	}
+    	for (Force f : forceIds.values()) {
+    		if (tech.getId().equals(f.getTechID())) {
+    			f.setTechID(null);
+    		}
+    	}
     }
 
     public void removeScenario(int id) {

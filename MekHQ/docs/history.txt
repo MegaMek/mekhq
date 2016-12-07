@@ -1,6 +1,7 @@
 VERSION HISTORY:
 ----------------
 v0.41.28
++Issue #237: Remove Tech From Lance assignments upon retiring
 
 v0.41.27 (2016-12-07 03:00 UTC)
 + PR #232: "Advanced Medical" refactor - new medical dialogue, lots of under-the-hood improvements
@@ -17,7 +18,7 @@ v0.41.27 (2016-12-07 03:00 UTC)
 + Overhaul of Mass Repair/Salvage and adding Mass Repair to warehouse
 + Issue #239: Be smarter about clearing assignments when removing personnel from units and vice versa.
 + Issue #252: Enable 'remove all personnel' when selecting multiple units in the hangar 
-+ Issue #239: Techs stuck on assignment (also #237, #261).
++ Issue #239: Techs stuck on assignment (also #261).
 + Issue #231: IndexOutOfBoundsException in Layered Icon editor
 + Issue #224: Mechs with bad hip/shoulder do not show in repair bay if IS undamaged
 + Updated MegaMek.jar and MegaMekLab.jar to 0.41.27
