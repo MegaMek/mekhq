@@ -633,6 +633,9 @@ public class PersonViewPanel extends JPanel {
             revalidate();
             initComponents();
             revalidate();
+            campaign.getApp().getCampaigngui().refreshDoctorsList();
+            campaign.getApp().getCampaigngui().refreshPatientList();
+            campaign.getApp().getCampaigngui().refreshPersonnelView();
         });
         medicalButton.setMaximumSize(new Dimension(32, 32));
         medicalButton.setMargin(new Insets(0, 0, 0, 0));
