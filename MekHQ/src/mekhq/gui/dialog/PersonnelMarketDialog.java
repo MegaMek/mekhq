@@ -60,6 +60,7 @@ public class PersonnelMarketDialog extends JDialog {
     private PersonnelMarket personnelMarket;
     boolean addToCampaign;
     Person selectedPerson = null;
+    @SuppressWarnings("unused")
     private DirectoryItems portraits;
     private long unitCost = 0;
 

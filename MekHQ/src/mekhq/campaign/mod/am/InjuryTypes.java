@@ -288,7 +288,6 @@ public final class InjuryTypes {
                 + loc.readableName;
         }
         
-        @SuppressWarnings("incomplete-switch")
         @Override
         public Collection<Modifier> getModifiers(Injury inj) {
             BodyLocation loc = inj.getLocation();
@@ -432,7 +431,6 @@ public final class InjuryTypes {
             return Arrays.asList(newResetRecoveryTimeAction(i));
         }
         
-        @SuppressWarnings("incomplete-switch")
         @Override
         public Collection<Modifier> getModifiers(Injury inj) {
             BodyLocation loc = inj.getLocation();
@@ -594,7 +592,6 @@ public final class InjuryTypes {
             return "A sprained " + loc.readableName;
         }
         
-        @SuppressWarnings("incomplete-switch")
         @Override
         public Collection<Modifier> getModifiers(Injury inj) {
             BodyLocation loc = inj.getLocation();

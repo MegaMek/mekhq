@@ -93,6 +93,7 @@ public class MedicalViewDialog extends JDialog {
 
     private static final ExtraData.Key<String> DOCTOR_NOTES = new ExtraData.StringKey("doctor_notes"); //$NON-NLS-1$
     // TODO: Custom paper dolls
+    @SuppressWarnings("unused")
     private static final ExtraData.Key<String> PAPERDOLL = new ExtraData.StringKey("paperdoll_xml_file"); //$NON-NLS-1$
 
     private final Campaign campaign;

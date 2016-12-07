@@ -288,7 +288,7 @@ public class Injury {
         }
     }
     
-    @SuppressWarnings({ "unused", "incomplete-switch" })
+    @SuppressWarnings({ "unused" })
     private void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
         // Fix old-style "hits" into "severity".
         if(version < 1) {

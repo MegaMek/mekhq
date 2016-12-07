@@ -33,7 +33,6 @@ import megamek.common.Aero;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.Mech;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.GameEffect;
 import mekhq.campaign.LogEntry;
