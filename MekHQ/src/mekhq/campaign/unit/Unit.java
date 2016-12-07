@@ -3894,6 +3894,79 @@ public class Unit implements MekHqXmlSerializable {
     public long getSparePartsCost() {
         long partsCost = 0;
 
+        entity = getEntity();
+        if (isMothballed()) {
+            return partsCost;
+        }
+        if ((entity instanceof Jumpship) || (entity instanceof SpaceStation)) {
+            partsCost += ((long)entity.getWeight()) * .0001 * 15000;
+        } else if (entity instanceof Aero) {
+            partsCost += ((long)entity.getWeight()) * .001 * 15000;
+        } else if (entity instanceof Tank) {
+            partsCost += ((long)entity.getWeight()) * .001 * 8000;
+        } else if ((entity instanceof Mech) || (entity instanceof BattleArmor)
+                || ((Infantry) entity).isMechanized()) {
+            partsCost += ((long)entity.getWeight()) * .001 * 10000;
+        } else if (entity instanceof Infantry) {
+            partsCost += ((long)entity.getWeight()) * .01 * 10000;
+        } else {
+            // Only protomechs should fall here. Anything else needs to be logged
+            if (!(entity instanceof Protomech)) {
+                MekHQ.logMessage(getName() + " has no Spare Parts value for unit type " 
+                        + Entity.getEntityTypeName(entity.getEntityType()), 5);
+            }
+        }
+
+        // Handle cost for quirks if used
+        if (entity.hasQuirk("easy_maintain")) {
+            partsCost = (long)(partsCost * .8);
+        }
+        if (entity.hasQuirk("difficult_maintain")) {
+            partsCost = (long)(partsCost * 1.25);
+        }
+        if (entity.hasQuirk("non_standard")) {
+            partsCost = (long)(partsCost * 2.0);
+        }
+        // TODO Obsolete quirk
+
+        // Now for extended parts cost modifiers
+        if (campaign.getCampaignOptions().useExtendedPartsModifier()) {
+            Engine en = entity.getEngine();
+            int currentYear = campaign.getCalendar().get(Calendar.YEAR);
+            int rating = getTechRating();
+            if ((currentYear > 2859) && (currentYear < 3040)) {
+                if (rating > 3) {
+                    partsCost = (long)(partsCost * 5.0);
+                }
+            }
+            if (rating == 4) {
+                partsCost = (long)(partsCost * 1.1);
+            }
+            if (rating == 5) {
+                partsCost = (long)(partsCost * 1.25);
+            }
+            if ((entity instanceof Tank)
+                    && (en.getEngineType() == Engine.NORMAL_ENGINE)) {
+                partsCost = (long)(partsCost * 2.0);
+            }
+            if (!(entity instanceof Infantry)) {
+                if ((en.getEngineType() == Engine.XL_ENGINE)
+                        || (en.getEngineType() == Engine.XXL_ENGINE)) {
+                    partsCost = (long)(partsCost * 2.5);
+                }
+                if (en.getEngineType() == Engine.LIGHT_ENGINE) {
+                    partsCost = (long)(partsCost * 1.5);
+                }
+            }
+            if (entity.isClan()) {
+                if ((currentYear >3048) && (currentYear < 3071)) {
+                    partsCost = (long)(partsCost * 5.0);
+                } else if (currentYear > 3070) {
+                    partsCost = (long)(partsCost * 4.0);
+                }
+            }
+        }
+
         return partsCost;
     }
 
