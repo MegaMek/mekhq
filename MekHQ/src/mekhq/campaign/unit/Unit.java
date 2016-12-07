@@ -3973,6 +3973,13 @@ public class Unit implements MekHqXmlSerializable {
     public long getAmmoCost() {
         long ammoCost = 0;
 
+        for (Part p : getParts()) {
+            if (p instanceof EquipmentPart && ((EquipmentPart)p).getType() instanceof AmmoType) {
+                ammoCost += p.getStickerPrice();
+            }
+        }
+        ammoCost = (long)(ammoCost * .25);
+
         return ammoCost;
     }
 
