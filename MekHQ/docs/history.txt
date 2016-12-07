@@ -2,7 +2,7 @@ VERSION HISTORY:
 ----------------
 v0.41.28
 
-v0.41.27
+v0.41.27 (2016-12-07 03:00 UTC)
 + PR #232: "Advanced Medical" refactor - new medical dialogue, lots of under-the-hood improvements
 + Allowing twins, triplets, quadruplets ... and so on to be born
 + Recording the biological father of children at conception time
