@@ -720,7 +720,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
             }
-            if (oneSelected && !unit.isMothballed()) {
+            if (oneSelected && !unit.isMothballed() && gui.getCampaign().getCampaignOptions().usePeacetimeCost()) {
                 menuItem = new JMenuItem("Show Monthly Supply Cost Report");
                 menuItem.setActionCommand("SUPPLY_COST");
                 menuItem.addActionListener(this);
