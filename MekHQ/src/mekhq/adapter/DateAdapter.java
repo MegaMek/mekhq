@@ -18,8 +18,6 @@
  */
 package mekhq.adapter;
 
-import java.time.format.DateTimeParseException;
-
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.joda.time.DateTime;
@@ -32,17 +30,21 @@ import mekhq.MekHQOptions;
 public class DateAdapter extends XmlAdapter<String, DateTime> {
 	private final static DateTimeFormatter FORMATTER =
 			DateTimeFormat.forPattern(MekHQOptions.getInstance().getDateFormatDataStorage().toPattern())
-			.withChronology(GJChronology.getInstanceUTC());
+			.withChronology(GJChronology.getInstanceUTC());	
 	private final static DateTimeFormatter FORMATTER_FALLBACK =
-			DateTimeFormat.forPattern("yyyy-MM-dd").withChronology(GJChronology.getInstanceUTC());
+			DateTimeFormat.forPattern("yyyy-MM-dd").withChronology(GJChronology.getInstanceUTC());	
 
 	@Override
 	public DateTime unmarshal(final String xml) throws Exception {
-		try {
-			return FORMATTER.parseDateTime(xml);
-		} catch (DateTimeParseException e) {
-			return FORMATTER_FALLBACK.parseDateTime(xml);
+		DateTime result = null;
+		
+		if(xml.length() > 10) {
+			result = FORMATTER.parseDateTime(xml);
+		} else {
+			result = FORMATTER_FALLBACK.parseDateTime(xml);
 		}
+		
+		return result;
 	}
 
 	@Override
