@@ -28,22 +28,22 @@ import org.joda.time.format.DateTimeFormatter;
 import mekhq.MekHQOptions;
 
 public class DateAdapter extends XmlAdapter<String, DateTime> {
-	private final static DateTimeFormatter FORMATTER =
-			DateTimeFormat.forPattern(MekHQOptions.getInstance().getDateFormatDataStorage().toPattern())
-			.withChronology(GJChronology.getInstanceUTC());	
-	private final static DateTimeFormatter FORMATTER_FALLBACK =
-			DateTimeFormat.forPattern("yyyy-MM-dd").withChronology(GJChronology.getInstanceUTC());	
+	private final static DateTimeFormatter FORMATTER = DateTimeFormat
+			.forPattern(MekHQOptions.getInstance().getDateFormatDataStorage().toPattern())
+			.withChronology(GJChronology.getInstanceUTC());
+	private final static DateTimeFormatter FORMATTER_FALLBACK = DateTimeFormat.forPattern("yyyy-MM-dd")
+			.withChronology(GJChronology.getInstanceUTC());
 
 	@Override
 	public DateTime unmarshal(final String xml) throws Exception {
 		DateTime result = null;
-		
-		if(xml.length() > 10) {
+
+		if (xml.length() > 10) {
 			result = FORMATTER.parseDateTime(xml);
 		} else {
 			result = FORMATTER_FALLBACK.parseDateTime(xml);
 		}
-		
+
 		return result;
 	}
 
