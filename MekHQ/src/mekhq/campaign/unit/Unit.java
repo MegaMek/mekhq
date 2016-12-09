@@ -3986,6 +3986,112 @@ public class Unit implements MekHqXmlSerializable {
     public long getFuelCost() {
         long fuelCost = 0;
 
+        if ((entity instanceof Warship) || (entity instanceof SmallCraft) ) {
+            fuelCost += ((long)getTonsBurnDay(entity));
+        } else if (entity instanceof Jumpship) {
+            fuelCost += ((long)getTonsBurnDay(entity));// * 3 * 15000;
+        } else if (entity instanceof ConvFighter) {
+            fuelCost += getFighterFuelCost(entity);
+        } else if (entity instanceof megamek.common.Aero) {
+            fuelCost += ((long)((Aero) entity).getFuelTonnage()) * 4 * 15000;
+        } else if ((entity instanceof Tank) || (entity instanceof Mech)) {
+            fuelCost += getVehicleFuelCost(entity);
+        } else if (entity instanceof Infantry) {
+            fuelCost += getInfantryFuelCost(entity);
+        }
+
         return fuelCost;
+    }
+
+    public double getTonsBurnDay(Entity e) {
+        double tonsburnday = 0;
+        if (e instanceof Dropship) {
+            if (((SmallCraft) e).getDesignType() != Dropship.MILITARY) {
+                if (e.getWeight() < 1000) {
+                    tonsburnday = 1.84;
+                } else if (e.getWeight() < 4000) {
+                    tonsburnday = 2.82;
+                } else if (e.getWeight() < 9000) {
+                    tonsburnday = 3.37;
+                } else if (e.getWeight() < 20000) {
+                    tonsburnday = 4.22;
+                } else if (e.getWeight() < 30000) {
+                    tonsburnday = 6.52;
+                } else if (e.getWeight() < 40000) {
+                    tonsburnday = 7.71;
+                } else if (e.getWeight() < 50000) {
+                    tonsburnday = 7.74;
+                } else if (e.getWeight() < 70000) {
+                    tonsburnday = 8.37;
+                } else {
+                    tonsburnday = 8.83;
+                }
+            } else {
+                tonsburnday = 1.84;
+            }
+            return  (tonsburnday * 15 * 15000);
+        } else if ((e instanceof SmallCraft)) {
+            return (1.84 * 15 * 15000);
+        } else if (e instanceof megamek.common.Jumpship) {
+            if (e.getWeight() < 50000) {
+                tonsburnday = 2.82;
+            } else if (e.getWeight() < 100000) {
+                tonsburnday = 9.77;
+            } else if (e.getWeight() < 200000) {
+                tonsburnday = 19.75;
+            } else {
+                tonsburnday = 39.52;
+            }
+            if (e instanceof megamek.common.Warship) {
+                return (tonsburnday * 15 * 15000);
+            }
+            return (tonsburnday * 3 * 15000);
+        }        
+        return tonsburnday;
+    }
+
+    public double getFighterFuelCost(Entity e) {
+        Engine en = e.getEngine();
+        if (en.isFusion()) {
+            return ((Aero) e).getFuelTonnage() * 4 * 15000;
+        } else {
+            return ((Aero) e).getFuelTonnage() * 4 * 1000;
+        }
+    }
+
+    public double getVehicleFuelCost(Entity e) {
+        Engine en = e.getEngine();
+        if (e instanceof SupportTank) {
+            if (en.getEngineType() == Engine.FUEL_CELL) {
+                return (((SupportTank) e).getFuelTonnage() * 15000 * 4);
+            } else if (en.getEngineType() == Engine.COMBUSTION_ENGINE) {
+                return (((SupportTank) e).getFuelTonnage() * 1000 * 4);
+            } else {
+                return 0;
+            }
+        } else {
+            if (en.getEngineType() == Engine.FUEL_CELL) {
+                return (en.getWeightEngine(e) *.1 * 15000 * 4);
+            } else if (en.getEngineType() == Engine.COMBUSTION_ENGINE) {
+                return (en.getWeightEngine(e) *.1 * 1000 * 4);
+            } else {
+                return 0;
+            }
+        }
+    }
+
+    public double getInfantryFuelCost(Entity e) {
+        if (e instanceof BattleArmor) {
+            if (e.getJumpMP() > 0) {
+                return (e.getWeight() * .02 * 1000 * 4);
+            } else {
+                return 0;
+            }
+        }
+        if (e.getMovementMode() == EntityMovementMode.INF_LEG) {
+            return 0;
+        } else {
+            return (e.getWeight() *.02 * 1000 * 4);
+        }
     }
 }
