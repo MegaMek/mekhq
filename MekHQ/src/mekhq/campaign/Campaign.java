@@ -2536,14 +2536,59 @@ public class Campaign implements Serializable {
             	}
             }
             // Payday!
-            if (campaignOptions.payForSalaries()) {
-                if (finances.debit(getPayRoll(), Transaction.C_SALARY,
-                                   "Monthly salaries", calendar.getTime())) {
-                    addReport("Payday! Your account has been debited for "
-                              + formatter.format(getPayRoll())
-                              + " C-bills in personnel salaries");
+            if (campaignOptions.usePeacetimeCost()) {
+                if (!campaignOptions.showPeacetimeCost()) {
+                    if (finances.debit(getPeacetimeCost(), Transaction.C_MAINTAIN, "Monthly Peacetime Operating Costs", calendar.getTime())) {
+                        addReport("Your account has been debited "
+                                + formatter.format(getPeacetimeCost())
+                                + " C-bills for peacetime operating costs");
+                    } else {
+                        addReport("<font color='red'><b>You cannot afford to pay operating costs!</b></font> Lucky for you that this does not appear to have any effect.");
+                    }
                 } else {
-                    addReport("<font color='red'><b>You cannot afford to pay payroll costs!</b></font> Lucky for you that personnel morale is not yet implemented.");
+                    if (finances.debit(getMonthlySpareParts(), Transaction.C_MAINTAIN,
+                            "Monthly Spare Parts", calendar.getTime())) {
+                        addReport("Your account has been debited "
+                                + formatter.format(getMonthlySpareParts())
+                                + " C-bills for spare parts");
+                    } else {
+                        addReport("<font color='red'><b>You cannot afford to pay for spare parts!</b></font> Lucky for you that this does not appear to have any effect.");
+                    }
+                    if (finances.debit(getMonthlyAmmo(), Transaction.C_MAINTAIN,
+                            "Monthly Ammunition", calendar.getTime())) {
+                        addReport("Your account has been debited "
+                                + formatter.format(getMonthlyAmmo())
+                                + " C-bills for training munitions");
+                    } else {
+                        addReport("<font color='red'><b>You cannot afford to pay for training munitions!</b></font> Lucky for you that this does not appear to have any effect.");
+                    }
+                    if (finances.debit(getMonthlyFuel(), Transaction.C_MAINTAIN,
+                            "Monthly Fuel bill", calendar.getTime())) {
+                        addReport("Your account has been debited "
+                                + formatter.format(getMonthlyFuel())
+                                + " C-bills for fuel");
+                    } else {
+                        addReport("<font color='red'><b>You cannot afford to pay for fuel!</b></font> Lucky for you that this does not appear to have any effect.");
+                    }
+                    if (finances.debit(getPayRoll(), Transaction.C_SALARY,
+                            "Monthly salaries", calendar.getTime())) {
+                        addReport("Payday! Your account has been debited for "
+                                  + formatter.format(getPayRoll())
+                                  + " C-bills in personnel salaries");
+                    } else {
+                        addReport("<font color='red'><b>You cannot afford to pay payroll costs!</b></font> Lucky for you that personnel morale is not yet implemented.");
+                    }
+                }
+            } else {
+                if (campaignOptions.payForSalaries()) {
+                    if (finances.debit(getPayRoll(), Transaction.C_SALARY,
+                                       "Monthly salaries", calendar.getTime())) {
+                        addReport("Payday! Your account has been debited for "
+                                  + formatter.format(getPayRoll())
+                                  + " C-bills in personnel salaries");
+                    } else {
+                        addReport("<font color='red'><b>You cannot afford to pay payroll costs!</b></font> Lucky for you that personnel morale is not yet implemented.");
+                    }
                 }
             }
             if (campaignOptions.payForOverhead()) {
