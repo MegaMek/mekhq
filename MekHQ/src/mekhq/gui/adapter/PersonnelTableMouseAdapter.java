@@ -439,7 +439,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             case CMD_REMOVE_PREGNANCY:
             {
                 if (selectedPerson.isPregnant()) {
-                    selectedPerson.setDueDate(null);
+                    selectedPerson.removePregnancy();
                     gui.refreshPersonnelList();
                 }
                 break;

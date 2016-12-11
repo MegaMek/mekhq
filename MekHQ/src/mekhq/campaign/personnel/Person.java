@@ -1045,6 +1045,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
+    public void removePregnancy() {
+        setDueDate(null);
+        extraData.set(PREGNANCY_CHILDREN_DATA, 0);
+        extraData.set(PREGNANCY_FATHER_DATA, null);
+    }
+
 	public boolean safeSpouse(Person p) {
 		// Huge convoluted return statement
 		return (
