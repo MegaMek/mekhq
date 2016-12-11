@@ -7390,22 +7390,28 @@ public class Campaign implements Serializable {
             if (noInfantry && u.getEntity() instanceof Infantry && !(u.getEntity() instanceof BattleArmor)) {
             	continue;
             }
-            if (getCampaignOptions().getDropshipContractPercent() != 0 && u.getEntity() instanceof Dropship) {
-                // we will assume sale value for now, but make this customizable
+            if (u.getEntity() instanceof Dropship) {
+                if (getCampaignOptions().getDropshipContractPercent() == 0) {
+                    continue;
+                }
                 if (getCampaignOptions().useEquipmentContractSaleValue()) {
                     value += (getCampaignOptions().getDropshipContractPercent() / 100) * u.getSellValue();
                 } else {
                     value += (getCampaignOptions().getDropshipContractPercent() / 100) * u.getBuyCost();
                 }
-            } else if (getCampaignOptions().getWarshipContractPercent() != 0 && u.getEntity() instanceof Warship) {
-                // we will assume sale value for now, but make this customizable
+            } else if (u.getEntity() instanceof Warship) {
+                if (getCampaignOptions().getWarshipContractPercent() == 0) {
+                    continue;
+                }
                 if (getCampaignOptions().useEquipmentContractSaleValue()) {
                     value += (getCampaignOptions().getWarshipContractPercent() / 100) * u.getSellValue();
                 } else {
                     value += (getCampaignOptions().getWarshipContractPercent() / 100) * u.getBuyCost();
                 }
-            } else if (getCampaignOptions().getJumpshipContractPercent() != 0 && u.getEntity() instanceof Jumpship) {
-                // we will assume sale value for now, but make this customizable
+            } else if (u.getEntity() instanceof Jumpship) {
+                if (getCampaignOptions().getJumpshipContractPercent() == 0) {
+                    continue;
+                }
                 if (getCampaignOptions().useEquipmentContractSaleValue()) {
                     value += (getCampaignOptions().getJumpshipContractPercent() / 100) * u.getSellValue();
                 } else {
