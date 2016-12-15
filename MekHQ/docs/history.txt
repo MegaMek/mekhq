@@ -1,7 +1,8 @@
 VERSION HISTORY:
 ----------------
 v0.41.28
-+Issue #237: Remove Tech From Lance assignments upon retiring
++ Issue #237: Remove Tech From Lance assignments upon retiring
++ Issue #265: Vehicle gunnery skills not showing same as personnel screen
 
 v0.41.27 (2016-12-07 03:00 UTC)
 + PR #232: "Advanced Medical" refactor - new medical dialogue, lots of under-the-hood improvements

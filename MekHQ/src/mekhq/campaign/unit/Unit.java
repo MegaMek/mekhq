@@ -2522,7 +2522,12 @@ public class Unit implements MekHqXmlSerializable {
                 nDrivers++;
             }
 
-
+            if (entity instanceof Tank
+            		&& Compute.getFullCrewSize(entity) == 1
+            		&& p.hasSkill(gunType)) {
+            	sumGunnery += p.getSkill(gunType).getFinalSkillValue();
+            	nGunners++;
+            }
             if(campaign.getCampaignOptions().useAdvancedMedical()) {
                 sumPiloting += p.getPilotingInjuryMod();
             }
@@ -2544,7 +2549,7 @@ public class Unit implements MekHqXmlSerializable {
                 sumGunnery += p.getGunneryInjuryMod();
             }
         }
-
+        
         for(UUID pid : vesselCrew) {
             Person p = campaign.getPerson(pid);
             if(null !=p && p.getHits() == 0) {
