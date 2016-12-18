@@ -1,9 +1,10 @@
 VERSION HISTORY:
 ----------------
-v0.41.28
+v0.41.28 (2016-12-18 17:35 UTC)
 + Issue #237: Remove Tech From Lance assignments upon retiring
 + Fix #262: Advanced Medical: Patient not added to infirmary until day is advanced
 + Fix #265: Vehicle gunnery skills not showing same as personnel screen
++ Updated MegaMek.jar and MegaMekLab.jar to 0.41.28
 
 v0.41.27 (2016-12-07 03:00 UTC)
 + PR #232: "Advanced Medical" refactor - new medical dialogue, lots of under-the-hood improvements
