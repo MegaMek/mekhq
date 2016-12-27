@@ -847,12 +847,17 @@ public class ResolveScenarioTracker {
             for (Entity e : parser.getAllies()) {
                 checkForLostLimbs(e, control);
                 if(!e.getExternalIdAsString().equals("-1")) {
-                    TestUnit nu = generateNewTestUnit(e);
-                    UnitStatus status = new UnitStatus(nu);
-                    unitsStatus.put(nu.getId(), status);
-                    alliedUnits.add(nu);
-                    boolean lost = (!e.canEscape() && !control) || e.getRemovalCondition() == IEntityRemovalConditions.REMOVE_DEVASTATED;
-                    status.assignFoundEntity(e, lost);
+                    UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
+                    if (null == status) {
+                        TestUnit nu = generateNewTestUnit(e);
+                        status = new UnitStatus(nu);
+                        unitsStatus.put(nu.getId(), status);
+                        alliedUnits.add(nu);
+                    }
+                    if(null != status) {
+                        boolean lost = (!e.canEscape() && !control) || e.getRemovalCondition() == IEntityRemovalConditions.REMOVE_DEVASTATED;
+                        status.assignFoundEntity(e, lost);
+                    }
                 }
                 if(null != e.getCrew()) {
                     if(!e.getCrew().getExternalIdAsString().equals("-1")) {
