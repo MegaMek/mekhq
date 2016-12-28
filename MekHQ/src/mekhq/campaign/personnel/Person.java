@@ -1866,10 +1866,15 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public String getRankName() {
     	String rankName;
     	int profession = getProfession();
+    	
+    	/* Track number of times the profession has been redirected so we don't get caught
+    	 * in a loop by self-reference or loops due to bad configuration */ 
+    	int redirects = 0;
 
     	// If we're using an "empty" profession, default to MechWarrior
-    	while (getRanks().isEmptyProfession(profession)) {
+    	while (getRanks().isEmptyProfession(profession) && redirects < Ranks.RPROF_NUM) {
     		profession = campaign.getRanks().getAlternateProfession(profession);
+    		redirects++;
     	}
 
     	// If we're set to a rank that no longer exists, demote ourself
@@ -1877,14 +1882,20 @@ public class Person implements Serializable, MekHqXmlSerializable {
     		setRankNumeric(--rank);
     	}
 
+    	redirects = 0;
     	// re-route through any profession redirections
-    	while (getRank().getName(profession).startsWith("--") && profession != Ranks.RPROF_MW) {
+    	while (getRank().getName(profession).startsWith("--") && profession != Ranks.RPROF_MW
+    			&& redirects < Ranks.RPROF_NUM) {
 	    	// We've hit a rank that defaults to the MechWarrior table, so grab the equivalent name from there
 	    	if (getRank().getName(profession).equals("--")) {
 	    		profession = getRanks().getAlternateProfession(profession);
 	    	} else if (getRank().getName(profession).startsWith("--")) {
 	    		profession = getRanks().getAlternateProfession(getRank().getName(profession));
 	    	}
+	    	redirects++;
+    	}
+    	if (getRank().getName(profession).startsWith("--")) {
+    		profession = Ranks.RPROF_MW;
     	}
 
     	rankName = getRank().getName(profession);
