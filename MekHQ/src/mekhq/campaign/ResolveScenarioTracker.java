@@ -644,7 +644,10 @@ public class ResolveScenarioTracker {
                 }
                 //check for an ejected entity and if we find one then assign it instead to switch vees
                 //over to infantry checks for casualties
-                Entity ejected = enemyEjections.get(UUID.fromString(en.getCrew().getExternalIdAsString()));                
+                Entity ejected = null;
+                if (!en.getCrew().getExternalIdAsString().equals("-1")) {
+                	ejected = enemyEjections.get(UUID.fromString(en.getCrew().getExternalIdAsString()));                
+                }
                 if(null != ejected) {
                     en = ejected;          
                 }
