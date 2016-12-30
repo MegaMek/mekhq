@@ -414,7 +414,7 @@ public class Armor extends Part implements IAcquisitionWork {
 	@Override
 	public int getTechRating() {
 		EquipmentType etype = EquipmentType.get(EquipmentType.getArmorTypeName(type, clan));
-    	if(null == etype) {
+    	if (null == etype || type == EquipmentType.T_ARMOR_STANDARD) {
     		return EquipmentType.RATING_D;
     	}
     	return etype.getTechRating();
