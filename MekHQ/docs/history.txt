@@ -2,6 +2,7 @@ VERSION HISTORY:
 ----------------
 v0.41.29-git
 + Fix #266: PayForTransport option ignored when estimating total contract profit
++ Fix #291: Pilots being generated with special abilities in the battle even though special abilities are turned off
 
 v0.41.28 (2016-12-18 17:35 UTC)
 + Issue #237: Remove Tech From Lance assignments upon retiring

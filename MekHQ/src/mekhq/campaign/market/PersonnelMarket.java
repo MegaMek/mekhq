@@ -381,9 +381,11 @@ public class PersonnelMarket {
 									p = c.newPerson(Person.T_VEE_GUNNER);
 								}
 								p = c.newPerson((Compute.d6() < 4)?Person.T_GVEE_DRIVER:Person.T_VEE_GUNNER);
-								int nabil = Math.max(0, p.getExperienceLevel(false) - SkillType.EXP_REGULAR);
-								while (nabil > 0 && null != c.rollSPA(p.getPrimaryRole(), p)) {
-									nabil--;
+								if (c.getCampaignOptions().useAbilities()) {
+									int nabil = Math.max(0, p.getExperienceLevel(false) - SkillType.EXP_REGULAR);
+									while (nabil > 0 && null != c.rollSPA(p.getPrimaryRole(), p)) {
+										nabil--;
+									}
 								}
 								id = UUID.randomUUID();
 								while (null != personnelIds.get(id)) {

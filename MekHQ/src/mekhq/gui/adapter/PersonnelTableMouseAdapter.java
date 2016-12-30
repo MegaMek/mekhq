@@ -500,7 +500,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 gui.getCampaign().personUpdated(selectedPerson);
                 selectedPerson.setXp(selectedPerson.getXp() - cost);
                 gui.getCampaign().addReport(String.format(resourceMap.getString("improved.format"), selectedPerson.getHyperlinkedName(), type)); //$NON-NLS-1$
-                if (gui.getCampaign().getCampaignOptions().getUseAtB()) {
+                if (gui.getCampaign().getCampaignOptions().getUseAtB()
+                		&& gui.getCampaign().getCampaignOptions().useAbilities()) {
                     if (selectedPerson.getPrimaryRole() > Person.T_NONE
                             && selectedPerson.getPrimaryRole() <= Person.T_CONV_PILOT
                             && selectedPerson.getExperienceLevel(false) > oldExpLevel

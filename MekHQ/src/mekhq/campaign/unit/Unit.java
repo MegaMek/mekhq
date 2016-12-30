@@ -2631,15 +2631,17 @@ public class Unit implements MekHqXmlSerializable {
         pilot.setArtillery(artillery);
         //create a new set of options. For now we will just assign based on commander, but
         //we really should be more detailed about this.
-        PilotOptions options = new PilotOptions();
-        for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements();) {
-             IOptionGroup group = i.nextElement();
-             for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
-                 IOption option = j.nextElement();
-                 option.setValue(commander.getOptions().getOption(option.getName()).getValue());
-             }
+        if (campaign.getCampaignOptions().useAbilities()) {
+	        PilotOptions options = new PilotOptions();
+	        for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements();) {
+	             IOptionGroup group = i.nextElement();
+	             for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
+	                 IOption option = j.nextElement();
+	                 option.setValue(commander.getOptions().getOption(option.getName()).getValue());
+	             }
+	        }
+	        pilot.setOptions(options);
         }
-        pilot.setOptions(options);
         if(usesSoloPilot()) {
             if(!commander.isActive()) {
                 entity.setCrew(null);
