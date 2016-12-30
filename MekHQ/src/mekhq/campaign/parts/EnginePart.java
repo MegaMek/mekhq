@@ -281,8 +281,7 @@ public class EnginePart extends Part {
 
 	@Override
 	public int getTechRating() {
-	    int year = campaign.getCalendar().get(GregorianCalendar.YEAR);
-		switch(engine.getTechType(year)) {
+		switch(engine.getEngineType()) {
 		case Engine.XL_ENGINE:
 			if(engine.hasFlag(Engine.CLAN_ENGINE)) {
 				return EquipmentType.RATING_F;
