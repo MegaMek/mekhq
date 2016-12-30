@@ -187,6 +187,7 @@ public class ResolveScenarioTracker {
                 e.printStackTrace();
             }
         }
+        initUnitsAndPilotsWithoutBattle();
         checkStatusOfPersonnel();
     }
 
@@ -929,6 +930,21 @@ public class ResolveScenarioTracker {
                 }
             }
         }
+    }
+    
+    /**
+     * When resolving the battle manually without a resolution file (such as MekHQ + tabletop),
+     * set initial status of units and crew as pre-battle.
+     */
+    private void initUnitsAndPilotsWithoutBattle() {
+    	for (Unit u : units) {
+    		UnitStatus status = unitsStatus.get(u.getId());
+    		status.assignFoundEntity(u.getEntity(), false);
+    		Crew crew = u.getEntity().getCrew();
+            if(null != crew && !crew.getExternalIdAsString().equals("-1")) {
+            	pilots.put(UUID.fromString(crew.getExternalIdAsString()), crew);
+            }    		
+    	}
     }
 
     public ArrayList<TestUnit> getAlliedUnits() {
