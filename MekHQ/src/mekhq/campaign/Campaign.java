@@ -5276,7 +5276,7 @@ public class Campaign implements Serializable {
 
         }
         // roll tactics skill
-        if (getCampaignOptions().useTactics() && !person.isSupport()) {
+        if (!person.isSupport()) {
             int tacLvl = Utilities.generateExpLevel(rskillPrefs
                                                             .getTacticsMod(expLvl));
             if (tacLvl > SkillType.EXP_ULTRA_GREEN) {

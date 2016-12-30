@@ -4144,7 +4144,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUnitRatingMethod(UnitRatingMethod.getUnitRatingMethod((String) unitRatingMethodCombo
                 .getSelectedItem()));
         options.setFactionForNames(useFactionForNamesBox.isSelected());
-        options.setTactics(useTacticsBox.isSelected());
+        options.setUseTactics(useTacticsBox.isSelected());
         campaign.getGameOptions().getOption("command_init").setValue(useTacticsBox.isSelected());
         options.setDestroyByMargin(useDamageMargin.isSelected());
         options.setDestroyMargin((Integer) spnDamageMargin.getModel().getValue());

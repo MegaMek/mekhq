@@ -599,7 +599,7 @@ public class CampaignOptions implements Serializable {
         return useTactics;
     }
 
-    public void setTactics(boolean b) {
+    public void setUseTactics(boolean b) {
         this.useTactics = b;
     }
 
@@ -1407,14 +1407,6 @@ public class CampaignOptions implements Serializable {
     public void setTougherHealing(boolean b) {
         tougherHealing = b;
     }
-
-    public boolean isUseTactics() {
-		return useTactics;
-	}
-
-	public void setUseTactics(boolean useTactics) {
-		this.useTactics = useTactics;
-	}
 
 	public boolean getUseAtB() {
 		return useAtB;
