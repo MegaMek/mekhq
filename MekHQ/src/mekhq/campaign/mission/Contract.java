@@ -38,6 +38,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Planets;
 
 
 /**
@@ -423,7 +424,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		supportAmount = (long)((straightSupport/100.0) * maintCosts * getLength());
 
 		//calculate transportation costs
-		if(null != c.getPlanet(planetName)) {
+		if(null != Planets.getInstance().getPlanetById(planetName)) {
 			transportAmount = (long)((transportComp/100.0) * 2 * c.calculateCostPerJump(false) * c.calculateJumpPath(c.getCurrentPlanet(), getPlanet()).getJumps());
 		}
 
