@@ -1284,20 +1284,20 @@ public class AtBScenario extends Scenario {
             enemyStart = Board.START_N;
 
             int roll = Compute.d6();
-            if (roll > 1) {
-                /* Only has enemy if SL 'Mech is not primitive */
-                for (weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
-                    enemy = new ArrayList<Entity>();
-                    for (int i = 0; i < 3; i++) {
-                        enemy.add(getEntity(getContract(campaign).getEnemyCode(),
-                                getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
-                                UnitType.MEK, weight, campaign));
-                    }
-                    specMissionEnemies.add(enemy);
-                }
-                botForces.add(getEnemyBotForce(getContract(campaign),
-                        enemyStart, specMissionEnemies.get(0)));
+            /* Only has enemy if SL 'Mech is not primitive */
+            for (weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
+            	enemy = new ArrayList<Entity>();
+            	if (roll > 1) {
+            		for (int i = 0; i < 3; i++) {
+            			enemy.add(getEntity(getContract(campaign).getEnemyCode(),
+            					getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
+            					UnitType.MEK, weight, campaign));
+            		}
+            	}
+            	specMissionEnemies.add(enemy);
             }
+            botForces.add(getEnemyBotForce(getContract(campaign),
+            		enemyStart, specMissionEnemies.get(0)));
 
             otherForce = new ArrayList<Entity>();
             MechSummary ms = null;

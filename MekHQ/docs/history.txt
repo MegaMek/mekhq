@@ -8,6 +8,7 @@ v0.41.29-git
 + Fix #272: Tactics Campaign/MegMek options bug
 + Fix #294: Contract market incorrectly calculating transport amount as 0 c-bills
 + Fix #295: Variable contract length option no longer works
++ Fix #292: Starleague cache 1: IndexOutOfBoundsException when generating enemy
 
 v0.41.28 (2016-12-18 17:35 UTC)
 + Issue #237: Remove Tech From Lance assignments upon retiring
