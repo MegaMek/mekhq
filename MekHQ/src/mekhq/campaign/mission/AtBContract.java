@@ -223,34 +223,35 @@ public class AtBContract extends Contract implements Serializable {
 	public void calculateLength(boolean variable) {
 		if (variable) {
 			calculateVariableLength();
-		}
-		switch (missionType) {
-			case AtBContract.MT_CADREDUTY:
-				setLength(12);
-				break;
-			case AtBContract.MT_GARRISONDUTY:
-				setLength(18);
-				break;
-			case AtBContract.MT_SECURITYDUTY:
-			case AtBContract.MT_PIRATEHUNTING:
-				setLength(6);
-				break;
-			case AtBContract.MT_DIVERSIONARYRAID:
-			case AtBContract.MT_EXTRACTIONRAID:
-			case AtBContract.MT_OBJECTIVERAID:
-			case AtBContract.MT_RECONRAID:
-				setLength(3);
-				break;
-			case AtBContract.MT_GUERRILLAWARFARE:
-				setLength(24);
-				break;
-			case AtBContract.MT_PLANETARYASSAULT:
-			case AtBContract.MT_RELIEFDUTY:
-				setLength(9);
-				break;
-			case AtBContract.MT_RIOTDUTY:
-				setLength(4);
-				break;
+		} else {
+			switch (missionType) {
+				case AtBContract.MT_CADREDUTY:
+					setLength(12);
+					break;
+				case AtBContract.MT_GARRISONDUTY:
+					setLength(18);
+					break;
+				case AtBContract.MT_SECURITYDUTY:
+				case AtBContract.MT_PIRATEHUNTING:
+					setLength(6);
+					break;
+				case AtBContract.MT_DIVERSIONARYRAID:
+				case AtBContract.MT_EXTRACTIONRAID:
+				case AtBContract.MT_OBJECTIVERAID:
+				case AtBContract.MT_RECONRAID:
+					setLength(3);
+					break;
+				case AtBContract.MT_GUERRILLAWARFARE:
+					setLength(24);
+					break;
+				case AtBContract.MT_PLANETARYASSAULT:
+				case AtBContract.MT_RELIEFDUTY:
+					setLength(9);
+					break;
+				case AtBContract.MT_RIOTDUTY:
+					setLength(4);
+					break;
+			}
 		}
 	}
 	
