@@ -937,13 +937,10 @@ public class AtBScenario extends Scenario {
 
             break;
         case CHASE:
-            start = playerHome = Board.START_S;
-            enemyStart = enemyHome = Board.START_S;
-            if (attacker) {
-                playerHome = Board.START_N;
-            } else {
-                enemyHome = Board.START_N;
-            }
+            start = Board.START_S;
+            enemyStart = Board.START_S;
+            playerHome = Board.START_N;
+            enemyHome = Board.START_N;
 
             allyBotForce = null;
             if (allyBot.size() > 0) {
