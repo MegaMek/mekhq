@@ -10,6 +10,7 @@ v0.41.29-git
 + Fix #295: Variable contract length option no longer works
 + Fix #292: Starleague cache 1: IndexOutOfBoundsException when generating enemy
 + Fix #250: [AtB] Wrong deployment edge for bot reinforcements in Chase(Att) scenario.
++ [AtB] Chase scenario uses unit speed to determine deployment turn.
 
 v0.41.28 (2016-12-18 17:35 UTC)
 + Issue #237: Remove Tech From Lance assignments upon retiring

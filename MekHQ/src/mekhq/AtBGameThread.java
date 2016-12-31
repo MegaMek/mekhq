@@ -167,8 +167,8 @@ public class AtBGameThread extends GameThread {
                 	entity.setOwner(client.getLocalPlayer()); 
                 	// Calculate deployment round
             		int speed = entity.getWalkMP();
-            		if (unit.getEntity().getJumpMP() > 0) {
-	            		if (unit.getEntity() instanceof megamek.common.Infantry) {
+            		if (entity.getJumpMP() > 0) {
+	            		if (entity instanceof megamek.common.Infantry) {
 	            			speed = entity.getJumpMP();
 	            		} else {
 	            			speed++;
@@ -195,6 +195,21 @@ public class AtBGameThread extends GameThread {
                 		continue;
                 	}
                 	entity.setOwner(client.getLocalPlayer());
+            		int speed = entity.getWalkMP();
+            		if (entity.getJumpMP() > 0) {
+	            		if (entity instanceof megamek.common.Infantry) {
+	            			speed = entity.getJumpMP();
+	            		} else {
+	            			speed++;
+	            		}
+            		}
+                	int deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
+                	if (scenario.getLanceRole() == Lance.ROLE_SCOUT
+                			&& scenario.getLance(campaign).getForceId() == scenario.getLanceForceId()
+                			&& !useDropship) {
+                		deploymentRound = Math.max(deploymentRound, 6 - speed);
+                	}
+                	entity.setDeployRound(Math.max(0, deploymentRound));
                 	client.sendAddEntity(entity);
                 	Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
                 }

@@ -936,7 +936,7 @@ public class AtBScenario extends Scenario {
             botForces.add(botForce);
 
             break;
-        case CHASE:
+        case CHASE:        	
             start = Board.START_S;
             enemyStart = Board.START_S;
             playerHome = Board.START_N;
@@ -966,7 +966,32 @@ public class AtBScenario extends Scenario {
             }
             botForces.add(botForce);
 
-            break;
+        	/* All forces deploy in 12 - WP turns */
+        	deploymentDelay = 12;
+        	for (Entity en : allyBot) {
+        		int speed = en.getWalkMP();
+        		if (en.getJumpMP() > 0) {
+            		if (en instanceof megamek.common.Infantry) {
+            			speed = en.getJumpMP();
+            		} else {
+            			speed++;
+            		}
+        		}
+        		en.setDeployRound(Math.max(0, 12 - speed));
+        	}
+        	for (Entity en : enemy) {
+        		int speed = en.getWalkMP();
+        		if (en.getJumpMP() > 0) {
+            		if (en instanceof megamek.common.Infantry) {
+            			speed = en.getJumpMP();
+            		} else {
+            			speed++;
+            		}
+        		}
+        		en.setDeployRound(Math.max(0, 12 - speed));
+        	}
+
+        	break;
         case PROBE:
             start = playerHome = startPos[Compute.randomInt(4)];
             enemyStart = start + 4;
