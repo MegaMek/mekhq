@@ -1,5 +1,7 @@
 VERSION HISTORY:
 ----------------
+v0.43.0-git
+
 v0.42.0 (2017-01-01 14:00 UTC)
 + Fix #266: PayForTransport option ignored when estimating total contract profit
 + Fix #291: Pilots being generated with special abilities in the battle even though special abilities are turned off
