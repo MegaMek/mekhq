@@ -1,6 +1,6 @@
 VERSION HISTORY:
 ----------------
-v0.41.29-git
+v0.42.0 (2017-01-01 14:00 UTC)
 + Fix #266: PayForTransport option ignored when estimating total contract profit
 + Fix #291: Pilots being generated with special abilities in the battle even though special abilities are turned off
 + Fix #268: Pilots always killed if resolve manually
@@ -11,6 +11,7 @@ v0.41.29-git
 + Fix #292: Starleague cache 1: IndexOutOfBoundsException when generating enemy
 + Fix #250: [AtB] Wrong deployment edge for bot reinforcements in Chase(Att) scenario.
 + [AtB] Chase scenario uses unit speed to determine deployment turn.
++ Updated MegaMek.jar and MegaMekLab.jar to 0.42.0
 
 v0.41.28 (2016-12-18 17:35 UTC)
 + Issue #237: Remove Tech From Lance assignments upon retiring
