@@ -2320,7 +2320,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         JScrollPane scrSPA = new JScrollPane(panSpecialAbilities);
         scrSPA.setPreferredSize(new java.awt.Dimension(500, 400));
 
-
         tabOptions.addTab("Special Abilities", scrSPA); // NOI18N
 
 
@@ -3842,6 +3841,13 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 		enableAtBComponents(panAtB, chkUseAtB.isSelected());
 		enableAtBComponents(panSubAtBRat, chkUseAtB.isSelected()
 				&& btnStaticRATs.isSelected());
+
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() { 
+                scrSPA.getVerticalScrollBar().setValue(0);
+                scrAtB.getVerticalScrollBar().setValue(0);
+            }
+         });        
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
