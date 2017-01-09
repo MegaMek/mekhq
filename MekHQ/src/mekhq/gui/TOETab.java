@@ -21,8 +21,6 @@ package mekhq.gui;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 import javax.swing.DropMode;
 import javax.swing.JScrollPane;
@@ -30,8 +28,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreeSelectionModel;
 
 import mekhq.campaign.force.Force;
@@ -77,12 +73,7 @@ public class TOETab extends CampaignGuiTab {
 		orgTree.setRowHeight(60);
 		orgTree.getSelectionModel().setSelectionMode(
 				TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
-		orgTree.addTreeSelectionListener(new TreeSelectionListener() {
-			@Override
-			public void valueChanged(TreeSelectionEvent e) {
-				refreshForceView();
-			}
-		});
+		orgTree.addTreeSelectionListener(ev -> refreshForceView());
 		orgTree.setDragEnabled(true);
 		orgTree.setDropMode(DropMode.ON);
 		orgTree.setTransferHandler(new OrgTreeTransferHandler(getCampaignGui()));
@@ -98,13 +89,7 @@ public class TOETab extends CampaignGuiTab {
 		splitOrg.setResizeWeight(1.0);
 		splitOrg.addPropertyChangeListener(
 				JSplitPane.DIVIDER_LOCATION_PROPERTY,
-				new PropertyChangeListener() {
-					@Override
-					public void propertyChange(PropertyChangeEvent pce) {
-						// this can mess up the unit view panel so refresh it
-						refreshForceView();
-					}
-				});
+				ev -> refreshForceView());
 		gridBagConstraints = new java.awt.GridBagConstraints();
 
 		gridBagConstraints.gridx = 0;
