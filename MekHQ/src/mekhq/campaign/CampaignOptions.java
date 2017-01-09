@@ -263,7 +263,9 @@ public class CampaignOptions implements Serializable {
     private boolean massRepairUseExtraTime;
     private boolean massRepairUseRushJob;
     private boolean massRepairAllowCarryover;
+    private boolean massRepairOptimizeToCompleteToday;
     private boolean massRepairScrapImpossible;
+    private boolean massRepairUseAssignedTechsFirst;
     private List<MassRepairOption> massRepairOptions;
 
     public CampaignOptions() {
@@ -465,7 +467,9 @@ public class CampaignOptions implements Serializable {
         massRepairUseExtraTime = true;
         massRepairUseRushJob = true;
         massRepairAllowCarryover = true;
+        massRepairOptimizeToCompleteToday = false;
         massRepairScrapImpossible = false;
+        massRepairUseAssignedTechsFirst = false;
         massRepairOptions = new ArrayList<MassRepairOption>();
         
         for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
@@ -1783,6 +1787,14 @@ public class CampaignOptions implements Serializable {
 		this.massRepairAllowCarryover = b;
 	}
 
+	public boolean massRepairOptimizeToCompleteToday() {
+		return massRepairOptimizeToCompleteToday;
+	}
+
+	public void setMassRepairOptimizeToCompleteToday(boolean massRepairOptimizeToCompleteToday) {
+		this.massRepairOptimizeToCompleteToday = massRepairOptimizeToCompleteToday;
+	}
+
 	public boolean massRepairScrapImpossible() {
 		return massRepairScrapImpossible;
 	}
@@ -1791,6 +1803,14 @@ public class CampaignOptions implements Serializable {
 		this.massRepairScrapImpossible = b;
 	}
 	
+	public boolean massRepairUseAssignedTechsFirst() {
+		return massRepairUseAssignedTechsFirst;
+	}
+
+	public void setMassRepairUseAssignedTechsFirst(boolean massRepairUseAssignedTechsFirst) {
+		this.massRepairUseAssignedTechsFirst = massRepairUseAssignedTechsFirst;
+	}
+
 	public List<MassRepairOption> getMassRepairOptions() {
 		return massRepairOptions;
 	}
@@ -1994,7 +2014,9 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairUseExtraTime", massRepairUseExtraTime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairUseRushJob", massRepairUseRushJob);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairAllowCarryover", massRepairAllowCarryover);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairOptimizeToCompleteToday", massRepairOptimizeToCompleteToday);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairScrapImpossible", massRepairScrapImpossible);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairUseAssignedTechsFirst", massRepairUseAssignedTechsFirst);
         
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<massRepairOptions>");
 
@@ -2446,8 +2468,12 @@ public class CampaignOptions implements Serializable {
                 retVal.massRepairUseRushJob = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairAllowCarryover")) {
                 retVal.massRepairAllowCarryover = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptimizeToCompleteToday")) {
+                retVal.massRepairOptimizeToCompleteToday = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairScrapImpossible")) {
-                retVal.massRepairScrapImpossible = Boolean.parseBoolean(wn2.getTextContent().trim());                
+                retVal.massRepairScrapImpossible = Boolean.parseBoolean(wn2.getTextContent().trim());        
+            } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseAssignedTechsFirst")) {
+                retVal.massRepairUseAssignedTechsFirst = Boolean.parseBoolean(wn2.getTextContent().trim());                        
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptions")) {
                 NodeList mroList = wn2.getChildNodes();
 

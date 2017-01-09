@@ -46,6 +46,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CampaignOptions.MassRepairOption;
 import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MissingMekLocation;
@@ -98,7 +99,9 @@ public class MassRepairSalvageDialog extends JDialog {
 	private JCheckBox useExtraTimeBox;
 	private JCheckBox useRushJobBox;
 	private JCheckBox allowCarryoverBox;
+	private JCheckBox optimizeToCompleteTodayBox;
 	private JCheckBox scrapImpossibleBox;
+	private JCheckBox useAssignedTechsFirstBox;
 
 	private Map<Integer, MassRepairOptionControl> massRepairOptionControlMap = null;
 
@@ -467,6 +470,13 @@ public class MassRepairSalvageDialog extends JDialog {
 		allowCarryoverBox.setToolTipText(resourceMap.getString("allowCarryoverBox.toolTipText"));
 		allowCarryoverBox.setName("massRepairAllowCarryoverBox");
 		allowCarryoverBox.setSelected(campaignOptions.massRepairAllowCarryover());
+		allowCarryoverBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				optimizeToCompleteTodayBox.setEnabled(allowCarryoverBox.isSelected());
+			}
+		});
+
 		gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = gridRowIdx++;
@@ -474,7 +484,32 @@ public class MassRepairSalvageDialog extends JDialog {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlOptions.add(allowCarryoverBox, gridBagConstraints);
 
+		optimizeToCompleteTodayBox = new JCheckBox();
+		optimizeToCompleteTodayBox.setText(resourceMap.getString("optimizeToCompleteTodayBox.text"));
+		optimizeToCompleteTodayBox.setToolTipText(resourceMap.getString("optimizeToCompleteTodayBox.toolTipText"));
+		optimizeToCompleteTodayBox.setName("massRepairOptimizeToCompleteTodayBox");
+		optimizeToCompleteTodayBox.setSelected(campaignOptions.massRepairOptimizeToCompleteToday());
+		optimizeToCompleteTodayBox.setEnabled(campaignOptions.massRepairAllowCarryover());
+		gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = gridRowIdx++;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		pnlOptions.add(optimizeToCompleteTodayBox, gridBagConstraints);
+
 		if (!isModeWarehouse()) {
+			useAssignedTechsFirstBox = new JCheckBox();
+			useAssignedTechsFirstBox.setText(resourceMap.getString("useAssignedTechsFirstBox.text"));
+			useAssignedTechsFirstBox.setToolTipText(resourceMap.getString("useAssignedTechsFirstBox.toolTipText"));
+			useAssignedTechsFirstBox.setName("massRepairUseAssignedTechsFirstBox");
+			useAssignedTechsFirstBox.setSelected(campaignOptions.massRepairUseAssignedTechsFirst());
+			gridBagConstraints = new GridBagConstraints();
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.gridy = gridRowIdx++;
+			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			pnlOptions.add(useAssignedTechsFirstBox, gridBagConstraints);
+
 			scrapImpossibleBox = new JCheckBox();
 			scrapImpossibleBox.setText(resourceMap.getString("scrapImpossibleBox.text"));
 			scrapImpossibleBox.setToolTipText(resourceMap.getString("scrapImpossibleBox.toolTipText"));
@@ -1010,10 +1045,12 @@ public class MassRepairSalvageDialog extends JDialog {
 				return;
 			}
 
+			MassRepairConfiguredOptions configuredOptions = new MassRepairConfiguredOptions();
+			configuredOptions.setup(this);
+
 			for (Unit unit : units) {
 				repairsCompleted += performUnitMassRepairOrSalvage(campaignGUI, unit, unit.isSalvage(), activeMROs,
-						useExtraTimeBox.isSelected(), useRushJobBox.isSelected(), allowCarryoverBox.isSelected(),
-						scrapImpossibleBox.isSelected());
+						configuredOptions);
 			}
 
 			if (repairsCompleted == 1) {
@@ -1051,8 +1088,11 @@ public class MassRepairSalvageDialog extends JDialog {
 				return;
 			}
 
-			repairsCompleted = performWarehouseMassRepair(parts, activeMROs, useExtraTimeBox.isSelected(),
-					useRushJobBox.isSelected(), allowCarryoverBox.isSelected(), false);
+			MassRepairConfiguredOptions configuredOptions = new MassRepairConfiguredOptions();
+			configuredOptions.setup(this);
+			configuredOptions.setScrapImpossible(false);
+
+			repairsCompleted = performWarehouseMassRepair(parts, activeMROs, configuredOptions);
 
 			if (repairsCompleted == 1) {
 				msg = "Mass Repair complete. There was 1 repair completed or scheduled.";
@@ -1101,9 +1141,11 @@ public class MassRepairSalvageDialog extends JDialog {
 		List<MassRepairOption> activeMROs = createActiveMROsFromConfiguration(campaignGUI);
 		String msg = "";
 
+		MassRepairConfiguredOptions configuredOptions = new MassRepairConfiguredOptions();
+		configuredOptions.setup(options);
+
 		int repairsCompleted = performUnitMassRepairOrSalvage(campaignGUI, unit, unit.isSalvage(), activeMROs,
-				options.massRepairUseExtraTime(), options.massRepairUseRushJob(), options.massRepairAllowCarryover(),
-				options.massRepairScrapImpossible());
+				configuredOptions);
 
 		if (repairsCompleted == 1) {
 			msg = "Mass Repair/Salvage complete. There was 1 repair completed or scheduled.";
@@ -1154,10 +1196,12 @@ public class MassRepairSalvageDialog extends JDialog {
 			}
 		});
 
+		MassRepairConfiguredOptions configuredOptions = new MassRepairConfiguredOptions();
+		configuredOptions.setup(options);
+
 		for (Unit unit : units) {
 			repairsCompleted += performUnitMassRepairOrSalvage(campaignGUI, unit, unit.isSalvage(), activeMROs,
-					options.massRepairUseExtraTime(), options.massRepairUseRushJob(),
-					options.massRepairAllowCarryover(), options.massRepairScrapImpossible());
+					configuredOptions);
 		}
 
 		if (repairsCompleted == 1) {
@@ -1176,8 +1220,7 @@ public class MassRepairSalvageDialog extends JDialog {
 	}
 
 	public static int performUnitMassRepairOrSalvage(CampaignGUI campaignGUI, Unit unit, boolean isSalvage,
-			List<MassRepairOption> mroList, boolean useExtraTime, boolean useRushJob, boolean allowCarryover,
-			boolean scrapImpossible) {
+			List<MassRepairOption> mroList, MassRepairConfiguredOptions configuredOptions) {
 		String actionDescriptor = isSalvage ? "salvage" : "repair";
 		Campaign campaign = campaignGUI.getCampaign();
 
@@ -1215,7 +1258,7 @@ public class MassRepairSalvageDialog extends JDialog {
 
 			while (actionsPerformed > 0) {
 				actionsPerformed = performUnitMassTechAction(campaignGUI, unit, techs, mroByTypeMap, isSalvage,
-						useExtraTime, useRushJob, allowCarryover, scrapImpossible);
+						configuredOptions);
 				totalActionsPerformed += actionsPerformed;
 			}
 
@@ -1227,8 +1270,8 @@ public class MassRepairSalvageDialog extends JDialog {
 	}
 
 	private static int performUnitMassTechAction(CampaignGUI campaignGUI, Unit unit, List<Person> techs,
-			Map<Integer, MassRepairOption> mroByTypeMap, boolean salvaging, boolean useExtraTime, boolean useRushJob,
-			boolean allowCarryover, boolean scrapImpossible) {
+			Map<Integer, MassRepairOption> mroByTypeMap, boolean salvaging,
+			MassRepairConfiguredOptions configuredOptions) {
 		Campaign campaign = campaignGUI.getCampaign();
 		int totalActionsPerformed = 0;
 		String actionDescriptor = salvaging ? "salvage" : "repair";
@@ -1240,7 +1283,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		 * can't be fixed by an elite tech, let's first get rid of those parts
 		 * and start with a cleaner slate
 		 */
-		if (scrapImpossible && !salvaging) {
+		if (configuredOptions.isScrapImpossible() && !salvaging) {
 			boolean refreshParts = false;
 
 			for (Part part : parts) {
@@ -1378,7 +1421,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		 * task list as scheduled if we're in 'repair' mode.
 		 */
 		if (scrappingLimbMode) {
-			allowCarryover = false;
+			configuredOptions.setAllowCarryover(false);
 		}
 
 		/*
@@ -1410,8 +1453,7 @@ public class MassRepairSalvageDialog extends JDialog {
 
 			// Search the list of techs each time for a variety of checks. We'll
 			// create a temporary truncated list of techs
-			if (repairPart(campaignGUI, part, techs, mroByTypeMap, useExtraTime, useRushJob, allowCarryover,
-					scrapImpossible, false)) {
+			if (repairPart(campaignGUI, part, unit, techs, mroByTypeMap, configuredOptions, false)) {
 				totalActionsPerformed++;
 			}
 		}
@@ -1424,7 +1466,7 @@ public class MassRepairSalvageDialog extends JDialog {
 	}
 
 	private int performWarehouseMassRepair(List<Part> selectedParts, List<MassRepairOption> mroList,
-			boolean useExtraTime, boolean useRushJob, boolean allowCarryover, boolean scrapImpossible) {
+			MassRepairConfiguredOptions configuredOptions) {
 		Campaign campaign = campaignGUI.getCampaign();
 
 		campaign.addReport("Beginning mass warehouse repair.");
@@ -1462,8 +1504,7 @@ public class MassRepairSalvageDialog extends JDialog {
 				int originalQuantity = part.getQuantity();
 
 				for (int i = 0; i < originalQuantity; i++) {
-					if (repairPart(campaignGUI, part, techs, mroByTypeMap, useExtraTime, useRushJob, allowCarryover,
-							false, true)) {
+					if (repairPart(campaignGUI, part, null, techs, mroByTypeMap, configuredOptions, true)) {
 						totalActionsPerformed++;
 					}
 				}
@@ -1473,13 +1514,16 @@ public class MassRepairSalvageDialog extends JDialog {
 		return totalActionsPerformed;
 	}
 
-	private static boolean repairPart(CampaignGUI campaignGUI, Part part, List<Person> techs,
-			Map<Integer, MassRepairOption> mroByTypeMap, boolean useExtraTime, boolean useRushJob,
-			boolean allowCarryover, boolean scrapImpossible, boolean warehouseMode) {
+	private static boolean repairPart(CampaignGUI campaignGUI, Part part, Unit unit, List<Person> techs,
+			Map<Integer, MassRepairOption> mroByTypeMap, MassRepairConfiguredOptions configuredOptions,
+			boolean warehouseMode) {
 		Map<String, WorkTime> techToWorktimeMap = new HashMap<String, WorkTime>();
 		int modePenalty = part.getMode().expReduction;
 		Campaign campaign = campaignGUI.getCampaign();
-		List<Person> validTechs = new ArrayList<Person>();
+		List<Person> sameDayTechs = new ArrayList<Person>();
+		List<Person> overflowDayTechs = new ArrayList<Person>();
+		List<Person> sameDayAssignedTechs = new ArrayList<Person>();
+		List<Person> overflowDayAssignedTechs = new ArrayList<Person>();
 
 		for (int i = techs.size() - 1; i >= 0; i--) {
 			/*
@@ -1532,7 +1576,7 @@ public class MassRepairSalvageDialog extends JDialog {
 
 			// Check if we need to increase the time to meet the min BTH
 			if (targetRoll.getValue() > mro.getBthMin()) {
-				if (!useExtraTime) {
+				if (!configuredOptions.isUseExtraTime()) {
 					continue;
 				}
 
@@ -1545,7 +1589,7 @@ public class MassRepairSalvageDialog extends JDialog {
 				selectedWorktime = newWorkTime;
 			} else if (targetRoll.getValue() < mro.getBthMax()) {
 				// Or decrease the time to meet the max BTH
-				if (useRushJob) {
+				if (configuredOptions.isUseRushJob()) {
 					WorkTime newWorkTime = calculateNewMassRepairWorktime(part, tech, mro, campaign, false);
 
 					// This should never happen, but...
@@ -1555,64 +1599,114 @@ public class MassRepairSalvageDialog extends JDialog {
 				}
 			}
 
-			if ((tech.getMinutesLeft() < part.getActualTime()) && !allowCarryover) {
-				continue;
+			//campaign.addReport(String.format("Checking tech %s", tech.getName()));
+
+			boolean assigned = false;
+
+			if ((null != unit) && configuredOptions.isUseAssignedTechsFirst()) {
+				//campaign.addReport("... checking is assigned");
+				
+				Force force = campaign.getForce(unit.getForceId());
+
+				if ((null != force) && (null != force.getTechID())) {
+					assigned = force.getTechID().toString().equals(tech.getId().toString());
+				}
+				
+				if (!assigned && (null != tech.getTechUnitIDs()) && !tech.getTechUnitIDs().isEmpty()) {
+					assigned = tech.getTechUnitIDs().contains(unit.getId());
+				}
+				
+				//campaign.addReport(String.format("... assigned -> %s", assigned));
 			}
 
-			validTechs.add(tech);
+			boolean isSameDayTech = false;
+
+			if ((tech.getMinutesLeft() < part.getActualTime())) {
+				if (!configuredOptions.isAllowCarryover()) {
+					continue;
+				}
+
+				if (configuredOptions.isOptimizeToCompleteToday()) {
+					isSameDayTech = false;
+				} else {
+					isSameDayTech = true;
+				}
+			} else {
+				isSameDayTech = true;
+			}
+
+			//campaign.addReport(String.format("... isSameDayTech -> %s", isSameDayTech));
+			
+			if (isSameDayTech) {
+				if (assigned) {
+					sameDayAssignedTechs.add(tech);
+				} else {
+					sameDayTechs.add(tech);
+				}
+			} else {
+				if (assigned) {
+					overflowDayAssignedTechs.add(tech);
+				} else {
+					overflowDayTechs.add(tech);
+				}
+			}
+
 			techToWorktimeMap.put(tech.getId().toString(), selectedWorktime);
 
 			part.setMode(WorkTime.of(WorkTime.NORMAL.id));
 		}
 
-		if (!validTechs.isEmpty()) {
-			/*
-			 * Sort the valid techs by applicable skill. Let's start with the
-			 * least experienced and work our way up until we find someone who
-			 * can perform the work. If we have two techs with the same skill,
-			 * put the one with the lesser XP in the front.
-			 */
-			Collections.sort(validTechs, new Comparator<Person>() {
-				@Override
-				public int compare(Person tech1, Person tech2) {
-					Skill skill1 = tech1.getSkillForWorkingOn(part);
-					Skill skill2 = tech2.getSkillForWorkingOn(part);
-
-					if (skill1.getExperienceLevel() == skill2.getExperienceLevel()) {
-						if (tech1.getXp() == tech2.getXp()) {
-							return 0;
-						}
-
-						return tech1.getXp() < tech2.getXp() ? -1 : 1;
-					}
-
-					return skill1.getExperienceLevel() < skill2.getExperienceLevel() ? -1 : 1;
-				}
-			});
-
-			Person tech = validTechs.get(0);
-			WorkTime wt = techToWorktimeMap.get(tech.getId().toString());
-
-			part.setMode(wt);
-
-			if (warehouseMode) {
-				campaign.fixWarehousePart(part, tech);
-			} else {
-				campaign.fixPart(part, tech);
-			}
-
-			// If this tech has no time left, filter them out so we don't
-			// spend cycles on them in the future
-			if (tech.getMinutesLeft() <= 0) {
-				techs.remove(tech);
-			}
-
-			Thread.yield();
-
-			return true;
+		if (overflowDayTechs.isEmpty() && sameDayTechs.isEmpty()) {
+			return false;
 		}
 
-		return false;
+		TechSorter sorter = new TechSorter(part);
+
+		if (!overflowDayTechs.isEmpty()) {
+			Collections.sort(overflowDayTechs, sorter);
+		}
+
+		if (!sameDayTechs.isEmpty()) {
+			Collections.sort(sameDayTechs, sorter);
+		}
+
+		if (!overflowDayAssignedTechs.isEmpty()) {
+			Collections.sort(overflowDayAssignedTechs, sorter);
+		}
+
+		if (!sameDayAssignedTechs.isEmpty()) {
+			Collections.sort(sameDayAssignedTechs, sorter);
+		}
+
+		List<Person> validTechs = new ArrayList<Person>();
+		validTechs.addAll(sameDayAssignedTechs);
+		validTechs.addAll(sameDayTechs);
+		validTechs.addAll(overflowDayAssignedTechs);
+		validTechs.addAll(overflowDayTechs);
+		
+		Person tech = validTechs.get(0);
+		
+		//campaign.addReport(String.format("... first tech -> %s", tech.getName()));
+		
+		WorkTime wt = techToWorktimeMap.get(tech.getId().toString());
+
+		part.setMode(wt);
+
+		if (warehouseMode) {
+			campaign.fixWarehousePart(part, tech);
+		} else {
+			campaign.fixPart(part, tech);
+		}
+
+		// If this tech has no time left, filter them out so we don't
+		// spend cycles on them in the future
+		if (tech.getMinutesLeft() <= 0) {
+			techs.remove(tech);
+		}
+
+		Thread.yield();
+
+		return true;
 	}
 
 	private static List<Part> filterParts(List<Part> parts, Map<Integer, MassRepairOption> mroByTypeMap) {
@@ -1628,7 +1722,7 @@ public class MassRepairSalvageDialog extends JDialog {
 					if (!checkArmorSupply(part)) {
 						continue;
 					}
-					
+
 					newParts.add(part);
 				}
 			}
@@ -1641,14 +1735,14 @@ public class MassRepairSalvageDialog extends JDialog {
 		if (part.isSalvaging()) {
 			return true;
 		}
-		
-        if ((part instanceof Armor) && !((Armor) part).isInSupply()) {
-        	return false;
-        }
-        
-        return true;
+
+		if ((part instanceof Armor) && !((Armor) part).isInSupply()) {
+			return false;
+		}
+
+		return true;
 	}
-	
+
 	private static WorkTime calculateNewMassRepairWorktime(Part part, Person tech, MassRepairOption mro,
 			Campaign campaign, boolean increaseTime) {
 		WorkTime newWorkTime = part.getMode();
@@ -1696,9 +1790,11 @@ public class MassRepairSalvageDialog extends JDialog {
 		campaignOptions.setMassRepairUseExtraTime(useExtraTimeBox.isSelected());
 		campaignOptions.setMassRepairUseRushJob(useRushJobBox.isSelected());
 		campaignOptions.setMassRepairAllowCarryover(allowCarryoverBox.isSelected());
+		campaignOptions.setMassRepairOptimizeToCompleteToday(optimizeToCompleteTodayBox.isSelected());
 
 		if (!isModeWarehouse()) {
 			campaignOptions.setMassRepairScrapImpossible(scrapImpossibleBox.isSelected());
+			campaignOptions.setMassRepairUseAssignedTechsFirst(useAssignedTechsFirstBox.isSelected());
 		}
 
 		for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
@@ -1733,5 +1829,117 @@ public class MassRepairSalvageDialog extends JDialog {
 		protected JComboBox<String> maxSkillCBox = null;
 		protected JSpinner minBTHSpn = null;
 		protected JSpinner maxBTHSpn = null;
+	}
+
+	private static class MassRepairConfiguredOptions {
+		private boolean useExtraTime;
+		private boolean useRushJob;
+		private boolean allowCarryover;
+		private boolean optimizeToCompleteToday;
+		private boolean useAssignedTechsFirst;
+		private boolean scrapImpossible;
+
+		public boolean isUseExtraTime() {
+			return useExtraTime;
+		}
+
+		public void setUseExtraTime(boolean useExtraTime) {
+			this.useExtraTime = useExtraTime;
+		}
+
+		public boolean isUseRushJob() {
+			return useRushJob;
+		}
+
+		public void setUseRushJob(boolean useRushJob) {
+			this.useRushJob = useRushJob;
+		}
+
+		public boolean isAllowCarryover() {
+			return allowCarryover;
+		}
+
+		public void setAllowCarryover(boolean allowCarryover) {
+			this.allowCarryover = allowCarryover;
+		}
+
+		public boolean isOptimizeToCompleteToday() {
+			return optimizeToCompleteToday;
+		}
+
+		public void setOptimizeToCompleteToday(boolean optimizeToCompleteToday) {
+			this.optimizeToCompleteToday = optimizeToCompleteToday;
+		}
+
+		public boolean isUseAssignedTechsFirst() {
+			return useAssignedTechsFirst;
+		}
+
+		public void setUseAssignedTechsFirst(boolean useAssignedTechsFirst) {
+			this.useAssignedTechsFirst = useAssignedTechsFirst;
+		}
+
+		public boolean isScrapImpossible() {
+			return scrapImpossible;
+		}
+
+		public void setScrapImpossible(boolean scrapImpossible) {
+			this.scrapImpossible = scrapImpossible;
+		}
+
+		public void setup(CampaignOptions options) {
+			setUseExtraTime(options.massRepairUseExtraTime());
+			setUseRushJob(options.massRepairUseRushJob());
+			setAllowCarryover(options.massRepairAllowCarryover());
+			setOptimizeToCompleteToday(options.massRepairOptimizeToCompleteToday());
+			setScrapImpossible(options.massRepairScrapImpossible());
+			setUseAssignedTechsFirst(options.massRepairUseAssignedTechsFirst());
+		}
+
+		public void setup(MassRepairSalvageDialog dlg) {
+			setUseExtraTime(dlg.useExtraTimeBox.isSelected());
+			setUseRushJob(dlg.useRushJobBox.isSelected());
+			setAllowCarryover(dlg.allowCarryoverBox.isSelected());
+			setOptimizeToCompleteToday(dlg.optimizeToCompleteTodayBox.isSelected());
+
+			if (null != dlg.scrapImpossibleBox) {
+				setScrapImpossible(dlg.scrapImpossibleBox.isSelected());
+			}
+
+			if (null != dlg.useAssignedTechsFirstBox) {
+				setUseAssignedTechsFirst(dlg.useAssignedTechsFirstBox.isSelected());
+			}
+		}
+	}
+
+	private static class TechSorter implements Comparator<Person> {
+		private Part part = null;
+
+		public TechSorter(Part _part) {
+			this.part = _part;
+		}
+
+		@Override
+		public int compare(Person tech1, Person tech2) {
+			/*
+			 * Sort the valid techs by applicable skill. Let's start with the
+			 * least experienced and work our way up until we find someone who
+			 * can perform the work. If we have two techs with the same skill,
+			 * put the one with the lesser XP in the front.
+			 */
+
+			Skill skill1 = tech1.getSkillForWorkingOn(part);
+			Skill skill2 = tech2.getSkillForWorkingOn(part);
+
+			if (skill1.getExperienceLevel() == skill2.getExperienceLevel()) {
+				if (tech1.getXp() == tech2.getXp()) {
+					return 0;
+				}
+
+				return tech1.getXp() < tech2.getXp() ? -1 : 1;
+			}
+
+			return skill1.getExperienceLevel() < skill2.getExperienceLevel() ? -1 : 1;
+		}
 	}
 }
