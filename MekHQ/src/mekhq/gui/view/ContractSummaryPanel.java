@@ -36,6 +36,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQOptions;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
@@ -206,7 +207,7 @@ public class ContractSummaryPanel extends JPanel {
 		java.awt.GridBagConstraints gridBagConstraints;
 		mainPanel.setLayout(new java.awt.GridBagLayout());
 
-		SimpleDateFormat shortDateFormat = new SimpleDateFormat("MM/dd/yyyy");
+		SimpleDateFormat dateFormatShort = MekHQOptions.getInstance().getDateFormatShort();
 
 		int y = 0;
 
@@ -418,7 +419,7 @@ public class ContractSummaryPanel extends JPanel {
 		mainPanel.add(lblStartDate, gridBagConstraints);
 
 		txtStartDate.setName("txtStartDate"); // NOI18N
-		txtStartDate.setText(shortDateFormat.format(contract.getStartDate()));
+		txtStartDate.setText(dateFormatShort.format(contract.getStartDate()));
 		txtStartDate.setEditable(false);
 		txtStartDate.setLineWrap(true);
 		txtStartDate.setWrapStyleWord(true);

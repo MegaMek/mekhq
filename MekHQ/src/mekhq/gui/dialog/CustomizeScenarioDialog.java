@@ -44,6 +44,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumn;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQOptions;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Loot;
@@ -63,7 +64,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     private Campaign campaign;
     private boolean newScenario;
     private Date date;
-    private SimpleDateFormat dateFormatter;
+    private SimpleDateFormat dateFormatShort;
 
     private LootTableModel lootModel;
     
@@ -105,7 +106,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         if(null == date) {
         	date = campaign.getCalendar().getTime();
         }
-        dateFormatter = new SimpleDateFormat("MM/dd/yyyy");
+        dateFormatShort = MekHQOptions.getInstance().getDateFormatShort();
         loots = new ArrayList<Loot>();
         for(Loot loot : scenario.getLoot()) {
             loots.add((Loot)loot.clone());
@@ -182,7 +183,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         }
         if (!scenario.isCurrent() || (campaign.getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario)) {
 	        btnDate = new javax.swing.JButton();
-	        btnDate.setText(dateFormatter.format(date));
+	        btnDate.setText(dateFormatShort.format(date));
 	        btnDate.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {
 	                changeDate();
@@ -353,7 +354,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         		return;
         	}
             date = dc.getDate().getTime();
-            btnDate.setText(dateFormatter.format(date));
+            btnDate.setText(dateFormatShort.format(date));
         }
     }
     

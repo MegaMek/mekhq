@@ -3,13 +3,13 @@ package mekhq.gui.model;
 import java.awt.Color;
 import java.awt.Component;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import mekhq.MekHQOptions;
 import mekhq.campaign.finances.Transaction;
 
 /**
@@ -91,8 +91,7 @@ public class FinanceTableModel extends DataTableModel {
             return formatter.format(balance);
         }
         if(col == COL_DATE) {
-            SimpleDateFormat shortDateFormat = new SimpleDateFormat("MM/dd/yyyy");
-            return shortDateFormat.format(transaction.getDate());
+            return MekHQOptions.getInstance().getDateFormatShort().format(transaction.getDate());
         }
         return "?";
     }

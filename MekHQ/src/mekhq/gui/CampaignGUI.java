@@ -218,6 +218,7 @@ import mekhq.gui.dialog.MaintenanceReportDialog;
 import mekhq.gui.dialog.ManageAssetsDialog;
 import mekhq.gui.dialog.MassRepairSalvageDialog;
 import mekhq.gui.dialog.MekHQAboutBox;
+import mekhq.gui.dialog.MekHQOptionsDialog;
 import mekhq.gui.dialog.MercRosterDialog;
 import mekhq.gui.dialog.MissionTypeDialog;
 import mekhq.gui.dialog.NewLoanDialog;
@@ -2858,6 +2859,17 @@ public class CampaignGUI extends JPanel {
         });
 
         menuFile.add(menuOptionsMM);
+        
+        JMenuItem menuOptionsMHQ = new JMenuItem(
+                resourceMap.getString("menuOptionsMHQ.text")); // NOI18N
+        menuOptionsMHQ.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	menuOptionsMHQActionPerformed(evt);
+            }
+        });
+
+        menuFile.add(menuOptionsMHQ);
 
         menuThemes = new JMenu("Themes");
         refreshThemeChoices();
@@ -4683,6 +4695,13 @@ public class CampaignGUI extends JPanel {
             refreshOverview();
         }
     }// GEN-LAST:event_menuOptionsActionPerformed
+    
+    private void menuOptionsMHQActionPerformed(java.awt.event.ActionEvent evt) {
+    	MekHQOptionsDialog mhqod = new MekHQOptionsDialog(getFrame(), false);
+    	mhqod.refreshOptions();
+    	mhqod.setVisible(true);
+    	
+    }
 
     private void miLoadForcesActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miLoadForcesActionPerformed
         try {

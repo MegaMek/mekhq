@@ -29,7 +29,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
@@ -48,6 +47,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQOptions;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
@@ -576,7 +576,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         lblYears.setText(loan.getYears() + " years");
         lblSchedule.setText(Finances.getScheduleName(loan.getPaymentSchedule()));
         lblPrincipal.setText(formatter.format(loan.getPrincipal()));
-        lblFirstPayment.setText(SimpleDateFormat.getDateInstance().format(loan.getNextPayDate()));
+        lblFirstPayment.setText(MekHQOptions.getInstance().getDateFormatShort().format(loan.getNextPayDate()));
         lblPayAmount.setText(formatter.format(loan.getPaymentAmount()));
         lblNPayment.setText(formatter.format(loan.getRemainingPayments()));
         lblTotalPayment.setText(formatter.format(loan.getRemainingValue()));

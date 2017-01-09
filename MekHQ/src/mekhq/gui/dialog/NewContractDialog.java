@@ -48,6 +48,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQOptions;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Contract;
@@ -66,7 +67,7 @@ public class NewContractDialog extends javax.swing.JDialog {
     protected Contract contract;
     protected Campaign campaign;
     protected DecimalFormat formatter;
-    protected SimpleDateFormat dateFormatter;
+    protected SimpleDateFormat dateFormatLong;
     private JComboBox<Person> cboNegotiator;
 
     
@@ -78,7 +79,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         contract = new Contract("New Contract", "New Employer");
         contract.calculateContract(campaign);
         formatter = new DecimalFormat();
-        dateFormatter = new SimpleDateFormat("EEEE, MMMM d yyyy");
+        dateFormatLong = MekHQOptions.getInstance().getDateFormatLong();
         initComponents();
         setLocationRelativeTo(parent);
     }
@@ -593,7 +594,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         
         
         btnDate = new javax.swing.JButton();
-        btnDate.setText(dateFormatter.format(contract.getStartDate()));
+        btnDate.setText(dateFormatLong.format(contract.getStartDate()));
         //btnDate.setMinimumSize(new java.awt.Dimension(400, 30));
         btnDate.setName("btnDate"); // NOI18N
         //btnDate.setPreferredSize(new java.awt.Dimension(400, 30));
@@ -939,7 +940,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         	}
             contract.setStartDate(dc.getDate().getTime());
             contract.calculateContract(campaign);
-            btnDate.setText(dateFormatter.format(contract.getStartDate()));
+            btnDate.setText(dateFormatLong.format(contract.getStartDate()));
         }
     }
     
@@ -1068,7 +1069,7 @@ public class NewContractDialog extends javax.swing.JDialog {
 
         contract.calculateContract(campaign);
         refreshTotals();
-        btnDate.setText(dateFormatter.format(contract.getStartDate()));
+        btnDate.setText(dateFormatLong.format(contract.getStartDate()));
     }
 
     // End of variables declaration//GEN-END:variables

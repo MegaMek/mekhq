@@ -92,6 +92,7 @@ import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import mekhq.MekHQOptions;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -122,7 +123,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private CampaignOptions options;
     private RandomSkillPreferences rskillPrefs;
     private GregorianCalendar date;
-    private SimpleDateFormat dateFormat;
+    private SimpleDateFormat dateFormatLong;
     private Frame frame;
     private String camoCategory;
     private String camoFileName;
@@ -427,7 +428,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         //this is a hack but I have no idea what is going on here
         this.frame = parent;
         this.date = campaign.calendar;
-        dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");
+        dateFormatLong = MekHQOptions.getInstance().getDateFormatLong();
         this.camoCategory = campaign.getCamoCategory();
         this.camoFileName = campaign.getCamoFileName();
         this.colorIndex = campaign.getColorIndex();
@@ -4559,7 +4560,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     }
 
     public String getDateAsString() {
-        return dateFormat.format(date.getTime());
+        return dateFormatLong.format(date.getTime());
     }
 
     public void setCamoIcon() {

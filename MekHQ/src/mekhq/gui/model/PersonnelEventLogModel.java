@@ -17,6 +17,7 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQOptions;
 import mekhq.campaign.Kill;
 import mekhq.campaign.LogEntry;
 
@@ -29,14 +30,14 @@ public class PersonnelEventLogModel extends DataTableModel {
     public final static int COL_TEXT = 1;
 
     private ResourceBundle resourceMap;
-    private SimpleDateFormat shortDateFormat;
+    private SimpleDateFormat dateFormatShort;
     private final int dateTextWidth;
 
     public PersonnelEventLogModel() {
         resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelEventLogModel", new EncodeControl()); //$NON-NLS-1$
-        shortDateFormat = new SimpleDateFormat(resourceMap.getString("date.format")); //$NON-NLS-1$
+        dateFormatShort = MekHQOptions.getInstance().getDateFormatShort();
         data = new ArrayList<Kill>();
-        dateTextWidth = getRenderer().metrics.stringWidth(shortDateFormat.format(new Date())) + 10;
+        dateTextWidth = getRenderer().metrics.stringWidth(dateFormatShort.format(new Date())) + 10;
     }
    
     @Override
@@ -66,7 +67,7 @@ public class PersonnelEventLogModel extends DataTableModel {
         LogEntry event = getEvent(row);
         switch(column) {
             case COL_DATE:
-                return shortDateFormat.format(event.getDate());
+                return dateFormatShort.format(event.getDate());
             case COL_TEXT:
                 return event.getDesc();
             default:

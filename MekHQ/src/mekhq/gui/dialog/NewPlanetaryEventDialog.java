@@ -37,12 +37,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import megamek.common.EquipmentType;
 import megamek.common.PlanetaryConditions;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQOptions;
 import mekhq.Utilities;
 import mekhq.adapter.SocioIndustrialDataAdapter;
 import mekhq.campaign.Campaign;
@@ -78,7 +77,6 @@ public class NewPlanetaryEventDialog extends JDialog {
     private static final String FIELD_GOVERNMENT = "government"; //$NON-NLS-1$
     private static final String FIELD_CONTROL = "control"; //$NON-NLS-1$
     
-    private final static DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd"); //$NON-NLS-1$
     private final static SocioIndustrialDataAdapter SOCIO_INDUSTRIAL_ADAPTER = new SocioIndustrialDataAdapter();
     
     ResourceBundle resourceMap;
@@ -836,7 +834,7 @@ public class NewPlanetaryEventDialog extends JDialog {
     }
     
     private void updateDate() {
-        dateButton.setText(date.toString(DATE_FORMATTER));
+        dateButton.setText(MekHQOptions.getInstance().getDateFormatShort().format(date));
         Planet.PlanetaryEvent event = getCurrentEvent();
 
         messageField.setText((null != event) ? event.message : null);

@@ -105,6 +105,7 @@ import megamek.common.util.BuildingBlock;
 import megamek.common.util.DirectoryItems;
 import megamek.common.weapons.BayWeapon;
 import mekhq.MekHQ;
+import mekhq.MekHQOptions;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.NullEntityException;
@@ -241,8 +242,6 @@ public class Campaign implements Serializable {
 
     // calendar stuff
     public GregorianCalendar calendar;
-    private SimpleDateFormat dateFormat;
-    private SimpleDateFormat shortDateFormat;
 
     private String factionCode;
     private String retainerEmployerCode; //AtB
@@ -297,8 +296,6 @@ public class Campaign implements Serializable {
         currentReportHTML = "";
         newReports = new ArrayList<String>();
         calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
-        dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");
-        shortDateFormat = new SimpleDateFormat("yyyyMMdd");
         name = "My Campaign";
         rng = new RandomNameGenerator();
         rng.populateNames();
@@ -589,7 +586,7 @@ public class Campaign implements Serializable {
 					report.append(shipSearchResult)
 						.append(" is available for purchase for ")
 						.append(NumberFormat.getInstance().format(ms.getCost()))
-						.append(" C-bills until ").append(dateFormat.format(shipSearchExpiration.getTime()));
+						.append(" C-bills until ").append(MekHQOptions.getInstance().getDateFormatLong().format(shipSearchExpiration.getTime()));
 				} else {
 					report.append(" <font color=\"red\">Could not determine ship type.</font>");
 				}
@@ -2951,11 +2948,11 @@ public class Campaign implements Serializable {
     }
 
     public String getDateAsString() {
-        return dateFormat.format(calendar.getTime());
+        return MekHQOptions.getInstance().getDateFormatLong().format(calendar.getTime());
     }
 
     public String getShortDateAsString() {
-        return shortDateFormat.format(calendar.getTime());
+        return MekHQOptions.getInstance().getDateFormatShort().format(calendar.getTime());
     }
 
     public void restore() {
@@ -3331,7 +3328,7 @@ public class Campaign implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastForceId", lastForceId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastMissionId", lastMissionId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastScenarioId", lastScenarioId);
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat df = MekHQOptions.getInstance().getDateFormatDataStorage();
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "calendar",
                                        df.format(calendar.getTime()));
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "fatigueLevel", fatigueLevel);
@@ -3424,13 +3421,13 @@ public class Campaign implements Serializable {
             retirementDefectionTracker.writeToXml(pw1, 1);
             if (shipSearchStart != null) {
             	MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "shipSearchStart",
-            			shortDateFormat.format(shipSearchStart.getTime()));
+            			MekHQOptions.getInstance().getDateFormatDataStorage().format(shipSearchStart.getTime()));
             }
             MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "shipSearchType", shipSearchType);
             MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "shipSearchResult", shipSearchResult);
             if (shipSearchExpiration != null) {
             	MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "shipSearchExpiration",
-            			shortDateFormat.format(shipSearchExpiration.getTime()));
+            			MekHQOptions.getInstance().getDateFormatDataStorage().format(shipSearchExpiration.getTime()));
             }
         }
         
@@ -3749,14 +3746,22 @@ public class Campaign implements Serializable {
                 	retVal.retirementDefectionTracker = RetirementDefectionTracker.generateInstanceFromXML(wn, retVal);
                 } else if (xn.equalsIgnoreCase("shipSearchStart")) {
                 	retVal.shipSearchStart = new GregorianCalendar();
-                	retVal.shipSearchStart.setTime(retVal.shortDateFormat.parse(wn.getTextContent()));
+                	try {
+                		retVal.shipSearchStart.setTime(MekHQOptions.getInstance().getDateFormatDataStorage().parse(wn.getTextContent()));
+                	} catch (ParseException e) {
+                		retVal.shipSearchStart.setTime(new SimpleDateFormat("yyyyMMdd").parse(wn.getTextContent()));
+                	}
                 } else if (xn.equalsIgnoreCase("shipSearchType")) {
                 	retVal.shipSearchType = Integer.parseInt(wn.getTextContent());
                 } else if (xn.equalsIgnoreCase("shipSearchResult")) {
                 	retVal.shipSearchResult = wn.getTextContent();
                 } else if (xn.equalsIgnoreCase("shipSearchExpiration")) {
                 	retVal.shipSearchExpiration = new GregorianCalendar();
-                	retVal.shipSearchExpiration.setTime(retVal.shortDateFormat.parse(wn.getTextContent()));
+                	try {
+                		retVal.shipSearchExpiration.setTime(MekHQOptions.getInstance().getDateFormatDataStorage().parse(wn.getTextContent()));
+                	} catch (ParseException e) {
+                		retVal.shipSearchStart.setTime(new SimpleDateFormat("yyyyMMdd").parse(wn.getTextContent()));
+                	}
                 } else if (xn.equalsIgnoreCase("customPlanetaryEvents")) {
                     updatePlanetaryEventsFromXML(wn);
                 }
@@ -4883,12 +4888,17 @@ public class Campaign implements Serializable {
                 // handle it.
                 // They're all primitives anyway...
                 if (xn.equalsIgnoreCase("calendar")) {
-                    SimpleDateFormat df = new SimpleDateFormat(
-                            "yyyy-MM-dd hh:mm:ss");
-                    retVal.calendar = (GregorianCalendar) GregorianCalendar
-                            .getInstance();
-                    retVal.calendar.setTime(df
-                                                    .parse(wn.getTextContent().trim()));
+                	SimpleDateFormat df = MekHQOptions.getInstance().getDateFormatDataStorage();
+                    SimpleDateFormat fallbackFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                    retVal.calendar = (GregorianCalendar) GregorianCalendar.getInstance();
+                    Date date = null;
+                    try {
+                    	date = df.parse(wn.getTextContent().trim());
+                        retVal.calendar.setTime(date);
+                    } catch(ParseException pe) {
+                    	date = fallbackFormat.parse(wn.getTextContent().trim());
+                        retVal.calendar.setTime(date);
+                    }
                 } else if (xn.equalsIgnoreCase("camoCategory")) {
                     String val = wn.getTextContent().trim();
 

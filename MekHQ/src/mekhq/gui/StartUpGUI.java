@@ -27,6 +27,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.gui.dialog.DataLoadingDialog;
+import mekhq.gui.dialog.MekHQOptionsDialog;
 /**
  *
  * @author Jay
@@ -89,6 +90,19 @@ public class StartUpGUI extends javax.swing.JPanel {
             	loadCampaign(lastSave);
             }
         });
+        
+        btnOptions = new javax.swing.JButton(resourceMap.getString("btnOptions.text"));
+        btnOptions.setMinimumSize(new Dimension(200, 25));
+        btnOptions.setPreferredSize(new Dimension(200, 25));
+        btnOptions.setMaximumSize(new Dimension(200, 25));
+        btnOptions.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	MekHQOptionsDialog mhqod = new MekHQOptionsDialog(frame, true);
+            	mhqod.refreshOptions();
+            	mhqod.setVisible(true);
+            }
+        });
+        
         btnQuit = new javax.swing.JButton(resourceMap.getString("btnQuit.text"));
         btnQuit.setMinimumSize(new Dimension(200, 25));
         btnQuit.setPreferredSize(new Dimension(200, 25));
@@ -97,7 +111,7 @@ public class StartUpGUI extends javax.swing.JPanel {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 System.exit(0);
             }
-        });
+        }); 
         
         // initialize splash image
         imgSplash = getToolkit().getImage("data/images/misc/mekhq-splash.png"); //$NON-NLS-1$
@@ -118,6 +132,8 @@ public class StartUpGUI extends javax.swing.JPanel {
         add(btnLoadGame);
         add(Box.createRigidArea(new Dimension(0,5)));
         add(btnLastSave);
+        add(Box.createRigidArea(new Dimension(0,5)));
+        add(btnOptions);
         add(Box.createRigidArea(new Dimension(0,5)));
         add(btnQuit);
                 
@@ -183,5 +199,6 @@ public class StartUpGUI extends javax.swing.JPanel {
     private javax.swing.JButton btnNewGame;
     private javax.swing.JButton btnLoadGame;
     private javax.swing.JButton btnLastSave;
+    private javax.swing.JButton btnOptions;
     private javax.swing.JButton btnQuit;
 }

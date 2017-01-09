@@ -33,6 +33,7 @@ import org.w3c.dom.NodeList;
 
 import megamek.common.BattleArmor;
 import megamek.common.Infantry;
+import mekhq.MekHQOptions;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -464,7 +465,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 
 	protected void writeToXmlBegin(PrintWriter pw1, int indent) {
 		super.writeToXmlBegin(pw1, indent);
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		SimpleDateFormat df = MekHQOptions.getInstance().getDateFormatDataStorage();
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<nMonths>"
 				+nMonths
@@ -566,7 +567,8 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 	public void loadFieldsFromXmlNode(Node wn) throws ParseException {
 		// Okay, now load mission-specific fields!
 		NodeList nl = wn.getChildNodes();
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		SimpleDateFormat df = MekHQOptions.getInstance().getDateFormatDataStorage();
+		SimpleDateFormat fallbackFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
@@ -575,10 +577,18 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 				employer = wn2.getTextContent();
 			}
 			else if (wn2.getNodeName().equalsIgnoreCase("startDate")) {
-				startDate = df.parse(wn2.getTextContent().trim());
+				try {
+					startDate = df.parse(wn2.getTextContent().trim());
+				} catch (ParseException e) {
+					startDate = fallbackFormat.parse(wn2.getTextContent().trim());
+				}
 			}
 			else if (wn2.getNodeName().equalsIgnoreCase("endDate")) {
-				endDate = df.parse(wn2.getTextContent().trim());
+				try {
+					endDate = df.parse(wn2.getTextContent().trim());
+				} catch (ParseException e) {
+					endDate = fallbackFormat.parse(wn2.getTextContent().trim());
+				}
 			}
 			else if (wn2.getNodeName().equalsIgnoreCase("nMonths")) {
 				nMonths = Integer.parseInt(wn2.getTextContent().trim());

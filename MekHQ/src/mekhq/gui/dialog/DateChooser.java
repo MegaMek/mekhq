@@ -37,6 +37,7 @@ import javax.swing.text.DateFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 
 import mekhq.MekHQ;
+import mekhq.MekHQOptions;
 
 /**
  * Hovanes Gambaryan Henry Demirchian CSUN, CS 585 Professor Mike Barnes
@@ -70,8 +71,10 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
     public static final int OK_OPTION = 1;
     public static final int CANCEL_OPTION = 2;
 
-    private final DateFormat MMDDYYYY = new SimpleDateFormat("MM/dd/yyyy");
-    private final DateFormat ISO8601 = new SimpleDateFormat("yyyy-MM-dd");
+    private final DateFormat ISO8601 = new SimpleDateFormat(MekHQOptions.DATE_PATTERN_ISO_SHORT);
+    private final DateFormat DDMMYYY = new SimpleDateFormat(MekHQOptions.DATE_PATTERN_LITTLE_ENDIAN_SHORT);
+    
+    private final DateFormat dateFormatShort;
 
     private static final ArrayList<String> monthNames;
     static {
@@ -113,6 +116,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         super(owner, "Date Chooser", true);
         date = d;
         workingDate = date;
+        dateFormatShort = MekHQOptions.getInstance().getDateFormatShort();
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
@@ -175,7 +179,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
             dateField = new JFormattedTextField();
             dateField.addFocusListener(this);
             dateField.addKeyListener(this);
-            dateField.setFormatterFactory(new DefaultFormatterFactory(new DateFormatter(MMDDYYYY)));
+            dateField.setFormatterFactory(new DefaultFormatterFactory(new DateFormatter(dateFormatShort)));
             dateField.setText(dateField.getFormatter().valueToString(date.getTime()));
             dateField.setToolTipText("Date of the transaction.");
             dateField.setName("dateField");
@@ -269,7 +273,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
             ready = true;
 
             //Set the date field to the new date.
-            dateField.setText(MMDDYYYY.format(date.getTime()));
+            dateField.setText(dateFormatShort.format(date.getTime()));
             setVisible(false);
         }
     }
@@ -285,7 +289,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         ready = true;
         monthLabel.setText(monthNames.get(cal.get(Calendar.MONTH)));
         yearLabel.setText("" + cal.get(Calendar.YEAR));
-        dateField.setText(MMDDYYYY.format(date.getTime()));
+        dateField.setText(dateFormatShort.format(date.getTime()));
         updateDayGrid(fromDateField);
 
     }
@@ -387,7 +391,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         //Update the date field with the newly selected date.
         if (dateField != null && !fromDateField) {
             workingDate = new GregorianCalendar(y, m, workingDay);
-            String textDate = MMDDYYYY.format(workingDate.getTime());
+            String textDate = dateFormatShort.format(workingDate.getTime());
             dateField.setText(textDate);
         }
 
@@ -492,8 +496,9 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                 DateFormat.getDateInstance(DateFormat.FULL),
                 DateFormat.getDateInstance(DateFormat.DEFAULT),
                 DateFormat.getDateInstance(DateFormat.MEDIUM),
-                MMDDYYYY,
-                ISO8601
+                dateFormatShort,
+                ISO8601,
+                DDMMYYY,
         };
         for (DateFormat format : dateFormats) {
             try {

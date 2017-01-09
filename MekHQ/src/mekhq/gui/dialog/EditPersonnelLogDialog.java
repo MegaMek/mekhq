@@ -26,7 +26,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridLayout;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
@@ -40,6 +39,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQOptions;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LogEntry;
 import mekhq.campaign.personnel.Person;
@@ -246,8 +246,7 @@ public class EditPersonnelLogDialog extends javax.swing.JDialog {
 	        	entry = (LogEntry)data.get(row);
 	        }
 			if(col == COL_DATE) {
-				SimpleDateFormat shortDateFormat = new SimpleDateFormat("MM/dd/yyyy");
-				return shortDateFormat.format(entry.getDate());
+				return MekHQOptions.getInstance().getDateFormatShort().format(entry.getDate());
 			}
 			if(col == COL_DESC) {
 				return entry.getDesc();

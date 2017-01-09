@@ -23,11 +23,13 @@
 package mekhq.campaign;
 
 import java.io.PrintWriter;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
 import mekhq.MekHQ;
+import mekhq.MekHQOptions;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 
@@ -42,7 +44,6 @@ public class LogEntry implements MekHqXmlSerializable {
     private String type;
     private Date date;
     private String desc;
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
     public LogEntry() {
         this(null, "", null);
@@ -91,7 +92,7 @@ public class LogEntry implements MekHqXmlSerializable {
         StringBuilder sb = new StringBuilder();
         sb.append(MekHqXmlUtil.indentStr(indent)).append("<logEntry>");
         if(null != date) {
-            sb.append("<date>").append(DATE_FORMAT.format(date)).append("</date>");
+            sb.append("<date>").append(MekHQOptions.getInstance().getDateFormatDataStorage().format(date)).append("</date>");
         }
         sb.append("<desc>").append(MekHqXmlUtil.escape(desc)).append("</desc>");
         if(null != type) {
@@ -116,7 +117,11 @@ public class LogEntry implements MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("type")) {
                     retVal.type = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
-                    retVal.date = DATE_FORMAT.parse(wn2.getTextContent().trim());
+                	try {
+                		retVal.date = MekHQOptions.getInstance().getDateFormatDataStorage().parse(wn2.getTextContent().trim());
+                	} catch (ParseException e) {
+                		retVal.date = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(wn2.getTextContent().trim());
+                	}
                 }
             }
         } catch (Exception ex) {
@@ -131,7 +136,7 @@ public class LogEntry implements MekHqXmlSerializable {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         if(null != date) {
-            sb.append("[").append(DATE_FORMAT.format(date)).append("] ");
+            sb.append("[").append(MekHQOptions.getInstance().getDateFormatDataStorage().format(date)).append("] ");
         }
         sb.append(desc);
         return sb.toString();

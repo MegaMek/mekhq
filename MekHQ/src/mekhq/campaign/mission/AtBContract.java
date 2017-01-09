@@ -41,6 +41,7 @@ import megamek.common.Player;
 import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
+import mekhq.MekHQOptions;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.UnitMarket;
@@ -1104,7 +1105,7 @@ public class AtBContract extends Contract implements Serializable {
 		if (null != routEnd) {
 			pw1.println(MekHqXmlUtil.indentStr(indent+1)
 					+"<routEnd>"
-					+ new SimpleDateFormat("yyyy-MM-dd").format(routEnd)
+					+ MekHQOptions.getInstance().getDateFormatDataStorage().format(routEnd)
 					+"</routEnd>");
 		}
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -1199,7 +1200,13 @@ public class AtBContract extends Contract implements Serializable {
 			} else if (wn2.getNodeName().equalsIgnoreCase("moraleLevel")) {
 				moraleLevel = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("routEnd")) {
-				routEnd = new SimpleDateFormat("yyyy-MM-dd").parse(wn2.getTextContent());
+				SimpleDateFormat df = MekHQOptions.getInstance().getDateFormatDataStorage();
+				SimpleDateFormat fallbackFormat = new SimpleDateFormat("yyyy-MM-dd");
+				try {
+					routEnd = df.parse(wn2.getTextContent());
+				} catch (ParseException e) {
+					routEnd = fallbackFormat.parse(wn2.getTextContent());
+				}
 			} else if (wn2.getNodeName().equalsIgnoreCase("partsAvailabilityLevel")) {
 				partsAvailabilityLevel = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("extensionLength")) {
@@ -1219,7 +1226,13 @@ public class AtBContract extends Contract implements Serializable {
 			} else if (wn2.getNodeName().equalsIgnoreCase("nextWeekBattleTypeMod")) {
 				nextWeekBattleTypeMod = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("specialEventScenarioDate")) {
-				specialEventScenarioDate = new SimpleDateFormat("yyyy-MM-dd").parse(wn2.getTextContent());
+				SimpleDateFormat df = MekHQOptions.getInstance().getDateFormatDataStorage();
+				SimpleDateFormat fallbackFormat = new SimpleDateFormat("yyyy-MM-dd");
+				try {
+					specialEventScenarioDate = df.parse(wn2.getTextContent());
+				} catch (ParseException e) {
+					specialEventScenarioDate = fallbackFormat.parse(wn2.getTextContent());
+				}
 			} else if (wn2.getNodeName().equalsIgnoreCase("specialEventScenarioType")) {
 				specialEventScenarioType = Integer.parseInt(wn2.getTextContent());
 			}
