@@ -280,6 +280,46 @@ import mekhq.gui.view.UnitViewPanel;
  */
 public class CampaignGUI extends JPanel {
     private static final long serialVersionUID = -687162569841072579L;
+    
+    public enum StandardTabs {
+    	TOE (0, "panOrganization.TabConstraints.tabTitle"),  //$NON-NLS-1$
+    	BRIEFING (1, "panBriefing.TabConstraints.tabTitle"),  //$NON-NLS-1$
+    	MAP (2, "panMap.TabConstraints.tabTitle"),  //$NON-NLS-1$
+    	PERSONNEL (3, "panPersonnel.TabConstraints.tabTitle"),  //$NON-NLS-1$
+    	HANGAR (4, "panHangar.TabConstraints.tabTitle"),  //$NON-NLS-1$
+    	WAREHOUSE (5, "panSupplies.TabConstraints.tabTitle"),  //$NON-NLS-1$
+    	REPAIR (6, "panRepairBay.TabConstraints.tabTitle"),  //$NON-NLS-1$
+    	INFIRMARY (7, "panInfirmary.TabConstraints.tabTitle"),  //$NON-NLS-1$
+    	MEKLAB (8, "panMekLab.TabConstraints.tabTitle"),  //$NON-NLS-1$
+    	FINANCES (9, "panFinances.TabConstraints.tabTitle"),  //$NON-NLS-1$
+    	OVERVIEW (10, "panOverview.TabConstraints.tabTitle");  //$NON-NLS-1$
+    	
+    	private int defaultPos;
+    	private String name;
+    	
+    	public int getDefaultPos() {
+    		return defaultPos;
+    	}
+    	
+    	public String getName() {
+    		return name;
+    	}
+    	
+    	public static StandardTabs tabAtPos(int index) {
+    		for (StandardTabs tab : values()) {
+    			if (tab.defaultPos == index) {
+    				return tab;
+    			}
+    		}
+    		return null;
+    	}
+    	
+    	StandardTabs(int defaultPos, String resKey) {
+    		this.defaultPos = defaultPos;
+    		this.name = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl())
+    				.getString(resKey); //$NON-NLS-1$;
+    	}
+    }
 
     public static final int UNIT_VIEW_WIDTH = 450;
     public static final int PERSONNEL_VIEW_WIDTH = 500;
@@ -369,6 +409,8 @@ public class CampaignGUI extends JPanel {
     private JMenuItem miShipSearch;
     private JMenuItem miRetirementDefectionDialog;
     private JCheckBoxMenuItem miShowOverview;
+    
+    private HashMap<String,CampaignGuiTab> tabs;
     
     /* For the TO&E tab */
     private JPanel panOrganization;
@@ -563,6 +605,7 @@ public class CampaignGUI extends JPanel {
         this.app = app;
         reportHLL = new ReportHyperlinkListener(this);
         selectedMission = -1;
+        tabs = new HashMap<>();
         initComponents();
     }
 
@@ -820,6 +863,64 @@ public class CampaignGUI extends JPanel {
 
         mainPanel.setDividerLocation(0.75);
     }
+    
+    public void addTab(CampaignGuiTab tab) {
+    	tabMain.add(tab.getName(), tab);
+    	tabs.put(tab.getName(), tab);
+    }
+    
+    public void insertTab(CampaignGuiTab tab, int index) {
+    	tabMain.insertTab(tab.getName(), null, tab, null, index);
+    	tabs.put(tab.getName(), tab);
+    }
+    
+    public void insertTabAfter(CampaignGuiTab tab, StandardTabs std) {
+    	int index = tabMain.indexOfTab(std.getName());
+    	if (index < 0) {
+    		if (std.getDefaultPos() == 0) {
+    			index = tabMain.getTabCount();
+    		} else {
+	    		for (int i = std.getDefaultPos() - 1; i >= 0; i--) {
+	    			index = tabMain.indexOfTab(StandardTabs.values()[i].getName());
+	    			if (index >= 0) {
+	    				break;
+	    			}
+	    		}
+    		}
+    	}
+		insertTab(tab, index);
+    }
+    
+    public void insertTabBefore(CampaignGuiTab tab, StandardTabs std) {
+    	int index = tabMain.indexOfTab(std.getName());
+    	if (index < 0) {
+    		if (std.getDefaultPos() == StandardTabs.values().length - 1) {
+    			index = tabMain.getTabCount();
+    		} else {
+	    		for (int i = std.getDefaultPos() + 1; i >= StandardTabs.values().length; i++) {
+	    			index = tabMain.indexOfTab(StandardTabs.values()[i].getName());
+	    			if (index >= 0) {
+	    				break;
+	    			}
+	    		}
+    		}
+    	}
+		insertTab(tab, Math.max(0, index - 1));
+    }
+    
+    public CampaignGuiTab removeTab(CampaignGuiTab tab) {
+    	return removeTab(tab.getName());
+    }
+    
+    public CampaignGuiTab removeTab(String tabName) {
+    	int index = tabMain.indexOfTab(tabName);
+    	if (index >= 0) {
+    		tabMain.removeTabAt(index);
+    		return tabs.remove(tabName);
+    	}
+    	return null;
+    }
+    
 
     private void initToeTab() {
         GridBagConstraints gridBagConstraints;
