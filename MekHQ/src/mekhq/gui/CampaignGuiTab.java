@@ -41,11 +41,11 @@ public abstract class CampaignGuiTab extends JPanel {
 
 	private CampaignGUI gui;
 	
-	protected String name;
+	protected String tabName;
 	
-	public CampaignGuiTab(CampaignGUI gui, String name) {
+	public CampaignGuiTab(CampaignGUI gui, String tabName) {
 		this.gui = gui;
-		this.name = name;
+		this.tabName = tabName;
 		initTab();
 	}
 	
@@ -70,8 +70,8 @@ public abstract class CampaignGuiTab extends JPanel {
 		return gui.getIconPackage();
 	}
 	
-	public String getName() {
-		return name;
+	public String getTabName() {
+		return tabName;
 	}
 	
 	abstract public void initTab();

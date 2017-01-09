@@ -66,7 +66,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
@@ -89,7 +88,6 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
-import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
@@ -104,13 +102,10 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.MouseInputAdapter;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
-import javax.swing.tree.TreeSelectionModel;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -192,7 +187,6 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.adapter.FinanceTableMouseAdapter;
 import mekhq.gui.adapter.LoanTableMouseAdapter;
-import mekhq.gui.adapter.OrgTreeMouseAdapter;
 import mekhq.gui.adapter.PartsTableMouseAdapter;
 import mekhq.gui.adapter.PersonnelTableMouseAdapter;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
@@ -233,12 +227,10 @@ import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.ShipSearchDialog;
 import mekhq.gui.dialog.UnitMarketDialog;
 import mekhq.gui.dialog.UnitSelectorDialog;
-import mekhq.gui.handler.OrgTreeTransferHandler;
 import mekhq.gui.model.AcquisitionTableModel;
 import mekhq.gui.model.DocTableModel;
 import mekhq.gui.model.FinanceTableModel;
 import mekhq.gui.model.LoanTableModel;
-import mekhq.gui.model.OrgTreeModel;
 import mekhq.gui.model.PartsInUseTableModel;
 import mekhq.gui.model.PartsInUseTableModel.ButtonColumn;
 import mekhq.gui.model.PartsTableModel;
@@ -266,7 +258,6 @@ import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.view.AtBContractViewPanel;
 import mekhq.gui.view.AtBScenarioViewPanel;
 import mekhq.gui.view.ContractViewPanel;
-import mekhq.gui.view.ForceViewPanel;
 import mekhq.gui.view.JumpPathViewPanel;
 import mekhq.gui.view.LanceAssignmentView;
 import mekhq.gui.view.MissionViewPanel;
@@ -301,23 +292,14 @@ public class CampaignGUI extends JPanel {
     		return defaultPos;
     	}
     	
-    	public String getName() {
+    	public String getTabName() {
     		return name;
-    	}
-    	
-    	public static StandardTabs tabAtPos(int index) {
-    		for (StandardTabs tab : values()) {
-    			if (tab.defaultPos == index) {
-    				return tab;
-    			}
-    		}
-    		return null;
     	}
     	
     	StandardTabs(int defaultPos, String resKey) {
     		this.defaultPos = defaultPos;
-    		this.name = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl())
-    				.getString(resKey); //$NON-NLS-1$;
+    		this.name = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl()) //$NON-NLS-1$;
+    				.getString(resKey);
     	}
     }
 
@@ -412,12 +394,6 @@ public class CampaignGUI extends JPanel {
     
     private HashMap<String,CampaignGuiTab> tabs;
     
-    /* For the TO&E tab */
-    private JPanel panOrganization;
-    private JTree orgTree;
-    private JSplitPane splitOrg;
-    private JScrollPane scrollForceView;
-
     /* For the briefing room tab */
     private JPanel panBriefing;
     private JPanel panScenario;
@@ -554,7 +530,6 @@ public class CampaignGUI extends JPanel {
     private FinanceTableModel financeModel;
     private LoanTableModel loanModel;
     private ScenarioTableModel scenarioModel;
-    private OrgTreeModel orgModel;
     private PartsInUseTableModel overviewPartsModel;
 
 
@@ -731,10 +706,8 @@ public class CampaignGUI extends JPanel {
         tabMain.setMinimumSize(new java.awt.Dimension(600, 200));
         tabMain.setPreferredSize(new java.awt.Dimension(900, 300));
 
-        initToeTab();
-        tabMain.addTab(resourceMap
-                .getString("panOrganization.TabConstraints.tabTitle"),
-                panOrganization); // NOI18N
+        addTab(new TOETab(this, resourceMap
+                .getString("panOrganization.TabConstraints.tabTitle"))); // NOI18N
 
         initBriefingTab();
         tabMain.addTab(
@@ -865,23 +838,23 @@ public class CampaignGUI extends JPanel {
     }
     
     public void addTab(CampaignGuiTab tab) {
-    	tabMain.add(tab.getName(), tab);
-    	tabs.put(tab.getName(), tab);
+    	tabMain.add(tab.getTabName(), tab);
+    	tabs.put(tab.getTabName(), tab);
     }
     
     public void insertTab(CampaignGuiTab tab, int index) {
-    	tabMain.insertTab(tab.getName(), null, tab, null, index);
-    	tabs.put(tab.getName(), tab);
+    	tabMain.insertTab(tab.getTabName(), null, tab, null, index);
+    	tabs.put(tab.getTabName(), tab);
     }
     
     public void insertTabAfter(CampaignGuiTab tab, StandardTabs std) {
-    	int index = tabMain.indexOfTab(std.getName());
+    	int index = tabMain.indexOfTab(std.getTabName());
     	if (index < 0) {
     		if (std.getDefaultPos() == 0) {
     			index = tabMain.getTabCount();
     		} else {
 	    		for (int i = std.getDefaultPos() - 1; i >= 0; i--) {
-	    			index = tabMain.indexOfTab(StandardTabs.values()[i].getName());
+	    			index = tabMain.indexOfTab(StandardTabs.values()[i].getTabName());
 	    			if (index >= 0) {
 	    				break;
 	    			}
@@ -892,13 +865,13 @@ public class CampaignGUI extends JPanel {
     }
     
     public void insertTabBefore(CampaignGuiTab tab, StandardTabs std) {
-    	int index = tabMain.indexOfTab(std.getName());
+    	int index = tabMain.indexOfTab(std.getTabName());
     	if (index < 0) {
     		if (std.getDefaultPos() == StandardTabs.values().length - 1) {
     			index = tabMain.getTabCount();
     		} else {
 	    		for (int i = std.getDefaultPos() + 1; i >= StandardTabs.values().length; i++) {
-	    			index = tabMain.indexOfTab(StandardTabs.values()[i].getName());
+	    			index = tabMain.indexOfTab(StandardTabs.values()[i].getTabName());
 	    			if (index >= 0) {
 	    				break;
 	    			}
@@ -909,7 +882,7 @@ public class CampaignGUI extends JPanel {
     }
     
     public CampaignGuiTab removeTab(CampaignGuiTab tab) {
-    	return removeTab(tab.getName());
+    	return removeTab(tab.getTabName());
     }
     
     public CampaignGuiTab removeTab(String tabName) {
@@ -921,58 +894,6 @@ public class CampaignGUI extends JPanel {
     	return null;
     }
     
-
-    private void initToeTab() {
-        GridBagConstraints gridBagConstraints;
-
-        panOrganization = new JPanel(new GridBagLayout());
-
-        orgModel = new OrgTreeModel(getCampaign());
-        orgTree = new JTree(orgModel);
-        orgTree.addMouseListener(new OrgTreeMouseAdapter(this));
-        orgTree.setCellRenderer(new ForceRenderer(getIconPackage()));
-        orgTree.setRowHeight(60);
-        orgTree.getSelectionModel().setSelectionMode(
-                TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
-        orgTree.addTreeSelectionListener(new TreeSelectionListener() {
-            @Override
-            public void valueChanged(TreeSelectionEvent e) {
-                refreshForceView();
-            }
-        });
-        orgTree.setDragEnabled(true);
-        orgTree.setDropMode(DropMode.ON);
-        orgTree.setTransferHandler(new OrgTreeTransferHandler(this));
-
-        scrollForceView = new JScrollPane();
-        scrollForceView.setMinimumSize(new java.awt.Dimension(550, 600));
-        scrollForceView.setPreferredSize(new java.awt.Dimension(550, 600));
-        scrollForceView
-                .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
-        splitOrg = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(orgTree), scrollForceView);
-        splitOrg.setOneTouchExpandable(true);
-        splitOrg.setResizeWeight(1.0);
-        splitOrg.addPropertyChangeListener(
-                JSplitPane.DIVIDER_LOCATION_PROPERTY,
-                new PropertyChangeListener() {
-                    @Override
-                    public void propertyChange(PropertyChangeEvent pce) {
-                        // this can mess up the unit view panel so refresh it
-                        refreshForceView();
-                    }
-                });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        panOrganization.add(splitOrg, gridBagConstraints);
-
-    }
 
     private void initBriefingTab() {
         GridBagConstraints gridBagConstraints;
@@ -5314,46 +5235,9 @@ public class CampaignGUI extends JPanel {
     }
 
     public void refreshForceView() {
-        Object node = orgTree.getLastSelectedPathComponent();
-        if (null == node
-                || -1 == orgTree.getRowForPath(orgTree.getSelectionPath())) {
-            scrollForceView.setViewportView(null);
-            return;
-        }
-        if (node instanceof Unit) {
-            Unit u = ((Unit) node);
-            JTabbedPane tabUnit = new JTabbedPane();
-            Person p = u.getCommander();
-            if (p != null) {
-                String name = "Commander";
-                if (u.usesSoloPilot()) {
-                    name = "Pilot";
-                }
-                tabUnit.add(name, new PersonViewPanel(p, getCampaign(), getIconPackage()));
-            }
-            tabUnit.add("Unit", new UnitViewPanel(u, getCampaign(),
-                    getIconPackage().getCamos(), getIconPackage()
-                            .getMechTiles()));
-            scrollForceView.setViewportView(tabUnit);
-            // This odd code is to make sure that the scrollbar stays at the top
-            // I can't just call it here, because it ends up getting reset
-            // somewhere later
-            javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    scrollForceView.getVerticalScrollBar().setValue(0);
-                }
-            });
-        } else if (node instanceof Force) {
-            scrollForceView.setViewportView(new ForceViewPanel((Force) node,
-                    getCampaign(), getIconPackage()));
-            javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    scrollForceView.getVerticalScrollBar().setValue(0);
-                }
-            });
-        }
+    	if (tabs.containsKey(StandardTabs.TOE.getTabName())) {
+    		((TOETab)tabs.get(StandardTabs.TOE.getTabName())).refreshForceView();
+    	}
     }
 
     public void refreshLanceAssignments() {
@@ -6947,21 +6831,9 @@ public class CampaignGUI extends JPanel {
     }
 
     public void refreshOrganization() {
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                orgTree.updateUI();
-                // This seems like bad juju since it makes it annoying as hell to
-                // add multiple units to a force if it's de-selected every single time
-                // So, commenting it out - ralgith
-                // orgTree.setSelectionPath(null);
-                refreshForceView();
-                if (getCampaign().getCampaignOptions().getUseAtB()) {
-                    refreshLanceAssignments();
-                }
-            }
-        });
-        refreshRating();
+    	if (tabs.containsKey(StandardTabs.TOE.getTabName())) {
+    		((TOETab)tabs.get(StandardTabs.TOE.getTabName())).refreshOrganization();
+    	}
     }
 
     public void refreshFunds() {
