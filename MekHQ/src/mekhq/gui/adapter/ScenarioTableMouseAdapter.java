@@ -13,23 +13,26 @@ import javax.swing.event.MouseInputAdapter;
 
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.gui.BriefingTab;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.CustomizeScenarioDialog;
 
 public class ScenarioTableMouseAdapter extends MouseInputAdapter implements
         ActionListener {
     private CampaignGUI gui;
+    private BriefingTab briefingTab;
 
-    public ScenarioTableMouseAdapter(CampaignGUI gui) {
+    public ScenarioTableMouseAdapter(CampaignGUI gui, BriefingTab briefingTab) {
         super();
         this.gui = gui;
+        this.briefingTab = briefingTab;
     }
 
     public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
-        Scenario scenario = gui.getScenarioModel().getScenario(gui.getScenarioTable()
+        Scenario scenario = briefingTab.getScenarioModel().getScenario(briefingTab.getScenarioTable()
                 .getSelectedRow());
-        Mission mission = gui.getCampaign().getMission(gui.getSelectedMission());
+        Mission mission = briefingTab.getSelectedMission();
         if (command.equalsIgnoreCase("EDIT")) {
             if (null != mission && null != scenario) {
                 CustomizeScenarioDialog csd = new CustomizeScenarioDialog(
@@ -65,13 +68,13 @@ public class ScenarioTableMouseAdapter extends MouseInputAdapter implements
     private void maybeShowPopup(MouseEvent e) {
         JPopupMenu popup = new JPopupMenu();
         if (e.isPopupTrigger()) {
-            int row = gui.getScenarioTable().getSelectedRow();
+            int row = briefingTab.getScenarioTable().getSelectedRow();
             if (row < 0) {
                 return;
             }
             @SuppressWarnings("unused")
             // FIXME
-            Scenario scenario = gui.getScenarioModel().getScenario(row);
+            Scenario scenario = briefingTab.getScenarioModel().getScenario(row);
             JMenuItem menuItem = null;
             JMenu menu = null;
             @SuppressWarnings("unused")

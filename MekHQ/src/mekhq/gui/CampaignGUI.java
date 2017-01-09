@@ -122,7 +122,6 @@ import megamek.common.AmmoType;
 import megamek.common.Crew;
 import megamek.common.Dropship;
 import megamek.common.Entity;
-import megamek.common.EntityListFile;
 import megamek.common.Jumpship;
 import megamek.common.MULParser;
 import megamek.common.MechView;
@@ -132,10 +131,8 @@ import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import megamek.common.WeaponType;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.options.GameOptions;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
-import megameklab.com.util.UnitPrintManager;
 import mekhq.IconPackage;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -144,12 +141,9 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.RandomSkillPreferences;
-import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Armor;
@@ -190,7 +184,6 @@ import mekhq.gui.adapter.LoanTableMouseAdapter;
 import mekhq.gui.adapter.PartsTableMouseAdapter;
 import mekhq.gui.adapter.PersonnelTableMouseAdapter;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
-import mekhq.gui.adapter.ScenarioTableMouseAdapter;
 import mekhq.gui.adapter.ServicedUnitsTableMouseAdapter;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
 import mekhq.gui.dialog.AddFundsDialog;
@@ -198,12 +191,7 @@ import mekhq.gui.dialog.AdvanceDaysDialog;
 import mekhq.gui.dialog.BatchXPDialog;
 import mekhq.gui.dialog.BloodnameDialog;
 import mekhq.gui.dialog.CampaignOptionsDialog;
-import mekhq.gui.dialog.ChooseMulFilesDialog;
-import mekhq.gui.dialog.CompleteMissionDialog;
 import mekhq.gui.dialog.ContractMarketDialog;
-import mekhq.gui.dialog.CustomizeAtBContractDialog;
-import mekhq.gui.dialog.CustomizeMissionDialog;
-import mekhq.gui.dialog.CustomizeScenarioDialog;
 import mekhq.gui.dialog.DailyReportLogDialog;
 import mekhq.gui.dialog.DataLoadingDialog;
 import mekhq.gui.dialog.GMToolsDialog;
@@ -213,7 +201,6 @@ import mekhq.gui.dialog.ManageAssetsDialog;
 import mekhq.gui.dialog.MassRepairSalvageDialog;
 import mekhq.gui.dialog.MekHQAboutBox;
 import mekhq.gui.dialog.MercRosterDialog;
-import mekhq.gui.dialog.MissionTypeDialog;
 import mekhq.gui.dialog.NewLoanDialog;
 import mekhq.gui.dialog.NewRecruitDialog;
 import mekhq.gui.dialog.NewsReportDialog;
@@ -222,7 +209,6 @@ import mekhq.gui.dialog.PersonnelMarketDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
 import mekhq.gui.dialog.RefitNameDialog;
 import mekhq.gui.dialog.ReportDialog;
-import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.ShipSearchDialog;
 import mekhq.gui.dialog.UnitMarketDialog;
@@ -237,7 +223,6 @@ import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.PatientTableModel;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.model.ProcurementTableModel;
-import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.model.TaskTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.model.UnitTableModel;
@@ -255,15 +240,9 @@ import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
 import mekhq.gui.sorter.WeightClassSorter;
 import mekhq.gui.utilities.JSuggestField;
-import mekhq.gui.view.AtBContractViewPanel;
-import mekhq.gui.view.AtBScenarioViewPanel;
-import mekhq.gui.view.ContractViewPanel;
 import mekhq.gui.view.JumpPathViewPanel;
-import mekhq.gui.view.LanceAssignmentView;
-import mekhq.gui.view.MissionViewPanel;
 import mekhq.gui.view.PersonViewPanel;
 import mekhq.gui.view.PlanetViewPanel;
-import mekhq.gui.view.ScenarioViewPanel;
 import mekhq.gui.view.UnitViewPanel;
 
 /**
@@ -394,32 +373,6 @@ public class CampaignGUI extends JPanel {
     
     private HashMap<String,CampaignGuiTab> tabs;
     
-    /* For the briefing room tab */
-    private JPanel panBriefing;
-    private JPanel panScenario;
-    private LanceAssignmentView panLanceAssignment;
-    private JSplitPane splitScenario;
-    private JSplitPane splitBrief;
-    private JSplitPane splitMission;
-    private JTable scenarioTable;
-    private JComboBox<String> choiceMission;
-    private JScrollPane scrollMissionView;
-    private JScrollPane scrollScenarioView;
-    private JPanel panMissionButtons;
-    private JPanel panScenarioButtons;
-    private JButton btnAddScenario;
-    private JButton btnAddMission;
-    private JButton btnEditMission;
-    private JButton btnCompleteMission;
-    private JButton btnDeleteMission;
-    private JButton btnStartGame;
-    private JButton btnJoinGame;
-    private JButton btnLoadGame;
-    private JButton btnPrintRS;
-    private JButton btnGetMul;
-    private JButton btnClearAssignedUnits;
-    private JButton btnResolveScenario;
-
     /* For the map tab */
     private JPanel panMapView;
     InterstellarMapPanel panMap;
@@ -529,7 +482,6 @@ public class CampaignGUI extends JPanel {
     private ProcurementTableModel acquireUnitsModel;
     private FinanceTableModel financeModel;
     private LoanTableModel loanModel;
-    private ScenarioTableModel scenarioModel;
     private PartsInUseTableModel overviewPartsModel;
 
 
@@ -570,8 +522,6 @@ public class CampaignGUI extends JPanel {
 
     ReportHyperlinkListener reportHLL;
 
-    public int selectedMission;
-
     private DailyReportLogDialog logDialog;
     private AdvanceDaysDialog advanceDaysDialog;
     private BloodnameDialog bloodnameDialog;
@@ -579,7 +529,6 @@ public class CampaignGUI extends JPanel {
     public CampaignGUI(MekHQ app) {
         this.app = app;
         reportHLL = new ReportHyperlinkListener(this);
-        selectedMission = -1;
         tabs = new HashMap<>();
         initComponents();
     }
@@ -708,11 +657,8 @@ public class CampaignGUI extends JPanel {
 
         addTab(new TOETab(this, resourceMap
                 .getString("panOrganization.TabConstraints.tabTitle"))); // NOI18N
-
-        initBriefingTab();
-        tabMain.addTab(
-                resourceMap.getString("panBriefing.TabConstraints.tabTitle"),
-                splitBrief); // NOI18N
+        addTab(new BriefingTab(this, resourceMap
+                .getString("panBriefing.TabConstraints.tabTitle"))); // NOI18N
 
         initMap();
         tabMain.addTab(resourceMap.getString("panMap.TabConstraints.tabTitle"),
@@ -778,6 +724,8 @@ public class CampaignGUI extends JPanel {
         add(mainPanel, BorderLayout.CENTER);
         add(btnPanel, BorderLayout.PAGE_START);
         add(statusPanel, BorderLayout.PAGE_END);
+        
+        tabs.values().forEach(t -> t.refreshAll());
 
         refreshServicedUnitList();
         refreshUnitList();
@@ -794,12 +742,9 @@ public class CampaignGUI extends JPanel {
         refreshFunds();
         refreshRating();
         refreshFinancialTransactions();
-        refreshOrganization();
-        refreshMissions();
         refreshLocation();
         refreshTempAstechs();
         refreshTempMedics();
-        refreshScenarioList();
         refreshOverview();
 
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -894,284 +839,6 @@ public class CampaignGUI extends JPanel {
     	return null;
     }
     
-
-    private void initBriefingTab() {
-        GridBagConstraints gridBagConstraints;
-
-        panBriefing = new JPanel(new GridBagLayout());
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 0.0;
-        panBriefing.add(new JLabel(resourceMap.getString("lblMission.text")),
-                gridBagConstraints);
-
-        choiceMission = new JComboBox<String>();
-        choiceMission.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                changeMission();
-            }
-        });
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        panBriefing.add(choiceMission, gridBagConstraints);
-
-        panMissionButtons = new JPanel(new GridLayout(2, 3));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        panBriefing.add(panMissionButtons, gridBagConstraints);
-
-        btnAddMission = new JButton(resourceMap.getString("btnAddMission.text")); // NOI18N
-        btnAddMission.setToolTipText(resourceMap
-                .getString("btnAddMission.toolTipText")); // NOI18N
-        btnAddMission.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addMission();
-            }
-        });
-        panMissionButtons.add(btnAddMission);
-
-        btnAddScenario = new JButton(
-                resourceMap.getString("btnAddScenario.text")); // NOI18N
-        btnAddScenario.setToolTipText(resourceMap
-                .getString("btnAddScenario.toolTipText")); // NOI18N
-        btnAddScenario.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addScenario();
-            }
-        });
-        panMissionButtons.add(btnAddScenario);
-
-        btnEditMission = new JButton(
-                resourceMap.getString("btnEditMission.text")); // NOI18N
-        btnEditMission.setToolTipText(resourceMap
-                .getString("btnEditMission.toolTipText")); // NOI18N
-        btnEditMission.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                editMission();
-            }
-        });
-        panMissionButtons.add(btnEditMission);
-
-        btnCompleteMission = new JButton(
-                resourceMap.getString("btnCompleteMission.text")); // NOI18N
-        btnCompleteMission.setToolTipText(resourceMap
-                .getString("btnCompleteMission.toolTipText")); // NOI18N
-        btnCompleteMission.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                completeMission();
-            }
-        });
-        panMissionButtons.add(btnCompleteMission);
-
-        btnDeleteMission = new JButton(
-                resourceMap.getString("btnDeleteMission.text")); // NOI18N
-        btnDeleteMission.setToolTipText(resourceMap
-                .getString("btnDeleteMission.toolTipText")); // NOI18N
-        btnDeleteMission.setName("btnDeleteMission"); // NOI18N
-        btnDeleteMission.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                deleteMission();
-            }
-        });
-        panMissionButtons.add(btnDeleteMission);
-
-        scrollMissionView = new JScrollPane();
-        scrollMissionView
-                .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollMissionView.setViewportView(null);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        panBriefing.add(scrollMissionView, gridBagConstraints);
-
-        scenarioModel = new ScenarioTableModel(getCampaign());
-        scenarioTable = new JTable(scenarioModel);
-        scenarioTable.setShowGrid(false);
-        scenarioTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        scenarioTable.addMouseListener(new ScenarioTableMouseAdapter(this));
-        scenarioTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        scenarioTable.setIntercellSpacing(new Dimension(0, 0));
-        scenarioTable.getSelectionModel().addListSelectionListener(
-                new javax.swing.event.ListSelectionListener() {
-                    @Override
-                    public void valueChanged(
-                            javax.swing.event.ListSelectionEvent evt) {
-                        refreshScenarioView();
-                    }
-                });
-        JScrollPane scrollScenarioTable = new JScrollPane(scenarioTable);
-        scrollScenarioTable.setMinimumSize(new java.awt.Dimension(200, 200));
-        scrollScenarioTable.setPreferredSize(new java.awt.Dimension(200, 200));
-
-        splitMission = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panBriefing, scrollScenarioTable);
-        splitMission.setOneTouchExpandable(true);
-        splitMission.setResizeWeight(1.0);
-
-        panScenario = new JPanel(new GridBagLayout());
-
-        panScenarioButtons = new JPanel(new GridLayout(3, 3));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        panScenario.add(panScenarioButtons, gridBagConstraints);
-
-        btnStartGame = new JButton(resourceMap.getString("btnStartGame.text")); // NOI18N
-        btnStartGame.setToolTipText(resourceMap
-                .getString("btnStartGame.toolTipText")); // NOI18N
-        btnStartGame.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                startScenario();
-            }
-        });
-        btnStartGame.setEnabled(false);
-        panScenarioButtons.add(btnStartGame);
-
-        btnJoinGame = new JButton(resourceMap.getString("btnJoinGame.text")); // NOI18N
-        btnJoinGame.setToolTipText(resourceMap
-                .getString("btnJoinGame.toolTipText")); // NOI18N
-        btnJoinGame.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                joinScenario();
-            }
-        });
-        btnJoinGame.setEnabled(false);
-        panScenarioButtons.add(btnJoinGame);
-
-        btnLoadGame = new JButton(resourceMap.getString("btnLoadGame.text")); // NOI18N
-        btnLoadGame.setToolTipText(resourceMap
-                .getString("btnLoadGame.toolTipText")); // NOI18N
-        btnLoadGame.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                loadScenario();
-            }
-        });
-        btnLoadGame.setEnabled(false);
-        panScenarioButtons.add(btnLoadGame);
-
-        btnPrintRS = new JButton(resourceMap.getString("btnPrintRS.text")); // NOI18N
-        btnPrintRS.setToolTipText(resourceMap
-                .getString("btnPrintRS.toolTipText")); // NOI18N
-        btnPrintRS.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                printRecordSheets();
-            }
-        });
-        btnPrintRS.setEnabled(false);
-        panScenarioButtons.add(btnPrintRS);
-
-        btnGetMul = new JButton(resourceMap.getString("btnGetMul.text")); // NOI18N
-        btnGetMul
-                .setToolTipText(resourceMap.getString("btnGetMul.toolTipText")); // NOI18N
-        btnGetMul.setName("btnGetMul"); // NOI18N
-        btnGetMul.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                deployListFile();
-            }
-        });
-        btnGetMul.setEnabled(false);
-        panScenarioButtons.add(btnGetMul);
-
-        btnResolveScenario = new JButton(
-                resourceMap.getString("btnResolveScenario.text")); // NOI18N
-        btnResolveScenario.setToolTipText(resourceMap
-                .getString("btnResolveScenario.toolTipText")); // NOI18N
-        btnResolveScenario.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                resolveScenario();
-            }
-        });
-        btnResolveScenario.setEnabled(false);
-        panScenarioButtons.add(btnResolveScenario);
-
-        btnClearAssignedUnits = new JButton(
-                resourceMap.getString("btnClearAssignedUnits.text")); // NOI18N
-        btnClearAssignedUnits.setToolTipText(resourceMap
-                .getString("btnClearAssignedUnits.toolTipText")); // NOI18N
-        btnClearAssignedUnits.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                clearAssignedUnits();
-            }
-        });
-        btnClearAssignedUnits.setEnabled(false);
-        panScenarioButtons.add(btnClearAssignedUnits);
-
-        scrollScenarioView = new JScrollPane();
-        scrollScenarioView.setViewportView(null);
-        scrollScenarioView.setMinimumSize(new java.awt.Dimension(450, 600));
-        scrollScenarioView.setPreferredSize(new java.awt.Dimension(450, 600));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        panScenario.add(scrollScenarioView, gridBagConstraints);
-
-        /* ATB */
-        panLanceAssignment = new LanceAssignmentView(getCampaign());
-        JScrollPane paneLanceDeployment = new JScrollPane(panLanceAssignment);
-        paneLanceDeployment.setMinimumSize(new java.awt.Dimension(200, 300));
-        paneLanceDeployment.setPreferredSize(new java.awt.Dimension(200, 300));
-        paneLanceDeployment.setVisible(getCampaign().getCampaignOptions()
-                .getUseAtB());
-        splitScenario = new javax.swing.JSplitPane(
-                javax.swing.JSplitPane.VERTICAL_SPLIT, panScenario,
-                paneLanceDeployment);
-        splitScenario.setOneTouchExpandable(true);
-        splitScenario.setResizeWeight(1.0);
-
-        splitBrief = new javax.swing.JSplitPane(
-                javax.swing.JSplitPane.HORIZONTAL_SPLIT, splitMission,
-                splitScenario);
-        splitBrief.setOneTouchExpandable(true);
-        splitBrief.setResizeWeight(0.5);
-        splitBrief.addPropertyChangeListener(
-                JSplitPane.DIVIDER_LOCATION_PROPERTY,
-                new PropertyChangeListener() {
-                    @Override
-                    public void propertyChange(PropertyChangeEvent pce) {
-                        // this can mess up the view panel so refresh it
-                        changeMission();
-                        refreshScenarioView();
-                    }
-                });
-    }
 
     private void initMap() {
         GridBagConstraints gridBagConstraints;
@@ -3446,37 +3113,6 @@ public class CampaignGUI extends JPanel {
         chatDialog.setVisible(true);
     }
 
-    private void addMission() {
-        MissionTypeDialog mtd = new MissionTypeDialog(getFrame(), true,
-                getCampaign(), this);
-        mtd.setVisible(true);
-    }
-
-    private void editMission() {
-        Mission mission = getCampaign().getMission(selectedMission);
-        if (null != mission) {
-            if (getCampaign().getCampaignOptions().getUseAtB()
-                    && mission instanceof AtBContract) {
-                CustomizeAtBContractDialog cmd = new CustomizeAtBContractDialog(
-                        getFrame(), true, (AtBContract) mission, getCampaign(),
-                        getIconPackage().getCamos());
-                cmd.setVisible(true);
-                if (cmd.getMissionId() != -1) {
-                    selectedMission = cmd.getMissionId();
-                }
-            } else {
-                CustomizeMissionDialog cmd = new CustomizeMissionDialog(
-                        getFrame(), true, mission, getCampaign());
-                cmd.setVisible(true);
-                if (cmd.getMissionId() != -1) {
-                    selectedMission = cmd.getMissionId();
-                }
-            }
-            refreshMissions();
-        }
-
-    }
-
     private void changeTheme(java.awt.event.ActionEvent evt) {
         final String lafClassName = evt.getActionCommand();
         Runnable runnable = new Runnable() {
@@ -3515,132 +3151,6 @@ public class CampaignGUI extends JPanel {
             });
         }
     }
-
-    private void completeMission() {
-        Mission mission = getCampaign().getMission(selectedMission);
-        if (null != mission) {
-            if (mission.hasPendingScenarios()) {
-                JOptionPane
-                        .showMessageDialog(
-                                getFrame(),
-                                "You cannot complete a mission that has pending scenarios",
-                                "Pending Scenarios",
-                                JOptionPane.WARNING_MESSAGE);
-            } else {
-                CompleteMissionDialog cmd = new CompleteMissionDialog(
-                        getFrame(), true, mission);
-                cmd.setVisible(true);
-                if (cmd.getStatus() > Mission.S_ACTIVE) {
-                    getCampaign().completeMission(mission.getId(),
-                            cmd.getStatus());
-
-                    if (getCampaign().getCampaignOptions().getUseAtB()
-                            && mission instanceof AtBContract) {
-                        if (((AtBContract) mission)
-                                .contractExtended(getCampaign())) {
-                            mission.setStatus(Mission.S_ACTIVE);
-                        } else {
-                            if (getCampaign().getCampaignOptions()
-                                    .doRetirementRolls()) {
-                                RetirementDefectionDialog rdd = new RetirementDefectionDialog(
-                                        this, (AtBContract) mission, true);
-                                rdd.setVisible(true);
-                                if (rdd.wasAborted()) {
-                                    /*
-                                     * Once the retirement rolls have been made,
-                                     * the outstanding payouts can be resolved
-                                     * without reference to the contract and the
-                                     * dialog can be accessed through the menu.
-                                     */
-                                    if (!getCampaign()
-                                            .getRetirementDefectionTracker()
-                                            .isOutstanding(mission.getId())) {
-                                        mission.setStatus(Mission.S_ACTIVE);
-                                    }
-                                } else {
-                                    if (null != getCampaign()
-                                            .getRetirementDefectionTracker()
-                                            .getRetirees((AtBContract) mission)
-                                            && getCampaign().getFinances()
-                                                    .getBalance() >= rdd
-                                                    .totalPayout()) {
-                                        final int[] admins = {Person.T_ADMIN_COM, Person.T_ADMIN_HR,
-                                                Person.T_ADMIN_LOG, Person.T_ADMIN_TRA};
-                                        for (int role : admins) {
-                                            Person admin = getCampaign().findBestInRole(role, SkillType.S_ADMIN);
-                                            if (admin != null) {
-                                                admin.setXp(admin.getXp() + 1);
-                                                getCampaign()
-                                                        .addReport(
-                                                                admin.getHyperlinkedName()
-                                                                        + " has gained 1 XP.");
-                                            }
-                                        }
-                                    }
-                                    if (!getCampaign().applyRetirement(
-                                            rdd.totalPayout(),
-                                            rdd.getUnitAssignments())) {
-                                        mission.setStatus(Mission.S_ACTIVE);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                if (!mission.isActive()) {
-                    if (getCampaign().getCampaignOptions().getUseAtB()
-                            && mission instanceof AtBContract) {
-                        ((AtBContract) mission).checkForFollowup(getCampaign());
-                    }
-                    if (getCampaign().getSortedMissions().size() > 0) {
-                        selectedMission = getCampaign().getSortedMissions()
-                                .get(0).getId();
-                    } else {
-                        selectedMission = -1;
-                    }
-                    refreshMissions();
-                }
-            }
-
-        }
-        refreshReport();
-        refreshFunds();
-        refreshFinancialTransactions();
-        refreshRating();
-    }
-
-    private void deleteMission() {
-        Mission mission = getCampaign().getMission(selectedMission);
-        MekHQ.logMessage("Attempting to Delete Mission, Mission ID: "
-                + mission.getId());
-        if (0 != JOptionPane.showConfirmDialog(null,
-                "Are you sure you want to delete this mission?",
-                "Delete mission?", JOptionPane.YES_NO_OPTION)) {
-            return;
-        }
-        getCampaign().removeMission(mission.getId());
-        if (getCampaign().getSortedMissions().size() > 0) {
-            selectedMission = getCampaign().getSortedMissions().get(0).getId();
-        } else {
-            selectedMission = -1;
-        }
-        refreshMissions();
-        refreshReport();
-        refreshFunds();
-        refreshFinancialTransactions();
-        refreshRating();
-    }
-
-    private void addScenario() {
-        Mission m = getCampaign().getMission(selectedMission);
-        if (null != m) {
-            CustomizeScenarioDialog csd = new CustomizeScenarioDialog(
-                    getFrame(), true, null, m, getCampaign());
-            csd.setVisible(true);
-            refreshScenarioList();
-        }
-    }
-
     private void calculateJumpPath() {
         if (null != panMap.getSelectedPlanet()) {
             panMap.setJumpPath(getCampaign().calculateJumpPath(
@@ -4643,9 +4153,6 @@ public class CampaignGUI extends JPanel {
                 getCampaign().initAtB();
                 refreshLanceAssignments();
             }
-            splitScenario.getBottomComponent().setVisible(
-                    getCampaign().getCampaignOptions().getUseAtB());
-            splitScenario.resetToPreferredSizes();
             miContractMarket.setVisible(getCampaign().getCampaignOptions()
                     .getUseAtB());
             miUnitMarket.setVisible(getCampaign().getCampaignOptions()
@@ -5183,65 +4690,18 @@ public class CampaignGUI extends JPanel {
         });
     }
 
-    private void refreshScenarioView() {
-        int row = scenarioTable.getSelectedRow();
-        if (row < 0) {
-            scrollScenarioView.setViewportView(null);
-            btnStartGame.setEnabled(false);
-            btnJoinGame.setEnabled(false);
-            btnLoadGame.setEnabled(false);
-            btnGetMul.setEnabled(false);
-            btnClearAssignedUnits.setEnabled(false);
-            btnResolveScenario.setEnabled(false);
-            btnPrintRS.setEnabled(false);
-            return;
-        }
-        Scenario scenario = scenarioModel.getScenario(scenarioTable
-                .convertRowIndexToModel(row));
-        if (getCampaign().getCampaignOptions().getUseAtB()
-                && (scenario instanceof AtBScenario)) {
-            scrollScenarioView.setViewportView(new AtBScenarioViewPanel(
-                    (AtBScenario) scenario, getCampaign(), getIconPackage(),
-                    frame));
-        } else {
-            scrollScenarioView.setViewportView(new ScenarioViewPanel(scenario,
-                    getCampaign(), getIconPackage()));
-        }
-        // This odd code is to make sure that the scrollbar stays at the top
-        // I can't just call it here, because it ends up getting reset somewhere
-        // later
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                scrollScenarioView.getVerticalScrollBar().setValue(0);
-            }
-        });
-        boolean unitsAssigned = scenario.getForces(getCampaign()).getAllUnits()
-                .size() > 0;
-        boolean canStartGame = scenario.isCurrent() && unitsAssigned;
-        if (getCampaign().getCampaignOptions().getUseAtB()
-                && scenario instanceof AtBScenario) {
-            canStartGame = canStartGame
-                    && getCampaign().getDate().equals(scenario.getDate());
-        }
-        btnStartGame.setEnabled(canStartGame);
-        btnJoinGame.setEnabled(canStartGame);
-        btnLoadGame.setEnabled(canStartGame);
-        btnGetMul.setEnabled(scenario.isCurrent() && unitsAssigned);
-        btnClearAssignedUnits.setEnabled(scenario.isCurrent() && unitsAssigned);
-        btnResolveScenario.setEnabled(canStartGame);
-        btnPrintRS.setEnabled(scenario.isCurrent() && unitsAssigned);
-
-    }
-
+    //TODO: Trigger from event
     public void refreshForceView() {
     	if (tabs.containsKey(StandardTabs.TOE.getTabName())) {
     		((TOETab)tabs.get(StandardTabs.TOE.getTabName())).refreshForceView();
     	}
     }
 
+    //TODO: Trigger from event
     public void refreshLanceAssignments() {
-        panLanceAssignment.refresh();
+    	if (tabs.containsKey(StandardTabs.TOE.getTabName())) {
+    		((BriefingTab)tabs.get(StandardTabs.TOE.getTabName())).refreshLanceAssignments();
+    	}
     }
 
     public void refreshPlanetView() {
@@ -6083,441 +5543,6 @@ public class CampaignGUI extends JPanel {
         Utilities.exportTabletoCSV(table, file);
     }
 
-    protected void clearAssignedUnits() {
-        if (0 == JOptionPane.showConfirmDialog(null,
-                "Do you really want to remove all units from this scenario?",
-                "Clear Units?", JOptionPane.YES_NO_OPTION)) {
-            int row = scenarioTable.getSelectedRow();
-            Scenario scenario = scenarioModel.getScenario(scenarioTable
-                    .convertRowIndexToModel(row));
-            if (null == scenario) {
-                return;
-            }
-            scenario.clearAllForcesAndPersonnel(getCampaign());
-            refreshPersonnelList();
-            refreshServicedUnitList();
-            refreshUnitList();
-            refreshOrganization();
-            refreshTaskList();
-            refreshUnitView();
-            refreshPartsList();
-            refreshAcquireList();
-            refreshReport();
-            refreshPatientList();
-            refreshPersonnelList();
-            refreshScenarioList();
-            refreshOverview();
-            filterTasks();
-        }
-    }
-
-    protected void resolveScenario() {
-        int row = scenarioTable.getSelectedRow();
-        Scenario scenario = scenarioModel.getScenario(scenarioTable
-                .convertRowIndexToModel(row));
-        if (null == scenario) {
-            return;
-        }
-        boolean control = JOptionPane
-                .showConfirmDialog(
-                        getFrame(),
-                        "Did your side control the battlefield at the end of the scenario?",
-                        "Control of Battlefield?", JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
-        ResolveScenarioTracker tracker = new ResolveScenarioTracker(scenario,
-                getCampaign(), control);
-        ChooseMulFilesDialog chooseFilesDialog = new ChooseMulFilesDialog(
-                getFrame(), true, tracker);
-        chooseFilesDialog.setVisible(true);
-        if (chooseFilesDialog.wasCancelled()) {
-            return;
-        }
-        // tracker.postProcessEntities(control);
-        ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(
-                getFrame(), true, tracker);
-        resolveDialog.setVisible(true);
-        if (getCampaign().getCampaignOptions().getUseAtB()
-                && getCampaign().getMission(scenario.getMissionId()) instanceof AtBContract
-                && getCampaign().getRetirementDefectionTracker().getRetirees()
-                        .size() > 0) {
-            RetirementDefectionDialog rdd = new RetirementDefectionDialog(
-                    getCampaignGUI(), (AtBContract) getCampaign().getMission(
-                            scenario.getMissionId()), false);
-            rdd.setVisible(true);
-            if (!rdd.wasAborted()) {
-                getCampaign().applyRetirement(rdd.totalPayout(),
-                        rdd.getUnitAssignments());
-            }
-        }
-
-        refreshScenarioList();
-        refreshOrganization();
-        refreshServicedUnitList();
-        refreshUnitList();
-        refreshPersonnelList();
-        filterPersonnel();
-        refreshDoctorsList();
-        refreshPatientList();
-        refreshReport();
-        changeMission();
-        refreshFinancialTransactions();
-        refreshOverview();
-    }
-
-    protected void printRecordSheets() {
-        int row = scenarioTable.getSelectedRow();
-        if (row < 0) {
-            return;
-        }
-        Scenario scenario = scenarioModel.getScenario(scenarioTable
-                .convertRowIndexToModel(row));
-        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
-
-        if (uids.size() == 0) {
-            return;
-        }
-
-        Vector<Entity> chosen = new Vector<Entity>();
-        // ArrayList<Unit> toDeploy = new ArrayList<Unit>();
-        StringBuffer undeployed = new StringBuffer();
-
-        for (UUID uid : uids) {
-            Unit u = getCampaign().getUnit(uid);
-            if (null != u.getEntity()) {
-                if (null == u.checkDeployment()) {
-                    chosen.add(u.getEntity());
-                } else {
-                    undeployed.append("\n").append(u.getName()).append(" (")
-                            .append(u.checkDeployment()).append(")");
-                }
-            }
-        }
-
-        if (undeployed.length() > 0) {
-            Object[] options = {"Continue",
-            "Cancel"};
-            int n = JOptionPane.showOptionDialog(getFrame(),
-                    "The following units could not be deployed:"
-                            + undeployed.toString(),
-                            "Could not deploy some units",
-                        JOptionPane.OK_CANCEL_OPTION,
-                        JOptionPane.WARNING_MESSAGE,
-                        null,
-                        options,
-                        options[1]);
-            if(n==1) {
-                return;
-            }
-        }
-
-        if (chosen.size() > 0) {
-            UnitPrintManager.printAllUnits(chosen, true);
-        }
-    }
-
-    protected void loadScenario() {
-        int row = scenarioTable.getSelectedRow();
-        if (row < 0) {
-            return;
-        }
-        Scenario scenario = scenarioModel.getScenario(scenarioTable
-                .convertRowIndexToModel(row));
-        if (null != scenario) {
-            ((MekHQ) getApplication()).startHost(scenario, true, null);
-        }
-    }
-
-    protected void startScenario() {
-        int row = scenarioTable.getSelectedRow();
-        if (row < 0) {
-            return;
-        }
-        Scenario scenario = scenarioModel.getScenario(scenarioTable
-                .convertRowIndexToModel(row));
-        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
-
-        if (uids.size() == 0) {
-            return;
-        }
-
-        ArrayList<Unit> chosen = new ArrayList<Unit>();
-        // ArrayList<Unit> toDeploy = new ArrayList<Unit>();
-        StringBuffer undeployed = new StringBuffer();
-
-        for (UUID uid : uids) {
-            Unit u = getCampaign().getUnit(uid);
-            if (null != u.getEntity()) {
-                if (null == u.checkDeployment()) {
-                    // Make sure the unit's entity and pilot are fully up to date!
-                    u.resetPilotAndEntity();
-
-                    // Add and run
-                    chosen.add(u);
-
-                    // So MegaMek has correct crew sizes
-                    u.getEntity().getCrew().setSize(u.getActiveCrew().size());
-                } else {
-                    undeployed.append("\n").append(u.getName()).append(" (")
-                            .append(u.checkDeployment()).append(")");
-                }
-            }
-        }
-
-        if (undeployed.length() > 0) {
-            Object[] options = {"Continue",
-                    "Cancel"};
-            int n = JOptionPane.showOptionDialog(getFrame(),
-                    "The following units could not be deployed:"
-                            + undeployed.toString(),
-                    "Could not deploy some units",
-                            JOptionPane.OK_CANCEL_OPTION,
-                            JOptionPane.WARNING_MESSAGE,
-                            null,
-                            options,
-                            options[1]);
-
-            if(n==1) {
-                return;
-            }
-        }
-
-        if (getCampaign().getCampaignOptions().getUseAtB()
-                && scenario instanceof AtBScenario) {
-            ((AtBScenario) scenario).refresh(getCampaign());
-
-            /*
-             * For standard battles, any deployed unit not part of the lance
-             * assigned to the battle is assumed to be reinforcements.
-             */
-            if (null != ((AtBScenario) scenario).getLance(getCampaign())) {
-                int assignedForceId = ((AtBScenario) scenario).getLance(
-                        getCampaign()).getForceId();
-                int cmdrStrategy = 0;
-                Person commander = getCampaign().getPerson(
-                        Lance.findCommander(assignedForceId, getCampaign()));
-                if (null != commander
-                        && null != commander
-                                .getSkill(SkillType.S_STRATEGY)) {
-                    cmdrStrategy = commander.getSkill(
-                            SkillType.S_STRATEGY).getLevel();
-                }
-                for (Force f : scenario.getForces(getCampaign()).getSubForces()) {
-                    if (f.getId() != assignedForceId) {
-                        Vector<UUID> units = f.getAllUnits();
-                        int slowest = 12;
-                        for (UUID id : units) {
-                            if (chosen.contains(getCampaign().getUnit(id))) {
-                                int speed = getCampaign().getUnit(id).getEntity().getWalkMP();
-                                if (getCampaign().getUnit(id).getEntity().getJumpMP() > 0) {
-                                    if (getCampaign().getUnit(id).getEntity() instanceof megamek.common.Infantry) {
-                                        speed = getCampaign().getUnit(id).getEntity().getJumpMP();
-                                    } else {
-                                        speed++;
-                                    }
-                                }
-                                slowest = Math.min(slowest, speed);
-                            }
-                        }
-                        int deployRound = Math.max(0, 12 - slowest - cmdrStrategy);
-
-                        for (UUID id : units) {
-                            if (chosen.contains(getCampaign().getUnit(id))) {
-                                getCampaign().getUnit(id).getEntity()
-                                        .setDeployRound(deployRound);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (chosen.size() > 0) {
-            // Ensure that the MegaMek year GameOption matches the campaign year
-            GameOptions gameOpts = getCampaign().getGameOptions();
-            int campaignYear = getCampaign().getCalendar().get(Calendar.YEAR);
-            if (gameOpts.intOption("year") != campaignYear) {
-                gameOpts.getOption("year").setValue(campaignYear);
-            }
-            ((MekHQ) getApplication()).startHost(scenario, false, chosen);
-        }
-    }
-
-    protected void joinScenario() {
-        int row = scenarioTable.getSelectedRow();
-        if (row < 0) {
-            return;
-        }
-        Scenario scenario = scenarioModel.getScenario(scenarioTable
-                .convertRowIndexToModel(row));
-        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
-
-        if (uids.size() == 0) {
-            return;
-        }
-
-        ArrayList<Unit> chosen = new ArrayList<Unit>();
-        // ArrayList<Unit> toDeploy = new ArrayList<Unit>();
-        StringBuffer undeployed = new StringBuffer();
-
-        for (UUID uid : uids) {
-            Unit u = getCampaign().getUnit(uid);
-            if (null != u.getEntity()) {
-                if (null == u.checkDeployment()) {
-                    // Make sure the unit's entity and pilot are fully up to date!
-                    u.resetPilotAndEntity();
-
-                    // Add and run
-                    chosen.add(u);
-
-                    // So MegaMek has correct crew sizes
-                    u.getEntity().getCrew().setSize(u.getActiveCrew().size());
-                } else {
-                    undeployed.append("\n").append(u.getName()).append(" (")
-                            .append(u.checkDeployment()).append(")");
-                }
-            }
-        }
-
-        if (undeployed.length() > 0) {
-            Object[] options = {"Continue",
-            "Cancel"};
-            int n = JOptionPane.showOptionDialog(getFrame(),
-                    "The following units could not be deployed:"
-                            + undeployed.toString(),
-                            "Could not deploy some units",
-                        JOptionPane.OK_CANCEL_OPTION,
-                        JOptionPane.WARNING_MESSAGE,
-                        null,
-                        options,
-                        options[1]);
-            if(n==1) {
-                return;
-            }
-        }
-
-        if (chosen.size() > 0) {
-            ((MekHQ) getApplication()).joinGame(scenario, chosen);
-        }
-    }
-
-    protected void deployListFile() {
-        int row = scenarioTable.getSelectedRow();
-        if (row < 0) {
-            return;
-        }
-        Scenario scenario = scenarioModel.getScenario(scenarioTable
-                .convertRowIndexToModel(row));
-        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
-
-        if (uids.size() == 0) {
-            return;
-        }
-
-        ArrayList<Entity> chosen = new ArrayList<Entity>();
-        // ArrayList<Unit> toDeploy = new ArrayList<Unit>();
-        StringBuffer undeployed = new StringBuffer();
-
-        for (UUID uid : uids) {
-            Unit u = getCampaign().getUnit(uid);
-            if (null != u.getEntity()) {
-                if (null == u.checkDeployment()) {
-                    // Make sure the unit's entity and pilot are fully up to date!
-                    u.resetPilotAndEntity();
-
-                    // So MegaMek has correct crew sizes
-                    u.getEntity().getCrew().setSize(u.getActiveCrew().size());
-                    
-                    // Add the entity
-                    chosen.add(u.getEntity());
-                } else {
-                    undeployed.append("\n").append(u.getName()).append(" (")
-                            .append(u.checkDeployment()).append(")");
-                }
-            }
-        }
-
-        if (undeployed.length() > 0) {
-            Object[] options = {"Continue",
-            "Cancel"};
-            int n = JOptionPane.showOptionDialog(getFrame(),
-                    "The following units could not be deployed:"
-                            + undeployed.toString(),
-                            "Could not deploy some units",
-                        JOptionPane.OK_CANCEL_OPTION,
-                        JOptionPane.WARNING_MESSAGE,
-                        null,
-                        options,
-                        options[1]);
-            if(n==1) {
-                return;
-            }
-        }
-
-        JFileChooser saveList = new JFileChooser(".");
-        saveList.setDialogTitle("Deploy Units");
-
-        saveList.setFileFilter(new FileFilter() {
-            @Override
-            public boolean accept(File dir) {
-                if (dir.isDirectory()) {
-                    return true;
-                }
-                return dir.getName().endsWith(".mul");
-            }
-
-            @Override
-            public String getDescription() {
-                return "MUL file";
-            }
-        });
-
-        saveList.setSelectedFile(new File(scenario.getName() + ".mul")); //$NON-NLS-1$
-        int returnVal = saveList.showSaveDialog(mainPanel);
-
-        if ((returnVal != JFileChooser.APPROVE_OPTION)
-                || (saveList.getSelectedFile() == null)) {
-            // I want a file, y'know!
-            return;
-        }
-
-        File unitFile = saveList.getSelectedFile();
-
-        if (unitFile != null) {
-            if (!(unitFile.getName().toLowerCase().endsWith(".mul") //$NON-NLS-1$
-            || unitFile.getName().toLowerCase().endsWith(".xml"))) { //$NON-NLS-1$
-                try {
-                    unitFile = new File(unitFile.getCanonicalPath() + ".mul"); //$NON-NLS-1$
-                } catch (IOException ie) {
-                    // nothing needs to be done here
-                    return;
-                }
-            }
-
-            try {
-                // Save the player's entities to the file.
-                // FIXME: this is not working
-                EntityListFile.saveTo(unitFile, chosen);
-
-            } catch (IOException excep) {
-                excep.printStackTrace(System.err);
-            }
-        }
-
-        refreshServicedUnitList();
-        refreshUnitList();
-        refreshPatientList();
-        refreshPersonnelList();
-        refreshOverview();
-
-        if (undeployed.length() > 0) {
-            JOptionPane.showMessageDialog(
-                    getFrame(),
-                    "The following units could not be deployed:"
-                            + undeployed.toString(),
-                    "Could not deploy some units", JOptionPane.WARNING_MESSAGE);
-        }
-    }
-
     public void refreshServicedUnitList() {
         int selected = servicedUnitTable.getSelectedRow();
         servicedUnitModel.setData(getCampaign().getServiceableUnits());
@@ -6554,56 +5579,25 @@ public class CampaignGUI extends JPanel {
         refreshRating();
     }
 
+    //TODO: Trigger from event
     public void changeMission() {
-        int idx = choiceMission.getSelectedIndex();
-        btnEditMission.setEnabled(false);
-        btnCompleteMission.setEnabled(false);
-        btnDeleteMission.setEnabled(false);
-        btnAddScenario.setEnabled(false);
-        if (idx >= 0 && idx < getCampaign().getSortedMissions().size()) {
-            Mission m = getCampaign().getSortedMissions().get(idx);
-            if (null != m) {
-                selectedMission = m.getId();
-                if (getCampaign().getCampaignOptions().getUseAtB()
-                        && m instanceof AtBContract) {
-                    scrollMissionView.setViewportView(new AtBContractViewPanel(
-                            (AtBContract) m, getCampaign()));
-                } else if (m instanceof Contract) {
-                    scrollMissionView.setViewportView(new ContractViewPanel(
-                            (Contract) m));
-                } else {
-                    scrollMissionView.setViewportView(new MissionViewPanel(m));
-                }
-                // This odd code is to make sure that the scrollbar stays at the
-                // top
-                // I can't just call it here, because it ends up getting reset
-                // somewhere later
-                javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        scrollMissionView.getVerticalScrollBar().setValue(0);
-                    }
-                });
-                btnEditMission.setEnabled(true);
-                btnCompleteMission.setEnabled(m.isActive());
-                btnDeleteMission.setEnabled(true);
-                btnAddScenario.setEnabled(m.isActive());
-            }
-
-        } else {
-            selectedMission = -1;
-            scrollMissionView.setViewportView(null);
-        }
-        refreshScenarioList();
+    	if (tabs.containsKey(StandardTabs.BRIEFING.getTabName())) {
+    		((BriefingTab)tabs.get(StandardTabs.BRIEFING.getTabName())).changeMission();
+    	}
     }
 
+    //TODO: Trigger from event
+    public void refreshMissions() {
+    	if (tabs.containsKey(StandardTabs.BRIEFING.getTabName())) {
+    		((BriefingTab)tabs.get(StandardTabs.BRIEFING.getTabName())).refreshMissions();
+    	}
+    }
+
+    //TODO: Trigger from event
     public void refreshScenarioList() {
-        Mission m = getCampaign().getMission(selectedMission);
-        if (null != m) {
-            scenarioModel.setData(m.getScenarios());
-        } else {
-            scenarioModel.setData(new ArrayList<Scenario>());
-        }
+    	if (tabs.containsKey(StandardTabs.BRIEFING.getTabName())) {
+    		((BriefingTab)tabs.get(StandardTabs.BRIEFING.getTabName())).refreshScenarioList();
+    	}
     }
 
     public void refreshUnitList() {
@@ -6666,30 +5660,6 @@ public class CampaignGUI extends JPanel {
             uuid = getSelectedServicedUnit().getId();
         }
         acquireModel.setData(getCampaign().getAcquisitionsForUnit(uuid));
-    }
-
-    public void refreshMissions() {
-        choiceMission.removeAllItems();
-        for (Mission m : getCampaign().getSortedMissions()) {
-            String desc = m.getName();
-            if (!m.isActive()) {
-                desc += " (Complete)";
-            }
-            choiceMission.addItem(desc);
-            if (m.getId() == selectedMission) {
-                choiceMission.setSelectedItem(m.getName());
-            }
-        }
-        if (choiceMission.getSelectedIndex() == -1
-                && getCampaign().getSortedMissions().size() > 0) {
-            selectedMission = getCampaign().getSortedMissions().get(0).getId();
-            choiceMission.setSelectedIndex(0);
-        }
-        changeMission();
-        refreshRating();
-        if (getCampaign().getCampaignOptions().getUseAtB()) {
-            refreshLanceAssignments();
-        }
     }
 
     public void refreshLab() {
@@ -6830,6 +5800,7 @@ public class CampaignGUI extends JPanel {
         getCampaign().fetchAndClearNewReports();
     }
 
+    //TODO: Trigger from event
     public void refreshOrganization() {
     	if (tabs.containsKey(StandardTabs.TOE.getTabName())) {
     		((TOETab)tabs.get(StandardTabs.TOE.getTabName())).refreshOrganization();
@@ -8865,27 +7836,6 @@ public class CampaignGUI extends JPanel {
      */
     public JTable getFinanceTable() {
         return financeTable;
-    }
-
-    /**
-     * @return the scenarioModel
-     */
-    public ScenarioTableModel getScenarioModel() {
-        return scenarioModel;
-    }
-
-    /**
-     * @return the scenarioTable
-     */
-    public JTable getScenarioTable() {
-        return scenarioTable;
-    }
-
-    /**
-     * @return the selectedMission
-     */
-    public int getSelectedMission() {
-        return selectedMission;
     }
 
     /**

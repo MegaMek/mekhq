@@ -18,8 +18,7 @@
  */
 package mekhq.gui;
 
-import java.awt.Frame;
-
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import mekhq.IconPackage;
@@ -62,7 +61,7 @@ public abstract class CampaignGuiTab extends JPanel {
 		return gui.getCampaign().getCampaignOptions();
 	}
 	
-	public Frame getFrame() {
+	public JFrame getFrame() {
 		return gui.getFrame();
 	}
 	
