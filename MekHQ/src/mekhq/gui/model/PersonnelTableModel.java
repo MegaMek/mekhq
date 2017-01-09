@@ -13,6 +13,7 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
+import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
@@ -21,6 +22,7 @@ import megamek.common.options.PilotOptions;
 import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -35,7 +37,9 @@ import mekhq.gui.BasicInfo;
         private static final long serialVersionUID = -5207167419079014157L;
 
         private Campaign campaign;
-
+        private PersonnelMarket personnelMarket;
+        private boolean loadAssignmentFromMarket;
+        
         public final static int COL_RANK     =    0;
         public final static int COL_NAME     =    1;
         public final static int COL_CALL     =    2;
@@ -219,7 +223,7 @@ import mekhq.gui.BasicInfo;
             case COL_NIMP:
                 return p.getAbilityList(PilotOptions.MD_ADVANTAGES);
             case COL_ASSIGN:
-                if(p.getTechUnitIDs().size() > 1) {
+                if((p.getTechUnitIDs().size() > 1) && !loadAssignmentFromMarket) {
                     String toReturn = "<html>";
                     for(UUID id : p.getTechUnitIDs()) {
                         Unit u = getCampaign().getUnit(id);
@@ -514,43 +518,53 @@ import mekhq.gui.BasicInfo;
                 return p.getSkillSummary();
             }
             if(col == COL_ASSIGN) {
-                Unit u = getCampaign().getUnit(p.getUnitId());
-                if(null != u) {
-                    String name = u.getName();
-                    if(u.getEntity() instanceof Tank) {
-                        if(u.isDriver(p)) {
-                            name = name + " [Driver]";
-                        } else {
-                            name = name + " [Gunner]";
-                        }
-                    }
-                    if(u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
-                        if(u.isNavigator(p)) {
-                            name = name + " [Navigator]";
-                        }
-                        else if(u.isDriver(p)) {
-                            name =  name + " [Pilot]";
-                        }
-                        else if(u.isGunner(p)) {
-                            name = name + " [Gunner]";
-                        } else {
-                            name = name + " [Crew]";
-                        }
-                    }
-                    return name;
-                }
-                //check for tech
-                if(!p.getTechUnitIDs().isEmpty()) {
-                    if(p.getTechUnitIDs().size() == 1) {
-                        u = getCampaign().getUnit(p.getTechUnitIDs().get(0));
-                        if(null != u) {
-                            return u.getName() + " (" + p.getMaintenanceTimeUsing() + "m)";
-                        }
-                    } else {
-                        return "" + p.getTechUnitIDs().size() + " units (" + p.getMaintenanceTimeUsing() + "m)";
-                    }
-                }
-                return "-";
+            	if (loadAssignmentFromMarket) {
+            		Entity en = personnelMarket.getAttachedEntity(p);
+            		
+            		if (null == en) {
+            			return "-";
+            		}
+            		
+            		return en.getDisplayName();
+            	} else {
+	                Unit u = getCampaign().getUnit(p.getUnitId());
+	                if(null != u) {
+	                    String name = u.getName();
+	                    if(u.getEntity() instanceof Tank) {
+	                        if(u.isDriver(p)) {
+	                            name = name + " [Driver]";
+	                        } else {
+	                            name = name + " [Gunner]";
+	                        }
+	                    }
+	                    if(u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
+	                        if(u.isNavigator(p)) {
+	                            name = name + " [Navigator]";
+	                        }
+	                        else if(u.isDriver(p)) {
+	                            name =  name + " [Pilot]";
+	                        }
+	                        else if(u.isGunner(p)) {
+	                            name = name + " [Gunner]";
+	                        } else {
+	                            name = name + " [Crew]";
+	                        }
+	                    }
+	                    return name;
+	                }
+	                //check for tech
+	                if(!p.getTechUnitIDs().isEmpty()) {
+	                    if(p.getTechUnitIDs().size() == 1) {
+	                        u = getCampaign().getUnit(p.getTechUnitIDs().get(0));
+	                        if(null != u) {
+	                            return u.getName() + " (" + p.getMaintenanceTimeUsing() + "m)";
+	                        }
+	                    } else {
+	                        return "" + p.getTechUnitIDs().size() + " units (" + p.getMaintenanceTimeUsing() + "m)";
+	                    }
+	                }
+	                return "-";
+            	}
             }
             if(col == COL_XP) {
                 return Integer.toString(p.getXp());
@@ -658,27 +672,37 @@ import mekhq.gui.BasicInfo;
                     setText(p.getFullDesc(), color);
                 }
                 if(actualCol == COL_ASSIGN) {
-                    Unit u = getCampaign().getUnit(p.getUnitId());
-                    if(!p.getTechUnitIDs().isEmpty()) {
-                        u = getCampaign().getUnit(p.getTechUnitIDs().get(0));
-                    }
-                    if(null != u) {
-                        String desc = "<b>" + u.getName() + "</b><br>";
-                        desc += u.getEntity().getWeightClassName();
-                        if(!(u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship)) {
-                            desc += " " + UnitType.getTypeDisplayableName(UnitType.determineUnitTypeCode(u.getEntity()));
-                        }
-                        desc += "<br>" + u.getStatus() + "";
-                        setText(desc, color);
-                        Image mekImage = getImageFor(u);
-                        if(null != mekImage) {
-                            setImage(mekImage);
-                        } else {
-                            clearImage();
-                        }
-                    } else {
-                        clearImage();
-                    }
+                	if (loadAssignmentFromMarket) {
+                		Entity en = personnelMarket.getAttachedEntity(p);
+                		
+                		if (null == en) {
+                			setText("-", color);
+                		}
+                		
+                		setText(en.getDisplayName(), color);
+                	} else {
+	                    Unit u = getCampaign().getUnit(p.getUnitId());
+	                    if(!p.getTechUnitIDs().isEmpty()) {
+	                        u = getCampaign().getUnit(p.getTechUnitIDs().get(0));
+	                    }
+	                    if(null != u) {
+	                        String desc = "<b>" + u.getName() + "</b><br>";
+	                        desc += u.getEntity().getWeightClassName();
+	                        if(!(u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship)) {
+	                            desc += " " + UnitType.getTypeDisplayableName(UnitType.determineUnitTypeCode(u.getEntity()));
+	                        }
+	                        desc += "<br>" + u.getStatus() + "";
+	                        setText(desc, color);
+	                        Image mekImage = getImageFor(u);
+	                        if(null != mekImage) {
+	                            setImage(mekImage);
+	                        } else {
+	                            clearImage();
+	                        }
+	                    } else {
+	                        clearImage();
+	                    }
+                	}
                 }
                 if(actualCol == COL_FORCE) {
                     Force force = getCampaign().getForceFor(p);
@@ -746,4 +770,9 @@ import mekhq.gui.BasicInfo;
                 return null;
             }
         }
+
+		public void loadAssignmentFromMarket(PersonnelMarket personnelMarket) {
+			this.personnelMarket = personnelMarket;
+			this.loadAssignmentFromMarket = (null != personnelMarket);
+		}
     }
