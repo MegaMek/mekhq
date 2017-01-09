@@ -181,7 +181,6 @@ import mekhq.campaign.work.WorkTime;
 import mekhq.gui.adapter.FinanceTableMouseAdapter;
 import mekhq.gui.adapter.LoanTableMouseAdapter;
 import mekhq.gui.adapter.PartsTableMouseAdapter;
-import mekhq.gui.adapter.PersonnelTableMouseAdapter;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
 import mekhq.gui.adapter.ServicedUnitsTableMouseAdapter;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
@@ -220,17 +219,13 @@ import mekhq.gui.model.PartsInUseTableModel;
 import mekhq.gui.model.PartsInUseTableModel.ButtonColumn;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.PatientTableModel;
-import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.model.ProcurementTableModel;
 import mekhq.gui.model.TaskTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.model.XTableColumnModel;
-import mekhq.gui.sorter.BonusSorter;
 import mekhq.gui.sorter.FormattedNumberSorter;
-import mekhq.gui.sorter.LevelSorter;
 import mekhq.gui.sorter.PartsDetailSorter;
-import mekhq.gui.sorter.RankSorter;
 import mekhq.gui.sorter.TargetSorter;
 import mekhq.gui.sorter.TaskSorter;
 import mekhq.gui.sorter.TechSorter;
@@ -238,7 +233,6 @@ import mekhq.gui.sorter.TwoNumbersSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
 import mekhq.gui.sorter.WeightClassSorter;
-import mekhq.gui.view.PersonViewPanel;
 import mekhq.gui.view.UnitViewPanel;
 
 /**
@@ -279,30 +273,9 @@ public class CampaignGUI extends JPanel {
     }
 
     public static final int UNIT_VIEW_WIDTH = 450;
-    public static final int PERSONNEL_VIEW_WIDTH = 500;
     public static final int MAX_START_WIDTH = 1400;
     public static final int MAX_START_HEIGHT = 900;
 
-    // personnel filter groups
-    public static final int PG_ACTIVE = 0;
-    public static final int PG_COMBAT = 1;
-    public static final int PG_SUPPORT = 2;
-    public static final int PG_MW = 3;
-    public static final int PG_CREW = 4;
-    public static final int PG_PILOT = 5;
-    public static final int PG_CPILOT = 6;
-    public static final int PG_PROTO = 7;
-    public static final int PG_BA = 8;
-    public static final int PG_SOLDIER = 9;
-    public static final int PG_VESSEL = 10;
-    public static final int PG_TECH = 11;
-    public static final int PG_DOC = 12;
-    public static final int PG_ADMIN = 13;
-    public static final int PG_DEPENDENT = 14;
-    public static final int PG_RETIRE = 15;
-    public static final int PG_MIA = 16;
-    public static final int PG_KIA = 17;
-    public static final int PG_NUM = 18;
 
     // parts filter groups
     private static final int SG_ALL = 0;
@@ -326,17 +299,6 @@ public class CampaignGUI extends JPanel {
     private static final int SV_UNDAMAGED = 3;
     private static final int SV_DAMAGED = 4;
     private static final int SV_NUM = 5;
-
-    // personnel views
-    private static final int PV_GRAPHIC = 0;
-    private static final int PV_GENERAL = 1;
-    private static final int PV_PILOT = 2;
-    private static final int PV_INF = 3;
-    private static final int PV_TACTIC = 4;
-    private static final int PV_TECH = 5;
-    private static final int PV_ADMIN = 6;
-    private static final int PV_FLUFF = 7;
-    private static final int PV_NUM = 8;
 
     // unit views
     private static final int UV_GRAPHIC = 0;
@@ -368,14 +330,6 @@ public class CampaignGUI extends JPanel {
     private JCheckBoxMenuItem miShowOverview;
     
     private HashMap<String,CampaignGuiTab> tabs;
-
-    /* For the personnel tab */
-    private JPanel panPersonnel;
-    private JSplitPane splitPersonnel;
-    private JTable personnelTable;
-    private JComboBox<String> choicePerson;
-    private JComboBox<String> choicePersonView;
-    private JScrollPane scrollPersonnelView;
 
     /* For the hangar tab */
     private JPanel panHangar;
@@ -464,7 +418,6 @@ public class CampaignGUI extends JPanel {
     private PatientTableModel assignedPatientModel;
     private PatientTableModel unassignedPatientModel;
     private DocTableModel doctorsModel;
-    private PersonnelTableModel personModel;
     private UnitTableModel unitModel;
     private PartsTableModel partsModel;
     private ProcurementTableModel acquirePartsModel;
@@ -475,7 +428,6 @@ public class CampaignGUI extends JPanel {
 
 
     /* table sorters for tables that can be filtered */
-    private TableRowSorter<PersonnelTableModel> personnelSorter;
     private TableRowSorter<PartsTableModel> partsSorter;
     private TableRowSorter<ProcurementTableModel> acquirePartsSorter;
     private TableRowSorter<UnitTableModel> unitSorter;
@@ -650,11 +602,8 @@ public class CampaignGUI extends JPanel {
                 .getString("panBriefing.TabConstraints.tabTitle"))); // NOI18N
         addTab(new MapTab(this, resourceMap
                 .getString("panMap.TabConstraints.tabTitle"))); // NOI18N
-
-        initPersonnelTab();
-        tabMain.addTab(
-                resourceMap.getString("panPersonnel.TabConstraints.tabTitle"),
-                panPersonnel); // NOI18N
+        addTab(new PersonnelTab(this, resourceMap
+                .getString("panPersonnel.TabConstraints.tabTitle"))); // NOI18N
 
         initHangarTab();
         tabMain.addTab(
@@ -717,7 +666,6 @@ public class CampaignGUI extends JPanel {
         refreshServicedUnitList();
         refreshUnitList();
         refreshPersonnelList();
-        changePersonnelView();
         refreshTaskList();
         refreshAcquireList();
         refreshTechsList();
@@ -919,154 +867,6 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.weighty = 1.0;
         //gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         panOverview.add(getTabOverview(), gridBagConstraints);
-    }
-
-    private void initPersonnelTab() {
-        GridBagConstraints gridBagConstraints;
-
-        panPersonnel = new JPanel(new GridBagLayout());
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        panPersonnel.add(
-                new JLabel(resourceMap.getString("lblPersonChoice.text")),
-                gridBagConstraints);
-
-        DefaultComboBoxModel<String> personGroupModel = new DefaultComboBoxModel<String>();
-        for (int i = 0; i < PG_NUM; i++) {
-            personGroupModel.addElement(getPersonnelGroupName(i));
-        }
-        choicePerson = new JComboBox<String>(personGroupModel);
-        choicePerson.setSelectedIndex(0);
-        choicePerson.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                filterPersonnel();
-            }
-        });
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        panPersonnel.add(choicePerson, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        panPersonnel.add(
-                new JLabel(resourceMap.getString("lblPersonView.text")),
-                gridBagConstraints);
-
-        DefaultComboBoxModel<String> personViewModel = new DefaultComboBoxModel<String>();
-        for (int i = 0; i < PV_NUM; i++) {
-            personViewModel.addElement(getPersonnelViewName(i));
-        }
-        choicePersonView = new JComboBox<String>(personViewModel);
-        choicePersonView.setSelectedIndex(PV_GENERAL);
-        choicePersonView.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                changePersonnelView();
-            }
-        });
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        panPersonnel.add(choicePersonView, gridBagConstraints);
-
-        personModel = new PersonnelTableModel(getCampaign());
-        personnelTable = new JTable(personModel);
-        personnelTable
-                .setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        personnelTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        XTableColumnModel personColumnModel = new XTableColumnModel();
-        personnelTable.setColumnModel(personColumnModel);
-        personnelTable.createDefaultColumnsFromModel();
-        personnelSorter = new TableRowSorter<PersonnelTableModel>(personModel);
-        personnelSorter.setComparator(PersonnelTableModel.COL_RANK,
-                new RankSorter(getCampaign()));
-        personnelSorter.setComparator(PersonnelTableModel.COL_SKILL, new LevelSorter());
-        for (int i = PersonnelTableModel.COL_MECH; i < PersonnelTableModel.N_COL; i++) {
-            personnelSorter.setComparator(i, new BonusSorter());
-        }
-        personnelSorter.setComparator(PersonnelTableModel.COL_SALARY,
-                new FormattedNumberSorter());
-        personnelSorter.setComparator(PersonnelTableModel.COL_AGE,
-                new FormattedNumberSorter());
-        personnelTable.setRowSorter(personnelSorter);
-        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
-        sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_RANK,
-                SortOrder.DESCENDING));
-        sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_SKILL,
-                SortOrder.DESCENDING));
-        personnelSorter.setSortKeys(sortKeys);
-        personnelTable.addMouseListener(new PersonnelTableMouseAdapter(this));
-        TableColumn column = null;
-        for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
-            column = personnelTable.getColumnModel().getColumn(i);
-            column.setPreferredWidth(personModel.getColumnWidth(i));
-            column.setCellRenderer(personModel.getRenderer(
-                    choicePersonView.getSelectedIndex() == PV_GRAPHIC,
-                    getIconPackage()));
-        }
-        personnelTable.setIntercellSpacing(new Dimension(0, 0));
-        personnelTable.setShowGrid(false);
-        changePersonnelView();
-        personnelTable.getSelectionModel().addListSelectionListener(
-                new javax.swing.event.ListSelectionListener() {
-                    @Override
-                    public void valueChanged(ListSelectionEvent evt) {
-                        refreshPersonnelView();
-                    }
-                });
-
-        scrollPersonnelView = new JScrollPane();
-        scrollPersonnelView.setMinimumSize(new java.awt.Dimension(
-                PERSONNEL_VIEW_WIDTH, 600));
-        scrollPersonnelView.setPreferredSize(new java.awt.Dimension(
-                PERSONNEL_VIEW_WIDTH, 600));
-        scrollPersonnelView
-                .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPersonnelView.setViewportView(null);
-
-        splitPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                new JScrollPane(personnelTable), scrollPersonnelView);
-        splitPersonnel.setOneTouchExpandable(true);
-        splitPersonnel.setResizeWeight(1.0);
-        splitPersonnel.addPropertyChangeListener(
-                JSplitPane.DIVIDER_LOCATION_PROPERTY,
-                new PropertyChangeListener() {
-                    @Override
-                    public void propertyChange(PropertyChangeEvent pce) {
-                        // this can mess up the pilot view pane so refresh it
-                        refreshPersonnelView();
-                    }
-                });
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        panPersonnel.add(splitPersonnel, gridBagConstraints);
-
-        filterPersonnel();
-
     }
 
     private void initHangarTab() {
@@ -2331,10 +2131,10 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miExportPersonCSV = new JMenuItem(
                 resourceMap.getString("miExportPersonCSV.text")); // NOI18N
-        miExportPersonCSV.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exportTable(personnelTable, getCampaign().getName()
+        miExportPersonCSV.addActionListener(ev -> {
+        		if (tabs.containsKey(StandardTabs.PERSONNEL.getTabName())) {
+        			exportTable(((PersonnelTab)tabs.get(StandardTabs.PERSONNEL.getTabName())).getPersonnelTable(),
+        					getCampaign().getName()
                         + getCampaign().getShortDateAsString()
                         + "_ExportedPersonnel" + ".csv");
             }
@@ -3451,6 +3251,10 @@ public class CampaignGUI extends JPanel {
         if (null == id) {
             return;
         }
+        PersonnelTab pt = (PersonnelTab)tabs.get(StandardTabs.PERSONNEL.getTabName());
+        if (pt == null) {
+        	return;
+        }
         if (mainPanel.getDividerLocation() < 700) {
             if (mainPanel.getLastDividerLocation() > 700) {
                 mainPanel
@@ -3459,35 +3263,8 @@ public class CampaignGUI extends JPanel {
                 mainPanel.resetToPreferredSizes();
             }
         }
-        splitPersonnel.resetToPreferredSizes();
-        tabMain.setSelectedIndex(getTabIndexByName(resourceMap
-                .getString("panPersonnel.TabConstraints.tabTitle")));
-        int row = -1;
-        for (int i = 0; i < personnelTable.getRowCount(); i++) {
-            if (personModel.getPerson(personnelTable.convertRowIndexToModel(i))
-                    .getId().equals(id)) {
-                row = i;
-                break;
-            }
-        }
-        if (row == -1) {
-            // try expanding the filter to all units
-            choicePerson.setSelectedIndex(0);
-            for (int i = 0; i < personnelTable.getRowCount(); i++) {
-                if (personModel
-                        .getPerson(personnelTable.convertRowIndexToModel(i))
-                        .getId().equals(id)) {
-                    row = i;
-                    break;
-                }
-            }
-
-        }
-        if (row != -1) {
-            personnelTable.setRowSelectionInterval(row, row);
-            personnelTable.scrollRectToVisible(personnelTable.getCellRect(row,
-                    0, true));
-        }
+        pt.focusOnPerson(id);
+        tabMain.setSelectedComponent(pt);
     }
 
     public void showNews(int id) {
@@ -3853,49 +3630,6 @@ public class CampaignGUI extends JPanel {
         return file;
     }
 
-    public static String getPersonnelGroupName(int group) {
-        switch (group) {
-            case PG_ACTIVE:
-                return "Active Personnel";
-            case PG_COMBAT:
-                return "Combat Personnel";
-            case PG_MW:
-                return "Mechwarriors";
-            case PG_CREW:
-                return "Vehicle Crews";
-            case PG_PILOT:
-                return "Aerospace Pilots";
-            case PG_CPILOT:
-                return "Conventional Pilots";
-            case PG_PROTO:
-                return "Protomech Pilots";
-            case PG_BA:
-                return "Battle Armor Infantry";
-            case PG_SOLDIER:
-                return "Conventional Infantry";
-            case PG_SUPPORT:
-                return "Support Personnel";
-            case PG_VESSEL:
-                return "Large Vessel Crews";
-            case PG_TECH:
-                return "Techs";
-            case PG_DOC:
-                return "Medical Staff";
-            case PG_ADMIN:
-                return "Administrators";
-            case PG_DEPENDENT:
-                return "Dependents";
-            case PG_RETIRE:
-                return "Retired Personnel";
-            case PG_MIA:
-                return "Personnel MIA";
-            case PG_KIA:
-                return "Rolls of Honor (KIA)";
-            default:
-                return "?";
-        }
-    }
-
     public static String getPartsGroupName(int group) {
         switch (group) {
             case SG_ALL:
@@ -3944,28 +3678,6 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    public static String getPersonnelViewName(int group) {
-        switch (group) {
-            case PV_GRAPHIC:
-                return "Graphic";
-            case PV_GENERAL:
-                return "General";
-            case PV_PILOT:
-                return "Piloting/Gunnery Skills";
-            case PV_INF:
-                return "Infantry Skills";
-            case PV_TACTIC:
-                return "Tactical Skills";
-            case PV_TECH:
-                return "Tech Skills";
-            case PV_ADMIN:
-                return "Admin Skills";
-            case PV_FLUFF:
-                return "Fluff Information";
-            default:
-                return "?";
-        }
-    }
 
     public static String getUnitViewName(int group) {
         switch (group) {
@@ -4047,8 +3759,6 @@ public class CampaignGUI extends JPanel {
         }
         refreshCalendar();
         getCampaign().reloadNews();
-        changePersonnelView();
-        refreshPersonnelList();
         refreshOverview();
     }// GEN-LAST:event_menuOptionsActionPerformed
 
@@ -4061,8 +3771,6 @@ public class CampaignGUI extends JPanel {
             getCampaign().setGameOptions(god.getOptions());
             setCampaignOptionsFromGameOptions();
             refreshCalendar();
-            changePersonnelView();
-            refreshPersonnelList();
             refreshOverview();
         }
     }// GEN-LAST:event_menuOptionsActionPerformed
@@ -4502,24 +4210,18 @@ public class CampaignGUI extends JPanel {
         column.setEnabled(getCampaign().isGM());
     }
 
+    //TODO: trigger from event
     public void refreshPersonnelView() {
-        int row = personnelTable.getSelectedRow();
-        if (row < 0) {
-            scrollPersonnelView.setViewportView(null);
-            return;
-        }
-        Person selectedPerson = personModel.getPerson(personnelTable
-                .convertRowIndexToModel(row));
-        scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, getCampaign(), getIconPackage()));
-        // This odd code is to make sure that the scrollbar stays at the top
-        // I can't just call it here, because it ends up getting reset somewhere
-        // later
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                scrollPersonnelView.getVerticalScrollBar().setValue(0);
-            }
-        });
+    	if (tabs.containsKey(StandardTabs.PERSONNEL.getTabName())) {
+    		((PersonnelTab)tabs.get(StandardTabs.PERSONNEL.getTabName())).refreshPersonnelView();
+    	}
+    }
+
+    //TODO: trigger from event
+    public void filterPersonnel() {
+    	if (tabs.containsKey(StandardTabs.PERSONNEL.getTabName())) {
+    		((PersonnelTab)tabs.get(StandardTabs.PERSONNEL.getTabName())).filterPersonnel();
+    	}
     }
 
     public void refreshUnitView() {
@@ -4770,6 +4472,7 @@ public class CampaignGUI extends JPanel {
         refreshOverview();
     }
 
+    //TODO: disable if not using personnel tab
     private void savePersonFile() throws IOException {
         JFileChooser savePersonnel = new JFileChooser(".");
         savePersonnel.setDialogTitle("Save Personnel");
@@ -4821,17 +4524,18 @@ public class CampaignGUI extends JPanel {
         PrintWriter pw = null;
 
         try {
-            int row = personnelTable.getSelectedRow();
+        	PersonnelTab pt = (PersonnelTab)tabs.get(StandardTabs.PERSONNEL.getTabName());
+            int row = pt.getPersonnelTable().getSelectedRow();
             if (row < 0) {
                 MekHQ.logMessage("ERROR: Cannot export person if no one is selected! Ignoring.");
                 return;
             }
-            Person selectedPerson = personModel.getPerson(personnelTable
+            Person selectedPerson = pt.getPersonModel().getPerson(pt.getPersonnelTable()
                     .convertRowIndexToModel(row));
-            int[] rows = personnelTable.getSelectedRows();
+            int[] rows = pt.getPersonnelTable().getSelectedRows();
             Person[] people = new Person[rows.length];
             for (int i = 0; i < rows.length; i++) {
-                people[i] = personModel.getPerson(personnelTable
+                people[i] = pt.getPersonModel().getPerson(pt.getPersonnelTable()
                         .convertRowIndexToModel(rows[i]));
             }
             fos = new FileOutputStream(file);
@@ -5226,8 +4930,6 @@ public class CampaignGUI extends JPanel {
 
         refreshCalendar();
         getCampaign().reloadNews();
-        changePersonnelView();
-        refreshPersonnelList();
     }
 
     private void savePartsFile() throws IOException {
@@ -5402,28 +5104,11 @@ public class CampaignGUI extends JPanel {
         refreshRating();
     }
 
+    //TODO: Trigger from event
     public void refreshPersonnelList() {
-        UUID selectedUUID = null;
-        int selectedRow = personnelTable.getSelectedRow();
-        if (selectedRow != -1) {
-            Person p = personModel.getPerson(personnelTable
-                    .convertRowIndexToModel(selectedRow));
-            if (null != p) {
-                selectedUUID = p.getId();
-            }
-        }
-        personModel.refreshData();
-        // try to put the focus back on same person if they are still available
-        for (int row = 0; row < personnelTable.getRowCount(); row++) {
-            Person p = personModel.getPerson(personnelTable
-                    .convertRowIndexToModel(row));
-            if (p.getId().equals(selectedUUID)) {
-                personnelTable.setRowSelectionInterval(row, row);
-                refreshPersonnelView();
-                break;
-            }
-        }
-        refreshRating();
+    	if (tabs.containsKey(StandardTabs.PERSONNEL.getTabName())) {
+    		((PersonnelTab)tabs.get(StandardTabs.PERSONNEL.getTabName())).refreshPersonnelList();
+    	}
     }
 
     //TODO: Trigger from event
@@ -5833,50 +5518,6 @@ public class CampaignGUI extends JPanel {
         taskSorter.setRowFilter(taskLocationFilter);
     }
 
-    public void filterPersonnel() {
-        RowFilter<PersonnelTableModel, Integer> personTypeFilter = null;
-        final int nGroup = choicePerson.getSelectedIndex();
-        personTypeFilter = new RowFilter<PersonnelTableModel, Integer>() {
-            @Override
-            public boolean include(
-                    Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
-                PersonnelTableModel personModel = entry.getModel();
-                Person person = personModel.getPerson(entry.getIdentifier());
-                int type = person.getPrimaryRole();
-                if ((nGroup == PG_ACTIVE)
-                        || (nGroup == PG_COMBAT && type <= Person.T_SPACE_GUNNER)
-                        || (nGroup == PG_SUPPORT && type > Person.T_SPACE_GUNNER)
-                        || (nGroup == PG_MW && type == Person.T_MECHWARRIOR)
-                        || (nGroup == PG_CREW && (type == Person.T_GVEE_DRIVER
-                                || type == Person.T_NVEE_DRIVER
-                                || type == Person.T_VTOL_PILOT || type == Person.T_VEE_GUNNER))
-                        || (nGroup == PG_PILOT && type == Person.T_AERO_PILOT)
-                        || (nGroup == PG_CPILOT && type == Person.T_CONV_PILOT)
-                        || (nGroup == PG_PROTO && type == Person.T_PROTO_PILOT)
-                        || (nGroup == PG_BA && type == Person.T_BA)
-                        || (nGroup == PG_SOLDIER && type == Person.T_INFANTRY)
-                        || (nGroup == PG_VESSEL && (type == Person.T_SPACE_PILOT
-                                || type == Person.T_SPACE_CREW
-                                || type == Person.T_SPACE_GUNNER || type == Person.T_NAVIGATOR))
-                        || (nGroup == PG_TECH && type >= Person.T_MECH_TECH && type < Person.T_DOCTOR)
-                        || (nGroup == PG_DOC && ((type == Person.T_DOCTOR) || (type == Person.T_MEDIC)))
-                        || (nGroup == PG_ADMIN && type > Person.T_MEDIC)) {
-                    return person.isActive();
-                } else if (nGroup == PG_DEPENDENT) {
-                    return person.isDependent() == true;
-                } else if (nGroup == PG_RETIRE) {
-                    return person.getStatus() == Person.S_RETIRED;
-                } else if (nGroup == PG_MIA) {
-                    return person.getStatus() == Person.S_MIA;
-                } else if (nGroup == PG_KIA) {
-                    return person.getStatus() == Person.S_KIA;
-                }
-                return false;
-            }
-        };
-        personnelSorter.setRowFilter(personTypeFilter);
-    }
-
     public void filterParts() {
         RowFilter<PartsTableModel, Integer> partsTypeFilter = null;
         final int nGroup = choiceParts.getSelectedIndex();
@@ -6033,1053 +5674,6 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    private void changePersonnelView() {
-
-        int view = choicePersonView.getSelectedIndex();
-        XTableColumnModel columnModel = (XTableColumnModel) personnelTable
-                .getColumnModel();
-        personnelTable.setRowHeight(15);
-
-        // set the renderer
-        TableColumn column = null;
-        for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
-            column = columnModel.getColumnByModelIndex(i);
-            column.setCellRenderer(personModel.getRenderer(
-                    choicePersonView.getSelectedIndex() == PV_GRAPHIC,
-                    getIconPackage()));
-            if (i == PersonnelTableModel.COL_RANK) {
-                if (view == PV_GRAPHIC) {
-                    column.setPreferredWidth(125);
-                    column.setHeaderValue("Person");
-                } else {
-                    column.setPreferredWidth(personModel.getColumnWidth(i));
-                    column.setHeaderValue("Rank");
-                }
-            }
-        }
-
-        if (view == PV_GRAPHIC) {
-            personnelTable.setRowHeight(80);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NAME),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_CALL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_AGE), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GENDER),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_TYPE),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SKILL),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN),
-                    true);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_FORCE),
-                            true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_MECH),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_AERO),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_JET), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SPACE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_VEE), false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NVEE),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_VTOL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GUN_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SMALL_ARMS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ANTI_MECH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_ARTY),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TACTICS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_STRATEGY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_MECH),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_AERO),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_VEE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_MEDICAL),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ADMIN),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NEG), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SCROUNGE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TOUGH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_EDGE),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NABIL),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NIMP),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_HITS), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SALARY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_KILLS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
-        } else if (view == PV_GENERAL) {
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_CALL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_AGE), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GENDER),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_SKILL),
-                            true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN),
-                    true);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_FORCE),
-                            true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY),
-                    true);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_MECH),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_AERO),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_JET), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SPACE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_VEE), false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NVEE),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_VTOL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GUN_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SMALL_ARMS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ANTI_MECH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_ARTY),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TACTICS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_STRATEGY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_MECH),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_AERO),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_VEE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_MEDICAL),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ADMIN),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NEG), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SCROUNGE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TOUGH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_EDGE),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NABIL),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NIMP),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_HITS), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SALARY),
-                    getCampaign().getCampaignOptions().payForSalaries());
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_KILLS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_XP), true);
-        } else if (view == PV_PILOT) {
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_CALL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_AGE), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GENDER),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SKILL),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_FORCE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_MECH), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_AERO), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_JET), true);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_SPACE),
-                            true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_VEE), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NVEE), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_VTOL), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GUN_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SMALL_ARMS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ANTI_MECH),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ARTY), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TACTICS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_STRATEGY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_MECH),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_AERO),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_VEE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_MEDICAL),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ADMIN),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NEG), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SCROUNGE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TOUGH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_EDGE),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NABIL),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NIMP),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_HITS),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SALARY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_KILLS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
-        } else if (view == PV_INF) {
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_CALL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_AGE), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GENDER),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SKILL),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_FORCE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_MECH),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_AERO),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_JET), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SPACE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_VEE), false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NVEE),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_VTOL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GUN_BA),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SMALL_ARMS),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ANTI_MECH),
-                    true);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_ARTY),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TACTICS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_STRATEGY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_MECH),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_AERO),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_VEE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_MEDICAL),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ADMIN),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NEG), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SCROUNGE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TOUGH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_EDGE),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NABIL),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NIMP),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_HITS),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SALARY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_KILLS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
-        } else if (view == PV_TACTIC) {
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_CALL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_AGE), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GENDER),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SKILL),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_FORCE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_MECH),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_AERO),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_JET), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SPACE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_VEE), false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NVEE),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_VTOL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GUN_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SMALL_ARMS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ANTI_MECH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_ARTY),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TACTICS),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_STRATEGY),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_MECH),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_AERO),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_VEE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_MEDICAL),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ADMIN),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NEG), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SCROUNGE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TOUGH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_EDGE),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NABIL),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NIMP),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_HITS),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SALARY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_KILLS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
-        } else if (view == PV_TECH) {
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_CALL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_AGE), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GENDER),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SKILL),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_FORCE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_MECH),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_AERO),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_JET), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SPACE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_VEE), false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NVEE),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_VTOL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GUN_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SMALL_ARMS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ANTI_MECH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_ARTY),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TACTICS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_STRATEGY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_MECH),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_AERO),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_VEE),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_BA),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_MEDICAL),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ADMIN),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NEG), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SCROUNGE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TOUGH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_EDGE),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NABIL),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NIMP),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_HITS),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SALARY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_KILLS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
-        } else if (view == PV_ADMIN) {
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_CALL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_AGE), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GENDER),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SKILL),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_FORCE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_MECH),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_AERO),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_JET), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SPACE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_VEE), false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NVEE),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_VTOL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GUN_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SMALL_ARMS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ANTI_MECH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_ARTY),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TACTICS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_STRATEGY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_MECH),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_AERO),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_VEE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_MEDICAL),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_ADMIN),
-                            true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NEG), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SCROUNGE),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TOUGH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_EDGE),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NABIL),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NIMP),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_HITS),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SALARY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_KILLS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
-        } else if (view == PV_FLUFF) {
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_CALL), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_AGE), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GENDER),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SKILL),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_FORCE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_MECH),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_AERO),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_JET), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SPACE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_VEE), false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NVEE),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_VTOL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GUN_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SMALL_ARMS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ANTI_MECH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_ARTY),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TACTICS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_STRATEGY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_MECH),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_AERO),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_VEE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_MEDICAL),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ADMIN),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NEG), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SCROUNGE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TOUGH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_EDGE),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NABIL),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NIMP),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_HITS),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SALARY),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_KILLS),
-                            true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
-        }
-    }
-
     private void changeUnitView() {
 
         int view = choiceUnitView.getSelectedIndex();
@@ -7099,7 +5693,7 @@ public class CampaignGUI extends JPanel {
                     column.setPreferredWidth(125);
                     column.setHeaderValue("Unit");
                 } else {
-                    column.setPreferredWidth(personModel.getColumnWidth(i));
+                    column.setPreferredWidth(unitModel.getColumnWidth(i));
                     column.setHeaderValue("Weight Class");
                 }
             }
@@ -7614,17 +6208,6 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    public Person[] getSelectedPeople() {
-        Person[] selected = new Person[personnelTable.getSelectedRowCount()];
-        int[] rows = personnelTable.getSelectedRows();
-        for (int i = 0; i < rows.length; i++) {
-            Person person = personModel.getPerson(personnelTable
-                    .convertRowIndexToModel(rows[i]));
-            selected[i] = person;
-        }
-        return selected;
-    }
-
     /**
      * @return the unitModel
      */
@@ -7686,27 +6269,6 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
-     * @return the personnelTable
-     */
-    public JTable getPersonnelTable() {
-        return personnelTable;
-    }
-
-    /**
-     * @return the personModel
-     */
-    public PersonnelTableModel getPersonnelModel() {
-        return personModel;
-    }
-
-    /**
-     * @return the splitPersonnel
-     */
-    public JSplitPane getSplitPersonnel() {
-        return splitPersonnel;
-    }
-
-    /**
      * @return the partsTable
      */
     public JTable getPartsTable() {
@@ -7745,5 +6307,6 @@ public class CampaignGUI extends JPanel {
         getCampaign().getCampaignOptions().setQuirks(getCampaign().getGameOptions().getOption("stratops_quirks").booleanValue());
         getCampaign().getCampaignOptions().setAllowCanonOnly(getCampaign().getGameOptions().getOption("canon_only").booleanValue());
         getCampaign().getCampaignOptions().setTechLevel(TechConstants.getSimpleLevel(getCampaign().getGameOptions().getOption("techlevel").stringValue()));
+        MekHQ.EVENT_BUS.trigger(new OptionsChangedEvent(getCampaign()));
     }
 }
