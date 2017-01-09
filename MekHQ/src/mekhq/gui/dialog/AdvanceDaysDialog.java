@@ -113,7 +113,6 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
             gui.refreshFunds();
             gui.refreshFinancialTransactions();
             gui.refreshOverview();
-            gui.getMapPanel().repaint();
         }
     }
 }

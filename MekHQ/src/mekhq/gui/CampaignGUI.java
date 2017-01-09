@@ -139,8 +139,8 @@ import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.JumpPath;
 import mekhq.campaign.RandomSkillPreferences;
+import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
@@ -175,7 +175,6 @@ import mekhq.campaign.report.Report;
 import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.NewsItem;
-import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.WorkTime;
@@ -239,10 +238,7 @@ import mekhq.gui.sorter.TwoNumbersSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
 import mekhq.gui.sorter.WeightClassSorter;
-import mekhq.gui.utilities.JSuggestField;
-import mekhq.gui.view.JumpPathViewPanel;
 import mekhq.gui.view.PersonViewPanel;
-import mekhq.gui.view.PlanetViewPanel;
 import mekhq.gui.view.UnitViewPanel;
 
 /**
@@ -372,13 +368,6 @@ public class CampaignGUI extends JPanel {
     private JCheckBoxMenuItem miShowOverview;
     
     private HashMap<String,CampaignGuiTab> tabs;
-    
-    /* For the map tab */
-    private JPanel panMapView;
-    InterstellarMapPanel panMap;
-    private JSplitPane splitMap;
-    private JScrollPane scrollPlanetView;
-    JSuggestField suggestPlanet;
 
     /* For the personnel tab */
     private JPanel panPersonnel;
@@ -659,10 +648,8 @@ public class CampaignGUI extends JPanel {
                 .getString("panOrganization.TabConstraints.tabTitle"))); // NOI18N
         addTab(new BriefingTab(this, resourceMap
                 .getString("panBriefing.TabConstraints.tabTitle"))); // NOI18N
-
-        initMap();
-        tabMain.addTab(resourceMap.getString("panMap.TabConstraints.tabTitle"),
-                splitMap); // NOI18N
+        addTab(new MapTab(this, resourceMap
+                .getString("panMap.TabConstraints.tabTitle"))); // NOI18N
 
         initPersonnelTab();
         tabMain.addTab(
@@ -839,113 +826,6 @@ public class CampaignGUI extends JPanel {
     	return null;
     }
     
-
-    private void initMap() {
-        GridBagConstraints gridBagConstraints;
-
-        panMapView = new JPanel(new GridBagLayout());
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panMapView.add(new JLabel(resourceMap.getString("lblFindPlanet.text")),
-                gridBagConstraints);
-
-        suggestPlanet = new JSuggestField(getFrame(), getCampaign().getPlanetNames());
-        suggestPlanet.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                Planet p = getCampaign().getPlanet(suggestPlanet.getText());
-                if (null != p) {
-                    panMap.setSelectedPlanet(p);
-                    refreshPlanetView();
-                }
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        panMapView.add(suggestPlanet, gridBagConstraints);
-
-        JButton btnCalculateJumpPath = new JButton(
-                resourceMap.getString("btnCalculateJumpPath.text")); // NOI18N
-        btnCalculateJumpPath.setToolTipText(resourceMap
-                .getString("btnCalculateJumpPath.toolTipText")); // NOI18N
-        btnCalculateJumpPath.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                calculateJumpPath();
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.weighty = 0.0;
-        panMapView.add(btnCalculateJumpPath, gridBagConstraints);
-
-        JButton btnBeginTransit = new JButton(
-                resourceMap.getString("btnBeginTransit.text")); // NOI18N
-        btnBeginTransit.setToolTipText(resourceMap
-                .getString("btnBeginTransit.toolTipText")); // NOI18N
-        btnBeginTransit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                beginTransit();
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.weighty = 0.0;
-        panMapView.add(btnBeginTransit, gridBagConstraints);
-
-        panMap = new InterstellarMapPanel(getCampaign(), this);
-        // lets go ahead and zoom in on the current location
-        panMap.setSelectedPlanet(getCampaign().getLocation().getCurrentPlanet());
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        panMapView.add(panMap, gridBagConstraints);
-
-        scrollPlanetView = new JScrollPane();
-        scrollPlanetView.setMinimumSize(new java.awt.Dimension(400, 600));
-        scrollPlanetView.setPreferredSize(new java.awt.Dimension(400, 600));
-        scrollPlanetView
-                .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPlanetView.setViewportView(null);
-        splitMap = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panMapView, scrollPlanetView);
-        splitMap.setOneTouchExpandable(true);
-        splitMap.setResizeWeight(1.0);
-        splitMap.addPropertyChangeListener(
-                JSplitPane.DIVIDER_LOCATION_PROPERTY,
-                new PropertyChangeListener() {
-                    @Override
-                    public void propertyChange(PropertyChangeEvent pce) {
-                        // this can mess up the planet view panel so refresh it
-                        refreshPlanetView();
-                    }
-                });
-
-        panMap.setCampaign(getCampaign());
-    }
-
     private void initOverviewTab() {
         GridBagConstraints gridBagConstraints;
 
@@ -3151,26 +3031,7 @@ public class CampaignGUI extends JPanel {
             });
         }
     }
-    private void calculateJumpPath() {
-        if (null != panMap.getSelectedPlanet()) {
-            panMap.setJumpPath(getCampaign().calculateJumpPath(
-                    getCampaign().getCurrentPlanet(),
-                    panMap.getSelectedPlanet()));
-            refreshPlanetView();
-        }
-    }
-
-    private void beginTransit() {
-        if (panMap.getJumpPath().isEmpty()) {
-            return;
-        }
-        getCampaign().getLocation().setJumpPath(panMap.getJumpPath());
-        refreshPlanetView();
-        refreshLocation();
-        panMap.setJumpPath(new JumpPath());
-        panMap.repaint();
-    }
-
+    
     private void doTask() {// GEN-FIRST:event_btnDoTaskActionPerformed
         int selectedRow = -1;
         int partId = -1;
@@ -3656,10 +3517,6 @@ public class CampaignGUI extends JPanel {
         updateTechTarget();
     }
 
-    public InterstellarMapPanel getMapPanel() {
-        return panMap;
-    }
-
     private void advanceDay() {
         // first check for overdue loan payments - dont allow advancement until
         // these are addressed
@@ -3710,8 +3567,6 @@ public class CampaignGUI extends JPanel {
         refreshFinancialTransactions();
         refreshOverview();
         refreshPlanetView();
-        panMap.repaint();
-        suggestPlanet.setSuggestData(getCampaign().getPlanetNames());
     }// GEN-LAST:event_btnAdvanceDayActionPerformed
 
     public boolean nagShortMaintenance() {
@@ -4195,7 +4050,6 @@ public class CampaignGUI extends JPanel {
         changePersonnelView();
         refreshPersonnelList();
         refreshOverview();
-        panMap.repaint();
     }// GEN-LAST:event_menuOptionsActionPerformed
 
     private void menuOptionsMMActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuOptionsActionPerformed
@@ -4699,23 +4553,16 @@ public class CampaignGUI extends JPanel {
 
     //TODO: Trigger from event
     public void refreshLanceAssignments() {
-    	if (tabs.containsKey(StandardTabs.TOE.getTabName())) {
-    		((BriefingTab)tabs.get(StandardTabs.TOE.getTabName())).refreshLanceAssignments();
+    	if (tabs.containsKey(StandardTabs.BRIEFING.getTabName())) {
+    		((BriefingTab)tabs.get(StandardTabs.BRIEFING.getTabName())).refreshLanceAssignments();
     	}
     }
 
+    //TODO: Trigger from event
     public void refreshPlanetView() {
-        JumpPath path = panMap.getJumpPath();
-        if (null != path && !path.isEmpty()) {
-            scrollPlanetView.setViewportView(new JumpPathViewPanel(path,
-                    getCampaign()));
-            return;
-        }
-        Planet planet = panMap.getSelectedPlanet();
-        if (null != planet) {
-            scrollPlanetView.setViewportView(new PlanetViewPanel(planet,
-                    getCampaign()));
-        }
+    	if (tabs.containsKey(StandardTabs.MAP.getTabName())) {
+    		((MapTab)tabs.get(StandardTabs.MAP.getTabName())).refreshPlanetView();
+    	}
     }
 
     private void addFundsActionPerformed(ActionEvent evt) {
@@ -5374,13 +5221,13 @@ public class CampaignGUI extends JPanel {
             }
 
             MekHQ.logMessage("Finished load of campaign options file");
+            MekHQ.EVENT_BUS.trigger(new OptionsChangedEvent(getCampaign(), options));
         }
 
         refreshCalendar();
         getCampaign().reloadNews();
         changePersonnelView();
         refreshPersonnelList();
-        panMap.repaint();
     }
 
     private void savePartsFile() throws IOException {
