@@ -369,7 +369,7 @@ public class CampaignGUI extends JPanel {
     private JMenuItem miShipSearch;
     private JMenuItem miRetirementDefectionDialog;
     private JCheckBoxMenuItem miShowOverview;
-
+    
     /* For the TO&E tab */
     private JPanel panOrganization;
     private JTree orgTree;
