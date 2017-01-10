@@ -61,6 +61,11 @@ public class TOETab extends CampaignGuiTab {
 		super(gui, name);
 	}
 
+    @Override
+    public TabType tabType() {
+    	return TabType.TOE;
+    }
+
 	@Override
 	public void initTab() {
 		GridBagConstraints gridBagConstraints;

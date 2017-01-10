@@ -40,7 +40,7 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.CampaignGUI;
+import mekhq.gui.HangarTab;
 import mekhq.gui.dialog.BombsDialog;
 import mekhq.gui.dialog.CamoChoiceDialog;
 import mekhq.gui.dialog.ChooseRefitDialog;
@@ -52,21 +52,21 @@ import mekhq.gui.utilities.StaticChecks;
 public class UnitTableMouseAdapter extends MouseInputAdapter implements
         ActionListener {
 
-    private CampaignGUI gui;
+    private HangarTab hangarTab;
 
-    public UnitTableMouseAdapter(CampaignGUI gui) {
+    public UnitTableMouseAdapter(HangarTab hangarTab) {
         super();
-        this.gui = gui;
+        this.hangarTab = hangarTab;
     }
 
     public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
-        Unit selectedUnit = gui.getUnitModel().getUnit(gui.getUnitTable()
-                .convertRowIndexToModel(gui.getUnitTable().getSelectedRow()));
-        int[] rows = gui.getUnitTable().getSelectedRows();
+        Unit selectedUnit = hangarTab.getUnitModel().getUnit(hangarTab.getUnitTable()
+                .convertRowIndexToModel(hangarTab.getUnitTable().getSelectedRow()));
+        int[] rows = hangarTab.getUnitTable().getSelectedRows();
         Unit[] units = new Unit[rows.length];
         for (int i = 0; i < rows.length; i++) {
-            units[i] = gui.getUnitModel().getUnit(gui.getUnitTable()
+            units[i] = hangarTab.getUnitModel().getUnit(hangarTab.getUnitTable()
                     .convertRowIndexToModel(rows[i]));
         }
         if (command.equalsIgnoreCase("REMOVE_ALL_PERSONNEL")) {
@@ -94,10 +94,10 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 }
             }
             
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshOrganization();
-            gui.refreshOverview();
+            hangarTab.getCampaignGui().refreshServicedUnitList();
+            hangarTab.refreshUnitList();
+            hangarTab.getCampaignGui().refreshOrganization();
+            hangarTab.getCampaignGui().refreshOverview();
         }/* else if (command.contains("QUIRK")) {
             String sel = command.split(":")[1];
                 selectedUnit.acquireQuirk(sel, true);
@@ -108,11 +108,11 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 gui.refreshCargo();
                 gui.refreshOverview();
         }*/ else if (command.contains("MAINTENANCE_REPORT")) {
-            gui.showMaintenanceReport(selectedUnit.getId());
+            hangarTab.getCampaignGui().showMaintenanceReport(selectedUnit.getId());
         } else if (command.contains("ASSIGN")) {
             String sel = command.split(":")[1];
             UUID id = UUID.fromString(sel);
-            Person tech = gui.getCampaign().getPerson(id);
+            Person tech = hangarTab.getCampaign().getPerson(id);
             if (null != tech) {
                 // remove any existing techs
                 if (null != selectedUnit.getTech()) {
@@ -120,16 +120,16 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 }
                 selectedUnit.setTech(tech);
             }
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshTechsList();
-            gui.refreshPersonnelList();
-            gui.refreshReport();
-            gui.refreshOverview();
+            hangarTab.getCampaignGui().refreshServicedUnitList();
+            hangarTab.refreshUnitList();
+            hangarTab.getCampaignGui().refreshTechsList();
+            hangarTab.getCampaignGui().refreshPersonnelList();
+            hangarTab.getCampaignGui().refreshReport();
+            hangarTab.getCampaignGui().refreshOverview();
         } else if (command.equalsIgnoreCase("SET_QUALITY")) {
             int q = -1;
             Object[] possibilities = { "F", "E", "D", "C", "B", "A" };
-            String quality = (String) JOptionPane.showInputDialog(gui.getFrame(),
+            String quality = (String) JOptionPane.showInputDialog(hangarTab.getFrame(),
                     "Choose the new quality level", "Set Quality",
                     JOptionPane.PLAIN_MESSAGE, null, possibilities, "F");
             switch (quality) {
@@ -172,37 +172,37 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                             "Do you really want to sell " + unit.getName()
                                     + " for " + text, "Sell Unit?",
                             JOptionPane.YES_NO_OPTION)) {
-                        gui.getCampaign().sellUnit(unit.getId());
+                        hangarTab.getCampaign().sellUnit(unit.getId());
                     }
                 }
             }
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshPersonnelList();
-            gui.refreshOrganization();
-            gui.refreshReport();
-            gui.refreshFunds();
-            gui.refreshFinancialTransactions();
-            gui.refreshOverview();
+            hangarTab.getCampaignGui().refreshServicedUnitList();
+            hangarTab.refreshUnitList();
+            hangarTab.getCampaignGui().refreshPersonnelList();
+            hangarTab.getCampaignGui().refreshOrganization();
+            hangarTab.getCampaignGui().refreshReport();
+            hangarTab.getCampaignGui().refreshFunds();
+            hangarTab.getCampaignGui().refreshFinancialTransactions();
+            hangarTab.getCampaignGui().refreshOverview();
         } else if (command.equalsIgnoreCase("LOSS")) {
             for (Unit unit : units) {
                 if (0 == JOptionPane.showConfirmDialog(null,
                         "Do you really want to consider " + unit.getName()
                                 + " a combat loss?", "Remove Unit?",
                         JOptionPane.YES_NO_OPTION)) {
-                    gui.getCampaign().removeUnit(unit.getId());
+                    hangarTab.getCampaign().removeUnit(unit.getId());
                 }
             }
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshPersonnelList();
-            gui.refreshOrganization();
-            gui.refreshReport();
-            gui.refreshOverview();
+            hangarTab.getCampaignGui().refreshServicedUnitList();
+            hangarTab.refreshUnitList();
+            hangarTab.getCampaignGui().refreshPersonnelList();
+            hangarTab.getCampaignGui().refreshOrganization();
+            hangarTab.getCampaignGui().refreshReport();
+            hangarTab.getCampaignGui().refreshOverview();
         } else if (command.contains("SWAP_AMMO")) {
             String sel = command.split(":")[1];
             int selAmmoId = Integer.parseInt(sel);
-            Part part = gui.getCampaign().getPart(selAmmoId);
+            Part part = hangarTab.getCampaign().getPart(selAmmoId);
             if (null == part || !(part instanceof AmmoBin)) {
                 return;
             }
@@ -210,12 +210,12 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             sel = command.split(":")[2];
             long munition = Long.parseLong(sel);
             ammo.changeMunition(munition);
-            gui.refreshTaskList();
-            gui.refreshAcquireList();
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshOverview();
-            gui.filterTasks();
+            hangarTab.getCampaignGui().refreshTaskList();
+            hangarTab.getCampaignGui().refreshAcquireList();
+            hangarTab.getCampaignGui().refreshServicedUnitList();
+            hangarTab.refreshUnitList();
+            hangarTab.getCampaignGui().refreshOverview();
+            hangarTab.getCampaignGui().filterTasks();
         } else if (command.contains("CHANGE_SITE")) {
             for (Unit unit : units) {
                 if (!unit.isDeployed()) {
@@ -226,33 +226,33 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     }
                 }
             }
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshTaskList();
-            gui.refreshAcquireList();
-            gui.refreshOverview();
+            hangarTab.getCampaignGui().refreshServicedUnitList();
+            hangarTab.refreshUnitList();
+            hangarTab.getCampaignGui().refreshTaskList();
+            hangarTab.getCampaignGui().refreshAcquireList();
+            hangarTab.getCampaignGui().refreshOverview();
         } else if (command.equalsIgnoreCase("SALVAGE")) {
             for (Unit unit : units) {
                 if (!unit.isDeployed()) {
                     unit.setSalvage(true);
                 }
             }
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshOverview();
+            hangarTab.getCampaignGui().refreshServicedUnitList();
+            hangarTab.refreshUnitList();
+            hangarTab.getCampaignGui().refreshOverview();
         } else if (command.equalsIgnoreCase("REPAIR")) {
             for (Unit unit : units) {
                 if (!unit.isDeployed() && unit.isRepairable()) {
                     unit.setSalvage(false);
                 }
             }
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshOverview();
+            hangarTab.getCampaignGui().refreshServicedUnitList();
+            hangarTab.refreshUnitList();
+            hangarTab.getCampaignGui().refreshOverview();
         } else if (command.equalsIgnoreCase("TAG_CUSTOM")) {
             String sCustomsDir = "data/mechfiles/customs/";
             String sCustomsDirCampaign = sCustomsDir
-                    + gui.getCampaign().getName() + "/";
+                    + hangarTab.getCampaign().getName() + "/";
             File customsDir = new File(sCustomsDir);
             if (!customsDir.exists()) {
                 customsDir.mkdir();
@@ -310,7 +310,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
-                gui.getCampaign().addCustom(
+                hangarTab.getCampaign().addCustom(
                         unit.getEntity().getChassis() + " "
                                 + unit.getEntity().getModel());
             }
@@ -323,16 +323,16 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                             "Do you really want to remove "
                                     + unit.getName() + "?", "Remove Unit?",
                             JOptionPane.YES_NO_OPTION)) {
-                        gui.getCampaign().removeUnit(unit.getId());
+                        hangarTab.getCampaign().removeUnit(unit.getId());
                     }
                 }
             }
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshPersonnelList();
-            gui.refreshOrganization();
-            gui.refreshReport();
-            gui.refreshOverview();
+            hangarTab.getCampaignGui().refreshServicedUnitList();
+            hangarTab.refreshUnitList();
+            hangarTab.getCampaignGui().refreshPersonnelList();
+            hangarTab.getCampaignGui().refreshOrganization();
+            hangarTab.getCampaignGui().refreshReport();
+            hangarTab.getCampaignGui().refreshOverview();
         } else if (command.equalsIgnoreCase("DISBAND")) {
             for (Unit unit : units) {
                 if (!unit.isDeployed()) {
@@ -347,90 +347,90 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                         for (Part p : parts) {
                             p.remove(true);
                         }
-                        gui.getCampaign().removeUnit(unit.getId());
+                        hangarTab.getCampaign().removeUnit(unit.getId());
                     }
                 }
             }
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshPartsList();
-            gui.refreshPersonnelList();
-            gui.refreshOrganization();
-            gui.refreshReport();
-            gui.refreshOverview();
+            hangarTab.getCampaignGui().refreshServicedUnitList();
+            hangarTab.refreshUnitList();
+            hangarTab.getCampaignGui().refreshPartsList();
+            hangarTab.getCampaignGui().refreshPersonnelList();
+            hangarTab.getCampaignGui().refreshOrganization();
+            hangarTab.getCampaignGui().refreshReport();
+            hangarTab.getCampaignGui().refreshOverview();
         } else if (command.equalsIgnoreCase("UNDEPLOY")) {
             for (Unit unit : units) {
                 if (unit.isDeployed()) {
-                    gui.undeployUnit(unit);
+                    hangarTab.getCampaignGui().undeployUnit(unit);
                 }
             }
-            gui.refreshPersonnelList();
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshOrganization();
-            gui.refreshTaskList();
-            gui.refreshUnitView();
-            gui.refreshPartsList();
-            gui.refreshAcquireList();
-            gui.refreshReport();
-            gui.refreshPatientList();
-            gui.refreshScenarioList();
-            gui.refreshOverview();
+            hangarTab.getCampaignGui().refreshPersonnelList();
+            hangarTab.getCampaignGui().refreshServicedUnitList();
+            hangarTab.refreshUnitList();
+            hangarTab.getCampaignGui().refreshOrganization();
+            hangarTab.getCampaignGui().refreshTaskList();
+            hangarTab.refreshUnitView();
+            hangarTab.getCampaignGui().refreshPartsList();
+            hangarTab.getCampaignGui().refreshAcquireList();
+            hangarTab.getCampaignGui().refreshReport();
+            hangarTab.getCampaignGui().refreshPatientList();
+            hangarTab.getCampaignGui().refreshScenarioList();
+            hangarTab.getCampaignGui().refreshOverview();
         } else if (command.contains("HIRE_FULL")) {
             for (Unit unit : units) {
-                gui.getCampaign().hirePersonnelFor(unit.getId());
+                hangarTab.getCampaign().hirePersonnelFor(unit.getId());
             }
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshPersonnelList();
-            gui.refreshOrganization();
-            gui.refreshFinancialTransactions();
-            gui.refreshReport();
-            gui.refreshOverview();
-            gui.refreshTechsList();
+            hangarTab.getCampaignGui().refreshServicedUnitList();
+            hangarTab.refreshUnitList();
+            hangarTab.getCampaignGui().refreshPersonnelList();
+            hangarTab.getCampaignGui().refreshOrganization();
+            hangarTab.getCampaignGui().refreshFinancialTransactions();
+            hangarTab.getCampaignGui().refreshReport();
+            hangarTab.getCampaignGui().refreshOverview();
+            hangarTab.getCampaignGui().refreshTechsList();
         } else if (command.contains("CUSTOMIZE")
                 && !command.contains("CANCEL")) {
-            gui.getPanMekLab().loadUnit(selectedUnit);
-            gui.getTabMain().setSelectedIndex(8);
+            hangarTab.getCampaignGui().getPanMekLab().loadUnit(selectedUnit);
+            hangarTab.getCampaignGui().getTabMain().setSelectedIndex(8);
         } else if (command.contains("CANCEL_CUSTOMIZE")) {
             if (selectedUnit.isRefitting()) {
                 selectedUnit.getRefit().cancel();
             }
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshForceView();
-            gui.refreshOrganization();
-            gui.refreshPartsList();
-            gui.refreshOverview();
+            hangarTab.getCampaignGui().refreshServicedUnitList();
+            hangarTab.refreshUnitList();
+            hangarTab.getCampaignGui().refreshForceView();
+            hangarTab.getCampaignGui().refreshOrganization();
+            hangarTab.getCampaignGui().refreshPartsList();
+            hangarTab.getCampaignGui().refreshOverview();
         } else if (command.contains("REFIT_GM_COMPLETE")) {
             if (selectedUnit.isRefitting()) {
-                gui.getCampaign().addReport(selectedUnit.getRefit().succeed());
+                hangarTab.getCampaign().addReport(selectedUnit.getRefit().succeed());
             }
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshForceView();
-            gui.refreshOrganization();
-            gui.refreshPartsList();
-            gui.refreshOverview();
+            hangarTab.getCampaignGui().refreshServicedUnitList();
+            hangarTab.refreshUnitList();
+            hangarTab.getCampaignGui().refreshForceView();
+            hangarTab.getCampaignGui().refreshOrganization();
+            hangarTab.getCampaignGui().refreshPartsList();
+            hangarTab.getCampaignGui().refreshOverview();
         } else if (command.contains("REFURBISH")) {
             Refit r = new Refit(selectedUnit, selectedUnit.getEntity(),false, true);
-            gui.refitUnit(r, false);
+            hangarTab.getCampaignGui().refitUnit(r, false);
         } else if (command.contains("REFIT_KIT")) {
-            ChooseRefitDialog crd = new ChooseRefitDialog(gui.getFrame(), true,
-                    gui.getCampaign(), selectedUnit, gui);
+            ChooseRefitDialog crd = new ChooseRefitDialog(hangarTab.getFrame(), true,
+                    hangarTab.getCampaign(), selectedUnit, hangarTab.getCampaignGui());
             crd.setVisible(true);
         } else if (command.contains("CHANGE_HISTORY")) {
             if (null != selectedUnit) {
-                TextAreaDialog tad = new TextAreaDialog(gui.getFrame(), true,
+                TextAreaDialog tad = new TextAreaDialog(hangarTab.getFrame(), true,
                         "Edit Unit History", selectedUnit.getHistory());
                 tad.setVisible(true);
                 if (tad.wasChanged()) {
                     selectedUnit.setHistory(tad.getText());
-                    gui.refreshServicedUnitList();
-                    gui.refreshUnitList();
-                    gui.refreshForceView();
-                    gui.refreshOrganization();
-                    gui.refreshOverview();
+                    hangarTab.getCampaignGui().refreshServicedUnitList();
+                    hangarTab.refreshUnitList();
+                    hangarTab.getCampaignGui().refreshForceView();
+                    hangarTab.getCampaignGui().refreshOrganization();
+                    hangarTab.getCampaignGui().refreshOverview();
                 }
             }
         } else if (command.contains("REMOVE_INDI_CAMO")) {
@@ -441,48 +441,48 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             if ("".equals(category)) {
                 category = Player.ROOT_CAMO;
             }
-            CamoChoiceDialog ccd = new CamoChoiceDialog(gui.getFrame(), true,
-                    category, selectedUnit.getCamoFileName(), gui.getCampaign()
-                            .getColorIndex(), gui.getIconPackage().getCamos());
-            ccd.setLocationRelativeTo(gui.getFrame());
+            CamoChoiceDialog ccd = new CamoChoiceDialog(hangarTab.getFrame(), true,
+                    category, selectedUnit.getCamoFileName(), hangarTab.getCampaign()
+                            .getColorIndex(), hangarTab.getIconPackage().getCamos());
+            ccd.setLocationRelativeTo(hangarTab.getFrame());
             ccd.setVisible(true);
 
             if (ccd.clickedSelect() == true) {
                 selectedUnit.getEntity().setCamoCategory(ccd.getCategory());
                 selectedUnit.getEntity().setCamoFileName(ccd.getFileName());
 
-                gui.refreshForceView();
-                gui.refreshUnitView();
+                hangarTab.getCampaignGui().refreshForceView();
+                hangarTab.refreshUnitView();
             }
-            gui.refreshOverview();
+            hangarTab.getCampaignGui().refreshOverview();
         } else if (command.equalsIgnoreCase("CANCEL_ORDER")) {
-            double refund = gui.getCampaign().getCampaignOptions()
+            double refund = hangarTab.getCampaign().getCampaignOptions()
                     .GetCanceledOrderReimbursement();
             if (null != selectedUnit) {
                 long refundAmount = (long) (refund * selectedUnit
                         .getBuyCost());
-                gui.getCampaign().removeUnit(selectedUnit.getId());
-                gui.getCampaign().getFinances().credit(refundAmount,
+                hangarTab.getCampaign().removeUnit(selectedUnit.getId());
+                hangarTab.getCampaign().getFinances().credit(refundAmount,
                         Transaction.C_EQUIP,
                         "refund for cancelled equipmemt sale",
-                        gui.getCampaign().getDate());
+                        hangarTab.getCampaign().getDate());
 
             }
-            gui.refreshFinancialTransactions();
-            gui.refreshUnitList();
-            gui.refreshReport();
-            gui.refreshOverview();
+            hangarTab.getCampaignGui().refreshFinancialTransactions();
+            hangarTab.refreshUnitList();
+            hangarTab.getCampaignGui().refreshReport();
+            hangarTab.getCampaignGui().refreshOverview();
         } else if (command.equalsIgnoreCase("ARRIVE")) {
             if (null != selectedUnit) {
                 selectedUnit.setDaysToArrival(0);
             }
-            gui.refreshUnitList();
-            gui.refreshReport();
-            gui.refreshOverview();
+            hangarTab.refreshUnitList();
+            hangarTab.getCampaignGui().refreshReport();
+            hangarTab.getCampaignGui().refreshOverview();
         } else if (command.equalsIgnoreCase("MOTHBALL")) {
             UUID id = null;
             if (!selectedUnit.isSelfCrewed()) {
-                id = gui.selectTech(selectedUnit, "mothball");
+                id = hangarTab.getCampaignGui().selectTech(selectedUnit, "mothball");
                 if (null == id) {
                     return;
                 }
@@ -490,14 +490,14 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             if (null != selectedUnit) {
                 selectedUnit.startMothballing(id);
             }
-            gui.refreshUnitList();
-            gui.refreshServicedUnitList();
-            gui.refreshReport();
-            gui.refreshOverview();
+            hangarTab.refreshUnitList();
+            hangarTab.getCampaignGui().refreshServicedUnitList();
+            hangarTab.getCampaignGui().refreshReport();
+            hangarTab.getCampaignGui().refreshOverview();
         } else if (command.equalsIgnoreCase("ACTIVATE")) {
             UUID id = null;
             if (!selectedUnit.isSelfCrewed()) {
-                id = gui.selectTech(selectedUnit, "activation");
+                id = hangarTab.getCampaignGui().selectTech(selectedUnit, "activation");
                 if (null == id) {
                     return;
                 }
@@ -505,60 +505,60 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             if (null != selectedUnit) {
                 selectedUnit.startMothballing(id);
             }
-            gui.refreshUnitList();
-            gui.refreshServicedUnitList();
-            gui.refreshReport();
-            gui.refreshOverview();
+            hangarTab.refreshUnitList();
+            hangarTab.getCampaignGui().refreshServicedUnitList();
+            hangarTab.getCampaignGui().refreshReport();
+            hangarTab.getCampaignGui().refreshOverview();
         } else if (command.equalsIgnoreCase("CANCEL_MOTHBALL")) {
             if (null != selectedUnit) {
                 selectedUnit.setMothballTime(0);
             }
-            gui.refreshUnitList();
-            gui.refreshServicedUnitList();
-            gui.refreshReport();
-            gui.refreshOverview();
+            hangarTab.refreshUnitList();
+            hangarTab.getCampaignGui().refreshServicedUnitList();
+            hangarTab.getCampaignGui().refreshReport();
+            hangarTab.getCampaignGui().refreshOverview();
         } else if (command.equalsIgnoreCase("BOMBS")) {
             if (null != selectedUnit
                     && selectedUnit.getEntity() instanceof Aero) {
                 BombsDialog dialog = new BombsDialog(
-                        (Aero) selectedUnit.getEntity(), gui.getCampaign(),
-                        gui.getFrame());
+                        (Aero) selectedUnit.getEntity(), hangarTab.getCampaign(),
+                        hangarTab.getFrame());
                 dialog.setVisible(true);
-                gui.refreshUnitList();
+                hangarTab.refreshUnitList();
             }
         } else if (command.equalsIgnoreCase("QUIRKS")) {
             if (null != selectedUnit) {
                 QuirksDialog dialog = new QuirksDialog(
-                        selectedUnit.getEntity(), gui.getFrame());
+                        selectedUnit.getEntity(), hangarTab.getFrame());
                 dialog.setVisible(true);
-                gui.refreshUnitList();
+                hangarTab.refreshUnitList();
             }
         } else if (command.equalsIgnoreCase("EDIT_DAMAGE")) {
             if (null != selectedUnit) {
                 Entity entity = selectedUnit.getEntity();
-                UnitEditorDialog med = new UnitEditorDialog(gui.getFrame(), entity);
+                UnitEditorDialog med = new UnitEditorDialog(hangarTab.getFrame(), entity);
                 med.setVisible(true);
                 selectedUnit.runDiagnostic(false);
-                gui.refreshServicedUnitList();
-                gui.refreshUnitList();
-                gui.refreshTaskList();
-                gui.refreshUnitView();
-                gui.refreshAcquireList();
-                gui.refreshOrganization();
+                hangarTab.getCampaignGui().refreshServicedUnitList();
+                hangarTab.refreshUnitList();
+                hangarTab.getCampaignGui().refreshTaskList();
+                hangarTab.refreshUnitView();
+                hangarTab.getCampaignGui().refreshAcquireList();
+                hangarTab.getCampaignGui().refreshOrganization();
             }
         } else if (command.equalsIgnoreCase("FLUFF_NAME")) {
             if (selectedUnit != null) {
                 String fluffName = (String) JOptionPane.showInputDialog(
-                        gui.getFrame(), "Name for this unit?", "Unit Name",
+                        hangarTab.getFrame(), "Name for this unit?", "Unit Name",
                         JOptionPane.QUESTION_MESSAGE, null, null,
                         selectedUnit.getFluffName() == null ? ""
                                 : selectedUnit.getFluffName());
                 selectedUnit.setFluffName(fluffName);
-                gui.refreshServicedUnitList();
-                gui.refreshUnitList();
-                gui.refreshTaskList();
-                gui.refreshUnitView();
-                gui.refreshOrganization();
+                hangarTab.getCampaignGui().refreshServicedUnitList();
+                hangarTab.refreshUnitList();
+                hangarTab.getCampaignGui().refreshTaskList();
+                hangarTab.refreshUnitView();
+                hangarTab.getCampaignGui().refreshOrganization();
             }
         } else if(command.equalsIgnoreCase("RESTORE_UNIT")) {
             for (Unit unit : units) {
@@ -615,24 +615,24 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     partsToFix = new HashSet<>(unit.getParts());
                 }
             }
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshTaskList();
-            gui.refreshUnitView();
-            gui.refreshOrganization();
+            hangarTab.getCampaignGui().refreshServicedUnitList();
+            hangarTab.refreshUnitList();
+            hangarTab.getCampaignGui().refreshTaskList();
+            hangarTab.refreshUnitView();
+            hangarTab.getCampaignGui().refreshOrganization();
         }
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
         if (e.getClickCount() == 2) {
-            if ((gui.getSplitUnit().getSize().width - gui.getSplitUnit().getDividerLocation() + gui.getSplitUnit()
-                    .getDividerSize()) < CampaignGUI.UNIT_VIEW_WIDTH) {
+            if ((hangarTab.getSplitUnit().getSize().width - hangarTab.getSplitUnit().getDividerLocation() + hangarTab.getSplitUnit()
+                    .getDividerSize()) < HangarTab.UNIT_VIEW_WIDTH) {
                 // expand
-                gui.getSplitUnit().resetToPreferredSizes();
+                hangarTab.getSplitUnit().resetToPreferredSizes();
             } else {
                 // collapse
-                gui.getSplitUnit().setDividerLocation(1.0);
+                hangarTab.getSplitUnit().setDividerLocation(1.0);
             }
 
         }
@@ -651,17 +651,17 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
     private void maybeShowPopup(MouseEvent e) {
         JPopupMenu popup = new JPopupMenu();
         if (e.isPopupTrigger()) {
-            if (gui.getUnitTable().getSelectedRowCount() == 0) {
+            if (hangarTab.getUnitTable().getSelectedRowCount() == 0) {
                 return;
             }
-            int[] rows = gui.getUnitTable().getSelectedRows();
-            int row = gui.getUnitTable().getSelectedRow();
-            boolean oneSelected = gui.getUnitTable().getSelectedRowCount() == 1;
-            Unit unit = gui.getUnitModel().getUnit(gui.getUnitTable()
+            int[] rows = hangarTab.getUnitTable().getSelectedRows();
+            int row = hangarTab.getUnitTable().getSelectedRow();
+            boolean oneSelected = hangarTab.getUnitTable().getSelectedRowCount() == 1;
+            Unit unit = hangarTab.getUnitModel().getUnit(hangarTab.getUnitTable()
                     .convertRowIndexToModel(row));
             Unit[] units = new Unit[rows.length];
             for (int i = 0; i < rows.length; i++) {
-                units[i] = gui.getUnitModel().getUnit(gui.getUnitTable()
+                units[i] = hangarTab.getUnitModel().getUnit(hangarTab.getUnitTable()
                         .convertRowIndexToModel(rows[i]));
             }
             JMenuItem menuItem = null;
@@ -678,7 +678,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 menuItem = new JMenuItem("Deliver Part Now");
                 menuItem.setActionCommand("ARRIVE");
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(gui.getCampaign().isGM());
+                menuItem.setEnabled(hangarTab.getCampaign().isGM());
                 menu.add(menuItem);
                 popup.addSeparator();
                 popup.add(menu);
@@ -709,7 +709,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     ammoMenu = new JMenu(ammo.getType().getDesc());
                     AmmoType curType = (AmmoType) ammo.getType();
                     for (AmmoType atype : Utilities.getMunitionsFor(unit
-                            .getEntity(), curType, gui.getCampaign()
+                            .getEntity(), curType, hangarTab.getCampaign()
                             .getCampaignOptions().getTechLevel())) {
                         cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
                         if (atype.equals(curType) && atype.getMunitionType() == curType.getMunitionType()) {
@@ -795,7 +795,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             if (oneSelected && unit.requiresMaintenance()
                     && !unit.isSelfCrewed() && unit.isAvailable()) {
                 menu = new JMenu("Assign Tech");
-                for (Person tech : gui.getCampaign().getTechs()) {
+                for (Person tech : hangarTab.getCampaign().getTechs()) {
                     if (tech.canTech(unit.getEntity())
                             && (tech.getMaintenanceTimeUsing() + unit
                                     .getMaintenanceTime()) <= 480) {
@@ -885,7 +885,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     menuItem = new JMenuItem("Complete Refit (GM)");
                     menuItem.setActionCommand("REFIT_GM_COMPLETE");
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(gui.getCampaign().isGM() && unit.isRefitting());
+                    menuItem.setEnabled(hangarTab.getCampaign().isGM() && unit.isRefitting());
                     menu.add(menuItem);
                 }
                 menu.setEnabled(unit.isAvailable(true) && unit.isRepairable());
@@ -903,7 +903,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             if (oneSelected) {
                 if (!unit.isEntityCamo()) {
                     menuItem = new JMenuItem(
-                            gui.getResourceMap()
+                            hangarTab.getCampaignGui().getResourceMap()
                                     .getString("customizeMenu.individualCamo.text"));
                     menuItem.setActionCommand("INDI_CAMO");
                     menuItem.addActionListener(this);
@@ -911,7 +911,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     popup.add(menuItem);
                 } else {
                     menuItem = new JMenuItem(
-                            gui.getResourceMap()
+                            hangarTab.getCampaignGui().getResourceMap()
                                     .getString("customizeMenu.removeIndividualCamo.text"));
                     menuItem.setActionCommand("REMOVE_INDI_CAMO");
                     menuItem.addActionListener(this);
@@ -919,7 +919,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     popup.add(menuItem);
                 }
             }
-            if (oneSelected && !gui.getCampaign().isCustom(unit)) {
+            if (oneSelected && !hangarTab.getCampaign().isCustom(unit)) {
                 menuItem = new JMenuItem("Tag as a custom unit");
                 menuItem.setActionCommand("TAG_CUSTOM");
                 menuItem.addActionListener(this);
@@ -927,7 +927,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 popup.add(menuItem);
             }
             if (oneSelected
-                    && gui.getCampaign().getCampaignOptions().useQuirks()) {
+                    && hangarTab.getCampaign().getCampaignOptions().useQuirks()) {
                 menuItem = new JMenuItem("Edit Quirks");
                 menuItem.setActionCommand("QUIRKS");
                 menuItem.addActionListener(this);
@@ -958,7 +958,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 popup.add(menuItem);
             }
             // sell unit
-            if (gui.getCampaign().getCampaignOptions().canSellUnits()) {
+            if (hangarTab.getCampaign().getCampaignOptions().canSellUnits()) {
                 popup.addSeparator();
                 menuItem = new JMenuItem("Sell Unit");
                 menuItem.setActionCommand("SELL");
@@ -971,27 +971,27 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             menuItem = new JMenuItem("Remove Unit");
             menuItem.setActionCommand("REMOVE");
             menuItem.addActionListener(this);
-            menuItem.setEnabled(gui.getCampaign().isGM());
+            menuItem.setEnabled(hangarTab.getCampaign().isGM());
             menu.add(menuItem);
             menuItem = new JMenuItem("Undeploy Unit");
             menuItem.setActionCommand("UNDEPLOY");
             menuItem.addActionListener(this);
-            menuItem.setEnabled(gui.getCampaign().isGM() && unit.isDeployed());
+            menuItem.setEnabled(hangarTab.getCampaign().isGM() && unit.isDeployed());
             menu.add(menuItem);
             menuItem = new JMenuItem("Edit Damage...");
             menuItem.setActionCommand("EDIT_DAMAGE");
             menuItem.addActionListener(this);
-            menuItem.setEnabled(gui.getCampaign().isGM());
+            menuItem.setEnabled(hangarTab.getCampaign().isGM());
             menu.add(menuItem);
             menuItem = new JMenuItem("Restore Unit");
             menuItem.setActionCommand("RESTORE_UNIT");
             menuItem.addActionListener(this);
-            menuItem.setEnabled(gui.getCampaign().isGM());
+            menuItem.setEnabled(hangarTab.getCampaign().isGM());
             menu.add(menuItem);
             menuItem = new JMenuItem("Set Quality...");
             menuItem.setActionCommand("SET_QUALITY");
             menuItem.addActionListener(this);
-            menuItem.setEnabled(gui.getCampaign().isGM());
+            menuItem.setEnabled(hangarTab.getCampaign().isGM());
             menu.add(menuItem);
             popup.addSeparator();
             popup.add(menu);

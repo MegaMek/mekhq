@@ -18,9 +18,12 @@
  */
 package mekhq.gui;
 
+import java.util.ResourceBundle;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -37,6 +40,66 @@ public abstract class CampaignGuiTab extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 6091435251932963385L;
+
+    public enum TabType {
+    	TOE (0, "panOrganization.TabConstraints.tabTitle"),  //$NON-NLS-1$
+    	BRIEFING (1, "panBriefing.TabConstraints.tabTitle"),  //$NON-NLS-1$
+    	MAP (2, "panMap.TabConstraints.tabTitle"),  //$NON-NLS-1$
+    	PERSONNEL (3, "panPersonnel.TabConstraints.tabTitle"),  //$NON-NLS-1$
+    	HANGAR (4, "panHangar.TabConstraints.tabTitle"),  //$NON-NLS-1$
+    	WAREHOUSE (5, "panSupplies.TabConstraints.tabTitle"),  //$NON-NLS-1$
+    	REPAIR (6, "panRepairBay.TabConstraints.tabTitle"),  //$NON-NLS-1$
+    	INFIRMARY (7, "panInfirmary.TabConstraints.tabTitle"),  //$NON-NLS-1$
+    	MEKLAB (8, "panMekLab.TabConstraints.tabTitle"),  //$NON-NLS-1$
+    	FINANCES (9, "panFinances.TabConstraints.tabTitle"),  //$NON-NLS-1$
+    	OVERVIEW (10, "panOverview.TabConstraints.tabTitle"),  //$NON-NLS-1$
+    	CUSTOM (11, null);
+    	
+    	private int defaultPos;
+    	private String name;
+    	
+    	public int getDefaultPos() {
+    		return defaultPos;
+    	}
+    	
+    	public String getTabName() {
+    		return name;
+    	}
+    	
+    	TabType(int defaultPos, String resKey) {
+    		this.defaultPos = defaultPos;
+    		if (resKey == null) {
+    			name = "Custom";
+    		} else {
+    			name = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl()) //$NON-NLS-1$;
+    				.getString(resKey);
+    		}
+    	}
+    	
+    	public CampaignGuiTab createTab(CampaignGUI gui) {
+    		switch (this) {
+			case TOE:
+				return new TOETab(gui, name);
+			case BRIEFING:
+				return new BriefingTab(gui, name);
+			case MAP:
+				return new MapTab(gui, name);
+			case PERSONNEL:
+				return new PersonnelTab(gui, name);
+			case HANGAR:
+				return new HangarTab(gui, name);
+			case WAREHOUSE:
+			case REPAIR:
+			case INFIRMARY:
+			case MEKLAB:
+			case FINANCES:
+			case OVERVIEW:
+			default:
+				return null;
+    		
+    		}
+    	}
+    }
 
 	private CampaignGUI gui;
 	
@@ -77,4 +140,5 @@ public abstract class CampaignGuiTab extends JPanel {
 	
 	abstract public void refreshAll();
 
+	abstract public TabType tabType();
 }

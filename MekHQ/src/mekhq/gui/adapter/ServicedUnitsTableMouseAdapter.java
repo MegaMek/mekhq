@@ -185,7 +185,7 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
                     .convertRowIndexToModel(row));
             Unit[] units = new Unit[rows.length];
             for (int i = 0; i < rows.length; i++) {
-                units[i] = gui.getUnitModel().getUnit(gui.getUnitTable()
+                units[i] = gui.getServicedUnitModel().getUnit(gui.getServicedUnitTable()
                         .convertRowIndexToModel(rows[i]));
             }
             JMenuItem menuItem = null;

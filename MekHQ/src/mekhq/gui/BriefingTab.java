@@ -128,6 +128,11 @@ public class BriefingTab extends CampaignGuiTab {
 		MekHQ.EVENT_BUS.register(this);
 	}
 
+    @Override
+    public TabType tabType() {
+    	return TabType.BRIEFING;
+    }
+
 	/* (non-Javadoc)
 	 * @see mekhq.gui.CampaignGuiTab#initTab()
 	 */

@@ -41,6 +41,7 @@ import javax.swing.table.TableRowSorter;
 
 import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.adapter.PersonnelTableMouseAdapter;
@@ -108,7 +109,13 @@ public class PersonnelTab extends CampaignGuiTab {
 
     public PersonnelTab(CampaignGUI gui, String name) {
 		super(gui, name);
+		MekHQ.EVENT_BUS.register(this);
 	}
+
+    @Override
+    public TabType tabType() {
+    	return TabType.PERSONNEL;
+    }
 
 	/* (non-Javadoc)
 	 * @see mekhq.gui.CampaignGuiTab#initTab()

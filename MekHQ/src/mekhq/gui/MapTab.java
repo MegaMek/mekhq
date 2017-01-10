@@ -62,6 +62,11 @@ public class MapTab extends CampaignGuiTab {
 		super(gui, tabName);
 		MekHQ.EVENT_BUS.register(this);
 	}
+    
+    @Override
+    public TabType tabType() {
+    	return TabType.MAP;
+    }
 
 	/* (non-Javadoc)
 	 * @see mekhq.gui.CampaignGuiTab#initTab()

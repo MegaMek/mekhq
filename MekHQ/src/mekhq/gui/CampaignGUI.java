@@ -39,8 +39,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.ImageObserver;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -54,6 +52,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -92,7 +91,6 @@ import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -128,7 +126,6 @@ import megamek.common.MechView;
 import megamek.common.MiscType;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
-import megamek.common.UnitType;
 import megamek.common.WeaponType;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.PilotOptions;
@@ -183,7 +180,6 @@ import mekhq.gui.adapter.LoanTableMouseAdapter;
 import mekhq.gui.adapter.PartsTableMouseAdapter;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
 import mekhq.gui.adapter.ServicedUnitsTableMouseAdapter;
-import mekhq.gui.adapter.UnitTableMouseAdapter;
 import mekhq.gui.dialog.AddFundsDialog;
 import mekhq.gui.dialog.AdvanceDaysDialog;
 import mekhq.gui.dialog.BatchXPDialog;
@@ -232,8 +228,6 @@ import mekhq.gui.sorter.TechSorter;
 import mekhq.gui.sorter.TwoNumbersSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
-import mekhq.gui.sorter.WeightClassSorter;
-import mekhq.gui.view.UnitViewPanel;
 
 /**
  * The application's main frame.
@@ -241,38 +235,6 @@ import mekhq.gui.view.UnitViewPanel;
 public class CampaignGUI extends JPanel {
     private static final long serialVersionUID = -687162569841072579L;
     
-    public enum StandardTabs {
-    	TOE (0, "panOrganization.TabConstraints.tabTitle"),  //$NON-NLS-1$
-    	BRIEFING (1, "panBriefing.TabConstraints.tabTitle"),  //$NON-NLS-1$
-    	MAP (2, "panMap.TabConstraints.tabTitle"),  //$NON-NLS-1$
-    	PERSONNEL (3, "panPersonnel.TabConstraints.tabTitle"),  //$NON-NLS-1$
-    	HANGAR (4, "panHangar.TabConstraints.tabTitle"),  //$NON-NLS-1$
-    	WAREHOUSE (5, "panSupplies.TabConstraints.tabTitle"),  //$NON-NLS-1$
-    	REPAIR (6, "panRepairBay.TabConstraints.tabTitle"),  //$NON-NLS-1$
-    	INFIRMARY (7, "panInfirmary.TabConstraints.tabTitle"),  //$NON-NLS-1$
-    	MEKLAB (8, "panMekLab.TabConstraints.tabTitle"),  //$NON-NLS-1$
-    	FINANCES (9, "panFinances.TabConstraints.tabTitle"),  //$NON-NLS-1$
-    	OVERVIEW (10, "panOverview.TabConstraints.tabTitle");  //$NON-NLS-1$
-    	
-    	private int defaultPos;
-    	private String name;
-    	
-    	public int getDefaultPos() {
-    		return defaultPos;
-    	}
-    	
-    	public String getTabName() {
-    		return name;
-    	}
-    	
-    	StandardTabs(int defaultPos, String resKey) {
-    		this.defaultPos = defaultPos;
-    		this.name = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl()) //$NON-NLS-1$;
-    				.getString(resKey);
-    	}
-    }
-
-    public static final int UNIT_VIEW_WIDTH = 450;
     public static final int MAX_START_WIDTH = 1400;
     public static final int MAX_START_HEIGHT = 900;
 
@@ -300,13 +262,6 @@ public class CampaignGUI extends JPanel {
     private static final int SV_DAMAGED = 4;
     private static final int SV_NUM = 5;
 
-    // unit views
-    private static final int UV_GRAPHIC = 0;
-    private static final int UV_GENERAL = 1;
-    private static final int UV_DETAILS = 2;
-    private static final int UV_STATUS = 3;
-    private static final int UV_NUM = 4;
-
     private JFrame frame;
 
     private MekHQ app;
@@ -329,16 +284,7 @@ public class CampaignGUI extends JPanel {
     private JMenuItem miRetirementDefectionDialog;
     private JCheckBoxMenuItem miShowOverview;
     
-    private HashMap<String,CampaignGuiTab> tabs;
-
-    /* For the hangar tab */
-    private JPanel panHangar;
-    private JSplitPane splitUnit;
-    private JTable unitTable;
-    private JTable acquireUnitsTable;
-    private JComboBox<String> choiceUnit;
-    private JComboBox<String> choiceUnitView;
-    private JScrollPane scrollUnitView;
+    private EnumMap<CampaignGuiTab.TabType,CampaignGuiTab> standardTabs;
 
     /* For the warehouse tab */
     private JPanel panSupplies;
@@ -418,10 +364,8 @@ public class CampaignGUI extends JPanel {
     private PatientTableModel assignedPatientModel;
     private PatientTableModel unassignedPatientModel;
     private DocTableModel doctorsModel;
-    private UnitTableModel unitModel;
     private PartsTableModel partsModel;
     private ProcurementTableModel acquirePartsModel;
-    private ProcurementTableModel acquireUnitsModel;
     private FinanceTableModel financeModel;
     private LoanTableModel loanModel;
     private PartsInUseTableModel overviewPartsModel;
@@ -430,7 +374,6 @@ public class CampaignGUI extends JPanel {
     /* table sorters for tables that can be filtered */
     private TableRowSorter<PartsTableModel> partsSorter;
     private TableRowSorter<ProcurementTableModel> acquirePartsSorter;
-    private TableRowSorter<UnitTableModel> unitSorter;
     private TableRowSorter<UnitTableModel> servicedUnitSorter;
     private TableRowSorter<TaskTableModel> taskSorter;
     private TableRowSorter<TechTableModel> techSorter;
@@ -470,7 +413,7 @@ public class CampaignGUI extends JPanel {
     public CampaignGUI(MekHQ app) {
         this.app = app;
         reportHLL = new ReportHyperlinkListener(this);
-        tabs = new HashMap<>();
+    	standardTabs = new EnumMap<>(CampaignGuiTab.TabType.class);
         initComponents();
     }
 
@@ -596,19 +539,11 @@ public class CampaignGUI extends JPanel {
         tabMain.setMinimumSize(new java.awt.Dimension(600, 200));
         tabMain.setPreferredSize(new java.awt.Dimension(900, 300));
 
-        addTab(new TOETab(this, resourceMap
-                .getString("panOrganization.TabConstraints.tabTitle"))); // NOI18N
-        addTab(new BriefingTab(this, resourceMap
-                .getString("panBriefing.TabConstraints.tabTitle"))); // NOI18N
-        addTab(new MapTab(this, resourceMap
-                .getString("panMap.TabConstraints.tabTitle"))); // NOI18N
-        addTab(new PersonnelTab(this, resourceMap
-                .getString("panPersonnel.TabConstraints.tabTitle"))); // NOI18N
-
-        initHangarTab();
-        tabMain.addTab(
-                resourceMap.getString("panHangar.TabConstraints.tabTitle"),
-                panHangar); // NOI18N
+        addStandardTab(CampaignGuiTab.TabType.TOE);
+        addStandardTab(CampaignGuiTab.TabType.BRIEFING);
+        addStandardTab(CampaignGuiTab.TabType.MAP);
+        addStandardTab(CampaignGuiTab.TabType.PERSONNEL);
+        addStandardTab(CampaignGuiTab.TabType.HANGAR);
 
         initWarehouseTab();
         tabMain.addTab(
@@ -661,10 +596,9 @@ public class CampaignGUI extends JPanel {
         add(btnPanel, BorderLayout.PAGE_START);
         add(statusPanel, BorderLayout.PAGE_END);
         
-        tabs.values().forEach(t -> t.refreshAll());
+        standardTabs.values().forEach(t -> t.refreshAll());
 
         refreshServicedUnitList();
-        refreshUnitList();
         refreshPersonnelList();
         refreshTaskList();
         refreshAcquireList();
@@ -717,61 +651,159 @@ public class CampaignGUI extends JPanel {
         mainPanel.setDividerLocation(0.75);
     }
     
-    public void addTab(CampaignGuiTab tab) {
-    	tabMain.add(tab.getTabName(), tab);
-    	tabs.put(tab.getTabName(), tab);
+    public CampaignGuiTab getTab(CampaignGuiTab.TabType tabType) {
+    	return standardTabs.get(tabType);
     }
     
-    public void insertTab(CampaignGuiTab tab, int index) {
-    	tabMain.insertTab(tab.getTabName(), null, tab, null, index);
-    	tabs.put(tab.getTabName(), tab);
-    }
-    
-    public void insertTabAfter(CampaignGuiTab tab, StandardTabs std) {
-    	int index = tabMain.indexOfTab(std.getTabName());
-    	if (index < 0) {
-    		if (std.getDefaultPos() == 0) {
-    			index = tabMain.getTabCount();
-    		} else {
-	    		for (int i = std.getDefaultPos() - 1; i >= 0; i--) {
-	    			index = tabMain.indexOfTab(StandardTabs.values()[i].getTabName());
-	    			if (index >= 0) {
-	    				break;
-	    			}
-	    		}
-    		}
+    /**
+     * Adds one of the built-in tabs to the gui, if it is not already present.
+     * 
+     * @param tab The type of tab to add
+     */
+    public void addStandardTab(CampaignGuiTab.TabType tab) {
+    	if (tab.equals(CampaignGuiTab.TabType.CUSTOM)) {
+    		throw new IllegalArgumentException("Attempted to add custom tab as standard");
     	}
-		insertTab(tab, index);
-    }
-    
-    public void insertTabBefore(CampaignGuiTab tab, StandardTabs std) {
-    	int index = tabMain.indexOfTab(std.getTabName());
-    	if (index < 0) {
-    		if (std.getDefaultPos() == StandardTabs.values().length - 1) {
-    			index = tabMain.getTabCount();
-    		} else {
-	    		for (int i = std.getDefaultPos() + 1; i >= StandardTabs.values().length; i++) {
-	    			index = tabMain.indexOfTab(StandardTabs.values()[i].getTabName());
-	    			if (index >= 0) {
-	    				break;
-	    			}
-	    		}
+    	if (!standardTabs.containsKey(tab)) {
+    		CampaignGuiTab t = tab.createTab(this);
+    		standardTabs.put(tab, t);
+    		int index = tabMain.getTabCount();
+    		for (int i = 0; i < tabMain.getTabCount(); i++) {
+    			if (((CampaignGuiTab)tabMain.getComponentAt(i)).tabType().getDefaultPos() > tab.getDefaultPos()) {
+    				index = i;
+    				break;
+    			}
     		}
+    		tabMain.insertTab(t.getTabName(), null, t, null, index);
     	}
-		insertTab(tab, Math.max(0, index - 1));
     }
     
-    public CampaignGuiTab removeTab(CampaignGuiTab tab) {
-    	return removeTab(tab.getTabName());
+    /**
+     * Adds a custom tab to the gui at the end
+     * 
+     * @param tab The tab to add
+     */
+    public void addCustomTab(CampaignGuiTab tab) {
+    	if (tabMain.indexOfComponent(tab) >= 0) {
+    		return;
+    	}
+    	if (tab.tabType().equals(CampaignGuiTab.TabType.CUSTOM)) {
+    		tabMain.addTab(tab.getTabName(), tab);
+    	} else {
+    		addStandardTab(tab.tabType());
+    	}
     }
     
-    public CampaignGuiTab removeTab(String tabName) {
+    /**
+     * Adds a custom tab to the gui in the specified position. If <code>tab</code> is a built-in
+     * type it will be placed in its normal position if it does not already exist.
+     * 
+     * @param tab	The tab to add
+     * @param index	The position to place the tab
+     */
+    public void insertCustomTab(CampaignGuiTab tab, int index) {
+    	if (tabMain.indexOfComponent(tab) >= 0) {
+    		return;
+    	}
+    	if (tab.tabType().equals(CampaignGuiTab.TabType.CUSTOM)) {
+    		tabMain.insertTab(tab.getTabName(), null, tab, null, Math.min(index, tabMain.getTabCount()));
+    	} else {
+    		addStandardTab(tab.tabType());
+    	}
+    }
+    
+    /**
+     * Adds a custom tab to the gui positioned after one of the built-in tabs
+     * 
+     * @param tab		The tab to add
+     * @param stdTab	The build-in tab after which to place the new one
+     */
+    public void insertCustomTabAfter(CampaignGuiTab tab, CampaignGuiTab.TabType stdTab) {
+    	if (tabMain.indexOfComponent(tab) >= 0) {
+    		return;
+    	}
+    	if (tab.tabType().equals(CampaignGuiTab.TabType.CUSTOM)) {
+	    	int index = tabMain.indexOfTab(stdTab.getTabName());
+	    	if (index < 0) {
+	    		if (stdTab.getDefaultPos() == 0) {
+	    			index = tabMain.getTabCount();
+	    		} else {
+		    		for (int i = stdTab.getDefaultPos() - 1; i >= 0; i--) {
+		    			index = tabMain.indexOfTab(CampaignGuiTab.TabType.values()[i].getTabName());
+		    			if (index >= 0) {
+		    				break;
+		    			}
+		    		}
+	    		}
+	    	}
+			insertCustomTab(tab, index);
+    	} else {
+    		addStandardTab(tab.tabType());
+    	}
+    }
+    
+    /**
+     * Adds a custom tab to the gui positioned before one of the built-in tabs
+     * 
+     * @param tab		The tab to add
+     * @param stdTab	The build-in tab before which to place the new one
+     */
+    public void insertCustomTabBefore(CampaignGuiTab tab, CampaignGuiTab.TabType stdTab) {
+    	if (tabMain.indexOfComponent(tab) >= 0) {
+    		return;
+    	}
+    	if (tab.tabType().equals(CampaignGuiTab.TabType.CUSTOM)) {
+	    	int index = tabMain.indexOfTab(stdTab.getTabName());
+	    	if (index < 0) {
+	    		if (stdTab.getDefaultPos() == CampaignGuiTab.TabType.values().length - 1) {
+	    			index = tabMain.getTabCount();
+	    		} else {
+		    		for (int i = stdTab.getDefaultPos() + 1; i >= CampaignGuiTab.TabType.values().length; i++) {
+		    			index = tabMain.indexOfTab(CampaignGuiTab.TabType.values()[i].getTabName());
+		    			if (index >= 0) {
+		    				break;
+		    			}
+		    		}
+	    		}
+	    	}
+			insertCustomTab(tab, Math.max(0, index - 1));
+    	} else {
+    		addStandardTab(tab.tabType());
+    	}
+    }
+    
+    /**
+     * Removes one of the built-in tabs from the gui.
+     * 
+     * @param tabType	The tab to remove
+     */
+    public void removeStandardTab(CampaignGuiTab.TabType tabType) {
+    	removeTab(standardTabs.get(tabType));
+    }
+    
+    /**
+     * Removes a tab from the gui.
+     * 
+     * @param tab	The tab to remove
+     */
+    public void removeTab(CampaignGuiTab tab) {
+    	removeTab(tab.getTabName());
+    }
+    
+    /**
+     * Removes a tab from the gui.
+     * 
+     * @param tabName	The name of the tab to remove
+     */
+    public void removeTab(String tabName) {
     	int index = tabMain.indexOfTab(tabName);
     	if (index >= 0) {
+        	CampaignGuiTab tab = (CampaignGuiTab)tabMain.getComponentAt(index);
+        	if (standardTabs.containsKey(tab.tabType())) {
+        		standardTabs.remove(tab.tabType());
+        	}
     		tabMain.removeTabAt(index);
-    		return tabs.remove(tabName);
     	}
-    	return null;
     }
     
     private void initOverviewTab() {
@@ -867,225 +899,6 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.weighty = 1.0;
         //gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         panOverview.add(getTabOverview(), gridBagConstraints);
-    }
-
-    private void initHangarTab() {
-        GridBagConstraints gridBagConstraints;
-
-        panHangar = new JPanel(new GridBagLayout());
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        panHangar.add(new JLabel(resourceMap.getString("lblUnitChoice.text")),
-                gridBagConstraints);
-
-        DefaultComboBoxModel<String> unitGroupModel = new DefaultComboBoxModel<String>();
-        unitGroupModel.addElement("All Units");
-        for (int i = 0; i < UnitType.SIZE; i++) {
-            unitGroupModel.addElement(UnitType.getTypeDisplayableName(i));
-        }
-        choiceUnit = new JComboBox<String>(unitGroupModel);
-        choiceUnit.setSelectedIndex(0);
-        choiceUnit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                filterUnits();
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        panHangar.add(choiceUnit, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        panHangar.add(new JLabel(resourceMap.getString("lblUnitView.text")),
-                gridBagConstraints);
-
-        DefaultComboBoxModel<String> unitViewModel = new DefaultComboBoxModel<String>();
-        for (int i = 0; i < UV_NUM; i++) {
-            unitViewModel.addElement(getUnitViewName(i));
-        }
-        choiceUnitView = new JComboBox<String>(unitViewModel);
-        choiceUnitView.setSelectedIndex(UV_GENERAL);
-        choiceUnitView.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                changeUnitView();
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        panHangar.add(choiceUnitView, gridBagConstraints);
-
-        unitModel = new UnitTableModel(getCampaign());
-        unitTable = new JTable(getUnitModel());
-        getUnitTable()
-                .setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        XTableColumnModel unitColumnModel = new XTableColumnModel();
-        getUnitTable().setColumnModel(unitColumnModel);
-        getUnitTable().createDefaultColumnsFromModel();
-        unitSorter = new TableRowSorter<UnitTableModel>(getUnitModel());
-        unitSorter.setComparator(UnitTableModel.COL_STATUS,
-                new UnitStatusSorter());
-        unitSorter.setComparator(UnitTableModel.COL_TYPE, new UnitTypeSorter());
-        unitSorter.setComparator(UnitTableModel.COL_WCLASS,
-                new WeightClassSorter());
-        unitSorter.setComparator(UnitTableModel.COL_COST,
-                new FormattedNumberSorter());
-        getUnitTable().setRowSorter(unitSorter);
-        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
-        sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_TYPE,
-                SortOrder.DESCENDING));
-        sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_WCLASS,
-                SortOrder.DESCENDING));
-        unitSorter.setSortKeys(sortKeys);
-        getUnitTable().addMouseListener(new UnitTableMouseAdapter(this));
-        getUnitTable().setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        TableColumn column = null;
-        for (int i = 0; i < UnitTableModel.N_COL; i++) {
-            column = getUnitTable().getColumnModel().getColumn(i);
-            column.setPreferredWidth(getUnitModel().getColumnWidth(i));
-            column.setCellRenderer(getUnitModel().getRenderer(
-                    choiceUnitView.getSelectedIndex() == UV_GRAPHIC,
-                    getIconPackage()));
-        }
-        getUnitTable().setIntercellSpacing(new Dimension(0, 0));
-        getUnitTable().setShowGrid(false);
-        changeUnitView();
-        getUnitTable().getSelectionModel().addListSelectionListener(
-                new javax.swing.event.ListSelectionListener() {
-                    @Override
-                    public void valueChanged(
-                            javax.swing.event.ListSelectionEvent evt) {
-                        refreshUnitView();
-                    }
-                });
-
-        acquireUnitsModel = new ProcurementTableModel(getCampaign());
-        acquireUnitsTable = new JTable(acquireUnitsModel);
-        TableRowSorter<ProcurementTableModel> acquireUnitsSorter = new TableRowSorter<ProcurementTableModel>(
-                acquireUnitsModel);
-        acquireUnitsSorter.setComparator(ProcurementTableModel.COL_COST,
-                new FormattedNumberSorter());
-        acquireUnitsSorter.setComparator(ProcurementTableModel.COL_TARGET,
-                new TargetSorter());
-        acquireUnitsTable.setRowSorter(acquireUnitsSorter);
-        column = null;
-        for (int i = 0; i < ProcurementTableModel.N_COL; i++) {
-            column = acquireUnitsTable.getColumnModel().getColumn(i);
-            column.setPreferredWidth(acquireUnitsModel.getColumnWidth(i));
-            column.setCellRenderer(acquireUnitsModel.getRenderer());
-        }
-        acquireUnitsTable.setIntercellSpacing(new Dimension(0, 0));
-        acquireUnitsTable.setShowGrid(false);
-        acquireUnitsTable.addMouseListener(new ProcurementTableMouseAdapter(this));
-        acquireUnitsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        acquireUnitsTable.getInputMap(JComponent.WHEN_FOCUSED).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "ADD");
-        acquireUnitsTable.getInputMap(JComponent.WHEN_FOCUSED).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, 0), "ADD");
-        acquireUnitsTable.getInputMap(JComponent.WHEN_FOCUSED).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), "REMOVE");
-        acquireUnitsTable.getInputMap(JComponent.WHEN_FOCUSED).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "REMOVE");
-
-        acquireUnitsTable.getActionMap().put("ADD", new AbstractAction() {
-            /**
-             *
-             */
-            private static final long serialVersionUID = 4958203340754214211L;
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (acquireUnitsTable.getSelectedRow() < 0) {
-                    return;
-                }
-                acquireUnitsModel.incrementItem(acquireUnitsTable
-                        .convertRowIndexToModel(acquireUnitsTable
-                                .getSelectedRow()));
-            }
-        });
-
-        acquireUnitsTable.getActionMap().put("REMOVE", new AbstractAction() {
-            /**
-             *
-             */
-            private static final long serialVersionUID = -8377486575329708963L;
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (acquireUnitsTable.getSelectedRow() < 0) {
-                    return;
-                }
-                if (acquireUnitsModel.getAcquisition(
-                        acquireUnitsTable
-                                .convertRowIndexToModel(acquireUnitsTable
-                                        .getSelectedRow())).getQuantity() > 0) {
-                    acquireUnitsModel.decrementItem(acquireUnitsTable
-                            .convertRowIndexToModel(acquireUnitsTable
-                                    .getSelectedRow()));
-                }
-            }
-        });
-
-        JScrollPane scrollAcquireUnitTable = new JScrollPane(acquireUnitsTable);
-        JPanel panAcquireUnit = new JPanel(new GridLayout(0, 1));
-        panAcquireUnit.setBorder(BorderFactory
-                .createTitledBorder("Procurement List"));
-        panAcquireUnit.add(scrollAcquireUnitTable);
-        panAcquireUnit.setMinimumSize(new Dimension(200, 200));
-        panAcquireUnit.setPreferredSize(new Dimension(200, 200));
-
-        JSplitPane splitLeftUnit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(getUnitTable()), panAcquireUnit);
-        splitLeftUnit.setOneTouchExpandable(true);
-        splitLeftUnit.setResizeWeight(1.0);
-
-        scrollUnitView = new JScrollPane();
-        scrollUnitView.setMinimumSize(new java.awt.Dimension(UNIT_VIEW_WIDTH,
-                600));
-        scrollUnitView.setPreferredSize(new java.awt.Dimension(UNIT_VIEW_WIDTH,
-                600));
-        scrollUnitView
-                .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollUnitView.setViewportView(null);
-
-        splitUnit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitLeftUnit, scrollUnitView);
-        getSplitUnit().setOneTouchExpandable(true);
-        getSplitUnit().setResizeWeight(1.0);
-        getSplitUnit().addPropertyChangeListener(
-                JSplitPane.DIVIDER_LOCATION_PROPERTY,
-                new PropertyChangeListener() {
-                    @Override
-                    public void propertyChange(PropertyChangeEvent pce) {
-                        // this can mess up the unit view panel so refresh it
-                        refreshUnitView();
-                    }
-                });
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 6;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        panHangar.add(getSplitUnit(), gridBagConstraints);
     }
 
     private void initWarehouseTab() {
@@ -2132,8 +1945,8 @@ public class CampaignGUI extends JPanel {
         JMenuItem miExportPersonCSV = new JMenuItem(
                 resourceMap.getString("miExportPersonCSV.text")); // NOI18N
         miExportPersonCSV.addActionListener(ev -> {
-        		if (tabs.containsKey(StandardTabs.PERSONNEL.getTabName())) {
-        			exportTable(((PersonnelTab)tabs.get(StandardTabs.PERSONNEL.getTabName())).getPersonnelTable(),
+        		if (getTab(CampaignGuiTab.TabType.PERSONNEL) != null) {
+        			exportTable(((PersonnelTab)getTab(CampaignGuiTab.TabType.PERSONNEL)).getPersonnelTable(),
         					getCampaign().getName()
                         + getCampaign().getShortDateAsString()
                         + "_ExportedPersonnel" + ".csv");
@@ -2143,10 +1956,10 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miExportUnitCSV = new JMenuItem(
                 resourceMap.getString("miExportUnitCSV.text")); // NOI18N
-        miExportUnitCSV.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exportTable(getUnitTable(), getCampaign().getName()
+        miExportUnitCSV.addActionListener(ev -> {
+        	if (getTab(CampaignGuiTab.TabType.HANGAR) != null) {
+                exportTable(((HangarTab)getTab(CampaignGuiTab.TabType.HANGAR)).getUnitTable(),
+                		getCampaign().getName()
                         + getCampaign().getShortDateAsString()
                         + "_ExportedUnit" + ".csv");
             }
@@ -3176,7 +2989,8 @@ public class CampaignGUI extends JPanel {
     }
     
     public void focusOnUnit(UUID id) {
-        if (null == id) {
+    	HangarTab ht = (HangarTab)getTab(CampaignGuiTab.TabType.HANGAR);
+        if (null == id || null == ht) {
             return;
         }
         if (mainPanel.getDividerLocation() < 700) {
@@ -3187,34 +3001,9 @@ public class CampaignGUI extends JPanel {
                 mainPanel.resetToPreferredSizes();
             }
         }
-        getSplitUnit().resetToPreferredSizes();
+        ht.focusOnUnit(id);
         tabMain.setSelectedIndex(getTabIndexByName(resourceMap
                 .getString("panHangar.TabConstraints.tabTitle")));
-        int row = -1;
-        for (int i = 0; i < getUnitTable().getRowCount(); i++) {
-            if (getUnitModel().getUnit(getUnitTable().convertRowIndexToModel(i)).getId()
-                    .equals(id)) {
-                row = i;
-                break;
-            }
-        }
-        if (row == -1) {
-            // try expanding the filter to all units
-            choiceUnit.setSelectedIndex(0);
-            for (int i = 0; i < getUnitTable().getRowCount(); i++) {
-                if (getUnitModel().getUnit(getUnitTable().convertRowIndexToModel(i))
-                        .getId().equals(id)) {
-                    row = i;
-                    break;
-                }
-            }
-
-        }
-        if (row != -1) {
-            getUnitTable().setRowSelectionInterval(row, row);
-            getUnitTable().scrollRectToVisible(getUnitTable().getCellRect(row, 0, true));
-        }
-
     }
 
     public void focusOnUnitInRepairBay(UUID id) {
@@ -3251,7 +3040,7 @@ public class CampaignGUI extends JPanel {
         if (null == id) {
             return;
         }
-        PersonnelTab pt = (PersonnelTab)tabs.get(StandardTabs.PERSONNEL.getTabName());
+        PersonnelTab pt = (PersonnelTab)getTab(CampaignGuiTab.TabType.PERSONNEL);
         if (pt == null) {
         	return;
         }
@@ -3678,21 +3467,6 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-
-    public static String getUnitViewName(int group) {
-        switch (group) {
-            case UV_GRAPHIC:
-                return "Graphic";
-            case UV_GENERAL:
-                return "General";
-            case UV_DETAILS:
-                return "Details";
-            case UV_STATUS:
-                return "Status";
-            default:
-                return "?";
-        }
-    }
 
     private void btnOvertimeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnOvertimeActionPerformed
         getCampaign().setOvertime(btnOvertime.isSelected());
@@ -4212,58 +3986,43 @@ public class CampaignGUI extends JPanel {
 
     //TODO: trigger from event
     public void refreshPersonnelView() {
-    	if (tabs.containsKey(StandardTabs.PERSONNEL.getTabName())) {
-    		((PersonnelTab)tabs.get(StandardTabs.PERSONNEL.getTabName())).refreshPersonnelView();
+    	if (getTab(CampaignGuiTab.TabType.PERSONNEL) != null) {
+    		((PersonnelTab)getTab(CampaignGuiTab.TabType.PERSONNEL)).refreshPersonnelView();
     	}
     }
 
     //TODO: trigger from event
     public void filterPersonnel() {
-    	if (tabs.containsKey(StandardTabs.PERSONNEL.getTabName())) {
-    		((PersonnelTab)tabs.get(StandardTabs.PERSONNEL.getTabName())).filterPersonnel();
+    	if (getTab(CampaignGuiTab.TabType.PERSONNEL) != null) {
+    		((PersonnelTab)getTab(CampaignGuiTab.TabType.PERSONNEL)).filterPersonnel();
     	}
     }
 
+    //TODO: Trigger from event
     public void refreshUnitView() {
-        int row = getUnitTable().getSelectedRow();
-        if (row < 0) {
-            scrollUnitView.setViewportView(null);
-            return;
-        }
-        Unit selectedUnit = getUnitModel().getUnit(getUnitTable()
-                .convertRowIndexToModel(row));
-        scrollUnitView.setViewportView(new UnitViewPanel(selectedUnit,
-                getCampaign(), getIconPackage().getCamos(), getIconPackage()
-                        .getMechTiles()));
-        // This odd code is to make sure that the scrollbar stays at the top
-        // I can't just call it here, because it ends up getting reset somewhere
-        // later
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                scrollUnitView.getVerticalScrollBar().setValue(0);
-            }
-        });
+    	if (getTab(CampaignGuiTab.TabType.HANGAR) != null) {
+    		((HangarTab)getTab(CampaignGuiTab.TabType.HANGAR)).refreshUnitView();
+    	}
     }
 
     //TODO: Trigger from event
     public void refreshForceView() {
-    	if (tabs.containsKey(StandardTabs.TOE.getTabName())) {
-    		((TOETab)tabs.get(StandardTabs.TOE.getTabName())).refreshForceView();
+    	if (getTab(CampaignGuiTab.TabType.TOE) != null) {
+    		((TOETab)getTab(CampaignGuiTab.TabType.TOE)).refreshForceView();
     	}
     }
 
     //TODO: Trigger from event
     public void refreshLanceAssignments() {
-    	if (tabs.containsKey(StandardTabs.BRIEFING.getTabName())) {
-    		((BriefingTab)tabs.get(StandardTabs.BRIEFING.getTabName())).refreshLanceAssignments();
+    	if (getTab(CampaignGuiTab.TabType.BRIEFING) != null) {
+    		((BriefingTab)getTab(CampaignGuiTab.TabType.BRIEFING)).refreshLanceAssignments();
     	}
     }
 
     //TODO: Trigger from event
     public void refreshPlanetView() {
-    	if (tabs.containsKey(StandardTabs.MAP.getTabName())) {
-    		((MapTab)tabs.get(StandardTabs.MAP.getTabName())).refreshPlanetView();
+    	if (getTab(CampaignGuiTab.TabType.MAP) != null) {
+    		((MapTab)getTab(CampaignGuiTab.TabType.MAP)).refreshPlanetView();
     	}
     }
 
@@ -4524,7 +4283,7 @@ public class CampaignGUI extends JPanel {
         PrintWriter pw = null;
 
         try {
-        	PersonnelTab pt = (PersonnelTab)tabs.get(StandardTabs.PERSONNEL.getTabName());
+        	PersonnelTab pt = (PersonnelTab)getTab(CampaignGuiTab.TabType.PERSONNEL);
             int row = pt.getPersonnelTable().getSelectedRow();
             if (row < 0) {
                 MekHQ.logMessage("ERROR: Cannot export person if no one is selected! Ignoring.");
@@ -5106,56 +4865,37 @@ public class CampaignGUI extends JPanel {
 
     //TODO: Trigger from event
     public void refreshPersonnelList() {
-    	if (tabs.containsKey(StandardTabs.PERSONNEL.getTabName())) {
-    		((PersonnelTab)tabs.get(StandardTabs.PERSONNEL.getTabName())).refreshPersonnelList();
+    	if (getTab(CampaignGuiTab.TabType.PERSONNEL) != null) {
+    		((PersonnelTab)getTab(CampaignGuiTab.TabType.PERSONNEL)).refreshPersonnelList();
     	}
     }
 
     //TODO: Trigger from event
     public void changeMission() {
-    	if (tabs.containsKey(StandardTabs.BRIEFING.getTabName())) {
-    		((BriefingTab)tabs.get(StandardTabs.BRIEFING.getTabName())).changeMission();
+    	if (getTab(CampaignGuiTab.TabType.BRIEFING) != null) {
+    		((BriefingTab)getTab(CampaignGuiTab.TabType.BRIEFING)).changeMission();
     	}
     }
 
     //TODO: Trigger from event
     public void refreshMissions() {
-    	if (tabs.containsKey(StandardTabs.BRIEFING.getTabName())) {
-    		((BriefingTab)tabs.get(StandardTabs.BRIEFING.getTabName())).refreshMissions();
+    	if (getTab(CampaignGuiTab.TabType.BRIEFING) != null) {
+    		((BriefingTab)getTab(CampaignGuiTab.TabType.BRIEFING)).refreshMissions();
     	}
     }
 
     //TODO: Trigger from event
     public void refreshScenarioList() {
-    	if (tabs.containsKey(StandardTabs.BRIEFING.getTabName())) {
-    		((BriefingTab)tabs.get(StandardTabs.BRIEFING.getTabName())).refreshScenarioList();
+    	if (getTab(CampaignGuiTab.TabType.BRIEFING) != null) {
+    		((BriefingTab)getTab(CampaignGuiTab.TabType.BRIEFING)).refreshScenarioList();
     	}
     }
 
+    //TODO: Trigger from event
     public void refreshUnitList() {
-        UUID selectedUUID = null;
-        int selectedRow = getUnitTable().getSelectedRow();
-        if (selectedRow != -1) {
-            Unit u = getUnitModel().getUnit(getUnitTable()
-                    .convertRowIndexToModel(selectedRow));
-            if (null != u) {
-                selectedUUID = u.getId();
-            }
-        }
-        getUnitModel().setData(getCampaign().getUnits());
-        // try to put the focus back on same person if they are still available
-        for (int row = 0; row < getUnitTable().getRowCount(); row++) {
-            Unit u = getUnitModel().getUnit(getUnitTable().convertRowIndexToModel(row));
-            if (u.getId().equals(selectedUUID)) {
-                getUnitTable().setRowSelectionInterval(row, row);
-                refreshUnitView();
-                break;
-            }
-        }
-        acquireUnitsModel
-                .setData(getCampaign().getShoppingList().getUnitList());
-        refreshLab();
-        refreshRating();
+    	if (getTab(CampaignGuiTab.TabType.HANGAR) != null) {
+    		((HangarTab)getTab(CampaignGuiTab.TabType.HANGAR)).refreshUnitList();
+    	}
     }
 
     public void refreshTaskList() {
@@ -5334,8 +5074,8 @@ public class CampaignGUI extends JPanel {
 
     //TODO: Trigger from event
     public void refreshOrganization() {
-    	if (tabs.containsKey(StandardTabs.TOE.getTabName())) {
-    		((TOETab)tabs.get(StandardTabs.TOE.getTabName())).refreshOrganization();
+    	if (getTab(CampaignGuiTab.TabType.TOE) != null) {
+    		((TOETab)getTab(CampaignGuiTab.TabType.TOE)).refreshOrganization();
     	}
     }
 
@@ -5588,29 +5328,6 @@ public class CampaignGUI extends JPanel {
         partsSorter.setRowFilter(partsTypeFilter);
     }
 
-    public void filterUnits() {
-        RowFilter<UnitTableModel, Integer> unitTypeFilter = null;
-        final int nGroup = choiceUnit.getSelectedIndex() - 1;
-        unitTypeFilter = new RowFilter<UnitTableModel, Integer>() {
-            @Override
-            public boolean include(
-                    Entry<? extends UnitTableModel, ? extends Integer> entry) {
-                if (nGroup < 0) {
-                    return true;
-                }
-                UnitTableModel unitModel = entry.getModel();
-                Unit unit = unitModel.getUnit(entry.getIdentifier());
-                Entity en = unit.getEntity();
-                int type = -1;
-                if (null != en) {
-                    type = UnitType.determineUnitTypeCode(en);
-                }
-                return type == nGroup;
-            }
-        };
-        unitSorter.setRowFilter(unitTypeFilter);
-    }
-
     public void filterTechs(boolean warehouse) {
         RowFilter<TechTableModel, Integer> techTypeFilter = null;
         final Part part = getSelectedTask();
@@ -5671,232 +5388,6 @@ public class CampaignGUI extends JPanel {
                 ((TechSorter) techSorter.getComparator(0)).setPart(part);
             }
             techSorter.setRowFilter(techTypeFilter);
-        }
-    }
-
-    private void changeUnitView() {
-
-        int view = choiceUnitView.getSelectedIndex();
-        XTableColumnModel columnModel = (XTableColumnModel) getUnitTable()
-                .getColumnModel();
-        getUnitTable().setRowHeight(15);
-
-        // set the renderer
-        TableColumn column = null;
-        for (int i = 0; i < UnitTableModel.N_COL; i++) {
-            column = columnModel.getColumnByModelIndex(i);
-            column.setCellRenderer(getUnitModel().getRenderer(
-                    choiceUnitView.getSelectedIndex() == UV_GRAPHIC,
-                    getIconPackage()));
-            if (i == UnitTableModel.COL_WCLASS) {
-                if (view == UV_GRAPHIC) {
-                    column.setPreferredWidth(125);
-                    column.setHeaderValue("Unit");
-                } else {
-                    column.setPreferredWidth(unitModel.getColumnWidth(i));
-                    column.setHeaderValue("Weight Class");
-                }
-            }
-        }
-
-        if (view == UV_GRAPHIC) {
-            getUnitTable().setRowHeight(80);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME),
-                    false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_WCLASS), true);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_WEIGHT), false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_COST),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_MAINTAIN), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_QUALITY), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_STATUS), false);
-            columnModel
-                    .setColumnVisible(columnModel
-                            .getColumnByModelIndex(UnitTableModel.COL_PILOT),
-                            true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_TECH_CRW), true);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW),
-                    false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_BV),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_REPAIR), false);
-            columnModel
-                    .setColumnVisible(columnModel
-                            .getColumnByModelIndex(UnitTableModel.COL_PARTS),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_QUIRKS), false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_SITE),
-                    false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS),
-                    false);
-        } else if (view == UV_GENERAL) {
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME),
-                    true);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_WCLASS), true);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_WEIGHT), false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_COST),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_MAINTAIN), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_QUALITY), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_STATUS), true);
-            columnModel
-                    .setColumnVisible(columnModel
-                            .getColumnByModelIndex(UnitTableModel.COL_PILOT),
-                            true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_TECH_CRW), true);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW),
-                    false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_BV),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_REPAIR), false);
-            columnModel
-                    .setColumnVisible(columnModel
-                            .getColumnByModelIndex(UnitTableModel.COL_PARTS),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_QUIRKS), false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_SITE),
-                    false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS),
-                    false);
-        } else if (view == UV_DETAILS) {
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME),
-                    true);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_WCLASS), true);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_WEIGHT), true);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_COST),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_MAINTAIN), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_QUALITY), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_STATUS), false);
-            columnModel
-                    .setColumnVisible(columnModel
-                            .getColumnByModelIndex(UnitTableModel.COL_PILOT),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_TECH_CRW), false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW),
-                    false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_BV),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_REPAIR), false);
-            columnModel
-                    .setColumnVisible(columnModel
-                            .getColumnByModelIndex(UnitTableModel.COL_PARTS),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_QUIRKS), true);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_SITE),
-                    false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS),
-                    false);
-        } else if (view == UV_STATUS) {
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME),
-                    true);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_WCLASS), false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_WEIGHT), false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_COST),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_MAINTAIN),
-                    getCampaign().getCampaignOptions().payForMaintain());
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_QUALITY), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_STATUS), true);
-            columnModel
-                    .setColumnVisible(columnModel
-                            .getColumnByModelIndex(UnitTableModel.COL_PILOT),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_TECH_CRW), false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW),
-                    true);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_BV),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_REPAIR), true);
-            columnModel
-                    .setColumnVisible(columnModel
-                            .getColumnByModelIndex(UnitTableModel.COL_PARTS),
-                            true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_QUIRKS), false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_SITE),
-                    true);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS),
-                    false);
         }
     }
 
@@ -6209,31 +5700,10 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
-     * @return the unitModel
-     */
-    public UnitTableModel getUnitModel() {
-        return unitModel;
-    }
-
-    /**
-     * @return the unitTable
-     */
-    public JTable getUnitTable() {
-        return unitTable;
-    }
-
-    /**
      * @return the panMekLab
      */
     public MekLabPanel getPanMekLab() {
         return panMekLab;
-    }
-
-    /**
-     * @return the splitUnit
-     */
-    public JSplitPane getSplitUnit() {
-        return splitUnit;
     }
 
     public JTabbedPane getTabMain() {
