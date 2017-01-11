@@ -26,7 +26,6 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -55,7 +54,6 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
@@ -73,7 +71,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
-import javax.swing.ListSelectionModel;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
@@ -137,9 +134,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.work.IAcquisitionWork;
-import mekhq.gui.adapter.FinanceTableMouseAdapter;
-import mekhq.gui.adapter.LoanTableMouseAdapter;
-import mekhq.gui.dialog.AddFundsDialog;
 import mekhq.gui.dialog.AdvanceDaysDialog;
 import mekhq.gui.dialog.BatchXPDialog;
 import mekhq.gui.dialog.BloodnameDialog;
@@ -150,10 +144,8 @@ import mekhq.gui.dialog.DataLoadingDialog;
 import mekhq.gui.dialog.GMToolsDialog;
 import mekhq.gui.dialog.HireBulkPersonnelDialog;
 import mekhq.gui.dialog.MaintenanceReportDialog;
-import mekhq.gui.dialog.ManageAssetsDialog;
 import mekhq.gui.dialog.MekHQAboutBox;
 import mekhq.gui.dialog.MercRosterDialog;
-import mekhq.gui.dialog.NewLoanDialog;
 import mekhq.gui.dialog.NewRecruitDialog;
 import mekhq.gui.dialog.NewsReportDialog;
 import mekhq.gui.dialog.PartsStoreDialog;
@@ -165,8 +157,6 @@ import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.ShipSearchDialog;
 import mekhq.gui.dialog.UnitMarketDialog;
 import mekhq.gui.dialog.UnitSelectorDialog;
-import mekhq.gui.model.FinanceTableModel;
-import mekhq.gui.model.LoanTableModel;
 import mekhq.gui.model.PartsInUseTableModel;
 import mekhq.gui.model.PartsInUseTableModel.ButtonColumn;
 import mekhq.gui.model.PartsTableModel;
@@ -206,14 +196,6 @@ public class CampaignGUI extends JPanel {
     
     private EnumMap<CampaignGuiTab.TabType,CampaignGuiTab> standardTabs;
 
-    /* For the finances tab */
-    private JPanel panFinances;
-    private JTable financeTable;
-    private JTable loanTable;
-    private JTextArea areaNetWorth;
-    private JButton btnAddFunds;
-    private JButton btnManageAssets;
-
     /* Components for the status panel */
     private JPanel statusPanel;
     private JLabel lblLocation;
@@ -231,8 +213,6 @@ public class CampaignGUI extends JPanel {
     private JButton btnAdvanceDay;
 
     /* Table models that we will need */
-    private FinanceTableModel financeModel;
-    private LoanTableModel loanModel;
     private PartsInUseTableModel overviewPartsModel;
 
 
@@ -407,11 +387,7 @@ public class CampaignGUI extends JPanel {
         addStandardTab(CampaignGuiTab.TabType.REPAIR);
         addStandardTab(CampaignGuiTab.TabType.INFIRMARY);
         addStandardTab(CampaignGuiTab.TabType.MEKLAB);
-
-        initFinanceTab();
-        tabMain.addTab(
-                resourceMap.getString("panFinances.TabConstraints.tabTitle"),
-                panFinances); // NOI18N
+        addStandardTab(CampaignGuiTab.TabType.FINANCES);
 
         initOverviewTab();
         tabMain.addTab(
@@ -423,7 +399,8 @@ public class CampaignGUI extends JPanel {
         tabMain.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                if(tabMain.getSelectedComponent() == panFinances) { // Yes, identity check
+                if(((CampaignGuiTab)tabMain.getSelectedComponent()).tabType()
+                		.equals(CampaignGuiTab.TabType.FINANCES)) {
                     refreshFinancialTransactions();
                 }
                 
@@ -738,119 +715,6 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.weighty = 1.0;
         //gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         panOverview.add(getTabOverview(), gridBagConstraints);
-    }
-
-    private void initFinanceTab() {
-        GridBagConstraints gridBagConstraints;
-
-        panFinances = new JPanel(new GridBagLayout());
-
-        financeModel = new FinanceTableModel();
-        financeTable = new JTable(financeModel);
-        financeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        financeTable.addMouseListener(new FinanceTableMouseAdapter(this));
-        financeTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        TableColumn column = null;
-        for (int i = 0; i < FinanceTableModel.N_COL; i++) {
-            column = financeTable.getColumnModel().getColumn(i);
-            column.setPreferredWidth(financeModel.getColumnWidth(i));
-            column.setCellRenderer(financeModel.getRenderer());
-        }
-        financeTable.setIntercellSpacing(new Dimension(0, 0));
-        financeTable.setShowGrid(false);
-
-        loanModel = new LoanTableModel();
-        loanTable = new JTable(loanModel);
-        loanTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        loanTable.addMouseListener(new LoanTableMouseAdapter(this));
-        loanTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        column = null;
-        for (int i = 0; i < LoanTableModel.N_COL; i++) {
-            column = loanTable.getColumnModel().getColumn(i);
-            column.setPreferredWidth(loanModel.getColumnWidth(i));
-            column.setCellRenderer(loanModel.getRenderer());
-        }
-        loanTable.setIntercellSpacing(new Dimension(0, 0));
-        loanTable.setShowGrid(false);
-        JScrollPane scrollLoanTable = new JScrollPane(loanTable);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        JPanel panBalance = new JPanel(new GridBagLayout());
-        panBalance.add(new JScrollPane(financeTable), gridBagConstraints);
-        panBalance.setBorder(BorderFactory.createTitledBorder("Balance Sheet"));
-        JPanel panLoan = new JPanel(new GridBagLayout());
-        panLoan.add(scrollLoanTable, gridBagConstraints);
-        scrollLoanTable.setMinimumSize(new java.awt.Dimension(450, 150));
-        scrollLoanTable.setPreferredSize(new java.awt.Dimension(450, 150));
-        panLoan.setBorder(BorderFactory.createTitledBorder("Active Loans"));
-        //JSplitPane splitFinances = new JSplitPane(JSplitPane.VERTICAL_SPLIT,panBalance, panLoan);
-        //splitFinances.setOneTouchExpandable(true);
-        //splitFinances.setResizeWeight(1.0);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        panFinances.add(panBalance, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        panFinances.add(panLoan, gridBagConstraints);
-
-        JPanel panelFinanceRight = new JPanel(new BorderLayout());
-
-        JPanel pnlFinanceBtns = new JPanel(new GridLayout(2, 2));
-        btnAddFunds = new JButton("Add Funds (GM)");
-        btnAddFunds.addActionListener(this::addFundsActionPerformed);
-        btnAddFunds.setEnabled(getCampaign().isGM());
-        pnlFinanceBtns.add(btnAddFunds);
-        JButton btnGetLoan = new JButton("Get Loan");
-        btnGetLoan.addActionListener(e -> showNewLoanDialog());
-        pnlFinanceBtns.add(btnGetLoan);
-
-        btnManageAssets = new JButton("Manage Assets (GM)");
-        btnManageAssets.addActionListener(e -> manageAssets());
-        btnManageAssets.setEnabled(getCampaign().isGM());
-        pnlFinanceBtns.add(btnManageAssets);
-
-        panelFinanceRight.add(pnlFinanceBtns, BorderLayout.NORTH);
-
-        areaNetWorth = new JTextArea();
-        areaNetWorth.setLineWrap(true);
-        areaNetWorth.setWrapStyleWord(true);
-        areaNetWorth.setFont(new Font("Courier New", Font.PLAIN, 12));
-        areaNetWorth.setText(getCampaign().getFinancialReport());
-        areaNetWorth.setEditable(false);
-
-        JScrollPane descriptionScroll = new JScrollPane(areaNetWorth);
-        panelFinanceRight.add(descriptionScroll, BorderLayout.CENTER);
-        areaNetWorth.setCaretPosition(0);
-        descriptionScroll.setMinimumSize(new Dimension(300, 200));
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 1.0;
-        panFinances.add(panelFinanceRight, gridBagConstraints);
-
     }
 
     private void initMenu() {
@@ -1979,9 +1843,8 @@ public class CampaignGUI extends JPanel {
     }// GEN-LAST:event_btnOvertimeActionPerformed
 
     private void btnGMModeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnGMModeActionPerformed
+    	
         getCampaign().setGMMode(btnGMMode.isSelected());
-        btnAddFunds.setEnabled(btnGMMode.isSelected());
-        btnManageAssets.setEnabled(btnGMMode.isSelected());
         refreshOverview();
     }// GEN-LAST:event_btnGMModeActionPerformed
 
@@ -2134,15 +1997,6 @@ public class CampaignGUI extends JPanel {
         refreshPartsList();
         refreshAcquireList();
         refreshOverview();
-    }
-
-    private void showNewLoanDialog() {
-        NewLoanDialog nld = new NewLoanDialog(getFrame(), true, getCampaign());
-        nld.setVisible(true);
-        refreshFinancialTransactions();
-        refreshFunds();
-        refreshReport();
-        refreshRating();
     }
 
     private void showMercRosterDialog() {
@@ -2528,29 +2382,6 @@ public class CampaignGUI extends JPanel {
     	if (getTab(CampaignGuiTab.TabType.MAP) != null) {
     		((MapTab)getTab(CampaignGuiTab.TabType.MAP)).refreshPlanetView();
     	}
-    }
-
-    private void addFundsActionPerformed(ActionEvent evt) {
-        AddFundsDialog addFundsDialog = new AddFundsDialog(getFrame(), true);
-        addFundsDialog.setVisible(true);
-        if (addFundsDialog.getClosedType() == JOptionPane.OK_OPTION) {
-            long funds = addFundsDialog.getFundsQuantity();
-            String description = addFundsDialog.getFundsDescription();
-            int category = addFundsDialog.getCategory();
-            getCampaign().addFunds(funds, description, category);
-            refreshReport();
-            refreshFunds();
-            refreshFinancialTransactions();
-        }
-    }
-
-    private void manageAssets() {
-        ManageAssetsDialog mad = new ManageAssetsDialog(getFrame(),
-                getCampaign());
-        mad.setVisible(true);
-        refreshReport();
-        refreshFunds();
-        refreshFinancialTransactions();
     }
 
     protected void loadListFile(boolean allowNewPilots) throws IOException {
@@ -3469,17 +3300,18 @@ public class CampaignGUI extends JPanel {
     	}
     }
 
+    //TODO: Trigger from event
     public void refreshFinancialTransactions() {
-        financeModel.setData(getCampaign().getFinances().getAllTransactions());
-        loanModel.setData(getCampaign().getFinances().getAllLoans());
-        refreshFunds();
-        refreshRating();
-        refreshFinancialReport();
+    	if (getTab(CampaignGuiTab.TabType.FINANCES) != null) {
+    		((FinancesTab)getTab(CampaignGuiTab.TabType.FINANCES)).refreshFinancialTransactions();
+    	}
     }
 
+    //TODO: Trigger from event
     public void refreshFinancialReport() {
-        areaNetWorth.setText(getCampaign().getFinancialReport());
-        areaNetWorth.setCaretPosition(0);
+    	if (getTab(CampaignGuiTab.TabType.FINANCES) != null) {
+    		((FinancesTab)getTab(CampaignGuiTab.TabType.FINANCES)).refreshFinancialReport();
+    	}
     }
 
     public void refreshCalendar() {
@@ -3635,27 +3467,6 @@ public class CampaignGUI extends JPanel {
      */
     public ResourceBundle getResourceMap() {
         return resourceMap;
-    }
-
-    /**
-     * @return the loanTable
-     */
-    public JTable getLoanTable() {
-        return loanTable;
-    }
-
-    /**
-     * @return the loanModel
-     */
-    public LoanTableModel getLoanModel() {
-        return loanModel;
-    }
-
-    /**
-     * @return the financeTable
-     */
-    public JTable getFinanceTable() {
-        return financeTable;
     }
 
     private void setCampaignOptionsFromGameOptions() {

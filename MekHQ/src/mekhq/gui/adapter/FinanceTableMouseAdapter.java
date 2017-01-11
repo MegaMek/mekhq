@@ -10,45 +10,45 @@ import javax.swing.JPopupMenu;
 import javax.swing.event.MouseInputAdapter;
 
 import mekhq.campaign.finances.Transaction;
-import mekhq.gui.CampaignGUI;
+import mekhq.gui.FinancesTab;
 import mekhq.gui.dialog.EditTransactionDialog;
 import mekhq.gui.model.FinanceTableModel;
 
 public class FinanceTableMouseAdapter extends MouseInputAdapter implements
         ActionListener {
-    private CampaignGUI gui;
+    private FinancesTab financesTab;
 
-    public FinanceTableMouseAdapter(CampaignGUI gui) {
+    public FinanceTableMouseAdapter(FinancesTab financesTab) {
         super();
-        this.gui = gui;
+        this.financesTab = financesTab;
     }
 
     public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
-        FinanceTableModel financeModel = (FinanceTableModel) gui.getFinanceTable()
+        FinanceTableModel financeModel = (FinanceTableModel) financesTab.getFinanceTable()
                 .getModel();
-        Transaction transaction = financeModel.getTransaction(gui.getFinanceTable()
+        Transaction transaction = financeModel.getTransaction(financesTab.getFinanceTable()
                 .getSelectedRow());
-        int row = gui.getFinanceTable().getSelectedRow();
+        int row = financesTab.getFinanceTable().getSelectedRow();
         if (null == transaction) {
             return;
         }
         if (command.equalsIgnoreCase("DELETE")) {
-            gui.getCampaign().addReport(transaction.voidTransaction());
+            financesTab.getCampaign().addReport(transaction.voidTransaction());
             financeModel.deleteTransaction(row);
-            gui.refreshFinancialTransactions();
-            gui.refreshReport();
+            financesTab.refreshFinancialTransactions();
+            financesTab.getCampaignGui().refreshReport();
         } else if (command.contains("EDIT")) {
             EditTransactionDialog dialog = new EditTransactionDialog(
-                    transaction, gui.getFrame(), true);
+                    transaction, financesTab.getFrame(), true);
             dialog.setVisible(true);
             transaction = dialog.getNewTransaction();
             financeModel.setTransaction(row, transaction);
-            gui.getCampaign().addReport(
+            financesTab.getCampaign().addReport(
                     transaction.updateTransaction(dialog
                             .getOldTransaction()));
-            gui.refreshFinancialTransactions();
-            gui.refreshReport();
+            financesTab.refreshFinancialTransactions();
+            financesTab.getCampaignGui().refreshReport();
         }
     }
 
@@ -65,7 +65,7 @@ public class FinanceTableMouseAdapter extends MouseInputAdapter implements
     private void maybeShowPopup(MouseEvent e) {
         JPopupMenu popup = new JPopupMenu();
         if (e.isPopupTrigger()) {
-            int row = gui.getFinanceTable().getSelectedRow();
+            int row = financesTab.getFinanceTable().getSelectedRow();
             if (row < 0) {
                 return;
             }
@@ -75,13 +75,13 @@ public class FinanceTableMouseAdapter extends MouseInputAdapter implements
             JMenuItem deleteItem = new JMenuItem("Delete Transaction");
             deleteItem.setActionCommand("DELETE");
             deleteItem.addActionListener(this);
-            deleteItem.setEnabled(gui.getCampaign().isGM());
+            deleteItem.setEnabled(financesTab.getCampaign().isGM());
             menu.add(deleteItem);
 
             JMenuItem editItem = new JMenuItem("Edit Transaction");
             editItem.setActionCommand("EDIT");
             editItem.addActionListener(this);
-            editItem.setEnabled(gui.getCampaign().isGM());
+            editItem.setEnabled(financesTab.getCampaign().isGM());
             menu.add(editItem);
 
             popup.show(e.getComponent(), e.getX(), e.getY());

@@ -111,6 +111,7 @@ import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.event.DayEndingEvent;
+import mekhq.campaign.event.GMModeEvent;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Finances;
@@ -3041,6 +3042,7 @@ public class Campaign implements Serializable {
 
     public void setGMMode(boolean b) {
         this.gmMode = b;
+        MekHQ.EVENT_BUS.trigger(new GMModeEvent(b));
     }
 
     public Faction getFaction() {
