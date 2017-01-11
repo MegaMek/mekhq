@@ -86,6 +86,7 @@ public class MassRepairSalvageDialog extends JDialog {
 	private UnitTableModel unitTableModel;
 	private JTable unitTable;
 	private TableRowSorter<UnitTableModel> unitSorter;
+	private JPanel pnlUnits;
 	private JScrollPane scrollUnitList;
 	private JButton btnSelectNone;
 	private JButton btnSelectAssigned;
@@ -93,6 +94,7 @@ public class MassRepairSalvageDialog extends JDialog {
 
 	private PartsTableModel partsTableModel;
 	private JTable partsTable;
+	private JPanel pnlParts;
 	private JScrollPane scrollPartsTable;
 	private JButton btnSelectAllParts;
 
@@ -324,7 +326,7 @@ public class MassRepairSalvageDialog extends JDialog {
 	}
 
 	private JPanel createUnitsPanel() {
-		JPanel pnlUnits = new JPanel(new GridBagLayout());
+		pnlUnits = new JPanel(new GridBagLayout());
 		pnlUnits.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Units"),
 				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
@@ -385,7 +387,7 @@ public class MassRepairSalvageDialog extends JDialog {
 	}
 
 	private JPanel createPartsPanel() {
-		JPanel pnlParts = new JPanel(new GridBagLayout());
+		pnlParts = new JPanel(new GridBagLayout());
 		pnlParts.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Parts"),
 				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
@@ -818,6 +820,54 @@ public class MassRepairSalvageDialog extends JDialog {
 
 		pnlButtons.add(btnSelectUnassigned, gridBagConstraints);
 
+		String btnHideDoHideLabel = "Hide Unit List";
+		String btnHideDoHideTooltip = "Hide units to save room on small screens";
+		
+		String btnHideDoShowLabel = "Show Unit List";
+		String btnHideDoShowTooltip = "Show list of units";
+
+		JDialog dlg = this;
+		
+		JButton btnHideUnits = new JButton();
+		
+		if (pnlUnits.isVisible()) {
+			btnHideUnits.setText(btnHideDoHideLabel);
+			btnHideUnits.setToolTipText(btnHideDoHideTooltip);
+		} else {
+			btnHideUnits.setText(btnHideDoShowLabel);
+			btnHideUnits.setToolTipText(btnHideDoShowTooltip);
+		}
+		
+		btnHideUnits.setName("btnHideUnits");
+		btnHideUnits.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				if (pnlUnits.isVisible()) {
+					pnlUnits.setVisible(false);
+					
+					btnHideUnits.setText(btnHideDoShowLabel);
+					btnHideUnits.setToolTipText(btnHideDoShowTooltip);
+					
+					dlg.pack();
+				} else {
+					pnlUnits.setVisible(true);
+					
+					btnHideUnits.setText(btnHideDoHideLabel);
+					btnHideUnits.setToolTipText(btnHideDoHideTooltip);
+					
+					dlg.pack();
+				}
+			}
+		});
+
+		gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.gridx = btnIdx++;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridwidth = 1;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+
+		pnlButtons.add(btnHideUnits, gridBagConstraints);
+
 		return pnlButtons;
 	}
 
@@ -902,6 +952,54 @@ public class MassRepairSalvageDialog extends JDialog {
 		});
 
 		pnlButtons.add(btnSelectAllParts, gridBagConstraints);
+
+		String btnHideDoHideLabel = "Hide Parts List";
+		String btnHideDoHideTooltip = "Hide parts to save room on small screens";
+		
+		String btnHideDoShowLabel = "Show Parts List";
+		String btnHideDoShowTooltip = "Show list of parts";
+
+		JDialog dlg = this;
+		
+		JButton btnHideParts = new JButton();
+		
+		if (pnlParts.isVisible()) {
+			btnHideParts.setText(btnHideDoHideLabel);
+			btnHideParts.setToolTipText(btnHideDoHideTooltip);
+		} else {
+			btnHideParts.setText(btnHideDoShowLabel);
+			btnHideParts.setToolTipText(btnHideDoShowTooltip);
+		}
+		
+		btnHideParts.setName("btnHideParts");
+		btnHideParts.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				if (pnlParts.isVisible()) {
+					pnlParts.setVisible(false);
+					
+					btnHideParts.setText(btnHideDoShowLabel);
+					btnHideParts.setToolTipText(btnHideDoShowTooltip);
+					
+					dlg.pack();
+				} else {
+					pnlParts.setVisible(true);
+					
+					btnHideParts.setText(btnHideDoHideLabel);
+					btnHideParts.setToolTipText(btnHideDoHideTooltip);
+					
+					dlg.pack();
+				}
+			}
+		});
+
+		gridBagConstraints = new GridBagConstraints();
+		gridBagConstraints.gridx = btnIdx++;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridwidth = 1;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+
+		pnlButtons.add(btnHideParts, gridBagConstraints);
 
 		return pnlButtons;
 	}
