@@ -16,69 +16,69 @@ import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.work.WorkTime;
-import mekhq.gui.CampaignGUI;
+import mekhq.gui.WarehouseTab;
 import mekhq.gui.dialog.MassRepairSalvageDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
 
 public class PartsTableMouseAdapter extends MouseInputAdapter implements
         ActionListener {
-    private CampaignGUI gui;
+    private WarehouseTab warehouseTab;
 
-    public PartsTableMouseAdapter(CampaignGUI gui) {
+    public PartsTableMouseAdapter(WarehouseTab warehouseTab) {
         super();
-        this.gui = gui;
+        this.warehouseTab = warehouseTab;
     }
 
     public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
-        int row = gui.getPartsTable().getSelectedRow();
+        int row = warehouseTab.getPartsTable().getSelectedRow();
         if (row < 0) {
             return;
         }
-        Part selectedPart = gui.getPartsModel().getPartAt(gui.getPartsTable()
+        Part selectedPart = warehouseTab.getPartsModel().getPartAt(warehouseTab.getPartsTable()
                 .convertRowIndexToModel(row));
-        int[] rows = gui.getPartsTable().getSelectedRows();
+        int[] rows = warehouseTab.getPartsTable().getSelectedRows();
         Part[] parts = new Part[rows.length];
         for (int i = 0; i < rows.length; i++) {
-            parts[i] = gui.getPartsModel().getPartAt(gui.getPartsTable()
+            parts[i] = warehouseTab.getPartsModel().getPartAt(warehouseTab.getPartsTable()
                     .convertRowIndexToModel(rows[i]));
         }
         if (command.equalsIgnoreCase("SELL")) {
             for (Part p : parts) {
                 if (null != p) {
-                    gui.getCampaign().sellPart(p, 1);
+                    warehouseTab.getCampaign().sellPart(p, 1);
                 }
             }
-            gui.refreshPartsList();
-            gui.refreshTaskList();
-            gui.refreshAcquireList();
-            gui.refreshReport();
-            gui.refreshFunds();
-            gui.refreshFinancialTransactions();
-            gui.refreshOverview();
-            gui.filterTasks();
+            warehouseTab.refreshPartsList();
+            warehouseTab.getCampaignGui().refreshTaskList();
+            warehouseTab.getCampaignGui().refreshAcquireList();
+            warehouseTab.getCampaignGui().refreshReport();
+            warehouseTab.getCampaignGui().refreshFunds();
+            warehouseTab.getCampaignGui().refreshFinancialTransactions();
+            warehouseTab.getCampaignGui().refreshOverview();
+            warehouseTab.getCampaignGui().filterTasks();
         } else if (command.equalsIgnoreCase("SELL_ALL")) {
             for (Part p : parts) {
                 if (null != p) {
                     if (p instanceof AmmoStorage) {
-                        gui.getCampaign().sellAmmo((AmmoStorage) p,
+                        warehouseTab.getCampaign().sellAmmo((AmmoStorage) p,
                                 ((AmmoStorage) p).getShots());
                     } 
                     else if(p instanceof Armor) {
-                    	gui.getCampaign().sellArmor((Armor)p, ((Armor)p).getAmount());
+                    	warehouseTab.getCampaign().sellArmor((Armor)p, ((Armor)p).getAmount());
                     }
                     else {
-                        gui.getCampaign().sellPart(p, p.getQuantity());
+                        warehouseTab.getCampaign().sellPart(p, p.getQuantity());
                     }
                 }
             }
-            gui.refreshPartsList();
-            gui.refreshTaskList();
-            gui.refreshAcquireList();
-            gui.refreshReport();
-            gui.refreshFunds();
-            gui.refreshFinancialTransactions();
-            gui.refreshOverview();
+            warehouseTab.refreshPartsList();
+            warehouseTab.getCampaignGui().refreshTaskList();
+            warehouseTab.getCampaignGui().refreshAcquireList();
+            warehouseTab.getCampaignGui().refreshReport();
+            warehouseTab.getCampaignGui().refreshFunds();
+            warehouseTab.getCampaignGui().refreshFinancialTransactions();
+            warehouseTab.getCampaignGui().refreshOverview();
         } else if (command.equalsIgnoreCase("SELL_N")) {
             if (null != selectedPart) {
                 int n = selectedPart.getQuantity();
@@ -89,74 +89,74 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements
                     n = ((Armor) selectedPart).getAmount();
                 }
                 PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
-                        gui.getFrame(), true, "Sell How Many "
+                        warehouseTab.getFrame(), true, "Sell How Many "
                                 + selectedPart.getName() + "s?", 1, 1, n);
                 pvcd.setVisible(true);
                 if (pvcd.getValue() < 0) {
                     return;
                 }
                 int q = pvcd.getValue();
-                gui.getCampaign().sellPart(selectedPart, q);
+                warehouseTab.getCampaign().sellPart(selectedPart, q);
             }
-            gui.refreshFinancialTransactions();
-            gui.refreshPartsList();
-            gui.refreshTaskList();
-            gui.refreshAcquireList();
-            gui.refreshReport();
-            gui.refreshOverview();
+            warehouseTab.getCampaignGui().refreshFinancialTransactions();
+            warehouseTab.refreshPartsList();
+            warehouseTab.getCampaignGui().refreshTaskList();
+            warehouseTab.getCampaignGui().refreshAcquireList();
+            warehouseTab.getCampaignGui().refreshReport();
+            warehouseTab.getCampaignGui().refreshOverview();
         } else if (command.equalsIgnoreCase("CANCEL_ORDER")) {
-            double refund = gui.getCampaign().getCampaignOptions()
+            double refund = warehouseTab.getCampaign().getCampaignOptions()
                     .GetCanceledOrderReimbursement();
             long refundAmount = 0;
             for (Part p : parts) {
                 if (null != p) {
                     refundAmount += (refund * p.getStickerPrice() * p
                             .getQuantity());
-                    gui.getCampaign().removePart(p);
+                    warehouseTab.getCampaign().removePart(p);
                 }
             }
-            gui.getCampaign().getFinances().credit(refundAmount,
+            warehouseTab.getCampaign().getFinances().credit(refundAmount,
                     Transaction.C_EQUIP,
                     "refund for cancelled equipmemt sale",
-                    gui.getCampaign().getDate());
-            gui.refreshFinancialTransactions();
-            gui.refreshPartsList();
-            gui.refreshTaskList();
-            gui.refreshAcquireList();
-            gui.refreshReport();
-            gui.refreshOverview();
+                    warehouseTab.getCampaign().getDate());
+            warehouseTab.getCampaignGui().refreshFinancialTransactions();
+            warehouseTab.refreshPartsList();
+            warehouseTab.getCampaignGui().refreshTaskList();
+            warehouseTab.getCampaignGui().refreshAcquireList();
+            warehouseTab.getCampaignGui().refreshReport();
+            warehouseTab.getCampaignGui().refreshOverview();
         } else if (command.equalsIgnoreCase("ARRIVE")) {
             for (Part p : parts) {
                 if (null != p) {
-                    gui.getCampaign().arrivePart(p);
+                    warehouseTab.getCampaign().arrivePart(p);
                 }
             }
-            gui.refreshPartsList();
-            gui.refreshTaskList();
-            gui.refreshAcquireList();
-            gui.refreshReport();
-            gui.refreshOverview();
+            warehouseTab.refreshPartsList();
+            warehouseTab.getCampaignGui().refreshTaskList();
+            warehouseTab.getCampaignGui().refreshAcquireList();
+            warehouseTab.getCampaignGui().refreshReport();
+            warehouseTab.getCampaignGui().refreshOverview();
         } else if (command.equalsIgnoreCase("REMOVE")) {
             for (Part p : parts) {
                 if (null != p) {
-                    gui.getCampaign().removePart(p);
+                    warehouseTab.getCampaign().removePart(p);
                 }
             }
-            gui.refreshPartsList();
-            gui.refreshTaskList();
-            gui.refreshAcquireList();
-            gui.refreshReport();
-            gui.refreshOverview();
+            warehouseTab.refreshPartsList();
+            warehouseTab.getCampaignGui().refreshTaskList();
+            warehouseTab.getCampaignGui().refreshAcquireList();
+            warehouseTab.getCampaignGui().refreshReport();
+            warehouseTab.getCampaignGui().refreshOverview();
         } else if (command.contains("SET_QUALITY")) {
             int q = -1;
-            boolean reverse = gui.getCampaign().getCampaignOptions().reverseQualityNames();
+            boolean reverse = warehouseTab.getCampaign().getCampaignOptions().reverseQualityNames();
             Object[] possibilities = { Part.getQualityName(Part.QUALITY_A, reverse), 
             		Part.getQualityName(Part.QUALITY_B, reverse), 
             		Part.getQualityName(Part.QUALITY_C, reverse),
             		Part.getQualityName(Part.QUALITY_D, reverse),
             		Part.getQualityName(Part.QUALITY_E, reverse),
             		Part.getQualityName(Part.QUALITY_F, reverse) };
-            String quality = (String) JOptionPane.showInputDialog(gui.getFrame(),
+            String quality = (String) JOptionPane.showInputDialog(warehouseTab.getFrame(),
                     "Choose the new quality level", "Set Quality",
                     JOptionPane.PLAIN_MESSAGE, null, possibilities, Part.getQualityName(Part.QUALITY_D, reverse));
             for(int i = 0; i < possibilities.length; i++) {
@@ -175,14 +175,15 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements
         } else if (command.contains("CHANGE_MODE")) {
             String sel = command.split(":")[1];
             selectedPart.setMode(WorkTime.of(sel));
-            gui.refreshPartsList();
-            gui.refreshOverview();
+            warehouseTab.refreshPartsList();
+            warehouseTab.getCampaignGui().refreshOverview();
         } else if (command.contains("MASS_REPAIR")) {
-            MassRepairSalvageDialog dlg = new MassRepairSalvageDialog(gui.getFrame(), true, gui, MassRepairSalvageDialog.MODE.WAREHOUSE);
+            MassRepairSalvageDialog dlg = new MassRepairSalvageDialog(warehouseTab.getFrame(),
+            		true, warehouseTab.getCampaignGui(), MassRepairSalvageDialog.MODE.WAREHOUSE);
             dlg.setVisible(true);
             
-            gui.refreshPartsList();
-            gui.refreshOverview();
+            warehouseTab.refreshPartsList();
+            warehouseTab.getCampaignGui().refreshOverview();
         }
     }
 
@@ -244,17 +245,17 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements
     private void maybeShowPopup(MouseEvent e) {
         JPopupMenu popup = new JPopupMenu();
         if (e.isPopupTrigger()) {
-            if (gui.getPartsTable().getSelectedRowCount() == 0) {
+            if (warehouseTab.getPartsTable().getSelectedRowCount() == 0) {
                 return;
             }
-            int[] rows = gui.getPartsTable().getSelectedRows();
+            int[] rows = warehouseTab.getPartsTable().getSelectedRows();
             JMenuItem menuItem = null;
             JMenu menu = null;
             JCheckBoxMenuItem cbMenuItem = null;
             Part[] parts = new Part[rows.length];
             boolean oneSelected = false;
             for (int i = 0; i < rows.length; i++) {
-                parts[i] = gui.getPartsModel().getPartAt(gui.getPartsTable()
+                parts[i] = warehouseTab.getPartsModel().getPartAt(warehouseTab.getPartsTable()
                         .convertRowIndexToModel(rows[i]));
             }
             Part part = null;
@@ -264,7 +265,7 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements
             }
             // **lets fill the pop up menu**//
             // sell part
-            if (gui.getCampaign().getCampaignOptions().canSellParts()
+            if (warehouseTab.getCampaign().getCampaignOptions().canSellParts()
                     && areAllPartsPresent(parts)) {
                 menu = new JMenu("Sell");
                 if (areAllPartsAmmo(parts)) {
@@ -344,11 +345,7 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements
                 popup.add(menuItem);
             }
             menuItem = new JMenuItem("Export Parts");
-            menuItem.addActionListener(new ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    gui.miExportPartsActionPerformed(evt);
-                }
-            });
+            menuItem.addActionListener(ev -> warehouseTab.getCampaignGui().miExportPartsActionPerformed(ev));
             menuItem.setEnabled(true);
             popup.add(menuItem);
             // GM mode
@@ -357,20 +354,20 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements
                 menuItem = new JMenuItem("Deliver Part Now");
                 menuItem.setActionCommand("ARRIVE");
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(gui.getCampaign().isGM());
+                menuItem.setEnabled(warehouseTab.getCampaign().isGM());
                 menu.add(menuItem);
             }
             // remove part
             menuItem = new JMenuItem("Remove Part");
             menuItem.setActionCommand("REMOVE");
             menuItem.addActionListener(this);
-            menuItem.setEnabled(gui.getCampaign().isGM());
+            menuItem.setEnabled(warehouseTab.getCampaign().isGM());
             menu.add(menuItem);
             // set part quality
             menuItem = new JMenuItem("Set Quality...");
             menuItem.setActionCommand("SET_QUALITY");
             menuItem.addActionListener(this);
-            menuItem.setEnabled(gui.getCampaign().isGM());
+            menuItem.setEnabled(warehouseTab.getCampaign().isGM());
             menu.add(menuItem);
             // end
             popup.addSeparator();

@@ -89,6 +89,7 @@ public abstract class CampaignGuiTab extends JPanel {
 			case HANGAR:
 				return new HangarTab(gui, name);
 			case WAREHOUSE:
+				return new WarehouseTab(gui, name);
 			case REPAIR:
 			case INFIRMARY:
 			case MEKLAB:
