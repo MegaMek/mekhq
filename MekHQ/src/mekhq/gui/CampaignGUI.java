@@ -23,7 +23,6 @@ package mekhq.gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Toolkit;
@@ -41,7 +40,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.text.NumberFormat;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -52,8 +50,6 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
@@ -65,23 +61,16 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
-import javax.swing.RowSorter;
-import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableRowSorter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -117,13 +106,10 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
-import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.rating.UnitRatingFactory;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
@@ -133,7 +119,6 @@ import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.RandomFactionGenerator;
-import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.dialog.AdvanceDaysDialog;
 import mekhq.gui.dialog.BatchXPDialog;
 import mekhq.gui.dialog.BloodnameDialog;
@@ -157,11 +142,7 @@ import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.ShipSearchDialog;
 import mekhq.gui.dialog.UnitMarketDialog;
 import mekhq.gui.dialog.UnitSelectorDialog;
-import mekhq.gui.model.PartsInUseTableModel;
-import mekhq.gui.model.PartsInUseTableModel.ButtonColumn;
 import mekhq.gui.model.PartsTableModel;
-import mekhq.gui.sorter.FormattedNumberSorter;
-import mekhq.gui.sorter.TwoNumbersSorter;
 
 /**
  * The application's main frame.
@@ -211,37 +192,6 @@ public class CampaignGUI extends JPanel {
     private JToggleButton btnGMMode;
     private JToggleButton btnOvertime;
     private JButton btnAdvanceDay;
-
-    /* Table models that we will need */
-    private PartsInUseTableModel overviewPartsModel;
-
-
-    /* table sorters for tables that can be filtered */
-    private TableRowSorter<PartsInUseTableModel> partsInUseSorter;
-
-    // Start Overview Tab
-    private JPanel panOverview;
-    private JTabbedPane tabOverview;
-    // Overview Parts In Use
-    private JScrollPane scrollOverviewParts;
-    private JPanel overviewPartsPanel;
-    private JTable overviewPartsInUseTable;
-    // Overview Transport
-    private JScrollPane scrollOverviewTransport;
-    // Overview Personnel
-    private JScrollPane scrollOverviewCombatPersonnel;
-    private JScrollPane scrollOverviewSupportPersonnel;
-    private JSplitPane splitOverviewPersonnel;
-    // Overview Hangar
-    private JScrollPane scrollOverviewHangar;
-    private JTextArea overviewHangarArea;
-    private JSplitPane splitOverviewHangar;
-    // Overview Rating
-    private JScrollPane scrollOverviewUnitRating;
-    private IUnitRating rating;
-    // Overview Cargo
-    private JScrollPane scrollOverviewCargo;
-    // End Overview Tab
 
     ReportHyperlinkListener reportHLL;
 
@@ -304,22 +254,17 @@ public class CampaignGUI extends JPanel {
     }
 
     public void toggleOverviewTab() {
-        getTabOverview().setVisible(!getTabOverview().isVisible());
-        miShowOverview.setSelected(getTabOverview().isVisible());
-        showHideTabOverview();
+    	boolean show = !hasTab(CampaignGuiTab.TabType.OVERVIEW);
+        miShowOverview.setSelected(show);
+        showOverviewTab(show);
     }
-
-    public void showHideTabOverview() {
-        miShowOverview.setSelected(tabOverview.isVisible());
-        int drIndex = getTabMain().indexOfComponent(panOverview);
-        if (drIndex > -1 && !tabOverview.isVisible()) {
-            getTabMain().removeTabAt(drIndex);
-        } else {
-            if (drIndex == -1) {
-                getTabMain().addTab(resourceMap.getString("panOverview.TabConstraints.tabTitle"),
-                        panOverview);
-            }
-        }
+    
+    public void showOverviewTab(boolean show) {
+    	if (show) {
+    		addStandardTab(CampaignGuiTab.TabType.OVERVIEW);
+    	} else {
+    		removeStandardTab(CampaignGuiTab.TabType.OVERVIEW);
+    	}    	
     }
 
     public void showGMToolsDialog() {
@@ -388,11 +333,7 @@ public class CampaignGUI extends JPanel {
         addStandardTab(CampaignGuiTab.TabType.INFIRMARY);
         addStandardTab(CampaignGuiTab.TabType.MEKLAB);
         addStandardTab(CampaignGuiTab.TabType.FINANCES);
-
-        initOverviewTab();
-        tabMain.addTab(
-                resourceMap.getString("panOverview.TabConstraints.tabTitle"),
-                panOverview); // NOI18N
+        addStandardTab(CampaignGuiTab.TabType.OVERVIEW);
 
         // The finance tab can be a pain to update when dealing with large units.
         // Refresh it on tab change to that panel instead.
@@ -422,11 +363,9 @@ public class CampaignGUI extends JPanel {
         initReport();
         refreshFunds();
         refreshRating();
-        refreshFinancialTransactions();
         refreshLocation();
         refreshTempAstechs();
         refreshTempMedics();
-        refreshOverview();
 
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 
@@ -594,7 +533,11 @@ public class CampaignGUI extends JPanel {
      * @param tabType	The tab to remove
      */
     public void removeStandardTab(CampaignGuiTab.TabType tabType) {
-    	removeTab(standardTabs.get(tabType));
+    	CampaignGuiTab tab = standardTabs.get(tabType);
+    	if (tab != null) {
+    		MekHQ.EVENT_BUS.unregister(tab);
+        	removeTab(tab);
+    	}
     }
     
     /**
@@ -622,101 +565,6 @@ public class CampaignGUI extends JPanel {
     	}
     }
     
-    private void initOverviewTab() {
-        GridBagConstraints gridBagConstraints;
-
-        panOverview = new JPanel();
-        setTabOverview(new JTabbedPane());
-        scrollOverviewParts = new JScrollPane();
-        initOverviewPartsInUse();
-        scrollOverviewTransport = new JScrollPane();
-        scrollOverviewCombatPersonnel = new JScrollPane();
-        scrollOverviewSupportPersonnel = new JScrollPane();
-        scrollOverviewHangar = new JScrollPane();
-        overviewHangarArea = new JTextArea();
-        splitOverviewHangar = new JSplitPane();
-        scrollOverviewUnitRating = new JScrollPane();
-        scrollOverviewCargo = new JScrollPane();
-
-        // Overview tab
-        panOverview.setName("panelOverview"); // NOI18N
-        panOverview.setLayout(new java.awt.GridBagLayout());
-
-        getTabOverview().setToolTipText(resourceMap.getString("tabOverview.toolTipText")); // NOI18N
-        getTabOverview().setMinimumSize(new java.awt.Dimension(250, 250));
-        getTabOverview().setName("tabOverview"); // NOI18N
-        getTabOverview().setPreferredSize(new java.awt.Dimension(800, 300));
-
-        scrollOverviewTransport.setToolTipText(resourceMap.getString("scrollOverviewTransport.TabConstraints.toolTipText")); // NOI18N
-        scrollOverviewTransport.setMinimumSize(new java.awt.Dimension(350, 400));
-        scrollOverviewTransport.setPreferredSize(new java.awt.Dimension(350, 400));
-        scrollOverviewTransport.setViewportView(new TransportReport(getCampaign()).getReport());
-        getTabOverview().addTab(resourceMap.getString("scrollOverviewTransport.TabConstraints.tabTitle"), scrollOverviewTransport);
-
-        scrollOverviewCargo.setToolTipText(resourceMap.getString("scrollOverviewCargo.TabConstraints.toolTipText")); // NOI18N
-        scrollOverviewCargo.setMinimumSize(new java.awt.Dimension(350, 400));
-        scrollOverviewCargo.setPreferredSize(new java.awt.Dimension(350, 400));
-        scrollOverviewCargo.setViewportView(new CargoReport(getCampaign()).getReport());
-        getTabOverview().addTab(resourceMap.getString("scrollOverviewCargo.TabConstraints.tabTitle"), scrollOverviewCargo);
-
-        scrollOverviewCombatPersonnel.setMinimumSize(new java.awt.Dimension(350, 400));
-        scrollOverviewCombatPersonnel.setPreferredSize(new java.awt.Dimension(350, 400));
-        scrollOverviewCombatPersonnel.setViewportView(new PersonnelReport(getCampaign()).getCombatPersonnelReport());
-        scrollOverviewSupportPersonnel.setMinimumSize(new java.awt.Dimension(350, 400));
-        scrollOverviewSupportPersonnel.setPreferredSize(new java.awt.Dimension(350, 400));
-        scrollOverviewSupportPersonnel.setViewportView(new PersonnelReport(getCampaign()).getSupportPersonnelReport());
-
-        splitOverviewPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollOverviewCombatPersonnel, scrollOverviewSupportPersonnel);
-        splitOverviewPersonnel.setName("splitOverviewPersonnel");
-        splitOverviewPersonnel.setOneTouchExpandable(true);
-        splitOverviewPersonnel.setResizeWeight(0.5);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        getTabOverview().addTab(resourceMap.getString("scrollOverviewPersonnel.TabConstraints.tabTitle"), splitOverviewPersonnel);
-
-        scrollOverviewHangar.setViewportView(new HangarReport(getCampaign()).getHangarTree());
-        overviewHangarArea.setName("overviewHangarArea"); // NOI18N
-        overviewHangarArea.setLineWrap(false);
-        overviewHangarArea.setFont(new Font("Courier New", Font.PLAIN, 18));
-        overviewHangarArea.setText("");
-        overviewHangarArea.setEditable(false);
-        overviewHangarArea.setName("overviewHangarArea"); // NOI18N
-        splitOverviewHangar = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollOverviewHangar, overviewHangarArea);
-        splitOverviewHangar.setName("splitOverviewHangar");
-        splitOverviewHangar.setOneTouchExpandable(true);
-        splitOverviewHangar.setResizeWeight(0.5);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        getTabOverview().addTab(resourceMap.getString("scrollOverviewHangar.TabConstraints.tabTitle"), splitOverviewHangar);
-
-        overviewPartsPanel.setName("overviewPartsPanel"); // NOI18N
-        scrollOverviewParts.setViewportView(overviewPartsPanel);
-        getTabOverview().addTab(resourceMap.getString("scrollOverviewParts.TabConstraints.tabTitle"), scrollOverviewParts);
-
-        rating = UnitRatingFactory.getUnitRating(getCampaign());
-        rating.reInitialize();
-        scrollOverviewUnitRating.setViewportView(new RatingReport(getCampaign()).getReport());
-        getTabOverview().addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"), scrollOverviewUnitRating);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        //gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-        panOverview.add(getTabOverview(), gridBagConstraints);
-    }
-
     private void initMenu() {
 
         menuBar = new JMenuBar();
@@ -1213,7 +1061,7 @@ public class CampaignGUI extends JPanel {
         menuView.add(miRetirementDefectionDialog);
 
         miShowOverview = new JCheckBoxMenuItem("Show Overview Tab");
-        miShowOverview.setSelected(getTabOverview().isVisible());
+        miShowOverview.setSelected(hasTab(CampaignGuiTab.TabType.OVERVIEW));
         miShowOverview.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
@@ -1410,20 +1258,6 @@ public class CampaignGUI extends JPanel {
 
     private static boolean isMacOSX() {
         return System.getProperty("os.name").indexOf("Mac OS X") >= 0;
-    }
-
-    /**
-     * @return the tabOverview
-     */
-    public JTabbedPane getTabOverview() {
-        return tabOverview;
-    }
-
-    /**
-     * @param tabOverview the tabOverview to set
-     */
-    public void setTabOverview(JTabbedPane tabOverview) {
-        this.tabOverview = tabOverview;
     }
 
     private void miChatActionPerformed(ActionEvent evt) {
@@ -2175,171 +2009,6 @@ public class CampaignGUI extends JPanel {
 
     public Part getPartByNameAndDetails(String pnd) {
         return getCampaign().getPartsStore().getByNameAndDetails(pnd);
-    }
-
-    public void refreshOverview() {
-        int drIndex = getTabOverview().indexOfComponent(scrollOverviewUnitRating);
-        if (!getCampaign().getCampaignOptions().useDragoonRating() && drIndex != -1) {
-            getTabOverview().removeTabAt(drIndex);
-        } else {
-            if (drIndex == -1) {
-                getTabOverview().addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"), scrollOverviewUnitRating);
-            }
-        }
-
-        scrollOverviewUnitRating.setViewportView(new RatingReport(getCampaign()).getReport());
-        scrollOverviewCombatPersonnel.setViewportView(new PersonnelReport(getCampaign()).getCombatPersonnelReport());
-        scrollOverviewSupportPersonnel.setViewportView(new PersonnelReport(getCampaign()).getSupportPersonnelReport());
-        scrollOverviewTransport.setViewportView(new TransportReport(getCampaign()).getReport());
-        scrollOverviewCargo.setViewportView(new CargoReport(getCampaign()).getReport());
-        HangarReport hr = new HangarReport(getCampaign());
-        overviewHangarArea.setText(hr.getHangarTotals());
-        scrollOverviewHangar.setViewportView(hr.getHangarTree());
-        refreshOverviewPartsInUse();
-    }
-
-    private void initOverviewPartsInUse() {
-        overviewPartsPanel = new JPanel(new GridBagLayout());
-        
-        overviewPartsModel = new PartsInUseTableModel();
-        overviewPartsInUseTable = new JTable(overviewPartsModel);
-        overviewPartsInUseTable.setRowSelectionAllowed(false);
-        overviewPartsInUseTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        TableColumn column = null;
-        for(int i = 0; i < overviewPartsModel.getColumnCount(); ++ i) {
-            column = overviewPartsInUseTable.getColumnModel().getColumn(i);
-            column.setCellRenderer(overviewPartsModel.getRenderer());
-            if(overviewPartsModel.hasConstantWidth(i)) {
-                column.setMinWidth(overviewPartsModel.getWidth(i));
-                column.setMaxWidth(overviewPartsModel.getWidth(i));
-            } else {
-                column.setPreferredWidth(overviewPartsModel.getPreferredWidth(i));
-            }
-        }
-        overviewPartsInUseTable.setIntercellSpacing(new Dimension(0, 0));
-        overviewPartsInUseTable.setShowGrid(false);
-        partsInUseSorter = new TableRowSorter<PartsInUseTableModel>(overviewPartsModel);
-        partsInUseSorter.setSortsOnUpdates(true);
-        // Don't sort the buttons
-        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_BUY, false);
-        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_BUY_BULK, false);
-        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_GMADD, false);
-        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_GMADD_BULK, false);
-        // Numeric columns
-        partsInUseSorter.setComparator(PartsInUseTableModel.COL_IN_USE, new FormattedNumberSorter());
-        partsInUseSorter.setComparator(PartsInUseTableModel.COL_STORED, new FormattedNumberSorter());
-        partsInUseSorter.setComparator(PartsInUseTableModel.COL_TONNAGE, new FormattedNumberSorter());
-        partsInUseSorter.setComparator(PartsInUseTableModel.COL_IN_TRANSFER, new TwoNumbersSorter());
-        partsInUseSorter.setComparator(PartsInUseTableModel.COL_COST, new FormattedNumberSorter());
-        // Default starting sort
-        partsInUseSorter.setSortKeys(Arrays.asList(new RowSorter.SortKey(0, SortOrder.ASCENDING)));
-        overviewPartsInUseTable.setRowSorter(partsInUseSorter);
-        
-        // Add buttons and actions. TODO: Only refresh the row we are working on, not the whole table
-        @SuppressWarnings("serial")
-        Action buy = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int row = Integer.valueOf(e.getActionCommand());
-                PartInUse piu = overviewPartsModel.getPartInUse(row);
-                IAcquisitionWork partToBuy = piu.getPartToBuy();
-                getCampaign().getShoppingList().addShoppingItem(partToBuy, 1, getCampaign());
-                refreshReport();
-                refreshAcquireList();
-                refreshPartsList();
-                refreshOverviewSpecificPart(row, piu, partToBuy);
-            }
-        };
-        @SuppressWarnings("serial")
-        Action buyInBulk = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int row = Integer.valueOf(e.getActionCommand());
-                PartInUse piu = overviewPartsModel.getPartInUse(row);
-                int quantity = 1;
-                PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true, "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, 100);
-                pcd.setVisible(true);
-                quantity = pcd.getValue();
-                IAcquisitionWork partToBuy = piu.getPartToBuy();
-                getCampaign().getShoppingList().addShoppingItem(partToBuy, quantity, getCampaign());
-                refreshReport();
-                refreshAcquireList();
-                refreshPartsList();
-                refreshOverviewSpecificPart(row, piu, partToBuy);
-            }
-        };
-        @SuppressWarnings("serial")
-        Action add = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int row = Integer.valueOf(e.getActionCommand());
-                PartInUse piu = overviewPartsModel.getPartInUse(row);
-                IAcquisitionWork partToBuy = piu.getPartToBuy();
-                getCampaign().addPart((Part) partToBuy.getNewEquipment(), 0);
-                refreshAcquireList();
-                refreshPartsList();
-                refreshOverviewSpecificPart(row, piu, partToBuy);
-            }
-        };
-        @SuppressWarnings("serial")
-        Action addInBulk = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int row = Integer.valueOf(e.getActionCommand());
-                PartInUse piu = overviewPartsModel.getPartInUse(row);
-                int quantity = 1;
-                PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true, "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, 100);
-                pcd.setVisible(true);
-                quantity = pcd.getValue();
-                IAcquisitionWork partToBuy = piu.getPartToBuy();
-                while(quantity > 0) {
-                    getCampaign().addPart((Part) partToBuy.getNewEquipment(), 0);
-                    -- quantity;
-                }
-                refreshAcquireList();
-                refreshPartsList();
-                refreshOverviewSpecificPart(row, piu, partToBuy);
-            }
-        };
-
-        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable,
-            buy, PartsInUseTableModel.COL_BUTTON_BUY);
-        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable,
-            buyInBulk, PartsInUseTableModel.COL_BUTTON_BUY_BULK);
-        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable,
-            add, PartsInUseTableModel.COL_BUTTON_GMADD);
-        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable,
-            addInBulk, PartsInUseTableModel.COL_BUTTON_GMADD_BULK);
-
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
-
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-
-        overviewPartsPanel.add(new JScrollPane(overviewPartsInUseTable), gridBagConstraints);
-    }
-    
-    private void refreshOverviewSpecificPart(int row, PartInUse piu, IAcquisitionWork newPart) {
-        if(piu.equals(new PartInUse((Part) newPart))) {
-            // Simple update
-            getCampaign().updatePartInUse(piu);
-            overviewPartsModel.fireTableRowsUpdated(row, row);
-        } else {
-            // Some other part changed; fire a full refresh to be sure
-            refreshOverviewPartsInUse();
-        }
-    }
-    public void refreshOverviewPartsInUse() {
-        overviewPartsModel.setData(getCampaign().getPartsInUse());
-        TableColumnModel tcm = overviewPartsInUseTable.getColumnModel();
-        PartsInUseTableModel.ButtonColumn column = (ButtonColumn)tcm.getColumn(PartsInUseTableModel.COL_BUTTON_GMADD).getCellRenderer();
-        column.setEnabled(getCampaign().isGM());
-        column = (ButtonColumn)tcm.getColumn(PartsInUseTableModel.COL_BUTTON_GMADD_BULK).getCellRenderer();
-        column.setEnabled(getCampaign().isGM());
     }
 
     //TODO: trigger from event
@@ -3311,6 +2980,13 @@ public class CampaignGUI extends JPanel {
     public void refreshFinancialReport() {
     	if (getTab(CampaignGuiTab.TabType.FINANCES) != null) {
     		((FinancesTab)getTab(CampaignGuiTab.TabType.FINANCES)).refreshFinancialReport();
+    	}
+    }
+
+    //TODO: Trigger from event
+    public void refreshOverview() {
+    	if (getTab(CampaignGuiTab.TabType.OVERVIEW) != null) {
+    		((OverviewTab)getTab(CampaignGuiTab.TabType.OVERVIEW)).refreshOverview();
     	}
     }
 

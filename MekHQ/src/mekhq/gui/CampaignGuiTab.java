@@ -97,6 +97,7 @@ public abstract class CampaignGuiTab extends JPanel {
 			case FINANCES:
 				return new FinancesTab(gui, name);
 			case OVERVIEW:
+				return new OverviewTab(gui, name);
 			default:
 				return null;
     		
