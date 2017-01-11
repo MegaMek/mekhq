@@ -29,120 +29,120 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 
 /**
- * Abstract base class for CampaignGUI tab components. Custom tabs should extend CustomCampaignGuiTab
- * instead of this one.
- * 
+ * Abstract base class for CampaignGUI tab components. Custom tabs should extend
+ * CustomCampaignGuiTab instead of this one.
+ *
  * @author Neoancient
  *
  */
 public abstract class CampaignGuiTab extends JPanel {
-	
-	private static final long serialVersionUID = 6091435251932963385L;
+
+    private static final long serialVersionUID = 6091435251932963385L;
 
     public enum TabType {
-    	TOE (0, "panOrganization.TabConstraints.tabTitle"),  //$NON-NLS-1$
-    	BRIEFING (1, "panBriefing.TabConstraints.tabTitle"),  //$NON-NLS-1$
-    	MAP (2, "panMap.TabConstraints.tabTitle"),  //$NON-NLS-1$
-    	PERSONNEL (3, "panPersonnel.TabConstraints.tabTitle"),  //$NON-NLS-1$
-    	HANGAR (4, "panHangar.TabConstraints.tabTitle"),  //$NON-NLS-1$
-    	WAREHOUSE (5, "panSupplies.TabConstraints.tabTitle"),  //$NON-NLS-1$
-    	REPAIR (6, "panRepairBay.TabConstraints.tabTitle"),  //$NON-NLS-1$
-    	INFIRMARY (7, "panInfirmary.TabConstraints.tabTitle"),  //$NON-NLS-1$
-    	MEKLAB (8, "panMekLab.TabConstraints.tabTitle"),  //$NON-NLS-1$
-    	FINANCES (9, "panFinances.TabConstraints.tabTitle"),  //$NON-NLS-1$
-    	OVERVIEW (10, "panOverview.TabConstraints.tabTitle"),  //$NON-NLS-1$
-    	CUSTOM (11, null);
-    	
-    	private int defaultPos;
-    	private String name;
-    	
-    	public int getDefaultPos() {
-    		return defaultPos;
-    	}
-    	
-    	public String getTabName() {
-    		return name;
-    	}
-    	
-    	TabType(int defaultPos, String resKey) {
-    		this.defaultPos = defaultPos;
-    		if (resKey == null) {
-    			name = "Custom";
-    		} else {
-    			name = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl()) //$NON-NLS-1$;
-    				.getString(resKey);
-    		}
-    	}
-    	
-    	public CampaignGuiTab createTab(CampaignGUI gui) {
-    		switch (this) {
-			case TOE:
-				return new TOETab(gui, name);
-			case BRIEFING:
-				return new BriefingTab(gui, name);
-			case MAP:
-				return new MapTab(gui, name);
-			case PERSONNEL:
-				return new PersonnelTab(gui, name);
-			case HANGAR:
-				return new HangarTab(gui, name);
-			case WAREHOUSE:
-				return new WarehouseTab(gui, name);
-			case REPAIR:
-				return new RepairTab(gui, name);
-			case INFIRMARY:
-				return new InfirmaryTab(gui, name);
-			case MEKLAB:
-				return new MekLabTab(gui, name);
-			case FINANCES:
-				return new FinancesTab(gui, name);
-			case OVERVIEW:
-				return new OverviewTab(gui, name);
-			default:
-				return null;
-    		
-    		}
-    	}
+        TOE(0, "panOrganization.TabConstraints.tabTitle"), //$NON-NLS-1$
+        BRIEFING(1, "panBriefing.TabConstraints.tabTitle"), //$NON-NLS-1$
+        MAP(2, "panMap.TabConstraints.tabTitle"), //$NON-NLS-1$
+        PERSONNEL(3, "panPersonnel.TabConstraints.tabTitle"), //$NON-NLS-1$
+        HANGAR(4, "panHangar.TabConstraints.tabTitle"), //$NON-NLS-1$
+        WAREHOUSE(5, "panSupplies.TabConstraints.tabTitle"), //$NON-NLS-1$
+        REPAIR(6, "panRepairBay.TabConstraints.tabTitle"), //$NON-NLS-1$
+        INFIRMARY(7, "panInfirmary.TabConstraints.tabTitle"), //$NON-NLS-1$
+        MEKLAB(8, "panMekLab.TabConstraints.tabTitle"), //$NON-NLS-1$
+        FINANCES(9, "panFinances.TabConstraints.tabTitle"), //$NON-NLS-1$
+        OVERVIEW(10, "panOverview.TabConstraints.tabTitle"), //$NON-NLS-1$
+        CUSTOM(11, null);
+
+        private int defaultPos;
+        private String name;
+
+        public int getDefaultPos() {
+            return defaultPos;
+        }
+
+        public String getTabName() {
+            return name;
+        }
+
+        TabType(int defaultPos, String resKey) {
+            this.defaultPos = defaultPos;
+            if (resKey == null) {
+                name = "Custom";
+            } else {
+                name = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl()) //$NON-NLS-1$ ;
+                        .getString(resKey);
+            }
+        }
+
+        public CampaignGuiTab createTab(CampaignGUI gui) {
+            switch (this) {
+            case TOE:
+                return new TOETab(gui, name);
+            case BRIEFING:
+                return new BriefingTab(gui, name);
+            case MAP:
+                return new MapTab(gui, name);
+            case PERSONNEL:
+                return new PersonnelTab(gui, name);
+            case HANGAR:
+                return new HangarTab(gui, name);
+            case WAREHOUSE:
+                return new WarehouseTab(gui, name);
+            case REPAIR:
+                return new RepairTab(gui, name);
+            case INFIRMARY:
+                return new InfirmaryTab(gui, name);
+            case MEKLAB:
+                return new MekLabTab(gui, name);
+            case FINANCES:
+                return new FinancesTab(gui, name);
+            case OVERVIEW:
+                return new OverviewTab(gui, name);
+            default:
+                return null;
+
+            }
+        }
     }
 
-	private CampaignGUI gui;
-	
-	protected String tabName;
-	
-	CampaignGuiTab(CampaignGUI gui, String tabName) {
-		this.gui = gui;
-		this.tabName = tabName;
-		initTab();
-	}
-	
-	public CampaignGUI getCampaignGui() {
-		return gui;
-	}
-	
-	/* Some convenience methods */
-	public Campaign getCampaign() {
-		return gui.getCampaign();
-	}
-	
-	public CampaignOptions getCampaignOptions() {
-		return gui.getCampaign().getCampaignOptions();
-	}
-	
-	public JFrame getFrame() {
-		return gui.getFrame();
-	}
-	
-	public IconPackage getIconPackage() {
-		return gui.getIconPackage();
-	}
-	
-	public String getTabName() {
-		return tabName;
-	}
-	
-	abstract public void initTab();
-	
-	abstract public void refreshAll();
+    private CampaignGUI gui;
 
-	abstract public TabType tabType();
+    protected String tabName;
+
+    CampaignGuiTab(CampaignGUI gui, String tabName) {
+        this.gui = gui;
+        this.tabName = tabName;
+        initTab();
+    }
+
+    public CampaignGUI getCampaignGui() {
+        return gui;
+    }
+
+    /* Some convenience methods */
+    public Campaign getCampaign() {
+        return gui.getCampaign();
+    }
+
+    public CampaignOptions getCampaignOptions() {
+        return gui.getCampaign().getCampaignOptions();
+    }
+
+    public JFrame getFrame() {
+        return gui.getFrame();
+    }
+
+    public IconPackage getIconPackage() {
+        return gui.getIconPackage();
+    }
+
+    public String getTabName() {
+        return tabName;
+    }
+
+    abstract public void initTab();
+
+    abstract public void refreshAll();
+
+    abstract public TabType tabType();
 }

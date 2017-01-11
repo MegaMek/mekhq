@@ -62,8 +62,8 @@ import mekhq.gui.sorter.TwoNumbersSorter;
  *
  */
 public final class OverviewTab extends CampaignGuiTab {
-	
-	private static final long serialVersionUID = -564451623308341081L;
+
+    private static final long serialVersionUID = -564451623308341081L;
 
     private JTabbedPane tabOverview;
     // Overview Parts In Use
@@ -85,115 +85,125 @@ public final class OverviewTab extends CampaignGuiTab {
     private IUnitRating rating;
     // Overview Cargo
     private JScrollPane scrollOverviewCargo;
-    
+
     private PartsInUseTableModel overviewPartsModel;
     private TableRowSorter<PartsInUseTableModel> partsInUseSorter;
 
     ResourceBundle resourceMap;
 
-	OverviewTab(CampaignGUI gui, String name) {
-		super(gui, name);
-	}
+    OverviewTab(CampaignGUI gui, String name) {
+        super(gui, name);
+    }
 
-	/* (non-Javadoc)
-	 * @see mekhq.gui.CampaignGuiTab#initTab()
-	 */
-	@Override
-	public void initTab() {
-		resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", //$NON-NLS-1$;
-				new EncodeControl());
-		GridBagConstraints gridBagConstraints;
+    /*
+     * (non-Javadoc)
+     *
+     * @see mekhq.gui.CampaignGuiTab#initTab()
+     */
+    @Override
+    public void initTab() {
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", //$NON-NLS-1$ ;
+                new EncodeControl());
+        GridBagConstraints gridBagConstraints;
 
-		setTabOverview(new JTabbedPane());
-		scrollOverviewParts = new JScrollPane();
-		initOverviewPartsInUse();
-		scrollOverviewTransport = new JScrollPane();
-		scrollOverviewCombatPersonnel = new JScrollPane();
-		scrollOverviewSupportPersonnel = new JScrollPane();
-		scrollOverviewHangar = new JScrollPane();
-		overviewHangarArea = new JTextArea();
-		splitOverviewHangar = new JSplitPane();
-		scrollOverviewUnitRating = new JScrollPane();
-		scrollOverviewCargo = new JScrollPane();
+        setTabOverview(new JTabbedPane());
+        scrollOverviewParts = new JScrollPane();
+        initOverviewPartsInUse();
+        scrollOverviewTransport = new JScrollPane();
+        scrollOverviewCombatPersonnel = new JScrollPane();
+        scrollOverviewSupportPersonnel = new JScrollPane();
+        scrollOverviewHangar = new JScrollPane();
+        overviewHangarArea = new JTextArea();
+        splitOverviewHangar = new JSplitPane();
+        scrollOverviewUnitRating = new JScrollPane();
+        scrollOverviewCargo = new JScrollPane();
 
-		// Overview tab
-		setName("panelOverview"); // NOI18N
-		setLayout(new java.awt.GridBagLayout());
+        // Overview tab
+        setName("panelOverview"); // NOI18N
+        setLayout(new java.awt.GridBagLayout());
 
-		getTabOverview().setToolTipText(resourceMap.getString("tabOverview.toolTipText")); // NOI18N
-		getTabOverview().setMinimumSize(new java.awt.Dimension(250, 250));
-		getTabOverview().setName("tabOverview"); // NOI18N
-		getTabOverview().setPreferredSize(new java.awt.Dimension(800, 300));
+        getTabOverview().setToolTipText(resourceMap.getString("tabOverview.toolTipText")); // NOI18N
+        getTabOverview().setMinimumSize(new java.awt.Dimension(250, 250));
+        getTabOverview().setName("tabOverview"); // NOI18N
+        getTabOverview().setPreferredSize(new java.awt.Dimension(800, 300));
 
-		scrollOverviewTransport.setToolTipText(resourceMap.getString("scrollOverviewTransport.TabConstraints.toolTipText")); // NOI18N
-		scrollOverviewTransport.setMinimumSize(new java.awt.Dimension(350, 400));
-		scrollOverviewTransport.setPreferredSize(new java.awt.Dimension(350, 400));
-		scrollOverviewTransport.setViewportView(new TransportReport(getCampaign()).getReport());
-		getTabOverview().addTab(resourceMap.getString("scrollOverviewTransport.TabConstraints.tabTitle"), scrollOverviewTransport);
+        scrollOverviewTransport
+                .setToolTipText(resourceMap.getString("scrollOverviewTransport.TabConstraints.toolTipText")); // NOI18N
+        scrollOverviewTransport.setMinimumSize(new java.awt.Dimension(350, 400));
+        scrollOverviewTransport.setPreferredSize(new java.awt.Dimension(350, 400));
+        scrollOverviewTransport.setViewportView(new TransportReport(getCampaign()).getReport());
+        getTabOverview().addTab(resourceMap.getString("scrollOverviewTransport.TabConstraints.tabTitle"),
+                scrollOverviewTransport);
 
-		scrollOverviewCargo.setToolTipText(resourceMap.getString("scrollOverviewCargo.TabConstraints.toolTipText")); // NOI18N
-		scrollOverviewCargo.setMinimumSize(new java.awt.Dimension(350, 400));
-		scrollOverviewCargo.setPreferredSize(new java.awt.Dimension(350, 400));
-		scrollOverviewCargo.setViewportView(new CargoReport(getCampaign()).getReport());
-		getTabOverview().addTab(resourceMap.getString("scrollOverviewCargo.TabConstraints.tabTitle"), scrollOverviewCargo);
+        scrollOverviewCargo.setToolTipText(resourceMap.getString("scrollOverviewCargo.TabConstraints.toolTipText")); // NOI18N
+        scrollOverviewCargo.setMinimumSize(new java.awt.Dimension(350, 400));
+        scrollOverviewCargo.setPreferredSize(new java.awt.Dimension(350, 400));
+        scrollOverviewCargo.setViewportView(new CargoReport(getCampaign()).getReport());
+        getTabOverview().addTab(resourceMap.getString("scrollOverviewCargo.TabConstraints.tabTitle"),
+                scrollOverviewCargo);
 
-		scrollOverviewCombatPersonnel.setMinimumSize(new java.awt.Dimension(350, 400));
-		scrollOverviewCombatPersonnel.setPreferredSize(new java.awt.Dimension(350, 400));
-		scrollOverviewCombatPersonnel.setViewportView(new PersonnelReport(getCampaign()).getCombatPersonnelReport());
-		scrollOverviewSupportPersonnel.setMinimumSize(new java.awt.Dimension(350, 400));
-		scrollOverviewSupportPersonnel.setPreferredSize(new java.awt.Dimension(350, 400));
-		scrollOverviewSupportPersonnel.setViewportView(new PersonnelReport(getCampaign()).getSupportPersonnelReport());
+        scrollOverviewCombatPersonnel.setMinimumSize(new java.awt.Dimension(350, 400));
+        scrollOverviewCombatPersonnel.setPreferredSize(new java.awt.Dimension(350, 400));
+        scrollOverviewCombatPersonnel.setViewportView(new PersonnelReport(getCampaign()).getCombatPersonnelReport());
+        scrollOverviewSupportPersonnel.setMinimumSize(new java.awt.Dimension(350, 400));
+        scrollOverviewSupportPersonnel.setPreferredSize(new java.awt.Dimension(350, 400));
+        scrollOverviewSupportPersonnel.setViewportView(new PersonnelReport(getCampaign()).getSupportPersonnelReport());
 
-		splitOverviewPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollOverviewCombatPersonnel, scrollOverviewSupportPersonnel);
-		splitOverviewPersonnel.setName("splitOverviewPersonnel");
-		splitOverviewPersonnel.setOneTouchExpandable(true);
-		splitOverviewPersonnel.setResizeWeight(0.5);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 1.0;
-		getTabOverview().addTab(resourceMap.getString("scrollOverviewPersonnel.TabConstraints.tabTitle"), splitOverviewPersonnel);
+        splitOverviewPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollOverviewCombatPersonnel,
+                scrollOverviewSupportPersonnel);
+        splitOverviewPersonnel.setName("splitOverviewPersonnel");
+        splitOverviewPersonnel.setOneTouchExpandable(true);
+        splitOverviewPersonnel.setResizeWeight(0.5);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        getTabOverview().addTab(resourceMap.getString("scrollOverviewPersonnel.TabConstraints.tabTitle"),
+                splitOverviewPersonnel);
 
-		scrollOverviewHangar.setViewportView(new HangarReport(getCampaign()).getHangarTree());
-		overviewHangarArea.setName("overviewHangarArea"); // NOI18N
-		overviewHangarArea.setLineWrap(false);
-		overviewHangarArea.setFont(new Font("Courier New", Font.PLAIN, 18));
-		overviewHangarArea.setText("");
-		overviewHangarArea.setEditable(false);
-		overviewHangarArea.setName("overviewHangarArea"); // NOI18N
-		splitOverviewHangar = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollOverviewHangar, overviewHangarArea);
-		splitOverviewHangar.setName("splitOverviewHangar");
-		splitOverviewHangar.setOneTouchExpandable(true);
-		splitOverviewHangar.setResizeWeight(0.5);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 1.0;
-		getTabOverview().addTab(resourceMap.getString("scrollOverviewHangar.TabConstraints.tabTitle"), splitOverviewHangar);
+        scrollOverviewHangar.setViewportView(new HangarReport(getCampaign()).getHangarTree());
+        overviewHangarArea.setName("overviewHangarArea"); // NOI18N
+        overviewHangarArea.setLineWrap(false);
+        overviewHangarArea.setFont(new Font("Courier New", Font.PLAIN, 18));
+        overviewHangarArea.setText("");
+        overviewHangarArea.setEditable(false);
+        overviewHangarArea.setName("overviewHangarArea"); // NOI18N
+        splitOverviewHangar = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollOverviewHangar, overviewHangarArea);
+        splitOverviewHangar.setName("splitOverviewHangar");
+        splitOverviewHangar.setOneTouchExpandable(true);
+        splitOverviewHangar.setResizeWeight(0.5);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        getTabOverview().addTab(resourceMap.getString("scrollOverviewHangar.TabConstraints.tabTitle"),
+                splitOverviewHangar);
 
-		overviewPartsPanel.setName("overviewPartsPanel"); // NOI18N
-		scrollOverviewParts.setViewportView(overviewPartsPanel);
-		getTabOverview().addTab(resourceMap.getString("scrollOverviewParts.TabConstraints.tabTitle"), scrollOverviewParts);
+        overviewPartsPanel.setName("overviewPartsPanel"); // NOI18N
+        scrollOverviewParts.setViewportView(overviewPartsPanel);
+        getTabOverview().addTab(resourceMap.getString("scrollOverviewParts.TabConstraints.tabTitle"),
+                scrollOverviewParts);
 
-		rating = UnitRatingFactory.getUnitRating(getCampaign());
-		rating.reInitialize();
-		scrollOverviewUnitRating.setViewportView(new RatingReport(getCampaign()).getReport());
-		getTabOverview().addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"), scrollOverviewUnitRating);
+        rating = UnitRatingFactory.getUnitRating(getCampaign());
+        rating.reInitialize();
+        scrollOverviewUnitRating.setViewportView(new RatingReport(getCampaign()).getReport());
+        getTabOverview().addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"),
+                scrollOverviewUnitRating);
 
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 1.0;
-		//gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-		add(getTabOverview(), gridBagConstraints);
-	}
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        // gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+        add(getTabOverview(), gridBagConstraints);
+    }
 
     /**
      * @return the tabOverview
@@ -203,40 +213,45 @@ public final class OverviewTab extends CampaignGuiTab {
     }
 
     /**
-     * @param tabOverview the tabOverview to set
+     * @param tabOverview
+     *            the tabOverview to set
      */
     public void setTabOverview(JTabbedPane tabOverview) {
         this.tabOverview = tabOverview;
     }
 
-	/* (non-Javadoc)
-	 * @see mekhq.gui.CampaignGuiTab#refreshAll()
-	 */
-	@Override
-	public void refreshAll() {
+    /*
+     * (non-Javadoc)
+     *
+     * @see mekhq.gui.CampaignGuiTab#refreshAll()
+     */
+    @Override
+    public void refreshAll() {
         refreshOverview();
-	}
+    }
 
-	/* (non-Javadoc)
-	 * @see mekhq.gui.CampaignGuiTab#tabType()
-	 */
-	@Override
-	public TabType tabType() {
-		return TabType.OVERVIEW;
-	}
+    /*
+     * (non-Javadoc)
+     *
+     * @see mekhq.gui.CampaignGuiTab#tabType()
+     */
+    @Override
+    public TabType tabType() {
+        return TabType.OVERVIEW;
+    }
 
     private void initOverviewPartsInUse() {
         overviewPartsPanel = new JPanel(new GridBagLayout());
-        
+
         overviewPartsModel = new PartsInUseTableModel();
         overviewPartsInUseTable = new JTable(overviewPartsModel);
         overviewPartsInUseTable.setRowSelectionAllowed(false);
         overviewPartsInUseTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         TableColumn column = null;
-        for(int i = 0; i < overviewPartsModel.getColumnCount(); ++ i) {
+        for (int i = 0; i < overviewPartsModel.getColumnCount(); ++i) {
             column = overviewPartsInUseTable.getColumnModel().getColumn(i);
             column.setCellRenderer(overviewPartsModel.getRenderer());
-            if(overviewPartsModel.hasConstantWidth(i)) {
+            if (overviewPartsModel.hasConstantWidth(i)) {
                 column.setMinWidth(overviewPartsModel.getWidth(i));
                 column.setMaxWidth(overviewPartsModel.getWidth(i));
             } else {
@@ -261,8 +276,9 @@ public final class OverviewTab extends CampaignGuiTab {
         // Default starting sort
         partsInUseSorter.setSortKeys(Arrays.asList(new RowSorter.SortKey(0, SortOrder.ASCENDING)));
         overviewPartsInUseTable.setRowSorter(partsInUseSorter);
-        
-        // Add buttons and actions. TODO: Only refresh the row we are working on, not the whole table
+
+        // Add buttons and actions. TODO: Only refresh the row we are working
+        // on, not the whole table
         @SuppressWarnings("serial")
         Action buy = new AbstractAction() {
             @Override
@@ -284,7 +300,8 @@ public final class OverviewTab extends CampaignGuiTab {
                 int row = Integer.valueOf(e.getActionCommand());
                 PartInUse piu = overviewPartsModel.getPartInUse(row);
                 int quantity = 1;
-                PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true, "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, 100);
+                PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true,
+                        "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, 100);
                 pcd.setVisible(true);
                 quantity = pcd.getValue();
                 IAcquisitionWork partToBuy = piu.getPartToBuy();
@@ -315,13 +332,14 @@ public final class OverviewTab extends CampaignGuiTab {
                 int row = Integer.valueOf(e.getActionCommand());
                 PartInUse piu = overviewPartsModel.getPartInUse(row);
                 int quantity = 1;
-                PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true, "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, 100);
+                PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true,
+                        "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, 100);
                 pcd.setVisible(true);
                 quantity = pcd.getValue();
                 IAcquisitionWork partToBuy = piu.getPartToBuy();
-                while(quantity > 0) {
+                while (quantity > 0) {
                     getCampaign().addPart((Part) partToBuy.getNewEquipment(), 0);
-                    -- quantity;
+                    --quantity;
                 }
                 getCampaignGui().refreshAcquireList();
                 getCampaignGui().refreshPartsList();
@@ -329,14 +347,12 @@ public final class OverviewTab extends CampaignGuiTab {
             }
         };
 
-        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable,
-            buy, PartsInUseTableModel.COL_BUTTON_BUY);
-        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable,
-            buyInBulk, PartsInUseTableModel.COL_BUTTON_BUY_BULK);
-        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable,
-            add, PartsInUseTableModel.COL_BUTTON_GMADD);
-        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable,
-            addInBulk, PartsInUseTableModel.COL_BUTTON_GMADD_BULK);
+        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, buy, PartsInUseTableModel.COL_BUTTON_BUY);
+        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, buyInBulk,
+                PartsInUseTableModel.COL_BUTTON_BUY_BULK);
+        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, add, PartsInUseTableModel.COL_BUTTON_GMADD);
+        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, addInBulk,
+                PartsInUseTableModel.COL_BUTTON_GMADD_BULK);
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
 
@@ -349,14 +365,15 @@ public final class OverviewTab extends CampaignGuiTab {
 
         overviewPartsPanel.add(new JScrollPane(overviewPartsInUseTable), gridBagConstraints);
     }
-    
+
     public void refreshOverview() {
         int drIndex = getTabOverview().indexOfComponent(scrollOverviewUnitRating);
         if (!getCampaign().getCampaignOptions().useDragoonRating() && drIndex != -1) {
             getTabOverview().removeTabAt(drIndex);
         } else {
             if (drIndex == -1) {
-                getTabOverview().addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"), scrollOverviewUnitRating);
+                getTabOverview().addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"),
+                        scrollOverviewUnitRating);
             }
         }
 
@@ -372,7 +389,7 @@ public final class OverviewTab extends CampaignGuiTab {
     }
 
     private void refreshOverviewSpecificPart(int row, PartInUse piu, IAcquisitionWork newPart) {
-        if(piu.equals(new PartInUse((Part) newPart))) {
+        if (piu.equals(new PartInUse((Part) newPart))) {
             // Simple update
             getCampaign().updatePartInUse(piu);
             overviewPartsModel.fireTableRowsUpdated(row, row);
@@ -381,12 +398,14 @@ public final class OverviewTab extends CampaignGuiTab {
             refreshOverviewPartsInUse();
         }
     }
+
     public void refreshOverviewPartsInUse() {
         overviewPartsModel.setData(getCampaign().getPartsInUse());
         TableColumnModel tcm = overviewPartsInUseTable.getColumnModel();
-        PartsInUseTableModel.ButtonColumn column = (ButtonColumn)tcm.getColumn(PartsInUseTableModel.COL_BUTTON_GMADD).getCellRenderer();
+        PartsInUseTableModel.ButtonColumn column = (ButtonColumn) tcm.getColumn(PartsInUseTableModel.COL_BUTTON_GMADD)
+                .getCellRenderer();
         column.setEnabled(getCampaign().isGM());
-        column = (ButtonColumn)tcm.getColumn(PartsInUseTableModel.COL_BUTTON_GMADD_BULK).getCellRenderer();
+        column = (ButtonColumn) tcm.getColumn(PartsInUseTableModel.COL_BUTTON_GMADD_BULK).getCellRenderer();
         column.setEnabled(getCampaign().isGM());
     }
 

@@ -48,39 +48,41 @@ import mekhq.gui.model.PatientTableModel;
  */
 
 public final class InfirmaryTab extends CampaignGuiTab {
-	
-	private static final long serialVersionUID = 7558886712192449186L;
-	
-	private JTable docTable;
+
+    private static final long serialVersionUID = 7558886712192449186L;
+
+    private JTable docTable;
     private JButton btnAssignDoc;
     private JButton btnUnassignDoc;
     private JList<Person> listAssignedPatient;
     private JList<Person> listUnassignedPatient;
-    
+
     private PatientTableModel assignedPatientModel;
     private PatientTableModel unassignedPatientModel;
     private DocTableModel doctorsModel;
 
     private Image bgImage;
 
-	InfirmaryTab(CampaignGUI gui, String name) {
-		super(gui, name);
-	}
+    InfirmaryTab(CampaignGUI gui, String name) {
+        super(gui, name);
+    }
 
-	/* (non-Javadoc)
-	 * @see mekhq.gui.CampaignGuiTab#initTab()
-	 */
-	@Override
-	public void initTab() {
-		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", //$NON-NLS-1$;
-				new EncodeControl());
+    /*
+     * (non-Javadoc)
+     *
+     * @see mekhq.gui.CampaignGuiTab#initTab()
+     */
+    @Override
+    public void initTab() {
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", //$NON-NLS-1$ ;
+                new EncodeControl());
         GridBagConstraints gridBagConstraints;
 
         setLayout(new GridBagLayout());
 
         String bgImageFile = getIconPackage().getGuiElement("infirmary_background");
-        if(null != bgImageFile && !bgImageFile.isEmpty()) {
-        	bgImage = Toolkit.getDefaultToolkit().createImage(bgImageFile);
+        if (null != bgImageFile && !bgImageFile.isEmpty()) {
+            bgImage = Toolkit.getDefaultToolkit().createImage(bgImageFile);
         }
 
         doctorsModel = new DocTableModel(getCampaign());
@@ -125,8 +127,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
 
         assignedPatientModel = new PatientTableModel(getCampaign());
         listAssignedPatient = new JList<Person>(assignedPatientModel);
-        listAssignedPatient.setCellRenderer(assignedPatientModel
-                .getRenderer(getIconPackage()));
+        listAssignedPatient.setCellRenderer(assignedPatientModel.getRenderer(getIconPackage()));
         listAssignedPatient.setLayoutOrientation(JList.HORIZONTAL_WRAP);
         listAssignedPatient.setVisibleRowCount(-1);
         listAssignedPatient.getSelectionModel().addListSelectionListener(ev -> updateAssignDoctorEnabled());
@@ -138,8 +139,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         scrollAssignedPatient.getViewport().setOpaque(false);
         unassignedPatientModel = new PatientTableModel(getCampaign());
         listUnassignedPatient = new JList<Person>(unassignedPatientModel);
-        listUnassignedPatient.setCellRenderer(unassignedPatientModel
-                .getRenderer(getIconPackage()));
+        listUnassignedPatient.setCellRenderer(unassignedPatientModel.getRenderer(getIconPackage()));
         listUnassignedPatient.setLayoutOrientation(JList.HORIZONTAL_WRAP);
         listUnassignedPatient.setVisibleRowCount(-1);
         listUnassignedPatient.getSelectionModel().addListSelectionListener(ev -> updateAssignDoctorEnabled());
@@ -149,10 +149,10 @@ public final class InfirmaryTab extends CampaignGuiTab {
         scrollUnassignedPatient.setPreferredSize(new java.awt.Dimension(300, 300));
         scrollUnassignedPatient.setOpaque(false);
         scrollUnassignedPatient.getViewport().setOpaque(false);
-        listAssignedPatient.setBorder(BorderFactory.createTitledBorder(
-                resourceMap.getString("panAssignedPatient.title")));
-        listUnassignedPatient.setBorder(BorderFactory.createTitledBorder(
-                resourceMap.getString("panUnassignedPatient.title")));
+        listAssignedPatient
+                .setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panAssignedPatient.title")));
+        listUnassignedPatient
+                .setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panUnassignedPatient.title")));
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -173,41 +173,42 @@ public final class InfirmaryTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         add(scrollUnassignedPatient, gridBagConstraints);
-	}
+    }
 
-	/* (non-Javadoc)
-	 * @see mekhq.gui.CampaignGuiTab#refreshAll()
-	 */
-	@Override
-	public void refreshAll() {
+    /*
+     * (non-Javadoc)
+     *
+     * @see mekhq.gui.CampaignGuiTab#refreshAll()
+     */
+    @Override
+    public void refreshAll() {
         refreshPatientList();
         refreshDoctorsList();
-	}
+    }
 
-	/* (non-Javadoc)
-	 * @see mekhq.gui.CampaignGuiTab#tabType()
-	 */
-	@Override
-	public TabType tabType() {
-		return TabType.INFIRMARY;
-	}
+    /*
+     * (non-Javadoc)
+     *
+     * @see mekhq.gui.CampaignGuiTab#tabType()
+     */
+    @Override
+    public TabType tabType() {
+        return TabType.INFIRMARY;
+    }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if(null == bgImage) {
+        if (null == bgImage) {
             return;
         }
         int size = Math.max(getWidth(), getHeight());
-        g.drawImage(bgImage, 0, 0, size, size, new ImageObserver() {
-            @Override
-            public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
-                if((infoflags & ImageObserver.ALLBITS) != 0) {
-                    repaint();
-                    return false;
-                }
-                return true;
+        g.drawImage(bgImage, 0, 0, size, size, (img, infoflags, x, y, width, height) -> {
+            if ((infoflags & ImageObserver.ALLBITS) != 0) {
+                repaint();
+                return false;
             }
+            return true;
         });
     }
 
@@ -253,9 +254,8 @@ public final class InfirmaryTab extends CampaignGuiTab {
 
     private void updateAssignDoctorEnabled() {
         Person doctor = getSelectedDoctor();
-        btnAssignDoc.setEnabled((null != doctor)
-            && (getCampaign().getPatientsFor(doctor) < 25)
-            && (unassignedPatientModel.getSize() > 0));
+        btnAssignDoc.setEnabled((null != doctor) && (getCampaign().getPatientsFor(doctor) < 25)
+                && (unassignedPatientModel.getSize() > 0));
         btnUnassignDoc.setEnabled(!getSelectedAssignedPatients().isEmpty());
     }
 
@@ -266,30 +266,32 @@ public final class InfirmaryTab extends CampaignGuiTab {
 
     private void assignDoctor() {
         Person doctor = getSelectedDoctor();
-        if(null == doctor) {
+        if (null == doctor) {
             return;
         }
         Collection<Person> selectedPatients = getSelectedUnassignedPatients();
-        if(selectedPatients.isEmpty()) {
+        if (selectedPatients.isEmpty()) {
             // Pick the first in the list ... if there are any
             int patientSize = unassignedPatientModel.getSize();
-            for(int i = 0; i < patientSize; ++ i) {
+            for (int i = 0; i < patientSize; ++i) {
                 Person p = unassignedPatientModel.getElementAt(i);
-                if((null != p)
-                        && (p.needsFixing() || (getCampaign().getCampaignOptions().useAdvancedMedical() && p.needsAMFixing()))
+                if ((null != p)
+                        && (p.needsFixing()
+                                || (getCampaign().getCampaignOptions().useAdvancedMedical() && p.needsAMFixing()))
                         && (getCampaign().getPatientsFor(doctor) < 25)
                         && (getCampaign().getTargetFor(p, doctor).getValue() != TargetRoll.IMPOSSIBLE)) {
-                        p.setDoctorId(doctor.getId(), getCampaign().getCampaignOptions().getHealingWaitingPeriod());
-                        break;
-                    }
+                    p.setDoctorId(doctor.getId(), getCampaign().getCampaignOptions().getHealingWaitingPeriod());
+                    break;
+                }
             }
-            
+
         } else {
             for (Person p : selectedPatients) {
-                if((null != p)
-                    && (p.needsFixing() || (getCampaign().getCampaignOptions().useAdvancedMedical() && p.needsAMFixing()))
-                    && (getCampaign().getPatientsFor(doctor) < 25)
-                    && (getCampaign().getTargetFor(p, doctor).getValue() != TargetRoll.IMPOSSIBLE)) {
+                if ((null != p)
+                        && (p.needsFixing()
+                                || (getCampaign().getCampaignOptions().useAdvancedMedical() && p.needsAMFixing()))
+                        && (getCampaign().getPatientsFor(doctor) < 25)
+                        && (getCampaign().getTargetFor(p, doctor).getValue() != TargetRoll.IMPOSSIBLE)) {
                     p.setDoctorId(doctor.getId(), getCampaign().getCampaignOptions().getHealingWaitingPeriod());
                 }
             }
@@ -302,8 +304,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
     private void unassignDoctor() {
         for (Person p : getSelectedAssignedPatients()) {
             if ((null != p)) {
-                p.setDoctorId(null, getCampaign().getCampaignOptions()
-                        .getNaturalHealingWaitingPeriod());
+                p.setDoctorId(null, getCampaign().getCampaignOptions().getNaturalHealingWaitingPeriod());
             }
         }
 
@@ -326,16 +327,14 @@ public final class InfirmaryTab extends CampaignGuiTab {
         ArrayList<Person> unassigned = new ArrayList<Person>();
         for (Person patient : getCampaign().getPatients()) {
             // Knock out inactive doctors
-            if((patient != null)
-                && (patient.getDoctorId() != null)
-                && (getCampaign().getPerson(patient.getDoctorId()) != null)
-                && getCampaign().getPerson(patient.getDoctorId()).isInActive()) {
-                patient.setDoctorId(null, getCampaign().getCampaignOptions()
-                        .getNaturalHealingWaitingPeriod());
+            if ((patient != null) && (patient.getDoctorId() != null)
+                    && (getCampaign().getPerson(patient.getDoctorId()) != null)
+                    && getCampaign().getPerson(patient.getDoctorId()).isInActive()) {
+                patient.setDoctorId(null, getCampaign().getCampaignOptions().getNaturalHealingWaitingPeriod());
             }
-            if(patient.getDoctorId() == null) {
+            if (patient.getDoctorId() == null) {
                 unassigned.add(patient);
-            } else if((doctor != null) && patient.getDoctorId().equals(doctor.getId())) {
+            } else if ((doctor != null) && patient.getDoctorId().equals(doctor.getId())) {
                 assigned.add(patient);
             }
         }
@@ -345,21 +344,21 @@ public final class InfirmaryTab extends CampaignGuiTab {
         Arrays.fill(assignedIndices, Integer.MAX_VALUE);
         int[] unassignedIndices = new int[unassignedPatients.size()];
         Arrays.fill(unassignedIndices, Integer.MAX_VALUE);
-        
+
         assignedPatientModel.setData(assigned);
         unassignedPatientModel.setData(unassigned);
-        
+
         int i = 0;
-        for(Person patient : assignedPatients) {
+        for (Person patient : assignedPatients) {
             int idx = assigned.indexOf(patient);
             assignedIndices[i] = (idx >= 0) ? idx : Integer.MAX_VALUE;
-            ++ i;
+            ++i;
         }
         i = 0;
-        for(Person patient : unassignedPatients) {
+        for (Person patient : unassignedPatients) {
             int idx = unassigned.indexOf(patient);
             unassignedIndices[i] = (idx >= 0) ? idx : Integer.MAX_VALUE;
-            ++ i;
+            ++i;
         }
         listAssignedPatient.setSelectedIndices(assignedIndices);
         listUnassignedPatient.setSelectedIndices(unassignedIndices);

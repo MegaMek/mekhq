@@ -51,10 +51,10 @@ import mekhq.gui.model.LoanTableModel;
  * Shows record of financial transactions.
  */
 public final class FinancesTab extends CampaignGuiTab {
-	
-	private static final long serialVersionUID = -3203920871646865885L;
 
-	private JTable financeTable;
+    private static final long serialVersionUID = -3203920871646865885L;
+
+    private JTable financeTable;
     private JTable loanTable;
     private JTextArea areaNetWorth;
     private JButton btnAddFunds;
@@ -64,15 +64,17 @@ public final class FinancesTab extends CampaignGuiTab {
     private LoanTableModel loanModel;
 
     FinancesTab(CampaignGUI gui, String name) {
-		super(gui, name);
-		MekHQ.EVENT_BUS.register(this);
-	}
+        super(gui, name);
+        MekHQ.EVENT_BUS.register(this);
+    }
 
-	/* (non-Javadoc)
-	 * @see mekhq.gui.CampaignGuiTab#initTab()
-	 */
-	@Override
-	public void initTab() {
+    /*
+     * (non-Javadoc)
+     *
+     * @see mekhq.gui.CampaignGuiTab#initTab()
+     */
+    @Override
+    public void initTab() {
         GridBagConstraints gridBagConstraints;
 
         setLayout(new GridBagLayout());
@@ -121,9 +123,10 @@ public final class FinancesTab extends CampaignGuiTab {
         scrollLoanTable.setMinimumSize(new java.awt.Dimension(450, 150));
         scrollLoanTable.setPreferredSize(new java.awt.Dimension(450, 150));
         panLoan.setBorder(BorderFactory.createTitledBorder("Active Loans"));
-        //JSplitPane splitFinances = new JSplitPane(JSplitPane.VERTICAL_SPLIT,panBalance, panLoan);
-        //splitFinances.setOneTouchExpandable(true);
-        //splitFinances.setResizeWeight(1.0);
+        // JSplitPane splitFinances = new
+        // JSplitPane(JSplitPane.VERTICAL_SPLIT,panBalance, panLoan);
+        // splitFinances.setOneTouchExpandable(true);
+        // splitFinances.setResizeWeight(1.0);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -182,39 +185,43 @@ public final class FinancesTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 1.0;
         add(panelFinanceRight, gridBagConstraints);
-	}
-	
-	public JTable getFinanceTable() {
-		return financeTable;
-	}
-	
-	public FinanceTableModel getFinanceModel() {
-		return financeModel;
-	}
-	
-	public JTable getLoanTable() {
-		return loanTable;
-	}
-	
-	public LoanTableModel getLoanModel() {
-		return loanModel;
-	}
+    }
 
-	/* (non-Javadoc)
-	 * @see mekhq.gui.CampaignGuiTab#refreshAll()
-	 */
-	@Override
-	public void refreshAll() {
+    public JTable getFinanceTable() {
+        return financeTable;
+    }
+
+    public FinanceTableModel getFinanceModel() {
+        return financeModel;
+    }
+
+    public JTable getLoanTable() {
+        return loanTable;
+    }
+
+    public LoanTableModel getLoanModel() {
+        return loanModel;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see mekhq.gui.CampaignGuiTab#refreshAll()
+     */
+    @Override
+    public void refreshAll() {
         refreshFinancialTransactions();
-	}
+    }
 
-	/* (non-Javadoc)
-	 * @see mekhq.gui.CampaignGuiTab#tabType()
-	 */
-	@Override
-	public TabType tabType() {
-		return TabType.FINANCES;
-	}
+    /*
+     * (non-Javadoc)
+     *
+     * @see mekhq.gui.CampaignGuiTab#tabType()
+     */
+    @Override
+    public TabType tabType() {
+        return TabType.FINANCES;
+    }
 
     private void addFundsActionPerformed() {
         AddFundsDialog addFundsDialog = new AddFundsDialog(getFrame(), true);
@@ -240,8 +247,7 @@ public final class FinancesTab extends CampaignGuiTab {
     }
 
     private void manageAssets() {
-        ManageAssetsDialog mad = new ManageAssetsDialog(getFrame(),
-                getCampaign());
+        ManageAssetsDialog mad = new ManageAssetsDialog(getFrame(), getCampaign());
         mad.setVisible(true);
         getCampaignGui().refreshReport();
         getCampaignGui().refreshFunds();
@@ -263,7 +269,7 @@ public final class FinancesTab extends CampaignGuiTab {
 
     @Subscribe
     public void gmMode(GMModeEvent ev) {
-    	btnAddFunds.setEnabled(ev.isGMMode());
-    	btnManageAssets.setEnabled(ev.isGMMode());
+        btnAddFunds.setEnabled(ev.isGMMode());
+        btnManageAssets.setEnabled(ev.isGMMode());
     }
 }

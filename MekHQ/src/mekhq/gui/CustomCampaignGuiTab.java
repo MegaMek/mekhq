@@ -21,26 +21,25 @@ package mekhq.gui;
 
 /**
  * Abstract base class for custom gui tabs
- * 
+ *
  * @author Neoancient
  */
 public abstract class CustomCampaignGuiTab extends CampaignGuiTab {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1312671796115618117L;
 
-	public CustomCampaignGuiTab(CampaignGUI gui, String tabName) {
-		super(gui, tabName);
-	}
+    private static final long serialVersionUID = 1312671796115618117L;
 
-	/* (non-Javadoc)
-	 * @see mekhq.gui.CampaignGuiTab#tabType()
-	 */
-	@Override
-	final public TabType tabType() {
-		return TabType.CUSTOM;
-	}
+    public CustomCampaignGuiTab(CampaignGUI gui, String tabName) {
+        super(gui, tabName);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see mekhq.gui.CampaignGuiTab#tabType()
+     */
+    @Override
+    final public TabType tabType() {
+        return TabType.CUSTOM;
+    }
 
 }
