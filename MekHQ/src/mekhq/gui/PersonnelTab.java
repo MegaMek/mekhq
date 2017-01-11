@@ -57,7 +57,7 @@ import mekhq.gui.view.PersonViewPanel;
  * Tab for interacting with all personnel
  *
  */
-public class PersonnelTab extends CampaignGuiTab {
+public final class PersonnelTab extends CampaignGuiTab {
 	
     /**
 	 * 
@@ -107,7 +107,7 @@ public class PersonnelTab extends CampaignGuiTab {
     private PersonnelTableModel personModel;
     private TableRowSorter<PersonnelTableModel> personnelSorter;
 
-    public PersonnelTab(CampaignGUI gui, String name) {
+    PersonnelTab(CampaignGUI gui, String name) {
 		super(gui, name);
 		MekHQ.EVENT_BUS.register(this);
 	}

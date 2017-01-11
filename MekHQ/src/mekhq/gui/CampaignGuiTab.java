@@ -29,12 +29,13 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 
 /**
- * Abstract base class for CampaignGUI tab components
+ * Abstract base class for CampaignGUI tab components. Custom tabs should extend CustomCampaignGuiTab
+ * instead of this one.
  * 
  * @author Neoancient
  *
  */
-public abstract class CampaignGuiTab extends JPanel {
+abstract class CampaignGuiTab extends JPanel {
 	
 	/**
 	 * 
@@ -106,7 +107,7 @@ public abstract class CampaignGuiTab extends JPanel {
 	
 	protected String tabName;
 	
-	public CampaignGuiTab(CampaignGUI gui, String tabName) {
+	CampaignGuiTab(CampaignGUI gui, String tabName) {
 		this.gui = gui;
 		this.tabName = tabName;
 		initTab();

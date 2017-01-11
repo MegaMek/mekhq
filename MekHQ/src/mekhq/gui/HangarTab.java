@@ -70,7 +70,7 @@ import mekhq.gui.view.UnitViewPanel;
  * Displays table of all units in the force.
  *
  */
-public class HangarTab extends CampaignGuiTab {
+public final class HangarTab extends CampaignGuiTab {
 	
     /**
 	 * 
@@ -97,7 +97,7 @@ public class HangarTab extends CampaignGuiTab {
     private ProcurementTableModel acquireUnitsModel;
     private TableRowSorter<UnitTableModel> unitSorter;
 
-	public HangarTab(CampaignGUI gui, String name) {
+	HangarTab(CampaignGUI gui, String name) {
 		super(gui, name);
 	}
 

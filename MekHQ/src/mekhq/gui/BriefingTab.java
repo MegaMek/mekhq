@@ -86,7 +86,7 @@ import mekhq.gui.view.ScenarioViewPanel;
  * Displays Mission/Contract and Scenario details.
  *
  */
-public class BriefingTab extends CampaignGuiTab {
+public final class BriefingTab extends CampaignGuiTab {
 
     /**
 	 * 
@@ -122,7 +122,7 @@ public class BriefingTab extends CampaignGuiTab {
 
     public int selectedMission;
 
-	public BriefingTab(CampaignGUI gui, String tabName) {
+	BriefingTab(CampaignGUI gui, String tabName) {
 		super(gui, tabName);
 		selectedMission = -1;
 		MekHQ.EVENT_BUS.register(this);

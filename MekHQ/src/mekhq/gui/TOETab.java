@@ -44,7 +44,7 @@ import mekhq.gui.view.UnitViewPanel;
  * Display organization tree (TO&E) and force/unit summary
  *
  */
-public class TOETab extends CampaignGuiTab {
+public final class TOETab extends CampaignGuiTab {
 	
     /**
 	 * 
@@ -57,7 +57,7 @@ public class TOETab extends CampaignGuiTab {
 
     private OrgTreeModel orgModel;
 
-	public TOETab(CampaignGUI gui, String name) {
+	TOETab(CampaignGUI gui, String name) {
 		super(gui, name);
 	}
 

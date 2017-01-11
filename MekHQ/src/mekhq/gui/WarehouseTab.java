@@ -85,7 +85,7 @@ import mekhq.gui.sorter.TechSorter;
  * Displays all spare parts in stock and on order and permits repair of damaged parts.
  */
 
-public class WarehouseTab extends CampaignGuiTab {
+public final class WarehouseTab extends CampaignGuiTab {
 	
     /**
 	 * 
@@ -136,7 +136,7 @@ public class WarehouseTab extends CampaignGuiTab {
     private TableRowSorter<ProcurementTableModel> acquirePartsSorter;
     private TableRowSorter<TechTableModel> techSorter;
 
-    public WarehouseTab(CampaignGUI gui, String name) {
+    WarehouseTab(CampaignGUI gui, String name) {
 		super(gui, name);
 	}
 

@@ -45,7 +45,7 @@ import mekhq.gui.view.PlanetViewPanel;
  * Displays interstellar map and contains transit controls.
  *
  */
-public class MapTab extends CampaignGuiTab {
+public final class MapTab extends CampaignGuiTab {
 	
     /**
 	 * 
@@ -58,7 +58,7 @@ public class MapTab extends CampaignGuiTab {
     private JScrollPane scrollPlanetView;
     JSuggestField suggestPlanet;
 
-    public MapTab(CampaignGUI gui, String tabName) {
+    MapTab(CampaignGUI gui, String tabName) {
 		super(gui, tabName);
 		MekHQ.EVENT_BUS.register(this);
 	}
