@@ -16,31 +16,31 @@ import mekhq.Utilities;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.CampaignGUI;
+import mekhq.gui.RepairTab;
 import mekhq.gui.dialog.MassRepairSalvageDialog;
 import mekhq.gui.utilities.MenuScroller;
 import mekhq.gui.utilities.StaticChecks;
 
 public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
         implements ActionListener {
-    private CampaignGUI gui;
+    private RepairTab repairTab;
 
-    public ServicedUnitsTableMouseAdapter(CampaignGUI gui) {
+    public ServicedUnitsTableMouseAdapter(RepairTab repairTab) {
         super();
-        this.gui = gui;
+        this.repairTab = repairTab;
     }
 
     public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
         @SuppressWarnings("unused")
-        Unit selectedUnit = gui.getServicedUnitModel()
-                .getUnit(gui.getServicedUnitTable()
-                        .convertRowIndexToModel(gui.getServicedUnitTable()
+        Unit selectedUnit = repairTab.getServicedUnitModel()
+                .getUnit(repairTab.getServicedUnitTable()
+                        .convertRowIndexToModel(repairTab.getServicedUnitTable()
                                 .getSelectedRow()));
-        int[] rows = gui.getServicedUnitTable().getSelectedRows();
+        int[] rows = repairTab.getServicedUnitTable().getSelectedRows();
         Unit[] units = new Unit[rows.length];
         for (int i = 0; i < rows.length; i++) {
-            units[i] = gui.getServicedUnitModel().getUnit(gui.getServicedUnitTable()
+            units[i] = repairTab.getServicedUnitModel().getUnit(repairTab.getServicedUnitTable()
                     .convertRowIndexToModel(rows[i]));
         }
         if (command.contains("ASSIGN_TECH")) {
@@ -60,7 +60,7 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
         } else if (command.contains("SWAP_AMMO")) {
             String sel = command.split(":")[1];
             int selAmmoId = Integer.parseInt(sel);
-            Part part = gui.getCampaign().getPart(selAmmoId);
+            Part part = repairTab.getCampaign().getPart(selAmmoId);
             if (null == part || !(part instanceof AmmoBin)) {
                 return;
             }
@@ -68,12 +68,12 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
             sel = command.split(":")[2];
             long munition = Long.parseLong(sel);
             ammo.changeMunition(munition);
-            gui.refreshTaskList();
-            gui.refreshAcquireList();
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshOverview();
-            gui.filterTasks();
+            repairTab.refreshTaskList();
+            repairTab.refreshAcquireList();
+            repairTab.refreshServicedUnitList();
+            repairTab.getCampaignGui().refreshUnitList();
+            repairTab.getCampaignGui().refreshOverview();
+            repairTab.filterTasks();
         } else if (command.contains("CHANGE_SITE")) {
             for (Unit unit : units) {
                 if (!unit.isDeployed()) {
@@ -84,29 +84,29 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
                     }
                 }
             }
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshTaskList();
-            gui.refreshAcquireList();
-            gui.refreshOverview();
+            repairTab.refreshServicedUnitList();
+            repairTab.getCampaignGui().refreshUnitList();
+            repairTab.refreshTaskList();
+            repairTab.refreshAcquireList();
+            repairTab.getCampaignGui().refreshOverview();
         } else if (command.equalsIgnoreCase("SALVAGE")) {
             for (Unit unit : units) {
                 if (!unit.isDeployed()) {
                     unit.setSalvage(true);
                 }
             }
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshOverview();
+            repairTab.refreshServicedUnitList();
+            repairTab.getCampaignGui().refreshUnitList();
+            repairTab.getCampaignGui().refreshOverview();
         } else if (command.equalsIgnoreCase("REPAIR")) {
             for (Unit unit : units) {
                 if (!unit.isDeployed() && unit.isRepairable()) {
                     unit.setSalvage(false);
                 }
             }
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshOverview();
+            repairTab.refreshServicedUnitList();
+            repairTab.getCampaignGui().refreshUnitList();
+            repairTab.getCampaignGui().refreshOverview();
         } else if (command.contains("MASS_REPAIR_SALVAGE")) {
             Unit unit = null;
             
@@ -115,15 +115,15 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
             }
             
             if (unit.isDeployed()) {
-    			JOptionPane.showMessageDialog(gui.getFrame(),
+    			JOptionPane.showMessageDialog(repairTab.getFrame(),
     					"Unit is currently deployed and can not be repaired.",
     					"Unit is deployed", JOptionPane.ERROR_MESSAGE);
             } else {
-				MassRepairSalvageDialog.performSingleUnitMassRepairOrSalvage(gui, unit);
+				MassRepairSalvageDialog.performSingleUnitMassRepairOrSalvage(repairTab.getCampaignGui(), unit);
 	
-				gui.refreshServicedUnitList();
-				gui.refreshUnitList();
-				gui.refreshOverview();
+				repairTab.refreshServicedUnitList();
+				repairTab.getCampaignGui().refreshUnitList();
+				repairTab.getCampaignGui().refreshOverview();
             }
         } else if (command.equalsIgnoreCase("REMOVE")) {
             for (Unit unit : units) {
@@ -133,32 +133,32 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
                             "Do you really want to remove "
                                     + unit.getName() + "?", "Remove Unit?",
                             JOptionPane.YES_NO_OPTION)) {
-                        gui.getCampaign().removeUnit(unit.getId());
+                        repairTab.getCampaign().removeUnit(unit.getId());
                     }
                 }
             }
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshReport();
-            gui.refreshOverview();
+            repairTab.refreshServicedUnitList();
+            repairTab.getCampaignGui().refreshUnitList();
+            repairTab.getCampaignGui().refreshReport();
+            repairTab.getCampaignGui().refreshOverview();
         } else if (command.equalsIgnoreCase("UNDEPLOY")) {
             for (Unit unit : units) {
                 if (unit.isDeployed()) {
-                    gui.undeployUnit(unit);
+                    repairTab.getCampaignGui().undeployUnit(unit);
                 }
             }
-            gui.refreshPersonnelList();
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshOrganization();
-            gui.refreshTaskList();
-            gui.refreshUnitView();
-            gui.refreshPartsList();
-            gui.refreshAcquireList();
-            gui.refreshReport();
-            gui.refreshPatientList();
-            gui.refreshScenarioList();
-            gui.refreshOverview();
+            repairTab.getCampaignGui().refreshPersonnelList();
+            repairTab.refreshServicedUnitList();
+            repairTab.getCampaignGui().refreshUnitList();
+            repairTab.getCampaignGui().refreshOrganization();
+            repairTab.refreshTaskList();
+            repairTab.getCampaignGui().refreshUnitView();
+            repairTab.getCampaignGui().refreshPartsList();
+            repairTab.refreshAcquireList();
+            repairTab.getCampaignGui().refreshReport();
+            repairTab.getCampaignGui().refreshPatientList();
+            repairTab.getCampaignGui().refreshScenarioList();
+            repairTab.getCampaignGui().refreshOverview();
         }
     }
 
@@ -175,17 +175,17 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
     private void maybeShowPopup(MouseEvent e) {
         JPopupMenu popup = new JPopupMenu();
         if (e.isPopupTrigger()) {
-            if (gui.getServicedUnitTable().getSelectedRowCount() == 0) {
+            if (repairTab.getServicedUnitTable().getSelectedRowCount() == 0) {
                 return;
             }
-            int[] rows = gui.getServicedUnitTable().getSelectedRows();
-            int row = gui.getServicedUnitTable().getSelectedRow();
-            boolean oneSelected = gui.getServicedUnitTable().getSelectedRowCount() == 1;
-            Unit unit = gui.getServicedUnitModel().getUnit(gui.getServicedUnitTable()
+            int[] rows = repairTab.getServicedUnitTable().getSelectedRows();
+            int row = repairTab.getServicedUnitTable().getSelectedRow();
+            boolean oneSelected = repairTab.getServicedUnitTable().getSelectedRowCount() == 1;
+            Unit unit = repairTab.getServicedUnitModel().getUnit(repairTab.getServicedUnitTable()
                     .convertRowIndexToModel(row));
             Unit[] units = new Unit[rows.length];
             for (int i = 0; i < rows.length; i++) {
-                units[i] = gui.getServicedUnitModel().getUnit(gui.getServicedUnitTable()
+                units[i] = repairTab.getServicedUnitModel().getUnit(repairTab.getServicedUnitTable()
                         .convertRowIndexToModel(rows[i]));
             }
             JMenuItem menuItem = null;
@@ -228,7 +228,7 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
                     ammoMenu = new JMenu(ammo.getType().getDesc());
                     AmmoType curType = (AmmoType) ammo.getType();
                     for (AmmoType atype : Utilities.getMunitionsFor(unit
-                            .getEntity(), curType, gui.getCampaign()
+                            .getEntity(), curType, repairTab.getCampaign()
                             .getCampaignOptions().getTechLevel())) {
                         cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
                         if (atype.equals(curType)

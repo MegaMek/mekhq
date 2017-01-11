@@ -393,8 +393,9 @@ public final class WarehouseTab extends CampaignGuiTab {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         panelDoTaskWarehouse.add(btnShowAllTechsWarehouse, gridBagConstraints);
 
-        techsModel = new TechTableModel(getCampaignGui());
-        techTable = new JTable(techsModel);
+        techTable = new JTable();
+        techsModel = new TechTableModel(getCampaignGui(), techTable);
+        techTable.setModel(techsModel);
         techTable.setRowHeight(60);
         techTable.getColumnModel().getColumn(0)
                 .setCellRenderer(techsModel.getRenderer(getIconPackage()));
@@ -735,6 +736,10 @@ public final class WarehouseTab extends CampaignGuiTab {
         getCampaignGui().refreshTaskList();
         getCampaignGui().refreshAcquireList();
         refreshTechsList();
+        if (getCampaignGui().getTab(CampaignGuiTab.TabType.REPAIR) != null) {
+        	((RepairTab)getCampaignGui().getTab(CampaignGuiTab.TabType.REPAIR))
+        		.refreshTechsList(); // NOI18N
+        }
         refreshPartsList();
         getCampaignGui().refreshReport();
         getCampaignGui().refreshFunds();

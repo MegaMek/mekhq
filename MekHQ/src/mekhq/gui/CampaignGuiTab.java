@@ -92,6 +92,7 @@ abstract class CampaignGuiTab extends JPanel {
 			case WAREHOUSE:
 				return new WarehouseTab(gui, name);
 			case REPAIR:
+				return new RepairTab(gui, name);
 			case INFIRMARY:
 			case MEKLAB:
 			case FINANCES:

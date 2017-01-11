@@ -26,6 +26,7 @@ public class TaskTableModel extends DataTableModel {
     private static Map<String, Person> techCache = new HashMap<String, Person>();
     
     private CampaignGUI campaignGUI;
+    private JTable techTable;
     
     private interface REPAIR_STATE {
     	public static final int AVAILABLE = 0;
@@ -35,11 +36,12 @@ public class TaskTableModel extends DataTableModel {
     	public static final int SCHEDULED = 4;
     }
     
-    public TaskTableModel(CampaignGUI campaignGUI) {
+    public TaskTableModel(CampaignGUI campaignGUI, JTable techTable) {
         columnNames = new String[] { "Tasks" };
         data = new ArrayList<Part>();
         
         this.campaignGUI = campaignGUI;
+        this.techTable = techTable;
     }
 
     public Object getValueAt(int row, int col) {
@@ -57,6 +59,14 @@ public class TaskTableModel extends DataTableModel {
             tasks[i] = (Part) data.get(row);
         }
         return tasks;
+    }
+
+    public Person getSelectedTech() {
+        int row = techTable.getSelectedRow();
+        if (row < 0) {
+            return null;
+        }
+        return ((TechTableModel)techTable.getModel()).getTechAt(techTable.convertRowIndexToModel(row));
     }
 
     public TaskTableModel.Renderer getRenderer(IconPackage icons) {
@@ -110,7 +120,7 @@ public class TaskTableModel extends DataTableModel {
             	}
             	
             	if (availableLevel == REPAIR_STATE.AVAILABLE) {
-	                Person tech = campaignGUI.getSelectedTech();
+	                Person tech = getSelectedTech();
 	                
 	                if (null == tech) {
 	                	//Find a valid tech that we can copy their skill from
