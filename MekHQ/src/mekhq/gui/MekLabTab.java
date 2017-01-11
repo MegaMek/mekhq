@@ -69,7 +69,7 @@ import mekhq.Utilities;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
 
-public class MekLabPanel extends JPanel {
+public class MekLabTab extends CampaignGuiTab {
 
     private static final long serialVersionUID = -5836932822468918198L;
 
@@ -102,8 +102,15 @@ public class MekLabPanel extends JPanel {
     
     private JPanel shoppingPanel;
     
-    public MekLabPanel(CampaignGUI gui) {
-    	campaignGUI = gui;
+    MekLabTab(CampaignGUI gui, String name) {
+    	super(gui, name);
+
+		this.repaint();
+    }
+
+
+	@Override
+	public void initTab() {
 		entityVerifier = EntityVerifier.getInstance(new File("data/mechfiles/UnitVerifierOptions.xml"));
         UnitUtil.loadFonts();
         new CConfig();
@@ -137,18 +144,25 @@ public class MekLabPanel extends JPanel {
 				clearUnit();
 			}
 		});
-        initComponents();
-        this.repaint();
-    }
-    
-    public void initComponents() {
+
     	setLayout(new BorderLayout());
     	emptyPanel = new JPanel(new BorderLayout());
 		emptyPanel.add(new JLabel("No Unit Loaded"), BorderLayout.PAGE_START);
 		add(emptyPanel, BorderLayout.CENTER);
-    }
+	}
 
-    public Unit getUnit() {
+	@Override
+	public void refreshAll() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public TabType tabType() {
+		return TabType.MEKLAB;
+	}
+
+	public Unit getUnit() {
     	return unit;
     }
     

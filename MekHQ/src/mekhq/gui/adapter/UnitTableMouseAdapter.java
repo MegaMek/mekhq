@@ -40,7 +40,9 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.CampaignGuiTab;
 import mekhq.gui.HangarTab;
+import mekhq.gui.MekLabTab;
 import mekhq.gui.dialog.BombsDialog;
 import mekhq.gui.dialog.CamoChoiceDialog;
 import mekhq.gui.dialog.ChooseRefitDialog;
@@ -390,7 +392,10 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             hangarTab.getCampaignGui().refreshTechsList();
         } else if (command.contains("CUSTOMIZE")
                 && !command.contains("CANCEL")) {
-            hangarTab.getCampaignGui().getPanMekLab().loadUnit(selectedUnit);
+        	if (hangarTab.getCampaignGui().hasTab(CampaignGuiTab.TabType.MEKLAB)) {
+        		((MekLabTab)hangarTab.getCampaignGui().getTab(CampaignGuiTab.TabType.MEKLAB))
+        			.loadUnit(selectedUnit);
+        	}
             hangarTab.getCampaignGui().getTabMain().setSelectedIndex(8);
         } else if (command.contains("CANCEL_CUSTOMIZE")) {
             if (selectedUnit.isRefitting()) {
@@ -866,16 +871,18 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                                 || unit.getEntity() instanceof BattleArmor
                                 || unit.getEntity() instanceof megamek.common.Protomech));
                 menu.add(menuItem);
-                menuItem = new JMenuItem("Customize in Mek Lab...");
-                menuItem.setActionCommand("CUSTOMIZE");
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(unit.isAvailable()
-                        && (unit.getEntity() instanceof megamek.common.Mech
-                                || unit.getEntity() instanceof megamek.common.Tank
-                                || (unit.getEntity() instanceof megamek.common.Aero && unit
-                                        .getEntity().getClass() == Aero.class) || (unit
-                                    .getEntity() instanceof Infantry)));
-                menu.add(menuItem);
+                if (hangarTab.getCampaignGui().hasTab(CampaignGuiTab.TabType.MEKLAB)) {
+	                menuItem = new JMenuItem("Customize in Mek Lab...");
+	                menuItem.setActionCommand("CUSTOMIZE");
+	                menuItem.addActionListener(this);
+	                menuItem.setEnabled(unit.isAvailable()
+	                        && (unit.getEntity() instanceof megamek.common.Mech
+	                                || unit.getEntity() instanceof megamek.common.Tank
+	                                || (unit.getEntity() instanceof megamek.common.Aero && unit
+	                                        .getEntity().getClass() == Aero.class) || (unit
+	                                    .getEntity() instanceof Infantry)));
+	                menu.add(menuItem);
+                }
                 if (unit.isRefitting()) {
                     menuItem = new JMenuItem("Cancel Customization");
                     menuItem.setActionCommand("CANCEL_CUSTOMIZE");

@@ -206,9 +206,6 @@ public class CampaignGUI extends JPanel {
     
     private EnumMap<CampaignGuiTab.TabType,CampaignGuiTab> standardTabs;
 
-    /* For the mek lab tab */
-    private MekLabPanel panMekLab;
-
     /* For the finances tab */
     private JPanel panFinances;
     private JTable financeTable;
@@ -409,11 +406,7 @@ public class CampaignGUI extends JPanel {
         addStandardTab(CampaignGuiTab.TabType.WAREHOUSE);
         addStandardTab(CampaignGuiTab.TabType.REPAIR);
         addStandardTab(CampaignGuiTab.TabType.INFIRMARY);
-
-        panMekLab = new MekLabPanel(this);
-        tabMain.addTab(
-                resourceMap.getString("panMekLab.TabConstraints.tabTitle"),
-                new JScrollPane(getPanMekLab())); // NOI18N
+        addStandardTab(CampaignGuiTab.TabType.MEKLAB);
 
         initFinanceTab();
         tabMain.addTab(
@@ -495,6 +488,10 @@ public class CampaignGUI extends JPanel {
     
     public CampaignGuiTab getTab(CampaignGuiTab.TabType tabType) {
     	return standardTabs.get(tabType);
+    }
+    
+    public boolean hasTab(CampaignGuiTab.TabType tabType) {
+    	return standardTabs.containsKey(tabType);
     }
     
     /**
@@ -2257,7 +2254,9 @@ public class CampaignGUI extends JPanel {
             return;
         }
         getCampaign().refit(r);
-        getPanMekLab().clearUnit();
+        if (hasTab(CampaignGuiTab.TabType.MEKLAB)) {
+        	((MekLabTab)getTab(CampaignGuiTab.TabType.MEKLAB)).clearUnit();
+        }
         refreshReport();
         refreshFunds();
         refreshFinancialTransactions();
@@ -3417,27 +3416,28 @@ public class CampaignGUI extends JPanel {
     }
 
     public void refreshLab() {
-        if (null == getPanMekLab()) {
-            return;
-        }
-        Unit u = getPanMekLab().getUnit();
-        if (null == u) {
-            return;
-        }
-        if (null == getCampaign().getUnit(u.getId())) {
-            // this unit has been removed so clear the mek lab
-            getPanMekLab().clearUnit();
-        } else {
-            // put a try-catch here so that bugs in the meklab don't screw up
-            // other stuff
-            try {
-                getPanMekLab().refreshSummary();
-            } catch (Exception err) {
-                err.printStackTrace();
-            }
-        }
+    	MekLabTab lab = (MekLabTab)getTab(CampaignGuiTab.TabType.MEKLAB);
+    	if (null == lab) {
+    		return;
+    	}
+    	Unit u = lab.getUnit();
+    	if (null == u) {
+    		return;
+    	}
+    	if (null == getCampaign().getUnit(u.getId())) {
+    		// this unit has been removed so clear the mek lab
+    		lab.clearUnit();
+    	} else {
+    		// put a try-catch here so that bugs in the meklab don't screw up
+    		// other stuff
+    		try {
+    			lab.refreshSummary();
+    		} catch (Exception err) {
+    			err.printStackTrace();
+    		}
+    	}
     }
-    
+
     //TODO: Trigger from event
     public void refreshTechsList() {
         if (getTab(CampaignGuiTab.TabType.WAREHOUSE) != null) {
@@ -3624,13 +3624,6 @@ public class CampaignGUI extends JPanel {
                 prevId = parent.getId();
             }
         }
-    }
-
-    /**
-     * @return the panMekLab
-     */
-    public MekLabPanel getPanMekLab() {
-        return panMekLab;
     }
 
     public JTabbedPane getTabMain() {

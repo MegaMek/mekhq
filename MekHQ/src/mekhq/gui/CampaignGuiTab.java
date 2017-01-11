@@ -35,11 +35,8 @@ import mekhq.campaign.CampaignOptions;
  * @author Neoancient
  *
  */
-abstract class CampaignGuiTab extends JPanel {
+public abstract class CampaignGuiTab extends JPanel {
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 6091435251932963385L;
 
     public enum TabType {
@@ -96,6 +93,7 @@ abstract class CampaignGuiTab extends JPanel {
 			case INFIRMARY:
 				return new InfirmaryTab(gui, name);
 			case MEKLAB:
+				return new MekLabTab(gui, name);
 			case FINANCES:
 			case OVERVIEW:
 			default:
