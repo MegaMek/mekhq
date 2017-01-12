@@ -78,7 +78,7 @@ import mekhq.gui.sorter.UnitTypeSorter;
  * Shows damaged units and controls for repair.
  *
  */
-public final class RepairTab extends CampaignGuiTab {
+public final class RepairTab extends TechWorkGuiTab {
 
     private static final long serialVersionUID = 6757065427956450309L;
 
@@ -229,9 +229,8 @@ public final class RepairTab extends CampaignGuiTab {
 
         JPanel panTasks = new JPanel(new GridBagLayout());
 
-        techTable = new JTable();
-        techsModel = new TechTableModel(getCampaignGui(), techTable);
-        techTable.setModel(techsModel);
+        techsModel = new TechTableModel(this);
+        techTable = new JTable(techsModel);
         techTable.setRowHeight(60);
         techTable.getColumnModel().getColumn(0).setCellRenderer(techsModel.getRenderer(getIconPackage()));
         techTable.getSelectionModel().addListSelectionListener(ev -> techTableValueChanged(ev));
@@ -319,9 +318,8 @@ public final class RepairTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 1.0;
         panTasks.add(panDoTask, gridBagConstraints);
 
-        taskTable = new JTable();
-        taskModel = new TaskTableModel(getCampaignGui(), taskTable);
-        taskTable.setModel(taskModel);
+        taskModel = new TaskTableModel(this);
+        taskTable = new JTable(taskModel);
         taskTable.setRowHeight(70);
         taskTable.getColumnModel().getColumn(0).setCellRenderer(taskModel.getRenderer(getIconPackage()));
         taskTable.getSelectionModel().addListSelectionListener(ev -> taskTableValueChanged());
@@ -431,7 +429,7 @@ public final class RepairTab extends CampaignGuiTab {
 
         filterTechs();
     }
-    
+
     public JTable getServicedUnitTable() {
         return servicedUnitTable;
     }
@@ -439,7 +437,7 @@ public final class RepairTab extends CampaignGuiTab {
     public JTable getTaskTable() {
         return taskTable;
     }
-    
+
     public JTable getAcquisitionTable() {
         return acquisitionTable;
     }
@@ -447,11 +445,11 @@ public final class RepairTab extends CampaignGuiTab {
     public UnitTableModel getServicedUnitModel() {
         return servicedUnitModel;
     }
-    
+
     public TaskTableModel getTaskModel() {
         return taskModel;
     }
-    
+
     public AcquisitionTableModel getAcquireModel() {
         return acquireModel;
     }
@@ -557,6 +555,7 @@ public final class RepairTab extends CampaignGuiTab {
         return GuiTabType.REPAIR;
     }
 
+    @Override
     public Person getSelectedTech() {
         int row = techTable.getSelectedRow();
         if (row < 0) {
@@ -565,6 +564,7 @@ public final class RepairTab extends CampaignGuiTab {
         return techsModel.getTechAt(techTable.convertRowIndexToModel(row));
     }
 
+    @Override
     public Part getSelectedTask() {
         int row = taskTable.getSelectedRow();
         if (row < 0) {

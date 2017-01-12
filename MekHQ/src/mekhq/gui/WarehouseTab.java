@@ -86,7 +86,7 @@ import mekhq.gui.sorter.TechSorter;
  * parts.
  */
 
-public final class WarehouseTab extends CampaignGuiTab {
+public final class WarehouseTab extends TechWorkGuiTab {
 
     private static final long serialVersionUID = 9172184916479921364L;
 
@@ -140,7 +140,7 @@ public final class WarehouseTab extends CampaignGuiTab {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see mekhq.gui.CampaignGuiTab#initTab()
      */
     @Override
@@ -370,9 +370,8 @@ public final class WarehouseTab extends CampaignGuiTab {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         panelDoTaskWarehouse.add(btnShowAllTechsWarehouse, gridBagConstraints);
 
-        techTable = new JTable();
-        techsModel = new TechTableModel(getCampaignGui(), techTable);
-        techTable.setModel(techsModel);
+        techsModel = new TechTableModel(this);
+        techTable = new JTable(techsModel);
         techTable.setRowHeight(60);
         techTable.getColumnModel().getColumn(0).setCellRenderer(techsModel.getRenderer(getIconPackage()));
         techTable.getSelectionModel().addListSelectionListener(ev -> updateTechTarget());
@@ -436,7 +435,7 @@ public final class WarehouseTab extends CampaignGuiTab {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see mekhq.gui.CampaignGuiTab#refreshAll()
      */
     @Override
@@ -447,7 +446,7 @@ public final class WarehouseTab extends CampaignGuiTab {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see mekhq.gui.CampaignGuiTab#tabType()
      */
     @Override
@@ -750,6 +749,7 @@ public final class WarehouseTab extends CampaignGuiTab {
         }
     }
 
+    @Override
     public Person getSelectedTech() {
         int row = techTable.getSelectedRow();
         if (row < 0) {
@@ -758,6 +758,7 @@ public final class WarehouseTab extends CampaignGuiTab {
         return techsModel.getTechAt(techTable.convertRowIndexToModel(row));
     }
 
+    @Override
     public Part getSelectedTask() {
         int row = partsTable.getSelectedRow();
         if (row < 0) {
