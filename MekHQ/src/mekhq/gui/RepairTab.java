@@ -16,15 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package mekhq.gui;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -32,11 +30,8 @@ import java.util.UUID;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -48,7 +43,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
-import javax.swing.event.MouseInputAdapter;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -66,6 +60,7 @@ import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.gui.adapter.AcquisitionTableMouseAdapter;
 import mekhq.gui.adapter.ServicedUnitsTableMouseAdapter;
 import mekhq.gui.adapter.TaskTableMouseAdapter;
 import mekhq.gui.dialog.MassRepairSalvageDialog;
@@ -356,7 +351,7 @@ public final class RepairTab extends CampaignGuiTab {
         acquisitionTable.setRowHeight(70);
         acquisitionTable.getColumnModel().getColumn(0).setCellRenderer(acquireModel.getRenderer(getIconPackage()));
         acquisitionTable.getSelectionModel().addListSelectionListener(ev -> acquisitionTableValueChanged());
-        acquisitionTable.addMouseListener(new AcquisitionTableMouseAdapter());
+        acquisitionTable.addMouseListener(new AcquisitionTableMouseAdapter(this));
         JScrollPane scrollAcquisitionTable = new JScrollPane(acquisitionTable);
         scrollAcquisitionTable.setMinimumSize(new java.awt.Dimension(200, 200));
         scrollAcquisitionTable.setPreferredSize(new java.awt.Dimension(300, 300));
@@ -444,6 +439,10 @@ public final class RepairTab extends CampaignGuiTab {
     public JTable getTaskTable() {
         return taskTable;
     }
+    
+    public JTable getAcquisitionTable() {
+        return acquisitionTable;
+    }
 
     public UnitTableModel getServicedUnitModel() {
         return servicedUnitModel;
@@ -451,6 +450,10 @@ public final class RepairTab extends CampaignGuiTab {
     
     public TaskTableModel getTaskModel() {
         return taskModel;
+    }
+    
+    public AcquisitionTableModel getAcquireModel() {
+        return acquireModel;
     }
 
     protected boolean repairsSelected() {
@@ -951,64 +954,5 @@ public final class RepairTab extends CampaignGuiTab {
             uuid = getSelectedServicedUnit().getId();
         }
         acquireModel.setData(getCampaign().getAcquisitionsForUnit(uuid));
-    }
-
-    public class AcquisitionTableMouseAdapter extends MouseInputAdapter implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent action) {
-            String command = action.getActionCommand();
-            IAcquisitionWork acquisitionWork = acquireModel
-                    .getAcquisitionAt(acquisitionTable.convertRowIndexToModel(acquisitionTable.getSelectedRow()));
-            if (acquisitionWork instanceof AmmoBin) {
-                acquisitionWork = ((AmmoBin) acquisitionWork).getAcquisitionWork();
-            }
-            if (null == acquisitionWork) {
-                return;
-            }
-            if (command.contains("FIX")) {
-                getCampaign().addReport(acquisitionWork.find(0));
-
-                refreshServicedUnitList();
-                getCampaignGui().refreshUnitList();
-                refreshTaskList();
-                refreshAcquireList();
-                getCampaignGui().refreshPartsList();
-                getCampaignGui().refreshOverview();
-                filterTasks();
-            }
-        }
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        private void maybeShowPopup(MouseEvent e) {
-            JPopupMenu popup = new JPopupMenu();
-            if (e.isPopupTrigger()) {
-                int row = acquisitionTable.getSelectedRow();
-                if (row < 0) {
-                    return;
-                }
-                JMenuItem menuItem = null;
-                JMenu menu = null;
-                menu = new JMenu("GM Mode");
-                popup.add(menu);
-                // Auto complete task
-
-                menuItem = new JMenuItem("Complete Task");
-                menuItem.setActionCommand("FIX");
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(getCampaign().isGM());
-                menu.add(menuItem);
-
-                popup.show(e.getComponent(), e.getX(), e.getY());
-            }
-        }
     }
 }
