@@ -110,8 +110,8 @@ public final class PersonnelTab extends CampaignGuiTab {
     }
 
     @Override
-    public TabType tabType() {
-        return TabType.PERSONNEL;
+    public GuiTabType tabType() {
+        return GuiTabType.PERSONNEL;
     }
 
     /*

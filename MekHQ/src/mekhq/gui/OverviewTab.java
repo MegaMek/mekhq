@@ -236,8 +236,8 @@ public final class OverviewTab extends CampaignGuiTab {
      * @see mekhq.gui.CampaignGuiTab#tabType()
      */
     @Override
-    public TabType tabType() {
-        return TabType.OVERVIEW;
+    public GuiTabType tabType() {
+        return GuiTabType.OVERVIEW;
     }
 
     private void initOverviewPartsInUse() {

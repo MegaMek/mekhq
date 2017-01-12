@@ -451,8 +451,8 @@ public final class WarehouseTab extends CampaignGuiTab {
      * @see mekhq.gui.CampaignGuiTab#tabType()
      */
     @Override
-    public TabType tabType() {
-        return TabType.WAREHOUSE;
+    public GuiTabType tabType() {
+        return GuiTabType.WAREHOUSE;
     }
 
     public void filterParts() {
@@ -697,8 +697,8 @@ public final class WarehouseTab extends CampaignGuiTab {
         getCampaignGui().refreshTaskList();
         getCampaignGui().refreshAcquireList();
         refreshTechsList();
-        if (getCampaignGui().getTab(CampaignGuiTab.TabType.REPAIR) != null) {
-            ((RepairTab) getCampaignGui().getTab(CampaignGuiTab.TabType.REPAIR)).refreshTechsList(); // NOI18N
+        if (getCampaignGui().getTab(GuiTabType.REPAIR) != null) {
+            ((RepairTab) getCampaignGui().getTab(GuiTabType.REPAIR)).refreshTechsList(); // NOI18N
         }
         refreshPartsList();
         getCampaignGui().refreshReport();

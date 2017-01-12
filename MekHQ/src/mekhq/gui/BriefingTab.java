@@ -126,8 +126,8 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     @Override
-    public TabType tabType() {
-        return TabType.BRIEFING;
+    public GuiTabType tabType() {
+        return GuiTabType.BRIEFING;
     }
 
     /*

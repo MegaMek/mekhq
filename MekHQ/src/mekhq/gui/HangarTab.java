@@ -97,8 +97,8 @@ public final class HangarTab extends CampaignGuiTab {
     }
 
     @Override
-    public TabType tabType() {
-        return TabType.HANGAR;
+    public GuiTabType tabType() {
+        return GuiTabType.HANGAR;
     }
 
     /*

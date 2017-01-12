@@ -177,7 +177,7 @@ import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
-import mekhq.gui.CampaignGuiTab;
+import mekhq.gui.GuiTabType;
 import mekhq.gui.utilities.PortraitFileFactory;
 
 /**
@@ -3320,7 +3320,7 @@ public class Campaign implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "overtime", overtime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "gmMode", gmMode);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "showOverview", app.getCampaigngui()
-        		.hasTab(CampaignGuiTab.TabType.OVERVIEW));
+        		.hasTab(GuiTabType.OVERVIEW));
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "astechPool", astechPool);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "astechPoolMinutes",
                                        astechPoolMinutes);

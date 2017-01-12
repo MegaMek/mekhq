@@ -38,8 +38,8 @@ public abstract class CustomCampaignGuiTab extends CampaignGuiTab {
      * @see mekhq.gui.CampaignGuiTab#tabType()
      */
     @Override
-    final public TabType tabType() {
-        return TabType.CUSTOM;
+    final public GuiTabType tabType() {
+        return GuiTabType.CUSTOM;
     }
 
 }

@@ -61,8 +61,8 @@ public final class MapTab extends CampaignGuiTab {
     }
 
     @Override
-    public TabType tabType() {
-        return TabType.MAP;
+    public GuiTabType tabType() {
+        return GuiTabType.MAP;
     }
 
     /*

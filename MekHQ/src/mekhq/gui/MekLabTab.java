@@ -144,8 +144,8 @@ public class MekLabTab extends CampaignGuiTab {
     }
 
     @Override
-    public TabType tabType() {
-        return TabType.MEKLAB;
+    public GuiTabType tabType() {
+        return GuiTabType.MEKLAB;
     }
 
     public Unit getUnit() {

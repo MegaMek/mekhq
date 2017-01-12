@@ -543,8 +543,8 @@ public final class RepairTab extends CampaignGuiTab {
      * @see mekhq.gui.CampaignGuiTab#tabType()
      */
     @Override
-    public TabType tabType() {
-        return TabType.REPAIR;
+    public GuiTabType tabType() {
+        return GuiTabType.REPAIR;
     }
 
     public Person getSelectedTech() {
@@ -681,8 +681,8 @@ public final class RepairTab extends CampaignGuiTab {
         refreshTaskList();
         refreshAcquireList();
         refreshTechsList();
-        if (getCampaignGui().getTab(CampaignGuiTab.TabType.WAREHOUSE) != null) {
-            ((WarehouseTab) getCampaignGui().getTab(CampaignGuiTab.TabType.WAREHOUSE)).refreshTechsList(); // NOI18N
+        if (getCampaignGui().getTab(GuiTabType.WAREHOUSE) != null) {
+            ((WarehouseTab) getCampaignGui().getTab(GuiTabType.WAREHOUSE)).refreshTechsList(); // NOI18N
         }
         getCampaignGui().refreshPartsList();
         getCampaignGui().refreshReport();
@@ -772,8 +772,8 @@ public final class RepairTab extends CampaignGuiTab {
         refreshTaskList();
         refreshAcquireList();
         refreshTechsList();
-        if (getCampaignGui().getTab(CampaignGuiTab.TabType.WAREHOUSE) != null) {
-            ((WarehouseTab) getCampaignGui().getTab(CampaignGuiTab.TabType.WAREHOUSE)).refreshTechsList(); // NOI18N
+        if (getCampaignGui().getTab(GuiTabType.WAREHOUSE) != null) {
+            ((WarehouseTab) getCampaignGui().getTab(GuiTabType.WAREHOUSE)).refreshTechsList(); // NOI18N
         }
         getCampaignGui().refreshPartsList();
         getCampaignGui().refreshReport();

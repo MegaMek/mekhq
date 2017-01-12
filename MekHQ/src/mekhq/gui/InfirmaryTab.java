@@ -192,8 +192,8 @@ public final class InfirmaryTab extends CampaignGuiTab {
      * @see mekhq.gui.CampaignGuiTab#tabType()
      */
     @Override
-    public TabType tabType() {
-        return TabType.INFIRMARY;
+    public GuiTabType tabType() {
+        return GuiTabType.INFIRMARY;
     }
 
     @Override

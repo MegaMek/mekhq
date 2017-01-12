@@ -219,8 +219,8 @@ public final class FinancesTab extends CampaignGuiTab {
      * @see mekhq.gui.CampaignGuiTab#tabType()
      */
     @Override
-    public TabType tabType() {
-        return TabType.FINANCES;
+    public GuiTabType tabType() {
+        return GuiTabType.FINANCES;
     }
 
     private void addFundsActionPerformed() {

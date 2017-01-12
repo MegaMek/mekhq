@@ -59,8 +59,8 @@ public final class TOETab extends CampaignGuiTab {
     }
 
     @Override
-    public TabType tabType() {
-        return TabType.TOE;
+    public GuiTabType tabType() {
+        return GuiTabType.TOE;
     }
 
     @Override
