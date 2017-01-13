@@ -9,30 +9,34 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
-import mekhq.gui.BriefingTab;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.CustomizeScenarioDialog;
+import mekhq.gui.model.ScenarioTableModel;
 
 public class ScenarioTableMouseAdapter extends MouseInputAdapter implements
         ActionListener {
+    
     private CampaignGUI gui;
-    private BriefingTab briefingTab;
+    private JTable scenarioTable;
+    private ScenarioTableModel scenarioModel;
 
-    public ScenarioTableMouseAdapter(CampaignGUI gui, BriefingTab briefingTab) {
+    public ScenarioTableMouseAdapter(CampaignGUI gui, JTable scenarioTable,
+            ScenarioTableModel scenarioModel) {
         super();
         this.gui = gui;
-        this.briefingTab = briefingTab;
+        this.scenarioTable = scenarioTable;
+        this.scenarioModel = scenarioModel;
     }
 
     public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
-        Scenario scenario = briefingTab.getScenarioModel().getScenario(briefingTab.getScenarioTable()
-                .getSelectedRow());
-        Mission mission = briefingTab.getSelectedMission();
+        Scenario scenario = scenarioModel.getScenario(scenarioTable.getSelectedRow());
+        Mission mission = gui.getCampaign().getMission(scenario.getMissionId());
         if (command.equalsIgnoreCase("EDIT")) {
             if (null != mission && null != scenario) {
                 CustomizeScenarioDialog csd = new CustomizeScenarioDialog(
@@ -68,13 +72,13 @@ public class ScenarioTableMouseAdapter extends MouseInputAdapter implements
     private void maybeShowPopup(MouseEvent e) {
         JPopupMenu popup = new JPopupMenu();
         if (e.isPopupTrigger()) {
-            int row = briefingTab.getScenarioTable().getSelectedRow();
+            int row = scenarioTable.getSelectedRow();
             if (row < 0) {
                 return;
             }
             @SuppressWarnings("unused")
             // FIXME
-            Scenario scenario = briefingTab.getScenarioModel().getScenario(row);
+            Scenario scenario = scenarioModel.getScenario(row);
             JMenuItem menuItem = null;
             JMenu menu = null;
             @SuppressWarnings("unused")

@@ -204,7 +204,8 @@ public final class RepairTab extends TechWorkGuiTab {
         servicedUnitTable.setIntercellSpacing(new Dimension(0, 0));
         servicedUnitTable.setShowGrid(false);
         servicedUnitTable.getSelectionModel().addListSelectionListener(ev -> servicedUnitTableValueChanged(ev));
-        servicedUnitTable.addMouseListener(new ServicedUnitsTableMouseAdapter(this));
+        servicedUnitTable.addMouseListener(new ServicedUnitsTableMouseAdapter(getCampaignGui(),
+                servicedUnitTable, servicedUnitModel));
         JScrollPane scrollServicedUnitTable = new JScrollPane(servicedUnitTable);
         scrollServicedUnitTable.setMinimumSize(new java.awt.Dimension(350, 200));
         scrollServicedUnitTable.setPreferredSize(new java.awt.Dimension(350, 200));
@@ -329,7 +330,8 @@ public final class RepairTab extends TechWorkGuiTab {
         sortKeys = new ArrayList<RowSorter.SortKey>();
         sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
         taskSorter.setSortKeys(sortKeys);
-        taskTable.addMouseListener(new TaskTableMouseAdapter(this));
+        taskTable.addMouseListener(new TaskTableMouseAdapter(getCampaignGui(),
+                taskTable, taskModel));
         JScrollPane scrollTaskTable = new JScrollPane(taskTable);
         scrollTaskTable.setMinimumSize(new java.awt.Dimension(200, 200));
         scrollTaskTable.setPreferredSize(new java.awt.Dimension(300, 300));
@@ -349,7 +351,8 @@ public final class RepairTab extends TechWorkGuiTab {
         acquisitionTable.setRowHeight(70);
         acquisitionTable.getColumnModel().getColumn(0).setCellRenderer(acquireModel.getRenderer(getIconPackage()));
         acquisitionTable.getSelectionModel().addListSelectionListener(ev -> acquisitionTableValueChanged());
-        acquisitionTable.addMouseListener(new AcquisitionTableMouseAdapter(this));
+        acquisitionTable.addMouseListener(new AcquisitionTableMouseAdapter(getCampaignGui(),
+                acquisitionTable, acquireModel));
         JScrollPane scrollAcquisitionTable = new JScrollPane(acquisitionTable);
         scrollAcquisitionTable.setMinimumSize(new java.awt.Dimension(200, 200));
         scrollAcquisitionTable.setPreferredSize(new java.awt.Dimension(300, 300));
@@ -428,30 +431,6 @@ public final class RepairTab extends TechWorkGuiTab {
         add(panTechs, gridBagConstraints);
 
         filterTechs();
-    }
-
-    public JTable getServicedUnitTable() {
-        return servicedUnitTable;
-    }
-
-    public JTable getTaskTable() {
-        return taskTable;
-    }
-
-    public JTable getAcquisitionTable() {
-        return acquisitionTable;
-    }
-
-    public UnitTableModel getServicedUnitModel() {
-        return servicedUnitModel;
-    }
-
-    public TaskTableModel getTaskModel() {
-        return taskModel;
-    }
-
-    public AcquisitionTableModel getAcquireModel() {
-        return acquireModel;
     }
 
     protected boolean repairsSelected() {

@@ -21,6 +21,7 @@ package mekhq.gui;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -197,7 +198,24 @@ public final class PersonnelTab extends CampaignGuiTab {
         sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_RANK, SortOrder.DESCENDING));
         sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_SKILL, SortOrder.DESCENDING));
         personnelSorter.setSortKeys(sortKeys);
-        personnelTable.addMouseListener(new PersonnelTableMouseAdapter(this));
+        personnelTable.addMouseListener(new PersonnelTableMouseAdapter(getCampaignGui(),
+                personnelTable, personModel) {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    if ((splitPersonnel.getSize().width
+                            - splitPersonnel.getDividerLocation() + splitPersonnel
+                                .getDividerSize()) < PersonnelTab.PERSONNEL_VIEW_WIDTH) {
+                        // expand
+                        splitPersonnel.resetToPreferredSizes();
+                    } else {
+                        // collapse
+                        splitPersonnel.setDividerLocation(1.0);
+                    }
+
+                }
+            }            
+        });
         TableColumn column = null;
         for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
             column = personnelTable.getColumnModel().getColumn(i);
@@ -232,16 +250,13 @@ public final class PersonnelTab extends CampaignGuiTab {
         filterPersonnel();
     }
 
+    /* For export */
     public JTable getPersonnelTable() {
         return personnelTable;
     }
-
+    
     public PersonnelTableModel getPersonModel() {
         return personModel;
-    }
-
-    public JSplitPane getSplitPersonnel() {
-        return splitPersonnel;
     }
 
     /*
@@ -359,16 +374,6 @@ public final class PersonnelTab extends CampaignGuiTab {
             }
         };
         personnelSorter.setRowFilter(personTypeFilter);
-    }
-
-    public Person[] getSelectedPeople() {
-        Person[] selected = new Person[personnelTable.getSelectedRowCount()];
-        int[] rows = personnelTable.getSelectedRows();
-        for (int i = 0; i < rows.length; i++) {
-            Person person = personModel.getPerson(personnelTable.convertRowIndexToModel(rows[i]));
-            selected[i] = person;
-        }
-        return selected;
     }
 
     private void changePersonnelView() {

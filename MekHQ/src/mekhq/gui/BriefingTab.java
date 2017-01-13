@@ -216,7 +216,8 @@ public final class BriefingTab extends CampaignGuiTab {
         scenarioTable = new JTable(scenarioModel);
         scenarioTable.setShowGrid(false);
         scenarioTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        scenarioTable.addMouseListener(new ScenarioTableMouseAdapter(getCampaignGui(), this));
+        scenarioTable.addMouseListener(new ScenarioTableMouseAdapter(getCampaignGui(),
+                scenarioTable, scenarioModel));
         scenarioTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         scenarioTable.setIntercellSpacing(new Dimension(0, 0));
         scenarioTable.getSelectionModel().addListSelectionListener(ev -> refreshScenarioView());
@@ -313,18 +314,6 @@ public final class BriefingTab extends CampaignGuiTab {
 
         setLayout(new BorderLayout());
         add(splitBrief, BorderLayout.CENTER);
-    }
-
-    public Mission getSelectedMission() {
-        return getCampaign().getMission(selectedMission);
-    }
-
-    public JTable getScenarioTable() {
-        return scenarioTable;
-    }
-
-    public ScenarioTableModel getScenarioModel() {
-        return scenarioModel;
     }
 
     private void addMission() {

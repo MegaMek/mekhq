@@ -28,54 +28,61 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
 import megamek.common.TargetRoll;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.WorkTime;
-import mekhq.gui.RepairTab;
+import mekhq.gui.CampaignGUI;
+import mekhq.gui.model.TaskTableModel;
 
 public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionListener {
     
-    private RepairTab repairTab;
+    private CampaignGUI gui;
+    private JTable taskTable;
+    private TaskTableModel taskModel;
 
-    public TaskTableMouseAdapter(RepairTab repairTab) {
+    public TaskTableMouseAdapter(CampaignGUI gui, JTable taskTable,
+            TaskTableModel taskModel) {
         super();
-        this.repairTab = repairTab;
+        this.gui = gui;
+        this.taskTable = taskTable;
+        this.taskModel = taskModel;
     }        
 
     @Override
     public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
-        Part part = repairTab.getTaskModel().getTaskAt(repairTab.getTaskTable().convertRowIndexToModel(repairTab.getTaskTable().getSelectedRow()));
+        Part part = taskModel.getTaskAt(taskTable.convertRowIndexToModel(taskTable.getSelectedRow()));
         if (null == part) {
             return;
         }
         if (command.equalsIgnoreCase("SCRAP")) {
             if (null != part.checkScrappable()) {
-                JOptionPane.showMessageDialog(repairTab.getFrame(), part.checkScrappable(), "Cannot scrap part",
+                JOptionPane.showMessageDialog(gui.getFrame(), part.checkScrappable(), "Cannot scrap part",
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
             Unit u = part.getUnit();
-            repairTab.getCampaign().addReport(part.scrap());
+            gui.getCampaign().addReport(part.scrap());
             if (null != u && !u.isRepairable() && u.getSalvageableParts().size() == 0) {
-                repairTab.getCampaign().removeUnit(u.getId());
+                gui.getCampaign().removeUnit(u.getId());
             }
-            repairTab.refreshServicedUnitList();
-            repairTab.getCampaignGui().refreshUnitList();
-            repairTab.refreshTaskList();
-            repairTab.getCampaignGui().refreshUnitView();
-            repairTab.getCampaignGui().refreshPartsList();
-            repairTab.refreshAcquireList();
-            repairTab.getCampaignGui().refreshReport();
-            repairTab.getCampaignGui().refreshOverview();
-            repairTab.filterTasks();
+            gui.refreshServicedUnitList();
+            gui.refreshUnitList();
+            gui.refreshTaskList();
+            gui.refreshUnitView();
+            gui.refreshPartsList();
+            gui.refreshAcquireList();
+            gui.refreshReport();
+            gui.refreshOverview();
+            gui.filterTasks();
         } else if (command.contains("SWAP_AMMO")) {
             /*
              * WorkItem task =
-             * repairTab.getTaskModel().getTaskAt(repairTab.getTaskTable().getSelectedRow()); if (task
+             * taskModel.getTaskAt(taskTable.getSelectedRow()); if (task
              * instanceof ReloadItem) { ReloadItem reload = (ReloadItem)
              * task; Entity en = reload.getUnit().getEntity(); Mounted m =
              * reload.getMounted(); if (null == m) { return; } AmmoType
@@ -88,12 +95,12 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
         } else if (command.contains("CHANGE_MODE")) {
             String sel = command.split(":")[1];
             part.setMode(WorkTime.of(sel));
-            repairTab.refreshServicedUnitList();
-            repairTab.getCampaignGui().refreshUnitList();
-            repairTab.refreshTaskList();
-            repairTab.getCampaignGui().refreshUnitView();
-            repairTab.refreshAcquireList();
-            repairTab.getCampaignGui().refreshOverview();
+            gui.refreshServicedUnitList();
+            gui.refreshUnitList();
+            gui.refreshTaskList();
+            gui.refreshUnitView();
+            gui.refreshAcquireList();
+            gui.refreshOverview();
         } else if (command.contains("UNASSIGN")) {
             /*
              * for (WorkItem task : tasks) { task.resetTimeSpent();
@@ -115,14 +122,14 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
              * refreshCargo(); refreshOverview(); }
              */
             if (part.checkFixable() == null) {
-                repairTab.getCampaign().addReport(part.succeed());
+                gui.getCampaign().addReport(part.succeed());
 
-                repairTab.refreshServicedUnitList();
-                repairTab.getCampaignGui().refreshUnitList();
-                repairTab.refreshTaskList();
-                repairTab.refreshAcquireList();
-                repairTab.getCampaignGui().refreshPartsList();
-                repairTab.getCampaignGui().refreshOverview();
+                gui.refreshServicedUnitList();
+                gui.refreshUnitList();
+                gui.refreshTaskList();
+                gui.refreshAcquireList();
+                gui.refreshPartsList();
+                gui.refreshOverview();
             }
         }
     }
@@ -140,11 +147,11 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
     private void maybeShowPopup(MouseEvent e) {
         JPopupMenu popup = new JPopupMenu();
         if (e.isPopupTrigger()) {
-            int row = repairTab.getTaskTable().getSelectedRow();
+            int row = taskTable.getSelectedRow();
             if (row < 0) {
                 return;
             }
-            Part part = repairTab.getTaskModel().getTaskAt(repairTab.getTaskTable().convertRowIndexToModel(row));
+            Part part = taskModel.getTaskAt(taskTable.convertRowIndexToModel(row));
             JMenuItem menuItem = null;
             JMenu menu = null;
             JCheckBoxMenuItem cbMenuItem = null;
@@ -181,7 +188,7 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
             menuItem = new JMenuItem("Complete Task");
             menuItem.setActionCommand("FIX");
             menuItem.addActionListener(this);
-            menuItem.setEnabled(repairTab.getCampaign().isGM() && (null == part.checkFixable()));
+            menuItem.setEnabled(gui.getCampaign().isGM() && (null == part.checkFixable()));
             menu.add(menuItem);
 
             popup.show(e.getComponent(), e.getX(), e.getY());

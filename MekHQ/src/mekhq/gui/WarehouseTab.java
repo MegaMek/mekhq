@@ -219,7 +219,8 @@ public final class WarehouseTab extends TechWorkGuiTab {
             filterTechs();
             updateTechTarget();
         });
-        partsTable.addMouseListener(new PartsTableMouseAdapter(this));
+        partsTable.addMouseListener(new PartsTableMouseAdapter(getCampaignGui(),
+                partsTable, partsModel));
 
         JScrollPane scrollPartsTable = new JScrollPane(partsTable);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -417,20 +418,13 @@ public final class WarehouseTab extends TechWorkGuiTab {
         add(splitWarehouse, BorderLayout.CENTER);
     }
 
+    /* For parts export */
     public JTable getPartsTable() {
         return partsTable;
     }
 
-    public JTable getAcquirePartsTable() {
-        return acquirePartsTable;
-    }
-
     public PartsTableModel getPartsModel() {
         return partsModel;
-    }
-
-    public ProcurementTableModel getAcquirePartsModel() {
-        return acquirePartsModel;
     }
 
     /*

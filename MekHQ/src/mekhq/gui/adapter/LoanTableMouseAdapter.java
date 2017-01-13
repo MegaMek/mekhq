@@ -10,29 +10,36 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.parts.Part;
-import mekhq.gui.FinancesTab;
+import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.PayCollateralDialog;
+import mekhq.gui.model.LoanTableModel;
 
 public class LoanTableMouseAdapter extends MouseInputAdapter implements
         ActionListener {
-    private FinancesTab financesTab;
+    private CampaignGUI gui;
+    private JTable loanTable;
+    private LoanTableModel loanModel;
 
-    public LoanTableMouseAdapter(FinancesTab financesTab) {
+    public LoanTableMouseAdapter(CampaignGUI gui, JTable loanTable,
+            LoanTableModel loanModel) {
         super();
-        this.financesTab = financesTab;
+        this.gui = gui;
+        this.loanTable = loanTable;
+        this.loanModel = loanModel;
     }
 
     public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
-        int row = financesTab.getLoanTable().getSelectedRow();
+        int row = loanTable.getSelectedRow();
         if (row < 0) {
             return;
         }
-        Loan selectedLoan = financesTab.getLoanModel().getLoan(financesTab.getLoanTable()
+        Loan selectedLoan = loanModel.getLoan(loanTable
                 .convertRowIndexToModel(row));
         if (null == selectedLoan) {
             return;
@@ -45,19 +52,19 @@ public class LoanTableMouseAdapter extends MouseInputAdapter implements
                             "Default on " + selectedLoan.getDescription()
                                     + "?", JOptionPane.YES_NO_OPTION)) {
                 PayCollateralDialog pcd = new PayCollateralDialog(
-                        financesTab.getFrame(), true, financesTab.getCampaign(), selectedLoan);
+                        gui.getFrame(), true, gui.getCampaign(), selectedLoan);
                 pcd.setVisible(true);
                 if (pcd.wasCancelled()) {
                     return;
                 }
-                financesTab.getCampaign().getFinances().defaultOnLoan(selectedLoan,
+                gui.getCampaign().getFinances().defaultOnLoan(selectedLoan,
                         pcd.wasPaid());
                 if (pcd.wasPaid()) {
                     for (UUID id : pcd.getUnits()) {
-                        financesTab.getCampaign().removeUnit(id);
+                        gui.getCampaign().removeUnit(id);
                     }
                     for (int[] part : pcd.getParts()) {
-                        Part p = financesTab.getCampaign().getPart(part[0]);
+                        Part p = gui.getCampaign().getPart(part[0]);
                         if (null != p) {
                             int quantity = part[1];
                             while (quantity > 0 && p.getQuantity() > 0) {
@@ -66,22 +73,22 @@ public class LoanTableMouseAdapter extends MouseInputAdapter implements
                             }
                         }
                     }
-                    financesTab.getCampaign().getFinances().setAssets(
+                    gui.getCampaign().getFinances().setAssets(
                             pcd.getRemainingAssets());
                 }
-                financesTab.refreshFinancialTransactions();
-                financesTab.getCampaignGui().refreshUnitList();
-                financesTab.getCampaignGui().refreshReport();
-                financesTab.getCampaignGui().refreshPartsList();
-                financesTab.getCampaignGui().refreshOverview();
+                gui.refreshFinancialTransactions();
+                gui.refreshUnitList();
+                gui.refreshReport();
+                gui.refreshPartsList();
+                gui.refreshOverview();
             }
         } else if (command.equalsIgnoreCase("PAY_BALANCE")) {
-            financesTab.getCampaign().payOffLoan(selectedLoan);
-            financesTab.refreshFinancialTransactions();
-            financesTab.getCampaignGui().refreshReport();
+            gui.getCampaign().payOffLoan(selectedLoan);
+            gui.refreshFinancialTransactions();
+            gui.refreshReport();
         } else if (command.equalsIgnoreCase("REMOVE")) {
-            financesTab.getCampaign().getFinances().removeLoan(selectedLoan);
-            financesTab.refreshFinancialTransactions();
+            gui.getCampaign().getFinances().removeLoan(selectedLoan);
+            gui.refreshFinancialTransactions();
         }
     }
 
@@ -98,11 +105,11 @@ public class LoanTableMouseAdapter extends MouseInputAdapter implements
     private void maybeShowPopup(MouseEvent e) {
         JPopupMenu popup = new JPopupMenu();
         if (e.isPopupTrigger()) {
-            if (financesTab.getLoanTable().getSelectedRowCount() == 0) {
+            if (loanTable.getSelectedRowCount() == 0) {
                 return;
             }
-            int row = financesTab.getLoanTable().getSelectedRow();
-            Loan loan = financesTab.getLoanModel().getLoan(financesTab.getLoanTable()
+            int row = loanTable.getSelectedRow();
+            Loan loan = loanModel.getLoan(loanTable
                     .convertRowIndexToModel(row));
             JMenuItem menuItem = null;
             JMenu menu = null;
@@ -111,7 +118,7 @@ public class LoanTableMouseAdapter extends MouseInputAdapter implements
                     + DecimalFormat.getInstance().format(
                             loan.getRemainingValue()) + ")");
             menuItem.setActionCommand("PAY_BALANCE");
-            menuItem.setEnabled(financesTab.getCampaign().getFunds() >= loan
+            menuItem.setEnabled(gui.getCampaign().getFunds() >= loan
                     .getRemainingValue());
             menuItem.addActionListener(this);
             popup.add(menuItem);
@@ -125,7 +132,7 @@ public class LoanTableMouseAdapter extends MouseInputAdapter implements
             menuItem = new JMenuItem("Remove Loan");
             menuItem.setActionCommand("REMOVE");
             menuItem.addActionListener(this);
-            menuItem.setEnabled(financesTab.getCampaign().isGM());
+            menuItem.setEnabled(gui.getCampaign().isGM());
             menu.add(menuItem);
             // end
             popup.addSeparator();

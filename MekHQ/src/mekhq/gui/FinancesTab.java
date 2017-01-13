@@ -82,7 +82,8 @@ public final class FinancesTab extends CampaignGuiTab {
         financeModel = new FinanceTableModel();
         financeTable = new JTable(financeModel);
         financeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        financeTable.addMouseListener(new FinanceTableMouseAdapter(this));
+        financeTable.addMouseListener(new FinanceTableMouseAdapter(getCampaignGui(),
+                financeTable, financeModel));
         financeTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         TableColumn column = null;
         for (int i = 0; i < FinanceTableModel.N_COL; i++) {
@@ -96,7 +97,8 @@ public final class FinancesTab extends CampaignGuiTab {
         loanModel = new LoanTableModel();
         loanTable = new JTable(loanModel);
         loanTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        loanTable.addMouseListener(new LoanTableMouseAdapter(this));
+        loanTable.addMouseListener(new LoanTableMouseAdapter(getCampaignGui(),
+                loanTable, loanModel));
         loanTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         column = null;
         for (int i = 0; i < LoanTableModel.N_COL; i++) {
@@ -185,22 +187,6 @@ public final class FinancesTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 1.0;
         add(panelFinanceRight, gridBagConstraints);
-    }
-
-    public JTable getFinanceTable() {
-        return financeTable;
-    }
-
-    public FinanceTableModel getFinanceModel() {
-        return financeModel;
-    }
-
-    public JTable getLoanTable() {
-        return loanTable;
-    }
-
-    public LoanTableModel getLoanModel() {
-        return loanModel;
     }
 
     /*

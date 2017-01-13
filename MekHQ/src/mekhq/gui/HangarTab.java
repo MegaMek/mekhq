@@ -25,6 +25,7 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -165,34 +166,50 @@ public final class HangarTab extends CampaignGuiTab {
         add(choiceUnitView, gridBagConstraints);
 
         unitModel = new UnitTableModel(getCampaign());
-        unitTable = new JTable(getUnitModel());
-        getUnitTable().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        unitTable = new JTable(unitModel);
+        unitTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         XTableColumnModel unitColumnModel = new XTableColumnModel();
-        getUnitTable().setColumnModel(unitColumnModel);
-        getUnitTable().createDefaultColumnsFromModel();
-        unitSorter = new TableRowSorter<UnitTableModel>(getUnitModel());
+        unitTable.setColumnModel(unitColumnModel);
+        unitTable.createDefaultColumnsFromModel();
+        unitSorter = new TableRowSorter<UnitTableModel>(unitModel);
         unitSorter.setComparator(UnitTableModel.COL_STATUS, new UnitStatusSorter());
         unitSorter.setComparator(UnitTableModel.COL_TYPE, new UnitTypeSorter());
         unitSorter.setComparator(UnitTableModel.COL_WCLASS, new WeightClassSorter());
         unitSorter.setComparator(UnitTableModel.COL_COST, new FormattedNumberSorter());
-        getUnitTable().setRowSorter(unitSorter);
+        unitTable.setRowSorter(unitSorter);
         ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
         sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_TYPE, SortOrder.DESCENDING));
         sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_WCLASS, SortOrder.DESCENDING));
         unitSorter.setSortKeys(sortKeys);
-        getUnitTable().addMouseListener(new UnitTableMouseAdapter(this));
-        getUnitTable().setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        unitTable.addMouseListener(new UnitTableMouseAdapter(getCampaignGui(),
+                unitTable, unitModel) {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    if ((splitUnit.getSize().width - splitUnit.getDividerLocation() + splitUnit
+                            .getDividerSize()) < HangarTab.UNIT_VIEW_WIDTH) {
+                        // expand
+                        splitUnit.resetToPreferredSizes();
+                    } else {
+                        // collapse
+                        splitUnit.setDividerLocation(1.0);
+                    }
+
+                }
+            }            
+        });
+        unitTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         TableColumn column = null;
         for (int i = 0; i < UnitTableModel.N_COL; i++) {
-            column = getUnitTable().getColumnModel().getColumn(i);
-            column.setPreferredWidth(getUnitModel().getColumnWidth(i));
+            column = unitTable.getColumnModel().getColumn(i);
+            column.setPreferredWidth(unitModel.getColumnWidth(i));
             column.setCellRenderer(
-                    getUnitModel().getRenderer(choiceUnitView.getSelectedIndex() == UV_GRAPHIC, getIconPackage()));
+                    unitModel.getRenderer(choiceUnitView.getSelectedIndex() == UV_GRAPHIC, getIconPackage()));
         }
-        getUnitTable().setIntercellSpacing(new Dimension(0, 0));
-        getUnitTable().setShowGrid(false);
+        unitTable.setIntercellSpacing(new Dimension(0, 0));
+        unitTable.setShowGrid(false);
         changeUnitView();
-        getUnitTable().getSelectionModel().addListSelectionListener(ev -> refreshUnitView());
+        unitTable.getSelectionModel().addListSelectionListener(ev -> refreshUnitView());
 
         acquireUnitsModel = new ProcurementTableModel(getCampaign());
         acquireUnitsTable = new JTable(acquireUnitsModel);
@@ -263,7 +280,7 @@ public final class HangarTab extends CampaignGuiTab {
         panAcquireUnit.setMinimumSize(new Dimension(200, 200));
         panAcquireUnit.setPreferredSize(new Dimension(200, 200));
 
-        JSplitPane splitLeftUnit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(getUnitTable()),
+        JSplitPane splitLeftUnit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(unitTable),
                 panAcquireUnit);
         splitLeftUnit.setOneTouchExpandable(true);
         splitLeftUnit.setResizeWeight(1.0);
@@ -275,28 +292,21 @@ public final class HangarTab extends CampaignGuiTab {
         scrollUnitView.setViewportView(null);
 
         splitUnit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitLeftUnit, scrollUnitView);
-        getSplitUnit().setOneTouchExpandable(true);
-        getSplitUnit().setResizeWeight(1.0);
-        getSplitUnit().addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, pce -> refreshUnitView());
+        splitUnit.setOneTouchExpandable(true);
+        splitUnit.setResizeWeight(1.0);
+        splitUnit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, pce -> refreshUnitView());
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        add(getSplitUnit(), gridBagConstraints);
+        add(splitUnit, gridBagConstraints);
     }
-
+    
+    /* For export */
     public JTable getUnitTable() {
         return unitTable;
-    }
-
-    public UnitTableModel getUnitModel() {
-        return unitModel;
-    }
-
-    public JSplitPane getSplitUnit() {
-        return splitUnit;
     }
 
     /*
@@ -349,15 +359,15 @@ public final class HangarTab extends CampaignGuiTab {
     public void changeUnitView() {
 
         int view = choiceUnitView.getSelectedIndex();
-        XTableColumnModel columnModel = (XTableColumnModel) getUnitTable().getColumnModel();
-        getUnitTable().setRowHeight(15);
+        XTableColumnModel columnModel = (XTableColumnModel) unitTable.getColumnModel();
+        unitTable.setRowHeight(15);
 
         // set the renderer
         TableColumn column = null;
         for (int i = 0; i < UnitTableModel.N_COL; i++) {
             column = columnModel.getColumnByModelIndex(i);
             column.setCellRenderer(
-                    getUnitModel().getRenderer(choiceUnitView.getSelectedIndex() == UV_GRAPHIC, getIconPackage()));
+                    unitModel.getRenderer(choiceUnitView.getSelectedIndex() == UV_GRAPHIC, getIconPackage()));
             if (i == UnitTableModel.COL_WCLASS) {
                 if (view == UV_GRAPHIC) {
                     column.setPreferredWidth(125);
@@ -370,7 +380,7 @@ public final class HangarTab extends CampaignGuiTab {
         }
 
         if (view == UV_GRAPHIC) {
-            getUnitTable().setRowHeight(80);
+            unitTable.setRowHeight(80);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WCLASS), true);
@@ -451,10 +461,10 @@ public final class HangarTab extends CampaignGuiTab {
     }
 
     public void focusOnUnit(UUID id) {
-        getSplitUnit().resetToPreferredSizes();
+        splitUnit.resetToPreferredSizes();
         int row = -1;
-        for (int i = 0; i < getUnitTable().getRowCount(); i++) {
-            if (getUnitModel().getUnit(getUnitTable().convertRowIndexToModel(i)).getId().equals(id)) {
+        for (int i = 0; i < unitTable.getRowCount(); i++) {
+            if (unitModel.getUnit(unitTable.convertRowIndexToModel(i)).getId().equals(id)) {
                 row = i;
                 break;
             }
@@ -462,8 +472,8 @@ public final class HangarTab extends CampaignGuiTab {
         if (row == -1) {
             // try expanding the filter to all units
             choiceUnit.setSelectedIndex(0);
-            for (int i = 0; i < getUnitTable().getRowCount(); i++) {
-                if (getUnitModel().getUnit(getUnitTable().convertRowIndexToModel(i)).getId().equals(id)) {
+            for (int i = 0; i < unitTable.getRowCount(); i++) {
+                if (unitModel.getUnit(unitTable.convertRowIndexToModel(i)).getId().equals(id)) {
                     row = i;
                     break;
                 }
@@ -471,18 +481,18 @@ public final class HangarTab extends CampaignGuiTab {
 
         }
         if (row != -1) {
-            getUnitTable().setRowSelectionInterval(row, row);
-            getUnitTable().scrollRectToVisible(getUnitTable().getCellRect(row, 0, true));
+            unitTable.setRowSelectionInterval(row, row);
+            unitTable.scrollRectToVisible(unitTable.getCellRect(row, 0, true));
         }
     }
 
     public void refreshUnitView() {
-        int row = getUnitTable().getSelectedRow();
+        int row = unitTable.getSelectedRow();
         if (row < 0) {
             scrollUnitView.setViewportView(null);
             return;
         }
-        Unit selectedUnit = getUnitModel().getUnit(getUnitTable().convertRowIndexToModel(row));
+        Unit selectedUnit = unitModel.getUnit(unitTable.convertRowIndexToModel(row));
         scrollUnitView.setViewportView(new UnitViewPanel(selectedUnit, getCampaign(), getIconPackage().getCamos(),
                 getIconPackage().getMechTiles()));
         // This odd code is to make sure that the scrollbar stays at the top
@@ -493,19 +503,19 @@ public final class HangarTab extends CampaignGuiTab {
 
     public void refreshUnitList() {
         UUID selectedUUID = null;
-        int selectedRow = getUnitTable().getSelectedRow();
+        int selectedRow = unitTable.getSelectedRow();
         if (selectedRow != -1) {
-            Unit u = getUnitModel().getUnit(getUnitTable().convertRowIndexToModel(selectedRow));
+            Unit u = unitModel.getUnit(unitTable.convertRowIndexToModel(selectedRow));
             if (null != u) {
                 selectedUUID = u.getId();
             }
         }
-        getUnitModel().setData(getCampaign().getUnits());
+        unitModel.setData(getCampaign().getUnits());
         // try to put the focus back on same person if they are still available
-        for (int row = 0; row < getUnitTable().getRowCount(); row++) {
-            Unit u = getUnitModel().getUnit(getUnitTable().convertRowIndexToModel(row));
+        for (int row = 0; row < unitTable.getRowCount(); row++) {
+            Unit u = unitModel.getUnit(unitTable.convertRowIndexToModel(row));
             if (u.getId().equals(selectedUUID)) {
-                getUnitTable().setRowSelectionInterval(row, row);
+                unitTable.setRowSelectionInterval(row, row);
                 refreshUnitView();
                 break;
             }

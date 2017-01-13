@@ -26,26 +26,33 @@ import java.awt.event.MouseEvent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.work.IAcquisitionWork;
-import mekhq.gui.RepairTab;
+import mekhq.gui.CampaignGUI;
+import mekhq.gui.model.AcquisitionTableModel;
 
 public class AcquisitionTableMouseAdapter extends MouseInputAdapter implements ActionListener {
     
-    private RepairTab repairTab;
+    private CampaignGUI gui;
+    private JTable acquisitionTable;
+    private AcquisitionTableModel acquireModel;
     
-    public AcquisitionTableMouseAdapter(RepairTab repairTab) {
+    public AcquisitionTableMouseAdapter(CampaignGUI gui, JTable acquisitionTable,
+            AcquisitionTableModel acquireModel) {
         super();
-        this.repairTab = repairTab;
+        this.gui = gui;
+        this.acquisitionTable = acquisitionTable;
+        this.acquireModel = acquireModel;
     }
     
     @Override
     public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
-        IAcquisitionWork acquisitionWork = repairTab.getAcquireModel()
-                .getAcquisitionAt(repairTab.getAcquisitionTable().convertRowIndexToModel(repairTab.getAcquisitionTable().getSelectedRow()));
+        IAcquisitionWork acquisitionWork = acquireModel
+                .getAcquisitionAt(acquisitionTable.convertRowIndexToModel(acquisitionTable.getSelectedRow()));
         if (acquisitionWork instanceof AmmoBin) {
             acquisitionWork = ((AmmoBin) acquisitionWork).getAcquisitionWork();
         }
@@ -53,15 +60,15 @@ public class AcquisitionTableMouseAdapter extends MouseInputAdapter implements A
             return;
         }
         if (command.contains("FIX")) {
-            repairTab.getCampaign().addReport(acquisitionWork.find(0));
+            gui.getCampaign().addReport(acquisitionWork.find(0));
 
-            repairTab.refreshServicedUnitList();
-            repairTab.getCampaignGui().refreshUnitList();
-            repairTab.refreshTaskList();
-            repairTab.refreshAcquireList();
-            repairTab.getCampaignGui().refreshPartsList();
-            repairTab.getCampaignGui().refreshOverview();
-            repairTab.filterTasks();
+            gui.refreshServicedUnitList();
+            gui.refreshUnitList();
+            gui.refreshTaskList();
+            gui.refreshAcquireList();
+            gui.refreshPartsList();
+            gui.refreshOverview();
+            gui.filterTasks();
         }
     }
 
@@ -78,7 +85,7 @@ public class AcquisitionTableMouseAdapter extends MouseInputAdapter implements A
     private void maybeShowPopup(MouseEvent e) {
         JPopupMenu popup = new JPopupMenu();
         if (e.isPopupTrigger()) {
-            int row = repairTab.getAcquisitionTable().getSelectedRow();
+            int row = acquisitionTable.getSelectedRow();
             if (row < 0) {
                 return;
             }
@@ -91,7 +98,7 @@ public class AcquisitionTableMouseAdapter extends MouseInputAdapter implements A
             menuItem = new JMenuItem("Complete Task");
             menuItem.setActionCommand("FIX");
             menuItem.addActionListener(this);
-            menuItem.setEnabled(repairTab.getCampaign().isGM());
+            menuItem.setEnabled(gui.getCampaign().isGM());
             menu.add(menuItem);
 
             popup.show(e.getComponent(), e.getX(), e.getY());

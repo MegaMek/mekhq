@@ -9,6 +9,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
 import megamek.common.AmmoType;
@@ -16,31 +17,38 @@ import mekhq.Utilities;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.RepairTab;
+import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.MassRepairSalvageDialog;
+import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.MenuScroller;
 import mekhq.gui.utilities.StaticChecks;
 
 public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
         implements ActionListener {
-    private RepairTab repairTab;
+    
+    private CampaignGUI gui;
+    private JTable servicedUnitTable;
+    private UnitTableModel servicedUnitModel;
 
-    public ServicedUnitsTableMouseAdapter(RepairTab repairTab) {
+    public ServicedUnitsTableMouseAdapter(CampaignGUI gui, JTable servicedUnitTable,
+            UnitTableModel servicedUnitModel) {
         super();
-        this.repairTab = repairTab;
+        this.gui = gui;
+        this.servicedUnitTable = servicedUnitTable;
+        this.servicedUnitModel = servicedUnitModel;
     }
 
     public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
         @SuppressWarnings("unused")
-        Unit selectedUnit = repairTab.getServicedUnitModel()
-                .getUnit(repairTab.getServicedUnitTable()
-                        .convertRowIndexToModel(repairTab.getServicedUnitTable()
+        Unit selectedUnit = servicedUnitModel
+                .getUnit(servicedUnitTable
+                        .convertRowIndexToModel(servicedUnitTable
                                 .getSelectedRow()));
-        int[] rows = repairTab.getServicedUnitTable().getSelectedRows();
+        int[] rows = servicedUnitTable.getSelectedRows();
         Unit[] units = new Unit[rows.length];
         for (int i = 0; i < rows.length; i++) {
-            units[i] = repairTab.getServicedUnitModel().getUnit(repairTab.getServicedUnitTable()
+            units[i] = servicedUnitModel.getUnit(servicedUnitTable
                     .convertRowIndexToModel(rows[i]));
         }
         if (command.contains("ASSIGN_TECH")) {
@@ -60,7 +68,7 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
         } else if (command.contains("SWAP_AMMO")) {
             String sel = command.split(":")[1];
             int selAmmoId = Integer.parseInt(sel);
-            Part part = repairTab.getCampaign().getPart(selAmmoId);
+            Part part = gui.getCampaign().getPart(selAmmoId);
             if (null == part || !(part instanceof AmmoBin)) {
                 return;
             }
@@ -68,12 +76,12 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
             sel = command.split(":")[2];
             long munition = Long.parseLong(sel);
             ammo.changeMunition(munition);
-            repairTab.refreshTaskList();
-            repairTab.refreshAcquireList();
-            repairTab.refreshServicedUnitList();
-            repairTab.getCampaignGui().refreshUnitList();
-            repairTab.getCampaignGui().refreshOverview();
-            repairTab.filterTasks();
+            gui.refreshTaskList();
+            gui.refreshAcquireList();
+            gui.refreshServicedUnitList();
+            gui.refreshUnitList();
+            gui.refreshOverview();
+            gui.filterTasks();
         } else if (command.contains("CHANGE_SITE")) {
             for (Unit unit : units) {
                 if (!unit.isDeployed()) {
@@ -84,29 +92,29 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
                     }
                 }
             }
-            repairTab.refreshServicedUnitList();
-            repairTab.getCampaignGui().refreshUnitList();
-            repairTab.refreshTaskList();
-            repairTab.refreshAcquireList();
-            repairTab.getCampaignGui().refreshOverview();
+            gui.refreshServicedUnitList();
+            gui.refreshUnitList();
+            gui.refreshTaskList();
+            gui.refreshAcquireList();
+            gui.refreshOverview();
         } else if (command.equalsIgnoreCase("SALVAGE")) {
             for (Unit unit : units) {
                 if (!unit.isDeployed()) {
                     unit.setSalvage(true);
                 }
             }
-            repairTab.refreshServicedUnitList();
-            repairTab.getCampaignGui().refreshUnitList();
-            repairTab.getCampaignGui().refreshOverview();
+            gui.refreshServicedUnitList();
+            gui.refreshUnitList();
+            gui.refreshOverview();
         } else if (command.equalsIgnoreCase("REPAIR")) {
             for (Unit unit : units) {
                 if (!unit.isDeployed() && unit.isRepairable()) {
                     unit.setSalvage(false);
                 }
             }
-            repairTab.refreshServicedUnitList();
-            repairTab.getCampaignGui().refreshUnitList();
-            repairTab.getCampaignGui().refreshOverview();
+            gui.refreshServicedUnitList();
+            gui.refreshUnitList();
+            gui.refreshOverview();
         } else if (command.contains("MASS_REPAIR_SALVAGE")) {
             Unit unit = null;
             
@@ -115,15 +123,15 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
             }
             
             if (unit.isDeployed()) {
-    			JOptionPane.showMessageDialog(repairTab.getFrame(),
+    			JOptionPane.showMessageDialog(gui.getFrame(),
     					"Unit is currently deployed and can not be repaired.",
     					"Unit is deployed", JOptionPane.ERROR_MESSAGE);
             } else {
-				MassRepairSalvageDialog.performSingleUnitMassRepairOrSalvage(repairTab.getCampaignGui(), unit);
+				MassRepairSalvageDialog.performSingleUnitMassRepairOrSalvage(gui, unit);
 	
-				repairTab.refreshServicedUnitList();
-				repairTab.getCampaignGui().refreshUnitList();
-				repairTab.getCampaignGui().refreshOverview();
+				gui.refreshServicedUnitList();
+				gui.refreshUnitList();
+				gui.refreshOverview();
             }
         } else if (command.equalsIgnoreCase("REMOVE")) {
             for (Unit unit : units) {
@@ -133,32 +141,32 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
                             "Do you really want to remove "
                                     + unit.getName() + "?", "Remove Unit?",
                             JOptionPane.YES_NO_OPTION)) {
-                        repairTab.getCampaign().removeUnit(unit.getId());
+                        gui.getCampaign().removeUnit(unit.getId());
                     }
                 }
             }
-            repairTab.refreshServicedUnitList();
-            repairTab.getCampaignGui().refreshUnitList();
-            repairTab.getCampaignGui().refreshReport();
-            repairTab.getCampaignGui().refreshOverview();
+            gui.refreshServicedUnitList();
+            gui.refreshUnitList();
+            gui.refreshReport();
+            gui.refreshOverview();
         } else if (command.equalsIgnoreCase("UNDEPLOY")) {
             for (Unit unit : units) {
                 if (unit.isDeployed()) {
-                    repairTab.getCampaignGui().undeployUnit(unit);
+                    gui.undeployUnit(unit);
                 }
             }
-            repairTab.getCampaignGui().refreshPersonnelList();
-            repairTab.refreshServicedUnitList();
-            repairTab.getCampaignGui().refreshUnitList();
-            repairTab.getCampaignGui().refreshOrganization();
-            repairTab.refreshTaskList();
-            repairTab.getCampaignGui().refreshUnitView();
-            repairTab.getCampaignGui().refreshPartsList();
-            repairTab.refreshAcquireList();
-            repairTab.getCampaignGui().refreshReport();
-            repairTab.getCampaignGui().refreshPatientList();
-            repairTab.getCampaignGui().refreshScenarioList();
-            repairTab.getCampaignGui().refreshOverview();
+            gui.refreshPersonnelList();
+            gui.refreshServicedUnitList();
+            gui.refreshUnitList();
+            gui.refreshOrganization();
+            gui.refreshTaskList();
+            gui.refreshUnitView();
+            gui.refreshPartsList();
+            gui.refreshAcquireList();
+            gui.refreshReport();
+            gui.refreshPatientList();
+            gui.refreshScenarioList();
+            gui.refreshOverview();
         }
     }
 
@@ -175,17 +183,17 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
     private void maybeShowPopup(MouseEvent e) {
         JPopupMenu popup = new JPopupMenu();
         if (e.isPopupTrigger()) {
-            if (repairTab.getServicedUnitTable().getSelectedRowCount() == 0) {
+            if (servicedUnitTable.getSelectedRowCount() == 0) {
                 return;
             }
-            int[] rows = repairTab.getServicedUnitTable().getSelectedRows();
-            int row = repairTab.getServicedUnitTable().getSelectedRow();
-            boolean oneSelected = repairTab.getServicedUnitTable().getSelectedRowCount() == 1;
-            Unit unit = repairTab.getServicedUnitModel().getUnit(repairTab.getServicedUnitTable()
+            int[] rows = servicedUnitTable.getSelectedRows();
+            int row = servicedUnitTable.getSelectedRow();
+            boolean oneSelected = servicedUnitTable.getSelectedRowCount() == 1;
+            Unit unit = servicedUnitModel.getUnit(servicedUnitTable
                     .convertRowIndexToModel(row));
             Unit[] units = new Unit[rows.length];
             for (int i = 0; i < rows.length; i++) {
-                units[i] = repairTab.getServicedUnitModel().getUnit(repairTab.getServicedUnitTable()
+                units[i] = servicedUnitModel.getUnit(servicedUnitTable
                         .convertRowIndexToModel(rows[i]));
             }
             JMenuItem menuItem = null;
@@ -228,7 +236,7 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
                     ammoMenu = new JMenu(ammo.getType().getDesc());
                     AmmoType curType = (AmmoType) ammo.getType();
                     for (AmmoType atype : Utilities.getMunitionsFor(unit
-                            .getEntity(), curType, repairTab.getCampaign()
+                            .getEntity(), curType, gui.getCampaign()
                             .getCampaignOptions().getTechLevel())) {
                         cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
                         if (atype.equals(curType)
