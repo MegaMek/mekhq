@@ -48,8 +48,10 @@ import javax.swing.table.TableRowSorter;
 
 import megamek.common.MechView;
 import megamek.common.TargetRoll;
+import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.parts.MekLocation;
@@ -110,6 +112,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
     RepairTab(CampaignGUI gui, String name) {
         super(gui, name);
+        MekHQ.registerHandler(this);
     }
 
     /*
@@ -933,5 +936,10 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             uuid = getSelectedServicedUnit().getId();
         }
         acquireModel.setData(getCampaign().getAcquisitionsForUnit(uuid));
+    }
+    
+    @Subscribe
+    public void deploymentChanged(DeploymentChangedEvent ev) {
+        refreshServicedUnitList();
     }
 }

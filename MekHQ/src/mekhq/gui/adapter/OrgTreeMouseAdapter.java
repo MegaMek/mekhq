@@ -16,6 +16,8 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.tree.TreePath;
 
 import megamek.common.GunEmplacement;
+import mekhq.MekHQ;
+import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Mission;
@@ -159,13 +161,8 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
         } else if (command.contains("UNDEPLOY_FORCE")) {
             for (Force force : forces) {
                 gui.undeployForce(force);
+                //Event triggered from undeployForce
             }
-            gui.refreshOrganization();
-            gui.refreshPersonnelList();
-            gui.refreshUnitList();
-            gui.refreshServicedUnitList();
-            gui.refreshScenarioList();
-            gui.refreshOverview();
         } else if (command.contains("DEPLOY_FORCE")) {
             int sid = Integer.parseInt(target);
             Scenario scenario = gui.getCampaign().getScenario(sid);
@@ -181,13 +178,8 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                         }
                     }
                 }
+                MekHQ.triggerEvent(new DeploymentChangedEvent(force, scenario));
             }
-            gui.refreshScenarioList();
-            gui.refreshOrganization();
-            gui.refreshPersonnelList();
-            gui.refreshUnitList();
-            gui.refreshServicedUnitList();
-            gui.refreshOverview();
         } else if (command.contains("CHANGE_ICON")) {
             if (null != singleForce) {
                 ImageChoiceDialog pcd = new ImageChoiceDialog(
@@ -284,13 +276,8 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
         } else if (command.contains("UNDEPLOY_UNIT")) {
             for (Unit unit : units) {
                 gui.undeployUnit(unit);
+                //Event triggered from undeployUnit
             }
-            gui.refreshScenarioList();
-            gui.refreshOrganization();
-            gui.refreshPersonnelList();
-            gui.refreshUnitList();
-            gui.refreshServicedUnitList();
-            gui.refreshOverview();
         } else if (command.contains("GOTO_UNIT")) {
             if (null != singleUnit) {
                 gui.focusOnUnit(singleUnit.getId());
@@ -306,15 +293,9 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 if (null != unit && null != scenario) {
                     scenario.addUnit(unit.getId());
                     unit.setScenarioId(scenario.getId());
-
+                    MekHQ.triggerEvent(new DeploymentChangedEvent(unit, scenario));
                 }
             }
-            gui.refreshScenarioList();
-            gui.refreshOrganization();
-            gui.refreshPersonnelList();
-            gui.refreshUnitList();
-            gui.refreshServicedUnitList();
-            gui.refreshOverview();
         } else if (command.contains("C3I")) {
             // don't set them directly, set the C3i UUIDs and then
             // run gui.refreshNetworks on the campaign

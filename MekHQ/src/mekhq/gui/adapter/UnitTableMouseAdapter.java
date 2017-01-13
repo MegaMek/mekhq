@@ -371,20 +371,9 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             for (Unit unit : units) {
                 if (unit.isDeployed()) {
                     gui.undeployUnit(unit);
+                    //Event triggered from undeployUnit
                 }
             }
-            gui.refreshPersonnelList();
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshOrganization();
-            gui.refreshTaskList();
-            gui.refreshUnitView();
-            gui.refreshPartsList();
-            gui.refreshAcquireList();
-            gui.refreshReport();
-            gui.refreshPatientList();
-            gui.refreshScenarioList();
-            gui.refreshOverview();
         } else if (command.contains("HIRE_FULL")) {
             for (Unit unit : units) {
                 gui.getCampaign().hirePersonnelFor(unit.getId());

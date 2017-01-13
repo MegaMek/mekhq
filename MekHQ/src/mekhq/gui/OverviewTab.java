@@ -41,7 +41,10 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
+import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.rating.IUnitRating;
@@ -93,6 +96,7 @@ public final class OverviewTab extends CampaignGuiTab {
 
     OverviewTab(CampaignGUI gui, String name) {
         super(gui, name);
+        MekHQ.registerHandler(this);
     }
 
     /*
@@ -409,4 +413,8 @@ public final class OverviewTab extends CampaignGuiTab {
         column.setEnabled(getCampaign().isGM());
     }
 
+    @Subscribe
+    public void deploymentChanged(DeploymentChangedEvent ev) {
+        refreshOverview();
+    }
 }

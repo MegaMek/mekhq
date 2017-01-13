@@ -52,6 +52,7 @@ import megamek.common.util.EncodeControl;
 import megameklab.com.util.UnitPrintManager;
 import mekhq.MekHQ;
 import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
@@ -474,20 +475,7 @@ public final class BriefingTab extends CampaignGuiTab {
                 return;
             }
             scenario.clearAllForcesAndPersonnel(getCampaign());
-            getCampaignGui().refreshPersonnelList();
-            getCampaignGui().refreshServicedUnitList();
-            getCampaignGui().refreshUnitList();
-            getCampaignGui().refreshOrganization();
-            getCampaignGui().refreshTaskList();
-            getCampaignGui().refreshUnitView();
-            getCampaignGui().refreshPartsList();
-            getCampaignGui().refreshAcquireList();
-            getCampaignGui().refreshReport();
-            getCampaignGui().refreshPatientList();
-            getCampaignGui().refreshPersonnelList();
-            refreshScenarioList();
-            getCampaignGui().refreshOverview();
-            getCampaignGui().filterTasks();
+            MekHQ.triggerEvent(new DeploymentChangedEvent(scenario));
         }
     }
 
@@ -969,5 +957,12 @@ public final class BriefingTab extends CampaignGuiTab {
     public void optionsChanged(OptionsChangedEvent ev) {
         splitScenario.getBottomComponent().setVisible(getCampaignOptions().getUseAtB());
         splitScenario.resetToPreferredSizes();
+    }
+    
+    @Subscribe
+    public void deploymentChanged(DeploymentChangedEvent ev) {
+        if (ev.getScenario() != null && ev.getScenario().getMissionId() == selectedMission) {
+            refreshScenarioList();
+        }
     }
 }

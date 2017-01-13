@@ -99,6 +99,7 @@ import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
+import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
@@ -3089,8 +3090,10 @@ public class CampaignGUI extends JPanel {
         if (f != null) {
             undeployForce(f, false);
         }
-        getCampaign().getScenario(u.getScenarioId()).removeUnit(u.getId());
+        Scenario s = getCampaign().getScenario(u.getScenarioId());
+        s.removeUnit(u.getId());
         u.undeploy();
+        MekHQ.triggerEvent(new DeploymentChangedEvent(u, s));
     }
 
     public void undeployForce(Force f) {
@@ -3132,6 +3135,7 @@ public class CampaignGUI extends JPanel {
                 prevId = parent.getId();
             }
         }
+        MekHQ.triggerEvent(new DeploymentChangedEvent(f, scenario));
     }
 
     public JTabbedPane getTabMain() {

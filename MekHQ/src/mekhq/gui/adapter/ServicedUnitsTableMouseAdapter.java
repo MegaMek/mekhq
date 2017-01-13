@@ -133,40 +133,6 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
 				gui.refreshUnitList();
 				gui.refreshOverview();
             }
-        } else if (command.equalsIgnoreCase("REMOVE")) {
-            for (Unit unit : units) {
-                if (!unit.isDeployed()) {
-                    if (0 == JOptionPane.showConfirmDialog(
-                            null,
-                            "Do you really want to remove "
-                                    + unit.getName() + "?", "Remove Unit?",
-                            JOptionPane.YES_NO_OPTION)) {
-                        gui.getCampaign().removeUnit(unit.getId());
-                    }
-                }
-            }
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshReport();
-            gui.refreshOverview();
-        } else if (command.equalsIgnoreCase("UNDEPLOY")) {
-            for (Unit unit : units) {
-                if (unit.isDeployed()) {
-                    gui.undeployUnit(unit);
-                }
-            }
-            gui.refreshPersonnelList();
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshOrganization();
-            gui.refreshTaskList();
-            gui.refreshUnitView();
-            gui.refreshPartsList();
-            gui.refreshAcquireList();
-            gui.refreshReport();
-            gui.refreshPatientList();
-            gui.refreshScenarioList();
-            gui.refreshOverview();
         }
     }
 

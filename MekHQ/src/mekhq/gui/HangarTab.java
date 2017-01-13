@@ -51,7 +51,10 @@ import javax.swing.table.TableRowSorter;
 
 import megamek.common.Entity;
 import megamek.common.UnitType;
+import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
@@ -95,6 +98,7 @@ public final class HangarTab extends CampaignGuiTab {
 
     HangarTab(CampaignGUI gui, String name) {
         super(gui, name);
+        MekHQ.registerHandler(this);
     }
 
     @Override
@@ -525,4 +529,8 @@ public final class HangarTab extends CampaignGuiTab {
         getCampaignGui().refreshRating();
     }
 
+    @Subscribe
+    public void deploymentChanged(DeploymentChangedEvent ev) {
+        refreshUnitList();
+    }
 }

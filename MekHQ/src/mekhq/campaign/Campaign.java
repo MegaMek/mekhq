@@ -111,6 +111,7 @@ import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.event.DayEndingEvent;
+import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.GMModeEvent;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.finances.Asset;
@@ -2405,6 +2406,7 @@ public class Campaign implements Serializable {
 										u.setScenarioId(s.getId());
 									}
 								}
+								MekHQ.triggerEvent(new DeploymentChangedEvent(forceIds.get(forceId), s));
 							}
         				}
         			}

@@ -30,6 +30,9 @@ import javax.swing.JTree;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.tree.TreeSelectionModel;
 
+import megamek.common.event.Subscribe;
+import mekhq.MekHQ;
+import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -56,6 +59,7 @@ public final class TOETab extends CampaignGuiTab {
 
     TOETab(CampaignGUI gui, String name) {
         super(gui, name);
+        MekHQ.registerHandler(this);
     }
 
     @Override
@@ -149,5 +153,10 @@ public final class TOETab extends CampaignGuiTab {
             scrollForceView.setViewportView(new ForceViewPanel((Force) node, getCampaign(), getIconPackage()));
             javax.swing.SwingUtilities.invokeLater(() -> scrollForceView.getVerticalScrollBar().setValue(0));
         }
+    }
+    
+    @Subscribe
+    public void deploymentChanged(DeploymentChangedEvent ev) {
+        refreshOrganization();
     }
 }
