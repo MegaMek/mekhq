@@ -535,7 +535,7 @@ public class CampaignGUI extends JPanel {
     public void removeStandardTab(GuiTabType tabType) {
     	CampaignGuiTab tab = standardTabs.get(tabType);
     	if (tab != null) {
-    		MekHQ.EVENT_BUS.unregister(tab);
+    		MekHQ.unregisterHandler(tab);
         	removeTab(tab);
     	}
     }
@@ -2688,7 +2688,7 @@ public class CampaignGUI extends JPanel {
             }
 
             MekHQ.logMessage("Finished load of campaign options file");
-            MekHQ.EVENT_BUS.trigger(new OptionsChangedEvent(getCampaign(), options));
+            MekHQ.triggerEvent(new OptionsChangedEvent(getCampaign(), options));
         }
 
         refreshCalendar();
@@ -3156,6 +3156,6 @@ public class CampaignGUI extends JPanel {
         getCampaign().getCampaignOptions().setQuirks(getCampaign().getGameOptions().getOption("stratops_quirks").booleanValue());
         getCampaign().getCampaignOptions().setAllowCanonOnly(getCampaign().getGameOptions().getOption("canon_only").booleanValue());
         getCampaign().getCampaignOptions().setTechLevel(TechConstants.getSimpleLevel(getCampaign().getGameOptions().getOption("techlevel").stringValue()));
-        MekHQ.EVENT_BUS.trigger(new OptionsChangedEvent(getCampaign()));
+        MekHQ.triggerEvent(new OptionsChangedEvent(getCampaign()));
     }
 }

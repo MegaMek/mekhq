@@ -122,7 +122,7 @@ public final class BriefingTab extends CampaignGuiTab {
     BriefingTab(CampaignGUI gui, String tabName) {
         super(gui, tabName);
         selectedMission = -1;
-        MekHQ.EVENT_BUS.register(this);
+        MekHQ.registerHandler(this);
     }
 
     @Override

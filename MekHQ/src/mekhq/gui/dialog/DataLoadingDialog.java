@@ -273,7 +273,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         		}
             } else {
                 // Make sure campaign options event handlers get their data
-                MekHQ.EVENT_BUS.trigger(new OptionsChangedEvent(campaign));
+                MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
             }
             return null;
         }

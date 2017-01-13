@@ -65,7 +65,7 @@ public final class FinancesTab extends CampaignGuiTab {
 
     FinancesTab(CampaignGUI gui, String name) {
         super(gui, name);
-        MekHQ.EVENT_BUS.register(this);
+        MekHQ.registerHandler(this);
     }
 
     /*

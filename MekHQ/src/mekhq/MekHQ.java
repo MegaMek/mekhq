@@ -59,6 +59,7 @@ import megamek.common.event.GameReportEvent;
 import megamek.common.event.GameSettingsChangeEvent;
 import megamek.common.event.GameTurnChangeEvent;
 import megamek.common.event.GameVictoryEvent;
+import megamek.common.event.MMEvent;
 import megamek.common.util.EncodeControl;
 import megamek.server.Server;
 import mekhq.campaign.Campaign;
@@ -86,7 +87,7 @@ public class MekHQ implements GameListener {
 	public static String PROPERTIES_FILE = "mmconf/mekhq.properties";
 	public static String PRESET_DIR = "./mmconf/mhqPresets/";
 
-	public static final EventBus EVENT_BUS = new EventBus();
+	private static final EventBus EVENT_BUS = new EventBus();
 	
 	//stuff related to MM games
     private Server myServer = null;
@@ -508,6 +509,21 @@ public class MekHQ implements GameListener {
 
 	public IconPackage getIconPackage() {
 	    return iconPackage;
+	}
+	
+	/*
+	 * Access methods for event bus.
+	 */
+	static public void registerHandler(Object handler) {
+	    EVENT_BUS.register(handler);
+	}
+	
+	static public boolean triggerEvent(MMEvent event) {
+	    return EVENT_BUS.trigger(event);
+	}
+	
+	static public void unregisterHandler(Object handler) {
+	    EVENT_BUS.unregister(handler);
 	}
 	
 	// TODO: This needs to be way more flexible, but it will do for now.

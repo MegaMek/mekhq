@@ -57,7 +57,7 @@ public final class MapTab extends CampaignGuiTab {
 
     MapTab(CampaignGUI gui, String tabName) {
         super(gui, tabName);
-        MekHQ.EVENT_BUS.register(this);
+        MekHQ.registerHandler(this);
     }
 
     @Override

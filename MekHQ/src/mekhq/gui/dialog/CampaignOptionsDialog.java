@@ -4022,7 +4022,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 				////TODO: it would be nice if we could just update the choices in this dialog now
 				//rather than closing it, but that is currently not possible given how
 				//this dialog is set up
-				MekHQ.EVENT_BUS.trigger(new OptionsChangedEvent(campaign));
+				MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
 				this.setVisible(false);
 			}
 		}
@@ -4369,7 +4369,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setContractMarketReportRefresh(chkUnitMarketReportRefresh.isSelected());
 
         // End Against the Bot
-        MekHQ.EVENT_BUS.trigger(new OptionsChangedEvent(campaign, options));
+        MekHQ.triggerEvent(new OptionsChangedEvent(campaign, options));
     }
 
     private void btnOkayActionPerformed() {

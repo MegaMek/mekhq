@@ -484,7 +484,7 @@ public class Campaign implements Serializable {
      */
     public void initUnitGenerator() {
         if (unitGenerator != null && unitGenerator instanceof RATManager) {
-            MekHQ.EVENT_BUS.unregister(unitGenerator);
+            MekHQ.unregisterHandler(unitGenerator);
         }
 		if (campaignOptions.useStaticRATs()) {
     		RATManager rm = new RATManager();
@@ -2066,7 +2066,7 @@ public class Campaign implements Serializable {
 
     /** @return <code>true</code> if the new day arrived */
     public boolean newDay() {
-        if(MekHQ.EVENT_BUS.trigger(new DayEndingEvent(this))) {
+        if(MekHQ.triggerEvent(new DayEndingEvent(this))) {
             return false;
         }
         calendar.add(Calendar.DAY_OF_MONTH, 1);
@@ -2619,7 +2619,7 @@ public class Campaign implements Serializable {
         }
         // check for anything else in finances
         finances.newDay(this);
-        MekHQ.EVENT_BUS.trigger(new NewDayEvent(this));
+        MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
     }
 
@@ -3043,7 +3043,7 @@ public class Campaign implements Serializable {
 
     public void setGMMode(boolean b) {
         this.gmMode = b;
-        MekHQ.EVENT_BUS.trigger(new GMModeEvent(b));
+        MekHQ.triggerEvent(new GMModeEvent(b));
     }
 
     public Faction getFaction() {
