@@ -107,7 +107,7 @@ public final class PersonnelTab extends CampaignGuiTab {
 
     PersonnelTab(CampaignGUI gui, String name) {
         super(gui, name);
-        MekHQ.EVENT_BUS.register(this);
+        MekHQ.registerHandler(this);
     }
 
     @Override
