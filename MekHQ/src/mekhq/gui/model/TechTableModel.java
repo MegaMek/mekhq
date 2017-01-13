@@ -11,7 +11,8 @@ import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.BasicInfo;
-import mekhq.gui.TechWorkGuiTab;
+import mekhq.gui.CampaignGUI;
+import mekhq.gui.ITechWorkPanel;
 
 /**
  * A table model for displaying work items
@@ -19,12 +20,14 @@ import mekhq.gui.TechWorkGuiTab;
 public class TechTableModel extends DataTableModel {
     private static final long serialVersionUID = 2738333372316332962L;
 
-    private TechWorkGuiTab tab;
+    private CampaignGUI tab;
+    private ITechWorkPanel panel;
 
-    public TechTableModel(TechWorkGuiTab tab) {
+    public TechTableModel(CampaignGUI tab, ITechWorkPanel panel) {
         columnNames = new String[] { "Techs" };
         data = new ArrayList<Person>();
         this.tab = tab;
+        this.panel = panel;
     }
 
     @Override
@@ -58,7 +61,7 @@ public class TechTableModel extends DataTableModel {
             int actualRow = table.convertRowIndexToModel(row);
             setOpaque(true);
             setPortrait(getTechAt(actualRow));
-            setText(getTechAt(actualRow).getTechDesc(getCampaign().isOvertimeAllowed(), tab.getSelectedTask()),
+            setText(getTechAt(actualRow).getTechDesc(getCampaign().isOvertimeAllowed(), panel.getSelectedTask()),
                     "black");
             if (isSelected) {
                 highlightBorder();

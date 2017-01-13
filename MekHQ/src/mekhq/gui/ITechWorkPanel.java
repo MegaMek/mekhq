@@ -23,21 +23,13 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 
 /**
- * Base class for any GUI tab that uses <code>TechTableModel</code> or
- * <code>TaskTableMode</code> to give each access to the selected tech or task.
- *
- * @author Neoancient
+ * Interface implemented by any panel that manages tech work. Needed to provide selectedTask
+ * to the TechTableModel and the selectedTech to the TaskTableModel.
  *
  */
-public abstract class TechWorkGuiTab extends CampaignGuiTab {
+public interface ITechWorkPanel {
 
-    private static final long serialVersionUID = -713421158605886893L;
-
-    TechWorkGuiTab(CampaignGUI gui, String tabName) {
-        super(gui, tabName);
-    }
-
-    public abstract Person getSelectedTech();
-
-    public abstract Part getSelectedTask();
+    public Part getSelectedTask();
+    
+    public Person getSelectedTech();
 }

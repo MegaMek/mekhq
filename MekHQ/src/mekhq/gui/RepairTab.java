@@ -78,7 +78,7 @@ import mekhq.gui.sorter.UnitTypeSorter;
  * Shows damaged units and controls for repair.
  *
  */
-public final class RepairTab extends TechWorkGuiTab {
+public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
     private static final long serialVersionUID = 6757065427956450309L;
 
@@ -230,7 +230,7 @@ public final class RepairTab extends TechWorkGuiTab {
 
         JPanel panTasks = new JPanel(new GridBagLayout());
 
-        techsModel = new TechTableModel(this);
+        techsModel = new TechTableModel(getCampaignGui(), this);
         techTable = new JTable(techsModel);
         techTable.setRowHeight(60);
         techTable.getColumnModel().getColumn(0).setCellRenderer(techsModel.getRenderer(getIconPackage()));
@@ -319,7 +319,7 @@ public final class RepairTab extends TechWorkGuiTab {
         gridBagConstraints.weightx = 1.0;
         panTasks.add(panDoTask, gridBagConstraints);
 
-        taskModel = new TaskTableModel(this);
+        taskModel = new TaskTableModel(getCampaignGui(), this);
         taskTable = new JTable(taskModel);
         taskTable.setRowHeight(70);
         taskTable.getColumnModel().getColumn(0).setCellRenderer(taskModel.getRenderer(getIconPackage()));

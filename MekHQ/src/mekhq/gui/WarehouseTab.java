@@ -86,7 +86,7 @@ import mekhq.gui.sorter.TechSorter;
  * parts.
  */
 
-public final class WarehouseTab extends TechWorkGuiTab {
+public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel {
 
     private static final long serialVersionUID = 9172184916479921364L;
 
@@ -371,7 +371,7 @@ public final class WarehouseTab extends TechWorkGuiTab {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         panelDoTaskWarehouse.add(btnShowAllTechsWarehouse, gridBagConstraints);
 
-        techsModel = new TechTableModel(this);
+        techsModel = new TechTableModel(getCampaignGui(), this);
         techTable = new JTable(techsModel);
         techTable.setRowHeight(60);
         techTable.getColumnModel().getColumn(0).setCellRenderer(techsModel.getRenderer(getIconPackage()));
