@@ -51,6 +51,7 @@ import megamek.common.TargetRoll;
 import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import mekhq.campaign.event.AssignmentChangedEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
@@ -939,9 +940,15 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
     
     private ActionScheduler servicedUnitListScheduler = new ActionScheduler(this::refreshServicedUnitList);
+    private ActionScheduler techsListScheduler = new ActionScheduler(this::refreshTechsList);
 
     @Subscribe
     public void deploymentChanged(DeploymentChangedEvent ev) {
         servicedUnitListScheduler.schedule();
+    }
+
+    @Subscribe
+    public void assigmentChanged(AssignmentChangedEvent ev) {
+        techsListScheduler.schedule();
     }
 }

@@ -99,6 +99,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.event.AssignmentChangedEvent;
 import mekhq.campaign.parts.AeroHeatSink;
 import mekhq.campaign.parts.AeroLifeSupport;
 import mekhq.campaign.parts.AeroSensor;
@@ -2956,6 +2957,7 @@ public class Unit implements MekHqXmlSerializable {
     }
 
     public void removeTech() {
+        MekHQ.triggerEvent(new AssignmentChangedEvent(campaign.getPerson(tech), this));
         tech = null;
     }
 
@@ -3009,6 +3011,7 @@ public class Unit implements MekHqXmlSerializable {
         if(log) {
             p.addLogEntry(campaign.getDate(), "Removed from " + getName());
         }
+        MekHQ.triggerEvent(new AssignmentChangedEvent(p, this));
     }
 
     public boolean isUnmanned() {

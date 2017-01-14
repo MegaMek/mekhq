@@ -103,9 +103,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 }
             }
             
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshOrganization();
             gui.refreshOverview();
         }/* else if (command.contains("QUIRK")) {
             String sel = command.split(":")[1];

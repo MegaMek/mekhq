@@ -17,6 +17,7 @@ import javax.swing.tree.TreePath;
 
 import megamek.common.GunEmplacement;
 import mekhq.MekHQ;
+import mekhq.campaign.event.AssignmentChangedEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.force.Force;
@@ -114,6 +115,7 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
             			Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
             			oldTech.clearTechUnitIDs();
             			oldTech.addLogEntry(gui.getCampaign().getDate(), "Removed from " + singleForce.getName());
+            			MekHQ.triggerEvent(new AssignmentChangedEvent(oldTech));
             		}
                 	singleForce.setTechID(tech.getId());
                 	tech.addLogEntry(gui.getCampaign().getDate(), "Assigned to " + singleForce.getFullName());
@@ -125,10 +127,12 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 			    if (null != u.getTech()) {
                 			        Person oldTech = u.getTech();
                 			        oldTech.removeTechUnitId(u.getId());
+                                    MekHQ.triggerEvent(new AssignmentChangedEvent(oldTech, u));
                 			    }
                 			    if (tech.canTech(u.getEntity())) {
                 			        u.setTech(tech.getId());
                                     tech.addTechUnitID(u.getId());
+                                    MekHQ.triggerEvent(new AssignmentChangedEvent(tech, u));
                 			    } else {
                 			        cantTech += tech.getName() + " cannot maintain " + u.getName() + "\n";
                 			    }
@@ -139,11 +143,6 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 		    JOptionPane.showMessageDialog(null, cantTech, "Warning", JOptionPane.WARNING_MESSAGE);
                 		}
                 	}
-                	gui.refreshOrganization();
-                	gui.refreshScenarioList();
-                	gui.refreshPersonnelList();
-                	gui.refreshUnitList();
-                	gui.refreshServicedUnitList();
                 }
           	}
         }
