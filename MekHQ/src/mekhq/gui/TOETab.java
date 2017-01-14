@@ -33,6 +33,7 @@ import javax.swing.tree.TreeSelectionModel;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -159,6 +160,11 @@ public final class TOETab extends CampaignGuiTab {
     
     @Subscribe
     public void deploymentChanged(DeploymentChangedEvent ev) {
+        organizationScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void organizationChanged(OrganizationChangedEvent ev) {
         organizationScheduler.schedule();
     }
 }

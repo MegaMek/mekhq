@@ -18,6 +18,7 @@ import javax.swing.tree.TreePath;
 import megamek.common.GunEmplacement;
 import mekhq.MekHQ;
 import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Mission;
@@ -99,8 +100,9 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                         "Enter the force name", "Force Name",
                         JOptionPane.PLAIN_MESSAGE, null, null, "My Lance");
                 if (null != name) {
-                    gui.getCampaign().addForce(new Force(name), singleForce);
-                    gui.refreshOrganization();
+                    Force f = new Force(name);
+                    gui.getCampaign().addForce(f, singleForce);
+                    MekHQ.triggerEvent(new OrganizationChangedEvent(f));
                 }
             }
         }
