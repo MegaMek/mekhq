@@ -33,6 +33,7 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.unit.Unit;
@@ -224,12 +225,14 @@ public class Scenario implements Serializable {
             Force f = campaign.getForce(fid);
             if(null != f) {
                 f.clearScenarioIds(campaign);
+                MekHQ.triggerEvent(new DeploymentChangedEvent(f, this));
             }    
         }
         for(UUID uid : unitIds) {
             Unit u = campaign.getUnit(uid);
             if(null != u) {
                 u.undeploy();
+                MekHQ.triggerEvent(new DeploymentChangedEvent(u, this));
             }
         }
         subForceIds = new ArrayList<Integer>();

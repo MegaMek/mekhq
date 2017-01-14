@@ -46,12 +46,6 @@ public class DeploymentChangedEvent extends MMEvent {
         this.unit = null;
     }
     
-    public DeploymentChangedEvent(Scenario scenario) {
-        this.force = null;
-        this.unit = null;
-        this.scenario = scenario;
-    }
-    
     public Unit getUnit() {
         return unit;
     }

@@ -155,8 +155,10 @@ public final class TOETab extends CampaignGuiTab {
         }
     }
     
+    private ActionScheduler organizationScheduler = new ActionScheduler(this::refreshOrganization);
+    
     @Subscribe
     public void deploymentChanged(DeploymentChangedEvent ev) {
-        refreshOrganization();
+        organizationScheduler.schedule();
     }
 }

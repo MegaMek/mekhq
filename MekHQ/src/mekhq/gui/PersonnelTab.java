@@ -787,14 +787,16 @@ public final class PersonnelTab extends CampaignGuiTab {
         javax.swing.SwingUtilities.invokeLater(() -> scrollPersonnelView.getVerticalScrollBar().setValue(0));
     }
 
+    private ActionScheduler personnelListScheduler = new ActionScheduler(this::refreshPersonnelList);
+
     @Subscribe
     public void optionsChanged(OptionsChangedEvent ev) {
         changePersonnelView();
-        refreshPersonnelList();
+        personnelListScheduler.schedule();
     }
     
     @Subscribe
     public void deploymentChanged(DeploymentChangedEvent ev) {
-        refreshPersonnelList();
+        personnelListScheduler.schedule();
     }
 }

@@ -413,8 +413,10 @@ public final class OverviewTab extends CampaignGuiTab {
         column.setEnabled(getCampaign().isGM());
     }
 
+    private ActionScheduler overviewScheduler = new ActionScheduler(this::refreshOverview);
+    
     @Subscribe
     public void deploymentChanged(DeploymentChangedEvent ev) {
-        refreshOverview();
+        overviewScheduler.schedule();
     }
 }

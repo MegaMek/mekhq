@@ -938,8 +938,10 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         acquireModel.setData(getCampaign().getAcquisitionsForUnit(uuid));
     }
     
+    private ActionScheduler servicedUnitListScheduler = new ActionScheduler(this::refreshServicedUnitList);
+
     @Subscribe
     public void deploymentChanged(DeploymentChangedEvent ev) {
-        refreshServicedUnitList();
+        servicedUnitListScheduler.schedule();
     }
 }

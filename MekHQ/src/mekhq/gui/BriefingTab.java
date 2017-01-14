@@ -475,7 +475,6 @@ public final class BriefingTab extends CampaignGuiTab {
                 return;
             }
             scenario.clearAllForcesAndPersonnel(getCampaign());
-            MekHQ.triggerEvent(new DeploymentChangedEvent(scenario));
         }
     }
 
@@ -953,6 +952,8 @@ public final class BriefingTab extends CampaignGuiTab {
         }
     }
 
+    private ActionScheduler scenarioListScheduler = new ActionScheduler(this::refreshScenarioList);
+
     @Subscribe
     public void optionsChanged(OptionsChangedEvent ev) {
         splitScenario.getBottomComponent().setVisible(getCampaignOptions().getUseAtB());
@@ -962,7 +963,7 @@ public final class BriefingTab extends CampaignGuiTab {
     @Subscribe
     public void deploymentChanged(DeploymentChangedEvent ev) {
         if (ev.getScenario() != null && ev.getScenario().getMissionId() == selectedMission) {
-            refreshScenarioList();
+            scenarioListScheduler.schedule();
         }
     }
 }

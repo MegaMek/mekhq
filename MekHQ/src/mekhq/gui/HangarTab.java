@@ -529,8 +529,10 @@ public final class HangarTab extends CampaignGuiTab {
         getCampaignGui().refreshRating();
     }
 
+    private ActionScheduler unitListScheduler = new ActionScheduler(this::refreshUnitList);
+
     @Subscribe
     public void deploymentChanged(DeploymentChangedEvent ev) {
-        refreshUnitList();
+        unitListScheduler.schedule();;
     }
 }
