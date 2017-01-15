@@ -151,12 +151,6 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 Unit u = gui.getCampaign().getUnit(UUID.fromString(target));
                 if (null != u) {
                     gui.getCampaign().addUnitToForce(u, singleForce.getId());
-                    gui.refreshOrganization();
-                    gui.refreshScenarioList();
-                    gui.refreshPersonnelList();
-                    gui.refreshUnitList();
-                    gui.refreshServicedUnitList();
-                    gui.refreshOverview();
                 }
             }
         } else if (command.contains("UNDEPLOY_FORCE")) {
@@ -192,7 +186,7 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                     singleForce.setIconCategory(pcd.getCategory());
                     singleForce.setIconFileName(pcd.getFileName());
                     singleForce.setIconMap(pcd.getIconMap());
-                    gui.refreshOrganization();
+                    MekHQ.triggerEvent(new OrganizationChangedEvent(singleForce));
                 }
             }
         } else if (command.contains("CHANGE_NAME")) {
@@ -204,7 +198,7 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 if (name != null) {
                     singleForce.setName(name);
                 }
-                gui.refreshOrganization();
+                MekHQ.triggerEvent(new OrganizationChangedEvent(singleForce));
             }
         } else if (command.contains("CHANGE_DESC")) {
             if (null != singleForce) {
@@ -214,7 +208,7 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 tad.setVisible(true);
                 if (tad.wasChanged()) {
                     singleForce.setDescription(tad.getText());
-                    gui.refreshOrganization();
+                    MekHQ.triggerEvent(new OrganizationChangedEvent(singleForce));
                 }
             }
         } else if (command.contains("REMOVE_FORCE")) {
@@ -230,16 +224,12 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                     gui.getCampaign().removeForce(force);
                 }
             }
-            gui.refreshOrganization();
-            gui.refreshPersonnelList();
-            gui.refreshScenarioList();
-            gui.refreshUnitList();
-            gui.refreshOverview();
         } else if (command.contains("REMOVE_LANCE_TECH")) {
            	if (singleForce.getTechID() != null) {
     			Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
     			oldTech.clearTechUnitIDs();
     			oldTech.addLogEntry(gui.getCampaign().getDate(), "Removed from " + singleForce.getName());
+    	        MekHQ.triggerEvent(new AssignmentChangedEvent(oldTech));
     			if (singleForce.getAllUnits() !=null) {
            			for (UUID uuid : singleForce.getAllUnits()) {
            				Unit u = gui.getCampaign().getUnit(uuid);
@@ -249,11 +239,6 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
            			}
            		}
     			singleForce.setTechID(null);
-
-    			gui.refreshOrganization();
-    			gui.refreshPersonnelList();
-                gui.refreshScenarioList();
-                gui.refreshUnitList();
     		}
         } else if (command.contains("REMOVE_UNIT")) {
             for (Unit unit : units) {
@@ -265,15 +250,12 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                            	unit.removeTech();
                            	Person forceTech = gui.getCampaign().getPerson(parentForce.getTechID());
                             forceTech.removeTechUnitId(unit.getId());
+                            MekHQ.triggerEvent(new AssignmentChangedEvent(forceTech));
                         }
                     }
+                    MekHQ.triggerEvent(new OrganizationChangedEvent(parentForce, unit));
                 }
             }
-            gui.refreshOrganization();
-            gui.refreshPersonnelList();
-            gui.refreshScenarioList();
-            gui.refreshUnitList();
-            gui.refreshOverview();
         } else if (command.contains("UNDEPLOY_UNIT")) {
             for (Unit unit : units) {
                 gui.undeployUnit(unit);

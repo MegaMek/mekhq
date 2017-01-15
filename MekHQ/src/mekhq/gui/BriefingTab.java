@@ -54,6 +54,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
@@ -965,5 +966,10 @@ public final class BriefingTab extends CampaignGuiTab {
         if (ev.getScenario() != null && ev.getScenario().getMissionId() == selectedMission) {
             scenarioListScheduler.schedule();
         }
+    }
+    
+    @Subscribe
+    public void organizationChanged(OrganizationChangedEvent ev) {
+        scenarioListScheduler.schedule();
     }
 }

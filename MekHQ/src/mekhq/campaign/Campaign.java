@@ -110,10 +110,12 @@ import mekhq.MekHqXmlUtil;
 import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.Version;
+import mekhq.campaign.event.AssignmentChangedEvent;
 import mekhq.campaign.event.DayEndingEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.GMModeEvent;
 import mekhq.campaign.event.NewDayEvent;
+import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
@@ -755,6 +757,7 @@ public class Campaign implements Serializable {
         Force prevForce = forceIds.get(u.getForceId());
         if (null != prevForce) {
             prevForce.removeUnit(u.getId());
+            MekHQ.triggerEvent(new OrganizationChangedEvent(prevForce, u));
             if (null != prevForce.getTechID()) {
                 u.removeTech();
                 Person forceTech = getPerson(prevForce.getTechID());
@@ -766,15 +769,18 @@ public class Campaign implements Serializable {
             u.setForceId(id);
             force.addUnit(u.getId());
             u.setScenarioId(force.getScenarioId());
+            MekHQ.triggerEvent(new OrganizationChangedEvent(force, u));
             if (null != force.getTechID()) {
                 if (null != u.getTech()) {
                     Person oldTech = u.getTech();
                     oldTech.removeTechUnitId(u.getId());
+                    MekHQ.triggerEvent(new AssignmentChangedEvent(oldTech));
                 }
             	Person forceTech = getPerson(force.getTechID());
             	if (forceTech.canTech(u.getEntity())) {
             	    u.setTech(force.getTechID());
             	    forceTech.addTechUnitID(u.getId());
+                    MekHQ.triggerEvent(new AssignmentChangedEvent(forceTech, u));
             	} else {
             	    String cantTech = forceTech.getName() + " cannot maintain " + u.getName() + "\n"
             	            + "You will need to assign a tech manually.";
@@ -2891,6 +2897,7 @@ public class Campaign implements Serializable {
                 }
             }
         }
+        MekHQ.triggerEvent(new OrganizationChangedEvent(force));
         // also remove this force's id from any scenarios
         if (force.isDeployed()) {
             Scenario s = getScenario(force.getScenarioId());
@@ -2910,6 +2917,7 @@ public class Campaign implements Serializable {
         }
         for (Force sub : subs) {
             removeForce(sub);
+            MekHQ.triggerEvent(new OrganizationChangedEvent(sub));
         }
     }
 
