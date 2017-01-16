@@ -114,6 +114,7 @@ import mekhq.campaign.event.AssignmentChangedEvent;
 import mekhq.campaign.event.DayEndingEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.GMModeEvent;
+import mekhq.campaign.event.NetworkChangedEvent;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.finances.Asset;
@@ -6792,6 +6793,7 @@ public class Campaign implements Serializable {
             }
         }
         refreshNetworks();
+        MekHQ.triggerEvent(new NetworkChangedEvent(networkedUnits));
     }
 
     public void removeUnitsFromNetwork(Vector<Unit> removedUnits) {
@@ -6854,6 +6856,7 @@ public class Campaign implements Serializable {
             }
         }
         refreshNetworks();
+        MekHQ.triggerEvent(new NetworkChangedEvent(addedUnits));
     }
 
     public Vector<String[]> getAvailableC3iNetworks() {
@@ -6948,15 +6951,18 @@ public class Campaign implements Serializable {
     }
 
     public void removeUnitsFromC3Master(Unit master) {
+        List<Unit> removed = new ArrayList<>();
         for (Unit unit : getUnits()) {
             if (null != unit.getEntity().getC3MasterIsUUIDAsString()
                 && unit.getEntity().getC3MasterIsUUIDAsString()
                        .equals(master.getEntity().getC3UUIDAsString())) {
                 unit.getEntity().setC3MasterIsUUIDAsString(null);
                 unit.getEntity().setC3Master(null, true);
+                removed.add(unit);
             }
         }
         refreshNetworks();
+        MekHQ.triggerEvent(new NetworkChangedEvent(removed));
     }
 
     /**

@@ -34,6 +34,7 @@ import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.event.AssignmentChangedEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.event.NetworkChangedEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
@@ -167,6 +168,11 @@ public final class TOETab extends CampaignGuiTab {
     
     @Subscribe
     public void organizationChanged(OrganizationChangedEvent ev) {
+        organizationScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void networkChanged(NetworkChangedEvent ev) {
         organizationScheduler.schedule();
     }
     

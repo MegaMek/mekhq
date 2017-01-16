@@ -19,6 +19,7 @@ import megamek.common.GunEmplacement;
 import mekhq.MekHQ;
 import mekhq.campaign.event.AssignmentChangedEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.event.NetworkChangedEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBScenario;
@@ -300,24 +301,22 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 }
             }
             gui.getCampaign().refreshNetworks();
-            gui.refreshOrganization();
+            MekHQ.triggerEvent(new NetworkChangedEvent(units));
         } else if (command.contains("REMOVE_NETWORK")) {
             gui.getCampaign().removeUnitsFromNetwork(units);
-            gui.refreshOrganization();
+            MekHQ.triggerEvent(new NetworkChangedEvent(units));
         } else if (command.contains("DISBAND_NETWORK")) {
             if (null != singleUnit) {
                 gui.getCampaign().disbandNetworkOf(singleUnit);
             }
-            gui.refreshOrganization();
         } else if (command.contains("ADD_NETWORK")) {
             gui.getCampaign().addUnitsToNetwork(units, target);
-            gui.refreshOrganization();
         } else if (command.contains("ADD_SLAVES")) {
             for (Unit u : units) {
                 u.getEntity().setC3MasterIsUUIDAsString(target);
             }
             gui.getCampaign().refreshNetworks();
-            gui.refreshOrganization();
+            MekHQ.triggerEvent(new NetworkChangedEvent(units));
         } else if (command.contains("SET_MM")) {
             for (Unit u : units) {
                 gui.getCampaign().removeUnitsFromC3Master(u);
@@ -325,7 +324,7 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                         u.getEntity().getC3UUIDAsString());
             }
             gui.getCampaign().refreshNetworks();
-            gui.refreshOrganization();
+            MekHQ.triggerEvent(new NetworkChangedEvent(units));
         } else if (command.contains("SET_IND_M")) {
             for (Unit u : units) {
                 u.getEntity().setC3MasterIsUUIDAsString(null);
@@ -333,7 +332,7 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 gui.getCampaign().removeUnitsFromC3Master(u);
             }
             gui.getCampaign().refreshNetworks();
-            gui.refreshOrganization();
+            MekHQ.triggerEvent(new NetworkChangedEvent(units));
         }
         if (command.contains("REMOVE_C3")) {
             for (Unit u : units) {
@@ -341,7 +340,7 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 u.getEntity().setC3Master(null, true);
             }
             gui.getCampaign().refreshNetworks();
-            gui.refreshOrganization();
+            MekHQ.triggerEvent(new NetworkChangedEvent(units));
         }
     }
 
