@@ -163,8 +163,7 @@ public final class MapTab extends CampaignGuiTab {
      */
     @Override
     public void refreshAll() {
-        // nothing
-
+        refreshPlanetView();
     }
 
     private void calculateJumpPath() {

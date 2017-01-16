@@ -110,7 +110,6 @@ public final class TOETab extends CampaignGuiTab {
     @Override
     public void refreshAll() {
         refreshOrganization();
-        refreshForceView();
     }
 
     public void refreshOrganization() {

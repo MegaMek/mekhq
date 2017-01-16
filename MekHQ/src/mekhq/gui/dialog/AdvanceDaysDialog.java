@@ -95,24 +95,13 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
                     logPanel.appendLog(gui.getCampaign().fetchAndClearNewReports());
                 }
             }
-            gui.refreshScenarioList();
-            gui.refreshMissions();
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshPersonnelList();
-            gui.refreshTaskList();
-            gui.refreshAcquireList();
-            gui.refreshTechsList();
-            gui.refreshPartsList();
-            gui.refreshPatientList();
-            gui.refreshDoctorsList();
+            
             gui.refreshCalendar();
             gui.refreshLocation();
-            gui.refreshOrganization();
             gui.initReport();
             gui.refreshFunds();
-            gui.refreshFinancialTransactions();
-            gui.refreshOverview();
+
+            gui.refreshAllTabs();
         }
     }
 }

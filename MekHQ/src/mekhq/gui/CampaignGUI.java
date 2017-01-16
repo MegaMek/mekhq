@@ -1412,25 +1412,13 @@ public class CampaignGUI extends JPanel {
         if(!getCampaign().newDay()) {
             return;
         }
-        refreshScenarioList();
-        refreshMissions();
-        refreshServicedUnitList();
-        refreshUnitList();
-        refreshPersonnelList();
-        refreshTaskList();
-        refreshAcquireList();
-        refreshTechsList();
-        refreshPartsList();
-        refreshPatientList();
-        refreshDoctorsList();
+        
         refreshCalendar();
         refreshLocation();
-        refreshOrganization();
         initReport();
         refreshFunds();
-        refreshFinancialTransactions();
-        refreshOverview();
-        refreshPlanetView();
+        
+        refreshAllTabs();
     }// GEN-LAST:event_btnAdvanceDayActionPerformed
 
     public boolean nagShortMaintenance() {
@@ -2852,6 +2840,12 @@ public class CampaignGUI extends JPanel {
 
         Utilities.exportTabletoCSV(table, file);
     }
+    
+    public void refreshAllTabs() {
+        for (int i = 0; i < tabMain.getTabCount(); i++) {
+            ((CampaignGuiTab)tabMain.getComponentAt(i)).refreshAll();
+        }
+    }
 
     //TODO: Trigger from event
     public void refreshServicedUnitList() {
@@ -2878,13 +2872,6 @@ public class CampaignGUI extends JPanel {
     public void refreshMissions() {
     	if (getTab(GuiTabType.BRIEFING) != null) {
     		((BriefingTab)getTab(GuiTabType.BRIEFING)).refreshMissions();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshScenarioList() {
-    	if (getTab(GuiTabType.BRIEFING) != null) {
-    		((BriefingTab)getTab(GuiTabType.BRIEFING)).refreshScenarioList();
     	}
     }
 
