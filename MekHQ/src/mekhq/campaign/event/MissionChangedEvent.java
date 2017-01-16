@@ -22,27 +22,28 @@ package mekhq.campaign.event;
 import java.util.Objects;
 
 import megamek.common.event.MMEvent;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.Mission;
 
 /**
- * Triggered when a scenario is modified, including GM removal but not resolution.
+ * Triggered when a mission or contract is modified, including resolution or deletion.
+ *
  */
-public class ScenarioChangedEvent extends MMEvent {
+public class MissionChangedEvent extends MMEvent {
 
-    private final Scenario scenario;
+    private final Mission mission;
     private final boolean removed;
     
-    public ScenarioChangedEvent(Scenario scenario, boolean removed) {
-        this.scenario = Objects.requireNonNull(scenario);
+    public MissionChangedEvent(Mission mission, boolean removed) {
+        this.mission = Objects.requireNonNull(mission);
         this.removed = removed;
     }
     
-    public ScenarioChangedEvent(Scenario scenario) {
-        this(scenario, false);
+    public MissionChangedEvent(Mission mission) {
+        this(mission, false);
     }
     
-    public Scenario getScenario() {
-        return scenario;
+    public Mission getMission() {
+        return mission;
     }
     
     public boolean wasRemoved() {

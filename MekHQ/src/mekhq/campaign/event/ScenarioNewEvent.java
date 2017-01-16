@@ -19,6 +19,8 @@
 
 package mekhq.campaign.event;
 
+import java.util.Objects;
+
 import megamek.common.event.MMEvent;
 import mekhq.campaign.mission.Scenario;
 
@@ -31,7 +33,7 @@ public class ScenarioNewEvent extends MMEvent {
     private final Scenario scenario;
     
     public ScenarioNewEvent(Scenario scenario) {
-        this.scenario = scenario;
+        this.scenario = Objects.requireNonNull(scenario);
     }
     
     public Scenario getScenario() {

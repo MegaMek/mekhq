@@ -114,6 +114,7 @@ import mekhq.campaign.event.AssignmentChangedEvent;
 import mekhq.campaign.event.DayEndingEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.GMModeEvent;
+import mekhq.campaign.event.MissionNewEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
@@ -826,6 +827,7 @@ public class Campaign implements Serializable {
         missions.add(m);
         missionIds.put(new Integer(id), m);
         lastMissionId = id;
+        MekHQ.triggerEvent(new MissionNewEvent(m));
         return id;
     }
 
@@ -836,6 +838,7 @@ public class Campaign implements Serializable {
         if (m.getId() > lastMissionId) {
             lastMissionId = m.getId();
         }
+        MekHQ.triggerEvent(new MissionNewEvent(m));
     }
 
     /**

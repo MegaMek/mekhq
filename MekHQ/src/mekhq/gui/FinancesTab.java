@@ -39,7 +39,10 @@ import javax.swing.table.TableColumn;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.event.GMModeEvent;
+import mekhq.campaign.event.MissionChangedEvent;
+import mekhq.campaign.event.MissionNewEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
+import mekhq.campaign.mission.Contract;
 import mekhq.gui.adapter.FinanceTableMouseAdapter;
 import mekhq.gui.adapter.LoanTableMouseAdapter;
 import mekhq.gui.dialog.AddFundsDialog;
@@ -265,5 +268,19 @@ public final class FinancesTab extends CampaignGuiTab {
     @Subscribe
     public void scenarioResolved(ScenarioResolvedEvent ev) {
         financialTransactionsScheduler.schedule();
+    }
+
+    @Subscribe
+    public void missionNew(MissionNewEvent ev) {
+        if (ev.getMission() instanceof Contract) {
+            financialTransactionsScheduler.schedule();
+        }
+    }
+
+    @Subscribe
+    public void missionChangedEvent(MissionChangedEvent ev) {
+        if (ev.getMission() instanceof Contract) {
+            financialTransactionsScheduler.schedule();
+        }
     }
 }

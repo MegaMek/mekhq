@@ -479,16 +479,10 @@ public class ContractMarketDialog extends JDialog {
 	    	campaign.addMission(selectedContract);
 	    	contractMarket.removeContract(selectedContract);
 	    	((DefaultTableModel)tblContracts.getModel()).removeRow(tblContracts.convertRowIndexToModel(tblContracts.getSelectedRow()));
-	    	refreshHqView();
+	    	hqView.refreshReport();
 	    	refreshContractView();
 	    }
 	}
-	
-    private void refreshHqView() {
-    	hqView.refreshMissions();
-        hqView.refreshReport();
-        hqView.refreshFinancialTransactions();
-    }
 	
 	private void btnCloseActionPerformed(ActionEvent evt) {
 	    selectedContract = null;

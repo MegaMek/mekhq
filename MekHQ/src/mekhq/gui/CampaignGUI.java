@@ -101,6 +101,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
@@ -1533,8 +1534,6 @@ public class CampaignGUI extends JPanel {
         ContractMarketDialog cmd = new ContractMarketDialog(getFrame(), this,
                 getCampaign());
         cmd.setVisible(true);
-        refreshMissions();
-        refreshFinancialTransactions();
     }
 
     public void showUnitMarket() {
@@ -1680,7 +1679,8 @@ public class CampaignGUI extends JPanel {
         if (atb != getCampaign().getCampaignOptions().getUseAtB()) {
             if (getCampaign().getCampaignOptions().getUseAtB()) {
                 getCampaign().initAtB();
-                refreshLanceAssignments();
+                //refresh lance assignment table
+                MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign().getForces()));
             }
             miContractMarket.setVisible(getCampaign().getCampaignOptions()
                     .getUseAtB());
@@ -2018,13 +2018,6 @@ public class CampaignGUI extends JPanel {
     public void refreshForceView() {
     	if (getTab(GuiTabType.TOE) != null) {
     		((TOETab)getTab(GuiTabType.TOE)).refreshForceView();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshLanceAssignments() {
-    	if (getTab(GuiTabType.BRIEFING) != null) {
-    		((BriefingTab)getTab(GuiTabType.BRIEFING)).refreshLanceAssignments();
     	}
     }
 
@@ -2858,20 +2851,6 @@ public class CampaignGUI extends JPanel {
     public void refreshPersonnelList() {
     	if (getTab(GuiTabType.PERSONNEL) != null) {
     		((PersonnelTab)getTab(GuiTabType.PERSONNEL)).refreshPersonnelList();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void changeMission() {
-    	if (getTab(GuiTabType.BRIEFING) != null) {
-    		((BriefingTab)getTab(GuiTabType.BRIEFING)).changeMission();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshMissions() {
-    	if (getTab(GuiTabType.BRIEFING) != null) {
-    		((BriefingTab)getTab(GuiTabType.BRIEFING)).refreshMissions();
     	}
     }
 

@@ -121,9 +121,6 @@ public final class TOETab extends CampaignGuiTab {
             // So, commenting it out - ralgith
             // orgTree.setSelectionPath(null);
             refreshForceView();
-            if (getCampaign().getCampaignOptions().getUseAtB()) {
-                getCampaignGui().refreshLanceAssignments();
-            }
         });
         getCampaignGui().refreshRating();
     }

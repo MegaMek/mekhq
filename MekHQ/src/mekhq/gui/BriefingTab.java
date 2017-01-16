@@ -53,6 +53,8 @@ import megameklab.com.util.UnitPrintManager;
 import mekhq.MekHQ;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.event.MissionChangedEvent;
+import mekhq.campaign.event.MissionNewEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.event.ScenarioChangedEvent;
@@ -333,8 +335,6 @@ public final class BriefingTab extends CampaignGuiTab {
             if (ncd.getContractId() != -1) {
                 selectedMission = ncd.getContractId();
             }
-            refreshMissions();
-            getCampaignGui().refreshFinancialTransactions();
         } else {
             CustomizeMissionDialog cmd = new CustomizeMissionDialog(getFrame(), true, null, getCampaign());
             cmd.setVisible(true);
@@ -342,7 +342,6 @@ public final class BriefingTab extends CampaignGuiTab {
             if (cmd.getMissionId() != -1) {
                 selectedMission = cmd.getMissionId();
             }
-            refreshMissions();
         }
     }
 
@@ -363,7 +362,7 @@ public final class BriefingTab extends CampaignGuiTab {
                     selectedMission = cmd.getMissionId();
                 }
             }
-            refreshMissions();
+            MekHQ.triggerEvent(new MissionChangedEvent(mission));
         }
 
     }
@@ -430,14 +429,13 @@ public final class BriefingTab extends CampaignGuiTab {
                     } else {
                         selectedMission = -1;
                     }
-                    refreshMissions();
                 }
             }
 
         }
+        MekHQ.triggerEvent(new MissionChangedEvent(mission));
         getCampaignGui().refreshReport();
         getCampaignGui().refreshFunds();
-        getCampaignGui().refreshFinancialTransactions();
         getCampaignGui().refreshRating();
     }
 
@@ -454,10 +452,9 @@ public final class BriefingTab extends CampaignGuiTab {
         } else {
             selectedMission = -1;
         }
-        refreshMissions();
+        MekHQ.triggerEvent(new MissionChangedEvent(mission, true));
         getCampaignGui().refreshReport();
         getCampaignGui().refreshFunds();
-        getCampaignGui().refreshFinancialTransactions();
         getCampaignGui().refreshRating();
     }
 
@@ -947,6 +944,8 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private ActionScheduler scenarioListScheduler = new ActionScheduler(this::refreshScenarioList);
+    private ActionScheduler missionsScheduler = new ActionScheduler(this::refreshMissions);
+    private ActionScheduler lanceAssignmentScheduler = new ActionScheduler(this::refreshLanceAssignments);
 
     @Subscribe
     public void optionsChanged(OptionsChangedEvent ev) {
@@ -964,6 +963,9 @@ public final class BriefingTab extends CampaignGuiTab {
     @Subscribe
     public void organizationChanged(OrganizationChangedEvent ev) {
         scenarioListScheduler.schedule();
+        if (getCampaignOptions().getUseAtB()) {
+            lanceAssignmentScheduler.schedule();
+        }
     }
     
     @Subscribe
@@ -980,5 +982,15 @@ public final class BriefingTab extends CampaignGuiTab {
     public void scenarioResolved(ScenarioChangedEvent ev) {
         scenarioListScheduler.schedule();
         changeMission();
+    }
+    
+    @Subscribe
+    public void missionNew(MissionNewEvent ev) {
+        missionsScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void missionChanged(MissionChangedEvent ev) {
+        missionsScheduler.schedule();
     }
 }
