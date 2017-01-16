@@ -46,6 +46,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.AssignmentChangedEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.rating.IUnitRating;
@@ -423,6 +424,11 @@ public final class OverviewTab extends CampaignGuiTab {
     
     @Subscribe
     public void assignmentChanged(AssignmentChangedEvent ev) {
+        overviewScheduler.schedule();
+    }
+
+    @Subscribe
+    public void scenarioResolved(ScenarioResolvedEvent ev) {
         overviewScheduler.schedule();
     }
 }

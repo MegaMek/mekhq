@@ -117,6 +117,7 @@ import mekhq.campaign.event.GMModeEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
+import mekhq.campaign.event.ScenarioChangedEvent;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
@@ -2834,6 +2835,7 @@ public class Campaign implements Serializable {
             mission.removeScenario(scenario.getId());
         }
         scenarioIds.remove(new Integer(id));
+        MekHQ.triggerEvent(new ScenarioChangedEvent(scenario, true));
     }
 
     public void removeMission(int id) {

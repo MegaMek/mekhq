@@ -55,6 +55,9 @@ import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
+import mekhq.campaign.event.ScenarioChangedEvent;
+import mekhq.campaign.event.ScenarioNewEvent;
+import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
@@ -508,18 +511,8 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        refreshScenarioList();
-        getCampaignGui().refreshOrganization();
-        getCampaignGui().refreshServicedUnitList();
-        getCampaignGui().refreshUnitList();
-        getCampaignGui().refreshPersonnelList();
-        getCampaignGui().filterPersonnel();
-        getCampaignGui().refreshDoctorsList();
-        getCampaignGui().refreshPatientList();
+        MekHQ.triggerEvent(new ScenarioResolvedEvent(scenario));
         getCampaignGui().refreshReport();
-        changeMission();
-        getCampaignGui().refreshFinancialTransactions();
-        getCampaignGui().refreshOverview();
     }
 
     protected void printRecordSheets() {
@@ -971,5 +964,21 @@ public final class BriefingTab extends CampaignGuiTab {
     @Subscribe
     public void organizationChanged(OrganizationChangedEvent ev) {
         scenarioListScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void scenarioNew(ScenarioNewEvent ev) {
+        scenarioListScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void scenarioChanged(ScenarioChangedEvent ev) {
+        scenarioListScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void scenarioResolved(ScenarioChangedEvent ev) {
+        scenarioListScheduler.schedule();
+        changeMission();
     }
 }

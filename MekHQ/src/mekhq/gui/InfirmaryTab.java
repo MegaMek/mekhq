@@ -38,7 +38,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
 import megamek.common.TargetRoll;
+import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.model.DocTableModel;
 import mekhq.gui.model.PatientTableModel;
@@ -65,6 +68,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
 
     InfirmaryTab(CampaignGUI gui, String name) {
         super(gui, name);
+        MekHQ.registerHandler(this);
     }
 
     /*
@@ -364,4 +368,12 @@ public final class InfirmaryTab extends CampaignGuiTab {
         listUnassignedPatient.setSelectedIndices(unassignedIndices);
     }
 
+    private ActionScheduler doctorListScheduler = new ActionScheduler(this::refreshDoctorsList);
+    private ActionScheduler patientListScheduler = new ActionScheduler(this::refreshPatientList);    
+    
+    @Subscribe
+    public void scenarioResolved(ScenarioResolvedEvent ev) {
+        doctorListScheduler.schedule();
+        patientListScheduler.schedule();
+    }
 }

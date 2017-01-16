@@ -2019,13 +2019,6 @@ public class CampaignGUI extends JPanel {
     	}
     }
 
-    //TODO: trigger from event
-    public void filterPersonnel() {
-    	if (getTab(GuiTabType.PERSONNEL) != null) {
-    		((PersonnelTab)getTab(GuiTabType.PERSONNEL)).filterPersonnel();
-    	}
-    }
-
     //TODO: Trigger from event
     public void refreshUnitView() {
     	if (getTab(GuiTabType.HANGAR) != null) {

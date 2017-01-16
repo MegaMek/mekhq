@@ -39,6 +39,7 @@ import javax.swing.table.TableColumn;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.event.GMModeEvent;
+import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.gui.adapter.FinanceTableMouseAdapter;
 import mekhq.gui.adapter.LoanTableMouseAdapter;
 import mekhq.gui.dialog.AddFundsDialog;
@@ -252,10 +253,17 @@ public final class FinancesTab extends CampaignGuiTab {
         areaNetWorth.setText(getCampaign().getFinancialReport());
         areaNetWorth.setCaretPosition(0);
     }
+    
+    ActionScheduler financialTransactionsScheduler = new ActionScheduler(this::refreshFinancialTransactions);
 
     @Subscribe
     public void gmMode(GMModeEvent ev) {
         btnAddFunds.setEnabled(ev.isGMMode());
         btnManageAssets.setEnabled(ev.isGMMode());
+    }
+
+    @Subscribe
+    public void scenarioResolved(ScenarioResolvedEvent ev) {
+        financialTransactionsScheduler.schedule();
     }
 }

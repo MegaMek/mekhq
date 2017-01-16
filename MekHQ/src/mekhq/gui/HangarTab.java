@@ -56,6 +56,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.AssignmentChangedEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
@@ -540,5 +541,10 @@ public final class HangarTab extends CampaignGuiTab {
     @Subscribe
     public void assignmentChanged(AssignmentChangedEvent ev) {
         unitListScheduler.schedule();;
+    }
+    
+    @Subscribe
+    public void scenarioResolved(ScenarioResolvedEvent ev) {
+        unitListScheduler.schedule();
     }
 }

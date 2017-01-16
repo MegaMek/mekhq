@@ -53,6 +53,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.AssignmentChangedEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.parts.MekLocation;
@@ -944,6 +945,11 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
     @Subscribe
     public void deploymentChanged(DeploymentChangedEvent ev) {
+        servicedUnitListScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void scenarioResolved(ScenarioResolvedEvent ev) {
         servicedUnitListScheduler.schedule();
     }
 
